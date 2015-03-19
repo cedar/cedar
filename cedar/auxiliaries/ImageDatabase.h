@@ -155,6 +155,18 @@ public:
     {
       return this->mHasScale;
     }
+    
+    //! Returns the difference in pixel between the estimated and the annotated x position, negative values indicate that the estimated position is to the left of the annotated position.
+    double evaluateXposition(double dxFromCenterEstimation) const;
+    
+    //! Returns the difference in pixel between the estimated and the annotated y position, negative values indicate that the estimated position is to the top of the annotated position.
+    double evaluateYposition(double dxFromCenterEstimation) const;
+    
+    //! Returns the difference in degree between the estimated and the annotated orientation, negative values indicate that the estimated orientation is rotated clockwise to the annotated orientation.
+    double evaluateOrientation(double orientationEstimation) const;
+    
+    //! Returns the difference between the estimated and the annotated scale, negative values indicate that the estimated scale is smaller than the annotated scale.
+    double evaluateScale(double scaleEstimation) const;
 
   private:
     double mX;
@@ -168,6 +180,145 @@ public:
     bool mHasScale;
   };
   CEDAR_GENERATE_POINTER_TYPES(ObjectPoseAnnotation);
+  
+  class MultiObjectPoseAnnotation : public Annotation
+  {
+  public:  
+    //! Returns the key of the last element of mObjectMap +1 or 0 if it is empty.
+    int getNewKey();
+    
+    //! Sets an annotation at the given id.
+    void setAnnotation(std::string& object, AnnotationPtr annotation, int id);
+    
+    //! Erases the element with the key = id of mObjectMap, does nothing if the key does not exist.
+    void removeAnnotation(int id);
+    
+    //! Returns a vector of object and annotationPtr pairs.
+    std::map<int, std::pair<std::string, ConstAnnotationPtr>> getObjectAnnotationPairMap() const;
+    
+    //! Returns the last added annotation.
+    ConstAnnotationPtr getLastAddedAnnotation() const;
+    
+    //! Returns the last added annotation cast to a specific type.
+    template <typename T>
+    boost::shared_ptr<T> getLastAddedAnnotation()
+    {
+      return boost::const_pointer_cast<T>(static_cast<const MultiObjectPoseAnnotation*>(this)->getLastAddedAnnotation<const T>());
+    }
+
+    //! Returns the last added annotation cast to a specific type.
+    template <typename T>
+    boost::shared_ptr<T> getLastAddedAnnotation() const
+    {
+      auto annotation = boost::dynamic_pointer_cast<T>(this->getLastAddedAnnotation());
+      if (annotation)
+      {
+        return annotation;
+      }
+      else
+      {
+        CEDAR_THROW
+        (
+          cedar::aux::NotFoundException,
+          "Last added annotation could not be converted to the requested type."
+        );
+      }
+    }
+    
+    //! Returns an annotation with a specific id.
+    ConstAnnotationPtr getAnnotation(int id) const;
+    
+    //! Returns an annotation with a specific id.
+    template <typename T>
+    boost::shared_ptr<T> getAnnotation(int id)
+    {
+      return boost::const_pointer_cast<T>(static_cast<const MultiObjectPoseAnnotation*>(this)->getAnnotation<const T>(id));
+    }
+
+    //! Returns an annotation with a specific id.
+    template <typename T>
+    boost::shared_ptr<T> getAnnotation(int id) const
+    {
+      auto annotation = boost::dynamic_pointer_cast<T>(this->getAnnotation(id));
+      if (annotation)
+      {
+        return annotation;
+      }
+      else
+      {
+        CEDAR_THROW
+        (
+          cedar::aux::NotFoundException,
+          "Last added annotation could not be converted to the requested type."
+        );
+      }
+    }
+
+  private:
+    std::map<int, std::pair<std::string, ConstAnnotationPtr>> mObjectMap;
+
+  };
+  CEDAR_GENERATE_POINTER_TYPES(MultiObjectPoseAnnotation);
+  
+  
+  class FrameAnnotation : public Annotation
+  {
+  public:  
+    //! Sets the annotation for a frame.
+    void setAnnotation(AnnotationPtr annotation, int frame = 0);
+    
+    //! Returns true if an annotation exists or can be interpolated for the frame and false if not.
+    bool hasAnnotation(int frame = 0) const;
+    
+    //! Returns an interpolated annotation at a specific frame or NULL if annotation cannot be interpolated.
+    ConstAnnotationPtr getAnnotation(int frame = 0) const;
+    
+    //! Returns an annotation at a specific frame.
+    template <typename T>
+    boost::shared_ptr<T> getAnnotation(int frame = 0)
+    {
+      return boost::const_pointer_cast<T>(static_cast<const FrameAnnotation*>(this)->getAnnotation<const T>(frame));
+    }
+
+    //! Returns an annotation at a specific frame.
+    template <typename T>
+    boost::shared_ptr<T> getAnnotation(int frame = 0) const
+    {
+      auto annotation = boost::dynamic_pointer_cast<T>(this->getAnnotation(frame));
+      if (annotation)
+      {
+        return annotation;
+      }
+      else
+      {
+        CEDAR_THROW
+        (
+          cedar::aux::NotFoundException,
+          "Annotation at specified frame could not be converted to the requested type."
+        );
+      }
+    }
+    
+    //! Returns the keyframe of the closest key annotation before frame, or -1 if there is no key annotation before frame.
+    int getPrevKeyframe(int frame);
+    
+    //! Returns the keyframe of the closest key annotation after frame, or -1 if there is no key annotation after frame.
+    int getNextKeyframe(int frame);
+    
+    //! Returns the map of all key frames and annotations.
+    std::map<int, AnnotationPtr> getKeyframeAnnotations();
+    
+    //! Returns true if a key frame annotation for the frame exists.
+    bool isKeyframeAnnotation(int frame);
+    
+    //! Deletes the key frame for the frame.
+    void deleteKeyFrameAnnotation(int frame);
+    
+  private:
+    std::map<int, AnnotationPtr> mFrameAnnotationMapping;
+  
+  };
+  CEDAR_GENERATE_POINTER_TYPES(FrameAnnotation);
 
   //! Represents an image in the database and the corresponding annotations.
   class Image
@@ -411,6 +562,12 @@ public:
 
   //! Returns the image corresponding to the given file path.
   ImagePtr findImageByFilename(const cedar::aux::Path& fileName) const;
+  
+  //! Returns true if the extension is a known image file extension.
+	static bool isKnownImageExtension(std::string extension);
+	
+  //! Returns true if the extension is a known video file extension.
+	static bool isKnownVideoExtension(std::string extension);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -439,6 +596,8 @@ private:
   void readCOIL100(const cedar::aux::Path& path);
 
   void readAnnotations(const cedar::aux::Path& path);
+  
+  void readMultiAnnotations(const cedar::aux::Path& path);
 
   //! Creates a new class id for the class name if it does not yet exist.
   ClassId getOrCreateClass(const std::string& className);
@@ -465,6 +624,12 @@ private:
 public:
   //! Standard name used for storing object pose annotations.
   static const std::string M_STANDARD_OBJECT_POSE_ANNOTATION_NAME;
+  static const std::string M_STANDARD_MULTI_OBJECT_POSE_ANNOTATION_NAME;
+  static const std::string M_STANDARD_OBJECT_IMAGE_ANNOTATION_NAME;
+  static const std::string M_STANDARD_FRAME_OBJECT_ANNOTATION_NAME;
+  
+  static const std::vector<std::string> M_STANDARD_KNOWN_IMAGE_FILE_EXTENSIONS;
+  static const std::vector<std::string> M_STANDARD_KNOWN_VIDEO_FILE_EXTENSIONS;
 protected:
   // none yet
 private:

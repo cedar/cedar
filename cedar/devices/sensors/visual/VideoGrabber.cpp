@@ -286,7 +286,6 @@ void cedar::dev::sensors::visual::VideoGrabber::onGrab(unsigned int channel)
 
   // read next frame from file for this channel
   (getVideoChannel(channel)->mVideoCapture) >> getImageMat(channel);
-
   // check if the grabbed frame is empty
   if (getImageMat(channel).empty())
   {
@@ -297,7 +296,22 @@ void cedar::dev::sensors::visual::VideoGrabber::onGrab(unsigned int channel)
     )
     {
       std::string msg = "Could not read from video file on channel " + cedar::aux::toString(channel);
-      CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException,msg)
+      //try to get the next working frame
+      unsigned int frame = getVideoChannel(channel)->mVideoCapture.get(CEDAR_OPENCV_CONSTANT(CAP_PROP_POS_FRAMES));
+      while (frame < (mFramesCount))
+      {
+        frame++;
+      	getVideoChannel(channel)->mVideoCapture.set(CEDAR_OPENCV_CONSTANT(CAP_PROP_POS_FRAMES), frame);
+      	
+      	(getVideoChannel(channel)->mVideoCapture) >> getImageMat(channel);
+      	
+      	if (! getImageMat(channel).empty())
+      	{
+      	  break;
+      	}
+      }
+      return;
+      //CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException,msg)
     }
 
     // otherwise end of file. Rewind if looped is on
