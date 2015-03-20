@@ -42,6 +42,7 @@
 #ifdef CEDAR_USE_QWTPLOT3D
   #include "cedar/auxiliaries/gui/QwtSurfacePlot.h"
 #endif // CEDAR_USE_QWTPLOT3D
+#include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
 
@@ -63,7 +64,14 @@ int testPlottingNullMatrix()
   std::cout << "Testing plotting of null matrix in " << cedar::aux::typeToString<PlotType>() << "." << std::endl;
   cedar::aux::MatDataPtr null_mat (new cedar::aux::MatData(cv::Mat()));
 
-  p_plot->plot(null_mat, "null mat");
+  try
+  {
+    p_plot->plot(null_mat, "null mat");
+  }
+  catch (cedar::aux::gui::InvalidPlotData& e)
+  {
+    std::cout << "Could not plot: " << std::endl << e.exceptionInfo() << std::endl;
+  }
 
   // maximum amount of events to process (the plot sends timer events)
   unsigned int i = 0;
