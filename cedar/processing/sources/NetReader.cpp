@@ -131,7 +131,6 @@ void cedar::proc::sources::NetReader::connect()
   // instantiate the reader, if not yet done
   if (!mReader)
   {
-
     try 
     {
       mReader
@@ -144,11 +143,11 @@ void cedar::proc::sources::NetReader::connect()
     {
       // the writer hasnt declared the channel yet ... abort, better luck
       // on the next compute()
-      this->setState( cedar::proc::Triggerable::STATE_EXCEPTION,
-                      "The writer hasn't initialized this port/channel, yet. "
-                      "Please check whether the name is correct and it "
-                      "is running, then "
-                      "select reset in the context menu." );
+//      this->setState( cedar::proc::Triggerable::STATE_EXCEPTION,
+//                      "The writer hasn't initialized this port/channel, yet. "
+//                      "Please check whether the name is correct and it "
+//                      "is running, then "
+//                      "select reset in the context menu." );
         // TODO: would be nice to have a state for temporarily disabling
       return;
     }
@@ -175,8 +174,16 @@ void cedar::proc::sources::NetReader::onStop()
 
 void cedar::proc::sources::NetReader::compute(const cedar::proc::Arguments&)
 {
+  // if there is no reader ...
   if (!mReader)
-    return;
+  {
+    // ... try to create one
+    this->connect();
+
+    // if we failed, stop computing
+    if (!mReader)
+      return;
+  }
 
   // read from net and set data
   try
@@ -191,19 +198,19 @@ void cedar::proc::sources::NetReader::compute(const cedar::proc::Arguments&)
       this->emitOutputPropertiesChangedSignal("output");
     }
   }
-  catch (cedar::aux::net::NetWaitingForWriterException& e)
+  catch (cedar::aux::net::NetWaitingForWriterException&)
   {
     // no writer instantiated yet? ignore
     // CHANGE NOTHING
     return;
   }
-  catch (cedar::aux::net::NetNoNewDataException& e)
+  catch (cedar::aux::net::NetNoNewDataException&)
   {
     // no new data has been sent. ignore
     // CHANGE NOTHING
     return;
   }
-  catch (cedar::aux::net::NetUnexpectedDataException& e)
+  catch (cedar::aux::net::NetUnexpectedDataException&)
   {
     // communication problem? ignore
     // CHANGE NOTHING
