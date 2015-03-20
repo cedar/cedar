@@ -74,7 +74,7 @@ const std::string AbstractNetBase::PORT_SUFFIX_IN("in"); // static
 
 
 // static variables:
-// none
+QMutex AbstractNetBase::mNetworkInitMutex;
 
 
 //-----------------------------------------------------------------------------
@@ -84,13 +84,15 @@ const std::string AbstractNetBase::PORT_SUFFIX_IN("in"); // static
 AbstractNetBase::AbstractNetBase(const std::string &myPortNameWithSuffix) 
           : mNetwork(), mFullPortName(), mIsConnected(false)
 {
-
+  QMutexLocker locker(&mNetworkInitMutex);
+  mNetwork = boost::shared_ptr<yarp::os::Network>(new yarp::os::Network());
 #ifdef DEBUG_NETT
   std::cout << "  AbstractNetBase [CONSTRUCTOR]" << endl;
 #else
   // if we are not in DEBUG-mode
-  mNetwork.setVerbosity(-1); // tells YARP to inhibit messages
+  mNetwork->setVerbosity(-1); // tells YARP to inhibit messages
 #endif
+  locker.unlock();
   mFullPortName= PORT_PREFIX + PORT_DELIMINATOR
                  + myPortNameWithSuffix;
 }
@@ -161,7 +163,7 @@ bool AbstractNetBase::connectTwo(const std::string &writerPort, const std::strin
     );
   }
 
-  if (!mNetwork.connect( writerPort.c_str(),
+  if (!mNetwork->connect( writerPort.c_str(),
                          readerPort.c_str(),
                          0, //"mcast",
                          true ) ) // 4. Argument: quiet = true

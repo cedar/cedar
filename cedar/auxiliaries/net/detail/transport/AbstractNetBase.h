@@ -59,6 +59,7 @@
 #ifndef Q_MOC_RUN
   #include <boost/utility.hpp>
 #endif
+#include <QMutex>
 #include <string>
 
 
@@ -90,7 +91,9 @@ class AbstractNetBase : virtual protected InterfaceOpenable,
   // members
   //---------------------------------------------------------------------------
 protected:
-  yarp::os::Network mNetwork; // not static and not a singleton(!)
+  static QMutex mNetworkInitMutex;
+
+  boost::shared_ptr<yarp::os::Network> mNetwork; // not static and not a singleton(!)
                               // (because that doesnt work with YARP)
                               // this is the YARP-documented way to use Network
 
