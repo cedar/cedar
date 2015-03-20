@@ -415,6 +415,11 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
 
   // unlock the step
   step_locker.unlock();
+
+  // process slots whose properties have changed during the compute call
+  this->processChangedSlots();
+
+  // finally, the step is now no longer busy
   this->mBusy.unlock();
 
   //!@todo This is code that really belongs in Trigger(able). But it can't be moved there as it is, because Trigger(able) doesn't know about loopiness etc.
@@ -441,6 +446,39 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
     {
       this->getFinishedTrigger()->trigger();
     }
+  }
+}
+
+void cedar::proc::Step::processChangedSlots()
+{
+  QWriteLocker locker(this->mSlotsChangedDuringComputeCall.getLockPtr());
+  auto& queue = this->mSlotsChangedDuringComputeCall.member();
+  while (!queue.empty())
+  {
+    auto slot = queue.front();
+    queue.pop_front();
+    this->cedar::proc::Connectable::emitOutputPropertiesChangedSignal(slot);
+  }
+  locker.unlock();
+}
+
+void cedar::proc::Step::emitOutputPropertiesChangedSignal(const std::string& slot)
+{
+  if (!this->mBusy.tryLock())
+  {
+    QWriteLocker locker(this->mSlotsChangedDuringComputeCall.getLockPtr());
+    this->mSlotsChangedDuringComputeCall.member().push_back(slot);
+    locker.unlock();
+  }
+  else
+  {
+    // this makes sure that if an exception occurs during emitOutputPropertiesChangedSignal, we do not end with a dangling lock
+    cedar::aux::CallOnScopeExit unlocker(boost::bind(&QMutex::unlock, &this->mBusy));
+
+    this->cedar::proc::Connectable::emitOutputPropertiesChangedSignal(slot);
+
+    // to be sure, unlock now
+    unlocker.callNow();
   }
 }
 

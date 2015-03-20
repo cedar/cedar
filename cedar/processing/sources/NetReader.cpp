@@ -181,8 +181,15 @@ void cedar::proc::sources::NetReader::compute(const cedar::proc::Arguments&)
   // read from net and set data
   try
   {
-    this->mOutput->setData(mReader->read());
-    //this->emitOutputPropertiesChangedSignal("output"); //dead-locks, see issue #626
+    cv::Mat old = this->mOutput->getData();
+    cv::Mat read = mReader->read();
+    bool changed = (old.type() != read.type() || old.size != read.size);
+    this->mOutput->setData(read);
+
+    if (changed)
+    {
+      this->emitOutputPropertiesChangedSignal("output");
+    }
   }
   catch (cedar::aux::net::NetWaitingForWriterException& e)
   {
