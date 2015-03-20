@@ -117,7 +117,10 @@ _mPort(new cedar::aux::StringParameter(this, "port",
 
 void cedar::proc::sources::NetReader::reset()
 {
-  mReader.reset();
+  QWriteLocker locker(mReader.getLockPtr());
+  mReader.member().reset();
+  locker.unlock();
+
   this->connect();
 }
 
@@ -129,11 +132,12 @@ void cedar::proc::sources::NetReader::emitOutputPropertiesChangedSignalOnAction(
 void cedar::proc::sources::NetReader::connect()
 {
   // instantiate the reader, if not yet done
-  if (!mReader)
+  QWriteLocker locker(mReader.getLockPtr());
+  if (!mReader.member())
   {
     try 
     {
-      mReader
+      mReader.member()
         = boost::shared_ptr< cedar::aux::net::Reader< cedar::aux::MatData::DataType > >
           (
             new cedar::aux::net::Reader< cedar::aux::MatData::DataType >(this->getPort())
@@ -157,6 +161,7 @@ void cedar::proc::sources::NetReader::connect()
       throw e; // lets try this ...
     }
   }
+  locker.unlock();
 }
 
 void cedar::proc::sources::NetReader::onStart()
@@ -169,19 +174,25 @@ void cedar::proc::sources::NetReader::onStart()
 void cedar::proc::sources::NetReader::onStop()
 {
   this->_mPort->setConstant(false);
-  mReader.reset();
+
+  QWriteLocker locker(mReader.getLockPtr());
+  mReader.member().reset();
+  locker.unlock();
 }
 
 void cedar::proc::sources::NetReader::compute(const cedar::proc::Arguments&)
 {
+  QReadLocker locker(mReader.getLockPtr());
   // if there is no reader ...
-  if (!mReader)
+  if (!mReader.member())
   {
+    locker.unlock();
     // ... try to create one
     this->connect();
 
+    locker.relock();
     // if we failed, stop computing
-    if (!mReader)
+    if (!mReader.member())
       return;
   }
 
@@ -189,7 +200,7 @@ void cedar::proc::sources::NetReader::compute(const cedar::proc::Arguments&)
   try
   {
     cv::Mat old = this->mOutput->getData();
-    cv::Mat read = mReader->read();
+    cv::Mat read = mReader.member()->read();
     bool changed = (old.type() != read.type() || old.size != read.size);
     this->mOutput->setData(read);
 
