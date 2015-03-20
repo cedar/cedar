@@ -223,7 +223,7 @@ public:
    *        Examples of instances in which this function should be called are matrices that change size, type or
    *        dimensionality.
    */
-  void emitOutputPropertiesChangedSignal(const std::string& slot);
+  virtual void emitOutputPropertiesChangedSignal(const std::string& slot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
