@@ -134,7 +134,7 @@ bool cedar::aux::gui::HistoryPlot0D::canAppend(cedar::aux::ConstDataPtr data) co
   }
 
   QReadLocker locker(&mat_data->getLock());
-  if (mat_data->getDimensionality() != 0)
+  if (mat_data->isEmpty() || mat_data->getDimensionality() != 0)
   {
     return false;
   }
