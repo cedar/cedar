@@ -262,7 +262,7 @@ unsigned int cedar::aux::kernel::Gauss::estimateWidth(unsigned int dim) const
 
 void cedar::aux::kernel::Gauss::updateDimensionality()
 {
-  mpReadWriteLockOutput->lockForWrite();
+  QWriteLocker locker(mpReadWriteLockOutput);
   unsigned int new_dimensionality = this->getDimensionality();
   unsigned int new_size = new_dimensionality;
   if (new_dimensionality == 0)
@@ -275,7 +275,7 @@ void cedar::aux::kernel::Gauss::updateDimensionality()
   _mShifts->setDefaultSize(new_size);
   this->mCenters.resize(new_size);
   this->mSizes.resize(new_size);
-  mpReadWriteLockOutput->unlock();
+  locker.unlock();
 
   this->updateKernel();
 }

@@ -219,9 +219,10 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
 
 void cedar::proc::steps::Convolution::inputDimensionalityChanged()
 {
+  unsigned int new_dimensionality = this->getDimensionality();
   for (size_t i = 0; i < this->_mKernels->size(); ++i)
   {
-    this->_mKernels->at(i)->setDimensionality(this->getDimensionality());
+    this->_mKernels->at(i)->setDimensionality(new_dimensionality);
   }
 }
 
