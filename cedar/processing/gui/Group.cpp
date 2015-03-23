@@ -1183,6 +1183,9 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
   cedar::aux::ConfigurationNode root_copy = root;
   // try to apply the UI configuration to any elements that may have already been added to the group.
   this->tryRestoreUIConfigurationsOfElements(root_copy);
+
+  // after loading, make sure the collapsed state is properly applied
+  this->updateCollapsedness();
 }
 
 void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node)
@@ -2301,29 +2304,26 @@ void cedar::proc::gui::Group::setCollapsed(bool collapsed)
 void cedar::proc::gui::Group::updateCollapsedness()
 {
   bool collapse = this->isCollapsed();
+
+  // hide all children of this group
   auto children = this->childItems();
-  for (int i = 0; i < children.size(); ++i)
+  for (auto child : children)
   {
-    auto child = children.at(i);
-    //!@todo This should cast to cedar::proc::gui::Element, but that class doesn't exist (yet)
-    if (auto element = dynamic_cast<cedar::proc::gui::Connectable*>(child))
-    {
-      element->setVisible(!collapse);
-    }
-    else if (auto element = dynamic_cast<cedar::proc::gui::TriggerItem*>(child))
+    if (auto element = dynamic_cast<cedar::proc::gui::Element*>(child))
     {
       element->setVisible(!collapse);
     }
   }
 
-  for (size_t i = 0; i < this->mConnectorSinks.size(); ++i)
+  // also, hide all connectors
+  for (auto connector : this->mConnectorSinks)
   {
-    this->mConnectorSinks.at(i)->setVisible(!collapse);
+    connector->setVisible(!collapse);
   }
 
-  for (size_t i = 0; i < this->mConnectorSources.size(); ++i)
+  for (auto connector : this->mConnectorSources)
   {
-    this->mConnectorSources.at(i)->setVisible(!collapse);
+    connector->setVisible(!collapse);
   }
 
   // update the text of the group
@@ -2352,7 +2352,8 @@ void cedar::proc::gui::Group::changeStepName(const std::string& from, const std:
     {
       group#1_name :
       [
-        { step: name,
+        {
+          step: name,
           position, plot info, etc. 
         },
         {
