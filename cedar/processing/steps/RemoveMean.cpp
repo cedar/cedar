@@ -106,9 +106,9 @@ void cedar::proc::steps::RemoveMean::inputConnectionChanged(const std::string& i
     if (this->mMatrix)
     {
       //!@todo Rather than this, there should be a callOnTrigger function which lets users disable triggering of subsequent steps.
-      this->lock();
+      cedar::proc::Step::ReadLocker locker(this);
       this->compute(cedar::proc::Arguments());
-      this->unlock();
+      locker.unlock();
 
       this->emitOutputPropertiesChangedSignal("mean-free matrix");
     }

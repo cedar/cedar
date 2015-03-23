@@ -110,7 +110,7 @@ public:
   /*!@brief get access to the write lock when in an asynchronous mode
    * @return pointer to the QReadWriteLock
    */
-  QReadWriteLock* getReadWriteLock();
+  QReadWriteLock* getReadWriteLock() const;
 
   /*!@brief get the dimensionality of the kernel matrix
    * @return dimensionality

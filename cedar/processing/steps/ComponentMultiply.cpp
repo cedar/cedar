@@ -135,9 +135,9 @@ void cedar::proc::steps::ComponentMultiply::inputConnectionChanged(const std::st
   if (!in_mat.empty())
   {
     mOutput->getData() = in_mat.clone();
-    this->lock(cedar::aux::LOCK_TYPE_READ);
+    cedar::proc::Step::ReadLocker locker(this);
     this->compute(cedar::proc::Arguments());
-    this->unlock(cedar::aux::LOCK_TYPE_READ);
+    locker.unlock();
   }
   this->emitOutputPropertiesChangedSignal("product");
   this->onTrigger();

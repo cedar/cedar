@@ -434,9 +434,9 @@ void cedar::proc::steps::ColorConversion::inputConnectionChanged(const std::stri
     this->updateTargetImageColorSpace();
     this->updateCvConvertConstant();
 
-    this->lock(cedar::aux::LOCK_TYPE_READ);
+    cedar::proc::Step::ReadLocker locker(this);
     this->compute(cedar::proc::Arguments());
-    this->unlock();
+    locker.unlock();
     this->emitOutputPropertiesChangedSignal("converted image");
     this->onTrigger();
   }
