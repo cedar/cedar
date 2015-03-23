@@ -282,7 +282,6 @@ void cedar::dev::sensors::visual::VideoGrabber::onGrab(unsigned int channel)
   // read next frame from file for this channel
   cv::Mat frame;
   getVideoChannel(channel)->mVideoCapture >> frame;
-
   // check if the grabbed frame is empty
   if (frame.empty())
   {

@@ -42,6 +42,7 @@
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/View.h"
+#include "cedar/auxiliaries/Configurable.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
@@ -57,6 +58,7 @@ mpView(new cedar::proc::gui::View())
 {
   auto layout = new QVBoxLayout();
   this->setLayout(layout);
+  layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(this->mpView);
 
   this->mpView->resetViewport();
@@ -64,6 +66,30 @@ mpView(new cedar::proc::gui::View())
   this->mGroup = cedar::proc::gui::GroupPtr(new cedar::proc::gui::Group(nullptr, this->mpView->getScene()));
 
   this->mpView->getScene()->setGroup(this->mGroup);
+
+  this->setAcceptDrops(true);
+}
+
+cedar::proc::gui::GroupWidget::GroupWidget(cedar::proc::gui::Group* pGroup, QWidget* pParent)
+:
+QWidget(pParent),
+mpView(new cedar::proc::gui::View())
+{
+  auto layout = new QVBoxLayout();
+  this->setLayout(layout);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->addWidget(this->mpView);
+
+  this->mpView->resetViewport();
+
+  this->mGroup = cedar::proc::gui::GroupPtr(new cedar::proc::gui::Group(nullptr, this->mpView->getScene()));
+  this->mpView->getScene()->setGroup(this->mGroup);
+  this->mGroup->setGroup(pGroup->getGroup());
+  this->mGroup->addElementsToGroup();
+  cedar::aux::ConfigurationNode node;
+  pGroup->writeConfiguration(node);
+  this->mGroup->tryRestoreUIConfigurationsOfElements(node);
+  this->mGroup->restoreConnections();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -73,4 +99,14 @@ mpView(new cedar::proc::gui::View())
 cedar::proc::gui::GroupPtr cedar::proc::gui::GroupWidget::getGroup() const
 {
   return this->mGroup;
+}
+
+void cedar::proc::gui::GroupWidget::setConfigurableWidget(cedar::aux::gui::Configurable* pConfigurableWidget)
+{
+  this->mpView->getScene()->setConfigurableWidget(pConfigurableWidget);
+}
+
+void cedar::proc::gui::GroupWidget::setRecorderWidget(cedar::proc::gui::RecorderWidget* pRecorderWidget)
+{
+  this->mpView->getScene()->setRecorderWidget(pRecorderWidget);
 }

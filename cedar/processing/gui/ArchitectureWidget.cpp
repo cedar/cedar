@@ -97,7 +97,7 @@ QWidget* cedar::proc::gui::ArchitectureWidget::readLabel(const cedar::aux::Confi
   return label;
 }
 
-QWidget* cedar::proc::gui::ArchitectureWidget::readPlot(const cedar::aux::ConfigurationNode& entry)
+QWidget* cedar::proc::gui::ArchitectureWidget::readPlot(const cedar::aux::ConfigurationNode& entry, int row, int column)
 {
   auto data_i = entry.find("data");
   if (data_i == entry.not_found())
@@ -171,7 +171,7 @@ QWidget* cedar::proc::gui::ArchitectureWidget::readPlot(const cedar::aux::Config
     {
       cedar::aux::LogSingleton::getInstance()->error
       (
-        "Cannot add more data: not a multi plot.",
+        "Cannot add more data to cell " + cedar::aux::toString(row) + ", " + cedar::aux::toString(column) + ": not a multi plot.",
         CEDAR_CURRENT_FUNCTION_NAME
       );
       return plot;
@@ -254,6 +254,31 @@ void cedar::proc::gui::ArchitectureWidget::readConfiguration(const cedar::aux::C
     const auto& entry = entry_pair.second;
     this->addEntry(entry);
   }
+
+  auto config_iter = node.find("configuration");
+  if (config_iter != node.not_found())
+  {
+    this->readConfig(config_iter->second);
+  }
+}
+
+void cedar::proc::gui::ArchitectureWidget::readConfig(const cedar::aux::ConfigurationNode& config)
+{
+  auto default_size_iter = config.find("default size");
+  if (default_size_iter != config.not_found())
+  {
+    const auto& default_size_node = default_size_iter->second;
+    auto width_iter = default_size_node.find("width");
+    auto height_iter = default_size_node.find("height");
+
+
+    if (width_iter != default_size_node.not_found() && height_iter != default_size_node.not_found())
+    {
+      int width = width_iter->second.get_value<int>();
+      int height = height_iter->second.get_value<int>();
+      this->resize(width, height);
+    }
+  }
 }
 
 void cedar::proc::gui::ArchitectureWidget::addEntry
@@ -281,7 +306,7 @@ void cedar::proc::gui::ArchitectureWidget::addEntry
   QWidget* widget = nullptr;
   if (type == "plot")
   {
-    widget = this->readPlot(entry);
+    widget = this->readPlot(entry, row, column);
   }
   else if (type == "label")
   {

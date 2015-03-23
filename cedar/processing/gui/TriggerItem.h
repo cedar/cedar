@@ -44,7 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/gui/Connection.h"
-#include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/gui/Element.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
@@ -57,7 +57,7 @@
 
 /*!@brief Representation of a cedar::proc::Trigger in a cedar::proc::gui::Scene.
  */
-class cedar::proc::gui::TriggerItem : public QObject, public cedar::proc::gui::GraphicsBase
+class cedar::proc::gui::TriggerItem : public QObject, public cedar::proc::gui::Element
 {
   Q_OBJECT
 

@@ -81,7 +81,7 @@ inline cv::Mat MatrixTypeWrapper<cv::Mat>::lateInitDataFromHeader()
 {
   return cv::Mat( mHeader.mRows,
                     mHeader.mColumns, 
-                    mHeader.mCVMatType );
+                    mHeader.mCVMatType, 0.0);
 }
 
 template <>

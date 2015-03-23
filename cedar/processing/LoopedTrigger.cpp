@@ -97,9 +97,10 @@ namespace
 cedar::proc::LoopedTrigger::LoopedTrigger(cedar::unit::Time stepSize, const std::string& name)
 :
 cedar::aux::LoopedThread(stepSize),
-cedar::proc::Trigger(name, true),
+cedar::proc::Trigger(name),
 mStarted(false),
-mStatistics(new TimeAverage(50))
+mStatistics(new TimeAverage(50)),
+_mStartWithAll(new cedar::aux::BoolParameter(this, "start with all", true))
 {
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
@@ -117,6 +118,27 @@ cedar::proc::LoopedTrigger::~LoopedTrigger()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::LoopedTrigger::canTrigger(cedar::proc::TriggerablePtr triggerable, std::string& reason) const
+{
+  // looped triggers can only be connected to triggerables that are themselves looped
+  if (!triggerable->isLooped())
+  {
+    reason = "Cannot connect looped trigger to the target connectable because the target is not looped.";
+    return false;
+  }
+  else
+  {
+    return true;
+  }
+}
+
+bool cedar::proc::LoopedTrigger::startWithAll() const
+{
+  cedar::aux::Parameter::ReadLocker locker(this->_mStartWithAll);
+  bool copy = this->_mStartWithAll->getValue();
+  return copy;
+}
+
 /*! This method takes care of changing the step's name in the registry as well.
  *
  * @todo Solve this with boost signals/slots; that way, this can be moved to cedar::proc::Element
@@ -130,24 +152,6 @@ void cedar::proc::LoopedTrigger::onNameChanged()
 
     // emit a signal to notify anyone interested in this
     emit nameChanged();
-  }
-}
-
-void cedar::proc::LoopedTrigger::removeListener(cedar::proc::TriggerablePtr triggerable)
-{
-  this->cedar::proc::Trigger::removeListener(triggerable);
-  if (this->isRunningNolocking())
-  {
-    triggerable->callOnStop();
-  }
-}
-
-void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr triggerable)
-{
-  this->cedar::proc::Trigger::addListener(triggerable);
-  if (this->isRunningNolocking())
-  {
-    triggerable->callOnStart();
   }
 }
 
@@ -217,4 +221,30 @@ void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
 cedar::proc::LoopedTrigger::ConstTimeAveragePtr cedar::proc::LoopedTrigger::getStatistics() const
 {
   return this->mStatistics;
+}
+
+void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr triggerable)
+{
+  cedar::proc::Trigger::addListener(triggerable);
+  triggerable->setLoopedTrigger(boost::static_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this()));
+  if (this->isRunningNolocking())
+  {
+    triggerable->callOnStart();
+  }
+}
+
+void cedar::proc::LoopedTrigger::removeListener(cedar::proc::Triggerable* triggerable)
+{
+  cedar::proc::Trigger::removeListener(triggerable);
+  if (this->isRunningNolocking())
+  {
+    triggerable->callOnStop();
+  }
+  // reset the looped trigger
+  triggerable->resetLoopedTrigger();
+}
+
+bool cedar::proc::LoopedTrigger::canConnectTo(cedar::proc::ConstTriggerablePtr target) const
+{
+  return target->isLooped() && !target->getLoopedTrigger();
 }

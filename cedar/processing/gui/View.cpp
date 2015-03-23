@@ -80,7 +80,6 @@ mpRecorderWidget(nullptr)
   this->setZoomLevel(100);
 
   setResizeAnchor(AnchorViewCenter);
-  setInteractive(true);
   setTransformationAnchor(AnchorUnderMouse);
   setDragMode(QGraphicsView::RubberBandDrag);
 }
@@ -148,7 +147,7 @@ void cedar::proc::gui::View::createZoomWidget()
   this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   this->mpZoomLevelSlider = new QSlider();
-  this->mpZoomLevelSlider->setMinimum(25);
+  this->mpZoomLevelSlider->setMinimum(5);
   this->mpZoomLevelSlider->setMaximum(175);
   this->mpZoomLevelSlider->setValue(100);
   this->mpZoomLevelSlider->setOrientation(Qt::Horizontal);
@@ -174,6 +173,12 @@ void cedar::proc::gui::View::createZoomWidget()
   p_reset_zoom->setSizePolicy(size_policy);
   p_reset_zoom->setMaximumSize(QSize(50, 20));
 
+  // reset button
+  auto p_full_zoom = new QPushButton("Full");
+  p_full_zoom->setSizePolicy(size_policy);
+  p_full_zoom->setMaximumSize(QSize(50, 20));
+  p_full_zoom->setToolTip("Shows the full architecture by adapting the zoom level accordingly.");
+
   // create widget that contains all of the above
   auto p_widget = new QWidget();
   auto p_layout = new QHBoxLayout();
@@ -184,6 +189,7 @@ void cedar::proc::gui::View::createZoomWidget()
   p_layout->addWidget(p_zoom_plus);
   p_layout->addWidget(this->mpZoomLevelDisplay);
   p_layout->addWidget(p_reset_zoom);
+  p_layout->addWidget(p_full_zoom);
 
   p_layout->setContentsMargins(0, 0, 0, 0);
 
@@ -209,6 +215,8 @@ void cedar::proc::gui::View::createZoomWidget()
   QObject::connect(p_zoom_plus, SIGNAL(clicked()), this, SLOT(increaseZoomLevel()));
 
   QObject::connect(p_zoom_minus, SIGNAL(clicked()), this, SLOT(decreaseZoomLevel()));
+
+  QObject::connect(p_full_zoom, SIGNAL(clicked()), this, SLOT(fitZoomToArchitecture()));
 }
 
 void cedar::proc::gui::View::increaseZoomLevel()
@@ -243,6 +251,14 @@ void cedar::proc::gui::View::zoomLevelSet(double zoomLevel)
       this->setZoomLevel(this->mpZoomLevelSlider->value());
     }
   }
+}
+
+void cedar::proc::gui::View::fitZoomToArchitecture()
+{
+  auto old_factor = this->transform().m22();
+  this->fitInView(this->getScene()->itemsBoundingRect(), Qt::KeepAspectRatioByExpanding);
+  mCurrentZoomLevel = mCurrentZoomLevel * this->transform().m22() / old_factor;
+  this->mpZoomLevelSlider->setValue(mCurrentZoomLevel * 100);
 }
 
 void cedar::proc::gui::View::wheelEvent(QWheelEvent *pEvent)
