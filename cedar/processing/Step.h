@@ -288,6 +288,8 @@ public:
   //! Updates the step's trigger chains
   void updateTriggerChains(std::set<cedar::proc::Trigger*>& visited);
 
+  void emitOutputPropertiesChangedSignal(const std::string& slot);
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
@@ -446,6 +448,9 @@ private:
 
   std::map<std::string, cedar::unit::Time> unregisterRecordedData() const;
 
+  //! Processes all slots that have been changed during the compute call.
+  void processChangedSlots();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -484,6 +489,9 @@ private:
 
   //! Used to test if the trigger chain attached to this step is finished or not.
   QFuture<void> mFinishedChainResult;
+
+  //! A queue of slots that have changed their properties during the compute call.
+  cedar::aux::LockableMember<std::deque<std::string>> mSlotsChangedDuringComputeCall;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

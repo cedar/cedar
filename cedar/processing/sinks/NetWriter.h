@@ -59,6 +59,13 @@ class cedar::proc::sinks::NetWriter : public cedar::proc::Step
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+  typedef cedar::aux::net::Writer<cedar::aux::MatData::DataType> Writer;
+  CEDAR_GENERATE_POINTER_TYPES(Writer);
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -121,8 +128,8 @@ protected:
   cedar::aux::ConstMatDataPtr mInput;
 
 private:
-  //!@brief the writer object (RAII)
-  boost::shared_ptr<cedar::aux::net::Writer<cedar::aux::MatData::DataType> > mWriter;
+  //!@brief the writer object
+  cedar::aux::LockableMember<WriterPtr> mWriter;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

@@ -59,6 +59,13 @@ class cedar::proc::sources::NetReader : public cedar::proc::Step
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+  typedef cedar::aux::net::Reader<cedar::aux::MatData::DataType> Reader;
+  CEDAR_GENERATE_POINTER_TYPES(Reader);
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -115,8 +122,8 @@ protected:
   //!@brief The data containing the output.
   cedar::aux::MatDataPtr mOutput;
 private:
-  //!@brief the reader object (RAII)
-  boost::shared_ptr< cedar::aux::net::Reader< cedar::aux::MatData::DataType > > mReader;
+  //!@brief the reader object
+  cedar::aux::LockableMember<ReaderPtr> mReader;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
