@@ -140,6 +140,8 @@ void cedar::proc::sinks::NetWriter::reset()
 {
   QWriteLocker locker(this->mWriter.getLockPtr());
   mWriter.member().reset();
+  locker.unlock();
+
   this->connect();
 }
 
