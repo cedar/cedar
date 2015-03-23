@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/opencv_helper.h"
 
 // SYSTEM INCLUDES
 #include <boost/filesystem.hpp>
@@ -380,7 +381,7 @@ void cedar::aux::ImageDatabase::Image::readImage() const
   if (this->mImage.empty())
   {
     cv::VideoCapture capture(this->mFileName.absolute().toString(false));
-    capture.set(CV_CAP_PROP_POS_FRAMES, 0);
+    capture.set(CEDAR_OPENCV_CONSTANT(CAP_PROP_POS_FRAMES), 0);
     capture.read(this->mImage);
   }
 }
