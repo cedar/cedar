@@ -482,7 +482,7 @@ fftw_plan cedar::aux::conv::FFTW::getForwardPlan(unsigned int dimensionality, st
 #ifdef CEDAR_USE_FFTW_THREADED
     cedar::aux::conv::FFTW::initThreads();
 #endif
-    cedar::aux::conv::FFTW::mPlanLock.lockForWrite();
+    QWriteLocker plan_locker(&cedar::aux::conv::FFTW::mPlanLock);
     cedar::aux::conv::FFTW::loadWisdom(unique_identifier);
     std::vector<int> sizes_signed(sizes.size());
     for (unsigned int i = 0; i < sizes_signed.size(); ++i)
@@ -517,12 +517,12 @@ fftw_plan cedar::aux::conv::FFTW::getForwardPlan(unsigned int dimensionality, st
     {
       cedar::aux::conv::FFTW::mForwardPlans[unique_identifier] = matrix_plan_forward;
       cedar::aux::conv::FFTW::saveWisdom(unique_identifier);
-      cedar::aux::conv::FFTW::mPlanLock.unlock();
+      plan_locker.unlock();
       return matrix_plan_forward;
     }
     else
     {
-      cedar::aux::conv::FFTW::mPlanLock.unlock();
+      plan_locker.unlock();
       CEDAR_THROW
       (
         cedar::aux::NotFoundException,
@@ -551,7 +551,7 @@ fftw_plan cedar::aux::conv::FFTW::getBackwardPlan(unsigned int dimensionality, s
 #ifdef CEDAR_USE_FFTW_THREADED
     cedar::aux::conv::FFTW::initThreads();
 #endif
-    cedar::aux::conv::FFTW::mPlanLock.lockForWrite();
+    QWriteLocker plan_locker(&cedar::aux::conv::FFTW::mPlanLock);
     cedar::aux::conv::FFTW::loadWisdom(unique_identifier);
     std::vector<int> sizes_signed(sizes.size());
     for (unsigned int i = 0; i < sizes_signed.size(); ++i)
@@ -586,7 +586,7 @@ fftw_plan cedar::aux::conv::FFTW::getBackwardPlan(unsigned int dimensionality, s
     {
       cedar::aux::conv::FFTW::mBackwardPlans[unique_identifier] = matrix_plan_backward;
       cedar::aux::conv::FFTW::saveWisdom(unique_identifier);
-      cedar::aux::conv::FFTW::mPlanLock.unlock();
+      plan_locker.unlock();
       return matrix_plan_backward;
     }
     else
