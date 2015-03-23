@@ -158,7 +158,7 @@ void cedar::aux::conv::OpenCV::translateAnchor
   anchor = cv::Point(-1, -1);
   const std::vector<int> anchor_vector = kernel->getAnchor();
 
-  kernel->lockForRead();
+  QReadLocker locker(kernel->getReadWriteLock());
   if (anchor_vector.size() >= 1 && anchor_vector.at(0) > 0)
   {
     int size = static_cast<int>(kernel->getSize(0));
@@ -169,7 +169,7 @@ void cedar::aux::conv::OpenCV::translateAnchor
     int size = static_cast<int>(kernel->getSize(1));
     anchor.y = cedar::aux::math::saturate(size/2 + anchor_vector.at(1), 0, size - 1);
   }
-  kernel->unlock();
+  locker.unlock();
 }
 
 cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
@@ -715,7 +715,7 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
   }
   else
   {
-    kernel->lockForRead();
+    QReadLocker locker(kernel->getReadWriteLock());
     cv::Mat result;
     const cv::Mat& kernel_mat = kernel->getKernel();
     result = this->cvConvolve(matrix, kernel_mat, cvBorderType, anchor);
@@ -734,7 +734,7 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
 {
   cv::Mat convolved;
 
-  kernel->lockForRead();
+  QReadLocker locker(kernel->getReadWriteLock());
 
   switch (kernel->getDimensionality())
   {
@@ -813,11 +813,10 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
     }
 
     default:
-      kernel->unlock();
       CEDAR_THROW(cedar::aux::UnhandledValueException, "Cannot convolve matrices of the given dimensionality.");
   }
 
-  kernel->unlock();
+  locker.unlock();
 
   return convolved;
 }
@@ -877,10 +876,10 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
               cv::Point anchor = cv::Point(-1, -1);
               this->translateAnchor(anchor, kernel);
 
-              kernel->lockForRead();
+              QReadLocker locker(kernel->getReadWriteLock());
               cv::Mat kernel_mat = kernel->getKernel();
               convolved = this->cvConvolve(matrix, kernel_mat, cv_border_type, anchor);
-              kernel->unlock();
+              locker.unlock();
               break;
             }
 
@@ -940,10 +939,10 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
                 cv::Point anchor = cv::Point(-1, -1);
                 this->translateAnchor(anchor, kernel);
 
-                kernel->lockForRead();
+                QReadLocker locker(kernel->getReadWriteLock());
                 cv::Mat kernel_mat = kernel->getKernel();
                 convolved = this->cvConvolve(matrix_full, kernel_mat, cv_border_type, anchor);
-                kernel->unlock();
+                locker.unlock();
                 break;
               }
 
@@ -1015,10 +1014,10 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
                   cv::Point anchor = cv::Point(-1, -1);
                   this->translateAnchor(anchor, kernel);
 
-                  kernel->lockForRead();
+                  QReadLocker locker(kernel->getReadWriteLock());
                   cv::Mat kernel_mat = kernel->getKernel();
                   convolved = this->cvConvolve(matrix, kernel_mat, cv_border_type, anchor);
-                  kernel->unlock();
+                  locker.unlock();
                   break;
                 }
 
