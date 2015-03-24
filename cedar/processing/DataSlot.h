@@ -42,6 +42,7 @@
 #include "cedar/processing/DataPath.h"
 #include "cedar/auxiliaries/LockType.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
+#include "cedar/auxiliaries/LockableMember.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Path.fwd.h"
@@ -294,7 +295,7 @@ private:
   bool mMandatory;
 
   //!@brief the validity of this slot
-  VALIDITY mValidity;
+  cedar::aux::LockableMember<VALIDITY> mValidity;
 
   //! Name of the slot, used to uniquely identify it among other slots of the same type in a step.
   std::string mName;

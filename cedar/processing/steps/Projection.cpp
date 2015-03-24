@@ -122,10 +122,10 @@ _mCompressionType(new cedar::aux::EnumParameter(
   this->outputDimensionalityChanged();
 
   // connect signals and slots
-  QObject::connect(_mDimensionMappings.get(), SIGNAL(valueChanged()), this, SLOT(reconfigure()));
-  QObject::connect(_mCompressionType.get(), SIGNAL(valueChanged()), this, SLOT(reconfigure()));
-  QObject::connect(_mOutputDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(outputDimensionalityChanged()));
-  QObject::connect(_mOutputDimensionSizes.get(), SIGNAL(valueChanged()), this, SLOT(outputDimensionSizesChanged()));
+  QObject::connect(_mDimensionMappings.get(), SIGNAL(valueChanged()), this, SLOT(reconfigure()), Qt::DirectConnection);
+  QObject::connect(_mCompressionType.get(), SIGNAL(valueChanged()), this, SLOT(reconfigure()), Qt::DirectConnection);
+  QObject::connect(_mOutputDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(outputDimensionalityChanged()), Qt::DirectConnection);
+  QObject::connect(_mOutputDimensionSizes.get(), SIGNAL(valueChanged()), this, SLOT(outputDimensionSizesChanged()), Qt::DirectConnection);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
