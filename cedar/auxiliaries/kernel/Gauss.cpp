@@ -123,11 +123,13 @@ cedar::aux::kernel::Gauss::~Gauss()
 void cedar::aux::kernel::Gauss::onInit()
 {
   updateDimensionality();
-  QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()));
-  QObject::connect(_mLimit.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()));
-  QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()));
-  QObject::connect(_mShifts.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()));
-  QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
+  // we need direct connections here so the update always happens at predictable times, i.e., every time the
+  // values change; otherwise, there might be short moments where dimensionality and the rest of the kernel don't match
+  QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()), Qt::DirectConnection);
+  QObject::connect(_mLimit.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()), Qt::DirectConnection);
+  QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()), Qt::DirectConnection);
+  QObject::connect(_mShifts.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()), Qt::DirectConnection);
+  QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()), Qt::DirectConnection);
 }
 
 void cedar::aux::kernel::Gauss::calculateParts()
