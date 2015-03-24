@@ -123,11 +123,13 @@ cedar::aux::kernel::Gauss::~Gauss()
 void cedar::aux::kernel::Gauss::onInit()
 {
   updateDimensionality();
-  QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()));
-  QObject::connect(_mLimit.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()));
-  QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()));
-  QObject::connect(_mShifts.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()));
-  QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
+  // we need direct connections here so the update always happens at predictable times, i.e., every time the
+  // values change; otherwise, there might be short moments where dimensionality and the rest of the kernel don't match
+  QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()), Qt::DirectConnection);
+  QObject::connect(_mLimit.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()), Qt::DirectConnection);
+  QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()), Qt::DirectConnection);
+  QObject::connect(_mShifts.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()), Qt::DirectConnection);
+  QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()), Qt::DirectConnection);
 }
 
 void cedar::aux::kernel::Gauss::calculateParts()
@@ -262,7 +264,7 @@ unsigned int cedar::aux::kernel::Gauss::estimateWidth(unsigned int dim) const
 
 void cedar::aux::kernel::Gauss::updateDimensionality()
 {
-  mpReadWriteLockOutput->lockForWrite();
+  QWriteLocker locker(mpReadWriteLockOutput);
   unsigned int new_dimensionality = this->getDimensionality();
   unsigned int new_size = new_dimensionality;
   if (new_dimensionality == 0)
@@ -275,7 +277,7 @@ void cedar::aux::kernel::Gauss::updateDimensionality()
   _mShifts->setDefaultSize(new_size);
   this->mCenters.resize(new_size);
   this->mSizes.resize(new_size);
-  mpReadWriteLockOutput->unlock();
+  locker.unlock();
 
   this->updateKernel();
 }
