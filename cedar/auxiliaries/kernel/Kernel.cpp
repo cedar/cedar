@@ -77,7 +77,10 @@ _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", dimension
   _mDimensionality->setValue(dimensionality);
   _mDimensionality->setConstant(true);
 
-  QObject::connect(this->_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
+  // we need a direct connection here so the update always happens at predictable times, i.e., every time the
+  // dimensionality changes; otherwise, there might be short moments where dimensionality and the rest of the kernel
+  // don't match
+  QObject::connect(this->_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()), Qt::DirectConnection);
 }
 
 cedar::aux::kernel::Kernel::~Kernel()
