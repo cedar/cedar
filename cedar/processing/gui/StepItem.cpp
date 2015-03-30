@@ -233,15 +233,21 @@ void cedar::proc::gui::StepItem::updateStepState()
 
   switch (this->getStep()->getState())
   {
-    case cedar::proc::Step::STATE_EXCEPTION_ON_START:
+    case cedar::proc::Triggerable::STATE_EXCEPTION_ON_START:
       this->setOverrideFillStyle(Qt::BDiagPattern, false);
-    case cedar::proc::Step::STATE_EXCEPTION:
-    case cedar::proc::Step::STATE_NOT_RUNNING:
+    case cedar::proc::Triggerable::STATE_EXCEPTION:
+    case cedar::proc::Triggerable::STATE_NOT_RUNNING:
       this->setOutlineColor(Qt::red);
       this->setOverrideFillColor(QColor(255, 175, 175), false);
       break;
 
-    case cedar::proc::Step::STATE_RUNNING:
+    case cedar::proc::Triggerable::STATE_INITIALIZING:
+      this->setOutlineColor(QColor(200, 200, 30));
+      this->setOverrideFillStyle(Qt::BDiagPattern, false);
+      this->setOverrideFillColor(QColor(233, 233, 51), false);
+      break;
+
+    case cedar::proc::Triggerable::STATE_RUNNING:
     default:
       this->setOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor);
   }

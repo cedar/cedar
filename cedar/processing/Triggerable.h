@@ -81,6 +81,10 @@ public:
     STATE_UNKNOWN,
     //! The Triggerable is not running.
     STATE_NOT_RUNNING,
+    /*! The triggerable has been started, but is still waiting for startup to be completed. In this state, the compute
+     *  function will be called, but subsequent steps will not be triggered.
+     */
+    STATE_INITIALIZING,
     //! The Triggerable is currently running.
     STATE_RUNNING,
     //! There was an exception thrown in the Triggerable's onTrigger function.
@@ -221,8 +225,13 @@ protected:
    * @param newState a new state from enum State
    * @param annotation A string to be displayed to the user that gives additional information to the state, e.g., the
    *        message of an exception in the STATE_EXCEPTION.
+   *
+   * @returns Whether or not the step state has changed and a signal was emitted (this ignores the dontEmit parameter).
    */
   void setState(cedar::proc::Triggerable::State newState, const std::string& annotation);
+
+  //! Manually signals a change in the step state.
+  void signalStateChanged() const;
 
   /*!@brief Resets the state of the Triggerable to the default state.
    *

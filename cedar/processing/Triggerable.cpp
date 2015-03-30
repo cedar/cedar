@@ -241,6 +241,7 @@ void cedar::proc::Triggerable::callOnStart()
   if (this->mStartCalls == 1)
   {
     this->signalStarted();
+    this->setState(cedar::proc::Triggerable::STATE_RUNNING, "");
 
     QReadLocker lock_r(this->mFinished.getLockPtr());
     if (mFinished.member())
@@ -310,8 +311,13 @@ void cedar::proc::Triggerable::setState(cedar::proc::Triggerable::State newState
     this->mState.member().mState = newState;
     this->mState.member().mStateReason = annotation;
     locker.unlock();
-    mStateChanged();
+    this->signalStateChanged();
   }
+}
+
+void cedar::proc::Triggerable::signalStateChanged() const
+{
+  this->mStateChanged();
 }
 
 cedar::proc::Triggerable::State cedar::proc::Triggerable::getState() const
