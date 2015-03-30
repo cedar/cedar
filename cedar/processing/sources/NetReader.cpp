@@ -147,19 +147,17 @@ void cedar::proc::sources::NetReader::connect()
     {
       // the writer hasnt declared the channel yet ... abort, better luck
       // on the next compute()
-//      this->setState( cedar::proc::Triggerable::STATE_EXCEPTION,
-//                      "The writer hasn't initialized this port/channel, yet. "
-//                      "Please check whether the name is correct and it "
-//                      "is running, then "
-//                      "select reset in the context menu." );
-        // TODO: would be nice to have a state for temporarily disabling
+      this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, "Waiting for net writer (" + e.getMessage() + ").");
       return;
     }
     catch (cedar::aux::net::NetMissingRessourceException &e)
     {
-      // somehow YARP doesnt work ... :( typically fatal.
-//      throw e; // lets try this ...
+      // somehow YARP doesnt work ... better luck next time :(
+      this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, "Waiting for resource (" + e.getMessage() + ").");
     }
+
+    // if we get here, we can (re)set the state to an ok state.
+    this->resetState();
   }
   locker.unlock();
 }
