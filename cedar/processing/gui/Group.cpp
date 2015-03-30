@@ -240,7 +240,7 @@ bool cedar::proc::gui::Group::manualDeletionRequiresConfirmation() const
 
 cedar::aux::PluginDeclaration* cedar::proc::gui::Group::declarationFromDrop(QGraphicsSceneDragDropEvent *pEvent) const
 {
-  auto tree = dynamic_cast<cedar::proc::gui::ElementClassList*>(pEvent->source());
+  auto tree = dynamic_cast<QListWidget*>(pEvent->source());
 
   if (tree)
   {

@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ElementClassList.fwd.h
+    File:        ElementList.fwd.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 11 07
+    Date:        2015 03 30
 
-    Description: Forward declaration file for the class cedar::proc::gui::ElementClassList.
+    Description: Forward declaration file for the class cedar::proc::gui::ElementList.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_FWD_H
-#define CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_FWD_H
+#ifndef CEDAR_PROC_GUI_ELEMENT_LIST_FWD_H
+#define CEDAR_PROC_GUI_ELEMENT_LIST_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -48,19 +48,20 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
+
 namespace cedar
 {
   namespace proc
   {
     namespace gui
     {
-      CEDAR_DECLARE_PROC_CLASS(ElementClassList);
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_PROC_CLASS(ElementList);
+      //!@endcond
     }
   }
 }
 
-//!@endcond
 
-#endif // CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_FWD_H
+#endif // CEDAR_PROC_GUI_ELEMENT_LIST_FWD_H
 

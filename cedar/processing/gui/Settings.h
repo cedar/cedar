@@ -328,6 +328,18 @@ public:
   //! Marks the given one time messages as read
   void markAsRead(const std::vector<OneTimeMessagePtr>& messages);
 
+  //! Returns favorite elements of the user
+  std::vector<std::string> getFavedElements() const;
+
+  //! Checks if the given element class is a favorite
+  bool isFavoriteElement(const std::string& className) const;
+
+  //! Favorites or unfavorites an element class.
+  void setFavorite(const std::string& className, bool favorite);
+
+signals:
+  void elementFavoritesChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -441,6 +453,9 @@ private:
 
   //!@brief A list of colors defined by the user; these can be used, e.g., to color the sticky notes.
   cedar::aux::StringVectorParameterPtr _mUserDefinedColors;
+
+  //!@brief A set of user-faved elements
+  cedar::aux::StringVectorParameterPtr _mFavoriteElements;
 
   //! Vector that holds all the user-defined colors parsed from the strings.
   std::vector<UserDefinedColorPtr> mUserDefinedColors;

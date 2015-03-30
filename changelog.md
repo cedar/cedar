@@ -80,6 +80,8 @@ Unreleased
     and the menu ("color elements by trigger"). In addition to showing what trigger elements are connected to, hovering
     over a step in this mode will also display in what order it will trigger its subsequent steps.
   - The time factor setting is now saved per architecture. New architectures start with time factor 1. 
+  - You can now declare favorite element classes in the elements tab. Right-click on any element to favorite/unfavorite
+    the class.
 
 Released versions
 =================

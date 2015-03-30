@@ -75,7 +75,7 @@ cedar_add_library(cedarproc
   gui/Connectable.h
   gui/CouplingCollection.h
   gui/DataSlotItem.h
-  gui/ElementClassList.h
+  gui/ElementList.h
   gui/ElementTreeWidget.h
   gui/ExperimentDialog.h
   gui/FindDialog.h

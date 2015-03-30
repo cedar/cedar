@@ -315,10 +315,6 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Resets the list of elements.
-   */
-  void resetStepList();
-
   /*!@brief Loads the default plugins.
    */
   void loadDefaultPlugins();
@@ -404,9 +400,6 @@ signals:
 protected:
   // none yet
 private:
-  //! Widgets for each list of element classes.
-  std::map<std::string, cedar::proc::gui::ElementClassList*> mElementClassListWidgets;
-
   //! The network currently displayed.
   cedar::proc::gui::GroupPtr mGroup;
 

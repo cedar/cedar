@@ -179,6 +179,24 @@ public:
     return this->mDeclarations;
   }
 
+  /*! Returns the declaration corresponding to the given class name.
+   * @returns A pointer to the declaration, or a null pointer if none was found.
+   */
+  ConstBasePluginDeclarationPtr getDeclarationNoThrow(const std::string& className) const
+  {
+    // look through all declarations and see if there is one whose name matches the given one
+    for (auto declaration : this->mDeclarations)
+    {
+      if (declaration->getClassName() == className)
+      {
+        return declaration;
+      }
+    }
+
+    // if none was found, return an empty (null) pointer
+    return ConstBasePluginDeclarationPtr();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

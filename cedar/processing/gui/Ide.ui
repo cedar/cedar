@@ -178,7 +178,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QTabWidget" name="mpCategoryList"/>
+      <widget class="cedar::proc::gui::ElementList" name="mpCategoryList"/>
      </item>
     </layout>
    </widget>
@@ -242,8 +242,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -300,8 +300,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>254</width>
-              <height>429</height>
+              <width>98</width>
+              <height>28</height>
              </rect>
             </property>
             <property name="palette">
@@ -894,6 +894,12 @@
    <class>cedar::proc::gui::RecorderWidget</class>
    <extends>QWidget</extends>
    <header>cedar/processing/gui/RecorderWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cedar::proc::gui::ElementList</class>
+   <extends>QTabWidget</extends>
+   <header>cedar/processing/gui/ElementList.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
