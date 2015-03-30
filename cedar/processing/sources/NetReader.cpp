@@ -158,7 +158,7 @@ void cedar::proc::sources::NetReader::connect()
     catch (cedar::aux::net::NetMissingRessourceException &e)
     {
       // somehow YARP doesnt work ... :( typically fatal.
-      throw e; // lets try this ...
+//      throw e; // lets try this ...
     }
   }
   locker.unlock();
