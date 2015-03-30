@@ -28,7 +28,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 03 06
+    Date:        2015 03 30
 
     Description: 
 
@@ -52,7 +52,7 @@ import os
 import re
 import sys
 import wx
-import wx.lib.agw.floatspin as FS
+#import wx.lib.agw.floatspin as FS
 from wx.lib.embeddedimage import PyEmbeddedImage
 from functools import partial
 from wx.lib.scrolledpanel import ScrolledPanel
@@ -171,17 +171,17 @@ class SnapshotSequenceDialog(wx.Dialog):
         btn_sizer.Add(cancel_btn, 1, wx.BOTTOM, border=10)
         
         step_txt = wx.StaticText(self, -1, 'Step options')
-        step_num = wx.StaticText(self, -1, 'Step number \t')
-        step_num_entry = wx.TextCtrl(self, -1)
-        step_size = wx.StaticText(self, -1, 'Step size')
-        step_size_entry = wx.TextCtrl(self, -1)
+        step_num = wx.StaticText(self, -1, 'Number of snapshots')
+        step_num_control = wx.SpinCtrl(self, -1, min=0, max=100)
+        step_size = wx.StaticText(self, -1, 'Distance between snapshots \t')
+        step_size_control = wx.SpinCtrl(self, -1, min=0, max=100)
         step_sizer = wx.FlexGridSizer(rows=2, cols=2)
         step_sizer.SetFlexibleDirection(wx.BOTH)
         
         step_sizer.Add(step_num, 1, wx.ALIGN_LEFT)
-        step_sizer.Add(step_num_entry, 1, wx.ALIGN_RIGHT|wx.EXPAND)
+        step_sizer.Add(step_num_control, 1, wx.ALIGN_RIGHT|wx.EXPAND)
         step_sizer.Add(step_size, 1, wx.ALIGN_LEFT)
-        step_sizer.Add(step_size_entry, 1, wx.ALIGN_RIGHT|wx.EXPAND)
+        step_sizer.Add(step_size_control, 1, wx.ALIGN_RIGHT|wx.EXPAND)
         
         # self.parent.proj consists of 2 axes => resulting plot will be 3D
         if len(self.parent.proj) >= 8:
@@ -194,7 +194,7 @@ class SnapshotSequenceDialog(wx.Dialog):
         min_max_sizer = wx.FlexGridSizer(rows=2, cols=2)         
         min_max_sizer.SetFlexibleDirection(wx.BOTH)
         
-        label_axes_txt = wx.StaticText(self, -1, 'Label plot axes')
+        label_axes_txt = wx.StaticText(self, -1, 'Axis labels')
         x_axis_txt = wx.StaticText(self, -1, 'X axis \t')
         y_axis_txt = wx.StaticText(self, -1, 'Y axis \t')
         
@@ -218,7 +218,7 @@ class SnapshotSequenceDialog(wx.Dialog):
             if parent.style != 'heatmap':
                 z_axis_txt = wx.StaticText(self, -1, 'Z axis \t')
             else:
-                z_axis_txt = wx.StaticText(self, -1, 'Legend \t')
+                z_axis_txt = wx.StaticText(self, -1, 'color bar \t')
             
             z_axis_label = wx.TextCtrl(self, -1, style=wx.TE_PROCESS_ENTER)
             z_axis_label.SetValue(self.parent.z_label)
@@ -240,8 +240,8 @@ class SnapshotSequenceDialog(wx.Dialog):
         top_sizer.Add(btn_sizer, 0, wx.ALIGN_CENTER|wx.RIGHT|wx.LEFT, border=20)
         
         # Event handling
-        ok_btn.Bind(wx.EVT_BUTTON, lambda evt, step_num_entry=step_num_entry, step_size_entry=step_size_entry: 
-                    self.evt_ok_btn(step_num_entry, step_size_entry, evt))
+        ok_btn.Bind(wx.EVT_BUTTON, lambda evt, step_num_control=step_num_control, step_size_control=step_size_control: 
+                    self.evt_ok_btn(step_num_control, step_size_control, evt))
         
         cancel_btn.Bind(wx.EVT_BUTTON, self.evt_cancel_button)
         
@@ -393,7 +393,7 @@ class RDPGUI(wx.Panel):
         self.step = 0
         self.step_size = 0
         self.slider_max = 0
-        self.resolution = 1
+        self.resolution = 5
         self.vmin = None
         self.vmax = None
         self.proj = None
@@ -407,18 +407,18 @@ class RDPGUI(wx.Panel):
         self.header = None
         self.header_list = []
         self.ndim = []
-        self.time_codes = []
+        self.time_stamps = []
         self.selection = None
-        self.proj_choice_timeline = None
+        self.proj_choice_time_course = None
         self.proj_choice_snapshot = None
         self.plot = None
         self.line_color = '#FF9600'
         self.save_mode = False
         
         # Plot modes
-        self.mode_ch = [' ', 'snapshot', 'snapshot sequence', 'timeline']
+        self.mode_ch = [' ', 'snapshot', 'snapshot sequence', 'time course']
         
-        # Projection choices for timeline plot mode
+        # Projection choices for time course plot mode
         self.proj_ch = [' ', 'x_1', 'x_2', 'x_3', 'x_4', 'x_5']
         
         # Projection choices for snapshot/snapshot sequence plot modes
@@ -435,10 +435,11 @@ class RDPGUI(wx.Panel):
         self.proj_label = wx.StaticText(self, -1, 'Projection')
         self.proj_method_label = wx.StaticText(self, -1, 'Projection method \t')
         self.style_label = wx.StaticText(self, -1, 'Plot style')
-        self.time_code_display = wx.StaticText(self, -1, '-')
-        self.time_code_label = wx.StaticText(self, -1, 'Time code t \t')
+        self.time_stamp_display = wx.StaticText(self, -1, '-')
+        self.time_stamp_label = wx.StaticText(self, -1, 'Time stamp t \t')
         self.resolution_label = wx.StaticText(self, -1, 'Plot resolution')
         self.line_color_label = wx.StaticText(self, -1, 'Line color')
+        self.player_label = wx.StaticText(self, -1, 'Time control')
         #========================================================================================================================
         
         self.line_1 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(300,10))
@@ -452,9 +453,9 @@ class RDPGUI(wx.Panel):
         self.proj_cbox = wx.ComboBox(self, value=' ', style = wx.CB_READONLY)
         self.proj_method_cbox = wx.ComboBox(self, choices = self.proj_methods, value=' ', style = wx.CB_READONLY)
         self.style_cbox = wx.ComboBox(self, choices = self.style_ch, style = wx.CB_READONLY)
-        self.pos_slider = wx.Slider(self, value=-1, minValue = -1, maxValue = 0, style = wx.SL_LABELS|wx.SL_AUTOTICKS)
+        self.pos_slider = wx.Slider(self, value=0, minValue = 0, maxValue = 0, style = wx.SL_LABELS|wx.SL_AUTOTICKS)
         self.pos_slider.Disable()
-        self.resolution_spn = wx.SpinCtrl(self, min=1, max=100)
+        self.resolution_spn = wx.SpinCtrl(self, min=1, max=100, value='5')
         self.line_color_ctrl = wx.ColourPickerCtrl(self, -1, col=self.line_color)
         #========================================================================================================================
 
@@ -465,13 +466,14 @@ class RDPGUI(wx.Panel):
         # Sizers
         #========================================================================================================================
         pos_slider_sizer = wx.BoxSizer(wx.VERTICAL)
-        time_code_sizer = wx.BoxSizer(wx.HORIZONTAL)        
+        player_caption_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        time_stamp_sizer = wx.BoxSizer(wx.HORIZONTAL)        
         plot_sizer = wx.BoxSizer(wx.HORIZONTAL)
         line_sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
         line_sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
         line_sizer_4 = wx.BoxSizer(wx.HORIZONTAL)
         player_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        player_time_code_sizer = wx.BoxSizer(wx.VERTICAL)
+        player_time_stamp_sizer = wx.BoxSizer(wx.VERTICAL)
         btn_sizer = wx.BoxSizer(wx.VERTICAL)
         axes_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
         axes_grid_sizer.SetFlexibleDirection(wx.BOTH)
@@ -491,6 +493,7 @@ class RDPGUI(wx.Panel):
         self.decrease_single_step_bitmap = wx.BitmapFromImage(decrease_single_step)
         increase_single_step = RDPImageFiles().increase_single_step.GetImage()
         self.increase_single_step_bitmap = wx.BitmapFromImage(increase_single_step)
+        self.marked_check_box = wx.CheckBox(self)
         
         # Buttons
         #========================================================================================================================
@@ -528,8 +531,11 @@ class RDPGUI(wx.Panel):
         #========================================================================================================================
         pos_slider_sizer.Add(self.pos_slider, 1, wx.EXPAND|wx.ALIGN_CENTER)
         
-        time_code_sizer.Add(self.time_code_label, 1, wx.ALIGN_LEFT)
-        time_code_sizer.Add(self.time_code_display, 1, wx.ALIGN_RIGHT)
+        player_caption_sizer.Add(self.marked_check_box, 0)
+        player_caption_sizer.Add(self.player_label, 1)
+        
+        time_stamp_sizer.Add(self.time_stamp_label, 1, wx.ALIGN_LEFT)
+        time_stamp_sizer.Add(self.time_stamp_display, 1, wx.ALIGN_RIGHT)
         
         player_sizer.Add(self.decrease_single_step_btn, 1, wx.ALIGN_CENTER)
         player_sizer.Add(self.reverse_play_pause_btn, 1, wx.ALIGN_CENTER)
@@ -537,15 +543,16 @@ class RDPGUI(wx.Panel):
         player_sizer.Add(self.increase_single_step_btn, 1, wx.ALIGN_CENTER)
         player_sizer.Add(self.reset_btn, 1, wx.ALIGN_CENTER)
         
-        player_time_code_sizer.Add(pos_slider_sizer, 2, wx.EXPAND|wx.ALIGN_CENTER)
-        player_time_code_sizer.Add(player_sizer, 2, wx.ALIGN_CENTER)
-        player_time_code_sizer.AddSpacer(10)
-        player_time_code_sizer.Add(time_code_sizer, 1, wx.ALIGN_LEFT)
+        player_time_stamp_sizer.Add(player_caption_sizer, 2)
+        player_time_stamp_sizer.Add(pos_slider_sizer, 2, wx.EXPAND|wx.ALIGN_CENTER)
+        player_time_stamp_sizer.Add(player_sizer, 2, wx.ALIGN_CENTER)
+        player_time_stamp_sizer.AddSpacer(10)
+        player_time_stamp_sizer.Add(time_stamp_sizer, 1, wx.ALIGN_LEFT)
         
         #========================================================================================================================
         
-        selection_sizer.Add(self.sel_cbox, 0)
         selection_sizer.Add(self.switch_btn, 0, wx.EXPAND)
+        selection_sizer.Add(self.sel_cbox, 0)
         
         # Selection ComboBoxes
         #========================================================================================================================
@@ -585,7 +592,7 @@ class RDPGUI(wx.Panel):
         self.main_sizer.Add(line_sizer_1, 0, wx.ALIGN_CENTER_HORIZONTAL)
         self.main_sizer.Add(item=cbox_grid_sizer, proportion=0, flag=wx.EXPAND|wx.ALIGN_CENTER|wx.LEFT|wx.RIGHT|wx.TOP, border=10)
         self.main_sizer.Add(line_sizer_2, 0, wx.ALIGN_CENTER_HORIZONTAL)
-        self.main_sizer.Add(item=player_time_code_sizer, proportion=0, flag=wx.ALIGN_CENTER|wx.LEFT|wx.RIGHT|wx.EXPAND, border=10)
+        self.main_sizer.Add(item=player_time_stamp_sizer, proportion=0, flag=wx.ALIGN_CENTER|wx.LEFT|wx.RIGHT|wx.EXPAND, border=10)
         self.main_sizer.Add(line_sizer_4, 0, wx.ALIGN_CENTER_HORIZONTAL)
         self.main_sizer.Add(btn_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.LEFT|wx.BOTTOM|wx.TOP, border=10)
                 
@@ -605,6 +612,7 @@ class RDPGUI(wx.Panel):
         self.switch_btn.Bind(wx.EVT_BUTTON, self.evt_switch_btn)
         self.resolution_spn.Bind(wx.EVT_SPINCTRL, self.evt_resolution_spn)
         self.line_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, self.evt_plot_color_ctrl)
+        self.marked_check_box.Bind(wx.EVT_CHECKBOX, self.evt_marked_check_box)
         #========================================================================================================================
         
         # Layout
@@ -615,6 +623,16 @@ class RDPGUI(wx.Panel):
         #========================================================================================================================
           
         return
+    
+    
+    def evt_marked_check_box(self, event):
+        widget = event.GetEventObject()
+        self.marked = widget.GetValue()
+        
+        if plt.get_fignums():
+                wx.CallAfter(self._update_plot)
+        
+        wx.Yield()
     
         
     def evt_close_plot_control_frame(self, event):
@@ -656,14 +674,14 @@ class RDPGUI(wx.Panel):
         
         # Labels
         #========================================================================================================================
-        label_axes_txt = wx.StaticText(heatmap_boundary, -1, 'Label plot axes')
+        label_axes_txt = wx.StaticText(heatmap_boundary, -1, 'Axis labels')
         x_axis_txt = wx.StaticText(heatmap_boundary, -1, 'X axis \t')
         y_axis_txt = wx.StaticText(heatmap_boundary, -1, 'Y axis \t')
         
         if self.style != 'heatmap' and 'Axes3DSubplot' in str(type(self.plot)):
             z_axis_txt = wx.StaticText(heatmap_boundary, -1, 'Z axis \t')
         elif self.style == 'heatmap':
-            z_axis_txt = wx.StaticText(heatmap_boundary, -1, 'Legend \t')
+            z_axis_txt = wx.StaticText(heatmap_boundary, -1, 'color bar \t')
         #========================================================================================================================
             
         x_axis_label = wx.TextCtrl(heatmap_boundary, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
@@ -709,19 +727,22 @@ class RDPGUI(wx.Panel):
             # Controls for narrowing of depicted value range
             vmin_label = wx.StaticText(heatmap_boundary, -1, 'Minimum \t')
             vmax_label = wx.StaticText(heatmap_boundary, -1, 'Maximum \t')
-            vmin_spn = FS.FloatSpin(heatmap_boundary, digits=4)
-            vmax_spn = FS.FloatSpin(heatmap_boundary, digits=4)
+            vmin_spn = wx.TextCtrl(heatmap_boundary, style=wx.TE_PROCESS_ENTER)
+            vmax_spn = wx.TextCtrl(heatmap_boundary, style=wx.TE_PROCESS_ENTER)
             
-            # Set FloatSpin widgets to default values
+            # Set widgets to default values
+            
             if self.vmin is not None:
-                vmin_spn.SetValue(self.vmin)
+                vmin_spn.SetValue(str(self.vmin))
             else:
-                vmin_spn.SetValue(0.0000)
+                vmin_spn.SetValue(str(0.0000))
                 
+            
             if self.vmax is not None:
-                vmax_spn.SetValue(self.vmax)
+                vmax_spn.SetValue(str(self.vmax))
             else:
-                vmax_spn.SetValue(0.0000)
+                vmax_spn.SetValue(str(0.0000))
+            
             
             reset_heatmap_boundaries_btn = wx.Button(heatmap_boundary, label = 'Reset')
             reset_heatmap_boundaries_btn.Bind(wx.EVT_BUTTON, self.evt_reset_heatmap_boundaries_btn)
@@ -735,16 +756,18 @@ class RDPGUI(wx.Panel):
             top_sizer.Add(min_max_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)
             top_sizer.Add(reset_heatmap_boundaries_btn, 0, flag=wx.ALIGN_LEFT|wx.ALL, border=10)
             
-            vmin_spn.Bind(FS.EVT_FLOATSPIN, self.evt_vmin_spn)
-            vmax_spn.Bind(FS.EVT_FLOATSPIN, self.evt_vmax_spn)    
             
-        if self.ndim[self.selection] == 0 and self.mode == 'timeline':
+            vmin_spn.Bind(wx.EVT_TEXT_ENTER, self.evt_vmin_spn)
+            vmax_spn.Bind(wx.EVT_TEXT_ENTER, self.evt_vmax_spn)
+            
+            
+        if self.ndim[self.selection] == 0 and self.mode == 'time course':
             self.control_plot_frame.sel_cbox = wx.ComboBox(heatmap_boundary, choices=self.flist_sorted, value=self.sel_cbox.GetValue(), style=wx.CB_READONLY)
             self.control_plot_frame.sel_cbox.Bind(wx.EVT_COMBOBOX, self.evt_sel_cbox)
             line2 = wx.StaticLine(heatmap_boundary, -1, style=wx.LI_HORIZONTAL)
             top_sizer.Add(line2, 0, wx.ALIGN_CENTER|wx.EXPAND|wx.RIGHT|wx.LEFT|wx.BOTTOM, border=5)
-            multi_plot_btn = wx.Button(heatmap_boundary, label = 'Add timeline', size=(100,30))
-            multi_plot_btn.Bind(wx.EVT_BUTTON, self.evt_add_timeline)
+            multi_plot_btn = wx.Button(heatmap_boundary, label = 'Add time course', size=(100,30))
+            multi_plot_btn.Bind(wx.EVT_BUTTON, self.evt_add_time_course)
             line_color_label = wx.StaticText(heatmap_boundary, -1, label='Line color \t')
             self.control_plot_frame.line_color_ctrl = wx.ColourPickerCtrl(heatmap_boundary, -1)
             self.control_plot_frame.line_color_ctrl.SetColour(self.line_color_ctrl.GetColour())
@@ -766,7 +789,7 @@ class RDPGUI(wx.Panel):
         heatmap_boundary.SetSizerAndFit(top_sizer)
         self.control_plot_frame.Fit()
         
-        
+                
     def _play_pause_btn(self, reverse):
         
         if reverse == False:
@@ -797,12 +820,7 @@ class RDPGUI(wx.Panel):
                         self.step = i
                         self.pos_slider.SetValue(min(self.slider_max, self.step))
                         
-                        if self.step == -1:
-                            self.time_code_display.SetLabel('-')
-                            self.marked = False
-                        else:
-                            self.marked = True
-                            self.time_code_display.SetLabel(str(self.time_codes[self.pos_slider.GetValue()]))
+                        self.time_stamp_display.SetLabel(str(self.time_stamps[self.pos_slider.GetValue()]))
                         
                         self._update_plot()
                         wx.Yield()
@@ -828,11 +846,14 @@ class RDPGUI(wx.Panel):
             
     def evt_reset_btn(self, evt):
         '''Reset plot to default.'''
-        self.step = -1
+        self.step = 0
         self.marked = False
+        self.marked_check_box.SetValue(False)
         self.pos_slider.SetValue(self.step)
-        self.time_code_display.SetLabel('-')
+        self.time_stamp_display.SetLabel(' ')
+
         wx.CallAfter(self._update_plot)
+
         
         
     def _move_single_step(self, increase):
@@ -844,13 +865,11 @@ class RDPGUI(wx.Panel):
             self.step += 1
             self.pos_slider.SetValue(min(self.slider_max, self.step))
             
-        self.time_code_display.SetLabel(str(self.time_codes[self.pos_slider.GetValue()]))
+        self.time_stamp_display.SetLabel(str(self.time_stamps[self.pos_slider.GetValue()]))
         
-        if self.step != -1:
-            self.marked = True
-        else:
-            self.time_code_display.SetLabel('-')
-            self.marked = False
+        if self.step == 0:
+            self.time_stamp_display.SetLabel(' ')
+
             
         wx.CallAfter(self._update_plot)
         
@@ -871,12 +890,12 @@ class RDPGUI(wx.Panel):
             self.z_label = z_axis_label.GetValue()
         
         if plt.get_fignums():
-            wx.CallAfter(self._update_plot)
+                wx.CallAfter(self._update_plot)
 
     
-    def evt_add_timeline(self, event):
-        '''Add timeline to currently displayed plot.'''
-        self._add_timeline()
+    def evt_add_time_course(self, event):
+        '''Add time course to currently displayed plot.'''
+        self._add_time_course()
 
         
     def evt_resolution_spn(self, event):
@@ -884,33 +903,41 @@ class RDPGUI(wx.Panel):
         self.resolution = int(widget.GetValue())
         
         if plt.get_fignums():
-            wx.CallAfter(self._update_plot)
-            wx.MilliSleep(2)
+                wx.CallAfter(self._update_plot)
+        
+        wx.Yield()
+
 
     
     def evt_vmax_spn(self, event):
+        
         widget = event.GetEventObject()
         self.vmax = float(widget.GetValue())
-        
+                
         if plt.get_fignums():
-            wx.CallAfter(self._update_plot)
+                wx.CallAfter(self._update_plot)
+        
+        wx.Yield()
 
     
     def evt_vmin_spn(self, event):
-        widget = event.GetEventObject()
-        self.vmin = float(widget.GetValue())
         
+        widget = event.GetEventObject()        
+        self.vmin = float(widget.GetValue())
+                
         if plt.get_fignums():
-            wx.CallAfter(self._update_plot)
-
+                wx.CallAfter(self._update_plot)
+            
+        wx.Yield()
+        
     
     def evt_proj_cbox(self, event):
         widget = event.GetEventObject()
         self.proj = widget.GetValue()
-                        
+        
         if plt.get_fignums():
-            wx.CallAfter(self._update_plot)
-            
+                wx.CallAfter(self._update_plot)
+        
         wx.Yield()
 
     
@@ -922,7 +949,7 @@ class RDPGUI(wx.Panel):
         wx.Yield()
 
                 
-    def _add_timeline(self):
+    def _add_time_course(self):
         wx.CallAfter(self._plot)
         wx.Yield()
     
@@ -932,7 +959,7 @@ class RDPGUI(wx.Panel):
         self.proj_method = widget.GetValue()
         
         if plt.get_fignums() and self.proj_method != '':
-            wx.CallAfter(self._update_plot)
+                wx.CallAfter(self._update_plot)
         
         wx.Yield()
 
@@ -960,10 +987,8 @@ class RDPGUI(wx.Panel):
             self.proj_method_cbox.Disable()
 
         if plt.get_fignums():
-            try:
-                wx.CallAfter(self._update_plot)
-            except TypeError:
-                raise TypeError
+            wx.CallAfter(self._update_plot)
+
         
         wx.Yield()
 
@@ -972,7 +997,7 @@ class RDPGUI(wx.Panel):
         self.vmin = self.vmax = None
         
         if plt.get_fignums():
-            wx.CallAfter(self._update_plot)
+                wx.CallAfter(self._update_plot)
             
         wx.Yield()
 
@@ -1009,16 +1034,9 @@ class RDPGUI(wx.Panel):
     def evt_slider(self, event):
         widget = event.GetEventObject()
         self.step = widget.GetValue()
-        
-        # Default state; no marker or time code is set
-        if self.step == -1:
-            self.time_code_display.SetLabel('-')
-            self.marked = False
-        
+                
         # Set marker and time code
-        else:
-            self.time_code_display.SetLabel(str(self.time_codes[self.pos_slider.GetValue()]))
-            self.marked = True
+        self.time_stamp_display.SetLabel(str(self.time_stamps[self.pos_slider.GetValue()]))
             
         wx.MilliSleep(5)
         
@@ -1035,8 +1053,8 @@ class RDPGUI(wx.Panel):
         self.mode = self.mode_cbox.GetValue()         
         
         # Fill projection combobox with the fitting options
-        if self.mode == 'timeline':
-            self.proj_cbox.SetItems(self.proj_choice_timeline)
+        if self.mode == 'time course':
+            self.proj_cbox.SetItems(self.proj_choice_time_course)
         elif self.mode == 'snapshot' or self.mode == 'snapshot sequence':
             self.proj_cbox.SetItems(self.proj_choice_snapshot)
         else:
@@ -1045,16 +1063,17 @@ class RDPGUI(wx.Panel):
         # Update plot
         if self.mode != 'snapshot sequence':
             if plt.get_fignums():
-                wx.CallAfter(self._update_plot)
+                try:
+                    wx.CallAfter(self._update_plot)
+                except TypeError:
+                    pass
             
         self.plot_btn.Bind(wx.EVT_BUTTON, self.evt_plot)
         self.save_btn.Bind(wx.EVT_BUTTON, self.evt_save_plot)
         
         
     def _update_selection_data(self):
-        '''
-        Reset the control panel and update it with the newly selected data
-        '''
+        '''Reset the control panel and update it with the newly selected data.'''
         
         # Clear memory
         if self.data is not None:
@@ -1065,7 +1084,7 @@ class RDPGUI(wx.Panel):
         self.slider_max = 0
         self.step = -1
         self.pos_slider.SetValue(self.step)
-        self.time_code_display.SetLabel('-')
+        self.time_stamp_display.SetLabel('-')
         self.pos_slider.Disable()
         self.play_pause_btn.Disable()
         self.reverse_play_pause_btn.Disable()
@@ -1074,7 +1093,7 @@ class RDPGUI(wx.Panel):
         self.increase_single_step_btn.Disable()
         
         # Generate adequate options for the projection combobox, depending on data dimensionality and plot mode
-        self.proj_choice_timeline = self.proj_ch[:self.ndim[self.selection]+1]
+        self.proj_choice_time_course = self.proj_ch[:self.ndim[self.selection]+1]
         self.proj_choice_snapshot = RDPPlot()._build_proj_ch_step(ndim=self.ndim[self.selection], temp_proj_ch_step=self.proj_ch_step)   
         
         # Get data and data header
@@ -1091,8 +1110,8 @@ class RDPGUI(wx.Panel):
         
         # Update GUI elements with loaded data
         self.data = temp_data[0]
-        self.time_codes = temp_data[1]
-        self.slider_max = len(self.time_codes)-1
+        self.time_stamps = temp_data[1]
+        self.slider_max = len(self.time_stamps)-1
         self.pos_slider.SetMax(self.slider_max)
 
         
@@ -1119,7 +1138,7 @@ class RDPGUI(wx.Panel):
         self.selection = widget.GetSelection()
         self._update_selection_data()
         self.sel_cbox.SetValue(widget.GetValue())
-        
+                
         # Mirror current selection on the control plot frame, if present
         if self.control_plot_frame:
             if hasattr(self.control_plot_frame, 'sel_cbox'):
@@ -1131,21 +1150,11 @@ class RDPGUI(wx.Panel):
     
     
     def _plot(self, save=False):
-        '''
-        Build plot(s) to either visualize or save as pdf file
-        '''
-        
-        if self.mode == 'snapshot' or self.mode == 'snapshot sequence':
-            
-            # If self.step is still set to the default value of -1
-            if self.step < 0:
-                step = 0
-            else:
-                step = self.step
-        
+        '''Build plot(s) to either visualize or save as pdf file'''
+                
         if self.mode == 'snapshot':                    
             try:
-                self.plot = RDPPlot().plot_snapshot(step = step, 
+                self.plot = RDPPlot().plot_snapshot(step = self.step, 
                                                     style = self.style, 
                                                     data = self.data, 
                                                     header = self.header, 
@@ -1170,9 +1179,9 @@ class RDPGUI(wx.Panel):
             dlg.ShowModal()
             dlg.Destroy()
             
-        elif self.mode == 'timeline':
+        elif self.mode == 'time course':
             try:
-                self.plot = RDPPlot().plot_timeline(data = self.data, 
+                self.plot = RDPPlot().plot_time_course(data = self.data, 
                                                     header = self.header, 
                                                     vmin = self.vmin,
                                                     vmax = self.vmax,
@@ -1186,7 +1195,7 @@ class RDPGUI(wx.Panel):
                                                     style = self.style)
             except UnboundLocalError:
                 dlg = wx.MessageDialog(parent = None, 
-                                       message = 'It is not possible to build a timeline out of 2-dimensional timeslices.', 
+                                       message = 'It is not possible to build a time course out of 2-dimensional timeslices.', 
                                        caption = 'The attempted operation is not possible.', 
                                        style = wx.OK | wx.ICON_INFORMATION | wx.CENTER | wx.STAY_ON_TOP)
                 dlg.ShowModal()
@@ -1383,7 +1392,7 @@ class RDPPlot(object):
         return X_1, X_2, Z
         
     def _set_marker(self, step, data, plot, style):
-        '''Mark the given time slice in a timeline plot.'''
+        '''Mark the given time slice in a time course plot.'''
                     
         min_data = 9999999
         max_data = -9999999
@@ -1410,7 +1419,7 @@ class RDPPlot(object):
         if style == ' ' or style == 'heatmap':
             # Mark step with red line
             plt.axvline(x=step, color='red')
-        
+            
         else:
             if style == 'wireframe':
                 cross = PolyCollection(v, facecolors='b', closed=False)
@@ -1432,7 +1441,7 @@ class RDPPlot(object):
         csv_file = open(csv_f, 'rb')
         reader = csv.reader(csv_file)
         row_count = len(list(open(csv_f))) 
-        time_codes = []
+        time_stamps = []
                 
         # skip header
         next(reader, None)
@@ -1440,12 +1449,12 @@ class RDPPlot(object):
         # Progress bar
         progress_dlg = Progress(None, -1, 'Load data recording', 'loading...', row_count+1)
         
-        # build time_codes list and data matrix
+        # build time_stamps list and data matrix
         #========================================================================================================================
         for row in reader:
             
-            # Update time_codecs list
-            time_codes.append(row[0])
+            # Update time_stampcs list
+            time_stamps.append(row[0])
             row.pop(0)
             
             # Matrix generation
@@ -1461,7 +1470,7 @@ class RDPPlot(object):
         progress_dlg.Destroy()
         csv_file.close()
         
-        return data, time_codes
+        return data, time_stamps
 
 
     def get_header(self, csv_f):
@@ -1673,7 +1682,7 @@ class RDPPlot(object):
                 self.save_plot(plot=plot, plot_mode=plot_mode, file_name=file_name, file_directory=file_directory, save_mode='sequence', plot_number=i)
                         
     
-    def plot_timeline(self, data, header, vmin, vmax, resolution, proj, proj_method, style, color=None, plot=None, marker=False, step=None):
+    def plot_time_course(self, data, header, vmin, vmax, resolution, proj, proj_method, style, color=None, plot=None, marker=False, step=None):
         ndim = self.get_dimension(header)
         steps = data.shape[0]
         
@@ -1699,7 +1708,7 @@ class RDPPlot(object):
             
             elif ndim >= 2:
                 try:
-                    X_1, X_2, data = self._project(mode='timeline', steps=steps, data=data, header=header, proj=proj, proj_method=proj_method)
+                    X_1, X_2, data = self._project(mode='time course', steps=steps, data=data, header=header, proj=proj, proj_method=proj_method)
                     
                 except UnboundLocalError:
                     raise UnboundLocalError
@@ -1784,8 +1793,10 @@ class RDPPlot(object):
         
         if plot_mode == 'snapshot sequence': 
             plot_mode = 'snapshot_sequence'
+        if plot_mode == 'time course':
+            plot_mode = 'time_course'
                     
-        # Snapshot or timeline
+        # Snapshot or time course
         if save_mode == 'single':
             file_path = file_directory + '/' + file_name.strip('.csv') + '-' + str(plot_mode) + '-' + str(plot_count) + '.pdf'
                     
