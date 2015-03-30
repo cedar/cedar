@@ -412,7 +412,6 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   {
     this->loadDefaultPlugins();
   }
-  this->resetStepList();
 
   this->mpArchitectureToolBox->setView(this->mpProcessingDrawer);
   this->mpProcessingDrawer->setWidgets(this, this->mpPropertyTable, this->mpRecorderWidget);
@@ -533,11 +532,6 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   );
   // make sure that we start with the right setting
   this->togglePlotGroupActions();
-
-  cedar::aux::PluginProxy::connectToPluginDeclaredSignal
-  (
-    boost::bind(&cedar::proc::gui::Ide::resetStepList, this)
-  );
 
   this->mpActionSave->setEnabled(true);
 
@@ -1226,35 +1220,6 @@ void cedar::proc::gui::Ide::updateTriggerStartStopThreadCallers()
 void cedar::proc::gui::Ide::architectureToolFinished()
 {
   this->mpArchitectureToolBox->selectMode("mode.Select");
-}
-
-void cedar::proc::gui::Ide::resetStepList()
-{
-  //!@todo This should become its own widget
-  for (const auto& category_name : ElementManagerSingleton::getInstance()->listCategories())
-  {
-    cedar::proc::gui::ElementClassList *p_tab;
-    if (mElementClassListWidgets.find(category_name) == mElementClassListWidgets.end())
-    {
-      p_tab = new cedar::proc::gui::ElementClassList();
-      this->mpCategoryList->addTab(p_tab, QString::fromStdString(category_name));
-      mElementClassListWidgets[category_name] = p_tab;
-    }
-    else
-    {
-      p_tab = mElementClassListWidgets[category_name];
-    }
-    p_tab->showList(category_name);
-
-    // if the category does not contain any displayed items, remove it
-    if (p_tab->count() == 0)
-    {
-      this->mpCategoryList->removeTab(this->mpCategoryList->indexOf(p_tab));
-      auto iter = mElementClassListWidgets.find(category_name);
-      CEDAR_DEBUG_ASSERT(iter != mElementClassListWidgets.end());
-      mElementClassListWidgets.erase(iter);
-    }
-  }
 }
 
 void cedar::proc::gui::Ide::notify(const QString& message)

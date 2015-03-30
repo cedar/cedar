@@ -199,6 +199,19 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   default_user_colors.push_back("yellow=rgb(255,255,110)");
   this->_mUserDefinedColors = new cedar::aux::StringVectorParameter(this, "user-defined colors", default_user_colors);
 
+  std::vector<std::string> default_favs;
+  default_favs.push_back("cedar.dynamics.NeuralField");
+  default_favs.push_back("node");
+  default_favs.push_back("cedar.processing.StaticGain");
+  default_favs.push_back("cedar.processing.steps.Convolution");
+  default_favs.push_back("cedar.processing.Projection");
+  default_favs.push_back("cedar.processing.Resize");
+  default_favs.push_back("cedar.processing.steps.Sum");
+  default_favs.push_back("cedar.processing.sources.Boost");
+  default_favs.push_back("cedar.processing.sources.GaussInput");
+  this->_mFavoriteElements = new cedar::aux::StringVectorParameter(this, "favorite elements", default_favs);
+  QObject::connect(this->_mFavoriteElements.get(), SIGNAL(valueChanged()), this, SIGNAL(elementFavoritesChanged()));
+
   this->_mReadOneTimeMessages = new cedar::aux::StringSetParameter(this, "read one-time messages", std::set<std::string>());
 
   this->load();
@@ -252,6 +265,39 @@ cedar::proc::gui::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+std::vector<std::string> cedar::proc::gui::Settings::getFavedElements() const
+{
+  return this->_mFavoriteElements->getValue();
+}
+
+void cedar::proc::gui::Settings::setFavorite(const std::string& className, bool favorite)
+{
+  if (favorite)
+  {
+    if (!this->isFavoriteElement(className))
+    {
+      this->_mFavoriteElements->pushBack(className);
+    }
+  }
+  else
+  {
+    this->_mFavoriteElements->eraseAll(className);
+  }
+}
+
+bool cedar::proc::gui::Settings::isFavoriteElement(const std::string& className) const
+{
+  for (const auto& favorite : this->getFavedElements())
+  {
+    if (favorite == className)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
 
 std::vector<cedar::proc::gui::Settings::OneTimeMessagePtr> cedar::proc::gui::Settings::getUnreadOneTimeMessages() const
 {

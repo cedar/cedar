@@ -22,94 +22,126 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ElementClassList.h
+    File:        ElementList.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 11 23
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2015 03 30
 
-    Description:
+    Description: Header file for the class cedar::proc::gui::ElementList.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
-#define CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
+#ifndef CEDAR_PROC_GUI_ELEMENT_LIST_H
+#define CEDAR_PROC_GUI_ELEMENT_LIST_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/gui/ElementClassList.fwd.h"
+#include "cedar/processing/gui/ElementList.fwd.h"
+#include "cedar/processing/ElementDeclaration.fwd.h"
+#include "cedar/processing/GroupDeclaration.fwd.h"
 #include "cedar/auxiliaries/PluginDeclaration.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QTabWidget>
 #include <QListWidget>
-#include <string>
-#include <vector>
 
-/*!@brief A widget showing a list of steps that can be dragged into the architecture area.
- *
- * More detailed description of the class.
+
+/*!@brief A widget for displaying elements that can be added to an architecture.
  */
-class cedar::proc::gui::ElementClassList : public QListWidget
+class cedar::proc::gui::ElementList : public QTabWidget
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  class TabBase : public QListWidget
+  {
+    public:
+      TabBase(QWidget* pParent = nullptr);
+
+    protected:
+      //! What drop actions are supported by this widget.
+      Qt::DropActions supportedDropActions() const;
+
+      //! Opens up the context menu.
+      void contextMenuEvent(QContextMenuEvent* pEvent);
+
+      void addEntry(cedar::aux::ConstPluginDeclarationPtr declaration);
+
+      cedar::aux::ConstPluginDeclaration* getDeclarationFromItem(QListWidgetItem* pItem) const;
+
+    private:
+      void addElementDeclaration(cedar::proc::ConstElementDeclarationPtr declaration);
+
+      void addGroupDeclaration(cedar::proc::ConstGroupDeclarationPtr declaration);
+
+      void addListEntry
+      (
+        const std::string& className,
+        const std::string& fullClassName,
+        const QIcon& icon,
+        std::vector<QString> decorations,
+        const std::string& description,
+        const std::string& deprecation,
+        const std::string& source,
+        cedar::aux::ConstPluginDeclarationPtr declaration
+      );
+  };
+
+  class CategoryTab : public TabBase
+  {
+    public:
+      CategoryTab(const std::string& categoryName, QWidget* pParent = nullptr);
+
+      void update();
+
+    private:
+      std::string mCategoryName;
+  };
+
+  class FavoritesTab : public TabBase
+  {
+    public:
+      FavoritesTab(QWidget* pParent = nullptr);
+
+      void update();
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ElementClassList(QWidget *pParent = NULL);
-
-  //!@brief Destructor
-  ~ElementClassList();
+  ElementList(QWidget* pParent = nullptr);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief for a given category, show all registered steps (their icon and name)
-  void showList(const std::string& categoryName);
+
+public slots:
+  void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! Opens up the context menu.
-  void contextMenuEvent(QContextMenuEvent* pEvent);
-
-  //! What drop actions are supported by this widget.
-  Qt::DropActions supportedDropActions() const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void addListEntry
-       (
-         const std::string& className,
-         const std::string& fullClassName,
-         const QIcon& icon,
-         const std::vector<QString>& decorations,
-         const std::string& description,
-         const std::string& deprecation,
-         const std::string& source,
-         cedar::aux::ConstPluginDeclarationPtr declaration
-       );
-
-private slots:
-  void showDeprecatedSteps(bool show);
-
-  void rebuild();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -117,8 +149,12 @@ private slots:
 protected:
   // none yet
 private:
-  std::string mCategoryName;
+  //! Tab containing the user's favorite elements
+  FavoritesTab* mpFavoritesTab;
 
-}; // class ElementClassList
+  //! Widgets for each list of element classes.
+  std::map<std::string, CategoryTab*> mCategoryWidgets;
+}; // class cedar::proc::gui::ElementList
 
-#endif // CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
+#endif // CEDAR_PROC_GUI_ELEMENT_LIST_H
+
