@@ -126,6 +126,9 @@ public:
   //! Returns true if the path is relative.
   bool isRelative() const;
 
+  //! Returns true if the file will be searched for in a unit test.
+  bool isTestFile() const;
+
   //! Returns true if the path is relative to a plugin folder, i.e., starts with the protocol plugin://
   bool isPluginRelative() const;
 
@@ -249,6 +252,7 @@ private:
   static const std::string M_PROTOCOL_ABSOLUTE_STR;
   static const std::string M_PROTOCOL_RESOURCE_STR;
   static const std::string M_PROTOCOL_PLUGIN_STR;
+  static const std::string M_PROTOCOL_TEST_STR;
 
 }; // class cedar::aux::Path
 

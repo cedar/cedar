@@ -208,7 +208,7 @@ int main(int, char**)
   }
 
   std::cout << "Saving network ... ";
-  group->writeJson("architecture1.json");
+  group->writeJson("test://unit/processing/ArchitectureIO/architecture1.json");
   std::cout << "done." << std::endl;
 
   std::cout << "Resetting ... ";
@@ -220,7 +220,7 @@ int main(int, char**)
 
   std::cout << "Loading network ... ";
   group = cedar::proc::GroupPtr(new cedar::proc::Group());
-  group->readJson("architecture1.json");
+  group->readJson("test://unit/processing/ArchitectureIO/architecture1.json");
   std::cout << "done." << std::endl;
 
   try

@@ -460,7 +460,7 @@ void run_test()
 
   std::cout << "Reading Sample.json ... ";
   cedar::proc::GroupPtr network(new cedar::proc::Group());
-  network->readJson("Sample.json");
+  network->readJson("test://unit/processing/Group/Sample.json");
   std::cout << "done." << std::endl;
 
   std::cout << "Trying to call compute functions ... ";
@@ -530,10 +530,10 @@ void run_test()
   network_parent->add(network_child);
 
   std::cout << "Write nested group." << std::endl;
-  network_parent->writeJson("Nested.json");
+  network_parent->writeJson("test://unit/processing/Group/Nested.json");
   std::cout << "Read nested group." << std::endl;
   cedar::proc::GroupPtr network_nested(new cedar::proc::Group());
-  network_nested->readJson("Nested.json");
+  network_nested->readJson("test://unit/processing/Group/Nested.json");
 
   std::cout << "testing Group::getElement for nested networks" << std::endl;
   network_nested->getElement<Step>("parent step");
@@ -676,22 +676,22 @@ void run_test()
 
   // test importing networks
   std::cout << "testing importing groups" << std::endl;
-  cedar::proc::GroupPtr network_importing(new cedar::proc::Group());
-  network_importing->importGroupFromFile("network child", "Nested.json");
+  cedar::proc::GroupPtr group_importing(new cedar::proc::Group());
+  group_importing->importGroupFromFile("network child", "test://unit/processing/Group/Nested.json");
 
   cedar::proc::GroupDeclarationPtr group_declaration
                                  (
                                    new cedar::proc::GroupDeclaration
                                    (
                                      "template",
-                                     "Template.json",
+                                     "test://unit/processing/Group/Template.json",
                                      "template",
                                      "test"
                                    )
                                  );
   group_declaration->declare();
 
-  cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup("template", network_importing);
+  cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup("template", group_importing);
   //!@todo check, if the template was loaded correctly
 
   // test connecting triggers to groups

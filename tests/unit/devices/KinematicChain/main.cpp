@@ -57,10 +57,9 @@ int main()
   TestKinematicChainPtr acceleration_test_arm(new TestKinematicChain());
   TestKinematicChainPtr complex_test_arm(new TestKinematicChain());
   std::cout << "reading configuration from test_arm->json" << std::endl;
-  test_arm->readJson("test_arm.json");
-  acceleration_test_arm->readJson("acceleration_test_arm.json");
-  std::string complex_test_arm_configuration_file = cedar::aux::locateResource("configs/complex_test_arm.json");
-  complex_test_arm->readJson(complex_test_arm_configuration_file);
+  test_arm->readJson("test://unit/devices/KinematicChain/test_arm.json");
+  acceleration_test_arm->readJson("test://unit/devices/KinematicChain/acceleration_test_arm.json");
+  complex_test_arm->readJson("resource://configs/complex_test_arm.json");
 
   cv::Mat theta;
   cv::Mat thetaDot;

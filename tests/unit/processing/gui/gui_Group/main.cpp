@@ -63,7 +63,7 @@ int main(int argc, char** argv)
 
   try
   {
-    p_network->readJson("test_arch.json");
+    p_network->readJson(cedar::aux::Path("test://unit/processing/gui/gui_Group/test_arch.json").absolute());
   }
   catch (cedar::proc::ArchitectureLoadingException& exception)
   {

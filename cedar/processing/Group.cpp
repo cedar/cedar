@@ -2772,11 +2772,11 @@ cedar::proc::ElementPtr cedar::proc::Group::createLinkedGroup(const std::string&
   return imported_group;
 }
 
-cedar::proc::ElementPtr cedar::proc::Group::importGroupFromFile(const std::string& groupName, const std::string& fileName)
+cedar::proc::ElementPtr cedar::proc::Group::importGroupFromFile(const std::string& groupName, const cedar::aux::Path& fileName)
 {
   // first, read in the configuration tree
   cedar::aux::ConfigurationNode configuration;
-  boost::property_tree::read_json(fileName, configuration);
+  boost::property_tree::read_json(fileName.absolute().toString(false), configuration);
 
   try
   {

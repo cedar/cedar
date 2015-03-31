@@ -44,6 +44,9 @@
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/assert.h"
 
+#define CEDAR_INTERNAL
+#include "cedar/internals.h"
+
 // SYSTEM INCLUDES
 #include <QDateTime>
 #include <boost/filesystem.hpp>
@@ -56,6 +59,7 @@
 const std::string cedar::aux::Path::M_PROTOCOL_ABSOLUTE_STR = "absolute";
 const std::string cedar::aux::Path::M_PROTOCOL_RESOURCE_STR = "resource";
 const std::string cedar::aux::Path::M_PROTOCOL_PLUGIN_STR = "plugin";
+const std::string cedar::aux::Path::M_PROTOCOL_TEST_STR = "test";
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -304,6 +308,11 @@ bool cedar::aux::Path::isRelative() const
   }
 }
 
+bool cedar::aux::Path::isTestFile() const
+{
+  return this->mProtocol == M_PROTOCOL_TEST_STR;
+}
+
 cedar::aux::Path cedar::aux::Path::absolute(bool showInLog) const
 {
   if (this->isResource())
@@ -314,6 +323,11 @@ cedar::aux::Path cedar::aux::Path::absolute(bool showInLog) const
   else if (this->isAbsolute())
   {
     return *this;
+  }
+
+  else if (this->isTestFile())
+  {
+    return cedar::aux::Path(CEDAR_HOME_DIRECTORY "/tests/" + this->toString(false));
   }
 
   else if (this->isPluginRelative())
@@ -486,6 +500,20 @@ void cedar::aux::Path::fromString(const std::string& path)
     else
     {
       ++iter;
+    }
+  }
+
+  if (!this->mProtocol.empty())
+  {
+    std::set<std::string> known_protocols;
+    known_protocols.insert(M_PROTOCOL_ABSOLUTE_STR);
+    known_protocols.insert(M_PROTOCOL_RESOURCE_STR);
+    known_protocols.insert(M_PROTOCOL_PLUGIN_STR);
+    known_protocols.insert(M_PROTOCOL_TEST_STR);
+
+    if (known_protocols.find(this->mProtocol) == known_protocols.end())
+    {
+      CEDAR_THROW(cedar::aux::InvalidValueException, "Unknown path protocol \"" + this->mProtocol + "\".");
     }
   }
 }

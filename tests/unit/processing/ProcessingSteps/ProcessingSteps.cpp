@@ -216,7 +216,7 @@ void run_tests()
       std::cout << "=========================================" << std::endl;
       std::cout << "  Testing class " << declaration->getClassName() << std::endl;
       std::cout << "=========================================" << std::endl;
-      group->readJson("processing_steps.json");
+      group->readJson("test://unit/processing/ProcessingSteps/processing_steps.json");
 
       auto empty_provider = EmptyMatrixProviderPtr(new EmptyMatrixProvider());
       group->add(empty_provider, "emp");

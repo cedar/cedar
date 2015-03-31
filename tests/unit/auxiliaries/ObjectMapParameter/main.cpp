@@ -360,7 +360,7 @@ int main()
   // the number of errors encountered in this test
   unsigned int number_of_errors = 0;
 
-  number_of_errors += testReading("object_map.json");
+  number_of_errors += testReading("test://unit/auxiliaries/ObjectMapParameter/object_map.json");
   number_of_errors += testWriting();
   number_of_errors += testSizes();
   number_of_errors += testIterators();

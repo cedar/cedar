@@ -72,7 +72,7 @@ void run_test()
   int errors = 0;
 
   GroupPtr group(new Group());
-  group->readJson("Architecture.json");
+  group->readJson("test://unit/processing/StepParameterLinking/Architecture.json");
 
   auto field_1 = group->getElement<NeuralField>("field 1");
   auto field_2 = group->getElement<NeuralField>("field 2");

@@ -597,7 +597,7 @@ public:
   bool isRoot() const;
 
   //!@brief imports a given group from a given configuration file
-  cedar::proc::ElementPtr importGroupFromFile(const std::string& groupName, const std::string& fileName);
+  cedar::proc::ElementPtr importGroupFromFile(const std::string& groupName, const cedar::aux::Path& fileName);
 
   //!@brief imports a given group from a given configuration file and links it to said file
   cedar::proc::ElementPtr createLinkedGroup(const std::string& groupName, const std::string& fileName);

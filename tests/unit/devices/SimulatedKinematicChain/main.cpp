@@ -53,7 +53,7 @@ int main()
   // create instance of test class
   std::cout << "reading kinematic chain from configuration file ..." << std::endl;
   cedar::dev::SimulatedKinematicChainPtr test_arm(new cedar::dev::SimulatedKinematicChain());
-  test_arm->readJson("test_arm.json");
+  test_arm->readJson("test://unit/devices/SimulatedKinematicChain/test_arm.json");
   
   //--------------------------------------------------------------------------------------------------------------------
   // single angle
