@@ -584,6 +584,9 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
       );
 
   QObject::connect(this, SIGNAL(signalGlobalTimeFactorSettingChanged(double)), this, SLOT(globalTimeFactorSettingChanged(double)));
+
+  QObject::connect(this->mpActionLockUIPositions, SIGNAL(toggled(bool)), this, SLOT(lockUI(bool)));
+  mpActionLockUIPositions->setChecked(true);
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -610,6 +613,34 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::lockUI(bool lock)
+{
+  std::vector<QDockWidget*> widgets;
+  widgets.push_back(this->mpItemsWidget);
+  widgets.push_back(this->mpToolsWidget);
+  widgets.push_back(this->mpPropertiesWidget);
+  widgets.push_back(this->mpLogWidget);
+
+  for (auto widget : widgets)
+  {
+    if (lock)
+    {
+      QDockWidget::DockWidgetFeatures f = widget->features();
+      f |= QDockWidget::DockWidgetMovable;
+      f ^= QDockWidget::DockWidgetMovable;
+      widget->setFeatures(f);
+    }
+    else
+    {
+      QDockWidget::DockWidgetFeatures f = widget->features();
+      f |= QDockWidget::DockWidgetMovable;
+      widget->setFeatures(f);
+    }
+  }
+
+  this->mpToolBar->setMovable(!lock);
+}
 
 void cedar::proc::gui::Ide::recorderDataAddedOrRemoved()
 {

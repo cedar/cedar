@@ -295,9 +295,11 @@ public slots:
   //! Shows recent notifications
   void showRecentNotifications();
 
-public slots:
   //! react to a change in experiment execution
   void experimentRunningChanged(bool running);
+
+  //! Locks the UI, i.e., prevents users from moving around the log and other such docks.
+  void lockUI(bool lock);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
