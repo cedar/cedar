@@ -84,7 +84,7 @@ void run_test()
 
   std::cout << "Reading Setup1.json ... ";
   cedar::proc::GroupPtr network(new cedar::proc::Group());
-  network->readJson("Setup1.json");
+  network->readJson("test://unit/dynamics/Dynamics/Setup1.json");
   std::cout << "done." << std::endl;
 
   // Create trigger for the "main loop"

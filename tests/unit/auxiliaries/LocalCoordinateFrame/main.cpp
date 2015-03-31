@@ -303,7 +303,7 @@ int main()
   std::cout << "test: readConfiguration" << std::endl;
   cedar::aux::LocalCoordinateFrame configured_local_coordinate_frame;
   std::cout << "constructed cofigured_local_coordinate_frame" << std::endl;
-  configured_local_coordinate_frame.readJson("test.json");
+  configured_local_coordinate_frame.readJson("test://unit/auxiliaries/LocalCoordinateFrame/test.json");
   std::cout << "called cofigured_local_coordinate_frame.readJson()" << std::endl;
   cv::Mat C = configured_local_coordinate_frame.getTransformation();
   if (

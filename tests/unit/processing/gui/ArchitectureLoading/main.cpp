@@ -144,7 +144,7 @@ int testArchitecture1(cedar::proc::gui::Ide *pIde)
 
   try
   {
-    pIde->loadFile("architecture-1.json");
+    pIde->loadFile(QString::fromStdString(cedar::aux::Path("test://unit/processing/gui/ArchitectureLoading/architecture-1.json").absolute().toString(false)));
   }
   catch (cedar::aux::ExceptionBase& e)
   {

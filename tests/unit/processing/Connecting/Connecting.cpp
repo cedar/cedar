@@ -280,16 +280,16 @@ int testOnlineDisconnecting()
 
   for (size_t i = 0; i < trials; ++i)
   {
-    cedar::proc::GroupPtr network(new cedar::proc::Group());
-    network->readJson("projection.json");
+    cedar::proc::GroupPtr group(new cedar::proc::Group());
+    group->readJson("test://unit/processing/Connecting/projection.json");
 
-    auto trigger = network->getElement<cedar::proc::LoopedTrigger>("trigger");
+    auto trigger = group->getElement<cedar::proc::LoopedTrigger>("trigger");
 
     trigger->start();
 
     cedar::aux::sleep(0.05 * cedar::unit::seconds);
 
-    network->disconnectSlots("step.result", "projection.input");
+    group->disconnectSlots("step.result", "projection.input");
 
     cedar::aux::sleep(0.05 * cedar::unit::seconds);
 

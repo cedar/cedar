@@ -267,7 +267,7 @@ int main(int, char**)
 
   errors += test_reading
             (
-              "test1-read.json",
+              "test://unit/auxiliaries/UnitParameter/test1-read.json",
               1.0 * cedar::unit::meters,
               5.0 * cedar::unit::seconds,
               1.0 * cedar::unit::meters / cedar::unit::seconds,
@@ -278,7 +278,7 @@ int main(int, char**)
             );
   errors += test_reading
             (
-              "test2-read.json",
+              "test://unit/auxiliaries/UnitParameter/test2-read.json",
               1.0 * cedar::unit::meters,
               5.0 * cedar::unit::seconds,
               1.0 * cedar::unit::meters / cedar::unit::seconds,
@@ -289,7 +289,7 @@ int main(int, char**)
             );
   errors += test_reading
             (
-              "test3-read.json",
+              "test://unit/auxiliaries/UnitParameter/test3-read.json",
               1.0 * cedar::unit::meters,
               5.0 * cedar::unit::seconds,
               1.0 * cedar::unit::meters / cedar::unit::seconds,

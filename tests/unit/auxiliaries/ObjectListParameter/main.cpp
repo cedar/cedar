@@ -238,7 +238,7 @@ int main()
   // the number of errors encountered in this test
   int errors = 0;
 
-  errors += testReading("object_list.json");
+  errors += testReading("test://unit/auxiliaries/ObjectListParameter/object_list.json");
   errors += testWriting();
 
   return errors;
