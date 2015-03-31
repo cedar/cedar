@@ -2694,6 +2694,7 @@ void cedar::proc::Group::removeAll(bool destructing)
 
 void cedar::proc::Group::revalidateConnections(const std::string& sender)
 {
+  //!@todo This no longer needs to be in group -- data slots should know who they are connected to
   std::string child;
   std::string output;
   cedar::aux::splitLast(sender, ".", child, output);

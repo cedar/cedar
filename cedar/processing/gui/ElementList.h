@@ -51,6 +51,44 @@
 // SYSTEM INCLUDES
 #include <QTabWidget>
 #include <QListWidget>
+#include <QLineEdit>
+#include <QPushButton>
+
+// pseudo-nested class (because the Qt moc doesn't do real nested classes)
+namespace cedar
+{
+  namespace proc
+  {
+    namespace gui
+    {
+      namespace elementList
+      {
+        class SearchBar : public QLineEdit
+        {
+          Q_OBJECT
+
+          public:
+            SearchBar(QWidget* pParent = nullptr);
+
+          signals:
+            void searchStringChanged(QString searchString);
+
+          protected:
+            //! Positions the search/clear icon
+            void resizeEvent(QResizeEvent* pEvent);
+
+          private slots:
+            void textChanged(const QString & text);
+
+            void clearClicked();
+
+          private:
+            QPushButton* mpSearchClearIcon;
+        };
+      }
+    }
+  }
+}
 
 
 /*!@brief A widget for displaying elements that can be added to an architecture.
@@ -116,6 +154,16 @@ private:
       void update();
   };
 
+  class SearchResultsTab : public TabBase
+  {
+    public:
+      SearchResultsTab(QWidget* pParent = nullptr);
+
+      void update(const std::string& searchFilter);
+
+      static bool searchFilterMatches(const std::string& searchFilter, cedar::aux::ConstPluginDeclarationPtr declaration);
+  };
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -135,13 +183,14 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //! Places the search bar
+  void resizeEvent(QResizeEvent* pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
+private slots:
+  void updateSearchResults(QString searchText);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -154,6 +203,15 @@ private:
 
   //! Widgets for each list of element classes.
   std::map<std::string, CategoryTab*> mCategoryWidgets;
+
+  //! Search input
+  cedar::proc::gui::elementList::SearchBar* mpSearchBox;
+
+  //! Tab for displaying search results
+  SearchResultsTab* mpSearchResultTab;
+
+  //! Used to remember the index that was active before searching
+  int mPreSearchIndex;
 }; // class cedar::proc::gui::ElementList
 
 #endif // CEDAR_PROC_GUI_ELEMENT_LIST_H
