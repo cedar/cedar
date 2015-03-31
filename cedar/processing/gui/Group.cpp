@@ -48,7 +48,6 @@
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/ConnectorItem.h"
 #include "cedar/processing/gui/Settings.h"
-#include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/sinks/GroupSink.h"
@@ -79,6 +78,7 @@
 #include <QList>
 #include <QDialog>
 #include <QStatusBar>
+#include <QListWidget>
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/json_parser.hpp>
   #include <boost/filesystem.hpp>
