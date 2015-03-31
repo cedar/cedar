@@ -123,3 +123,15 @@ const cedar::proc::GroupDeclarationManager::GroupDeclarationMap& cedar::proc::Gr
 {
   return this->mDeclarations;
 }
+
+cedar::proc::ConstGroupDeclarationPtr cedar::proc::GroupDeclarationManager::getDeclarationNoThrow(const std::string& name) const
+{
+  for (const auto& name_declaration_pair : this->mDeclarations)
+  {
+    if (name_declaration_pair.first == name)
+    {
+      return name_declaration_pair.second;
+    }
+  }
+  return cedar::proc::ConstGroupDeclarationPtr();
+}

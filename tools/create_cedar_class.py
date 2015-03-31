@@ -197,7 +197,10 @@ replacements = {}
 replacements["<filename>"] = class_name + ".[extension]"
 today = datetime.date.today()
 replacements["<creation date YYYY MM DD>"] = str(today.year) + " " + ("%02i") % (today.month) + " " + ("%02i") % (today.day)
-replacements["<class header path>"] = class_path + ".h"
+if options.no_subdirectories:
+  replacements["<class header path>"] = class_name + ".h"
+else:
+  replacements["<class header path>"] = class_path + ".h"
 replacements["class cedar::xxx::xxx"] = "class " + class_name_full
 replacements["CEDAR_XXX_XXX_H"] = class_id_all_cap + "_H"
 replacements["CEDAR_XXX_XXX_FWD_H"] = class_id_all_cap + "_FWD_H"
@@ -236,13 +239,28 @@ namespace_begin = namespace_begin[:-1]
 replacements["<begin namespaces>"] = namespace_begin
 replacements["<end namespaces>"] = namespace_end
 replacements["<namespaces indent>"] = indent
+
+# determine where to put the new files
+base_directory = cedar_home
+
+is_in_cedar = options.output_path is None and is_cedar_class
+if not is_in_cedar:
+  if not options.output_path is None:
+    base_directory = options.output_path
+  else:
+    base_directory = os.getcwd()
+    
+if not options.no_subdirectories:
+  destination_base = base_directory + os.sep + class_path
+else:
+  destination_base = base_directory + os.sep + class_name
   
 # Get user confirmation
 
 print "Creating class:", class_name_full, "aka", class_name
 if not options.template is None:
     print "Using template", options.template
-print "at:", class_path + ".{" + ", ".join(extensions) + "}"
+print "at:", destination_base + ".{" + ", ".join(extensions) + "}"
 # print "replacements:", replacements
 # print "namespaces:", namespaces
 print "top-level namespace:", top_level_namespace
@@ -259,15 +277,6 @@ if has_namespace and not options.no_subdirectories and not os.path.exists(namesp
   os.makedirs(namespace_path)
 
 templates = {"h": "classHeader.h", "fwd.h": "classHeader.fwd.h", "cpp": "classImplementation.cpp"}
-
-base_directory = cedar_home
-
-is_in_cedar = options.output_path is None and is_cedar_class
-if not is_in_cedar:
-  if not options.output_path is None:
-    base_directory = options.output_path
-  else:
-    base_directory = os.getcwd()
     
 if_re = re.compile(r'\<if\s*:\s*(\w+)\s*\>\n(.*?)\<\s*endif\s*\>\n', re.DOTALL)
 else_re = re.compile(r'(.*?)\s*\<\s*else\s*\>\n(.*)', re.DOTALL)
@@ -312,10 +321,7 @@ for extension in extensions:
     for search, replace in replacements.items():
         contents = contents.replace(search, replace)
         
-    if not options.no_subdirectories:
-      destination = base_directory + os.sep + class_path + "." + extension
-    else:
-      destination = base_directory + os.sep + class_name + "." + extension
+    destination = destination_base + "." + extension
       
     print "destination:", destination
     

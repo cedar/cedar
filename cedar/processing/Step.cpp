@@ -234,6 +234,11 @@ const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
   return this->mActions;
 }
 
+bool cedar::proc::Step::hasAction(const std::string& action) const
+{
+  return this->mActions.find(action) != this->mActions.end();
+}
+
 /*! This method takes care of changing the step's name in the registry as well.
  *
  * @todo Unify in element using boost signals/slots
@@ -292,13 +297,13 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   {
     std::string invalid_inputs = cedar::aux::join(this->getInvalidInputNames(), "\", \"");
 
-    this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING,
-                   "Invalid inputs prevent the step from running. These are: \"" + invalid_inputs + "\"");
+    this->setState
+    (
+      cedar::proc::Triggerable::STATE_NOT_RUNNING,
+      "Invalid inputs prevent the step from running. These are: \"" + invalid_inputs + "\""
+    );
     return;
   }
-
-  // if we get to this point, set the state to running
-  this->setState(cedar::proc::Triggerable::STATE_RUNNING, "");
 
   // do the work!
   if (!this->mBusy.tryLock())
@@ -322,8 +327,11 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   {
     std::string errors = cedar::aux::join(this->getInvalidInputNames(), ", ");
 
-    this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING,
-                   "Unconnected mandatory inputs prevent the step from running. These inputs are:" + errors);
+    this->setState
+    (
+      cedar::proc::Triggerable::STATE_NOT_RUNNING,
+      "Unconnected mandatory inputs prevent the step from running. These inputs are:" + errors
+    );
     this->mBusy.unlock();
     return;
   } // this->mMandatoryConnectionsAreSet
@@ -341,7 +349,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
     cedar::unit::Time precise_time(elapsed_precise.total_microseconds() * cedar::unit::micro * cedar::unit::seconds);
     this->setRoundTimeMeasurement(precise_time);
   }
-  
+
   // start measuring the execution time.
   boost::posix_time::ptime run_start = boost::posix_time::microsec_clock::universal_time();
 
@@ -349,7 +357,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   {
     if (arguments.get() != nullptr)
     {
-    // call the compute function with the given arguments
+      // call the compute function with the given arguments
       this->compute(*(arguments.get()));
     }
     else
@@ -357,6 +365,11 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
       // call the compute function with empty arguments
       cedar::proc::Arguments args;
       this->compute(args);
+
+      if (this->getState() == cedar::proc::Triggerable::STATE_UNKNOWN)
+      {
+        this->setState(cedar::proc::Triggerable::STATE_RUNNING, "");
+      }
     }
   }
   // catch exceptions and translate them to the given state/message
@@ -368,7 +381,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
       "cedar::proc::Step::run()",
       this->getName()
     );
-    this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + e.exceptionInfo());
+    this->setState(cedar::proc::Triggerable::STATE_EXCEPTION, "An exception occurred:\n" + e.exceptionInfo());
   }
   catch(const std::exception& e)
   {
@@ -378,7 +391,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
       "cedar::proc::Step::run()",
       this->getName()
     );
-    this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + std::string(e.what()));
+    this->setState(cedar::proc::Triggerable::STATE_EXCEPTION, "An exception occurred:\n" + std::string(e.what()));
   }
   catch(...)
   {
@@ -388,7 +401,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
       "cedar::proc::Step::run()",
       this->getName()
     );
-    this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
+    this->setState(cedar::proc::Triggerable::STATE_EXCEPTION, "An unknown exception type occurred.");
   }
 
   boost::posix_time::ptime run_end = boost::posix_time::microsec_clock::universal_time();
@@ -407,7 +420,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
       if (!cv::checkRange(mat_data->getData(), true))
       {
         std::cout << "NaN detected! " << this->getFullPath() << std::endl;
-        this->setState(cedar::proc::Step::STATE_EXCEPTION, "NaN detected.");
+        this->setState(cedar::proc::Triggerable::STATE_EXCEPTION, "NaN detected.");
       }
     }
   }
@@ -429,7 +442,16 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   // c) The step is a trigger source. This can happen, e.g., if it has no inputs. This also makes it the start
   //    of a trigger chain. The exception here are group sources because they are triggered from the outside (but via a
   //    special mechanism in Trigger::buildTriggerGraph)
-  if (!trigger || this->isLooped() || (this->isTriggerSource() && !dynamic_cast<cedar::proc::sources::GroupSource*>(this)))
+  if
+  (
+    this->getState() != cedar::proc::Triggerable::STATE_INITIALIZING &&
+    (
+      !trigger
+      || this->isLooped()
+      ||
+      (this->isTriggerSource() && !dynamic_cast<cedar::proc::sources::GroupSource*>(this))
+    )
+  )
   {
 #ifdef DEBUG_TRIGGERING
     std::cout << "Step " << this->getName() << " was computed and thus triggers its done trigger." << std::endl;

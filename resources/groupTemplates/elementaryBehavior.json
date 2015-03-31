@@ -51,6 +51,22 @@
             "cyclic": "false"
         }
     },
+    "triggers":
+    {
+        "cedar.processing.LoopedTrigger":
+        {
+            "name": "default trigger",
+            "step size": "0.001 s",
+            "idle time": "1e-05 s",
+            "simulated time": "0.001 s",
+            "loop mode": "Fixed",
+            "start with all": "true",
+            "listeners":
+            [
+                "Elementary behavior"
+            ]
+        }
+    },
     "groups":
     {
         "Elementary behavior":
@@ -426,24 +442,6 @@
                     "gain factor": "1"
                 }
             },
-            "triggers":
-            {
-                "cedar.processing.LoopedTrigger":
-                {
-                    "name": "new LoopedTrigger",
-                    "step size": "0.001 s",
-                    "idle time": "1e-05 s",
-                    "simulated time": "0.001 s",
-                    "loop mode": "Fixed",
-                    "listeners":
-                    [
-                        "intention node",
-                        "intention field",
-                        "CoS node",
-                        "CoS field"
-                    ]
-                }
-            },
             "connections":
             [
                 {
@@ -523,21 +521,6 @@
                     "target": "new StaticGain 4.input"
                 }
             ],
-            "records":
-            {
-                "OBJ CENT (cod)_activation": "0.05 s",
-                "OBJ CENT (cos)_activation": "0.05 s",
-                "REF field_activation": "0.05 s",
-                "REF inhib ret_activation": "0.05 s",
-                "TAR field_activation": "0.05 s",
-                "color cod_activation": "0.05 s",
-                "color cos_activation": "0.05 s",
-                "color int_activation": "0.05 s",
-                "perceptual_activation": "0.05 s",
-                "reference production_activation": "0.05 s",
-                "spatial term production_activation": "0.05 s",
-                "target production_activation": "0.05 s"
-            },
             "name": "Elementary behavior",
             "connectors":
             {
@@ -545,7 +528,7 @@
                 "intention field input": "true",
                 "task input": "true"
             },
-            "is looped": "false",
+            "is looped": "true",
             "ui":
             [
                 {
@@ -592,14 +575,6 @@
                     "height": "40",
                     "positionX": "272",
                     "positionY": "312"
-                },
-                {
-                    "type": "trigger",
-                    "trigger": "new LoopedTrigger",
-                    "width": "30",
-                    "height": "30",
-                    "positionX": "312",
-                    "positionY": "216"
                 },
                 {
                     "type": "step",
@@ -691,6 +666,7 @@
                 "height": "403",
                 "smart mode": "false",
                 "collapsed": "false",
+                "lock geometry": "false",
                 "uncollapsed width": "634",
                 "uncollapsed height": "403",
                 "positionX": "176",
@@ -713,26 +689,19 @@
             "target": "Elementary behavior.task input"
         }
     ],
-    "records":
-    {
-        "OBJ CENT (cod)_activation": "0.05 s",
-        "OBJ CENT (cos)_activation": "0.05 s",
-        "REF field_activation": "0.05 s",
-        "REF inhib ret_activation": "0.05 s",
-        "TAR field_activation": "0.05 s",
-        "color cod_activation": "0.05 s",
-        "color cos_activation": "0.05 s",
-        "color int_activation": "0.05 s",
-        "perceptual_activation": "0.05 s",
-        "reference production_activation": "0.05 s",
-        "spatial term production_activation": "0.05 s",
-        "target production_activation": "0.05 s"
-    },
     "name": "root",
     "connectors": "",
     "is looped": "false",
     "ui":
     [
+        {
+            "type": "trigger",
+            "trigger": "default trigger",
+            "width": "30",
+            "height": "30",
+            "positionX": "0",
+            "positionY": "0"
+        },
         {
             "type": "step",
             "step": "new Boost",
@@ -771,6 +740,7 @@
         "height": "250",
         "smart mode": "false",
         "collapsed": "false",
+        "lock geometry": "false",
         "uncollapsed width": "250",
         "uncollapsed height": "250",
         "positionX": "0",

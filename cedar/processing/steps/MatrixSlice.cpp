@@ -98,7 +98,7 @@ const cedar::proc::steps::MatrixSlice::AnchorType::Id cedar::proc::steps::Matrix
 
 cedar::proc::steps::MatrixSlice::MatrixSlice()
 :
-mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
+mOutput(new cedar::aux::MatData(cv::Mat())),
 _mAnchorType
 (
   new cedar::aux::EnumParameter
@@ -139,9 +139,9 @@ _mRangeUpper
 
   this->declareOutput("slice", mOutput);
 
-  QObject::connect(this->_mAnchorType.get(), SIGNAL(valueChanged()), this, SLOT(rangeChanged()));
-  QObject::connect(this->_mRangeLower.get(), SIGNAL(valueChanged()), this, SLOT(rangeChanged()));
-  QObject::connect(this->_mRangeUpper.get(), SIGNAL(valueChanged()), this, SLOT(rangeChanged()));
+  QObject::connect(this->_mAnchorType.get(), SIGNAL(valueChanged()), this, SLOT(rangeChanged()), Qt::DirectConnection);
+  QObject::connect(this->_mRangeLower.get(), SIGNAL(valueChanged()), this, SLOT(rangeChanged()), Qt::DirectConnection);
+  QObject::connect(this->_mRangeUpper.get(), SIGNAL(valueChanged()), this, SLOT(rangeChanged()), Qt::DirectConnection);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

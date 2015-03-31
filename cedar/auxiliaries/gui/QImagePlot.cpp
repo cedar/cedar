@@ -38,6 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/annotation/ValueRangeHint.h"
 #include "cedar/auxiliaries/gui/QImagePlot.h"
 #include "cedar/auxiliaries/ColorGradient.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -106,7 +107,7 @@ _mColorJet(new cedar::aux::EnumParameter(this, "color jet", cedar::aux::ColorGra
   this->mpImageDisplay = new cedar::aux::gui::QImagePlot::ImageDisplay(this, "no data");
   p_layout->addWidget(mpImageDisplay);
   this->mpImageDisplay->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-  this->mpImageDisplay->setMinimumSize(QSize(50, 50));
+  this->mpImageDisplay->setMinimumSize(QSize(5, 5));
 
   QObject::connect
   (
@@ -171,6 +172,27 @@ cedar::aux::gui::detail::QImagePlotLegend::QImagePlotLegend()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::QImagePlot::plot(cedar::aux::ConstDataPtr data, const std::string& /*title*/)
+{
+  if (data->hasAnnotation<cedar::aux::annotation::ValueRangeHint>())
+  {
+    this->mValueHint = data->getAnnotation<cedar::aux::annotation::ValueRangeHint>();
+
+    // set fixed scaling based on the value hint
+    this->setLimits(this->mValueHint->getRange().getLower(), this->mValueHint->getRange().getUpper());
+  }
+  else
+  {
+    // if a value hint was previously set, revert to automatic scaling
+    if (this->mValueHint)
+    {
+      this->setAutomaticScaling();
+    }
+    // reset the value hint
+    this->mValueHint.reset();
+  }
+}
 
 void cedar::aux::gui::QImagePlot::colorJetChanged()
 {

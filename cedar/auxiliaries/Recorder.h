@@ -64,6 +64,8 @@
    */
 class cedar::aux::Recorder : public cedar::aux::LoopedThread
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
@@ -157,6 +159,13 @@ public:
 
   //!@brief Removes all threads.
   void removeAllRecordings();
+
+  //! Returns true if any data is set to be recorded.
+  bool hasDataToRecord() const;
+
+signals:
+  //! Emitted whenver data is added or removed.
+  void recordedDataChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

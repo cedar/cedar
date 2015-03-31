@@ -22,24 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ImageSetData.h
+    File:        ElementTreeWidget.fwd.h
 
-    Maintainer:  Irina Popova
-    Email:       irina.popova@ini.ruhr-uni-bochum.de
-    Date:        2012 04 03
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 10 21
 
-    Description: This is a dummy header for the typedef ImageSetData
-                 (which is actually a cedar::aux::DataTemplate<std::vector<cv::Mat>>).
+    Description: Forward declaration file for the class cedar::proc::gui::ElementTreeWidget.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_IMAGE_SET_DATA_H
-#define CEDAR_AUX_IMAGE_SET_DATA_H
+#ifndef CEDAR_PROC_GUI_ELEMENT_TREE_WIDGET_FWD_H
+#define CEDAR_PROC_GUI_ELEMENT_TREE_WIDGET_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/processing/lib.h"
 
-#endif // CEDAR_AUX_IMAGE_SET_DATA_H
+// SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
+
+
+namespace cedar
+{
+  namespace proc
+  {
+    namespace gui
+    {
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_PROC_CLASS(ElementTreeWidget);
+      //!@endcond
+    }
+  }
+}
+
+
+#endif // CEDAR_PROC_GUI_ELEMENT_TREE_WIDGET_FWD_H
+

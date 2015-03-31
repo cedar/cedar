@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/VectorParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/systemFunctions.h"
+#include "cedar/version.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -75,7 +76,6 @@ mLog(new cedar::proc::gui::Settings::DockSettings()),
 mSteps(new cedar::proc::gui::Settings::DockSettings()),
 mTools(new cedar::proc::gui::Settings::DockSettings()),
 mProperties(new cedar::proc::gui::Settings::DockSettings()),
-mBoostCtrlSettgings(new cedar::proc::gui::Settings::DockSettings(false)),
 mMainWindowGeometry(new cedar::aux::StringParameter(this, "mainWindowGeometry", "")),
 mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
 {
@@ -86,7 +86,9 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   ui_settings->addConfigurableChild("steps", mSteps);
   ui_settings->addConfigurableChild("tools", mTools);
   ui_settings->addConfigurableChild("properties", mProperties);
-  ui_settings->addConfigurableChild("boost control", mBoostCtrlSettgings);
+  this->declareDockSettings("boost control", false);
+  this->declareDockSettings("simulation control", false);
+  this->declareDockSettings("architecture consistency check", false);
 
   cedar::aux::ConfigurablePtr slot_growth(new cedar::aux::Configurable());
   this->addConfigurableChild("slot growth", slot_growth);
@@ -197,7 +199,35 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   default_user_colors.push_back("yellow=rgb(255,255,110)");
   this->_mUserDefinedColors = new cedar::aux::StringVectorParameter(this, "user-defined colors", default_user_colors);
 
+  std::vector<std::string> default_favs;
+  default_favs.push_back("cedar.dynamics.NeuralField");
+  default_favs.push_back("node");
+  default_favs.push_back("cedar.processing.StaticGain");
+  default_favs.push_back("cedar.processing.steps.Convolution");
+  default_favs.push_back("cedar.processing.Projection");
+  default_favs.push_back("cedar.processing.Resize");
+  default_favs.push_back("cedar.processing.steps.Sum");
+  default_favs.push_back("cedar.processing.sources.Boost");
+  default_favs.push_back("cedar.processing.sources.GaussInput");
+  this->_mFavoriteElements = new cedar::aux::StringVectorParameter(this, "favorite elements", default_favs);
+  QObject::connect(this->_mFavoriteElements.get(), SIGNAL(valueChanged()), this, SIGNAL(elementFavoritesChanged()));
+
+  this->_mReadOneTimeMessages = new cedar::aux::StringSetParameter(this, "read one-time messages", std::set<std::string>());
+
   this->load();
+
+
+  this->addOneTimeMessage
+  (
+    CEDAR_MAKE_VERSION(5, 0, 0), // this feature was introduced in 5.0.0
+    "looped-trigger-overhaul",
+    "Looped Trigger Overhaul",
+    "<p>In a recent overhaul, looped triggers have been redesigned.</p>"
+    "<p>You no longer have to manually connect steps to looped triggers. Rather, they are connected to a default trigger"
+    " automatically. If you want more triggers, you can add them in the new simulation control widget. Assigning them"
+    " can be done in the right-click menu.</p>"
+    "<p>Please refer to the changelog for more details."
+  );
 }
 
 cedar::proc::gui::Settings::UserDefinedColor::UserDefinedColor(const std::string& stringToParse)
@@ -235,6 +265,115 @@ cedar::proc::gui::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+std::vector<std::string> cedar::proc::gui::Settings::getFavedElements() const
+{
+  return this->_mFavoriteElements->getValue();
+}
+
+void cedar::proc::gui::Settings::setFavorite(const std::string& className, bool favorite)
+{
+  if (favorite)
+  {
+    if (!this->isFavoriteElement(className))
+    {
+      this->_mFavoriteElements->pushBack(className);
+    }
+  }
+  else
+  {
+    this->_mFavoriteElements->eraseAll(className);
+  }
+}
+
+bool cedar::proc::gui::Settings::isFavoriteElement(const std::string& className) const
+{
+  for (const auto& favorite : this->getFavedElements())
+  {
+    if (favorite == className)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+std::vector<cedar::proc::gui::Settings::OneTimeMessagePtr> cedar::proc::gui::Settings::getUnreadOneTimeMessages() const
+{
+  std::vector<cedar::proc::gui::Settings::OneTimeMessagePtr> messages;
+
+  for (auto message : this->mOneTimeMessages)
+  {
+    unsigned int major_minor_version = CEDAR_MAKE_VERSION(CEDAR_VERSION_MAJOR, CEDAR_VERSION_MINOR, 0);
+    if
+    (
+      !this->_mReadOneTimeMessages->contains(message->mId)
+      && message->mVersion >= major_minor_version // only select messages that pertain to the current version (ignoring the bugfix counter)
+    )
+    {
+      messages.push_back(message);
+    }
+  }
+
+  return messages;
+}
+
+std::vector<cedar::proc::gui::Settings::OneTimeMessagePtr> cedar::proc::gui::Settings::getRecentOneTimeMessages() const
+{
+  std::multimap<unsigned int, OneTimeMessagePtr> messages_by_version;
+  for (auto message : this->mOneTimeMessages)
+  {
+    messages_by_version.insert(std::make_pair(message->mVersion, message));
+  }
+
+  std::vector<OneTimeMessagePtr> messages;
+  for (auto iter = messages_by_version.rbegin(); iter != messages_by_version.rend(); ++iter)
+  {
+    messages.push_back(iter->second);
+  }
+  return messages;
+}
+
+void cedar::proc::gui::Settings::markAsRead(const std::vector<OneTimeMessagePtr>& messages)
+{
+  for (auto message : messages)
+  {
+    this->_mReadOneTimeMessages->insert(message->mId);
+  }
+}
+
+void cedar::proc::gui::Settings::addOneTimeMessage
+(
+  unsigned int version,
+  const std::string& messageId,
+  const std::string& title,
+  const std::string& message
+)
+{
+  OneTimeMessagePtr otm(new OneTimeMessage());
+  otm->mVersion = version;
+  otm->mId = messageId;
+  otm->mTitle = title;
+  otm->mMessage = message;
+
+  this->mOneTimeMessages.insert(otm);
+}
+
+void cedar::proc::gui::Settings::declareDockSettings(const std::string& id, bool defaultVisible)
+{
+  auto ui_child = this->getConfigurableChild("ui");
+  cedar::proc::gui::Settings::DockSettingsPtr dock_settings(new cedar::proc::gui::Settings::DockSettings(defaultVisible));
+  ui_child->addConfigurableChild(id, dock_settings);
+  this->mNamedDockSettings[id] = dock_settings;
+}
+
+cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::getNamedDockSettings(const std::string& id) const
+{
+  auto iter = this->mNamedDockSettings.find(id);
+  CEDAR_ASSERT(iter != this->mNamedDockSettings.end());
+  return iter->second;
+}
 
 void cedar::proc::gui::Settings::userDefinedColorStringsChanged()
 {
@@ -434,9 +573,6 @@ void cedar::proc::gui::Settings::DockSettings::getFrom(QDockWidget *pDock)
 
 void cedar::proc::gui::Settings::DockSettings::setTo(QDockWidget *pDock)
 {
-  pDock->setVisible(this->mVisible->getValue());
-  pDock->setFloating(this->mFloating->getValue());
-
   if (!this->mGeometry->getValue().empty())
   {
     QByteArray window_geometry_hex(this->mGeometry->getValue().c_str());
@@ -446,11 +582,9 @@ void cedar::proc::gui::Settings::DockSettings::setTo(QDockWidget *pDock)
       std::cout << "Could not restore geometry of dock widget." << std::endl;
     }
   }
-}
 
-cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::boostCtrlSettings()
-{
-  return this->mBoostCtrlSettgings;
+  pDock->setVisible(this->mVisible->getValue());
+  pDock->setFloating(this->mFloating->getValue());
 }
 
 cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::logSettings()
