@@ -104,6 +104,8 @@
     <addaction name="separator"/>
     <addaction name="mpMenuArchitecturePlots"/>
     <addaction name="separator"/>
+    <addaction name="mpActionLockUIPositions"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -242,8 +244,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>98</width>
-          <height>28</height>
+          <width>116</width>
+          <height>422</height>
          </rect>
         </property>
         <attribute name="label">
@@ -300,8 +302,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>28</height>
+              <width>254</width>
+              <height>429</height>
              </rect>
             </property>
             <property name="palette">
@@ -864,6 +866,22 @@
   <action name="mpActionShowRecentNotifications">
    <property name="text">
     <string>Show recent notifications...</string>
+   </property>
+  </action>
+  <action name="mpActionLockUIPositions">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+     <normaloff>:/cedar/auxiliaries/gui/lock_unlocked.svg</normaloff>
+     <normalon>:/cedar/auxiliaries/gui/lock_locked.svg</normalon>:/cedar/auxiliaries/gui/lock_unlocked.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Lock UI positions</string>
+   </property>
+   <property name="toolTip">
+    <string>Locks/unlocks the position of UI elements such as the log, the elements tab and so on.</string>
    </property>
   </action>
  </widget>

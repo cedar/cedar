@@ -82,6 +82,8 @@ Unreleased
   - The time factor setting is now saved per architecture. New architectures start with time factor 1. 
   - You can now declare favorite element classes in the elements tab. Right-click on any element to favorite/unfavorite
     the class.
+  - The UI elements (log, elements, properties etc.) are now locked by default and cannot be moved. You can unlock them
+    in the windows menu.
 
 Released versions
 =================
