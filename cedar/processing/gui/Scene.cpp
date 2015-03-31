@@ -40,7 +40,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/CouplingCollection.h"
-#include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/ResizeHandle.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/StepItem.h"

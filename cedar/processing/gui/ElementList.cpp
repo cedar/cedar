@@ -41,7 +41,6 @@
 #include "cedar/processing/gui/ElementList.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
@@ -459,7 +458,21 @@ void cedar::proc::gui::ElementList::reset()
       p_tab->update();
     }
 
-    //!@todo: Re-sort the tabs
+    // sort the tabs alphabetically using bubble sort
+    for (int n = this->tabBar()->count(); n > 1; --n)
+    {
+      // start at i = 1 because the first tab is the favorites tab and should always stay in the first place
+      for (int i = 1; i < n - 1; ++i)
+      {
+        std::string text_1 = this->tabBar()->tabText(i).toStdString();
+        std::string text_2 = this->tabBar()->tabText(i + 1).toStdString();
+
+        if (cedar::aux::toLower(text_1) > cedar::aux::toLower(text_2))
+        {
+          this->tabBar()->moveTab(i, i + 1);
+        }
+      }
+    }
 
     // if the category does not contain any displayed items, remove it
     if (p_tab->count() == 0)

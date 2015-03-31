@@ -53,7 +53,6 @@
 #include "cedar/processing/gui/SettingsDialog.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
-#include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/SimulationControl.h"
