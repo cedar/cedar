@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ElementClassList.fwd.h
+    File:        CallElementAction.fwd.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 11 07
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2015 01 16
 
-    Description: Forward declaration file for the class cedar::proc::gui::ElementClassList.
+    Description: Forward declaration file for the class cedar::proc::experiment::CallElementAction.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_FWD_H
-#define CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_CALL_ELEMENT_ACTION_FWD_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_CALL_ELEMENT_ACTION_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -53,14 +53,17 @@ namespace cedar
 {
   namespace proc
   {
-    namespace gui
+    namespace experiment
     {
-      CEDAR_DECLARE_PROC_CLASS(ElementClassList);
+      namespace action
+      {
+        CEDAR_DECLARE_PROC_CLASS(CallElementAction);
+      }
     }
   }
 }
 
 //!@endcond
 
-#endif // CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_FWD_H
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_CALL_ELEMENT_ACTION_FWD_H
 

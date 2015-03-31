@@ -122,8 +122,8 @@ _mInterpolationType(new cedar::aux::EnumParameter(this,
   this->declareOutput("output", mOutput);
 
   // connect the parameter's change signal
-  QObject::connect(_mOutputSize.get(), SIGNAL(valueChanged()), this, SLOT(outputSizeChanged()));
-  QObject::connect(_mInterpolationType.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
+  QObject::connect(_mOutputSize.get(), SIGNAL(valueChanged()), this, SLOT(outputSizeChanged()), Qt::DirectConnection);
+  QObject::connect(_mInterpolationType.get(), SIGNAL(valueChanged()), this, SLOT(recompute()), Qt::DirectConnection);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

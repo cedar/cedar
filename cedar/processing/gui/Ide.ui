@@ -87,6 +87,9 @@
     <addaction name="mpActionStartPauseSimulation"/>
     <addaction name="mpActionResetSimulation"/>
     <addaction name="mpThreadsSingleStep"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionRecord"/>
+    <addaction name="mpActionSnapshot"/>
    </widget>
    <widget class="QMenu" name="mpMenuWindows">
     <property name="title">
@@ -101,11 +104,15 @@
     <addaction name="separator"/>
     <addaction name="mpMenuArchitecturePlots"/>
     <addaction name="separator"/>
+    <addaction name="mpActionLockUIPositions"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="mpActionShowRecentNotifications"/>
+    <addaction name="separator"/>
     <addaction name="mpActionAbout"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
@@ -123,23 +130,17 @@
     <property name="title">
      <string>View</string>
     </property>
-    <widget class="QMenu" name="menuTrigger_Connections">
-     <property name="title">
-      <string>Trigger Connections</string>
-     </property>
-     <addaction name="mpActionToggleTriggerVisibility"/>
-     <addaction name="mpActionTriggerSmartHide"/>
-    </widget>
-    <addaction name="menuTrigger_Connections"/>
     <addaction name="mpActionShowHideGrid"/>
     <addaction name="mpActionToggleSmartConnections"/>
+    <addaction name="mpActionToggleTriggerColor"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionClosePlots"/>
+    <addaction name="mpActionToggleVisibilityOfPlots"/>
    </widget>
-   <widget class="QMenu" name="menuTools">
+   <widget class="QMenu" name="mpToolsMenu">
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="mpActionArchitectureConsistencyCheck"/>
-    <addaction name="mpActionBoostControl"/>
     <addaction name="mpActionPerformanceOverview"/>
     <addaction name="mpActionExperiments"/>
     <addaction name="mpActionParameterLinker"/>
@@ -157,7 +158,7 @@
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuSimulation"/>
-   <addaction name="menuTools"/>
+   <addaction name="mpToolsMenu"/>
    <addaction name="mpMenuWindows"/>
    <addaction name="mpMenuArchitectureScripts"/>
    <addaction name="menuHelp"/>
@@ -179,7 +180,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QTabWidget" name="mpCategoryList"/>
+      <widget class="cedar::proc::gui::ElementList" name="mpCategoryList"/>
      </item>
     </layout>
    </widget>
@@ -243,8 +244,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>98</width>
-          <height>28</height>
+          <width>116</width>
+          <height>422</height>
          </rect>
         </property>
         <attribute name="label">
@@ -301,8 +302,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>28</height>
+              <width>254</width>
+              <height>429</height>
              </rect>
             </property>
             <property name="palette">
@@ -428,11 +429,12 @@
    <addaction name="mpActionRecord"/>
    <addaction name="mpActionSnapshot"/>
    <addaction name="separator"/>
-   <addaction name="mpActionBoostControl"/>
+   <addaction name="mpActionDummy"/>
    <addaction name="separator"/>
    <addaction name="mpActionToggleSmartConnections"/>
    <addaction name="mpActionShowHideGrid"/>
    <addaction name="mpActionToggleTriggerVisibility"/>
+   <addaction name="mpActionToggleTriggerColor"/>
    <addaction name="mpActionClosePlots"/>
    <addaction name="mpActionToggleVisibilityOfPlots"/>
    <addaction name="separator"/>
@@ -580,7 +582,7 @@
     <bool>true</bool>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
@@ -605,15 +607,6 @@
     <string>Smart hide</string>
    </property>
   </action>
-  <action name="mpActionArchitectureConsistencyCheck">
-   <property name="icon">
-    <iconset resource="icons/cedar_proc_gui_icons.qrc">
-     <normaloff>:/menus/consistency_check.svg</normaloff>:/menus/consistency_check.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Architecture consistency check ...</string>
-   </property>
-  </action>
   <action name="mpThreadsSingleStep">
    <property name="icon">
     <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
@@ -627,21 +620,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl++</string>
-   </property>
-  </action>
-  <action name="mpActionBoostControl">
-   <property name="icon">
-    <iconset resource="icons/cedar_proc_gui_icons.qrc">
-     <normaloff>:/steps/boost.svg</normaloff>:/steps/boost.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Boost control ...</string>
-   </property>
-   <property name="toolTip">
-    <string>Open a boost control widget.</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+B</string>
    </property>
   </action>
   <action name="mpActionToggleSmartConnections">
@@ -859,6 +837,53 @@
     <string>store open plots in selected plot group</string>
    </property>
   </action>
+  <action name="mpActionToggleTriggerColor">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/show_trigger_colors.svg</normaloff>:/toolbaricons/show_trigger_colors.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Color elements by trigger</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle visibility of trigger colors.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+T</string>
+   </property>
+  </action>
+  <action name="mpActionDummy">
+   <property name="text">
+    <string>dummy action</string>
+   </property>
+   <property name="toolTip">
+    <string>You should not see this. This is what tells the IDE where to (automatically) put buttons for, e.g., the boost control.</string>
+   </property>
+  </action>
+  <action name="mpActionShowRecentNotifications">
+   <property name="text">
+    <string>Show recent notifications...</string>
+   </property>
+  </action>
+  <action name="mpActionLockUIPositions">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+     <normaloff>:/cedar/auxiliaries/gui/lock_unlocked.svg</normaloff>
+     <normalon>:/cedar/auxiliaries/gui/lock_locked.svg</normalon>:/cedar/auxiliaries/gui/lock_unlocked.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Lock UI positions</string>
+   </property>
+   <property name="toolTip">
+    <string>Locks/unlocks the position of UI elements such as the log, the elements tab and so on.</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -887,6 +912,12 @@
    <class>cedar::proc::gui::RecorderWidget</class>
    <extends>QWidget</extends>
    <header>cedar/processing/gui/RecorderWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cedar::proc::gui::ElementList</class>
+   <extends>QTabWidget</extends>
+   <header>cedar/processing/gui/ElementList.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

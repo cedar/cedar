@@ -168,12 +168,17 @@ const std::string& cedar::proc::DataSlot::getText() const
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::getValidity() const
 {
-  return this->mValidity;
+  QReadLocker locker(this->mValidity.getLockPtr());
+  auto copy = this->mValidity.member();
+  return copy;
 }
 
 void cedar::proc::DataSlot::setValidity(cedar::proc::DataSlot::VALIDITY validity)
 {
-  this->mValidity = validity;
+  QWriteLocker locker(this->mValidity.getLockPtr());
+  this->mValidity.member() = validity;
+  locker.unlock();
+
   this->signalValidityChanged();
 }
 

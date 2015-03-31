@@ -113,6 +113,9 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
     //! return the maximum of skipped steps
     double getMaxStepsTaken();
 
+    //! Return the number of steps taken (including skipped ones).
+    double getSumOfStepsTaken();
+
   private:
     void globalTimeFactorChanged(double newFactor);
 

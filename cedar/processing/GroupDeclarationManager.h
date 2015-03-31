@@ -104,6 +104,9 @@ public:
   //!@brief get all definitions
   const GroupDeclarationMap& getDefinitions() const;
 
+  //! Gets a declaration given a name. Returns a null pointer if
+  cedar::proc::ConstGroupDeclarationPtr getDeclarationNoThrow(const std::string& name) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

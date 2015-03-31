@@ -38,6 +38,7 @@
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Group.h"
+#include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -182,19 +183,32 @@ boost::signals2::connection cedar::proc::Triggerable::connectToStateChanged(boos
   return mStateChanged.connect(slot);
 }
 
-void cedar::proc::Triggerable::setParentTrigger(cedar::proc::TriggerPtr parent)
+void cedar::proc::Triggerable::setLoopedTrigger(cedar::proc::LoopedTriggerPtr parent)
 {
-  if (this->isLooped())
+  if (!this->isLooped())
   {
-    // If there is already a parent trigger for looped steps, disconnect it first!
-    CEDAR_ASSERT(!parent || !this->mParentTrigger.lock());
+    CEDAR_THROW(cedar::proc::LoopStateException, "Setting a looped trigger is only allowed for looped triggerables.");
   }
-  this->mParentTrigger = parent;
+  this->mLoopedTrigger = parent;
+  this->signalLoopedTriggerChanged();
 }
 
-cedar::proc::TriggerPtr cedar::proc::Triggerable::getParentTrigger()
+cedar::proc::LoopedTriggerPtr cedar::proc::Triggerable::getLoopedTrigger()
 {
-  return this->mParentTrigger.lock();
+  if (!this->isLooped())
+  {
+    CEDAR_THROW(cedar::proc::LoopStateException, "Only looped triggerables have a looped trigger.");
+  }
+  return this->mLoopedTrigger.lock();
+}
+
+cedar::proc::ConstLoopedTriggerPtr cedar::proc::Triggerable::getLoopedTrigger() const
+{
+  if (!this->isLooped())
+  {
+    CEDAR_THROW(cedar::proc::LoopStateException, "Only looped triggerables have a looped trigger.");
+  }
+  return this->mLoopedTrigger.lock();
 }
 
 void cedar::proc::Triggerable::callOnStart()
@@ -227,6 +241,7 @@ void cedar::proc::Triggerable::callOnStart()
   if (this->mStartCalls == 1)
   {
     this->signalStarted();
+    this->setState(cedar::proc::Triggerable::STATE_RUNNING, "");
 
     QReadLocker lock_r(this->mFinished.getLockPtr());
     if (mFinished.member())
@@ -296,8 +311,13 @@ void cedar::proc::Triggerable::setState(cedar::proc::Triggerable::State newState
     this->mState.member().mState = newState;
     this->mState.member().mStateReason = annotation;
     locker.unlock();
-    mStateChanged();
+    this->signalStateChanged();
   }
+}
+
+void cedar::proc::Triggerable::signalStateChanged() const
+{
+  this->mStateChanged();
 }
 
 cedar::proc::Triggerable::State cedar::proc::Triggerable::getState() const
@@ -343,4 +363,10 @@ unsigned int cedar::proc::Triggerable::numberOfStartCalls() const
   QMutexLocker locker(this->mpStartCallsLock);
   unsigned int calls = this->mStartCalls;
   return calls;
+}
+
+void cedar::proc::Triggerable::resetLoopedTrigger()
+{
+  this->mLoopedTrigger.reset();
+  this->signalLoopedTriggerChanged();
 }
