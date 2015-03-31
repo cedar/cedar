@@ -48,6 +48,7 @@
 #ifndef Q_MOC_RUN
   #include <boost/signals2.hpp>
 #endif // Q_MOC_RUN
+#include <QReadWriteLock>
 
 //!@brief Can start, stop and reset the network time and should be used as a central time giver in a network.
 class cedar::aux::GlobalClock
@@ -111,6 +112,9 @@ protected:
     // none yet
 
 private:
+  //! Lock used to synchronize access to the global clock.
+  mutable QReadWriteLock* mpAccessLock;
+
   //!@brief Flag that indicates when the timer starts/stops
   bool mRunning;
 
