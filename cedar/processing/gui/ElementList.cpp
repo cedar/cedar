@@ -92,7 +92,10 @@ bool metatype_registered = registerPluginDeclaratioMetaType();
 cedar::proc::gui::ElementList::ElementList(QWidget* pParent)
 :
 QTabWidget(pParent),
-mpFavoritesTab(nullptr)
+mpFavoritesTab(nullptr),
+mpSearchBox(new cedar::proc::gui::elementList::SearchBar(this)),
+mpSearchResultTab(nullptr),
+mPreSearchIndex(-1)
 {
   QObject::connect
   (
@@ -115,6 +118,15 @@ mpFavoritesTab(nullptr)
     boost::bind(&cedar::proc::gui::ElementList::reset, this)
   );
 
+  QObject::connect
+  (
+    this->mpSearchBox,
+    SIGNAL(searchStringChanged(QString)),
+    this,
+    SLOT(updateSearchResults(QString))
+  );
+
+
   this->reset();
 }
 
@@ -127,6 +139,12 @@ QListWidget(pParent)
   this->setResizeMode(QListView::Adjust);
   this->setDragEnabled(true);
   this->setIconSize(QSize(40, 40));
+}
+
+cedar::proc::gui::ElementList::SearchResultsTab::SearchResultsTab(QWidget* pParent)
+:
+cedar::proc::gui::ElementList::TabBase(pParent)
+{
 }
 
 cedar::proc::gui::ElementList::CategoryTab::CategoryTab(const std::string& categoryName, QWidget* pParent)
@@ -144,9 +162,81 @@ cedar::proc::gui::ElementList::TabBase(pParent)
   this->update();
 }
 
+cedar::proc::gui::elementList::SearchBar::SearchBar(QWidget* pParent)
+:
+QLineEdit(pParent)
+{
+  this->setFixedWidth(300);
+
+  this->mpSearchClearIcon = new QPushButton(QIcon(":/cedar/auxiliaries/gui/search.svg"), "", this);
+  this->mpSearchClearIcon->setFixedSize(16, 16);
+  this->mpSearchClearIcon->setFlat(true);
+  this->mpSearchClearIcon->setFocusPolicy(Qt::NoFocus);
+  this->mpSearchClearIcon->setStyleSheet("QPushButton{background:rgba(0,0,0,0);}");
+
+  QObject::connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(textChanged(const QString&)));
+  QObject::connect(this->mpSearchClearIcon, SIGNAL(clicked()), this, SLOT(clearClicked()));
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::elementList::SearchBar::textChanged(const QString& text)
+{
+  if (text.isEmpty())
+  {
+    this->mpSearchClearIcon->setIcon(QIcon(":/cedar/auxiliaries/gui/search.svg"));
+  }
+  else
+  {
+    this->mpSearchClearIcon->setIcon(QIcon(":/cedar/auxiliaries/gui/clear.svg"));
+  }
+
+  emit searchStringChanged(text);
+}
+
+void cedar::proc::gui::elementList::SearchBar::clearClicked()
+{
+  this->setText("");
+}
+
+void cedar::proc::gui::elementList::SearchBar::resizeEvent(QResizeEvent* pEvent)
+{
+  QLineEdit::resizeEvent(pEvent);
+
+  // update size/position of icon
+  auto geometry = this->mpSearchClearIcon->geometry();
+  int icon_w = geometry.width();
+  int icon_h = geometry.height();
+  int w = pEvent->size().width();
+  int h = pEvent->size().height();
+  int v_space_top = (h - icon_h) / 2;
+  geometry.setLeft(w - icon_w - v_space_top);
+  geometry.setRight(w - v_space_top);
+  geometry.setTop(v_space_top);
+  geometry.setBottom(v_space_top + icon_h);
+  this->mpSearchClearIcon->setGeometry(geometry);
+
+  // update text margins
+  auto margins = this->textMargins();
+  margins.setRight(icon_w + v_space_top);
+  this->setTextMargins(margins);
+}
+
+void cedar::proc::gui::ElementList::resizeEvent(QResizeEvent* pEvent)
+{
+  QTabWidget::resizeEvent(pEvent);
+
+  // put the search bar into the top-right corner
+  auto geomertry = this->mpSearchBox->geometry();
+  geomertry.setLeft(pEvent->size().width() - geomertry.width());
+  geomertry.setRight(pEvent->size().width());
+  this->mpSearchBox->setGeometry(geomertry);
+
+  // resize the tab bar
+  this->tabBar()->setMaximumWidth(pEvent->size().width() - this->mpSearchBox->width());
+}
 
 cedar::aux::ConstPluginDeclaration* cedar::proc::gui::ElementList::TabBase::getDeclarationFromItem(QListWidgetItem* pItem) const
 {
@@ -483,4 +573,114 @@ void cedar::proc::gui::ElementList::reset()
       mCategoryWidgets.erase(iter);
     }
   }
+}
+
+void cedar::proc::gui::ElementList::updateSearchResults(QString searchText)
+{
+  if (this->mpSearchResultTab == nullptr)
+  {
+    this->mpSearchResultTab = new SearchResultsTab();
+  }
+
+  if (searchText.isEmpty())
+  {
+    // remove the tab to "hide" it (qt has no method for hiding it)
+    int tab_index = -1;
+    for (int i = 0; i < this->count(); ++i)
+    {
+      if (this->widget(i) == this->mpSearchResultTab)
+      {
+        tab_index = i;
+        break;
+      }
+    }
+
+    if (tab_index == this->currentIndex() && this->mPreSearchIndex >= 0)
+    {
+      this->setCurrentIndex(this->mPreSearchIndex);
+    }
+
+    this->mPreSearchIndex = -1;
+
+    if (tab_index >= 0)
+    {
+      this->removeTab(tab_index);
+    }
+  }
+  else
+  {
+    if (this->mPreSearchIndex < 0)
+    {
+      this->addTab(this->mpSearchResultTab, "search results");
+    }
+
+    // find out the index of the search result tab
+    int tab_index = -1;
+    for (int i = 0; i < this->count(); ++i)
+    {
+      if (this->widget(i) == this->mpSearchResultTab)
+      {
+        tab_index = i;
+        break;
+      }
+    }
+
+    // if the user has changed the tab, remember where we were before
+    if (tab_index >= 0 && tab_index != this->currentIndex())
+    {
+      this->mPreSearchIndex = this->currentIndex();
+      this->setCurrentIndex(tab_index);
+    }
+
+    this->mpSearchResultTab->update(searchText.toStdString());
+  }
+}
+
+void cedar::proc::gui::ElementList::SearchResultsTab::update(const std::string& searchFilter)
+{
+  // gather all declarations
+  std::multimap<std::string, cedar::aux::ConstPluginDeclarationPtr> ordered_entries;
+
+  // first, go trough all element declaration entries and put them in the map, thus ordering them
+  auto entries = ElementManagerSingleton::getInstance()->getDeclarations();
+  for (const auto& base_declaration : entries)
+  {
+    auto declaration = boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(base_declaration);
+    CEDAR_ASSERT(declaration);
+    ordered_entries.insert(std::make_pair(cedar::aux::toLower(declaration->getClassNameWithoutNamespace()), declaration));
+  }
+
+  // also go through all group declarations
+  auto group_entries = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->getDefinitions();
+  for (auto group_entry : group_entries)
+  {
+    auto declaration = group_entry.second;
+    ordered_entries.insert(std::make_pair(cedar::aux::toLower(declaration->getClassName()), declaration));
+  }
+
+  // add declarations to the list if it matches the search filter
+  this->clear();
+  for (const auto& name_params_pair : ordered_entries)
+  {
+    const auto& declaration = name_params_pair.second;
+    if (searchFilterMatches(searchFilter, declaration))
+    {
+      this->addEntry(declaration);
+    }
+  }
+}
+
+bool cedar::proc::gui::ElementList::SearchResultsTab::searchFilterMatches(const std::string& searchFilter, cedar::aux::ConstPluginDeclarationPtr declaration)
+{
+  std::string normalized_classname = cedar::aux::toLower(declaration->getClassName());
+  std::string normalized_search_filter = cedar::aux::toLower(searchFilter);
+
+  // see if the search filter is part of the class name
+  if (normalized_classname.find(normalized_search_filter) != std::string::npos)
+  {
+    return true;
+  }
+
+  // no match
+  return false;
 }
