@@ -510,6 +510,7 @@ void cedar::aux::Path::fromString(const std::string& path)
     known_protocols.insert(M_PROTOCOL_RESOURCE_STR);
     known_protocols.insert(M_PROTOCOL_PLUGIN_STR);
     known_protocols.insert(M_PROTOCOL_TEST_STR);
+    known_protocols.insert("relative");
 
     if (known_protocols.find(this->mProtocol) == known_protocols.end())
     {
