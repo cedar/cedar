@@ -28,7 +28,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 03 30
+    Date:        2015 04 10
 
     Description: 
 
@@ -439,7 +439,7 @@ class RDPGUI(wx.Panel):
         self.time_stamp_label = wx.StaticText(self, -1, 'Time stamp t \t')
         self.resolution_label = wx.StaticText(self, -1, 'Plot resolution')
         self.line_color_label = wx.StaticText(self, -1, 'Line color')
-        self.player_label = wx.StaticText(self, -1, 'Time control')
+        self.player_label = wx.StaticText(self, -1, 'Mark time slice')
         #========================================================================================================================
         
         self.line_1 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(300,10))
@@ -450,7 +450,7 @@ class RDPGUI(wx.Panel):
         #========================================================================================================================
         self.sel_cbox = wx.ComboBox(self, choices = self.flist_sorted, value = ' ', style = wx.CB_READONLY)
         self.mode_cbox = wx.ComboBox(self, choices = self.mode_ch, style = wx.CB_READONLY)
-        self.proj_cbox = wx.ComboBox(self, value=' ', style = wx.CB_READONLY)
+        self.proj_cbox = wx.ComboBox(self, style = wx.CB_READONLY)
         self.proj_method_cbox = wx.ComboBox(self, choices = self.proj_methods, value=' ', style = wx.CB_READONLY)
         self.style_cbox = wx.ComboBox(self, choices = self.style_ch, style = wx.CB_READONLY)
         self.pos_slider = wx.Slider(self, value=0, minValue = 0, maxValue = 0, style = wx.SL_LABELS|wx.SL_AUTOTICKS)
@@ -621,6 +621,13 @@ class RDPGUI(wx.Panel):
         self.Fit()
         self.size = self.GetSize()
         #========================================================================================================================
+        
+        self.mode_cbox.Disable()
+        self.proj_cbox.Disable()
+        self.proj_method_cbox.Disable()
+        self.style_cbox.Disable()
+        self.player_label.Disable()
+        self.marked_check_box.Disable()
           
         return
     
@@ -737,7 +744,6 @@ class RDPGUI(wx.Panel):
             else:
                 vmin_spn.SetValue(str(0.0000))
                 
-            
             if self.vmax is not None:
                 vmax_spn.SetValue(str(self.vmax))
             else:
@@ -935,20 +941,33 @@ class RDPGUI(wx.Panel):
         widget = event.GetEventObject()
         self.proj = widget.GetValue()
         
+        if ',' not in self.proj and self.mode != 'time course':
+            self.style_cbox.Disable()
+            self.proj_method_cbox.Disable()
+            self.style_cbox.SetValue('')
+            self.proj_method_cbox.SetValue('')
+        else:
+            self.style_cbox.Enable()
+            self.proj_method_cbox.Enable()
+        
         if plt.get_fignums():
                 wx.CallAfter(self._update_plot)
         
         wx.Yield()
 
     
-    def _update_plot(self):
-        wx.CallAfter(plt.clf)
+    def _update_plot(self):            
+        if self.ndim[self.selection] == 0:
+            wx.CallAfter(plt.cla)
+        else:
+            wx.CallAfter(plt.clf)
+            
         wx.CallAfter(self._plot)
         wx.CallAfter(self.create_plot_control_frame, self)
         wx.CallAfter(self.control_plot_frame.Show)
         wx.Yield()
 
-                
+          
     def _add_time_course(self):
         wx.CallAfter(self._plot)
         wx.Yield()
@@ -969,7 +988,7 @@ class RDPGUI(wx.Panel):
         self.style = widget.GetValue()
         
         self.plot_btn.Bind(wx.EVT_BUTTON, self.evt_plot)
-        
+                
         if self.style != 'image':
             self.mode_cbox.Enable()
             self.proj_cbox.Enable()
@@ -1037,20 +1056,29 @@ class RDPGUI(wx.Panel):
                 
         # Set marker and time code
         self.time_stamp_display.SetLabel(str(self.time_stamps[self.pos_slider.GetValue()]))
-            
-        wx.MilliSleep(5)
-        
+                    
         # Update currently displayed plot
         if plt.get_fignums():
             wx.CallAfter(self._update_plot)
             
-        wx.MilliSleep(5)
         wx.Yield()
             
 
     def evt_mode_cbox(self, event):
         
-        self.mode = self.mode_cbox.GetValue()         
+        self.mode = self.mode_cbox.GetValue()   
+        
+        if self.mode == 'time course':
+            self.player_label.Enable()
+            self.marked_check_box.Enable()
+        else:
+            self.player_label.Disable()
+            self.marked_check_box.Disable()  
+        
+        if self.mode != ' ':
+            self.proj_cbox.Enable()
+        else:
+            self.proj_cbox.Disable()    
         
         # Fill projection combobox with the fitting options
         if self.mode == 'time course':
@@ -1079,12 +1107,13 @@ class RDPGUI(wx.Panel):
         if self.data is not None:
             del self.data
             self.data = None
-        
+                                
         # Reset control panel
         self.slider_max = 0
         self.step = -1
         self.pos_slider.SetValue(self.step)
         self.time_stamp_display.SetLabel('-')
+        self.mode_cbox.Disable()
         self.pos_slider.Disable()
         self.play_pause_btn.Disable()
         self.reverse_play_pause_btn.Disable()
@@ -1101,7 +1130,7 @@ class RDPGUI(wx.Panel):
         temp_data = RDPPlot().get_data(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
         
         # Enable slider and player buttons
-        self.pos_slider.Enable()
+        self.pos_slider.Enable()    
         self.play_pause_btn.Enable()
         self.reverse_play_pause_btn.Enable()
         self.reset_btn.Enable()
@@ -1138,7 +1167,9 @@ class RDPGUI(wx.Panel):
         self.selection = widget.GetSelection()
         self._update_selection_data()
         self.sel_cbox.SetValue(widget.GetValue())
-                
+        
+        self.mode_cbox.Enable()
+        
         # Mirror current selection on the control plot frame, if present
         if self.control_plot_frame:
             if hasattr(self.control_plot_frame, 'sel_cbox'):
@@ -1167,7 +1198,7 @@ class RDPGUI(wx.Panel):
             
             except IndexError:
                 dlg = wx.MessageDialog(parent  = None, 
-                message = 'The specified timeslice does not exist.', 
+                message = 'The specified time slice does not exist.', 
                 caption = 'An Error has occurred.', 
                 style = wx.OK | wx.ICON_ERROR | wx.CENTER | wx.STAY_ON_TOP)
                 dlg.ShowModal()
@@ -1182,20 +1213,20 @@ class RDPGUI(wx.Panel):
         elif self.mode == 'time course':
             try:
                 self.plot = RDPPlot().plot_time_course(data = self.data, 
-                                                    header = self.header, 
-                                                    vmin = self.vmin,
-                                                    vmax = self.vmax,
-                                                    resolution = self.resolution,
-                                                    plot = self.plot,
-                                                    proj = self.proj, 
-                                                    proj_method = self.proj_method,
-                                                    color = self.line_color,
-                                                    step = self.step, 
-                                                    marker = self.marked, 
-                                                    style = self.style)
+                                                       header = self.header, 
+                                                       vmin = self.vmin,
+                                                       vmax = self.vmax,
+                                                       resolution = self.resolution,
+                                                       plot = self.plot,
+                                                       proj = self.proj, 
+                                                       proj_method = self.proj_method,
+                                                       color = self.line_color,
+                                                       step = self.step, 
+                                                       marker = self.marked, 
+                                                       style = self.style)
             except UnboundLocalError:
                 dlg = wx.MessageDialog(parent = None, 
-                                       message = 'It is not possible to build a time course out of 2-dimensional timeslices.', 
+                                       message = 'It is not possible to build a time course out of 2-dimensional time slices.', 
                                        caption = 'The attempted operation is not possible.', 
                                        style = wx.OK | wx.ICON_INFORMATION | wx.CENTER | wx.STAY_ON_TOP)
                 dlg.ShowModal()
