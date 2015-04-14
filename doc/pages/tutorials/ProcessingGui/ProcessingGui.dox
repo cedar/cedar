@@ -60,34 +60,19 @@ of the two slots (see @ref ProcessingIntroduction_DataAndConnections).
 
 \b Triggers manage the time course of processing. They trigger an element when another element has done 
 its work or trigger a time-varying dynamics whenever a time interval elapsed. cedar::proc::LoopedTrigger provides the latter
-functionality. You can connect up triggers by left-clicking on them and, while still keeping the mouse button pressed,
-drag a line to any suitable element that is highlighted in the gui. You can start and stop a cedar::proc::LoopedTrigger
-by right-clicking onto the trigger and choosing \b start or \b stop. The trigger changes from white to green once it is
-started. Triggers play an additional role in multi-threading.
+functionality. Triggers are not displayed in the GUI. Each element requiring a looped trigger is automatically assigned to a
+default trigger when it is added to the architecture. Custom looped triggers can be added in the advanced simulation control
+widget (see below). Elements can be assigned to custom looped triggers in their (right-click) context menu. 
 
 At any time, you can remove elements from an architecture by first selecting them and subsequently pressing \b delete 
 on your keyboard.
 
-@section GuiTutorialFourthStep Tutorial: Assembling a simple architecture
-Start assembling the simple architecture by clicking on the \b sources tab of the elements area and drag a cedar::proc::sources::GaussInput
-into the architecture area. A new elements of this class pops up in the middle of the area. Go to the \b DFT tab and 
-drag a cedar::dyn::NeuralField onto the area as well. Note that GaussInput provides an output slot, while
-NeuralField has both an output and an input slot. Create a connection between the output slot of the GaussInput to the input
-of NeuralField. A green-colored connection should appear, linking up these two slots. Now add a cedar::proc::LoopedTrigger
-from the \b triggers tab. Connect the LoopedTrigger to the NeuralField. Start the LoopedTrigger by right-clicking and
-choosing \b start. The architecture is now running. You can inspect the ongoing processing in NeuralField by right-clicking
-on the element and choosing <i>field plot</i>. If you change the <i>center</i> property of the GaussInput, you can see how
-a change in input affects the neural field. 
-
-This is the result of the assembly described above:
-@image html doc/pages/tutorials/ProcessingGui/images/cedar_sample_architecture.png
-
-@section GuiTutorialFifthStep Tutorial: Toolbar icons
+@section GuiTutorialFourthStep Tutorial: Toolbar icons
 @image html doc/pages/tutorials/ProcessingGui/images/toolbar_save.png
 This icon saves the current architecture (if a filename was already chosen).
 
 @image html doc/pages/tutorials/ProcessingGui/images/toolbar_trigger.png
-These icons allow you to start and stop all looped triggers in your architecture. You can also do a single step of 
+These icons allow you to start/pause and reset all looped triggers in your architecture. You can also do a single step of 
 computation, with an optional duration. The slider allows you to apply a global factor to the real-time measurements of 
 all looped triggers, effectively slowing down or speeding up your architecture.  
 
@@ -99,11 +84,27 @@ marking data to be recorded.
 @image html doc/pages/tutorials/ProcessingGui/images/toolbar_boost.png
 This icon opens the boost control widget, allowing you to control each Boost source in your architecture.
 
+@image html doc/pages/tutorials/ProcessingGui/images/toolbar_advanced_trigger.png
+This icon opens the advanced simulation control widget, allowing you to control each trigger of the architecture separately.
+
 @image html doc/pages/tutorials/ProcessingGui/images/toolbar_visibility.png
 These three icons allow to use a different plotting mode for connections, activate a grid for precise placement of 
-steps and hide/show looped triggers and their connections in the architecture canvas.
+steps and hide/show the assignment of looped elements to looped triggers in the architecture canvas.
 
 @image html doc/pages/tutorials/ProcessingGui/images/toolbar_plotting.png
 This part of the tool bar allows you to close all open plots, hide the current plots and define custom plot groups that 
-you can restore later. 
+you can restore later. You cann show, add, rename, store, and delete custom plot groups.
+
+@section GuiTutorialFifthStep Tutorial: Assembling a simple architecture
+Start assembling the simple architecture by clicking on the \b sources tab of the elements area and drag a cedar::proc::sources::GaussInput
+into the architecture area. A new elements of this class pops up in the middle of the area. Go to the \b DFT tab and 
+drag a cedar::dyn::NeuralField onto the area as well. Note that GaussInput provides an output slot, while
+NeuralField has both an output and an input slot. Create a connection between the output slot of the GaussInput to the input
+of NeuralField. A green-colored connection should appear, linking up these two slots. Start the simulation by clicking on the \b play button. 
+The architecture is now running. You can inspect the ongoing processing in NeuralField by right-clicking on the element 
+and choosing <i>field plot</i>. If you change the <i>centers</i> property of the GaussInput, you can see how a change in 
+input affects the neural field. 
+
+This is the result of the assembly described above:
+@image html doc/pages/tutorials/ProcessingGui/images/cedar_sample_architecture.png
 */

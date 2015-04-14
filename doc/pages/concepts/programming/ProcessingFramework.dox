@@ -2,8 +2,7 @@
 
 @page ProcessingFrameworkConcept An introduction to cedar's processing framework
 
-@todo Mention where the UI executable can be found
-@todo Enrich this page with some screenshots to visualize concepts.
+@todo This needs some serious rewriting.
 
 This page gives an overview of the functionalities of the processing framework contained in cedar. Documentation of the
 relevant classes can be found in the namespace cedar::proc. Tutorials are available at @ref ProcessingFrameworkTutorial. 
@@ -35,20 +34,20 @@ In order to cope with these differences, the processing framework uses the conce
 that triggers a process at some connected entity. This can be a step, in which case the computation is triggered, or it
 can be another trigger which then can be connected to entities in the same way. In terms of the example, this translates
 into two different kinds of triggers: the looped trigger (cedar::proc::LoopedTrigger) which sends out trigger signals as
-often as possible, and plain triggers (cedar::proc::Trigger) which doesn't send any trigger signals on it's own.
+often as possible, and plain triggers (cedar::proc::Trigger) which do not send any trigger signals on their own.
 
 One trigger of the latter kind is contained in each processing step: the "done" trigger. It is triggered everytime the
 step successfully completes its computation. This allows the realization of the image processing example: when a step
 providing an input image is done loading it, it triggers "done". If the filter operation is connected to the
-"done"-trigger, it will subsequently be computed as well. Done triggers are autimatically connected if a data connection
- is establish (see @ref ProcessingIntroduction_DataAndConnections).
+"done"-trigger, it will subsequently be computed as well. Done triggers are automatically connected if a data connection
+ is established (see @ref ProcessingIntroduction_DataAndConnections).
 
 Looped triggers on the other hand can be started and stopped, thus causing actual computations to take place repeatedly.
 
 
-@subsection ProcessingIntroduction_Modules Networks
+@subsection ProcessingIntroduction_Modules Groups
 
-Networks are a feature of the processing framework. They allow grouping a number of steps into a reusable architecture.
+Groups are a feature of the processing framework. They allow grouping a number of steps into a reusable architecture.
 
 
 @subsection ProcessingIntroduction_DataAndConnections Data and Connections
@@ -63,17 +62,7 @@ three colors: a red connection symbolizes an incompatibility of data. This may h
 size, or type. A green connection symbolizes the opposite situation: every relevant characteristic of the data matches
 between output slot and input slot. A yellow connection hints at a potential problem with a connection. In general,
 the receiving step can operate on the output data (e.g., a matrix of same dimensionality and size), but some
-assumptions are made to process the data, which may not be desirable. The following configuration is an example of a
-yellow warning: a cedar::proc::sources::GaussInput produces cedar::aux::MatData, which can be read off at its output slot. 
-cedar::aux::MatData is a data type, which just specifies the data structure (here: cv::Mat). A cedar::dyn::NeuralField 
-expects cedar::dyn::SpaceCode at its input slot. cedar::dyn::SpaceCode is another type of data, not only specifying the 
-data structure, but also the content of a data. Here, the matrix should contain neural activation in space code (i.e., 
-the spatial location of activity carries information). This is different from other data types (such as rate code that 
-puts emphasis on the level of activation as information content). A connection between cedar::proc::sources::GaussInput and 
-cedar::dyn::NeuralField is flagged yellow because cedar::dyn::NeuralField assumes that the cedar::aux::MatData it receives
-is carrying information through spatial location. The warning raises awareness to this assumption, which may be wrong
-in other scenarios. In future work, cedar will introduce conversion steps that can be put between non-matching outputs
-and inputs, making this assumption explicit.
+assumptions are made to process the data, which may not be desirable.
 
 Creating a data collection may also create a connection between the done trigger (see @ref ProcessingIntroduction_TriggersAndSteps)
 and the target step of the connection. This assures that once the source of a connection has computed an update on its

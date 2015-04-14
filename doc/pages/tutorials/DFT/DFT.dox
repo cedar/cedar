@@ -44,11 +44,9 @@ The next step is putting this artificial input into a field and creating a peak 
 <li> add a neural field (called @em NeuralField) from the @em DFT tab</li>
 <li> set the dimensionality and size of the field to match the Gaussian input</li>
 <li> drag a connection from the output circle on the right of the Gaussian input to the field's input diamond (to the left)</li>
-<li> add a looped trigger (called @em LoopedTrigger) from the @em Triggers tab</li>
-<li> drag a connection from the trigger to the field</li>
 <li> right-click the field and choose @em field plot, then right-click the opened plot and pick @em legend</li>
-<li> start the looped trigger by right-clicking it and choosing @em start</li>
-<li> watch what happens in the plot after starting the trigger, then start increasing the field's resting level (found in the property pane when the field is selected) until a peak forms</li>
+<li> start the simulation by clicking the \b play button in the tool bar</li>
+<li> watch what happens in the plot after starting the simulation, then start increasing the field's resting level (found in the property pane when the field is selected) until a peak forms</li>
 </ul>
 
 You should now have a peak representing a detection decision on the Gaussian input. Let us now project this peak into a two-dimensional field in form of a ridge.
@@ -63,13 +61,13 @@ You should now have a peak representing a detection decision on the Gaussian inp
 <li> \[*\] you can also try out different interpolation methods</li>
 <li> add the last element to this chain, a @em Projection from the @em Utilities tab</li>
 <li> connect the ouput of the resize element to the input of the projection</li>
-<li> to alter the configuration of the projection, you have to first stop the trigger by right-clicking it and choosing @em stop</li>
+<li> to alter the configuration of the projection, you have to first pause the simulation in the tool bar</li>
 <li> select the projection, set @em output dimensionality to two, and the @em dimension mapping to zero in the property pane</li>
 <li> you'll notice that a part of the @em sizes section turns gray --- this indicates that you cannot change this parameter since the preceeding step determines the projection size in this dimension</li>
 <li> set the second size to 40 (we will later come back to this)</li>
 <li> open the plot of the projection element and inspect the output</li>
 <li> add a new field to your architecture, leave it's dimensionality at two, but change its sizes to 50 and 40</li>
-<li> connect the projection step to this field's input and also connect the looped trigger to the field</li>
+<li> connect the projection step to this field's input</li>
 </ul>
 
 For now, there is only one input coming into the two-dimensional field. We will change this now by repeating the steps above, with the following differences:

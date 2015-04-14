@@ -18,9 +18,8 @@ letters for new words (e.g. \b mpMyMemberPointer )
 - prefixes (in this order):
   - leading underscore for parameters loaded from a configuration file
   - small m for member variables
-  - small p for pointer variables
-  - small e for external pointer variables
-  - e.g. \b mpeMyExternalMemberPointerFromAConfigurationFile
+  - small p for raw pointer variables
+  - e.g. \b mpMyRawMemberPointer
 - local variables are all lower case, words and prefixes are separated with an underscore (e.g. \b p_local_pointer )
 - constants are all upper case, with additional prefix (e.g. \b M_MY_MEMBER_CONSTANT )
 - pointer style: \b always put the * adjacent to the pointer type (e.g. Example* getExample())
@@ -84,12 +83,11 @@ myFunctionCall(parameter1, parameter2, parameter3);
 - keep your interface clean - only declare methods as public, if a user needs them
 
 @section CodingStyleGeneral General Rules
+- use smart pointers (and weak pointers) whenever possible
 - never put more than one variable declaration in a single line (i.e., do not do something like int i, j, *p_u;)
-- make sure that there's a way of switching off all (debug) output that is send to std::cout - use at least \#ifdef 
-DEBUG *stuff* \#endif to encapsulate all output
-- use meaningful debug output, preferably with information about the object/class name and the method name that has
- caused the output/error
-- if you release an object, first make sure that it actually exists, that you are responsible for freeing it and that
+- do not leave debug output in your code (e.g., output to std::cout) - if you need debug output on a regular basis (which you should not),
+  encapsulate debug code with #ifdef SOME_DEF [your debug code] #endif
+- if you release an object (raw pointer), first make sure that it actually exists, that you are responsible for freeing it and that
  future attempts to release this object will be intercepted - in other words, check:
   - if an object address is legitimate
   - if this object was created in the course of the context that tries to release it
