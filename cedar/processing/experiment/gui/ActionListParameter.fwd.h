@@ -48,7 +48,6 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace proc
@@ -62,8 +61,6 @@ namespace cedar
     }
   }
 }
-
-//!@endcond
 
 #endif // CEDAR_PROC_EXPERIMENT_GUI_ACTION_LIST_PARAMETER_FWD_H
 

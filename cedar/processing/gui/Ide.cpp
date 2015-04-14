@@ -103,7 +103,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 // nested private classes
 //----------------------------------------------------------------------------------------------------------------------
-//! A class that takes care of dialog that can be opened by the Ide, such as the boost control.
+//!@cond SKIPPED_DOCUMENTATION
+// A class that takes care of dialog that can be opened by the Ide, such as the boost control.
 class cedar::proc::gui::Ide::OpenableDialog
 {
 public:
@@ -212,6 +213,7 @@ private:
   bool mIsInToolBar;
 };
 
+// An internal class that implements the architecture consistency check as an openable dialog.
 class cedar::proc::gui::Ide::OpenableArchitectureConsistencyCheck : public cedar::proc::gui::Ide::OpenableDialog
 {
   public:
@@ -240,6 +242,7 @@ class cedar::proc::gui::Ide::OpenableArchitectureConsistencyCheck : public cedar
     cedar::proc::gui::View* mpView;
 };
 
+// An internal class that implements the simulation control widget as an openable dialog.
 class cedar::proc::gui::Ide::OpenableSimulationControl : public cedar::proc::gui::Ide::OpenableDialog
 {
 public:
@@ -271,6 +274,7 @@ private:
   }
 };
 
+// An internal class that implements the boost control as an openable dialog.
 class cedar::proc::gui::Ide::OpenableBoostControl : public cedar::proc::gui::Ide::OpenableDialog
 {
 public:
@@ -305,6 +309,7 @@ private:
 private:
   cedar::proc::gui::View* mpView;
 };
+//!@endcond
 
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -78,6 +78,9 @@ namespace
 // custom scale div
 //----------------------------------------------------------------------------------------------------------------------
 
+//!@cond SKIPPED_DOCUMENTATION
+/* Implementation of a Qwt scale draw that displays labels instead of numbers.
+ */
 class cedar::aux::gui::Multi0DPlot::LabeledScaleDraw : public QwtScaleDraw
 {
 public:
@@ -119,6 +122,7 @@ public:
 private:
   cedar::aux::gui::Multi0DPlot* mpPlot;
 };
+//!@endcond
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

@@ -203,7 +203,10 @@ public:
    */
   void clearMarkers();
 
+  //! Checks if data can be appended, i.e., if data is the same dimensionality and size as existing data.
   bool canAppend(cedar::aux::ConstDataPtr data) const;
+
+  //! Checks if the given data object is in this plot.
   bool canDetach(cedar::aux::ConstDataPtr data) const;
 
   //!@brief Returns the limits of the x axis.
@@ -218,6 +221,7 @@ public:
   //! Sets whether the plot emits dataChanged for 0d data
   void setAccepts0DData(bool accept);
 
+  //! Determines the style (pen and brush) to be used for the given data object in this plot.
   void getStyleFor(cedar::aux::ConstDataPtr data, QPen& pen, QBrush& brush) const;
 
 signals:
@@ -249,12 +253,16 @@ protected:
   //!@brief create and handle the context menu
   void contextMenuEvent(QContextMenuEvent *pEvent);
 
+  //! Appends the data object to this plot.
   void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
 
+  //! Detaches the given data object from this plot.
   void doDetach(cedar::aux::ConstDataPtr data);
 
+  //! Returns a pointer to the QwtPlot object used by this plot.
   QwtPlot* getPlot();
 
+  //! Enables or disables automatic determination of the x axis limits.
   void setAutoDetermineXLimits(bool automatic);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -291,7 +299,7 @@ private slots:
 protected:
   // none yet
 private:
-  //!@brief a plot
+  //! Pointer to the Qwt plot object used by this plot.
   QwtPlot *mpPlot;
 
   QwtPlotGrid *mpGrid;

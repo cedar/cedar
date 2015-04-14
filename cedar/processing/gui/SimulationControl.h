@@ -70,7 +70,7 @@ namespace cedar
     {
       namespace SimulationControlPrivate
       {
-        /*! A widget that can be used to start/stop a looped trigger. Also reacts to when the trigger is started from
+        /* A widget that can be used to start/stop a looped trigger. Also reacts to when the trigger is started from
          * elsewhere
          */
         class TriggerControlWidget : public QWidget
@@ -135,6 +135,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! Periodically updates the simulation quality displays.
   void timerEvent(QTimerEvent* pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -202,7 +203,10 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Path to the icon that indicates that the simulation is started.
   static QString M_STARTED_ICON_PATH;
+
+  //! Path to the icon that indicates that the simulation is stopped.
   static QString M_PAUSED_ICON_PATH;
 
 protected:

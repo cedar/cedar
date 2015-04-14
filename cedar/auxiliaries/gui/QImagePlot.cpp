@@ -211,6 +211,7 @@ void cedar::aux::gui::QImagePlot::setColorJet(cedar::aux::ColorGradientPtr gradi
   }
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 void cedar::aux::gui::detail::QImagePlotLegend::setGradient(cedar::aux::ColorGradientPtr gradient)
 {
   this->mGradient = QLinearGradient(0, 1, 0, 0);
@@ -224,6 +225,7 @@ void cedar::aux::gui::detail::QImagePlotLegend::setGradient(cedar::aux::ColorGra
   palette.setBrush(QPalette::Window, QBrush(this->mGradient));
   this->mpGradientDisplay->setPalette(palette);
 }
+//!@endcond
 
 cv::Mat cedar::aux::gui::QImagePlot::colorizeMatrix(const cv::Mat& toColorize) const
 {
