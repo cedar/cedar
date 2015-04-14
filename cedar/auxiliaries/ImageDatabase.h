@@ -181,6 +181,7 @@ public:
   };
   CEDAR_GENERATE_POINTER_TYPES(ObjectPoseAnnotation);
   
+  //! Aggregate annotation for multiple object poses.
   class MultiObjectPoseAnnotation : public Annotation
   {
   public:  
@@ -260,7 +261,7 @@ public:
   };
   CEDAR_GENERATE_POINTER_TYPES(MultiObjectPoseAnnotation);
   
-  
+  //! Annotation for a video frame.
   class FrameAnnotation : public Annotation
   {
   public:  
@@ -624,11 +625,20 @@ private:
 public:
   //! Standard name used for storing object pose annotations.
   static const std::string M_STANDARD_OBJECT_POSE_ANNOTATION_NAME;
+
+  //! Standard name used for storing a multi-object-pose annotation.
   static const std::string M_STANDARD_MULTI_OBJECT_POSE_ANNOTATION_NAME;
+
+  //! Standard name used for storing object image annotations.
   static const std::string M_STANDARD_OBJECT_IMAGE_ANNOTATION_NAME;
+
+  //! Standard name used for storing frame annotations.
   static const std::string M_STANDARD_FRAME_OBJECT_ANNOTATION_NAME;
-  
+
+  //! The file extensions used for finding images.
   static const std::vector<std::string> M_STANDARD_KNOWN_IMAGE_FILE_EXTENSIONS;
+  
+  //! The file extensions used for finding videos.
   static const std::vector<std::string> M_STANDARD_KNOWN_VIDEO_FILE_EXTENSIONS;
 protected:
   // none yet

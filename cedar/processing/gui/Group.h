@@ -157,6 +157,7 @@ public:
   //!@brief saves a configuration to a node
   void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 
+  //! Disconnects the group.
   void disconnect();
 
   //! deals with changes to the group gui item
@@ -260,10 +261,13 @@ public:
   //! Returns the slot item used for the given group source.
   cedar::proc::gui::DataSlotItem* getSlotItemFor(cedar::proc::sources::GroupSourcePtr source) const;
 
+  //! Returns true in this case, as deleting groups requires confirmation.
   bool manualDeletionRequiresConfirmation() const;
 
+  //! Implements supported display modes for groups.
   bool supportsDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id id) const;
 
+  //! Defines draggability of groups.
   bool canBeDragged() const;
 
 public slots:
@@ -284,6 +288,7 @@ public slots:
   //! Calls reset on the underlying group, i.e., resets all elements in the group displayed by this item.
   void reset();
 
+  //! Opens a container that displays this group.
   void openGroupContainer();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -293,8 +298,10 @@ protected:
   //! handles removal of a slot
   void slotRemoved(cedar::proc::DataRole::Id role, const std::string& name);
 
+  //! Overrides Qt's hoverEnterEvent.
   void hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent);
 
+  //! Overrides Qt's hoverLeaveEvent.
   void hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent);
 
   /*!@brief Handles the drop event of the scene.
@@ -304,6 +311,7 @@ protected:
    */
   void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
 
+  //! Overrides Qt's dragEnterEvent.
   void dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent);
 
   /*!@brief Handles the dragLeave event of the scene.

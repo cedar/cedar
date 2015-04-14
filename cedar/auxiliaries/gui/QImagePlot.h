@@ -69,11 +69,12 @@ namespace cedar
       {
         //!@cond SKIPPED_DOCUMENTATION
         /* This is an internal class of QImagePlot that cannot be nested because Qt's moc doesn't support nested classes.
-        *
-        * Don't use it outside of the QImagePlot!
-        */
-        /*! Class for displaying a legend for the image plot worker.
-        */
+         *
+         * Don't use it outside of the QImagePlot!
+         *
+         *
+         * Class for displaying a legend for the image plot worker.
+         */
         class QImagePlotLegend : public QWidget
         {
           Q_OBJECT
@@ -82,10 +83,10 @@ namespace cedar
           QImagePlotLegend();
 
           public slots:
-          //! Updates the minimum and maximum value displayed by the legend.
+          // Updates the minimum and maximum value displayed by the legend.
           void updateMinMax(double min, double max);
 
-          //! Applies the colors of the graident to the legend.
+          // Applies the colors of the graident to the legend.
           void setGradient(cedar::aux::ColorGradientPtr gradient);
 
         private:

@@ -185,8 +185,10 @@ namespace cedar
   }
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 CEDAR_PROC_SINGLETON(CppScriptDeclarationManager);
 CEDAR_PROC_SINGLETON(CppScriptFactoryManager);
+//!@endcond
 
 #endif // CEDAR_PROC_CPP_SCRIPT_H
 
