@@ -61,6 +61,7 @@ QString cedar::proc::gui::SimulationControl::M_PAUSED_ICON_PATH = ":/cedar/auxil
 // private (pseudo) nested classes
 //----------------------------------------------------------------------------------------------------------------------
 
+//!@cond SKIPPED_DOCUMENTATION
 cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget::TriggerControlWidget(cedar::proc::LoopedTriggerPtr loopedTrigger)
 :
 QWidget(),
@@ -131,6 +132,7 @@ void cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget::triggerCh
   this->mpStartStopButton->setEnabled(false);
   this->mpSingleStepButton->setEnabled(false);
 }
+//!@endcond
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

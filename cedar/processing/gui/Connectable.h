@@ -230,8 +230,10 @@ public:
   //! Adds a PlotWidget to the step (usually after loading a stored network that had open Plots)
   void addPlotWidget(cedar::proc::gui::PlotWidget* pPlotWidget, int x, int y, int width, int height);
 
+  //! Returns whether or not the item can be duplicated.
   bool canDuplicate() const;
 
+  //! Returns whether or not the item can be dragged.
   bool canBeDragged() const;
 
   //! Fills the triggers in the group into the action as a submenu
@@ -244,6 +246,7 @@ public:
     boost::optional<cedar::proc::LoopedTriggerPtr> current = (boost::optional<cedar::proc::LoopedTriggerPtr>())
   );
 
+  //! Extracts a trigger pointer from an action in the assign triggers menu.
   static cedar::proc::TriggerPtr getTriggerFromConnectTriggerAction(QAction* action, cedar::proc::GroupPtr group);
 
   //! Checks if the connectable can be hidden in the connections going from and to it.
@@ -393,8 +396,10 @@ protected:
    */
   std::string getNameForTitle() const;
 
+  //! Overrides Qt's hoverEnterEvent.
   void hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent);
 
+  //! Overrides Qt's hoverLeabeEvent.
   void hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent);
 
   /*! Sets the desired background color of the connectable. Note that this may not be the color in which the connectable
@@ -402,6 +407,7 @@ protected:
    */
   void setBackgroundColor(const QColor& color);
 
+  //! Returns the background color for this connectable that was set by the user.
   QColor getBackgroundColor() const;
 
   //--------------------------------------------------------------------------------------------------------------------

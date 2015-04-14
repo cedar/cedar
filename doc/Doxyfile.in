@@ -322,7 +322,7 @@ TYPEDEF_HIDES_STRUCT   = NO
 # 2^(16+SYMBOL_CACHE_SIZE). The valid range is 0..9, the default is 0, 
 # corresponding to a cache size of 2^16 = 65536 symbols
 
-SYMBOL_CACHE_SIZE      = 0
+# SYMBOL_CACHE_SIZE      = 0
 
 #---------------------------------------------------------------------------
 # Build related configuration options
@@ -595,6 +595,7 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = "@DOXYFILE_SOURCE_DIR@" \
+                         "@DOXYFILE_SOURCE_DIR@/build" \
                          "@DOXYFILE_SOURCE_DIR@/changelog.md" \
                          "@DOXYFILE_SOURCE_DIR@/readme.md" \
                          "@DOXYFILE_SOURCE_DIR@/troubleshooting.md" \
@@ -649,7 +650,7 @@ EXCLUDE_PATTERNS       = "*/.*" "*/.*/*" "*/templates/*" "*/moc_*" "*/ui/*" "*/U
 # wildcard * is used, a substring. Examples: ANamespace, AClass, 
 # AClass::ANamespace, ANamespace::*Test
 
-EXCLUDE_SYMBOLS        = 
+EXCLUDE_SYMBOLS        = boost::* 
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or 
 # directories that contain example code fragments that are included (see 
@@ -1255,7 +1256,8 @@ SEARCH_INCLUDES        = YES
 # contain include files that are not input files but should be processed by 
 # the preprocessor.
 
-INCLUDE_PATH           = 
+INCLUDE_PATH           = "@DOXYFILE_SOURCE_DIR@" \ 
+                         "@DOXYFILE_SOURCE_DIR@/build"
 
 # You can use the INCLUDE_FILE_PATTERNS tag to specify one or more wildcard 
 # patterns (like *.h and *.hpp) to filter out the header-files in the 
@@ -1289,6 +1291,7 @@ PREDEFINED             = CEDAR_USE_FFTW \
                          CEDAR_INSTANTIATE_DYN_TEMPLATE \
                          CEDAR_INSTANTIATE_TESTING_UTILITIES_TEMPLATE \
                          CEDAR_GENERATE_POINTER_TYPES(NAME)=1 \
+                         CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(NAME)=1 \
                          CEDAR_DECLARE_SIGNAL(NAME,SIGNATURE)=1
                          
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
@@ -1395,7 +1398,7 @@ HAVE_DOT               = @DOXYFILE_DOT@
 # DOTFONTPATH environment variable or by setting DOT_FONTPATH to the directory 
 # containing the font.
 
-DOT_FONTNAME           = FreeSans
+# DOT_FONTNAME           = FreeSans
 
 # The DOT_FONTSIZE tag can be used to set the size of the font of dot graphs. 
 # The default size is 10pt.

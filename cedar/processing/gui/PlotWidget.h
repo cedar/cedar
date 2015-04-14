@@ -74,7 +74,7 @@ namespace cedar
     {
       namespace PlotWidgetPrivate
       {
-        //! This should be a private nested class, but that is not supported by the MOC.
+        // This should be a private nested class, but that is not supported by the MOC.
         class LabeledPlot : public QObject
         {
           Q_OBJECT

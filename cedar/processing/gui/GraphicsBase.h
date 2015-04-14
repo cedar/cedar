@@ -275,6 +275,7 @@ public:
   //! If this returns false, the item should not be dragged around.
   virtual bool canBeDragged() const;
 
+  //! Returns the minimum size that this graphics object must have.
   const QSizeF getMinimumSize() const;
 
   /*! Returns the color used to fill the foreground when the given brush is not solid.
@@ -288,6 +289,9 @@ public:
   /*! Fills the given pixmap in the same way that the background of a graphicsbase would be filled with the given brush.
    */
   static void paintBackgroundColor(QPixmap& pixmap, QBrush brush);
+
+  //!@brief get the right color for a certain validity
+  static const QColor& getValidityColor(cedar::proc::gui::ConnectValidity validity);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public signals
@@ -350,6 +354,7 @@ protected:
   //! Updates the display of the resize handles.
   void updateResizeHandles();
 
+  //! Sets the minimum size for this graphics object.
   void setMinimumSize(QSizeF size);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -395,11 +400,9 @@ public:
   
   //!@brief color for outline
   static const QColor mDefaultOutlineColor;
+
   //!@brief fill color
   static const QColor mDefaultFillColor;
-
-  //!@brief get the right color for a certain validity
-  static const QColor& getValidityColor(cedar::proc::gui::ConnectValidity validity);
 
 protected:
   //!@brief flag if the background should be drawn
