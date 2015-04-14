@@ -70,8 +70,6 @@ public:
 	CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ActionParameter);
 	//!@endcond
 
-	#include "cedar/auxiliaries/FactoryManager.h"
-
 private:
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -117,6 +115,8 @@ protected:
 private:
 
 }; // class cedar::proc::experiment::Action
+
+#include "cedar/auxiliaries/FactoryManager.h"
 
 CEDAR_PROC_EXPORT_SINGLETON(cedar::aux::FactoryManager<cedar::proc::experiment::action::ActionPtr>);
 

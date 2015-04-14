@@ -179,6 +179,11 @@ public:
 
   CEDAR_GENERATE_POINTER_TYPES(UserDefinedColor);
 
+  /*!@brief Structure that holds information about one-time messages.
+   *
+   * One-time messages are messages that are displayed to the user when he starts cedar's gui. When the user
+   * acknowledges these messages, they are no longer displayed, but are still accessible from a menu entry.
+   */
   struct OneTimeMessage
   {
     //! The version in which the message was introduced.

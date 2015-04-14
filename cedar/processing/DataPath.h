@@ -51,7 +51,12 @@
 #include <string>
 
 
-/*!@brief A path for data in architectures.
+/*!@brief A class that encapsulates functionality for addressing data in an architecture.
+ *
+ * This class is responsible for parsing and creating paths to data in architectures. These paths have the form
+ * path.to.Element[ROLE].data name
+ * where path.to.Element is a cedar::proc::GroupPath, ROLE is one of either INPUT, BUFFER or OUTPUT
+ * (cf. cedar::proc::DataRole), and data name is the name of a data slot in the element referenced by path.to.Element.
  */
 class cedar::proc::DataPath
 {
@@ -63,8 +68,10 @@ class cedar::proc::DataPath
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
+  //!@brief Constructor that takes a path to an element, a role and a data name.
   DataPath(cedar::proc::GroupPath pathToElement, cedar::proc::DataRole::Id role, const std::string& dataName);
+
+  //! Constructs the path from a string.
   DataPath(const std::string& path);
 
   //!@brief Destructor
@@ -74,11 +81,22 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Returns the path to the element stored in this data path.
   cedar::proc::GroupPath getPathToElement() const;
+
+  //! Returns the data role stored in this path.
   cedar::proc::DataRole::Id getDataRole() const;
+
+  //! Returns the name of the data object referenced by this path.
   std::string getDataName() const;
+
+  //! Sets the path by parsing a string.
   void parseFromString(const std::string& dataPath);
+
+  //! Sets the data path with a given group path to an element, data role and data name.
   void setDataPath(cedar::proc::GroupPath pathToElement, cedar::proc::DataRole::Id role, const std::string& dataName);
+
+  //! Converts the path to a string.
   std::string toString() const;
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -48,6 +48,7 @@
 // private nested structs and classes
 //----------------------------------------------------------------------------------------------------------------------
 
+//!@cond SKIPPED_DOCUMENTATION
 cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::LabeledPlot
 (
   const QString& pLabel,
@@ -223,6 +224,7 @@ void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::fillPlotOptions(QMenu* me
     this->mpPlotSelector->setEnabled(false);
   }
 }
+//!@endcond
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

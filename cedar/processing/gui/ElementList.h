@@ -63,14 +63,19 @@ namespace cedar
     {
       namespace elementList
       {
+        /*!@brief A line edit that displays like a search bar, i.e., with a search icon and a button to clear it.
+         *
+         */
         class SearchBar : public QLineEdit
         {
           Q_OBJECT
 
           public:
+            //! Constructor.
             SearchBar(QWidget* pParent = nullptr);
 
           signals:
+            //! Signal that is emitted whenver the search string changes and the results should be updated.
             void searchStringChanged(QString searchString);
 
           protected:
