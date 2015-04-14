@@ -60,17 +60,25 @@ known issues
     correctly. This can be fixed by saving and loading the architecture. If you encounter such a (reproducible)
     situation, please let us know.
   - single elements cannot be loaded as linked templates into architectures. They are simply added to the architecture.
+  - When a net reader step revalidates its output while the architecture is running, this can lead to connections
+    temporarily flashing in different colors. This can take a while, depending on how complicated the revalidation
+    process is, but is normal. Connections also sometimes are blue for a short time.
+  - When net readers and writers are in the same architecture, this can sometimes lead to crashes. This *seems* to be a
+    YARP issue.
 
 Unreleased
 ==========
 
 - build system
   - fixed an error that made it imposssible to use opencv versions that are not in /usr/local/include.
+  - cedar should now compile with the opencv 3.0 beta.
 
 - cedar::aux
   - There is a new plot called Multi0DPlot. This is mainly intended to be used for showing the state of (EB) nodes in an
     architecture, thus, it should be used in conjunction with an architecture widget. See the tutorial for architecture
     widgets for details.
+- cedar::dev
+  - Fixed some issues with video playback in the video grabber.
 - cedar::proc
   - The use of (Looped)Triggers has been remodeled completely. They are no longer shown in the architecture. Instead,
     each looped element is, by default, connected to a default trigger that is created automatically. If you want to use
@@ -82,8 +90,11 @@ Unreleased
   - The time factor setting is now saved per architecture. New architectures start with time factor 1. 
   - You can now declare favorite element classes in the elements tab. Right-click on any element to favorite/unfavorite
     the class.
+  - There is now a search bar in the element class list. 
   - The UI elements (log, elements, properties etc.) are now locked by default and cannot be moved. You can unlock them
     in the windows menu.
+  - The net reader and writer steps now work much more smoothly than before. They now automatically revalidate their
+    connections as soon as possible, and indicate that they are not receiving data by turning yellow.
 
 Released versions
 =================
