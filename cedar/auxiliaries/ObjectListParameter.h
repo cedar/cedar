@@ -74,14 +74,6 @@ public:
   //!@brief clear vector
   virtual void clear() = 0;
 
-  /*!@brief Returns the object with the given index.
-   */
-  CEDAR_DECLARE_DEPRECATED(virtual cedar::aux::ConfigurablePtr configurableAt(size_t index)) = 0;
-
-  /*!@brief Returns the object with the given index.
-   */
-  CEDAR_DECLARE_DEPRECATED(virtual cedar::aux::ConstConfigurablePtr configurableAt(size_t index) const) = 0;
-
   /*!@brief Fills a vector with the types that can be added to this object list
    */
   virtual void listTypes(std::vector<std::string>& types) const = 0;

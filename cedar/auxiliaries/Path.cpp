@@ -135,11 +135,6 @@ std::string cedar::aux::Path::separator()
   return "/";
 }
 
-void cedar::aux::Path::appendComponent(const std::string& component)
-{
-  this->append(component);
-}
-
 std::vector<cedar::aux::Path> cedar::aux::Path::listSubdirectories() const
 {
   CEDAR_ASSERT(this->isDirectory());
@@ -337,11 +332,6 @@ cedar::aux::Path cedar::aux::Path::absolute(bool showInLog) const
 
   // if the path is neither a resource, nor absolute, it should be relative
   return cedar::aux::Path(boost::filesystem::current_path().string() + separator() + this->toString(false));
-}
-
-bool cedar::aux::Path::isEmpty() const
-{
-  return this->empty();
 }
 
 bool cedar::aux::Path::isResource() const

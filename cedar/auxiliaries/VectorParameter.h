@@ -391,12 +391,6 @@ public:
     return this->mDefaults;
   }
 
-  //!@deprecated use setValue instead.
-  CEDAR_DECLARE_DEPRECATED(void set(const std::vector<T>& values, bool lock = false))
-  {
-    this->setValue(values, lock);
-  }
-
   //!@brief set the internal vector to a given vector
   void setValue(const std::vector<T>& values, bool lock = false)
   {
@@ -428,12 +422,6 @@ public:
       this->emitChangedSignal();
       this->emitPropertyChangedSignal();
     }
-  }
-
-  //!@deprecated use setValue instead.
-  CEDAR_DECLARE_DEPRECATED(void set(size_t index, const T& value, bool lock = false))
-  {
-    this->setValue(index, value, lock);
   }
 
   //!@brief set one entry of the vector to a new value
