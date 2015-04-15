@@ -98,24 +98,6 @@ public:
    */
   void step(cedar::unit::Time time);
 
-  /*!@brief Starts the trigger loop.
-   *
-   * @deprecated Use the ThreadWrapper::start() method instead.
-   */
-  CEDAR_DECLARE_DEPRECATED(void startTrigger())
-  {
-    start();
-  }
-
-  /*!@brief Stops the trigger loop.
-   *
-   * @deprecated Use the ThreadWrapper::stop() method instead.
-   */
-  CEDAR_DECLARE_DEPRECATED(void stopTrigger())
-  {
-    stop();
-  }
-
   //! Returns the current time measurement statistics
   ConstTimeAveragePtr getStatistics() const;
 
