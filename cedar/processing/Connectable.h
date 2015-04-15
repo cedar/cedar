@@ -110,12 +110,6 @@ public:
   //!@brief Returns whether this connectable has at least one slot of the given role.
   bool hasSlotForRole(cedar::proc::DataRole::Id role) const;
 
-  //!@deprecated Use hasSlotForRole.
-  CEDAR_DECLARE_DEPRECATED(bool hasRole(cedar::proc::DataRole::Id role) const)
-  {
-    return this->hasSlotForRole(role);
-  }
-
   //!@brief Returns a constant reference to the map of data slots for a given role.
   const cedar::proc::Connectable::SlotMap& getDataSlots(DataRole::Id role) const;
 

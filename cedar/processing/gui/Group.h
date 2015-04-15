@@ -103,12 +103,6 @@ public:
   //!@brief write group to file
   void write() const;
 
-  //!@brief write group to file given by destination (replaced by writeJson)
-  CEDAR_DECLARE_DEPRECATED(void write(const std::string& destination) const);
-
-  //!@brief read group from given file (replaced by readJson)
-  CEDAR_DECLARE_DEPRECATED(void read(const std::string& source));
-
   //!@brief write configuration to path
   void writeJson(const cedar::aux::Path& filename) const;
 
