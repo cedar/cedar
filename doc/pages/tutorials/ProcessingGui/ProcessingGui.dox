@@ -1,0 +1,110 @@
+/*!
+
+@page ProcessingGuiTutorial Tutorials for the cedar's graphical user interface
+
+This page offers several tutorials for using cedar's graphical user interface (we'll refer to it as the cedar gui, or
+just cedar for short). This gui is a graphical frontend for cedar's processing framework. The cedar gui does not require
+knowledge of a programming language and is thus well suited for users of different scientific backgrounds. If you are
+interested in a more programming-oriented introduction to the framework, please refer to
+@ref ProcessingFrameworkConcept.
+
+This page contains the following sections:
+
+<ol>
+  <li>@ref GuiTutorialFirstStep</li>
+  <li>@ref GuiTutorialSecondStep</li>
+  <li>@ref GuiTutorialThirdStep</li>
+  <li>@ref GuiTutorialFourthStep</li>
+  <li>@ref GuiTutorialFifthStep</li>
+</ol>
+
+@section GuiTutorialFirstStep Tutorial: Starting the cedar gui 
+
+In this section, we describe how to find and run the cedar gui. Before using it, you have to compile a version of cedar
+or look for an installed version. The cedar gui can be found in the binaries folder of cedar (the default name is \b bin).
+There you will find an executable named \b cedar (with an additional file extension on some operating systems, e.g., .exe).
+Executing this file opens up the cedar gui. You are now ready to make your first steps with this tool.
+
+@section GuiTutorialSecondStep Tutorial: Understanding the components of the main window
+Have a look at the following picture of a freshly started cedar (note that the arrangement of areas can be customized
+and may thus differ in your cedar version):
+@image html doc/pages/tutorials/ProcessingFramework/images/cedar_areas.png
+The central part of the main window is the \b architecture assembly. Here, building blocks can be added from the 
+\b elements area by dragging them onto the architecture area. Elements can be selected by left-clicking onto an element 
+or left-clicking in the area and selecting multiple elements in a dragged rectangle. Special elements (looped triggers)
+require a double-click if you want to move them. If only a single element is selected and this elements provides
+parameters, the list of available parameters appears in the \b properties area.
+
+@section GuiTutorialThirdStep Tutorial: Understanding the representation of elements
+Everything that can be added to an architecture is called an element. Currently, there are three different types of 
+elements:
+<ol>
+  <li>processing steps</li>
+  <li>groups</li>
+  <li>triggers</li>
+</ol> 
+\b Processing \b steps represent a unit of processing in an architecture. For example, applying a filter operation on 
+an image matrix is considered a processing step. Processing steps process specific childrens of cedar::aux::Data. The nature
+of a step defines the data it can meaningfully process. Steps may have input and output \b slots. These define how data
+flows into and out of the step. If a step does not provide any input slots, it is considered as a \b source. In contrast,
+not providing an output renders a step a \b drain. You can connect up an output slot of a step with an input step of a
+second step by left-clicking onto the output slot and, while keeping the mouse button pressed, dragging a line to an
+input slot. All available input slots will be highlighted and color-coded. This color code states the compatibility
+of the two slots (see @ref ProcessingIntroduction_DataAndConnections).
+
+\b Groups are collections of elements with defined inputs and outputs. You can add elements to groups by dragging
+ elements into them. You can also promote output and input slots of elements to output and input slots of the group by
+ right-clicking the group, choosing <i>add input</i> or <i>add output</i> from the menu and connecting the elements to 
+ the added connection circles inside the group. Note that this happens automatically for existing connections if you 
+ drag connected elements into a group.
+
+\b Triggers manage the time course of processing. They trigger an element when another element has done 
+its work or trigger a time-varying dynamics whenever a time interval elapsed. cedar::proc::LoopedTrigger provides the latter
+functionality. Triggers are not displayed in the GUI. Each element requiring a looped trigger is automatically assigned to a
+default trigger when it is added to the architecture. Custom looped triggers can be added in the advanced simulation control
+widget (see below). Elements can be assigned to custom looped triggers in their (right-click) context menu. 
+
+At any time, you can remove elements from an architecture by first selecting them and subsequently pressing \b delete 
+on your keyboard.
+
+@section GuiTutorialFourthStep Tutorial: Toolbar icons
+@image html doc/pages/tutorials/ProcessingGui/images/toolbar_save.png
+This icon saves the current architecture (if a filename was already chosen).
+
+@image html doc/pages/tutorials/ProcessingGui/images/toolbar_trigger.png
+These icons allow you to start/pause and reset all looped triggers in your architecture. You can also do a single step of 
+computation, with an optional duration. The slider allows you to apply a global factor to the real-time measurements of 
+all looped triggers, effectively slowing down or speeding up your architecture.  
+
+@image html doc/pages/tutorials/ProcessingGui/images/toolbar_recording.png
+With these icons, you can start and stop a recording of data or save a snapshot of data. Note that you first have to 
+select which data you want to record by selecting an element, going to the \b Recorder tab in the property pane and 
+marking data to be recorded.
+
+@image html doc/pages/tutorials/ProcessingGui/images/toolbar_boost.png
+This icon opens the boost control widget, allowing you to control each Boost source in your architecture.
+
+@image html doc/pages/tutorials/ProcessingGui/images/toolbar_advanced_trigger.png
+This icon opens the advanced simulation control widget, allowing you to control each trigger of the architecture separately.
+
+@image html doc/pages/tutorials/ProcessingGui/images/toolbar_visibility.png
+These three icons allow to use a different plotting mode for connections, activate a grid for precise placement of 
+steps and hide/show the assignment of looped elements to looped triggers in the architecture canvas.
+
+@image html doc/pages/tutorials/ProcessingGui/images/toolbar_plotting.png
+This part of the tool bar allows you to close all open plots, hide the current plots and define custom plot groups that 
+you can restore later. You cann show, add, rename, store, and delete custom plot groups.
+
+@section GuiTutorialFifthStep Tutorial: Assembling a simple architecture
+Start assembling the simple architecture by clicking on the \b sources tab of the elements area and drag a cedar::proc::sources::GaussInput
+into the architecture area. A new elements of this class pops up in the middle of the area. Go to the \b DFT tab and 
+drag a cedar::dyn::NeuralField onto the area as well. Note that GaussInput provides an output slot, while
+NeuralField has both an output and an input slot. Create a connection between the output slot of the GaussInput to the input
+of NeuralField. A green-colored connection should appear, linking up these two slots. Start the simulation by clicking on the \b play button. 
+The architecture is now running. You can inspect the ongoing processing in NeuralField by right-clicking on the element 
+and choosing <i>field plot</i>. If you change the <i>centers</i> property of the GaussInput, you can see how a change in 
+input affects the neural field. 
+
+This is the result of the assembly described above:
+@image html doc/pages/tutorials/ProcessingGui/images/cedar_sample_architecture.png
+*/
