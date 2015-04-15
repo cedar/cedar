@@ -49,7 +49,7 @@ likely to undergo major changes:
 known issues
 ============
   - On Windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
-  - using multiple 3D convolutions in separate threads slows down all involved convolutions
+  - Using multiple 3D convolutions in separate threads slows down all involved convolutions
   - Some of the interactive CAREN tests may not run if you do not have the corresponding meshes.
   - Using the field plot and switching dimensionality might lead to messed up plots. Please reopen the field plot.
   - Singleton-related classes may sometimes cause crashes when programs exit. If you experience random crashes when your
@@ -59,7 +59,7 @@ known issues
   - In rare cases, moving elements into groups breaks the triggering chain, which leads to steps not being iterated
     correctly. This can be fixed by saving and loading the architecture. If you encounter such a (reproducible)
     situation, please let us know.
-  - single elements cannot be loaded as linked templates into architectures. They are simply added to the architecture.
+  - Single elements cannot be loaded as linked templates into architectures. They are simply added to the architecture.
   - When a net reader step revalidates its output while the architecture is running, this can lead to connections
     temporarily flashing in different colors. This can take a while, depending on how complicated the revalidation
     process is, but is normal. Connections also sometimes are blue for a short time.
@@ -68,6 +68,16 @@ known issues
 
 Unreleased
 ==========
+
+  none
+
+Released versions
+=================
+
+The following are the changes made in the release versions.
+
+Version 5.0.0
+-------------
 
 - build system
   - fixed an error that made it imposssible to use opencv versions that are not in /usr/local/include.
@@ -95,11 +105,6 @@ Unreleased
     in the windows menu.
   - The net reader and writer steps now work much more smoothly than before. They now automatically revalidate their
     connections as soon as possible, and indicate that they are not receiving data by turning yellow.
-
-Released versions
-=================
-
-The following are the changes made in the release versions.
 
 Version 4.1.0
 -------------
