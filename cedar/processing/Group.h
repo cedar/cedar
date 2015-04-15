@@ -204,13 +204,6 @@ public:
 
   void readData(const cedar::aux::ConfigurationNode& root);
 
-  /*!@deprecated Use readConfiguration instead.
-   */
-  CEDAR_DECLARE_DEPRECATED(void readFrom(const cedar::aux::ConfigurationNode& root))
-  {
-    this->readConfiguration(root);
-  }
-
   /*!@brief Writes the group to a configuration node.
    */
   void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
@@ -218,33 +211,6 @@ public:
   /*!@brief Writes data marked as serializable to the given configuration node.
    */
   void writeData(cedar::aux::ConfigurationNode& root) const;
-
-  /*!@deprecated Use writeConfiguration instead.
-   */
-  CEDAR_DECLARE_DEPRECATED(void writeTo(cedar::aux::ConfigurationNode& root))
-  {
-    this->writeConfiguration(root);
-  }
-
-  /*!@brief Reads the group from a given json file.
-   *
-   *        This file must have the same format as the one output by cedar::proc::Group::writeFile.
-   *
-   * @deprecated Use readJson (from cedar::aux::Configurable)
-   */
-  CEDAR_DECLARE_DEPRECATED(void readFile(const std::string& filename))
-  {
-    this->readJson(filename);
-  }
-
-  /*!@brief Writes the group to a given json file.
-   *
-   * @deprecated Use writeJson (from cedar::aux::Configurable)
-   */
-  CEDAR_DECLARE_DEPRECATED(void writeFile(const std::string& filename))
-  {
-    this->writeJson(filename);
-  }
 
   /*!@brief Removes an element from the group.
    *

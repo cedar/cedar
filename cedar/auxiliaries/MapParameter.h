@@ -189,11 +189,6 @@ public:
     return this->mDefaults;
   }
 
-  CEDAR_DECLARE_DEPRECATED(virtual void set(const std::string& index, const T& value, bool lock = false))
-  {
-    this->setValue(index, value, lock);
-  }
-
   //!@brief set one entry of the map to a new value
   virtual void setValue(const std::string& index, const T& value, bool lock = false)
   {

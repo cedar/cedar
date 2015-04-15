@@ -132,14 +132,6 @@ public:
   //! Returns true if the path is relative to a plugin folder, i.e., starts with the protocol plugin://
   bool isPluginRelative() const;
 
-  //! Returns true if there are no entries in this path, i.e., the path is "".
-  //!@deprecated Use empty() instead.
-  CEDAR_DECLARE_DEPRECATED(bool isEmpty() const);
-
-  //! Sets the stored path from a string.
-  //!@deprecated Use fromString instead.
-  CEDAR_DECLARE_DEPRECATED(void setPath(const std::string& path));
-
   //! Returns the stored protocol.
   const std::string& getProtocol() const;
 
@@ -204,10 +196,6 @@ public:
 
   //! Lists all the files in the path whose absolute path matches the given regular expression.
   std::vector<cedar::aux::Path> listFilesThatMatchRe(const std::string& regexp) const;
-
-  //! Appends another component to the path.
-  //!@deprecated Use append() instead.
-  CEDAR_DECLARE_DEPRECATED(void appendComponent(const std::string& component));
 
   //! Ensures that all directories that are part of this path exist.
   void createDirectories() const;
