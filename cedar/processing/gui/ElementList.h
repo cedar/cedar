@@ -106,10 +106,12 @@ class cedar::proc::gui::ElementList : public QTabWidget
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  class TabBase : public QListWidget
+  class TabBase : public QListView
   {
     public:
       TabBase(QWidget* pParent = nullptr);
+
+      void clear();
 
     protected:
       //! What drop actions are supported by this widget.
@@ -120,7 +122,7 @@ private:
 
       void addEntry(cedar::aux::ConstPluginDeclarationPtr declaration);
 
-      cedar::aux::ConstPluginDeclaration* getDeclarationFromItem(QListWidgetItem* pItem) const;
+      cedar::aux::ConstPluginDeclaration* getDeclarationFromIndex(const QModelIndex& index) const;
 
     private:
       void addElementDeclaration(cedar::proc::ConstElementDeclarationPtr declaration);
