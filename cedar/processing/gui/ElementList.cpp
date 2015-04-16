@@ -48,10 +48,12 @@
 #include "cedar/processing/GroupDeclarationManager.h"
 #include "cedar/auxiliaries/PluginDeclarationTemplate.h"
 #include "cedar/auxiliaries/PluginProxy.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 #include <QContextMenuEvent>
 #include <QApplication>
+#include <QStandardItemModel>
 #include <QResource>
 #include <QPainter>
 #include <QPixmap>
@@ -133,8 +135,9 @@ mPreSearchIndex(-1)
 
 cedar::proc::gui::ElementList::TabBase::TabBase(QWidget* pParent)
 :
-QListWidget(pParent)
+QListView(pParent)
 {
+  this->setModel(new QStandardItemModel());
   this->setViewMode(QListView::IconMode);
   this->setMovement(QListView::Static);
   this->setResizeMode(QListView::Adjust);
@@ -242,24 +245,28 @@ void cedar::proc::gui::ElementList::resizeEvent(QResizeEvent* pEvent)
   this->tabBar()->setMaximumWidth(pEvent->size().width() - this->mpSearchBox->width());
 }
 
-cedar::aux::ConstPluginDeclaration* cedar::proc::gui::ElementList::TabBase::getDeclarationFromItem(QListWidgetItem* pItem) const
+cedar::aux::ConstPluginDeclaration* cedar::proc::gui::ElementList::TabBase::getDeclarationFromIndex(const QModelIndex& index) const
 {
-  return pItem->data(Qt::UserRole).value<cedar::aux::PluginDeclaration*>();
+  auto data = this->model()->itemData(index);
+  auto iter = data.find(Qt::UserRole);
+  // there must be data for the user role, as that contains the pointer to the declaration
+  CEDAR_DEBUG_ASSERT(iter != data.end());
+  return iter->value<cedar::aux::PluginDeclaration*>();
 }
 
 void cedar::proc::gui::ElementList::TabBase::contextMenuEvent(QContextMenuEvent* pEvent)
 {
   QMenu context_menu(this);
 
-  auto item = this->itemAt(pEvent->pos());
+  auto index = this->indexAt(pEvent->pos());
 
   QAction* fav_action = context_menu.addAction("favorite");
   fav_action->setCheckable(true);
   cedar::aux::ConstPluginDeclaration* p_declaration = nullptr;
   std::string class_name;
-  if (item)
+  if (index.isValid())
   {
-    p_declaration = this->getDeclarationFromItem(item);
+    p_declaration = this->getDeclarationFromIndex(index);
     class_name = p_declaration->getClassName();
     fav_action->setChecked(cedar::proc::gui::SettingsSingleton::getInstance()->isFavoriteElement(class_name));
   }
@@ -383,6 +390,11 @@ void cedar::proc::gui::ElementList::TabBase::addEntry(cedar::aux::ConstPluginDec
   }
 }
 
+void cedar::proc::gui::ElementList::TabBase::clear()
+{
+  static_cast<QStandardItemModel*>(this->model())->clear();
+}
+
 void cedar::proc::gui::ElementList::CategoryTab::update()
 {
   this->clear();
@@ -461,7 +473,8 @@ void cedar::proc::gui::ElementList::TabBase::addListEntry
 )
 {
   QString label = QString::fromStdString(className);
-  QListWidgetItem *p_item = new QListWidgetItem(label);
+  auto p_item = new QStandardItem(label);
+  //QListWidgetItem *p_item = new QListWidgetItem(label);
   p_item->setFlags(p_item->flags() | Qt::ItemIsDragEnabled);
 
   if (cedar::proc::gui::SettingsSingleton::getInstance()->isFavoriteElement(declaration->getClassName()))
@@ -518,8 +531,9 @@ void cedar::proc::gui::ElementList::TabBase::addListEntry
 
   p_item->setToolTip(class_description);
 
-  p_item->setData(Qt::UserRole, QVariant::fromValue(const_cast<cedar::aux::PluginDeclaration*>(declaration.get())));
-  this->addItem(p_item);
+  p_item->setData(QVariant::fromValue(const_cast<cedar::aux::PluginDeclaration*>(declaration.get())), Qt::UserRole);
+  int row = this->model()->rowCount();
+  cedar::aux::asserted_cast<QStandardItemModel*>(this->model())->appendRow(p_item);
 }
 
 Qt::DropActions cedar::proc::gui::ElementList::TabBase::supportedDropActions() const
@@ -569,7 +583,7 @@ void cedar::proc::gui::ElementList::reset()
     }
 
     // if the category does not contain any displayed items, remove it
-    if (p_tab->count() == 0)
+    if (p_tab->model()->rowCount() == 0)
     {
       this->removeTab(this->indexOf(p_tab));
       auto iter = mCategoryWidgets.find(category_name);
