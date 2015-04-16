@@ -1,0 +1,1133 @@
+/* 
+ * HTML5 ✰ Boilerplate
+ *
+ * What follows is the result of much research on cross-browser styling. 
+ * Credit left inline and big thanks to Nicolas Gallagher, Jonathan Neal,
+ * Kroc Camen, and the H5BP dev community and team.
+ *
+ * Detailed information about this CSS: h5bp.com/css
+ * 
+ * ==|== normalize ==========================================================
+ */
+
+
+/* =============================================================================
+   HTML5 display definitions
+   ========================================================================== */
+
+article, aside, details, figcaption, figure, footer, header, hgroup, nav, section { display: block; }
+audio, canvas, video { display: inline-block; *display: inline; *zoom: 1; }
+audio:not([controls]) { display: none; }
+[hidden] { display: none; }
+
+/* =============================================================================
+   Base
+   ========================================================================== */
+
+/*
+ * 1. Correct text resizing oddly in IE6/7 when body font-size is set using em units
+ * 2. Force vertical scrollbar in non-IE
+ * 3. Prevent iOS text size adjust on device orientation change, without disabling user zoom: h5bp.com/g
+ */
+
+html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+
+body { margin: 0; font-size: 13px; line-height: 1.231; }
+
+body, button, input, select, textarea { font-family: sans-serif; color: #222; }
+
+/* 
+ * Remove text-shadow in selection highlight: h5bp.com/i
+ * These selection declarations have to be separate
+ * Also: hot pink! (or customize the background color to match your design)
+ */
+
+::-moz-selection { background: #fe57a1; color: #fff; text-shadow: none; }
+::selection { background: #fe57a1; color: #fff; text-shadow: none; }
+
+
+/* =============================================================================
+   Links
+   ========================================================================== */
+
+a { color: #00e; }
+a:visited { color: #551a8b; }
+a:hover { color: #06e; }
+a:focus { outline: thin dotted; }
+
+/* Improve readability when focused and hovered in all browsers: h5bp.com/h */
+a:hover, a:active { outline: 0; }
+
+
+/* =============================================================================
+   Typography
+   ========================================================================== */
+
+abbr[title] { border-bottom: 1px dotted; }
+
+b, strong { font-weight: bold; }
+
+blockquote { margin: 1em 40px; }
+
+dfn { font-style: italic; }
+
+hr { display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin: 1em 0; padding: 0; }
+
+ins { background: #ff9; color: #000305; text-decoration: none; }
+
+mark { background: #ff0; color: #000305; font-style: italic; font-weight: bold; }
+
+/* Redeclare monospace font family: h5bp.com/j */
+pre, code, kbd, samp { font-family: monospace, monospace; _font-family: 'courier new', monospace; font-size: 1em; }
+
+/* Improve readability of pre-formatted text in all browsers */
+pre { white-space: pre; white-space: pre-wrap; word-wrap: break-word; }
+
+q { quotes: none; }
+q:before, q:after { content: ""; content: none; }
+
+small { font-size: 85%; }
+
+/* Position subscript and superscript content without affecting line-height: h5bp.com/k */
+sub, sup { font-size: 75%; line-height: 0; position: relative; vertical-align: baseline; }
+sup { top: -0.5em; }
+sub { bottom: -0.25em; }
+
+
+/* =============================================================================
+   Lists
+   ========================================================================== */
+
+ul, ol { margin: 1em 0; padding: 0 0 0 40px; }
+dd { margin: 0 0 0 40px; }
+nav ul, nav ol { list-style: none; list-style-image: none; margin: 0; padding: 0; }
+
+
+/* =============================================================================
+   Embedded content
+   ========================================================================== */
+
+/*
+ * 1. Improve image quality when scaled in IE7: h5bp.com/d
+ * 2. Remove the gap between images and borders on image containers: h5bp.com/e 
+ */
+
+img { border: 0; -ms-interpolation-mode: bicubic; vertical-align: middle; }
+
+/*
+ * Correct overflow not hidden in IE9 
+ */
+
+svg:not(:root) { overflow: hidden; }
+
+
+/* =============================================================================
+   Figures
+   ========================================================================== */
+
+figure { margin: 0; }
+
+
+/* =============================================================================
+   Forms
+   ========================================================================== */
+
+form { margin: 0; }
+fieldset { border: 0; margin: 0; padding: 0; }
+
+/* Indicate that 'label' will shift focus to the associated form element */
+label { cursor: pointer; }
+
+/* 
+ * 1. Correct color not inheriting in IE6/7/8/9 
+ * 2. Correct alignment displayed oddly in IE6/7 
+ */
+
+legend { border: 0; *margin-left: -7px; padding: 0; }
+
+/*
+ * 1. Correct font-size not inheriting in all browsers
+ * 2. Remove margins in FF3/4 S5 Chrome
+ * 3. Define consistent vertical alignment display in all browsers
+ */
+
+button, input, select, textarea { font-size: 100%; margin: 0; vertical-align: baseline; *vertical-align: middle; }
+
+/*
+ * 1. Define line-height as normal to match FF3/4 (set using !important in the UA stylesheet)
+ * 2. Correct inner spacing displayed oddly in IE6/7
+ */
+
+button, input { line-height: normal; *overflow: visible; }
+
+/*
+ * Reintroduce inner spacing in 'table' to avoid overlap and whitespace issues in IE6/7
+ */
+
+table button, table input { *overflow: auto; }
+
+/*
+ * 1. Display hand cursor for clickable form elements
+ * 2. Allow styling of clickable form elements in iOS
+ */
+
+button, input[type="button"], input[type="reset"], input[type="submit"] { cursor: pointer; -webkit-appearance: button; }
+
+/*
+ * Consistent box sizing and appearance
+ */
+
+input[type="checkbox"], input[type="radio"] { box-sizing: border-box; }
+input[type="search"] { -webkit-appearance: textfield; -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; }
+input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; }
+
+/* 
+ * Remove inner padding and border in FF3/4: h5bp.com/l 
+ */
+
+button::-moz-focus-inner, input::-moz-focus-inner { border: 0; padding: 0; }
+
+/* 
+ * 1. Remove default vertical scrollbar in IE6/7/8/9 
+ * 2. Allow only vertical resizing
+ */
+
+textarea { overflow: auto; vertical-align: top; resize: vertical; }
+
+/* Colors for form validity */
+input:valid, textarea:valid {  }
+input:invalid, textarea:invalid { background-color: #f0dddd; }
+
+
+/* =============================================================================
+   Tables
+   ========================================================================== */
+
+table { border-collapse: collapse; border-spacing: 0; }
+td { vertical-align: top; }
+
+
+/* ==|== primary styles =====================================================
+   Author: 
+   ========================================================================== */
+
+/***** Layout *****/
+.body {clear: both; margin: 0 auto; width: 800px;}
+img.right figure.right {float: right; margin: 0 0 2em 2em;}
+img.left, figure.left {float: left; margin: 0 0 2em 2em;}
+
+/* Body */
+  body {
+    background: #F5F4EF url('../images/bg.png');
+    color: #000305;
+    font-size: 87.5%; /* Base font size: 14px */
+    font-family: 'Trebuchet MS', Trebuchet, 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    line-height: 1.429;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+  }
+
+/* Headings */
+h2 {font-size: 1.571em; color: #ff9600}  /* 22px */
+h3 {font-size: 1.429em; color: #ff9600}  /* 20px */
+h4 {font-size: 1.286em}  /* 18px */
+h5 {font-size: 1.143em}  /* 16px */
+h6 {font-size: 1em}      /* 14px */
+
+h2, h3, h4, h5, h6 {
+  font-weight: 400;
+  line-height: 1.1;
+  margin-bottom: .8em;
+}
+
+/* Anchors */
+a {outline: 0;}
+a img {border: 0px; text-decoration: none;}
+a:link, a:visited {
+  color: #ff9600;
+  padding: 0;
+  text-decoration: none;
+}
+a:hover, a:active {
+  text-decoration: underline;
+}
+
+strong, b {font-weight: bold;}
+em, i {font-style: italic;}
+
+::-moz-selection {background: #F6CF74; color: #fff;}
+::selection {background: #F6CF74; color: #fff;}
+
+/* Lists */
+ul {
+  list-style: outside disc;
+  margin: 1em 0 1.5em 1.5em;
+}
+
+ol {
+  list-style: outside decimal;
+  margin: 1em 0 1.5em 1.5em;
+}
+
+dl {margin: 0 0 1.5em 0;}
+dt {font-weight: bold;}
+dd {margin-left: 1.5em;}
+
+/* Quotes */
+blockquote {font-style: italic;}
+cite {}
+
+q {}
+
+/* Tables */
+table {margin: .5em auto 1.5em auto; width: 98%;}
+
+  /* Thead */
+  thead th {padding: .5em .4em; text-align: left;}
+  thead td {}
+
+  /* Tbody */
+  tbody td {padding: .5em .4em;}
+  tbody th {}
+
+  tbody .alt td {}
+  tbody .alt th {}
+
+  /* Tfoot */
+  tfoot th {}
+  tfoot td {}
+
+/* HTML5 tags */
+header, section, footer,
+aside, nav, article, figure {
+  display: block;
+}
+
+
+#content {clear: both; margin: 0 auto; width: 800px; overflow: visible;}
+
+
+/*
+  Header
+*****************/
+#banner {
+  margin: 0 auto;
+  padding: 2.5em 0 0 0;
+  width = 100%;
+  background: none;
+}
+
+/* Banner */
+#banner h1 {font-size: 3.571em; line-height: .6;}
+#banner h1 a:link, #banner h1 a:visited {
+  font-size: 95%;
+  font-family: 'Signika', sans-serif;
+  color: #000305;
+  display: block;
+  font-weight: bold;
+  margin: 0 0 .6em .2em;
+  text-decoration: none;
+  width: 427px;
+}
+#banner h1 a:hover, #banner h1 a:active {
+  background: none;
+  color: #C74350;
+  text-shadow: none;
+}
+
+#banner h1 strong {font-size: 0.36em; font-weight: normal;}
+
+#banner img {display: block; margin-left: 22em; clear: both;}
+
+/* Main Nav */
+#banner nav {
+  background: #000305;
+  font-size: 1.143em;
+  height: 30px;
+  line-height: 20px;
+  margin: 0 auto;
+  padding: 0;
+  text-align: center;
+  width: 800px;
+
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+}
+
+#banner nav ul {list-style: none; margin: 0 auto; width: 800px;}
+#banner nav li {float: left; display: inline; margin: 0;}
+
+#banner nav a:link, #banner nav a:visited {
+  font-family: 'Signika', sans-serif;
+  color: #fff;
+  display: inline-block;
+  height: 20px;
+  padding: 5px 1.5em;
+  text-decoration: none;
+}
+#banner nav a:hover, #banner nav a:active,
+#banner nav .active a:link, #banner nav .active a:visited {
+/*  background: #C74451; */
+  background: #ff9600;
+  color: #000305;
+  text-shadow: none !important;
+}
+
+#banner nav li:first-child a {
+  border-top-left-radius: 5px;
+  -moz-border-radius-topleft: 5px;
+  -webkit-border-top-left-radius: 5px;
+
+  border-bottom-left-radius: 5px;
+  -moz-border-radius-bottomleft: 5px;
+  -webkit-border-bottom-left-radius: 5px;
+}
+
+
+/*
+  Body
+*****************/
+.box {
+  width = 100%;
+  padding: 20px;
+  overflow: hidden;
+  background: #fff;
+  margin-top: 1em;
+  
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+}
+
+
+
+/*
+  Featured
+*****************/
+#featured img {display: block; float: right; border: none; margin: 0;}
+
+#featured h2 {color: #ff9600; font-size: 1.714em; margin: 0; margin-bottom: 0.3em;}
+#featured h3 {font-size: 1.429em; margin-top: 0; margin-bottom: .5em;}
+
+#featured h3 a:link, #featured h3 a:visited {color: #000305; text-decoration: none;}
+#featured h3 a:hover, #featured h3 a:active {color: #000305; background: #ff9600; text-shadow: 1px 1px 1px #333; border-radius: 3px; -moz-border-radius: 3px;  -webkit-border-radius: 3px; }
+
+
+#about {
+  color: #000302;
+  font-size: 0.9em;
+  height: 30px;
+  line-height: 29px;
+  padding: 0 20px;
+  text-align: right;
+}
+
+
+/*
+  Doxygen documentation
+******************/
+
+
+/* The standard CSS for doxygen */
+
+/* @group Heading Levels */
+
+#doxygen h1 {
+  font-size: 1.8em;
+}
+
+#doxygen dt {
+  font-weight: bold;
+}
+
+#doxygen div.multicol {
+  -moz-column-gap: 1em;
+  -webkit-column-gap: 1em;
+  -moz-column-count: 3;
+  -webkit-column-count: 3;
+}
+
+#doxygen p.startli, #doxygen p.startdd, #doxygen p.starttd {
+  margin-top: 2px;
+}
+
+#doxygen p.endli {
+  margin-bottom: 0px;
+}
+
+#doxygen p.enddd {
+  margin-bottom: 4px;
+}
+
+#doxygen p.endtd {
+  margin-bottom: 2px;
+}
+
+/* @end */
+
+#doxygen caption {
+  font-weight: bold;
+}
+
+#doxygen span.legend {
+        font-size: 70%;
+        text-align: center;
+}
+
+#doxygen h3.version {
+        font-size: 90%;
+        text-align: center;
+}
+/*
+#doxygen div.qindex, div.navtab{
+  background-color: #EBEFF6;
+  border: 1px solid #A3B4D7;
+  text-align: center;
+  margin: 2px;
+  padding: 2px;
+}
+*/
+#doxygen div.qindex, div.navpath {
+  width: 100%;
+  line-height: 140%;
+}
+
+#doxygen div.navtab {
+  margin-right: 15px;
+}
+
+/* @group Link Styling */
+
+#doxygen a {
+  color: #ff9600;
+  font-weight: normal;
+  text-decoration: none;
+}
+
+#doxygen .contents a:visited {
+  color: #ff9600;
+}
+
+#doxygen a:hover {
+  text-decoration: underline;
+}
+
+#doxygen a.qindex {
+  font-weight: bold;
+}
+/*
+#doxygen a.qindexHL {
+  font-weight: bold;
+  background-color: #9CAFD4;
+  color: #ffffff;
+  border: 1px double #869DCA;
+}
+*/
+#doxygen .contents a.qindexHL:visited {
+        color: #ffffff;
+}
+
+#doxygen a.el {
+  font-weight: normal;
+}
+
+#doxygen a.elRef {
+}
+
+#doxygen a.code {
+  color: #ff9600;
+}
+
+#doxygen a.codeRef {
+  color: #ff9600;
+}
+
+/* @end */
+
+#doxygen dl.el {
+  margin-left: -1cm;
+}
+
+#doxygen .fragment {
+  font-family: monospace, fixed;
+  font-size: 105%;
+}
+
+#doxygen pre.fragment {
+  border: 1px solid #dedede;
+  background-color: #fdfcfb;
+  padding: 4px 6px;
+  margin: 4px 8px 4px 2px;
+  overflow: auto;
+  word-wrap: break-word;
+  font-size:  9pt;
+  line-height: 125%;
+}
+
+#doxygen div.ah {
+  background-color: black;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 3px;
+  margin-top: 3px;
+  padding: 0.2em;
+  border: solid thin #333;
+  border-radius: 0.5em;
+  -webkit-border-radius: .5em;
+  -moz-border-radius: .5em;
+  -webkit-box-shadow: 2px 2px 3px #999;
+  -moz-box-shadow: rgba(0, 0, 0, 0.15) 2px 2px 2px;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#000305),color-stop(0.3, #444));
+  background-image: -moz-linear-gradient(center top, #eee 0%, #444 40%, #000305);
+}
+
+#doxygen div.groupHeader {
+  margin-left: 16px;
+  margin-top: 12px;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+#doxygen div.groupText {
+  margin-left: 16px;
+  font-style: italic;
+}
+
+#doxygen body {
+  background: white;
+  color: black;
+        margin: 0;
+}
+
+#doxygen div.contents {
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+#doxygen td.indexkey {
+  font-weight: bold;
+  border: 1px solid #e4e3de;
+  border-left: 0px;
+  border-right: 0px;
+  margin: 2px 0px 2px 0;
+  padding: 2px 10px;
+}
+
+#doxygen td.indexvalue {
+  background: none;
+  border: 1px solid #e4e3de;
+  border-left: 0px;
+  border-right: 0px;
+  padding: 2px 10px;
+  margin: 2px 0px;
+}
+
+#doxygen tr.memlist {
+  background-color: #EEF1F7;
+}
+
+#doxygen p.formulaDsp {
+  text-align: center;
+}
+
+#doxygen img.formulaDsp {
+  
+}
+
+#doxygen img.formulaInl {
+  vertical-align: middle;
+}
+
+#doxygen div.center {
+  text-align: center;
+        margin-top: 0px;
+        margin-bottom: 0px;
+        padding: 0px;
+}
+
+#doxygen div.center img {
+  border: 0px;
+}
+
+#doxygen address.footer {
+  text-align: right;
+  padding-right: 12px;
+}
+
+#doxygen img.footer {
+  border: 0px;
+  vertical-align: middle;
+}
+
+/* @group Code Colorization */
+
+#doxygen span.keyword {
+  color: #008000
+}
+
+#doxygen span.keywordtype {
+  color: #604020
+}
+
+#doxygen span.keywordflow {
+  color: #e08000
+}
+
+#doxygen span.comment {
+  color: #800000
+}
+
+#doxygen span.preprocessor {
+  color: #806020
+}
+
+#doxygen span.stringliteral {
+  color: #002080
+}
+
+#doxygen span.charliteral {
+  color: #008080
+}
+
+#doxygen span.vhdldigit { 
+  color: #ff00ff 
+}
+
+#doxygen span.vhdlchar { 
+  color: #000000 
+}
+
+#doxygen span.vhdlkeyword { 
+  color: #700070 
+}
+
+#doxygen span.vhdllogic { 
+  color: #ff0000 
+}
+
+/* @end */
+
+/*
+.search {
+  color: #003399;
+  font-weight: bold;
+}
+
+form.search {
+  margin-bottom: 0px;
+  margin-top: 0px;
+}
+
+input.search {
+  font-size: 75%;
+  color: #000080;
+  font-weight: normal;
+  background-color: #e8eef2;
+}
+*/
+
+#doxygen td.tiny {
+  font-size: 75%;
+}
+
+#doxygen .dirtab {
+  padding: 4px;
+  border-collapse: collapse;
+  border: 1px solid #A3B4D7;
+}
+
+#doxygen th.dirtab {
+  background: #EBEFF6;
+  font-weight: bold;
+}
+
+#doxygen hr {
+  height: 0px;
+  border: none;
+  border-top: 1px solid #e4e3de;
+}
+
+#doxygen hr.footer {
+  height: 1px;
+}
+
+/* @group Member Descriptions */
+
+#doxygen table.memberdecls {
+  border-spacing: 0px;
+  padding: 0px;
+}
+
+#doxygen .mdescLeft, #doxygen .mdescRight,
+#doxygen .memItemLeft, #doxygen .memItemRight,
+#doxygen .memTemplItemLeft, #doxygen .memTemplItemRight, #doxygen .memTemplParams {
+  border: none;
+  margin: 4px;
+  padding: 1px 0 0 8px;
+}
+
+#doxygen .mdescLeft, #doxygen .mdescRight {
+  padding: 0px 8px 4px 8px;
+  color: #555;
+}
+
+#doxygen .memItemLeft, #doxygen .memItemRight, #doxygen .memTemplParams {
+  border-top: 1px solid #e4e3de;
+}
+
+#doxygen .memItemLeft, #doxygen .memTemplItemLeft {
+        white-space: nowrap;
+}
+
+#doxygen .memTemplParams {
+  color: #4665A2;
+        white-space: nowrap;
+}
+
+/* @end */
+
+/* @group Member Details */
+
+/* Styles for detailed member documentation */
+
+#doxygen .memtemplate {
+  font-size: 80%;
+  color: #4665A2;
+  font-weight: normal;
+  margin-left: 3px;
+}
+
+#doxygen .memnav {
+  background-color: #EBEFF6;
+  border: 1px solid #A3B4D7;
+  text-align: center;
+  margin: 2px;
+  margin-right: 15px;
+  padding: 2px;
+}
+
+#doxygen .memitem {
+  padding: 0;
+  margin-bottom: 10px;
+}
+
+#doxygen .memname {
+        white-space: nowrap;
+        font-weight: bold;
+        margin-left: 6px;
+}
+
+#doxygen .memproto {
+        border-top: 1px solid #ff9600;
+        border-left: 1px solid #ff9600;
+        border-right: 1px solid #ff9600;
+        border-bottom: 1px solid #dedede;
+        background-color: #f3f3f3;
+        padding: 6px 0px 6px 0px;
+        color: #253555;
+        font-weight: bold;
+        text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.9);
+        /* firefox specific markup */
+        -moz-box-shadow: rgba(0, 0, 0, 0.15) 5px 5px 5px;
+        -moz-border-radius-topright: 8px;
+        -moz-border-radius-topleft: 8px;
+        /* webkit specific markup */
+        -webkit-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.15);
+        -webkit-border-top-right-radius: 8px;
+        -webkit-border-top-left-radius: 8px;
+}
+
+#doxygen .memdoc {
+        border: 1px solid #ff9600;
+        padding: 2px 5px;
+        background-color: #fdfcfb;
+        border-top-width: 0;
+        /* firefox specific markup */
+        -moz-box-shadow: rgba(0, 0, 0, 0.15) 5px 5px 5px;
+        -moz-border-radius-bottomright: 8px;
+        -moz-border-radius-bottomleft: 8px;
+        /* webkit specific markup */
+        -webkit-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.15);
+        -webkit-border-bottom-right-radius: 8px;
+        -webkit-border-bottom-left-radius: 8px;
+}
+
+#doxygen .paramkey {
+  text-align: right;
+}
+
+#doxygen .paramtype {
+  white-space: nowrap;
+}
+
+#doxygen .paramname {
+  color: #602020;
+  white-space: nowrap;
+}
+#doxygen .paramname em {
+  font-style: normal;
+}
+
+/* @end */
+
+/* @group Directory (tree) */
+
+/* for the tree view */
+
+#doxygen .ftvtree {
+  font-family: sans-serif;
+  margin: 0px;
+}
+
+/* these are for tree view when used as main index */
+
+#doxygen .directory {
+  font-size: 9pt;
+  font-weight: bold;
+  margin: 5px;
+}
+
+#doxygen .directory h3 {
+  margin: 0px;
+  margin-top: 1em;
+  font-size: 11pt;
+}
+
+/*
+The following two styles can be used to replace the root node title
+with an image of your choice.  Simply uncomment the next two styles,
+specify the name of your image and be sure to set 'height' to the
+proper pixel height of your image.
+*/
+
+/*
+.directory h3.swap {
+  height: 61px;
+  background-repeat: no-repeat;
+  background-image: url("yourimage.gif");
+}
+.directory h3.swap span {
+  display: none;
+}
+*/
+
+#doxygen .directory > h3 {
+  margin-top: 0;
+}
+
+#doxygen .directory p {
+  margin: 0px;
+  white-space: nowrap;
+}
+
+#doxygen .directory div {
+  display: none;
+  margin: 0px;
+}
+
+#doxygen .directory img {
+  vertical-align: -30%;
+}
+
+/* these are for tree view when not used as main index */
+
+#doxygen .directory-alt {
+  font-size: 100%;
+  font-weight: bold;
+}
+
+#doxygen .directory-alt h3 {
+  margin: 0px;
+  margin-top: 1em;
+  font-size: 11pt;
+}
+
+#doxygen .directory-alt > h3 {
+  margin-top: 0;
+}
+
+#doxygen .directory-alt p {
+  margin: 0px;
+  white-space: nowrap;
+}
+
+#doxygen .directory-alt div {
+  display: none;
+  margin: 0px;
+}
+
+#doxygen .directory-alt img {
+  vertical-align: -30%;
+}
+
+/* @end */
+
+#doxygen div.dynheader {
+        margin-top: 8px;
+}
+
+#doxygen address {
+  font-style: normal;
+  color: #2A3D61;
+}
+
+#doxygen table.doxtable {
+  border-collapse:collapse;
+}
+
+#doxygen table.doxtable td, #doxygen table.doxtable th {
+  border: 1px solid #2D4068;
+  padding: 3px 7px 2px;
+}
+
+#doxygen table.doxtable th {
+  background-color: #374F7F;
+  color: #FFFFFF;
+  font-size: 110%;
+  padding-bottom: 4px;
+  padding-top: 5px;
+  text-align:left;
+}
+
+#doxygen .tabsearch {
+  top: 0px;
+  left: 10px;
+  height: 36px;
+  background-image: url('tab_b.png');
+  z-index: 101;
+  overflow: hidden;
+  font-size: 13px;
+}
+
+#doxygen .navpath ul
+{
+  font-size: 11px;
+  height:30px;
+  line-height:30px;
+  color:#8AA0CC;
+  border:solid 1px #e4e3de;
+  overflow:hidden;
+  margin:0px;
+  padding:0px;
+}
+
+#doxygen .navpath li
+{
+  list-style-type:none;
+  float:left;
+  padding-left:10px;
+  padding-right: 15px;
+  background-position:right;
+  color: #000305;
+}
+
+#doxygen .navpath a
+{
+  height:32px;
+  display:block;
+  text-decoration: none;
+  outline: none;
+}
+
+#doxygen .navpath a:hover
+{
+  text-decoration: underline;
+}
+
+#doxygen div.summary
+{
+  float: right;
+  font-size: 8pt;
+  padding-right: 5px;
+  width: 50%;
+  text-align: right;
+}       
+
+#doxygen div.summary a
+{
+  white-space: nowrap;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==|== non-semantic helper classes ========================================
+   Please define your styles before this section.
+   ========================================================================== */
+
+/* For image replacement */
+.ir { display: block; border: 0; text-indent: -999em; overflow: hidden; background-color: transparent; background-repeat: no-repeat; text-align: left; direction: ltr; }
+.ir br { display: none; }
+
+/* Hide from both screenreaders and browsers: h5bp.com/u */
+.hidden { display: none !important; visibility: hidden; }
+
+/* Hide only visually, but have it available for screenreaders: h5bp.com/v */
+.visuallyhidden { border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }
+
+/* Extends the .visuallyhidden class to allow the element to be focusable when navigated to via the keyboard: h5bp.com/p */
+.visuallyhidden.focusable:active, .visuallyhidden.focusable:focus { clip: auto; height: auto; margin: 0; overflow: visible; position: static; width: auto; }
+
+/* Hide visually and from screenreaders, but maintain layout */
+.invisible { visibility: hidden; }
+
+/* Contain floats: h5bp.com/q */ 
+.clearfix:before, .clearfix:after { content: ""; display: table; }
+.clearfix:after { clear: both; }
+.clearfix { zoom: 1; }
+
+
+
+/* ==|== media queries ======================================================
+   PLACEHOLDER Media Queries for Responsive Design.
+   These override the primary ('mobile first') styles
+   Modify as content requires.
+   ========================================================================== */
+
+@media only screen and (min-width: 480px) {
+  /* Style adjustments for viewports 480px and over go here */
+
+}
+
+@media only screen and (min-width: 768px) {
+  /* Style adjustments for viewports 768px and over go here */
+
+}
+
+
+
+/* ==|== print styles =======================================================
+   Print styles.
+   Inlined to avoid required HTTP connection: h5bp.com/r
+   ========================================================================== */
+ 
+@media print {
+  * { background: transparent !important; color: black !important; text-shadow: none !important; filter:none !important; -ms-filter: none !important; } /* Black prints faster: h5bp.com/s */
+  a, a:visited { text-decoration: underline; }
+  a[href]:after { content: " (" attr(href) ")"; }
+  abbr[title]:after { content: " (" attr(title) ")"; }
+  .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after { content: ""; }  /* Don't show links for images, or javascript/internal links */
+  pre, blockquote { border: 1px solid #999; page-break-inside: avoid; }
+  thead { display: table-header-group; } /* h5bp.com/t */
+  tr, img { page-break-inside: avoid; }
+  img { max-width: 100% !important; }
+  @page { margin: 0.5cm; }
+  p, h2, h3 { orphans: 3; widows: 3; }
+  h2, h3 { page-break-after: avoid; }
+}
