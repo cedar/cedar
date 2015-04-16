@@ -126,6 +126,7 @@ mPreSearchIndex(-1)
     SLOT(updateSearchResults(QString))
   );
 
+  this->mpSearchBox->setFixedHeight(this->tabBar()->height());
 
   this->reset();
 }
@@ -233,6 +234,9 @@ void cedar::proc::gui::ElementList::resizeEvent(QResizeEvent* pEvent)
   geomertry.setLeft(pEvent->size().width() - geomertry.width());
   geomertry.setRight(pEvent->size().width());
   this->mpSearchBox->setGeometry(geomertry);
+
+  // make sure the search box has the same height as the tab bar
+  this->mpSearchBox->setFixedHeight(this->tabBar()->height());
 
   // resize the tab bar
   this->tabBar()->setMaximumWidth(pEvent->size().width() - this->mpSearchBox->width());
