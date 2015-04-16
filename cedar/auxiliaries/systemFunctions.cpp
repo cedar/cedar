@@ -91,7 +91,7 @@ std::string cedar::aux::getCedarConfigurationInfo(const std::string& separator, 
     << lineEnd;
   str << separator;
 
-  auto print_library = [&] (const std::string& name, bool present, const std::string& version = "")
+  auto print_library = [&] (const std::string& name, bool present, const std::string& version)
   {
     str << name << ": ";
     if (present)
@@ -114,27 +114,33 @@ std::string cedar::aux::getCedarConfigurationInfo(const std::string& separator, 
   print_library
   (
     "boost",
-    true
+    true,
 #ifdef BOOST_LIB_VERSION
-    , BOOST_LIB_VERSION
+    BOOST_LIB_VERSION
+#else
+    ""
 #endif // BOOST_LIB_VERSION
   );
 
   print_library
   (
     "Qt",
-    true
+    true,
 #ifdef QT_VERSION_STR
-    , QT_VERSION_STR
+    QT_VERSION_STR
+#else
+    ""
 #endif // BOOST_LIB_VERSION
   );
 
   print_library
   (
     "OpenCV",
-    true
+    true,
 #ifdef CV_VERSION
-    , CV_VERSION
+    CV_VERSION
+#else
+    ""
 #endif // BOOST_LIB_VERSION
   );
 
@@ -150,8 +156,11 @@ std::string cedar::aux::getCedarConfigurationInfo(const std::string& separator, 
 #else
     false
 #endif // CEDAR_USE_FFTW
+    ,
 #ifdef CEDAR_USE_FFTW_THREADED
-    , "threaded"
+    "threaded"
+#else
+    ""
 #endif // CEDAR_USE_FFTW_THREADED
   );
 
@@ -163,6 +172,7 @@ std::string cedar::aux::getCedarConfigurationInfo(const std::string& separator, 
 #else
     false
 #endif // CEDAR_USE_FFTW
+    , ""
   );
 
   print_library
@@ -173,8 +183,11 @@ std::string cedar::aux::getCedarConfigurationInfo(const std::string& separator, 
 #else
     false
 #endif // CEDAR_USE_FFTW
+    ,
 #ifdef YARP_VERSION_STRING
-    , YARP_VERSION_STRING
+    YARP_VERSION_STRING
+#else
+    ""
 #endif // YARP_VERSION_STRING
   );
 
@@ -186,6 +199,7 @@ std::string cedar::aux::getCedarConfigurationInfo(const std::string& separator, 
 #else
     false
 #endif // CEDAR_USE_FFTW
+    , ""
   );
 
   print_library
@@ -196,6 +210,7 @@ std::string cedar::aux::getCedarConfigurationInfo(const std::string& separator, 
 #else
     false
 #endif // CEDAR_USE_FFTW
+    , ""
   );
 
   return str.str();
