@@ -131,6 +131,9 @@ mPreSearchIndex(-1)
   this->mpSearchBox->setFixedHeight(this->tabBar()->height());
 
   this->reset();
+
+  // update search results once to create the search tab; this takes time when called for the first time, and is fast afterwards
+  this->updateSearchResults(QString());
 }
 
 cedar::proc::gui::ElementList::TabBase::TabBase(QWidget* pParent)
@@ -149,6 +152,39 @@ cedar::proc::gui::ElementList::SearchResultsTab::SearchResultsTab(QWidget* pPare
 :
 cedar::proc::gui::ElementList::TabBase(pParent)
 {
+  // gather all declarations
+  std::multimap<std::string, cedar::aux::ConstPluginDeclarationPtr> ordered_entries;
+
+  // first, go trough all element declaration entries and put them in the map, thus ordering them
+  auto entries = ElementManagerSingleton::getInstance()->getDeclarations();
+  for (const auto& base_declaration : entries)
+  {
+    auto declaration = boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(base_declaration);
+    CEDAR_ASSERT(declaration);
+    ordered_entries.insert(std::make_pair(cedar::aux::toLower(declaration->getClassNameWithoutNamespace()), declaration));
+  }
+
+  // also go through all group declarations
+  auto group_entries = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->getDefinitions();
+  for (auto group_entry : group_entries)
+  {
+    auto declaration = group_entry.second;
+    ordered_entries.insert(std::make_pair(cedar::aux::toLower(declaration->getClassName()), declaration));
+  }
+
+  // add declarations to the list
+  this->clear();
+  std::vector<cedar::aux::ConstPluginDeclarationPtr> to_add;
+  for (const auto& name_params_pair : ordered_entries)
+  {
+    const auto& declaration = name_params_pair.second;
+    to_add.push_back(declaration);
+  }
+
+  this->addEntries(to_add);
+
+  // update search results (to display only those matching the current search string)
+  this->update(std::string());
 }
 
 cedar::proc::gui::ElementList::CategoryTab::CategoryTab(const std::string& categoryName, QWidget* pParent)
@@ -293,7 +329,7 @@ void cedar::proc::gui::ElementList::TabBase::contextMenuEvent(QContextMenuEvent*
   }
 }
 
-void cedar::proc::gui::ElementList::TabBase::addElementDeclaration(cedar::proc::ConstElementDeclarationPtr declaration)
+QStandardItem* cedar::proc::gui::ElementList::TabBase::makeItemFromElementDeclaration(cedar::proc::ConstElementDeclarationPtr declaration)
 {
   std::string full_class_name = declaration->getClassName();
 
@@ -305,7 +341,7 @@ void cedar::proc::gui::ElementList::TabBase::addElementDeclaration(cedar::proc::
     || full_class_name == "cedar.processing.LoopedTrigger"
   )
   {
-    return;
+    return nullptr;
   }
 
   std::vector<QString> decorations;
@@ -323,7 +359,7 @@ void cedar::proc::gui::ElementList::TabBase::addElementDeclaration(cedar::proc::
   {
     if (!cedar::proc::gui::SettingsSingleton::getInstance()->getElementListShowsDeprecated())
     {
-      return;
+      return nullptr;
     }
     decorations.push_back(":/cedar/auxiliaries/gui/warning.svg");
   }
@@ -343,7 +379,7 @@ void cedar::proc::gui::ElementList::TabBase::addElementDeclaration(cedar::proc::
     source = declaration->getSource();
   }
 
-  this->addListEntry
+  return this->makeItem
   (
     declaration->getClassNameWithoutNamespace(),
     full_class_name,
@@ -356,12 +392,12 @@ void cedar::proc::gui::ElementList::TabBase::addElementDeclaration(cedar::proc::
   );
 }
 
-void cedar::proc::gui::ElementList::TabBase::addGroupDeclaration(cedar::proc::ConstGroupDeclarationPtr declaration)
+QStandardItem* cedar::proc::gui::ElementList::TabBase::makeItemFromGroupDeclaration(cedar::proc::ConstGroupDeclarationPtr declaration)
 {
   std::vector<QString> decorations;
   decorations.push_back(":/decorations/template.svg");
 
-  this->addListEntry
+  return this->makeItem
   (
     declaration->getClassNameWithoutNamespace(),
     "group template",
@@ -374,20 +410,40 @@ void cedar::proc::gui::ElementList::TabBase::addGroupDeclaration(cedar::proc::Co
   );
 }
 
+void cedar::proc::gui::ElementList::TabBase::addEntries(const std::vector<cedar::aux::ConstPluginDeclarationPtr>& entries)
+{
+  bool blocked = this->model()->blockSignals(true);
+  for (const auto& declaration : entries)
+  {
+    QStandardItem* p_item = nullptr;
+    if (auto element_declaration = boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(declaration))
+    {
+      p_item = this->makeItemFromElementDeclaration(element_declaration);
+    }
+    else if (auto group_declaration = boost::dynamic_pointer_cast<cedar::proc::ConstGroupDeclaration>(declaration))
+    {
+      p_item = this->makeItemFromGroupDeclaration(group_declaration);
+    }
+    else
+    {
+      CEDAR_NON_CRITICAL_ASSERT(false || "Unhandled declaration type. This should not happen...");
+    }
+
+    // p_item can be a nullptr if the declaration is not supposed to be shown (e.g., if it is deprecated)
+    if (p_item != nullptr)
+    {
+      cedar::aux::asserted_cast<QStandardItemModel*>(this->model())->appendRow(p_item);
+    }
+  }
+  this->model()->blockSignals(blocked);
+  this->update();
+}
+
 void cedar::proc::gui::ElementList::TabBase::addEntry(cedar::aux::ConstPluginDeclarationPtr declaration)
 {
-  if (auto element_declaration = boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(declaration))
-  {
-    this->addElementDeclaration(element_declaration);
-  }
-  else if (auto group_declaration = boost::dynamic_pointer_cast<cedar::proc::ConstGroupDeclaration>(declaration))
-  {
-    this->addGroupDeclaration(group_declaration);
-  }
-  else
-  {
-    CEDAR_NON_CRITICAL_ASSERT(false || "Unhandled declaration type. This should not happen...");
-  }
+  std::vector<cedar::aux::ConstPluginDeclarationPtr> entries;
+  entries.push_back(declaration);
+  this->addEntries(entries);
 }
 
 void cedar::proc::gui::ElementList::TabBase::clear()
@@ -422,11 +478,13 @@ void cedar::proc::gui::ElementList::CategoryTab::update()
   }
 
   // then, actually add the entries
+  std::vector<cedar::aux::ConstPluginDeclarationPtr> to_add;
   for (const auto& name_params_pair : ordered_entries)
   {
     const auto& declaration = name_params_pair.second;
-    this->addEntry(declaration);
+    to_add.push_back(declaration);
   }
+  this->addEntries(to_add);
 }
 
 void cedar::proc::gui::ElementList::FavoritesTab::update()
@@ -454,13 +512,15 @@ void cedar::proc::gui::ElementList::FavoritesTab::update()
     }
   }
 
+  std::vector<cedar::aux::ConstPluginDeclarationPtr> to_add;
   for (const auto& name_declaration_pair : ordered_list)
   {
-    this->addEntry(name_declaration_pair.second);
+    to_add.push_back(name_declaration_pair.second);
   }
+  this->addEntries(to_add);
 }
 
-void cedar::proc::gui::ElementList::TabBase::addListEntry
+QStandardItem* cedar::proc::gui::ElementList::TabBase::makeItem
 (
   const std::string& className,
   const std::string& fullClassName,
@@ -496,10 +556,10 @@ void cedar::proc::gui::ElementList::TabBase::addListEntry
     {
       QIcon decoration(decorations.at(i));
       overlayer.drawPixmap
-                (
-                  icon_size.width() - decoration_size, icon_size.height() - (i + 1) * decoration_size,
-                  decoration.pixmap(decoration_size, decoration_size)
-                );
+        (
+        icon_size.width() - decoration_size, icon_size.height() - (i + 1) * decoration_size,
+        decoration.pixmap(decoration_size, decoration_size)
+        );
     }
   }
 
@@ -526,14 +586,13 @@ void cedar::proc::gui::ElementList::TabBase::addListEntry
   if (!source.empty())
   {
     class_description += "<br /><b>From plugin:</b> "
-                         + QString::fromStdString(source);
+      + QString::fromStdString(source);
   }
 
   p_item->setToolTip(class_description);
 
   p_item->setData(QVariant::fromValue(const_cast<cedar::aux::PluginDeclaration*>(declaration.get())), Qt::UserRole);
-  int row = this->model()->rowCount();
-  cedar::aux::asserted_cast<QStandardItemModel*>(this->model())->appendRow(p_item);
+  return p_item;
 }
 
 Qt::DropActions cedar::proc::gui::ElementList::TabBase::supportedDropActions() const
@@ -602,7 +661,7 @@ void cedar::proc::gui::ElementList::updateSearchResults(QString searchText)
 
   if (searchText.isEmpty())
   {
-    // remove the tab to "hide" it (qt has no method for hiding it)
+    // remove the tab to "hide" it (qt has no method for hiding individual tabs)
     int tab_index = -1;
     for (int i = 0; i < this->count(); ++i)
     {
@@ -656,39 +715,21 @@ void cedar::proc::gui::ElementList::updateSearchResults(QString searchText)
 
 void cedar::proc::gui::ElementList::SearchResultsTab::update(const std::string& searchFilter)
 {
-  // gather all declarations
-  std::multimap<std::string, cedar::aux::ConstPluginDeclarationPtr> ordered_entries;
-
-  // first, go trough all element declaration entries and put them in the map, thus ordering them
-  auto entries = ElementManagerSingleton::getInstance()->getDeclarations();
-  for (const auto& base_declaration : entries)
+  for (int row = 0; row < this->model()->rowCount(); ++row)
   {
-    auto declaration = boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(base_declaration);
-    CEDAR_ASSERT(declaration);
-    ordered_entries.insert(std::make_pair(cedar::aux::toLower(declaration->getClassNameWithoutNamespace()), declaration));
-  }
+    QStandardItem* item = cedar::aux::asserted_cast<QStandardItem*>(cedar::aux::asserted_cast<QStandardItemModel*>(this->model())->item(row, 0));
+    auto declaration = this->getDeclarationFromIndex(item->index());
 
-  // also go through all group declarations
-  auto group_entries = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->getDefinitions();
-  for (auto group_entry : group_entries)
-  {
-    auto declaration = group_entry.second;
-    ordered_entries.insert(std::make_pair(cedar::aux::toLower(declaration->getClassName()), declaration));
-  }
-
-  // add declarations to the list if it matches the search filter
-  this->clear();
-  for (const auto& name_params_pair : ordered_entries)
-  {
-    const auto& declaration = name_params_pair.second;
-    if (searchFilterMatches(searchFilter, declaration))
-    {
-      this->addEntry(declaration);
-    }
+    this->setRowHidden(row, !searchFilterMatches(searchFilter, declaration));
   }
 }
 
 bool cedar::proc::gui::ElementList::SearchResultsTab::searchFilterMatches(const std::string& searchFilter, cedar::aux::ConstPluginDeclarationPtr declaration)
+{
+  return searchFilterMatches(searchFilter, declaration.get());
+}
+
+bool cedar::proc::gui::ElementList::SearchResultsTab::searchFilterMatches(const std::string& searchFilter, cedar::aux::ConstPluginDeclaration* declaration)
 {
   std::string normalized_classname = cedar::aux::toLower(declaration->getClassName());
   std::string normalized_search_filter = cedar::aux::toLower(searchFilter);

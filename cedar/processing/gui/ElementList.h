@@ -53,6 +53,7 @@
 #include <QListWidget>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QStandardItem>
 
 // pseudo-nested class (because the Qt moc doesn't do real nested classes)
 namespace cedar
@@ -120,16 +121,20 @@ private:
       //! Opens up the context menu.
       void contextMenuEvent(QContextMenuEvent* pEvent);
 
+      //! Adds multiple entries to the list. This is faster than calling addEntry for all items in the list!
+      void addEntries(const std::vector<cedar::aux::ConstPluginDeclarationPtr>& entries);
+
+      //! Add a single entry to the list.
       void addEntry(cedar::aux::ConstPluginDeclarationPtr declaration);
 
       cedar::aux::ConstPluginDeclaration* getDeclarationFromIndex(const QModelIndex& index) const;
 
     private:
-      void addElementDeclaration(cedar::proc::ConstElementDeclarationPtr declaration);
+      QStandardItem* makeItemFromElementDeclaration(cedar::proc::ConstElementDeclarationPtr declaration);
 
-      void addGroupDeclaration(cedar::proc::ConstGroupDeclarationPtr declaration);
+      QStandardItem* makeItemFromGroupDeclaration(cedar::proc::ConstGroupDeclarationPtr declaration);
 
-      void addListEntry
+      QStandardItem* makeItem
       (
         const std::string& className,
         const std::string& fullClassName,
@@ -169,6 +174,8 @@ private:
       void update(const std::string& searchFilter);
 
       static bool searchFilterMatches(const std::string& searchFilter, cedar::aux::ConstPluginDeclarationPtr declaration);
+
+      static bool searchFilterMatches(const std::string& searchFilter, cedar::aux::ConstPluginDeclaration* declaration);
   };
 
   //--------------------------------------------------------------------------------------------------------------------
