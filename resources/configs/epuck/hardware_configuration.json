@@ -1,0 +1,38 @@
+{
+  "name": "hardware e-puck robot",
+  "description file": "configs/epuck/description.json",
+  "component slots":
+  {
+    "drive":
+    {
+      "channel": "serial"
+    },
+    "ambient light sensor":
+    {
+      "channel": "serial"
+    },
+    "proximity sensor":
+    {
+      "channel": "serial"
+    },
+    "acceleration sensor":
+    {
+      "channel": "serial"
+    },
+    "led":
+    {
+      "channel": "serial"
+    }
+  },
+  "channel configurations":
+  {
+    "serial":
+    {
+      "name": "serial channel",
+      "device path": "/dev/rfcomm0",
+      "baud rate": "115200",
+      "escaped command delimiter": "\\r\\n",
+      "time out": "5.25 s"
+    }
+  }
+}
