@@ -54,6 +54,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QStandardItem>
+#include <QGraphicsSceneDragDropEvent>
 
 // pseudo-nested class (because the Qt moc doesn't do real nested classes)
 namespace cedar
@@ -113,6 +114,8 @@ private:
       TabBase(QWidget* pParent = nullptr);
 
       void clear();
+
+      static cedar::aux::ConstPluginDeclaration* getDeclarationFromItem(QStandardItem* pItem);
 
     protected:
       //! What drop actions are supported by this widget.
@@ -188,10 +191,11 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public:
-
 public slots:
   void reset();
+
+public:
+  static cedar::aux::ConstPluginDeclaration* declarationFromDrop(QGraphicsSceneDragDropEvent* pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

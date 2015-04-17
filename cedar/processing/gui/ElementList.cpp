@@ -222,6 +222,31 @@ QLineEdit(pParent)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::aux::ConstPluginDeclaration* cedar::proc::gui::ElementList::declarationFromDrop(QGraphicsSceneDragDropEvent* pEvent)
+{
+  auto source = dynamic_cast<QListView*>(pEvent->source());
+
+  if (source)
+  {
+    QByteArray itemData = pEvent->mimeData()->data("application/x-qstandarditemmodeldatalist");
+    QDataStream stream(&itemData, QIODevice::ReadOnly);
+
+    int r, c;
+    QMap<int, QVariant> v;
+    stream >> r >> c >> v;
+
+    auto model = cedar::aux::asserted_cast<QStandardItemModel*>(source->model());
+    auto p_item = model->item(r, c);
+
+    if (p_item)
+    {
+      return cedar::proc::gui::ElementList::TabBase::getDeclarationFromItem(p_item);
+    }
+  }
+
+  return nullptr;
+}
+
 void cedar::proc::gui::elementList::SearchBar::textChanged(const QString& text)
 {
   if (text.isEmpty())
@@ -289,6 +314,19 @@ cedar::aux::ConstPluginDeclaration* cedar::proc::gui::ElementList::TabBase::getD
   CEDAR_DEBUG_ASSERT(iter != data.end());
   return iter->value<cedar::aux::PluginDeclaration*>();
 }
+
+cedar::aux::ConstPluginDeclaration* cedar::proc::gui::ElementList::TabBase::getDeclarationFromItem(QStandardItem* pItem)
+{
+  if (pItem->data(Qt::UserRole).isValid())
+  {
+    return pItem->data(Qt::UserRole).value<cedar::aux::PluginDeclaration*>();
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
 
 void cedar::proc::gui::ElementList::TabBase::contextMenuEvent(QContextMenuEvent* pEvent)
 {

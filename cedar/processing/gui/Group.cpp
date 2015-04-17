@@ -49,6 +49,7 @@
 #include "cedar/processing/gui/ConnectorItem.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/exceptions.h"
+#include "cedar/processing/gui/ElementList.h"
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/sinks/GroupSink.h"
 #include "cedar/processing/LoopedTrigger.h"
@@ -238,30 +239,6 @@ bool cedar::proc::gui::Group::manualDeletionRequiresConfirmation() const
   return !this->getGroup() || !this->getGroup()->getElements().empty();
 }
 
-cedar::aux::PluginDeclaration* cedar::proc::gui::Group::declarationFromDrop(QGraphicsSceneDragDropEvent *pEvent) const
-{
-  auto tree = dynamic_cast<QListWidget*>(pEvent->source());
-
-  if (tree)
-  {
-    QByteArray itemData = pEvent->mimeData()->data("application/x-qabstractitemmodeldatalist");
-    QDataStream stream(&itemData, QIODevice::ReadOnly);
-
-    int r, c;
-    QMap<int, QVariant> v;
-    stream >> r >> c >> v;
-
-    QListWidgetItem *item = tree->item(r);
-
-    if (item)
-    {
-      return item->data(Qt::UserRole).value<cedar::aux::PluginDeclaration*>();
-    }
-  }
-
-  return nullptr;
-}
-
 void cedar::proc::gui::Group::dragLeaveEvent(QGraphicsSceneDragDropEvent * /* pEvent */)
 {
   // reset the status message
@@ -276,40 +253,37 @@ void cedar::proc::gui::Group::dragLeaveEvent(QGraphicsSceneDragDropEvent * /* pE
 
 void cedar::proc::gui::Group::dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
-  if (pEvent->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
+  auto declaration = cedar::proc::gui::ElementList::declarationFromDrop(pEvent);
+  if (!declaration)
   {
-    auto declaration = this->declarationFromDrop(pEvent);
-    if (!declaration)
-    {
-      return;
-    }
-
-    bool can_link = (dynamic_cast<const cedar::proc::GroupDeclaration*>(declaration) != nullptr);
-
-    QString message;
-    if (pEvent->modifiers().testFlag(Qt::ControlModifier) && can_link)
-    {
-      message = "Inserted element will be added as a link, i.e., unmodifiable, and will be loaded from a file every time.";
-      pEvent->setDropAction(Qt::LinkAction);
-    }
-    else
-    {
-      if (can_link)
-      {
-        message = "Inserted element will be copied. Hold ctrl to create a linked element.";
-      }
-      pEvent->setDropAction(Qt::CopyAction);
-    }
-
-    if (this->mpMainWindow && this->mpMainWindow->statusBar())
-    {
-      auto status_bar = this->mpMainWindow->statusBar();
-      status_bar->showMessage(message);
-    }
-
-    pEvent->accept();
-    this->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+    return;
   }
+
+  bool can_link = (dynamic_cast<const cedar::proc::GroupDeclaration*>(declaration) != nullptr);
+
+  QString message;
+  if (pEvent->modifiers().testFlag(Qt::ControlModifier) && can_link)
+  {
+    message = "Inserted element will be added as a link, i.e., unmodifiable, and will be loaded from a file every time.";
+    pEvent->setDropAction(Qt::LinkAction);
+  }
+  else
+  {
+    if (can_link)
+    {
+      message = "Inserted element will be copied. Hold ctrl to create a linked element.";
+    }
+    pEvent->setDropAction(Qt::CopyAction);
+  }
+
+  if (this->mpMainWindow && this->mpMainWindow->statusBar())
+  {
+    auto status_bar = this->mpMainWindow->statusBar();
+    status_bar->showMessage(message);
+  }
+
+  pEvent->accept();
+  this->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
 }
 
 void cedar::proc::gui::Group::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
@@ -319,7 +293,7 @@ void cedar::proc::gui::Group::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
 
 void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
-  auto declaration = this->declarationFromDrop(pEvent);
+  auto declaration = cedar::proc::gui::ElementList::declarationFromDrop(pEvent);
   if (declaration == nullptr)
   {
     return;
