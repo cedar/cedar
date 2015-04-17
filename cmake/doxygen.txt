@@ -127,6 +127,7 @@ if(DOXYGEN_FOUND AND DOXYFILE_IN_FOUND)
 
   set(PROJECT_VERSION "${CEDAR_VERSION_MAJOR}.${CEDAR_VERSION_MINOR}.${CEDAR_VERSION_BUGFIX}")
   configure_file(${DOXYFILE_IN} Doxyfile IMMEDIATE @ONLY)
+  configure_file(${CEDAR_HOME}/doc/resources/header.html.in ${CEDAR_BUILD_DIR}/doc_resources/header.html IMMEDIATE @ONLY)
 
   get_target_property(DOC_TARGET doc TYPE)
   if(NOT DOC_TARGET)
