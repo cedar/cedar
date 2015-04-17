@@ -285,7 +285,7 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
   }
 
   // if no inputs are present, there is nothing to do (i.e., no inputs have to be passed to the component)
-  if (!this->hasRole(cedar::proc::DataRole::INPUT))
+  if (!this->hasSlotForRole(cedar::proc::DataRole::INPUT))
   {
     return;
   }
