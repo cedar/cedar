@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -369,8 +369,10 @@ void cedar::aux::CommandLineParser::defineOption
        const std::string& group
      )
 {
-  //!@todo Proper exception
-  CEDAR_ASSERT(mDescriptions.find(longName) == mDescriptions.end());
+  if (mDescriptions.find(longName) != mDescriptions.end())
+  {
+    CEDAR_THROW(cedar::aux::DuplicateNameException, "Cannot add command line option \"" + longName + "\": already defined.");
+  }
 
   this->mDescriptions[longName] = description;
 
@@ -500,7 +502,6 @@ void cedar::aux::CommandLineParser::parse(int argc, char* argv[], bool terminati
           else
           {
             // series of short names
-            //!@todo Only accept series if there's no value-expecting one in there
             for (size_t i = 1; i < string.size(); ++i)
             {
               char short_name = string.at(i);
@@ -551,8 +552,10 @@ void cedar::aux::CommandLineParser::parse(int argc, char* argv[], bool terminati
 
       case STATE_EXPECTING_VALUE:
       {
-        //!@todo Proper exception: expecting a value.
-        CEDAR_ASSERT(!current_option.empty());
+        if (current_option.empty())
+        {
+          CEDAR_THROW(cedar::aux::InvalidValueException, "Option " + current_option + " expects a value, none was given.");
+        }
         this->setParsedValue(current_option, string);
         state = STATE_PLAIN;
         current_option = std::string();
@@ -561,8 +564,10 @@ void cedar::aux::CommandLineParser::parse(int argc, char* argv[], bool terminati
     }
   }
 
-  //!@todo Proper exception: should not end while looking for value.
-  CEDAR_ASSERT(state == STATE_PLAIN);
+  if (state != STATE_PLAIN)
+  {
+    CEDAR_THROW(cedar::aux::InvalidValueException, "Error parsing options: still expecting a value at end of arguments.");
+  }
 
   if (this->hasParsedFlag("help"))
   {
@@ -670,7 +675,6 @@ void cedar::aux::CommandLineParser::writeHelp(std::ostream& stream) const
 {
   if (this->mArguments.size() > 0)
   {
-    //!@todo also append free-floating values, if allowed.
     stream << "Usage: " << this->mArguments.front() << " [options]" << std::endl << std::endl;
   }
 

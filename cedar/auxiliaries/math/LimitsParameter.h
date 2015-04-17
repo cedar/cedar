@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -325,7 +325,6 @@ private:
 protected:
   // none yet
 private:
-  //!@todo Why aren't mLowerLimitMinimum etc. stored as cedar::aux::math::Limits?
   //!@brief The default value of the lower limit
   T mLowerLimitDefault;
   //!@brief The minimum value of the lower limit

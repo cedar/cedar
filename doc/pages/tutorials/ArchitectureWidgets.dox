@@ -185,4 +185,58 @@ simplify your live. Here's an example of how to make a template called EB and ad
 Note, that templates are always instantiated with relative rows/columns, i.e., the label in the above example will be in
 row 2, the plot in row 3.
 
+
+@section EBPlots How to build a plot for your elementary behaviors
+
+Architecture widgets can also be used to make a plot of nodes in an architecture, e.g., to visualize the state of the
+behavioral organization.
+
+For this, we use a cedar::aux::gui::Multi0DPlot. This plot shows several zero-dimensional values in a single plot,
+representing each value as a filled circle. 
+
+Here's an example json file describing a widget configuration:
+@code
+{
+  "configuration":
+  {
+    "default size":
+    {
+      "width": "600",
+      "height": "400"
+    }
+  },
+  "entries":
+  [
+    {
+      "plot type": "cedar.aux.gui.Multi0DPlot",
+      "data":
+      [
+        {"eb 1 intention.activation": "eb 1 intention node[BUFFER].activation"},
+        {"eb 1 intention.output": "eb 1 intention node[OUTPUT].sigmoided activation"},
+        {"eb 1 CoS.activation": "eb 1 CoS node[BUFFER].activation"},
+        {"eb 1 CoS.output": "eb 1 CoS node[OUTPUT].sigmoided activation"},
+        {"eb 2 intention.activation": "eb 2 intention node[BUFFER].activation"},
+        {"eb 2 intention.output": "eb 2 intention node[OUTPUT].sigmoided activation"},
+        {"eb 2 CoS.activation": "eb 2 CoS node[BUFFER].activation"},
+        {"eb 2 CoS.output": "eb 2 CoS node[OUTPUT].sigmoided activation"}
+      ],
+      "plot configuration":
+      {
+        "autoscaling": "false",
+        "y axis limits":
+        {
+          "lower limit": "-7",
+          "upper limit": "7"
+        }
+      }
+    }
+  ]
+}
+@endcode
+A few things to note: using data titles like "eb 1 intention.activation" means that all data belonging to "eb 1
+intention" will have the same horizontal position. I.e., activation and output of each node are plotted on top of each
+other.
+
+Setting axis limits is not necessary, but makes the plot appear less jittery. 
+
 */

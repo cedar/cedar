@@ -4,7 +4,7 @@ Troubleshooting
  <!--
 =======================================================================================================================
 
-   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+   Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
    This file is part of cedar.
 
@@ -55,6 +55,7 @@ Installing cedar
 > Make sure to put the right paths to the installed libraries in cedar.conf. cedar tries to find both includes and libraries by matching some of the required files (for example, some important header files, which exist since a certain release of an external library). You may also encounter problems with different names for shared objects.
 
 * **I am having troubles with boost during compilation. What should I do?**
+
 > Please check if your boost version matches our minimal requirement 1.47. There is also an issue with version 1.49 and C++11, which we cannot fix since this appears to be a bug in boost itself. If you have an older version of boost or version 1.49, try switching to a newer version (1.50+) and check that cedar finds this particular version and not the old one.
 
 * **During linking, I get unresolved references to some dependencies such as OpenCV.**
@@ -68,18 +69,14 @@ Installing cedar
 
 * **Some of the unit tests fail. Help!**
 
-> There may be several causes for this. Unfortuantely, unit tests don't work well on Windows. Also, if you see a lot of unit tests with the gui prefix failing, this may be because you are not in an environment where GUIs can be opened. If you are using ssh, try adding -X.
+> There may be several causes for this. Unfortunately, unit tests do not work well on Windows. Also, if you see a lot of unit tests with the gui prefix failing, this may be because you are not in an environment where GUIs can be opened. If you are using ssh, try adding -X.
 
 Using cedar
 -----------
 
-* **I'm using cedar together with plugins. Why does the processing ide crash on start-up or during use (e.g., loading an architecture)?**
+* **I'm using cedar together with plugins. Why does the GUI crash on start-up or during use (e.g., loading an architecture)?**
 
-> The plugins are most likely compiled or linked to a different version of cedar. You can disable loading the plugins by using a command line option --no-plugins (see --help). If your ide now starts up without crashing, you should recompile all plugins using your current cedar version. In some cases, outdated plugins are loaded without crashing and may lead to crashes later on while using or shutting down cedar. In this case, please also recompile your plugins everytime you update your core cedar.
-
-* **How can I move triggers once I placed them on the architecture canvas?**
-
-> Try double-click dragging the trigger or select multiple items to move around.
+> The plugins are most likely compiled or linked to a different version of cedar. You can disable loading the plugins by using a command line option --no-plugins (see --help). If your GUI now starts up without crashing, you should recompile all plugins using your current cedar version. In some cases, outdated plugins are loaded without crashing and may lead to crashes later on while using or shutting down cedar. In this case, please also recompile your plugins everytime you update your core cedar.
 
 * **When using 3D neural fields, exceptions occur once the triggers are started.**
 

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -41,9 +41,10 @@
 #include "cedar/processing/gui/BoostControl.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/gui/Element.h"
 #include "cedar/processing/sources/Boost.h"
 #include "cedar/processing/Group.h"
-#include "cedar/processing/NetworkPath.h"
+#include "cedar/processing/GroupPath.h"
 #include "cedar/processing/Element.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/Configurable.h"
@@ -66,17 +67,27 @@ mpView(view)
 {
   this->setupUi(this);
 
-  QObject::connect(this, SIGNAL(elementAddedSignal(QString)), this, SLOT(elementAdded(QString)));
-  QObject::connect(this, SIGNAL(elementRemovedSignal(QString)), this, SLOT(elementRemoved(QString)));
   QObject::connect(this->mpBoostTree, SIGNAL(itemActivated(QTreeWidgetItem*, int)), this, SLOT(itemActivated(QTreeWidgetItem*, int)));
+
+  auto filter_boosts = [] (cedar::proc::ConstElementPtr element)
+  {
+    return static_cast<bool>(boost::dynamic_pointer_cast<cedar::proc::sources::ConstBoost>(element));
+  };
+  this->mpBoostTree->setFilter(boost::bind<bool>(filter_boosts, _1));
 
   this->mpBoostTree->header()->setResizeMode(0, QHeaderView::Stretch);
   this->mpBoostTree->header()->setResizeMode(1, QHeaderView::ResizeToContents);
-}
 
-cedar::proc::gui::BoostControl::~BoostControl()
-{
-  this->disconnectSignals();
+  this->mBoostAddedConnection = this->mpBoostTree->connectToElementAddedSignal
+      (
+        boost::bind
+        (
+          &cedar::proc::gui::BoostControl::boostAdded,
+          this,
+          _1,
+          _2
+        )
+      );
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -109,7 +120,7 @@ bool cedar::proc::gui::BoostControl::isBoostItem(QTreeWidgetItem* pItem) const
 
 cedar::proc::sources::BoostPtr cedar::proc::gui::BoostControl::findBoostFor(QTreeWidgetItem* pItem) const
 {
-  cedar::proc::NetworkPath path;
+  cedar::proc::GroupPath path;
 
   // traverse the parents and add them to the path
   QTreeWidgetItem* parent = pItem->parent();
@@ -124,201 +135,31 @@ cedar::proc::sources::BoostPtr cedar::proc::gui::BoostControl::findBoostFor(QTre
   return boost::dynamic_pointer_cast<cedar::proc::sources::Boost>(this->mGroup->getElement(path));
 }
 
-void cedar::proc::gui::BoostControl::disconnectSignals()
-{
-  for (auto connection : this->mElementAddedConnections)
-  {
-    connection.disconnect();
-  }
-  for (auto connection : this->mElementRemovedConnections)
-  {
-    connection.disconnect();
-  }
-}
-
 void cedar::proc::gui::BoostControl::setGroup(cedar::proc::GroupPtr group)
 {
-  this->disconnectSignals();
-
-  this->mpBoostTree->clear();
-  this->mElementNames.clear();
-
   this->mGroup = group;
-
-  this->addGroup(this->mGroup);
+  this->mpBoostTree->setGroup(group);
 }
 
-void cedar::proc::gui::BoostControl::addGroup(cedar::proc::GroupPtr group)
+void cedar::proc::gui::BoostControl::boostAdded(QTreeWidgetItem* pItem, cedar::proc::ElementPtr element)
 {
-  for (const auto& name_element_pair : group->getElements())
+  auto boost = boost::dynamic_pointer_cast<cedar::proc::sources::Boost>(element);
+  if (!boost)
   {
-    this->translateElementAddedSignal(name_element_pair.second);
+    return;
   }
 
-  this->mElementAddedConnections.push_back
-  (
-    group->connectToNewElementAddedSignal
-    (
-      boost::bind(&cedar::proc::gui::BoostControl::translateElementAddedSignal, this, _1)
-    )
-  );
-
-  this->mElementRemovedConnections.push_back
-  (
-    group->connectToElementRemovedSignal
-    (
-      boost::bind(&cedar::proc::gui::BoostControl::translateElementRemovedSignal, this, _1)
-    )
-  );
-}
-
-void cedar::proc::gui::BoostControl::translateElementRemovedSignal(cedar::proc::ConstElementPtr element)
-{
-  auto iter = this->mElementNames.find(element.get());
-  if (iter != this->mElementNames.end())
-  {
-    QString name = iter->second;
-    this->mElementNames.erase(iter);
-
-    emit elementRemovedSignal(name);
-  }
-}
-
-void cedar::proc::gui::BoostControl::elementRemoved(QString elementName)
-{
-  auto items = this->mpBoostTree->findItems(elementName, 0);
-
-  QTreeWidgetItemIterator it(this->mpBoostTree);
-  while (*it)
-  {
-    QTreeWidgetItem* p_item = *it;
-    if (p_item->data(0, Qt::UserRole).toString() == elementName)
-    {
-      delete p_item;
-      return;
-    }
-    ++it;
-  }
-}
-
-void cedar::proc::gui::BoostControl::translateElementAddedSignal(cedar::proc::ElementPtr element)
-{
-  std::string path = this->mGroup->findPath(element);
-  emit elementAddedSignal(QString::fromStdString(path));
-}
-
-QTreeWidgetItem* cedar::proc::gui::BoostControl::getGroupItem(const std::string& elementPath)
-{
-  std::vector<std::string> subpaths;
-  cedar::aux::split(elementPath, ".", subpaths);
-
-  CEDAR_ASSERT(!subpaths.empty());
-
-  subpaths.pop_back();
-
-  QTreeWidgetItem* p_last = this->mpBoostTree->invisibleRootItem();
-  for (const auto& subpath : subpaths)
-  {
-    QTreeWidgetItem* p_item = nullptr;
-    for (int i = 0; i < p_last->childCount(); ++i)
-    {
-      auto child = p_last->child(i);
-      if (child->text(0).toStdString() == subpath)
-      {
-        p_item = child;
-      }
-    }
-    if (p_item == nullptr)
-    {
-      p_item = new QTreeWidgetItem();
-      p_item->setText(0, QString::fromStdString(subpath));
-      p_last->addChild(p_item);
-      p_item->setExpanded(true);
-    }
-    p_last = p_item;
-  }
-
-  return p_last;
-}
-
-void cedar::proc::gui::BoostControl::elementAdded(QString elementName)
-{
-  cedar::proc::ElementPtr element = this->mGroup->getElement(elementName.toStdString());
-
-  if (auto boost = boost::dynamic_pointer_cast<cedar::proc::sources::Boost>(element))
-  {
-    this->addBoost(boost);
-  }
-  else if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
-  {
-    std::string path = this->mGroup->findPath(group);
-
-    this->connectRenameSignal(group);
-
-    this->addGroup(group);
-  }
-}
-
-void cedar::proc::gui::BoostControl::elementNameChanged()
-{
-  auto name = cedar::aux::asserted_cast<cedar::aux::Parameter*>(QObject::sender());
-  auto element = dynamic_cast<cedar::proc::Element*>(name->getOwner());
-
-  auto iter = this->mElementNames.find(element);
-  if (iter == this->mElementNames.end())
-  {
-    return; // can happen if the element is being deleted
-  }
-
-  QString old_name = iter->second;
-  QString new_name = QString::fromStdString(this->mGroup->findPath(element));
-
-  auto items = this->mpBoostTree->findItems(old_name, 0);
-
-  for (int i = 0; i < items.size(); ++i)
-  {
-    items.at(i)->setText(0, new_name);
-  }
-
-  this->mElementNames[element] = new_name;
-}
-
-void cedar::proc::gui::BoostControl::connectRenameSignal(cedar::proc::ElementPtr element)
-{
-  cedar::aux::ParameterPtr name = element->getParameter("name");
-  QObject::connect(name.get(), SIGNAL(valueChanged()), this, SLOT(elementNameChanged()));
-}
-
-void cedar::proc::gui::BoostControl::addBoost(cedar::proc::sources::BoostPtr boost)
-{
-  std::string path = this->mGroup->findPath(boost);
-  this->mElementNames[boost.get()] = QString::fromStdString(path);
-
-  this->connectRenameSignal(boost);
-
-  QStringList labels;
-  labels << QString::fromStdString(boost->getName());
-
-  auto p_item = new QTreeWidgetItem(labels);
-  p_item->setData(0, Qt::UserRole, QString::fromStdString(path));
-  p_item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-  p_item->setToolTip(0, "Double-click to show the boost in the architecture.");
-
-  // this retrieves the group item (or creates it if it does not exist)
-  auto group_item = this->getGroupItem(path);
-  group_item->addChild(p_item);
+  pItem->setToolTip(0, "Double-click to show the boost in the architecture.");
 
   // create checkbox for enabling/disabling boost (by creating a gui::BoolParameter and passing the boost's parameter)
-  cedar::aux::ParameterPtr active_parameter = boost->getParameter("active");
-  cedar::aux::gui::Parameter* p_enabler
-    = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(active_parameter)->allocateRaw();
-  this->mpBoostTree->setItemWidget(p_item, 1, p_enabler);
+  auto active_parameter = boost->getParameter("active");
+  auto p_enabler = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(active_parameter)->allocateRaw();
+  this->mpBoostTree->setItemWidget(pItem, 1, p_enabler);
   p_enabler->setParameter(active_parameter);
 
   // create spinbox for setting boost strength (by creating a gui::DoubleParameter and passing the boost's parameter)
-  cedar::aux::ParameterPtr strength_parameter = boost->getParameter("strength");
-  cedar::aux::gui::Parameter* p_strength
-    = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(strength_parameter)->allocateRaw();
-  this->mpBoostTree->setItemWidget(p_item, 2, p_strength);
+  auto strength_parameter = boost->getParameter("strength");
+  auto p_strength = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(strength_parameter)->allocateRaw();
+  this->mpBoostTree->setItemWidget(pItem, 2, p_strength);
   p_strength->setParameter(strength_parameter);
 }

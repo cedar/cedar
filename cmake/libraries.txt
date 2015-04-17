@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -185,6 +185,7 @@ find_package(OpenCV REQUIRED)
 if(OpenCV_FOUND)
   message("   OpenCV was found in ${OpenCV_INCLUDE_DIRS}")
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OpenCV_LIBS})
+  include_directories(${OpenCV_INCLUDE_DIRS})
 elseif(OpenCV_FOUND)
   message(${CEDAR_LIB_ERROR_TYPE} "   Required library OpenCV was not found on your system!
   You can try to alter the default search paths in cedar.conf.")

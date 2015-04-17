@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -44,10 +44,10 @@
 #include "cedar/auxiliaries/gui/ColorValueRGBA.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/ColorGradient.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
-#include "cedar/auxiliaries/ImageData.h"
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
@@ -219,6 +219,7 @@ bool cedar::aux::gui::ImagePlot::doConversion()
     this->setInfo("cannot display matrices of dimensionality > 2");
     return false;
   }
+
   const cv::Mat& mat = this->mData->getData();
 
   if (mat.empty())
@@ -460,9 +461,10 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
   }
 }
 
-void cedar::aux::gui::ImagePlot::plot(cedar::aux::ConstDataPtr data, const std::string& /* title */)
+void cedar::aux::gui::ImagePlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   this->stop();
+  this->cedar::aux::gui::QImagePlot::plot(data, title);
 
   this->mDataType = DATA_TYPE_MAT;
   this->setLegendAvailable(true);

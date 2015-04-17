@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -71,17 +71,17 @@ namespace
 cedar::proc::experiment::gui::StepPropertyParameter::StepPropertyParameter(QWidget *pParent)
 :
 cedar::aux::gui::Parameter(pParent),
-mpStep(new QComboBox()),
+mpElement(new QComboBox()),
 mpProperty(new QComboBox()),
 mpPropertyCopy(nullptr)
 {
-  this->mpStep->setEditable(true);
+  this->mpElement->setEditable(true);
   this->mpProperty->setEditable(true);
 
   auto layout = new QFormLayout();
   layout->setMargin(0);
   this->setLayout(layout);
-  layout->addRow(new QLabel("Step"), mpStep);
+  layout->addRow(new QLabel("Element"), mpElement);
   layout->addRow(new QLabel("Property"), mpProperty);
   layout->addRow(new QLabel("Value"), new QLabel("(select an element and parameter first)"));
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
@@ -105,19 +105,19 @@ void cedar::proc::experiment::gui::StepPropertyParameter::parameterPointerChange
   if (parameter)
   {
     auto path = parameter->getElementPath();
-    this->mpStep->setEditText(QString::fromStdString(path));
+    this->mpElement->setEditText(QString::fromStdString(path));
   }
   this->stepChanged();
   this->mpProperty->setEditText(QString::fromStdString(parameter->getParameterPath()));
   this->updateValue();
-  connect(this->mpStep, SIGNAL(editTextChanged(const QString&)), this, SLOT(stepChanged()));
+  connect(this->mpElement, SIGNAL(editTextChanged(const QString&)), this, SLOT(stepChanged()));
   connect(this->mpProperty, SIGNAL(editTextChanged(const QString&)), this, SLOT(propertyChanged()));
 }
 
 void cedar::proc::experiment::gui::StepPropertyParameter::stepChanged()
 {
   auto parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
-  parameter->setElementPath(this->mpStep->currentText().toStdString());
+  parameter->setElementPath(this->mpElement->currentText().toStdString());
   this->updateProperties();
 }
 
@@ -133,18 +133,18 @@ void cedar::proc::experiment::gui::StepPropertyParameter::propertyChanged()
 
 void cedar::proc::experiment::gui::StepPropertyParameter::updateSteps()
 {
-  mpStep->clear();
+  mpElement->clear();
   std::vector<std::string> steps = SupervisorSingleton::getInstance()->getExperiment()->getGroupSteps();
   for (std::string step : steps)
   {
-    mpStep->addItem(QString::fromStdString(step));
+    mpElement->addItem(QString::fromStdString(step));
   }
 }
 
 void cedar::proc::experiment::gui::StepPropertyParameter::updateProperties()
 {
   mpProperty->clear();
-  std::string index = mpStep->currentText().toStdString();
+  std::string index = mpElement->currentText().toStdString();
   if (index == "")
   {
     return;

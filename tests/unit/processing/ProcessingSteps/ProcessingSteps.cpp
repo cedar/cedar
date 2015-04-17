@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -46,7 +46,6 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
-#include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/logFilter/Type.h"
 #include "cedar/auxiliaries/NullLogger.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
@@ -82,7 +81,7 @@ unsigned int checkOutputsForInvalidValues(cedar::proc::StepPtr testStep)
 {
   unsigned int errors = 0;
 
-  if (testStep->hasRole(cedar::proc::DataRole::OUTPUT))
+  if (testStep->hasSlotForRole(cedar::proc::DataRole::OUTPUT))
   {
     for (auto name_slot_pair : testStep->getDataSlots(cedar::proc::DataRole::OUTPUT))
     {
@@ -139,7 +138,7 @@ unsigned int testStep(cedar::proc::GroupPtr group, cedar::proc::StepPtr testStep
     sources.push_back("double_2D.converted matrix");
     sources.push_back("double_3D.converted matrix");
     sources.push_back("emp.empty matrix");
-    if (testStep->hasRole(cedar::proc::DataRole::INPUT))
+    if (testStep->hasSlotForRole(cedar::proc::DataRole::INPUT))
     {
       const auto& inputs = testStep->getOrderedDataSlots(cedar::proc::DataRole::INPUT);
       for (unsigned int src = 0; src < sources.size(); ++src)
@@ -217,7 +216,7 @@ void run_tests()
       std::cout << "=========================================" << std::endl;
       std::cout << "  Testing class " << declaration->getClassName() << std::endl;
       std::cout << "=========================================" << std::endl;
-      group->readJson("processing_steps.json");
+      group->readJson("test://unit/processing/ProcessingSteps/processing_steps.json");
 
       auto empty_provider = EmptyMatrixProviderPtr(new EmptyMatrixProvider());
       group->add(empty_provider, "emp");

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -357,7 +357,7 @@ void cedar::aux::math::logTwist(const cv::Mat& rTransformation, cv::Mat& rXi, do
   // calculate v
   cv::Mat omega_wedge = wedgeAxis<T>(omega);
   cv::Mat s1 = (cv::Mat::eye(3, 3, rTransformation.type()) - R) * omega_wedge;
-  cv::Mat v = (s1 + omega_wedge * omega_wedge.t() * rTheta).inv() * p;
+  cv::Mat v = (s1 + omega * omega.t() * rTheta).inv() * p;
 
   // concatenate omega and v to get twist coordinates
   rXi.at<T>(0, 0) = v.at<T>(0, 0);

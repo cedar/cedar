@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -42,6 +42,8 @@
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
+#include <QMutex>
+#include <QMutexLocker>
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members
@@ -70,6 +72,27 @@ void cedar::aux::ColorGradient::StandardGradients::construct()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+#ifdef CEDAR_USE_QWTPLOT3D
+Qwt3D::StandardColor cedar::aux::ColorGradient::toQwt3DStandardColor(size_t steps) const
+{
+  Qwt3D::StandardColor col;
+  std::vector<Qwt3D::RGBA> qwt_colors;
+  qwt_colors.resize(steps);
+  for (size_t i = 0; i < steps; ++i)
+  {
+    double step = static_cast<double>(i) / static_cast<double>(steps - 1); // - 1 because we want to reach the last color
+    QColor color = this->getColor(step);
+    qwt_colors.at(i).r = static_cast<double>(color.redF());
+    qwt_colors.at(i).g = static_cast<double>(color.greenF());
+    qwt_colors.at(i).b = static_cast<double>(color.blueF());
+    qwt_colors.at(i).a = static_cast<double>(color.alphaF());
+  }
+  col.setColorVector(qwt_colors);
+  return col;
+}
+#endif // CEDAR_USE_QWTPLOT3D
+
 
 bool cedar::aux::ColorGradient::empty() const
 {
@@ -110,17 +133,22 @@ const std::map<double, QColor>& cedar::aux::ColorGradient::getStops() const
 cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getDefaultPlotColorJet()
 {
   static cedar::aux::ColorGradientPtr gradient;
-  //!@todo Locking?
   if (!gradient)
   {
-    gradient = cedar::aux::ColorGradientPtr(new cedar::aux::ColorGradient());
+    static QMutex lock;
+    QMutexLocker locker(&lock);
+    // the additional check makes sure the pointer is only created once (another thread might have hit the same code)
+    if (!gradient)
+    {
+      gradient = cedar::aux::ColorGradientPtr(new cedar::aux::ColorGradient());
 
-    gradient->setStop(0.000, QColor::fromRgbF(0.0, 0.0, 0.5));
-    gradient->setStop(0.125, QColor::fromRgbF(0.0, 0.0, 1.0));
-    gradient->setStop(0.375, QColor::fromRgbF(0.0, 1.0, 1.0));
-    gradient->setStop(0.625, QColor::fromRgbF(1.0, 1.0, 0.0));
-    gradient->setStop(0.875, QColor::fromRgbF(1.0, 0.0, 0.0));
-    gradient->setStop(1.000, QColor::fromRgbF(0.5, 0.0, 0.0));
+      gradient->setStop(0.000, QColor::fromRgbF(0.0, 0.0, 0.5));
+      gradient->setStop(0.125, QColor::fromRgbF(0.0, 0.0, 1.0));
+      gradient->setStop(0.375, QColor::fromRgbF(0.0, 1.0, 1.0));
+      gradient->setStop(0.625, QColor::fromRgbF(1.0, 1.0, 0.0));
+      gradient->setStop(0.875, QColor::fromRgbF(1.0, 0.0, 0.0));
+      gradient->setStop(1.000, QColor::fromRgbF(0.5, 0.0, 0.0));
+    }
   }
 
   return gradient;
@@ -129,13 +157,18 @@ cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getDefaultPlotColorJet()
 cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getPlotGrayColorJet()
 {
   static cedar::aux::ColorGradientPtr gradient;
-  //!@todo Locking?
   if (!gradient)
   {
-    gradient = cedar::aux::ColorGradientPtr(new cedar::aux::ColorGradient());
+    static QMutex lock;
+    QMutexLocker locker(&lock);
+    // the additional check makes sure the pointer is only created once (another thread might have hit the same code)
+    if (!gradient)
+    {
+      gradient = cedar::aux::ColorGradientPtr(new cedar::aux::ColorGradient());
 
-    gradient->setStop(0.000, QColor::fromRgbF(0.0, 0.0, 0.0));
-    gradient->setStop(1.000, QColor::fromRgbF(1.0, 1.0, 1.0));
+      gradient->setStop(0.000, QColor::fromRgbF(0.0, 0.0, 0.0));
+      gradient->setStop(1.000, QColor::fromRgbF(1.0, 1.0, 1.0));
+    }
   }
 
   return gradient;
@@ -144,13 +177,18 @@ cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getPlotGrayColorJet()
 cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getPlotInverseGrayColorJet()
 {
   static cedar::aux::ColorGradientPtr gradient;
-  //!@todo Locking?
   if (!gradient)
   {
-    gradient = cedar::aux::ColorGradientPtr(new cedar::aux::ColorGradient());
+    static QMutex lock;
+    QMutexLocker locker(&lock);
+    // the additional check makes sure the pointer is only created once (another thread might have hit the same code)
+    if (!gradient)
+    {
+      gradient = cedar::aux::ColorGradientPtr(new cedar::aux::ColorGradient());
 
-    gradient->setStop(0.000, QColor::fromRgbF(1.0, 1.0, 1.0));
-    gradient->setStop(1.000, QColor::fromRgbF(0.0, 0.0, 0.0));
+      gradient->setStop(0.000, QColor::fromRgbF(1.0, 1.0, 1.0));
+      gradient->setStop(1.000, QColor::fromRgbF(0.0, 0.0, 0.0));
+    }
   }
 
   return gradient;
@@ -205,7 +243,6 @@ QColor cedar::aux::ColorGradient::getColor(double position) const
   }
   return color;
 }
-
 
 void cedar::aux::ColorGradient::updateLookupTable()
 {

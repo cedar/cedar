@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -40,79 +40,15 @@
 #include "cedar/internals.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/stringFunctions.h"
-#include "cedar/version.h"
-
+#include "cedar/auxiliaries/systemFunctions.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 
+
 int main(int, char**)
 {
   std::cout << "==================================" << std::endl;
-  std::cout << "  This is cedar version " << cedar::aux::versionNumberToString(CEDAR_VERSION) << std::endl;
-  std::cout << "                (";
-#ifdef DEBUG
-  std::cout << "debug";
-#else
-  std::cout << "release";
-#endif // DEBUG
-  std::cout << " build)";
-  std::cout << std::endl;
-  std::cout << "----------------------------------" << std::endl;
-  std::cout << std::endl;
-  std::cout << " built on " <<
-    CEDAR_BUILT_ON_MACHINE
-    << std::endl;
-  std::cout << " in " <<
-    CEDAR_HOME_DIRECTORY
-    << std::endl
-    << std::endl;
-
-  std::cout << "External libraries:" << std::endl;
-  std::cout << " - FFTW: "
-#ifdef CEDAR_USE_FFTW
-      "yes"
-#else
-      "no"
-#endif // CEDAR_USE_FFTW
-      << std::endl;
-
-
-  std::cout << " - LibDC1394: "
-#ifdef CEDAR_USE_LIB_DC1394
-      "yes"
-#else
-      "no"
-#endif // CEDAR_USE_LIB_DC1394
-      << std::endl;
-
-
-  std::cout << " - Yarp: "
-#ifdef CEDAR_USE_YARP
-      "yes"
-#else
-      "no"
-#endif // CEDAR_USE_YARP
-      << std::endl;
-
-
-  std::cout << " - Amtec: "
-#ifdef CEDAR_USE_AMTEC
-      "yes"
-#else
-      "no"
-#endif // CEDAR_USE_AMTEC
-      << std::endl;
-
-
-  std::cout << " - Kuka FRI: "
-#ifdef CEDAR_USE_KUKA_LWR
-      "yes"
-#else
-      "no"
-#endif // CEDAR_USE_KUKA_LWR
-      << std::endl;
-
+  std::cout << cedar::aux::getCedarConfigurationInfo("\n----------------------------------\n", "\n") << std::endl;
   std::cout << "==================================" << std::endl;
 }

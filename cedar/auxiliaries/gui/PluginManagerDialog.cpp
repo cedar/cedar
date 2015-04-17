@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -80,45 +80,45 @@ QDialog(pParent)
   QObject::connect(this->mpAddPathBtn, SIGNAL(clicked()), this, SLOT(addSearchPathClicked()));
   QObject::connect(this->mpRemoveSearchPathBtn, SIGNAL(clicked()), this, SLOT(removeSearchPathClicked()));
 
-  cedar::aux::SettingsSingleton::getInstance()->connectToPluginSearchPathAddedSignal
+  this->addScopedConnection(cedar::aux::SettingsSingleton::getInstance()->connectToPluginSearchPathAddedSignal
   (
     boost::bind(&cedar::aux::gui::PluginManagerDialog::addPluginSearchPath, this, _1)
-  );
+  ));
 
-  cedar::aux::SettingsSingleton::getInstance()->connectToPluginSearchPathIndexRemovedSignal
+  this->addScopedConnection(cedar::aux::SettingsSingleton::getInstance()->connectToPluginSearchPathIndexRemovedSignal
   (
     boost::bind(&cedar::aux::gui::PluginManagerDialog::removePluginSearchPathIndex, this, _1)
-  );
+  ));
 
-  cedar::aux::SettingsSingleton::getInstance()->connectToSearchPathsSwappedSignal
+  this->addScopedConnection(cedar::aux::SettingsSingleton::getInstance()->connectToSearchPathsSwappedSignal
   (
     boost::bind(&cedar::aux::gui::PluginManagerDialog::swapSearchPaths, this, _1, _2)
-  );
+  ));
 
-  cedar::aux::SettingsSingleton::getInstance()->connectToPluginSearchPathsChangedSignal
+  this->addScopedConnection(cedar::aux::SettingsSingleton::getInstance()->connectToPluginSearchPathsChangedSignal
   (
     boost::bind(&cedar::aux::gui::PluginManagerDialog::updatePluginPaths, this)
-  );
+  ));
 
 
   QObject::connect(this->mpAddPluginBtn, SIGNAL(clicked()), this, SLOT(addPluginClicked()));
 
-  cedar::aux::SettingsSingleton::getInstance()->connectToPluginAddedSignal
+  this->addScopedConnection(cedar::aux::SettingsSingleton::getInstance()->connectToPluginAddedSignal
   (
     boost::bind(&cedar::aux::gui::PluginManagerDialog::addPlugin, this, _1)
-  );
+  ));
 
-  cedar::aux::SettingsSingleton::getInstance()->connectToPluginRemovedSignal
+  this->addScopedConnection(cedar::aux::SettingsSingleton::getInstance()->connectToPluginRemovedSignal
   (
     boost::bind(&cedar::aux::gui::PluginManagerDialog::removePlugin, this, _1)
-  );
+  ));
 
   QObject::connect(mpPluginList, SIGNAL(itemSelectionChanged()), this, SLOT(toggleSelectedPluginsButtons()));
 
-  cedar::aux::PluginProxy::connectToPluginDeclaredSignal
+  this->addScopedConnection(cedar::aux::PluginProxy::connectToPluginDeclaredSignal
   (
     boost::bind(&cedar::aux::gui::PluginManagerDialog::pluginDeclared ,this, _1)
-  );
+  ));
 
   this->mpPluginList->horizontalHeader()->setResizeMode(0, QHeaderView::ResizeToContents);
   this->mpPluginList->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
@@ -138,6 +138,12 @@ QDialog(pParent)
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::PluginManagerDialog::addScopedConnection(const boost::signals2::connection& connection)
+{
+  boost::shared_ptr<boost::signals2::scoped_connection> scoped(new boost::signals2::scoped_connection(connection));
+  this->mScopedConnecitons.push_back(scoped);
+}
 
 void cedar::aux::gui::PluginManagerDialog::showSearchPathHelp()
 {

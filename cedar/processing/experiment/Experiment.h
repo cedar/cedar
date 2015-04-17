@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -162,9 +162,14 @@ public:
         return mType.type();
       }
     public:
-     static const Id Greater = 0;
-     static const Id Lower = 1;
-     static const Id Equal = 2;
+      //! greater than comparison
+      static const Id Greater = 0;
+
+      //! lower than comparison
+      static const Id Lower = 1;
+
+      //! equality comparison
+      static const Id Equal = 2;
 
     private:
       static cedar::aux::EnumType<CompareMethod> mType;
@@ -233,16 +238,6 @@ public:
   //!@brief Get all steps of the current group
   std::vector<std::string> getGroupSteps();
 
-  //!@brief Get all triggers of the current group
-  std::vector<std::string> getGroupTriggers();
-
-  //!@brief Returns the ParameterPtr defined by step name and parameter name
-  cedar::aux::ParameterPtr getStepParameter(std::string step, std::string parameter);
-
-  //!@brief Returns the ConstDataPtr defined by step name and data name
-  cedar::aux::ConstDataPtr getStepData(std::string step, std::string value, cedar::proc::DataRole::Id role
-      = cedar::proc::DataRole::OUTPUT);
-
   //!@brief Returns the actual trial that is currently running
   unsigned int getCurrentTrial();
 
@@ -256,9 +251,9 @@ public:
   void startAllTriggers();
 
   /*!@brief Stops a  trial. Should only be called when a trial is currently running.
-   *              @param{reset} specifies what reset method should be used after stopping
+   *              @param reset specifies what reset method should be used after stopping
    */
-  void stopTrial(ResetType::Id reset = ResetType::Reset);
+  void stopTrial(ResetType::Id reset = ResetType::Reset, bool stopTriggers = true);
 
   //! Sets the repeat flag of the experiment.
   void setRepeating(bool repeats);
@@ -266,6 +261,7 @@ public:
   //! Returns the repeat flag of the experiment.
   bool getRepeating() const;
 
+  //! Returns if there are any more trials to run.
   bool hasMoreTrials() const;
 
   /*! Checks if the experiment is valid. If it returns false, errors are written to the vectors passed as arguments and
@@ -284,8 +280,6 @@ signals:
   //!@brief Should be emitted if the group has changed
   void groupChanged();
 
-public slots:
-  void elementRenamed(const std::string& oldName, const std::string& newName);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -344,11 +338,7 @@ private:
   cedar::aux::LoopFunctionInThreadPtr mLooper;
 
   //!@brief The currently running trial. It is 0 if no trial is running
-  //!@todo This should be called mCurrentTrial
   unsigned int mCurrentTrial;
-
-  //!@brief The flag stores if the experiment is on initial state
-  bool mInit;
 
   //!@brief The flag sores if there is currently no trial running
   bool mIsRunning;

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -123,9 +123,14 @@ _mTargetType(new cedar::aux::EnumParameter(this, "target type", MatrixType::type
 
 void cedar::proc::steps::MatrixTypeConverter::targetTypeChanged()
 {
-  this->onTrigger();
-
-  this->emitOutputPropertiesChangedSignal("converted matrix");
+  if (this->allInputsValid())
+  {
+    cedar::proc::Step::ReadLocker locker(this);
+    this->compute(cedar::proc::Arguments());
+    locker.unlock();
+    this->emitOutputPropertiesChangedSignal("converted matrix");
+    this->onTrigger();
+  }
 }
 
 void cedar::proc::steps::MatrixTypeConverter::compute(const cedar::proc::Arguments&)
@@ -149,9 +154,9 @@ void cedar::proc::steps::MatrixTypeConverter::inputConnectionChanged(const std::
     auto old_type = this->mConverted->getData().type();
     this->mConverted->copyAnnotationsFrom(this->mMatrix);
 
-    this->lock(cedar::aux::LOCK_TYPE_READ);
+    cedar::proc::Step::ReadLocker locker(this);
     this->compute(cedar::proc::Arguments());
-    this->unlock();
+    locker.unlock();
 
     if (old_type != this->mConverted->getData().type())
     {

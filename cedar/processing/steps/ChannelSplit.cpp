@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -211,9 +211,9 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
     && cedar::aux::math::getDimensionalityOf(this->mInput->getData()) < 3
   )
   {
-    this->lock(cedar::aux::LOCK_TYPE_READ);
+    cedar::proc::Step::ReadLocker locker(this);
     this->compute(cedar::proc::Arguments());
-    this->unlock();
+    locker.unlock();
     for (size_t i = 0; i < this->mChannelData.size(); ++i)
     {
       this->emitOutputPropertiesChangedSignal(this->generateDataName(i));

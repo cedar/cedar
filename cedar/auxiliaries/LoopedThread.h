@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -111,8 +111,6 @@
  * to fulfill real-time constraints.
  *
  * The preferred way to stop the thread from itself is to call requestStop().
- *
- * \todo Use units instead of doubles
  */
 class cedar::aux::LoopedThread : public cedar::aux::ThreadWrapper
 {
@@ -264,6 +262,9 @@ public:
   }
 
   void waitUntilStepped() const;
+  
+  //! Returns the average number of steps that were skipped during iteration.
+  double getAverageStepsTaken() const;
 
   //----------------------------------------------------------------------------
   // protected methods

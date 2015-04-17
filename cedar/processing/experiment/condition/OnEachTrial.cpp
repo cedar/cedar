@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -76,12 +76,12 @@ cedar::proc::experiment::condition::OnEachTrial::OnEachTrial()
 //----------------------------------------------------------------------------------------------------------------------
 
 
-bool cedar::proc::experiment::condition::OnEachTrial::check()
+bool cedar::proc::experiment::condition::OnEachTrial::check() const
 {
   return false;
 }
 
-bool cedar::proc::experiment::condition::OnEachTrial::initialCheck()
+bool cedar::proc::experiment::condition::OnEachTrial::initialCheck() const
 {
   return true;
 }

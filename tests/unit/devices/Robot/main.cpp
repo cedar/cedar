@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -121,8 +121,8 @@ int main()
 {
   int errors = 0;
 
-  errors += testConfiguration("RobotConfiguration_1.json", "channel 1", "channel 1 info 1", 1);
-  errors += testConfiguration("RobotConfiguration_2.json", "channel 2", "channel 2 info 2", 2);
+  errors += testConfiguration("test://unit/devices/Robot/RobotConfiguration_1.json", "channel 1", "channel 1 info 1", 1);
+  errors += testConfiguration("test://unit/devices/Robot/RobotConfiguration_2.json", "channel 2", "channel 2 info 2", 2);
 
   return errors;
 }

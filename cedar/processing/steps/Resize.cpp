@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -122,8 +122,8 @@ _mInterpolationType(new cedar::aux::EnumParameter(this,
   this->declareOutput("output", mOutput);
 
   // connect the parameter's change signal
-  QObject::connect(_mOutputSize.get(), SIGNAL(valueChanged()), this, SLOT(outputSizeChanged()));
-  QObject::connect(_mInterpolationType.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
+  QObject::connect(_mOutputSize.get(), SIGNAL(valueChanged()), this, SLOT(outputSizeChanged()), Qt::DirectConnection);
+  QObject::connect(_mInterpolationType.get(), SIGNAL(valueChanged()), this, SLOT(recompute()), Qt::DirectConnection);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -312,7 +312,7 @@ void cedar::proc::steps::Resize::linearInterpolationNDRecursion
 void cedar::proc::steps::Resize::setOutputSize(unsigned int dimension, unsigned int size)
 {
   CEDAR_ASSERT(dimension < this->_mOutputSize->size());
-  this->_mOutputSize->set(dimension, size, true);
+  this->_mOutputSize->setValue(dimension, size, true);
 }
 
 unsigned int cedar::proc::steps::Resize::getOutputSize(unsigned int dimension) const

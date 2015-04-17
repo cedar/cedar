@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -139,4 +139,9 @@ void cedar::proc::OwnedData::addOutgoingConnection(cedar::proc::DataConnectionPt
 void cedar::proc::OwnedData::removeOutgoingConnection(cedar::proc::DataConnectionPtr removedConnection)
 {
   this->removeConnection(removedConnection);
+  auto parent = this->getParentPtr();
+  if (parent)
+  {
+    parent->callOutputConnectionRemoved(this->shared_from_this());
+  }
 }

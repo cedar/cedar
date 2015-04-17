@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -45,6 +45,9 @@
 
 // SYSTEM INCLUDES
 #include <QDialog>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2.hpp>
+#endif // Q_MOC_RUN
 #include <string>
 
 
@@ -108,6 +111,8 @@ private:
 
   void swapSearchPaths(unsigned int first, unsigned int second);
 
+  void addScopedConnection(const boost::signals2::connection& connection);
+
 private slots:
   //! Removes the plugins currently checked for deletion.
   void removeSelectedPlugins();
@@ -143,6 +148,7 @@ private slots:
 protected:
   // none yet
 private:
+  std::vector<boost::shared_ptr<boost::signals2::scoped_connection> > mScopedConnecitons;
 
 }; // class cedar::aux::PluginManagerDialog
 

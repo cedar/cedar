@@ -1,6 +1,6 @@
 /*=============================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -105,21 +105,20 @@ void cedar::proc::sinks::NetWriter::onStart()
 {
   _mPort->setConstant(true);
 
+  QReadLocker locker(_mPort->getLock());
   this->connect();
 }
 
 void cedar::proc::sinks::NetWriter::connect()
 {
   // instantiate the reader, if not yet done
-  if (!mWriter)
+  QWriteLocker locker(this->mWriter.getLockPtr());
+  if (!mWriter.member())
   {
     try 
     {
-      mWriter
-        = boost::shared_ptr<cedar::aux::net::Writer<cedar::aux::MatData::DataType> >
-          (
-            new cedar::aux::net::Writer<cedar::aux::MatData::DataType>(this->getPort())
-          );
+      std::string port_copy = this->getPort();
+      mWriter.member() = WriterPtr(new Writer(port_copy));
     }
     catch (cedar::aux::net::NetMissingRessourceException& e)
     {
@@ -132,19 +131,24 @@ void cedar::proc::sinks::NetWriter::connect()
 
 void cedar::proc::sinks::NetWriter::onStop()
 {
-  mWriter.reset();
+  QWriteLocker locker(this->mWriter.getLockPtr());
+  mWriter.member().reset();
   _mPort->setConstant(false);
 }
 
 void cedar::proc::sinks::NetWriter::reset()
 {
-  mWriter.reset();
+  QWriteLocker locker(this->mWriter.getLockPtr());
+  mWriter.member().reset();
+  locker.unlock();
+
   this->connect();
 }
 
 void cedar::proc::sinks::NetWriter::compute(const cedar::proc::Arguments&)
 {
-  if (!mWriter)
+  QReadLocker locker(this->mWriter.getLockPtr());
+  if (!mWriter.member())
   {
     return;
   }
@@ -152,7 +156,7 @@ void cedar::proc::sinks::NetWriter::compute(const cedar::proc::Arguments&)
   // write it over the channel
   try
   {
-    mWriter->write(mInput->getData());
+    mWriter.member()->write(mInput->getData());
   }
   // note, we could catch NetUnexpectedDataException here (which is thrown when 
   // the matrix changes size) but that is more than a validation error, because

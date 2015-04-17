@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -49,6 +49,7 @@ namespace cedar
 {
   namespace aux
   {
+    //! a string parser for unit velocity
     template <>
     inline cedar::unit::Velocity parseUnitString<cedar::unit::Velocity::unit_type>(const std::string& unitStr)
     {
@@ -64,6 +65,7 @@ namespace cedar
     }
 
     // Generate types for the length parameter.
+    //! a unit parameter for velocity
     typedef cedar::aux::UnitParameterTemplate<cedar::unit::Velocity::unit_type> VelocityParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(VelocityParameter);
   }

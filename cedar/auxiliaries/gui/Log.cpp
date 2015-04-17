@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -84,6 +84,8 @@ QTabWidget(pParent)
   this->setContextMenuPolicy(Qt::CustomContextMenu);
   connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(showContextMenu(const QPoint&)));
 
+  this->updateAllMessageCounts();
+
   this->startTimer(3000);
 }
 
@@ -143,7 +145,6 @@ void cedar::aux::gui::Log::outdateAllMessages(QTableWidget* pPane)
 {
   int threshold = 200;
 
-  //!@todo This can be made faster by remembering for each pane where the last above-threshold message was and then starting from there.
   for (int i = 0; i < pPane->rowCount(); ++i)
   {
     this->setMessageCurrentness(pPane, i, threshold);
@@ -157,14 +158,6 @@ void cedar::aux::gui::Log::updatePaneCurrentness(QTableWidget* pPane)
   int delta_high = -5;
   int delta_low = -1;
 
-  // check for maximum amount of log messages
-  unsigned int max_messages = cedar::aux::gui::SettingsSingleton::getInstance()->getMaximumNumberOfLogEntries();
-  while (static_cast<unsigned int>(pPane->rowCount()) > max_messages)
-  {
-    pPane->removeRow(0);
-  }
-
-  //!@todo This can be made faster by remembering for each pane where the last above-threshold message was and then starting from there.
   for (int i = 0; i < pPane->rowCount(); ++i)
   {
     int currentness = this->getMessageCurrentness(pPane, i);
@@ -299,6 +292,21 @@ void cedar::aux::gui::Log::postMessage
   pTable->setItem(row, 0, p_title_item);
   pTable->setCellWidget(row, 1, p_message_item);
   pTable->resizeRowToContents(row);
+
+  // check for maximum amount of log messages
+  unsigned int max_messages = cedar::aux::gui::SettingsSingleton::getInstance()->getMaximumNumberOfLogEntries();
+  while (static_cast<unsigned int>(pTable->rowCount()) > max_messages)
+  {
+    pTable->removeRow(0);
+  }
+  for (auto pane_iter = this->mpPanes.begin(); pane_iter != this->mpPanes.end(); ++pane_iter)
+  {
+    if (pane_iter->second == pTable)
+    {
+      this->updateMessageCount(pane_iter->first, pane_iter->second);
+      break;
+    }
+  }
 }
 
 void cedar::aux::gui::Log::message
@@ -361,6 +369,14 @@ void cedar::aux::gui::Log::showContextMenu(const QPoint& point)
   {
     QTableWidget* p_current_table = dynamic_cast<QTableWidget*>(this->currentWidget());
     p_current_table->setRowCount(0);
+    for (auto pane_iter = this->mpPanes.begin(); pane_iter != this->mpPanes.end(); ++pane_iter)
+    {
+      if (pane_iter->second == p_current_table)
+      {
+        this->updateMessageCount(pane_iter->first, pane_iter->second);
+        break;
+      }
+    }
   }
   else if (a == p_delete_all)
   {
@@ -369,9 +385,43 @@ void cedar::aux::gui::Log::showContextMenu(const QPoint& point)
       QTableWidget* p_current_table = dynamic_cast<QTableWidget*>(this->widget(i));
       p_current_table->setRowCount(0);
     }
+    this->updateAllMessageCounts();
   }
   else if (a != NULL)
   {
     std::cout << "Unmatched action in cedar::aux::gui::Log::contextMenuEvent." << std::endl;
   }
+}
+
+QString cedar::aux::gui::Log::logLevelToString(cedar::aux::LOG_LEVEL level) const
+{
+  switch (level)
+  {
+    case cedar::aux::LOG_LEVEL_ERROR:
+      return "error";
+    case cedar::aux::LOG_LEVEL_WARNING:
+      return "warning";
+    case cedar::aux::LOG_LEVEL_MESSAGE:
+      return "message";
+    case cedar::aux::LOG_LEVEL_DEBUG:
+      return "debug";
+    case cedar::aux::LOG_LEVEL_MEM_DEBUG:
+      return "memory";
+    default:
+      return "all";
+  }
+}
+
+void cedar::aux::gui::Log::updateAllMessageCounts()
+{
+  for (auto pane_iter = this->mpPanes.begin(); pane_iter != this->mpPanes.end(); ++pane_iter)
+  {
+    this->updateMessageCount(pane_iter->first, pane_iter->second);
+  }
+}
+
+void cedar::aux::gui::Log::updateMessageCount(cedar::aux::LOG_LEVEL level, QTableWidget* pPane)
+{
+  auto index = this->indexOf(pPane);
+  this->setTabText(index, this->logLevelToString(level) + " (" + QString("%1").arg(pPane->rowCount()) + ")");
 }

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -85,8 +85,21 @@ namespace
                                        "DFT"
                                      )
                                    );
-    field_declaration->setIconPath(":/cedar/dynamics/gui/steps/field_generic.svg");
+    field_declaration->setIconPath(":/cedar/dynamics/gui/steps/field_1d.svg");
     field_declaration->declare();
+
+    cedar::proc::GroupDeclarationPtr node_declaration
+                                   (
+                                     new cedar::proc::GroupDeclaration
+                                     (
+                                       "node",
+                                       "resource://groupTemplates/fieldTemplates.json",
+                                       "node",
+                                       "DFT"
+                                     )
+                                   );
+    node_declaration->setIconPath(":/cedar/dynamics/gui/steps/field_0d.svg");
+    node_declaration->declare();
 
     return true;
   }

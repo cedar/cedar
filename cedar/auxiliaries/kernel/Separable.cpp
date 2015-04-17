@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -58,7 +58,9 @@ cedar::aux::kernel::Kernel(dimensionality)
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   this->dimensionalityChanged();
-  QObject::connect(this->_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
+  // we need a direct connection here so that changes to the dimensionality are applied immediately; otherwise, there
+  // might be short moments where the kernel is in an undefined state
+  QObject::connect(this->_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()), Qt::DirectConnection);
 }
 
 cedar::aux::kernel::Separable::~Separable()
@@ -97,6 +99,7 @@ const cv::Mat& cedar::aux::kernel::Separable::getKernelPart(unsigned int dimensi
 
 void cedar::aux::kernel::Separable::setKernelPart(unsigned int dimension, const cv::Mat& mat)
 {
+  CEDAR_DEBUG_ASSERT(dimension < this->mKernelParts.size());
   this->mKernelParts.at(dimension) = mat;
 }
 

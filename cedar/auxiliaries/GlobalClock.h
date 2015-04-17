@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -48,6 +48,7 @@
 #ifndef Q_MOC_RUN
   #include <boost/signals2.hpp>
 #endif // Q_MOC_RUN
+#include <QReadWriteLock>
 
 //!@brief Can start, stop and reset the network time and should be used as a central time giver in a network.
 class cedar::aux::GlobalClock
@@ -84,11 +85,13 @@ public:
   void stop();
 
   //!@brief Returns the elapsed time since timer has started
-  //!@todo make this const?
-  cedar::unit::Time getTime();
+  cedar::unit::Time getTime() const;
 
   //! Returns true if the timer is running.
   bool isRunning() const;
+
+  //! Adds the given amount of time to the global clock.
+  void addTime(const cedar::unit::Time& time);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -109,6 +112,9 @@ protected:
     // none yet
 
 private:
+  //! Lock used to synchronize access to the global clock.
+  mutable QReadWriteLock* mpAccessLock;
+
   //!@brief Flag that indicates when the timer starts/stops
   bool mRunning;
 
@@ -132,6 +138,7 @@ namespace cedar
   namespace aux
   {
     CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::aux::GlobalClock>);
+    //! a singleton for the global clock
     typedef cedar::aux::Singleton<cedar::aux::GlobalClock> GlobalClockSingleton;
   }
 }

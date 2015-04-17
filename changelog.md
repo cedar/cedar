@@ -4,7 +4,7 @@ List of changes
  <!--
 =======================================================================================================================
 
-   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+   Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
    This file is part of cedar.
 
@@ -49,10 +49,8 @@ likely to undergo major changes:
 known issues
 ============
   - On Windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
-  - using multiple 3D convolutions in separate threads slows down all involved convolutions
+  - Using multiple 3D convolutions in separate threads slows down all involved convolutions
   - Some of the interactive CAREN tests may not run if you do not have the corresponding meshes.
-  - Toggling the smart connections mode doesn't improve trigger connections. In fact, they are more strange than in
-    standard mode. For now, triggers and their strange connections can be hidden with Ctrl+T during smart mode.
   - Using the field plot and switching dimensionality might lead to messed up plots. Please reopen the field plot.
   - Singleton-related classes may sometimes cause crashes when programs exit. If you experience random crashes when your
     own programs exit and the stack contains cedar::aux::Log::getMemoryDebugFlag(), this may be the cause. As a
@@ -61,10 +59,56 @@ known issues
   - In rare cases, moving elements into groups breaks the triggering chain, which leads to steps not being iterated
     correctly. This can be fixed by saving and loading the architecture. If you encounter such a (reproducible)
     situation, please let us know.
+  - Single elements cannot be loaded as linked templates into architectures. They are simply added to the architecture.
+  - When a net reader step revalidates its output while the architecture is running, this can lead to connections
+    temporarily flashing in different colors. This can take a while, depending on how complicated the revalidation
+    process is, but is normal. Connections also sometimes are blue for a short time.
+  - When net readers and writers are in the same architecture, this can sometimes lead to crashes. This *seems* to be a
+    YARP issue.
 
 Unreleased
 ==========
-  
+
+  none
+
+Released versions
+=================
+
+The following are the changes made in the release versions.
+
+Version 5.0.0
+-------------
+
+- build system
+  - fixed an error that made it imposssible to use opencv versions that are not in /usr/local/include.
+  - cedar should now compile with the opencv 3.0 beta.
+
+- cedar::aux
+  - There is a new plot called Multi0DPlot. This is mainly intended to be used for showing the state of (EB) nodes in an
+    architecture, thus, it should be used in conjunction with an architecture widget. See the tutorial for architecture
+    widgets for details.
+- cedar::dev
+  - Fixed some issues with video playback in the video grabber.
+- cedar::proc
+  - The use of (Looped)Triggers has been remodeled completely. They are no longer shown in the architecture. Instead,
+    each looped element is, by default, connected to a default trigger that is created automatically. If you want to use
+    more triggers, you can now do so via the simulation control widget (shift + t, or click the corresponding button in
+    the toolbar/menu). This allows you to add triggers, remove them and change their settings.
+    There is also a new mode for seeing what steps are connected to what triggers. This can be enabled from the toolbar
+    and the menu ("color elements by trigger"). In addition to showing what trigger elements are connected to, hovering
+    over a step in this mode will also display in what order it will trigger its subsequent steps.
+  - The time factor setting is now saved per architecture. New architectures start with time factor 1. 
+  - You can now declare favorite element classes in the elements tab. Right-click on any element to favorite/unfavorite
+    the class.
+  - There is now a search bar in the element class list. 
+  - The UI elements (log, elements, properties etc.) are now locked by default and cannot be moved. You can unlock them
+    in the windows menu.
+  - The net reader and writer steps now work much more smoothly than before. They now automatically revalidate their
+    connections as soon as possible, and indicate that they are not receiving data by turning yellow.
+
+Version 4.1.0
+-------------
+
 - cedar::aux
   - You can now enable grid lines in line plots from the right-click menu.
 - cedar::proc
@@ -89,12 +133,6 @@ Unreleased
     processing group. More details can be found in a tutorial in the documentation.
 - cedar::dyn
   - On Windows, it should no longer be necessary to load this part of cedar as a plugin.
-
-
-Released versions
-=================
-
-The following are the changes made in the release versions.
 
 Version 4.0.0
 -------------

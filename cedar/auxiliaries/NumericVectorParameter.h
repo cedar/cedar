@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -71,7 +71,7 @@ public:
   // using directives
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  using Super::set;
+  using Super::setValue;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -198,9 +198,9 @@ public:
     return this->mLimits.getUpper();
   }
 
-  void set(size_t index, const T& value, bool lock = false)
+  void setValue(size_t index, const T& value, bool lock = false)
   {
-    this->Super::set(index, this->mLimits.limit(value), lock);
+    this->Super::setValue(index, this->mLimits.limit(value), lock);
   }
 
   //! Returns the limits for the values of this parameter.

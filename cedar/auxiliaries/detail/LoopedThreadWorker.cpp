@@ -1,6 +1,6 @@
 /*=============================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -276,11 +276,11 @@ void cedar::aux::detail::LoopedThreadWorker::initStatistics()
 
 void cedar::aux::detail::LoopedThreadWorker::updateStatistics(double stepsTaken)
 {
-  double old_sum = mSumOfStepsTaken;
-
   QWriteLocker locker1(&mNumberOfStepsLock);
   QWriteLocker locker2(&mSumOfStepsTakenLock);
   QWriteLocker locker3(&mMaxStepsTakenLock);
+
+  double old_sum = mSumOfStepsTaken;
 
   mNumberOfSteps += 1.0;
   mSumOfStepsTaken += stepsTaken;
@@ -297,11 +297,14 @@ void cedar::aux::detail::LoopedThreadWorker::updateStatistics(double stepsTaken)
       "cedar::aux::LoopedThread::updateStatistics(double)"
     );
 
-    //!@todo: unlock locker1 before going in here!
+    // init statistics locks these again
+    locker3.unlock();
+    locker2.unlock();
+    locker1.unlock();
+
     initStatistics();
     return;
   }
-
 }
 
 boost::posix_time::ptime cedar::aux::detail::LoopedThreadWorker::getLastTimeStepStart() const
@@ -352,9 +355,16 @@ double cedar::aux::detail::LoopedThreadWorker::getMaxStepsTaken()
   return value;
 }
 
+double cedar::aux::detail::LoopedThreadWorker::getSumOfStepsTaken()
+{
+  QReadLocker locker(&this->mSumOfStepsTakenLock);
+  double value = this->mSumOfStepsTaken;
+  return value;
+}
+
 void cedar::aux::detail::LoopedThreadWorker::safeRequestStop()
 {
-  if (mpWrapper != NULL)
+  if (mpWrapper != nullptr)
   {
     mpWrapper->requestStop();
   }
@@ -362,7 +372,7 @@ void cedar::aux::detail::LoopedThreadWorker::safeRequestStop()
 
 bool cedar::aux::detail::LoopedThreadWorker::safeStopRequested()
 {
-  if (mpWrapper != NULL)
+  if (mpWrapper != nullptr)
   {
     return mpWrapper->stopRequested();
   }

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -45,6 +45,7 @@
 #include "cedar/processing/Arguments.fwd.h"
 #include "cedar/processing/DataConnection.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/LoopedTrigger.fwd.h"
 #include "cedar/processing/Triggerable.fwd.h"
 #include "cedar/processing/TriggerConnection.fwd.h"
 
@@ -80,6 +81,10 @@ public:
     STATE_UNKNOWN,
     //! The Triggerable is not running.
     STATE_NOT_RUNNING,
+    /*! The triggerable has been started, but is still waiting for startup to be completed. In this state, the compute
+     *  function will be called, but subsequent steps will not be triggered.
+     */
+    STATE_INITIALIZING,
     //! The Triggerable is currently running.
     STATE_RUNNING,
     //! There was an exception thrown in the Triggerable's onTrigger function.
@@ -128,14 +133,10 @@ public:
                  cedar::proc::TriggerPtr pSender = cedar::proc::TriggerPtr()
                ) = 0;
 
-  /*!@brief   Sets this Triggerable's parent trigger. Triggerable's may only be triggerd by one trigger.
-   *
-   * @remarks This throws an exception if the Triggerable's already has a parent trigger. If this happens, disconnect the trigger
-   *          first using the method in cedar::proc::Network.
-   * @remarks Currently, the parent only has meaning if the mIsLooped is true, because only looped steps are restricted
-   *          to a single parent.
+  /*!@brief   Sets this Triggerable's looped trigger. Looped triggerable's may only be triggerd by one looped trigger
+   *          and it has to be a looped one.
    */
-  void setParentTrigger(cedar::proc::TriggerPtr parent);
+  void setLoopedTrigger(cedar::proc::LoopedTriggerPtr parent);
 
   //!@brief Returns whether this step should automatically be connected to done triggers when data is connected.
   virtual bool isLooped() const
@@ -170,8 +171,14 @@ public:
   //!@brief Returns the finished trigger singleton.
   cedar::proc::TriggerPtr getFinishedTrigger();
 
-  //!@brief Returns this step's parent trigger. Steps may only be triggered by one trigger.
-  cedar::proc::TriggerPtr getParentTrigger();
+  //!@brief Returns this step's looped trigger. Steps may only be triggered by one looped trigger.
+  cedar::proc::LoopedTriggerPtr getLoopedTrigger();
+
+  //!@brief Returns this step's looped trigger. Steps may only be triggered by one looped trigger.
+  cedar::proc::ConstLoopedTriggerPtr getLoopedTrigger() const;
+
+  //!@brief Resets the parent looped trigger. Note that this can be called for non-looped triggerables.
+  void resetLoopedTrigger();
 
   //!@brief function that connects up a function to Triggerable's state changed signal
   boost::signals2::connection connectToStateChanged(boost::function<void ()> slot);
@@ -206,6 +213,9 @@ public:
 public:
   CEDAR_DECLARE_SIGNAL(Stopped, void());
 
+public:
+  CEDAR_DECLARE_SIGNAL(LoopedTriggerChanged, void());
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -215,8 +225,13 @@ protected:
    * @param newState a new state from enum State
    * @param annotation A string to be displayed to the user that gives additional information to the state, e.g., the
    *        message of an exception in the STATE_EXCEPTION.
+   *
+   * @returns Whether or not the step state has changed and a signal was emitted (this ignores the dontEmit parameter).
    */
   void setState(cedar::proc::Triggerable::State newState, const std::string& annotation);
+
+  //! Manually signals a change in the step state.
+  void signalStateChanged() const;
 
   /*!@brief Resets the state of the Triggerable to the default state.
    *
@@ -274,12 +289,11 @@ protected:
   //!@brief Whether the connect function should automatically connect the triggers as well.
   bool mIsLooped;
 
-  //!@brief If set, this is the trigger that triggers the step.
-  cedar::proc::TriggerWeakPtr mParentTrigger;
+  //!@brief If set, this is the looped trigger that triggers the step.
+  cedar::proc::LoopedTriggerWeakPtr mLoopedTrigger;
 
   //! The triggers this step is triggered by.
-  //!@todo Unify this with mParentTrigger
-  cedar::aux::LockableMember< std::set<TriggerWeakPtr> > mTriggersListenedTo;
+  cedar::aux::LockableMember<std::set<TriggerWeakPtr> > mTriggersListenedTo;
 
   //!@brief Signal that is emitted whenever the Triggerable's state is changed.
   boost::signals2::signal<void ()> mStateChanged;

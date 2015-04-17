@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -61,7 +61,6 @@ mCaller(boost::bind(&cedar::aux::gui::ThreadedPlot::convert, this))
   QObject::connect(this, SIGNAL(conversionDoneSignal()), this, SLOT(conversionDone()), Qt::QueuedConnection);
   QObject::connect(this, SIGNAL(conversionFailedSignal()), this, SLOT(conversionFailed()), Qt::QueuedConnection);
 
-  //!@todo Give this a low priority!
   mCaller.start();
 }
 

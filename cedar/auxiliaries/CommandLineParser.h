@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -223,9 +223,10 @@ public:
    *
    *        In addition, this function will parser include directives in the file being read. These take the form of a
    *        json-list with the files to include, relative to the configuration file being read. Example:
-   *        @code
-   *  "include" : ["path1", "path2"]
-   *        @endcode
+   *
+           @code
+     "include" : ["path1", "path2"]
+           @endcode
    */
   void readConfigFromFile(const cedar::aux::Path& path);
 
@@ -361,8 +362,10 @@ namespace cedar
     //! Specialization of the getValue method for enums.
     template <> inline cedar::aux::Enum CommandLineParser::getValue(const std::string& longName) const
     {
-      //!@todo Proper exception: the given parameter is not an enum parameter.
-      CEDAR_ASSERT(this->isEnum(longName));
+      if (!this->isEnum(longName))
+      {
+        CEDAR_THROW(cedar::aux::TypeMismatchException, "The parameter \"" + longName + "\" is not an enum parameter.");
+      }
       return this->mEnumValues.find(longName)->second->get(this->getValue(longName));
     }
   }

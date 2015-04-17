@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -111,7 +111,7 @@ _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 50, 1, 1000))
 void cedar::proc::sources::BoxInput::setLeftBound(unsigned int dimension, unsigned int leftBound)
 {
   CEDAR_ASSERT(dimension < this->_mLeftBounds->size());
-  this->_mLeftBounds->set(dimension, leftBound);
+  this->_mLeftBounds->setValue(dimension, leftBound);
 }
 
 double cedar::proc::sources::BoxInput::getAmplitude() const

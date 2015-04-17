@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
+#include "cedar/auxiliaries/LockableMember.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Settings.fwd.h"
@@ -212,8 +213,6 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private slots:
-  void qGlobalTimeFactorChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -221,6 +220,9 @@ private slots:
 protected:
   // none yet
 private:
+  //! The global time factor used to slow down *everything*.
+  cedar::aux::LockableMember<double> mGlobalTimeFactor;
+
   boost::signals2::signal<void (const std::string&)> mPathAddedSignal;
 
   boost::signals2::signal<void (const std::string&)> mSearchPathRemovedSignal;
@@ -259,9 +261,6 @@ protected:
 
   //! Planning strategy of FFTW.
   cedar::aux::EnumParameterPtr _mFFTWPlanningStrategy;
-
-  //! Planning strategy of FFTW.
-  cedar::aux::DoubleParameterPtr _mGlobalTimeFactor;
 
 private:
   // none yet

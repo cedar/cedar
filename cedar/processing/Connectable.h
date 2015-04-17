@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -72,6 +72,7 @@ class cedar::proc::Connectable : public cedar::proc::Element, public cedar::aux:
   friend class cedar::proc::Group;
   friend class cedar::proc::Step;
   friend class cedar::proc::sources::GroupSource;
+  friend class cedar::proc::OwnedData;
   template <typename T> friend class cedar::proc::InputSlotHelper;
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
@@ -106,9 +107,8 @@ public:
   //!@brief Returns a specific output data pointer stored in this Connectable.
   cedar::aux::ConstDataPtr getOutput(const std::string& name) const;
 
-  //!@brief Returns whether this connectable has a slot of the given role.
-  //!@todo Rename this to hasSlotForRole.
-  bool hasRole(cedar::proc::DataRole::Id role) const;
+  //!@brief Returns whether this connectable has at least one slot of the given role.
+  bool hasSlotForRole(cedar::proc::DataRole::Id role) const;
 
   //!@brief Returns a constant reference to the map of data slots for a given role.
   const cedar::proc::Connectable::SlotMap& getDataSlots(DataRole::Id role) const;
@@ -217,7 +217,7 @@ public:
    *        Examples of instances in which this function should be called are matrices that change size, type or
    *        dimensionality.
    */
-  void emitOutputPropertiesChangedSignal(const std::string& slot);
+  virtual void emitOutputPropertiesChangedSignal(const std::string& slot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -471,6 +471,10 @@ private:
    *
    */
   void callInputConnectionChanged(const std::string& slot);
+
+  void callOutputConnectionRemoved(cedar::proc::DataSlotPtr slot);
+
+  virtual void outputConnectionRemoved(cedar::proc::DataSlotPtr slot);
 
   //!@brief Declares an output slot and immediately sets a non-owned data pointer for that slot.
   cedar::proc::DataSlotPtr declareSharedOutput(const std::string& name, cedar::aux::DataPtr data);

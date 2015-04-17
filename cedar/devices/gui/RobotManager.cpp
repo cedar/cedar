@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -345,7 +345,7 @@ void cedar::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()
   extensions.push_back(".json");
   cedar::aux::Path resource = cedar::aux::gui::ResourceDialog::openResource(this, extensions);
 
-  if (!resource.isEmpty())
+  if (!resource.empty())
   {
     this->loadConfiguration(resource);
   }

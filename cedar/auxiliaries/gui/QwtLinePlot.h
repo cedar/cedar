@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -51,6 +51,7 @@
 #include "cedar/auxiliaries/BoolParameter.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/annotation/ValueRangeHint.fwd.h"
 #include "cedar/auxiliaries/MatData.fwd.h"
 #include "cedar/auxiliaries/gui/QwtLinePlot.fwd.h"
 #include "cedar/auxiliaries/math/Limits.fwd.h"
@@ -133,7 +134,7 @@ private:
   {
     PlotSeries()
     :
-    mpCurve(NULL)
+    mpCurve(nullptr)
     {
     }
 
@@ -147,12 +148,18 @@ private:
 
     //!@brief the displayed data
     cedar::aux::ConstMatDataPtr mMatData;
+
     //!@brief a curve inside the plot
     QwtPlotCurve *mpCurve;
+
     //!@brief the x values of the plot
     std::vector<double> mXValues;
+
     //!@brief the y values of the plot
     std::vector<double> mYValues;
+
+    //! The value range hint, if any.
+    cedar::aux::annotation::ConstValueRangeHintPtr mValueRange;
   };
 
   CEDAR_GENERATE_POINTER_TYPES(PlotSeries);
@@ -164,10 +171,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  QwtLinePlot(QWidget *pParent = NULL);
+  QwtLinePlot(QWidget *pParent = nullptr);
 
   //!@brief Constructor expecting a DataPtr.
-  QwtLinePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
+  QwtLinePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = nullptr);
 
   //!@brief Destructor
   ~QwtLinePlot();
@@ -182,10 +189,13 @@ public:
   //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
 
-  /*!
-   * @remarks This method is a temporary way to provide annotations, a more general one will be added soon.
+  /*! Attaches a marker to this plot.
    */
   void attachMarker(QwtPlotMarker *pMarker);
+
+  /*! Detaches the given marker from this plot. Also deletes the marker.
+   */
+  void detachMarker(QwtPlotMarker *pMarker);
 
   /*!@brief Detaches and deletes all markers added to this plot.
    *
@@ -193,7 +203,10 @@ public:
    */
   void clearMarkers();
 
+  //! Checks if data can be appended, i.e., if data is the same dimensionality and size as existing data.
   bool canAppend(cedar::aux::ConstDataPtr data) const;
+
+  //! Checks if the given data object is in this plot.
   bool canDetach(cedar::aux::ConstDataPtr data) const;
 
   //!@brief Returns the limits of the x axis.
@@ -204,6 +217,12 @@ public:
 
   //! Returns whether or not autoscaling is enabled for this plot.
   bool autoScalingEnabled() const;
+
+  //! Sets whether the plot emits dataChanged for 0d data
+  void setAccepts0DData(bool accept);
+
+  //! Determines the style (pen and brush) to be used for the given data object in this plot.
+  void getStyleFor(cedar::aux::ConstDataPtr data, QPen& pen, QBrush& brush) const;
 
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
@@ -234,15 +253,24 @@ protected:
   //!@brief create and handle the context menu
   void contextMenuEvent(QContextMenuEvent *pEvent);
 
+  //! Appends the data object to this plot.
+  void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+
+  //! Detaches the given data object from this plot.
+  void doDetach(cedar::aux::ConstDataPtr data);
+
+  //! Returns a pointer to the QwtPlot object used by this plot.
+  QwtPlot* getPlot();
+
+  //! Enables or disables automatic determination of the x axis limits.
+  void setAutoDetermineXLimits(bool automatic);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //!@brief initialize
   void init();
-
-  void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
-  void doDetach(cedar::aux::ConstDataPtr data);
 
   //!@brief Applies a plot style to a given curve.
   static void applyStyle(cedar::aux::ConstDataPtr data, size_t lineId, QwtPlotCurve *pCurve);
@@ -271,7 +299,7 @@ private slots:
 protected:
   // none yet
 private:
-  //!@brief a plot
+  //! Pointer to the Qwt plot object used by this plot.
   QwtPlot *mpPlot;
 
   QwtPlotGrid *mpGrid;
@@ -292,6 +320,14 @@ private:
 
   //! The worker that does actual converison.
   cedar::aux::gui::detail::QwtLinePlotWorkerPtr mConversionWorker;
+
+  std::vector<QwtPlotMarker*> mMarkers;
+
+  //! If true, the plot will not complain about 0d data. Otherwise, 0D data will lead it to emit a dataChanged signal.
+  bool mPlot0D;
+
+  //! If true, the plot will set its x limits automatically in each plot step.
+  bool mAutoDetermineXLimits;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

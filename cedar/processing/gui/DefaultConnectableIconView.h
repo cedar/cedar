@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -50,7 +50,7 @@
 #include <QGraphicsSvgItem>
 
 
-/*!@todo Displays a static svg icon based on the icon in the connectable's declaration.
+/*!@brief Displays a static svg icon based on the icon in the connectable's declaration.
  */
 class cedar::proc::gui::DefaultConnectableIconView : public cedar::proc::gui::ConnectableIconView
 {
@@ -69,22 +69,27 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! returns the bounding rectangle covering the icon
   QRectF boundingRect() const;
 
+  //! sets the bounding box (position and size)
   void setBounds(const qreal& x, const qreal& y, const qreal& size);
 
+  //! paints the icon
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! sets the path to the icon
   void setIconPath(const QString& path);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! handles a change in connectable
   void connectableChanged();
 
   //--------------------------------------------------------------------------------------------------------------------

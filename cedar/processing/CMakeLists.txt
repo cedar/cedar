@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -51,15 +51,19 @@ cedar_add_library(cedarproc
   cedardev
   MOC_HEADERS
   experiment/Experiment.h
+  experiment/ActionParameter.h
+  experiment/PropertyParameter.h
+  experiment/ConnectableParameter.h
   experiment/StepPropertyParameter.h
   experiment/Supervisor.h
   experiment/condition/OnMatrixValue.h
   experiment/action/IterateDirectoryContents.h
   experiment/gui/ActionListParameter.h
   experiment/gui/ActionSequence.h
+  experiment/gui/ActionParameter.h
   experiment/gui/ExperimentItemWidget.h
+  experiment/gui/ConnectableParameter.h
   experiment/gui/StepPropertyParameter.h
-  experiment/gui/TriggerParameter.h
   gui/ArchitectureWidgetList.h
   gui/ArchitectureScriptEditor.h
   gui/stepViews/BoostView.h
@@ -70,13 +74,17 @@ cedar_add_library(cedarproc
   gui/ArchitectureToolBox.h
   gui/BoostControl.h
   gui/Connectable.h
+  gui/CouplingCollection.h
   gui/DataSlotItem.h
-  gui/ElementClassList.h
+  gui/ElementList.h
+  gui/ElementTreeWidget.h
   gui/ExperimentDialog.h
   gui/FindDialog.h
+  gui/GroupContainerItem.h
   gui/GroupParameterDesigner.h
   gui/Ide.h
   gui/IdeApplication.h
+  gui/OneTimeMessageDialog.h
   gui/PlotWidget.h
   gui/ProjectionMappingParameter.h
   gui/PerformanceOverview.h
@@ -85,11 +93,13 @@ cedar_add_library(cedarproc
   gui/Scene.h
   gui/Settings.h
   gui/SettingsDialog.h
+  gui/SimulationControl.h
   gui/StepItem.h
   gui/TriggerItem.h
   gui/Group.h
   gui/ToolBox.h
   gui/View.h
+  gui/WidgetContainerItem.h
   sources/BoxInput.h
   sources/GaussInput.h
   steps/Component.h

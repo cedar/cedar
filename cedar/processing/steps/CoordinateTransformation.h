@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -194,11 +194,35 @@ private:
 }; // class cedar::proc::steps::TransformationType
 
 
-/*!@brief Performs a coordinate transformation on an input matrix.
+/*!@brief Transforms the coordinate system of an input image.
  *
- * @remarks This step is still under development.
+ * Depending on the setup, this step performs different transformations.
  *
- * @todo Make the magnitude parameter const when it does not apply (i.e., for Cart <-> Polar)
+ * Let \f$I_{\mathrm{in}}\f$ be the input image and \f$I_{\mathrm{out}}\f$ be the output image.
+ * When transforming from Cartesian coordinates to a log-polar representation, the output is calculated as
+ * \f[
+ *     I_{\mathrm{out}}(\varphi, \rho)
+ *       = I_{\mathrm{in}}
+ *         \left(
+ *           c_x + \exp\left(\frac{\rho}{d_{\rho} \cdot m_{\rho}}\right) \cdot \sin\left(\varphi \cdot d_{\varphi}\right),
+ *           c_y + \exp\left(\frac{\rho}{d_{\rho} \cdot m_{\rho}}\right) \cdot \cos\left(\varphi \cdot d_{\varphi}\right)
+ *         \right),
+ * \f]
+ * where \f$\rho\f$ is the distance from the center, \f$\varphi\f$ is the angle, \f$c_x\f$ and \f$c_y\f$ specify the center of the image (and the origin of the transformation), \f$d_{\rho}\f$ is the samples per distance parameter, \f$m_{\rho}\f$ is the magnitude (forward) parameter, and \f$d_{\varphi}\f$ is the samples per degree parameter.
+ *
+ * With the same definitions, the inverse of this transformation is calculated as
+ * \f[
+ *     I_{\mathrm{out}}(x, y)
+ *       = I_{\mathrm{in}}
+ *         \left(
+ *           m_{\rho} \cdot \log\left( \sqrt{(x - c_x)^2 + (y - c_y)^2} \right) \cdot d_{\rho},
+ *           \mathrm{atan2}(y, x)
+ *         \right).
+ * \f]
+ *
+ * @todo Write down the equations for the non-logarithmic versions.
+ * @todo There really only needs to be one magnitude parameter
+ * @todo The output size (and possibly other unused parameters) should be constant when forward-transforming
  */
 class cedar::proc::steps::CoordinateTransformation : public cedar::proc::Step
 {

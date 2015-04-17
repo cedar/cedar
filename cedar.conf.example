@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -43,8 +43,12 @@ set (CEDAR_LOG_DIR        "${CEDAR_HOME}/logs"        CACHE PATH "Default direct
 set (CEDAR_BUILD_STATIC_LIBS              0           CACHE BOOL "Build all libraries statically (*.a)?")
 set (CEDAR_BUILD_DEBUG_VERSION            0           CACHE BOOL "Build with debug information?")
 set (CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS    0           CACHE BOOL "Use opencv debug libraries when building in debug mode?")
-set (CEDAR_BUILD_TESTS                    1           CACHE BOOL "Build unit and interactive tests? (Disabling this can save compile time.")
 #set (CEDAR_STOP_ON_MISSING_LIBRARIES      0           CACHE BOOL "Stop when libraries cannot be found by cmake?")
+
+# extra tests
+set (CEDAR_BUILD_TESTS                    1           CACHE BOOL "Build unit and interactive tests? (Disabling this can save compile time.)")
+set (CEDAR_COVERAGE_TEST                  0           CACHE BOOL "Execute coverage testing? (Enabling this will force Debug build.)")
+set (CEDAR_BUILD_VALGRIND_CHECK           0           CACHE BOOL "Execute valgrind memory check? (Disabling this will save testing time, especially on Debug build.)")
 
 # mandatory dependencies
 set (CEDAR_OPENCV_CMAKE_DIR "/usr/share/OpenCV"     CACHE PATH "Directory where CMake will find the OpenCVConfig.cmake file.")

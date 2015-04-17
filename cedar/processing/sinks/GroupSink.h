@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -49,9 +49,9 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
+/*!@brief a sink for data in a group, passed on to the outside
  *
- * @todo describe more.
+ * @remark this is not meant to be used manually - each group takes care of this when adding/removing connectors
  */
 class cedar::proc::sinks::GroupSink : public cedar::proc::Step
 {

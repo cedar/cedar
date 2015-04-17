@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -303,7 +303,7 @@ int main()
   std::cout << "test: readConfiguration" << std::endl;
   cedar::aux::LocalCoordinateFrame configured_local_coordinate_frame;
   std::cout << "constructed cofigured_local_coordinate_frame" << std::endl;
-  configured_local_coordinate_frame.readJson("test.json");
+  configured_local_coordinate_frame.readJson("test://unit/auxiliaries/LocalCoordinateFrame/test.json");
   std::cout << "called cofigured_local_coordinate_frame.readJson()" << std::endl;
   cv::Mat C = configured_local_coordinate_frame.getTransformation();
   if (

@@ -2,7 +2,7 @@
 """
 ========================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -75,14 +75,22 @@ class IssueC0002 (Issue):
 
 class IssueM0001 (Issue):
   def __init__(self, line, column):
-    replacements = {"shared_dynamic_cast": "dynamic_pointer_cast"}
     Issue.__init__(self, 
                    issue_type_miscellaneous, 1,
                    "In line " + str(line) + ", col. " + str(column) + ": copyright year is outdated."
                    )
-                   
+
+class IssueM0002 (Issue):
+  def __init__(self):
+    Issue.__init__(self, 
+                   issue_type_miscellaneous, 2,
+                   "The copyright information does not conform to the established standards."
+                   )
 
 class IssueList:
+  """
+  A list of issues found by checks.
+  """
   def __init__(self):
     self._issues = dict()
     
@@ -118,8 +126,22 @@ class IssueList:
 issues = IssueList()
 
 
-class REBasedCheck:
+class Check:
+  """
+  A base class for checks that can be performed.
+  """
+  def __init__(self):
+    pass
+    
+  def handles_file_type(self, file_type):
+    return True
+
+class REBasedCheck (Check):
+  """
+  Base class for checks that are performed by applying a regular expression on the content.
+  """
   def __init__(self, re, use_preprocessed = True):
+    Check.__init__(self)
     self._use_preprocessed = use_preprocessed
     self._re = re
     
@@ -130,10 +152,13 @@ class REBasedCheck:
       contents = file_contents
       
     current_pos = 0
+    any_found = False
     while True:
       m = self._re.search(file_contents, current_pos)
       if m is None:
         break
+        
+      any_found = True
         
       current_pos = m.end()
       lines = contents[:m.start()].split("\n")
@@ -141,9 +166,15 @@ class REBasedCheck:
       col_no = len(lines[-1]) + 1
       
       self._found(issues, filename, line_no, col_no, m)
+      
+    if not any_found and "_no_matches" in dir(self):
+      self._no_matches(issues, filename)
 
     
-class CheckC0001 (REBasedCheck):
+class CheckC0002 (REBasedCheck):
+  """
+  Checks for instances of boost::shared_dynamic_cast.
+  """
   def __init__(self):
     REBasedCheck.__init__(self,
                           re = re.compile(r'boost\:\:(shared_dynamic_cast)'),
@@ -153,8 +184,17 @@ class CheckC0001 (REBasedCheck):
   def _found(self, issues, filename, line, column, match):
     issues.add_issue(filename, IssueC0002(line, column, match.group(1)))
     
+  def handles_file_type(self, file_type):
+    if file_type in ("h", "cpp"):
+      return True
+    else:
+      return False
+    
     
 class CheckM0001 (REBasedCheck):
+  """
+  This class implements the check for proper copyright information in a file.
+  """
   def __init__(self):
     self.years = "2011"
     today = datetime.date.today()
@@ -169,6 +209,9 @@ class CheckM0001 (REBasedCheck):
   def _found(self, issues, filename, line, column, match):
     if match.group(0) != "Copyright " + self.years + " ":
       issues.add_issue(filename, IssueM0001(line, column))
+    
+  def _no_matches(self, issues, filename):
+      issues.add_issue(filename, IssueM0002())
     
 
   
@@ -216,96 +259,107 @@ def preprocess(source):
   no_comments = "".join(no_comments)
   return no_comments
 
-#
-# Tests for C0001: checks if all the std headers are included where they should be.
-#
-std_use_regex = re.compile(r"std\:\:([a-zA-Z]+)[ \<]")
-std_class_headers = {
-                      "cout": "iostream",
-                      "endl": "iostream",
-                      "cerr": "iostream",
-                      "stringstream": "sstream",
-                      "function": "functional",
-                      "ifstream": "fstream",
-                      "ofstream": "fstream",
-                      "multiset": "set",
-                      "pair": "utility",
-                      "min": "algorithm",
-                      "max": "algorithm",
-                      "istringstream": "sstream",
-                      "ostringstream": "sstream",
-                      "get": "tuple"
-                    }
-def check_std_headers(filename, file_contents, preprocessed_contents, ):
-  matches = set(std_use_regex.findall(preprocessed_contents))
-  filetype = filename.split('.')[-1]
-  for classname in matches:
-    # determine the header for the class
-    if classname in std_class_headers:
-      header = std_class_headers[classname]
+class CheckC0001 (Check):
+  """
+  Checks if all headers for stl-classes are included properly.
+  """
+  std_use_regex = re.compile(r"std\:\:([a-zA-Z]+)[ \<]")
+  std_class_headers = {
+                        "cout": "iostream",
+                        "endl": "iostream",
+                        "cerr": "iostream",
+                        "stringstream": "sstream",
+                        "function": "functional",
+                        "ifstream": "fstream",
+                        "ofstream": "fstream",
+                        "multiset": "set",
+                        "pair": "utility",
+                        "min": "algorithm",
+                        "max": "algorithm",
+                        "istringstream": "sstream",
+                        "ostringstream": "sstream",
+                        "get": "tuple"
+                      }
+                      
+  def __init__(self):
+    Check.__init__(self)
+    
+  def handles_file_type(self, file_type):
+    if file_type in ("h", "cpp"):
+      return True
     else:
-      header = classname
+      return False
     
-    # see if the header is being included
-    include_re = re.compile(r'\s*#\s*include\s*[\<\"]' + header + r'[\>\"]')
-    include = include_re.search(preprocessed_contents)
-    
-    header_found = True
-    if include is None:
-      header_found = False
+  def check(self, issues, filename, file_contents, preprocessed_contents):
+    matches = set(std_use_regex.findall(preprocessed_contents))
+    filetype = filename.split('.')[-1]
+    for classname in matches:
+      # determine the header for the class
+      if classname in std_class_headers:
+        header = std_class_headers[classname]
+      else:
+        header = classname
       
-    if not header_found and filetype == "cpp":
-      file_header = get_header(filename)
-      #print "also checking header", file_header
-      try:
-        with open(file_header, "r") as f_header: 
-          contents = preprocess(f_header.read())
-          include = include_re.search(contents)
-          if not include is None:
-            header_found = True
-      except IOError:
-        pass # ok: if the header file doesn't exist, we don't care about it.
-    
-    if header_found == False:
-      issues.add_issue(filename, IssueC0001(classname, header))
-
-#
-# Tests for C0002: Checks if boost::shared_dynamic_cast is used
-#
-def check_deprecated_boost_casts(filename, file_contents, preprocessed_contents):
-  check = CheckC0001()
-  check.check(issues, filename, file_contents, preprocessed_contents)
-  
-def check_copyright_year(filename, file_contents, preprocessed_contents):
-  check = CheckM0001()
-  check.check(issues, filename, file_contents, preprocessed_contents)
-  
+      # see if the header is being included
+      include_re = re.compile(r'\s*#\s*include\s*[\<\"]' + header + r'[\>\"]')
+      include = include_re.search(preprocessed_contents)
+      
+      header_found = True
+      if include is None:
+        header_found = False
+        
+      if not header_found and filetype == "cpp":
+        file_header = get_header(filename)
+        try:
+          with open(file_header, "r") as f_header: 
+            contents = preprocess(f_header.read())
+            include = include_re.search(contents)
+            if not include is None:
+              header_found = True
+        except IOError:
+          pass # ok: if the header file doesn't exist, we don't care about it.
+      
+      if header_found == False:
+        issues.add_issue(filename, IssueC0001(classname, header))
 
 #
 #
 #
-file_regex = re.compile(r"\.(h|cpp)$")
+file_regex = re.compile(r"\.(h|cpp|md|example|txt)$")
 def check_file(filename):
+  """
+  Checks the file specified by filename for any issues.
+  """
   match = file_regex.search(filename)
   if match is None:
     return
+    
+  file_type = match.groups(1)
 
   print "Checking file", filename.split(base_directory)[-1]
+  
+  checks = [CheckC0001(), CheckC0002(), CheckM0001()]
   
   with open(filename, "r") as f:
     file_contents = f.read()
     preprocessed_contents = preprocess(file_contents)
-    check_std_headers(filename, file_contents, preprocessed_contents)
-    check_deprecated_boost_casts(filename, file_contents, preprocessed_contents)
-    check_copyright_year(filename, file_contents, preprocessed_contents)
+    for check_type in checks:
+      if check_type.handles_file_type(file_type):
+        check_type.check(issues, filename, file_contents, preprocessed_contents)
     
-    
-def check_directory(directory):
+#
+#
+def check_directory(directory, recurse=True):
+  """
+  Runs code checks on the contents of the given directory.
+  
+  This function will also recurse down into any subdirectories of the given directory if recurse is set to True.
+  """
   files = os.listdir(directory)
   
   for file in files:
     path = directory + os.sep + file
-    if os.path.isdir(path) == True:
+    if os.path.isdir(path) == True and recurse:
       check_directory(path)
     else:
       check_file(path)
@@ -313,9 +367,11 @@ def check_directory(directory):
 #
 #
 #
-def check_all(directory):
-  check_directory(directory)
-  
+def check_cedar():
+  check_directory(cedar_home, False)
+  check_directory(cedar_home + os.sep + "cedar")
+  check_directory(cedar_home + os.sep + "templates")
+
 #
 #
 #
@@ -323,7 +379,7 @@ if __name__ == "__main__":
   try:
     parser = argparse.ArgumentParser(description='Checks code for style and other issues.')
     parser.add_argument('--input-directory', dest='input_directory', action='store',
-                       default=cedar_home + os.sep + "cedar",
+                       default=None,
                        help='Specify the directory in which files should be checked.')
                        
     parser.add_argument('--output', dest='output', action='store',
@@ -331,7 +387,11 @@ if __name__ == "__main__":
                        help='Specify the file to which the issues are to be written.')
 
     args = parser.parse_args()
-    check_all(args.input_directory)
+    if not args.input_directory is None:
+      check_directory(args.input_directory)
+    else:
+      check_cedar()
+      
     issues.write_issues(args.output)
     print "Done."
   except KeyboardInterrupt:

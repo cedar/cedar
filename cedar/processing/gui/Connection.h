@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -69,10 +69,13 @@ class cedar::proc::gui::Connection : public QGraphicsPathItem
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Connection(cedar::proc::gui::GraphicsBase *pSource, cedar::proc::gui::GraphicsBase *pTarget);
+  Connection(cedar::proc::gui::GraphicsBase *pSource = nullptr, cedar::proc::gui::GraphicsBase *pTarget = nullptr);
 
   //!@brief Destructor
   ~Connection();
+
+  //! If this returns true, the connection can be deleted by pressing the delete key.
+  virtual bool isDeleteable() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -80,8 +83,24 @@ public:
 public:
   //!@brief access the source of this connection
   cedar::proc::gui::GraphicsBase* getSource();
+
+  //!@brief access the source of this connection
+  cedar::proc::gui::ConstGraphicsBase* getSource() const;
+
   //!@brief access the target of this connection
   cedar::proc::gui::GraphicsBase* getTarget();
+
+  //!@brief access the target of this connection
+  cedar::proc::gui::ConstGraphicsBase* getTarget() const;
+
+  //! Sets the source of the connection
+  void setSource(cedar::proc::gui::GraphicsBase* source);
+
+  //! Sets the source of the connection
+  void setTarget(cedar::proc::gui::GraphicsBase* target);
+
+  //! Sets source and target of the connection.
+  void setSourceAndTarget(cedar::proc::gui::GraphicsBase* source, cedar::proc::gui::GraphicsBase* target);
 
   //!@brief set the validity (i.e. the color) of this instance
   void setValidity(cedar::proc::gui::ConnectValidity validity);
@@ -89,8 +108,11 @@ public:
   //!@brief paint this connection
   void paint(QPainter *pPainter, const QStyleOptionGraphicsItem*, QWidget*);
 
-  //!@brief Removes the underlying connection in the processing framework.
+  //!@brief Removes the connection, but only in the GUI layer.
   void disconnect();
+
+  //! Disconnects the connection in the non-gui layer.
+  void disconnectUnderlying();
 
   //! Displays this connection in smart mode.
   void setSmartMode(bool smart);
@@ -115,13 +137,17 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void setBaseLineWidth(double width);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
   QColor highlightColor(const QColor& source) const;
+
+  void updateGraphics();
+
+  void updateValidity();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -147,6 +173,9 @@ private:
 
   //! Whether or not to highlight the connection due to mouse hovering.
   bool mHighlightHover;
+
+  //! Base width of the connection's line
+  double mBaseLineWidth;
 }; // class cedar::proc::gui::TriggerConnection
 
 #endif // CEDAR_PROC_GUI_CONNECTION_H

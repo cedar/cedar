@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -41,6 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/PathTemplate.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Path.fwd.h"
@@ -51,20 +52,43 @@
 #include <vector>
 
 
+namespace cedar
+{
+  namespace aux
+  {
+    //! Policy for paths that determines the separator for path entries.
+    //!@todo On windows: use forward and backward slash, where appropriate
+    class FilesystemPathSeparator
+    {
+      public:
+        //! Splits the string based on the separator specified via template argument.
+        static std::vector<std::string> separate(const std::string&)
+        {
+          // nothing to do, cedar::aux::Path does not use this
+          return std::vector<std::string>();
+        }
+
+        static std::string joinComponents(const std::vector<std::string>& components)
+        {
+          return cedar::aux::join(components, "/");
+        }
+    };
+  }
+}
+
 /*!@brief A class for representing paths to files and directories.
- *
- * @todo This should really use/be merged with cedar::aux::PathTemplate.
  */
-class cedar::aux::Path
+class cedar::aux::Path : public cedar::aux::PathTemplate<cedar::aux::FilesystemPathSeparator, std::string>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend std::ostream& operator<<(std::ostream& stream, const cedar::aux::Path& path)
-  {
-    stream << path.toString();
-    return stream;
-  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef cedar::aux::PathTemplate<cedar::aux::FilesystemPathSeparator, std::string> PathBase;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -79,8 +103,9 @@ public:
   //!@brief Constructor that reads a path from a const char* string.
   Path(const char* path);
 
-  //!@brief Destructor
-  virtual ~Path();
+private:
+  //!@brief Constructs this object from a base path.
+  Path(const PathBase& path);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -101,14 +126,11 @@ public:
   //! Returns true if the path is relative.
   bool isRelative() const;
 
+  //! Returns true if the file will be searched for in a unit test.
+  bool isTestFile() const;
+
   //! Returns true if the path is relative to a plugin folder, i.e., starts with the protocol plugin://
   bool isPluginRelative() const;
-
-  //! Returns true if there are no entries in this path, i.e., the path is "".
-  bool isEmpty() const;
-
-  //! Sets the stored path from a string.
-  void setPath(const std::string& path);
 
   //! Returns the stored protocol.
   const std::string& getProtocol() const;
@@ -116,11 +138,16 @@ public:
   //! Returns the base directory for storing global cedar settings.
   static cedar::aux::Path globalCofigurationBaseDirectory();
 
+  //! Returns the path, but without the protocol.
+  std::string toString() const;
+
   //! Returns a string representation of the path.
-  std::string toString(bool withProtocol = false) const;
+  std::string toString(bool withProtocol) const;
+
+  void fromString(const std::string& string);
 
   /*! Returns the directory pointed to by the path. If this path is already a directory, the path itself is returned.
-   *  Otherwise, if this path points to a file, the filename is removed.
+   *  Otherwise, if this path points to a file, the path without the filename is returned.
    */
   cedar::aux::Path getDirectory() const;
 
@@ -170,11 +197,8 @@ public:
   //! Lists all the files in the path whose absolute path matches the given regular expression.
   std::vector<cedar::aux::Path> listFilesThatMatchRe(const std::string& regexp) const;
 
-  //! Returns the last element in the path
-  const std::string& getLast() const;
-
-  //! Appends another component to the path.
-  void appendComponent(const std::string& component);
+  //! Ensures that all directories that are part of this path exist.
+  void createDirectories() const;
 
   //! Returns the separator for paths (depends on the operating system).
   static std::string separator();
@@ -182,11 +206,15 @@ public:
   //! Returns a formatted timestamp to be used in file and directory names.
   static std::string getTimestampForFileName();
 
-  //! Compares two paths.
-  bool operator< (const cedar::aux::Path& other) const;
+  virtual bool operator== (const cedar::aux::Path& other) const;
 
-  //! Compares two paths.
-  bool operator== (const cedar::aux::Path& other) const;
+  virtual bool operator< (const cedar::aux::Path& other) const;
+
+  //! slice operator
+  Path operator()(size_t start, size_t end) const;
+
+  //! Slices the path, starting from the given index.
+  Path operator()(size_t start) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -209,12 +237,10 @@ private:
   //! The protocol used for finding the absolute path. Can be: resource, absolute, relative
   std::string mProtocol;
 
-  //! Components of the path.
-  std::deque<std::string> mComponents;
-
   static const std::string M_PROTOCOL_ABSOLUTE_STR;
   static const std::string M_PROTOCOL_RESOURCE_STR;
   static const std::string M_PROTOCOL_PLUGIN_STR;
+  static const std::string M_PROTOCOL_TEST_STR;
 
 }; // class cedar::aux::Path
 

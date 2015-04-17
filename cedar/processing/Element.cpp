@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -76,21 +76,6 @@ std::string cedar::proc::Element::getFullPath() const
 void cedar::proc::Element::updateTriggerChains(std::set<cedar::proc::Trigger*>& /*visited*/)
 {
   // empty default implementation
-}
-
-void cedar::proc::Element::setNetwork(cedar::proc::GroupPtr network)
-{
-  this->setGroup(network);
-}
-
-cedar::proc::GroupPtr cedar::proc::Element::getNetwork()
-{
-  return this->getGroup();
-}
-
-cedar::proc::ConstGroupPtr cedar::proc::Element::getNetwork() const
-{
-  return this->getGroup();
 }
 
 void cedar::proc::Element::setGroup(cedar::proc::GroupPtr group)

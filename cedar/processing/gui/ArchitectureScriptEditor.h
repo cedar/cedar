@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -59,11 +59,14 @@ namespace cedar
     {
       namespace detail
       {
+        /*!@brief A widget for script control.
+         */
         class ScriptControlWidget : public QWidget
         {
         Q_OBJECT
 
         public:
+          //!@brief constructor
           ScriptControlWidget(cedar::proc::CppScriptPtr script);
 
         private slots:
@@ -108,8 +111,10 @@ public:
   ArchitectureScriptEditor(cedar::proc::gui::GroupPtr group, QWidget* pParent = nullptr);
 
 signals:
+  //! signaling that a script was added to a group
   void scriptAddedInGroup(QString scriptName);
 
+  //! signaling that a script was removed from a group
   void scriptRemovedFromGroup(QString scriptName);
 
   //--------------------------------------------------------------------------------------------------------------------

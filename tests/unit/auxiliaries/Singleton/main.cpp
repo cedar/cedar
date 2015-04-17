@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -36,7 +36,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Singleton.h"
-#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>

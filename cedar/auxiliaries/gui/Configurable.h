@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -75,6 +75,15 @@ class cedar::aux::gui::Configurable : public QWidget
 private:
   class DataDelegate;
 
+  class CustomTree : public QTreeWidget
+  {
+    public:
+      QTreeWidgetItem* getItemFromIndex(const QModelIndex& index)
+      {
+        return this->itemFromIndex(index);
+      }
+  };
+
   //!@cond SKIPPED_DOCUMENTATION
   class ParameterItem;
   //!@endcond
@@ -104,6 +113,13 @@ public:
    */
   void clear();
 
+  /*!@brief Displays a list of configurables.
+   */
+  void display(std::vector<cedar::aux::ConfigurablePtr> configurables);
+
+  //! Returns the parameter for the given model index
+  cedar::aux::ParameterPtr parameterFromModelIndex(const QModelIndex& index);
+
 public slots:
   //! Resizes the rows to fit their contents.
   void fitRowsToContents();
@@ -122,11 +138,14 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //! Appends a root configurable.
+  void appendRootConfigurable(cedar::aux::ConfigurablePtr configurable);
+
   //! Appends the given configurable to the tree widget item.
-  void append(cedar::aux::ConfigurablePtr configurable, QTreeWidgetItem* pItem, const std::string& pathSoFar);
+  void append(size_t configurableIndex, cedar::aux::ConfigurablePtr configurable, QTreeWidgetItem* pItem, const std::string& pathSoFar);
 
   //! Appends the given parameter to the tree node.
-  void append(cedar::aux::ParameterPtr parameter, QTreeWidgetItem* pNode, const std::string& pathSoFar);
+  void append(size_t configurableIndex, cedar::aux::ParameterPtr parameter, QTreeWidgetItem* pNode, const std::string& pathSoFar);
 
   QTreeWidgetItem* appendHeading(QTreeWidgetItem* pParent, const QString& text, int hLevel = 2);
 
@@ -144,26 +163,29 @@ private:
 
   void appendObjectListParameter
        (
-         cedar::aux::ObjectListParameterPtr objectListParameter,
+         size_t configurableIndex,
+         cedar::aux::ParameterPtr objectListParameter,
          QTreeWidgetItem* pParent,
          const std::string& path
        );
 
-  void translateParameterAddedSignal(cedar::aux::ParameterPtr parameter);
+  void translateParameterAddedSignal(unsigned int configurableIndex, cedar::aux::ParameterPtr parameter);
 
-  void translateParameterRemovedSignal(cedar::aux::ParameterPtr parameter);
+  void translateParameterRemovedSignal(unsigned int configurableIndex, cedar::aux::ParameterPtr parameter);
 
-  void translateParameterNameChangedSignal(const std::string& oldName, const std::string& newName);
+  void translateParameterNameChangedSignal(unsigned int configurableIndex, const std::string& oldName, const std::string& newName);
+
+  int getRootIndexForItem(QTreeWidgetItem* pItem) const;
 
 signals:
   //! Emitted, whenever a parameter is added to the displayed configurable.
-  void parameterAdded(QString path);
+  void parameterAdded(int configurableIndex, QString path);
 
   //! Emitted, whenever a parameter is removed from the displayed configurable.
-  void parameterRemoved(QVariant parameter);
+  void parameterRemoved(int configurableIndex, QVariant parameter);
 
   //! Emitted, whenever a parameter in the displayed configurable is renamed.
-  void parameterRenamed(QString oldName, QString newName);
+  void parameterRenamed(int configurableIndex, QString oldName, QString newName);
 
 private slots:
   void parameterChangeFlagChanged();
@@ -172,11 +194,11 @@ private slots:
 
   void objectListParameterValueChanged();
 
-  void parameterAddedSlot(QString path);
+  void parameterAddedSlot(int configurableIndex, QString path);
 
-  void parameterRemovedSlot(QVariant parameter);
+  void parameterRemovedSlot(int configurableIndex, QVariant parameter);
 
-  void parameterRenamedSlot(QString oldName, QString newName);
+  void parameterRenamedSlot(int configurableIndex, QString oldName, QString newName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -184,9 +206,9 @@ private slots:
 protected:
   // none yet
 private:
-  QTreeWidget* mpPropertyTree;
+  CustomTree* mpPropertyTree;
 
-  cedar::aux::ConfigurablePtr mDisplayedConfigurable;
+  std::vector<cedar::aux::ConfigurablePtr> mDisplayedConfigurables;
 
   boost::signals2::scoped_connection mParameterAddedConnection;
 
@@ -208,7 +230,7 @@ class cedar::aux::gui::Configurable::DataDelegate : public QStyledItemDelegate
   Q_OBJECT
 public:
   //! Constructor for the DataDelegate.
-  DataDelegate(cedar::aux::ConfigurablePtr pConfigurable, cedar::aux::gui::Configurable* configurableWidget, bool readOnly = false);
+  DataDelegate(cedar::aux::gui::Configurable* configurableWidget, bool readOnly = false);
 
   //! Destructor.
   ~DataDelegate();
@@ -221,8 +243,6 @@ public slots:
   void widgetDestroyed(QObject* removed);
 
 private:
-  cedar::aux::ConfigurablePtr mpConfigurable;
-
   cedar::aux::gui::Configurable* mConfigurableWidget;
 
   // set storing all opened editors - during the destructor call, all remaining editors are deleted

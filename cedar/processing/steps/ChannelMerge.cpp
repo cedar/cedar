@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -131,7 +131,6 @@ void cedar::proc::steps::ChannelMerge::inputConnectionChanged(const std::string&
     return;
   }
 
-  //!@todo split number from name, choose vector entry with number
   auto mat_data = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(data);
   if (inputName == "channel 1")
   {

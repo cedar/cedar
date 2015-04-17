@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -77,7 +77,10 @@ _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", dimension
   _mDimensionality->setValue(dimensionality);
   _mDimensionality->setConstant(true);
 
-  QObject::connect(this->_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
+  // we need a direct connection here so the update always happens at predictable times, i.e., every time the
+  // dimensionality changes; otherwise, there might be short moments where dimensionality and the rest of the kernel
+  // don't match
+  QObject::connect(this->_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()), Qt::DirectConnection);
 }
 
 cedar::aux::kernel::Kernel::~Kernel()
@@ -114,7 +117,7 @@ void cedar::aux::kernel::Kernel::hideDimensionality(bool hide)
   _mDimensionality->setHidden(hide);
 }
 
-QReadWriteLock* cedar::aux::kernel::Kernel::getReadWriteLock()
+QReadWriteLock* cedar::aux::kernel::Kernel::getReadWriteLock() const
 {
   return mpReadWriteLockOutput;
 }

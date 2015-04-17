@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -141,12 +141,14 @@ public:
   class ReadLocker : public Locker
   {
   public:
+    //! constructor accepting a shared pointer
     ReadLocker(cedar::proc::StepPtr step)
     :
     Locker(step, cedar::aux::LOCK_TYPE_READ)
     {
     }
 
+    //! constructor accepting a raw pointer
     ReadLocker(cedar::proc::Step* step)
     :
     Locker(step, cedar::aux::LOCK_TYPE_READ)
@@ -159,12 +161,14 @@ public:
   class WriteLocker : public Locker
   {
   public:
+    //! constructor accepting a shared pointer
     WriteLocker(cedar::proc::StepPtr step)
     :
     Locker(step, cedar::aux::LOCK_TYPE_WRITE)
     {
     }
 
+    //! constructor accepting a raw pointer
     WriteLocker(cedar::proc::Step* step)
     :
     Locker(step, cedar::aux::LOCK_TYPE_WRITE)
@@ -181,10 +185,6 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // this constructor is deprecated because steps are no longer executed in their own thread
-  //!@brief A deprecated constructor. Do not use it anymore!
-  CEDAR_DECLARE_DEPRECATED(Step(bool runInThread, bool isLooped));
-
   //!@brief The standard constructor.
   Step(bool isLooped = false);
 
@@ -210,22 +210,6 @@ public:
          cedar::proc::TriggerPtr = cedar::proc::TriggerPtr()
        );
 
-  /*!@brief Sets the arguments used by the next execution of the run function.
-   */
-//  bool setNextArguments(cedar::proc::ConstArgumentsPtr arguments, bool triggerSubsequent);
-
-  /*!@brief Toggles if a step is executed as its own thread, or if the run() function is called in the same thread as
-   *        the source of the trigger signal.
-   *        This function is deprecated because steps are not executed in their own thread anymore.
-   */
-  CEDAR_DECLARE_DEPRECATED(void setThreaded(bool isThreaded));
-
-  /*!@brief States if a step is executed as its own thread, or if the run() function is called in the same thread as
-   *        the source of the trigger signal.
-   *        This function is deprecated because steps are not executed in their own thread anymore.
-   */
-  CEDAR_DECLARE_DEPRECATED(bool isThreaded() const);
-
   //!@brief Gets the amount of triggers stored in this step.
   size_t getTriggerCount() const;
 
@@ -234,6 +218,9 @@ public:
 
   //!@brief Returns the map of actions defined for this step.
   const ActionMap& getActions() const;
+
+  //!@brief Returns if this step has an action of this name.
+  bool hasAction(const std::string& action) const;
 
   //!@brief Calls the action with the given name.
   void callAction(const std::string& name);
@@ -301,6 +288,8 @@ public:
   //! Updates the step's trigger chains
   void updateTriggerChains(std::set<cedar::proc::Trigger*>& visited);
 
+  void emitOutputPropertiesChangedSignal(const std::string& slot);
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
@@ -366,7 +355,7 @@ protected:
    *        To alleviate this, steps can disable automatic locking/unlocking of inputs and outputs. The envisioned use
    *        case for this is a compute function that looks as follows:
    *
-   *        @code
+   *        @code{.unparsed}
    * lock inputs
    *   preprocess inputs
    * unlock inputs
@@ -457,6 +446,11 @@ private:
    */
   void callInputConnectionChanged(const std::string& slot);
 
+  std::map<std::string, cedar::unit::Time> unregisterRecordedData() const;
+
+  //! Processes all slots that have been changed during the compute call.
+  void processChangedSlots();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -495,6 +489,9 @@ private:
 
   //! Used to test if the trigger chain attached to this step is finished or not.
   QFuture<void> mFinishedChainResult;
+
+  //! A queue of slots that have changed their properties during the compute call.
+  cedar::aux::LockableMember<std::deque<std::string>> mSlotsChangedDuringComputeCall;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

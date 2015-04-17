@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -104,12 +104,6 @@ public:
   //!@brief returns a list of listeners
   const std::vector<cedar::proc::TriggerablePtr>& getListeners() const;
 
-  //!@brief empty implementation of a function that gets called if a trigger connects to this instance
-  virtual void notifyConnected(cedar::proc::TriggerPtr trigger);
-
-  //!@brief empty implementation of a function that gets called if a trigger disconnects from this instance
-  virtual void notifyDisconnected(cedar::proc::TriggerPtr trigger);
-
   //!@brief saves a configuration to a ConfigurationNode
   void writeConfiguration(cedar::aux::ConfigurationNode& node);
 
@@ -118,6 +112,33 @@ public:
   {
     return this->mpOwner;
   }
+
+  /*! Returns a copy of the triggering order associated with this trigger.
+   *
+   *  The uint represents the depth; all triggerables with the same depths can be executed in parallel.
+   */
+  std::map<unsigned int, std::set<cedar::proc::TriggerablePtr>> getTriggeringOrder() const;
+
+  /*! Checks whether this trigger can be connected to the given Triggerable. The default implementation returns true.
+   *
+   * @param target This is the triggerable that might be connected.
+   * @param reason If false is returned, this should contain a reason why.
+   */
+  virtual bool canTrigger(cedar::proc::TriggerablePtr target, std::string& reason) const;
+
+  //! Convenience overload of canTrigger(Triggerable, string)
+  bool canTrigger(cedar::proc::TriggerablePtr target) const;
+
+  //! Checks if this trigger can be connected to the given triggerable. If not, an exception is thrown.
+  void checkIfCanBeConnectedTo(cedar::proc::TriggerablePtr) const;
+
+  /*! Same as checkIfCanBeConnectedTo, but instead of throwing, returns a bool.
+   *
+   * @return True if the this trigger can be connected to @em target.
+   */
+  bool testIfCanBeConnectedTo(cedar::proc::TriggerablePtr target) const;
+
+  virtual bool canConnectTo(cedar::proc::ConstTriggerablePtr target) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

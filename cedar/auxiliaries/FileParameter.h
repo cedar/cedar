@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -122,24 +122,6 @@ public:
    * @remarks This is an alias for calling getValue().path().toStdString(). See the documentation for QDir for details.
    */
   std::string getPath() const;
-
-  //!@brief Old version of the setValue method.
-  CEDAR_DECLARE_DEPRECATED(void set(const std::string& value))
-  {
-    this->setValue(value);
-  }
-
-  //!@brief Old version of the setValue method.
-  CEDAR_DECLARE_DEPRECATED(void set(const QDir& value))
-  {
-    this->setValue(value);
-  }
-
-  //!@brief Old version of the getValue method.
-  CEDAR_DECLARE_DEPRECATED(const QDir& get())
-  {
-    return this->getValue();
-  }
 
   /*!@brief Returns the mode of the file parameter.
    */

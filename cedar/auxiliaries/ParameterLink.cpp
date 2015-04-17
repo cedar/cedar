@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -143,8 +143,14 @@ void cedar::aux::ParameterLink::setLinkedParameters(cedar::aux::ParameterPtr sou
 {
   CEDAR_ASSERT(source);
   CEDAR_ASSERT(target);
-  //!@todo Exception; also, this should be checked in setSource, setTarget as well
-  CEDAR_ASSERT(this->canLink(source, target));
+  if (!this->canLink(source, target))
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::ParameterLinkingException,
+      "Cannot link parameters " + source->getName() + " and " + target->getName()
+    );
+  }
 
   this->setSource(source);
   this->setTarget(target);

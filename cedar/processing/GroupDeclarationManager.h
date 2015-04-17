@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -53,8 +53,6 @@
 #include <map>
 
 /*!@brief Manages declarations of group templates.
- *
- * @todo describe more.
  */
 class cedar::proc::GroupDeclarationManager
 {
@@ -105,6 +103,9 @@ public:
 
   //!@brief get all definitions
   const GroupDeclarationMap& getDefinitions() const;
+
+  //! Gets a declaration given a name. Returns a null pointer if
+  cedar::proc::ConstGroupDeclarationPtr getDeclarationNoThrow(const std::string& name) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

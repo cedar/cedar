@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -47,6 +47,7 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/annotation/DiscreteMetric.h"
+#include "cedar/auxiliaries/annotation/ValueRangeHint.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/convolution/FFTW.h"
 #include "cedar/auxiliaries/convolution/OpenCV.h"
@@ -107,7 +108,6 @@ namespace
     declaration->definePlot(field_plot_data);
 
     // define field plot again, but this time with image plots
-    //!@todo different icon
     ElementDeclaration::PlotDefinition field_image_plot_data("field plot (image)", ":/cedar/dynamics/gui/field_image_plot.svg");
     field_image_plot_data.mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(DataRole::BUFFER, "input sum", false, "cedar::aux::gui::ImagePlot")));
     field_image_plot_data.mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(DataRole::BUFFER, "activation", true, "cedar::aux::gui::ImagePlot")));
@@ -227,6 +227,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   this->declareBuffer("noise", this->mInputNoise);
 
   this->declareOutput("sigmoided activation", mSigmoidalActivation);
+  this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::ValueRangeHint(0, 1)));
 
   this->declareInputCollection("input");
 
@@ -530,13 +531,11 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
     cv::randn(neural_noise, cv::Scalar(0), cv::Scalar(1));
     neural_noise = this->_mNoiseCorrelationKernelConvolution->convolve(neural_noise);
 
-    //!@todo not sure, if dividing time by 1s (which is an implicit tau) makes any sense or should be a parameter
-    //!@todo not sure what sqrt(time) does here (i.e., within the sigmoid); check if this is correct, and, if so, explain it
+    //!@todo document why this has to use sqrt(time) for noise
     sigmoid_u = _mSigmoid->getValue()->compute
                 (
                   u
-                  + sqrt(time / (1.0 * cedar::unit::second))
-                    * neural_noise
+                  + sqrt(time / (1.0 * cedar::unit::second)) * neural_noise
                 );
   }
   else
@@ -569,7 +568,6 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 
   // integrate one time step
   u += time / cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds) * d_u
-       //!@todo Something may be wrong with the units here: technically, this would be sqrt(ms) / ms, which just seems to be a silly unit,
        + (sqrt(time / (cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))) / tau)
            * _mInputNoiseGain->getValue() * input_noise;
 }

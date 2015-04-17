@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -49,7 +49,7 @@ void run_test()
   errors = 1;
   cedar::dyn::NeuralFieldPtr field = boost::shared_ptr<cedar::dyn::NeuralField>(new cedar::dyn::NeuralField());
   cedar::proc::gui::RecorderWidget recorder;
-  recorder.setStep(field);
+  recorder.setConnectable(field);
   errors = 0;
 }
 

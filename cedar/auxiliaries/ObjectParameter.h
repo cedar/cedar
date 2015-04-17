@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -76,10 +76,6 @@ public:
   /*!@brief Lists all the types available to be stored in this parameter.
    */
   virtual void listTypes(std::vector<std::string>& types) const = 0;
-
-  /*!@brief   Returns the object currently stored in the parameter as a configurable.
-   */
-  virtual cedar::aux::ConfigurablePtr getConfigurable() = 0;
 
   /*!@brief   Sets the type of the object stored in the parameter.
    *

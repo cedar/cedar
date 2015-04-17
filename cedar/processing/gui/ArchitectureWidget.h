@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -111,7 +111,7 @@ private:
 
   void readDataNode(const cedar::aux::ConfigurationNode& node, std::string& dataPath, std::string& title);
 
-  QWidget* readPlot(const cedar::aux::ConfigurationNode& entry);
+  QWidget* readPlot(const cedar::aux::ConfigurationNode& entry, int row, int column);
 
   QWidget* readLabel(const cedar::aux::ConfigurationNode& entry);
 
@@ -122,6 +122,8 @@ private:
   void readTemplates(const cedar::aux::ConfigurationNode& templates);
 
   void applySubstitutions(cedar::aux::ConfigurationNode& target, const cedar::aux::ConfigurationNode& substitutions);
+
+  void readConfig(const cedar::aux::ConfigurationNode& config);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

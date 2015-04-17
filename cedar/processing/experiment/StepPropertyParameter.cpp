@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -52,8 +52,11 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::StepPropertyParameter::StepPropertyParameter(
-    cedar::aux::Configurable *pOwner, const std::string& name)
+cedar::proc::experiment::StepPropertyParameter::StepPropertyParameter
+(
+  cedar::aux::Configurable* pOwner,
+  const std::string& name
+)
 :
 cedar::aux::Parameter(pOwner, name, false)
 ,
@@ -224,8 +227,6 @@ void cedar::proc::experiment::StepPropertyParameter::makeDefault()
 {
   this->mElement.reset();
   this->setParameterPath("");
-  //!@todo Is this right? Should restoring the default change the type of this object?
-  this->mType = PARAMETER_VALUE;
 }
 
 void cedar::proc::experiment::StepPropertyParameter::copyValueFrom(cedar::aux::ConstParameterPtr other)
@@ -372,7 +373,6 @@ cedar::aux::ParameterPtr cedar::proc::experiment::StepPropertyParameter::getPara
     return cedar::aux::ParameterPtr();
   }
   return cedar::aux::ParameterPtr();
-  //!@todo catch parameter not found exception
 }
 
 cedar::aux::ParameterPtr cedar::proc::experiment::StepPropertyParameter::getParameterCopy() const
@@ -471,7 +471,7 @@ std::vector<std::string> cedar::proc::experiment::StepPropertyParameter::getList
   std::vector<std::string> list;
   if (auto step = mElement.lock())
   {
-    if (step->hasRole(role))
+    if (step->hasSlotForRole(role))
     {
       for (auto data : step->getDataSlots(role))
       {
@@ -522,7 +522,6 @@ std::vector<std::string> cedar::proc::experiment::StepPropertyParameter::getList
     }
     catch (cedar::aux::UnknownTypeException e)
     {
-       //!@todo handle this!
     }
   }
   return list;

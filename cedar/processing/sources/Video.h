@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -44,7 +44,6 @@
 #include "cedar/processing/sources/GrabberBase.h"
 #include "cedar/processing/Step.h"
 #include "cedar/devices/sensors/visual/VideoGrabber.h"
-#include "cedar/auxiliaries/ImageData.h"
 #include "cedar/auxiliaries/FileParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/units/Time.h"

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -158,7 +158,7 @@ void cedar::aux::conv::OpenCV::translateAnchor
   anchor = cv::Point(-1, -1);
   const std::vector<int> anchor_vector = kernel->getAnchor();
 
-  kernel->lockForRead();
+  QReadLocker locker(kernel->getReadWriteLock());
   if (anchor_vector.size() >= 1 && anchor_vector.at(0) > 0)
   {
     int size = static_cast<int>(kernel->getSize(0));
@@ -169,7 +169,7 @@ void cedar::aux::conv::OpenCV::translateAnchor
     int size = static_cast<int>(kernel->getSize(1));
     anchor.y = cedar::aux::math::saturate(size/2 + anchor_vector.at(1), 0, size - 1);
   }
-  kernel->unlock();
+  locker.unlock();
 }
 
 cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
@@ -715,7 +715,7 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
   }
   else
   {
-    kernel->lockForRead();
+    QReadLocker locker(kernel->getReadWriteLock());
     cv::Mat result;
     const cv::Mat& kernel_mat = kernel->getKernel();
     result = this->cvConvolve(matrix, kernel_mat, cvBorderType, anchor);
@@ -734,7 +734,7 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
 {
   cv::Mat convolved;
 
-  kernel->lockForRead();
+  QReadLocker locker(kernel->getReadWriteLock());
 
   switch (kernel->getDimensionality())
   {
@@ -787,11 +787,13 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
       else
       {
         cv::Mat modified;
-        //@todo For even kernels, this may pad 1 too much
-        int dh = cedar::aux::math::get1DMatrixSize(flipped_kernel_mat_x) / 2;
-        int dw = cedar::aux::math::get1DMatrixSize(flipped_kernel_mat_y) / 2;
+        int height = static_cast<int>(cedar::aux::math::get1DMatrixSize(flipped_kernel_mat_x));
+        int width = static_cast<int>(cedar::aux::math::get1DMatrixSize(flipped_kernel_mat_y));
+        int dh = height / 2;
+        int dw = width / 2;
 
-        cv::copyMakeBorder(matrix, modified, dh, dh, dw, dw, cv::BORDER_WRAP);
+        // height - dh makes sure that in uneven cases, padding is not too small or too large
+        cv::copyMakeBorder(matrix, modified, dh, height - dh, dw, width - dw, cv::BORDER_WRAP);
         cv::sepFilter2D
         (
           modified,
@@ -811,11 +813,10 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
     }
 
     default:
-      kernel->unlock();
       CEDAR_THROW(cedar::aux::UnhandledValueException, "Cannot convolve matrices of the given dimensionality.");
   }
 
-  kernel->unlock();
+  locker.unlock();
 
   return convolved;
 }
@@ -875,10 +876,10 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
               cv::Point anchor = cv::Point(-1, -1);
               this->translateAnchor(anchor, kernel);
 
-              kernel->lockForRead();
+              QReadLocker locker(kernel->getReadWriteLock());
               cv::Mat kernel_mat = kernel->getKernel();
               convolved = this->cvConvolve(matrix, kernel_mat, cv_border_type, anchor);
-              kernel->unlock();
+              locker.unlock();
               break;
             }
 
@@ -938,10 +939,10 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
                 cv::Point anchor = cv::Point(-1, -1);
                 this->translateAnchor(anchor, kernel);
 
-                kernel->lockForRead();
+                QReadLocker locker(kernel->getReadWriteLock());
                 cv::Mat kernel_mat = kernel->getKernel();
                 convolved = this->cvConvolve(matrix_full, kernel_mat, cv_border_type, anchor);
-                kernel->unlock();
+                locker.unlock();
                 break;
               }
 
@@ -1013,10 +1014,10 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
                   cv::Point anchor = cv::Point(-1, -1);
                   this->translateAnchor(anchor, kernel);
 
-                  kernel->lockForRead();
+                  QReadLocker locker(kernel->getReadWriteLock());
                   cv::Mat kernel_mat = kernel->getKernel();
                   convolved = this->cvConvolve(matrix, kernel_mat, cv_border_type, anchor);
-                  kernel->unlock();
+                  locker.unlock();
                   break;
                 }
 
@@ -1162,11 +1163,11 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
   else
   {
     cv::Mat modified;
-    //@todo For even kernels, this may pad 1 too much
     int dh = flipped_kernel.rows / 2;
     int dw = flipped_kernel.cols / 2;
 
-    cv::copyMakeBorder(matrix, modified, dh, dh, dw, dw, cv::BORDER_WRAP);
+    // rows - dh makes sure that in uneven cases, padding is not too small or too large
+    cv::copyMakeBorder(matrix, modified, dh, flipped_kernel.rows - dh, dw, flipped_kernel.cols - dw, cv::BORDER_WRAP);
     cv::filter2D(modified, result, -1, flipped_kernel, anchor, 0.0, cv::BORDER_DEFAULT);
     result = result(cv::Range(dh, dh + matrix.rows), cv::Range(dw, dw + matrix.cols));
   }

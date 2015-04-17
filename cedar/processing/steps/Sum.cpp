@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -205,9 +205,10 @@ void cedar::proc::steps::Sum::inputConnectionChanged(const std::string& /*inputN
 
     // finally, compute once and then notify subsequent steps that the output size may have changed
     //!@todo Only notify when something actually changed.
-    this->lock(cedar::aux::LOCK_TYPE_READ);
+    cedar::proc::Step::ReadLocker locker(this);
     this->compute(cedar::proc::Arguments());
-    this->unlock(cedar::aux::LOCK_TYPE_READ);
+    locker.unlock();
+
     this->emitOutputPropertiesChangedSignal("sum");
     this->onTrigger();
   }

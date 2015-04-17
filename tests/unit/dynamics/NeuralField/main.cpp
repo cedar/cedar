@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -73,9 +73,9 @@ void run_test()
 
   global_errors = 0;
 
-  std::cout << "Reading network.json ... " << std::endl;
+  std::cout << "Reading group.json ... " << std::endl;
   cedar::proc::GroupPtr network(new cedar::proc::Group());
-  network->readJson("network.json");
+  network->readJson("test://unit/dynamics/NeuralField/group.json");
   std::cout << "done." << std::endl;
 
 #ifdef CEDAR_USE_FFTW

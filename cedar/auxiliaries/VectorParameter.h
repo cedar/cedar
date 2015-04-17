@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -173,7 +173,7 @@ public:
   {
     if (auto other_self = boost::dynamic_pointer_cast<ConstSelfType>(other))
     {
-      this->set(other_self->getValue());
+      this->setValue(other_self->getValue());
     }
     else
     {
@@ -392,7 +392,7 @@ public:
   }
 
   //!@brief set the internal vector to a given vector
-  void set(const std::vector<T>& values, bool lock = false)
+  void setValue(const std::vector<T>& values, bool lock = false)
   {
     cedar::aux::Parameter::WriteLockerPtr locker;
     if (lock)
@@ -425,8 +425,7 @@ public:
   }
 
   //!@brief set one entry of the vector to a new value
-  //!@todo This should be called setValue
-  virtual void set(size_t index, const T& value, bool lock = false)
+  virtual void setValue(size_t index, const T& value, bool lock = false)
   {
     CEDAR_DEBUG_ASSERT(index < this->mValues.size());
 

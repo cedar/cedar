@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -55,7 +55,34 @@
  *        To use this object, create an instance, either as a pointer or just a normal object. Pass a function via
  *        boost::bind. When the object gets destroyed, the function you provided will be called.
  *
- * @todo Add an example of how to use it here.
+ *
+ *        For example, say you have the following method:
+ *        @code
+ *          void print_stuff()
+ *          {
+ *            std::cout << "stuff called!" << std::endl;
+ *          }
+ *        @endcode
+ *
+ *        If you want this function called at the end of another function, you can do this like this:
+ *        @code
+ *          void another_function(bool something)
+ *          {
+ *            cedar::aux::CallOnScopeExit caller(boost::bind(&print_stuff));
+ *
+ *            // do stuff
+ *            if (something)
+ *            {
+ *              // here, print_stuff will be called
+ *              return;
+ *            }
+ *
+ *            // do more stuff
+ *
+ *            // print_stuff will be called here if this is reached
+ *          }
+ *        @endcode
+ *        Note, that in the above example, print_stuff will be called only once.
  */
 class cedar::aux::CallOnScopeExit
 {

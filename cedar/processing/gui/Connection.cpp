@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -43,6 +43,8 @@
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/processing/gui/TriggerItem.h"
+#include "cedar/processing/Group.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/casts.h"
@@ -63,61 +65,181 @@ cedar::proc::gui::Connection::Connection
   cedar::proc::gui::GraphicsBase* pTarget
 )
 :
-mpSource(pSource),
-mpTarget(pTarget),
-mpArrowStart(0),
-mpArrowEnd(0),
+mpSource(nullptr),
+mpTarget(nullptr),
+mpArrowStart(nullptr),
+mpArrowEnd(nullptr),
 mValidity(CONNECT_NOT_SET),
 mSmartMode(false),
 mHighlight(false),
-mHighlightHover(false)
+mHighlightHover(false),
+mBaseLineWidth(2.5)
 {
-  cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setFlags(this->flags() | QGraphicsItem::ItemStacksBehindParent | QGraphicsItem::ItemIsSelectable);
-  this->setParentItem(pSource);
-  pSource->addConnection(this);
-  pTarget->addConnection(this);
+  this->setHighlightedBySelection(false);
 
-  QPen pen = this->pen();
-  if (this->isTriggerConnection())
+  this->setSourceAndTarget(pSource, pTarget);
+}
+
+cedar::proc::gui::Connection::~Connection()
+{
+  this->setSourceAndTarget(nullptr, nullptr);
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::gui::Connection::isDeleteable() const
+{
+  auto source = this->getSource();
+  auto target = this->getTarget();
+  CEDAR_ASSERT(source);
+  CEDAR_ASSERT(target);
+
+  auto source_item = dynamic_cast<cedar::proc::gui::Connectable*>(source->parentItem());
+  auto target_item = dynamic_cast<cedar::proc::gui::Connectable*>(target->parentItem());
+
+  if ( (!source_item || !source_item->isReadOnly()) && (!target_item || !target_item->isReadOnly()) )
   {
-    pen.setColor(QColor(180, 180, 180));
-
-    QVector<QPointF> arrow;
-    arrow.push_back(QPointF(5.0, 0.0));
-    arrow.push_back(QPointF(-5.0, 0.0));
-    arrow.push_back(QPointF(0.0, 8.0));
-    mpArrowStart = new QGraphicsPolygonItem(this);
-    mpArrowStart->setPolygon(QPolygonF(arrow));
-    mpArrowStart->setPen(pen);
-    QBrush brush = this->brush();
-    brush.setColor(QColor(180, 180, 180));
-    brush.setStyle(Qt::SolidPattern);
-    mpArrowStart->setBrush(brush);
-
-    if (mSmartMode)
-    {
-      mpArrowEnd = new QGraphicsPolygonItem(this);
-      mpArrowEnd->setPolygon(QPolygonF(arrow));
-      mpArrowEnd->setPen(pen);
-      mpArrowEnd->setBrush(brush);
-    }
+    return true;
   }
   else
   {
-    pen.setWidth(2.5);
+    return false;
   }
-  this->setPen(pen);
+}
 
+void cedar::proc::gui::Connection::setBaseLineWidth(double width)
+{
+  this->mBaseLineWidth = width;
+}
+
+void cedar::proc::gui::Connection::setSource(cedar::proc::gui::GraphicsBase* source)
+{
+  this->setSourceAndTarget(source, this->mpTarget);
+}
+
+void cedar::proc::gui::Connection::setTarget(cedar::proc::gui::GraphicsBase* target)
+{
+  this->setSourceAndTarget(this->mpSource, target);
+}
+
+void cedar::proc::gui::Connection::setSourceAndTarget(cedar::proc::gui::GraphicsBase* source, cedar::proc::gui::GraphicsBase* target)
+{
+  if (this->mpSource != source)
+  {
+    if (this->mpSource)
+    {
+      this->mpSource->removeConnection(this);
+    }
+
+    this->mpSource = source;
+
+    if (this->mpSource)
+    {
+      this->mpSource->addConnection(this);
+    }
+  }
+
+  if (this->mpTarget != target)
+  {
+    if (this->mpTarget)
+    {
+      this->mpTarget->removeConnection(this);
+    }
+
+    this->mpTarget = target;
+
+    if (this->mpTarget)
+    {
+      this->mpTarget->addConnection(this);
+    }
+  }
+
+  this->updateGraphics();
+}
+
+void cedar::proc::gui::Connection::updateGraphics()
+{
+  if (!this->mpSource || !this->mpTarget)
+  {
+    return;
+  }
+
+  this->setParentItem(this->mpSource);
+
+  QPen pen = this->pen();
+  pen.setCapStyle(Qt::RoundCap);
+  pen.setJoinStyle(Qt::RoundJoin);
+
+  QVector<QPointF> arrow;
+  double arrow_size_factor = std::max(4.0 - this->mBaseLineWidth, 0.9);
+
+  arrow.push_back(QPointF(arrow_size_factor * this->mBaseLineWidth, 0.0));
+  arrow.push_back(QPointF(-arrow_size_factor * this->mBaseLineWidth, 0.0));
+  arrow.push_back(QPointF(0.0, 1.6 * arrow_size_factor * this->mBaseLineWidth));
+
+  if (!this->mpArrowStart)
+  {
+    this->mpArrowStart = new QGraphicsPolygonItem(this);
+    this->mpArrowStart->setPolygon(QPolygonF(arrow));
+  }
+
+  if (mSmartMode)
+  {
+    if (!this->mpArrowEnd)
+    {
+      this->mpArrowEnd = new QGraphicsPolygonItem(this);
+      this->mpArrowEnd->setPolygon(QPolygonF(arrow));
+    }
+    this->mpArrowEnd->setVisible(true);
+  }
+  else if (this->mpArrowEnd)
+  {
+    this->mpArrowEnd->setVisible(false);
+  }
+
+  QColor color;
+  if (this->isTriggerConnection())
+  {
+    color = QColor(180, 180, 180);
+  }
+  else
+  {
+    color = cedar::proc::gui::GraphicsBase::getValidityColor(mValidity);
+    pen.setWidthF(static_cast<qreal>(this->mBaseLineWidth));
+  }
+  QBrush brush = this->brush();
+  brush.setColor(color);
+  brush.setStyle(Qt::SolidPattern);
+  mpArrowStart->setBrush(brush);
+  if (mpArrowEnd)
+  {
+    mpArrowEnd->setBrush(brush);
+    this->mpArrowEnd->setPen(pen);
+  }
+
+  pen.setColor(color);
+  this->setPen(pen);
+  mpArrowStart->setPen(pen);
 
   // update validity
-  if (pSource->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM)
+  this->updateValidity();
+
+  this->update();
+}
+
+void cedar::proc::gui::Connection::updateValidity()
+{
+  if (this->mpSource->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM)
   {
     // data slots should only be connected to other slots
-    CEDAR_DEBUG_ASSERT(pTarget->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM);
+    CEDAR_DEBUG_ASSERT(this->mpTarget->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM);
 
     cedar::proc::gui::ConnectValidity validity = cedar::proc::gui::CONNECT_ERROR;
-    switch (cedar::aux::asserted_cast<cedar::proc::gui::DataSlotItem*>(pTarget)->getSlot()->getValidity())
+    switch (cedar::aux::asserted_cast<cedar::proc::gui::DataSlotItem*>(this->mpTarget)->getSlot()->getValidity())
     {
       case cedar::proc::DataSlot::VALIDITY_VALID:
         validity = cedar::proc::gui::CONNECT_YES;
@@ -137,20 +259,7 @@ mHighlightHover(false)
     }
     this->setValidity(validity);
   }
-
-  this->setHighlightedBySelection(false);
-  this->update();
 }
-
-cedar::proc::gui::Connection::~Connection()
-{
-  cedar::aux::LogSingleton::getInstance()->freeing(this);
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
 
 bool cedar::proc::gui::Connection::isTriggerConnection() const
 {
@@ -207,9 +316,56 @@ void cedar::proc::gui::Connection::disconnect()
 {
   this->mpSource->disconnect(this->mpTarget);
   this->mpSource->removeConnection(this);
-  this->mpSource = NULL;
+  this->mpSource = nullptr;
   this->mpTarget->removeConnection(this);
-  this->mpTarget = NULL;
+  this->mpTarget = nullptr;
+}
+
+void cedar::proc::gui::Connection::disconnectUnderlying()
+{
+  //!@todo This code can probably use some cleaning up
+  if (this->isDeleteable())
+  {
+    auto source = dynamic_cast<cedar::proc::gui::DataSlotItem*>(this->getSource());
+    auto target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(this->getTarget());
+    if (source && target)
+    {
+      auto source_slot = boost::dynamic_pointer_cast<cedar::proc::OwnedData>(source->getSlot());
+      auto target_slot = boost::dynamic_pointer_cast<cedar::proc::ExternalData>(target->getSlot());
+
+      if (source_slot && target_slot)
+      {
+        source->getSlot()->getParentPtr()->getGroup()->disconnectSlots(source_slot, target_slot);
+      }
+    }
+    else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(this->getSource()))
+    {
+      if (!source->isReadOnly())
+      {
+        if (cedar::proc::gui::Connectable* target = dynamic_cast<cedar::proc::gui::Connectable*>(this->getTarget()))
+        {
+          if (!target->isReadOnly())
+          {
+            if (auto target_triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(target->getConnectable()))
+            {
+              source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target_triggerable);
+            }
+          }
+        }
+        else if (cedar::proc::gui::TriggerItem* target = dynamic_cast<cedar::proc::gui::TriggerItem*>(this->getTarget()))
+        {
+          if (!target->isReadOnly())
+          {
+            source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target->getTrigger());
+          }
+        }
+      }
+    }
+    else
+    {
+      CEDAR_THROW(cedar::proc::InvalidObjectException, "The source or target of a connection is not valid.");
+    }
+  }
 }
 
 void cedar::proc::gui::Connection::setValidity(cedar::proc::gui::ConnectValidity validity)
@@ -228,41 +384,7 @@ void cedar::proc::gui::Connection::setValidity(cedar::proc::gui::ConnectValidity
     )
   );
 
-  QPen pen = this->pen();
-  pen.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(mValidity));
-  this->setPen(pen);
-
-  if (mpArrowStart == 0)
-  {
-    QVector<QPointF> arrow;
-    arrow.push_back(QPointF(5.0, 0.0));
-    arrow.push_back(QPointF(-5.0, 0.0));
-    arrow.push_back(QPointF(0.0, 8.0));
-    mpArrowStart = new QGraphicsPolygonItem(this);
-    mpArrowStart->setPolygon(QPolygonF(arrow));
-  }
-  pen.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(mValidity));
-  mpArrowStart->setPen(pen);
-  QBrush brush = this->brush();
-  brush.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(mValidity));
-  brush.setStyle(Qt::SolidPattern);
-  mpArrowStart->setBrush(brush);
-
-  if (mpArrowEnd == 0 && mSmartMode)
-  {
-    QVector<QPointF> arrow;
-    arrow.push_back(QPointF(5.0, 0.0));
-    arrow.push_back(QPointF(-5.0, 0.0));
-    arrow.push_back(QPointF(0.0, 8.0));
-    mpArrowEnd = new QGraphicsPolygonItem(this);
-    mpArrowEnd->setPolygon(QPolygonF(arrow));
-  }
-  if (mSmartMode)
-  {
-    mpArrowEnd->setPen(pen);
-    mpArrowEnd->setBrush(brush);
-  }
-  this->update();
+  this->updateGraphics();
 }
 
 void cedar::proc::gui::Connection::update()
@@ -419,6 +541,8 @@ void cedar::proc::gui::Connection::paint(QPainter *pPainter, const QStyleOptionG
 
   QPen pen = this->pen();
 
+  qreal width_factor = static_cast<qreal>(std::max(2.5 - this->mBaseLineWidth, 0.8));
+
   if
   (
     !this->isSelected()
@@ -429,12 +553,12 @@ void cedar::proc::gui::Connection::paint(QPainter *pPainter, const QStyleOptionG
     QColor new_color = this->highlightColor(pen.color());
 
     pen.setColor(new_color);
-    pen.setWidthF(static_cast<qreal>(2) * pen.widthF());
+    pen.setWidthF(width_factor* static_cast<qreal>(2) * pen.widthF());
   }
 
   if (this->mHighlightHover && cedar::proc::gui::SettingsSingleton::getInstance()->getHighlightHoveredConnections())
   {
-    pen.setWidthF(static_cast<qreal>(2) * pen.widthF());
+    pen.setWidthF(width_factor * static_cast<qreal>(2) * pen.widthF());
   }
 
   if (this->isSelected())
@@ -442,7 +566,7 @@ void cedar::proc::gui::Connection::paint(QPainter *pPainter, const QStyleOptionG
     QPen dash_pen = pen;
     dash_pen.setColor(Qt::black);
     dash_pen.setStyle(Qt::DashLine);
-    dash_pen.setWidthF(static_cast<qreal>(1.5) * pen.widthF());
+    dash_pen.setWidthF(width_factor * static_cast<qreal>(1.5) * pen.widthF());
     pPainter->setPen(dash_pen);
     pPainter->drawPath(this->path());
   }
@@ -458,6 +582,16 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Connection::getSource()
 }
 
 cedar::proc::gui::GraphicsBase* cedar::proc::gui::Connection::getTarget()
+{
+  return this->mpTarget;
+}
+
+cedar::proc::gui::ConstGraphicsBase* cedar::proc::gui::Connection::getSource() const
+{
+  return this->mpSource;
+}
+
+cedar::proc::gui::ConstGraphicsBase* cedar::proc::gui::Connection::getTarget() const
 {
   return this->mpTarget;
 }

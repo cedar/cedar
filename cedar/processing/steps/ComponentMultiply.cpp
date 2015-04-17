@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -45,7 +45,7 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/DataTemplate.h"
-#include "cedar/auxiliaries/ImageData.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
@@ -135,9 +135,9 @@ void cedar::proc::steps::ComponentMultiply::inputConnectionChanged(const std::st
   if (!in_mat.empty())
   {
     mOutput->getData() = in_mat.clone();
-    this->lock(cedar::aux::LOCK_TYPE_READ);
+    cedar::proc::Step::ReadLocker locker(this);
     this->compute(cedar::proc::Arguments());
-    this->unlock(cedar::aux::LOCK_TYPE_READ);
+    locker.unlock();
   }
   this->emitOutputPropertiesChangedSignal("product");
   this->onTrigger();

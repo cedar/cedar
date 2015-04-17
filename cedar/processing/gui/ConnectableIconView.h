@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -72,10 +72,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! set a connectable
   void setConnectable(cedar::proc::ConstConnectablePtr connectable);
 
+  //! get connectable
   cedar::proc::ConstConnectablePtr getConnectable() const;
 
+  //! set bounding box position and size
   virtual void setBounds(const qreal& x, const qreal& y, const qreal& size) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -88,6 +91,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! handles a change in connectable
   virtual void connectableChanged();
 
   //--------------------------------------------------------------------------------------------------------------------

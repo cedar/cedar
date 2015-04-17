@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -60,8 +60,6 @@ namespace cedar
   namespace aux
   {
     //! writes the matrix into the shell properly organized by columns and rows
-    //!\todo rework (template for copy & paste code)
-    //!\todo add log file capability
     CEDAR_AUX_LIB_EXPORT void write(cv::Mat matrix);
 
     /*!@brief Unmangles a c++ name.

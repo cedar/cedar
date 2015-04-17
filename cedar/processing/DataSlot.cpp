@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -168,17 +168,17 @@ const std::string& cedar::proc::DataSlot::getText() const
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::getValidity() const
 {
-  return this->mValidity;
-}
-
-cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::getValidlity() const
-{
-  return this->getValidity();
+  QReadLocker locker(this->mValidity.getLockPtr());
+  auto copy = this->mValidity.member();
+  return copy;
 }
 
 void cedar::proc::DataSlot::setValidity(cedar::proc::DataSlot::VALIDITY validity)
 {
-  this->mValidity = validity;
+  QWriteLocker locker(this->mValidity.getLockPtr());
+  this->mValidity.member() = validity;
+  locker.unlock();
+
   this->signalValidityChanged();
 }
 
@@ -225,11 +225,6 @@ void cedar::proc::DataSlot::setName(const std::string& name)
   this->mName = name;
 }
 
-void cedar::proc::DataSlot::deleteParentPointer()
-{
-  this->resetParentPointer();
-}
-
 void cedar::proc::DataSlot::resetParentPointer()
 {
   this->mpParent = NULL;
@@ -268,4 +263,14 @@ std::vector<cedar::proc::DataConnectionPtr>& cedar::proc::DataSlot::getDataConne
 const std::string& cedar::proc::DataSlot::getValidityInfo() const
 {
   return this->mValidityInfo;
+}
+
+void cedar::proc::DataSlot::setValidityInfo(const std::string& info)
+{
+  this->mValidityInfo = info;
+}
+
+cedar::proc::DataPath cedar::proc::DataSlot::getDataPath() const
+{
+  return cedar::proc::DataPath(this->mpParent->getFullPath(), this->getRole(), this->getName());
 }

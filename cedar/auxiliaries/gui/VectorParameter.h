@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -194,7 +194,7 @@ protected:
 
     if (WidgetAbstraction::getValue(this->mWidgets[index]) != this->parameter()->at(index))
     {
-      this->parameter()->set(index, WidgetAbstraction::getValue(this->mWidgets[index]), true);
+      this->parameter()->setValue(index, WidgetAbstraction::getValue(this->mWidgets[index]), true);
     }
   }
 

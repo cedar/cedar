@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -59,8 +59,10 @@ namespace cedar
 
       inline std::string getNumericType(cedar::aux::ConstParameterPtr parameter)
       {
-        //!@todo Exception
-        CEDAR_ASSERT(isNumeric(parameter));
+        if (!isNumeric(parameter))
+        {
+          CEDAR_THROW(cedar::aux::TypeMismatchException, "Cannot get the type of number stored in the parameter: parameter is not numeric.");
+        }
 
         std::string rest, last;
         cedar::aux::splitLast(cedar::aux::objectTypeToString(parameter), "<", rest, last);

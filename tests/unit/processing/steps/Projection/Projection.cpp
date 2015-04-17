@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -42,7 +42,6 @@
 #include "cedar/processing/ProjectionMapping.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/StepTime.h"
-#include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/logFilter/Type.h"
 #include "cedar/auxiliaries/NullLogger.h"
 #include "cedar/units/Time.h"
@@ -103,7 +102,7 @@ void checkValidProjection(const std::string& configurationFile, unsigned int& nu
   std::cout << "Checking file \"" << configurationFile << "\" (valid)" << std::endl;
 
   cedar::proc::GroupPtr network(new cedar::proc::Group());
-  network->readJson(configurationFile);
+  network->readJson("test://unit/processing/steps/Projection/" + configurationFile);
 
   // if the projection is in an invalid state, increase the error count
   if (checkProjectionState(network, cedar::proc::Triggerable::STATE_EXCEPTION) ||
@@ -125,7 +124,7 @@ void checkInvalidProjection(const std::string& configurationFile, unsigned int& 
 {
   std::cout << "Checking file \"" << configurationFile << "\" (invalid)" << std::endl;
   cedar::proc::GroupPtr network(new cedar::proc::Group());
-  network->readJson(configurationFile);
+  network->readJson("test://unit/processing/steps/Projection/" + configurationFile);
 
   if (!checkProjectionState(network, cedar::proc::Triggerable::STATE_EXCEPTION))
   {

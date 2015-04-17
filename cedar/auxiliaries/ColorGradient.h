@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -47,6 +47,9 @@
 #include "cedar/auxiliaries/ColorGradient.fwd.h"
 
 // SYSTEM INCLUDES
+#ifdef CEDAR_USE_QWTPLOT3D
+  #include <qwtplot3d/qwt3d_color_std.h>
+#endif // CEDAR_USE_QWTPLOT3D
 #include <opencv2/opencv.hpp>
 #include <QColor>
 #include <map>
@@ -117,6 +120,10 @@ public:
 
   //! Checks if the gradient is empty.
   bool empty() const;
+
+#ifdef CEDAR_USE_QWTPLOT3D
+  Qwt3D::StandardColor toQwt3DStandardColor(size_t steps) const;
+#endif // CEDAR_USE_QWTPLOT3D
 
   //! Returns the (interpolated) color for the given position.
   QColor getColor(double position) const;

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -57,12 +57,6 @@ namespace cedar
   {
     namespace math
     {
-      //!@cond SKIPPED_DOCUMENTATION
-
-      //! an exponential-based sigmoid for a single double value
-      CEDAR_AUX_LIB_EXPORT CEDAR_DECLARE_DEPRECATED(double sigmoid(const double x, const double beta, const double threshold = 0));
-      //!@endcond
-
       //! an exponential-based sigmoid for a single double value
       CEDAR_AUX_LIB_EXPORT double sigmoidExp(const double x, const double beta, const double threshold = 0);
 

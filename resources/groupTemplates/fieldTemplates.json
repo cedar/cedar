@@ -7,6 +7,68 @@
     {
         "cedar.dynamics.NeuralField":
         {
+            "name": "node",
+            "resting level": "-5",
+            "time scale": "100",
+            "global inhibition": "0",
+            "activation as output": "false",
+            "discrete metric (workaround)": "false",
+            "dimensionality": "0",
+            "sizes": "",
+            "input noise gain": "0.1",
+            "sigmoid":
+            {
+                "type": "cedar.aux.math.AbsSigmoid",
+                "threshold": "0",
+                "beta": "100"
+            },
+            "lateral kernels":
+            {
+                "cedar.aux.kernel.Box":
+                {
+                    "dimensionality": "1",
+                    "anchor":
+                    [
+                        "0"
+                    ],
+                    "amplitude": "1",
+                    "widths":
+                    [
+                        "1"
+                    ]
+                }
+            },
+            "lateral kernel convolution":
+            {
+                "borderType": "Zero",
+                "mode": "Same",
+                "engine":
+                {
+                    "type": "cedar.aux.conv.OpenCV"
+                }
+            },
+            "noise correlation kernel":
+            {
+                "dimensionality": "1",
+                "anchor":
+                [
+                    "0"
+                ],
+                "amplitude": "0",
+                "sigmas":
+                [
+                    "3"
+                ],
+                "normalize": "true",
+                "shifts":
+                [
+                    "0"
+                ],
+                "limit": "5"
+            }
+        },
+        "cedar.dynamics.NeuralField":
+        {
             "name": "one-dimensional field",
             "resting level": "-5",
             "time scale": "100",
@@ -462,10 +524,12 @@
             "ui generic":
             {
                 "group": "three-layer",
+                "architecture widgets": "",
                 "width": "465",
                 "height": "229",
                 "smart mode": "false",
                 "collapsed": "false",
+                "lock geometry": "false",
                 "uncollapsed width": "465",
                 "uncollapsed height": "229",
                 "positionX": "120",
@@ -667,7 +731,7 @@
             [
                 {
                     "name": "dimensionality",
-                    "type": "cedar.aux.UIntParameterPtr"
+                    "type": "cedar.aux.UIntParameter"
                 }
             ],
             "name": "two-layer",
@@ -698,10 +762,12 @@
             "ui generic":
             {
                 "group": "two-layer",
+                "architecture widgets": "",
                 "width": "238",
                 "height": "226",
                 "smart mode": "false",
                 "collapsed": "false",
+                "lock geometry": "false",
                 "uncollapsed width": "238",
                 "uncollapsed height": "226",
                 "positionX": "0",
@@ -714,6 +780,15 @@
     "is looped": "false",
     "ui":
     [
+        {
+            "type": "step",
+            "step": "node",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "432",
+            "positionY": "64"
+        },
         {
             "type": "step",
             "step": "one-dimensional field",
@@ -738,10 +813,12 @@
         "group": "root",
         "open plots": "",
         "plot groups": "",
+        "architecture widgets": "",
         "width": "250",
         "height": "250",
         "smart mode": "false",
         "collapsed": "false",
+        "lock geometry": "false",
         "uncollapsed width": "250",
         "uncollapsed height": "250",
         "positionX": "0",

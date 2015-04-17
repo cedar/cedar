@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -136,8 +136,7 @@ public:
   {
     for (auto declaration : this->mDeclarations)
     {
-      //!@todo Get rid of this const cast
-      if (declaration->isObjectInstanceOf(boost::const_pointer_cast<typename BaseTypePtr::element_type>(object)))
+      if (declaration->isObjectInstanceOf(object))
       {
         return declaration;
       }
@@ -178,6 +177,24 @@ public:
   const BasePluginList& getDeclarations() const
   {
     return this->mDeclarations;
+  }
+
+  /*! Returns the declaration corresponding to the given class name.
+   * @returns A pointer to the declaration, or a null pointer if none was found.
+   */
+  ConstBasePluginDeclarationPtr getDeclarationNoThrow(const std::string& className) const
+  {
+    // look through all declarations and see if there is one whose name matches the given one
+    for (auto declaration : this->mDeclarations)
+    {
+      if (declaration->getClassName() == className)
+      {
+        return declaration;
+      }
+    }
+
+    // if none was found, return an empty (null) pointer
+    return ConstBasePluginDeclarationPtr();
   }
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -79,26 +79,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
-cedar::proc::Step::Step(bool /*runInThread*/, bool isLooped)
-:
-Triggerable(isLooped),
-// initialize parameters
-mAutoLockInputsAndOutputs(true)
-{
-  this->mComputeTimeId = this->registerTimeMeasurement("compute call");
-  this->mLockingTimeId = this->registerTimeMeasurement("locking");
-  this->mRoundTimeId = this->registerTimeMeasurement("round time");
-
-  // create the finished trigger singleton.
-  this->getFinishedTrigger();
-
-  // When the name changes, we need to tell the manager about this.
-  QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
-
-  this->registerFunction("reset", boost::bind(&cedar::proc::Step::callReset, this), false);
-}
-
 cedar::proc::Step::Step(bool isLooped)
 :
 Triggerable(isLooped),
@@ -120,6 +100,7 @@ mAutoLockInputsAndOutputs(true)
 
 cedar::proc::Step::~Step()
 {
+  this->unregisterRecordedData();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -241,7 +222,6 @@ void cedar::proc::Step::callAction(const std::string& name)
   if (autolock)
   {
     // lock the step
-    //!@todo Should this be a read lock?
     locker = cedar::aux::Lockable::WriteLockerPtr(new cedar::aux::Lockable::WriteLocker(this));
   }
 
@@ -252,6 +232,11 @@ void cedar::proc::Step::callAction(const std::string& name)
 const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
 {
   return this->mActions;
+}
+
+bool cedar::proc::Step::hasAction(const std::string& action) const
+{
+  return this->mActions.find(action) != this->mActions.end();
 }
 
 /*! This method takes care of changing the step's name in the registry as well.
@@ -312,13 +297,13 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   {
     std::string invalid_inputs = cedar::aux::join(this->getInvalidInputNames(), "\", \"");
 
-    this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING,
-                   "Invalid inputs prevent the step from running. These are: \"" + invalid_inputs + "\"");
+    this->setState
+    (
+      cedar::proc::Triggerable::STATE_NOT_RUNNING,
+      "Invalid inputs prevent the step from running. These are: \"" + invalid_inputs + "\""
+    );
     return;
   }
-
-  // if we get to this point, set the state to running
-  this->setState(cedar::proc::Triggerable::STATE_RUNNING, "");
 
   // do the work!
   if (!this->mBusy.tryLock())
@@ -342,8 +327,11 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   {
     std::string errors = cedar::aux::join(this->getInvalidInputNames(), ", ");
 
-    this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING,
-                   "Unconnected mandatory inputs prevent the step from running. These inputs are:" + errors);
+    this->setState
+    (
+      cedar::proc::Triggerable::STATE_NOT_RUNNING,
+      "Unconnected mandatory inputs prevent the step from running. These inputs are:" + errors
+    );
     this->mBusy.unlock();
     return;
   } // this->mMandatoryConnectionsAreSet
@@ -361,7 +349,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
     cedar::unit::Time precise_time(elapsed_precise.total_microseconds() * cedar::unit::micro * cedar::unit::seconds);
     this->setRoundTimeMeasurement(precise_time);
   }
-  
+
   // start measuring the execution time.
   boost::posix_time::ptime run_start = boost::posix_time::microsec_clock::universal_time();
 
@@ -369,7 +357,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   {
     if (arguments.get() != nullptr)
     {
-    // call the compute function with the given arguments
+      // call the compute function with the given arguments
       this->compute(*(arguments.get()));
     }
     else
@@ -377,6 +365,11 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
       // call the compute function with empty arguments
       cedar::proc::Arguments args;
       this->compute(args);
+
+      if (this->getState() == cedar::proc::Triggerable::STATE_UNKNOWN)
+      {
+        this->setState(cedar::proc::Triggerable::STATE_RUNNING, "");
+      }
     }
   }
   // catch exceptions and translate them to the given state/message
@@ -388,7 +381,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
       "cedar::proc::Step::run()",
       this->getName()
     );
-    this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + e.exceptionInfo());
+    this->setState(cedar::proc::Triggerable::STATE_EXCEPTION, "An exception occurred:\n" + e.exceptionInfo());
   }
   catch(const std::exception& e)
   {
@@ -398,7 +391,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
       "cedar::proc::Step::run()",
       this->getName()
     );
-    this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + std::string(e.what()));
+    this->setState(cedar::proc::Triggerable::STATE_EXCEPTION, "An exception occurred:\n" + std::string(e.what()));
   }
   catch(...)
   {
@@ -408,7 +401,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
       "cedar::proc::Step::run()",
       this->getName()
     );
-    this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
+    this->setState(cedar::proc::Triggerable::STATE_EXCEPTION, "An unknown exception type occurred.");
   }
 
   boost::posix_time::ptime run_end = boost::posix_time::microsec_clock::universal_time();
@@ -427,7 +420,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
       if (!cv::checkRange(mat_data->getData(), true))
       {
         std::cout << "NaN detected! " << this->getFullPath() << std::endl;
-        this->setState(cedar::proc::Step::STATE_EXCEPTION, "NaN detected.");
+        this->setState(cedar::proc::Triggerable::STATE_EXCEPTION, "NaN detected.");
       }
     }
   }
@@ -435,6 +428,11 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
 
   // unlock the step
   step_locker.unlock();
+
+  // process slots whose properties have changed during the compute call
+  this->processChangedSlots();
+
+  // finally, the step is now no longer busy
   this->mBusy.unlock();
 
   //!@todo This is code that really belongs in Trigger(able). But it can't be moved there as it is, because Trigger(able) doesn't know about loopiness etc.
@@ -444,7 +442,16 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   // c) The step is a trigger source. This can happen, e.g., if it has no inputs. This also makes it the start
   //    of a trigger chain. The exception here are group sources because they are triggered from the outside (but via a
   //    special mechanism in Trigger::buildTriggerGraph)
-  if (!trigger || this->isLooped() || (this->isTriggerSource() && !dynamic_cast<cedar::proc::sources::GroupSource*>(this)))
+  if
+  (
+    this->getState() != cedar::proc::Triggerable::STATE_INITIALIZING &&
+    (
+      !trigger
+      || this->isLooped()
+      ||
+      (this->isTriggerSource() && !dynamic_cast<cedar::proc::sources::GroupSource*>(this))
+    )
+  )
   {
 #ifdef DEBUG_TRIGGERING
     std::cout << "Step " << this->getName() << " was computed and thus triggers its done trigger." << std::endl;
@@ -461,6 +468,39 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
     {
       this->getFinishedTrigger()->trigger();
     }
+  }
+}
+
+void cedar::proc::Step::processChangedSlots()
+{
+  QWriteLocker locker(this->mSlotsChangedDuringComputeCall.getLockPtr());
+  auto& queue = this->mSlotsChangedDuringComputeCall.member();
+  while (!queue.empty())
+  {
+    auto slot = queue.front();
+    queue.pop_front();
+    this->cedar::proc::Connectable::emitOutputPropertiesChangedSignal(slot);
+  }
+  locker.unlock();
+}
+
+void cedar::proc::Step::emitOutputPropertiesChangedSignal(const std::string& slot)
+{
+  if (!this->mBusy.tryLock())
+  {
+    QWriteLocker locker(this->mSlotsChangedDuringComputeCall.getLockPtr());
+    this->mSlotsChangedDuringComputeCall.member().push_back(slot);
+    locker.unlock();
+  }
+  else
+  {
+    // this makes sure that if an exception occurs during emitOutputPropertiesChangedSignal, we do not end with a dangling lock
+    cedar::aux::CallOnScopeExit unlocker(boost::bind(&QMutex::unlock, &this->mBusy));
+
+    this->cedar::proc::Connectable::emitOutputPropertiesChangedSignal(slot);
+
+    // to be sure, unlock now
+    unlocker.callNow();
   }
 }
 
@@ -597,12 +637,12 @@ bool cedar::proc::Step::isRecorded() const
   for (unsigned int s = 0; s < slotTypes.size(); s++)
   {
 
-    if (this->hasRole(slotTypes[s]))
+    if (this->hasSlotForRole(slotTypes[s]))
     {
       cedar::proc::Connectable::SlotList dataSlots = this->getOrderedDataSlots(slotTypes[s]);
       for (unsigned int i = 0; i < dataSlots.size(); i++)
       {
-        if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(dataSlots[i]->getData()))
+        if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(dataSlots[i]->getDataPath().toString()))
         {
           return true;
         }
@@ -612,17 +652,35 @@ bool cedar::proc::Step::isRecorded() const
   return false;
 }
 
-void cedar::proc::Step::setThreaded(bool /*isThreaded*/)
-{
-  // does nothing
-}
-
-bool cedar::proc::Step::isThreaded() const
-{
-  return false;
-}
-
 void cedar::proc::Step::callInputConnectionChanged(const std::string& slot)
 {
   this->revalidateInputSlot(slot);
+}
+
+std::map<std::string, cedar::unit::Time> cedar::proc::Step::unregisterRecordedData() const
+{
+  std::vector<cedar::proc::DataRole::Id> roles;
+  roles.push_back(cedar::proc::DataRole::BUFFER);
+  roles.push_back(cedar::proc::DataRole::OUTPUT);
+  std::map<std::string, cedar::unit::Time> removed_recorded_data;
+  for (auto role : roles)
+  {
+    // if any data of this step is recorded, we have to remove them from the recorder
+    if (this->hasSlotForRole(role))
+    {
+      // we have to check every buffer if it is registered at recorder
+      for (auto slot : this->getDataSlots(role))
+      {
+        std::string data_path = slot.second->getDataPath().toString();
+        auto data = slot.second->getData();
+        if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(data))
+        {
+          // remember the name and time
+          removed_recorded_data[data_path] = cedar::aux::RecorderSingleton::getInstance()->getRecordIntervalTime(data);
+          cedar::aux::RecorderSingleton::getInstance()->unregisterData(data);
+        }
+      }
+    }
+  }
+  return removed_recorded_data;
 }

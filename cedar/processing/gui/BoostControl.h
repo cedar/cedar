@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -53,7 +53,7 @@
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
   #include <boost/signals2.hpp>
-#endif
+#endif // Q_MOC_RUN
 #include <map>
 #include <vector>
 
@@ -75,9 +75,6 @@ public:
   //!@brief The standard constructor.
   BoostControl(cedar::proc::gui::View* view);
 
-  //!@brief The destructor.
-  ~BoostControl();
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -97,43 +94,13 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //! Adds a boost to this control widget.
-  void addBoost(cedar::proc::sources::BoostPtr boost);
-
-  //! Translates the boost signal by emitting a Qt signal.
-  void translateElementAddedSignal(cedar::proc::ElementPtr);
-
-  //! Translates the boost signal by emitting a Qt signal.
-  void translateElementRemovedSignal(cedar::proc::ConstElementPtr);
-
-  void addGroup(cedar::proc::GroupPtr group);
-
-  void disconnectSignals();
-
-  QTreeWidgetItem* getGroupItem(const std::string& elementPath);
-
-  void connectRenameSignal(cedar::proc::ElementPtr element);
+  void boostAdded(QTreeWidgetItem* pItem, cedar::proc::ElementPtr element);
 
   bool isBoostItem(QTreeWidgetItem* pItem) const;
 
   cedar::proc::sources::BoostPtr findBoostFor(QTreeWidgetItem* pItem) const;
 
-signals:
-  //! Used to translate a boost signal to a Qt signal.
-  void elementAddedSignal(QString);
-
-  //! Used to translate a boost signal to a Qt signal.
-  void elementRemovedSignal(QString);
-
 private slots:
-  //! Reacts to an element that has been added in the underlying network.
-  void elementAdded(QString elementName);
-
-  //! Reacts to the removal of a boost in the underlying network.
-  void elementRemoved(QString elementName);
-
-  //! Reacts to the change of the name of a boost in the underlying network.
-  void elementNameChanged();
-
   //! If possible, centers the boost that was double-clicked.
   void itemActivated(QTreeWidgetItem* pItem, int column);
 
@@ -147,11 +114,7 @@ private:
 
   cedar::proc::gui::View* mpView;
 
-  std::vector<boost::signals2::connection> mElementAddedConnections;
-
-  std::vector<boost::signals2::connection> mElementRemovedConnections;
-
-  std::map<const cedar::proc::Element*, QString> mElementNames;
+  boost::signals2::scoped_connection mBoostAddedConnection;
 
 }; // class cedar::proc::gui::BoostControl
 

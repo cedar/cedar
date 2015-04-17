@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -73,12 +73,6 @@ public:
 
   //!@brief clear vector
   virtual void clear() = 0;
-
-  /*!@brief Returns the object with the given index.
-   *
-   * @todo There needs to be a const variant of this.
-   */
-  virtual cedar::aux::ConfigurablePtr configurableAt(size_t index) = 0;
 
   /*!@brief Fills a vector with the types that can be added to this object list
    */

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -280,42 +280,20 @@ int testOnlineDisconnecting()
 
   for (size_t i = 0; i < trials; ++i)
   {
-    cedar::proc::GroupPtr network(new cedar::proc::Group());
-    network->readJson("projection.json");
+    cedar::proc::GroupPtr group(new cedar::proc::Group());
+    group->readJson("test://unit/processing/Connecting/projection.json");
 
-    auto trigger = network->getElement<cedar::proc::LoopedTrigger>("trigger");
+    auto trigger = group->getElement<cedar::proc::LoopedTrigger>("trigger");
 
     trigger->start();
 
     cedar::aux::sleep(0.05 * cedar::unit::seconds);
 
-    network->disconnectSlots("step.result", "projection.input");
+    group->disconnectSlots("step.result", "projection.input");
 
     cedar::aux::sleep(0.05 * cedar::unit::seconds);
 
     trigger->stop();
-  }
-
-  for (size_t i = 0; i < trials; ++i)
-  {
-    std::cout << "Testing double-triggered case ..." << std::endl;
-    cedar::proc::GroupPtr network(new cedar::proc::Group());
-    network->readJson("taste_the_double_trigger.json");
-
-    auto trigger1 = network->getElement<cedar::proc::LoopedTrigger>("trigger1");
-    auto trigger2 = network->getElement<cedar::proc::LoopedTrigger>("trigger2");
-
-    trigger1->start();
-    trigger2->start();
-
-    cedar::aux::sleep(0.05 * cedar::unit::seconds);
-
-    network->disconnectSlots("step.Gauss input", "projection.input");
-
-    cedar::aux::sleep(0.05 * cedar::unit::seconds);
-
-    trigger1->stop();
-    trigger2->stop();
   }
 
   std::cout << "Online (dis-)connecting revealed " << errors << " error(s)." << std::endl;

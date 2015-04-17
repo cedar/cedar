@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Group.h"
+#include "cedar/processing/gui/GroupContainerItem.h"
 #include "cedar/processing/gui/ArchitectureWidget.h"
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/StepItem.h"
@@ -48,11 +49,14 @@
 #include "cedar/processing/gui/ConnectorItem.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/exceptions.h"
+#include "cedar/processing/gui/ElementList.h"
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/sinks/GroupSink.h"
-#include "cedar/processing/Step.h"
+#include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/DataConnection.h"
+#include "cedar/processing/GroupDeclaration.h"
+#include "cedar/processing/GroupDeclarationManager.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/stringFunctions.h"
@@ -74,22 +78,27 @@
 #include <QSet>
 #include <QList>
 #include <QDialog>
+#include <QStatusBar>
+#include <QListWidget>
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/json_parser.hpp>
   #include <boost/filesystem.hpp>
 #endif
 #include <iostream>
+#include <functional>
 #include <set>
 #include <sstream>
+
+// needed for being able to cast data in drop events to a plugin declaration
+Q_DECLARE_METATYPE(cedar::aux::PluginDeclaration*)
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members
 //----------------------------------------------------------------------------------------------------------------------
 
 const qreal cedar::proc::gui::Group::M_EXPANDED_SLOT_OFFSET = static_cast<qreal>(25);
-
 const qreal cedar::proc::gui::Group::M_EXPANDED_ICON_SIZE = static_cast<qreal>(20);
-const qreal cedar::proc::gui::Group::M_COLLAPSED_ICON_SIZE = cedar::proc::gui::StepItem::mIconSize;
+const qreal cedar::proc::gui::Group::M_COLLAPSED_ICON_SIZE = cedar::proc::gui::StepItem::M_ICON_SIZE;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -108,6 +117,7 @@ cedar::proc::gui::Connectable(width, height, cedar::proc::gui::GraphicsBase::GRA
 mGroup(group),
 mpScene(scene),
 mHoldFitToContents(false),
+mShowTriggerColors(false),
 _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false)),
 mPlotGroupsNode(cedar::aux::ConfigurationNode()),
 _mIsCollapsed(new cedar::aux::BoolParameter(this, "collapsed", false)),
@@ -117,9 +127,9 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-  if (!mGroup)
+  if (!this->mGroup)
   {
-    mGroup = cedar::proc::GroupPtr(new cedar::proc::Group());
+    this->mGroup = cedar::proc::GroupPtr(new cedar::proc::Group());
   }
 
   this->linkedChanged(this->mGroup->isLinked());
@@ -194,45 +204,145 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
   );
   this->updateDecorations();
   this->update();
+
+  this->connect(this->mGroup.get(), SIGNAL(stepNameChanged(const std::string&, const std::string&)), SLOT(elementNameChanged(const std::string&, const std::string&)));
+
+  this->setAcceptDrops(true);
 }
 
 cedar::proc::gui::Group::~Group()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
-  if (mNewElementAddedConnection.connected())
-  {
-    mNewElementAddedConnection.disconnect();
-  }
-  if (mElementRemovedConnection.connected())
-  {
-    mElementRemovedConnection.disconnect();
-  }
-  if (mElementRemovedConnection.connected())
-  {
-    mElementRemovedConnection.disconnect();
-  }
-  if (mDataConnectionChangedConnection.connected())
-  {
-    mDataConnectionChangedConnection.disconnect();
-  }
-  if (mTriggerConnectionChangedConnection.connected())
-  {
-    mTriggerConnectionChangedConnection.disconnect();
-  }
   if (this->scene())
   {
     cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->removeGroupItem(this);
-  }
-  else
-  {
-//    CEDAR_DEBUG_ASSERT(this->isRootGroup());
   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::gui::Group::canBeDragged() const
+{
+  if (!cedar::proc::gui::Connectable::canBeDragged() || this->_mGeometryLocked->getValue())
+  {
+    return false;
+  }
+
+  return true;
+}
+
+bool cedar::proc::gui::Group::manualDeletionRequiresConfirmation() const
+{
+  return !this->getGroup() || !this->getGroup()->getElements().empty();
+}
+
+void cedar::proc::gui::Group::dragLeaveEvent(QGraphicsSceneDragDropEvent * /* pEvent */)
+{
+  // reset the status message
+  if (this->mpMainWindow && this->mpMainWindow->statusBar())
+  {
+    auto status_bar = this->mpMainWindow->statusBar();
+    status_bar->showMessage("");
+  }
+
+  this->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+}
+
+void cedar::proc::gui::Group::dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent)
+{
+  auto declaration = cedar::proc::gui::ElementList::declarationFromDrop(pEvent);
+  if (!declaration)
+  {
+    return;
+  }
+
+  bool can_link = (dynamic_cast<const cedar::proc::GroupDeclaration*>(declaration) != nullptr);
+
+  QString message;
+  if (pEvent->modifiers().testFlag(Qt::ControlModifier) && can_link)
+  {
+    message = "Inserted element will be added as a link, i.e., unmodifiable, and will be loaded from a file every time.";
+    pEvent->setDropAction(Qt::LinkAction);
+  }
+  else
+  {
+    if (can_link)
+    {
+      message = "Inserted element will be copied. Hold ctrl to create a linked element.";
+    }
+    pEvent->setDropAction(Qt::CopyAction);
+  }
+
+  if (this->mpMainWindow && this->mpMainWindow->statusBar())
+  {
+    auto status_bar = this->mpMainWindow->statusBar();
+    status_bar->showMessage(message);
+  }
+
+  pEvent->accept();
+  this->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+}
+
+void cedar::proc::gui::Group::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
+{
+  this->dragEnterEvent(pEvent);
+}
+
+void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
+{
+  auto declaration = cedar::proc::gui::ElementList::declarationFromDrop(pEvent);
+  if (declaration == nullptr)
+  {
+    return;
+  }
+  QPointF mapped = pEvent->scenePos();
+  auto target_group = this->getGroup();
+  if (!this->isRootGroup())
+  {
+    mapped -= this->scenePos();
+  }
+
+  if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration*>(declaration))
+  {
+    //!@todo can createElement be moved into gui::Group?
+    this->mpScene->createElement(target_group, elem_declaration->getClassName(), mapped);
+  }
+  else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration*>(declaration))
+  {
+    auto elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup
+        (
+          group_declaration->getClassName(),
+          target_group,
+          pEvent->modifiers().testFlag(Qt::ControlModifier)
+        );
+    this->mpScene->getGraphicsItemFor(elem)->setPos(mapped);
+  }
+  else
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not cast the dropped declaration to any known type.");
+  }
+
+  // reset the status message and display
+  this->dragLeaveEvent(pEvent);
+
+  pEvent->setAccepted(true);
+}
+
+bool cedar::proc::gui::Group::supportsDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id id) const
+{
+  if (id == cedar::proc::gui::Connectable::DisplayMode::HIDE_IN_CONNECTIONS)
+  {
+    return true;
+  }
+  else
+  {
+    //!@todo When the group is collapsed, this could return true as well, allowing the use of the same display styles that steps have
+    return false;
+  }
+}
 
 bool cedar::proc::gui::Group::canResize() const
 {
@@ -256,6 +366,121 @@ void cedar::proc::gui::Group::geometryLockChanged()
   bool locked = this->_mGeometryLocked->getValue();
   this->setFlag(QGraphicsItem::ItemIsMovable, !locked);
   this->updateResizeHandles();
+}
+
+void cedar::proc::gui::Group::hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent)
+{
+  // only looped groups have meaningful trigger chains (which are displayed in gui::Connectable::hoverEnterEvent)
+  if (!this->getGroup()->isLooped())
+  {
+    pEvent->setAccepted(false);
+    return;
+  }
+  else
+  {
+    cedar::proc::gui::Connectable::hoverEnterEvent(pEvent);
+  }
+}
+
+void cedar::proc::gui::Group::hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent)
+{
+  // see cedar::proc::gui::Group::hoverEnterEvent
+  if (!this->getGroup()->isLooped())
+  {
+    pEvent->setAccepted(false);
+    return;
+  }
+  else
+  {
+    cedar::proc::gui::Connectable::hoverLeaveEvent(pEvent);
+  }
+}
+
+void cedar::proc::gui::Group::elementNameChanged(const std::string&, const std::string& to)
+{
+  auto element = this->getGroup()->getElement(to);
+
+  if (boost::dynamic_pointer_cast<cedar::proc::Trigger>(element))
+  {
+    this->clearTriggerColorCache();
+  }
+}
+
+void cedar::proc::gui::Group::clearTriggerColorCache() const
+{
+  this->mTriggerColors.clear();
+
+  this->updateAllElementsTriggerColorState();
+
+  emit triggerColorsChanged();
+}
+
+QBrush cedar::proc::gui::Group::getColorFor(cedar::proc::LoopedTriggerPtr trigger) const
+{
+  static std::vector<QColor> colors;
+  static std::vector<Qt::BrushStyle> brush_styles;
+
+  if (colors.empty())
+  {
+    colors.push_back(QColor::fromRgb(0x6feb00));
+    colors.push_back(QColor::fromRgb(0x6100eb));
+    colors.push_back(QColor::fromRgb(0xeba900));
+    colors.push_back(QColor::fromRgb(0x00c2eb));
+    colors.push_back(QColor::fromRgb(0xeb6c00));
+    colors.push_back(QColor::fromRgb(0x008ceb));
+    colors.push_back(QColor::fromRgb(0xc7eb00));
+    colors.push_back(QColor::fromRgb(0x00eb71));
+    colors.push_back(QColor::fromRgb(0xeb00c5));
+  }
+
+  if (brush_styles.empty())
+  {
+    brush_styles.push_back(Qt::SolidPattern);
+    brush_styles.push_back(Qt::BDiagPattern);
+    brush_styles.push_back(Qt::Dense7Pattern);
+  }
+
+  if (mTriggerColors.empty())
+  {
+    auto triggers = this->mGroup->findAll<cedar::proc::Trigger>(true);
+    std::map<std::string, cedar::proc::TriggerPtr> sorted_triggers;
+
+    for (auto trigger : triggers)
+    {
+      sorted_triggers[trigger->getName()] = trigger;
+    }
+
+    size_t color_count = colors.size();
+    size_t style_count = brush_styles.size();
+    size_t color_style_count = color_count * style_count;
+
+    size_t num = 0;
+    for (auto name_trigger_pair : sorted_triggers)
+    {
+      size_t color_index = num % colors.size();
+      size_t style_index = (num / colors.size()) % style_count;
+      size_t overflow = num / color_style_count;
+
+      QBrush brush;
+
+      auto trigger = name_trigger_pair.second;
+
+      QColor color = colors[color_index];
+      int saturation = std::max(30, color.saturation() - 60 * static_cast<int>(overflow));
+      int value = std::max(30, color.value() - 60 * static_cast<int>(overflow));
+      color.setHsv(color.hsvHue(), saturation, value);
+      ++num;
+
+      brush.setColor(color);
+      brush.setStyle(brush_styles.at(style_index));
+
+      mTriggerColors[trigger] = brush;
+    }
+  }
+
+  auto iter = this->mTriggerColors.find(trigger);
+  CEDAR_ASSERT(iter != this->mTriggerColors.end());
+  return iter->second;
 }
 
 const std::map<std::string, cedar::aux::Path>& cedar::proc::gui::Group::getArchitectureWidgets() const
@@ -417,13 +642,13 @@ void cedar::proc::gui::Group::addGuiItemsForGroup()
   }
 }
 
-cedar::proc::gui::GraphicsBase* cedar::proc::gui::Group::getUiElementFor(cedar::proc::ElementPtr element) const
+cedar::proc::gui::Element* cedar::proc::gui::Group::getUiElementFor(cedar::proc::ElementPtr element) const
 {
-  return this->getScene()->getGraphicsItemFor(element.get());
+  return this->getScene()->getGraphicsItemFor(element);
 }
 
 
-cedar::proc::gui::GraphicsBase* cedar::proc::gui::Group::duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName)
+cedar::proc::gui::Element* cedar::proc::gui::Group::duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName)
 {
   auto to_duplicate = this->getGroup()->getElement(elementName);
   auto to_duplicate_ui = this->getUiElementFor(to_duplicate);
@@ -690,30 +915,24 @@ void cedar::proc::gui::Group::addElements(const std::list<QGraphicsItem*>& eleme
   {
     cedar::proc::ElementPtr element;
     //!@todo This if/else if stuff could probably be replaced by just casting to a common cedar::proc::gui::Element class.
-    if (auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(*it))
+    if (auto element_item = dynamic_cast<cedar::proc::gui::Element*>(*it))
     {
-      element = graphics_base->getElement();
+      element = element_item->getElement();
 
       std::vector<QGraphicsItem*> items;
-      items.push_back(graphics_base);
+      items.push_back(element_item);
       while (!items.empty())
       {
         auto item = *items.begin();
         items.erase(items.begin());
 
-        if (auto graphics_child = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item))
+        if (auto child_element = dynamic_cast<cedar::proc::gui::Element*>(item))
         {
-          auto child_element = graphics_child->getElement();
-          // some objects such as data slots may not have an element
-          //!@todo Cast to a common superclass, proc::gui::Element here.
-          if (child_element)
-          {
-            all_elements.push_back(child_element);
+          all_elements.push_back(child_element->getElement());
 
-            for (int i = 0; i < graphics_child->childItems().size(); ++i)
-            {
-              items.push_back(graphics_child->childItems().at(i));
-            }
+          for (int i = 0; i < child_element->childItems().size(); ++i)
+          {
+            items.push_back(child_element->childItems().at(i));
           }
         }
       }
@@ -805,11 +1024,6 @@ const std::string& cedar::proc::gui::Group::getFileName() const
   return this->mFileName;
 }
 
-//!@todo Can this method be removed?
-void cedar::proc::gui::Group::addElementsToScene()
-{
-}
-
 void cedar::proc::gui::Group::setScene(cedar::proc::gui::Scene* pScene)
 {
   //!@todo Why doesn't this use QGraphicsItem->scene() instead?
@@ -834,11 +1048,6 @@ void cedar::proc::gui::Group::write() const
   this->writeJson(this->mFileName);
 }
 
-void cedar::proc::gui::Group::write(const std::string& destination) const
-{
-  this->writeJson(destination);
-}
-
 void cedar::proc::gui::Group::writeJson(const cedar::aux::Path& filename) const
 {
   this->mFileName = filename.toString();
@@ -852,11 +1061,6 @@ void cedar::proc::gui::Group::writeJson(const cedar::aux::Path& filename) const
   write_json(filename.toString(), root);
 
   this->mGroup->writeDataFile(filename.toString() + ".data");
-}
-
-void cedar::proc::gui::Group::read(const std::string& source)
-{
-  this->readJson(source);
 }
 
 void cedar::proc::gui::Group::readJson(const cedar::aux::Path& source)
@@ -907,7 +1111,9 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
         this->_mArchitectureWidgets[key] = value.get_value<std::string>();
       }
     }
+    // read background color
 
+    // read background color
     auto color_node = node.find("background color");
     if (color_node != node.not_found())
     {
@@ -941,6 +1147,9 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
   cedar::aux::ConfigurationNode root_copy = root;
   // try to apply the UI configuration to any elements that may have already been added to the group.
   this->tryRestoreUIConfigurationsOfElements(root_copy);
+
+  // after loading, make sure the collapsed state is properly applied
+  this->updateCollapsedness();
 }
 
 void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node)
@@ -951,28 +1160,16 @@ void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, con
     std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
     try
     {
-      //!@todo Why isn't there a virtual functon in cedar::proc::Connectable or cedar::proc::Step to restore plots that is called here instead of having these ifs?
-      //!@todo And why is a group/step item used here when all that is done in createAndShow... is to get its associated connectable? Why not pass step/group?
-      //!@todo Rewrite this code!
-      // is it a step?
-      auto step = this->getGroup()->getElement<cedar::proc::Step>(step_name);
-      if (step) // check if cast worked
+      // is it a connectable?
+      auto connectable = this->getGroup()->getElement<cedar::proc::Connectable>(step_name);
+      if (connectable) // check if cast worked
       {
-        auto step_item = this->mpScene->getStepItemFor(step.get());
-        cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, step_item);
+        auto graphics_item = this->mpScene->getGraphicsItemFor(connectable.get());
+        cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, cedar::aux::asserted_cast<cedar::proc::gui::Connectable*>(graphics_item));
       }
-      else // might be a group instead
+      else // element is not present - show error
       {
-        auto group = this->getGroup()->getElement<cedar::proc::Group>(step_name);
-        if (group) // check if cast worked
-        {
-          auto group_item = this->mpScene->getGroupFor(group.get());
-          cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, group_item);
-        }
-        else // element is neither step nor group - show error
-        {
-          removed_elements.insert(step_name);
-        }
+        removed_elements.insert(step_name);
       }
     }
     catch (cedar::aux::InvalidNameException& exc)
@@ -1037,12 +1234,14 @@ void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode& 
     generic.put_child("architecture widgets", architecture_plots);
   }
 
-  if (this->mBackgroundColor.isValid())
+  // write background color
+  auto bg_color = this->getBackgroundColor();
+  if (bg_color.isValid())
   {
     std::stringstream color_str;
-    color_str << this->mBackgroundColor.red() << ","
-        << this->mBackgroundColor.green() << ","
-        << this->mBackgroundColor.blue();
+    color_str << bg_color.red() << ","
+        << bg_color.green() << ","
+        << bg_color.blue();
     generic.put("background color", color_str.str());
   }
 
@@ -1352,10 +1551,7 @@ void cedar::proc::gui::Group::checkTriggerConnection
 
 void cedar::proc::gui::Group::updateConnectorPositions()
 {
-//  qreal distance = 20;
   qreal pad_side = 5;
-//  QPointF start_dist(pad_side, this->getInputOutputSlotOffset());
-//  QPointF direction(0, 1);
 
   for (size_t i = 0; i < this->mConnectorSources.size(); ++i)
   {
@@ -1488,6 +1684,8 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
   {
     this->mpScene->addTrigger(trigger, QPointF(0, 0));
     p_scene_element = this->mpScene->getTriggerItemFor(trigger.get());
+
+    this->clearTriggerColorCache();
   }
   CEDAR_ASSERT(p_scene_element != nullptr);
 
@@ -1508,12 +1706,14 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
   }
 
   // if there is a configuration stored for the UI of the element, load it
-  std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode>::iterator iter
-    = this->mNextElementUiConfigurations.find(p_scene_element->getElement().get());
-  if (iter != this->mNextElementUiConfigurations.end())
+  if (auto element_item = dynamic_cast<cedar::proc::gui::Element*>(p_scene_element))
   {
-    p_scene_element->readConfiguration(iter->second);
-    this->mNextElementUiConfigurations.erase(iter);
+    auto iter = this->mNextElementUiConfigurations.find(element_item->getElement().get());
+    if (iter != this->mNextElementUiConfigurations.end())
+    {
+      element_item->readConfiguration(iter->second);
+      this->mNextElementUiConfigurations.erase(iter);
+    }
   }
 
   // see if there is a configuration for the UI item stored in the group's ui node
@@ -1534,6 +1734,14 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
   if (this->isCollapsed())
   {
     p_scene_element->hide();
+  }
+
+  if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(element))
+  {
+    if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(p_scene_element))
+    {
+      connectable->updateTriggerColorState();
+    }
   }
 }
 
@@ -1634,6 +1842,19 @@ void cedar::proc::gui::Group::slotRemoved(cedar::proc::DataRole::Id role, const 
   this->updateConnectorPositions();
 }
 
+cedar::proc::gui::DataSlotItem* cedar::proc::gui::Group::getSlotItemFor(cedar::proc::sources::GroupSourcePtr source) const
+{
+  for (auto p_data_slot : mConnectorSources)
+  {
+    if (p_data_slot->getSlot()->getParentPtr() == source.get())
+    {
+      return p_data_slot;
+    }
+  }
+
+  CEDAR_THROW(cedar::aux::UnknownNameException, "Could not find data slot for group source \"" + source->getName() + "\".");
+}
+
 void cedar::proc::gui::Group::removeConnectorItem(bool isSource, const std::string& name)
 {
   auto p_list = &mConnectorSources;
@@ -1658,7 +1879,10 @@ void cedar::proc::gui::Group::removeConnectorItem(bool isSource, const std::stri
 
 void cedar::proc::gui::Group::processElementRemovedSignal(cedar::proc::ConstElementPtr element)
 {
-
+  if (boost::dynamic_pointer_cast<cedar::proc::ConstTrigger>(element))
+  {
+    this->clearTriggerColorCache();
+  }
   if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sources::ConstGroupSource>(element))
   {
     this->removeConnectorItem(true, element->getName());
@@ -1711,6 +1935,22 @@ void cedar::proc::gui::Group::addPlotGroup(std::string plotGroupName)
   this->mPlotGroupsNode.put_child(plotGroupName, node);
 }
 
+void cedar::proc::gui::Group::editPlotGroup(std::string plotGroupName)
+{
+  auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
+  if(plot_group == this->mPlotGroupsNode.not_found())
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::NotFoundException,
+      "cedar::proc::gui::Group::editPlotGroup could not edit plot group. Does not exist."
+    );
+  }
+  cedar::aux::ConfigurationNode node;
+  this->writeOpenPlotsTo(plot_group->second);
+  //this->mPlotGroupsNode.put_child(plotGroupName, node);
+}
+
 void cedar::proc::gui::Group::removePlotGroup(std::string plotGroupName)
 {
   auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
@@ -1755,6 +1995,18 @@ std::list<std::string> cedar::proc::gui::Group::getPlotGroupNames()
   return plot_group_names;
 }
 
+bool cedar::proc::gui::Group::plotGroupNameExists(const std::string& newName) const
+{
+  for (auto node : mPlotGroupsNode)
+  {
+    if (node.first == newName)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 void cedar::proc::gui::Group::displayPlotGroup(std::string plotGroupName)
 {
   auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
@@ -1779,15 +2031,14 @@ void cedar::proc::gui::Group::backgroundColorActionTriggered()
   this->setBackgroundColor(new_color);
 }
 
-void cedar::proc::gui::Group::setBackgroundColor(const QColor& color)
+void cedar::proc::gui::Group::reset()
 {
-  this->setFillColor(color);
-  this->mBackgroundColor = color;
+  this->getGroup()->reset();
 }
 
 void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-  CEDAR_DEBUG_ONLY(cedar::proc::gui::Scene* p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());)
+  cedar::proc::gui::Scene* p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
   CEDAR_DEBUG_ASSERT(p_scene);
 
   QMenu menu;
@@ -1798,7 +2049,11 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
     return;
   }
 
-  this->fillPlotMenu(menu, event);
+  this->fillConnectableMenu(menu, event);
+  
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+  QAction* p_reset = menu.addAction("reset");
+  this->connect(p_reset, SIGNAL(triggered()), SLOT(reset()));
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
@@ -1836,6 +2091,8 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
       QObject::connect(action, SIGNAL(triggered()), this, SLOT(backgroundColorActionTriggered()));
     }
   }
+
+  color_menu->setDisabled(p_scene->getRootGroup()->showsTriggerColors());
 
   bool can_edit_slots = this->getGroup()->getState() != cedar::proc::Triggerable::STATE_RUNNING
                        && !this->getGroup()->isLinked();
@@ -1916,6 +2173,13 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
     edit_parameters_action->setEnabled(!this->getGroup()->isLinked());
     QObject::connect(edit_parameters_action, SIGNAL(triggered()), this, SLOT(openParameterEditor()));
   }
+
+  //!@todo Fully implement showing groups in cotnainers
+  // currently, this feature is disabled because there are too many bugs
+//  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+//  QAction* open_group_container = menu.addAction("open group in container");
+//  open_group_container->setEnabled(true);
+//  QObject::connect(open_group_container, SIGNAL(triggered()), this, SLOT(openGroupContainer()));
 
   QAction* a = menu.exec(event->screenPos());
 
@@ -2004,29 +2268,26 @@ void cedar::proc::gui::Group::setCollapsed(bool collapsed)
 void cedar::proc::gui::Group::updateCollapsedness()
 {
   bool collapse = this->isCollapsed();
+
+  // hide all children of this group
   auto children = this->childItems();
-  for (int i = 0; i < children.size(); ++i)
+  for (auto child : children)
   {
-    auto child = children.at(i);
-    //!@todo This should cast to cedar::proc::gui::Element, but that class doesn't exist (yet)
-    if (auto element = dynamic_cast<cedar::proc::gui::Connectable*>(child))
-    {
-      element->setVisible(!collapse);
-    }
-    else if (auto element = dynamic_cast<cedar::proc::gui::TriggerItem*>(child))
+    if (auto element = dynamic_cast<cedar::proc::gui::Element*>(child))
     {
       element->setVisible(!collapse);
     }
   }
 
-  for (size_t i = 0; i < this->mConnectorSinks.size(); ++i)
+  // also, hide all connectors
+  for (auto connector : this->mConnectorSinks)
   {
-    this->mConnectorSinks.at(i)->setVisible(!collapse);
+    connector->setVisible(!collapse);
   }
 
-  for (size_t i = 0; i < this->mConnectorSources.size(); ++i)
+  for (auto connector : this->mConnectorSources)
   {
-    this->mConnectorSources.at(i)->setVisible(!collapse);
+    connector->setVisible(!collapse);
   }
 
   // update the text of the group
@@ -2036,7 +2297,7 @@ void cedar::proc::gui::Group::updateCollapsedness()
   {
     this->setInputOutputSlotOffset(static_cast<qreal>(0));
     //!@todo Same size as processing steps/adapt to the number of inputs, outputs?
-    this->setSize(cedar::proc::gui::StepItem::mDefaultWidth, cedar::proc::gui::StepItem::mDefaultHeight);
+    this->setSize(cedar::proc::gui::Connectable::M_DEFAULT_WIDTH, cedar::proc::gui::Connectable::M_DEFAULT_HEIGHT);
 
   }
   else
@@ -2055,7 +2316,8 @@ void cedar::proc::gui::Group::changeStepName(const std::string& from, const std:
     {
       group#1_name :
       [
-        { step: name,
+        {
+          step: name,
           position, plot info, etc. 
         },
         {
@@ -2162,5 +2424,133 @@ void cedar::proc::gui::Group::removeElementFromPlotGroup(const std::string& plot
     {
       ++plot_iter;
     }
+  }
+}
+
+bool cedar::proc::gui::Group::showsTriggerColors() const
+{
+  return this->mShowTriggerColors;
+}
+
+void cedar::proc::gui::Group::toggleTriggerColors(bool show)
+{
+  this->mShowTriggerColors = show;
+
+  this->updateAllElementsTriggerColorState();
+}
+
+void cedar::proc::gui::Group::updateTriggerColorState()
+{
+  cedar::proc::gui::Connectable::updateTriggerColorState();
+  this->updateAllElementsTriggerColorState();
+}
+
+void cedar::proc::gui::Group::updateAllElementsTriggerColorState() const
+{
+  for (const auto element : this->getGroup()->getElements())
+  {
+    // get the gui representation, if this is a triggerable
+    if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::ConstTriggerable>(element.second))
+    {
+      if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(this->mpScene->getGraphicsItemFor(element.second.get())))
+      {
+        connectable->updateTriggerColorState();
+      }
+    }
+  }
+}
+
+void cedar::proc::gui::Group::openGroupContainer()
+{
+  auto p_item = new cedar::proc::gui::GroupContainerItem(this);
+  p_item->setConfigurableWidget(this->getScene()->getConfigurableWidget());
+  p_item->setRecorderWidget(this->getScene()->getRecorderWidget());
+  this->getScene()->addItem(p_item);
+}
+
+void cedar::proc::gui::Group::setGroup(cedar::proc::GroupPtr group)
+{
+  mGroup = group;
+  this->linkedChanged(this->mGroup->isLinked());
+  this->mLinkedChangedConnection = this->mGroup->connectToLinkedChangedSignal(boost::bind(&cedar::proc::gui::Group::linkedChanged, this, _1));
+  this->mLastReadConfigurationChangedConnection
+    = this->mGroup->connectToLastReadConfigurationChangedSignal(boost::bind(&cedar::proc::gui::Group::lastReadConfigurationChanged, this));
+
+  this->setElement(mGroup);
+  this->setConnectable(mGroup);
+
+  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
+                               | QGraphicsItem::ItemIsMovable
+                               );
+
+  mpNameDisplay = new QGraphicsTextItem(this);
+  this->groupNameChanged();
+
+
+  this->setCollapsed(false);
+  this->updateCollapsedness();
+
+  cedar::aux::ParameterPtr name_param = this->getGroup()->getParameter("name");
+  QObject::connect(name_param.get(), SIGNAL(valueChanged()), this, SLOT(groupNameChanged()));
+  QObject::connect(_mSmartMode.get(), SIGNAL(valueChanged()), this, SLOT(toggleSmartConnectionMode()));
+  QObject::connect
+  (
+    this,
+    SIGNAL(signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange)),
+    this,
+    SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange))
+  );
+  cedar::aux::ParameterPtr looped_param = this->getGroup()->getParameter("is looped");
+  QObject::connect(looped_param.get(), SIGNAL(valueChanged()), this, SLOT(loopedChanged()));
+
+  mDataConnectionChangedConnection = mGroup->connectToDataConnectionChangedSignal
+                                     (
+                                       boost::bind(&cedar::proc::gui::Group::checkDataConnection, this, _1, _2, _3)
+                                     );
+  mTriggerConnectionChangedConnection = mGroup->connectToTriggerConnectionChangedSignal
+                                        (
+                                          boost::bind
+                                          (
+                                            &cedar::proc::gui::Group::checkTriggerConnection,
+                                            this,
+                                            _1,
+                                            _2,
+                                            _3
+                                          )
+                                        );
+
+  mNewElementAddedConnection
+    = mGroup->connectToNewElementAddedSignal
+      (
+        boost::bind(&cedar::proc::gui::Group::processElementAddedSignal, this, _1)
+      );
+  mElementRemovedConnection
+    = mGroup->connectToElementRemovedSignal
+      (
+        boost::bind(&cedar::proc::gui::Group::processElementRemovedSignal, this, _1)
+      );
+
+  this->connect(this->_mIsCollapsed.get(), SIGNAL(valueChanged()), SLOT(updateCollapsedness()));
+
+  this->connect(this->_mGeometryLocked.get(), SIGNAL(valueChanged()), SLOT(geometryLockChanged()));
+
+  QObject::connect
+  (
+    this->mGroup.get(),
+    SIGNAL(stepNameChanged(const std::string&, const std::string&)),
+    this,
+    SLOT(handleStepNameChanged(const std::string&, const std::string&))
+  );
+  this->updateDecorations();
+  this->update();
+
+  this->connect(this->mGroup.get(), SIGNAL(stepNameChanged(const std::string&, const std::string&)), SLOT(elementNameChanged(const std::string&, const std::string&)));
+}
+
+void cedar::proc::gui::Group::addElementsToGroup()
+{
+  for (const auto& element : this->mGroup->getElements())
+  {
+    this->processElementAddedSignal(element.second);
   }
 }

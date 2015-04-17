@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -125,7 +125,7 @@ int main()
   TestClassPtr limited(new TestClass);
 
   // read from file
-  limited->readJson("limits.json");
+  limited->readJson("test://unit/auxiliaries/math/LimitsParameter/limits.json");
   if (!(cedar::aux::math::isZero(limited->getLowerLimit() - (-2.0))))
   {
     std::cout << "lower limit was not read correctly, read:" << limited->getLowerLimit() << std::endl;

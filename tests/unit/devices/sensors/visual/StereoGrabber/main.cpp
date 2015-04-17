@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -35,7 +35,6 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/LogFile.h"
 #include "cedar/testingUtilities/devices/TestGrabber.h"
 
 // PROJECT INCLUDES

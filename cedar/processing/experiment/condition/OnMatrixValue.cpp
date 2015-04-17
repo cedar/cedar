@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionPartialCheckMat.cpp
+    File:        OnMatrixValue.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
     Date:        2014 04 04
 
-    Description: Source file for the class cedar::proc::experiment::ConditionPartialCheckMat.
+    Description: Source file for the class cedar::proc::experiment::OnMatrixValue.
 
     Credits:
 
@@ -114,7 +114,7 @@ bool cedar::proc::experiment::condition::OnMatrixValue::checkValidity(std::vecto
   }
 }
 
-bool cedar::proc::experiment::condition::OnMatrixValue::check()
+bool cedar::proc::experiment::condition::OnMatrixValue::check() const
 {
   if (cedar::aux::ConstDataPtr data = _stepData->getData())
   {

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -104,15 +104,26 @@ void cedar::aux::gui::StringParameter::parameterPointerChanged()
   parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(this->getParameter());
   this->mpEdit->setText(parameter->getValue().c_str());
   QObject::connect(this->mpEdit, SIGNAL(textEdited(const QString&)), this, SLOT(textEdited(const QString&)));
+  QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(parameterValueChanged()));
 
   this->propertiesChanged();
+}
+
+void cedar::aux::gui::StringParameter::parameterValueChanged()
+{
+  auto parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(this->getParameter());
+  CEDAR_DEBUG_ASSERT(parameter);
+  QString value = QString::fromStdString(parameter->getValue());
+  if (this->mpEdit->text() != value)
+  {
+    this->mpEdit->setText(value);
+  }
 }
 
 void cedar::aux::gui::StringParameter::textEdited(const QString& text)
 {
   this->setStyleSheet("");
-  cedar::aux::StringParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(this->getParameter());
+  auto parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(this->getParameter());
   try
   {
     parameter->setValue(text.toStdString());

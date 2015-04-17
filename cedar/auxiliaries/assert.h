@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -34,13 +34,13 @@
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_ASSERT_H
+#define CEDAR_ASSERT_H
+
 /*!@file  assert.h
  *
  * @brief File containing multiple global macros for cedar.
  */
-
-#ifndef CEDAR_ASSERT_H
-#define CEDAR_ASSERT_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/exceptions.h"
@@ -57,24 +57,31 @@
 /*!@brief This is a mild variant of a cedar assertion, which does not throw an exception. */
 #define CEDAR_NON_CRITICAL_ASSERT(expr) if(!(expr)) { std::cerr << "Non-critical assertion failed: " << #expr << "\n" << "  in file " << __FILE__ << " on line " << __LINE__ << std::endl; }
 
+// documentation is put here so it doesn't have to be repeated for all the different cases
+/*!@def CEDAR_DEBUG_ASSERT(expr)
+ * @brief This macro replaces the C++ assertion and throws an exception instead, pointing out the line number of the
+ * failed assertion. It is only active when cedar is built in debug configuration.
+ */
+
+/*!@def CEDAR_DEBUG_ONLY(expr)
+ * @brief This macro hides code in release mode, which is only used in debug mode (e.g. output to std::cout)
+ */
+
+/*!@def CEDAR_DEBUG_NON_CRITICAL_ASSERT(expr)
+ * @brief This is a mild variant of a cedar assertion, which does not throw an exception. It is only active when cedar
+ * is built in debug configuration
+ */
+
 #ifdef DEBUG
   #include <assert.h>
-/*!@brief This macro replaces the C++ assertion and throws an exception instead, pointing out the line number of the
- * failed assertion. It is only active when cedar is built in debug configuration. */
   #define CEDAR_DEBUG_ASSERT(expr) CEDAR_ASSERT(expr)
-/*!@brief This macro hides code in release mode, which is only used in debug mode (e.g. output to std::cout) */
   #define CEDAR_DEBUG_ONLY(expr) expr
-/*!@brief This is a mild variant of a cedar assertion, which does not throw an exception. It is only active when cedar
- * is built in debug configuration*/
   #define CEDAR_DEBUG_NON_CRITICAL_ASSERT(expr) if(!(expr)) { std::cerr << "Non-critical assertion failed: " << #expr << "\n" << "  in file " << __FILE__ << " on line " << __LINE__ << std::endl; }
 
 #else // if DEBUG is not defined, all macros default to empty
-  //!@cond SKIPPED_DOCUMENTATION
   #define CEDAR_DEBUG_ASSERT(expr)
   #define CEDAR_DEBUG_ONLY(expr)
   #define CEDAR_DEBUG_NON_CRITICAL_ASSERT(expr)
-  //!@endcond
-
 #endif // DEBUG
 
 #endif // CEDAR_ASSERT_H

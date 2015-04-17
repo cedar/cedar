@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -76,19 +76,6 @@ mCatchExceptions(true)
   QStringList args = QCoreApplication::arguments();
 
   cedar::aux::CommandLineParser parser;
-  parser.defineFlag
-  (
-    "no-plugins",
-    "Start without loading any plugins.",
-    'p'
-  );
-
-  parser.defineFlag
-  (
-    "no-log",
-    "Don't redirect log messages to the UI. May help debugging if too many log messages cause the UI to lock up.",
-    'l'
-  );
 
   parser.defineFlag
   (
@@ -97,15 +84,14 @@ mCatchExceptions(true)
     "the program. Helpful for debugging.",
     'e'
   );
+  cedar::proc::gui::Ide::addCommandLineOptionsTo(parser);
 
   parser.parse(argc, argv);
   parser.writeSummary();
 
-  bool no_plugins = parser.hasParsedFlag("no-plugins");
-  bool no_log_redirect = parser.hasParsedFlag("no-log");
   this->mCatchExceptions = !parser.hasParsedFlag("dont-catch-exceptions");
 
-  this->mpIde = new cedar::proc::gui::Ide(!no_plugins, !no_log_redirect);
+  this->mpIde = new cedar::proc::gui::Ide(parser);
 
   QObject::connect(this, SIGNAL(showExceptionDialogSignal()), this, SLOT(showExceptionDialog()));
 

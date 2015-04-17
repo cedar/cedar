@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -85,8 +85,12 @@ private:
   };
 
 public:
+  //!@cond SKIPPED_DOCUMENTATION
+
   CEDAR_DECLARE_AUX_CLASS(RowCollection);
   CEDAR_DECLARE_AUX_CLASS(Row);
+
+  //!@endcond
 
   /*! A row in the DataTable.
    */

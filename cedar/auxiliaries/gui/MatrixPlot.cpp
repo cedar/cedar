@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -95,18 +95,13 @@ namespace
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// static members
-//----------------------------------------------------------------------------------------------------------------------
-std::vector<cedar::aux::gui::ColorValueRGBA> cedar::aux::gui::MatrixPlot::mStandardColorVector;
-
-//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::aux::gui::MatrixPlot::MatrixPlot(QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
-mpCurrentPlotWidget(NULL),
+mpCurrentPlotWidget(nullptr),
 mTitle("")
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
@@ -292,52 +287,6 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
   mTitle = title;
 }
 
-const std::vector<cedar::aux::gui::ColorValueRGBA>& cedar::aux::gui::MatrixPlot::getStandardColorVector()
-{
-  //!@todo Use cedar::aux::ColorGradient instead
-  if (cedar::aux::gui::MatrixPlot::mStandardColorVector.empty())
-  {
-    cedar::aux::gui::ColorValueRGBA rgb;
-    rgb.alpha = 1;
-    for (double i = 0; i < 256; i++)
-    {
-      if(i < 32.0)
-      {
-        rgb.red = 0.0;
-        rgb.green = 0.0;
-        rgb.blue = 0.5 + 0.5 * i/32.0;
-      }
-      else if(i < 96.0)
-      {
-        rgb.red = 0.0;
-        rgb.green = (i - 32.0) / 64.0;
-        rgb.blue = 1;
-      }
-      else if(i < 160.0)
-      {
-        rgb.red = (i - 96.0) / 64.0;
-        rgb.green = 1.0;
-        rgb.blue = 1.0 - (i - 96.0) / 64.0;
-      }
-      else if(i < 224.0)
-      {
-        rgb.red = 1.0;
-        rgb.green = 1.0 - (i - 160.0) / 64.0;
-        rgb.blue = 0.0;
-      }
-      else if(i < 256.0)
-      {
-        rgb.red = 1.0 - (i - 224.0) / 64.0;
-        rgb.green = 0.0;
-        rgb.blue = 0.0;
-      }
-      cedar::aux::gui::MatrixPlot::mStandardColorVector.push_back(rgb);
-    }
-  }
-
-  return cedar::aux::gui::MatrixPlot::mStandardColorVector;
-}
-
 void cedar::aux::gui::MatrixPlot::processChangedData()
 {
   if (mpCurrentPlotWidget)
@@ -349,7 +298,7 @@ void cedar::aux::gui::MatrixPlot::processChangedData()
     )
     {
       // first, recover data from multiplot
-      cedar::aux::gui::MultiPlotInterface::DataMap map = p_multi->getDataMap();
+      cedar::aux::gui::MultiPlotInterface::DataMap map = p_multi->getDataTitleMap();
       //QWriteLocker map_locker(p_multi->getLock());
       auto iter = map.begin();
       if (iter != map.end())

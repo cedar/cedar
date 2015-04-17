@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -168,7 +168,6 @@ void cedar::dyn::RateMatrixToSpaceCode::limitsChanged()
 
 void cedar::dyn::RateMatrixToSpaceCode::interpolate()
 {
-  //!@todo member?
   std::vector<int> index;
   index.resize(this->mDimensionality);
   const cv::Mat& input = this->getInput("bin map")->getData<cv::Mat>();

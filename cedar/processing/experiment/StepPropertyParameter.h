@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -59,8 +59,6 @@
  *
  *          The property could either be a parameter or an output or a buffer.
  *          The property type should be defined when creating an instance of this parameter.
- *
- * @todo describe more.
  */
 class cedar::proc::experiment::StepPropertyParameter : public cedar::aux::Parameter
 {
@@ -73,11 +71,16 @@ class cedar::proc::experiment::StepPropertyParameter : public cedar::aux::Parame
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! enum defining the type of the property represented by this parameter
   enum PropertyType
   {
+    //! type parameter
     PARAMETER_VALUE,
+    //! type parameter
     PARAMETER,
+    //! type output slot
     OUTPUT,
+    //! type buffer slot
     BUFFER
   };
 
@@ -143,6 +146,7 @@ public:
     */
    cedar::aux::ConstDataPtr getData() const;
 
+   //! returns a list of data names for given data role
    std::vector<std::string> getListOfData(cedar::proc::DataRole::Id role) const;
 
    /*!@brief Returns the ParameterPtr of the property

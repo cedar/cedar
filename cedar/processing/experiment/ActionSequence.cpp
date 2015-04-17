@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -148,7 +148,6 @@ void cedar::proc::experiment::ActionSequence::setCondition(cedar::proc::experime
 
 std::vector<cedar::proc::experiment::action::ActionPtr> cedar::proc::experiment::ActionSequence::getActions()
 {
-  //!@todo Does this need to make a copy?
   std::vector<cedar::proc::experiment::action::ActionPtr> ret;
   for (unsigned int i = 0; i < _mActionSet->size(); i++)
   {

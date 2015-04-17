@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -118,6 +118,11 @@ cedar::proc::gui::DataSlotItem::~DataSlotItem()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::gui::DataSlotItem::canDuplicate() const
+{
+  return false;
+}
 
 void cedar::proc::gui::DataSlotItem::setHighlightedBySelection(bool highlight)
 {
@@ -306,7 +311,7 @@ void cedar::proc::gui::DataSlotItem::generateTooltip()
   else
   {
     tool_tip += QString::fromStdString(cedar::proc::DataRole::type().get(this->mSlot->getRole()).prettyString());
-    tool_tip += ": <b>" + QString::fromStdString(this->mSlot->getText()) + "</b>";
+    tool_tip += ": <b>" + Qt::escape(QString::fromStdString(this->mSlot->getText())) + "</b>";
   }
   if (this->mSlot->getData())
   {

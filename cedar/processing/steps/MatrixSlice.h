@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -63,6 +63,8 @@ class cedar::proc::steps::MatrixSlice : public cedar::proc::Step
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief An enum class defining types of anchors for a matrix slice.
+   */
   class AnchorType
   {
   public:

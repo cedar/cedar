@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -53,8 +53,6 @@
 
 
 /*!@brief Defines a template group, which can be found in a given file.
- *
- * @todo describe more.
  */
 class cedar::proc::GroupDeclaration : public cedar::aux::PluginDeclaration, public boost::enable_shared_from_this<cedar::proc::GroupDeclaration>
 {

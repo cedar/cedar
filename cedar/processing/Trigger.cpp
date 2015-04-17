@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -145,6 +145,56 @@ std::string nameTrigger(cedar::proc::TriggerPtr trigger)
 {
   return nameTrigger(trigger.get());
 }
+
+bool cedar::proc::Trigger::canTrigger(cedar::proc::TriggerablePtr target) const
+{
+  std::string reason;
+  return this->canTrigger(target, reason);
+}
+
+bool cedar::proc::Trigger::canTrigger(cedar::proc::TriggerablePtr, std::string&) const
+{
+  // default implementation, can be overridden in child classes
+  return true;
+}
+
+bool cedar::proc::Trigger::testIfCanBeConnectedTo(cedar::proc::TriggerablePtr target) const
+{
+  if (this->isListener(target))
+  {
+    return false;
+  }
+
+  if (!this->canTrigger(target))
+  {
+    return false;
+  }
+  return true;
+}
+
+void cedar::proc::Trigger::checkIfCanBeConnectedTo(cedar::proc::TriggerablePtr target) const
+{
+  if (this->isListener(target))
+  {
+    CEDAR_THROW(cedar::proc::DuplicateConnectionException, "The given triggerable is already a listener of this trigger.");
+  }
+
+  std::string reason;
+  if (!this->canTrigger(target, reason))
+  {
+    CEDAR_THROW(cedar::proc::InvalidTriggerConnectionException, reason);
+  }
+}
+
+std::map<unsigned int, std::set<cedar::proc::TriggerablePtr>> cedar::proc::Trigger::getTriggeringOrder() const
+{
+  std::map<unsigned int, std::set<cedar::proc::TriggerablePtr>> copy;
+
+  QReadLocker locker(this->mTriggeringOrder.getLockPtr());
+  copy = this->mTriggeringOrder.member();
+  return copy;
+}
+
 
 void cedar::proc::Trigger::exploreSink
      (
@@ -655,7 +705,6 @@ void cedar::proc::Trigger::updateTriggeringOrderRecurseUpSource(cedar::proc::sou
 
 void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
-  //!@todo Remove debug outputs here
   auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
 
   QReadLocker lock(this->mTriggeringOrder.getLockPtr());
@@ -700,12 +749,6 @@ void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr triggerable)
   {
     this->mListeners.member().push_back(triggerable);
     triggerable->triggeredBy(this_ptr);
-    
-    //!@todo Can this be removed (because MultiTriggers don't exist anymore)
-    if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(triggerable))
-    {
-      trigger->notifyConnected(this_ptr);
-    }
 
     lock.unlock();
     std::set<cedar::proc::Trigger*> visited;
@@ -729,14 +772,9 @@ void cedar::proc::Trigger::removeListener(cedar::proc::Triggerable* triggerable)
   auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
 
   QWriteLocker lock(this->mListeners.getLockPtr());
-  std::vector<cedar::proc::TriggerablePtr>::iterator iter;
-  iter = this->find(triggerable);
+  auto iter = this->find(triggerable);
   if (iter != this->mListeners.member().end())
   {
-    if (cedar::proc::Trigger* trigger = dynamic_cast<cedar::proc::Trigger*>(triggerable))
-    {
-      trigger->notifyDisconnected(this_ptr);
-    }
     this->mListeners.member().erase(iter);
     triggerable->noLongerTriggeredBy(this_ptr);
 
@@ -744,14 +782,6 @@ void cedar::proc::Trigger::removeListener(cedar::proc::Triggerable* triggerable)
     std::set<cedar::proc::Trigger*> visited;
     this->updateTriggeringOrder(visited);
   }
-}
-
-void cedar::proc::Trigger::notifyConnected(cedar::proc::TriggerPtr /* trigger */)
-{
-}
-
-void cedar::proc::Trigger::notifyDisconnected(cedar::proc::TriggerPtr /* trigger */)
-{
 }
 
 std::vector<cedar::proc::TriggerablePtr>::iterator cedar::proc::Trigger::find(cedar::proc::Triggerable* triggerable)
@@ -799,3 +829,7 @@ void cedar::proc::Trigger::writeConfiguration(cedar::aux::ConfigurationNode& nod
   }
 }
 
+bool cedar::proc::Trigger::canConnectTo(cedar::proc::ConstTriggerablePtr) const
+{
+  return true;
+}

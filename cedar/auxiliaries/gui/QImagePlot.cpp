@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -38,6 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/annotation/ValueRangeHint.h"
 #include "cedar/auxiliaries/gui/QImagePlot.h"
 #include "cedar/auxiliaries/ColorGradient.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -106,7 +107,7 @@ _mColorJet(new cedar::aux::EnumParameter(this, "color jet", cedar::aux::ColorGra
   this->mpImageDisplay = new cedar::aux::gui::QImagePlot::ImageDisplay(this, "no data");
   p_layout->addWidget(mpImageDisplay);
   this->mpImageDisplay->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-  this->mpImageDisplay->setMinimumSize(QSize(50, 50));
+  this->mpImageDisplay->setMinimumSize(QSize(5, 5));
 
   QObject::connect
   (
@@ -172,6 +173,27 @@ cedar::aux::gui::detail::QImagePlotLegend::QImagePlotLegend()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::gui::QImagePlot::plot(cedar::aux::ConstDataPtr data, const std::string& /*title*/)
+{
+  if (data->hasAnnotation<cedar::aux::annotation::ValueRangeHint>())
+  {
+    this->mValueHint = data->getAnnotation<cedar::aux::annotation::ValueRangeHint>();
+
+    // set fixed scaling based on the value hint
+    this->setLimits(this->mValueHint->getRange().getLower(), this->mValueHint->getRange().getUpper());
+  }
+  else
+  {
+    // if a value hint was previously set, revert to automatic scaling
+    if (this->mValueHint)
+    {
+      this->setAutomaticScaling();
+    }
+    // reset the value hint
+    this->mValueHint.reset();
+  }
+}
+
 void cedar::aux::gui::QImagePlot::colorJetChanged()
 {
   auto enum_id = this->_mColorJet->getValue();
@@ -189,6 +211,7 @@ void cedar::aux::gui::QImagePlot::setColorJet(cedar::aux::ColorGradientPtr gradi
   }
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 void cedar::aux::gui::detail::QImagePlotLegend::setGradient(cedar::aux::ColorGradientPtr gradient)
 {
   this->mGradient = QLinearGradient(0, 1, 0, 0);
@@ -202,6 +225,7 @@ void cedar::aux::gui::detail::QImagePlotLegend::setGradient(cedar::aux::ColorGra
   palette.setBrush(QPalette::Window, QBrush(this->mGradient));
   this->mpGradientDisplay->setPalette(palette);
 }
+//!@endcond
 
 cv::Mat cedar::aux::gui::QImagePlot::colorizeMatrix(const cv::Mat& toColorize) const
 {
@@ -481,6 +505,11 @@ void cedar::aux::gui::QImagePlot::showLegendChanged()
     p_layout->addWidget(this->mpLegend);
     p_layout->setStretch(0, 1);
     p_layout->setStretch(1, 0);
+
+    if (this->_mAutoScaling->getValue() == false)
+    {
+      this->mpLegend->updateMinMax(this->_mValueLimits->getLowerLimit(), this->_mValueLimits->getUpperLimit());
+    }
   }
 
   if (this->mpLegend)

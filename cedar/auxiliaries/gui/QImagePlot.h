@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/ColorGradient.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/annotation/ValueRangeHint.fwd.h"
 #include "cedar/auxiliaries/gui/QImagePlot.fwd.h"
 
 // SYSTEM INCLUDES
@@ -68,11 +69,12 @@ namespace cedar
       {
         //!@cond SKIPPED_DOCUMENTATION
         /* This is an internal class of QImagePlot that cannot be nested because Qt's moc doesn't support nested classes.
-        *
-        * Don't use it outside of the QImagePlot!
-        */
-        /*! Class for displaying a legend for the image plot worker.
-        */
+         *
+         * Don't use it outside of the QImagePlot!
+         *
+         *
+         * Class for displaying a legend for the image plot worker.
+         */
         class QImagePlotLegend : public QWidget
         {
           Q_OBJECT
@@ -81,10 +83,10 @@ namespace cedar
           QImagePlotLegend();
 
           public slots:
-          //! Updates the minimum and maximum value displayed by the legend.
+          // Updates the minimum and maximum value displayed by the legend.
           void updateMinMax(double min, double max);
 
-          //! Applies the colors of the graident to the legend.
+          // Applies the colors of the graident to the legend.
           void setGradient(cedar::aux::ColorGradientPtr gradient);
 
         private:
@@ -155,6 +157,8 @@ public:
 
   //! Returns the currently active color jet.
   cedar::aux::ColorGradient::StandardGradients::Id getColorJet() const;
+
+  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
 
 public slots:
   /*!@brief Set the scaling mode of the plot.
@@ -268,6 +272,9 @@ private:
 
   //! The color gradient to be used.
   cedar::aux::ColorGradientPtr mColorGradient;
+
+  //! If not null, this is used to determine the range of the plot.
+  cedar::aux::annotation::ConstValueRangeHintPtr mValueHint;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

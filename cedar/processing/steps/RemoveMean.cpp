@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -106,9 +106,9 @@ void cedar::proc::steps::RemoveMean::inputConnectionChanged(const std::string& i
     if (this->mMatrix)
     {
       //!@todo Rather than this, there should be a callOnTrigger function which lets users disable triggering of subsequent steps.
-      this->lock();
+      cedar::proc::Step::ReadLocker locker(this);
       this->compute(cedar::proc::Arguments());
-      this->unlock();
+      locker.unlock();
 
       this->emitOutputPropertiesChangedSignal("mean-free matrix");
     }

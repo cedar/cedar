@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -270,7 +270,7 @@ void cedar::aux::gui::QwtMatrixPlot::processChangedData()
     if (auto p_multi = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(mpCurrentPlotWidget))
     {
       // first, recover data from multiplot
-      auto map = p_multi->getDataMap();
+      auto map = p_multi->getDataTitleMap();
       //QWriteLocker map_locker(p_multi->getLock());
       auto iter = map.begin();
       if (iter != map.end())

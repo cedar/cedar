@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -172,11 +172,19 @@ macro(cedar_add_test)
   
   if (CMAKE_COMPILER_IS_GNUCC)
   	set_target_properties(${testExecutableName} PROPERTIES LINK_FLAGS "-Wl,--no-as-needed")
+    
+    if (CEDAR_COVERAGE_TEST)
+      set_target_properties(${testExecutableName} PROPERTIES COMPILE_FLAGS "-O0 -g --coverage -fprofile-arcs -ftest-coverage")
+    endif (CEDAR_COVERAGE_TEST)
   endif(CMAKE_COMPILER_IS_GNUCC)
   
   if (MSVC)
     # In visual studio, put all unit tests into a subfolder
     set_target_properties(${testExecutableName} PROPERTIES FOLDER "${test_PREFIX}")
+    
+    if (CEDAR_COVERAGE_TEST)
+      message("Sorry, coverage tests are not available for non-gcc compilers.")
+    endif (CEDAR_COVERAGE_TEST)
   endif (MSVC)
   
   # add the unit test to the CMake build system (will create a build target and run the test when calling 'make test')
@@ -236,6 +244,11 @@ macro(cedar_add_test)
   if (test_ADDITIONAL_DEPENDENCIES)
     target_link_libraries(${testExecutableName} ${test_ADDITIONAL_DEPENDENCIES})
   endif (test_ADDITIONAL_DEPENDENCIES)
+  
+  # link gcov for coverage testing
+  if (CMAKE_COMPILER_IS_GNUCC AND CEDAR_COVERAGE_TEST)
+    target_link_libraries(${testExecutableName} gcov)
+  endif ()  
   
   # change the runtime output directory back to the original value
   set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${originalRuntimeOutputDirectory})

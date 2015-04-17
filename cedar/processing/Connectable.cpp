@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -102,7 +102,7 @@ void cedar::proc::Connectable::writeData(cedar::aux::ConfigurationNode& stored_d
 {
   for (auto role_enum : cedar::proc::DataRole::type().list())
   {
-    if (!this->hasRole(role_enum.id()))
+    if (!this->hasSlotForRole(role_enum.id()))
     {
       continue;
     }
@@ -183,6 +183,11 @@ void cedar::proc::Connectable::redetermineInputValidity(const std::string& slot)
 void cedar::proc::Connectable::callInputConnectionChanged(const std::string& slot)
 {
   this->revalidateInputSlot(slot);
+}
+
+void cedar::proc::Connectable::callOutputConnectionRemoved(cedar::proc::DataSlotPtr slot)
+{
+  this->outputConnectionRemoved(slot);
 }
 
 void cedar::proc::Connectable::revalidateInputSlot(const std::string& slot)
@@ -396,7 +401,7 @@ const cedar::proc::Connectable::SlotMap& cedar::proc::Connectable::getDataSlots(
   return iter->second;
 }
 
-bool cedar::proc::Connectable::hasRole(cedar::proc::DataRole::Id role) const
+bool cedar::proc::Connectable::hasSlotForRole(cedar::proc::DataRole::Id role) const
 {
   auto iter = this->mDataConnectionsOrder.find(role);
   if (iter == this->mDataConnectionsOrder.end())
@@ -466,6 +471,11 @@ void cedar::proc::Connectable::callInputConnectionChangedFor(cedar::proc::DataSl
  */
 void cedar::proc::Connectable::inputConnectionChanged(const std::string& /*inputName*/)
 {
+}
+
+void cedar::proc::Connectable::outputConnectionRemoved(cedar::proc::DataSlotPtr /* slot */)
+{
+  // empty by default -- override in derived classes if you want to react to changes in output connectivity
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::checkInputValidity
@@ -763,7 +773,6 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareData
 
   if (role == cedar::proc::DataRole::INPUT)
   {
-
     slot_ptr->connectToDataChangedSignal
     (
       boost::bind
@@ -1108,9 +1117,8 @@ void cedar::proc::Connectable::freeTargetSlots(cedar::proc::DataSlotWeakPtr slot
     connections
   );
 
-  for (size_t i = 0; i < connections.size(); ++i)
+  for (auto connection : connections)
   {
-    cedar::proc::DataConnectionPtr connection = connections.at(i);
     connection->getTarget()->getParentPtr()->freeInput(connection->getTarget()->getName(), data);
   }
 }

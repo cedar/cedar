@@ -16,6 +16,7 @@ In the following pages you can find out about general programming concepts we us
 - @link ParametersConcept Storing and loading parameters @endlink
 - @link ProcessingFrameworkConcept Processing framework @endlink
 - @link ThreadingConcept Threads and dynamics @endlink
+- @link ExperimentFrameworkConcept Experiment framework @endlink
 - @link InterProcessCommunicationConcept Inter-process communication using YARP @endlink
 - @link UnitsConcept Physical units @endlink
 - @link BoostSignalsWrapper cedar's helper functions for boost signals @endlink
@@ -30,9 +31,9 @@ description of the involved concepts can be found @link RunTimeTypeSystem here@e
 
 @section BugFixing Bug Fixing
 If you want to fix a bug in cedar, please stick to the following process.
--# report the bug in the <a href="https://bitbucket.org/cedar/testing/issues">issue tracker</a>
+-# report the bug in the <a href="https://bitbucket.org/cedar/release/issues">issue tracker</a>
 -# ask a member of the cedar development team to assign this bug to you
--# clone the current cedar tip of the most stable repository the bug appears in (e.g., if testing and unstable are affected, clone testing)
+-# clone the current cedar tip of the release repository if the bug appears in release, otherwise clone development (e.g., if release and development are affected, clone release)
 -# write or modify a unit test that fails due to this bug
 -# fix the bug
 -# check if the unit test now passes

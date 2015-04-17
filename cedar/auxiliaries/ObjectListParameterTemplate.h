@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -51,8 +51,6 @@
 
 
 /*!@brief A parameter that reads a list of configurable objects from a file.
- *
- * @todo Should BaseType include the pointer type?
  */
 template <class BaseType>
 class cedar::aux::ObjectListParameterTemplate : public cedar::aux::ObjectListParameter
@@ -100,12 +98,20 @@ public:
     this->makeDefault();
   }
 
-  //!@brief Destructor
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  bool canHaveConfigurableChildren() const
+  {
+    return true;
+  }
+
+  size_t getNumberOfConfigurableChildren() const
+  {
+    return this->mObjectList.size();
+  }
+
   //!@brief set this parameter to a value, read from a configuration node
   virtual void readFromNode(const cedar::aux::ConfigurationNode& node)
   {
@@ -186,6 +192,14 @@ public:
     return this->at(index);
   }
 
+  /*!
+   * @remarks This method must be overridden because ConfigurablePtr and BaseTypePtr are not considered covariant types.
+   */
+  cedar::aux::ConstConfigurablePtr configurableAt(size_t index) const
+  {
+    return this->at(index);
+  }
+
   //!@brief add an object before the index position
   void insert(size_t index, BaseTypePtr object)
   {
@@ -246,7 +260,10 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  cedar::aux::ConstConfigurablePtr retrieveConfigurableChild(size_t index) const
+  {
+    return this->at(index);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

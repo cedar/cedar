@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -88,8 +88,7 @@ public:
   virtual bool canDetach(cedar::aux::ConstDataPtr data) const = 0;
 
   //!@brief Returns a map of data associated with its title.
-  //!@todo Rename this to getDataNameMap?
-  const DataMap& getDataMap() const;
+  const DataMap& getDataTitleMap() const;
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

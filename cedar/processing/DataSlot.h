@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -39,8 +39,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/DataRole.h"
+#include "cedar/processing/DataPath.h"
 #include "cedar/auxiliaries/LockType.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
+#include "cedar/auxiliaries/LockableMember.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Path.fwd.h"
@@ -147,9 +149,6 @@ public:
   //!@brief is this a mandatory connection? i.e. there must be at least one connection using this slot
   bool isMandatory() const;
 
-  //!@brief typo version of getValidity() const
-  CEDAR_DECLARE_DEPRECATED(VALIDITY getValidlity() const);
-
   //!@brief get the current validity of this slot
   virtual VALIDITY getValidity() const;
 
@@ -205,7 +204,13 @@ public:
   //! Get all data connections currently connected to this slot
   std::vector<DataConnectionPtr>& getDataConnections();
   
+  //! returns a string stating the validity of the slot
   const std::string& getValidityInfo() const;
+
+  //! Sets the validity info that indicates why the slot is invalid.
+  void setValidityInfo(const std::string& info);
+
+  cedar::proc::DataPath getDataPath() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals and slots
@@ -266,9 +271,6 @@ private:
   //! Returns the type check function object for this slot.
   const TypeCheckFunction& getCheck() const;
 
-  //!@brief deprecated due to bad name, see resetParentPointer
-  CEDAR_DECLARE_DEPRECATED(void deleteParentPointer());
-
   //!@brief sets the parent pointer to NULL
   void resetParentPointer();
 
@@ -293,7 +295,7 @@ private:
   bool mMandatory;
 
   //!@brief the validity of this slot
-  VALIDITY mValidity;
+  cedar::aux::LockableMember<VALIDITY> mValidity;
 
   //! Name of the slot, used to uniquely identify it among other slots of the same type in a step.
   std::string mName;

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -43,7 +43,6 @@
 #include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
-#include <list>
 #include <QWriteLocker>
 #include <QReadLocker>
 #include <QReadWriteLock>
@@ -53,6 +52,7 @@
   #include <boost/date_time/posix_time/posix_time.hpp>
   #include <boost/pointer_cast.hpp>
 #endif
+#include <list>
 #include <limits>
 
 //------------------------------------------------------------------------------
@@ -61,6 +61,7 @@
 
 cedar::aux::Recorder::Recorder()
 :
+mpListLock(new QReadWriteLock()),
 mSubFolder("recording_#T#")
 {
   mProjectName = "Unnamed";
@@ -72,29 +73,45 @@ mSubFolder("recording_#T#")
 cedar::aux::Recorder::~Recorder()
 {
   this->clear();
+  if (mpListLock)
+  {
+    delete mpListLock;
+  }
 }
 
 void cedar::aux::Recorder::step(cedar::unit::Time)
 {
-  //Writing the first value of every DataSpectator queue.
-  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  // Writing the first value of every DataSpectator queue.
+  for (auto data_spectator : mDataSpectators)
   {
-    mDataSpectatorCollection.get<cedar::aux::DataSpectator>(i)->writeFirstRecordData();
+    boost::static_pointer_cast<cedar::aux::DataSpectator>(data_spectator.second)->writeFirstRecordData();
   }
+}
+
+bool cedar::aux::Recorder::hasDataToRecord() const
+{
+  QReadLocker locker(mpListLock);
+  bool ret = !this->mDataSpectators.empty();
+  return ret;
 }
 
 void cedar::aux::Recorder::registerData(cedar::aux::ConstDataPtr toSpectate, cedar::unit::Time recordInterval, const std::string& name)
 {
-  //check if Name is not already in use
-  if (isRegistered(name))
+  // check if Name is not already in use
+  if (this->isRegistered(name))
   {
-    CEDAR_THROW(cedar::aux::DuplicateNameException,"The data with name " + name + " is already registered");
+    CEDAR_THROW(cedar::aux::DuplicateNameException, "The data with name " + name + " is already registered");
   }
 
-  // create new DataSpectaor and push it to the DataSpectator list
+  // create new DataSpectator and push it to the DataSpectator list
   cedar::aux::DataSpectatorPtr spec
     = cedar::aux::DataSpectatorPtr(new cedar::aux::DataSpectator(toSpectate, recordInterval, name));
-  mDataSpectatorCollection.addThread(spec);
+  QWriteLocker locker(mpListLock);
+  if (mDataSpectators.find(name) != mDataSpectators.end())
+  {
+    CEDAR_THROW(cedar::aux::DuplicateNameException, "Thread of name \"" + name + "\" is already registered.");
+  }
+  mDataSpectators[name] = spec;
 
   // If Recorder is already running, also start the new DataSpectator
   if (this->isRunningNolocking())
@@ -102,42 +119,48 @@ void cedar::aux::Recorder::registerData(cedar::aux::ConstDataPtr toSpectate, ced
     spec->start();
   }
 
+  locker.unlock();
+  emit recordedDataChanged();
 }
 
 void cedar::aux::Recorder::unregisterData(const std::string& name)
 {
-  //throw exception if running
-  if (isRunningNolocking())
+  // throw exception if running
+  if (this->isRunningNolocking())
   {
-    CEDAR_THROW(cedar::aux::ThreadRunningExeption, "Cannot unregister data while Recorder is running");
+    CEDAR_THROW(cedar::aux::RecorderException, "Cannot unregister data while Recorder is running");
   }
-    
-  //!@todo This is redundant with the code below (unregisterData(cedar::aux::ConstDataPtr data)); please remove these
-  //!      redundancies as far as possible (make this function call the one below, or the other way around)
-  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); ++i)
+  QWriteLocker locker(mpListLock);
+  auto it = mDataSpectators.find(name);
+  if (it !=  mDataSpectators.end())
   {
-    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    if (spec->getName() == name)
-    {
-      mDataSpectatorCollection.remove(i);
-      break;
-    }
+    mDataSpectators.erase(it);
   }
+  else
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "Thread of name \"" + name + "\" is not registered.");
+  }
+
+  locker.unlock();
+  emit recordedDataChanged();
 }
 
 void cedar::aux::Recorder::unregisterData(cedar::aux::ConstDataPtr data)
 {
-  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); ++i)
+  QWriteLocker locker(mpListLock);
+  for (auto it = mDataSpectators.begin(); it != mDataSpectators.end(); ++it)
   {
-    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    if (spec->getData() == data)
+    auto casted = boost::static_pointer_cast<cedar::aux::DataSpectator>(it->second);
+    if (casted->getData() == data)
     {
-      mDataSpectatorCollection.remove(i);
+      mDataSpectators.erase(it);
       break;
     }
   }
-}
 
+  locker.unlock();
+  emit recordedDataChanged();
+}
 
 void cedar::aux::Recorder::createOutputDirectory()
 {
@@ -150,26 +173,27 @@ void cedar::aux::Recorder::createOutputDirectory()
 
 void cedar::aux::Recorder::prepareStart()
 {
-  if (mDataSpectatorCollection.size() > 0)
+  if (mDataSpectators.size() > 0)
   {
-    //Generate output directory
+    // Generate output directory
     this->createOutputDirectory();
   }
 
-  //find the minimal time to write to file. This should the smallest stepTime in the DataSpectator threads.
+  // find the minimal time to write to file. This should the smallest stepTime in the DataSpectator threads.
   cedar::unit::Time min(1000.0 * cedar::unit::milli * cedar::unit::seconds);
-  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  for (auto data_spectator : mDataSpectators)
   {
-    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    if (spec->getStepSize() < min)
+    auto casted = boost::static_pointer_cast<cedar::aux::DataSpectator>(data_spectator.second);
+    if (casted->getStepSize() < min)
     {
-      min = spec->getStepSize();
+      min = casted->getStepSize();
     }
   }
-  setStepSize(min);
 
-  //start all DataSpectators.
-  mDataSpectatorCollection.startAll();
+  this->setStepSize(min);
+
+  // start all DataSpectators.
+  this->startAllRecordings();
 }
 
 void cedar::aux::Recorder::processQuit()
@@ -177,21 +201,21 @@ void cedar::aux::Recorder::processQuit()
   // Resets the subdirectory if any was setted
   mSubFolder = "recording_#T#";
 
-  //Stop all DataSpectators.They will automatically write all containing data to file.
-  mDataSpectatorCollection.stopAll();
+  // Stop all DataSpectators.They will automatically write all containing data to file.
+  this->stopAllRecordings();
 }
 
 void cedar::aux::Recorder::clear()
 {
-  //throw exception if running
-  if (isRunningNolocking())
+  // throw exception if running
+  if (this->isRunningNolocking())
   {
-    CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot unregister data while Recorder is Running");
+    CEDAR_THROW(cedar::aux::RecorderException, "Cannot unregister data while Recorder is Running");
   }
 
-  stop();
-  //remove all data.
-  mDataSpectatorCollection.removeAll();
+  this->stop();
+  // remove all data.
+  this->removeAllRecordings();
 }
 
 
@@ -200,7 +224,7 @@ void cedar::aux::Recorder::setRecordedProjectName(const std::string& name)
   //throw exception if running
   if (isRunningNolocking())
   {
-    CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot change output directory while recorder is running");
+    CEDAR_THROW(cedar::aux::RecorderException, "Cannot change output directory while recorder is running");
   }
 
   this->mProjectName = boost::filesystem::path(name).stem().string();
@@ -213,71 +237,57 @@ const std::string& cedar::aux::Recorder::getOutputDirectory() const
 
 void cedar::aux::Recorder::setRecordIntervalTime(const std::string& name, cedar::unit::Time recordInterval)
 {
-  //throw exception if running
-  if (isRunningNolocking())
+  // throw exception if running
+  if (this->isRunningNolocking())
   {
-    CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot change record inerval while recorder is running");
+    CEDAR_THROW(cedar::aux::RecorderException,"Cannot change record interval while recorder is running");
   }
-
-  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  auto it = mDataSpectators.find(name);
+  if (it != mDataSpectators.end())
   {
-    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<cedar::aux::DataSpectator>(i);
-    if (spec->getName() == name)
-    {
-      spec->setStepSize(recordInterval);
-      return;
-    }
+    it->second->setStepSize(recordInterval);
   }
-  CEDAR_THROW(cedar::aux::UnknownNameException, "The data named \"" + name + "\" is not registered.");
+  else
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "No data of name \"" + name + "\" registered.");
+  }
 }
 
 cedar::unit::Time cedar::aux::Recorder::getRecordIntervalTime(const std::string& name) const
 {
-  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  auto it = mDataSpectators.find(name);
+  if (it != mDataSpectators.end())
   {
-    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    if (spec->getName() == name)
-    {
-      return spec->getRecordIntervalTime();
-    }
+    return it->second->getRecordIntervalTime();
   }
-
-  CEDAR_THROW(cedar::aux::UnknownNameException, "The data named \"" + name + "\" is not registered.");
+  else
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "No data of name \"" + name + "\" registered.");
+  }
 }
 
 cedar::unit::Time cedar::aux::Recorder::getRecordIntervalTime(cedar::aux::ConstDataPtr data) const
 {
-  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  for (auto data_spectator : mDataSpectators)
   {
-    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<cedar::aux::DataSpectator>(i);
-    if (spec->getData() == data)
+    if (data_spectator.second->getData() == data)
     {
-      return spec->getRecordIntervalTime();
+      return data_spectator.second->getRecordIntervalTime();
     }
   }
-
-  CEDAR_THROW(cedar::aux::UnknownNameException, "The given data pointer is not registered.");
+  CEDAR_THROW(cedar::aux::NotFoundException, "No data found.");
 }
 
 bool cedar::aux::Recorder::isRegistered(const std::string& name) const
 {
-  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
-  {
-    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    if (spec->getName() == name)
-    {
-      return true;
-    }
-  }
-  return false;
+  return this->mDataSpectators.find(name) != this->mDataSpectators.end();
 }
 
 bool cedar::aux::Recorder::isRegistered(cedar::aux::ConstDataPtr data) const
 {
-  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  for (auto data_spectator : mDataSpectators)
   {
-    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    if (spec->getData() == data)
+    if (data_spectator.second->getData() == data)
     {
       return true;
     }
@@ -287,28 +297,29 @@ bool cedar::aux::Recorder::isRegistered(cedar::aux::ConstDataPtr data) const
 
 void cedar::aux::Recorder::renameRegisteredData(cedar::aux::ConstDataPtr data, const std::string& newName)
 {
-  //throw exception if running
-  if(isRunningNolocking())
+  // throw exception if running
+  if (this->isRunningNolocking())
   {
-    CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot rename data while recorder is running");
+    CEDAR_THROW(cedar::aux::RecorderException, "Cannot rename data while recorder is running");
   }
-
-  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  for (auto data_spectator : mDataSpectators)
   {
-    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    if (spec->getData() == data)
+    if (data_spectator.second->getData() == data)
     {
-      spec->setName(newName);
+      std::string oldName = data_spectator.first;
+      this->unregisterData(oldName);
+      this->registerData(data_spectator.second->getData(), data_spectator.second->getRecordIntervalTime(), newName);
+      return;
     }
   }
 }
 
 void cedar::aux::Recorder::takeSnapshot()
 {
-  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  for (auto data_spectator : mDataSpectators)
   {
-    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    spec->makeSnapshot();
+    auto casted = boost::static_pointer_cast<cedar::aux::DataSpectator>(data_spectator.second);
+    casted->makeSnapshot();
   }
 }
 
@@ -316,10 +327,10 @@ std::map<std::string, cedar::unit::Time> cedar::aux::Recorder::getRegisteredData
 {
   std::map<std::string, cedar::unit::Time> registeredData;
 
-  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  for (auto data_spectator : mDataSpectators)
   {
-    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    registeredData[spec->getName()] = spec->getRecordIntervalTime();
+    auto casted = boost::static_pointer_cast<cedar::aux::DataSpectator>(data_spectator.second);
+    registeredData[data_spectator.first] = casted->getRecordIntervalTime();
   }
   return registeredData;
 }
@@ -333,15 +344,47 @@ const std::string& cedar::aux::Recorder::getRecorderProjectName()
 
 void cedar::aux::Recorder::setSubfolder(const std::string& subfolderName)
 {
-  //throw exception if running
-  if(isRunningNolocking())
+  // throw exception if running
+  if (this->isRunningNolocking())
   {
-    CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot set ouput directory while recorder is running");
+    CEDAR_THROW(cedar::aux::RecorderException, "Cannot set output directory while recorder is running");
   }
 
   this->mSubFolder = subfolderName;
 }
+
 std::string cedar::aux::Recorder::getTimeStamp()
 {
   return cedar::aux::Path::getTimestampForFileName();
+}
+
+void cedar::aux::Recorder::startAllRecordings()
+{
+  QReadLocker locker(mpListLock);
+  for (auto thread : mDataSpectators)
+  {
+    thread.second->start();
+  }
+}
+
+void cedar::aux::Recorder::stopAllRecordings()
+{
+  QReadLocker locker(mpListLock);
+  //First performing a requestStop() to stop all thread as fast as possible without blocking
+  for (auto thread : mDataSpectators)
+  {
+    thread.second->requestStop();
+  }
+
+  //Waiting for each thread stopped.
+  for (auto thread : mDataSpectators)
+  {
+    thread.second->stop();
+  }
+}
+
+void cedar::aux::Recorder::removeAllRecordings()
+{
+  QWriteLocker locker(mpListLock);
+  mDataSpectators.clear();
 }

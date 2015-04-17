@@ -41,4 +41,7 @@ and then start filling the file with your code.
 This folder contains unit- and interactive tests. If you want more detailed information, have a look at the page on
 @link SoftwareTestingConcept software testing @endlink.
 
+@section tools
+This folder contains scripts and tools.
+
  */

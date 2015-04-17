@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -163,7 +163,7 @@ void insert_triggered_children(TriggerTestPtr step, std::set<TriggerTestPtr>& tr
   }
 }
 
-void test_step(cedar::proc::GroupPtr network, TriggerTestPtr step)
+void test_step(cedar::proc::GroupPtr group, TriggerTestPtr step)
 {
   // build a list of all steps triggered by the one being checked
   std::set<TriggerTestPtr> triggered;
@@ -183,7 +183,7 @@ void test_step(cedar::proc::GroupPtr network, TriggerTestPtr step)
 
   // reset data of all steps
   std::cout << "Resetting data." << std::endl;
-  for (auto iter = network->getElements().begin(); iter != network->getElements().end(); ++iter)
+  for (auto iter = group->getElements().begin(); iter != group->getElements().end(); ++iter)
   {
     cedar::proc::ElementPtr element = iter->second;
     if (auto trigger_test = boost::dynamic_pointer_cast<TriggerTest>(element))
@@ -209,10 +209,9 @@ void test_step(cedar::proc::GroupPtr network, TriggerTestPtr step)
 
   // check all triggered steps for being up-to-date (they should be after being triggered.
 
-  for (auto iter = network->getElements().begin(); iter != network->getElements().end(); ++iter)
+  for (auto name_element_pair : group->getElements())
   {
-    cedar::proc::ElementPtr element = iter->second;
-    if (auto trigger_test = boost::dynamic_pointer_cast<TriggerTest>(element))
+    if (const auto& trigger_test = boost::dynamic_pointer_cast<TriggerTest>(name_element_pair.second))
     {
       bool is_triggered = triggered.find(trigger_test) != triggered.end();
 
@@ -270,18 +269,59 @@ void test_step(cedar::proc::GroupPtr network, TriggerTestPtr step)
   }
 }
 
-void test_network(cedar::proc::GroupPtr network)
+void test_group(cedar::proc::GroupPtr group)
 {
   using cedar::proc::Group;
   using cedar::proc::GroupPtr;
 
-  for (auto iter = network->getElements().begin(); iter != network->getElements().end(); ++iter)
+  for (const auto& name_element_pair : group->getElements())
   {
-    cedar::proc::ElementPtr element = iter->second;
-    if (auto step = boost::dynamic_pointer_cast<TriggerTest>(element))
+    if (auto step = boost::dynamic_pointer_cast<TriggerTest>(name_element_pair.second))
     {
-      test_step(network, step);
+      test_step(group, step);
     }
+  }
+}
+
+/* This tests if elements that are connected to group outputs are properly disconnected from being triggered by steps
+ * inside the group (see also issue #1003).
+ */
+void test_disconnecting()
+{
+  using cedar::proc::Group;
+  using cedar::proc::GroupPtr;
+
+  std::cout << "=========================================" << std::endl;
+  std::cout << " Checking disconnecting of group outputs" << std::endl;
+  std::cout << "=========================================" << std::endl << std::endl;
+
+  GroupPtr group(new Group());
+
+  GroupPtr nested(new Group());
+  group->add(nested, "nested");
+  nested->addConnector("slot", false);
+
+  TriggerTestPtr source(new TriggerTest());
+  nested->add(source, "source");
+  nested->connectSlots("source.out", "slot.input");
+
+  TriggerTestPtr target(new TriggerTest());
+  group->add(target, "target");
+  group->connectSlots("nested.slot", "target.in1");
+
+  std::cout << "Disconnecting slots." << std::endl;
+  group->disconnectSlots("nested.slot", "target.in1");
+
+  // reset data to remove any triggering that happened due to (dis)connecting the slots.
+  target->resetData();
+
+  std::cout << "Triggering source." << std::endl;
+  source->onTrigger();
+
+  if (target->mTriggerCount > 0)
+  {
+    ++global_errors;
+    std::cout << "ERROR: target was triggered by source even though no connection exists." << std::endl;
   }
 }
 
@@ -296,23 +336,25 @@ void run_test()
     std::cout << " Checking network configuration 1" << std::endl;
     std::cout << "==================================" << std::endl << std::endl;
 
-    GroupPtr network(new Group());
-    network->add(boost::make_shared<TriggerTest>(), "step1");
-    network->add(boost::make_shared<TriggerTest>(), "step2");
-    network->add(boost::make_shared<TriggerTest>(), "step3");
-    network->add(boost::make_shared<TriggerTest>(), "step4");
+    GroupPtr group(new Group());
+    group->add(boost::make_shared<TriggerTest>(), "step1");
+    group->add(boost::make_shared<TriggerTest>(), "step2");
+    group->add(boost::make_shared<TriggerTest>(), "step3");
+    group->add(boost::make_shared<TriggerTest>(), "step4");
 
     std::cout << "Connecting step1.out -> step2.in1" << std::endl;
-    network->connectSlots("step1.out", "step2.in1");
+    group->connectSlots("step1.out", "step2.in1");
     std::cout << "Connecting step1.out -> step3.in1" << std::endl;
-    network->connectSlots("step1.out", "step3.in1");
+    group->connectSlots("step1.out", "step3.in1");
     std::cout << "Connecting step2.out -> step4.in1" << std::endl;
-    network->connectSlots("step2.out", "step4.in1");
+    group->connectSlots("step2.out", "step4.in1");
     std::cout << "Connecting step3.out -> step4.in1" << std::endl;
-    network->connectSlots("step3.out", "step4.in2");
+    group->connectSlots("step3.out", "step4.in2");
 
-    test_network(network);
+    test_group(group);
   }
+
+  test_disconnecting();
 }
 
 int main(int argc, char** argv)

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -50,6 +50,7 @@ namespace cedar
 {
   namespace aux
   {
+    //! a string parser for unit frequency
     template <>
     inline cedar::unit::Frequency getUnitFromPostFix(const std::string& postFix)
     {
@@ -91,6 +92,7 @@ namespace cedar
     }
 
     // Generate types for the length parameter.
+    //! a unit parameter for frequency
     typedef cedar::aux::UnitParameterTemplate<cedar::unit::Frequency::unit_type> FrequencyParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(FrequencyParameter);
   }

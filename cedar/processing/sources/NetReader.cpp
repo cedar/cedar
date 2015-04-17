@@ -1,6 +1,6 @@
 /*=============================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -117,7 +117,10 @@ _mPort(new cedar::aux::StringParameter(this, "port",
 
 void cedar::proc::sources::NetReader::reset()
 {
-  mReader.reset();
+  QWriteLocker locker(mReader.getLockPtr());
+  mReader.member().reset();
+  locker.unlock();
+
   this->connect();
 }
 
@@ -129,12 +132,12 @@ void cedar::proc::sources::NetReader::emitOutputPropertiesChangedSignalOnAction(
 void cedar::proc::sources::NetReader::connect()
 {
   // instantiate the reader, if not yet done
-  if (!mReader)
+  QWriteLocker locker(mReader.getLockPtr());
+  if (!mReader.member())
   {
-
     try 
     {
-      mReader
+      mReader.member()
         = boost::shared_ptr< cedar::aux::net::Reader< cedar::aux::MatData::DataType > >
           (
             new cedar::aux::net::Reader< cedar::aux::MatData::DataType >(this->getPort())
@@ -144,20 +147,19 @@ void cedar::proc::sources::NetReader::connect()
     {
       // the writer hasnt declared the channel yet ... abort, better luck
       // on the next compute()
-      this->setState( cedar::proc::Triggerable::STATE_EXCEPTION,
-                      "The writer hasn't initialized this port/channel, yet. "
-                      "Please check whether the name is correct and it "
-                      "is running, then "
-                      "select reset in the context menu." );
-        // TODO: would be nice to have a state for temporarily disabling
+      this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, "Waiting for net writer (" + e.getMessage() + ").");
       return;
     }
     catch (cedar::aux::net::NetMissingRessourceException &e)
     {
-      // somehow YARP doesnt work ... :( typically fatal.
-      throw e; // lets try this ...
+      // somehow YARP doesnt work ... better luck next time :(
+      this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, "Waiting for resource (" + e.getMessage() + ").");
     }
+
+    // if we get here, we can (re)set the state to an ok state.
+    this->resetState();
   }
+  locker.unlock();
 }
 
 void cedar::proc::sources::NetReader::onStart()
@@ -170,33 +172,54 @@ void cedar::proc::sources::NetReader::onStart()
 void cedar::proc::sources::NetReader::onStop()
 {
   this->_mPort->setConstant(false);
-  mReader.reset();
+
+  QWriteLocker locker(mReader.getLockPtr());
+  mReader.member().reset();
+  locker.unlock();
 }
 
 void cedar::proc::sources::NetReader::compute(const cedar::proc::Arguments&)
 {
-  if (!mReader)
-    return;
+  QReadLocker locker(mReader.getLockPtr());
+  // if there is no reader ...
+  if (!mReader.member())
+  {
+    locker.unlock();
+    // ... try to create one
+    this->connect();
+
+    locker.relock();
+    // if we failed, stop computing
+    if (!mReader.member())
+      return;
+  }
 
   // read from net and set data
   try
   {
-    this->mOutput->setData(mReader->read());
-    //!@todo: this->emitOutputPropertiesChangedSignal("output"); //dead-locks, see issue #626
+    cv::Mat old = this->mOutput->getData();
+    cv::Mat read = mReader.member()->read();
+    bool changed = (old.type() != read.type() || old.size != read.size);
+    this->mOutput->setData(read);
+
+    if (changed)
+    {
+      this->emitOutputPropertiesChangedSignal("output");
+    }
   }
-  catch (cedar::aux::net::NetWaitingForWriterException& e)
+  catch (cedar::aux::net::NetWaitingForWriterException&)
   {
     // no writer instantiated yet? ignore
     // CHANGE NOTHING
     return;
   }
-  catch (cedar::aux::net::NetNoNewDataException& e)
+  catch (cedar::aux::net::NetNoNewDataException&)
   {
     // no new data has been sent. ignore
     // CHANGE NOTHING
     return;
   }
-  catch (cedar::aux::net::NetUnexpectedDataException& e)
+  catch (cedar::aux::net::NetUnexpectedDataException&)
   {
     // communication problem? ignore
     // CHANGE NOTHING

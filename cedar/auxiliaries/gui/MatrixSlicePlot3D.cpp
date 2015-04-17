@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -56,6 +56,10 @@
 #include <QKeyEvent>
 #include <vector>
 
+#if !defined(CV_MINOR_VERSION) || !defined(CV_MAJOR_VERSION) || CV_MAJOR_VERSION < 2 || (CV_MAJOR_VERSION == 2 && CV_MINOR_VERSION < 4)
+#define CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
+#endif
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -104,9 +108,11 @@ void cedar::aux::gui::MatrixSlicePlot3D::init()
   this->setValueScalingEnabled(true);
 }
 
-void cedar::aux::gui::MatrixSlicePlot3D::plot(cedar::aux::ConstDataPtr data, const std::string& /* title */)
+void cedar::aux::gui::MatrixSlicePlot3D::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   this->stop();
+
+  this->cedar::aux::gui::QImagePlot::plot(data, title);
 
   this->mData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   if (!this->mData)
@@ -162,8 +168,6 @@ unsigned int cedar::aux::gui::MatrixSlicePlot3D::getSlicedDimension() const
 
 void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
 {
-  //!@todo This is actually kind of close to a 3d slice plot for a matrix with dims >= 3 (instead of just == 3)
-  //!      Could this be generalized to a ND-slice-plot where three dimension are selected for plotting?
   int dim_sliced = static_cast<int>(this->getSlicedDimension());
 
   int dim_0, dim_1;
@@ -195,7 +199,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
 
   // decide which plot code is used depending on the OpenCV version
   // versions are defined since version 2.4, which supports the following code
-#if defined(CV_MINOR_VERSION) && defined(CV_MAJOR_VERSION) && CV_MAJOR_VERSION >= 2 && CV_MINOR_VERSION >= 4
+#ifndef CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
   // for each tile, copy content to right place
   // ranges is used to select the slice in the 3d-data
   cv::Range ranges[3];
@@ -208,7 +212,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   cv::Mat mSliceSize = cv::Mat(mat.size[dim_0], mat.size[dim_1], mat.type());
   unsigned int column = 0;
   unsigned int row = 0;
-  //!@todo For the special case of dim_sliced == 0, this can be done more efficiently
+
   for (unsigned int tile = 0; tile < tiles; tile++, column++)
   {
     if (column >= columns)
@@ -246,7 +250,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
       min = std::min(local_min, min);
     }
   }
-#else
+#else // CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
   // for each tile, copy content to right place
   unsigned int max_rows = static_cast<unsigned int>(mat.size[0]);
   unsigned int max_columns = static_cast<unsigned int>(mat.size[1]);
@@ -281,7 +285,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
     min = this->getValueLimits().getLower();
     max = this->getValueLimits().getUpper();
   }
-#endif // OpenCV version
+#endif // CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
 
   if (this->isAutoScaling())
   {
@@ -321,9 +325,9 @@ bool cedar::aux::gui::MatrixSlicePlot3D::doConversion()
   {
 //  case CV_8UC1:
     case CV_32FC1:
-#if defined(CV_MINOR_VERSION) && defined(CV_MAJOR_VERSION) && CV_MAJOR_VERSION >= 2 && CV_MINOR_VERSION >= 4
+#ifndef CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
   case CV_64FC1:
-#endif
+#endif // CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
     {
       this->slicesFromMat(cloned_mat);
       break;
@@ -342,7 +346,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::fillContextMenu(QMenu& menu)
 {
   QMenu* p_slice_menu = menu.addMenu("sliced dimension");
 
-#if defined(CV_MINOR_VERSION) && defined(CV_MAJOR_VERSION) && CV_MAJOR_VERSION >= 2 && CV_MINOR_VERSION >= 4
+#ifndef CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
   for (int d = 0; d < 3; ++d)
   {
     QString action_str = QString("along %1").arg(d);
@@ -353,9 +357,9 @@ void cedar::aux::gui::MatrixSlicePlot3D::fillContextMenu(QMenu& menu)
     p_action->setChecked(this->getSlicedDimension() == static_cast<unsigned int>(d));
     QObject::connect(p_action, SIGNAL(triggered()), SLOT(slicedDimensionSelected()));
   }
-#else
+#else // CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
   p_slice_menu->setEnabled(false);
-#endif
+#endif // CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
 }
 
 void cedar::aux::gui::MatrixSlicePlot3D::slicedDimensionSelected()

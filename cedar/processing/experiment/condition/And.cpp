@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -82,7 +82,7 @@ _mCondition2
 {
 }
 
-bool cedar::proc::experiment::condition::And::check()
+bool cedar::proc::experiment::condition::And::check() const
 {
   return _mCondition1->getValue()->runCheck(false) && _mCondition2->getValue()->runCheck(false);
 }

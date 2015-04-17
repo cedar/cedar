@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -85,13 +85,13 @@ namespace cedar
             const QString& pLabel,
             cedar::aux::ConstDataPtr pData,
             cedar::proc::PlotDataPtr pPlotData,
-            const std::string& decalarationToUse = std::string()
+            const std::string& declarationToUse = std::string()
           );
 
         private:
           void fillPlotOptions(QMenu* menu);
 
-          void openPlotFromDeclaration(const std::string& decalarationToFind);
+          void openPlotFromDeclaration(const std::string& declarationToFind);
 
         private slots:
           void openDefaultPlot();
@@ -120,7 +120,7 @@ namespace cedar
 }
 //!@endcond
 
-/*!@todo Document this.
+/*!@brief a widget for plots
  */
 class cedar::proc::gui::PlotWidget : public QWidget
 {

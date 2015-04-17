@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -55,6 +55,7 @@
 cedar::aux::Settings::Settings()
 :
 cedar::aux::Configurable(),
+mGlobalTimeFactor(1.0),
 _mMemoryDebugOutput(new cedar::aux::BoolParameter(this, "memory debug output", false))
 {
   _mRecorderWorkspace = new cedar::aux::DirectoryParameter
@@ -105,9 +106,6 @@ _mMemoryDebugOutput(new cedar::aux::BoolParameter(this, "memory debug output", f
                                  );
 #endif // CEDAR_USE_FFTW
 
-  this->_mGlobalTimeFactor = new cedar::aux::DoubleParameter(this, "global time factor", 1.0, cedar::aux::DoubleParameter::LimitType::positive());
-  QObject::connect(this->_mGlobalTimeFactor.get(), SIGNAL(valueChanged()), this, SLOT(qGlobalTimeFactorChanged()));
-
   try
   {
     this->load();
@@ -145,21 +143,20 @@ cedar::aux::Settings::~Settings()
 
 void cedar::aux::Settings::setGlobalTimeFactor(double factor)
 {
-  this->_mGlobalTimeFactor->setValue(factor, true);
+  QWriteLocker locker(this->mGlobalTimeFactor.getLockPtr());
+  this->mGlobalTimeFactor.member() = factor;
+  locker.unlock();
+
+  // note, that we do not pass this->mGlobalTimeFactor here to prevent race conditions
+  this->signalGlobalTimeFactorChanged(factor);
 }
 
 double cedar::aux::Settings::getGlobalTimeFactor() const
 {
-  QReadLocker locker(this->_mGlobalTimeFactor->getLock());
-  double copy = this->_mGlobalTimeFactor->getValue();
+  QReadLocker locker(this->mGlobalTimeFactor.getLockPtr());
+  double copy = this->mGlobalTimeFactor.member();
   locker.unlock();
   return copy;
-}
-
-void cedar::aux::Settings::qGlobalTimeFactorChanged()
-{
-  double copy = this->getGlobalTimeFactor();
-  this->signalGlobalTimeFactorChanged(copy);
 }
 
 cedar::aux::DirectoryParameterPtr cedar::aux::Settings::getRecorderWorkspaceParameter() const
@@ -220,8 +217,7 @@ void cedar::aux::Settings::removePlugin(const std::string& pluginName)
   auto iter = this->_mKnownPlugins->get().find(pluginName);
   if (iter == this->_mKnownPlugins->get().end())
   {
-    //!@todo Should this be a UnknownPluginException?
-    CEDAR_THROW(cedar::aux::UnknownNameException, "The plugin \"" + pluginName + "\" is not known.");
+    CEDAR_THROW(cedar::aux::UnknownPluginException, "The plugin \"" + pluginName + "\" is not known.");
   }
 
   auto load_iter = this->_mPluginsToLoad->get().find(pluginName);

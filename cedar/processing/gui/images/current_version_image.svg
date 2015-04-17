@@ -14,8 +14,8 @@
    height="191.9375"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
-   sodipodi:docname="current_version_image_crimson_king.svg"
+   inkscape:version="0.91 r"
+   sodipodi:docname="current_version_image.svg"
    inkscape:export-filename="/home/lompolbx/Pictures/moonchild_desktop_alt.png"
    inkscape:export-xdpi="142.5284"
    inkscape:export-ydpi="142.5284">
@@ -268,13 +268,32 @@
        y2="372.21948" />
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient3802"
+       xlink:href="#linearGradient4211"
        id="linearGradient3808"
        x1="0.5363853"
        y1="65.072937"
        x2="-0.5363853"
        y2="256.5625"
        gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient4211">
+      <stop
+         id="stop4213"
+         offset="0"
+         style="stop-color:#029500;stop-opacity:1" />
+      <stop
+         style="stop-color:#a0ff00;stop-opacity:1"
+         offset="0.34615386"
+         id="stop4215" />
+      <stop
+         style="stop-color:#bbfb00;stop-opacity:1"
+         offset="0.66469431"
+         id="stop4217" />
+      <stop
+         id="stop4219"
+         offset="1"
+         style="stop-color:#d3ff04;stop-opacity:1" />
+    </linearGradient>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -283,11 +302,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.8643314"
-     inkscape:cx="143.23455"
-     inkscape:cy="84.431429"
+     inkscape:zoom="0.9321657"
+     inkscape:cx="42.641951"
+     inkscape:cy="47.264653"
      inkscape:document-units="px"
-     inkscape:current-layer="layer9"
+     inkscape:current-layer="g3688"
      showgrid="false"
      inkscape:window-width="1920"
      inkscape:window-height="1005"
@@ -339,7 +358,7 @@
      style="display:inline"
      transform="translate(-172.93067,-400.70852)">
     <path
-       style="fill:url(#linearGradient3808);fill-opacity:1;fill-rule:evenodd;stroke:none;display:inline"
+       style="fill:url(#linearGradient3808);fill-opacity:1.0;fill-rule:evenodd;stroke:none;display:inline"
        d="m 0,64.625 0,191.9375 488.28125,0 0,-191.9375 L 0,64.625 z"
        transform="translate(172.93067,336.08352)"
        id="rect3194" />
@@ -404,13 +423,13 @@
          id="text3684"
          y="481.02283"
          x="-72.445229"
-         style="font-size:72px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         style="font-style:normal;font-weight:normal;font-size:72px;line-height:125%;font-family:'Bitstream Vera Sans';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
          xml:space="preserve"><tspan
-           style="font-size:95px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;font-family:URW Gothic L;-inkscape-font-specification:URW Gothic L Semi-Bold"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:95px;font-family:'URW Gothic L';-inkscape-font-specification:'URW Gothic L Semi-Bold';fill:#000000;fill-opacity:1"
            y="481.02283"
            x="-72.445229"
            id="tspan3686"
-           sodipodi:role="line">cedar 4.0</tspan></text>
+           sodipodi:role="line">cedar 5.0</tspan></text>
     </g>
   </g>
 </svg>

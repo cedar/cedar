@@ -3,8 +3,7 @@ Readme
 
 # License
 
-Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum,
-Germany
+Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
 This file is part of cedar.
 
@@ -260,10 +259,10 @@ containing the cedar sources from our
         sudo make install
 
 
-## Play around with the processing framework
+## First steps
 
 If you don't want to start coding right away, you can have a look at our
-processing framework:
+GUI:
 
 1. Go into the binary folder of the cedar repository:
 

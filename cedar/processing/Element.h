@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -78,17 +78,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief sets the network at which this element is registered
-  CEDAR_DECLARE_DEPRECATED(void setNetwork(cedar::proc::GroupPtr network));
-
   //!@brief sets the group at which this element is registered
   void setGroup(cedar::proc::GroupPtr group);
-
-  //!@brief get the network at which this element is registered
-  CEDAR_DECLARE_DEPRECATED(cedar::proc::GroupPtr getNetwork());
-
-  //!@brief get the network at which this element is registered as const
-  CEDAR_DECLARE_DEPRECATED(cedar::proc::ConstGroupPtr getNetwork() const);
 
   //!@brief get the group at which this element is registered
   cedar::proc::GroupPtr getGroup();
@@ -112,8 +103,8 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! connects to network changed signal
-  inline boost::signals2::connection connectToNetworkChanged(boost::function<void()> slot)
+  //! connects to group changed signal
+  inline boost::signals2::connection connectToGroupChanged(boost::function<void()> slot)
   {
     return this->mGroupChanged.connect(slot);
   }

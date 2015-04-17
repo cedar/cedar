@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -134,24 +134,6 @@ public:
   const QDir& getValue() const
   {
     return this->mValue;
-  }
-
-  //!@brief Old version of the set function.
-  CEDAR_DECLARE_DEPRECATED(void set(const std::string& value))
-  {
-    this->setValue(value);
-  }
-
-  //!@brief Old version of the set function.
-  CEDAR_DECLARE_DEPRECATED(void set(const QDir& value))
-  {
-    this->setValue(value);
-  }
-
-  //!@brief Old version of the get function.
-  CEDAR_DECLARE_DEPRECATED(const QDir& get())
-  {
-    return this->getValue();
   }
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 
 /*=============================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -110,8 +110,11 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
     //! return the current counter of steps
     unsigned long getNumberOfSteps();
 
-    //!@todo: needs documentation. I don't get it. js
+    //! return the maximum of skipped steps
     double getMaxStepsTaken();
+
+    //! Return the number of steps taken (including skipped ones).
+    double getSumOfStepsTaken();
 
   private:
     void globalTimeFactorChanged(double newFactor);
@@ -124,7 +127,7 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
     unsigned long mNumberOfSteps;
     //!@brief
     double mSumOfStepsTaken;
-    //!@brief
+    //!@brief the maximum number of skipped steps, ever!
     double mMaxStepsTaken;
 
     //! Used for multiplying all step times.

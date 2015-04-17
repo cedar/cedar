@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -44,7 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/gui/Connection.h"
-#include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/gui/Element.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
@@ -57,7 +57,7 @@
 
 /*!@brief Representation of a cedar::proc::Trigger in a cedar::proc::gui::Scene.
  */
-class cedar::proc::gui::TriggerItem : public QObject, public cedar::proc::gui::GraphicsBase
+class cedar::proc::gui::TriggerItem : public QObject, public cedar::proc::gui::Element
 {
   Q_OBJECT
 
@@ -124,6 +124,8 @@ public:
 
   //!@brief disconnect from a listener
   void disconnect(cedar::proc::gui::GraphicsBase* pListener);
+
+  bool canDuplicate() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

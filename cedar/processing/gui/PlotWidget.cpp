@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -48,12 +48,13 @@
 // private nested structs and classes
 //----------------------------------------------------------------------------------------------------------------------
 
+//!@cond SKIPPED_DOCUMENTATION
 cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::LabeledPlot
 (
   const QString& pLabel,
   cedar::aux::ConstDataPtr pData,
   cedar::proc::PlotDataPtr pPlotData,
-  const std::string& decalarationToUse
+  const std::string& declarationToUse
 )
 :
 //mpPlotDeclaration(pPlotDecl),
@@ -81,10 +82,10 @@ mpLabel(new QLabel(pLabel))
   this->mpTitleLayout->addWidget(this->mpPlotSelector);
   this->mpTitleLayout->addWidget(this->mpLabel);
 
-  this->openPlotFromDeclaration(decalarationToUse);
+  this->openPlotFromDeclaration(declarationToUse);
 };
 
-void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openPlotFromDeclaration(const std::string& decalarationToFind)
+void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openPlotFromDeclaration(const std::string& declarationToFind)
 {
   // first, check if there are any declarations for the data at all
   cedar::aux::gui::ConstPlotDeclarationPtr decl;
@@ -94,47 +95,57 @@ void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openPlotFromDeclaration(c
   }
   catch (cedar::aux::NotFoundException&)
   {
-    return;
+    // ok -- below, we display info to the user
+  }
+  catch (cedar::aux::UnknownTypeException)
+  {
+    // ok -- below, we display info to the user
   }
 
-  if (!decalarationToFind.empty())
+  if (!declarationToFind.empty())
   {
     // then, try to find one that matches the specified one
-    auto declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find(mpData)->getData();
-    for (auto declaration : declarations)
+    try
     {
-      if (declaration->getClassName() == decalarationToFind)
+      auto declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find(mpData)->getData();
+      for (auto declaration : declarations)
       {
-        mpPlotDeclaration = declaration;
-        break;
+        if (declaration->getClassName() == declarationToFind)
+        {
+          mpPlotDeclaration = declaration;
+          break;
+        }
       }
     }
+    catch (cedar::aux::UnknownTypeException)
+    {
+    }
+  }
+
+  if (this->mpPlotter)
+  {
+    // remember the old data that was plotted
+    if (auto multi = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpPlotter))
+    {
+      const auto& map = multi->getDataTitleMap();
+      mMultiPlotData.insert(map.begin(), map.end());
+    }
+
+    this->mpPlotContainer->layout()->removeWidget(this->mpPlotter);
+    delete this->mpPlotter;
+  }
+
+  // clear all remaining widgets from the plot container
+  while (this->mpPlotContainer->layout()->count() > 0)
+  {
+    auto item = this->mpPlotContainer->layout()->itemAt(0);
+    auto widget = item->widget();
+    this->mpPlotContainer->layout()->removeItem(item);
+    delete widget;
   }
 
   if (mpPlotDeclaration)
   {
-    if (this->mpPlotter)
-    {
-      // remember the old data that was plotted
-      if (auto multi = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpPlotter))
-      {
-        const auto& map = multi->getDataMap();
-        mMultiPlotData.insert(map.begin(), map.end());
-      }
-
-      this->mpPlotContainer->layout()->removeWidget(this->mpPlotter);
-      delete this->mpPlotter;
-    }
-
-    // clear all remaining widgets from the plot container
-    while (this->mpPlotContainer->layout()->count() > 0)
-    {
-      auto item = this->mpPlotContainer->layout()->itemAt(0);
-      auto widget = item->widget();
-      this->mpPlotContainer->layout()->removeItem(item);
-      delete widget;
-    }
-
     try
     {
       mpPlotter = mpPlotDeclaration->createPlot();
@@ -168,6 +179,12 @@ void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openPlotFromDeclaration(c
       }
     }
   }
+  else // No plot declaration found
+  {
+    auto label = new QLabel("Could not open plot: no known plot for type.");
+    label->setWordWrap(true);
+    this->mpPlotContainer->layout()->addWidget(label);
+  }
 }
 
 void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openDefaultPlot()
@@ -185,17 +202,29 @@ void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openSpecificPlot()
 
 void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::fillPlotOptions(QMenu* menu)
 {
+  this->mpPlotSelector->setEnabled(true);
   auto default_action = menu->addAction("default");
   menu->addSeparator();
   QObject::connect(default_action, SIGNAL(triggered()), this, SLOT(openDefaultPlot()));
 
-  auto declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find(mpData)->getData();
-  for (auto declaration : declarations)
+  try
   {
-    auto action = menu->addAction(QString::fromStdString(declaration->getClassName()));
-    QObject::connect(action, SIGNAL(triggered()), this, SLOT(openSpecificPlot()));
+    auto declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find(mpData)->getData();
+    for (auto declaration : declarations)
+    {
+      auto action = menu->addAction(QString::fromStdString(declaration->getClassName()));
+      QObject::connect(action, SIGNAL(triggered()), this, SLOT(openSpecificPlot()));
+    }
+  }
+  catch (cedar::aux::UnknownTypeException)
+  {
+    default_action->setEnabled(false);
+    auto no_action = menu->addAction("no plots found");
+    no_action->setEnabled(false);
+    this->mpPlotSelector->setEnabled(false);
   }
 }
+//!@endcond
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -739,7 +768,7 @@ void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::a
   auto serialized_data_list = node.get_child("data_list");
   cedar::proc::ElementDeclaration::DataList data_list;
   
-  for(auto data_item : serialized_data_list)
+  for (auto data_item : serialized_data_list)
   {
     auto p_plot_data = cedar::proc::PlotDataPtr(new cedar::proc::PlotData());
     p_plot_data->readConfiguration(data_item.second);

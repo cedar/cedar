@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -109,7 +109,7 @@ int main(int argc, char** argv)
 
   cedar::proc::gui::SettingsSingleton::getInstance()->disableWriting();
 
-  cedar::proc::gui::Ide *p_ide = new cedar::proc::gui::Ide(false);
+  cedar::proc::gui::Ide *p_ide = new cedar::proc::gui::Ide(false, false, true);
 
   errors += testSaving(p_ide);
 

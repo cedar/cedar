@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -305,7 +305,6 @@ cedar::aux::DataTable::ConstRowCollectionPtr cedar::aux::DataTable::RowCollectio
 
 cedar::aux::DataTable::ConstRowCollectionPtr cedar::aux::DataTable::RowCollection::selectByCounter(const std::string& counter, int value) const
 {
-  //!@todo Can be sped up by looking up the integer handle of the counter once beforehand, then using that to get the value
   auto selector = [](cedar::aux::DataTable::ConstRowPtr row, const std::string& counter, int match_value)
   {
     if (!row->hasCounterValue(counter))
@@ -322,7 +321,6 @@ cedar::aux::DataTable::ConstRowCollectionPtr cedar::aux::DataTable::RowCollectio
 
 cedar::aux::DataTable::ConstRowCollectionPtr cedar::aux::DataTable::RowCollection::selectById(const std::string& id, const std::string& value) const
 {
-  //!@todo Can be sped up by looking up the integer handle of the id once beforehand, then using that to get the value
   auto selector = [](cedar::aux::DataTable::ConstRowPtr row, const std::string& id, const std::string& match_value)
   {
     if (!row->hasId(id))

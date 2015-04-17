@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -42,6 +42,7 @@
 
 cedar::aux::GlobalClock::GlobalClock()
 :
+mpAccessLock(new QReadWriteLock()),
 mRunning(false)
 {
   this->mGlobalTimeFactorConnection = cedar::aux::SettingsSingleton::getInstance()->connectToGlobalTimeFactorChangedSignal
@@ -56,6 +57,13 @@ mRunning(false)
 
 cedar::aux::GlobalClock::~GlobalClock()
 {
+  delete this->mpAccessLock;
+}
+
+void cedar::aux::GlobalClock::addTime(const cedar::unit::Time& time)
+{
+  QWriteLocker locker(this->mpAccessLock);
+  this->mAdditionalElapsedTime += static_cast<double>(time / (0.001 * cedar::unit::seconds));
 }
 
 void cedar::aux::GlobalClock::globalTimeFactorChanged(double newFactor)
@@ -79,11 +87,24 @@ void cedar::aux::GlobalClock::addCurrentToAdditionalElapsedTime()
 
 bool cedar::aux::GlobalClock::isRunning() const
 {
-  return this->mRunning;
+  QReadLocker locker(this->mpAccessLock);
+  bool copy = this->mRunning;
+  return copy;
 }
 
 void cedar::aux::GlobalClock::start()
 {
+  // since write locks block, let's see if were running in a read-only mode first
+  QReadLocker r_locker(this->mpAccessLock);
+  if (this->mRunning)
+  {
+    return;
+  }
+  r_locker.unlock();
+
+  // if we aren't running, lets change that
+  QWriteLocker w_locker(this->mpAccessLock);
+  // since we unlocked for a brief moment, we need to check again if we're running
   if (!this->mRunning)
   {
     this->mTimer.start();
@@ -93,6 +114,8 @@ void cedar::aux::GlobalClock::start()
 
 void cedar::aux::GlobalClock::reset()
 {
+  QWriteLocker w_locker(this->mpAccessLock);
+
   this->mAdditionalElapsedTime = 0;
   this->mTimer.restart();
 }
@@ -100,6 +123,17 @@ void cedar::aux::GlobalClock::reset()
 
 void cedar::aux::GlobalClock::stop()
 {
+  // since write locks block, let's see if were running in a read-only mode first
+  QReadLocker r_locker(this->mpAccessLock);
+  if (!this->mRunning)
+  {
+    return;
+  }
+  r_locker.unlock();
+
+  // if we are running, lets change that
+  QWriteLocker w_locker(this->mpAccessLock);
+  // since we unlocked for a brief moment, we need to check again if we're running
   if (this->mRunning)
   {
     this->addCurrentToAdditionalElapsedTime();
@@ -107,8 +141,9 @@ void cedar::aux::GlobalClock::stop()
   }
 }
 
-cedar::unit::Time cedar::aux::GlobalClock::getTime()
+cedar::unit::Time cedar::aux::GlobalClock::getTime() const
 {
+  QReadLocker locker(this->mpAccessLock);
   double time_msecs = this->mAdditionalElapsedTime;
 
   if (this->mRunning)

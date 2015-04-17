@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -45,7 +45,6 @@
 #include "cedar/auxiliaries/net/exceptions.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -57,11 +56,6 @@ using namespace std;
 
 int main()
 {
-  cedar::aux::LogFile log_file("net.log");
-
-  log_file.addTimeStamp();
-  log_file << std::endl;
-
   // the number of errors encountered in this test
   signed char errors = 0;
   signed char mat_errors = 0;
@@ -85,19 +79,19 @@ int main()
   }
   catch (cedar::aux::ExceptionBase &E)
   {
-    log_file << E.exceptionInfo() << std::endl;
+    std::cout << E.exceptionInfo() << std::endl;
     return 1;
   }
 
   if (mat_errors)
   {
     errors++;
-    log_file << "ERROR with float" << std::endl;
+    std::cout << "ERROR with float" << std::endl;
     mat_errors= 0;
   }
   else
   {
-    log_file << "OK (float)" << std::endl;
+    std::cout << "OK (float)" << std::endl;
   }
 
   //// cv::Mat Test ////
@@ -192,19 +186,19 @@ int main()
   } // end try
   catch (cedar::aux::ExceptionBase &E)
   {
-    log_file << E.exceptionInfo() << std::endl;
+    std::cout << E.exceptionInfo() << std::endl;
     return 1;
   }
 
   if (mat_errors)
   {
-    log_file << "ERROR with cv::Mat simple write() / read()" << std::endl;
+    std::cout << "ERROR with cv::Mat simple write() / read()" << std::endl;
     errors++;
     mat_errors = 0;
   }
   else
   {
-    log_file << "OK (cv::Mat)" << std::endl;
+    std::cout << "OK (cv::Mat)" << std::endl;
   }
 
 #endif
@@ -238,35 +232,35 @@ int main()
     if (mat5(1,1) != mat4(1,1))
     {
       mat_errors++;
-      log_file << "ERROR with cv::Mat_ test" << std::endl;
+      std::cout << "ERROR with cv::Mat_ test" << std::endl;
     }
   }
   catch (cedar::aux::net::NetWaitingForWriterException &e)
   {
-    log_file << "ERROR writer not initialized yet, should wait" << std::endl;
+    std::cout << "ERROR writer not initialized yet, should wait" << std::endl;
     return 1;
   }
   catch (cedar::aux::net::NetMissingRessourceException &e)
   {
-    log_file << "ERROR YARP NAME SERVER NOT RUNNING" << std::endl;
+    std::cout << "ERROR YARP NAME SERVER NOT RUNNING" << std::endl;
     return 1;
   }
   catch (cedar::aux::net::NetUnexpectedDataException &e)
   {
-    log_file << "ERROR YARP unexpected data" << std::endl;
+    std::cout << "ERROR YARP unexpected data" << std::endl;
     return 1;
   }
 #endif
  
   if (mat_errors)
   {
-    log_file << "ERROR with cv::Mat_ simple" << std::endl;
+    std::cout << "ERROR with cv::Mat_ simple" << std::endl;
     errors++;
     mat_errors = 0;
   }
   else
   {
-    log_file << "OK (cv::Mat_)" << std::endl;
+    std::cout << "OK (cv::Mat_)" << std::endl;
   }
 
 #if 1
@@ -286,7 +280,7 @@ int main()
     if (t != s)
     {
       mat_errors++;
-      log_file << "ERROR with std::string (1)" << std::endl;
+      std::cout << "ERROR with std::string (1)" << std::endl;
     }
 
     // test sending another string (with different size)
@@ -298,13 +292,13 @@ int main()
     if (t2 != s2)
     {
       mat_errors++;
-      log_file << "ERROR with std::string (2)" << std::endl;
+      std::cout << "ERROR with std::string (2)" << std::endl;
     }
 
   }
   catch (cedar::aux::ExceptionBase &E)
   {
-    log_file << E.exceptionInfo() << std::endl;
+    std::cout << E.exceptionInfo() << std::endl;
     return 1;
   }
 #endif

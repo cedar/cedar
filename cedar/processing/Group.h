@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -43,10 +43,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Connectable.h"
-#include "cedar/processing/NetworkPath.h"
+#include "cedar/processing/GroupPath.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/MapParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 #include "cedar/units/Time.h"
@@ -76,6 +77,7 @@
 #include <set>
 #include <list>
 #include <string>
+#include <functional>
 
 /*!@brief A collection of cedar::proc::Elements forming some logical unit.
  *
@@ -104,17 +106,28 @@ public:
    */
   struct ParameterLinkInfo
   {
+    //! returns the path to the source element of this parameter link
     std::string getSourceElementPath() const;
+
+    //! returns the path to the target element of this parameter link
     std::string getTargetElementPath() const;
 
+    //! returns the path to the source parameter of this parameter link
     std::string getSourceParameterPath() const;
+
+    //! returns the path to the target parameter of this parameter link
     std::string getTargetParameterPath() const;
 
+    //! the link parameter
     cedar::aux::ParameterLinkPtr mParameterLink;
 
+    //! the source element
     cedar::proc::ElementPtr mSourceElement;
+
+    //! the target element
     cedar::proc::ElementPtr mTargetElement;
 
+    //! the group
     cedar::proc::GroupWeakPtr mGroup;
   };
 
@@ -127,7 +140,7 @@ public:
     CONNECTION_REMOVED,
   };
 
- signals:
+signals:
   //! Signals when a step name changes.
   void stepNameChanged(const std::string& from, const std::string& to);
 
@@ -191,13 +204,6 @@ public:
 
   void readData(const cedar::aux::ConfigurationNode& root);
 
-  /*!@deprecated Use readConfiguration instead.
-   */
-  CEDAR_DECLARE_DEPRECATED(void readFrom(const cedar::aux::ConfigurationNode& root))
-  {
-    this->readConfiguration(root);
-  }
-
   /*!@brief Writes the group to a configuration node.
    */
   void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
@@ -206,42 +212,15 @@ public:
    */
   void writeData(cedar::aux::ConfigurationNode& root) const;
 
-  /*!@deprecated Use writeConfiguration instead.
-   */
-  CEDAR_DECLARE_DEPRECATED(void writeTo(cedar::aux::ConfigurationNode& root))
-  {
-    this->writeConfiguration(root);
-  }
-
-  /*!@brief Reads the group from a given json file.
-   *
-   *        This file must have the same format as the one output by cedar::proc::Group::writeFile.
-   *
-   * @deprecated Use readJson (from cedar::aux::Configurable)
-   */
-  CEDAR_DECLARE_DEPRECATED(void readFile(const std::string& filename))
-  {
-    this->readJson(filename);
-  }
-
-  /*!@brief Writes the group to a given json file.
-   *
-   * @deprecated Use writeJson (from cedar::aux::Configurable)
-   */
-  CEDAR_DECLARE_DEPRECATED(void writeFile(const std::string& filename))
-  {
-    this->writeJson(filename);
-  }
-
   /*!@brief Removes an element from the group.
    *
    * @remark Before calling this function, you should remove all connections to the element.
    */
-  void remove(cedar::proc::ConstElementPtr element);
+  void remove(cedar::proc::ConstElementPtr element, bool destructing = false);
 
   /*!@brief calls remove() for every element of the group
    */
-  void removeAll();
+  void removeAll(bool destructing = false);
 
   /*!@brief Creates a new element with the type given by className and the name instanceName.
    *
@@ -289,15 +268,10 @@ public:
    */
   std::string duplicate(const std::string& elementName, const std::string& newName = "");
 
-  /*!@brief unmodifiedName unmodified name, possibly non-unique in group
-   * @return unique name created by attaching a number if name is already taken
-   */
-  CEDAR_DECLARE_DEPRECATED(std::string getUniqueName(const std::string& unmodifiedName) const);
-
   /*!@brief Returns the element with the given name as a pointer of the specified type.
    */
   template <class T>
-  boost::shared_ptr<T> getElement(const cedar::proc::NetworkPath& name)
+  boost::shared_ptr<T> getElement(const cedar::proc::GroupPath& name)
   {
     return boost::dynamic_pointer_cast<T>(this->getElement(name));
   }
@@ -305,7 +279,7 @@ public:
   /*!@brief Returns the element with the given name as a const pointer of the specified type.
    */
   template <class T>
-  boost::shared_ptr<const T> getElement(const cedar::proc::NetworkPath& name) const
+  boost::shared_ptr<const T> getElement(const cedar::proc::GroupPath& name) const
   {
     return boost::dynamic_pointer_cast<const T>(this->getElement(name));
   }
@@ -314,13 +288,13 @@ public:
    *
    * @throws cedar::aux::InvalidNameException if no element is found with the given name.
    */
-  cedar::proc::ElementPtr getElement(const cedar::proc::NetworkPath& name);
+  cedar::proc::ElementPtr getElement(const cedar::proc::GroupPath& name);
 
   /*!@brief  Returns a const pointer to the element with the given name.
    *
    * @throws cedar::aux::InvalidNameException if no element is found with the given name.
    */
-  cedar::proc::ConstElementPtr getElement(const cedar::proc::NetworkPath& name) const;
+  cedar::proc::ConstElementPtr getElement(const cedar::proc::GroupPath& name) const;
 
   /*!@brief Connects data slots of two cedar::proc::Connectable elements.
    *
@@ -451,11 +425,9 @@ public:
   //! Recursively lists all elements in the group and all its subgroups.
   std::vector<cedar::proc::GroupPath> listAllElementPaths(const cedar::proc::GroupPath& base_path = cedar::proc::GroupPath()) const;
 
-  //!@deprecated Use getElements instead.
-  CEDAR_DECLARE_DEPRECATED(const ElementMap& elements() const)
-  {
-    return this->getElements();
-  }
+  /*! Recursively lists elements in the group and all its subgroups if they fit the function fit.
+   */
+  std::vector<cedar::proc::GroupPath> listElementPaths(std::function<bool(cedar::proc::ConstElementPtr)> fit, const cedar::proc::GroupPath& base_path = cedar::proc::GroupPath()) const;
 
   /*!@brief Updates the name stored for the object.
    */
@@ -521,7 +493,10 @@ public:
   std::string getUniqueIdentifier(const std::string& identifier) const;
 
   //!@brief Checks whether a name exists in the group.
-  bool nameExists(const cedar::proc::NetworkPath& name) const;
+  bool nameExists(const cedar::proc::GroupPath& name) const;
+
+  //!@brief Checks whether a name exists in this group or any of its children or parents.
+  bool nameExistsInAnyGroup(const cedar::proc::GroupPath& name) const;
 
   //!@brief returns the last ui node that was read
   cedar::aux::ConfigurationNode& getLastReadConfiguration()
@@ -557,7 +532,7 @@ public:
   std::vector<cedar::proc::ConsistencyIssuePtr> checkConsistency() const;
 
   //! Returns a list of all the looped triggers in this group.
-  std::vector<cedar::proc::LoopedTriggerPtr> listLoopedTriggers() const;
+  std::vector<cedar::proc::LoopedTriggerPtr> listLoopedTriggers(bool recursive = false) const;
 
   //! Reads the meta information from the given file and extracts the plugins required by the architecture.
   static std::set<std::string> getRequiredPlugins(const std::string& architectureFile);
@@ -588,7 +563,7 @@ public:
   bool isRoot() const;
 
   //!@brief imports a given group from a given configuration file
-  cedar::proc::ElementPtr importGroupFromFile(const std::string& groupName, const std::string& fileName);
+  cedar::proc::ElementPtr importGroupFromFile(const std::string& groupName, const cedar::aux::Path& fileName);
 
   //!@brief imports a given group from a given configuration file and links it to said file
   cedar::proc::ElementPtr createLinkedGroup(const std::string& groupName, const std::string& fileName);
@@ -661,7 +636,7 @@ public:
    */
   inline bool isLinked() const
   {
-    return !this->mLinkedGroupFile.isEmpty() && !this->mLinkedGroupName.empty();
+    return !this->mLinkedGroupFile.empty() && !this->mLinkedGroupName.empty();
   }
 
   //!@brief finds all elements in this group and child groups that match the given name
@@ -703,6 +678,15 @@ public:
 
   //! Checks if a script with the given name exists in this group.
   bool checkScriptNameExists(const std::string& name) const;
+
+  //! Sets the time factor to be used for simulating this group. Only applied by the root group.
+  void setTimeFactor(double factor);
+
+  //! Returns the time factor set for this architecture.
+  double getTimeFactor() const;
+
+  //! Applies the group's time factor, i.e., sets it at the cedar::aux::SettingsSingleton.
+  void applyTimeFactor();
 
   //!@brief connects two slots across groups, allocating connectors if necessary
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
@@ -778,6 +762,13 @@ private:
 
   //! Finds an identifier for which the @em checker function returns false.
   static std::string findNewIdentifier(const std::string& basis, boost::function<bool(const std::string&)> checker);
+
+  //! if the parent group changes (i.e., this group looses its 'rootness'), the default trigger is removed if it exists
+  void onParentGroupChanged();
+
+  void disconnectTriggerInternal(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
+
+  void outputConnectionRemoved(cedar::proc::DataSlotPtr slot);
 
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
@@ -885,6 +876,9 @@ private:
   //! Map of scripts present in this architecture
   cedar::aux::LockableMember<std::set<cedar::proc::CppScriptPtr>> mScripts;
 
+  //! a connection to the groupChanged signal of element
+  boost::signals2::scoped_connection mParentGroupChangedConnection;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -894,6 +888,8 @@ protected:
 
   //! loopiness of this group
   cedar::aux::BoolParameterPtr _mIsLooped;
+
+  cedar::aux::DoubleParameterPtr _mTimeFactor;
 
 }; // class cedar::proc::Group
 

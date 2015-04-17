@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -52,6 +52,12 @@
 #include <string>
 #include <vector>
 
+/*!@brief Exception that relates to arithmetic expression errors
+ */
+class cedar::aux::ArithmeticExpressionException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::ArithmeticExpressionException
+
 /*!@brief Exception that occurs when a data type is not handled (e.g. by a generic plotter).
  */
 class cedar::aux::UnhandledTypeException : public cedar::aux::ExceptionBase
@@ -75,6 +81,12 @@ class cedar::aux::UnknownTypeException : public cedar::aux::ExceptionBase
 class cedar::aux::UnknownNameException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::UnknownNameException
+
+/*!@brief Exception that occurs when a plugin is not known.
+ */
+class cedar::aux::UnknownPluginException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::UnknownPluginException
 
 /*!@brief Exception that signals that something could not be found.
  */
@@ -303,13 +315,17 @@ class cedar::aux::NotImplementedException: public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::NotImplementedException
 
-/*!@brief An exception that is thrown, when a thread is running and an operation
- *        is called which is not allowed.
- * @todo  This exception needs a better name
+/*!@brief An exception that is thrown, when the recorder cannot execute a method due to thread constraints
  */
-class cedar::aux::ThreadRunningExeption: public cedar::aux::ExceptionBase
+class cedar::aux::RecorderException: public cedar::aux::ExceptionBase
 {
-}; // class cedar::aux::ThreadRunningExeption
+}; // class cedar::aux::RecorderException
+
+/*!@brief An exception that is thrown when parameter linking encounters an error
+ */
+class cedar::aux::ParameterLinkingException: public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::ParameterLinkingException
 
 
 #endif // CEDAR_AUX_EXCEPTIONS_H

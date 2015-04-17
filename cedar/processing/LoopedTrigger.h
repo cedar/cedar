@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -98,26 +98,18 @@ public:
    */
   void step(cedar::unit::Time time);
 
-  /*!@brief Starts the trigger loop.
-   *
-   * @deprecated Use the ThreadWrapper::start() method instead.
-   */
-  CEDAR_DECLARE_DEPRECATED(void startTrigger())
-  {
-    start();
-  }
-
-  /*!@brief Stops the trigger loop.
-   *
-   * @deprecated Use the ThreadWrapper::stop() method instead.
-   */
-  CEDAR_DECLARE_DEPRECATED(void stopTrigger())
-  {
-    stop();
-  }
-
   //! Returns the current time measurement statistics
   ConstTimeAveragePtr getStatistics() const;
+
+  //! If false, this trigger should not be started with start all triggers calls.
+  bool startWithAll() const;
+
+  // override name hiding
+  using cedar::proc::Trigger::canTrigger;
+
+  bool canTrigger(cedar::proc::TriggerablePtr target, std::string& reason) const;
+
+  bool canConnectTo(cedar::proc::ConstTriggerablePtr target) const;
 
 public slots:
   //!@brief This slot is called when the step's name is changed.
@@ -150,11 +142,11 @@ signals:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Removes the triggerable from the list of listeners of this trigger.
+  /*!@brief Removes the triggerable from the list of listeners of this trigger, and remove parent looped trigger.
    */
-  void removeListener(cedar::proc::TriggerablePtr triggerable);
+  void removeListener(cedar::proc::Triggerable* triggerable);
 
-  /*!@brief Adds the triggerable to the listeners of this of this trigger.
+  /*!@brief Adds the triggerable to the listeners of this of this trigger, and add parent looped trigger.
    */
   void addListener(cedar::proc::TriggerablePtr triggerable);
 
@@ -171,7 +163,13 @@ protected:
   // none yet
 
 private:
-  // none yet
+  //! Used to prevent multiple start calls to the trigger.
+  bool mStarted;
+
+  //! Used to prevent multiple start calls to the trigger.
+  QMutex mStartedMutex;
+
+  TimeAveragePtr mStatistics;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -180,13 +178,7 @@ protected:
   // none yet
 
 private:
-  //! Used to prevent multiple start calls to the trigger.
-  bool mStarted;
-
-  //! Used to prevent multiple start calls to the trigger.
-  QMutex mStartedMutex;
-
-  TimeAveragePtr mStatistics;
+  cedar::aux::BoolParameterPtr _mStartWithAll;
 
 }; // class cedar::proc::LoopedTrigger
 

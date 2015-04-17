@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -41,7 +41,6 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/LoopedThread.h"
-#include "cedar/auxiliaries/ThreadCollection.h"
 #include "cedar/auxiliaries/DataSpectator.h"
 #include "cedar/units/Time.h"
 
@@ -65,6 +64,8 @@
    */
 class cedar::aux::Recorder : public cedar::aux::LoopedThread
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
@@ -100,7 +101,7 @@ public:
   void unregisterData(const std::string& name);
 
   //!@brief Used to unregister a DataPtr to stop him from being recorded.
-   void unregisterData(cedar::aux::ConstDataPtr);
+  void unregisterData(cedar::aux::ConstDataPtr);
 
   //!@brief Unregister all DataPtr.
   void clear();
@@ -150,24 +151,27 @@ public:
   //!@brief Returns all registered DataPtr by name and their record interval
   std::map<std::string, cedar::unit::Time> getRegisteredData() const;
 
+  //!@brief Starts all threads.
+  void startAllRecordings();
+
+  //!@brief Stops all threads.
+  void stopAllRecordings();
+
+  //!@brief Removes all threads.
+  void removeAllRecordings();
+
+  //! Returns true if any data is set to be recorded.
+  bool hasDataToRecord() const;
+
+signals:
+  //! Emitted whenver data is added or removed.
+  void recordedDataChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief Starts the recorder thread.
-  *
-  *              By calling start, every registered observer thread will automatically be started.
-  *              Additionally all files will be created and filled with headers.
-  *!todo: docu is wrong, should be private, no?
-  */
-  void prepareStart();
-
-  /*!@brief Stops the recorder thread.
-   *
-   *              By calling stop, the calling thread waits until all recorded data has been written to disk.
-   *!todo: docu is wrong, should be private, no?
-   */
-  void processQuit();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -179,6 +183,19 @@ private:
   //!@brief Creates a new Output directory
   void createOutputDirectory();
 
+  /*!@brief Starts the recorder thread.
+  *
+  *              By calling start, every registered observer thread will automatically be started.
+  *              Additionally all files will be created and filled with headers.
+  */
+  void prepareStart();
+
+  /*!@brief Stops the recorder thread.
+   *
+   *              By calling stop, the calling thread waits until all recorded data has been written to disk.
+   */
+  void processQuit();
+
 //--------------------------------------------------------------------------------------------------------------------
 // members
 //--------------------------------------------------------------------------------------------------------------------
@@ -187,8 +204,9 @@ protected:
   // none yet
 
 private:
-  //!@brief The registered DataSpectaors.
-  cedar::aux::ThreadCollection mDataSpectatorCollection;
+  //!@brief The registered DataSpectators.
+  std::map<std::string, cedar::aux::DataSpectatorPtr> mDataSpectators;
+  QReadWriteLock* mpListLock;
 
   //!@brief The output directory.
   std::string mOutputDirectory;
@@ -197,7 +215,6 @@ private:
   std::string mProjectName;
 
   std::string mSubFolder;
-
 };
 
 
@@ -209,6 +226,7 @@ namespace cedar
   namespace aux
   {
     CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::aux::Recorder>);
+    //! a singleton for the recorder
     typedef cedar::aux::Singleton<cedar::aux::Recorder> RecorderSingleton;
   }
 }

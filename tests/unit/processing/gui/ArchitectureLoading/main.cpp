@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -144,7 +144,7 @@ int testArchitecture1(cedar::proc::gui::Ide *pIde)
 
   try
   {
-    pIde->loadFile("architecture-1.json");
+    pIde->loadFile(QString::fromStdString(cedar::aux::Path("test://unit/processing/gui/ArchitectureLoading/architecture-1.json").absolute().toString(false)));
   }
   catch (cedar::aux::ExceptionBase& e)
   {
@@ -164,7 +164,7 @@ int main(int argc, char** argv)
 
   cedar::proc::gui::SettingsSingleton::getInstance()->disableWriting();
 
-  cedar::proc::gui::Ide *p_ide = new cedar::proc::gui::Ide(false);
+  cedar::proc::gui::Ide *p_ide = new cedar::proc::gui::Ide(false, false, true);
 
   std::cout << "Testing architecture-1.json" << std::endl;
   errors += testArchitecture1(p_ide);

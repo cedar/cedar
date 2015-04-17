@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -34,17 +34,23 @@
 
 ======================================================================================================================*/
 
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/version.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
   #include <boost/date_time.hpp>
   #include <boost/filesystem.hpp>
+  #include <boost/version.hpp>
 #endif
 #include <cstdlib>
+#include <qglobal.h>
+#include <opencv2/core/version.hpp>
 
 #if defined CEDAR_COMPILER_GCC
 #include <stdlib.h>
@@ -56,11 +62,159 @@
   #pragma comment(lib, "comsuppw")
 #endif // CEDAR_COMPILER_MSVC
 
+#ifdef CEDAR_OS_WINDOWS
+#include <Windows.h>
+#endif // CEDAR_OS_WINDOWS
+
 // INTERNALS HEADER
 #define CEDAR_INTERNAL
 #include "cedar/internals.h"
 #undef CEDAR_INTERNAL
 
+// ---------------------------------------------------------------------------------------------------------------------
+//  general methods
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string cedar::aux::getCedarConfigurationInfo(const std::string& separator, const std::string& lineEnd)
+{
+  std::stringstream str;
+  str << "This is cedar version " << cedar::aux::versionNumberToString(CEDAR_VERSION);
+  str << " (";
+#ifdef DEBUG
+  str << "debug";
+#else
+  str << "release";
+#endif // DEBUG
+  str << " build)";
+  str << " built on " <<
+    CEDAR_BUILT_ON_MACHINE
+    << lineEnd;
+  str << separator;
+
+  auto print_library = [&] (const std::string& name, bool present, const std::string& version)
+  {
+    str << name << ": ";
+    if (present)
+    {
+      str << "yes";
+      if (!version.empty())
+      {
+        str << " (" << version << ")";
+      }
+    }
+    else
+    {
+      str << "no";
+    }
+    str << lineEnd;
+  };
+
+  str << "Mandatory third-party libraries:" << lineEnd;
+
+  print_library
+  (
+    "boost",
+    true,
+#ifdef BOOST_LIB_VERSION
+    BOOST_LIB_VERSION
+#else
+    ""
+#endif // BOOST_LIB_VERSION
+  );
+
+  print_library
+  (
+    "Qt",
+    true,
+#ifdef QT_VERSION_STR
+    QT_VERSION_STR
+#else
+    ""
+#endif // BOOST_LIB_VERSION
+  );
+
+  print_library
+  (
+    "OpenCV",
+    true,
+#ifdef CV_VERSION
+    CV_VERSION
+#else
+    ""
+#endif // BOOST_LIB_VERSION
+  );
+
+  str << separator;
+
+  str << "Optional third-party libraries:" << lineEnd;
+
+  print_library
+  (
+    "FFTW",
+#ifdef CEDAR_USE_FFTW
+    true
+#else
+    false
+#endif // CEDAR_USE_FFTW
+    ,
+#ifdef CEDAR_USE_FFTW_THREADED
+    "threaded"
+#else
+    ""
+#endif // CEDAR_USE_FFTW_THREADED
+  );
+
+  print_library
+  (
+    "LibDC1394",
+#ifdef CEDAR_USE_LIB_DC1394
+    true
+#else
+    false
+#endif // CEDAR_USE_FFTW
+    , ""
+  );
+
+  print_library
+  (
+    "Yarp",
+#ifdef CEDAR_USE_YARP
+    true
+#else
+    false
+#endif // CEDAR_USE_FFTW
+    ,
+#ifdef YARP_VERSION_STRING
+    YARP_VERSION_STRING
+#else
+    ""
+#endif // YARP_VERSION_STRING
+  );
+
+  print_library
+  (
+    "Amtec",
+#ifdef CEDAR_USE_AMTEC
+    true
+#else
+    false
+#endif // CEDAR_USE_FFTW
+    , ""
+  );
+
+  print_library
+  (
+    "Kuka FRI",
+#ifdef CEDAR_USE_KUKA_LWR
+    true
+#else
+    false
+#endif // CEDAR_USE_FFTW
+    , ""
+  );
+
+  return str.str();
+}
 
 void cedar::aux::openCrashFile(std::ofstream& stream, std::string& crash_file)
 {
@@ -122,7 +276,7 @@ std::string cedar::aux::getUserApplicationDataDirectory()
   }
   else
   {
-    //!@todo handle errors
+    CEDAR_THROW(cedar::aux::UnknownNameException, "Could not find application data directory. Error: " + cedar::aux::windows::getLastError());
   }
   return "";
 #endif // CEDAR_COMPILER_GCC
@@ -208,3 +362,33 @@ std::string cedar::aux::locateResource(const std::string& resourcePath, bool sho
   }
 }
 
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+//  Windows specific
+// ---------------------------------------------------------------------------------------------------------------------
+
+#ifdef CEDAR_OS_WINDOWS
+
+std::string cedar::aux::windows::getLastError()
+{
+  LPVOID lpMsgBuf;
+  DWORD dw = GetLastError();
+
+  FormatMessage(
+    FORMAT_MESSAGE_ALLOCATE_BUFFER |
+    FORMAT_MESSAGE_FROM_SYSTEM |
+    FORMAT_MESSAGE_IGNORE_INSERTS,
+    NULL,
+    dw,
+    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+    (LPTSTR)&lpMsgBuf,
+    0, NULL);
+
+  std::string error((char*)lpMsgBuf);
+
+  LocalFree(lpMsgBuf);
+  return error;
+}
+
+#endif //def CEDAR_OS_WINDOWS

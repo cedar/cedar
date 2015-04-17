@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -52,6 +52,7 @@
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/systemFunctions.h"
+#include "cedar/auxiliaries/Path.h"
 
 // SYSTEM INCLUDES
 #ifdef CEDAR_USE_FFTW_THREADED
@@ -60,7 +61,7 @@
 
 QReadWriteLock cedar::aux::conv::FFTW::mPlanLock;
 bool cedar::aux::conv::FFTW::mMultiThreadActivated = false;
-bool cedar::aux::conv::FFTW::mWisdomLoaded = false;
+std::set<std::string> cedar::aux::conv::FFTW::mLoadedWisdoms;
 std::map<std::string, fftw_plan> cedar::aux::conv::FFTW::mForwardPlans;
 std::map<std::string, fftw_plan> cedar::aux::conv::FFTW::mBackwardPlans;
 
@@ -79,9 +80,9 @@ namespace
 cedar::aux::conv::FFTW::FFTW()
 :
 mAllocatedSize(0),
-mMatrixBuffer(NULL),
-mKernelBuffer(NULL),
-mResultBuffer(NULL),
+mMatrixBuffer(nullptr),
+mKernelBuffer(nullptr),
+mResultBuffer(nullptr),
 mRetransformKernel(true)
 {
  this->connect(this, SIGNAL(kernelListChanged()), SLOT(kernelListChanged()));
@@ -435,7 +436,7 @@ bool cedar::aux::conv::FFTW::checkModeCapability
 
 void cedar::aux::conv::FFTW::loadWisdom(const std::string& uniqueIdentifier)
 {
-  if (!cedar::aux::conv::FFTW::mWisdomLoaded)
+  if (cedar::aux::conv::FFTW::mLoadedWisdoms.find(uniqueIdentifier) == cedar::aux::conv::FFTW::mLoadedWisdoms.end())
   {
     std::string path = cedar::aux::getUserApplicationDataDirectory()
                          + "/.cedar/fftw/fftw."
@@ -445,20 +446,22 @@ void cedar::aux::conv::FFTW::loadWisdom(const std::string& uniqueIdentifier)
                          + uniqueIdentifier + "."
                          + "wisdom";
     fftw_import_wisdom_from_filename(path.c_str());
-    cedar::aux::conv::FFTW::mWisdomLoaded = true;
+    cedar::aux::conv::FFTW::mLoadedWisdoms.insert(uniqueIdentifier);
   }
 }
 
 void cedar::aux::conv::FFTW::saveWisdom(const std::string& uniqueIdentifier)
 {
-  std::string path = cedar::aux::getUserApplicationDataDirectory()
-                       + "/.cedar/fftw/fftw."
-                       + CEDAR_BUILT_ON_MACHINE + "."
-                       + cedar::aux::toString(cedar::aux::SettingsSingleton::getInstance()->getFFTWNumberOfThreads()) + "."
-                       + cedar::aux::toString(cedar::aux::SettingsSingleton::getInstance()->getFFTWPlanningStrategyString()) + "."
-                       + uniqueIdentifier + "."
-                       + "wisdom";
-  fftw_export_wisdom_to_filename(path.c_str());
+  cedar::aux::Path path = cedar::aux::getUserApplicationDataDirectory()
+                          + "/.cedar/fftw/fftw."
+                          + CEDAR_BUILT_ON_MACHINE + "."
+                          + cedar::aux::toString(cedar::aux::SettingsSingleton::getInstance()->getFFTWNumberOfThreads()) + "."
+                          + cedar::aux::toString(cedar::aux::SettingsSingleton::getInstance()->getFFTWPlanningStrategyString()) + "."
+                          + uniqueIdentifier + "."
+                          + "wisdom";
+  path.createDirectories();
+                       
+  fftw_export_wisdom_to_filename(path.toString().c_str());
 }
 
 fftw_plan cedar::aux::conv::FFTW::getForwardPlan(unsigned int dimensionality, std::vector<unsigned int> sizes)
@@ -479,7 +482,7 @@ fftw_plan cedar::aux::conv::FFTW::getForwardPlan(unsigned int dimensionality, st
 #ifdef CEDAR_USE_FFTW_THREADED
     cedar::aux::conv::FFTW::initThreads();
 #endif
-    cedar::aux::conv::FFTW::mPlanLock.lockForWrite();
+    QWriteLocker plan_locker(&cedar::aux::conv::FFTW::mPlanLock);
     cedar::aux::conv::FFTW::loadWisdom(unique_identifier);
     std::vector<int> sizes_signed(sizes.size());
     for (unsigned int i = 0; i < sizes_signed.size(); ++i)
@@ -514,12 +517,12 @@ fftw_plan cedar::aux::conv::FFTW::getForwardPlan(unsigned int dimensionality, st
     {
       cedar::aux::conv::FFTW::mForwardPlans[unique_identifier] = matrix_plan_forward;
       cedar::aux::conv::FFTW::saveWisdom(unique_identifier);
-      cedar::aux::conv::FFTW::mPlanLock.unlock();
+      plan_locker.unlock();
       return matrix_plan_forward;
     }
     else
     {
-      cedar::aux::conv::FFTW::mPlanLock.unlock();
+      plan_locker.unlock();
       CEDAR_THROW
       (
         cedar::aux::NotFoundException,
@@ -548,7 +551,7 @@ fftw_plan cedar::aux::conv::FFTW::getBackwardPlan(unsigned int dimensionality, s
 #ifdef CEDAR_USE_FFTW_THREADED
     cedar::aux::conv::FFTW::initThreads();
 #endif
-    cedar::aux::conv::FFTW::mPlanLock.lockForWrite();
+    QWriteLocker plan_locker(&cedar::aux::conv::FFTW::mPlanLock);
     cedar::aux::conv::FFTW::loadWisdom(unique_identifier);
     std::vector<int> sizes_signed(sizes.size());
     for (unsigned int i = 0; i < sizes_signed.size(); ++i)
@@ -583,7 +586,7 @@ fftw_plan cedar::aux::conv::FFTW::getBackwardPlan(unsigned int dimensionality, s
     {
       cedar::aux::conv::FFTW::mBackwardPlans[unique_identifier] = matrix_plan_backward;
       cedar::aux::conv::FFTW::saveWisdom(unique_identifier);
-      cedar::aux::conv::FFTW::mPlanLock.unlock();
+      plan_locker.unlock();
       return matrix_plan_backward;
     }
     else

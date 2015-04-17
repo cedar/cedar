@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -60,16 +60,15 @@ class cedar::proc::experiment::action::Action : public cedar::aux::Configurable
 {
 public:
 
-	//!@brief a parameter for action sequence objects
+	//!@brief a parameter for a list of action objects
 	typedef cedar::aux::ObjectListParameterTemplate<cedar::proc::experiment::action::Action> ActionListParameter;
+	//!@brief a parameter for action objects
 	typedef cedar::aux::ObjectParameterTemplate<cedar::proc::experiment::action::Action> ActionParameter;
 
 	//!@cond SKIPPED_DOCUMENTATION
 	CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ActionListParameter);
 	CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ActionParameter);
 	//!@endcond
-
-	#include "cedar/auxiliaries/FactoryManager.h"
 
 private:
 
@@ -116,6 +115,8 @@ protected:
 private:
 
 }; // class cedar::proc::experiment::Action
+
+#include "cedar/auxiliaries/FactoryManager.h"
 
 CEDAR_PROC_EXPORT_SINGLETON(cedar::aux::FactoryManager<cedar::proc::experiment::action::ActionPtr>);
 

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -56,14 +56,14 @@ int main(int argc, char** argv)
 
   unsigned int errors = 0;
 
-  cedar::proc::gui::Ide* p_window = new cedar::proc::gui::Ide(false);
+  cedar::proc::gui::Ide* p_window = new cedar::proc::gui::Ide(false, false, true);
 
   cedar::proc::gui::Group* p_network
     = new cedar::proc::gui::Group(p_window, p_window->getArchitectureView()->getScene());
 
   try
   {
-    p_network->readJson("test_arch.json");
+    p_network->readJson(cedar::aux::Path("test://unit/processing/gui/gui_Group/test_arch.json").absolute());
   }
   catch (cedar::proc::ArchitectureLoadingException& exception)
   {

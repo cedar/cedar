@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -88,8 +88,6 @@ namespace cedar
   }
 }
 
-//!@todo These functions should probably be in the appropriate header for the given parameters (e.g., LengthParameter.h)
-
 namespace cedar
 {
   namespace aux
@@ -127,9 +125,14 @@ namespace cedar
       const std::string& alias
     )
     {
-      //!@todo Proper exceptions
-      CEDAR_ASSERT(map.find(name) != map.end());
-      CEDAR_ASSERT(map.find(alias) == map.end());
+      if (map.find(name) == map.end())
+      {
+        CEDAR_THROW(cedar::aux::UnknownNameException, "Cannot add an alias for \"" + name + "\": not a known unit.");
+      }
+      if (map.find(alias) != map.end())
+      {
+        CEDAR_THROW(cedar::aux::DuplicateNameException, "Cannot add alias \"" + alias + "\" for unit \"" + name + "\": alias already exists.");
+      }
 
       map[alias] = map[name];
     }
@@ -149,7 +152,6 @@ namespace cedar
       }
 
       // could not find unit, throw exception
-      //!@todo Proper exception
       CEDAR_THROW(cedar::aux::UnknownUnitSuffixException, "Could not find unit for suffix \"" + postFix + "\".");
     }
 
@@ -299,9 +301,10 @@ namespace cedar
           unit_str = getDefaultUnit<T>();
         }
 
-        //!@todo Proper exceptions
-        CEDAR_ASSERT(!number_str.empty());
-        CEDAR_ASSERT(!unit_str.empty());
+        if (number_str.empty() || unit_str.empty())
+        {
+          CEDAR_THROW(cedar::aux::InvalidValueException, "Could not extract unit or value from string \"" + str + "\".");
+        }
 
         // normalize the white space in the unit
         unit_str = cedar::aux::regexReplace(unit_str, "\\s+", " ");

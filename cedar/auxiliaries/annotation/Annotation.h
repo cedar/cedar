@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -88,6 +88,12 @@ public:
    *          breaks.
    */
   virtual std::string getDescription() const = 0;
+
+  /*! If this function returns true, Annotatable will not copy this annotation in the copyAnnotationsFrom function.
+   *
+   * The default implementation returns false.
+   */
+  virtual bool excludeFromCopying() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

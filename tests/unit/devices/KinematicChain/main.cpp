@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -65,6 +65,7 @@ void test()
   test_arm->startCommunication();
   acceleration_test_arm->readJson("acceleration_test_arm.json");
   acceleration_test_arm->startCommunication();
+  complex_test_arm->readJson("resource://configs/complex_test_arm.json");
 
   cv::Mat theta;
   cv::Mat thetaDot;

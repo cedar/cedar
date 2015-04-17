@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -164,34 +164,19 @@ private:
   //!@brief sets the represented step
   void setStep(cedar::proc::StepPtr step);
 
-  //! Fills the menu with the appropriate entries for serializing data.
-  void fillDataSerialization(QMenu* pMenu);
-
-  //! Fills in the actions for the display style.
-  void fillDisplayStyleMenu(QMenu* pMenu);
-
   //! Updates the display of the step's run time measurements.
   void updateToolTip();
-
-  //! Sets the current display mode.
-  void setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id mode);
 
   void updateIconGeometry();
 
   qreal getContentsPadding() const;
 
-private slots:
-  void displayStyleMenuTriggered(QAction* pAction);
+  void displayModeChanged();
 
+private slots:
   void openDefinedPlotAction();
 
-  void openProperties();
-
   void openActionsDock();
-
-  void saveDataClicked();
-
-  void loadDataClicked();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -201,15 +186,6 @@ protected:
 private:
   //!@brief a vector of all triggers of the current step
   std::vector<cedar::proc::gui::TriggerItem*> mTriggers;
-
-  //! Size used for displaying the step icons.
-  static const int mIconSize;
-
-  //! The width of newly created steps.
-  static const qreal mDefaultWidth;
-
-  //! The height of newly created steps.
-  static const qreal mDefaultHeight;
 
   //!@brief connection to state changed signal of step
   boost::signals2::connection mStateChangedConnection;

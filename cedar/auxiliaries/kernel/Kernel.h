@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -110,7 +110,7 @@ public:
   /*!@brief get access to the write lock when in an asynchronous mode
    * @return pointer to the QReadWriteLock
    */
-  QReadWriteLock* getReadWriteLock();
+  QReadWriteLock* getReadWriteLock() const;
 
   /*!@brief get the dimensionality of the kernel matrix
    * @return dimensionality

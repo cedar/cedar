@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -55,8 +55,6 @@
  *
  * Most of the vector access functions are mirrored by this class. This ensures that a change signal is emitted every
  * time the content of the represented vector changes.
- *
- * @todo Write a unit test for this class.
  */
 template <typename T>
 class cedar::aux::MapParameter : public cedar::aux::Parameter
@@ -191,9 +189,8 @@ public:
     return this->mDefaults;
   }
 
-  //!@brief set one entry of the vector to a new value
-  //!@todo This should be called setValue
-  virtual void set(const std::string& index, const T& value, bool lock = false)
+  //!@brief set one entry of the map to a new value
+  virtual void setValue(const std::string& index, const T& value, bool lock = false)
   {
     if (lock)
     {

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -229,15 +229,18 @@ void cedar::proc::GroupFileFormatV1::writeTriggers
 
 void cedar::proc::GroupFileFormatV1::writeRecords
      (
-       cedar::proc::ConstGroupPtr /* group */,
+       cedar::proc::ConstGroupPtr group,
        cedar::aux::ConfigurationNode& records
      ) const
 {
-  std::map<std::string, cedar::unit::Time> dataMap = cedar::aux::RecorderSingleton::getInstance()->getRegisteredData();
-  for (auto iter = dataMap.begin(); iter != dataMap.end(); ++iter)
+  if (group->isRoot())
   {
-    cedar::aux::ConfigurationNode recorder_node(cedar::aux::toString<cedar::unit::Time>(iter->second));
-    records.push_back(cedar::aux::ConfigurationNode::value_type(iter->first, recorder_node));
+    std::map<std::string, cedar::unit::Time> dataMap = cedar::aux::RecorderSingleton::getInstance()->getRegisteredData();
+    for (auto iter = dataMap.begin(); iter != dataMap.end(); ++iter)
+    {
+      cedar::aux::ConfigurationNode recorder_node(cedar::aux::toString<cedar::unit::Time>(iter->second));
+      records.push_back(cedar::aux::ConfigurationNode::value_type(iter->first, recorder_node));
+    }
   }
 }
 
@@ -614,42 +617,78 @@ void cedar::proc::GroupFileFormatV1::readRecords
      (
        cedar::proc::GroupPtr group,
        const cedar::aux::ConfigurationNode& root,
-       std::vector<std::string>& /* exceptions */
+       std::vector<std::string>& exceptions
      )
 {
-  // clear all registered data
-  cedar::aux::RecorderSingleton::getInstance()->clear();
-  // create a new map to get a better data structure
-  std::map<std::string, cedar::unit::Time> data;
-  for (cedar::aux::ConfigurationNode::const_iterator node_iter = root.begin();
-       node_iter != root.end();
-       ++node_iter)
+  if (group->isRoot())
   {
-    data[node_iter->first] = root.get<cedar::unit::Time>(node_iter->first);
-  }
-
-  // check for every slot if it is to register or not
-  for (auto name_element_pair : group->getElements())
-  {
-    auto element = name_element_pair.second;
-    if (cedar::proc::ConstStepPtr step = boost::dynamic_pointer_cast<cedar::proc::ConstStep>(element))
+    // clear all registered data
+    cedar::aux::RecorderSingleton::getInstance()->clear();
+    // create a new map to get a better data structure
+    std::map<std::string, cedar::unit::Time> data;
+    for (cedar::aux::ConfigurationNode::const_iterator node_iter = root.begin();
+         node_iter != root.end();
+         ++node_iter)
     {
-      std::vector<cedar::proc::DataRole::Id> slotTypes;
-      slotTypes.push_back(cedar::proc::DataRole::BUFFER);
-      slotTypes.push_back(cedar::proc::DataRole::OUTPUT);
-      for (unsigned int s = 0; s < slotTypes.size(); s++)
+      data[node_iter->first] = node_iter->second.get_value<cedar::unit::Time>();
+    }
+
+    for (auto entry : data)
+    {
+      // decide if the entry is of old or new format
+      if (entry.first.find("[") != std::string::npos && entry.first.find("]") != std::string::npos)
       {
-        if (step->hasRole(slotTypes[s]))
+        // this is the new format, easy to get into the recorder (we already know the data role and element)
+        cedar::proc::DataPath data_path(entry.first);
+        auto elem = group->getElement<cedar::proc::Connectable>(data_path.getPathToElement());
+        auto data = elem->getData(data_path.getDataRole(), data_path.getDataName());
+        cedar::aux::RecorderSingleton::getInstance()->registerData(data, entry.second, entry.first);
+      }
+      else
+      {
+        // this is the old format, we have to guess the data role and element
+        std::string element_name;
+        std::string data_name;
+        // split data name
+        cedar::aux::splitLast(entry.first, "_", element_name, data_name);
+
+        // now try to find an element of this name
+        try
         {
-          cedar::proc::Connectable::SlotList dataSlots = step->getOrderedDataSlots(slotTypes[s]);
-          for (unsigned int i = 0; i < dataSlots.size(); i++)
+          auto elem = group->getElement<cedar::proc::Connectable>(element_name);
+          // try to find a data slot of this name
+          try
           {
-            std::string name = step->getName() + "_" + dataSlots[i]->getName();
-            if (data.count(name)==1)
-            {
-              cedar::aux::RecorderSingleton::getInstance()->registerData(dataSlots[i]->getData(),data[name],name);
-            }
+            auto slot = elem->getData(cedar::proc::DataRole::BUFFER, data_name);
+            cedar::proc::DataPath path(element_name, cedar::proc::DataRole::BUFFER, data_name);
+            cedar::aux::RecorderSingleton::getInstance()->registerData(slot, entry.second, path.toString());
           }
+          catch (cedar::proc::InvalidRoleException& exc)
+          {
+            // still ok,
+          }
+          catch (cedar::aux::InvalidNameException& exc)
+          {
+            // still ok,
+          }
+          try
+          {
+            auto slot = elem->getData(cedar::proc::DataRole::OUTPUT, data_name);
+            cedar::proc::DataPath path(element_name, cedar::proc::DataRole::OUTPUT, data_name);
+            cedar::aux::RecorderSingleton::getInstance()->registerData(slot, entry.second, path.toString());
+          }
+          catch (cedar::proc::InvalidRoleException& exc)
+          {
+            exceptions.push_back("Recorder: Could not find any recordable slots at element \"" + element_name + "\". This configuration file was created with an outdated version of cedar, which did not correctly store recordings.");
+          }
+          catch (cedar::aux::InvalidNameException& exc)
+          {
+            exceptions.push_back("Recorder: Could not find data of name \"" + data_name +"\" at element \"" + element_name + "\". This configuration file was created with an outdated version of cedar, which did not correctly store recordings.");
+          }
+        }
+        catch (cedar::aux::InvalidNameException& exc)
+        {
+          exceptions.push_back("Recorder: Could not find element \"" + element_name  + "\" to record its data \"" + data_name + "\". This configuration file was created with an outdated version of cedar, which did not correctly store recordings.");
         }
       }
     }
@@ -727,7 +766,16 @@ void cedar::proc::GroupFileFormatV1::readTriggers
 
     try
     {
-      group->add(trigger);
+      // if this is the default trigger and group already has one, only copy the configuration
+      if (trigger->getName() == "default trigger" && group->nameExists("default trigger"))
+      {
+        auto existing_trigger = group->getElement<cedar::proc::Trigger>("default trigger");
+        existing_trigger->copyFrom(trigger);
+      }
+      else
+      {
+        group->add(trigger);
+      }
     }
     catch (cedar::aux::ExceptionBase& e)
     {
