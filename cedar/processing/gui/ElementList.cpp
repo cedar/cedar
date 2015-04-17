@@ -688,7 +688,7 @@ void cedar::proc::gui::ElementList::updateSearchResults(QString searchText)
   {
     if (this->mPreSearchIndex < 0)
     {
-      this->addTab(this->mpSearchResultTab, "search results");
+      this->addTab(this->mpSearchResultTab, QIcon(":/cedar/auxiliaries/gui/search.svg"), "search results");
     }
 
     // find out the index of the search result tab
