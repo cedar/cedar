@@ -38,13 +38,15 @@
 #define CEDAR_DEV_COMPONENT_SLOT_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/MapParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/FactoryManager.fwd.h"
+#include "cedar/devices/Component.fwd.h"
+#include "cedar/devices/ComponentSlot.fwd.h"
+#include "cedar/devices/Robot.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/enable_shared_from_this.hpp>
@@ -91,7 +93,9 @@ public:
    */
   inline cedar::dev::RobotPtr getRobot() const
   {
-    return mRobot;
+    auto robot = mRobot.lock();
+    CEDAR_ASSERT(robot);
+    return robot;
   }
 
   /*!@brief Returns the component currently docked to this component slot.
@@ -134,7 +138,7 @@ protected:
 
 private:
   //! robot the component slot belongs to
-  cedar::dev::RobotPtr mRobot;
+  cedar::dev::RobotWeakPtr mRobot;
 
   //! component that is currently docked to this slot
   cedar::dev::ComponentPtr mComponent;

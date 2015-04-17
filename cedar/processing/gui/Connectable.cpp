@@ -46,6 +46,7 @@
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/DefaultConnectableIconView.h"
+#include "cedar/processing/steps/Component.h"
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/DataConnection.h"
@@ -56,10 +57,12 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Triggerable.h"
+#include "cedar/devices/Component.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/gui/Configurable.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
+#include "cedar/auxiliaries/ColorGradient.h"
 
 // SYSTEM INCLUDES
 #include <map>
@@ -184,12 +187,13 @@ cedar::proc::gui::Connectable::~Connectable()
 
 cedar::proc::gui::Connectable::Decoration::Decoration
 (
-  cedar::proc::gui::Connectable* pConnectable,
+  QGraphicsItem* pParent,
   const QString& icon,
   const QString& description,
   const QColor& bgColor
 )
 :
+mpIcon(nullptr),
 mDefaultBackground(bgColor)
 {
   qreal padding = 1;
@@ -199,33 +203,117 @@ mDefaultBackground(bgColor)
                         -padding,
                         cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE + 2 * padding,
                         cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE + 2 * padding,
-                        pConnectable
+                        pParent
                       );
-  this->mpIcon = new QGraphicsSvgItem
-                 (
-                   icon,
-                   this->mpRectangle
-                 );
 
-  // setting this cache mode makes sure that when writing out an svg file, the icon will not be pixelized
-  this->mpIcon->setCacheMode(QGraphicsItem::NoCache);
+  if (!icon.isEmpty())
+  {
+    this->mpIcon = new QGraphicsSvgItem
+                   (
+                     icon,
+                     this->mpRectangle
+                   );
 
-  this->mpIcon->setToolTip(description);
+    // setting this cache mode makes sure that when writing out an svg file, the icon will not be pixelized
+    this->mpIcon->setCacheMode(QGraphicsItem::NoCache);
 
-  qreal h = this->mpIcon->boundingRect().height();
-  this->mpIcon->setScale(cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE / h);
+    qreal h = this->mpIcon->boundingRect().height();
+    this->mpIcon->setScale(cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE / h);
+  }
+
+  this->setToolTip(description);
 
   QPen pen = this->mpRectangle->pen();
   pen.setWidth(1);
   pen.setColor(QColor(0, 0, 0));
-  QBrush bg(bgColor);
   this->mpRectangle->setPen(pen);
-  this->mpRectangle->setBrush(bg);
+  this->setBackgroundColor(bgColor);
+}
+
+//!@todo This should really be solved differently, steps should be able to provide decorations via their declarations, rather than putting in dynamic casts here.
+cedar::proc::gui::Connectable::DeviceQualityDecoration::DeviceQualityDecoration
+(
+  QGraphicsItem* pParent,
+  cedar::proc::steps::ComponentPtr step
+)
+:
+cedar::proc::gui::Connectable::Decoration(pParent, ":/cedar/dev/gui/icons/connecting.svg", QString()),
+mStep(step)
+{
+  // update the quality once every second
+  this->startTimer(500);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Connectable::Decoration::setToolTip(const QString& toolTip)
+{
+  if (this->mpIcon != nullptr)
+  {
+    this->mpIcon->setToolTip(toolTip);
+  }
+  this->mpRectangle->setToolTip(toolTip);
+}
+
+void cedar::proc::gui::Connectable::DeviceQualityDecoration::timerEvent(QTimerEvent*)
+{
+  if (!mStep->hasComponent())
+  {
+    return;
+  }
+
+
+  if (this->mStep->isStarted())
+  {
+    auto component = this->mStep->getComponent();
+    double command_errors, measurement_errors;
+    component->getCommunicationErrorRates(command_errors, measurement_errors);
+
+    static cedar::aux::ColorGradient gradient;
+    if (gradient.empty())
+    {
+      // initialize gradient
+      gradient.setStop(0.0, QColor(0, 220, 0));
+      // yellow starts much earlier so errors are more noticeable
+      gradient.setStop(0.1, QColor(220, 220, 0));
+      gradient.setStop(1.0, QColor(220, 0, 0));
+    }
+
+    this->setBackgroundColor(gradient.getColor(std::max(command_errors, measurement_errors)));
+
+    QString tool_tip = QString("<table><tr><td>command quality:</td><td>%1%</td></tr><tr><td>measurement quality:</td><td>%2%</td></tr></table>")
+                       .arg(100.0 * (1.0 - command_errors), -1, 'f', 0)
+                       .arg(100.0 * (1.0 - measurement_errors), -1, 'f', 0);
+
+    auto command_error_msgs = component->getLastCommandCommunicationErrors();
+    if (!command_error_msgs.empty())
+    {
+      tool_tip += "<br /><b>Last command communication errors</b>:<br />";
+      for (const auto& error : command_error_msgs)
+      {
+        tool_tip += QString::fromStdString(error) + "<br />";
+      }
+    }
+
+    auto measurement_error_msgs = component->getLastMeasurementCommunicationErrors();
+    if (!measurement_error_msgs.empty())
+    {
+      tool_tip += "<br /><b>Last measurement communication errors</b>:<br />";
+      for (const auto& error : measurement_error_msgs)
+      {
+        tool_tip += QString::fromStdString(error) + "<br />";
+      }
+    }
+
+    this->setToolTip(tool_tip);
+  }
+  else
+  {
+    this->setBackgroundColor(Qt::white);
+  }
+}
 
 void cedar::proc::gui::Connectable::Decoration::setBackgroundColor(const QColor& background)
 {
@@ -1308,14 +1396,17 @@ void cedar::proc::gui::Connectable::Decoration::setSize(double sizeFactor)
   new_dims.setWidth(size + 2*padding);
   new_dims.setHeight(size + 2*padding);
   this->mpRectangle->setRect(new_dims);
-  qreal h = this->mpIcon->boundingRect().height();
-  this->mpIcon->setScale(size / h);
+
+  if (this->mpIcon)
+  {
+    qreal h = this->mpIcon->boundingRect().height();
+    this->mpIcon->setScale(size / h);
+  }
 }
 
 void cedar::proc::gui::Connectable::updateDecorations()
 {
-  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getConnectable());
-  if (triggerable)
+  if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getConnectable()))
   {
     if (triggerable->isLooped())
     {
@@ -1338,6 +1429,23 @@ void cedar::proc::gui::Connectable::updateDecorations()
       this->removeDecoration(this->mpLoopedDecoration);
     }
   }
+
+  if (auto component = boost::dynamic_pointer_cast<cedar::proc::steps::Component>(this->getConnectable()))
+  {
+    if (!this->mDeviceQuality)
+    {
+      this->mDeviceQuality = DeviceQualityDecorationPtr(new DeviceQualityDecoration(this, component));
+    }
+    this->addDecoration(mDeviceQuality);
+  }
+  else
+  {
+    if (this->mDeviceQuality)
+    {
+      this->removeDecoration(this->mDeviceQuality);
+    }
+  }
+
 
   this->updateDecorationPositions();
 }

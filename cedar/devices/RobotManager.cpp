@@ -68,6 +68,12 @@ cedar::dev::RobotManager::RobotManager()
   khepera_template.addNamedConfiguration("hardware", cedar::aux::Path("resource://configs/khepera/default_configuration.json"));
   this->addRobotTemplate("khepera", khepera_template);
 
+  // kuka ---------------------------------------------------------------------------------------------------------
+  cedar::dev::RobotManager::Template kuka_template;
+  kuka_template.setIconPath(":/cedar/dev/gui/icons/khepera_icon_256.png");
+  kuka_template.addNamedConfiguration("hardware", cedar::aux::Path("resource://configs/caren/default_configuration.json"));
+  this->addRobotTemplate("kuka", kuka_template);
+
   this->restore();
 }
 
@@ -199,6 +205,30 @@ void cedar::dev::RobotManager::addRobotName(const std::string& robotName)
   this->mRobotInstances[robotName] = cedar::dev::RobotPtr(new cedar::dev::Robot());
 
   this->mRobotNameAddedSignal(robotName);
+}
+
+void cedar::dev::RobotManager::renameRobot(const std::string& robotName, const std::string& newName)
+{
+  auto old_robot = mRobotInstances.find(robotName);
+  if (old_robot == mRobotInstances.end())
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "A robot with the name \"" + robotName + "\" could not be found.");
+  }
+  if (mRobotInstances.find(newName) != mRobotInstances.end())
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "A robot with the name \"" + newName + "\" already exists.");
+  }
+  mRobotInstances[newName] = old_robot->second;
+  this->mRobotInstances.erase(old_robot);
+
+  auto old_info = mRobotInfos.find(robotName);
+  if (old_info != mRobotInfos.end())
+  {
+    mRobotInfos[newName] = old_info->second;
+    mRobotInfos.erase(old_info);
+  }
+
+  this->signalRobotNameChanged(robotName, newName);
 }
 
 void cedar::dev::RobotManager::removeRobot(const std::string& robotName)
@@ -333,16 +363,31 @@ void cedar::dev::RobotManager::store() const
 
   cedar::aux::ConfigurationNode root, robots;
 
-  for (auto iter = this->mRobotInfos.begin(); iter != this->mRobotInfos.end(); ++iter)
+  // serialized templated robots
+  for (const auto& name_robot_pair : this->mRobotInstances)
   {
-    const std::string& robot_name = iter->first;
-    auto robot_info = iter->second;
+    const auto& robot_name = name_robot_pair.first;
 
     cedar::aux::ConfigurationNode robot;
     robot.put("name", robot_name);
-    robot.put("template name", robot_info.mTemplateName);
-    robot.put("loaded template configuration", robot_info.mLoadedTemplateConfiguration);
-    robot.put("loaded template configuration name", robot_info.mLoadedTemplateConfigurationName);
+
+    auto info_iter = this->mRobotInfos.find(robot_name);
+    if (info_iter != this->mRobotInfos.end())
+    {
+      auto robot_info = info_iter->second;
+      robot.put("template name", robot_info.mTemplateName);
+      robot.put("loaded template configuration", robot_info.mLoadedTemplateConfiguration);
+      robot.put("loaded template configuration name", robot_info.mLoadedTemplateConfigurationName);
+
+    }
+    else
+    {
+      auto config_iter = this->mRobotConfigurations.find(robot_name);
+      if (config_iter != this->mRobotConfigurations.end())
+      {
+        robot.put("configuration", config_iter->second);
+      }
+    }
 
     robots.push_back(cedar::aux::ConfigurationNode::value_type("robot", robot));
   }
@@ -372,7 +417,8 @@ void cedar::dev::RobotManager::restore()
 
   robots = root.get_child("robots");
 
-  for(auto child_iter = robots.begin(); child_iter != robots.end(); ++child_iter)
+  //!@todo Needs error handling.
+  for (auto child_iter = robots.begin(); child_iter != robots.end(); ++child_iter)
   {
     if (child_iter->first != "robot")
     {
@@ -385,13 +431,17 @@ void cedar::dev::RobotManager::restore()
     const cedar::aux::ConfigurationNode& robot = child_iter->second;
 
     std::string name = robot.get<std::string>("name");
-    std::string template_name = robot.get<std::string>("template name");
-    std::string loaded_template_configuration = robot.get<std::string>("loaded template configuration");
-    std::string loaded_template_configuration_name = robot.get<std::string>("loaded template configuration name");
-    if (!name.empty())
+    if (name.empty())
     {
-      this->addRobotName(name);
+      continue;
+    }
+    this->addRobotName(name);
 
+    if (robot.find("template name") != robot.not_found())
+    {
+      std::string template_name = robot.get<std::string>("template name");
+      std::string loaded_template_configuration = robot.get<std::string>("loaded template configuration");
+      std::string loaded_template_configuration_name = robot.get<std::string>("loaded template configuration name");
       if (!template_name.empty())
       {
         this->setRobotTemplateName(name, template_name);
@@ -405,6 +455,15 @@ void cedar::dev::RobotManager::restore()
       if (!loaded_template_configuration_name.empty())
       {
         this->setRobotTemplateConfigurationName(name, loaded_template_configuration_name);
+      }
+    }
+    else
+    {
+      auto config_iter = robot.find("configuration");
+      if (config_iter != robot.not_found())
+      {
+        auto config = config_iter->second.get_value<std::string>();
+        this->loadRobotConfiguration(name, config);
       }
     }
   }

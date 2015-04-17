@@ -42,9 +42,14 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/ObjectVisualization.fwd.h"
+#include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/gl/gl.h"
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/IntParameter.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -55,7 +60,7 @@
 /*!@brief Base class for simple OpenGL visualizations of geometric objects
  *
  */
-class cedar::aux::gl::ObjectVisualization : public QObject
+class cedar::aux::gl::ObjectVisualization : public QObject, public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // structs
@@ -164,6 +169,17 @@ public:
    */
   void setColor(double r, double g, double b);
 
+
+  inline bool getIsDrawnAsWireFrame() const
+  {
+    return _mIsDrawnAsWireFrame->getValue();
+  }
+  
+  inline bool getIsDrawingLocalCoordinateFrame() const
+  {
+    return _mIsDrawingLocalCoordinateFrame->getValue();
+  }
+
   /*!@brief returns a smart pointer to the local coordinate frame of the visualized object
    *
    * @return smart pointer to the LocalCoordinateFrame
@@ -218,32 +234,14 @@ public slots:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+private:
   //!@brief geometric type of the object
   std::string mObjectType;
-
-  //!@brief the object will only be drawn if this is true
-  bool mIsVisible;
-  //!@brief determines if the object is drawn with full surfaces or as wire frame only
-  bool mIsDrawnAsWireFrame;
-  //!@brief determines whether the local coordinate frame of the rigid body is drawn
-  bool mIsDrawingLocalCoordinateFrame;
-  //!@brief length of the local coordinate frame axis arrows
-  double mAxisLength;
-  //!@brief determines how well curves and surfaces are approximated (default 10)
-  int mResolution;
-  
-  //!@brief object color in RGB, R channel
-  double mColorR;
-  //!@brief object color in RGB, G channel
-  double mColorG;
-  //!@brief object color in RGB, B channel
-  double mColorB;
-  
+ 
   //!@brief pointer to the LocalCoordinateFrame of the visualized object
   cedar::aux::LocalCoordinateFramePtr mpLocalCoordinateFrame;
 
-  //!@brief dummy matrix to hold the transpose of the current object transformation (it's what OpenGL needs)
-  cv::Mat mTransformationTranspose;
+protected:
 
   //!@brief encodes the different materials
   enum MaterialType {
@@ -346,6 +344,52 @@ protected:
 
 private:
   // none yet
+
+// Parameters:
+
+  
+  //!@brief object color in RGB, R channel
+  cedar::aux::DoubleParameterPtr _mColorR;
+  //!@brief object color in RGB, G channel
+  cedar::aux::DoubleParameterPtr _mColorG;
+  //!@brief object color in RGB, B channel
+  cedar::aux::DoubleParameterPtr _mColorB;
+
+  //!@brief determines how well curves and surfaces are approximated (default 10)
+  cedar::aux::IntParameterPtr _mResolution;
+
+  //!@brief length of the local coordinate frame axis arrows
+  cedar::aux::DoubleParameterPtr _mAxisLength;
+
+  //!@brief determines if the object is drawn with full surfaces or as wire frame only
+  cedar::aux::BoolParameterPtr _mIsDrawnAsWireFrame;
+  //!@brief determines whether the local coordinate frame of the rigid body is drawn
+  cedar::aux::BoolParameterPtr _mIsDrawingLocalCoordinateFrame;
+
+  //!@brief the object will only be drawn if this is true
+  cedar::aux::BoolParameterPtr _mIsVisible;
+
 };
+
+#include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/Singleton.h"
+
+namespace cedar
+{
+  namespace aux
+  {
+    namespace gl
+    {
+      //!@brief The manager of all sigmoind instances
+      typedef cedar::aux::FactoryManager<ObjectVisualizationPtr> ObjectVisualizationManager;
+
+      //!@brief The singleton object of the TransferFunctionFactory.
+      typedef cedar::aux::Singleton<ObjectVisualizationManager> ObjectVisualizationManagerSingleton;
+    }
+  }
+}
+
+CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::math::ObjectVisualizationManager);
+
 
 #endif  // CEDAR_AUX_GL_OBJECT_VISUALIZATION_H

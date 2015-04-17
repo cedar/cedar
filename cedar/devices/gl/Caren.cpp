@@ -112,35 +112,36 @@ void cedar::dev::gl::Caren::drawBase()
   glPushMatrix();
 
   // go to trunk frame
-  mTransformationTranspose = mTrunk->getRootTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  cv::Mat transformation;
+  transformation = mTrunk->getRootTransformation().t();
+  glMultMatrixd((GLdouble*)transformation.data);
   // go to table frame
   glTranslated(0, 0, -0.36);
   glRotated(180, 0, 0, 1);
 
   // table plate
   setMaterial(WHITE);
-  cedar::aux::gl::drawBlock(.728, .12, 1.4985, .3745, .0, 0.06, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.728, .12, 1.4985, .3745, .0, 0.06, getIsDrawnAsWireFrame());
 
   setMaterial(CHROME);
   // table connector plate
-  cedar::aux::gl::drawBlock(.1, .1, 1.4575, .3425, .012, 0, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.1, .1, 1.4575, .3425, .012, 0, getIsDrawnAsWireFrame());
   // base plate
   glTranslated(0, 0, 0.012);
-  cedar::aux::gl::drawBlock(.1, .1, 0.075, .165, .012, 0, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.1, .1, 0.075, .165, .012, 0, getIsDrawnAsWireFrame());
   // trunk block
   glTranslated(0, 0, 0.012);
-  cedar::aux::gl::drawBlock(.07, .07, 0.075, .165, .225, 0, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.07, .07, 0.075, .165, .225, 0, getIsDrawnAsWireFrame());
 
   // vertical neck bar
   glTranslated(0, -0.1875, -0.012);
-  cedar::aux::gl::drawBlock(.0225, .0225, 0.0225, .0225, .823, 0, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.0225, .0225, 0.0225, .0225, .823, 0, getIsDrawnAsWireFrame());
   // horizontal neck bar
   glTranslated(0, 0, 0.8005);
-  cedar::aux::gl::drawBlock(.0225, .0225, .2475, 0.0225, .0225, 0.0225, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.0225, .0225, .2475, 0.0225, .0225, 0.0225, getIsDrawnAsWireFrame());
   // neck plate
   glTranslated(0, 0.1875, 0.0225);
-  cedar::aux::gl::drawBlock(.045, .045, .07, 0.07, .01, 0.0, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.045, .045, .07, 0.07, .01, 0.0, getIsDrawnAsWireFrame());
 
 
   setMaterial(NO_MATERIAL);
@@ -157,12 +158,13 @@ void cedar::dev::gl::Caren::drawHead()
   glPushMatrix();
 
   // go to head end-effector frame
-  mTransformationTranspose = mHead->getEndEffectorTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  cv::Mat transformation;
 
+  transformation = mHead->getEndEffectorTransformation().t();
+  glMultMatrixd((GLdouble*)transformation.data);
   // draw camera base plate
   setMaterial(CHROME);
-  cedar::aux::gl::drawBlock(.045, .045, .125, 0.125, .008, 0.0, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.045, .045, .125, 0.125, .008, 0.0, getIsDrawnAsWireFrame());
 
   // draw middle camera
   glTranslated(0.016, 0.0, 0.008);
@@ -187,26 +189,26 @@ void cedar::dev::gl::Caren::drawCamera()
 
   // draw body of the camera
   setMaterial(CHROME);
-  cedar::aux::gl::drawBlock(.029, .029, .022, 0.022, .033, 0.0, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.029, .029, .022, 0.022, .033, 0.0, getIsDrawnAsWireFrame());
 
   // move to lens
   glTranslated(0.029, 0.0, 0.0165);
   glRotated(90, 0, 1, 0);
 
   // lens holder
-  cedar::aux::gl::drawCone(0, .008, .0145, .0145, mResolution, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawCone(0, .008, .0145, .0145, getResolution(), getIsDrawnAsWireFrame());
   glTranslated(0.0, 0.0, 0.008);
-  cedar::aux::gl::drawDisk(.0145, .018, mResolution, mResolution, true, mIsDrawnAsWireFrame);
-  cedar::aux::gl::drawCone(0, .0065, .018, .018, mResolution, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawDisk(.0145, .018, getResolution(), getResolution(), true, getIsDrawnAsWireFrame());
+  cedar::aux::gl::drawCone(0, .0065, .018, .018, getResolution(), getIsDrawnAsWireFrame());
   glTranslated(0.0, 0.0, 0.0065);
   setMaterial(BLACK);
-  cedar::aux::gl::drawDisk(.018, .02, mResolution, mResolution, true, mIsDrawnAsWireFrame);
-  cedar::aux::gl::drawCone(0, .029, .02, .02, mResolution, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawDisk(.018, .02, getResolution(), getResolution(), true, getIsDrawnAsWireFrame());
+  cedar::aux::gl::drawCone(0, .029, .02, .02, getResolution(), getIsDrawnAsWireFrame());
   glTranslated(0.0, 0.0, 0.024);
-  cedar::aux::gl::drawDisk(.0, .02, mResolution, mResolution, false, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawDisk(.0, .02, getResolution(), getResolution(), false, getIsDrawnAsWireFrame());
   glTranslated(0.0, 0.0, -0.01);
   setMaterial(CHROME);
-  cedar::aux::gl::drawSphere(0.015, mResolution, mResolution, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawSphere(0.015, getResolution(), getResolution(), getIsDrawnAsWireFrame());
   // get back to previous transformation
   glPopMatrix();
 }

@@ -70,10 +70,10 @@ void cedar::aux::gl::Prism::draw()
   prepareDraw();
   
   // draw object
-  if (mIsVisible)
+  if (isVisible())
   {
-    gl::setColor(mColorR, mColorG, mColorB);
-    drawPrism(mWidth, mHeight, mIsDrawnAsWireFrame);
+    gl::setColor(getColorR(), getColorG(), getColorB());
+    drawPrism(mWidth, mHeight, getIsDrawnAsWireFrame());
   }
 }
 

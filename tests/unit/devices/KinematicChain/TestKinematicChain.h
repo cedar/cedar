@@ -62,20 +62,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief get current state of a single joint angle
-   *
-   * @param index    specifies the joint
-   * @return    joint angle value
-   */
-  double getJointAngle(unsigned int index) const;
-
-  /*!@brief set current state of a single joint angle
-   *
-   * @param index    specifies the joint
-   * @param angle    new joint angle value
-   */
-  virtual void setJointAngle(unsigned int index, double angle);
-
   /*!@brief check whether the kinematic chain is currently responsive to movement commands
    *
    * @return    state

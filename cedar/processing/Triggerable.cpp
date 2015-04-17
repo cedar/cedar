@@ -237,7 +237,6 @@ void cedar::proc::Triggerable::callOnStart()
 
   locker.unlock();
 
-
   if (this->mStartCalls == 1)
   {
     this->signalStarted();
