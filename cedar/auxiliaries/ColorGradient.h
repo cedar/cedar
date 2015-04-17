@@ -118,6 +118,9 @@ public:
   //! get a map of all color stops along the gradient
   const std::map<double, QColor>& getStops() const;
 
+  //! Checks if the gradient is empty.
+  bool empty() const;
+
 #ifdef CEDAR_USE_QWTPLOT3D
   Qwt3D::StandardColor toQwt3DStandardColor(size_t steps) const;
 #endif // CEDAR_USE_QWTPLOT3D

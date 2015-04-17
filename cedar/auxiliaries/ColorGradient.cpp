@@ -93,6 +93,12 @@ Qwt3D::StandardColor cedar::aux::ColorGradient::toQwt3DStandardColor(size_t step
 }
 #endif // CEDAR_USE_QWTPLOT3D
 
+
+bool cedar::aux::ColorGradient::empty() const
+{
+  return this->mGradientColors.empty();
+}
+
 cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getStandardGradient(const cedar::aux::Enum& id)
 {
   switch (id.id())

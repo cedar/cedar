@@ -51,7 +51,7 @@
 
 /*!@brief A base class for RAII-based lockers that behave similar to, e.g., QReadLocker
  */
-class cedar::aux::LockerBase : private cedar::aux::CallOnScopeExit
+class cedar::aux::LockerBase : protected cedar::aux::CallOnScopeExit
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -61,8 +61,15 @@ class cedar::aux::LockerBase : private cedar::aux::CallOnScopeExit
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The constructor.
-  LockerBase(const boost::function<void()>& lockFunction, const boost::function<void()>& unlockFunction);
+  /*!@brief The constructor.
+   *
+   * @param lockFunction Function called when the locker is locked.
+   * @param unlockFunction Function called when the locker is unlocked.
+   * @param lockImmediately If true, this constructor will call the lock function. Note, that this can be a problem if
+   *        the @em lockFunction accesses members of the derived class, as those will not be initialized at this time.
+   *        If you set this to false, you should call relock() in the derived class.
+   */
+  LockerBase(const boost::function<void()>& lockFunction, const boost::function<void()>& unlockFunction, bool lockImmediately = true);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
