@@ -937,8 +937,12 @@ void cedar::proc::gui::Connectable::slotRenamed(cedar::proc::DataRole::Id role, 
 
 void cedar::proc::gui::Connectable::reactToSlotAdded(cedar::proc::DataRole::Id role, QString name)
 {
-  this->addDataItemFor(this->getConnectable()->getSlot(role, name.toStdString()));
-  this->updateAttachedItems();
+  // buffers aren't displayed, so only add the slot if it is something else
+  if (isRoleDisplayed(role))
+  {
+    this->addDataItemFor(this->getConnectable()->getSlot(role, name.toStdString()));
+    this->updateAttachedItems();
+  }
 }
 
 void cedar::proc::gui::Connectable::reactToSlotRenamed(cedar::proc::DataRole::Id role, QString oldName, QString newName)
@@ -946,7 +950,12 @@ void cedar::proc::gui::Connectable::reactToSlotRenamed(cedar::proc::DataRole::Id
   cedar::proc::gui::DataSlotItem* p_item = NULL;
 
   DataSlotMap::iterator iter = this->mSlotMap.find(role);
-  CEDAR_ASSERT(iter != this->mSlotMap.end());
+  if (iter == this->mSlotMap.end())
+  {
+    // only slots for roles that aren't displayed should fail this condition
+    CEDAR_DEBUG_NON_CRITICAL_ASSERT(!isRoleDisplayed(role));
+    return;
+  }
 
   DataSlotNameMap& name_map = iter->second;
   DataSlotNameMap::iterator name_iter = name_map.find(oldName.toStdString());
@@ -968,7 +977,12 @@ void cedar::proc::gui::Connectable::reactToSlotRemoved(cedar::proc::DataRole::Id
   cedar::proc::gui::DataSlotItem* p_item = nullptr;
 
   DataSlotMap::iterator iter = this->mSlotMap.find(role);
-  CEDAR_ASSERT(iter != this->mSlotMap.end());
+  if (iter == this->mSlotMap.end())
+  {
+    // only slots for roles that aren't displayed should fail this condition
+    CEDAR_DEBUG_NON_CRITICAL_ASSERT(!isRoleDisplayed(role));
+    return;
+  }
 
   DataSlotNameMap& name_map = iter->second;
   DataSlotNameMap::iterator name_iter = name_map.find(name.toStdString());
@@ -984,15 +998,24 @@ void cedar::proc::gui::Connectable::reactToSlotRemoved(cedar::proc::DataRole::Id
   this->updateDataSlotPositions();
 }
 
+bool cedar::proc::gui::Connectable::isRoleDisplayed(cedar::proc::DataRole::Id role)
+{
+  switch (role)
+  {
+    case cedar::proc::DataRole::INPUT:
+    case cedar::proc::DataRole::OUTPUT:
+      return true;
+
+    default:
+      return false;
+  }
+}
+
 void cedar::proc::gui::Connectable::addDataItems()
 {
-  std::vector<cedar::proc::DataRole::Id> to_show;
-  to_show.push_back(cedar::proc::DataRole::INPUT);
-  to_show.push_back(cedar::proc::DataRole::OUTPUT);
-  
-  for (const auto& id : to_show)
+  for (const auto& id : cedar::proc::DataRole::type().list())
   {
-    if (id == cedar::aux::Enum::UNDEFINED)
+    if (!isRoleDisplayed(id))
       continue;
 
     // populate step item list
