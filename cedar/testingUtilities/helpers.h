@@ -37,6 +37,7 @@
 #ifndef CEDAR_TESTING_UTILITIES_HELPERS_H
 #define CEDAR_TESTING_UTILITIES_HELPERS_H
 
+#include "cedar/auxiliaries/math/tools.h"
 #include <iostream>
 
 #ifdef CEDAR_OS_LINUX
@@ -132,6 +133,29 @@
     ++ERROR_VAR_NAME; \
     CEDAR_UNIT_TEST_PRINT_FAILURE("threw an exception when " WHAT); \
   }
+
+namespace cedar
+{
+  namespace test
+  {
+    inline bool checkZero(const std::string& message, double value, double precision = 1e-5)
+    {
+      if
+      (
+        !cedar::aux::math::isZero(value, precision)
+      )
+      {
+        std::cout << "ERROR with " << message << ": value should be smaller than " << precision << " but is " << value << "." << std::endl;
+        return false;
+      }
+      else
+      {
+        std::cout << message << " passed." << std::endl;
+        return true;
+      }
+    }
+  }
+}
 
 
 #endif // CEDAR_TESTING_UTILITIES_HELPERS_H
