@@ -866,15 +866,10 @@ void test()
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateSpatialJacobianTemporalDerivative" << std::endl;
   if (
-      !cedar::aux::math::isZero(pow(norm(spatial_jacobian_dot - spatial_jacobian_dot_numeric)/(spatial_jacobian_dot.cols*6), 2), 1e-5)
+      !cedar::test::checkZero("calculateSpatialJacobianTemporalDerivative", pow(norm(spatial_jacobian_dot - spatial_jacobian_dot_numeric)/(spatial_jacobian_dot.cols*6), 2), 1e-5)
      )
   {
     errors++;
-    std::cout << "ERROR with calculateSpatialJacobianTemporalDerivative(...)" << std::endl;
-  }
-  else
-  {
-    std::cout << "passed" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -882,45 +877,29 @@ void test()
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateCartesianJacobianTemporalDerivative" << std::endl;
   if (
-      !cedar::aux::math::isZero(pow(norm(cartesian_jacobian_dot - cartesian_jacobian_dot_numeric)/(cartesian_jacobian_dot.cols*3), 2), 1e-5)
+      !cedar::test::checkZero("calculateCartesianJacobianTemporalDerivative", pow(norm(cartesian_jacobian_dot - cartesian_jacobian_dot_numeric)/(cartesian_jacobian_dot.cols*3), 2), 1e-5)
      )
   {
     errors++;
-    std::cout << "ERROR with calculateCartesianJacobianTemporalDerivative(...)" << std::endl;
-  }
-  else
-  {
-    std::cout << "passed" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // end-effector velocity
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateEndEffectorVelocity" << std::endl;
-  if (!cedar::aux::math::isZero(pow(norm(v_eef - v_eef_numeric)/3.0, 2), 1e-4))
+  if (!cedar::test::checkZero("calculateEndEffectorVelocity", pow(norm(v_eef - v_eef_numeric)/3.0, 2), 1e-4))
   {
     errors++;
-    std::cout << "ERROR with calculateEndEffectorVelocity()" << std::endl;
-  }
-  else
-  {
-    std::cout << "passed" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // end-effector acceleration
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateEndEffectorAcceleration" << std::endl;
-  if (!cedar::aux::math::isZero(pow(norm(a_eef - a_eef_numeric)/3.0, 2), 1e-3))
+  if (!cedar::test::checkZero("calculateEndEffectorAcceleration", pow(norm(a_eef - a_eef_numeric)/3.0, 2), 1e-3))
   {
     errors++;
-    std::cout << "ERROR with calculateEndEffectorAcceleration()" << std::endl;
   }
-  else
-  {
-    std::cout << "passed" << std::endl;
-  }
-
 
   QApplication::exit(errors);
 }
