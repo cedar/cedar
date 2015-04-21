@@ -1,0 +1,135 @@
+{
+    "meta":
+    {
+        "format": "1"
+    },
+    "steps":
+    {
+        "cedar.processing.sources.GaussInput":
+        {
+            "name": "gaussInput",
+            "threaded": "false",
+            "amplitude": "1",
+            "dimensionality": "2",
+            "sigma":
+            [
+                "3",
+                "3"
+            ],
+            "centers":
+            [
+                "3",
+                "3"
+            ],
+            "sizes":
+            [
+                "10",
+                "10"
+            ]
+        },
+        "cedar.dynamics.NeuralField":
+        {
+            "name": "field",
+            "threaded": "false",
+            "restingLevel": "-5",
+            "tau": "100",
+            "globalInhibition": "-0.01",
+            "dimensionality": "2",
+            "sizes":
+            [
+                "10",
+                "10"
+            ],
+            "inputNoiseGain": "0.1",
+            "sigmoid":
+            {
+                "type": "cedar.aux.math.AbsSigmoid",
+                "threshold": "0",
+                "beta": "100"
+            },
+            "lateralKernels":
+            {
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "2",
+                    "amplitude": "1",
+                    "sigmas":
+                    [
+                        "3",
+                        "3"
+                    ],
+                    "shifts":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "limit": "5"
+                }
+            },
+            "noiseCorrelationKernel":
+            {
+                "dimensionality": "2",
+                "amplitude": "0",
+                "sigmas":
+                [
+                    "3",
+                    "3"
+                ],
+                "shifts":
+                [
+                    "0",
+                    "0"
+                ],
+                "limit": "5"
+            }
+        }
+    },
+    "triggers":
+    {
+        "cedar.processing.LoopedTrigger":
+        {
+            "name": "trigger",
+            "LoopMode": "FIXED_ADAPTIVE",
+            "LoopTime": "1",
+            "wait": "true",
+            "listeners":
+            [
+                "field"
+            ]
+        }
+    },
+    "connections":
+    [
+        {
+            "source": "gaussInput.Gauss input",
+            "target": "field.input"
+        }
+    ],
+    "ui":
+    [
+        {
+            "type": "trigger",
+            "trigger": "trigger",
+            "width": "30",
+            "height": "30",
+            "positionX": "248",
+            "positionY": "104"
+        },
+        {
+            "type": "step",
+            "step": "gaussInput",
+            "width": "160",
+            "height": "50",
+            "positionX": "-88",
+            "positionY": "240"
+        },
+        {
+            "type": "step",
+            "step": "field",
+            "width": "160",
+            "height": "50",
+            "positionX": "184",
+            "positionY": "240"
+        }
+    ]
+}
