@@ -57,6 +57,7 @@ const std::string cedar::aux::ImageDatabase::M_STANDARD_OBJECT_POSE_ANNOTATION_N
 const std::string cedar::aux::ImageDatabase::M_STANDARD_MULTI_OBJECT_POSE_ANNOTATION_NAME = "multi_object_pose";
 const std::string cedar::aux::ImageDatabase::M_STANDARD_OBJECT_IMAGE_ANNOTATION_NAME = "object";
 const std::string cedar::aux::ImageDatabase::M_STANDARD_FRAME_OBJECT_ANNOTATION_NAME = "frame_object";
+const std::string cedar::aux::ImageDatabase::M_STANDARD_CLASS_ID_ANNOTATION_NAME = "class id";
 
 const std::vector<std::string> cedar::aux::ImageDatabase::M_STANDARD_KNOWN_IMAGE_FILE_EXTENSIONS = {"png"};
 const std::vector<std::string> cedar::aux::ImageDatabase::M_STANDARD_KNOWN_VIDEO_FILE_EXTENSIONS = {"avi", "mpeg", "mp4", "flv", "ogg", "vob", "mpg"};
@@ -83,8 +84,6 @@ mScale(1.0), mHasScale(false)
 }
 
 cedar::aux::ImageDatabase::Image::Image()
-:
-mClassId(0)
 {
 }
 
@@ -612,9 +611,25 @@ cedar::aux::ImageDatabase::ConstAnnotationPtr
   return iter->second;
 }
 
-void cedar::aux::ImageDatabase::Image::setClassId(ClassId classId)
+cedar::aux::ImageDatabase::ClassId cedar::aux::ImageDatabase::Image::getClassId() const
 {
-  this->mClassId = classId;
+  auto annotation = this->getAnnotation<const ClassIdAnnotation>(cedar::aux::ImageDatabase::M_STANDARD_CLASS_ID_ANNOTATION_NAME);
+  return annotation->getClassId();
+}
+
+void cedar::aux::ImageDatabase::Image::setClassId(cedar::aux::ImageDatabase::ClassId classId)
+{
+  ClassIdAnnotationPtr annotation;
+  if (this->hasAnnotation(cedar::aux::ImageDatabase::M_STANDARD_CLASS_ID_ANNOTATION_NAME))
+  {
+    annotation = this->getAnnotation<ClassIdAnnotation>(cedar::aux::ImageDatabase::M_STANDARD_CLASS_ID_ANNOTATION_NAME);
+    annotation->setClassId(classId);
+  }
+  else
+  {
+    annotation = ClassIdAnnotationPtr(new ClassIdAnnotation(classId));
+    this->setAnnotation(cedar::aux::ImageDatabase::M_STANDARD_CLASS_ID_ANNOTATION_NAME, annotation);
+  }
 }
 
 std::set<cedar::aux::ImageDatabase::ImagePtr>
@@ -1113,9 +1128,26 @@ void cedar::aux::ImageDatabase::scanDirectory(const cedar::aux::Path& path)
         std::string tags = parts.at(1);
 
         ImagePtr sample(new Image());
-        sample->setClassId(this->getOrCreateClass(classname));
         sample->setFileName(file);
         sample->appendTags(tags);
+        ClassId class_id;
+        // only training images create new classes
+        try
+        {
+          if (sample->hasTag("train"))
+          {
+            class_id = this->getOrCreateClass(classname);
+          }
+          else
+          {
+            class_id = this->getClass(classname);
+          }
+          sample->setClassId(class_id);
+        }
+        catch (const cedar::aux::UnknownNameException&)
+        {
+          // happens when no id is known for the class
+        }
 
         this->appendImage(sample);
       }
