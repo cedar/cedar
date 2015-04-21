@@ -289,6 +289,9 @@ public:
   //! Resets the display mode to the default
   void resetDisplayMode(bool resize = true);
 
+  //! Returns true if the data role is displayed, false otherwise
+  static bool isRoleDisplayed(cedar::proc::DataRole::Id role);
+
 public slots:
   //! Updates whether the connectable shows the color of its trigger.
   virtual void updateTriggerColorState();
