@@ -570,6 +570,13 @@ public:
   //! Returns true if the extension is a known video file extension.
 	static bool isKnownVideoExtension(std::string extension);
 
+	/*!@brief   Orders the given set of (training) images by class.
+	 *
+	 * @remarks This function assumes that the images contain just a single object, i.e., that getClassId() on each image
+	 *          returns a valid value.
+	 */
+	static std::vector<ImagePtr> orderTrainingImagesByClassId(const std::set<ImagePtr>& images);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

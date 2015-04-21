@@ -454,6 +454,31 @@ std::vector<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::shuf
   return shuffled;
 }
 
+std::vector<cedar::aux::ImageDatabase::ImagePtr>
+  cedar::aux::ImageDatabase::orderTrainingImagesByClassId(const std::set<ImagePtr>& images)
+{
+  std::set<ClassId> ids;
+
+  for (auto image : images)
+  {
+    ids.insert(image->getClassId());
+  }
+
+  std::vector<ImagePtr> ordered_samples;
+  for (auto current_id : ids)
+  {
+    for (auto image : images)
+    {
+      if (image->getClassId() == current_id)
+      {
+        ordered_samples.push_back(image);
+      }
+    }
+  }
+
+  return ordered_samples;
+}
+
 void cedar::aux::ImageDatabase::addCommandLineOptions(cedar::aux::CommandLineParser& parser)
 {
   std::string group_name = "image database settings";
