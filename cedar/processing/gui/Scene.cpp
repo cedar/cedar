@@ -1018,12 +1018,12 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
   {
     QPointF p2 = pMouseEvent->scenePos() - mpConnectionStart->scenePos();
 
-    for (auto iter = this->mStepMap.begin(); iter != this->mStepMap.end(); ++iter)
+    for (const auto& element_gui_ptr_pair : this->mElementMap)
     {
-      cedar::proc::gui::StepItem* p_step_gui = iter->second;
-      if (mpConnectionStart->canConnectTo(p_step_gui))
+      auto p_gui_connectable = dynamic_cast<cedar::proc::gui::Connectable*>(element_gui_ptr_pair.second);
+      if (p_gui_connectable && mpConnectionStart->canConnectTo(p_gui_connectable))
       {
-        p_step_gui->magnetizeSlots(pMouseEvent->scenePos());
+        p_gui_connectable->magnetizeSlots(pMouseEvent->scenePos());
       }
     }
 
@@ -1216,9 +1216,9 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
           break;
       }
 
-      if (auto p_step = dynamic_cast<cedar::proc::gui::StepItem*>(item))
+      if (auto p_connectable = dynamic_cast<cedar::proc::gui::Connectable*>(item))
       {
-        p_step->demagnetizeSlots();
+        p_connectable->demagnetizeSlots();
       }
     }
   }
