@@ -375,9 +375,13 @@ void cedar::proc::gui::Scene::itemSelected()
 
       if (this->mpRecorderWidget != nullptr)
       {
-        if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(p_element->getElement()))
+        if (auto connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(p_element->getElement()))
         {
-          this->mpRecorderWidget->setConnectable(step);
+          this->mpRecorderWidget->setConnectable(connectable);
+        }
+        else
+        {
+          this->mpRecorderWidget->clear();
         }
       }
     }
