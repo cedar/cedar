@@ -207,10 +207,15 @@ void cedar::proc::sources::NetReader::compute(const cedar::proc::Arguments&)
       this->emitOutputPropertiesChangedSignal("output");
     }
   }
-  catch (cedar::aux::net::NetWaitingForWriterException&)
+  catch (cedar::aux::net::NetWaitingForWriterException& e)
   {
-    // no writer instantiated yet? ignore
-    // CHANGE NOTHING
+    // no writer instantiated yet? writer disconnected?
+    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, "Waiting for net writer (" + e.getMessage() + ").");
+    locker.unlock();
+    QWriteLocker w_locker(mReader.getLockPtr());
+    this->mReader.member().reset();
+    w_locker.unlock();
+    locker.relock();
     return;
   }
   catch (cedar::aux::net::NetNoNewDataException&)

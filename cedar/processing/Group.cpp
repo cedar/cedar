@@ -169,7 +169,8 @@ _mIsLooped(new cedar::aux::BoolParameter(this, "is looped", false)),
 _mTimeFactor(new cedar::aux::DoubleParameter(this, "time factor", 1.0, cedar::aux::DoubleParameter::LimitType::positiveZero()))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
-  _mConnectors->setHidden(true);
+  this->_mConnectors->setHidden(true);
+  this->_mTimeFactor->setHidden(true);
   mParentGroupChangedConnection = this->connectToGroupChanged(boost::bind<void>(&cedar::proc::Group::onParentGroupChanged, this));
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 }
