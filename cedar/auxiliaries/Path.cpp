@@ -48,6 +48,7 @@
 #include "cedar/internals.h"
 
 // SYSTEM INCLUDES
+#include <set>
 #include <QDateTime>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
