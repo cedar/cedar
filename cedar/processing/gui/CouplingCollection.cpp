@@ -209,7 +209,7 @@ std::tuple<cedar::proc::gui::Connectable*, cedar::proc::DataSlotPtr>
 {
   if (this->mComponents.empty())
   {
-    return std::make_tuple<cedar::proc::gui::Connectable*, cedar::proc::DataSlotPtr>(nullptr, nullptr);
+    return std::make_tuple<cedar::proc::gui::Connectable*, cedar::proc::DataSlotPtr>(nullptr, cedar::proc::DataSlotPtr());
   }
 
   auto source = this->getConnection(cedar::proc::DataRole::INPUT)->getSource();
@@ -222,7 +222,7 @@ std::tuple<cedar::proc::gui::Connectable*, cedar::proc::DataSlotPtr>
 {
   if (this->mComponents.empty())
   {
-    return std::make_tuple<cedar::proc::gui::Connectable*, cedar::proc::DataSlotPtr>(nullptr, nullptr);
+    return std::make_tuple<cedar::proc::gui::Connectable*, cedar::proc::DataSlotPtr>(nullptr, cedar::proc::DataSlotPtr());
   }
 
   auto target = this->getConnection(cedar::proc::DataRole::OUTPUT)->getTarget();

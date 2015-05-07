@@ -157,7 +157,7 @@ double cedar::aux::ImageDatabase::ObjectPoseAnnotation::evaluateScale(double sca
 int cedar::aux::ImageDatabase::MultiObjectPoseAnnotation::getNewKey()
 {
   int key = 0;
-  if(!this->mObjectMap.empty())
+  if (!this->mObjectMap.empty())
   {
     auto lastElement = this->mObjectMap.end();
     lastElement--;
@@ -196,7 +196,7 @@ cedar::aux::ImageDatabase::ConstAnnotationPtr
   cedar::aux::ImageDatabase::MultiObjectPoseAnnotation::getAnnotation(int id) const
 {
   auto iter = this->mObjectMap.find(id);
-  if(iter != this->mObjectMap.end())
+  if (iter != this->mObjectMap.end())
   {
     return iter->second.second;
   }
@@ -213,7 +213,7 @@ void cedar::aux::ImageDatabase::FrameAnnotation::setAnnotation(AnnotationPtr ann
 
 bool cedar::aux::ImageDatabase::FrameAnnotation::hasAnnotation(int frame) const
 {
-  if(this->getAnnotation(frame))
+  if (this->getAnnotation(frame))
   {
     return true;
   }
@@ -224,7 +224,7 @@ cedar::aux::ImageDatabase::ConstAnnotationPtr
   cedar::aux::ImageDatabase::FrameAnnotation::getAnnotation(int frame) const
 {
   auto iter = this->mFrameAnnotationMapping.find(frame);
-  if(iter != this->mFrameAnnotationMapping.end())
+  if (iter != this->mFrameAnnotationMapping.end())
   {
     return iter->second;
   }
@@ -232,31 +232,31 @@ cedar::aux::ImageDatabase::ConstAnnotationPtr
   {
     try
     {
-      cedar::aux::ImageDatabase::ObjectPoseAnnotationPtr prev = NULL;
-      cedar::aux::ImageDatabase::ObjectPoseAnnotationPtr next = NULL;
+      cedar::aux::ImageDatabase::ObjectPoseAnnotationPtr prev;
+      cedar::aux::ImageDatabase::ObjectPoseAnnotationPtr next;
       double prevFrame = 0.;
       double nextFrame = 0.;
       
       for(auto iter = this->mFrameAnnotationMapping.begin(); iter!= this->mFrameAnnotationMapping.end(); ++iter)
       {
         //find closest annotations
-        if(iter->first <= frame)
+        if (iter->first <= frame)
         {
           prev = boost::dynamic_pointer_cast<cedar::aux::ImageDatabase::ObjectPoseAnnotation>(iter->second);
           prevFrame = iter->first;
         }
-        else if(iter->first > frame)
+        else if (iter->first > frame)
         {
           next = boost::dynamic_pointer_cast<cedar::aux::ImageDatabase::ObjectPoseAnnotation>(iter->second);
           nextFrame = iter->first;
           break;
         }
       }
-      if(prev == NULL)
+      if (!prev)
       {
-        return NULL;
+        return cedar::aux::ImageDatabase::ConstAnnotationPtr();
       }
-      else if(next == NULL)
+      else if (!next)
       {
         return prev;
       }
@@ -301,11 +301,12 @@ cedar::aux::ImageDatabase::ConstAnnotationPtr
         return poseAnnotation;
       }
     }
-    catch(cedar::aux::NotFoundException e)
+    catch (cedar::aux::NotFoundException e)
     {
       CEDAR_THROW(cedar::aux::NotFoundException, "Interpolation for annotation type not implemented");
     }
-    return NULL;
+
+    return cedar::aux::ImageDatabase::ConstAnnotationPtr();
   }
 }
 
@@ -322,11 +323,11 @@ int cedar::aux::ImageDatabase::FrameAnnotation::getPrevKeyframe(int frame)
   for(auto iter = this->mFrameAnnotationMapping.begin(); iter!= this->mFrameAnnotationMapping.end(); ++iter)
   {
     //find previous annotation
-    if(iter->first < frame)
+    if (iter->first < frame)
     {
       prevFrame = iter->first;
     }
-    else if(iter->first > frame)
+    else if (iter->first > frame)
     {
       break;
     }
@@ -341,7 +342,7 @@ int cedar::aux::ImageDatabase::FrameAnnotation::getNextKeyframe(int frame)
   for(auto iter = this->mFrameAnnotationMapping.begin(); iter!= this->mFrameAnnotationMapping.end(); ++iter)
   {
     //find next annotation
-    if(iter->first > frame)
+    if (iter->first > frame)
     {
       nextFrame = iter->first;
       break;
@@ -353,7 +354,7 @@ int cedar::aux::ImageDatabase::FrameAnnotation::getNextKeyframe(int frame)
 bool cedar::aux::ImageDatabase::FrameAnnotation::isKeyframeAnnotation(int frame)
 {
   auto iter = this->mFrameAnnotationMapping.find(frame);
-  if(iter != this->mFrameAnnotationMapping.end())
+  if (iter != this->mFrameAnnotationMapping.end())
   {
     return true;
   }
@@ -991,7 +992,7 @@ void cedar::aux::ImageDatabase::readMultiAnnotations(const cedar::aux::Path& pat
             rel_x = static_cast<double>(x) - region_cols/2.0;
             rel_y = static_cast<double>(y) - region_rows/2.0;
 
-            if(isFrameAnnotation)
+            if (isFrameAnnotation)
             {
               auto lastFrameAnnotation = annotation->getLastAddedAnnotation<FrameAnnotation>();
               auto poseAnnotation = lastFrameAnnotation->getAnnotation<ObjectPoseAnnotation>(frame);
@@ -1040,10 +1041,10 @@ void cedar::aux::ImageDatabase::readMultiAnnotations(const cedar::aux::Path& pat
           else if (left == "removed")
           {
             bool isRemoved = cedar::aux::fromString<bool>(right);
-            if(isRemoved && isFrameAnnotation)
+            if (isRemoved && isFrameAnnotation)
             {
               auto annotation = image->getAnnotation<MultiObjectPoseAnnotation>(M_STANDARD_MULTI_OBJECT_POSE_ANNOTATION_NAME);
-              annotation->getLastAddedAnnotation<FrameAnnotation>()->setAnnotation(NULL, frame);
+              annotation->getLastAddedAnnotation<FrameAnnotation>()->setAnnotation(cedar::aux::ImageDatabase::AnnotationPtr(), frame);
             }
           }
           else
