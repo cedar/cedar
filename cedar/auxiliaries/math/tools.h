@@ -474,6 +474,15 @@ namespace cedar
         return res;
       }
 
+      /*! Given an activation matrix, this function groups together values above a given threshold into peaks and returns
+       *  a list of centers of these peaks.
+       *
+       *  @param activation The activation matrix.
+       *  @param peakCenters Found centers will be written into this vector.
+       *  @param threshold Only values above this threshold are considered to be part of a peak.
+       */
+      CEDAR_AUX_LIB_EXPORT void findPeaks(cv::Mat& activation, std::vector<cv::Point>& peakCenters, double threshold = 0.1);
+
     } // namespace math
   } // namespace aux
 } // namespace cedar
