@@ -22,6 +22,8 @@ public:
   // Type that should be used whenever values of this enum are stored. (Resolves to unsigned int)
   typedef cedar::aux::EnumId Id;
 
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
   // Using cedar's enum framework, this function is called to fill the enum at an appropriate time.
   static void construct();
 
@@ -29,7 +31,7 @@ public:
   static const cedar::aux::EnumBase& type();
 
   // Same as above, but returns a pointer to the object
-  static const cedar::proc::steps::NormalizationType::TypePtr& typePtr();
+  static const your::Enum::TypePtr& typePtr();
 
   // The numbers have to be given manually. They do not have to be consecutive, and can be other constants, e.g., when
   // exposing opencv enum values
