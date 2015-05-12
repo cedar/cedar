@@ -69,7 +69,8 @@ known issues
 Unreleased
 ==========
 
-  none
+- cedar::proc
+  - Architecture scripts can now set a status that is displayed in the script manager.
 
 Released versions
 =================
