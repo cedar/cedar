@@ -28,7 +28,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 04 29
+    Date:        2015 05 15
 
     Description: 
 
@@ -1802,7 +1802,7 @@ class RDPPlot(object):
                             plot = self._initialize_3D_plot(mode=mode)
                             
                             if style == 'surface':   
-                                plot.plot_surface(X_1,X_2,data,rstride=resolution, cstride=resolution,cmap='coolwarm', alpha=0.5)
+                                plot.plot_surface(X_1,X_2,data,rstride=resolution, cstride=resolution,cmap='coolwarm', alpha=0.5, linewidth=0, antialiased=True)
                             elif style == 'wireframe':
                                 plot.plot_wireframe(X_1,X_2, data, rstride=resolution,cstride=resolution, color=color)
                             
@@ -1846,7 +1846,7 @@ class RDPPlot(object):
                             plot = self._initialize_3D_plot(mode=mode)
             
                             if style == 'surface': 
-                                plot.plot_surface(X_1,X_2,data,rstride=resolution, cstride=resolution,cmap='coolwarm', alpha=0.5)
+                                plot.plot_surface(X_1,X_2,data,rstride=resolution, cstride=resolution,cmap='coolwarm', alpha=0.5, linewidth=0, antialiased=True)
                             elif style == 'wireframe':
                                 plot.plot_wireframe(X_1,X_2,data, rstride=resolution,cstride=resolution, color=color)
                             
@@ -1921,7 +1921,7 @@ class RDPPlot(object):
                 plot = self._initialize_3D_plot()
                 
                 if style == 'surface':   
-                    plot.plot_surface(X_1, X_2, data, rstride=resolution, cstride=resolution, cmap='coolwarm', alpha=0.5)
+                    plot.plot_surface(X_1, X_2, data, rstride=resolution, cstride=resolution, cmap='coolwarm', alpha=0.5, linewidth=0, antialiased=True)
                 elif style == 'wireframe': 
                     plot.plot_wireframe(X_1, X_2, data, rstride=resolution, cstride=resolution, color=color)
             
