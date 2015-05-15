@@ -1391,6 +1391,9 @@ class RDPGUI(wx.Panel):
                 
         self.frame.rdp_plot.label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
         
+        if self.style == 'heatmap' or self.style == 'surface' or self.style == 'wireframe':
+            plt.gca().invert_yaxis()
+        
         if save is False and self.mode != 'snapshot sequence':
             
             manager = plt.get_current_fig_manager() 
@@ -1871,6 +1874,10 @@ class RDPPlot(object):
                                       proj = proj, 
                                       proj_method = proj_method,
                                       color = color)
+            
+            if style == 'heatmap' or style == 'surface' or style == 'wireframe':
+                plt.gca().invert_yaxis()
+            
             #if i == 0:
             self.label_axis(plot = plot, x_label=x_label, y_label=y_label, z_label=z_label)
             
