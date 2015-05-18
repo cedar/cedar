@@ -525,7 +525,7 @@ void cedar::aux::math::findPeaks(cv::Mat& activation, std::vector<cv::Point>& pe
     {
       sum += point;
     }
-    cv::Point center = sum / static_cast<int>(points.size());
+    cv::Point center = cv::Point(sum.x / static_cast<int>(points.size()), sum.y / static_cast<int>(points.size()));
     peakCenters.push_back(center);
   }
 }
