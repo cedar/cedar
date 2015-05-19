@@ -606,7 +606,12 @@ cedar::aux::ImageDatabase::ConstAnnotationPtr
     {
       known_annotations = "none";
     }
-    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find an annotation with the id \"" + annotationId + "\". Known annotations are: " + known_annotations);
+    CEDAR_THROW
+    (
+      cedar::aux::NotFoundException,
+      "Could not find an annotation with the id \"" + annotationId + "\" in image " + this->getFileName() +
+          ". Known annotations are: " + known_annotations
+    );
   }
 
   return iter->second;
@@ -1432,9 +1437,9 @@ void cedar::aux::ImageDatabase::Image::appendTags(const std::string& tags)
 {
   std::vector<std::string> tag_split;
   cedar::aux::split(tags, ",", tag_split);
-  for (auto iter = tag_split.begin(); iter != tag_split.end(); ++iter)
+  for (const auto& tag : tag_split)
   {
-    this->mTags.insert(*iter);
+    this->mTags.insert(tag);
   }
 }
 
