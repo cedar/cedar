@@ -22,38 +22,19 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        exceptions.h
+    File:        namespace.dox
 
     Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 28
+    Email:       oliver.lomp@ini.rub.de
+    Date:        2015 05 21
 
-    Description: Header file for exceptions in the cedar::aux::gui namespace.
+    Description: Namespace documentation for cedar::aux::kernel.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_EXCEPTIONS_FWD_H
-#define CEDAR_AUX_GUI_EXCEPTIONS_FWD_H
-
-// CEDAR INCLUDES
-
-// SYSTEM INCLUDES
-
-namespace cedar
-{
-  namespace aux
-  {
-    namespace gui
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      /* Exceptions */
-      class CEDAR_AUX_LIB_EXPORT InvalidPlotData;
-      //!@endcond
-    }
-  }
-}
-
-
-#endif // CEDAR_AUX_GUI_EXCEPTIONS_FWD_H
+/*! @namespace cedar::aux::kernel
+ * 
+ *  @brief Namespace for all kernel classes.
+ */

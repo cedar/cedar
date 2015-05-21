@@ -44,15 +44,5 @@
 
 #warning Do not include this header any more. Use the new forward declaration headers instead.
 
-namespace cedar
-{
-  /*!@brief Namespace that encapsulates functionality shared across multiple unit/interactive tests.
-   *
-   *        This is an internal namespace of cedar. Functionality in here should not be used outside of unit tests!
-   */
-  namespace test
-  {
-  }
-}
 
 #endif // CEDAR_TESTING_UTILITIES_NAMESPACE_H
