@@ -49,7 +49,6 @@ namespace cedar
 {
   namespace aux
   {
-    /*!@brief Namespace for all gl classes. */
     namespace gl
     {
       //!@cond SKIPPED_DOCUMENTATION
