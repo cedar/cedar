@@ -207,6 +207,7 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std
     this->mData->hasAnnotation<cedar::aux::annotation::ColorSpace>()
     || this->mData->hasAnnotation<cedar::aux::annotation::Disparity>()
     || this->mData->hasAnnotation<cedar::aux::annotation::Depth>()
+    || this->mData->getData().channels() > 1
   )
   {
     // data should be plotted as an image
