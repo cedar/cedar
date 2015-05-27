@@ -57,6 +57,11 @@
 QString cedar::proc::gui::SimulationControl::M_STARTED_ICON_PATH = ":/cedar/auxiliaries/gui/start.svg";
 QString cedar::proc::gui::SimulationControl::M_PAUSED_ICON_PATH = ":/cedar/auxiliaries/gui/pause.svg";
 
+const int cedar::proc::gui::SimulationControl::M_COLUMN_COLOR_WIDGET = 0;
+const int cedar::proc::gui::SimulationControl::M_COLUMN_CONNECTION_COUNT = 3;
+const int cedar::proc::gui::SimulationControl::M_COLUMN_QUALITY_INDICATOR = 4;
+const int cedar::proc::gui::SimulationControl::M_COLUMN_PARAMETERS_START = 5;
+
 //----------------------------------------------------------------------------------------------------------------------
 // private (pseudo) nested classes
 //----------------------------------------------------------------------------------------------------------------------
@@ -172,6 +177,7 @@ mSimulationRunning(false)
   QObject::connect(this->mpAddButton, SIGNAL(clicked()), this, SLOT(createClicked()));
   QObject::connect(this->mpDeleteButton, SIGNAL(clicked()), this, SLOT(removeClicked()));
   QObject::connect(this->mpTree, SIGNAL(elementNameChanged(QTreeWidgetItem*)), this, SLOT(elementNameChanged()));
+  QObject::connect(this, SIGNAL(signalTriggerCountChanged(QString)), this, SLOT(triggerCountChanged(QString)));
 
   if (cedar::aux::GlobalClockSingleton::getInstance()->isRunning())
   {
@@ -328,6 +334,8 @@ void cedar::proc::gui::SimulationControl::updateItemQualityWidget(QWidget* pQual
 
 void cedar::proc::gui::SimulationControl::setGroup(cedar::proc::gui::GroupPtr group)
 {
+  this->mTriggerCountChangedConnections.clear();
+
   this->mGroup = group;
   this->mpTree->setGroup(this->mGroup->getGroup());
 
@@ -389,6 +397,15 @@ void cedar::proc::gui::SimulationControl::elementAdded(QTreeWidgetItem* pItem, c
   }
 }
 
+void cedar::proc::gui::SimulationControl::elementRemoved(QTreeWidgetItem* pItem, cedar::proc::ElementPtr element)
+{
+  if (auto looped_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
+  {
+    this->loopedTriggerRemoved(pItem, looped_trigger);
+    this->sortItems();
+  }
+}
+
 QLabel* cedar::proc::gui::SimulationControl::addColorWidget(QTreeWidgetItem* pItem, int column)
 {
   auto color_indicator_frame = new QWidget();
@@ -408,17 +425,19 @@ void cedar::proc::gui::SimulationControl::loopedTriggerAdded(QTreeWidgetItem* pI
   auto control = new cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget(loopedTrigger);
   this->mpTree->setItemWidget(pItem, 2, control);
 
-  auto color_indicator = this->addColorWidget(pItem, 0);
+  auto color_indicator = this->addColorWidget(pItem, M_COLUMN_COLOR_WIDGET);
   this->updateItemColorWidgetColor(color_indicator, loopedTrigger);
 
-  auto quality_indicator = this->addColorWidget(pItem, 3);
+  auto quality_indicator = this->addColorWidget(pItem, M_COLUMN_QUALITY_INDICATOR);
   quality_indicator->setFrameStyle(QFrame::Box | QFrame::Plain);
   this->updateItemQualityWidget(quality_indicator, loopedTrigger);
   QFont font = quality_indicator->font();
   font.setPointSize(5);
   quality_indicator->setFont(font);
 
-  int column = 4;
+  pItem->setText(M_COLUMN_CONNECTION_COUNT, "-");
+
+  int column = M_COLUMN_PARAMETERS_START;
   std::vector<std::string> parameter_names;
   parameter_names.push_back("start with all");
   parameter_names.push_back("loop mode");
@@ -435,8 +454,53 @@ void cedar::proc::gui::SimulationControl::loopedTriggerAdded(QTreeWidgetItem* pI
     ++column;
   }
 
-  this->mpTree->resizeColumnToContents(0);
-  this->mpTree->resizeColumnToContents(2);
+  this->updateTriggerConnectionCount(loopedTrigger);
+
+  this->mpTree->resizeColumnToContents(M_COLUMN_COLOR_WIDGET);
+  this->mpTree->resizeColumnToContents(M_COLUMN_QUALITY_INDICATOR);
+  this->mpTree->resizeColumnToContents(M_COLUMN_CONNECTION_COUNT);
+
+  this->mTriggerCountChangedConnections[loopedTrigger] =
+    boost::shared_ptr<boost::signals2::scoped_connection>
+    (
+      new boost::signals2::scoped_connection
+      (
+        loopedTrigger->connectToTriggerCountChangedSignal
+        (
+          boost::bind(&cedar::proc::gui::SimulationControl::translateTriggerCountChangedSignal, this, _1, loopedTrigger)
+        )
+      )
+    );
+}
+
+void cedar::proc::gui::SimulationControl::loopedTriggerRemoved(QTreeWidgetItem* /* pItem */, cedar::proc::LoopedTriggerPtr loopedTrigger)
+{
+  auto iter = this->mTriggerCountChangedConnections.find(loopedTrigger);
+  if (iter != this->mTriggerCountChangedConnections.end())
+  {
+    this->mTriggerCountChangedConnections.erase(iter);
+  }
+}
+
+void cedar::proc::gui::SimulationControl::translateTriggerCountChangedSignal(size_t, cedar::proc::LoopedTriggerPtr trigger)
+{
+  emit signalTriggerCountChanged(QString::fromStdString(trigger->getFullPath()));
+}
+
+void cedar::proc::gui::SimulationControl::triggerCountChanged(QString triggerPath)
+{
+  auto trigger = this->mGroup->getGroup()->getElement<cedar::proc::LoopedTrigger>(triggerPath.toStdString());
+  this->updateTriggerConnectionCount(trigger);
+}
+
+void cedar::proc::gui::SimulationControl::updateTriggerConnectionCount(cedar::proc::LoopedTriggerPtr trigger)
+{
+  QTreeWidgetItem* p_item = this->mpTree->findItemForElement(trigger);
+  if (!p_item)
+  {
+    return;
+  }
+  p_item->setText(M_COLUMN_CONNECTION_COUNT, QString("%1").arg(trigger->getTriggerCount()));
 }
 
 void cedar::proc::gui::SimulationControl::startPauseSimulationClicked()

@@ -46,6 +46,7 @@
 #include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/LockableMember.h"
 #include "cedar/auxiliaries/GraphTemplate.h"
+#include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/sources/GroupSource.fwd.h"
@@ -140,6 +141,9 @@ public:
 
   virtual bool canConnectTo(cedar::proc::ConstTriggerablePtr target) const;
 
+  //! Returns the number of triggerables directly listening to this trigger.
+  size_t getTriggerCount() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -225,6 +229,12 @@ protected:
 
 private:
   // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // boost signals
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  CEDAR_DECLARE_SIGNAL(TriggerCountChanged, void(size_t));
 }; // class cedar::proc::Trigger
 
 #endif // CEDAR_PROC_TRIGGER_H

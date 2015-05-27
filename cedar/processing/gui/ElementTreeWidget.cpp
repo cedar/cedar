@@ -94,6 +94,11 @@ QTreeWidgetItem* cedar::proc::gui::ElementTreeWidget::findItemWithPath(const ced
   return nullptr;
 }
 
+QTreeWidgetItem* cedar::proc::gui::ElementTreeWidget::findItemForElement(cedar::proc::ConstElementPtr element)
+{
+  return this->findItemWithPath(element->getFullPath());
+}
+
 std::string cedar::proc::gui::ElementTreeWidget::getPathFromItem(QTreeWidgetItem* pItem) const
 {
   return pItem->data(this->getNameColumn(), Qt::UserRole).toString().toStdString();
@@ -288,6 +293,9 @@ void cedar::proc::gui::ElementTreeWidget::elementRemoved(QString elementName)
     QTreeWidgetItem* p_item = *it;
     if (p_item->data(this->mNameColumn, Qt::UserRole).toString() == elementName)
     {
+      auto path = p_item->data(this->getNameColumn(), Qt::UserRole).toString().toStdString();
+      auto element = this->mGroup->getElement(path);
+      this->signalElementRemoved(p_item, element);
       delete p_item;
       return;
     }
