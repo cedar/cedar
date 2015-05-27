@@ -108,6 +108,9 @@ public:
   //! Sets the group path stored in the item.
   void setItemPath(QTreeWidgetItem* pItem, const std::string& newPath);
 
+  //! Returns the item corresponding to the given element.
+  QTreeWidgetItem* findItemForElement(cedar::proc::ConstElementPtr element);
+
 signals:
   //! Used to translate a boost signal to a Qt signal.
   void elementAddedSignal(QString);
@@ -123,6 +126,8 @@ signals:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   CEDAR_DECLARE_SIGNAL(ElementAdded, void(QTreeWidgetItem* item, cedar::proc::ElementPtr));
+
+  CEDAR_DECLARE_SIGNAL(ElementRemoved, void(QTreeWidgetItem* item, cedar::proc::ElementPtr));
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
