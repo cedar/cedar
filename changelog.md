@@ -71,6 +71,7 @@ Unreleased
 
 - cedar::proc
   - Architecture scripts can now set a status that is displayed in the script manager.
+  - Architecture widgets can now add buttons for calling step actions.
 
 Released versions
 =================

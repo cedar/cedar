@@ -50,6 +50,7 @@
 
 // SYSTEM INCLUDES
 #include <QWidget>
+#include <QPushButton>
 #include <map>
 #include <string>
 
@@ -58,6 +59,8 @@
  */
 class cedar::proc::gui::ArchitectureWidget : public QWidget, public cedar::aux::Configurable
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -78,6 +81,13 @@ private:
     //! Weight that determines how much an entry stretches in the layout.
     int mRowStretch, mColumnStretch;
   };
+
+  struct StepActionParameters
+  {
+    std::vector<std::pair<std::string, std::string> > mStepActions;
+    bool mConfirm;
+  };
+  CEDAR_GENERATE_POINTER_TYPES(StepActionParameters);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -115,6 +125,8 @@ private:
 
   QWidget* readLabel(const cedar::aux::ConfigurationNode& entry);
 
+  QWidget* readStepAction(const cedar::aux::ConfigurationNode& entry);
+
   void addEntry(const cedar::aux::ConfigurationNode& entry, int rowOffset = 0, int colOffset = 0, const BaseCellAttributes& attributes = BaseCellAttributes());
 
   void addTemplate(int row, int column, const cedar::aux::ConfigurationNode& entry, const BaseCellAttributes& attributes = BaseCellAttributes());
@@ -125,6 +137,9 @@ private:
 
   void readConfig(const cedar::aux::ConfigurationNode& config);
 
+private slots:
+  void triggerStepAction();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -132,6 +147,8 @@ protected:
   // none yet
 private:
   std::map<std::string, cedar::aux::ConfigurationNode> mTemplates;
+
+  std::map<QPushButton*, StepActionParametersPtr> mStepActionParameters;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
