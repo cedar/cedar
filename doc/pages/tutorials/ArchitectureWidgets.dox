@@ -186,6 +186,32 @@ Note, that templates are always instantiated with relative rows/columns, i.e., t
 row 2, the plot in row 3.
 
 
+@section ArchitectureWidgets_StepActions Row Contents: Step Actions
+
+If you want to add a button to your architecture widget that lets you call actions of one or more steps (e.g., reset a
+number of fields all at the same time), you can do so using the following entry:
+
+@code
+{
+  "type": "step action",
+  "label": "will be on the button",
+  "actions":
+  [
+    {"field A": "reset"},
+    {"field B": "reset"}
+  ]
+}
+@endcode
+
+Pushing the button in the architecture widget will, in this example, reset both field A and field B.
+
+If you want to make sure the user did not click the button accidentally, add the following line to the above code:
+@code
+  "confirm": "true"
+@endcode
+When the button is clicked, a message box will pop up that asks the user for confirmation.
+
+
 @section EBPlots How to build a plot for your elementary behaviors
 
 Architecture widgets can also be used to make a plot of nodes in an architecture, e.g., to visualize the state of the
