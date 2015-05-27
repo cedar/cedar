@@ -59,7 +59,7 @@ const std::string cedar::aux::ImageDatabase::M_STANDARD_OBJECT_IMAGE_ANNOTATION_
 const std::string cedar::aux::ImageDatabase::M_STANDARD_FRAME_OBJECT_ANNOTATION_NAME = "frame_object";
 const std::string cedar::aux::ImageDatabase::M_STANDARD_CLASS_ID_ANNOTATION_NAME = "class id";
 
-const std::vector<std::string> cedar::aux::ImageDatabase::M_STANDARD_KNOWN_IMAGE_FILE_EXTENSIONS = {"png"};
+const std::vector<std::string> cedar::aux::ImageDatabase::M_STANDARD_KNOWN_IMAGE_FILE_EXTENSIONS = {"png", "ppm"};
 const std::vector<std::string> cedar::aux::ImageDatabase::M_STANDARD_KNOWN_VIDEO_FILE_EXTENSIONS = {"avi", "mpeg", "mp4", "flv", "ogg", "vob", "mpg"};
 
 #ifndef CEDAR_COMPILER_MSVC
@@ -1099,7 +1099,7 @@ void cedar::aux::ImageDatabase::scanDirectory(const cedar::aux::Path& path)
     }
   }
 
-  for (std::string file : files)
+  for (auto file : files)
   {
     std::string file_no_dir, restpath;
 
@@ -1202,7 +1202,7 @@ void cedar::aux::ImageDatabase::readCOIL100(const cedar::aux::Path& path)
   for (const auto& file : path.listFiles())
   {
     std::string extension = file.getExtension();
-    if (extension != "png")
+    if (!isKnownImageExtension(extension))
     {
       continue;
     }
