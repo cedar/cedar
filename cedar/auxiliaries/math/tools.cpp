@@ -465,3 +465,67 @@ void cedar::aux::math::reduceCvMat3D
 
 template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::reduceCvMat3D<float>(const cv::Mat& source, cv::Mat& dst, int dimensionToReduce, int reductionOperator, bool swapDimensions);
 template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::reduceCvMat3D<double>(const cv::Mat& source, cv::Mat& dst, int dimensionToReduce, int reductionOperator, bool swapDimensions);
+
+
+void cedar::aux::math::findPeaks(cv::Mat& activation, std::vector<cv::Point>& peakCenters, double threshold)
+{
+  if (activation.empty())
+  {
+    return;
+  }
+
+  cv::Mat marked_map = activation.clone();
+
+  while (true)
+  {
+    cv::Point max_loc;
+    double max;
+    cv::minMaxLoc(marked_map, nullptr, &max, nullptr, &max_loc);
+    if (max < threshold)
+    {
+      break;
+    }
+
+    std::vector<cv::Point> points;
+    std::vector<cv::Point> to_explore;
+    to_explore.push_back(max_loc);
+
+    // find all connected above-threshold points around the maximum
+    while (!to_explore.empty())
+    {
+      cv::Point pt = to_explore.back();
+      to_explore.pop_back();
+
+      if (pt.x < 0 || pt.y < 0 || pt.x >= marked_map.cols || pt.y >= marked_map.rows)
+      {
+        continue;
+      }
+
+      if (marked_map.at<float>(pt) >= threshold)
+      {
+        points.push_back(pt);
+        for (int i = -1; i <= 1; ++i)
+        {
+          for (int j = -1; j <= 1; ++j)
+          {
+            if (i != 0 || j != 0)
+            {
+              to_explore.push_back(pt + cv::Point(i, j));
+            }
+          }
+        }
+      }
+      // remove the point from those to be clustered
+      marked_map.at<float>(pt) = 0.0f;
+    }
+
+    // find center of the point (use mean value)
+    cv::Point sum(0, 0);
+    for (auto point : points)
+    {
+      sum += point;
+    }
+    cv::Point center = cv::Point(sum.x / static_cast<int>(points.size()), sum.y / static_cast<int>(points.size()));
+    peakCenters.push_back(center);
+  }
+}
