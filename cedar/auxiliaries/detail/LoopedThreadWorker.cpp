@@ -142,7 +142,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
       scheduled_wakeup = getLastTimeStepEnd() + step_size;
 
       // this makes sure that every thread has a different random seed
-      srand(boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds());
+      this->initRngs();
 
       // some auxiliary variables
       boost::posix_time::time_duration sleep_duration = boost::posix_time::microseconds(0);
@@ -202,7 +202,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
       setLastTimeStepEnd( boost::posix_time::microsec_clock::universal_time() );
       scheduled_wakeup = getLastTimeStepEnd() + step_size;
 
-      srand(boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds());
+      this->initRngs();
 
       // some auxiliary variables
       boost::posix_time::time_duration sleep_duration = boost::posix_time::microseconds(0);
@@ -261,6 +261,13 @@ void cedar::aux::detail::LoopedThreadWorker::work()
 
   safeRequestStop();
   return;
+}
+
+void cedar::aux::detail::LoopedThreadWorker::initRngs()
+{
+  auto seed = boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds();
+  srand(seed);
+  cv::theRNG().state = seed;
 }
 
 void cedar::aux::detail::LoopedThreadWorker::initStatistics()
