@@ -1179,7 +1179,7 @@ void cedar::proc::gui::Connectable::updateDataSlotPositions()
     const QPointF& origin = add_origins[role];
     const QPointF& direction = add_directions[role];
 
-    try
+    if (this->mConnectable->hasSlotForRole(role))
     {
       QPointF current_origin = QPointF(0, 0);
       const cedar::proc::Connectable::SlotList& slotmap = this->mConnectable->getOrderedDataSlots(role);
@@ -1200,10 +1200,6 @@ void cedar::proc::gui::Connectable::updateDataSlotPositions()
         p_item->setPos(QPointF(x - size_diff, y) + current_origin);
         current_origin += direction * (slot_size + M_DATA_SLOT_PADDING);
       }
-    }
-    catch(const cedar::proc::InvalidRoleException&)
-    {
-      // ok -- a step may not have any data for this role.
     }
   }
 }
