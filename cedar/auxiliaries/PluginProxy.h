@@ -155,6 +155,10 @@ private:
   //!@brief Searches for the plugin description file.
   std::string findPluginDescription(const std::string& plugin_path) const;
 
+  static std::string findPluginInWorkspaceNoThrow(const std::string& plugin_path, const std::string& workspace, bool& found, std::vector<std::string>& searchedPaths);
+
+  static std::string findPluginNoThrow(const std::string& pluginName, bool& found, std::vector<std::string>& searchedPaths);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
