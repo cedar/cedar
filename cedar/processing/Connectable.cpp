@@ -990,6 +990,12 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
   slot->setData(data);
 
   this->checkMandatoryConnections();
+
+  if (role == cedar::proc::DataRole::INPUT)
+  {
+    // update the validity of the input
+    this->revalidateInputSlot(name);
+  }
 }
 
 void cedar::proc::Connectable::dataAddedToSlot(DataRole::Id role, cedar::proc::DataSlotWeakPtr slotWeak, cedar::aux::ConstDataPtr data)
@@ -1043,9 +1049,6 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
 void cedar::proc::Connectable::setInput(const std::string& name, cedar::aux::DataPtr data)
 {
   this->setData(DataRole::INPUT, name, data);
-
-  // update the validity of the input
-  this->getInputValidity(name);
 }
 
 void cedar::proc::Connectable::setBuffer(const std::string& name, cedar::aux::DataPtr data)
