@@ -549,6 +549,15 @@ cedar::aux::ConstDataPtr cedar::proc::gui::ArchitectureWidget::findData(const st
   }
 
   auto connectable = this->mGroup->getElement<cedar::proc::Connectable>(step_path_rest);
+  if (!connectable)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "When opening architecture widget: No element found with the path \"" + step_path + "\".",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
+    return cedar::aux::ConstDataPtr();
+  }
 
   auto role_enum = cedar::proc::DataRole::type().get(role);
   return connectable->getData(role_enum, data_name);
