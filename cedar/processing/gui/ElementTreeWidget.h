@@ -127,8 +127,6 @@ signals:
 public:
   CEDAR_DECLARE_SIGNAL(ElementAdded, void(QTreeWidgetItem* item, cedar::proc::ElementPtr));
 
-  CEDAR_DECLARE_SIGNAL(ElementRemoved, void(QTreeWidgetItem* item, cedar::proc::ElementPtr));
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
