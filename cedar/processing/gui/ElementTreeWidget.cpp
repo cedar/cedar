@@ -291,11 +291,10 @@ void cedar::proc::gui::ElementTreeWidget::elementRemoved(QString elementName)
   while (*it)
   {
     QTreeWidgetItem* p_item = *it;
-    if (p_item->data(this->mNameColumn, Qt::UserRole).toString() == elementName)
+    QString item_name = p_item->data(this->getNameColumn(), Qt::UserRole).toString();
+    if (item_name == elementName)
     {
-      auto path = p_item->data(this->getNameColumn(), Qt::UserRole).toString().toStdString();
-      auto element = this->mGroup->getElement(path);
-      this->signalElementRemoved(p_item, element);
+      auto path = item_name.toStdString();
       delete p_item;
       return;
     }
