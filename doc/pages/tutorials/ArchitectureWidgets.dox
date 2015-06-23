@@ -218,7 +218,9 @@ Architecture widgets can also be used to make a plot of nodes in an architecture
 behavioral organization.
 
 For this, we use a cedar::aux::gui::Multi0DPlot. This plot shows several zero-dimensional values in a single plot,
-representing each value as a filled circle. 
+representing each value as a filled circle. It looks like this:
+
+@image html doc/pages/tutorials/images/Multi0DPlotExample.png
 
 Here's an example json file describing a widget configuration:
 @code
