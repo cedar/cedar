@@ -467,7 +467,7 @@ template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::reduceCvMat3D<float>(const 
 template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::reduceCvMat3D<double>(const cv::Mat& source, cv::Mat& dst, int dimensionToReduce, int reductionOperator, bool swapDimensions);
 
 
-void cedar::aux::math::findPeaks(cv::Mat& activation, std::vector<cv::Point>& peakCenters, double threshold)
+void cedar::aux::math::findPeaks(const cv::Mat& activation, std::vector<cv::Point>& peakCenters, double threshold)
 {
   if (activation.empty())
   {
