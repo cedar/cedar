@@ -1270,7 +1270,7 @@ void cedar::proc::gui::Connectable::demagnetizeSlots()
 
 void cedar::proc::gui::Connectable::magnetizeSlots(const QPointF& mousePositionInScene)
 {
-  double max_distance = 100.0;
+  double max_distance = 50.0;
   double scale_factor = cedar::proc::gui::SettingsSingleton::getInstance()->getDataSlotScaling();
   double scale_sensitivity = cedar::proc::gui::SettingsSingleton::getInstance()->getDataSlotScalingSensitivity();
 

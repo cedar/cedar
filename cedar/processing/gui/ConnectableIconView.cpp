@@ -74,3 +74,14 @@ cedar::proc::ConstConnectablePtr cedar::proc::gui::ConnectableIconView::getConne
 {
   return this->mConnectable;
 }
+
+void cedar::proc::gui::ConnectableIconView::prepareSvgExport()
+{
+  // empty default implementation
+}
+
+void cedar::proc::gui::ConnectableIconView::unprepareSvgExport()
+{
+  // empty default implementation
+}
+

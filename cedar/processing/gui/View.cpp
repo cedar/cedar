@@ -68,8 +68,8 @@ mpRecorderWidget(nullptr)
   this->setDragMode(QGraphicsView::RubberBandDrag);
   this->setRenderHints(this->renderHints() | QPainter::Antialiasing
                                            | QPainter::SmoothPixmapTransform
-                                           | QPainter::HighQualityAntialiasing
                                            );
+  this->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
   this->mpScrollTimer->setSingleShot(false);
   QObject::connect(this->mpScrollTimer, SIGNAL(timeout()), this, SLOT(scrollTimerEvent()));

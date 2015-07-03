@@ -537,8 +537,6 @@ QPainterPath cedar::proc::gui::Connection::shape() const
 
 void cedar::proc::gui::Connection::paint(QPainter *pPainter, const QStyleOptionGraphicsItem*, QWidget*)
 {
-  pPainter->save();
-
   QPen pen = this->pen();
 
   qreal width_factor = static_cast<qreal>(std::max(2.5 - this->mBaseLineWidth, 0.8));
@@ -573,7 +571,6 @@ void cedar::proc::gui::Connection::paint(QPainter *pPainter, const QStyleOptionG
 
   pPainter->setPen(pen);
   pPainter->drawPath(this->path());
-  pPainter->restore();
 }
 
 cedar::proc::gui::GraphicsBase* cedar::proc::gui::Connection::getSource()
