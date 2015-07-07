@@ -81,6 +81,12 @@ public:
   //! set bounding box position and size
   virtual void setBounds(const qreal& x, const qreal& y, const qreal& size) = 0;
 
+  //! Prepares the view for writing out to SVG.
+  virtual void prepareSvgExport();
+
+  //! Undoes the changes needed for writing out to SVG.
+  virtual void unprepareSvgExport();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

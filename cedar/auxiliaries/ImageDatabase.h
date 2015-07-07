@@ -107,6 +107,33 @@ public:
   };
   CEDAR_GENERATE_POINTER_TYPES(ETH80Annotation);
 
+  /*! An annotation containing ground-truth information about object identity.
+   */
+  class ClassIdAnnotation : public Annotation
+  {
+  public:
+    //! Constructor.
+    ClassIdAnnotation(cedar::aux::ImageDatabase::ClassId classId)
+    :
+    mClassId(classId)
+    {
+    }
+
+    void setClassId(cedar::aux::ImageDatabase::ClassId classId)
+    {
+      this->mClassId = classId;
+    }
+
+    cedar::aux::ImageDatabase::ClassId getClassId() const
+    {
+      return this->mClassId;
+    }
+
+  private:
+    cedar::aux::ImageDatabase::ClassId mClassId;
+  };
+  CEDAR_GENERATE_POINTER_TYPES(ClassIdAnnotation);
+
   /*! An annotation containing ground-truth information about object pose.
    *
    * @todo Switch to boost::optional instead of using a bool for each pose component.
@@ -341,10 +368,7 @@ public:
     void setClassId(ClassId classId);
 
     //! Returns the correct class id for the image.
-    ClassId getClassId() const
-    {
-      return this->mClassId;
-    }
+    ClassId getClassId() const;
 
     //! Appends a set of tags to the image.
     void appendTags(const std::string&);
@@ -403,8 +427,6 @@ public:
     void readImage() const;
 
   private:
-    ClassId mClassId;
-
     cedar::aux::Path mFileName;
 
     std::set<std::string> mTags;
@@ -570,6 +592,13 @@ public:
   //! Returns true if the extension is a known video file extension.
 	static bool isKnownVideoExtension(std::string extension);
 
+	/*!@brief   Orders the given set of (training) images by class.
+	 *
+	 * @remarks This function assumes that the images contain just a single object, i.e., that getClassId() on each image
+	 *          returns a valid value.
+	 */
+	static std::vector<ImagePtr> orderTrainingImagesByClassId(const std::set<ImagePtr>& images);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -634,6 +663,9 @@ public:
 
   //! Standard name used for storing frame annotations.
   static const std::string M_STANDARD_FRAME_OBJECT_ANNOTATION_NAME;
+
+  //! Standard name used for storing class id annotations.
+  static const std::string M_STANDARD_CLASS_ID_ANNOTATION_NAME;
 
   //! The file extensions used for finding images.
   static const std::vector<std::string> M_STANDARD_KNOWN_IMAGE_FILE_EXTENSIONS;

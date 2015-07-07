@@ -54,6 +54,7 @@
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
 #include <QPushButton>
+#include <QFileDialog>
 
 
 //!@cond SKIPPED_DOCUMENTATION
@@ -81,6 +82,12 @@ public:
 };
 
 //!@endcond
+
+//----------------------------------------------------------------------------------------------------------------------
+// static members
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::LockableMember<QDir> cedar::aux::gui::QImagePlot::mLastSaveLocation;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -380,7 +387,46 @@ void cedar::aux::gui::QImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
 
   this->fillContextMenu(menu);
 
+  menu.addSeparator();
+  auto p_save = menu.addAction("save image ...");
+  p_save->setIcon(QIcon(":/cedar/auxiliaries/gui/menu_save.svg"));
+  QObject::connect(p_save, SIGNAL(triggered()), this, SLOT(saveImageActionTriggered()));
+
   menu.exec(pEvent->globalPos());
+}
+
+void cedar::aux::gui::QImagePlot::saveImageActionTriggered()
+{
+  // make a copy of the current image (make it now so the time taken to select the destination doesn't lead to a change
+  // in the image)
+  QReadLocker l(&mImageLock);
+  QImage image_copy = this->mImage.copy();
+  l.unlock();
+
+  // query where the user wants to save it
+  QReadLocker last_dir_l(mLastSaveLocation.getLockPtr());
+
+  QString selected_path = QFileDialog::getSaveFileName
+  (
+    this,
+    "select a destination for the image",
+    mLastSaveLocation.member().absolutePath(),
+    "Image (*.png *.jpg *.ppm)"
+  );
+  last_dir_l.unlock();
+
+  if (selected_path.isEmpty())
+  {
+    return;
+  }
+
+  // remember the last save location
+  QWriteLocker last_dir_wl(mLastSaveLocation.getLockPtr());
+  mLastSaveLocation.member() = selected_path;
+  last_dir_wl.unlock();
+
+  // save the image
+  image_copy.save(selected_path);
 }
 
 cedar::aux::ColorGradient::StandardGradients::Id cedar::aux::gui::QImagePlot::getColorJet() const

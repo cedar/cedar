@@ -41,6 +41,7 @@
 #include "cedar/processing/gui/ArchitectureWidget.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/Group.h"
+#include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
@@ -49,6 +50,8 @@
 
 // SYSTEM INCLUDES
 #include <QGridLayout>
+#include <QPushButton>
+#include <QMessageBox>
 #include <QLabel>
 #include <deque>
 
@@ -232,6 +235,7 @@ void cedar::proc::gui::ArchitectureWidget::readTemplates(const cedar::aux::Confi
 
 void cedar::proc::gui::ArchitectureWidget::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
+  // check if there are entries in this widget; if not, no sense parsing the rest
   auto entries_iter = node.find("entries");
   if (entries_iter == node.not_found())
   {
@@ -243,18 +247,21 @@ void cedar::proc::gui::ArchitectureWidget::readConfiguration(const cedar::aux::C
     return;
   }
 
+  // read all templates so they are present when later parsing the entries
   auto templates_iter = node.find("templates");
   if (templates_iter != node.not_found())
   {
     this->readTemplates(templates_iter->second);
   }
 
+  // go through all entries
   for (const auto& entry_pair : entries_iter->second)
   {
     const auto& entry = entry_pair.second;
     this->addEntry(entry);
   }
 
+  // read the overall widget configuration (e.g., widget size)
   auto config_iter = node.find("configuration");
   if (config_iter != node.not_found())
   {
@@ -312,6 +319,10 @@ void cedar::proc::gui::ArchitectureWidget::addEntry
   {
     widget = this->readLabel(entry);
   }
+  else if (type == "step action")
+  {
+    widget = this->readStepAction(entry);
+  }
   else if (type == "template")
   {
     this->addTemplate(row, column, entry, attributes);
@@ -331,6 +342,85 @@ void cedar::proc::gui::ArchitectureWidget::addEntry
     if (!style.empty())
     {
       widget->setStyleSheet(QString::fromStdString(style));
+    }
+  }
+}
+
+QWidget* cedar::proc::gui::ArchitectureWidget::readStepAction(const cedar::aux::ConfigurationNode& entry)
+{
+  // create a button with the given label (or a default if none is given)
+  auto label = readOptional<std::string>(entry, "label", "step action");
+  auto button = new QPushButton(QString::fromStdString(label));
+
+  // create a parameters-object to hold the settings for this button
+  StepActionParametersPtr parameters(new StepActionParameters());
+  // add it to the map so the slot can later access it
+  this->mStepActionParameters[button] = parameters;
+
+  // read the list of step-actions to be performed by the button
+  auto actions_iter = entry.find("actions");
+  if (actions_iter != entry.not_found())
+  {
+    const auto& actions_node = actions_iter->second;
+    // the actions list contains a set of actions to be performed; each entry is a pair step name -> action name
+    for (const auto& iter : actions_node)
+    {
+      if (iter.second.size() != 1)
+      {
+        cedar::aux::LogSingleton::getInstance()->warning("Invalid entry in step action list.", CEDAR_CURRENT_FUNCTION_NAME);
+        continue;
+      }
+      const std::string& step_name = iter.second.begin()->first;
+      std::string action_name = iter.second.begin()->second.get_value<std::string>();
+      auto pair = std::make_pair(step_name, action_name);
+      parameters->mStepActions.push_back(pair);
+    }
+  }
+
+  // read other parameters
+  parameters->mConfirm = readOptional<bool>(entry, "confirm", false);
+
+  // now that the parameters exist, connect the button to the slot
+  QObject::connect(button, SIGNAL(clicked()), this, SLOT(triggerStepAction()));
+
+  return button;
+}
+
+void cedar::proc::gui::ArchitectureWidget::triggerStepAction()
+{
+  auto sender = dynamic_cast<QPushButton*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(sender != nullptr);
+  auto parameters_iter = this->mStepActionParameters.find(sender);
+  CEDAR_DEBUG_ASSERT(parameters_iter != this->mStepActionParameters.end());
+  auto parameters = parameters_iter->second;
+
+  // if a confirmation is set to be requested, get it
+  if (parameters->mConfirm)
+  {
+    auto r = QMessageBox::question(this, "Confirm running action", "Are you sure you want to trigger the action \"" + sender->text() + "\"?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if (r != QMessageBox::Yes)
+    {
+      return;
+    }
+  }
+
+  // call the actions
+  for (const auto& step_action_pair : parameters->mStepActions)
+  {
+    const std::string& step_name = step_action_pair.first;
+    const std::string& action_name = step_action_pair.second;
+    auto step = this->mGroup->getElement<cedar::proc::Step>(step_name);
+    if (!step)
+    {
+      CEDAR_THROW(cedar::aux::NotFoundException, "Could not find a step with the path \"" + step_name + "\" while trying to run action.");
+    }
+    if (!step->hasAction(action_name))
+    {
+      CEDAR_THROW(cedar::aux::NotFoundException, "Step \"" + step_name + "\" has no action called \"" + action_name + "\".");
+    }
+    else
+    {
+      step->callAction(action_name);
     }
   }
 }
@@ -459,6 +549,15 @@ cedar::aux::ConstDataPtr cedar::proc::gui::ArchitectureWidget::findData(const st
   }
 
   auto connectable = this->mGroup->getElement<cedar::proc::Connectable>(step_path_rest);
+  if (!connectable)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "When opening architecture widget: No element found with the path \"" + step_path + "\".",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
+    return cedar::aux::ConstDataPtr();
+  }
 
   auto role_enum = cedar::proc::DataRole::type().get(role);
   return connectable->getData(role_enum, data_name);
