@@ -104,7 +104,7 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   }
   else
   {
-    return matrix.clone();
+    return cv::Mat::zeros(matrix.dims, matrix.size, matrix.type());
   }
 }
 
@@ -148,7 +148,7 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   }
   else
   {
-    return matrix.clone();
+    return cv::Mat::zeros(matrix.dims, matrix.size, matrix.type());
   }
 }
 
