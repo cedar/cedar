@@ -28,7 +28,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 07 03
+    Date:        2015 08 03
 
     Description: 
 
@@ -373,7 +373,6 @@ class RDPMainWindow(wx.Frame):
     def evt_end_app(self, event):                
         sys.exit()
         
-
 #========================================================================================================================
 
 class RDPBrowserPanel(wx.Panel):
@@ -419,6 +418,7 @@ class RDPGUI(wx.Panel):
     
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
+        
         self.SetAutoLayout(True)  
         self.frame = parent        
         self.control_plot_frame = None
@@ -465,6 +465,7 @@ class RDPGUI(wx.Panel):
         self.figure_canvas = None
         self.title = ''
         self.figure_resize = None
+        self.colorbar = None
                 
         # Plot modes
         #self.mode_ch = [' ', 'snapshot', 'snapshot sequence', 'time course']
@@ -703,6 +704,7 @@ class RDPGUI(wx.Panel):
         self.figure.clf()
         self.plot = None
         self.figure = None
+        self.colorbar = None
         self.figure_canvas = None
         self.control_plot_frame.Hide()
         self.control_plot_frame = None
@@ -902,7 +904,7 @@ class RDPGUI(wx.Panel):
             self.proj_method_cbox.Enable()
             
         else:
-            self.mode = 'snapshot'
+            self.mode = self.mode_cbox.GetValue()
             self.mode_cbox.Disable()
             self.proj_cbox.Disable()
             self.proj_method_cbox.Disable()
@@ -967,54 +969,52 @@ class RDPGUI(wx.Panel):
         
         self.mode = self.mode_cbox.GetValue()
         
-        for i in range(len(self.frame_ids)):
-            current_frame = self._set_current_frame(i)
-            current_frame.title = self.frame_ids[i]
-        
-            if current_frame.figure:
-                plt.close(current_frame.figure)
-                        
-            else:
-                current_frame.proj_method = ' '
-                current_frame.style = ' '
-                current_frame.proj = ' '
-                
-                current_frame.proj_method_cbox.Disable()
-                current_frame.style_cbox.Disable()
-                
-                current_frame.proj_cbox.SetValue(current_frame.proj)
-                current_frame.proj_method_cbox.SetValue(current_frame.proj_method)
-                current_frame.style_cbox.SetValue(current_frame.style)
+        if self.figure:
+            plt.close(self.figure)
+                    
+        else:
+            self.proj_method = ' '
+            self.style = ' '
+            self.proj = ' '
             
-            # Fill projection combobox with the fitting options
-            if current_frame.mode == 'time course':
-                current_frame.proj_cbox.SetItems(current_frame.proj_choice_time_course)
-                current_frame.proj_cbox.Enable()
-            elif current_frame.mode == 'snapshot' or current_frame.mode == 'snapshot sequence':
-                current_frame.proj_cbox.SetItems(current_frame.proj_choice_snapshot)
-                current_frame.proj_cbox.Enable()
-            else:
-                current_frame.proj_cbox.SetItems([])
-                        
-            current_frame.plot_btn.Bind(wx.EVT_BUTTON, current_frame.evt_plot)
-            current_frame.save_btn.Bind(wx.EVT_BUTTON, current_frame.evt_save_plot)
+            self.proj_method_cbox.Disable()
+            self.style_cbox.Disable()
+            
+            self.proj_cbox.SetValue(self.proj)
+            self.proj_method_cbox.SetValue(self.proj_method)
+            self.style_cbox.SetValue(self.style)
+        
+        # Fill projection combobox with the fitting options
+        if self.mode == 'time course':
+            self.proj_cbox.SetItems(self.proj_choice_time_course)
+            self.proj_cbox.Enable()
+        elif self.mode == 'snapshot' or self.mode == 'snapshot sequence':
+            self.proj_cbox.SetItems(self.proj_choice_snapshot)
+            self.proj_cbox.Enable()
+        else:
+            self.proj_cbox.SetItems([])
+                    
+        self.plot_btn.Bind(wx.EVT_BUTTON, self.evt_plot)
+        self.save_btn.Bind(wx.EVT_BUTTON, self.evt_save_plot)
             
             
     def evt_plot(self, event):
         
-        self._plot()
+        if self.style != 'heatmap':    
+            self._plot()
         
         if self.mode != 'snapshot sequence':
             
-            self.create_control_plot_frame(parent=self)
-            self.control_plot_frame.Show()
-            
+            if self.control_plot_frame is None:
+                self.create_control_plot_frame(parent=self)
+                self.control_plot_frame.Show()
+        
         if self.mode == 'time course' and self.figure:
             self.marked_check_box.Enable()
         else:
             self.marked_check_box.Disable()
             
-        self._plot()
+        self._update_plot()
         
 
     def evt_line_color_ctrl(self, event):
@@ -1088,7 +1088,7 @@ class RDPGUI(wx.Panel):
             
     
     def evt_change_plot_parameters(self, event):
-                
+        
         if 'Axes3DSubplot' in str(type(self.plot)):
             self.figure_azimuth = self.figure.gca(projection='3d').azim
             self.figure_elevation = self.figure.gca(projection='3d').elev
@@ -1372,7 +1372,6 @@ class RDPGUI(wx.Panel):
             except AttributeError:
                 pass
         
-        
         for i in range(len(self.frame_ids)):
             current_frame = self._set_current_frame(i)
             current_frame.step = self.step
@@ -1386,9 +1385,10 @@ class RDPGUI(wx.Panel):
             if self.ndim[self.selection] == 0:
                 plt.cla()              
             else:
-                self.figure.clf()
-                
-        wx.CallAfter(self._plot)
+                self.figure.clf(keep_observers=True)
+        
+        self._plot()
+        wx.Yield()
             
        
     def _add_time_course(self):
@@ -1415,7 +1415,7 @@ class RDPGUI(wx.Panel):
     def _create_figure_canvas(self):
         
         if self.figure is None:
-            self.figure = plt.figure()
+            self.figure = plt.figure(str(self.title))
             
         if self.figure_canvas is None:
             self.figure_canvas = FigureCanvas(self.control_plot_frame.control_plot_panel, -1, self.figure)
@@ -1497,11 +1497,11 @@ class RDPGUI(wx.Panel):
                 
     def _plot(self, save=False, file_path=None):
         '''Build plot(s) to either visualize or save as pdf file'''
-                  
+                          
         if self.mode != 'snapshot sequence':
-            if self.figure is None and self.style != 'heatmap':
+            if self.figure is None:
                 self.figure = plt.figure(str(self.title))
-                                                                    
+                                                                                    
         if self.mode == 'snapshot':                    
             try:
                                 
@@ -1519,11 +1519,21 @@ class RDPGUI(wx.Panel):
                                                               figure = self.figure,
                                                               title = self.title)
                 
+                if self.style == 'heatmap' or self.style == 'surface' or self.style == 'wireframe':
+                    self.figure.gca().invert_yaxis()
+                            
+                if self.mode == 'time course' and self.x_label == '':
+                    try:
+                        self.plot.set_xlabel('Time')
+                    except AttributeError:
+                        pass
+                
             except IndexError:
-                dlg = wx.MessageDialog(parent  = None, 
-                message = 'The specified time slice does not exist.', 
-                caption = 'An Error has occurred.', 
-                style = wx.OK | wx.ICON_ERROR | wx.CENTER | wx.STAY_ON_TOP)
+                dlg = wx.MessageDialog(parent=None, 
+                                       message = 'The specified time slice does not exist.', 
+                                       caption = 'An Error has occurred.', 
+                                       style = wx.OK | wx.ICON_ERROR | wx.CENTER | wx.STAY_ON_TOP)
+                
                 dlg.ShowModal()
                 dlg.Hide()
                 wx.CallAfter(dlg.Destroy)
@@ -1553,6 +1563,16 @@ class RDPGUI(wx.Panel):
                                                                  marker_color = self.marker_color,
                                                                  figure = self.figure,
                                                                  title = self.title)
+                
+                if self.style == 'heatmap' or self.style == 'surface' or self.style == 'wireframe':
+                    self.figure.gca().invert_yaxis()
+                            
+                if self.mode == 'time course' and self.x_label == '':
+                    try:
+                        self.plot.set_xlabel('Time')
+                    except AttributeError:
+                        pass
+                    
             except UnboundLocalError:
                 dlg = wx.MessageDialog(parent = None, 
                                        message = 'It is not possible to build a time course out of 2-dimensional time slices.', 
@@ -1561,28 +1581,9 @@ class RDPGUI(wx.Panel):
                 dlg.ShowModal()
                 dlg.Hide()
                 wx.CallAfter(dlg.Destroy)
-        
-        self.frame.rdp_plot.label_axis(figure=self.figure, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
-        
-        if self.mode == 'time course' and self.x_label == '':
-            try:
-                self.plot.set_xlabel('Time')
-            except AttributeError:
-                pass
-            
-        if self.style == 'heatmap' or self.style == 'surface' or self.style == 'wireframe':
-            try:                    
-                self.figure.gca().invert_yaxis()
-            except AttributeError:
-                pass          
-        
-        if self.style == 'heatmap':
-            
-            try:
-                self.figure.gca().set_yticks(self.figure.gca().get_yticks()[:-1])
-            except AttributeError:
-                pass
-            
+                
+        self.frame.rdp_plot.label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
+                            
         if self.style != 'heatmap':
             if self.figure_azimuth is not None and self.figure_elevation is not None:
                 self.figure.gca(projection='3d').view_init(elev=self.figure_elevation, azim=self.figure_azimuth)
@@ -1591,17 +1592,10 @@ class RDPGUI(wx.Panel):
                 self.figure.gca(projection='3d').dist = self.figure_distance
                 
         if save is False and self.mode != 'snapshot sequence':
-            
-            '''
-            try:
-                self.plot.draw_artist(self.figure_canvas)
-                self.figure_canvas.blit(self.plot.bbox)
-                
-            except AssertionError:
-            '''
-            
+
             try:
                 self.figure_canvas.draw()
+                wx.YieldIfNeeded()
             except AttributeError:
                 pass
             
@@ -1936,6 +1930,11 @@ class RDPPlot(object):
     def plot_snapshot(self, step, data, vmin, vmax, resolution, header, style, surface_linewidth, mode=' ', proj=' ', proj_method='average', color='#FF9600', figure=None, title=None):        
         ndim = self.get_dimension(header)
         steps = data.shape[0]
+        
+        if figure is None:
+            fig = plt.figure()
+        else:
+            fig = figure
                     
         if style == 'image':
             
@@ -1955,21 +1954,9 @@ class RDPPlot(object):
                 wx.CallAfter(dlg.Destroy)
         
         else:                    
-            if ndim == 1:
-                if figure is None:
-                    if mode == 'snapshot sequence':
-                        fig = plt.figure()
-                    else:
-                        if figure is None:
-                            fig = plt.figure()
-                        else:
-                            fig = figure
-                    
-                else:
-                    fig = figure
-                
-                    plot = fig.add_subplot(1,1,1)
-                    plot.plot(data[step], color=color)
+            if ndim == 1:                
+                plot = fig.add_subplot(1,1,1)
+                plot.plot(data[step], color=color)
             
             elif ndim != 1:
                 if proj != ' ':
@@ -2074,7 +2061,7 @@ class RDPPlot(object):
                 except AttributeError:
                     plot.invert_yaxis()
                     
-            self.label_axis(figure=figure, x_label=x_label, y_label=y_label, z_label=z_label)
+            self.label_axis(plot=plot, x_label=x_label, y_label=y_label, z_label=z_label)
             
             if save_mode == True:
                 self.save_plot(plot=plot, plot_mode=plot_mode, file_name=file_name, file_directory=file_directory, save_mode='sequence', plot_number=i, figure=figure)
@@ -2088,16 +2075,16 @@ class RDPPlot(object):
         ndim = self.get_dimension(header)
         steps = data.shape[0]
         
-        if plot is None and ndim == 0:
-            
-            if figure is None:
-                fig = plt.figure()
-            else:
-                fig = figure
-                
-            plot = fig.add_subplot(1,1,1)
+        if figure is None:
+            fig = plt.figure()
+        else:
+            fig = figure
+        
+        if plot is None:
+            plot = fig.gca()
                     
         if ndim == 0:
+            
             if color == None:
                 plot.plot(data)
             else:
@@ -2155,41 +2142,40 @@ class RDPPlot(object):
             
             plot.set_ylim([X_2.min(), X_2.max()])
             plot.set_xlim([X_1.min(), X_1.max()])
-            
+                        
             return plot
         
         except AttributeError:
             pass
                         
     
-    def label_axis(self, figure, x_label, y_label, z_label=None):
+    def label_axis(self, plot, x_label, y_label, z_label=None):
         '''Adds axis labels to an existing plot.'''
         
-        if figure is None:
-            return 
+        try:
+            colorbar = None
+        except UnboundLocalError:
+            pass
         
-        else:
-            plot = figure.gca()
-            
-            # Plot is no heatmap
-            if 'matplotlib.image.AxesImage' not in str(type(plot)):
-                plot.set_xlabel(x_label)
-                plot.set_ylabel(y_label)
-            
-            # Plot is in 3D
-            if 'Axes3DSubplot' in str(type(plot)):
-                plot.set_zlabel(z_label)
-            
-            # Plot is a heatmap
-            elif 'matplotlib.axes.AxesSubplot' in str(type(plot)):
-                try:
-                    colorbar = plt.colorbar(ax=plot, use_gridspec=True)              
-                    colorbar.set_label(z_label)
-                        
-                except RuntimeError:
-                    pass
-                        
-            return
+        # Plot is no heatmap
+        if 'matplotlib.image.AxesImage' not in str(type(plot)):
+            plot.set_xlabel(x_label)
+            plot.set_ylabel(y_label)
+        
+        # Plot is in 3D
+        if 'Axes3DSubplot' in str(type(plot)):
+            plot.set_zlabel(z_label)
+        
+        # Plot is a heatmap
+        elif 'matplotlib.axes.AxesSubplot' in str(type(plot)):
+            try:
+                colorbar = plt.colorbar(ax=plot)        
+                colorbar.set_label(z_label)
+                    
+            except RuntimeError:
+                pass
+        
+        return
 
 
     def save_plot(self, plot, plot_mode, file_name, file_directory, save_mode='single', plot_number=0, figure=None, file_path=None):
