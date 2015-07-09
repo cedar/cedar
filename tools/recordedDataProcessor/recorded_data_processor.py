@@ -28,7 +28,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 08 03
+    Date:        2015 07 09
 
     Description: 
 
@@ -37,7 +37,7 @@
 ========================================================================================================================
 '''
 
-import wx
+
 import csv
 import matplotlib as mpl
 
@@ -49,6 +49,7 @@ import numpy as np
 import os
 import re
 import sys
+import wx
 
 from functools import partial
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
@@ -201,7 +202,7 @@ class SnapshotSequenceDialog(wx.Dialog):
             axes_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
         else:
             axes_grid_sizer = wx.FlexGridSizer(rows=2, cols=2) 
-                    
+        
         axes_grid_sizer.SetFlexibleDirection(wx.BOTH)
         axes_label_sizer = wx.BoxSizer(wx.VERTICAL)
         min_max_sizer = wx.FlexGridSizer(rows=2, cols=2)         
@@ -320,7 +321,6 @@ class RDPMainWindow(wx.Frame):
         self.rdp_plot = RDPPlot()
         self.rdp_image_files = RDPImageFiles()
 
-        
         # search for standard cedarRecordings directory
         if 'HOME' in os.environ:
             self.dir = os.environ['HOME']
@@ -347,7 +347,6 @@ class RDPMainWindow(wx.Frame):
             wx.Frame.__init__(self, parent=None, title=title, style=wx.MINIMIZE_BOX|wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.CLIP_CHILDREN)  
             
             self.rdp_browser = RDPBrowserPanel(parent=self)
-            self.SetAutoLayout(True)          
             self.SetSizer(self.rdp_browser.main_sizer)
             self.Bind(wx.EVT_CLOSE, self.evt_end_app)
             self.Sizer.Fit(self)
@@ -359,7 +358,6 @@ class RDPMainWindow(wx.Frame):
                         
             self.rdp_plot = RDPPlot()
             self.rdp_image_files = RDPImageFiles()
-            self.SetAutoLayout(True)
             self.dir = self.parent.dir
             self.parent = parent
             self.rdp_gui = RDPGUI(parent=self)
@@ -414,12 +412,223 @@ class RDPBrowserPanel(wx.Panel):
         
 #========================================================================================================================
 
+class RDPPlotFrame(wx.Frame):
+    def __init__(self, parent):
+        
+        # Initialize control plot frame if none is present
+        if parent.control_plot_frame is None:
+            parent.control_plot_frame = wx.Frame(parent=parent, id=-1, title=str(parent.title), style=wx.MAXIMIZE_BOX|wx.RESIZE_BORDER|
+                                                 wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.CLIP_CHILDREN|wx.FRAME_NO_TASKBAR)
+        
+        parent.control_plot_frame.control_plot_panel = wx.PyPanel(parent=parent.control_plot_frame, id=-1)
+        parent.control_plot_frame.Bind(wx.EVT_CLOSE, parent.evt_close_figure)
+        
+        save_btn = wx.Button(parent.control_plot_frame.control_plot_panel, wx.ID_SAVE, label = 'Save')
+        save_btn.Bind(wx.EVT_BUTTON, parent.evt_save_plot)
+        
+        # Sizers
+        #========================================================================================================================
+        top_sizer = wx.FlexGridSizer(rows=1, cols=1)
+        top_sizer.SetFlexibleDirection(wx.BOTH)
+        parent.control_plot_frame.main_sizer = wx.FlexGridSizer(rows=1, cols=2)
+        parent.control_plot_frame.main_sizer.SetFlexibleDirection(wx.BOTH)
+                
+        if 'Axes3DSubplot' in str(type(parent.plot)) or parent.style == 'heatmap':
+            axes_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
+        else:
+            axes_grid_sizer = wx.FlexGridSizer(rows=2, cols=2)
+        
+        axes_grid_sizer.SetFlexibleDirection(wx.BOTH)
+        axes_label_sizer = wx.FlexGridSizer(rows=2, cols=1)
+        axes_label_sizer.SetFlexibleDirection(wx.BOTH)
+        min_max_sizer = wx.FlexGridSizer(rows=2, cols=2)         
+        min_max_sizer.SetFlexibleDirection(wx.BOTH)
+        #========================================================================================================================
+        
+        # Labels
+        #========================================================================================================================
+        label_axes_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Axis labels')
+        x_axis_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'X axis \t')
+        y_axis_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Y axis \t')
+        
+        if parent.style != 'heatmap' and 'Axes3DSubplot' in str(type(parent.plot)):
+            z_axis_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Z axis \t')
+        elif parent.style == 'heatmap':
+            z_axis_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'color bar \t')
+        #========================================================================================================================
+            
+        x_axis_label = wx.TextCtrl(parent.control_plot_frame.control_plot_panel, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
+        y_axis_label = wx.TextCtrl(parent.control_plot_frame.control_plot_panel, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
+        
+        x_axis_label.SetValue(parent.x_label)
+        y_axis_label.SetValue(parent.y_label)
+        
+        # Build sizers
+        #========================================================================================================================
+        axes_grid_sizer.Add(x_axis_txt, 0)
+        axes_grid_sizer.Add(x_axis_label, 1)
+        axes_grid_sizer.Add(y_axis_txt, 0)
+        axes_grid_sizer.Add(y_axis_label, 1)
+        
+        # Plot is either 3-dimensional or a heatmap
+        if 'Axes3DSubplot' in str(type(parent.plot)) or parent.style == 'heatmap':
+            z_axis_label = wx.TextCtrl(parent.control_plot_frame.control_plot_panel, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
+            z_axis_label.SetValue(parent.z_label)
+            z_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
+            axes_grid_sizer.Add(z_axis_txt, 0)
+            axes_grid_sizer.Add(z_axis_label, 1)
+            x_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
+            y_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
+        else:
+            x_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=None))
+            y_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=None))
+                
+        axes_label_sizer.Add(item=label_axes_txt, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.RIGHT|wx.BOTTOM, border=10)
+        axes_label_sizer.Add(item=axes_grid_sizer, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)
+                
+        parent._create_figure_canvas()
+        
+        parent.figure_canvas.Bind(wx.EVT_SIZE, parent.evt_resize_control_plot_panel)
+        
+        top_sizer.Add(item=axes_label_sizer, proportion=0, flag=wx.EXPAND|wx.RIGHT|wx.LEFT, border=10)
+        
+        if parent.style == 'heatmap':
+            line1 = wx.StaticLine(parent.control_plot_frame.control_plot_panel, -1, style=wx.LI_HORIZONTAL)
+            top_sizer.Add(line1, 0, wx.ALIGN_CENTER|wx.RIGHT|wx.LEFT|wx.BOTTOM, border=5)
+            heatmap_boundaries_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Heatmap boundaries')
+            
+            # Controls for narrowing of depicted value range
+            vmin_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Minimum \t')
+            vmax_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Maximum \t')
+            parent.control_plot_frame.vmin_spn = wx.TextCtrl(parent.control_plot_frame.control_plot_panel, style=wx.TE_PROCESS_ENTER)
+            parent.control_plot_frame.vmax_spn = wx.TextCtrl(parent.control_plot_frame.control_plot_panel, style=wx.TE_PROCESS_ENTER)
+            
+            # Set widgets to default values
+            if parent.vmin is not None:
+                parent.control_plot_frame.vmin_spn.SetValue(str(parent.vmin))
+            else:
+                parent.control_plot_frame.vmin_spn.SetValue(str(0.0000))
+                
+            if parent.vmax is not None:
+                parent.control_plot_frame.vmax_spn.SetValue(str(parent.vmax))
+            else:
+                parent.control_plot_frame.vmax_spn.SetValue(str(0.0000))
+            
+            reset_heatmap_boundaries_btn = wx.Button(parent.control_plot_frame.control_plot_panel, label = 'Reset')
+            reset_heatmap_boundaries_btn.Bind(wx.EVT_BUTTON, parent.evt_reset_heatmap_boundaries_btn)
+        
+            min_max_sizer.Add(vmin_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=10)
+            min_max_sizer.Add(parent.control_plot_frame.vmin_spn, 2, wx.ALIGN_RIGHT|wx.RIGHT, border=10)
+            min_max_sizer.Add(vmax_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=10)
+            min_max_sizer.Add(parent.control_plot_frame.vmax_spn, 2, wx.ALIGN_RIGHT|wx.RIGHT, border=10)
+            
+            top_sizer.Add(heatmap_boundaries_txt, 0, flag=wx.ALIGN_LEFT|wx.BOTTOM|wx.LEFT, border=10)
+            top_sizer.Add(min_max_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)
+            top_sizer.Add(reset_heatmap_boundaries_btn, 0, flag=wx.ALIGN_LEFT|wx.ALL, border=10)
+            top_sizer.Add(item=save_btn, proportion=0, flag=wx.ALIGN_CENTER|wx.TOP, border=25)
+            
+            parent.control_plot_frame.vmin_spn.Bind(wx.EVT_TEXT_ENTER, parent.evt_vmin_spn)
+            parent.control_plot_frame.vmax_spn.Bind(wx.EVT_TEXT_ENTER, parent.evt_vmax_spn)
+        
+        elif parent.style == 'wireframe' or parent.style == 'surface':
+            
+            visual_controls_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Visual controls')
+            plot_control_sizer = wx.BoxSizer(wx.VERTICAL)
+            
+            if parent.style == 'wireframe':
+                if parent.mode == 'time course':
+                    plot_control_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
+                else:
+                    plot_control_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
+            
+            elif parent.style == 'surface':
+                if parent.mode == 'time course':
+                    plot_control_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
+                else:
+                    plot_control_grid_sizer = wx.FlexGridSizer(rows=2, cols=2)
+            
+            plot_control_grid_sizer.SetFlexibleDirection(wx.BOTH)
+                        
+            if parent.style == 'wireframe':
+                line_color_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, label='Line color ')  
+                parent.control_plot_frame.line_color_ctrl = wx.ColourPickerCtrl(parent.control_plot_frame.control_plot_panel, -1, col=parent.aux_line_color)
+                parent.control_plot_frame.line_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, parent.evt_line_color_ctrl)
+                
+                plot_control_grid_sizer.Add(line_color_label, 1, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
+                plot_control_grid_sizer.Add(parent.control_plot_frame.line_color_ctrl, 1, wx.ALIGN_CENTER)
+                
+            elif parent.style == 'surface':
+                linewidth_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, label='Line width ') 
+                parent.control_plot_frame.linewidth_spn = wx.SpinCtrl(parent.control_plot_frame.control_plot_panel, -1, min=0, max=20)
+                parent.control_plot_frame.linewidth_spn.Bind(wx.EVT_SPINCTRL, parent.evt_linewidth_spn)
+                plot_control_grid_sizer.Add(linewidth_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
+                plot_control_grid_sizer.Add(parent.control_plot_frame.linewidth_spn, 1, wx.ALIGN_RIGHT)
+                
+            if parent.mode == 'time course':
+                marker_color_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, label='Marker')
+                parent.marked_check_box = wx.CheckBox(parent.control_plot_frame.control_plot_panel, -1)
+                parent.control_plot_frame.marker_color_ctrl = wx.ColourPickerCtrl(parent.control_plot_frame.control_plot_panel, -1, col=parent.aux_marker_color)
+                parent.control_plot_frame.marker_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, parent.evt_marker_color_ctrl)
+                
+                color_picker_sizer = wx.BoxSizer(wx.HORIZONTAL)
+                color_picker_sizer.Add(parent.marked_check_box, flag=wx.ALIGN_CENTER_VERTICAL)
+                color_picker_sizer.Add(parent.control_plot_frame.marker_color_ctrl)
+                           
+                plot_control_grid_sizer.Add(marker_color_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
+                plot_control_grid_sizer.Add(color_picker_sizer, 1, wx.ALIGN_RIGHT)
+                parent.marked_check_box.Bind(wx.EVT_CHECKBOX, parent.evt_marked_check_box)
+                    
+            resolution_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Resolution ')
+            parent.control_plot_frame.resolution_spn = wx.SpinCtrl(parent.control_plot_frame.control_plot_panel, min=1, max=100, value=str(parent.resolution))
+            parent.control_plot_frame.resolution_spn.Bind(wx.EVT_SPINCTRL, parent.evt_resolution_spn)
+                        
+            plot_control_grid_sizer.Add(resolution_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
+            plot_control_grid_sizer.Add(parent.control_plot_frame.resolution_spn, 1, wx.ALIGN_RIGHT)
+            
+            plot_control_sizer.Add(item=visual_controls_txt, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.BOTTOM|wx.TOP, border=10)
+            plot_control_sizer.Add(item=plot_control_grid_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)    
+            top_sizer.Add(item=plot_control_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.LEFT|wx.RIGHT, border=10)
+            top_sizer.Add(item=save_btn, proportion=0, flag=wx.ALIGN_CENTER|wx.TOP|wx.LEFT|wx.RIGHT, border=25)
+            
+        if parent.ndim[parent.selection] == 0 and parent.mode == 'time course':
+            parent.control_plot_frame.sel_cbox = wx.ComboBox(parent.control_plot_frame.control_plot_panel, choices=parent.flist_sorted, value=parent.sel_cbox.GetValue(), style=wx.CB_READONLY)
+            parent.control_plot_frame.sel_cbox.Bind(wx.EVT_COMBOBOX, parent.evt_sel_cbox)
+            line2 = wx.StaticLine(parent.control_plot_frame.control_plot_panel, -1, style=wx.LI_HORIZONTAL)
+            top_sizer.Add(line2, 0, wx.ALIGN_CENTER|wx.EXPAND|wx.RIGHT|wx.LEFT|wx.BOTTOM, border=5)
+            multi_plot_btn = wx.Button(parent.control_plot_frame.control_plot_panel, label = 'Add time course', size=(100,30))
+            multi_plot_btn.Bind(wx.EVT_BUTTON, parent.evt_add_time_course)
+            line_color_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, label='Line color \t')
+            
+            parent.control_plot_frame.line_color_ctrl = wx.ColourPickerCtrl(parent.control_plot_frame.control_plot_panel, -1, col=parent.aux_line_color)
+            parent.control_plot_frame.line_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, parent.evt_line_color_ctrl)
+            
+            line_sizer = wx.BoxSizer(wx.HORIZONTAL)
+            line_sizer.Add(line_color_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
+            line_sizer.Add(parent.control_plot_frame.line_color_ctrl, 1, wx.ALIGN_RIGHT)
+            
+            top_sizer.Add(item=parent.control_plot_frame.sel_cbox, proportion=0, flag=wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, border=10)
+            top_sizer.Add(item=line_sizer, proportion=0, flag=wx.LEFT|wx.RIGHT, border=10)
+            top_sizer.Add(item=multi_plot_btn, proportion=0, flag=wx.ALL, border=10)
+        
+        parent.control_plot_frame.main_sizer.Add(item=parent.figure_canvas, proportion=1, flag=wx.EXPAND)
+        parent.control_plot_frame.main_sizer.Add(item=top_sizer, proportion=1, flag=wx.EXPAND)
+        
+        #========================================================================================================================
+        
+        # Layout
+        #========================================================================================================================
+        parent.control_plot_frame.control_plot_panel.SetSizerAndFit(parent.control_plot_frame.main_sizer)
+        parent.control_plot_frame.SetSizerAndFit(parent.control_plot_frame.main_sizer)
+        
+        return
+        
+#========================================================================================================================
+        
 class RDPGUI(wx.Panel):
     
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
         
-        self.SetAutoLayout(True)  
         self.frame = parent        
         self.control_plot_frame = None
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -463,6 +672,7 @@ class RDPGUI(wx.Panel):
         self.frame_ids.append(self.frame.GetId())
         self.figure = None
         self.figure_canvas = None
+        self.figure_canvas_connection_id = None
         self.title = ''
         self.figure_resize = None
         self.colorbar = None
@@ -556,12 +766,9 @@ class RDPGUI(wx.Panel):
             increase_single_step = self.frame.rdp_image_files.increase_single_step.GetImage()
             self.increase_single_step_bitmap = wx.BitmapFromImage(increase_single_step)
             
-        self.marked_check_box = wx.CheckBox(self, -1)
-        
         # Buttons
         #========================================================================================================================
         self.plot_btn = wx.Button(self, label = 'Plot')
-        self.save_btn = wx.Button(self, wx.ID_SAVE, label = 'Save')
         
         if self.frame.parent is None:
             self.switch_btn = wx.Button(self, label = 'Switch directory')
@@ -589,7 +796,6 @@ class RDPGUI(wx.Panel):
             
         # Slider and player functionalities
         #========================================================================================================================
-        self.player_caption_sizer.Add(self.marked_check_box, 0)
         self.player_caption_sizer.Add(self.player_label, 1)
         self.player_time_stamp_sizer.Add(self.player_caption_sizer, 0, wx.ALIGN_LEFT)
         
@@ -636,7 +842,6 @@ class RDPGUI(wx.Panel):
         # Buttons
         #========================================================================================================================
         self.plot_sizer.Add(item=self.plot_btn, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
-        self.plot_sizer.Add(item=self.save_btn, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
         self.btn_sizer.Add(item=self.plot_sizer, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
         #========================================================================================================================
         
@@ -677,9 +882,7 @@ class RDPGUI(wx.Panel):
             self.decrease_single_step_btn.Bind(wx.EVT_BUTTON, self.evt_decrease_single_step_btn)
             self.reset_btn.Bind(wx.EVT_BUTTON, self.evt_reset_btn)
             self.switch_btn.Bind(wx.EVT_BUTTON, self.evt_switch_btn)
-            
-        self.marked_check_box.Bind(wx.EVT_CHECKBOX, self.evt_marked_check_box)
-        
+                    
         if self.frame.parent is None:
             self.add_figure_frame_btn.Bind(wx.EVT_BUTTON, self.evt_add_figure_frame_btn)
         #========================================================================================================================
@@ -694,13 +897,16 @@ class RDPGUI(wx.Panel):
         self.proj_cbox.Disable()
         self.proj_method_cbox.Disable()
         self.style_cbox.Disable()
-        self.marked_check_box.Disable()
+        #self.marked_check_box.Disable()
                   
         return
         
     
     def evt_close_figure(self, event):
         
+        self.figure_canvas.mpl_disconnect(self.figure_canvas_connection_id)
+        
+        self.figure_canvas_connection_id = None
         self.figure.clf()
         self.plot = None
         self.figure = None
@@ -708,7 +914,7 @@ class RDPGUI(wx.Panel):
         self.figure_canvas = None
         self.control_plot_frame.Hide()
         self.control_plot_frame = None
-    
+        
     
     def evt_add_figure_frame_btn(self, event):
         
@@ -727,6 +933,8 @@ class RDPGUI(wx.Panel):
         
         new_frame_id = new_frame.GetId()
         self.frame_ids.append(new_frame_id)
+        
+        event.Skip()
                 
          
     def evt_marked_check_box(self, event):
@@ -734,6 +942,8 @@ class RDPGUI(wx.Panel):
         widget = event.GetEventObject()
         self.marked = widget.GetValue()
         wx.CallAfter(self._update_plot)
+        
+        event.Skip()
         
         
     def evt_close_frame(self, event):
@@ -744,6 +954,8 @@ class RDPGUI(wx.Panel):
             self.frame_ids.remove(frame_id)
         
         wx.FindWindowById(frame_id).Hide()
+        
+        event.Skip()
         
                 
     def evt_play_pause_btn(self, event):
@@ -795,24 +1007,21 @@ class RDPGUI(wx.Panel):
                 except AttributeError:
                     pass
                 
-                current_frame._update_plot()
+            current_frame._update_plot()
                 
             wx.Yield()
+            event.Skip()
                 
         
     def evt_increase_single_step_btn(self, event):
-        
-        for i in range(len(self.frame_ids)):
-            current_frame = self._set_current_frame(i)
-            current_frame._move_single_step(increase=True)
-        
+                    
+        self._move_single_step(increase=True)
+                    
     
     def evt_decrease_single_step_btn(self, event):
+                    
+        self._move_single_step(increase=False)
         
-        for i in range(len(self.frame_ids)):
-            current_frame = self._set_current_frame(i)
-            current_frame._move_single_step(increase=False)
-    
     
     def evt_axis_label(self, event, x_axis_label, y_axis_label, z_axis_label=None):
         
@@ -826,12 +1035,14 @@ class RDPGUI(wx.Panel):
                 pass
         
         wx.CallAfter(self._update_plot)
+        event.Skip()
         
     
     def evt_add_time_course(self, event):
         '''Add time course to currently displayed plot.'''
         
         self._add_time_course()
+        event.Skip()
         
         
     def evt_resolution_spn(self, event):
@@ -839,18 +1050,21 @@ class RDPGUI(wx.Panel):
         self.resolution = int(self.control_plot_frame.resolution_spn.GetValue())
         wx.CallAfter(self._update_plot)
         wx.Yield()
+        event.Skip()
         
 
     def evt_vmax_spn(self, event):
         
         self.vmax = float(self.control_plot_frame.vmax_spn.GetValue())
         wx.CallAfter(self._update_plot)
+        event.Skip()
 
     
     def evt_vmin_spn(self, event):
         
         self.vmin = float(self.control_plot_frame.vmin_spn.GetValue())
         wx.CallAfter(self._update_plot)
+        event.Skip()
         
     
     def evt_proj_cbox(self, event):
@@ -877,6 +1091,7 @@ class RDPGUI(wx.Panel):
             self.style_cbox.SetValue(self.style)
         
         wx.Yield()
+        event.Skip()
         
         
     def evt_proj_method_cbox(self, event):
@@ -891,6 +1106,7 @@ class RDPGUI(wx.Panel):
             self.style_cbox.Enable()
                     
         wx.Yield()
+        event.Skip()
         
     
     def evt_style_cbox(self, event):
@@ -910,6 +1126,7 @@ class RDPGUI(wx.Panel):
             self.proj_method_cbox.Disable()
     
         wx.Yield()
+        event.Skip()
 
     
     def evt_reset_heatmap_boundaries_btn(self, event):
@@ -920,6 +1137,7 @@ class RDPGUI(wx.Panel):
         self.control_plot_frame.vmax_spn.SetValue(str(0.0000))
         
         wx.CallAfter(self._update_plot)
+        event.Skip()
 
     
     def evt_switch_btn(self, event):  
@@ -945,6 +1163,7 @@ class RDPGUI(wx.Panel):
         # Layout
         wx.CallAfter(frame.Sizer.Fit, frame)
         wx.CallAfter(frame.Layout)
+        event.Skip()
         
                     
     def evt_pos_slider(self, event):
@@ -963,6 +1182,8 @@ class RDPGUI(wx.Panel):
             # Update currently displayed plot
             current_frame._update_plot()
             wx.Yield()
+        
+        event.Skip()
 
             
     def evt_mode_cbox(self, event):
@@ -995,7 +1216,7 @@ class RDPGUI(wx.Panel):
             self.proj_cbox.SetItems([])
                     
         self.plot_btn.Bind(wx.EVT_BUTTON, self.evt_plot)
-        self.save_btn.Bind(wx.EVT_BUTTON, self.evt_save_plot)
+        event.Skip()
             
             
     def evt_plot(self, event):
@@ -1006,7 +1227,7 @@ class RDPGUI(wx.Panel):
         if self.mode != 'snapshot sequence':
             
             if self.control_plot_frame is None:
-                self.create_control_plot_frame(parent=self)
+                RDPPlotFrame(parent=self)                
                 self.control_plot_frame.Show()
         
         if self.mode == 'time course' and self.figure:
@@ -1057,7 +1278,7 @@ class RDPGUI(wx.Panel):
         if self.figure:
             wx.CallAfter(self._update_plot)
             wx.Yield()
-        
+                
                             
     def evt_sel_cbox(self, event):
         
@@ -1085,7 +1306,7 @@ class RDPGUI(wx.Panel):
             self.marked_check_box.Enable()
         else:
             self.marked_check_box.Disable()
-            
+                    
     
     def evt_change_plot_parameters(self, event):
         
@@ -1094,204 +1315,6 @@ class RDPGUI(wx.Panel):
             self.figure_elevation = self.figure.gca(projection='3d').elev
             self.figure_distance = self.figure.gca(projection='3d').dist
             
-                        
-    def create_control_plot_frame(self, parent):
-                
-        # Initialize control plot frame if none is present
-        if self.control_plot_frame is None:
-            self.control_plot_frame = wx.Frame(parent=parent, id=-1, title=str(self.title), style=wx.MAXIMIZE_BOX|wx.RESIZE_BORDER|
-                                               wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.CLIP_CHILDREN|wx.FRAME_NO_TASKBAR)
-        
-        self.control_plot_frame.control_plot_panel = wx.Panel(parent=self.control_plot_frame, id=-1)
-        self.control_plot_frame.Bind(wx.EVT_CLOSE, self.evt_close_figure)
-        self.control_plot_frame.Bind(wx.EVT_SIZE, self.evt_resize_control_plot_frame)
-        self.control_plot_frame.control_plot_panel.SetAutoLayout(True)
-        
-        # Sizers
-        #========================================================================================================================
-        top_sizer = wx.FlexGridSizer(rows=1, cols=1)
-        top_sizer.SetFlexibleDirection(wx.BOTH)
-        self.control_plot_frame.main_sizer = wx.FlexGridSizer(rows=1, cols=2)
-        self.control_plot_frame.main_sizer.SetFlexibleDirection(wx.BOTH)
-                
-        if 'Axes3DSubplot' in str(type(self.plot)) or self.style == 'heatmap':
-            axes_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
-        else:
-            axes_grid_sizer = wx.FlexGridSizer(rows=2, cols=2)
-        
-        axes_grid_sizer.SetFlexibleDirection(wx.BOTH)
-        axes_label_sizer = wx.FlexGridSizer(rows=2, cols=1)
-        axes_label_sizer.SetFlexibleDirection(wx.BOTH)
-        min_max_sizer = wx.FlexGridSizer(rows=2, cols=2)         
-        min_max_sizer.SetFlexibleDirection(wx.BOTH)
-        #========================================================================================================================
-        
-        # Labels
-        #========================================================================================================================
-        label_axes_txt = wx.StaticText(self.control_plot_frame.control_plot_panel, -1, 'Axis labels')
-        x_axis_txt = wx.StaticText(self.control_plot_frame.control_plot_panel, -1, 'X axis \t')
-        y_axis_txt = wx.StaticText(self.control_plot_frame.control_plot_panel, -1, 'Y axis \t')
-        
-        if self.style != 'heatmap' and 'Axes3DSubplot' in str(type(self.plot)):
-            z_axis_txt = wx.StaticText(self.control_plot_frame.control_plot_panel, -1, 'Z axis \t')
-        elif self.style == 'heatmap':
-            z_axis_txt = wx.StaticText(self.control_plot_frame.control_plot_panel, -1, 'color bar \t')
-        #========================================================================================================================
-            
-        x_axis_label = wx.TextCtrl(self.control_plot_frame.control_plot_panel, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
-        y_axis_label = wx.TextCtrl(self.control_plot_frame.control_plot_panel, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
-        
-        x_axis_label.SetValue(self.x_label)
-        y_axis_label.SetValue(self.y_label)
-        
-        # Build sizers
-        #========================================================================================================================
-        axes_grid_sizer.Add(x_axis_txt, 0)
-        axes_grid_sizer.Add(x_axis_label, 1)
-        axes_grid_sizer.Add(y_axis_txt, 0)
-        axes_grid_sizer.Add(y_axis_label, 1)
-        
-        # Plot is either 3-dimensional or a heatmap
-        if 'Axes3DSubplot' in str(type(self.plot)) or self.style == 'heatmap':
-            z_axis_label = wx.TextCtrl(self.control_plot_frame.control_plot_panel, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
-            z_axis_label.SetValue(self.z_label)
-            z_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
-            axes_grid_sizer.Add(z_axis_txt, 0)
-            axes_grid_sizer.Add(z_axis_label, 1)
-            x_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
-            y_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
-        else:
-            x_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=None))
-            y_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=None))
-                
-        axes_label_sizer.Add(item=label_axes_txt, proportion=1, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.BOTTOM, border=10)
-        axes_label_sizer.Add(axes_grid_sizer, proportion=1, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)
-                
-        self._create_figure_canvas()
-        
-        top_sizer.Add(item=axes_label_sizer, proportion=0, flag=wx.EXPAND|wx.RIGHT|wx.LEFT, border=10)
-        
-        if self.style == 'heatmap':
-            line1 = wx.StaticLine(self.control_plot_frame.control_plot_panel, -1, style=wx.LI_HORIZONTAL)
-            top_sizer.Add(line1, 0, wx.ALIGN_CENTER|wx.RIGHT|wx.LEFT|wx.BOTTOM, border=5)
-            heatmap_boundaries_txt = wx.StaticText(self.control_plot_frame.control_plot_panel, -1, 'Heatmap boundaries')
-            
-            # Controls for narrowing of depicted value range
-            vmin_label = wx.StaticText(self.control_plot_frame.control_plot_panel, -1, 'Minimum \t')
-            vmax_label = wx.StaticText(self.control_plot_frame.control_plot_panel, -1, 'Maximum \t')
-            self.control_plot_frame.vmin_spn = wx.TextCtrl(self.control_plot_frame.control_plot_panel, style=wx.TE_PROCESS_ENTER)
-            self.control_plot_frame.vmax_spn = wx.TextCtrl(self.control_plot_frame.control_plot_panel, style=wx.TE_PROCESS_ENTER)
-            
-            # Set widgets to default values
-            if self.vmin is not None:
-                self.control_plot_frame.vmin_spn.SetValue(str(self.vmin))
-            else:
-                self.control_plot_frame.vmin_spn.SetValue(str(0.0000))
-                
-            if self.vmax is not None:
-                self.control_plot_frame.vmax_spn.SetValue(str(self.vmax))
-            else:
-                self.control_plot_frame.vmax_spn.SetValue(str(0.0000))
-            
-            reset_heatmap_boundaries_btn = wx.Button(self.control_plot_frame.control_plot_panel, label = 'Reset')
-            reset_heatmap_boundaries_btn.Bind(wx.EVT_BUTTON, self.evt_reset_heatmap_boundaries_btn)
-        
-            min_max_sizer.Add(vmin_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=10)
-            min_max_sizer.Add(self.control_plot_frame.vmin_spn, 2, wx.ALIGN_RIGHT|wx.RIGHT, border=10)
-            min_max_sizer.Add(vmax_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=10)
-            min_max_sizer.Add(self.control_plot_frame.vmax_spn, 2, wx.ALIGN_RIGHT|wx.RIGHT, border=10)
-            
-            top_sizer.Add(heatmap_boundaries_txt, 0, flag=wx.ALIGN_LEFT|wx.BOTTOM|wx.LEFT, border=10)
-            top_sizer.Add(min_max_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)
-            top_sizer.Add(reset_heatmap_boundaries_btn, 0, flag=wx.ALIGN_LEFT|wx.ALL, border=10)
-            
-            self.control_plot_frame.vmin_spn.Bind(wx.EVT_TEXT_ENTER, self.evt_vmin_spn)
-            self.control_plot_frame.vmax_spn.Bind(wx.EVT_TEXT_ENTER, self.evt_vmax_spn)
-        
-        elif self.style == 'wireframe' or self.style == 'surface':
-            
-            visual_controls_txt = wx.StaticText(self.control_plot_frame.control_plot_panel, -1, 'Visual controls')
-            plot_control_sizer = wx.BoxSizer(wx.VERTICAL)
-            
-            if self.style == 'wireframe':
-                if self.mode == 'time course':
-                    plot_control_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
-                else:
-                    plot_control_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
-                    
-            elif self.style == 'surface':
-                if self.mode == 'time course':
-                    plot_control_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
-                else:
-                    plot_control_grid_sizer = wx.FlexGridSizer(rows=2, cols=2)
-            
-            plot_control_grid_sizer.SetFlexibleDirection(wx.BOTH)
-                        
-            if self.style == 'wireframe':
-                line_color_label = wx.StaticText(self.control_plot_frame.control_plot_panel, -1, label='Line color ')  
-                self.control_plot_frame.line_color_ctrl = wx.ColourPickerCtrl(self.control_plot_frame.control_plot_panel, -1, col=self.aux_line_color)
-                self.control_plot_frame.line_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, self.evt_line_color_ctrl)
-                
-                plot_control_grid_sizer.Add(line_color_label, 1, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
-                plot_control_grid_sizer.Add(self.control_plot_frame.line_color_ctrl, 1, wx.ALIGN_CENTER)
-                
-            elif self.style == 'surface':
-                linewidth_label = wx.StaticText(self.control_plot_frame.control_plot_panel, -1, label='Line width ') 
-                self.control_plot_frame.linewidth_spn = wx.SpinCtrl(self.control_plot_frame.control_plot_panel, -1, min=0, max=20)
-                self.control_plot_frame.linewidth_spn.Bind(wx.EVT_SPINCTRL, self.evt_linewidth_spn)
-                plot_control_grid_sizer.Add(linewidth_label, 1, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
-                plot_control_grid_sizer.Add(self.control_plot_frame.linewidth_spn, 1, wx.ALIGN_CENTER)
-                
-            if self.mode == 'time course':
-                marker_color_label = wx.StaticText(self.control_plot_frame.control_plot_panel, -1, label='Marker color ') 
-                self.control_plot_frame.marker_color_ctrl = wx.ColourPickerCtrl(self.control_plot_frame.control_plot_panel, -1, col=self.aux_marker_color)
-                self.control_plot_frame.marker_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, self.evt_marker_color_ctrl)
-                           
-                plot_control_grid_sizer.Add(marker_color_label, 0, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
-                plot_control_grid_sizer.Add(self.control_plot_frame.marker_color_ctrl, 1, wx.ALIGN_CENTER)
-                    
-            resolution_label = wx.StaticText(self.control_plot_frame.control_plot_panel, -1, 'Resolution ')
-            self.control_plot_frame.resolution_spn = wx.SpinCtrl(self.control_plot_frame.control_plot_panel, min=1, max=100, value=str(self.resolution))
-            self.control_plot_frame.resolution_spn.Bind(wx.EVT_SPINCTRL, self.evt_resolution_spn)
-                        
-            plot_control_grid_sizer.Add(resolution_label, 0, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
-            plot_control_grid_sizer.Add(self.control_plot_frame.resolution_spn, 1, wx.ALIGN_CENTER)
-            
-            plot_control_sizer.Add(item=visual_controls_txt, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.BOTTOM|wx.TOP, border=10)
-            plot_control_sizer.Add(item=plot_control_grid_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)    
-            top_sizer.Add(item=plot_control_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.LEFT|wx.RIGHT, border=10)
-            
-        if self.ndim[self.selection] == 0 and self.mode == 'time course':
-            self.control_plot_frame.sel_cbox = wx.ComboBox(self.control_plot_frame.control_plot_panel, choices=self.flist_sorted, value=self.sel_cbox.GetValue(), style=wx.CB_READONLY)
-            self.control_plot_frame.sel_cbox.Bind(wx.EVT_COMBOBOX, self.evt_sel_cbox)
-            line2 = wx.StaticLine(self.control_plot_frame.control_plot_panel, -1, style=wx.LI_HORIZONTAL)
-            top_sizer.Add(line2, 0, wx.ALIGN_CENTER|wx.EXPAND|wx.RIGHT|wx.LEFT|wx.BOTTOM, border=5)
-            multi_plot_btn = wx.Button(self.control_plot_frame.control_plot_panel, label = 'Add time course', size=(100,30))
-            multi_plot_btn.Bind(wx.EVT_BUTTON, self.evt_add_time_course)
-            line_color_label = wx.StaticText(self.control_plot_frame.control_plot_panel, -1, label='Line color \t')
-            
-            self.control_plot_frame.line_color_ctrl = wx.ColourPickerCtrl(self.control_plot_frame.control_plot_panel, -1, col=self.aux_line_color)
-            self.control_plot_frame.line_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, self.evt_line_color_ctrl)
-            
-            line_sizer = wx.BoxSizer(wx.HORIZONTAL)
-            line_sizer.Add(line_color_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-            line_sizer.Add(self.control_plot_frame.line_color_ctrl, 1, wx.ALIGN_RIGHT)
-            
-            top_sizer.Add(item=self.control_plot_frame.sel_cbox, proportion=0, flag=wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, border=10)
-            top_sizer.Add(item=line_sizer, proportion=0, flag=wx.LEFT|wx.RIGHT, border=10)
-            top_sizer.Add(item=multi_plot_btn, proportion=0, flag=wx.ALL, border=10)
-        
-        self.control_plot_frame.main_sizer.Add(item=parent.figure_canvas, proportion=1, flag=wx.ALIGN_LEFT)
-        self.control_plot_frame.main_sizer.Add(item=top_sizer, proportion=0, flag=wx.ALIGN_RIGHT)
-        
-        #========================================================================================================================
-        
-        # Layout
-        #========================================================================================================================
-        self.control_plot_frame.control_plot_panel.SetSizerAndFit(self.control_plot_frame.main_sizer)
-        self.control_plot_frame.SetSizerAndFit(self.control_plot_frame.main_sizer)
-        self.control_plot_frame.SetClientSize(self.control_plot_frame.main_sizer.GetSize())
-        
                         
     def _play_pause_btn(self, reverse):
                 
@@ -1305,7 +1328,7 @@ class RDPGUI(wx.Panel):
             active_btn = self.reverse_play_pause_btn
             active_bitmap = self.reverse_play_bitmap
             inactive_btn = self.play_pause_btn
-            loop_range = range(self.step, -2, -1)
+            loop_range = range(self.step, -1, -1)
         
         if active_btn.GetBitmapLabel() == active_bitmap:
             active_btn.SetBitmapLabel(self.pause_bitmap)
@@ -1322,7 +1345,6 @@ class RDPGUI(wx.Panel):
                             current_frame = self._set_current_frame(j)
                             current_frame.step = i
                             current_frame._update_plot()
-                            wx.Yield()
                                                                                            
                         inactive_btn.Disable()
                         self.increase_single_step_btn.Disable()
@@ -1348,7 +1370,7 @@ class RDPGUI(wx.Panel):
             self.step -= 1
                         
             try:
-                self.pos_slider.SetValue(max(-1, self.step))
+                self.pos_slider.SetValue(max(0, self.step))
             except AttributeError:
                 pass
             
@@ -1376,7 +1398,6 @@ class RDPGUI(wx.Panel):
             current_frame = self._set_current_frame(i)
             current_frame.step = self.step
             current_frame._update_plot()
-            wx.Yield()
             
         
     def _update_plot(self):
@@ -1385,7 +1406,7 @@ class RDPGUI(wx.Panel):
             if self.ndim[self.selection] == 0:
                 plt.cla()              
             else:
-                self.figure.clf(keep_observers=True)
+                self.figure.clf()
         
         self._plot()
         wx.Yield()
@@ -1395,22 +1416,24 @@ class RDPGUI(wx.Panel):
         wx.CallAfter(self._plot)
 
                 
-    def evt_resize_control_plot_frame(self, event):
-        self.control_plot_frame.Layout()
+    def evt_resize_control_plot_panel(self, event):
         
-    
-    ''' 
-    def evt_resize_figure(self, event):
+        pix = self.control_plot_frame.control_plot_panel.GetClientSize()
+        
+        self.figure.set_size_inches(pix[0]/self.figure.get_dpi(),
+                                    pix[1]/self.figure.get_dpi())
+        
+        
+        x,y = self.control_plot_frame.GetSize()  
+        
+        self.figure.set_size_inches(x/self.figure.get_dpi(),
+                                    y/self.figure.get_dpi())
+        
+        self.figure_canvas.SetSize((x-1, y-1))
+        self.figure_canvas.SetSize((x, y))
+                        
+        event.Skip()
                 
-        figure_dpi = self.figure.get_dpi()
-        
-        x,y = self.control_plot_frame.GetSize()
-                
-        self.figure.set_size_inches(float(self.control_plot_frame.GetSize()[0]*0.75) / figure_dpi, float(self.control_plot_frame.GetSize()[1] / figure_dpi), forward=True)
-        self.figure_canvas.SetSize((x,y))
-        self.figure_canvas.draw()
-    '''
-        
                                    
     def _create_figure_canvas(self):
         
@@ -1419,7 +1442,7 @@ class RDPGUI(wx.Panel):
             
         if self.figure_canvas is None:
             self.figure_canvas = FigureCanvas(self.control_plot_frame.control_plot_panel, -1, self.figure)
-            self.figure_canvas.mpl_connect('button_release_event', self.evt_change_plot_parameters)
+            self.figure_canvas_connection_id = self.figure_canvas.mpl_connect('button_release_event', self.evt_change_plot_parameters)
     
                         
     def _update_selection_data(self):
@@ -1604,7 +1627,7 @@ class RDPGUI(wx.Panel):
         
 #========================================================================================================================
 
-class RDPPlot(object):
+class RDPPlot():
 
     def __init__(self):
         return
@@ -1945,10 +1968,10 @@ class RDPPlot(object):
                 return plot
             
             except TypeError:
-                dlg = wx.MessageDialog(parent  = None, 
-                message = 'The plot was not updated.', 
-                caption = '', 
-                style = wx.OK | wx.ICON_INFORMATION | wx.CENTER | wx.STAY_ON_TOP)
+                dlg = wx.MessageDialog(parent = None, 
+                                       message = 'The plot was not updated.', 
+                                       caption = '', 
+                                       style = wx.OK|wx.ICON_INFORMATION|wx.CENTER|wx.STAY_ON_TOP)
                 dlg.ShowModal()
                 dlg.Hide()
                 wx.CallAfter(dlg.Destroy)
