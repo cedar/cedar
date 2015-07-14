@@ -42,6 +42,7 @@
 
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatNetHeader.h"
 #include "cedar/auxiliaries/net/exceptions.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 #include <opencv2/opencv.hpp>
@@ -52,7 +53,7 @@
 #include <iostream>
 
 // TODO: make constant
-#define CONST_MAGIC_NUMBER (0xabc)
+#define CONST_MAGIC_NUMBER (0xdef)
 
 namespace cedar {
   namespace aux {
@@ -66,11 +67,11 @@ template <typename CVT> void cvMatHelper<CVT>::initLocalHeader(
                                                  const HeaderType &header)
 {
   // initially fill the local header with information 
-  mLocalHeader.mMagicNumber= CONST_MAGIC_NUMBER;
+  mLocalHeader.mMagicNumber = CONST_MAGIC_NUMBER;
                                 // note: this is set here, not copied from
                                 //       the external header
-  mLocalHeader.mRows= header.mRows;
-  mLocalHeader.mColumns= header.mColumns;
+  mLocalHeader.mDims = header.mDims;
+  mLocalHeader.mSizes = header.mSizes;
   mLocalHeader.mElementSize= header.mElementSize;
   mLocalHeader.mCVMatType= header.mCVMatType;
 }
@@ -80,8 +81,21 @@ template <typename CVT> void cvMatHelper<CVT>::initExternalHeader(
                                                    const CVT &mat,
                                                    HeaderType &extheader)
 {
-  extheader.mColumns= mat.cols;
-  extheader.mRows= mat.rows;
+  extheader.mDims= mat.dims;
+  extheader.mSizes.clear();
+  extheader.mSizes.reserve(static_cast<size_t>(mat.dims));
+  if (mat.dims == 2)
+  {
+    extheader.mSizes.push_back(mat.rows);
+    extheader.mSizes.push_back(mat.cols);
+  }
+  else
+  {
+    for (int i = 0; i < mat.dims; ++i)
+    {
+      extheader.mSizes.push_back(mat.size[i]);
+    }
+  }
   extheader.mElementSize= mat.elemSize();
   extheader.mCVMatType= mat.type();
   extheader.mMagicNumber= CONST_MAGIC_NUMBER;
@@ -94,19 +108,9 @@ template <typename CVT> bool cvMatHelper<CVT>::checkCollatedDataForWrite(
                                                const CVT &mat,
                                                HeaderType &extheader)
 {
-  // TODO: safer: have a boolean in header to mark initialization status
-
   // first run: Initialize
-  if (!mLocalHeader.mColumns || !mLocalHeader.mRows)
+  if (!mLocalHeader.mInitialized)
   {
-    // TODO: temporary fix
-    if (extheader.mRows < 0 
-        || extheader.mColumns < 0)
-    {
-      CEDAR_THROW( cedar::aux::net::NetUnhandledDataException,
-                   "n-dimensional (n>2) matrices currently unsupported" );
-    }
-
     // init the header data (from mat) that will be sent over the line
     initExternalHeader(mat, extheader); // get info from mat!
 
@@ -118,31 +122,37 @@ template <typename CVT> bool cvMatHelper<CVT>::checkCollatedDataForWrite(
   // all later runs: Compare (with locally saved localheader to check against)
   else
   {
-    if (mLocalHeader.mColumns != mat.cols
-        || mLocalHeader.mRows != mat.rows
-        || mLocalHeader.mElementSize != mat.elemSize() 
-        || mLocalHeader.mCVMatType != mat.type() )
+    if
+    (
+      mLocalHeader.mSizes.size() != static_cast<size_t>(mat.dims)
+      || mLocalHeader.mElementSize != mat.elemSize()
+      || mLocalHeader.mCVMatType != mat.type()
+    )
     {
-
-      return false; // exceptions will not be thrown here
+      return false;
     }
-    else
+    for (size_t i = 0; i < mLocalHeader.mSizes.size(); ++i)
     {
-      // init the header data (from mat) that will be sent over the line
-
-      // we need this for different mat-variables that are passed
-      // to the same writer
-      initExternalHeader(mat, extheader);
-
-      return true;
+      if (mLocalHeader.mSizes.at(i) != mat.size[i])
+      {
+        return false;
+      }
     }
+
+    // init the header data (from mat) that will be sent over the line
+
+    // we need this for different mat-variables that are passed
+    // to the same writer
+    initExternalHeader(mat, extheader);
+
+    return true;
   }
 }
 
 template <typename CVT> bool cvMatHelper<CVT>::checkCollatedDataForRead(
                                                  const HeaderType &extheader)
 {
-  if (!mLocalHeader.mColumns || !mLocalHeader.mRows)
+  if (!mLocalHeader.mInitialized)
   {
     // first run: initialize!
     initLocalHeader(extheader); // get info from header!
@@ -159,8 +169,8 @@ template <typename CVT> bool cvMatHelper<CVT>::checkCollatedDataForRead(
   else
   {
     // all later runs: just check for consistency
-    if (mLocalHeader.mColumns != extheader.mColumns
-        || mLocalHeader.mRows != extheader.mRows
+    if (mLocalHeader.mSizes.size() != extheader.mSizes.size()
+        || mLocalHeader.mDims != extheader.mDims
         || mLocalHeader.mElementSize != extheader.mElementSize
         || mLocalHeader.mCVMatType != extheader.mCVMatType 
         || mLocalHeader.mMagicNumber != extheader.mMagicNumber 
@@ -168,6 +178,14 @@ template <typename CVT> bool cvMatHelper<CVT>::checkCollatedDataForRead(
     {
       // exceptions will not be thrown here
       return false;
+    }
+
+    for (size_t i = 0; i < this->mLocalHeader.mSizes.size(); ++i)
+    {
+      if (mLocalHeader.mSizes.at(i) != extheader.mSizes.at(i))
+      {
+        return false;
+      }
     }
 
     return true;
@@ -180,8 +198,7 @@ template <typename CVT> cvMatHelper<CVT>::cvMatHelper()
 #ifdef DEBUG_NETT
 //  cout << "  cvMatHelper [CONSTRUCTOR]" << endl;
 #endif
-    mLocalHeader.mRows= 0;
-    mLocalHeader.mColumns= 0;
+  mLocalHeader.mInitialized = false;
 }
 
 template <typename CVT> cvMatHelper<CVT>::~cvMatHelper()
