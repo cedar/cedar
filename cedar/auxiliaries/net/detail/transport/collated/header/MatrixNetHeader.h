@@ -42,6 +42,7 @@
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/transport/collated/header/MatrixNetHeader.fwd.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/header/BasicNetHeader.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 
@@ -54,9 +55,69 @@
 struct cedar::aux::net::detail::MatrixNetHeader : BasicNetHeader
 {
 public:
-  /*unsigned*/ int mRows; // cv::Mat uses signed ints for this
-  /*unsigned*/ int mColumns; // cv::Mat uses signed ints for this
+  int mDims; // number of dimensions
+  std::vector<int> mSizes; // for 2d matrices, this will be {rows, cols}
   unsigned int mElementSize;
+  bool mInitialized;
+
+  //! Returns the necessary size of a memarray that is used to completely serialize this header
+  virtual unsigned int getFixedSerializationSize() const
+  {
+    return sizeof(int) // mDims
+         + sizeof(unsigned int) // mElementSize
+         + this->BasicNetHeader::getFixedSerializationSize();
+  }
+
+  virtual unsigned int getVariableSerializationSize() const
+  {
+    return mDims * sizeof(int) // mSizes
+           + this->BasicNetHeader::getVariableSerializationSize();
+  }
+
+  virtual void serializeFixed(char* memarray)
+  {
+    char* p = memarray;
+    *reinterpret_cast<int*>(p) = this->mDims;
+    p += sizeof(int);
+    *reinterpret_cast<unsigned int*>(p) = this->mElementSize;
+    p += sizeof(unsigned int);
+    this->BasicNetHeader::serializeFixed(p);
+  }
+
+  virtual void serializeVariable(char* memarray)
+  {
+    char* p = memarray;
+    CEDAR_DEBUG_ASSERT(this->mSizes.size() == static_cast<size_t>(this->mDims));
+    for (size_t i = 0; i < this->mSizes.size(); ++i)
+    {
+      *reinterpret_cast<int*>(p) = this->mSizes.at(i);
+      p += sizeof(int);
+    }
+    this->BasicNetHeader::serializeVariable(p);
+  }
+
+  virtual void deserializeFixed(const char* memarray)
+  {
+    const char* p = memarray;
+    this->mDims = *reinterpret_cast<const int*>(p);
+    p += sizeof(int);
+    this->mElementSize = *reinterpret_cast<const unsigned int*>(p);
+    p += sizeof(unsigned int);
+
+    this->BasicNetHeader::deserializeFixed(p);
+  }
+
+  virtual void deserializeVariable(const char* memarray)
+  {
+    const char* p = memarray;
+    this->mSizes.resize(static_cast<size_t>(this->mDims));
+    for (size_t i = 0; i < this->mSizes.size(); ++i)
+    {
+      this->mSizes.at(i) = *reinterpret_cast<const int*>(p);
+      p += sizeof(int);
+    }
+    this->BasicNetHeader::deserializeVariable(p);
+  }
 };
 //!@endcond
 
