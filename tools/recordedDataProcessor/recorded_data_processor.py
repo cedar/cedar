@@ -28,7 +28,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 07 09
+    Date:        2015 07 15
 
     Description: 
 
@@ -49,11 +49,22 @@ import numpy as np
 import os
 import re
 import sys
+import warnings    
+
+warnings.filterwarnings('ignore', category=UserWarning)
+    
 import wx
 
 from functools import partial
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.collections import PolyCollection
+
+from matplotlib import rc
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
+#rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+#rc('text', usetex=True)
+
 from mpl_toolkits.mplot3d import Axes3D
 from scipy import ndimage
 from wx.lib.embeddedimage import PyEmbeddedImage
@@ -356,7 +367,6 @@ class RDPMainWindow(wx.Frame):
         else:
             wx.Frame.__init__(self, parent=parent, title=' ', style=wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.FRAME_NO_TASKBAR|wx.CLIP_CHILDREN)
                         
-            self.rdp_plot = RDPPlot()
             self.rdp_image_files = RDPImageFiles()
             self.dir = self.parent.dir
             self.parent = parent
@@ -409,6 +419,7 @@ class RDPBrowserPanel(wx.Panel):
         rdp_gui = RDPGUI(parent=frame)
         frame.SetSizer(rdp_gui.main_sizer)
         frame.Sizer.Fit(frame)
+        self.Hide()
         
 #========================================================================================================================
 
@@ -485,9 +496,8 @@ class RDPPlotFrame(wx.Frame):
                 
         axes_label_sizer.Add(item=label_axes_txt, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.RIGHT|wx.BOTTOM, border=10)
         axes_label_sizer.Add(item=axes_grid_sizer, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)
-                
-        parent._create_figure_canvas()
         
+        parent._create_figure_canvas()
         parent.figure_canvas.Bind(wx.EVT_SIZE, parent.evt_resize_control_plot_panel)
         
         top_sizer.Add(item=axes_label_sizer, proportion=0, flag=wx.EXPAND|wx.RIGHT|wx.LEFT, border=10)
@@ -521,11 +531,29 @@ class RDPPlotFrame(wx.Frame):
             min_max_sizer.Add(parent.control_plot_frame.vmin_spn, 2, wx.ALIGN_RIGHT|wx.RIGHT, border=10)
             min_max_sizer.Add(vmax_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=10)
             min_max_sizer.Add(parent.control_plot_frame.vmax_spn, 2, wx.ALIGN_RIGHT|wx.RIGHT, border=10)
-            
+
             top_sizer.Add(heatmap_boundaries_txt, 0, flag=wx.ALIGN_LEFT|wx.BOTTOM|wx.LEFT, border=10)
             top_sizer.Add(min_max_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)
             top_sizer.Add(reset_heatmap_boundaries_btn, 0, flag=wx.ALIGN_LEFT|wx.ALL, border=10)
-            top_sizer.Add(item=save_btn, proportion=0, flag=wx.ALIGN_CENTER|wx.TOP, border=25)
+            
+            
+            if parent.mode == 'time course':
+                marker_color_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, label='Marker')
+                parent.marked_check_box = wx.CheckBox(parent.control_plot_frame.control_plot_panel, -1)
+                parent.control_plot_frame.marker_color_ctrl = wx.ColourPickerCtrl(parent.control_plot_frame.control_plot_panel, -1, col=parent.aux_marker_color)
+                parent.control_plot_frame.marker_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, parent.evt_marker_color_ctrl)
+                
+                color_picker_sizer = wx.BoxSizer(wx.HORIZONTAL)
+                color_picker_sizer.Add(parent.marked_check_box, flag=wx.ALIGN_CENTER_VERTICAL)
+                color_picker_sizer.Add(parent.control_plot_frame.marker_color_ctrl)
+            
+                plot_control_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
+                plot_control_grid_sizer.Add(marker_color_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
+                plot_control_grid_sizer.Add(color_picker_sizer, 1, wx.ALIGN_RIGHT)
+                top_sizer.Add(plot_control_grid_sizer, 0, flag=wx.ALIGN_LEFT|wx.ALL, border=10)
+                parent.marked_check_box.Bind(wx.EVT_CHECKBOX, parent.evt_marked_check_box)
+                
+            #top_sizer.Add(item=save_btn, proportion=0, flag=wx.ALIGN_CENTER|wx.TOP, border=25)
             
             parent.control_plot_frame.vmin_spn.Bind(wx.EVT_TEXT_ENTER, parent.evt_vmin_spn)
             parent.control_plot_frame.vmax_spn.Bind(wx.EVT_TEXT_ENTER, parent.evt_vmax_spn)
@@ -563,7 +591,7 @@ class RDPPlotFrame(wx.Frame):
                 parent.control_plot_frame.linewidth_spn.Bind(wx.EVT_SPINCTRL, parent.evt_linewidth_spn)
                 plot_control_grid_sizer.Add(linewidth_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
                 plot_control_grid_sizer.Add(parent.control_plot_frame.linewidth_spn, 1, wx.ALIGN_RIGHT)
-                
+            
             if parent.mode == 'time course':
                 marker_color_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, label='Marker')
                 parent.marked_check_box = wx.CheckBox(parent.control_plot_frame.control_plot_panel, -1)
@@ -588,8 +616,8 @@ class RDPPlotFrame(wx.Frame):
             plot_control_sizer.Add(item=visual_controls_txt, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.BOTTOM|wx.TOP, border=10)
             plot_control_sizer.Add(item=plot_control_grid_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)    
             top_sizer.Add(item=plot_control_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.LEFT|wx.RIGHT, border=10)
-            top_sizer.Add(item=save_btn, proportion=0, flag=wx.ALIGN_CENTER|wx.TOP|wx.LEFT|wx.RIGHT, border=25)
-            
+            #top_sizer.Add(item=save_btn, proportion=0, flag=wx.ALIGN_CENTER|wx.TOP|wx.LEFT|wx.RIGHT, border=25)
+                        
         if parent.ndim[parent.selection] == 0 and parent.mode == 'time course':
             parent.control_plot_frame.sel_cbox = wx.ComboBox(parent.control_plot_frame.control_plot_panel, choices=parent.flist_sorted, value=parent.sel_cbox.GetValue(), style=wx.CB_READONLY)
             parent.control_plot_frame.sel_cbox.Bind(wx.EVT_COMBOBOX, parent.evt_sel_cbox)
@@ -602,14 +630,30 @@ class RDPPlotFrame(wx.Frame):
             parent.control_plot_frame.line_color_ctrl = wx.ColourPickerCtrl(parent.control_plot_frame.control_plot_panel, -1, col=parent.aux_line_color)
             parent.control_plot_frame.line_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, parent.evt_line_color_ctrl)
             
+            marker_color_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, label='Marker')
+            parent.marked_check_box = wx.CheckBox(parent.control_plot_frame.control_plot_panel, -1)
+            parent.control_plot_frame.marker_color_ctrl = wx.ColourPickerCtrl(parent.control_plot_frame.control_plot_panel, -1, col=parent.aux_marker_color)
+            parent.control_plot_frame.marker_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, parent.evt_marker_color_ctrl)
+            
+            color_picker_sizer = wx.BoxSizer(wx.HORIZONTAL)
+            color_picker_sizer.Add(parent.marked_check_box, flag=wx.ALIGN_CENTER_VERTICAL)
+            color_picker_sizer.Add(parent.control_plot_frame.marker_color_ctrl)
+            
+            plot_control_grid_sizer = wx.BoxSizer(wx.HORIZONTAL)
+            plot_control_grid_sizer.Add(marker_color_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
+            plot_control_grid_sizer.Add(color_picker_sizer, 1, wx.ALIGN_RIGHT)
+            parent.marked_check_box.Bind(wx.EVT_CHECKBOX, parent.evt_marked_check_box)
+            
             line_sizer = wx.BoxSizer(wx.HORIZONTAL)
             line_sizer.Add(line_color_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
             line_sizer.Add(parent.control_plot_frame.line_color_ctrl, 1, wx.ALIGN_RIGHT)
             
             top_sizer.Add(item=parent.control_plot_frame.sel_cbox, proportion=0, flag=wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, border=10)
             top_sizer.Add(item=line_sizer, proportion=0, flag=wx.LEFT|wx.RIGHT, border=10)
-            top_sizer.Add(item=multi_plot_btn, proportion=0, flag=wx.ALL, border=10)
+            top_sizer.Add(item=plot_control_grid_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)
+            top_sizer.Add(item=multi_plot_btn, proportion=0, flag=wx.LEFT|wx.RIGHT, border=10)
         
+        top_sizer.Add(item=save_btn, proportion=0, flag=wx.ALIGN_CENTER|wx.TOP|wx.LEFT|wx.RIGHT, border=25) 
         parent.control_plot_frame.main_sizer.Add(item=parent.figure_canvas, proportion=1, flag=wx.EXPAND)
         parent.control_plot_frame.main_sizer.Add(item=top_sizer, proportion=1, flag=wx.EXPAND)
         
@@ -676,6 +720,7 @@ class RDPGUI(wx.Panel):
         self.title = ''
         self.figure_resize = None
         self.colorbar = None
+        self.marked_check_box = None
                 
         # Plot modes
         #self.mode_ch = [' ', 'snapshot', 'snapshot sequence', 'time course']
@@ -689,7 +734,7 @@ class RDPGUI(wx.Panel):
         self.proj_ch_step = [' ', 'x_1', 'x_2', 'x_3', 'x_4', 'x_5', 
                              'x_1, x_2', 'x_1, x_3', 'x_1, x_4', 'x_1, x_5', 'x_2, x_3', 
                              'x_2, x_4', 'x_2, x_5', 'x_3, x_4', 'x_3, x_5', 'x_4, x_5']
-        self.style_ch = [' ', 'heatmap', 'image', 'surface', 'wireframe']
+        self.style_ch = [' ', 'heatmap', 'surface', 'wireframe']
         self.proj_methods = [' ', 'average', 'maximum', 'sum']
         
         self.figure_azimuth = None
@@ -897,7 +942,6 @@ class RDPGUI(wx.Panel):
         self.proj_cbox.Disable()
         self.proj_method_cbox.Disable()
         self.style_cbox.Disable()
-        #self.marked_check_box.Disable()
                   
         return
         
@@ -927,23 +971,21 @@ class RDPGUI(wx.Panel):
         except TypeError:
             pass
         
-        new_frame = RDPMainWindow(parent=self.frame, title='', pos=None, size=None, style=None, name=None)        
-        new_frame.step = self.step        
+        new_frame = RDPMainWindow(parent=self.frame, title='', pos=None, size=None, style=None, name=None)     
+        new_frame.rdp_gui.step = self.step   
         new_frame.Bind(wx.EVT_CLOSE, self.evt_close_frame)
         
         new_frame_id = new_frame.GetId()
         self.frame_ids.append(new_frame_id)
         
-        event.Skip()
-                
-         
+        wx.FindWindowById(new_frame_id).step = self.step
+        
+                     
     def evt_marked_check_box(self, event):
         
         widget = event.GetEventObject()
         self.marked = widget.GetValue()
         wx.CallAfter(self._update_plot)
-        
-        event.Skip()
         
         
     def evt_close_frame(self, event):
@@ -954,9 +996,7 @@ class RDPGUI(wx.Panel):
             self.frame_ids.remove(frame_id)
         
         wx.FindWindowById(frame_id).Hide()
-        
-        event.Skip()
-        
+                
                 
     def evt_play_pause_btn(self, event):
         self._play_pause_btn(reverse=False)
@@ -973,7 +1013,6 @@ class RDPGUI(wx.Panel):
             current_frame = self._set_current_frame(i)
             current_frame.step = 0
             current_frame.marked = False
-            current_frame.marked_check_box.SetValue(False)
             
             current_frame.x_label = ''
             current_frame.y_label = ''
@@ -1042,7 +1081,6 @@ class RDPGUI(wx.Panel):
         '''Add time course to currently displayed plot.'''
         
         self._add_time_course()
-        event.Skip()
         
         
     def evt_resolution_spn(self, event):
@@ -1214,27 +1252,22 @@ class RDPGUI(wx.Panel):
             self.proj_cbox.Enable()
         else:
             self.proj_cbox.SetItems([])
-                    
-        self.plot_btn.Bind(wx.EVT_BUTTON, self.evt_plot)
-        event.Skip()
+        
+        for i in range(len(self.frame_ids)):
+            current_frame = self._set_current_frame(i)
+            current_frame.plot_btn.Bind(wx.EVT_BUTTON, current_frame.evt_plot)
             
             
     def evt_plot(self, event):
         
-        if self.style != 'heatmap':    
+        if self.style != 'heatmap' and self.ndim[self.selection] != 0:    
             self._plot()
         
         if self.mode != 'snapshot sequence':
-            
             if self.control_plot_frame is None:
                 RDPPlotFrame(parent=self)                
                 self.control_plot_frame.Show()
-        
-        if self.mode == 'time course' and self.figure:
-            self.marked_check_box.Enable()
-        else:
-            self.marked_check_box.Disable()
-            
+              
         self._update_plot()
         
 
@@ -1251,7 +1284,7 @@ class RDPGUI(wx.Panel):
         self.line_color = [red, green, blue]
         
         # Update currently displayed plot
-        if self.figure:
+        if self.figure and self.ndim[self.selection] != 0:
             wx.CallAfter(self._update_plot)
             
         wx.Yield()
@@ -1282,13 +1315,29 @@ class RDPGUI(wx.Panel):
                             
     def evt_sel_cbox(self, event):
         
-        self.selection = self.sel_cbox.GetSelection()
+        widget = event.GetEventObject()
+        self.selection = widget.GetSelection()
         self._update_selection_data()
-        self.sel_cbox.SetValue(self.sel_cbox.GetValue())
+        self.sel_cbox.SetValue(widget.GetValue())
         
-        self.mode_cbox.Enable()
+        try:
+            self.control_plot_frame.sel_cbox.SetValue(widget.GetValue())
+        except AttributeError:
+            pass
                 
-                    
+        if 'CV_8U' in self.header_list[self.selection] or 'CV_8UC3' in self.header_list[self.selection]:
+            self.style_ch = ['image']
+            self.style_cbox.Enable()
+            self.style_cbox.SetItems(self.style_ch)
+            self.style_cbox.SetSelection(0)
+            self.style = 'image'
+            self.plot_btn.Bind(wx.EVT_BUTTON, self.evt_plot)
+        else:
+            self.style_ch = [' ', 'heatmap', 'surface', 'wireframe']
+            self.style_cbox.SetItems(self.style_ch)
+            self.mode_cbox.Enable()
+            
+    
     def evt_save_plot(self, event):
         
         dlg_name = self.dir + '/' + self.flist_sorted[self.selection].strip('.csv') + '-' + str(self.mode) + '-1.svg'
@@ -1302,11 +1351,6 @@ class RDPGUI(wx.Panel):
         if self.mode != 'snapshot sequence':
             self._plot(save=True, file_path=file_path)
         
-        if self.mode == 'time course' and self.figure:
-            self.marked_check_box.Enable()
-        else:
-            self.marked_check_box.Disable()
-                    
     
     def evt_change_plot_parameters(self, event):
         
@@ -1345,7 +1389,7 @@ class RDPGUI(wx.Panel):
                             current_frame = self._set_current_frame(j)
                             current_frame.step = i
                             current_frame._update_plot()
-                                                                                           
+                                                               
                         inactive_btn.Disable()
                         self.increase_single_step_btn.Disable()
                         self.decrease_single_step_btn.Disable()
@@ -1397,23 +1441,24 @@ class RDPGUI(wx.Panel):
         for i in range(len(self.frame_ids)):
             current_frame = self._set_current_frame(i)
             current_frame.step = self.step
-            current_frame._update_plot()
+            wx.CallAfter(current_frame._update_plot)
             
         
     def _update_plot(self):
         
         if self.figure_canvas:
+    
             if self.ndim[self.selection] == 0:
-                plt.cla()              
+                plt.cla()
             else:
                 self.figure.clf()
         
-        self._plot()
-        wx.Yield()
-            
-       
-    def _add_time_course(self):
         wx.CallAfter(self._plot)
+        wx.Yield()
+
+                   
+    def _add_time_course(self):
+        self._plot()
 
                 
     def evt_resize_control_plot_panel(self, event):
@@ -1437,14 +1482,17 @@ class RDPGUI(wx.Panel):
                                    
     def _create_figure_canvas(self):
         
-        if self.figure is None:
-            self.figure = plt.figure(str(self.title))
+        self.figure = plt.figure(str(self.title))
             
-        if self.figure_canvas is None:
-            self.figure_canvas = FigureCanvas(self.control_plot_frame.control_plot_panel, -1, self.figure)
-            self.figure_canvas_connection_id = self.figure_canvas.mpl_connect('button_release_event', self.evt_change_plot_parameters)
-    
-                        
+        self.figure_canvas = FigureCanvas(self.control_plot_frame.control_plot_panel, -1, self.figure)
+        self.figure_canvas_connection_id = self.figure_canvas.mpl_connect('button_release_event', self.evt_change_plot_parameters)
+        #self.figure_canvas.mpl_connect('resize_event', self.evt_resize_canvas)
+        
+        
+    def evt_resize_canvas(self, event):
+        self.figure_canvas.draw()
+        
+                                
     def _update_selection_data(self):
         '''Reset the control panel and update it with the newly selected data.'''
         
@@ -1520,110 +1568,116 @@ class RDPGUI(wx.Panel):
                 
     def _plot(self, save=False, file_path=None):
         '''Build plot(s) to either visualize or save as pdf file'''
-                          
-        if self.mode != 'snapshot sequence':
-            if self.figure is None:
-                self.figure = plt.figure(str(self.title))
-                                                                                    
-        if self.mode == 'snapshot':                    
-            try:
-                                
-                self.plot = self.frame.rdp_plot.plot_snapshot(step = self.step, 
-                                                              style = self.style, 
-                                                              data = self.data, 
-                                                              header = self.header, 
-                                                              vmin = self.vmin,
-                                                              vmax = self.vmax,
-                                                              resolution = self.resolution, 
-                                                              surface_linewidth = self.surface_linewidth,
-                                                              proj = self.proj,
-                                                              proj_method = self.proj_method,
-                                                              color = self.line_color,
-                                                              figure = self.figure,
-                                                              title = self.title)
                 
-                if self.style == 'heatmap' or self.style == 'surface' or self.style == 'wireframe':
-                    self.figure.gca().invert_yaxis()
-                            
-                if self.mode == 'time course' and self.x_label == '':
-                    try:
-                        self.plot.set_xlabel('Time')
-                    except AttributeError:
-                        pass
-                
-            except IndexError:
-                dlg = wx.MessageDialog(parent=None, 
-                                       message = 'The specified time slice does not exist.', 
-                                       caption = 'An Error has occurred.', 
-                                       style = wx.OK | wx.ICON_ERROR | wx.CENTER | wx.STAY_ON_TOP)
-                
-                dlg.ShowModal()
-                dlg.Hide()
-                wx.CallAfter(dlg.Destroy)
-            
-        elif self.mode == 'snapshot sequence':
-            self.save_mode = save
-            dlg = SnapshotSequenceDialog(self, -1, 'Options')
-            dlg.ShowModal()
-            dlg.Hide()
-            wx.CallAfter(dlg.Destroy)
-            
-        elif self.mode == 'time course':
-            try:
-                self.plot = self.frame.rdp_plot.plot_time_course(data = self.data, 
-                                                                 header = self.header, 
-                                                                 vmin = self.vmin,
-                                                                 vmax = self.vmax,
-                                                                 resolution = self.resolution,
-                                                                 surface_linewidth = self.surface_linewidth,
-                                                                 plot = self.plot,
-                                                                 proj = self.proj,
-                                                                 proj_method = self.proj_method,
-                                                                 color = self.line_color,
-                                                                 step = self.step, 
-                                                                 marker = self.marked, 
-                                                                 style = self.style,
-                                                                 marker_color = self.marker_color,
-                                                                 figure = self.figure,
-                                                                 title = self.title)
-                
-                if self.style == 'heatmap' or self.style == 'surface' or self.style == 'wireframe':
-                    self.figure.gca().invert_yaxis()
-                            
-                if self.mode == 'time course' and self.x_label == '':
-                    try:
-                        self.plot.set_xlabel('Time')
-                    except AttributeError:
-                        pass
-                    
-            except UnboundLocalError:
-                dlg = wx.MessageDialog(parent = None, 
-                                       message = 'It is not possible to build a time course out of 2-dimensional time slices.', 
-                                       caption = 'The attempted operation is not possible.', 
-                                       style = wx.OK | wx.ICON_INFORMATION | wx.CENTER | wx.STAY_ON_TOP)
-                dlg.ShowModal()
-                dlg.Hide()
-                wx.CallAfter(dlg.Destroy)
-                
-        self.frame.rdp_plot.label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
-                            
-        if self.style != 'heatmap':
-            if self.figure_azimuth is not None and self.figure_elevation is not None:
-                self.figure.gca(projection='3d').view_init(elev=self.figure_elevation, azim=self.figure_azimuth)
-        
-            if self.figure_distance is not None:
-                self.figure.gca(projection='3d').dist = self.figure_distance
-                
-        if save is False and self.mode != 'snapshot sequence':
-
-            try:
-                self.figure_canvas.draw()
-                wx.YieldIfNeeded()
-            except AttributeError:
-                pass
-            
         if save is True and self.mode != 'snapshot sequence':
             self.frame.rdp_plot.save_plot(plot=self.plot, plot_mode=self.mode, file_name=self.flist_sorted[self.selection], file_directory=self.dir, figure=self.figure, file_path=file_path)
+            self._update_plot()
+            
+        else:         
+                       
+            if self.mode != 'snapshot sequence':
+                if self.figure is None:
+                    self.figure = plt.figure(str(self.title))
+                                                                       
+            if self.mode == 'snapshot' or self.style == 'image':            
+                try:
+                                    
+                    self.plot = self.frame.rdp_plot.plot_snapshot(step = self.step, 
+                                                                  style = self.style, 
+                                                                  data = self.data, 
+                                                                  header = self.header, 
+                                                                  vmin = self.vmin,
+                                                                  vmax = self.vmax,
+                                                                  resolution = self.resolution, 
+                                                                  surface_linewidth = self.surface_linewidth,
+                                                                  proj = self.proj,
+                                                                  proj_method = self.proj_method,
+                                                                  color = self.line_color,
+                                                                  figure = self.figure,
+                                                                  title = self.title)
+                    
+                    if self.style == 'heatmap' or self.style == 'surface' or self.style == 'wireframe':
+                        self.figure.gca().invert_yaxis()
+                                
+                    if self.mode == 'time course' and self.x_label == '':
+                        try:
+                            self.plot.set_xlabel('Time')
+                        except AttributeError:
+                            pass
+                    
+                except IndexError:
+                    dlg = wx.MessageDialog(parent=None, 
+                                           message = 'The specified time slice does not exist.', 
+                                           caption = 'An Error has occurred.', 
+                                           style = wx.OK | wx.ICON_ERROR | wx.CENTER | wx.STAY_ON_TOP)
+                    
+                    dlg.ShowModal()
+                    dlg.Hide()
+                    wx.CallAfter(dlg.Destroy)
+                
+            elif self.mode == 'snapshot sequence':
+                self.save_mode = save
+                dlg = SnapshotSequenceDialog(self, -1, 'Options')
+                dlg.ShowModal()
+                dlg.Hide()
+                wx.CallAfter(dlg.Destroy)
+                        
+            elif self.mode == 'time course':
+                try:
+                    self.plot = self.frame.rdp_plot.plot_time_course(data = self.data, 
+                                                                     header = self.header, 
+                                                                     vmin = self.vmin,
+                                                                     vmax = self.vmax,
+                                                                     resolution = self.resolution,
+                                                                     surface_linewidth = self.surface_linewidth,
+                                                                     plot = self.plot,
+                                                                     proj = self.proj,
+                                                                     proj_method = self.proj_method,
+                                                                     color = self.line_color,
+                                                                     step = self.step, 
+                                                                     marker = self.marked, 
+                                                                     style = self.style,
+                                                                     marker_color = self.marker_color,
+                                                                     figure = self.figure,
+                                                                     title = self.title)
+                    
+                    if self.style == 'heatmap' or self.style == 'surface' or self.style == 'wireframe':
+                        self.figure.gca().invert_yaxis()
+                                
+                    if self.mode == 'time course' and self.x_label == '':
+                        try:
+                            self.plot.set_xlabel('Time')
+                        except AttributeError:
+                            pass
+                        
+                except UnboundLocalError:
+                    dlg = wx.MessageDialog(parent = None, 
+                                           message = 'It is not possible to build a time course out of 2-dimensional time slices.', 
+                                           caption = 'The attempted operation is not possible.', 
+                                           style = wx.OK | wx.ICON_INFORMATION | wx.CENTER | wx.STAY_ON_TOP)
+                    dlg.ShowModal()
+                    dlg.Hide()
+                    wx.CallAfter(dlg.Destroy)
+            
+            try:
+                self.frame.rdp_plot.label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
+            except AttributeError:
+                pass
+                            
+            if self.style != 'heatmap':
+                if self.figure_azimuth is not None and self.figure_elevation is not None:
+                    self.figure.gca(projection='3d').view_init(elev=self.figure_elevation, azim=self.figure_azimuth)
+            
+                if self.figure_distance is not None:
+                    self.figure.gca(projection='3d').dist = self.figure_distance
+                    
+            if save is False and self.mode != 'snapshot sequence':
+    
+                try:
+                    self.figure_canvas.draw()
+                    wx.YieldIfNeeded()
+                except AttributeError:
+                    pass
         
 #========================================================================================================================
 
@@ -1853,7 +1907,7 @@ class RDPPlot():
         next(reader, None)
         
         # Progress bar
-        progress_dlg = Progress(None, -1, 'Load data recording', 'loading...', row_count+1)
+        progress_dlg = Progress(None, -1, 'Loading data', '', row_count+1)
         
         # build time_stamps list and data matrix
         #========================================================================================================================
@@ -1887,7 +1941,7 @@ class RDPPlot():
         reader = csv.reader(csv_file)
         header = reader.next()
         csv_file.close()
-                
+                        
         return header   
     
             
@@ -1953,20 +2007,30 @@ class RDPPlot():
     def plot_snapshot(self, step, data, vmin, vmax, resolution, header, style, surface_linewidth, mode=' ', proj=' ', proj_method='average', color='#FF9600', figure=None, title=None):        
         ndim = self.get_dimension(header)
         steps = data.shape[0]
-        
+                        
         if figure is None:
             fig = plt.figure()
         else:
             fig = figure
                     
         if style == 'image':
-            
             try:
-                image = self._process_image(data=data, header=header, step=step)
-                plot = plt.imshow(image, origin='lower')
+                image = self._process_image(data=data, header=header, step=step)                
+                plot = plt.imshow(image, origin='lower', rasterized=True)
+                plt.tick_params(
+                axis='both',       # changes apply to the x-axis
+                which='both',      # both major and minor ticks are affected
+                bottom='off',      # ticks along the bottom edge are off
+                top='off',         # ticks along the top edge are off
+                left='off',
+                right='off',
+                labelbottom='off')
+                
+                plot.axes.set_xticklabels([])
+                plot.axes.set_yticklabels([])
                 
                 return plot
-            
+                
             except TypeError:
                 dlg = wx.MessageDialog(parent = None, 
                                        message = 'The plot was not updated.', 
@@ -2003,9 +2067,9 @@ class RDPPlot():
                             plot = self._initialize_3D_plot(mode=mode, figure=figure, title=title)
                             
                             if style == 'surface':
-                                plot.plot_surface(X_1,X_2,data,rstride=resolution, cstride=resolution,cmap='coolwarm', alpha=0.5, linewidth=surface_linewidth, rasterized=False)
+                                plot.plot_surface(X_1, X_2, data,rstride=resolution, cstride=resolution,cmap='coolwarm', alpha=0.5, linewidth=surface_linewidth, rasterized=True)
                             elif style == 'wireframe':
-                                plot.plot_wireframe(X_1,X_2, data, rstride=resolution,cstride=resolution, color=color)
+                                plot.plot_wireframe(X_1,X_2, data, rstride=resolution,cstride=resolution, color=color, rasterized=True)
                             
                         elif style == 'heatmap':
                             plot = self.plot_heatmap(X_1=X_1, X_2=X_2, data=data, vmin=vmin, vmax=vmax, mode=mode, figure=figure)
@@ -2107,11 +2171,16 @@ class RDPPlot():
             plot = fig.gca()
                     
         if ndim == 0:
-            
-            if color == None:
-                plot.plot(data)
+            if plot is None:
+                if color == None:
+                    plot.plot(data)
+                else:
+                    plot.plot(data, color=color)
             else:
-                plot.plot(data, color=color)
+                if color == None:
+                    plot.add_line(plt.plot(data)[0])
+                else:
+                    plot.add_line(plt.plot(data, color=color)[0])
         
         elif ndim != 0:
             if ndim == 1:
@@ -2129,9 +2198,9 @@ class RDPPlot():
                 plot = self._initialize_3D_plot(figure=figure, title=title)
                 
                 if style == 'surface':   
-                    plot.plot_surface(X_1, X_2, data, rstride=resolution, cstride=resolution, cmap='coolwarm', alpha=0.5, linewidth=surface_linewidth, rasterized=False)
+                    plot.plot_surface(X_1, X_2, data, rstride=resolution, cstride=resolution, cmap='coolwarm', alpha=0.5, linewidth=surface_linewidth, rasterized=True)
                 elif style == 'wireframe': 
-                    plot.plot_wireframe(X_1, X_2, data, rstride=resolution, cstride=resolution, color=color)
+                    plot.plot_wireframe(X_1, X_2, data, rstride=resolution, cstride=resolution, color=color, rasterized=True)
             
             elif style == 'heatmap':
                 plot = self.plot_heatmap(X_1=X_1, X_2=X_2, data=data, vmin=vmin, vmax=vmax, figure=figure)
@@ -2160,7 +2229,7 @@ class RDPPlot():
         
         try:
             plot = fig.gca()
-            heatmap_data = plt.pcolormesh(X_1, X_2, data, cmap='RdYlBu_r', vmin=vmin, vmax=vmax)
+            heatmap_data = plt.pcolor(X_1, X_2, data, cmap='RdYlBu_r', vmin=vmin, vmax=vmax, rasterized=True)
             plot.add_collection(heatmap_data)
             
             plot.set_ylim([X_2.min(), X_2.max()])
@@ -2249,7 +2318,7 @@ class RDPPlot():
                         count += 1
                         file_path = file_path_partial + file_name.strip('.csv') + '-' + str(plot_mode) + '-' + str(count) + '.svg'
         
-        figure.savefig(file_path, dpi=1000)
+        figure.savefig(file_path, dpi=400, bbox_inches='tight', pad_inches=0.0, transparent=True)
         
 #========================================================================================================================
 
