@@ -59,11 +59,7 @@ from functools import partial
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.collections import PolyCollection
 
-from matplotlib import rc
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
-#rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-#rc('text', usetex=True)
+plt.rcdefaults()
 
 from mpl_toolkits.mplot3d import Axes3D
 from scipy import ndimage
@@ -181,6 +177,16 @@ class SaveDialog(wx.FileDialog):
     
 #========================================================================================================================
 
+class WriteCSVDialog(wx.FileDialog):
+    def __init__(self, parent, defaultDir, defaultFile):
+        
+        wildcard = 'Comma-separated Values (*.csv)|*.csv|'  \
+                   'All files (*.*)|*.*'
+        
+        wx.FileDialog.__init__(self, parent=parent, message='Write .csv file', wildcard=wildcard, style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT|wx.FD_PREVIEW, defaultDir=defaultDir, defaultFile=defaultFile)
+        
+        return
+
 class SnapshotSequenceDialog(wx.Dialog):
     def __init__(self, parent, _, title):
         mpl.interactive(True)
@@ -282,7 +288,7 @@ class SnapshotSequenceDialog(wx.Dialog):
         self.parent.nstep = int(step_num_entry.GetValue())
         self.parent.step_size = int(step_size_entry.GetValue())
 
-        self.parent.plot = self.parent.frame.rdp_plot.plot_snapshot_sequence(start = self.parent.step, 
+        self.parent.plot, self.reduced_data = self.parent.frame.rdp_plot.plot_snapshot_sequence(start = self.parent.step, 
                                                                              step_size = self.parent.step_size, 
                                                                              steps = self.parent.nstep, 
                                                                              style = self.parent.style, 
@@ -426,6 +432,8 @@ class RDPBrowserPanel(wx.Panel):
 class RDPPlotFrame(wx.Frame):
     def __init__(self, parent):
         
+        self.parent = parent
+        
         # Initialize control plot frame if none is present
         if parent.control_plot_frame is None:
             parent.control_plot_frame = wx.Frame(parent=parent, id=-1, title=str(parent.title), style=wx.MAXIMIZE_BOX|wx.RESIZE_BORDER|
@@ -435,7 +443,9 @@ class RDPPlotFrame(wx.Frame):
         parent.control_plot_frame.Bind(wx.EVT_CLOSE, parent.evt_close_figure)
         
         save_btn = wx.Button(parent.control_plot_frame.control_plot_panel, wx.ID_SAVE, label = 'Save')
-        save_btn.Bind(wx.EVT_BUTTON, parent.evt_save_plot)
+        write_csv_btn = wx.Button(parent.control_plot_frame.control_plot_panel, label = 'Write .csv')
+        save_btn.Bind(wx.EVT_BUTTON, parent.evt_save_plot_btn)
+        write_csv_btn.Bind(wx.EVT_BUTTON, parent.evt_write_csv_btn)
         
         # Sizers
         #========================================================================================================================
@@ -493,7 +503,26 @@ class RDPPlotFrame(wx.Frame):
         else:
             x_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=None))
             y_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=None))
-                
+        
+        plot_labelling_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        
+        plot_labelling_tooltipstring = ('Choose the style in which the plot is to be labelled.\n'
+                                        '=====================================\n'
+                                        'Off:\t\tThere will be no labelling at all.\n'
+                                        'LateX:\tFonts will be consistent with the one used in \t\t\tstandard LateX documents. Furthermore, the\n'
+                                        '\t\taxis labels will accept input in LateX notation.\n'
+                                        '\t\tRendering time will be severely impeded.\n'
+                                        'Standard:\tThe plot will be labelled in a simple, sans-serif \t\t\tfont. Input in LateX notation will not be accepted.\n'
+                                        '=====================================')
+        
+        plot_labelling_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Plot Labelling\t')
+        plot_labelling_cbox = wx.ComboBox(parent.control_plot_frame.control_plot_panel, choices=parent.labelling_choices, value='Off', style=wx.CB_READONLY)
+        plot_labelling_txt.SetToolTipString(plot_labelling_tooltipstring)
+        plot_labelling_cbox.SetToolTipString(plot_labelling_tooltipstring)
+        plot_labelling_cbox.Bind(wx.EVT_COMBOBOX, self.evt_plot_labelling_cbox)
+        plot_labelling_sizer.Add(item=plot_labelling_txt, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
+        plot_labelling_sizer.Add(item=plot_labelling_cbox, proportion=2, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
+        axes_label_sizer.Add(item=plot_labelling_sizer, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.RIGHT|wx.BOTTOM, border=10)
         axes_label_sizer.Add(item=label_axes_txt, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.RIGHT|wx.BOTTOM, border=10)
         axes_label_sizer.Add(item=axes_grid_sizer, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)
         
@@ -653,7 +682,10 @@ class RDPPlotFrame(wx.Frame):
             top_sizer.Add(item=plot_control_grid_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)
             top_sizer.Add(item=multi_plot_btn, proportion=0, flag=wx.LEFT|wx.RIGHT, border=10)
         
-        top_sizer.Add(item=save_btn, proportion=0, flag=wx.ALIGN_CENTER|wx.TOP|wx.LEFT|wx.RIGHT, border=25) 
+        button_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        button_sizer.Add(item=save_btn, proportion=0, flag=wx.ALIGN_CENTER|wx.TOP|wx.LEFT|wx.RIGHT, border=5)
+        button_sizer.Add(item=write_csv_btn, proportion=0, flag=wx.ALIGN_CENTER|wx.TOP|wx.LEFT|wx.RIGHT, border=5)
+        top_sizer.Add(item=button_sizer, proportion=0, flag=wx.ALIGN_CENTER|wx.TOP|wx.LEFT|wx.RIGHT, border=25) 
         parent.control_plot_frame.main_sizer.Add(item=parent.figure_canvas, proportion=1, flag=wx.EXPAND)
         parent.control_plot_frame.main_sizer.Add(item=top_sizer, proportion=1, flag=wx.EXPAND)
         
@@ -665,6 +697,13 @@ class RDPPlotFrame(wx.Frame):
         parent.control_plot_frame.SetSizerAndFit(parent.control_plot_frame.main_sizer)
         
         return
+    
+    def evt_plot_labelling_cbox(self, event):
+        parent = self.parent
+        widget = event.GetEventObject()
+        parent.plot_label_mode = widget.GetValue()
+        parent._update_plot()
+        parent._update_plot()
         
 #========================================================================================================================
         
@@ -693,12 +732,14 @@ class RDPGUI(wx.Panel):
         self.proj_method = 'average'
         self.style = ' '
         self.mode = ' '
+        self.plot_label_mode = 'Off'
         self.ext = '.csv'
         self.flist = [record_file for record_file in os.listdir(self.dir) if record_file.lower().endswith(self.ext)]
         
         self.flist_sorted = self.frame.rdp_plot._sort_alphnum(self.flist)
                 
         self.data = None
+        self.reduced_data = None
         self.header = None
         self.header_list = []
         self.ndim = []
@@ -736,6 +777,8 @@ class RDPGUI(wx.Panel):
                              'x_2, x_4', 'x_2, x_5', 'x_3, x_4', 'x_3, x_5', 'x_4, x_5']
         self.style_ch = [' ', 'heatmap', 'surface', 'wireframe']
         self.proj_methods = [' ', 'average', 'maximum', 'sum']
+        
+        self.labelling_choices = ['Off', 'Standard', 'LateX']
         
         self.figure_azimuth = None
         self.figure_elevation = None
@@ -1258,8 +1301,38 @@ class RDPGUI(wx.Panel):
             current_frame.plot_btn.Bind(wx.EVT_BUTTON, current_frame.evt_plot)
             
             
-    def evt_plot(self, event):
+    def enforce_labelling_mode(self, plot, labelling_mode):
         
+        if labelling_mode == 'Off':
+            
+            '''
+            plt.tick_params(axis='both',       # changes apply to the x-axis
+                            which='both',      # both major and minor ticks are affected
+                            bottom='off',      # ticks along the bottom edge are off
+                            top='off',         # ticks along the top edge are off
+                            left='off',
+                            right='off',
+                            labelbottom='off')
+            '''
+                
+            plot.axes.set_xticklabels([])
+            plot.axes.set_yticklabels([])
+                        
+            if 'Axes3D' in str(type(plot)):
+                plot.axes.set_zticklabels([])
+        
+        elif self.plot_label_mode == 'Standard':
+            plt.rcdefaults()
+            
+        elif self.plot_label_mode == 'LateX':
+            plt.rc('text', usetex=True)
+            plt.rc('font', family='serif')
+
+        return plot
+            
+            
+    def evt_plot(self, event):
+    
         if self.style != 'heatmap' and self.ndim[self.selection] != 0:    
             self._plot()
         
@@ -1337,8 +1410,20 @@ class RDPGUI(wx.Panel):
             self.style_cbox.SetItems(self.style_ch)
             self.mode_cbox.Enable()
             
-    
-    def evt_save_plot(self, event):
+            
+    def evt_write_csv_btn(self, event):
+                
+        dlg_name = self.dir + '/' + self.flist_sorted[self.selection].strip('.csv') + '-' + str(self.mode) + '-1.csv'
+        dlg = WriteCSVDialog(self, self.dir, dlg_name)
+        
+        if dlg.ShowModal() == wx.ID_CANCEL:
+            return
+        
+        file_path = dlg.GetPath()
+        np.savetxt(fname=file_path, X=self.reduced_data, delimiter=',')
+        
+
+    def evt_save_plot_btn(self, event):
         
         dlg_name = self.dir + '/' + self.flist_sorted[self.selection].strip('.csv') + '-' + str(self.mode) + '-1.svg'
         dlg = SaveDialog(self, self.dir, dlg_name)
@@ -1353,13 +1438,14 @@ class RDPGUI(wx.Panel):
         
     
     def evt_change_plot_parameters(self, event):
-        
-        if 'Axes3DSubplot' in str(type(self.plot)):
+                
+        if 'Axes3D' in str(type(self.plot)):
             self.figure_azimuth = self.figure.gca(projection='3d').azim
             self.figure_elevation = self.figure.gca(projection='3d').elev
-            self.figure_distance = self.figure.gca(projection='3d').dist
             
-                        
+        self._update_plot()
+            
+                                    
     def _play_pause_btn(self, reverse):
                 
         if reverse == False:
@@ -1451,7 +1537,7 @@ class RDPGUI(wx.Panel):
             if self.ndim[self.selection] == 0:
                 plt.cla()
             else:
-                self.figure.clf()
+                wx.CallAfter(self.figure.clf)
         
         wx.CallAfter(self._plot)
         wx.Yield()
@@ -1483,12 +1569,12 @@ class RDPGUI(wx.Panel):
     def _create_figure_canvas(self):
         
         self.figure = plt.figure(str(self.title))
-            
-        self.figure_canvas = FigureCanvas(self.control_plot_frame.control_plot_panel, -1, self.figure)
-        self.figure_canvas_connection_id = self.figure_canvas.mpl_connect('button_release_event', self.evt_change_plot_parameters)
-        #self.figure_canvas.mpl_connect('resize_event', self.evt_resize_canvas)
         
-        
+        if self.figure_canvas == None:
+            self.figure_canvas = FigureCanvas(self.control_plot_frame.control_plot_panel, -1, self.figure)
+            self.figure_canvas_connection_id = self.figure_canvas.mpl_connect('button_release_event', self.evt_change_plot_parameters)
+                
+
     def evt_resize_canvas(self, event):
         self.figure_canvas.draw()
         
@@ -1496,9 +1582,8 @@ class RDPGUI(wx.Panel):
     def _update_selection_data(self):
         '''Reset the control panel and update it with the newly selected data.'''
         
-        # Clear memory
-        if self.data is not None:
-            self.data = None
+        self.data = None    
+        self.reduced_data = None
         
         if len(self.frame_ids) == 1 and self.frame.parent is None:
             if self.ndim[self.selection] == 0:
@@ -1573,6 +1658,7 @@ class RDPGUI(wx.Panel):
             self.frame.rdp_plot.save_plot(plot=self.plot, plot_mode=self.mode, file_name=self.flist_sorted[self.selection], file_directory=self.dir, figure=self.figure, file_path=file_path)
             self._update_plot()
             
+            
         else:         
                        
             if self.mode != 'snapshot sequence':
@@ -1580,9 +1666,8 @@ class RDPGUI(wx.Panel):
                     self.figure = plt.figure(str(self.title))
                                                                        
             if self.mode == 'snapshot' or self.style == 'image':            
-                try:
-                                    
-                    self.plot = self.frame.rdp_plot.plot_snapshot(step = self.step, 
+                try:             
+                    self.plot, self.reduced_data = self.frame.rdp_plot.plot_snapshot(step = self.step, 
                                                                   style = self.style, 
                                                                   data = self.data, 
                                                                   header = self.header, 
@@ -1660,7 +1745,7 @@ class RDPGUI(wx.Panel):
                     wx.CallAfter(dlg.Destroy)
             
             try:
-                self.frame.rdp_plot.label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
+                self.colorbar = self.frame.rdp_plot.label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
             except AttributeError:
                 pass
                             
@@ -1674,7 +1759,13 @@ class RDPGUI(wx.Panel):
             if save is False and self.mode != 'snapshot sequence':
     
                 try:
-                    self.figure_canvas.draw()
+                    self.plot = self.enforce_labelling_mode(plot=self.plot, labelling_mode=self.plot_label_mode)
+                    
+                    try:
+                        self.figure_canvas.draw()
+                    except UnicodeEncodeError:
+                        pass
+                    
                     wx.YieldIfNeeded()
                 except AttributeError:
                     pass
@@ -2017,17 +2108,6 @@ class RDPPlot():
             try:
                 image = self._process_image(data=data, header=header, step=step)                
                 plot = plt.imshow(image, origin='lower', rasterized=True)
-                plt.tick_params(
-                axis='both',       # changes apply to the x-axis
-                which='both',      # both major and minor ticks are affected
-                bottom='off',      # ticks along the bottom edge are off
-                top='off',         # ticks along the top edge are off
-                left='off',
-                right='off',
-                labelbottom='off')
-                
-                plot.axes.set_xticklabels([])
-                plot.axes.set_yticklabels([])
                 
                 return plot
                 
@@ -2115,7 +2195,7 @@ class RDPPlot():
                             plot = self.plot_heatmap(X_1=X_1, X_2=X_2, data=data, vmin=vmin, vmax=vmax, mode=mode, figure=figure)
             
             try:
-                return plot
+                return plot, data
 
             except UnboundLocalError:
                 pass
@@ -2127,7 +2207,7 @@ class RDPPlot():
         plot_mode = 'snapshot sequence'
         
         for i in range(int(steps)):
-            plot = self.plot_snapshot(data = data,
+            plot, reduced_data = self.plot_snapshot(data = data,
                                       header = header, 
                                       vmin = vmin, 
                                       vmax = vmax, 
@@ -2148,7 +2228,7 @@ class RDPPlot():
                 except AttributeError:
                     plot.invert_yaxis()
                     
-            self.label_axis(plot=plot, x_label=x_label, y_label=y_label, z_label=z_label)
+            self.colorbar = self.label_axis(plot=plot, x_label=x_label, y_label=y_label, z_label=z_label)
             
             if save_mode == True:
                 self.save_plot(plot=plot, plot_mode=plot_mode, file_name=file_name, file_directory=file_directory, save_mode='sequence', plot_number=i, figure=figure)
@@ -2250,9 +2330,9 @@ class RDPPlot():
             pass
         
         # Plot is no heatmap
-        if 'matplotlib.image.AxesImage' not in str(type(plot)):
-            plot.set_xlabel(x_label)
-            plot.set_ylabel(y_label)
+        #if 'matplotlib.image.AxesImage' not in str(type(plot)):
+        plot.set_xlabel(x_label)
+        plot.set_ylabel(y_label)
         
         # Plot is in 3D
         if 'Axes3DSubplot' in str(type(plot)):
@@ -2267,7 +2347,7 @@ class RDPPlot():
             except RuntimeError:
                 pass
         
-        return
+        return colorbar
 
 
     def save_plot(self, plot, plot_mode, file_name, file_directory, save_mode='single', plot_number=0, figure=None, file_path=None):
