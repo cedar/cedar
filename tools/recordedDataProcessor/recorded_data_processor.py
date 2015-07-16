@@ -28,7 +28,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 07 15
+    Date:        2015 07 16
 
     Description: 
 
@@ -506,6 +506,7 @@ class RDPPlotFrame(wx.Frame):
         
         plot_labelling_sizer = wx.BoxSizer(wx.HORIZONTAL)
         
+        
         plot_labelling_tooltipstring = ('Choose the style in which the plot is to be labelled.\n'
                                         '=====================================\n'
                                         'Off:\t\tThere will be no labelling at all.\n'
@@ -520,9 +521,29 @@ class RDPPlotFrame(wx.Frame):
         plot_labelling_txt.SetToolTipString(plot_labelling_tooltipstring)
         plot_labelling_cbox.SetToolTipString(plot_labelling_tooltipstring)
         plot_labelling_cbox.Bind(wx.EVT_COMBOBOX, self.evt_plot_labelling_cbox)
+        
         plot_labelling_sizer.Add(item=plot_labelling_txt, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
         plot_labelling_sizer.Add(item=plot_labelling_cbox, proportion=2, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-        axes_label_sizer.Add(item=plot_labelling_sizer, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.RIGHT|wx.BOTTOM, border=10)
+        
+        if 'Axes3D' not in str(type(parent.plot)):
+            axis_ticks_sizer = wx.BoxSizer(wx.HORIZONTAL)
+            axis_ticks_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Axis ticks\t')
+            axis_ticks_cbox = wx.ComboBox(parent.control_plot_frame.control_plot_panel, choices=['On', 'Off'], style=wx.CB_READONLY)
+            
+            if parent.style == 'image':
+                axis_ticks_cbox.SetValue('Off')
+            else:
+                axis_ticks_cbox.SetValue('On')
+                
+            axis_ticks_cbox.Bind(wx.EVT_COMBOBOX, self.evt_axis_ticks_cbox)
+            axis_ticks_sizer.Add(item=axis_ticks_txt, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
+            axis_ticks_sizer.Add(item=axis_ticks_cbox, proportion=2, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
+        
+        axes_label_sizer.Add(item=plot_labelling_sizer, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.RIGHT, border=10)
+        
+        if 'Axes3D' not in str(type(parent.plot)):
+            axes_label_sizer.Add(item=axis_ticks_sizer, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.RIGHT|wx.BOTTOM, border=10) 
+        
         axes_label_sizer.Add(item=label_axes_txt, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.RIGHT|wx.BOTTOM, border=10)
         axes_label_sizer.Add(item=axes_grid_sizer, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)
         
@@ -701,8 +722,21 @@ class RDPPlotFrame(wx.Frame):
     def evt_plot_labelling_cbox(self, event):
         parent = self.parent
         widget = event.GetEventObject()
-        parent.plot_label_mode = widget.GetValue()
+        parent.labelling_mode = widget.GetValue()
         parent._update_plot()
+        parent._update_plot()
+        
+    
+        
+    def evt_axis_ticks_cbox(self, event):
+        parent = self.parent
+        widget = event.GetEventObject()
+                
+        if widget.GetValue() == 'On':
+            parent.axis_ticks = True
+        else:
+            parent.axis_ticks = False
+            
         parent._update_plot()
         
 #========================================================================================================================
@@ -732,7 +766,7 @@ class RDPGUI(wx.Panel):
         self.proj_method = 'average'
         self.style = ' '
         self.mode = ' '
-        self.plot_label_mode = 'Off'
+        self.labelling_mode = 'Off'
         self.ext = '.csv'
         self.flist = [record_file for record_file in os.listdir(self.dir) if record_file.lower().endswith(self.ext)]
         
@@ -762,6 +796,7 @@ class RDPGUI(wx.Panel):
         self.figure_resize = None
         self.colorbar = None
         self.marked_check_box = None
+        self.axis_ticks = True
                 
         # Plot modes
         #self.mode_ch = [' ', 'snapshot', 'snapshot sequence', 'time course']
@@ -1301,33 +1336,33 @@ class RDPGUI(wx.Panel):
             current_frame.plot_btn.Bind(wx.EVT_BUTTON, current_frame.evt_plot)
             
             
-    def enforce_labelling_mode(self, plot, labelling_mode):
+    def enforce_labelling_mode(self, plot, labelling_mode, style):
         
         if labelling_mode == 'Off':
-            
-            '''
-            plt.tick_params(axis='both',       # changes apply to the x-axis
-                            which='both',      # both major and minor ticks are affected
-                            bottom='off',      # ticks along the bottom edge are off
-                            top='off',         # ticks along the top edge are off
-                            left='off',
-                            right='off',
-                            labelbottom='off')
-            '''
-                
-            plot.axes.set_xticklabels([])
-            plot.axes.set_yticklabels([])
+          
+            plt.gca().axes.set_xticklabels([])
+            plt.gca().axes.set_yticklabels([])
                         
-            if 'Axes3D' in str(type(plot)):
-                plot.axes.set_zticklabels([])
+            if 'Axes3D' in str(type(self.plot)):
+                plt.gca().axes.set_zticklabels([])
         
-        elif self.plot_label_mode == 'Standard':
+        elif labelling_mode == 'Standard':
             plt.rcdefaults()
             
-        elif self.plot_label_mode == 'LateX':
+        else:
             plt.rc('text', usetex=True)
             plt.rc('font', family='serif')
-
+        
+        
+        try:
+            if self.axis_ticks == False:
+                plt.gca().tick_params(axis='both', which='both', bottom='off', top='off', left='off', right='off')
+                    
+            else:
+                plt.gca().tick_params(axis='both', which='both', bottom='on', top='on', left='on', right='on')
+        except AttributeError:
+            pass
+        
         return plot
             
             
@@ -1537,9 +1572,9 @@ class RDPGUI(wx.Panel):
             if self.ndim[self.selection] == 0:
                 plt.cla()
             else:
-                wx.CallAfter(self.figure.clf)
+                self.figure.clf()
         
-        wx.CallAfter(self._plot)
+        self._plot()
         wx.Yield()
 
                    
@@ -1621,6 +1656,10 @@ class RDPGUI(wx.Panel):
         
         # Get data and data header
         self.header = self.frame.rdp_plot.get_header(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
+        
+        if 'CV_8U' in self.header or 'CV_8UC3' in self.header:
+            self.axis_ticks = False
+        
         temp_data = self.frame.rdp_plot.get_data(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
         
         # Enable slider and player buttons
@@ -1757,18 +1796,23 @@ class RDPGUI(wx.Panel):
                     self.figure.gca(projection='3d').dist = self.figure_distance
                     
             if save is False and self.mode != 'snapshot sequence':
-    
+                                
+                self.plot = self.enforce_labelling_mode(plot=self.plot, labelling_mode=self.labelling_mode, style=self.style)
+                                        
                 try:
-                    self.plot = self.enforce_labelling_mode(plot=self.plot, labelling_mode=self.plot_label_mode)
                     
                     try:
                         self.figure_canvas.draw()
                     except UnicodeEncodeError:
                         pass
+                    except RuntimeError:
+                        self._update_plot()
+                        self.figure_canvas.draw()
                     
-                    wx.YieldIfNeeded()
                 except AttributeError:
                     pass
+                    
+                wx.YieldIfNeeded()
         
 #========================================================================================================================
 
@@ -2109,7 +2153,7 @@ class RDPPlot():
                 image = self._process_image(data=data, header=header, step=step)                
                 plot = plt.imshow(image, origin='lower', rasterized=True)
                 
-                return plot
+                return plot, data
                 
             except TypeError:
                 dlg = wx.MessageDialog(parent = None, 
@@ -2309,8 +2353,8 @@ class RDPPlot():
         
         try:
             plot = fig.gca()
-            heatmap_data = plt.pcolor(X_1, X_2, data, cmap='RdYlBu_r', vmin=vmin, vmax=vmax, rasterized=True)
-            plot.add_collection(heatmap_data)
+            heatmap_collection = plt.pcolormesh(X_1, X_2, data, cmap='RdYlBu_r', vmin=vmin, vmax=vmax, rasterized=True)
+            plot.add_collection(heatmap_collection)
             
             plot.set_ylim([X_2.min(), X_2.max()])
             plot.set_xlim([X_1.min(), X_1.max()])
@@ -2397,9 +2441,11 @@ class RDPPlot():
                     if file_path_partial is not None:
                         count += 1
                         file_path = file_path_partial + file_name.strip('.csv') + '-' + str(plot_mode) + '-' + str(count) + '.svg'
-        
-        figure.savefig(file_path, dpi=400, bbox_inches='tight', pad_inches=0.0, transparent=True)
-        
+        try:
+            figure.savefig(file_path, dpi=400, bbox_inches='tight', pad_inches=0.2, transparent=True)
+        except RuntimeError:
+            figure.savefig(file_path, dpi=400, bbox_inches='tight', pad_inches=0.2, transparent=True)
+            
 #========================================================================================================================
 
 if __name__ == '__main__':
