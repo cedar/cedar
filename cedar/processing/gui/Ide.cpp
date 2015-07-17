@@ -772,13 +772,13 @@ void cedar::proc::gui::Ide::buildStatusBar()
 
 void cedar::proc::gui::Ide::triggerableStateCountsChanged()
 {
-  if (!this->mGroup)
+  if (!this->mGroup || !this->mGroup->getGroup())
   {
     return;
   }
 
-  unsigned int warnings = this->mGroup->getTriggerablesInWarningStateCount();
-  unsigned int errors = this->mGroup->getTriggerablesInErrorStateCount();
+  unsigned int warnings = this->mGroup->getGroup()->getTriggerablesInWarningStateCount();
+  unsigned int errors = this->mGroup->getGroup()->getTriggerablesInErrorStateCount();
   int icon_size = 16;
   this->mpWarningStateCount->setVisible(warnings != 0);
   this->mpErrorStateCount->setVisible(errors != 0);
@@ -1988,7 +1988,7 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(triggerStarted()), this, SLOT(triggerStarted()));
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(allTriggersStopped()), this, SLOT(allTriggersStopped()));
 
-  QObject::connect(this->mGroup.get(), SIGNAL(triggerableStateCountsChanged()), this, SLOT(triggerableStateCountsChanged()));
+  QObject::connect(this->mGroup->getGroup().get(), SIGNAL(triggerableStateCountsChanged()), this, SLOT(triggerableStateCountsChanged()));
 
   this->mpProcessingDrawer->getScene()->setGroup(group);
   this->mpPropertyTable->clear();

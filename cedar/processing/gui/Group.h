@@ -265,12 +265,6 @@ public:
   //! Defines draggability of groups.
   bool canBeDragged() const;
 
-  //! Returns the number of triggerables in this group that are in a warning state
-  unsigned int getTriggerablesInWarningStateCount() const;
-
-  //! Returns the number of triggerables in this group that are in a warning state
-  unsigned int getTriggerablesInErrorStateCount() const;
-
 public slots:
   /*! sets the recording state of all steps
    * @todo why is this done here? why is this done for all steps if one changes??
@@ -413,19 +407,12 @@ private:
 
   void addElementsToGroup();
 
-  void triggerableStateChanged(cedar::proc::TriggerableWeakPtr triggerable);
-
-  void uncountTriggerableState(cedar::proc::ConstTriggerablePtr triggerable);
-
 signals:
   //!@brief signal that is emitted when a boost signal is received
   void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange);
 
   //! Emitted whenever trigger colors need updating.
   void triggerColorsChanged() const;
-
-  //! Sent when the number of triggerables in warning/error states is changed
-  void triggerableStateCountsChanged();
 
 private slots:
   //!@brief Updates the label of the group.
@@ -516,14 +503,6 @@ private:
   cedar::proc::gui::Connectable::DecorationPtr mpLinkedDecoration;
 
   std::vector<QWeakPointer<QWidget>> mArchitectureWidgetDocks;
-
-  std::map<cedar::proc::ConstTriggerablePtr, boost::shared_ptr<boost::signals2::scoped_connection> > mTriggerableStateChangedConnections;
-
-  std::map<cedar::proc::ConstTriggerablePtr, cedar::proc::Triggerable::State> mPreviousTriggerableStates;
-
-  cedar::aux::LockableMember<unsigned int> mTriggerablesInWarningStates;
-
-  cedar::aux::LockableMember<unsigned int> mTriggerablesInErrorStates;
 
   bool mShowTriggerColors;
 
