@@ -62,6 +62,18 @@
 class cedar::aux::Data : public cedar::aux::annotation::Annotatable
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  enum SerializationMode
+  {
+    //! Serializes the data in a CSV-Compatible way
+    SERIALIZE_CSV,
+    //! Serializes the data so that it takes up less space (e.g., matrices in binary representation)
+    SERIALIZE_COMPACT
+  };
+
+  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -76,17 +88,17 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Returns a string that contains the data in CSV format. Should be overridden for all inheriting classes.
-  //!@todo: It should be possible to specify the output format (e.g., CSV, XML, BINARY) via a second parameter.
-  virtual void serializeData(std::ostream& stream) const;
+  //!@todo: Isn't this specific to MatData? Why is this here? (serializeHeader as well)
+  virtual void serializeData(std::ostream& stream, SerializationMode mode = SERIALIZE_CSV) const;
 
   //!@brief Returns a string that describes the data in CSV format. Should be overridden for all inheriting classes.
-  virtual void serializeHeader(std::ostream& stream) const;
+  virtual void serializeHeader(std::ostream& stream, SerializationMode mode = SERIALIZE_CSV) const;
 
   //! Serializes the data into a format that can later be read by a call to deserialize. Must be implemented in subclasses.
-  virtual void serialize(std::ostream& stream) const;
+  virtual void serialize(std::ostream& stream, SerializationMode mode = SERIALIZE_CSV) const;
 
   //! Reads data that has been written using the serialize method. Must be implemented in subclasses.
-  virtual void deserialize(std::istream& stream);
+  virtual void deserialize(std::istream& stream, SerializationMode mode = SERIALIZE_CSV);
 
   //!@brief Returns the lock associated with this data object.
   QReadWriteLock& getLock();

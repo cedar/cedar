@@ -117,6 +117,8 @@ cedar::proc::gui::Connectable(width, height, cedar::proc::gui::GraphicsBase::GRA
 mGroup(group),
 mpScene(scene),
 mHoldFitToContents(false),
+mTriggerablesInWarningStates(0),
+mTriggerablesInErrorStates(0),
 mShowTriggerColors(false),
 _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false)),
 mPlotGroupsNode(cedar::aux::ConfigurationNode()),
@@ -223,6 +225,99 @@ cedar::proc::gui::Group::~Group()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Group::uncountTriggerableState(cedar::proc::ConstTriggerablePtr triggerable)
+{
+  // if the triggerable's state was previously known, remove it from the count
+  auto iter = this->mPreviousTriggerableStates.find(triggerable);
+  if (iter != this->mPreviousTriggerableStates.end())
+  {
+    auto prev_state = iter->second;
+    this->mPreviousTriggerableStates.erase(iter);
+
+    switch (prev_state)
+    {
+      case cedar::proc::Triggerable::STATE_EXCEPTION:
+      case cedar::proc::Triggerable::STATE_EXCEPTION_ON_START:
+      case cedar::proc::Triggerable::STATE_NOT_RUNNING:
+      {
+        QWriteLocker l(this->mTriggerablesInErrorStates.getLockPtr());
+        this->mTriggerablesInErrorStates.member() -= 1;
+        break;
+      }
+
+      case cedar::proc::Triggerable::STATE_INITIALIZING:
+      {
+        QWriteLocker l(this->mTriggerablesInWarningStates.getLockPtr());
+        this->mTriggerablesInWarningStates.member() -= 1;
+        break;
+      }
+
+      default:
+        // other states are not counted
+        CEDAR_DEBUG_NON_CRITICAL_ASSERT(false);
+        return;
+    }
+  }
+}
+
+void cedar::proc::gui::Group::triggerableStateChanged(cedar::proc::TriggerableWeakPtr weakTriggerable)
+{
+  auto triggerable = weakTriggerable.lock();
+  CEDAR_DEBUG_NON_CRITICAL_ASSERT(triggerable);
+  if (!triggerable)
+  {
+    return;
+  }
+  auto state = triggerable->getState();
+
+  // if the triggerable was previously known, remove it from the count
+  this->uncountTriggerableState(triggerable);
+
+  // add the triggerable to the counts based on its current state
+  switch (state)
+  {
+    case cedar::proc::Triggerable::STATE_EXCEPTION:
+    case cedar::proc::Triggerable::STATE_EXCEPTION_ON_START:
+    case cedar::proc::Triggerable::STATE_INITIALIZING:
+    case cedar::proc::Triggerable::STATE_NOT_RUNNING:
+      if (state == cedar::proc::Triggerable::STATE_INITIALIZING)
+      {
+        QWriteLocker l(this->mTriggerablesInWarningStates.getLockPtr());
+        this->mTriggerablesInWarningStates.member() += 1;
+      }
+      else
+      {
+        QWriteLocker l(this->mTriggerablesInErrorStates.getLockPtr());
+        this->mTriggerablesInErrorStates.member() += 1;
+      }
+      this->mPreviousTriggerableStates[triggerable] = state;
+      break;
+
+    case cedar::proc::Triggerable::STATE_RUNNING:
+    case cedar::proc::Triggerable::STATE_UNKNOWN:
+        // these states are not communicated to the user -- do nothing
+        break;
+  }
+
+  emit triggerableStateCountsChanged();
+}
+
+unsigned int cedar::proc::gui::Group::getTriggerablesInWarningStateCount() const
+{
+  QReadLocker l(this->mTriggerablesInWarningStates.getLockPtr());
+  unsigned int copy = this->mTriggerablesInWarningStates.member();
+  l.unlock();
+  return copy;
+}
+
+unsigned int cedar::proc::gui::Group::getTriggerablesInErrorStateCount() const
+{
+  QReadLocker l(this->mTriggerablesInErrorStates.getLockPtr());
+  unsigned int copy = this->mTriggerablesInErrorStates.member();
+  l.unlock();
+  return copy;
+}
 
 bool cedar::proc::gui::Group::canBeDragged() const
 {
@@ -1742,6 +1837,18 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
     {
       connectable->updateTriggerColorState();
     }
+
+    this->mTriggerableStateChangedConnections[triggerable] =
+      boost::shared_ptr<boost::signals2::scoped_connection>
+      (
+        new boost::signals2::scoped_connection
+        (
+          triggerable->connectToStateChanged
+          (
+            boost::bind(&cedar::proc::gui::Group::triggerableStateChanged, this, triggerable)
+          )
+        )
+      );
   }
 }
 
@@ -1879,6 +1986,17 @@ void cedar::proc::gui::Group::removeConnectorItem(bool isSource, const std::stri
 
 void cedar::proc::gui::Group::processElementRemovedSignal(cedar::proc::ConstElementPtr element)
 {
+  if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::ConstTriggerable>(element))
+  {
+    this->uncountTriggerableState(triggerable);
+    auto iter = this->mTriggerableStateChangedConnections.find(triggerable);
+    if (iter != this->mTriggerableStateChangedConnections.end())
+    {
+      this->mTriggerableStateChangedConnections.erase(iter);
+    }
+    emit triggerableStateCountsChanged();
+  }
+
   if (boost::dynamic_pointer_cast<cedar::proc::ConstTrigger>(element))
   {
     this->clearTriggerColorCache();

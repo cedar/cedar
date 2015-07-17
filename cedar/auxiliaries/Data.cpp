@@ -65,24 +65,24 @@ cedar::aux::Data::~Data()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::Data::serialize(std::ostream& /* stream */) const
+void cedar::aux::Data::serialize(std::ostream& /* stream */, SerializationMode /* mode */) const
 {
   CEDAR_THROW(cedar::aux::NotImplementedException, "serialize function is not implemented for this type of data");
 }
 
-void cedar::aux::Data::deserialize(std::istream& /* stream */)
+void cedar::aux::Data::deserialize(std::istream& /* stream */, SerializationMode /* mode */)
 {
   CEDAR_THROW(cedar::aux::NotImplementedException, "deserialize function is not implemented for this type of data");
 }
 
-void cedar::aux::Data::serializeData(std::ostream& /*stream*/) const
+void cedar::aux::Data::serializeData(std::ostream& /*stream*/, SerializationMode /* mode */) const
 {
-  CEDAR_THROW(cedar::aux::NotImplementedException,"serializeData function not implemented for this type of data");
+  CEDAR_THROW(cedar::aux::NotImplementedException, "serializeData function not implemented for this type of data");
 }
 
-void cedar::aux::Data::serializeHeader(std::ostream& /*stream*/) const
+void cedar::aux::Data::serializeHeader(std::ostream& /*stream*/, SerializationMode /* mode */) const
 {
-  CEDAR_THROW(cedar::aux::NotImplementedException,"serializeHeader function not implemented for this type of data");
+  CEDAR_THROW(cedar::aux::NotImplementedException, "serializeHeader function not implemented for this type of data");
 }
 
 QReadWriteLock& cedar::aux::Data::getLock()

@@ -125,16 +125,25 @@ public:
   // the content has to be placed into the reference given by content()
   bool read(yarp::os::ConnectionReader& connection) 
   {
-    int header_size, data_size;
+    int fixed_header_size, variable_header_size, data_size;
 
-    header_size= sizeof(mNetType.mHeader);
+    fixed_header_size= mNetType.mHeader.getFixedSerializationSize();
 
     connection.convertTextMode(); // if connection is text-mode, convert!
 
     ////////////////////////
-    // read out the header ...
-    connection.expectBlock( (char*)(&mNetType.mHeader),
-                            header_size );
+    // read out the fixed part of the header ...
+    std::vector<char> fixed_part;
+    fixed_part.resize(fixed_header_size);
+    connection.expectBlock( &fixed_part.front(), fixed_header_size);
+    mNetType.mHeader.deserializeFixed(&fixed_part.front());
+
+    // read out the variable part of the header ...
+    variable_header_size = mNetType.mHeader.getVariableSerializationSize();
+    std::vector<char> variable_part;
+    variable_part.resize(variable_header_size);
+    connection.expectBlock( &variable_part.front(), variable_header_size);
+    mNetType.mHeader.deserializeVariable(&variable_part.front());
 
     data_size= mNetType.getDataSize();
 
@@ -182,26 +191,33 @@ public:
   // CollatedNetWriter::write()
   bool write(yarp::os::ConnectionWriter& connection) 
   {
-    int header_size, data_size, blocks_array[2];
+    int fixed_header_size, variable_header_size, data_size, blocks_array[3];
 
-    header_size= sizeof(mNetType.mHeader);
+    fixed_header_size = mNetType.mHeader.getFixedSerializationSize();
+    variable_header_size = mNetType.mHeader.getVariableSerializationSize();
     data_size= mNetType.getDataSize();
  
-    blocks_array[0]= header_size;
-    blocks_array[1]= data_size;
+    blocks_array[0]= fixed_header_size;
+    blocks_array[1]= variable_header_size;
+    blocks_array[2]= data_size;
 
-    connection.declareSizes( 2, blocks_array );
+    connection.declareSizes( 3, blocks_array );
       // yarp: This may improve efficiency in some situations.
 
     //////////////////////////////////////
+    //!@todo Make this a member so it only has to be (de)allocated once
+    std::vector<char> bytes_fixed, bytes_variable;
+    bytes_fixed.resize(fixed_header_size);
+    bytes_variable.resize(variable_header_size);
+    mNetType.mHeader.serializeFixed(&bytes_fixed.front());
+    mNetType.mHeader.serializeVariable(&bytes_variable.front());
     // write the generated matrix header to network ...
-    connection.appendBlock( (char*)(&mNetType.mHeader),
-                            sizeof(mNetType.mHeader) );
-      // note: YARP will copy this block - TODO: is that necessary?
+    connection.appendBlock(&bytes_fixed.front(), fixed_header_size);
+    connection.appendBlock(&bytes_variable.front(), variable_header_size);
 
     //////////////////////////////////////
     // write matrix content to network ...
-    if (mpVals == NULL)
+    if (mpVals == nullptr)
     {
       mpVals= static_cast<char*>(malloc(data_size));
     }
@@ -212,6 +228,7 @@ public:
       // YARP will copy this block internally TODO: ist that necessary?
  
     connection.convertTextMode(); // if connection is text-mode, convert!
+
     return true;
   }
 
