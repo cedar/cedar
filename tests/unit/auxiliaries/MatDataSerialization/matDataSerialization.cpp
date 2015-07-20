@@ -107,14 +107,10 @@ template <typename T>
 int test_matrix(cv::Mat matrix)
 {
   int errors = 0;
-  std::map<cedar::aux::MatData::SerializationMode, std::string> mode_str;
-  mode_str[cedar::aux::Data::SERIALIZE_CSV] = "cedar::aux::Data::SERIALIZE_CSV";
-  mode_str[cedar::aux::Data::SERIALIZE_COMPACT] = "cedar::aux::Data::SERIALIZE_COMPACT";
 
-  for (const auto& mode_str_pair : mode_str)
+  for (const auto& mode : cedar::aux::SerializationFormat::type().list())
   {
-    auto mode = mode_str_pair.first;
-    const auto& mode_str = mode_str_pair.second;
+    const auto& mode_str = mode.prettyString();
     std::cout << "Testing mode " << mode_str << std::endl;
 
     std::stringstream stream;

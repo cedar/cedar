@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 #include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/SerializationFormat.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Settings.fwd.h"
@@ -201,6 +202,14 @@ public:
   //! Returns the global time factor.
   double getGlobalTimeFactor() const;
 
+  //! Returns the currently chosen serialization format.
+  cedar::aux::SerializationFormat::Id getSerializationFormat() const;
+
+  //! Sets the serialization format.
+  void setSerializationFormat(cedar::aux::SerializationFormat::Id);
+
+  cedar::aux::EnumParameterPtr getRecorderSerializationFormatParameter() const;
+
 public:
   CEDAR_DECLARE_SIGNAL(GlobalTimeFactorChanged, void(double));
 
@@ -261,6 +270,9 @@ protected:
 
   //! Planning strategy of FFTW.
   cedar::aux::EnumParameterPtr _mFFTWPlanningStrategy;
+
+  //! Format of data written out by the recorder
+  cedar::aux::EnumParameterPtr _mRecorderSerializationFormat;
 
 private:
   // none yet
