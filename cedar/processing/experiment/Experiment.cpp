@@ -178,8 +178,6 @@ void cedar::proc::experiment::Experiment::setTrialCount(unsigned int repetitions
 
 void cedar::proc::experiment::Experiment::preExperiment()
 {
-  this->installLog();
-
   for (size_t i = 0; i < this->_mActionSequences->size(); ++i)
   {
     this->_mActionSequences->at(i)->preExperiment();
@@ -188,8 +186,6 @@ void cedar::proc::experiment::Experiment::preExperiment()
 
 void cedar::proc::experiment::Experiment::postExperiment()
 {
-  this->removeLog();
-
   for (size_t i = 0; i < this->_mActionSequences->size(); ++i)
   {
     this->_mActionSequences->at(i)->postExperiment();
@@ -218,6 +214,7 @@ void cedar::proc::experiment::Experiment::removeLog()
 
 void cedar::proc::experiment::Experiment::startExperiment()
 {
+  this->installLog();
   if (this->_mTrials->getValue() > 0)
   {
     this->preExperiment();
@@ -244,6 +241,7 @@ void cedar::proc::experiment::Experiment::stopExperiment()
 
   std::string time_stamp = cedar::aux::RecorderSingleton::getInstance()->getTimeStamp();
   cedar::aux::LogSingleton::getInstance()->message("Experiment stopped. Timestamp: " + time_stamp, "Experiment");
+  this->removeLog();
 }
 
 void cedar::proc::experiment::Experiment::startTrial()
