@@ -106,15 +106,16 @@ std::string cedar::aux::MatData::getDescription() const
   return description;
 }
 
-void cedar::aux::MatData::serialize(std::ostream& stream, SerializationMode mode) const
+void cedar::aux::MatData::serialize(std::ostream& stream, cedar::aux::SerializationFormat::Id mode) const
 {
   this->serializeHeader(stream, mode);
   stream << std::endl;
   this->serializeData(stream, mode);
 }
 
-void cedar::aux::MatData::deserialize(std::istream& stream, SerializationMode mode)
+void cedar::aux::MatData::deserialize(std::istream& stream, cedar::aux::SerializationFormat::Id mode)
 {
+  //!@todo The serialization mode should be deduced from the header, no need to pass it here.
   // read header
   std::string header;
   std::getline(stream, header);
@@ -135,7 +136,13 @@ void cedar::aux::MatData::deserialize(std::istream& stream, SerializationMode mo
   std::vector<int> sizes;
 
   // read the matrix size
-  for (size_t i = 2; i < header_entries.size(); ++i)
+  size_t offset = 0;
+  if (header_entries.back() == "compact")
+  {
+    offset = 1;
+    CEDAR_NON_CRITICAL_ASSERT(mode == cedar::aux::SerializationFormat::Compact);
+  }
+  for (size_t i = 2; i < header_entries.size() - offset; ++i)
   {
     sizes.push_back(cedar::aux::fromString<int>(header_entries.at(i)));
   }
@@ -145,7 +152,7 @@ void cedar::aux::MatData::deserialize(std::istream& stream, SerializationMode mo
   // read data
   switch (mode)
   {
-    case SERIALIZE_CSV:
+    case cedar::aux::SerializationFormat::CSV:
     {
       std::vector<std::string> data_entries;
       cedar::aux::split(data, ",", data_entries);
@@ -178,7 +185,7 @@ void cedar::aux::MatData::deserialize(std::istream& stream, SerializationMode mo
       break;
     } // case SERIALIZE_CSV
 
-    case SERIALIZE_COMPACT:
+    case cedar::aux::SerializationFormat::Compact:
     {
       CEDAR_DEBUG_ASSERT(mat.isContinuous());
       // the input stream should contain at least as many characters as are necessary to fill the matrix
@@ -199,14 +206,14 @@ void cedar::aux::MatData::deserialize(std::istream& stream, SerializationMode mo
   this->setData(mat);
 }
 
-void cedar::aux::MatData::serializeData(std::ostream& stream, SerializationMode mode) const
+void cedar::aux::MatData::serializeData(std::ostream& stream, cedar::aux::SerializationFormat::Id mode) const
 {
   QReadLocker locker(this->mpLock);
   //creating index that addresses an element in the n dimensional Mat
 
   switch (mode)
   {
-    case SerializationMode::SERIALIZE_CSV:
+    case cedar::aux::SerializationFormat::CSV:
     {
       std::vector<int> index(mData.dims, 0);
 
@@ -293,7 +300,7 @@ void cedar::aux::MatData::serializeData(std::ostream& stream, SerializationMode 
       break;
     } // case SerializationMode::SERIALIZE_CSV
 
-    case SerializationMode::SERIALIZE_COMPACT:
+    case cedar::aux::SerializationFormat::Compact:
     {
       // we can only handle matrices that are continuous, i.e., those, that are written linearly in memory
       CEDAR_ASSERT(this->mData.isContinuous());
@@ -310,7 +317,7 @@ void cedar::aux::MatData::serializeData(std::ostream& stream, SerializationMode 
 
 }
 
-void cedar::aux::MatData::serializeHeader(std::ostream& stream, SerializationMode /* mode */) const
+void cedar::aux::MatData::serializeHeader(std::ostream& stream, cedar::aux::SerializationFormat::Id mode) const
 {
   //!@todo When any non-default serialization mode is used, this should probably be indicated in the header. Replace Mat by, e.g., CompactMat?
   QReadLocker locker(this->mpLock);
@@ -323,6 +330,11 @@ void cedar::aux::MatData::serializeHeader(std::ostream& stream, SerializationMod
       stream << ",";
     }
     stream << mData.size[i];
+  }
+
+  if (mode == cedar::aux::SerializationFormat::Compact)
+  {
+    stream << ",compact";
   }
 }
 

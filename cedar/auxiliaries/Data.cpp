@@ -65,22 +65,22 @@ cedar::aux::Data::~Data()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::Data::serialize(std::ostream& /* stream */, SerializationMode /* mode */) const
+void cedar::aux::Data::serialize(std::ostream& /* stream */, cedar::aux::SerializationFormat::Id /* mode */) const
 {
   CEDAR_THROW(cedar::aux::NotImplementedException, "serialize function is not implemented for this type of data");
 }
 
-void cedar::aux::Data::deserialize(std::istream& /* stream */, SerializationMode /* mode */)
+void cedar::aux::Data::deserialize(std::istream& /* stream */, cedar::aux::SerializationFormat::Id /* mode */)
 {
   CEDAR_THROW(cedar::aux::NotImplementedException, "deserialize function is not implemented for this type of data");
 }
 
-void cedar::aux::Data::serializeData(std::ostream& /*stream*/, SerializationMode /* mode */) const
+void cedar::aux::Data::serializeData(std::ostream& /*stream*/, cedar::aux::SerializationFormat::Id /* mode */) const
 {
   CEDAR_THROW(cedar::aux::NotImplementedException, "serializeData function not implemented for this type of data");
 }
 
-void cedar::aux::Data::serializeHeader(std::ostream& /*stream*/, SerializationMode /* mode */) const
+void cedar::aux::Data::serializeHeader(std::ostream& /*stream*/, cedar::aux::SerializationFormat::Id /* mode */) const
 {
   CEDAR_THROW(cedar::aux::NotImplementedException, "serializeHeader function not implemented for this type of data");
 }

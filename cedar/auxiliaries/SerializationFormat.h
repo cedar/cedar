@@ -22,117 +22,65 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatData.h
+    File:        SerializationFormat.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 12 09
+    Date:        2015 07 20
 
-    Description: This is a dummy header for the typedef MatData (which is actually a cedar::aux::DataTemplate<cv::Mat>).
+    Description: Header file for the class cedar::aux::SerializationFormat.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MAT_DATA_H
-#define CEDAR_AUX_MAT_DATA_H
+#ifndef CEDAR_AUX_SERIALIZATION_FORMAT_H
+#define CEDAR_AUX_SERIALIZATION_FORMAT_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/DataTemplate.h"
-#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/EnumType.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/SerializationFormat.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QReadWriteLock>
-#include <string>
 
-/*!@brief Data containing matrices.
+
+/*!@brief Enum class for the serialization format of cedar::aux::Data.
  */
-class cedar::aux::MatData : public cedar::aux::DataTemplate<cv::Mat>
+class cedar::aux::SerializationFormat
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  typedef cedar::aux::DataTemplate<cv::Mat> Super;
+public:
+  //! Type of the enum.
+  typedef cedar::aux::EnumId Id;
+public:
+  //! Pointer to the enumeration type.
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  MatData()
-  {
-  }
-
-  //!@brief This constructor initializes the internal data to a value.
-  MatData(const cv::Mat& value)
-  :
-  cedar::aux::DataTemplate<cv::Mat>(value)
-  {
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Returns a string that contains the matrix body in CSV format.
-  void serializeData(std::ostream& stream, cedar::aux::SerializationFormat::Id mode) const;
-  
-  //!@brief Returns a string that describes the matrix header in CSV format.
-  void serializeHeader(std::ostream& stream, cedar::aux::SerializationFormat::Id mode) const;
+  //! Constructs the enumeration values.
+  static void construct();
 
-  void serialize(std::ostream& stream, cedar::aux::SerializationFormat::Id mode) const;
+  //! Returns the enum base class.
+  static const cedar::aux::EnumBase& type();
 
-  void deserialize(std::istream& stream, cedar::aux::SerializationFormat::Id mode);
-  
-  //!@brief creates a deep copy of this data
-  cedar::aux::DataPtr clone() const;
-
-  std::string getDescription() const;
-
-  /*!@brief Returns the dimensionality of the matrix stored in this data.
-   *
-   * @remarks Calls cedar::aux::math::getDimensionalityOf(this->getData()) to determine the dimensionality.
-   */
-  unsigned int getDimensionality() const;
-
-  //! Convenience method that returns the opencv-type of the stored matrix.
-  inline int getCvType() const
-  {
-    return this->getData().type();
-  }
-
-  void copyValueFrom(cedar::aux::ConstDataPtr data)
-  {
-    if (ConstMatDataPtr mat_data_ptr = boost::dynamic_pointer_cast<ConstMatData>(data))
-    {
-      this->setData(mat_data_ptr->getData().clone());
-    }
-    else
-    {
-      CEDAR_THROW(cedar::aux::TypeMismatchException, "Cannot cast given data to matrix data.");
-    }
-  }
-
-  //! Checks if the matrix is empty.
-  bool isEmpty() const
-  {
-    return this->getData().empty();
-  }
-
-  //! Returns the value of the contained (two-dimensional) matrix at the given location
-  template <typename ReturnT>
-  ReturnT getValue(int row, int col) const
-  {
-    return cedar::aux::math::getMatrixEntry<ReturnT>(this->getData(), row, col);
-  }
+  //! Returns a pointer to the enum base class.
+  static const cedar::aux::SerializationFormat::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -149,12 +97,28 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! Write data as CSV.
+  static const Id CSV = 0;
+
+  //! Write data in a compact (binary) format.
+  static const Id Compact = 1;
+
+protected:
+  // none yet
+private:
+  static cedar::aux::EnumType<cedar::aux::SerializationFormat> mType;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::aux::MatData
+}; // class cedar::aux::SerializationFormat
 
-#endif // CEDAR_AUX_MAT_DATA_H
+#endif // CEDAR_AUX_SERIALIZATION_FORMAT_H
+
