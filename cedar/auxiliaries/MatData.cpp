@@ -120,9 +120,6 @@ void cedar::aux::MatData::deserialize(std::istream& stream, cedar::aux::Serializ
   std::string header;
   std::getline(stream, header);
 
-  std::string data;
-  std::getline(stream, data);
-
   std::vector<std::string> header_entries;
   cedar::aux::split(header, ",", header_entries);
 
@@ -154,6 +151,9 @@ void cedar::aux::MatData::deserialize(std::istream& stream, cedar::aux::Serializ
   {
     case cedar::aux::SerializationFormat::CSV:
     {
+      std::string data;
+      std::getline(stream, data);
+
       std::vector<std::string> data_entries;
       cedar::aux::split(data, ",", data_entries);
 
@@ -187,17 +187,18 @@ void cedar::aux::MatData::deserialize(std::istream& stream, cedar::aux::Serializ
 
     case cedar::aux::SerializationFormat::Compact:
     {
+      // matrix should be a linear array in memory, without gaps
       CEDAR_DEBUG_ASSERT(mat.isContinuous());
-      // the input stream should contain at least as many characters as are necessary to fill the matrix
-      CEDAR_ASSERT(data.size() >= mat.total() * mat.elemSize());
-      // if the input stream contains more characters, reading will work but might be wrong; warn the user
-      CEDAR_NON_CRITICAL_ASSERT(data.size() == mat.total() * mat.elemSize());
 
-      // read the data
-      for (size_t i = 0; i < mat.total() * mat.elemSize(); ++i)
-      {
-        mat.data[i] = data.at(i);
-      }
+      // make sure the fail bit wasn't false before the operations
+      CEDAR_ASSERT(!stream.fail());
+
+      // initialize string with the appropriate size
+      stream.read(reinterpret_cast<char*>(mat.data), static_cast<size_t>(mat.total() * mat.elemSize()));
+
+      // make sure the fail bit wasn't set by the preceding operations
+      CEDAR_ASSERT(!stream.fail());
+
       break;
     } // case SERIALIZE_COMPACT
   }
