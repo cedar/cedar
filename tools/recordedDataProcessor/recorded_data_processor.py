@@ -29,7 +29,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 08 04
+    Date:        2015 08 05
 
     Description: 
 
@@ -603,10 +603,16 @@ class RDPPlotFrame(wx.Frame):
             axis_ticks_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Axis ticks\t')
             axis_ticks_cbox = wx.ComboBox(parent.control_plot_frame.control_plot_panel, choices=['On', 'Off'], style=wx.CB_READONLY)
             
-            if parent.style == 'image':
-                axis_ticks_cbox.SetValue('Off')
+            if parent.axis_ticks is not None:
+                if parent.axis_ticks is False:
+                    axis_ticks_cbox.SetValue('Off')
+                else:
+                    axis_ticks_cbox.SetValue('On')
             else:
-                axis_ticks_cbox.SetValue('On')
+                if parent.style == 'image':
+                    axis_ticks_cbox.SetValue('Off')
+                else:
+                    axis_ticks_cbox.SetValue('On')
                 
             axis_ticks_cbox.Bind(wx.EVT_COMBOBOX, self.evt_axis_ticks_cbox)
             axis_ticks_sizer.Add(item=axis_ticks_txt, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
@@ -929,7 +935,7 @@ class RDPGUI(wx.Panel):
         self.labelling_mode = 'Off'
         self.flist = [record_file for record_file in os.listdir(self.dir) if record_file.lower().endswith('.csv') or record_file.lower().endswith('.data')]
         
-        self.flist_sorted = self.frame.rdp_plot.sort_alphnum(self.flist)
+        self.flist_sorted = np.asarray(self.frame.rdp_plot.sort_alphnum(self.flist))
         
         self.data = None
         self.reduced_data = None
@@ -954,7 +960,7 @@ class RDPGUI(wx.Panel):
         self.title = ''
         self.figure_resize = None
         self.colorbar = None
-        self.axis_ticks = True
+        self.axis_ticks = None
         self.sel_cbox_selection = ''
                 
         # Plot modes
@@ -1052,6 +1058,7 @@ class RDPGUI(wx.Panel):
         # Buttons
         #========================================================================================================================
         self.plot_btn = wx.Button(self, label = 'Plot')
+        self.load_config_btn = wx.Button(self, label = 'Load configuration')
         
         if self.frame.parent is None:
             self.switch_btn = wx.Button(self, label = 'Switch directory')
@@ -1125,6 +1132,7 @@ class RDPGUI(wx.Panel):
         # Buttons
         #========================================================================================================================
         self.plot_sizer.Add(item=self.plot_btn, proportion=0, flag=wx.ALIGN_LEFT|wx.EXPAND)
+        self.plot_sizer.Add(item=self.load_config_btn, proportion=0, flag=wx.ALIGN_LEFT|wx.EXPAND)
         self.btn_sizer.Add(item=self.plot_sizer, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
         #========================================================================================================================
         
@@ -1154,6 +1162,7 @@ class RDPGUI(wx.Panel):
         self.proj_cbox.Bind(wx.EVT_COMBOBOX, self.evt_proj_cbox)
         self.proj_method_cbox.Bind(wx.EVT_COMBOBOX, self.evt_proj_method_cbox)
         self.style_cbox.Bind(wx.EVT_COMBOBOX, self.evt_style_cbox)
+        self.load_config_btn.Bind(wx.EVT_BUTTON, self.evt_load_config_btn)
         
         if self.frame.parent is None:
             
@@ -1187,51 +1196,13 @@ class RDPGUI(wx.Panel):
     def prepare_plot_configuration(self, directory, x_label, y_label, z_label, marked, step, slider_max, resolution, vmax, vmin, proj, 
                                    proj_method, style, mode, labelling_mode, data, reduced_data, header, ndim, time_stamps, selection, sel_cbox_selection,
                                    proj_choice_time_course, proj_choice_snapshot, line_color, aux_line_color, marker_color, aux_marker_color, title, 
-                                   axis_ticks, figure_azimuth, figure_elevation, figure_distance, surface_linewidth):
+                                   axis_ticks, figure_azimuth, figure_elevation, figure_distance, surface_linewidth, flist_sorted, mode_ch, proj_ch):
                               
         save_object = [directory, x_label, y_label, z_label, marked, step, slider_max, resolution, vmax, vmin, proj, 
                        proj_method, style, mode, labelling_mode, data, reduced_data, header, ndim, time_stamps, selection, sel_cbox_selection,
                        proj_choice_time_course, proj_choice_snapshot, line_color, aux_line_color, marker_color, aux_marker_color, title, 
-                       axis_ticks, figure_azimuth, figure_elevation, figure_distance, surface_linewidth]
-        
-        '''
-        print type(directory)
-        print type(x_label)
-        print type(y_label)
-        print type(z_label)
-        print type(marked)
-        print type(step)
-        print type(slider_max)
-        print type(resolution)
-        print type(vmax)
-        print type(vmin)
-        print type(proj)
-        print type(proj_method)
-        print type(style)
-        print type(mode)
-        print type(labelling_mode)
-        print type(data)
-        print type(reduced_data)
-        print type(header)
-        print type(ndim)
-        print type(time_stamps)
-        print type(selection)
-        print type(sel_cbox_selection)
-        print type(proj_choice_time_course)
-        print type(proj_choice_snapshot)
-        print type(line_color)
-        print type(aux_line_color)
-        print type(marker_color)
-        print type(aux_line_color)
-        print type(title)
-        print type(colorbar)
-        print type(axis_ticks)
-        print type(figure_azimuth)
-        print type(figure_elevation)
-        print type(figure_distance)
-        print type(surface_linewidth)
-        '''
-        
+                       axis_ticks, figure_azimuth, figure_elevation, figure_distance, surface_linewidth, flist_sorted, mode_ch, proj_ch]
+                
         return save_object
     
     
@@ -1295,26 +1266,33 @@ class RDPGUI(wx.Panel):
         self.figure_azimuth = loaded_object[30]  
         self.figure_elevation = loaded_object[31]  
         self.figure_distance = loaded_object[32]  
-        self.surface_linewidth = loaded_object[33]     
+        self.surface_linewidth = loaded_object[33]  
+        self.flist_sorted = loaded_object[34] 
+        self.mode_ch = loaded_object[35]
+        self.proj_ch = loaded_object[36]
            
         self.plot_btn.Bind(wx.EVT_BUTTON, self.evt_plot)
-        self.sel_cbox.SetItems([self.sel_cbox_selection])
+        self.sel_cbox.SetItems(self.flist_sorted)
         self.sel_cbox.SetValue(self.sel_cbox_selection)
-        self.pos_slider.SetMax(self.slider_max)
-        self.pos_slider.SetValue(self.step)
-        self.proj_cbox.SetItems([self.proj])
+        
+        try:
+            self.pos_slider.SetMax(self.slider_max)
+            self.pos_slider.SetValue(self.step)
+            self.time_stamp_display.SetLabel(str(self.time_stamps[self.step]))
+        except AttributeError:
+            pass
+        
+        self.proj_cbox.SetItems(self.proj_ch)
         self.proj_cbox.SetValue(self.proj)
         self.proj_method_cbox.SetValue(self.proj_method)
-        self.mode_cbox.SetItems([self.mode])
+        self.mode_cbox.SetItems(self.mode_ch)
         self.mode_cbox.SetValue(self.mode)
         self.style_cbox.SetValue(self.style)
-        self.time_stamp_display.SetLabel(str(self.time_stamps[self.step]))
         
         self.mode_cbox.Enable()
         self.style_cbox.Enable()
         self.proj_cbox.Enable()
         self.proj_method_cbox.Enable()
-        self.Update()
         
             
     def evt_save_config_btn(self, event):
@@ -1357,8 +1335,11 @@ class RDPGUI(wx.Panel):
                                                       figure_azimuth=self.figure_azimuth, 
                                                       figure_elevation=self.figure_elevation, 
                                                       figure_distance=self.figure_distance, 
-                                                      surface_linewidth=self.surface_linewidth)
-        
+                                                      surface_linewidth=self.surface_linewidth,
+                                                      flist_sorted=self.flist_sorted,
+                                                      mode_ch = self.mode_cbox.GetItems(),
+                                                      proj_ch=self.proj_cbox.GetItems())
+                
         file_path = dlg.GetPath()
 
         pickle.dump(save_object, open(file_path, 'wb'), 0)
@@ -1690,7 +1671,7 @@ class RDPGUI(wx.Panel):
     def enforce_labelling_mode(self, plot, labelling_mode, style):
         
         if labelling_mode == 'Off':
-          
+            plt.rcdefaults()
             plt.gca().axes.set_xticklabels([])
             plt.gca().axes.set_yticklabels([])
                         
@@ -1699,11 +1680,12 @@ class RDPGUI(wx.Panel):
         
         elif labelling_mode == 'Standard':
             plt.rcdefaults()
-            
+        
         else:
             plt.rc('text', usetex=True)
+            mpl.rcParams['text.latex.unicode']=True
             plt.rc('font', family='serif')
-        
+            
         try:
             if self.axis_ticks == False:
                 plt.gca().tick_params(axis='both', which='both', bottom='off', top='off', left='off', right='off')
@@ -1720,12 +1702,14 @@ class RDPGUI(wx.Panel):
         
         if self.style != 'heatmap' and self.ndim[self.selection] != 0:    
             self._plot()
+
             
         if self.mode != 'snapshot sequence':
             if self.control_plot_frame is None:
                 RDPPlotFrame(parent=self)                
                 self.control_plot_frame.Show()
-              
+        
+        self._update_plot()
         self._update_plot()
         
                 
