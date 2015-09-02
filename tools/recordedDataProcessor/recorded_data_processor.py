@@ -29,7 +29,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 08 05
+    Date:        2015 09 02
 
     Description: 
 
@@ -52,7 +52,7 @@ try:
     import cPickle as pickle
 except ImportError:
     import pickle
-    
+
 import re
 import sys
 import warnings
@@ -66,100 +66,711 @@ from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.collections import PolyCollection
 from mpl_toolkits.mplot3d import Axes3D
 from scipy import ndimage
-
 from wx.lib.embeddedimage import PyEmbeddedImage
 
 # Prevent Eclipse warning from Axes3D import
 Axes3D
 
-
 #========================================================================================================================
 
 class RDPImageFiles():
     play = PyEmbeddedImage(
-        "iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABmJLR0QA/wD/AP+gvaeTAAAA"
-        "CXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gsMCgc1zYOOZAAAAYtJREFUSMfVlr9Kw1AU"
-        "h79IRaVDpGv/7DrqA5R2an2AtKPabi66iJMgCKUPoIMpFnwBnyAVHAxdCw7tmOozdLE5Tleu"
-        "IbVJGhF/ELiE3PNx7sk5vwt/rK3fDH4GiPY8AcdpAvYDAAF8bX0LbK8KeVRBe72etNttyWaz"
-        "EgK2gc2kEAGk2WyKrsFgIJVKJQx2ERdQVJv7/b74vv8FUevJZCLVajUIegd2o0IO1MbRaCRh"
-        "UrDhcCilUilYs6sokBMFmc1m8pMUrNvtBrNyl0Gu1cdxNJ1OpVAo6KApsL4IcgNIJpOJBVFZ"
-        "1et1/fheF0HuATFNU+JKgSzL0jM6CoM8AJLL5SSJFEjLpq8Cr2mQD4D5fB6/uUQwDAPLstQr"
-        "A3hOvSa1Wi1STRL9XZ7nST6f12vhAZnU+qTT6QT75GXZ0dajdrzrulIsFoMdf5nK7BqPx/qg"
-        "VMHfgJ3YU7jRaHzLwHEcKZfLYVP4fCU/sW1bWq3WIj+5AzaS+sneEme8Acw0LPg0AHGAw395"
-        "W0ldn0BVyth0l+oCAAAAAElFTkSuQmCC")
+        'iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABmJLR0QA/wD/AP+gvaeTAAAA'
+        'CXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gsMCgc1zYOOZAAAAYtJREFUSMfVlr9Kw1AU'
+        'h79IRaVDpGv/7DrqA5R2an2AtKPabi66iJMgCKUPoIMpFnwBnyAVHAxdCw7tmOozdLE5Tleu'
+        'IbVJGhF/ELiE3PNx7sk5vwt/rK3fDH4GiPY8AcdpAvYDAAF8bX0LbK8KeVRBe72etNttyWaz'
+        'EgK2gc2kEAGk2WyKrsFgIJVKJQx2ERdQVJv7/b74vv8FUevJZCLVajUIegd2o0IO1MbRaCRh'
+        'UrDhcCilUilYs6sokBMFmc1m8pMUrNvtBrNyl0Gu1cdxNJ1OpVAo6KApsL4IcgNIJpOJBVFZ'
+        '1et1/fheF0HuATFNU+JKgSzL0jM6CoM8AJLL5SSJFEjLpq8Cr2mQD4D5fB6/uUQwDAPLstQr'
+        'A3hOvSa1Wi1STRL9XZ7nST6f12vhAZnU+qTT6QT75GXZ0dajdrzrulIsFoMdf5nK7BqPx/qg'
+        'VMHfgJ3YU7jRaHzLwHEcKZfLYVP4fCU/sW1bWq3WIj+5AzaS+sneEme8Acw0LPg0AHGAw395'
+        'W0ldn0BVyth0l+oCAAAAAElFTkSuQmCC')
     
     reverse_play = PyEmbeddedImage(
-        "iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABmJLR0QA/wD/AP+gvaeTAAAA"
-        "CXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gsMDiYjssGGCgAAAZJJREFUSMfVlr1OwlAY"
-        "ht+aGjUMNaxQdh31AkiZqBdQGFXYXHQxTiYmJoQL0MESSbwBrwBMHGxYSRxgbPUaWKSvgx7z"
-        "WfkptQw8SZMOJ+9zzvn6nVNgxdhaVvAxgCcAFM9ZGsHbAG5FaBiREMB+0vBNAG40MJPJsF6v"
-        "s9VqSeljEsFFNNyyLHa7XUqq1aocE5tdAO8yvFQqcTgckiTDMPwRhGHIdrstJWYcwZXc80Kh"
-        "wF6v9ydc0u/3peRgnsCTs282mzPDFaPRSEpOpoWvAwjUwHw+zyAIuAhCcj1N8qq2x7btWLOP"
-        "ouu6ktxMEhypWTiOk0hAkoZhKMn9JElbrSKpgCSz2aySPKjgNSF5BqABgOM40DQNX1u8GOPx"
-        "WL1+zK1JuVxeSk0AQAfgq9rkcjn6vp/616V4kX3SaDRS7RPJpex40zTped4iHW/HreMOgDcp"
-        "syyLg8EgtbNLch49hYvFIjudzq+VVCqVRKewZAPA3aT7pFar0XXdf98nEuP785x1M+6leccf"
-        "AuhEBKcr+bcSi09pHsrYk6RaDwAAAABJRU5ErkJggg==")
+        'iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABmJLR0QA/wD/AP+gvaeTAAAA'
+        'CXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gsMDiYjssGGCgAAAZJJREFUSMfVlr1OwlAY'
+        'ht+aGjUMNaxQdh31AkiZqBdQGFXYXHQxTiYmJoQL0MESSbwBrwBMHGxYSRxgbPUaWKSvgx7z'
+        'WfkptQw8SZMOJ+9zzvn6nVNgxdhaVvAxgCcAFM9ZGsHbAG5FaBiREMB+0vBNAG40MJPJsF6v'
+        's9VqSeljEsFFNNyyLHa7XUqq1aocE5tdAO8yvFQqcTgckiTDMPwRhGHIdrstJWYcwZXc80Kh'
+        'wF6v9ydc0u/3peRgnsCTs282mzPDFaPRSEpOpoWvAwjUwHw+zyAIuAhCcj1N8qq2x7btWLOP'
+        'ouu6ktxMEhypWTiOk0hAkoZhKMn9JElbrSKpgCSz2aySPKjgNSF5BqABgOM40DQNX1u8GOPx'
+        'WL1+zK1JuVxeSk0AQAfgq9rkcjn6vp/616V4kX3SaDRS7RPJpex40zTped4iHW/HreMOgDcp'
+        'syyLg8EgtbNLch49hYvFIjudzq+VVCqVRKewZAPA3aT7pFar0XXdf98nEuP785x1M+6leccf'
+        'AuhEBKcr+bcSi09pHsrYk6RaDwAAAABJRU5ErkJggg==')
 
     pause = PyEmbeddedImage(
-        "iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABmJLR0QA/wD/AP+gvaeTAAAA"
-        "CXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gsMCg4cXvOtQQAAAZVJREFUSMftlrFKw0AY"
-        "x3+apKHNkgZbULC+g7jqoLM46STio5S+gauCk4u4+ARSirMPIPUBpKlZpZfzXO7CeYZ6wbUH"
-        "JV/z+933vyxfAqvVYK0tYXvAKZACz8AdoJy9J8Chrh+ASZPwS0DqpuZ37Ti3DpfAeZOQKaA6"
-        "nY7Kssw0+QIGmg/0f5VlmWq328aZ+gasAwJQo9FIjcdj+7T72jkw9yaTiRoOh4Yv9P5fDd3V"
-        "B0KAfr9Pr9ez2aa+blXyTycCNnxCMlN0u13SNLVZ6uF0fUKiqogiWq2WzVoeTuQTElZFGBJF"
-        "UR3zcfxDwjCsO6WPszQksBsEQVDHqptBELghgU9IWRVliZTSZtJ1pJSUZVnn+IUIIRBC2Ew0"
-        "cJaGCLuBc8qygeMfslgs6piPszRkboqiKCiKoo75OH+GlAB5npPnuc3enSuz2Yz5fG4/xYfv"
-        "kHwDVBzHKkkSe5Rva75jpnCSJCqOY+O8Nhn1F/pp7Al85Tg3Dhf6JdfozbgLnAEd4Al4rNl7"
-        "DBwBn8A98LL62Pj3+gaJWayoxGFTWwAAAABJRU5ErkJggg==")
+        'iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABmJLR0QA/wD/AP+gvaeTAAAA'
+        'CXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gsMCg4cXvOtQQAAAZVJREFUSMftlrFKw0AY'
+        'x3+apKHNkgZbULC+g7jqoLM46STio5S+gauCk4u4+ARSirMPIPUBpKlZpZfzXO7CeYZ6wbUH'
+        'JV/z+933vyxfAqvVYK0tYXvAKZACz8AdoJy9J8Chrh+ASZPwS0DqpuZ37Ti3DpfAeZOQKaA6'
+        'nY7Kssw0+QIGmg/0f5VlmWq328aZ+gasAwJQo9FIjcdj+7T72jkw9yaTiRoOh4Yv9P5fDd3V'
+        'B0KAfr9Pr9ez2aa+blXyTycCNnxCMlN0u13SNLVZ6uF0fUKiqogiWq2WzVoeTuQTElZFGBJF'
+        'UR3zcfxDwjCsO6WPszQksBsEQVDHqptBELghgU9IWRVliZTSZtJ1pJSUZVnn+IUIIRBC2Ew0'
+        'cJaGCLuBc8qygeMfslgs6piPszRkboqiKCiKoo75OH+GlAB5npPnuc3enSuz2Yz5fG4/xYfv'
+        'kHwDVBzHKkkSe5Rva75jpnCSJCqOY+O8Nhn1F/pp7Al85Tg3Dhf6JdfozbgLnAEd4Al4rNl7'
+        'DBwBn8A98LL62Pj3+gaJWayoxGFTWwAAAABJRU5ErkJggg==')
     
     reset = PyEmbeddedImage(
-        "iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABmJLR0QA/wD/AP+gvaeTAAAA"
-        "CXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gsMChUs0RxWdwAAAVJJREFUSMftlU8rRVEU"
-        "xX+PnvSSCBk8ysSEqUyRkie9MhTyAYyMDQ3uV8BIRCiGeogv4BsYGZAXI5MXRUzOqd3u3Hv3"
-        "yZ+BrDp1T3ets/a6Z7cv/BU0R/LbgTLwDrx+ZyGzwBHwBHyI9QgcAjNfObwPuFQHp60LlzAK"
-        "o0DdaOBX3enMCbRBDZgGio7TAlSAc8V7sCY6E6IGsJDDX3Q8WVAmJlRlS8b0y0o3nkXeFcTT"
-        "yHusCe1OFlHeRTXSZE7dTRBtKnJHpEm30pdCpH5BeAMKkSZNbhL4M4JdVlKVdImEFvQqfat0"
-        "92gA92I/DxwAa0aTMfF8B7ykETdFJT56YjAoANdCu6G/o5zIzynv8rAKjIj9dojUCVylzKSt"
-        "HINh1yief5JFHgSOAyb7OSZTgnsL9FiiTwI3QpgYWncd2AOGYnq+CKy4H1XCD2PAjfh//B4+"
-        "Ac1ehBpa7nlwAAAAAElFTkSuQmCC")
+        'iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABmJLR0QA/wD/AP+gvaeTAAAA'
+        'CXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gsMChUs0RxWdwAAAVJJREFUSMftlU8rRVEU'
+        'xX+PnvSSCBk8ysSEqUyRkie9MhTyAYyMDQ3uV8BIRCiGeogv4BsYGZAXI5MXRUzOqd3u3Hv3'
+        'yZ+BrDp1T3ets/a6Z7cv/BU0R/LbgTLwDrx+ZyGzwBHwBHyI9QgcAjNfObwPuFQHp60LlzAK'
+        'o0DdaOBX3enMCbRBDZgGio7TAlSAc8V7sCY6E6IGsJDDX3Q8WVAmJlRlS8b0y0o3nkXeFcTT'
+        'yHusCe1OFlHeRTXSZE7dTRBtKnJHpEm30pdCpH5BeAMKkSZNbhL4M4JdVlKVdImEFvQqfat0'
+        '92gA92I/DxwAa0aTMfF8B7ykETdFJT56YjAoANdCu6G/o5zIzynv8rAKjIj9dojUCVylzKSt'
+        'HINh1yief5JFHgSOAyb7OSZTgnsL9FiiTwI3QpgYWncd2AOGYnq+CKy4H1XCD2PAjfh//B4+'
+        'Ac1ehBpa7nlwAAAAAElFTkSuQmCC')
     
     decrease_single_step = PyEmbeddedImage(
-        "iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABmJLR0QA/wD/AP+gvaeTAAAA"
-        "CXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gsMDgUx/9GAIwAAApVJREFUSMftlr9rE3EU"
-        "wD9p7pJeQiEXgjgpsUinCsGhBKSDCEVRdFEEnbs0dOg5ODi0iLi0HVrORfsXOOrgErRFSBBs"
-        "lw4NtdJNtGjaEiO5u/Tr4F37clxjdO6DL9z7ft/7ft77/njfgxP5B4mH9FHgAXAV6AdqPc6T"
-        "A64D94AzwCbgRhneB9qAEu1Fl4k14BbwJsLvHdAX5fQJUIZhqGw2Gxgf+JFJiQG3/SzlxCqR"
-        "SEj9ZhjQBziAmp6eVisrK9J4VNhdAKpyYtM0lWVZqlqtqv39fZVOp4OxZ2HIqcDJtm21sbEh"
-        "IXcBHXgcBAKobDarZmdnVaPRUFLGxsYCv3WZAYAZdGQyGUzTlAGcB94DjwBd0zSmpqbY2trC"
-        "sizS6XRHtMPDw8HnOX9p0fwOPRhJJBLoui79HgIpgEKhwNLSEoVC4djTkM/ng08DOA186RMn"
-        "5Q9N19E0TfqlACYmJqhUKl0BALlcTqqZyEw0TeuAxGIxFhYWKJVKPV0YwzA6VLkncQmJx4/u"
-        "6NDQUM+AYLmFJCWkHfR6nke7fahSq9VYXFzsGeI4jlRbEnJYAlzXxXWPKoJSisnJSUqlEq1W"
-        "66+QZrMp1V8S4slMJARoAti2TbFYZHV1tStkZ2dHqj8iM3EcJwx5CnwAWFtbY2RkBMuy2N3d"
-        "jYRsb2/L4L5JyPdgpF6vU6/XpV8NuAQ8AVzP85ifn2dwcJC5uTkajUYHZH398KJ/9m9+R+1y"
-        "ATUzM6OWl5e71a6KrF0DAwNqfHxclctltbe3p1KpVDBmR2W6CahkMimL3AFwNqIK3wA+hqtw"
-        "qF2LgtzxD4A0fN5lj2PAFeB1xHvyVr4nsZDjRR/WD5SBV+F17fIyXgbywFfgJfDz5Mfjv+Q3"
-        "/MwNiDUDxl8AAAAASUVORK5CYII=")
+        'iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABmJLR0QA/wD/AP+gvaeTAAAA'
+        'CXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gsMDgUx/9GAIwAAApVJREFUSMftlr9rE3EU'
+        'wD9p7pJeQiEXgjgpsUinCsGhBKSDCEVRdFEEnbs0dOg5ODi0iLi0HVrORfsXOOrgErRFSBBs'
+        'lw4NtdJNtGjaEiO5u/Tr4F37clxjdO6DL9z7ft/7ft77/njfgxP5B4mH9FHgAXAV6AdqPc6T'
+        'A64D94AzwCbgRhneB9qAEu1Fl4k14BbwJsLvHdAX5fQJUIZhqGw2Gxgf+JFJiQG3/SzlxCqR'
+        'SEj9ZhjQBziAmp6eVisrK9J4VNhdAKpyYtM0lWVZqlqtqv39fZVOp4OxZ2HIqcDJtm21sbEh'
+        'IXcBHXgcBAKobDarZmdnVaPRUFLGxsYCv3WZAYAZdGQyGUzTlAGcB94DjwBd0zSmpqbY2trC'
+        'sizS6XRHtMPDw8HnOX9p0fwOPRhJJBLoui79HgIpgEKhwNLSEoVC4djTkM/ng08DOA186RMn'
+        '5Q9N19E0TfqlACYmJqhUKl0BALlcTqqZyEw0TeuAxGIxFhYWKJVKPV0YwzA6VLkncQmJx4/u'
+        '6NDQUM+AYLmFJCWkHfR6nke7fahSq9VYXFzsGeI4jlRbEnJYAlzXxXWPKoJSisnJSUqlEq1W'
+        '66+QZrMp1V8S4slMJARoAti2TbFYZHV1tStkZ2dHqj8iM3EcJwx5CnwAWFtbY2RkBMuy2N3d'
+        'jYRsb2/L4L5JyPdgpF6vU6/XpV8NuAQ8AVzP85ifn2dwcJC5uTkajUYHZH398KJ/9m9+R+1y'
+        'ATUzM6OWl5e71a6KrF0DAwNqfHxclctltbe3p1KpVDBmR2W6CahkMimL3AFwNqIK3wA+hqtw'
+        'qF2LgtzxD4A0fN5lj2PAFeB1xHvyVr4nsZDjRR/WD5SBV+F17fIyXgbywFfgJfDz5Mfjv+Q3'
+        '/MwNiDUDxl8AAAAASUVORK5CYII=')
     
     increase_single_step = PyEmbeddedImage(
-        "iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABmJLR0QA/wD/AP+gvaeTAAAA"
-        "CXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gsMChYCJucIewAAAqBJREFUSMftlTFME2EU"
-        "x3+1d72ct/QqUScNEsMiJl3sYlw0ISEh6oBxYCQxkYaBWxwcSIxxoSwFF90Jzg5OaooJTYOQ"
-        "mA40iuKIWEpKRdtr/Vz6lcflLLDzkkvue/d/7/+9d9/3f3Bix7BoYO0Ao8A94AywCewdIU8E"
-        "uAs8BIaAX8D3MOAp4D2gxNMC3gB3AKMLycuQuNEw4G0NisViKhCkgBIw0t61tAvAX0AlEgll"
-        "27bGfwkjeQ4ox3FUtVpV+XxeeZ6nXNcNkuWBqyLuhv6Wy+XU1NSUxjXa3TlgRUANDg4qabVa"
-        "TU1PT6tEIiGJGsATwATua//a2pqam5uTuLMIpghwCWBgYODgSXAcPM9jfX2dyclJDMOgnfwx"
-        "8AG4rLGu6xKPx2W4K0nOAzZAb29v6J+Nx+NkMhkKhQLJZFK7rwGP9MI0TWKxmAwzJUmHvqen"
-        "p+tZTSaTLC0tMT4+rl2n9YthGJimKeGGJLG117btQy+FZVnMzs6SzWaJRPYPm2EYup2hlVja"
-        "Gyi3q6XTafr7+/dvdjQaJIlKkrr2NhqNI5Nks1lKpVJn3Wq1aDabEtKSJL+1d2/vcBWp1+uk"
-        "02kmJiZQSnX8vu/j+76E+gip2Nbera2trgQrKyuMjY2xurra2Zf++b7vBytpykp+aCHc2NgI"
-        "Tb6zs4PneaRSKUlQAJ7JSgLt9iWJAr4CFIvFA8lrtRqZTIa+vj5mZmb0Tn3gKXC9rWkAVCoV"
-        "KpWKDC8TUNYccGVxcZFqtcry8jILCwvMz8+zu7srA/PAA+BTe70pW10ul2WrtoMdGQpRXvl8"
-        "BIZDVPiiVmHHcZRlWRr/+X/z5F3IXHgN3ApJLu1FIK7ZHnwdYQxOxhHgHPANeAv8POJkHAZu"
-        "An+AV+3KT+z49g/v5g/7k3CcCwAAAABJRU5ErkJggg==")
-    
+        'iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABmJLR0QA/wD/AP+gvaeTAAAA'
+        'CXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gsMChYCJucIewAAAqBJREFUSMftlTFME2EU'
+        'x3+1d72ct/QqUScNEsMiJl3sYlw0ISEh6oBxYCQxkYaBWxwcSIxxoSwFF90Jzg5OaooJTYOQ'
+        'mA40iuKIWEpKRdtr/Vz6lcflLLDzkkvue/d/7/+9d9/3f3Bix7BoYO0Ao8A94AywCewdIU8E'
+        'uAs8BIaAX8D3MOAp4D2gxNMC3gB3AKMLycuQuNEw4G0NisViKhCkgBIw0t61tAvAX0AlEgll'
+        '27bGfwkjeQ4ox3FUtVpV+XxeeZ6nXNcNkuWBqyLuhv6Wy+XU1NSUxjXa3TlgRUANDg4qabVa'
+        'TU1PT6tEIiGJGsATwATua//a2pqam5uTuLMIpghwCWBgYODgSXAcPM9jfX2dyclJDMOgnfwx'
+        '8AG4rLGu6xKPx2W4K0nOAzZAb29v6J+Nx+NkMhkKhQLJZFK7rwGP9MI0TWKxmAwzJUmHvqen'
+        'p+tZTSaTLC0tMT4+rl2n9YthGJimKeGGJLG117btQy+FZVnMzs6SzWaJRPYPm2EYup2hlVja'
+        'Gyi3q6XTafr7+/dvdjQaJIlKkrr2NhqNI5Nks1lKpVJn3Wq1aDabEtKSJL+1d2/vcBWp1+uk'
+        '02kmJiZQSnX8vu/j+76E+gip2Nbera2trgQrKyuMjY2xurra2Zf++b7vBytpykp+aCHc2NgI'
+        'Tb6zs4PneaRSKUlQAJ7JSgLt9iWJAr4CFIvFA8lrtRqZTIa+vj5mZmb0Tn3gKXC9rWkAVCoV'
+        'KpWKDC8TUNYccGVxcZFqtcry8jILCwvMz8+zu7srA/PAA+BTe70pW10ul2WrtoMdGQpRXvl8'
+        'BIZDVPiiVmHHcZRlWRr/+X/z5F3IXHgN3ApJLu1FIK7ZHnwdYQxOxhHgHPANeAv8POJkHAZu'
+        'An+AV+3KT+z49g/v5g/7k3CcCwAAAABJRU5ErkJggg==')
+
 #========================================================================================================================
 
-class Progress(wx.ProgressDialog):
+class RDPGUIEvents():
+    
+    def evt_ok_btn(self, step_num_entry, step_size_entry, event, parent):
+        
+        great_parent = parent.parent
+        # Get number of steps as well as step size from widgets
+        great_parent.nstep = int(step_num_entry.GetValue())
+        great_parent.step_size = int(step_size_entry.GetValue())
+
+        great_parent.plot, parent.reduced_data = great_parent.frame.rdp_plot.plot_snapshot_sequence(start = great_parent.step, 
+                                                                                                    step_size = great_parent.step_size, 
+                                                                                                    steps = great_parent.nstep, 
+                                                                                                    style = great_parent.style, 
+                                                                                                    data = great_parent.data, 
+                                                                                                    header = great_parent.header, 
+                                                                                                    vmin = great_parent.vmin,
+                                                                                                    vmax = great_parent.vmax,
+                                                                                                    resolution = great_parent.resolution,
+                                                                                                    surface_linewidth = great_parent.surface_linewidth,
+                                                                                                    proj = great_parent.proj,
+                                                                                                    linestyle = great_parent.line_style,
+                                                                                                    proj_method = great_parent.proj_method,
+                                                                                                    x_label = great_parent.x_label,
+                                                                                                    y_label = great_parent.y_label,
+                                                                                                    z_label = great_parent.z_label,
+                                                                                                    file_name = great_parent.flist_sorted[great_parent.selection],
+                                                                                                    file_directory = great_parent.dir,
+                                                                                                    save_mode = great_parent.save_mode,
+                                                                                                    color = great_parent.line_color,
+                                                                                                    figure = None)
+        
+        # Close dialog
+        parent.Hide()
+        mpl.interactive(False)
+        wx.CallAfter(parent.Destroy)
+
+        
+    def evt_cancel_button(self, event, parent):
+        #Close dialog
+        parent.Hide()
+        wx.CallAfter(parent.Destroy)
+    
+    def evt_save_config_btn(self, event, parent):
+        dlg = SaveConfigDialog(parent, parent.dir)
+        
+        if dlg.ShowModal() == wx.ID_CANCEL:
+            return
+        
+        save_object = parent.prepare_plot_configuration(directory=parent.dir,
+                                                        x_label=parent.x_label,
+                                                        y_label=parent.y_label, 
+                                                        z_label=parent.z_label, 
+                                                        marked=parent.marked, 
+                                                        step=parent.step, 
+                                                        slider_max=parent.slider_max, 
+                                                        resolution=parent.resolution, 
+                                                        vmax=parent.vmax, 
+                                                        vmin=parent.vmin, 
+                                                        proj=parent.proj, 
+                                                        proj_method=parent.proj_method, 
+                                                        style=parent.style, 
+                                                        mode=parent.mode, 
+                                                        labelling_mode=parent.labelling_mode, 
+                                                        reduced_data=parent.reduced_data, 
+                                                        header=parent.header, 
+                                                        ndim=parent.ndim, 
+                                                        selection=parent.selection,
+                                                        sel_cbox_selection=parent.sel_cbox_selection,
+                                                        proj_choice_time_course=parent.proj_choice_time_course, 
+                                                        proj_choice_snapshot=parent.proj_choice_snapshot, 
+                                                        line_color=parent.line_color, 
+                                                        aux_line_color=parent.aux_line_color, 
+                                                        marker_color=parent.marker_color, 
+                                                        aux_marker_color=parent.aux_marker_color,
+                                                        title=parent.title, 
+                                                        axis_ticks=parent.axis_ticks, 
+                                                        figure_azimuth=parent.figure_azimuth, 
+                                                        figure_elevation=parent.figure_elevation, 
+                                                        figure_distance=parent.figure_distance, 
+                                                        surface_linewidth=parent.surface_linewidth,
+                                                        flist_sorted=parent.flist_sorted,
+                                                        mode_ch = parent.rdp_frame.frame.mode_cbox.GetItems(),
+                                                        proj_ch=parent.rdp_frame.frame.proj_cbox.GetItems())
+                
+        file_path = dlg.GetPath()
+
+        pickle.dump(save_object, open(file_path, 'wb'), 0)
+        
+        
+    def evt_elevation_spn(self, event, parent):
+        widget = event.GetEventObject()
+        value = widget.GetValue()
+        parent.figure_elevation = value
+        parent.figure.gca().elev = parent.figure_elevation
+           
+        wx.CallAfter(parent._update_plot)
+        
+        
+    def evt_line_style_cbox(self, event, parent):
+        widget = event.GetEventObject()
+        value = widget.GetValue()
+        
+        great_parent = parent.parent
+        
+        great_parent.line_style = value
+        
+        wx.CallAfter(great_parent._update_plot)
+        
+        
+    def evt_azimuth_spn(self, event, parent):
+        widget = event.GetEventObject()
+        value = widget.GetValue()
+        parent.figure_azimuth = value      
+        parent.figure.gca().azim = parent.figure_azimuth
+        
+        wx.CallAfter(parent._update_plot)
+        
+
+    def evt_distance_spn(self, event, parent):
+        widget = event.GetEventObject()
+        value = widget.GetValue()
+        parent.figure_distance = value        
+                
+        wx.CallAfter(parent._update_plot)
+        
+    
+    def evt_close_figure(self, event, parent):
+        
+        parent.figure_canvas.mpl_disconnect(parent.figure_canvas_connection_id)
+        parent.figure_canvas_connection_id = None
+        parent.figure.clf()
+        parent.plot = None
+        parent.figure = None
+        parent.colorbar = None
+        parent.figure_canvas = None
+        parent.control_plot_frame.Hide()
+        parent.control_plot_frame = None
+        
+    
+    def evt_add_figure_frame_btn(self, event, parent):
+                        
+        new_frame = RDPMainWindow(parent=parent.frame, title='', pos=None, size=None, style=None, name=None, directory=parent.dir)     
+        new_frame.rdp_gui.step = parent.step   
+        new_frame.Bind(wx.EVT_CLOSE, partial(self.evt_close_frame, parent=parent))
+        
+        new_frame_id = new_frame.GetId()
+        parent.frame_ids.append(new_frame_id)
+        
+        wx.FindWindowById(new_frame_id).step = parent.step
+        
+     
+    def evt_close_frame(self, event, parent):
+        frame = event.GetEventObject()
+        frame_id = frame.GetId()
+        
+        if frame_id in parent.frame_ids:
+            parent.frame_ids.remove(frame_id)
+        
+        wx.FindWindowById(frame_id).Hide()
+    
+                            
+    def evt_play_pause_btn(self, event, parent):
+        parent._play_pause_btn(reverse=False)
+        
+
+    def evt_reverse_play_pause_btn(self, event, parent):
+        parent._play_pause_btn(reverse=True)
+        
+            
+    def evt_reset_btn(self, event, parent):
+        '''Reset plot to default.'''
+        
+        for i in range(len(parent.frame_ids)):
+            current_frame = parent._set_current_frame(i)
+            current_frame.step = 0
+            current_frame.nstep = 0
+            current_frame.step_size = 0
+            current_frame.save_mode = False
+            
+            if i == 0:
+                current_frame.pos_slider.SetValue(current_frame.step)
+                current_frame.time_stamp_display.SetLabel(' ')
+                    
+            if current_frame.control_plot_frame:
+                
+                try:
+                    current_frame.control_plot_frame.resolution_spn.SetValue(current_frame.resolution)
+                except AttributeError:
+                    
+                    pass
+                try:
+                    current_frame.control_plot_frame.linewidth_spn.SetValue(current_frame.surface_linewidth)
+                except AttributeError:
+                    pass
+                
+            current_frame._update_plot()  
+
+            
+    def evt_increase_single_step_btn(self, event, parent):
+        parent._move_single_step(increase=True)
+                    
+    
+    def evt_decrease_single_step_btn(self, event, parent):
+        parent._move_single_step(increase=False)
+        
+    
+    def evt_axis_label(self, event, x_axis_label, y_axis_label, parent, z_axis_label=None):
+        
+        parent.x_label = x_axis_label.GetValue()
+        parent.y_label = y_axis_label.GetValue()
+        
+        if z_axis_label != None:
+            try:
+                parent.z_label = z_axis_label.GetValue()
+            except AttributeError:
+                pass
+                    
+        wx.CallAfter(parent._update_plot)
+        
+    
+    def evt_add_time_course(self, event, parent):
+        '''Add time course to currently displayed plot.'''
+        
+        parent._add_time_course()
+        
+        
+    def evt_resolution_spn(self, event, parent):
+        
+        parent.resolution = int(parent.control_plot_frame.resolution_spn.GetValue())
+        wx.CallAfter(parent._update_plot)
+        
+
+    def evt_vmax_spn(self, event, parent):
+        
+        parent.vmax = parent.control_plot_frame.vmax_spn.GetValue()
+        wx.CallAfter(parent._update_plot)
+
+    
+    def evt_vmin_spn(self, event, parent):
+        
+        parent.vmin = parent.control_plot_frame.vmin_spn.GetValue()
+        wx.CallAfter(parent._update_plot)
+        
+    
+    def evt_proj_cbox(self, event, parent):
+        
+        great_parent = parent.parent
+        widget = event.GetEventObject()
+        great_parent.proj = widget.GetValue()
+        
+        if ',' not in parent.parent.proj and parent.parent.mode != 'time course':
+            parent.style_cbox.Disable()
+            parent.proj_method_cbox.Disable()
+            parent.style_cbox.SetValue('')
+            parent.proj_method_cbox.SetValue('')
+            
+            if great_parent.proj != ' ':
+                if great_parent.style != 'heatmap' and great_parent.ndim[great_parent.selection] != 0:    
+                    great_parent._plot()
+    
+                if great_parent.mode != 'snapshot sequence':
+                    RDPPlotFrame(parent=great_parent, panel=parent.panel) 
+                    great_parent.rdp_frame.frame.Hide()
+            
+                great_parent._update_plot()
+                great_parent._update_plot()
+            
+        else:
+            parent.style_cbox.Enable()
+            parent.proj_method_cbox.Enable()
+            
+        if great_parent.proj == ' ':
+            great_parent.proj_method = ' '
+            great_parent.style = ' '
+            great_parent.proj = ' '
+            
+            parent.proj_method_cbox.Disable()
+            parent.style_cbox.Disable()
+            
+            parent.proj_method_cbox.SetValue(great_parent.proj_method)
+            parent.style_cbox.SetValue(great_parent.style)
+            
+    
+    def evt_reset_heatmap_boundaries_btn(self, event, parent):
+        
+        parent.vmin = parent.vmax = None
+        
+        parent.control_plot_frame.vmin_spn.SetValue(0.0000)
+        parent.control_plot_frame.vmax_spn.SetValue(0.0000)
+        
+        wx.CallAfter(parent._update_plot)
+
+    
+    def evt_switch_btn(self, event, parent):  
+        for i in range(len(parent.frame_ids)):
+            current_frame = parent._set_current_frame(i)
+            
+            # Clear memory
+            if current_frame.data is not None:
+                del current_frame.data
+                current_frame.data = None
+            
+            # Close open plots              
+            if current_frame.figure:
+                plt.close(current_frame.figure)
+                current_frame.figure = None
+                        
+        frame = parent.GetParent()
+        browser_panel = RDPBrowserPanel(parent=frame)
+        
+        # Replace plot generation frame with file browser
+        frame.SetSizer(browser_panel.main_sizer)
+        
+        # Layout
+        wx.CallAfter(frame.Sizer.Fit, frame)
+        wx.CallAfter(frame.Layout)
+
+                    
+    def evt_pos_slider(self, event, parent):
+        
+        step = parent.pos_slider.GetValue()
+                
+        for i in range(len(parent.frame_ids)):
+            current_frame = parent._set_current_frame(i)
+            current_frame.step = step
+        
+            if i == 0:
+                # Set time code
+                current_time_stamp = parent.time_stamps[current_frame.step]
+                current_frame.time_stamp_display.SetLabel(current_time_stamp)
+                
+            # Update currently displayed plot
+            current_frame._update_plot()
+        
+                
+    def evt_linewidth_spn(self, event, parent):
+        widget = event.GetEventObject()
+        parent.surface_linewidth = float(widget.GetValue() / 20.)
+        wx.CallAfter(parent._update_plot)
+        
+        
+    def evt_sel_cbox(self, event, parent):
+        widget = event.GetEventObject()
+        
+        if 'RDPGUI' not in str(type(parent)):
+            parent = parent.GetParent()
+        
+        parent.selection = widget.GetSelection()
+        parent.sel_cbox_selection = widget.GetValue()
+        parent.title = parent.sel_cbox_selection
+        parent.rdp_frame = RDPFrame(parent=parent, title=parent.sel_cbox_selection)
+        parent._update_selection_data(parent.rdp_frame.frame)
+        
+        if 'RDPGUI' in str(type(parent)):
+            parent.rdp_frame.frame.Show()
+        
+        # Case 1: selected file is an image
+        if 'CV_8U' in parent.header_list[parent.selection] or 'CV_8UC3' in parent.header_list[parent.selection]:
+            parent.rdp_frame.frame.style_ch = ['image']
+            parent.rdp_frame.frame.style_cbox.Enable()
+            parent.rdp_frame.frame.proj_cbox.Disable()
+            parent.rdp_frame.frame.proj_method_cbox.Disable()
+            parent.rdp_frame.frame.style_cbox.SetValue('image')
+            parent.rdp_frame.frame.style_cbox.SetSelection(0)
+            parent.rdp_frame.frame.style = 'image'
+            
+            RDPPlotFrame(parent=parent, panel=parent.rdp_frame.frame.panel) 
+            parent.rdp_frame.frame.Hide()
+            
+            parent._plot()
+            
+        else:
+            parent.style_ch = ['', 'heatmap', 'surface', 'wireframe']
+            parent.rdp_frame.frame.style_cbox.SetItems(parent.style_ch)
+            parent.rdp_frame.frame.mode_cbox.Enable()
+            
+            # Initialize plot generation GUI      
+            parent.rdp_frame.frame.style_cbox.SetItems(parent.style_ch)
+        
+                          
+    def evt_write_csv_btn(self, event, parent):
+                
+        dlg_name = parent.dir + '/' + parent.flist_sorted[parent.selection].strip('.csv') + '-' + str(parent.mode) + '-1.csv'
+        dlg = WriteCSVDialog(parent, parent.dir, dlg_name)
+        
+        if dlg.ShowModal() == wx.ID_CANCEL:
+            return
+        
+        file_path = dlg.GetPath()
+        np.savetxt(fname=file_path, X=parent.reduced_data, delimiter=',')
+        
+
+    def evt_save_plot_btn(self, event, parent):
+        
+        dlg = RDPSaveDialog(parent=parent, defaultDir=parent.dir)
+        
+        if dlg.ShowModal() == wx.ID_CANCEL:
+            return
+        
+        file_path = dlg.GetPath()
+                        
+        if parent.mode != 'snapshot sequence':
+            parent._plot(save=True, file_path=file_path)
+            
+            
+    def evt_dir_btn(self, event, parent):
+        
+        RDPMainWindow(parent=None, title='Recorded Data Processor', pos=None, size=None, style=None, name=None, directory=parent.frame.dir)
+        parent.frame.Destroy()
+        
+        
+    def evt_load_config_btn(self, event, parent):
+        try:
+            rdp_gui = parent._initialize_rdp_gui()
+            rdp_gui._load_plot_configuration()
+            wx.CallAfter(parent.frame.Hide)
+        except AttributeError:
+            parent._load_plot_configuration()
+        
+        
+    def evt_end_app(self, event):                
+        sys.exit()
+        
+        
+    def evt_sel_btn(self, event, parent):
+        parent._initialize_rdp_gui()
+        
+        
+    def evt_line_color_ctrl(self, event, parent):
+        great_parent = parent.parent
+        widget = event.GetEventObject()
+        great_parent.aux_line_color = widget.GetColour()
+        widget.SetColour(great_parent.aux_line_color)
+        
+        # Color conversion
+        red = great_parent.aux_line_color.Red()/255.
+        green = great_parent.aux_line_color.Green()/255.
+        blue = great_parent.aux_line_color.Blue()/255.
+        
+        great_parent.line_color = [red, green, blue]
+        
+        # Update currently displayed plot
+        if great_parent.figure and great_parent.ndim[great_parent.selection] != 0:
+            wx.CallAfter(great_parent._update_plot)
+            
+            
+    def evt_marker_color_ctrl(self, event, parent):
+        great_parent = parent.parent
+        widget = event.GetEventObject()
+        great_parent.aux_marker_color = widget.GetColour()
+        widget.SetColour(great_parent.aux_marker_color)
+        
+        # Color conversion
+        red = great_parent.aux_marker_color.Red()/255.
+        green = great_parent.aux_marker_color.Green()/255.
+        blue = great_parent.aux_marker_color.Blue()/255.
+        great_parent.marker_color = [red, green, blue]
+        
+        # Update currently displayed plot
+        if great_parent.figure:
+            wx.CallAfter(great_parent._update_plot)
+    
+    
+    def evt_marked_check_box(self, event, parent):
+        
+        great_parent = parent.parent
+        widget = event.GetEventObject()
+        great_parent.marked = widget.GetValue()
+        wx.CallAfter(great_parent._update_plot)
+    
+    
+    def evt_plot_labelling_cbox(self, event, parent):
+        
+        widget = event.GetEventObject()
+        parent.labelling_mode = widget.GetValue()
+        
+        parent._update_plot()
+        parent._update_plot()
+            
+        
+    def evt_axis_ticks_cbox(self, event, parent):
+        
+        widget = event.GetEventObject()
+                
+        if widget.GetValue() == 'on':
+            parent.axis_ticks = True
+        else:
+            parent.axis_ticks = False
+            
+        parent._update_plot()
+        
+    
+    def evt_mode_cbox(self, event, parent):
+        
+        
+        great_parent = parent.parent
+        widget = event.GetEventObject()
+        great_parent.mode = widget.GetValue()
+
+        if great_parent.figure:
+            plt.close(great_parent.figure)
+                    
+        else:
+            great_parent.proj_method = ' '
+            great_parent.style = ' '
+            great_parent.proj = ' '
+            
+            parent.proj_method_cbox.Disable()
+            parent.style_cbox.Disable()
+            
+            parent.proj_cbox.SetValue(great_parent.proj)
+            parent.proj_method_cbox.SetValue(great_parent.proj_method)
+            parent.style_cbox.SetValue(great_parent.style)
+            
+        if great_parent.ndim[great_parent.selection] == 0:    
+                    
+            if great_parent.mode != 'snapshot sequence':
+                RDPPlotFrame(parent=great_parent, panel=parent.panel) 
+                great_parent.rdp_frame.frame.Hide()
+            
+            great_parent._update_plot()
+        
+        # Fill projection combobox with the fitting options
+        if great_parent.mode == 'time course':
+            parent.proj_cbox.SetItems(great_parent.proj_choice_time_course)
+            parent.proj_cbox.Enable()
+        elif great_parent.mode == 'snapshot' or great_parent.mode == 'snapshot sequence':
+            parent.proj_cbox.SetItems(great_parent.proj_choice_snapshot)
+            parent.proj_cbox.Enable()
+        else:
+            parent.proj_cbox.SetItems([])
+            
+           
+    def evt_proj_method_cbox(self, event, parent):
+        
+        widget = event.GetEventObject()
+        parent.parent.proj_method = widget.GetValue()
+                
+        if parent.parent.proj_method == ' ':
+            parent.style_cbox.Disable()
+            parent.parent.style = ' '
+            parent.style_cbox.SetValue(parent.parent.style)
+        else:
+            parent.style_cbox.Enable()
+                    
+        if parent.parent.control_plot_frame:
+            parent.parent._update_plot()
+            
+            
+    def evt_style_cbox(self, event, parent):
+        
+        great_parent = parent.parent
+        widget = event.GetEventObject()
+        great_parent.style = widget.GetValue()
+        
+        if great_parent.style != 'image':
+            parent.mode_cbox.Enable()
+            parent.proj_cbox.Enable()
+            parent.proj_method_cbox.Enable()
+            
+        else:
+            great_parent.mode = parent.mode_cbox.GetValue()
+            parent.mode_cbox.Disable()
+            parent.proj_cbox.Disable()
+            parent.proj_method_cbox.Disable()
+            
+        if great_parent.mode != 'snapshot sequence':
+            RDPPlotFrame(parent=great_parent, panel=parent.panel) 
+            great_parent.rdp_frame.frame.Hide()
+            
+            great_parent._update_plot()
+            
+            
+    def evt_resize_control_plot_panel(self, event, parent):
+        
+        pix = parent.control_plot_frame.control_plot_panel.GetClientSize()
+        
+        parent.figure.set_size_inches(pix[0]/parent.figure.get_dpi(),
+                                    pix[1]/parent.figure.get_dpi())
+        
+        
+        x,y = parent.control_plot_frame.GetSize()  
+        
+        parent.figure.set_size_inches(x/parent.figure.get_dpi(),
+                                    y/parent.figure.get_dpi())
+        
+        parent.figure_canvas.SetSize((x-1, y-1))
+        parent.figure_canvas.SetSize((x, y))
+                        
+        event.Skip()
+                
+                                   
+    def evt_resize_canvas(self, event, parent):
+        parent.figure_canvas.draw()
+        
+        
+    def evt_change_plot_parameters(self, event, parent):
+        
+        parent.figure = plt.figure(str(parent.title))
+        parent.plot = parent.figure.gca()
+        
+        if parent.style == 'surface' or parent.style == 'wireframe':
+            parent.figure_azimuth = int(parent.figure.gca(projection='3d').azim)
+            parent.figure_elevation = int(parent.figure.gca(projection='3d').elev)
+        
+        try:
+            parent.control_plot_frame.azimuth_spn.SetValue(parent.figure_azimuth)
+            parent.control_plot_frame.elevation_spn.SetValue(parent.figure_elevation)
+        except AttributeError:
+            pass    
+        
+#========================================================================================================================
+        
+class RDPProgress(wx.ProgressDialog):
     '''Simple progress bar'''
     def __init__(self, parent, _, title, message, maximum):
         wx.ProgressDialog.__init__(self, title, message=message, maximum=maximum, parent=parent, style=wx.PD_ELAPSED_TIME|wx.PD_REMAINING_TIME|wx.STAY_ON_TOP)
@@ -168,7 +779,7 @@ class Progress(wx.ProgressDialog):
         
 #========================================================================================================================
 
-class SaveDialog(wx.FileDialog):
+class RDPSaveDialog(wx.FileDialog):
     def __init__(self, parent, defaultDir):
         
         wildcard = 'Scalable Vector Graphic (*.svg)|*.svg|'  \
@@ -182,6 +793,74 @@ class SaveDialog(wx.FileDialog):
     
 #========================================================================================================================
 
+class RDPStartupFrame(wx.Frame):
+    def __init__(self, parent):
+        
+        rdp_gui_events = RDPGUIEvents()
+        
+        title = 'Recorded Data Processor'
+                
+        self.frame = wx.Frame(parent=None, title=title)
+        self.frame.parent = parent
+        self.frame.rdp_plot = RDPPlot()
+        self.frame.rdp_image_files = RDPImageFiles()
+        self.panel = wx.Panel(parent=self.frame)
+        self.main_sizer = wx.BoxSizer(wx.VERTICAL)
+        
+        # search for standard cedarRecordings directory
+        if 'HOME' in os.environ:
+            self.frame.dir = os.environ['HOME']
+        elif os.name == 'posix':
+            self.frame.dir = os.path.expanduser("~/")
+        elif os.name == 'nt':
+            if 'HOMEPATH' in os.environ and 'HOMEDRIVE' in os.environ:
+                self.frame.dir = os.environ['HOMEDRIVE'] + os.environ['HOMEPATH']
+        else:
+            self.frame.dir = os.environ['HOMEPATH']
+        
+        # Walk through directories until 'cedarRecordings' is found
+        for (self.frame.dir, dirs, _) in os.walk(self.frame.dir):
+            for j in range(len(dirs)):
+                if dirs[j] == 'cedarRecordings':
+                    new_dir = dirs[j]
+                    self.frame.dir = os.path.join(self.frame.dir, new_dir)
+                    break
+            
+            break
+                
+        dir_btn = wx.Button(parent=self.panel, id=-1, label='Please choose a directory containing files recorded by cedar')
+        choose_txt2 = wx.StaticText(self.panel, -1, 'OR')
+        load_btn = wx.Button(parent=self.panel, id=-1, label='load a previously saved plot configuration')
+        
+        dir_btn.Bind(wx.EVT_BUTTON, partial(rdp_gui_events.evt_dir_btn, parent=self))
+        load_btn.Bind(wx.EVT_BUTTON, partial(rdp_gui_events.evt_load_config_btn, parent=self))
+        
+        self.main_sizer.Add(item=dir_btn, flag=wx.ALIGN_CENTER|wx.ALL, border=25)
+        self.main_sizer.Add(item=choose_txt2, flag=wx.ALIGN_CENTER|wx.RIGHT|wx.LEFT, border=25)
+        self.main_sizer.Add(item=load_btn, flag=wx.ALIGN_CENTER|wx.ALL, border=25)
+        
+        self.main_sizer.Fit(self.panel)
+        self.frame.SetSizerAndFit(self.main_sizer)
+        self.frame.CenterOnScreen()
+        self.frame.Show()
+        
+        return
+    
+        
+    def _initialize_rdp_gui(self):
+        
+        # Initialize plot generation GUI      
+        rdp_gui = RDPGUI(parent=self.frame)
+        self.frame.SetSizer(rdp_gui.main_sizer)
+        self.frame.Sizer.Fit(self.frame)
+        
+        RDPMainWindow(parent=None, title='Recorded Data Processor', pos=None, size=None, style=None, name=None, directory=self.frame.dir)
+        wx.CallAfter(self.frame.Hide)
+        
+        return rdp_gui
+    
+#========================================================================================================================
+
 class WriteCSVDialog(wx.FileDialog):
     def __init__(self, parent, defaultDir, defaultFile):
         
@@ -191,7 +870,8 @@ class WriteCSVDialog(wx.FileDialog):
         wx.FileDialog.__init__(self, parent=parent, message='Write .csv file', wildcard=wildcard, style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT|wx.FD_PREVIEW, defaultDir=defaultDir)
         
         return
-    
+
+#========================================================================================================================    
     
 class SaveConfigDialog(wx.FileDialog):
     def __init__(self, parent, defaultDir):
@@ -202,8 +882,9 @@ class SaveConfigDialog(wx.FileDialog):
         wx.FileDialog.__init__(self, parent=parent, message='Save Plot configuration', wildcard=wildcard, style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT|wx.FD_PREVIEW, defaultDir=defaultDir)
         
         return
-    
-    
+
+#========================================================================================================================
+
 class LoadConfigDialog(wx.FileDialog):
     def __init__(self, parent, defaultDir):
         
@@ -213,7 +894,8 @@ class LoadConfigDialog(wx.FileDialog):
         wx.FileDialog.__init__(self, parent=parent, message='Load Plot configuration', wildcard=wildcard, style=wx.FD_OPEN|wx.FD_PREVIEW, defaultDir=defaultDir)
         
         return
-    
+
+#======================================================================================================================== 
 
 class SnapshotSequenceDialog(wx.Dialog):
     def __init__(self, parent, _, title):
@@ -234,7 +916,7 @@ class SnapshotSequenceDialog(wx.Dialog):
         step_num_control = wx.SpinCtrl(self, -1, min=0, max=100)
         step_size = wx.StaticText(self, -1, 'Distance between snapshots \t')
         step_size_control = wx.SpinCtrl(self, -1, min=0, max=100)
-        step_sizer = wx.FlexGridSizer(rows=2, cols=2)
+        step_sizer = wx.FlexGridSizer(cols=2)
         step_sizer.SetFlexibleDirection(wx.BOTH)
         
         step_sizer.Add(step_num, 1, wx.ALIGN_LEFT)
@@ -242,20 +924,15 @@ class SnapshotSequenceDialog(wx.Dialog):
         step_sizer.Add(step_size, 1, wx.ALIGN_LEFT)
         step_sizer.Add(step_size_control, 1, wx.ALIGN_RIGHT|wx.EXPAND)
         
-        # self.parent.proj consists of 2 axes => resulting plot will be 3D
-        if len(self.parent.proj) >= 8:
-            axes_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
-        else:
-            axes_grid_sizer = wx.FlexGridSizer(rows=2, cols=2) 
-        
+        axes_grid_sizer = wx.FlexGridSizer(cols=2)
         axes_grid_sizer.SetFlexibleDirection(wx.BOTH)
         axes_label_sizer = wx.BoxSizer(wx.VERTICAL)
-        min_max_sizer = wx.FlexGridSizer(rows=2, cols=2)         
+        min_max_sizer = wx.FlexGridSizer(cols=2)         
         min_max_sizer.SetFlexibleDirection(wx.BOTH)
         
         label_axes_txt = wx.StaticText(self, -1, 'Axis labels')
-        x_axis_txt = wx.StaticText(self, -1, 'X axis \t')
-        y_axis_txt = wx.StaticText(self, -1, 'Y axis \t')
+        x_axis_txt = wx.StaticText(self, -1, 'X axis')
+        y_axis_txt = wx.StaticText(self, -1, 'Y axis')
         
         x_axis_label = wx.TextCtrl(self, -1, style=wx.TE_PROCESS_ENTER)
         y_axis_label = wx.TextCtrl(self, -1, style=wx.TE_PROCESS_ENTER)
@@ -263,8 +940,8 @@ class SnapshotSequenceDialog(wx.Dialog):
         x_axis_label.SetValue(parent.x_label)
         y_axis_label.SetValue(parent.y_label)
         
-        x_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=None))
-        y_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=None))
+        x_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.rdp_gui_events.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, parent=parent, z_axis_label=None))
+        y_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.rdp_gui_events.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, parent=parent, z_axis_label=None))
         
         axes_grid_sizer.Add(x_axis_txt, 0, wx.ALIGN_LEFT|wx.EXPAND)
         axes_grid_sizer.Add(x_axis_label, 1, wx.ALIGN_RIGHT|wx.EXPAND)
@@ -278,20 +955,21 @@ class SnapshotSequenceDialog(wx.Dialog):
             if parent.style != 'heatmap':
                 z_axis_txt = wx.StaticText(self, -1, 'Z axis \t')
             else:
-                z_axis_txt = wx.StaticText(self, -1, 'color bar \t')
+                z_axis_txt = wx.StaticText(self, -1, 'Color bar \t')
             
             z_axis_label = wx.TextCtrl(self, -1, style=wx.TE_PROCESS_ENTER)
             z_axis_label.SetValue(self.parent.z_label)
             
-            z_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
-            x_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
-            y_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
+            z_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.rdp_gui_events.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, parent=parent, z_axis_label=z_axis_label))
+            x_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.rdp_gui_events.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, parent=parent, z_axis_label=z_axis_label))
+            y_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.rdp_gui_events.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, parent=parent, z_axis_label=z_axis_label))
         
             axes_grid_sizer.Add(z_axis_txt, 0, wx.ALIGN_LEFT|wx.EXPAND)
             axes_grid_sizer.Add(z_axis_label, 1, wx.ALIGN_RIGHT)
         
         axes_label_sizer.Add(axes_grid_sizer, proportion=0, flag=wx.ALIGN_LEFT)
         axes_label_sizer.AddSpacer((10,10))
+        
         top_sizer.Add(item=label_axes_txt, proportion=0, flag=wx.ALIGN_LEFT|wx.ALL, border=10)
         top_sizer.Add(axes_label_sizer, 0, wx.ALIGN_CENTER|wx.TOP, border=10)
         
@@ -303,98 +981,40 @@ class SnapshotSequenceDialog(wx.Dialog):
         ok_btn.Bind(wx.EVT_BUTTON, lambda evt, step_num_control=step_num_control, step_size_control=step_size_control: 
                     self.evt_ok_btn(step_num_control, step_size_control, evt))
         
-        cancel_btn.Bind(wx.EVT_BUTTON, self.evt_cancel_button)
+        ok_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_ok_btn, step_num_control=step_num_control, step_size_control=step_size_control, parent=self))
+        
+        cancel_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_cancel_button, parent=self))
         
         # Layout
         self.SetSizer(top_sizer)
         top_sizer.Fit(self)
         self.Center(wx.CENTER_ON_SCREEN)
         
-    
-    def evt_ok_btn(self, step_num_entry, step_size_entry, event):
-        
-        # Get number of steps as well as step size from widgets
-        self.parent.nstep = int(step_num_entry.GetValue())
-        self.parent.step_size = int(step_size_entry.GetValue())
-
-        self.parent.plot, self.reduced_data = self.parent.frame.rdp_plot.plot_snapshot_sequence(start = self.parent.step, 
-                                                                             step_size = self.parent.step_size, 
-                                                                             steps = self.parent.nstep, 
-                                                                             style = self.parent.style, 
-                                                                             data = self.parent.data, 
-                                                                             header = self.parent.header, 
-                                                                             vmin = self.parent.vmin,
-                                                                             vmax = self.parent.vmax,
-                                                                             resolution = self.parent.resolution,
-                                                                             surface_linewidth = self.parent.surface_linewidth,
-                                                                             proj = self.parent.proj,
-                                                                             proj_method = self.parent.proj_method,
-                                                                             x_label = self.parent.x_label,
-                                                                             y_label = self.parent.y_label,
-                                                                             z_label = self.parent.z_label,
-                                                                             file_name = self.parent.flist_sorted[self.parent.selection],
-                                                                             file_directory = self.parent.dir,
-                                                                             save_mode = self.parent.save_mode,
-                                                                             color = self.parent.line_color,
-                                                                             figure = None)
-        
-        # Close dialog
-        self.Hide()
-        mpl.interactive(False)
-        wx.CallAfter(self.Destroy)
-
-        
-    def evt_cancel_button(self, event):
-        #Close dialog
-        self.Hide()
-        wx.CallAfter(self.Destroy)
-
 #========================================================================================================================
 
 class RDPApp(wx.App):
-    def OnInit(self):
-        self.main_window = RDPMainWindow(parent=None, title='Recorded Data Processor', pos=None, size=None, style=None, name=None)
-        self.SetTopWindow(self.main_window)
+    def OnInit(self):        
+        RDPStartupFrame(parent=None)
                 
         return True
             
 #========================================================================================================================
 
 class RDPMainWindow(wx.Frame):
-    def __init__(self, parent, title, pos, size, style, name):
-        
+    def __init__(self, parent, title, pos, size, style, name, directory):
+         
+        self.rdp_gui_events = RDPGUIEvents()
         self.parent = parent
         self.rdp_plot = RDPPlot()
         self.rdp_image_files = RDPImageFiles()
-
-        # search for standard cedarRecordings directory
-        if 'HOME' in os.environ:
-            self.dir = os.environ['HOME']
-        elif os.name == 'posix':
-            self.dir = os.path.expanduser("~/")
-        elif os.name == 'nt':
-            if 'HOMEPATH' in os.environ and 'HOMEDRIVE' in os.environ:
-                self.dir = os.environ['HOMEDRIVE'] + os.environ['HOMEPATH']
-        else:
-            self.dir = os.environ['HOMEPATH']
-        
-        # Walk through directories until 'cedarRecordings' is found
-        for (self.dir, dirs, _) in os.walk(self.dir):
-            for j in range(len(dirs)):
-                if dirs[j] == 'cedarRecordings':
-                    new_dir = dirs[j]
-                    self.dir = os.path.join(self.dir, new_dir)
-                    break
-            
-            break
-        
+        self.dir = directory
+                
         # initialize first frame
         if self.parent is None:
             wx.Frame.__init__(self, parent=None, title=title, style=wx.MINIMIZE_BOX|wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.CLIP_CHILDREN)  
-            
             self.rdp_browser = RDPBrowserPanel(parent=self)
             self.SetSizer(self.rdp_browser.main_sizer)
-            self.Bind(wx.EVT_CLOSE, self.evt_end_app)
+            self.Bind(wx.EVT_CLOSE, self.rdp_gui_events.evt_end_app)
             self.Sizer.Fit(self)
             self.Show()
         
@@ -402,24 +1022,23 @@ class RDPMainWindow(wx.Frame):
         else:
             wx.Frame.__init__(self, parent=parent, title=' ', style=wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.FRAME_NO_TASKBAR|wx.CLIP_CHILDREN)
                         
-            self.rdp_image_files = RDPImageFiles()
-            self.dir = self.parent.dir
+            self.dir = self.parent.dir  
             self.parent = parent
             self.rdp_gui = RDPGUI(parent=self)
             self.SetSizer(self.rdp_gui.main_sizer)
             self.Sizer.Fit(self)
-            self.Show()
             
+            parent.rdp_browser.rdp_gui.sel_cbox.Reparent(self.rdp_gui)
+            self.rdp_gui.sel_cbox.Reparent(parent.rdp_browser.rdp_gui)
+                        
         return
-            
-            
-    def evt_end_app(self, event):                
-        sys.exit()
         
 #========================================================================================================================
 
 class RDPBrowserPanel(wx.Panel):
     def __init__(self, parent):
+        
+        rdp_gui_events = RDPGUIEvents()
         wx.Panel.__init__(self, parent)
         self.frame = parent
                 
@@ -430,8 +1049,8 @@ class RDPBrowserPanel(wx.Panel):
         self.browser = wx.GenericDirCtrl(parent=self, dir=self.frame.dir, size=(325, 450))            
         self.sel_btn = wx.Button(parent=self, label = 'Select')
         self.load_config_btn = wx.Button(parent=self, label = 'Load configuration')
-        self.sel_btn.Bind(wx.EVT_BUTTON, self.evt_sel_btn)
-        self.load_config_btn.Bind(wx.EVT_BUTTON, self.evt_load_config_btn)
+        self.sel_btn.Bind(wx.EVT_BUTTON, partial(rdp_gui_events.evt_sel_btn, parent=self))
+        self.load_config_btn.Bind(wx.EVT_BUTTON, partial(rdp_gui_events.evt_load_config_btn, parent=self))
         
         # Main sizer
         self.main_sizer.Add(item=self.select_directory, proportion=0, flag=wx.TOP|wx.LEFT|wx.BOTTOM, border=10)
@@ -449,137 +1068,111 @@ class RDPBrowserPanel(wx.Panel):
         return
     
     
-    def evt_load_config_btn(self, event):
-        rdp_gui = self._initialize_rdp_gui()
-        rdp_gui._load_plot_configuration()
-        
-    
-    def evt_sel_btn(self, event):
-        '''Switch browser panel with control panel for plot generation/manipulation'''
-                      
-        self._initialize_rdp_gui()
-        
-        
     def _initialize_rdp_gui(self):
         frame = self.GetParent()
         frame.dir = self.browser.GetPath()
         
         # Initialize plot generation GUI      
-        rdp_gui = RDPGUI(parent=frame)
-        frame.SetSizer(rdp_gui.main_sizer)
+        self.rdp_gui = RDPGUI(parent=frame)
+        frame.SetSizer(self.rdp_gui.main_sizer)
         frame.Sizer.Fit(frame)
         wx.CallAfter(self.Hide)
         
-        return rdp_gui
+        return self.rdp_gui
     
-        
 #========================================================================================================================
 
 class RDPPlotFrame(wx.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, panel):
         
         self.parent = parent
+        self.rdp_gui_events = RDPGUIEvents()
         
-        # Initialize control plot frame if none is present
-        if parent.control_plot_frame is None:
-            parent.control_plot_frame = wx.Frame(parent=parent, id=-1, title=str(parent.title), style=wx.MAXIMIZE_BOX|wx.RESIZE_BORDER|
-                                                 wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.CLIP_CHILDREN|wx.FRAME_NO_TASKBAR)
+        # Initialize control plot frame
+        if parent.control_plot_frame == None:
+            parent.control_plot_frame = wx.Frame(parent=parent, id=-1, title=str(parent.title), style=wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.CLIP_CHILDREN|wx.FRAME_NO_TASKBAR)
+            parent.control_plot_frame.Bind(wx.EVT_CLOSE, partial(self.rdp_gui_events.evt_close_figure, parent=parent))
+            
+        parent.control_plot_frame.control_plot_panel = wx.Panel(parent=parent.control_plot_frame)
+        self.notebook = wx.Notebook(parent.control_plot_frame.control_plot_panel)
         
-        parent.control_plot_frame.control_plot_panel = wx.PyPanel(parent=parent.control_plot_frame, id=-1)
-        parent.control_plot_frame.Bind(wx.EVT_CLOSE, parent.evt_close_figure)
+        notebook_setup_panel = wx.Panel(parent=self.notebook)
+        notebook_parameters_panel = wx.Panel(parent=self.notebook)
+        notebook_export_panel = wx.Panel(parent=self.notebook)
         
-        save_btn = wx.Button(parent.control_plot_frame.control_plot_panel, wx.ID_SAVE, label = 'Save')
-        write_csv_btn = wx.Button(parent.control_plot_frame.control_plot_panel, label = 'Write .csv')
-        save_config_btn = wx.Button(parent.control_plot_frame.control_plot_panel, label = 'Save plot configuration')
-        save_btn.Bind(wx.EVT_BUTTON, parent.evt_save_plot_btn)
-        write_csv_btn.Bind(wx.EVT_BUTTON, parent.evt_write_csv_btn)
-        save_config_btn.Bind(wx.EVT_BUTTON, parent.evt_save_config_btn)
+        panel.Reparent(notebook_setup_panel)
+        
+        notebook_setup_panel_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        notebook_setup_panel_sizer.Add(item=panel, proportion=1, flag=wx.ALIGN_LEFT|wx.RIGHT, border=10)
+        
+        notebook_parameters_panel_sizer = wx.FlexGridSizer(cols=2)
+        notebook_parameters_panel_sizer.SetFlexibleDirection(wx.BOTH)
+        
+        notebook_export_panel_sizer = wx.BoxSizer(wx.HORIZONTAL)
+                
+        save_btn = wx.Button(notebook_export_panel, id=wx.ID_SAVE)
+        write_csv_btn = wx.Button(notebook_export_panel, label = 'Write .csv')
+        save_config_btn = wx.Button(notebook_export_panel, label = 'Save plot configuration')
+        
+        save_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_save_plot_btn, parent=parent))
+        write_csv_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_write_csv_btn, parent=parent))
+        save_config_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_save_config_btn, parent=parent))
+        
+        notebook_export_panel_sizer.Add(item=save_btn, proportion=0, flag=wx.ALIGN_BOTTOM|wx.BOTTOM|wx.LEFT, border=10)
+        notebook_export_panel_sizer.Add(item=write_csv_btn, proportion=0, flag=wx.ALIGN_BOTTOM|wx.BOTTOM, border=10)
+        notebook_export_panel_sizer.Add(item=save_config_btn, proportion=0, flag=wx.ALIGN_BOTTOM|wx.BOTTOM|wx.RIGHT, border=10)
         
         # Sizers
         #========================================================================================================================
-        top_sizer = wx.BoxSizer(wx.VERTICAL)
-        parent.control_plot_frame.main_sizer = wx.FlexGridSizer(rows=1, cols=2)
-        parent.control_plot_frame.main_sizer.SetFlexibleDirection(wx.BOTH)
-                
-        if 'Axes3DSubplot' in str(type(parent.plot)) or parent.style == 'heatmap':
-            axes_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
-        else:
-            axes_grid_sizer = wx.FlexGridSizer(rows=2, cols=2)
+        parent.control_plot_frame.main_sizer = wx.FlexGridSizer(cols=2)
+        parent.control_plot_frame.main_sizer.SetFlexibleDirection(wx.HORIZONTAL)
         
+        axes_grid_sizer = wx.FlexGridSizer(cols=2)        
         axes_grid_sizer.SetFlexibleDirection(wx.BOTH)
-        axes_label_sizer = wx.FlexGridSizer(rows=4, cols=1)
+        axes_label_sizer = wx.FlexGridSizer(cols=1)
         axes_label_sizer.SetFlexibleDirection(wx.BOTH)
-        min_max_sizer = wx.FlexGridSizer(rows=2, cols=2)         
+        min_max_sizer = wx.FlexGridSizer(cols=2)         
         min_max_sizer.SetFlexibleDirection(wx.BOTH)
         #========================================================================================================================
         
         # Labels
         #========================================================================================================================
-        label_axes_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Axis labels')
-        x_axis_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'X axis \t')
-        y_axis_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Y axis \t')
+        axes_heading = wx.StaticText(notebook_parameters_panel, -1, 'Axes labelling')
+        axes_heading.SetFont(wx.Font(pointSize=10, family=wx.DEFAULT, style=wx.NORMAL, weight=wx.NORMAL))  
+        x_axis_txt = wx.StaticText(notebook_parameters_panel, -1, 'X axis')
+        y_axis_txt = wx.StaticText(notebook_parameters_panel, -1, 'Y axis')
                 
-        if parent.style != 'heatmap' and 'Axes3DSubplot' in str(type(parent.plot)):
-            z_axis_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Z axis \t')
+        if parent.style != 'heatmap' and (parent.style == 'surface' or parent.style == 'wireframe'):
+            z_axis_txt = wx.StaticText(notebook_parameters_panel, -1, 'Z axis')
         elif parent.style == 'heatmap':
-            z_axis_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'color bar \t')
+            z_axis_txt = wx.StaticText(notebook_parameters_panel, -1, 'color bar')
         #========================================================================================================================
-            
-        x_axis_label = wx.TextCtrl(parent.control_plot_frame.control_plot_panel, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
-        y_axis_label = wx.TextCtrl(parent.control_plot_frame.control_plot_panel, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)        
+        
+        x_axis_label = wx.TextCtrl(notebook_parameters_panel, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
+        y_axis_label = wx.TextCtrl(notebook_parameters_panel, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
+        z_axis_label = None 
         
         # Build sizers
         #========================================================================================================================
-        axes_grid_sizer.Add(x_axis_txt, 0)
-        axes_grid_sizer.Add(x_axis_label, 1)
-        axes_grid_sizer.Add(y_axis_txt, 0)
-        axes_grid_sizer.Add(y_axis_label, 1)
+        
+        notebook_parameters_panel_sizer.Add(axes_heading, 1, wx.ALIGN_LEFT|wx.ALL, border=10)
+        notebook_parameters_panel_sizer.AddSpacer(5)
+        notebook_parameters_panel_sizer.Add(x_axis_txt, 1, wx.ALIGN_LEFT|wx.LEFT, border=20)
+        notebook_parameters_panel_sizer.Add(x_axis_label, 1, wx.ALIGN_RIGHT|wx.RIGHT, border=20)
+        notebook_parameters_panel_sizer.Add(y_axis_txt, 1, wx.ALIGN_LEFT|wx.LEFT, border=20)
+        notebook_parameters_panel_sizer.Add(y_axis_label, 1, wx.ALIGN_RIGHT|wx.RIGHT, border=20)
         
         # Plot is either 3-dimensional or a heatmap
-        if 'Axes3DSubplot' in str(type(parent.plot)) or parent.style == 'heatmap':
-            z_axis_label = wx.TextCtrl(parent.control_plot_frame.control_plot_panel, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
-            axes_grid_sizer.Add(z_axis_txt, 0)
-            axes_grid_sizer.Add(z_axis_label, 1)
-            x_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
-            y_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
-            z_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
+        if parent.style == 'surface' or parent.style == 'wireframe' or parent.style == 'heatmap':
+            z_axis_label = wx.TextCtrl(notebook_parameters_panel, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
+            notebook_parameters_panel_sizer.Add(z_axis_txt, 0, wx.ALIGN_LEFT|wx.LEFT, border=20)
+            notebook_parameters_panel_sizer.Add(z_axis_label, 1, wx.ALIGN_RIGHT|wx.RIGHT, border=20)
+            z_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.rdp_gui_events.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label, parent=parent))
+                                                        
+
+        x_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.rdp_gui_events.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label, parent=parent))
+        y_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.rdp_gui_events.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label, parent=parent))
             
-            if parent.style != 'heatmap':
-                plot_parameter_sizer = wx.BoxSizer(wx.VERTICAL)
-                plot_parameter_content_sizer = wx.FlexGridSizer(rows=3, cols=2)
-                plot_parameter_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Plot parameters')
-                
-                parent.control_plot_frame.azimuth_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Azimuth\t')
-                parent.control_plot_frame.elevation_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Elevation\t')
-                parent.control_plot_frame.distance_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Distance\t')
-                
-                parent.control_plot_frame.azimuth_spn = wx.SpinCtrl(parent.control_plot_frame.control_plot_panel, 
-                                                                          min=-180, max=180, initial=-60)
-                parent.control_plot_frame.elevation_spn = wx.SpinCtrl(parent.control_plot_frame.control_plot_panel, 
-                                                                            min=-90, max=90, initial=30)
-                parent.control_plot_frame.distance_spn = wx.SpinCtrl(parent.control_plot_frame.control_plot_panel, 
-                                                                           min=10, max=100, initial=10)
-                parent.control_plot_frame.azimuth_spn.Bind(wx.EVT_SPINCTRL, parent.evt_azimuth_spn)
-                parent.control_plot_frame.elevation_spn.Bind(wx.EVT_SPINCTRL, parent.evt_elevation_spn)
-                parent.control_plot_frame.distance_spn.Bind(wx.EVT_SPINCTRL, parent.evt_distance_spn)
-                
-                plot_parameter_content_sizer.Add(item=parent.control_plot_frame.azimuth_label, proportion=1)
-                plot_parameter_content_sizer.Add(item=parent.control_plot_frame.azimuth_spn, proportion=0)
-                plot_parameter_content_sizer.Add(item=parent.control_plot_frame.elevation_label, proportion=1)
-                plot_parameter_content_sizer.Add(item=parent.control_plot_frame.elevation_spn, proportion=0)
-                plot_parameter_content_sizer.Add(item=parent.control_plot_frame.distance_label, proportion=1)
-                plot_parameter_content_sizer.Add(item=parent.control_plot_frame.distance_spn, proportion=0)
-                
-                plot_parameter_sizer.Add(item=plot_parameter_label)
-                plot_parameter_sizer.Add(item=plot_parameter_content_sizer)
-                
-                top_sizer.Add(item=plot_parameter_sizer)
-            
-        else:
-            x_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=None))
-            y_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=None))
-        
-        plot_labelling_sizer = wx.BoxSizer(wx.HORIZONTAL)
         plot_labelling_tooltipstring = ('Choose the style in which the plot is to be labelled.\n'
                                         '=====================================\n'
                                         'Off:\t\tThere will be no labelling at all.\n'
@@ -589,61 +1182,126 @@ class RDPPlotFrame(wx.Frame):
                                         'Standard:\tThe plot will be labelled in a simple, sans-serif \t\t\tfont. Input in LateX notation will not be accepted.\n'
                                         '=====================================')
         
-        plot_labelling_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Plot Labelling\t')
-        plot_labelling_cbox = wx.ComboBox(parent.control_plot_frame.control_plot_panel, choices=parent.labelling_choices, value='Off', style=wx.CB_READONLY)
+        plot_labelling_txt = wx.StaticText(notebook_parameters_panel, -1, 'Plot labelling')
+        plot_labelling_cbox = wx.ComboBox(notebook_parameters_panel, size=x_axis_label.GetSize(), choices=parent.labelling_choices, value='off', style=wx.CB_READONLY)
         plot_labelling_txt.SetToolTipString(plot_labelling_tooltipstring)
         plot_labelling_cbox.SetToolTipString(plot_labelling_tooltipstring)
-        plot_labelling_cbox.Bind(wx.EVT_COMBOBOX, self.evt_plot_labelling_cbox)
+        plot_labelling_cbox.Bind(wx.EVT_COMBOBOX, partial(self.rdp_gui_events.evt_plot_labelling_cbox, parent=parent))
         
-        plot_labelling_sizer.Add(item=plot_labelling_txt, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-        plot_labelling_sizer.Add(item=plot_labelling_cbox, proportion=2, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
+        notebook_parameters_panel_sizer.Add(item=plot_labelling_txt, proportion=1, flag=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
+        notebook_parameters_panel_sizer.Add(item=plot_labelling_cbox, proportion=1, flag=wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.RIGHT, border=20)
         
-        if 'Axes3D' not in str(type(parent.plot)):
-            axis_ticks_sizer = wx.BoxSizer(wx.HORIZONTAL)
-            axis_ticks_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Axis ticks\t')
-            axis_ticks_cbox = wx.ComboBox(parent.control_plot_frame.control_plot_panel, choices=['On', 'Off'], style=wx.CB_READONLY)
-            
-            if parent.axis_ticks is not None:
-                if parent.axis_ticks is False:
-                    axis_ticks_cbox.SetValue('Off')
-                else:
-                    axis_ticks_cbox.SetValue('On')
+        axis_ticks_txt = wx.StaticText(notebook_parameters_panel, -1, 'Axis ticks\t')
+        axis_ticks_cbox = wx.ComboBox(notebook_parameters_panel, size=x_axis_label.GetSize(), choices=['on', 'off'], style=wx.CB_READONLY)
+        
+        if parent.axis_ticks is not None:
+            if parent.axis_ticks is False:
+                axis_ticks_cbox.SetValue('off')
             else:
-                if parent.style == 'image':
-                    axis_ticks_cbox.SetValue('Off')
-                else:
-                    axis_ticks_cbox.SetValue('On')
-                
-            axis_ticks_cbox.Bind(wx.EVT_COMBOBOX, self.evt_axis_ticks_cbox)
-            axis_ticks_sizer.Add(item=axis_ticks_txt, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-            axis_ticks_sizer.Add(item=axis_ticks_cbox, proportion=2, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-        
-        axes_label_sizer.Add(item=plot_labelling_sizer, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.RIGHT, border=10)
-        
-        if 'Axes3D' not in str(type(parent.plot)):
-            axes_label_sizer.Add(item=axis_ticks_sizer, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.RIGHT|wx.BOTTOM, border=10) 
-        
-        axes_label_sizer.Add(item=label_axes_txt, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.RIGHT|wx.BOTTOM, border=10)
-        axes_label_sizer.Add(item=axes_grid_sizer, proportion=1, flag=wx.EXPAND|wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)
-        
-        self._create_figure_canvas()
-        #parent.figure_canvas.Bind(wx.EVT_SIZE, parent.evt_resize_control_plot_panel)
-        
-        top_sizer.Add(item=axes_label_sizer, proportion=0, flag=wx.EXPAND|wx.RIGHT|wx.LEFT, border=10)
-        
-        if parent.style == 'heatmap':
-            line1 = wx.StaticLine(parent.control_plot_frame.control_plot_panel, -1, style=wx.LI_HORIZONTAL)
-            top_sizer.Add(line1, 0, wx.ALIGN_CENTER|wx.RIGHT|wx.LEFT|wx.BOTTOM, border=5)
-            heatmap_boundaries_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Heatmap boundaries')
+                axis_ticks_cbox.SetValue('on')
+        else:
+            if parent.style == 'image':
+                axis_ticks_cbox.SetValue('off')
+            else:
+                axis_ticks_cbox.SetValue('on')
             
+        axis_ticks_cbox.Bind(wx.EVT_COMBOBOX, partial(self.rdp_gui_events.evt_axis_ticks_cbox, parent=parent))
+        
+        notebook_parameters_panel_sizer.Add(item=axis_ticks_txt, proportion=1, flag=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
+        notebook_parameters_panel_sizer.Add(item=axis_ticks_cbox, proportion=1, flag=wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.RIGHT, border=20)
+            
+        if (parent.style == 'surface' or parent.style == 'wireframe' or parent.style == 'heatmap') and parent.style != 'heatmap':
+            
+            perspective_heading = wx.StaticText(notebook_parameters_panel, -1, 'Perspective')
+            perspective_heading.SetFont(wx.Font(pointSize=10, family=wx.DEFAULT, style=wx.NORMAL, weight=wx.NORMAL))  
+            parent.control_plot_frame.azimuth_label = wx.StaticText(notebook_parameters_panel, -1, 'Azimuth')
+            parent.control_plot_frame.elevation_label = wx.StaticText(notebook_parameters_panel, -1, 'Elevation')
+            parent.control_plot_frame.distance_label = wx.StaticText(notebook_parameters_panel, -1, 'Distance')
+            
+            parent.control_plot_frame.azimuth_spn = wx.SpinCtrl(notebook_parameters_panel, size=x_axis_label.GetSize(), 
+                                                                      min=-180, max=180, initial=-60)
+            parent.control_plot_frame.elevation_spn = wx.SpinCtrl(notebook_parameters_panel, size=x_axis_label.GetSize(),  
+                                                                        min=-90, max=90, initial=30)
+            parent.control_plot_frame.distance_spn = wx.SpinCtrl(notebook_parameters_panel, size=x_axis_label.GetSize(),  
+                                                                       min=10, max=100, initial=10)
+            parent.control_plot_frame.azimuth_spn.Bind(wx.EVT_SPINCTRL, partial(self.rdp_gui_events.evt_azimuth_spn, parent=parent))
+            parent.control_plot_frame.elevation_spn.Bind(wx.EVT_SPINCTRL, partial(self.rdp_gui_events.evt_elevation_spn, parent=parent))
+            parent.control_plot_frame.distance_spn.Bind(wx.EVT_SPINCTRL, partial(self.rdp_gui_events.evt_distance_spn, parent=parent))
+            
+            notebook_parameters_panel_sizer.Add(item=perspective_heading, proportion=1, flag=wx.ALIGN_LEFT|wx.ALL, border=10)
+            notebook_parameters_panel_sizer.AddSpacer(5)
+            notebook_parameters_panel_sizer.Add(item=parent.control_plot_frame.azimuth_label, proportion=1, flag=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
+            notebook_parameters_panel_sizer.Add(item=parent.control_plot_frame.azimuth_spn, proportion=1, flag=wx.ALIGN_RIGHT|wx.RIGHT, border=20)
+            notebook_parameters_panel_sizer.Add(item=parent.control_plot_frame.elevation_label, proportion=1, flag=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
+            notebook_parameters_panel_sizer.Add(item=parent.control_plot_frame.elevation_spn, proportion=1, flag=wx.ALIGN_RIGHT|wx.RIGHT, border=20)
+            notebook_parameters_panel_sizer.Add(item=parent.control_plot_frame.distance_label, proportion=1, flag=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
+            notebook_parameters_panel_sizer.Add(item=parent.control_plot_frame.distance_spn, proportion=1, flag=wx.ALIGN_RIGHT|wx.RIGHT, border=20)
+                        
+        self._create_figure_canvas()
+        
+        style_heading = wx.StaticText(notebook_parameters_panel, -1, 'Style')
+        style_heading.SetFont(wx.Font(pointSize=10, family=wx.DEFAULT, style=wx.NORMAL, weight=wx.NORMAL))
+        notebook_parameters_panel_sizer.Add(item=style_heading, proportion=1, flag=wx.ALIGN_LEFT|wx.ALL, border=10)
+        notebook_parameters_panel_sizer.AddSpacer(1)
+                                        
+        # Style options for 3-dimensional plots                                                                    
+        if parent.style == 'surface' or parent.style == 'wireframe':
+            
+            if parent.style == 'wireframe':
+                line_color_label = wx.StaticText(notebook_parameters_panel, -1, label='Line color ')  
+                self.line_color_ctrl = wx.ColourPickerCtrl(notebook_parameters_panel, -1, col=parent.aux_line_color)
+                self.line_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, partial(self.rdp_gui_events.evt_line_color_ctrl, parent=self))
+                notebook_parameters_panel_sizer.Add(line_color_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
+                notebook_parameters_panel_sizer.Add(self.line_color_ctrl, 1, wx.ALIGN_RIGHT|wx.RIGHT, border=20)
+            
+            elif parent.style == 'surface':
+                linewidth_label = wx.StaticText(notebook_parameters_panel, -1, label='Line width ') 
+                parent.control_plot_frame.linewidth_spn = wx.SpinCtrl(notebook_parameters_panel, size=x_axis_label.GetSize(), min=0, max=20)
+                parent.control_plot_frame.linewidth_spn.Bind(wx.EVT_SPINCTRL, partial(self.rdp_gui_events.evt_linewidth_spn, parent=parent))
+                notebook_parameters_panel_sizer.Add(linewidth_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
+                notebook_parameters_panel_sizer.Add(parent.control_plot_frame.linewidth_spn, 1, wx.ALIGN_RIGHT|wx.RIGHT, border=20)
+            
+            resolution_label = wx.StaticText(notebook_parameters_panel, -1, 'Resolution ')
+            parent.control_plot_frame.resolution_spn = wx.SpinCtrl(notebook_parameters_panel,  size=x_axis_label.GetSize(), min=1, max=100, value=str(parent.resolution))
+            parent.control_plot_frame.resolution_spn.Bind(wx.EVT_SPINCTRL, partial(self.rdp_gui_events.evt_resolution_spn, parent=parent))
+        
+            notebook_parameters_panel_sizer.Add(resolution_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
+            notebook_parameters_panel_sizer.Add(parent.control_plot_frame.resolution_spn, 1, wx.ALIGN_RIGHT|wx.RIGHT, border=20)
+                                                        
+        # Style options for line plots
+        elif parent.style == ' ':
+            line_style_options = ['solid', 'dashed', 'dash dot', 'dotted']
+            line_style_label = wx.StaticText(notebook_parameters_panel, -1, label='Line style ')  
+            self.line_style_cbox = wx.ComboBox(notebook_parameters_panel, size=x_axis_label.GetSize(), choices=line_style_options, value='solid', style=wx.CB_READONLY)
+            self.line_style_cbox.Bind(wx.EVT_COMBOBOX, partial(self.rdp_gui_events.evt_line_style_cbox, parent=self))
+            notebook_parameters_panel_sizer.Add(line_style_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
+            notebook_parameters_panel_sizer.Add(self.line_style_cbox, 1, wx.ALIGN_RIGHT|wx.RIGHT, border=20)
+            
+        if parent.mode == 'time course':
+            marker_color_label = wx.StaticText(notebook_parameters_panel, -1, label='Marker')
+            self.marked_check_box = wx.CheckBox(notebook_parameters_panel, -1)
+            self.marked_check_box.Bind(wx.EVT_CHECKBOX, partial(self.rdp_gui_events.evt_marked_check_box, parent=self))
+            self.marker_color_ctrl = wx.ColourPickerCtrl(notebook_parameters_panel, -1, col=parent.aux_marker_color)
+            self.marker_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, partial(self.rdp_gui_events.evt_marker_color_ctrl, parent=self))
+            
+            color_picker_sizer = wx.BoxSizer(wx.HORIZONTAL)
+            color_picker_sizer.Add(item=self.marked_check_box, proportion=0, flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT)
+            color_picker_sizer.Add(item=self.marker_color_ctrl,proportion=1, flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT)
+                       
+            notebook_parameters_panel_sizer.Add(marker_color_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
+            notebook_parameters_panel_sizer.Add(color_picker_sizer, 1, wx.ALIGN_RIGHT|wx.RIGHT, border=20)
+            
+        # Plot options for heatmaps
+        if parent.style == 'heatmap':
+            
+            heatmap_boundaries_heading = wx.StaticText(notebook_parameters_panel, -1, 'Heatmap boundaries')
+            heatmap_boundaries_heading.SetFont(wx.Font(pointSize=10, family=wx.DEFAULT, style=wx.NORMAL, weight=wx.NORMAL))
+                        
             # Controls for narrowing of depicted value range
-            vmin_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Minimum \t')
-            vmax_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Maximum \t')
-                    
-            parent.control_plot_frame.vmin_spn = wx.SpinCtrl(parent.control_plot_frame.control_plot_panel, min=-50, max=50, initial=0)
-            parent.control_plot_frame.vmax_spn = wx.SpinCtrl(parent.control_plot_frame.control_plot_panel, min=-50, max=50, initial=0)
-            #parent.control_plot_frame.vmax_spn.SetDigits(5)
-            #parent.control_plot_frame.vmin_spn.SetDigits(5)
+            vmin_label = wx.StaticText(notebook_parameters_panel, -1, 'Minimum')
+            vmax_label = wx.StaticText(notebook_parameters_panel, -1, 'Maximum')
+            parent.control_plot_frame.vmin_spn = wx.SpinCtrl(notebook_parameters_panel, size=x_axis_label.GetSize(), min=-50, max=50, initial=0)
+            parent.control_plot_frame.vmax_spn = wx.SpinCtrl(notebook_parameters_panel, size=x_axis_label.GetSize(),  min=-50, max=50, initial=0)
             
             # Set widgets to default values
             if parent.vmin is not None:
@@ -656,142 +1314,56 @@ class RDPPlotFrame(wx.Frame):
             else:
                 parent.control_plot_frame.vmax_spn.SetValue(0.0)
             
-            reset_heatmap_boundaries_btn = wx.Button(parent.control_plot_frame.control_plot_panel, label = 'Reset')
-            reset_heatmap_boundaries_btn.Bind(wx.EVT_BUTTON, parent.evt_reset_heatmap_boundaries_btn)
+            reset_heatmap_boundaries_btn = wx.Button(notebook_parameters_panel, label = 'Reset')
+            reset_heatmap_boundaries_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_reset_heatmap_boundaries_btn, parent=parent))
         
-            min_max_sizer.Add(vmin_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=10)
-            min_max_sizer.Add(parent.control_plot_frame.vmin_spn, 2, wx.ALIGN_RIGHT|wx.RIGHT, border=10)
-            min_max_sizer.Add(vmax_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=10)
-            min_max_sizer.Add(parent.control_plot_frame.vmax_spn, 2, wx.ALIGN_RIGHT|wx.RIGHT, border=10)
+            notebook_parameters_panel_sizer.Add(item=heatmap_boundaries_heading, proportion=1, flag=wx.ALIGN_LEFT|wx.ALL, border=10)
+            notebook_parameters_panel_sizer.AddSpacer(1)
+            notebook_parameters_panel_sizer.Add(vmin_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
+            notebook_parameters_panel_sizer.Add(parent.control_plot_frame.vmin_spn, 2, wx.ALIGN_RIGHT|wx.RIGHT, border=20)
+            notebook_parameters_panel_sizer.Add(vmax_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
+            notebook_parameters_panel_sizer.Add(parent.control_plot_frame.vmax_spn, 2, wx.ALIGN_RIGHT|wx.RIGHT, border=20)
+            notebook_parameters_panel_sizer.Add(reset_heatmap_boundaries_btn, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
+            notebook_parameters_panel_sizer.AddSpacer(5)
+            
+            parent.control_plot_frame.vmin_spn.Bind(wx.EVT_SPINCTRL, partial(self.rdp_gui_events.evt_vmin_spn, parent=parent))
+            parent.control_plot_frame.vmax_spn.Bind(wx.EVT_SPINCTRL, partial(self.rdp_gui_events.evt_vmax_spn, parent=parent))
+                                                    
+        if parent.ndim[parent.selection] == 0:
+            parent.control_plot_frame.sel_cbox = wx.ComboBox(notebook_parameters_panel, size=(150, 27), choices=parent.flist_sorted, value=parent.sel_cbox.GetValue(), style=wx.CB_READONLY)
+            parent.control_plot_frame.sel_cbox.Bind(wx.EVT_COMBOBOX, partial(self.rdp_gui_events.evt_sel_cbox, parent=parent))
+            
+            add_time_course_btn = wx.Button(notebook_parameters_panel, label = 'Add time course')
+            add_time_course_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_add_time_course, parent=parent))
+            remove_time_course_btn = wx.Button(notebook_parameters_panel, label = 'Remove time course')
+            
+            #remove_time_course_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_add_time_course, parent=parent))
+            line_color_label = wx.StaticText(notebook_parameters_panel, -1, label='Line color')
+            
+            self.line_color_ctrl = wx.ColourPickerCtrl(notebook_parameters_panel, -1, col=parent.aux_line_color)
+            self.line_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, partial(self.rdp_gui_events.evt_line_color_ctrl, parent=self))
+            sel_label = wx.StaticText(notebook_parameters_panel, -1, 'File')            
 
-            top_sizer.Add(heatmap_boundaries_txt, 0, flag=wx.ALIGN_LEFT|wx.BOTTOM|wx.LEFT, border=10)
-            top_sizer.Add(min_max_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)
-            top_sizer.Add(reset_heatmap_boundaries_btn, 0, flag=wx.ALIGN_LEFT|wx.ALL, border=10)
+            notebook_parameters_panel_sizer.Add(line_color_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
+            notebook_parameters_panel_sizer.Add(self.line_color_ctrl, 1, wx.ALIGN_RIGHT)
+            notebook_parameters_panel_sizer.Add(item=add_time_course_btn, proportion=0, flag=wx.ALIGN_LEFT|wx.EXPAND)
+            notebook_parameters_panel_sizer.Add(item=remove_time_course_btn, proportion=0, flag=wx.ALIGN_RIGHT|wx.EXPAND)
+            notebook_parameters_panel_sizer.Add(item=sel_label, proportion=0, flag=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
+            notebook_parameters_panel_sizer.Add(item=parent.control_plot_frame.sel_cbox, proportion=0, flag=wx.ALIGN_RIGHT)
             
-            
-            if parent.mode == 'time course':
-                marker_color_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, label='Marker')
-                self.marked_check_box = wx.CheckBox(parent.control_plot_frame.control_plot_panel, -1)
-                self.marker_color_ctrl = wx.ColourPickerCtrl(parent.control_plot_frame.control_plot_panel, -1, col=parent.aux_marker_color)
-                self.marker_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, self.evt_marker_color_ctrl)
-                
-                color_picker_sizer = wx.BoxSizer(wx.HORIZONTAL)
-                color_picker_sizer.Add(self.marked_check_box, flag=wx.ALIGN_CENTER_VERTICAL)
-                color_picker_sizer.Add(self.marker_color_ctrl)
-            
-                plot_control_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
-                plot_control_grid_sizer.Add(marker_color_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-                plot_control_grid_sizer.Add(color_picker_sizer, 1, wx.ALIGN_RIGHT)
-                top_sizer.Add(plot_control_grid_sizer, 0, flag=wx.ALIGN_LEFT|wx.ALL, border=10)
-                self.marked_check_box.Bind(wx.EVT_CHECKBOX, self.evt_marked_check_box)
-                
-            #top_sizer.Add(item=save_btn, proportion=0, flag=wx.ALIGN_CENTER|wx.TOP, border=25)
-            
-            parent.control_plot_frame.vmin_spn.Bind(wx.EVT_SPINCTRL, parent.evt_vmin_spn)
-            
-            parent.control_plot_frame.vmax_spn.Bind(wx.EVT_SPINCTRL, parent.evt_vmax_spn)
+        notebook_parameters_panel.SetSizerAndFit(notebook_parameters_panel_sizer)  
+        notebook_setup_panel.SetSizerAndFit(notebook_setup_panel_sizer)
+        notebook_export_panel.SetSizerAndFit(notebook_export_panel_sizer)
         
-        elif parent.style == 'wireframe' or parent.style == 'surface':
-            
-            visual_controls_txt = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Visual controls')
-            plot_control_sizer = wx.BoxSizer(wx.VERTICAL)
-            
-            if parent.style == 'wireframe':
-                if parent.mode == 'time course':
-                    plot_control_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
-                else:
-                    plot_control_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
-            
-            elif parent.style == 'surface':
-                if parent.mode == 'time course':
-                    plot_control_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
-                else:
-                    plot_control_grid_sizer = wx.FlexGridSizer(rows=2, cols=2)
-            
-            plot_control_grid_sizer.SetFlexibleDirection(wx.BOTH)
-                        
-            if parent.style == 'wireframe':
-                line_color_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, label='Line color ')  
-                self.line_color_ctrl = wx.ColourPickerCtrl(parent.control_plot_frame.control_plot_panel, -1, col=parent.aux_line_color)
-                self.line_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, self.evt_line_color_ctrl)
-                plot_control_grid_sizer.Add(line_color_label, 1, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
-                plot_control_grid_sizer.Add(self.line_color_ctrl, 1, wx.ALIGN_CENTER)
-            
-            elif parent.style == 'surface':
-                linewidth_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, label='Line width ') 
-                parent.control_plot_frame.linewidth_spn = wx.SpinCtrl(parent.control_plot_frame.control_plot_panel, -1, min=0, max=20)
-                parent.control_plot_frame.linewidth_spn.Bind(wx.EVT_SPINCTRL, parent.evt_linewidth_spn)
-                plot_control_grid_sizer.Add(linewidth_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-                plot_control_grid_sizer.Add(parent.control_plot_frame.linewidth_spn, 1, wx.ALIGN_RIGHT)
-            
-            if parent.mode == 'time course':
-                marker_color_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, label='Marker')
-                self.marked_check_box = wx.CheckBox(parent.control_plot_frame.control_plot_panel, -1)
-                self.marker_color_ctrl = wx.ColourPickerCtrl(parent.control_plot_frame.control_plot_panel, -1, col=parent.aux_marker_color)
-                self.marker_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, self.evt_marker_color_ctrl)
-                
-                color_picker_sizer = wx.BoxSizer(wx.HORIZONTAL)
-                color_picker_sizer.Add(self.marked_check_box, flag=wx.ALIGN_CENTER_VERTICAL)
-                color_picker_sizer.Add(self.marker_color_ctrl)
-                           
-                plot_control_grid_sizer.Add(marker_color_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-                plot_control_grid_sizer.Add(color_picker_sizer, 1, wx.ALIGN_RIGHT)
-                self.marked_check_box.Bind(wx.EVT_CHECKBOX, self.evt_marked_check_box)
-                    
-            resolution_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, 'Resolution ')
-            parent.control_plot_frame.resolution_spn = wx.SpinCtrl(parent.control_plot_frame.control_plot_panel, min=1, max=100, value=str(parent.resolution))
-            parent.control_plot_frame.resolution_spn.Bind(wx.EVT_SPINCTRL, parent.evt_resolution_spn)
-                        
-            plot_control_grid_sizer.Add(resolution_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-            plot_control_grid_sizer.Add(parent.control_plot_frame.resolution_spn, 1, wx.ALIGN_RIGHT)
-            
-            plot_control_sizer.Add(item=visual_controls_txt, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.BOTTOM|wx.TOP, border=10)
-            plot_control_sizer.Add(item=plot_control_grid_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)    
-            top_sizer.Add(item=plot_control_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.LEFT|wx.RIGHT, border=10)
-            #top_sizer.Add(item=save_btn, proportion=0, flag=wx.ALIGN_CENTER|wx.TOP|wx.LEFT|wx.RIGHT, border=25)
-                        
-        if parent.ndim[parent.selection] == 0 and parent.mode == 'time course':
-            parent.control_plot_frame.sel_cbox = wx.ComboBox(parent.control_plot_frame.control_plot_panel, choices=parent.flist_sorted, value=parent.sel_cbox.GetValue(), style=wx.CB_READONLY)
-            parent.control_plot_frame.sel_cbox.Bind(wx.EVT_COMBOBOX, parent.evt_sel_cbox)
-            line2 = wx.StaticLine(parent.control_plot_frame.control_plot_panel, -1, style=wx.LI_HORIZONTAL)
-            top_sizer.Add(line2, 0, wx.ALIGN_CENTER|wx.EXPAND|wx.RIGHT|wx.LEFT|wx.BOTTOM, border=5)
-            multi_plot_btn = wx.Button(parent.control_plot_frame.control_plot_panel, label = 'Add time course', size=(100,30))
-            multi_plot_btn.Bind(wx.EVT_BUTTON, parent.evt_add_time_course)
-            line_color_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, label='Line color \t')
-            
-            self.line_color_ctrl = wx.ColourPickerCtrl(parent.control_plot_frame.control_plot_panel, -1, col=parent.aux_line_color)
-            self.line_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, self.evt_line_color_ctrl)
-            
-            marker_color_label = wx.StaticText(parent.control_plot_frame.control_plot_panel, -1, label='Marker')
-            self.marked_check_box = wx.CheckBox(parent.control_plot_frame.control_plot_panel, -1)
-            self.marker_color_ctrl = wx.ColourPickerCtrl(parent.control_plot_frame.control_plot_panel, -1, col=parent.aux_marker_color)
-            self.marker_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, self.evt_marker_color_ctrl)
-            
-            color_picker_sizer = wx.BoxSizer(wx.HORIZONTAL)
-            color_picker_sizer.Add(self.marked_check_box, flag=wx.ALIGN_CENTER_VERTICAL)
-            color_picker_sizer.Add(self.marker_color_ctrl)
-            
-            plot_control_grid_sizer = wx.BoxSizer(wx.HORIZONTAL)
-            plot_control_grid_sizer.Add(marker_color_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-            plot_control_grid_sizer.Add(color_picker_sizer, 1, wx.ALIGN_RIGHT)
-            self.marked_check_box.Bind(wx.EVT_CHECKBOX, self.evt_marked_check_box)
-            
-            line_sizer = wx.BoxSizer(wx.HORIZONTAL)
-            line_sizer.Add(line_color_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-            line_sizer.Add(self.line_color_ctrl, 1, wx.ALIGN_RIGHT)
-            
-            top_sizer.Add(item=parent.control_plot_frame.sel_cbox, proportion=0, flag=wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, border=10)
-            top_sizer.Add(item=line_sizer, proportion=0, flag=wx.LEFT|wx.RIGHT, border=10)
-            top_sizer.Add(item=plot_control_grid_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)
-            top_sizer.Add(item=multi_plot_btn, proportion=0, flag=wx.LEFT|wx.RIGHT, border=10)
+        self.notebook.AddPage(notebook_setup_panel, 'Setup')
+        self.notebook.AddPage(notebook_parameters_panel, 'Plot parameters')
+        self.notebook.AddPage(notebook_export_panel, 'Export')
         
-        button_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        button_sizer.Add(item=save_btn, proportion=0, flag=wx.ALIGN_CENTER|wx.TOP, border=5)
-        button_sizer.Add(item=write_csv_btn, proportion=0, flag=wx.ALIGN_CENTER|wx.TOP, border=5)
-        button_sizer.Add(item=save_config_btn, proportion=0, flag=wx.ALIGN_CENTER|wx.TOP, border=5)
-        top_sizer.Add(item=button_sizer, proportion=0, flag=wx.ALIGN_CENTER|wx.TOP|wx.LEFT|wx.RIGHT, border=25) 
-        parent.control_plot_frame.main_sizer.Add(item=parent.figure_canvas, proportion=1, flag=wx.EXPAND)
-        parent.control_plot_frame.main_sizer.Add(item=top_sizer, proportion=1, flag=wx.EXPAND)
+        notebook_sizer = wx.BoxSizer()
+        notebook_sizer.Add(self.notebook, 1, wx.EXPAND)
+        
+        parent.control_plot_frame.main_sizer.Add(item=parent.figure_canvas, proportion=0, flag=wx.ALIGN_LEFT|wx.ALL|wx.EXPAND, border=10)
+        parent.control_plot_frame.main_sizer.Add(item=notebook_sizer, proportion=0, flag=wx.ALIGN_RIGHT|wx.ALL|wx.EXPAND, border=10)
         
         #========================================================================================================================
         
@@ -823,103 +1395,96 @@ class RDPPlotFrame(wx.Frame):
             self.line_color_ctrl.SetColour(parent.aux_line_color)
         except AttributeError:
             pass
-        
+                
         # Layout
         #========================================================================================================================
         parent.control_plot_frame.control_plot_panel.SetSizerAndFit(parent.control_plot_frame.main_sizer)
         parent.control_plot_frame.SetSizerAndFit(parent.control_plot_frame.main_sizer)
+        parent.control_plot_frame.Show()
         
         return
     
-    
-    def evt_line_color_ctrl(self, event):
-        widget = event.GetEventObject()
-        self.parent.aux_line_color = widget.GetColour()
-        widget.SetColour(self.parent.aux_line_color)
-        
-        # Color conversion
-        red = self.parent.aux_line_color.Red()/255.
-        green = self.parent.aux_line_color.Green()/255.
-        blue = self.parent.aux_line_color.Blue()/255.
-        
-        self.parent.line_color = [red, green, blue]
-        
-        # Update currently displayed plot
-        if self.parent.figure and self.parent.ndim[self.parent.selection] != 0:
-            wx.CallAfter(self.parent._update_plot)
-            wx.Yield()
-            
-    
-    def evt_marker_color_ctrl(self, event):
-        
-        self.parent.aux_marker_color = self.marker_color_ctrl.GetColour()
-        self.marker_color_ctrl.SetColour(self.parent.aux_marker_color)
-        
-        # Color conversion
-        red = self.parent.aux_marker_color.Red()/255.
-        green = self.parent.aux_marker_color.Green()/255.
-        blue = self.parent.aux_marker_color.Blue()/255.
-        self.parent.marker_color = [red, green, blue]
-        
-        # Update currently displayed plot
-        if self.parent.figure:
-            wx.CallAfter(self.parent._update_plot)
-            wx.Yield()
-    
-    
-    def evt_marked_check_box(self, event):
-        
-        widget = event.GetEventObject()
-        self.parent.marked = widget.GetValue()
-        wx.CallAfter(self.parent._update_plot)
-    
-    
-    def evt_plot_labelling_cbox(self, event):
-        parent = self.parent
-        widget = event.GetEventObject()
-        parent.labelling_mode = widget.GetValue()
-        
-        parent._update_plot()
-        parent._update_plot()
-            
-        
-    def evt_axis_ticks_cbox(self, event):
-        parent = self.parent
-        widget = event.GetEventObject()
-                
-        if widget.GetValue() == 'On':
-            parent.axis_ticks = True
-        else:
-            parent.axis_ticks = False
-            
-        parent._update_plot()
-        
      
     def _create_figure_canvas(self):
     
         self.parent.figure = plt.figure(str(self.parent.title))
         
-        if self.parent.figure_canvas == None:
-            self.parent.figure_canvas = FigureCanvas(self.parent.control_plot_frame.control_plot_panel, wx.ID_ANY, self.parent.figure)
-            self.parent.figure_canvas.mpl_connect('button_release_event', self.parent.evt_change_plot_parameters)
+        self.parent.figure_canvas = FigureCanvas(self.parent.control_plot_frame.control_plot_panel, wx.ID_ANY, self.parent.figure)    
+        self.parent.figure_canvas.mpl_connect('button_release_event', partial(self.rdp_gui_events.evt_change_plot_parameters, parent=self.parent))
+            
         wx.Yield()
-            
-            
-#========================================================================================================================
         
+
+class RDPFrame(wx.Frame):
+    def __init__(self, parent, title):
+        
+        rdp_gui_events = RDPGUIEvents()
+        self.frame = wx.Frame(parent=parent, title=title)
+        self.frame.panel = wx.Panel(parent=self.frame)
+        
+        self.frame.parent = parent
+        self.frame.dir = self.frame.parent.dir
+        self.frame.main_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.frame.widget_sizer = wx.FlexGridSizer(cols=2)
+        self.frame.widget_sizer.SetFlexibleDirection(wx.BOTH)
+        
+        self.frame.sel_cbox = wx.ComboBox(self.frame.panel, style = wx.CB_READONLY)
+        self.frame.mode_cbox = wx.ComboBox(self.frame.panel, style = wx.CB_READONLY)
+        self.frame.proj_cbox = wx.ComboBox(self.frame.panel, style = wx.CB_READONLY)
+        self.frame.proj_method_cbox = wx.ComboBox(self.frame.panel, style = wx.CB_READONLY, choices=self.frame.parent.proj_methods)
+        self.frame.style_cbox = wx.ComboBox(self.frame.panel, style = wx.CB_READONLY, choices=[])
+        
+        
+        self.frame.sel_cbox.SetItems(parent.flist_sorted)
+        self.frame.sel_cbox.SetValue(parent.sel_cbox_selection)
+        self.frame.sel_cbox.Bind(wx.EVT_COMBOBOX, partial(rdp_gui_events.evt_sel_cbox, parent=self.frame))
+        self.frame.mode_cbox.SetItems(parent.mode_ch)
+        self.frame.mode_cbox.Bind(wx.EVT_COMBOBOX, partial(rdp_gui_events.evt_mode_cbox, parent=self.frame))
+        self.frame.proj_cbox.Bind(wx.EVT_COMBOBOX, partial(rdp_gui_events.evt_proj_cbox, parent=self.frame))
+        self.frame.proj_method_cbox.Bind(wx.EVT_COMBOBOX, partial(rdp_gui_events.evt_proj_method_cbox, parent=self.frame))
+        self.frame.style_cbox.Bind(wx.EVT_COMBOBOX, partial(rdp_gui_events.evt_style_cbox, parent=self.frame))
+        
+        self.frame.sel_label = wx.StaticText(self.frame.panel, -1, 'File')
+        self.frame.mode_label = wx.StaticText(self.frame.panel, -1, 'Plot mode')
+        self.frame.proj_label = wx.StaticText(self.frame.panel, -1, 'Projection')
+        self.frame.proj_method_label = wx.StaticText(self.frame.panel, -1, 'Projection method \t')
+        self.frame.style_label = wx.StaticText(self.frame.panel, -1, 'Plot style')
+        
+        self.frame.widget_sizer.Add(self.frame.sel_label, proportion=0, flag=wx.ALIGN_LEFT|wx.TOP|wx.LEFT, border=15)
+        self.frame.widget_sizer.Add(self.frame.sel_cbox, proportion=1, flag=wx.ALIGN_RIGHT|wx.EXPAND|wx.TOP|wx.RIGHT, border=15)       
+        self.frame.widget_sizer.Add(self.frame.mode_label, proportion=0, flag=wx.ALIGN_LEFT|wx.LEFT, border=15)
+        self.frame.widget_sizer.Add(self.frame.mode_cbox, proportion=1, flag=wx.ALIGN_RIGHT|wx.EXPAND|wx.RIGHT, border=15)
+        self.frame.widget_sizer.Add(self.frame.proj_label, proportion=0, flag=wx.ALIGN_LEFT|wx.LEFT, border=15)
+        self.frame.widget_sizer.Add(self.frame.proj_cbox, proportion=1, flag=wx.ALIGN_RIGHT|wx.EXPAND|wx.RIGHT, border=15)
+        self.frame.widget_sizer.Add(self.frame.proj_method_label, proportion=0, flag=wx.ALIGN_LEFT|wx.LEFT, border=15)
+        self.frame.widget_sizer.Add(self.frame.proj_method_cbox, proportion=1, flag=wx.ALIGN_RIGHT|wx.EXPAND|wx.RIGHT, border=15)
+        self.frame.widget_sizer.Add(self.frame.style_label, proportion=0, flag=wx.ALIGN_LEFT|wx.LEFT|wx.BOTTOM, border=15)
+        self.frame.widget_sizer.Add(self.frame.style_cbox, proportion=1, flag=wx.ALIGN_RIGHT|wx.EXPAND|wx.BOTTOM|wx.RIGHT, border=15)
+        
+        self.frame.main_sizer.Add(self.frame.widget_sizer)
+        
+        self.frame.main_sizer.Fit(self.frame.panel)
+        self.frame.SetSizerAndFit(self.frame.main_sizer)
+        self.frame.CenterOnScreen()
+        
+        return
+                
+#========================================================================================================================
+
 class RDPGUI(wx.Panel):
     
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
-                        
+        
+        self.rdp_gui_events = RDPGUIEvents()
         self.frame = parent        
         self.control_plot_frame = None
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.dir = self.GetParent().dir            
+        self.dir = self.frame.dir            
         self.figure_size = None
-        self.x_label = ''
-        self.y_label = ''
-        self.z_label = ''
+        self.x_label = ' ' 
+        self.y_label = ' ' 
+        self.z_label = ' ' 
         self.marked = False
         self.nstep = 0
         self.step = 0
@@ -932,11 +1497,9 @@ class RDPGUI(wx.Panel):
         self.proj_method = 'average'
         self.style = ' '
         self.mode = ' '
-        self.labelling_mode = 'Off'
+        self.labelling_mode = 'off'
         self.flist = [record_file for record_file in os.listdir(self.dir) if record_file.lower().endswith('.csv') or record_file.lower().endswith('.data')]
-        
         self.flist_sorted = np.asarray(self.frame.rdp_plot.sort_alphnum(self.flist))
-        
         self.data = None
         self.reduced_data = None
         self.header = None
@@ -957,12 +1520,15 @@ class RDPGUI(wx.Panel):
         self.figure = None
         self.figure_canvas = None
         self.figure_canvas_connection_id = None
-        self.title = ''
+        self.title = ' ' 
         self.figure_resize = None
         self.colorbar = None
         self.axis_ticks = None
-        self.sel_cbox_selection = ''
-                
+        self.sel_cbox_selection = ' ' 
+        self.rdp_frame = None
+        self.line_style = 'solid'
+        self.lines = []
+        
         # Plot modes
         #self.mode_ch = [' ', 'snapshot', 'snapshot sequence', 'time course']
         self.mode_ch = [' ', 'snapshot', 'time course']
@@ -978,7 +1544,7 @@ class RDPGUI(wx.Panel):
         self.style_ch = [' ', 'heatmap', 'surface', 'wireframe']
         self.proj_methods = [' ', 'average', 'maximum', 'sum']
         
-        self.labelling_choices = ['Off', 'LateX', 'Standard']
+        self.labelling_choices = ['off', 'LateX', 'Standard']
         
         self.figure_azimuth = None
         self.figure_elevation = None
@@ -988,17 +1554,12 @@ class RDPGUI(wx.Panel):
         
         # Labels
         #========================================================================================================================
-        self.sel_label = wx.StaticText(self, -1, 'Recording')
-        self.mode_label = wx.StaticText(self, -1, 'Plot mode')
-        self.proj_label = wx.StaticText(self, -1, 'Projection')
-        self.proj_method_label = wx.StaticText(self, -1, 'Projection method \t')
-        self.style_label = wx.StaticText(self, -1, 'Plot style')
-        
+        self.sel_label = wx.StaticText(self, -1, 'File\t\t')
+                
         if self.frame.parent is None:
             self.time_stamp_display = wx.StaticText(self, -1, '-')
             self.time_stamp_label = wx.StaticText(self, -1, 'Time stamp t \t')
             
-        self.player_label = wx.StaticText(self, -1, 'Mark time slice')
         #========================================================================================================================
         
         self.line_1 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(300,10))
@@ -1008,18 +1569,13 @@ class RDPGUI(wx.Panel):
         # Control widgets
         #========================================================================================================================
         self.sel_cbox = wx.ComboBox(self, size=(200, 27), choices = self.flist_sorted, value = ' ', style = wx.CB_READONLY) 
-        self.mode_cbox = wx.ComboBox(self, size = self.sel_cbox.GetSize(), style = wx.CB_READONLY)
-        self.proj_cbox = wx.ComboBox(self, size = self.sel_cbox.GetSize(), style = wx.CB_READONLY)
-        self.proj_method_cbox = wx.ComboBox(self, size = self.sel_cbox.GetSize(), choices = self.proj_methods, value=' ', style = wx.CB_READONLY)
-        self.style_cbox = wx.ComboBox(self, size = self.sel_cbox.GetSize(), choices = self.style_ch, style = wx.CB_READONLY)
-        
+                
         if self.frame.parent is None:
             self.pos_slider = wx.Slider(self, value=0, minValue = 0, maxValue = 1, style = wx.SL_LABELS|wx.SL_AUTOTICKS)
             
         #========================================================================================================================
 
-        for i in range(len(self.flist_sorted)):
-            
+        for i in range(len(self.flist_sorted)):    
                 self.header_list.append(self.frame.rdp_plot.get_header(csv_f=self.dir + '/' + self.flist_sorted[i]))
                 self.ndim.append(self.frame.rdp_plot.get_dimension(self.header_list[i]))
         
@@ -1035,10 +1591,11 @@ class RDPGUI(wx.Panel):
         self.player_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.player_time_stamp_sizer = wx.BoxSizer(wx.VERTICAL)
         self.btn_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.axes_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
+        self.axes_grid_sizer = wx.FlexGridSizer(cols=2)
         self.axes_grid_sizer.SetFlexibleDirection(wx.BOTH)
-        self.cbox_grid_sizer = wx.FlexGridSizer(rows=5, cols=2)
+        self.cbox_grid_sizer = wx.FlexGridSizer(cols=2)
         self.cbox_grid_sizer.SetFlexibleDirection(wx.BOTH)
+        self.directory_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.selection_sizer = wx.BoxSizer(wx.VERTICAL)
         
         if self.frame.parent is None:
@@ -1057,12 +1614,11 @@ class RDPGUI(wx.Panel):
             
         # Buttons
         #========================================================================================================================
-        self.plot_btn = wx.Button(self, label = 'Plot')
         self.load_config_btn = wx.Button(self, label = 'Load configuration')
         
         if self.frame.parent is None:
             self.switch_btn = wx.Button(self, label = 'Switch directory')
-            self.add_figure_frame_btn = wx.Button(self, label = 'Additional figure panel')
+            self.add_figure_frame_btn = wx.Button(self, label = '+', size=(27,27))
 
             # Player buttons
             #========================================================================================================================
@@ -1074,10 +1630,9 @@ class RDPGUI(wx.Panel):
             
             # Player button tooltips
             #========================================================================================================================
-            #self.self.control_plot_frame.resolution_spn.SetToolTipString('Determines the resolution of the plot. Lower values lead to finer resolutions.')
             self.play_pause_btn.SetToolTipString('Starts and pauses the Plot animation.')
             self.reverse_play_pause_btn.SetToolTipString('Starts and pauses the reverse Plot animation.')
-            self.reset_btn.SetToolTipString('Resets the plot to default start parameters.')
+            self.reset_btn.SetToolTipString('Resets the plot to the first recorded time step.')
             self.increase_single_step_btn.SetToolTipString('Updates the plot by increasing the time slice index by 1.')
             self.decrease_single_step_btn.SetToolTipString('Updates the plot by decreasing the time slice index by 1.')
         
@@ -1086,7 +1641,6 @@ class RDPGUI(wx.Panel):
             
         # Slider and player functionalities
         #========================================================================================================================
-        self.player_caption_sizer.Add(self.player_label, 1)
         self.player_time_stamp_sizer.Add(self.player_caption_sizer, 0, wx.ALIGN_LEFT)
         
         if self.frame.parent is None:
@@ -1108,31 +1662,28 @@ class RDPGUI(wx.Panel):
             self.player_time_stamp_sizer.Add(self.time_stamp_sizer, 1, wx.ALIGN_LEFT)
         
         #========================================================================================================================
-        
-        if self.frame.parent is None:
-            self.selection_sizer.Add(self.switch_btn, 1, wx.EXPAND)
-            self.selection_sizer.Add(self.add_figure_frame_btn, 1, wx.EXPAND)
-            
-        self.selection_sizer.Add(self.sel_cbox, 1, wx.EXPAND)
+                
+        self.directory_sizer.Add(self.sel_cbox, 1, wx.EXPAND)
+        try:
+            self.directory_sizer.Add(self.add_figure_frame_btn, 0, wx.EXPAND)
+        except AttributeError:
+            pass
+        self.selection_sizer.Add(self.directory_sizer, 1, wx.EXPAND)
+
         
         # Selection ComboBoxes
         #========================================================================================================================
         self.cbox_grid_sizer.Add(self.sel_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-        self.cbox_grid_sizer.Add(self.selection_sizer, 1, wx.ALIGN_RIGHT)
-        self.cbox_grid_sizer.Add(self.mode_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-        self.cbox_grid_sizer.Add(self.mode_cbox, 1, wx.ALIGN_RIGHT)
-        self.cbox_grid_sizer.Add(self.proj_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-        self.cbox_grid_sizer.Add(self.proj_cbox, 1, wx.ALIGN_RIGHT)
-        self.cbox_grid_sizer.Add(self.proj_method_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-        self.cbox_grid_sizer.Add(self.proj_method_cbox, 1, wx.ALIGN_RIGHT)
-        self.cbox_grid_sizer.Add(self.style_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-        self.cbox_grid_sizer.Add(self.style_cbox, 1, wx.ALIGN_RIGHT)
+        self.cbox_grid_sizer.Add(self.selection_sizer, 1, wx.ALIGN_RIGHT)        
         #========================================================================================================================
         
         # Buttons
         #========================================================================================================================
-        self.plot_sizer.Add(item=self.plot_btn, proportion=0, flag=wx.ALIGN_LEFT|wx.EXPAND)
         self.plot_sizer.Add(item=self.load_config_btn, proportion=0, flag=wx.ALIGN_LEFT|wx.EXPAND)
+        
+        if self.frame.parent == None:
+            self.plot_sizer.Add(item=self.switch_btn, proportion=0, flag=wx.ALIGN_LEFT|wx.EXPAND)
+            
         self.btn_sizer.Add(item=self.plot_sizer, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
         #========================================================================================================================
         
@@ -1157,26 +1708,22 @@ class RDPGUI(wx.Panel):
                 
         # Event handling
         #========================================================================================================================
-        self.sel_cbox.Bind(wx.EVT_COMBOBOX, self.evt_sel_cbox)
-        self.mode_cbox.Bind(wx.EVT_COMBOBOX, self.evt_mode_cbox)
-        self.proj_cbox.Bind(wx.EVT_COMBOBOX, self.evt_proj_cbox)
-        self.proj_method_cbox.Bind(wx.EVT_COMBOBOX, self.evt_proj_method_cbox)
-        self.style_cbox.Bind(wx.EVT_COMBOBOX, self.evt_style_cbox)
-        self.load_config_btn.Bind(wx.EVT_BUTTON, self.evt_load_config_btn)
+        self.sel_cbox.Bind(wx.EVT_COMBOBOX, partial(self.rdp_gui_events.evt_sel_cbox, parent=self))
+        self.load_config_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_load_config_btn, parent=self))
         
         if self.frame.parent is None:
             
-            self.pos_slider.Bind(wx.EVT_COMMAND_SCROLL_THUMBTRACK, self.evt_pos_slider)
-            self.pos_slider.Bind(wx.EVT_COMMAND_SCROLL_CHANGED, self.evt_pos_slider)       
-            self.play_pause_btn.Bind(wx.EVT_BUTTON, self.evt_play_pause_btn)
-            self.reverse_play_pause_btn.Bind(wx.EVT_BUTTON, self.evt_reverse_play_pause_btn)
-            self.increase_single_step_btn.Bind(wx.EVT_BUTTON, self.evt_increase_single_step_btn)
-            self.decrease_single_step_btn.Bind(wx.EVT_BUTTON, self.evt_decrease_single_step_btn)
-            self.reset_btn.Bind(wx.EVT_BUTTON, self.evt_reset_btn)
-            self.switch_btn.Bind(wx.EVT_BUTTON, self.evt_switch_btn)
+            self.pos_slider.Bind(wx.EVT_COMMAND_SCROLL_THUMBTRACK, partial(self.rdp_gui_events.evt_pos_slider, parent=self))
+            self.pos_slider.Bind(wx.EVT_COMMAND_SCROLL_CHANGED, partial(self.rdp_gui_events.evt_pos_slider, parent=self))       
+            self.play_pause_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_play_pause_btn, parent=self))
+            self.reverse_play_pause_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_reverse_play_pause_btn, parent=self))
+            self.increase_single_step_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_increase_single_step_btn, parent=self))
+            self.decrease_single_step_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_decrease_single_step_btn, parent=self))
+            self.reset_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_reset_btn, parent=self))
+            self.switch_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_switch_btn, parent=self))
                     
         if self.frame.parent is None:
-            self.add_figure_frame_btn.Bind(wx.EVT_BUTTON, self.evt_add_figure_frame_btn)
+            self.add_figure_frame_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_add_figure_frame_btn, parent=self))
         #========================================================================================================================
         
         # Layout
@@ -1184,45 +1731,24 @@ class RDPGUI(wx.Panel):
         self.SetSizerAndFit(self.main_sizer)
 
         #========================================================================================================================
-        
-        self.mode_cbox.Disable()
-        self.proj_cbox.Disable()
-        self.proj_method_cbox.Disable()
-        self.style_cbox.Disable()
-                  
+                          
         return
     
     
     def prepare_plot_configuration(self, directory, x_label, y_label, z_label, marked, step, slider_max, resolution, vmax, vmin, proj, 
-                                   proj_method, style, mode, labelling_mode, data, reduced_data, header, ndim, time_stamps, selection, sel_cbox_selection,
+                                   proj_method, style, mode, labelling_mode, reduced_data, header, ndim, selection, sel_cbox_selection,
                                    proj_choice_time_course, proj_choice_snapshot, line_color, aux_line_color, marker_color, aux_marker_color, title, 
                                    axis_ticks, figure_azimuth, figure_elevation, figure_distance, surface_linewidth, flist_sorted, mode_ch, proj_ch):
-                              
-        save_object = [directory, x_label, y_label, z_label, marked, step, slider_max, resolution, vmax, vmin, proj, 
-                       proj_method, style, mode, labelling_mode, data, reduced_data, header, ndim, time_stamps, selection, sel_cbox_selection,
+        
+        
+        save_object = [432, directory, x_label, y_label, z_label, marked, step, slider_max, resolution, vmax, vmin, proj, 
+                       proj_method, style, mode, labelling_mode, reduced_data, header, ndim, selection, sel_cbox_selection,
                        proj_choice_time_course, proj_choice_snapshot, line_color, aux_line_color, marker_color, aux_marker_color, title, 
                        axis_ticks, figure_azimuth, figure_elevation, figure_distance, surface_linewidth, flist_sorted, mode_ch, proj_ch]
-                
+                        
         return save_object
     
-    
-    def evt_change_plot_parameters(self, event):
-        
-        self.figure = plt.figure(str(self.title))
-        self.plot = self.figure.gca()
-        
-        if 'Axes3D' in str(type(self.plot)):
-            self.figure_azimuth = int(self.figure.gca(projection='3d').azim)
-            self.figure_elevation = int(self.figure.gca(projection='3d').elev)
-                    
-        self.control_plot_frame.azimuth_spn.SetValue(self.figure_azimuth)
-        self.control_plot_frame.elevation_spn.SetValue(self.figure_elevation)
-                
-    
-    def evt_load_config_btn(self, event):       
-        self._load_plot_configuration()
-        
-        
+
     def _load_plot_configuration(self):
         
         dlg = LoadConfigDialog(self, self.dir)
@@ -1233,45 +1759,48 @@ class RDPGUI(wx.Panel):
         file_path = dlg.GetPath()
         loaded_object = pickle.load(open(file_path, 'rb'))
         
-        self.dir = loaded_object[0]
-        self.x_label = loaded_object[1] 
-        self.y_label = loaded_object[2]
-        self.z_label = loaded_object[3]  
-        self.marked = loaded_object[4]  
-        self.step = loaded_object[5]  
-        self.slider_max = loaded_object[6]  
-        self.resolution = loaded_object[7]  
-        self.vmax = loaded_object[8]  
-        self.vmin = loaded_object[9]  
-        self.proj = loaded_object[10]  
-        self.proj_method = loaded_object[11]  
-        self.style = loaded_object[12]  
-        self.mode = loaded_object[13]  
-        self.labelling_mode = loaded_object[14]  
-        self.data = loaded_object[15]  
-        self.reduced_data = loaded_object[16]  
-        self.header = loaded_object[17]  
-        self.ndim = loaded_object[18]  
-        self.time_stamps = loaded_object[19]  
-        self.selection = loaded_object[20] 
-        self.sel_cbox_selection = loaded_object[21]
-        self.proj_choice_time_course = loaded_object[22]  
-        self.proj_choice_snapshot = loaded_object[23]  
-        self.line_color = loaded_object[24]  
-        self.aux_line_color = loaded_object[25]  
-        self.marker_color = loaded_object[26] 
-        self.aux_marker_color = loaded_object[27] 
-        self.title = loaded_object[28]  
-        self.axis_ticks = loaded_object[29]  
-        self.figure_azimuth = loaded_object[30]  
-        self.figure_elevation = loaded_object[31]  
-        self.figure_distance = loaded_object[32]  
-        self.surface_linewidth = loaded_object[33]  
-        self.flist_sorted = loaded_object[34] 
-        self.mode_ch = loaded_object[35]
-        self.proj_ch = loaded_object[36]
-           
-        self.plot_btn.Bind(wx.EVT_BUTTON, self.evt_plot)
+        if loaded_object[0] == 432:
+            self.dir = loaded_object[1]
+            self.x_label = loaded_object[2] 
+            self.y_label = loaded_object[3]
+            self.z_label = loaded_object[4]  
+            self.marked = loaded_object[5]  
+            self.step = loaded_object[6]  
+            self.slider_max = loaded_object[7]  
+            self.resolution = loaded_object[8]  
+            self.vmax = loaded_object[9]  
+            self.vmin = loaded_object[10]  
+            self.proj = loaded_object[11]  
+            self.proj_method = loaded_object[12]  
+            self.style = loaded_object[13]  
+            self.mode = loaded_object[14]  
+            self.labelling_mode = loaded_object[15]  
+            self.reduced_data = loaded_object[16]  
+            self.header = loaded_object[17]  
+            self.ndim = loaded_object[18]  
+            self.selection = loaded_object[19] 
+            self.sel_cbox_selection = loaded_object[20]
+            self.proj_choice_time_course = loaded_object[21]  
+            self.proj_choice_snapshot = loaded_object[22]  
+            self.line_color = loaded_object[23]  
+            self.aux_line_color = loaded_object[24]  
+            self.marker_color = loaded_object[25] 
+            self.aux_marker_color = loaded_object[26] 
+            self.title = loaded_object[27]  
+            self.axis_ticks = loaded_object[28]  
+            self.figure_azimuth = loaded_object[29]  
+            self.figure_elevation = loaded_object[30]  
+            self.figure_distance = loaded_object[31]  
+            self.surface_linewidth = loaded_object[32]  
+            self.flist_sorted = loaded_object[33] 
+            self.mode_ch = loaded_object[34]
+            self.proj_ch = loaded_object[35]
+                        
+        else:
+            print 'File format cannot be read.'
+            return
+        
+        self.data, self.time_stamps = RDPPlot().get_data(csv_f=self.dir + '/' + self.flist_sorted[self.selection], header=self.header) 
         self.sel_cbox.SetItems(self.flist_sorted)
         self.sel_cbox.SetValue(self.sel_cbox_selection)
         
@@ -1282,489 +1811,29 @@ class RDPGUI(wx.Panel):
         except AttributeError:
             pass
         
-        self.proj_cbox.SetItems(self.proj_ch)
-        self.proj_cbox.SetValue(self.proj)
-        self.proj_method_cbox.SetValue(self.proj_method)
-        self.mode_cbox.SetItems(self.mode_ch)
-        self.mode_cbox.SetValue(self.mode)
-        self.style_cbox.SetValue(self.style)
+        self.rdp_frame = RDPFrame(parent=self, title=self.sel_cbox_selection) 
+        self.rdp_frame.frame.Show()
+        self.rdp_frame.frame.proj_cbox.SetItems(self.proj_ch)
+        self.rdp_frame.frame.proj_cbox.SetValue(self.proj)
+        self.rdp_frame.frame.proj_method_cbox.SetValue(self.proj_method)
+        self.rdp_frame.frame.mode_cbox.SetItems(self.mode_ch)
+        self.rdp_frame.frame.mode_cbox.SetValue(self.mode)
+        self.rdp_frame.frame.style_cbox.SetItems(self.style_ch)
+        self.rdp_frame.frame.style_cbox.SetValue(self.style)
+        
+        
+        self.rdp_frame.frame.mode_cbox.Enable()
+        self.rdp_frame.frame.style_cbox.Enable()
+        self.rdp_frame.frame.proj_cbox.Enable()
+        self.rdp_frame.frame.proj_method_cbox.Enable()
         
-        self.mode_cbox.Enable()
-        self.style_cbox.Enable()
-        self.proj_cbox.Enable()
-        self.proj_method_cbox.Enable()
-        
-            
-    def evt_save_config_btn(self, event):
-        #dlg_name = self.dir + '/' + self.flist_sorted[self.selection].strip('.p') + '-' + str(self.mode) + '-1.p'
-        dlg = SaveConfigDialog(self, self.dir)
-        
-        if dlg.ShowModal() == wx.ID_CANCEL:
-            return
-        
-        save_object = self.prepare_plot_configuration(directory=self.dir,
-                                                      x_label=self.x_label,
-                                                      y_label=self.y_label, 
-                                                      z_label=self.z_label, 
-                                                      marked=self.marked, 
-                                                      step=self.step, 
-                                                      slider_max=self.slider_max, 
-                                                      resolution=self.resolution, 
-                                                      vmax=self.vmax, 
-                                                      vmin=self.vmin, 
-                                                      proj=self.proj, 
-                                                      proj_method=self.proj_method, 
-                                                      style=self.style, 
-                                                      mode=self.mode, 
-                                                      labelling_mode=self.labelling_mode, 
-                                                      data=self.data, 
-                                                      reduced_data=self.reduced_data, 
-                                                      header=self.header, 
-                                                      ndim=self.ndim, 
-                                                      time_stamps=self.time_stamps, 
-                                                      selection=self.selection,
-                                                      sel_cbox_selection=self.sel_cbox_selection,
-                                                      proj_choice_time_course=self.proj_choice_time_course, 
-                                                      proj_choice_snapshot=self.proj_choice_snapshot, 
-                                                      line_color=self.line_color, 
-                                                      aux_line_color=self.aux_line_color, 
-                                                      marker_color=self.marker_color, 
-                                                      aux_marker_color=self.aux_marker_color,
-                                                      title=self.title, 
-                                                      axis_ticks=self.axis_ticks, 
-                                                      figure_azimuth=self.figure_azimuth, 
-                                                      figure_elevation=self.figure_elevation, 
-                                                      figure_distance=self.figure_distance, 
-                                                      surface_linewidth=self.surface_linewidth,
-                                                      flist_sorted=self.flist_sorted,
-                                                      mode_ch = self.mode_cbox.GetItems(),
-                                                      proj_ch=self.proj_cbox.GetItems())
-                
-        file_path = dlg.GetPath()
-
-        pickle.dump(save_object, open(file_path, 'wb'), 0)
-        
-        
-    def evt_elevation_spn(self, event):
-        widget = event.GetEventObject()
-        value = widget.GetValue()
-        self.figure_elevation = value
-        self.figure.gca().elev = self.figure_elevation
-           
-        wx.CallAfter(self._update_plot)
-        
-        
-    def evt_azimuth_spn(self, event):
-        widget = event.GetEventObject()
-        value = widget.GetValue()
-        self.figure_azimuth = value      
-        self.figure.gca().azim = self.figure_azimuth
-        
-        wx.CallAfter(self._update_plot)
-        
-
-    def evt_distance_spn(self, event):
-        widget = event.GetEventObject()
-        value = widget.GetValue()
-        self.figure_distance = value        
-                
-        wx.CallAfter(self._update_plot)
-        
-        
-    def evt_close_figure(self, event):
-        
-        self.figure_canvas.mpl_disconnect(self.figure_canvas_connection_id)
-        
-        self.figure_canvas_connection_id = None
-        self.figure.clf()
-        self.plot = None
-        self.figure = None
-        self.colorbar = None
-        self.figure_canvas = None
-        self.control_plot_frame.Hide()
-        self.control_plot_frame = None
-        
-    
-    def evt_add_figure_frame_btn(self, event):
-        
-        try:
-            if self.ndim[self.selection] == 0:
-                self.mode_cbox.SetItems(['time course'])
-            else:
-                self.mode_cbox.SetItems(self.multi_mode_ch)
-        
-        except TypeError:
-            pass
-        
-        new_frame = RDPMainWindow(parent=self.frame, title='', pos=None, size=None, style=None, name=None)     
-        new_frame.rdp_gui.step = self.step   
-        new_frame.Bind(wx.EVT_CLOSE, self.evt_close_frame)
-        
-        new_frame_id = new_frame.GetId()
-        self.frame_ids.append(new_frame_id)
-        
-        wx.FindWindowById(new_frame_id).step = self.step
-        
-                             
-    def evt_close_frame(self, event):
-        frame = event.GetEventObject()
-        frame_id = frame.GetId()
-        
-        if frame_id in self.frame_ids:
-            self.frame_ids.remove(frame_id)
-        
-        wx.FindWindowById(frame_id).Hide()
-                
-                
-    def evt_play_pause_btn(self, event):
-        self._play_pause_btn(reverse=False)
-        
-
-    def evt_reverse_play_pause_btn(self, event):
-        self._play_pause_btn(reverse=True)
-        
-            
-    def evt_reset_btn(self, event):
-        '''Reset plot to default.'''
-        
-        for i in range(len(self.frame_ids)):
-            current_frame = self._set_current_frame(i)
-            current_frame.step = 0
-            current_frame.marked = False
-            
-            current_frame.x_label = ''
-            current_frame.y_label = ''
-            current_frame.z_label = ''
-            current_frame.nstep = 0
-            current_frame.step_size = 0
-            current_frame.resolution = 5
-            current_frame.line_color = '#FF9600'
-            current_frame.aux_line_color = '#FF9600'
-            current_frame.marker_color = '#FF9600'
-            current_frame.aux_marker_color = '#FF9600'
-            current_frame.save_mode = False
-            current_frame.figure_azimuth = None
-            current_frame.figure_elevation = None
-            current_frame.figure_distance = None
-            current_frame.surface_linewidth = 0
-            
-            if i == 0:
-                current_frame.pos_slider.SetValue(current_frame.step)
-                current_frame.time_stamp_display.SetLabel(' ')
-                    
-            if current_frame.control_plot_frame:
-                
-                try:
-                    current_frame.control_plot_frame.resolution_spn.SetValue(current_frame.resolution)
-                except AttributeError:
-                    
-                    pass
-                try:
-                    current_frame.control_plot_frame.linewidth_spn.SetValue(current_frame.surface_linewidth)
-                except AttributeError:
-                    pass
-                
-            current_frame._update_plot()
-                
-            wx.Yield()
-            event.Skip()
-                
-        
-    def evt_increase_single_step_btn(self, event):
-                    
-        self._move_single_step(increase=True)
-                    
-    
-    def evt_decrease_single_step_btn(self, event):
-                    
-        self._move_single_step(increase=False)
-        
-    
-    def evt_axis_label(self, event, x_axis_label, y_axis_label, z_axis_label=None):
-        
-        self.x_label = x_axis_label.GetValue()
-        self.y_label = y_axis_label.GetValue()
-        
-        if z_axis_label != None:
-            try:
-                self.z_label = z_axis_label.GetValue()
-            except AttributeError:
-                pass
-                    
-        wx.CallAfter(self._update_plot)
-        
-    
-    def evt_add_time_course(self, event):
-        '''Add time course to currently displayed plot.'''
-        
-        self._add_time_course()
-        
-        
-    def evt_resolution_spn(self, event):
-        
-        self.resolution = int(self.control_plot_frame.resolution_spn.GetValue())
-        wx.CallAfter(self._update_plot)
-        wx.Yield()
-        
-
-    def evt_vmax_spn(self, event):
-        
-        self.vmax = self.control_plot_frame.vmax_spn.GetValue()
-        wx.CallAfter(self._update_plot)
-
-    
-    def evt_vmin_spn(self, event):
-        
-        self.vmin = self.control_plot_frame.vmin_spn.GetValue()
-        wx.CallAfter(self._update_plot)
-        
-    
-    def evt_proj_cbox(self, event):
-        self.proj = self.proj_cbox.GetValue()
-        
-        if ',' not in self.proj and self.mode != 'time course':
-            self.style_cbox.Disable()
-            self.proj_method_cbox.Disable()
-            self.style_cbox.SetValue('')
-            self.proj_method_cbox.SetValue('')
-        else:
-            self.style_cbox.Enable()
-            self.proj_method_cbox.Enable()
-            
-        if self.proj == ' ':
-            self.proj_method = ' '
-            self.style = ' '
-            self.proj = ' '
-            
-            self.proj_method_cbox.Disable()
-            self.style_cbox.Disable()
-            
-            self.proj_method_cbox.SetValue(self.proj_method)
-            self.style_cbox.SetValue(self.style)
-        
-        wx.Yield()
-        event.Skip()
-        
-        
-    def evt_proj_method_cbox(self, event):
-        
-        self.proj_method = self.proj_method_cbox.GetValue()
-        
-        if self.proj_method == ' ':
-            self.style_cbox.Disable()
-            self.style = ' '
-            self.style_cbox.SetValue(self.style)
-        else:
-            self.style_cbox.Enable()
-                    
-        wx.Yield()
-        event.Skip()
-        
-    
-    def evt_style_cbox(self, event):
-
-        self.style = self.style_cbox.GetValue()
-        self.plot_btn.Bind(wx.EVT_BUTTON, self.evt_plot)
-        
-        if self.style != 'image':
-            self.mode_cbox.Enable()
-            self.proj_cbox.Enable()
-            self.proj_method_cbox.Enable()
-            
-        else:
-            self.mode = self.mode_cbox.GetValue()
-            self.mode_cbox.Disable()
-            self.proj_cbox.Disable()
-            self.proj_method_cbox.Disable()
-    
-        wx.Yield()
-        event.Skip()
-
-    
-    def evt_reset_heatmap_boundaries_btn(self, event):
-        
-        self.vmin = self.vmax = None
-        
-        self.control_plot_frame.vmin_spn.SetValue(0.0000)
-        self.control_plot_frame.vmax_spn.SetValue(0.0000)
-        
-        wx.CallAfter(self._update_plot)
-
-    
-    def evt_switch_btn(self, event):  
-        for i in range(len(self.frame_ids)):
-            current_frame = self._set_current_frame(i)
-            
-            # Clear memory
-            if current_frame.data is not None:
-                del current_frame.data
-                current_frame.data = None
-            
-            # Close open plots              
-            if current_frame.figure:
-                plt.close(current_frame.figure)
-                current_frame.figure = None
-                        
-        frame = self.GetParent()
-        browser_panel = RDPBrowserPanel(parent=frame)
-        
-        # Replace plot generation frame with file browser
-        frame.SetSizer(browser_panel.main_sizer)
-        
-        # Layout
-        wx.CallAfter(frame.Sizer.Fit, frame)
-        wx.CallAfter(frame.Layout)
-        event.Skip()
-        
-                    
-    def evt_pos_slider(self, event):
-        
-        step = self.pos_slider.GetValue()
-                
-        for i in range(len(self.frame_ids)):
-            current_frame = self._set_current_frame(i)
-            current_frame.step = step
-        
-            if i == 0:
-                # Set time code
-                current_time_stamp = self.time_stamps[current_frame.step]
-                current_frame.time_stamp_display.SetLabel(current_time_stamp)
-                
-            # Update currently displayed plot
-            current_frame._update_plot()
-        
-            
-    def evt_mode_cbox(self, event):
-        
-        self.mode = self.mode_cbox.GetValue()
-        
-        if self.figure:
-            plt.close(self.figure)
-                    
-        else:
-            self.proj_method = ' '
-            self.style = ' '
-            self.proj = ' '
-            
-            self.proj_method_cbox.Disable()
-            self.style_cbox.Disable()
-            
-            self.proj_cbox.SetValue(self.proj)
-            self.proj_method_cbox.SetValue(self.proj_method)
-            self.style_cbox.SetValue(self.style)
-        
-        # Fill projection combobox with the fitting options
-        if self.mode == 'time course':
-            self.proj_cbox.SetItems(self.proj_choice_time_course)
-            self.proj_cbox.Enable()
-        elif self.mode == 'snapshot' or self.mode == 'snapshot sequence':
-            self.proj_cbox.SetItems(self.proj_choice_snapshot)
-            self.proj_cbox.Enable()
-        else:
-            self.proj_cbox.SetItems([])
-        
-        for i in range(len(self.frame_ids)):
-            current_frame = self._set_current_frame(i)
-            current_frame.plot_btn.Bind(wx.EVT_BUTTON, current_frame.evt_plot)
-            
-            
-    def enforce_labelling_mode(self, plot, labelling_mode, style):
-        
-        if labelling_mode == 'Off':
-            plt.rcdefaults()
-            plt.gca().axes.set_xticklabels([])
-            plt.gca().axes.set_yticklabels([])
-                        
-            if 'Axes3D' in str(type(self.plot)):
-                plt.gca().axes.set_zticklabels([])
-        
-        elif labelling_mode == 'Standard':
-            plt.rcdefaults()
-        
-        else:
-            plt.rc('text', usetex=True)
-            mpl.rcParams['text.latex.unicode']=True
-            plt.rc('font', family='serif')
-            
-        try:
-            if self.axis_ticks == False:
-                plt.gca().tick_params(axis='both', which='both', bottom='off', top='off', left='off', right='off')
-                    
-            else:
-                plt.gca().tick_params(axis='both', which='both', bottom='on', top='on', left='on', right='on')
-        except AttributeError:
-            pass
-                
-        return plot
-            
-            
-    def evt_plot(self, event):
-        
-        if self.style != 'heatmap' and self.ndim[self.selection] != 0:    
-            self._plot()
-
-            
         if self.mode != 'snapshot sequence':
-            if self.control_plot_frame is None:
-                RDPPlotFrame(parent=self)                
-                self.control_plot_frame.Show()
+            RDPPlotFrame(parent=self, panel=self.rdp_frame.frame.panel)
+            self.rdp_frame.frame.Hide()
         
         self._update_plot()
-        self._update_plot()
         
-                
-    def evt_linewidth_spn(self, event):
-        self.surface_linewidth = float(self.control_plot_frame.linewidth_spn.GetValue() / 20.)
-        wx.CallAfter(self._update_plot)
-        wx.Yield()
-        
-                                
-    def evt_sel_cbox(self, event):
-        
-        widget = event.GetEventObject()
-        self.selection = widget.GetSelection()
-        self._update_selection_data()
-        self.sel_cbox.SetValue(widget.GetValue())
-        self.sel_cbox_selection = widget.GetValue()
-                                
-        if 'CV_8U' in self.header_list[self.selection] or 'CV_8UC3' in self.header_list[self.selection]:
-            self.style_ch = ['image']
-            self.style_cbox.Enable()
-            self.style_cbox.SetItems(self.style_ch)
-            self.style_cbox.SetSelection(0)
-            self.style = 'image'
-            self.plot_btn.Bind(wx.EVT_BUTTON, self.evt_plot)
-        else:
-            self.style_ch = [' ', 'heatmap', 'surface', 'wireframe']
-            self.style_cbox.SetItems(self.style_ch)
-            self.mode_cbox.Enable()
-            
-            
-    def evt_write_csv_btn(self, event):
-                
-        dlg_name = self.dir + '/' + self.flist_sorted[self.selection].strip('.csv') + '-' + str(self.mode) + '-1.csv'
-        dlg = WriteCSVDialog(self, self.dir, dlg_name)
-        
-        if dlg.ShowModal() == wx.ID_CANCEL:
-            return
-        
-        file_path = dlg.GetPath()
-        np.savetxt(fname=file_path, X=self.reduced_data, delimiter=',')
-        
-
-    def evt_save_plot_btn(self, event):
-        
-        dlg = SaveDialog(parent=self, defaultDir=self.dir)
-        
-        if dlg.ShowModal() == wx.ID_CANCEL:
-            return
-        
-        file_path = dlg.GetPath()
-                        
-        if self.mode != 'snapshot sequence':
-            self._plot(save=True, file_path=file_path)
-        
-                                    
+             
     def _play_pause_btn(self, reverse):
                 
         if reverse == False:
@@ -1789,7 +1858,6 @@ class RDPGUI(wx.Panel):
                     if active_btn.GetBitmapLabel() == active_bitmap:
                         break
                     else:
-                        
                         for j in range(len(self.frame_ids)):
                             current_frame = self._set_current_frame(j)
                             current_frame.step = i
@@ -1857,54 +1925,30 @@ class RDPGUI(wx.Panel):
             else:
                 self.figure.clf()
         
-        self._plot()
-            
+        self._plot()    
         wx.YieldIfNeeded()
-
+            
                    
-    def _add_time_course(self):
+    def _add_time_course(self): 
         self._plot()
 
-                
-    def evt_resize_control_plot_panel(self, event):
-        
-        pix = self.control_plot_frame.control_plot_panel.GetClientSize()
-        
-        self.figure.set_size_inches(pix[0]/self.figure.get_dpi(),
-                                    pix[1]/self.figure.get_dpi())
-        
-        
-        x,y = self.control_plot_frame.GetSize()  
-        
-        self.figure.set_size_inches(x/self.figure.get_dpi(),
-                                    y/self.figure.get_dpi())
-        
-        self.figure_canvas.SetSize((x-1, y-1))
-        self.figure_canvas.SetSize((x, y))
-                        
-        event.Skip()
-                
-                                   
-    def evt_resize_canvas(self, event):
-        self.figure_canvas.draw()
-        
-                                
-    def _update_selection_data(self):
+              
+    def _update_selection_data(self, frame):
         '''Reset the control panel and update it with the newly selected data.'''
         
         self.data = None    
         self.reduced_data = None
-        
+                        
         if len(self.frame_ids) == 1 and self.frame.parent is None:
             if self.ndim[self.selection] == 0:
-                self.mode_cbox.SetItems(['time course'])
+                frame.mode_cbox.SetItems(['time course'])
             else:
-                self.mode_cbox.SetItems(self.mode_ch)
+                frame.mode_cbox.SetItems(self.mode_ch)
         else:
             if self.ndim[self.selection] == 0:
-                self.mode_cbox.SetItems(['time course'])
+                frame.mode_cbox.SetItems(['time course'])
             else:
-                self.mode_cbox.SetItems(self.multi_mode_ch)
+                frame.mode_cbox.SetItems(self.multi_mode_ch)
                                                 
         if self.frame.parent is None:
             # Reset control panel
@@ -1923,7 +1967,7 @@ class RDPGUI(wx.Panel):
                 current_frame = self._set_current_frame(i)
                 current_frame.step = self.step
             
-        self.mode_cbox.Disable()
+        frame.mode_cbox.Disable()
 
         # Generate adequate options for the projection combobox, depending on data dimensionality and plot mode
         self.proj_choice_time_course = self.proj_ch[:self.ndim[self.selection]+1]
@@ -1958,19 +2002,51 @@ class RDPGUI(wx.Panel):
         
         if i == 0:
             current_frame = self
-        else:    
+        else:
             current_frame = wx.FindWindowById(self.frame_ids[i]).rdp_gui
                             
         return current_frame
+    
+    
+    def enforce_labelling_mode(self, plot, labelling_mode, style):
+        
+        if labelling_mode == 'off':
+            plt.rcdefaults()
+            plt.gca().axes.set_xticklabels([])
+            plt.gca().axes.set_yticklabels([])
+            
+            if self.style == 'surface' or self.style == 'wireframe':
+                try:
+                    plt.gca().axes.set_zticklabels([])
+                except AttributeError:
+                    pass
+        
+        elif labelling_mode == 'Standard':
+            plt.rcdefaults()
+        
+        else:
+            plt.rc('text', usetex=True)
+            mpl.rcParams['text.latex.unicode']=True
+            plt.rc('font', family='serif')
+            
+        try:
+            if self.axis_ticks == False:
+                plt.gca().tick_params(axis='both', which='both', bottom='off', top='off', left='off', right='off')
+                    
+            else:
+                plt.gca().tick_params(axis='both', which='both', bottom='on', top='on', left='on', right='on')
+        except AttributeError:
+            pass
+                
+        return plot
 
                 
     def _plot(self, save=False, file_path=None):
         '''Build plot(s) to either visualize or save as pdf file'''
-                
+        
         if save is True and self.mode != 'snapshot sequence':
             self.frame.rdp_plot.save_plot(plot=self.plot, plot_mode=self.mode, file_name=self.flist_sorted[self.selection], file_directory=self.dir, figure=self.figure, file_path=file_path)
             self._update_plot()
-            
             
         else:         
                        
@@ -1978,8 +2054,10 @@ class RDPGUI(wx.Panel):
                 if self.figure is None:
                     self.figure = plt.figure(str(self.title))
                                                                        
-            if self.mode == 'snapshot' or self.style == 'image':            
-                try:             
+            if self.mode == 'snapshot' or self.style == 'image':
+
+                try:
+                    
                     self.plot, self.reduced_data = self.frame.rdp_plot.plot_snapshot(step = self.step, 
                                                                   style = self.style, 
                                                                   data = self.data, 
@@ -1989,20 +2067,15 @@ class RDPGUI(wx.Panel):
                                                                   resolution = self.resolution, 
                                                                   surface_linewidth = self.surface_linewidth,
                                                                   proj = self.proj,
+                                                                  linestyle = self.line_style,
                                                                   proj_method = self.proj_method,
                                                                   color = self.line_color,
                                                                   figure = self.figure,
                                                                   title = self.title)
-                    
+                                        
                     if self.style == 'heatmap' or self.style == 'surface' or self.style == 'wireframe':
                         self.figure.gca().invert_yaxis()
-                                
-                    if self.mode == 'time course' and self.x_label == '':
-                        try:
-                            self.plot.set_xlabel('Time')
-                        except AttributeError:
-                            pass
-                    
+                                                    
                 except IndexError:
                     dlg = wx.MessageDialog(parent=None, 
                                            message = 'The specified time slice does not exist.', 
@@ -2029,6 +2102,7 @@ class RDPGUI(wx.Panel):
                                                                      resolution = self.resolution,
                                                                      surface_linewidth = self.surface_linewidth,
                                                                      plot = self.plot,
+                                                                     linestyle=self.line_style,
                                                                      proj = self.proj,
                                                                      proj_method = self.proj_method,
                                                                      color = self.line_color,
@@ -2039,12 +2113,16 @@ class RDPGUI(wx.Panel):
                                                                      figure = self.figure,
                                                                      title = self.title)
                     
+                    if self.ndim[self.selection] == 0:
+                        self.lines.append(self.plot.get_lines()[-1])
+                        
                     if self.style == 'heatmap' or self.style == 'surface' or self.style == 'wireframe':
                         self.figure.gca().invert_yaxis()
-                                
-                    if self.mode == 'time course' and self.x_label == '':
+                    
+                    if self.x_label == ' ' or self.x_label == ' ' :
+                        self.x_label = 'Time'
                         try:
-                            self.plot.set_xlabel('Time')
+                            self.plot.set_xlabel(self.x_label)
                         except AttributeError:
                             pass
                         
@@ -2074,20 +2152,10 @@ class RDPGUI(wx.Panel):
                 self.plot = self.enforce_labelling_mode(plot=self.plot, labelling_mode=self.labelling_mode, style=self.style)
                 
                 try:
-                    
-                    try:
-                        self.figure_canvas.draw()
-                    except UnicodeEncodeError:
-                        pass
-                    except RuntimeError:
-                        #self._update_plot()
-                        self.figure_canvas.draw()
-                    
+                    self.figure_canvas.draw()
                 except AttributeError:
                     pass
-                    
-                wx.YieldIfNeeded()
-        
+                            
 #========================================================================================================================
 
 class RDPPlot():
@@ -2307,20 +2375,21 @@ class RDPPlot():
         '''Gets data and time codes from given csv file.'''
         
         time_stamps = []
-        
         data = None
         count = 0
         csv_file = open(csv_f, 'rb')
+        csv_file2 = open(csv_f, 'rb')
         
         reader = csv.reader(csv_file)
                 
-        row_count = len(list(open(csv_f)))-1 
-                
+        row_count = len(list(csv_file2))
+        csv_file2.close()
+        
         # skip header
         next(reader, None)
         
         # Progress bar
-        progress_dlg = Progress(None, -1, 'Loading data', '', row_count+1)
+        progress_dlg = RDPProgress(None, -1, 'Loading data', '', row_count)
         
         # build time_stamps list and data matrix
         #========================================================================================================================
@@ -2332,7 +2401,7 @@ class RDPPlot():
             
             # Matrix generation
             if data is None:
-                data = np.zeros((row_count, len(row)))
+                data = np.zeros((row_count-1, len(row)))
             
             # Fill current data row and update progress bar
             data[count] = row
@@ -2350,7 +2419,6 @@ class RDPPlot():
     def get_header(self, csv_f):
         '''Gets header from given csv file.'''
         
-        #if csv_f.endswith('.csv'):
         csv_file = open(csv_f, 'rb')        
         reader = csv.reader(csv_file)
         header = reader.next()
@@ -2421,9 +2489,12 @@ class RDPPlot():
             return img_array
 
 
-    def plot_snapshot(self, step, data, vmin, vmax, resolution, header, style, surface_linewidth, mode=' ', proj=' ', proj_method='average', color='#FF9600', figure=None, title=None):        
+    def plot_snapshot(self, step, data, vmin, vmax, resolution, header, style, surface_linewidth, mode=' ', proj=' ', linestyle='solid', proj_method='average', color='#FF9600', figure=None, title=None):        
         ndim = self.get_dimension(header)
         steps = data.shape[0]
+                
+        if linestyle == 'dash dot':
+            linestyle = '-.'
                         
         if figure is None:
             fig = plt.figure()
@@ -2440,7 +2511,7 @@ class RDPPlot():
             except TypeError:
                 dlg = wx.MessageDialog(parent = None, 
                                        message = 'The plot was not updated.', 
-                                       caption = '', 
+                                       caption = ' ' , 
                                        style = wx.OK|wx.ICON_INFORMATION|wx.CENTER|wx.STAY_ON_TOP)
                 dlg.ShowModal()
                 dlg.Hide()
@@ -2449,7 +2520,7 @@ class RDPPlot():
         else:                    
             if ndim == 1:                
                 plot = fig.add_subplot(1,1,1)
-                plot.plot(data[step], color=color)
+                plot.plot(data[step], color=color, linestyle=linestyle)
             
             elif ndim != 1:
                 if proj != ' ':
@@ -2495,9 +2566,11 @@ class RDPPlot():
                         plot = fig.gca()
                         
                         try:
-                            plot.plot(data[step], color=color)
-                        except IndexError:
-                            raise IndexError
+                            plot.plot(data[step], color=color, linestyle=linestyle)
+                        except:
+                            fig = plt.figure()
+                            plot = fig.gca()
+                            plot.plot(data[step], color=color, linestyle=linestyle)
                                             
                 elif proj == ' ':
                     
@@ -2527,7 +2600,7 @@ class RDPPlot():
                 pass
             
         
-    def plot_snapshot_sequence(self, data, header, vmin, vmax, resolution, surface_linewidth, start, step_size, steps, proj, proj_method, style, 
+    def plot_snapshot_sequence(self, data, header, vmin, vmax, resolution, surface_linewidth, start, step_size, steps, proj, proj_method, style, linestyle='solid',
                                x_label=None, y_label=None, z_label=None, file_name=None, file_directory=None, save_mode=False, color='#FF9600', figure=None, title=None):
         
         plot_mode = 'snapshot sequence'
@@ -2543,6 +2616,7 @@ class RDPPlot():
                                       surface_linewidth = surface_linewidth,
                                       mode = plot_mode, 
                                       proj = proj, 
+                                      linestyle = linestyle,
                                       proj_method = proj_method,
                                       color = color,
                                       figure = figure,
@@ -2562,7 +2636,7 @@ class RDPPlot():
                 plt.draw()
                         
     
-    def plot_time_course(self, data, header, vmin, vmax, resolution, surface_linewidth, proj, proj_method, style, color=None, plot=None, marker=False, step=None, 
+    def plot_time_course(self, data, header, vmin, vmax, resolution, surface_linewidth, proj, proj_method, style, linestyle='solid', color='#FF9600', plot=None, marker=False, step=None, 
                          marker_color=None, figure=None, title=None):
         
         ndim = self.get_dimension(header)
@@ -2577,17 +2651,8 @@ class RDPPlot():
             plot = fig.gca()
                     
         if ndim == 0:
-            if plot is None:
-                if color == None:
-                    plot.plot(data)
-                else:
-                    plot.plot(data, color=color)
-            else:
-                if color == None:
-                    plot.add_line(plt.plot(data)[0])
-                else:
-                    plot.add_line(plt.plot(data, color=color)[0])
-        
+            plot.plot(data, color=color, linestyle=linestyle)
+            
         elif ndim != 0:
             if ndim == 1:
                 x = int(header[2])
@@ -2656,7 +2721,6 @@ class RDPPlot():
             pass
         
         # Plot is no heatmap
-        #if 'matplotlib.image.AxesImage' not in str(type(plot)):
         plot.set_xlabel(x_label)
         plot.set_ylabel(y_label)
         
