@@ -29,7 +29,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 09 02
+    Date:        2015 09 04
 
     Description: 
 
@@ -352,7 +352,8 @@ class RDPGUIEvents():
                 except AttributeError:
                     pass
                 
-            current_frame._update_plot()  
+            current_frame._update_plot()
+            wx.Yield()  
 
             
     def evt_increase_single_step_btn(self, event, parent):
@@ -413,15 +414,14 @@ class RDPGUIEvents():
             parent.style_cbox.SetValue('')
             parent.proj_method_cbox.SetValue('')
             
-            if great_parent.proj != ' ':
-                if great_parent.style != 'heatmap' and great_parent.ndim[great_parent.selection] != 0:    
-                    great_parent._plot()
-    
+            if great_parent.proj != '':
+                
                 if great_parent.mode != 'snapshot sequence':
                     RDPPlotFrame(parent=great_parent, panel=parent.panel) 
-                    great_parent.rdp_frame.frame.Hide()
-            
-                great_parent._update_plot()
+                
+                if great_parent.style != 'heatmap' and great_parent.ndim[great_parent.selection] != 0:    
+                    great_parent._plot()
+                
                 great_parent._update_plot()
             
         else:
@@ -431,7 +431,6 @@ class RDPGUIEvents():
         if great_parent.proj == ' ':
             great_parent.proj_method = ' '
             great_parent.style = ' '
-            great_parent.proj = ' '
             
             parent.proj_method_cbox.Disable()
             parent.style_cbox.Disable()
@@ -490,6 +489,7 @@ class RDPGUIEvents():
                 
             # Update currently displayed plot
             current_frame._update_plot()
+            wx.Yield()
         
                 
     def evt_linewidth_spn(self, event, parent):
@@ -509,10 +509,8 @@ class RDPGUIEvents():
         parent.title = parent.sel_cbox_selection
         parent.rdp_frame = RDPFrame(parent=parent, title=parent.sel_cbox_selection)
         parent._update_selection_data(parent.rdp_frame.frame)
-        
-        if 'RDPGUI' in str(type(parent)):
-            parent.rdp_frame.frame.Show()
-        
+        RDPPlotFrame(parent=parent, panel=parent.rdp_frame.frame.panel)
+                
         # Case 1: selected file is an image
         if 'CV_8U' in parent.header_list[parent.selection] or 'CV_8UC3' in parent.header_list[parent.selection]:
             parent.rdp_frame.frame.style_ch = ['image']
@@ -725,8 +723,7 @@ class RDPGUIEvents():
             
         if great_parent.mode != 'snapshot sequence':
             RDPPlotFrame(parent=great_parent, panel=parent.panel) 
-            great_parent.rdp_frame.frame.Hide()
-            
+            #great_parent.rdp_frame.frame.Hide()
             great_parent._update_plot()
             
             
@@ -1408,10 +1405,8 @@ class RDPPlotFrame(wx.Frame):
     def _create_figure_canvas(self):
     
         self.parent.figure = plt.figure(str(self.parent.title))
-        
         self.parent.figure_canvas = FigureCanvas(self.parent.control_plot_frame.control_plot_panel, wx.ID_ANY, self.parent.figure)    
         self.parent.figure_canvas.mpl_connect('button_release_event', partial(self.rdp_gui_events.evt_change_plot_parameters, parent=self.parent))
-            
         wx.Yield()
         
 
@@ -1712,7 +1707,6 @@ class RDPGUI(wx.Panel):
         self.load_config_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_load_config_btn, parent=self))
         
         if self.frame.parent is None:
-            
             self.pos_slider.Bind(wx.EVT_COMMAND_SCROLL_THUMBTRACK, partial(self.rdp_gui_events.evt_pos_slider, parent=self))
             self.pos_slider.Bind(wx.EVT_COMMAND_SCROLL_CHANGED, partial(self.rdp_gui_events.evt_pos_slider, parent=self))       
             self.play_pause_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_play_pause_btn, parent=self))
@@ -1812,7 +1806,6 @@ class RDPGUI(wx.Panel):
             pass
         
         self.rdp_frame = RDPFrame(parent=self, title=self.sel_cbox_selection) 
-        self.rdp_frame.frame.Show()
         self.rdp_frame.frame.proj_cbox.SetItems(self.proj_ch)
         self.rdp_frame.frame.proj_cbox.SetValue(self.proj)
         self.rdp_frame.frame.proj_method_cbox.SetValue(self.proj_method)
@@ -1821,7 +1814,6 @@ class RDPGUI(wx.Panel):
         self.rdp_frame.frame.style_cbox.SetItems(self.style_ch)
         self.rdp_frame.frame.style_cbox.SetValue(self.style)
         
-        
         self.rdp_frame.frame.mode_cbox.Enable()
         self.rdp_frame.frame.style_cbox.Enable()
         self.rdp_frame.frame.proj_cbox.Enable()
@@ -1829,7 +1821,6 @@ class RDPGUI(wx.Panel):
         
         if self.mode != 'snapshot sequence':
             RDPPlotFrame(parent=self, panel=self.rdp_frame.frame.panel)
-            self.rdp_frame.frame.Hide()
         
         self._update_plot()
         
@@ -1862,6 +1853,7 @@ class RDPGUI(wx.Panel):
                             current_frame = self._set_current_frame(j)
                             current_frame.step = i
                             current_frame._update_plot()
+                            wx.Yield()
                                                                
                         inactive_btn.Disable()
                         self.increase_single_step_btn.Disable()
@@ -1914,12 +1906,13 @@ class RDPGUI(wx.Panel):
         for i in range(len(self.frame_ids)):
             current_frame = self._set_current_frame(i)
             current_frame.step = self.step
-            wx.CallAfter(current_frame._update_plot)
+            current_frame._update_plot()
+            wx.Yield()
             
-        
-    def _update_plot(self):
-        if self.figure_canvas:
     
+    def _update_plot(self):
+                
+        if self.figure_canvas:
             if self.ndim[self.selection] == 0:
                 plt.cla()
             else:
@@ -2012,12 +2005,12 @@ class RDPGUI(wx.Panel):
         
         if labelling_mode == 'off':
             plt.rcdefaults()
-            plt.gca().axes.set_xticklabels([])
-            plt.gca().axes.set_yticklabels([])
+            plot.axes.set_xticklabels([])
+            plot.axes.set_yticklabels([])
             
             if self.style == 'surface' or self.style == 'wireframe':
                 try:
-                    plt.gca().axes.set_zticklabels([])
+                    plot.axes.set_zticklabels([])
                 except AttributeError:
                     pass
         
@@ -2031,16 +2024,16 @@ class RDPGUI(wx.Panel):
             
         try:
             if self.axis_ticks == False:
-                plt.gca().tick_params(axis='both', which='both', bottom='off', top='off', left='off', right='off')
+                plot.tick_params(axis='both', which='both', bottom='off', top='off', left='off', right='off')
                     
             else:
-                plt.gca().tick_params(axis='both', which='both', bottom='on', top='on', left='on', right='on')
+                plot.tick_params(axis='both', which='both', bottom='on', top='on', left='on', right='on')
         except AttributeError:
             pass
                 
         return plot
 
-                
+    
     def _plot(self, save=False, file_path=None):
         '''Build plot(s) to either visualize or save as pdf file'''
         
@@ -2057,7 +2050,6 @@ class RDPGUI(wx.Panel):
             if self.mode == 'snapshot' or self.style == 'image':
 
                 try:
-                    
                     self.plot, self.reduced_data = self.frame.rdp_plot.plot_snapshot(step = self.step, 
                                                                   style = self.style, 
                                                                   data = self.data, 
@@ -2148,7 +2140,6 @@ class RDPGUI(wx.Panel):
                     self.figure.gca(projection='3d').dist = self.figure_distance
                     
             if save is False and self.mode != 'snapshot sequence':
-                                
                 self.plot = self.enforce_labelling_mode(plot=self.plot, labelling_mode=self.labelling_mode, style=self.style)
                 
                 try:
@@ -2489,14 +2480,14 @@ class RDPPlot():
             return img_array
 
 
-    def plot_snapshot(self, step, data, vmin, vmax, resolution, header, style, surface_linewidth, mode=' ', proj=' ', linestyle='solid', proj_method='average', color='#FF9600', figure=None, title=None):        
+    def plot_snapshot(self, step, data, vmin, vmax, resolution, header, style, surface_linewidth, mode=' ', proj='', linestyle='solid', proj_method='average', color='#FF9600', figure=None, title=None):        
         ndim = self.get_dimension(header)
         steps = data.shape[0]
                 
         if linestyle == 'dash dot':
             linestyle = '-.'
                         
-        if figure is None:
+        if figure == None:
             fig = plt.figure()
         else:
             fig = figure
