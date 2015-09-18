@@ -29,7 +29,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 09 17
+    Date:        2015 09 18
 
     Description: 
 
@@ -531,9 +531,10 @@ class RDPGUIEvents():
         parent.selection = widget.GetSelection()
         parent.sel_cbox_selection = widget.GetValue()
         parent.title = parent.sel_cbox_selection
+        
+        
         parent.rdp_frame = RDPFrame(parent=parent, title=parent.sel_cbox_selection)
         parent._update_selection_data(parent.rdp_frame.frame)
-        
         parent.rdp_frame.frame.panel.Hide()
         RDPPlotFrame(parent=parent, panel=parent.rdp_frame.frame.panel)
                 
@@ -559,7 +560,7 @@ class RDPGUIEvents():
             RDPPlotFrame(parent=parent, panel=parent.rdp_frame.frame.panel) 
             parent.rdp_frame.frame.Hide()
             parent._plot()
-            
+          
         else:
             parent.style_ch = ['', 'heatmap', 'surface', 'wireframe']
             parent.rdp_frame.frame.style_cbox.SetItems(parent.style_ch)
@@ -601,13 +602,20 @@ class RDPGUIEvents():
         
         
     def evt_load_config_btn(self, event, parent):
+        
         try:
             rdp_gui = parent._initialize_rdp_gui()
-            rdp_gui._load_plot_configuration()
-            wx.CallAfter(parent.frame.Hide)
         except AttributeError:
-            parent._load_plot_configuration()
+            new_frame = RDPMainWindow(parent=parent.frame, title='', pos=None, size=None, style=None, name=None, directory=parent.dir)     
+            new_frame.rdp_gui.step = parent.step   
+            new_frame.Bind(wx.EVT_CLOSE, partial(self.evt_close_frame, parent=parent))
         
+            new_frame_id = new_frame.GetId()
+            parent.frame_ids.append(new_frame_id)
+            rdp_gui = new_frame.rdp_gui
+            
+        rdp_gui._load_plot_configuration()
+
         
     def evt_end_app(self, event):                
         sys.exit()
@@ -1058,14 +1066,12 @@ class RDPMainWindow(wx.Frame):
             wx.Frame.__init__(self, parent=None, title=title, style=wx.MINIMIZE_BOX|wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.CLIP_CHILDREN)  
             self.rdp_browser = RDPBrowserPanel(parent=self)
             self.SetSizer(self.rdp_browser.main_sizer)
-            self.Bind(wx.EVT_CLOSE, self.rdp_gui_events.evt_end_app)
             self.Sizer.Fit(self)
             self.Show()
         
         # initialize frame for multi-plot purposes
         else:
             wx.Frame.__init__(self, parent=parent, title=' ', style=wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.FRAME_NO_TASKBAR|wx.CLIP_CHILDREN)
-                        
             self.dir = self.parent.dir  
             self.parent = parent
             self.rdp_gui = RDPGUI(parent=self)
@@ -1074,6 +1080,8 @@ class RDPMainWindow(wx.Frame):
             
             parent.rdp_browser.rdp_gui.sel_cbox.Reparent(self.rdp_gui)
             self.rdp_gui.sel_cbox.Reparent(parent.rdp_browser.rdp_gui)
+            
+        self.Bind(wx.EVT_CLOSE, self.rdp_gui_events.evt_end_app)
                         
         return
         
@@ -1120,7 +1128,7 @@ class RDPBrowserPanel(wx.Panel):
         self.rdp_gui = RDPGUI(parent=frame)
         frame.SetSizer(self.rdp_gui.main_sizer)
         frame.Sizer.Fit(frame)
-        wx.CallAfter(self.Hide)
+        #wx.CallAfter(self.Hide)
         
         return self.rdp_gui
     
@@ -1882,6 +1890,19 @@ class RDPGUI(wx.Panel):
         self.rdp_frame.frame.style_cbox.Enable()
         self.rdp_frame.frame.proj_cbox.Enable()
         self.rdp_frame.frame.proj_method_cbox.Enable()
+        
+        init_color = '#FFFFFF'
+        
+        if 'wxMac' in wx.PlatformInfo:
+            self.rdp_frame.frame.mode_cbox.GetChildren()[0].SetBackgroundColour(init_color)
+            self.rdp_frame.frame.proj_cbox.GetChildren()[0].SetBackgroundColour(init_color)
+            self.rdp_frame.frame.proj_method_cbox.GetChildren()[0].SetBackgroundColour(init_color)
+            self.rdp_frame.frame.style_cbox.GetChildren()[0].SetBackgroundColour(init_color)
+        else:
+            self.rdp_frame.frame.mode_cbox.SetBackgroundColour(init_color)
+            self.rdp_frame.frame.proj_cbox.SetBackgroundColour(init_color)
+            self.rdp_frame.frame.proj_method_cbox.SetBackgroundColour(init_color)
+            self.rdp_frame.frame.style_cbox.SetBackgroundColour(init_color)
         
         if self.mode != 'snapshot sequence':
             self.rdp_frame.frame.panel.Hide()
