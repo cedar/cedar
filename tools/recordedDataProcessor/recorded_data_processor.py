@@ -29,7 +29,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 09 18
+    Date:        2015 09 22
 
     Description: 
 
@@ -1517,8 +1517,7 @@ class RDPFrame(wx.Frame):
         self.frame.main_sizer.Add(self.frame.widget_sizer)
         
         self.frame.main_sizer.Fit(self.frame.panel)
-        self.frame.SetSizerAndFit(self.frame.main_sizer)
-        self.frame.CenterOnScreen()
+        self.frame.panel.SetSizerAndFit(self.frame.main_sizer)
         
         return
                 
