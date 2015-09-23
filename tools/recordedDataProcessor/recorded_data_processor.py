@@ -346,11 +346,6 @@ class RDPGUIEvents():
                 if great_parent.mode != 'snapshot sequence':
                     parent.panel.Hide()
                     RDPPlotFrame(parent=great_parent, panel=parent.panel) 
-                    new_frame = great_parent.control_plot_frame
-                    new_frame.Bind(wx.EVT_CLOSE, partial(self.evt_close_frame, parent=great_parent))
-                    new_frame_id = new_frame.GetId()
-                    great_parent.frame_ids.append(new_frame_id)
-                    
                 
                 if great_parent.style != 'heatmap' and great_parent.ndim[great_parent.selection] != 0:
                     try:    
@@ -843,8 +838,8 @@ class RDPMainWindow(wx.Frame):
             self.SetSizer(self.rdp_gui.main_sizer)
             self.Sizer.Fit(self)
             
-            parent.rdp_browser.rdp_gui.sel_cbox.Reparent(self.rdp_gui.panel)
-            self.rdp_gui.sel_cbox.Reparent(parent.rdp_browser.rdp_gui.panel)
+            parent.rdp_browser.rdp_gui.sel_cbox.Reparent(self.rdp_gui)
+            self.rdp_gui.sel_cbox.Reparent(parent.rdp_browser.rdp_gui)
             
         self.Bind(wx.EVT_CLOSE, self.rdp_gui_events.evt_end_app)
                         
@@ -907,7 +902,7 @@ class RDPPlotFrame(wx.Frame):
         
         # Initialize control plot frame
         if parent.control_plot_frame == None:
-            parent.control_plot_frame = wx.Frame(parent=parent.panel, id=-1, title=str(parent.title), style=wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.CLIP_CHILDREN|wx.FRAME_NO_TASKBAR)
+            parent.control_plot_frame = wx.Frame(parent=parent, id=-1, title=str(parent.title), style=wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.CLIP_CHILDREN|wx.FRAME_NO_TASKBAR)
             parent.control_plot_frame.Bind(wx.EVT_CLOSE, partial(self.rdp_gui_events.evt_close_figure, parent=parent))
             
         parent.control_plot_frame.control_plot_panel = wx.Panel(parent=parent.control_plot_frame)
@@ -1225,7 +1220,7 @@ class RDPSetupFrame(wx.Frame):
     def __init__(self, parent, title):
         
         rdp_gui_events = RDPGUIEvents()
-        self.frame = wx.Frame(parent=parent.panel, title=title)
+        self.frame = wx.Frame(parent=parent, title=title)
         self.frame.panel = wx.Panel(parent=self.frame)
         
         self.frame.parent = parent
@@ -1290,16 +1285,17 @@ class RDPSetupFrame(wx.Frame):
 class RDPGUI(wx.Panel):
     
     def __init__(self, parent):
-        self.panel = wx.Panel(parent)
+        wx.Panel.__init__(self, parent)
+        
         self.rdp_gui_events = RDPGUIEvents()
         self.frame = parent        
         self.control_plot_frame = None
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
         self.dir = self.frame.dir            
         self.figure_size = None
-        self.x_label = '' 
-        self.y_label = '' 
-        self.z_label = '' 
+        self.x_label = ' ' 
+        self.y_label = ' ' 
+        self.z_label = ' ' 
         self.marked = False
         self.nstep = 0
         self.step = 0
@@ -1310,12 +1306,11 @@ class RDPGUI(wx.Panel):
         self.vmax = None
         self.proj = None
         self.proj_method = 'average'
-        self.style = ''
-        self.mode = ''
+        self.style = ' '
+        self.mode = ' '
         self.labelling_mode = 'off'
         self.flist = [record_file for record_file in os.listdir(self.dir) if record_file.lower().endswith('.csv') or record_file.lower().endswith('.data')]
-        self.flist_sorted = rdp.datatools.sort_alphnum(self.flist)
-        self.flist_sorted = np.asarray(self.flist_sorted)
+        self.flist_sorted = np.asarray(rdp.datatools.sort_alphnum(self.flist))
         self.data = None
         self.reduced_data = None
         self.header = None
@@ -1336,29 +1331,29 @@ class RDPGUI(wx.Panel):
         self.figure = None
         self.figure_canvas = None
         self.figure_canvas_connection_id = None
-        self.title = '' 
+        self.title = ' ' 
         self.figure_resize = None
         self.colorbar = None
         self.axis_ticks = None
-        self.sel_cbox_selection = '' 
+        self.sel_cbox_selection = ' ' 
         self.rdp_frame = None
         self.line_style = 'solid'
         self.lines = []
         
         # Plot modes
-        #self.mode_ch = ['', 'snapshot', 'snapshot sequence', 'time course']
-        self.mode_ch = ['', 'snapshot', 'time course']
-        self.multi_mode_ch = ['', 'snapshot', 'time course']
+        #self.mode_ch = [' ', 'snapshot', 'snapshot sequence', 'time course']
+        self.mode_ch = [' ', 'snapshot', 'time course']
+        self.multi_mode_ch = [' ', 'snapshot', 'time course']
         
         # Projection choices for time course plot mode
-        self.proj_ch = ['', 'x_1', 'x_2', 'x_3', 'x_4', 'x_5']
+        self.proj_ch = [' ', 'x_1', 'x_2', 'x_3', 'x_4', 'x_5']
         
         # Projection choices for snapshot/snapshot sequence plot modes
-        self.proj_ch_step = ['', 'x_1', 'x_2', 'x_3', 'x_4', 'x_5', 
+        self.proj_ch_step = [' ', 'x_1', 'x_2', 'x_3', 'x_4', 'x_5', 
                              'x_1, x_2', 'x_1, x_3', 'x_1, x_4', 'x_1, x_5', 'x_2, x_3', 
                              'x_2, x_4', 'x_2, x_5', 'x_3, x_4', 'x_3, x_5', 'x_4, x_5']
-        self.style_ch = ['', 'heatmap', 'surface', 'wireframe']
-        self.proj_methods = ['', 'average', 'maximum', 'sum']
+        self.style_ch = [' ', 'heatmap', 'surface', 'wireframe']
+        self.proj_methods = [' ', 'average', 'maximum', 'sum']
         
         self.labelling_choices = ['off', 'LateX', 'Standard']
         
@@ -1370,20 +1365,24 @@ class RDPGUI(wx.Panel):
         
         # Labels
         #========================================================================================================================
-        self.sel_label = wx.StaticText(self.panel, -1, 'File\t\t')
-        self.time_stamp_display = wx.StaticText(self.panel, -1, '-')
-        self.time_stamp_label = wx.StaticText(self.panel, -1, 'Time stamp t \t')
+        self.sel_label = wx.StaticText(self, -1, 'File\t\t')
+                
+        if self.frame.parent is None:
+            self.time_stamp_display = wx.StaticText(self, -1, '-')
+            self.time_stamp_label = wx.StaticText(self, -1, 'Time stamp t \t')
             
         #========================================================================================================================
         
-        self.line_1 = wx.StaticLine(self.panel, -1, style=wx.LI_HORIZONTAL, size=(300,10))
-        self.line_2 = wx.StaticLine(self.panel, -1, style=wx.LI_HORIZONTAL, size=(300,10))
-        self.line_4 = wx.StaticLine(self.panel, -1, style=wx.LI_HORIZONTAL, size=(300,10))
+        self.line_1 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(300,10))
+        self.line_2 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(300,10))
+        self.line_4 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(300,10))
         
         # Control widgets
         #========================================================================================================================
-        self.sel_cbox = wx.ComboBox(self.panel, size=(200, 27), choices = self.flist_sorted, value = '', style = wx.CB_READONLY) 
-        self.pos_slider = wx.Slider(self.panel, value=0, minValue = 0, maxValue = 1, style = wx.SL_LABELS|wx.SL_AUTOTICKS)
+        self.sel_cbox = wx.ComboBox(self, size=(200, 27), choices = self.flist_sorted, value = ' ', style = wx.CB_READONLY) 
+                
+        if self.frame.parent is None:
+            self.pos_slider = wx.Slider(self, value=0, minValue = 0, maxValue = 1, style = wx.SL_LABELS|wx.SL_AUTOTICKS)
             
         #========================================================================================================================
 
@@ -1408,40 +1407,43 @@ class RDPGUI(wx.Panel):
         self.directory_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.selection_sizer = wx.BoxSizer(wx.VERTICAL)
         
-        play = rdp.images.play.GetImage()
-        self.play_bitmap = wx.BitmapFromImage(play)
-        reverse_play = rdp.images.reverse_play.GetImage()
-        self.reverse_play_bitmap = wx.BitmapFromImage(reverse_play)
-        pause = rdp.images.pause.GetImage()
-        self.pause_bitmap = wx.BitmapFromImage(pause)
-        reset = rdp.images.reset.GetImage()
-        self.reset_bitmap = wx.BitmapFromImage(reset)
-        decrease_single_step = rdp.images.decrease_single_step.GetImage()
-        self.decrease_single_step_bitmap = wx.BitmapFromImage(decrease_single_step)
-        increase_single_step = rdp.images.increase_single_step.GetImage()
-        self.increase_single_step_bitmap = wx.BitmapFromImage(increase_single_step)
+        if self.frame.parent is None:
+            play = rdp.images.play.GetImage()
+            self.play_bitmap = wx.BitmapFromImage(play)
+            reverse_play = rdp.images.reverse_play.GetImage()
+            self.reverse_play_bitmap = wx.BitmapFromImage(reverse_play)
+            pause = rdp.images.pause.GetImage()
+            self.pause_bitmap = wx.BitmapFromImage(pause)
+            reset = rdp.images.reset.GetImage()
+            self.reset_bitmap = wx.BitmapFromImage(reset)
+            decrease_single_step = rdp.images.decrease_single_step.GetImage()
+            self.decrease_single_step_bitmap = wx.BitmapFromImage(decrease_single_step)
+            increase_single_step = rdp.images.increase_single_step.GetImage()
+            self.increase_single_step_bitmap = wx.BitmapFromImage(increase_single_step)
             
         # Buttons
         #========================================================================================================================
-        self.load_config_btn = wx.Button(self.panel, label = 'Load configuration')
-        self.switch_btn = wx.Button(self.panel, label = 'Switch directory')
-        self.add_figure_frame_btn = wx.Button(self.panel, label = '+', size=(27,27))
-
-        # Player buttons
-        #========================================================================================================================
-        self.play_pause_btn = wx.BitmapButton(self.panel, -1, bitmap=self.play_bitmap)
-        self.reverse_play_pause_btn = wx.BitmapButton(self.panel, -1, bitmap=self.reverse_play_bitmap)
-        self.reset_btn = wx.BitmapButton(self.panel, -1, bitmap=self.reset_bitmap)
-        self.decrease_single_step_btn = wx.BitmapButton(self.panel, -1, bitmap=self.decrease_single_step_bitmap)
-        self.increase_single_step_btn = wx.BitmapButton(self.panel, -1, bitmap=self.increase_single_step_bitmap)
+        self.load_config_btn = wx.Button(self, label = 'Load configuration')
         
-        # Player button tooltips
-        #========================================================================================================================
-        self.play_pause_btn.SetToolTipString('Starts and pauses the Plot animation.')
-        self.reverse_play_pause_btn.SetToolTipString('Starts and pauses the reverse Plot animation.')
-        self.reset_btn.SetToolTipString('Resets the plot to the first recorded time step.')
-        self.increase_single_step_btn.SetToolTipString('Updates the plot by increasing the time slice index by 1.')
-        self.decrease_single_step_btn.SetToolTipString('Updates the plot by decreasing the time slice index by 1.')
+        if self.frame.parent is None:
+            self.switch_btn = wx.Button(self, label = 'Switch directory')
+            self.add_figure_frame_btn = wx.Button(self, label = '+', size=(27,27))
+
+            # Player buttons
+            #========================================================================================================================
+            self.play_pause_btn = wx.BitmapButton(self, -1, bitmap=self.play_bitmap)
+            self.reverse_play_pause_btn = wx.BitmapButton(self, -1, bitmap=self.reverse_play_bitmap)
+            self.reset_btn = wx.BitmapButton(self, -1, bitmap=self.reset_bitmap)
+            self.decrease_single_step_btn = wx.BitmapButton(self, -1, bitmap=self.decrease_single_step_bitmap)
+            self.increase_single_step_btn = wx.BitmapButton(self, -1, bitmap=self.increase_single_step_bitmap)
+            
+            # Player button tooltips
+            #========================================================================================================================
+            self.play_pause_btn.SetToolTipString('Starts and pauses the Plot animation.')
+            self.reverse_play_pause_btn.SetToolTipString('Starts and pauses the reverse Plot animation.')
+            self.reset_btn.SetToolTipString('Resets the plot to the first recorded time step.')
+            self.increase_single_step_btn.SetToolTipString('Updates the plot by increasing the time slice index by 1.')
+            self.decrease_single_step_btn.SetToolTipString('Updates the plot by decreasing the time slice index by 1.')
         
         # Build partial sizers
         #========================================================================================================================
@@ -1450,23 +1452,23 @@ class RDPGUI(wx.Panel):
         #========================================================================================================================
         self.player_time_stamp_sizer.Add(self.player_caption_sizer, 0, wx.ALIGN_LEFT)
         
-        #if self.frame.parent is None:
+        if self.frame.parent is None:
             
-        self.pos_slider_sizer.Add(self.pos_slider, 1, wx.EXPAND|wx.ALIGN_CENTER)
+            self.pos_slider_sizer.Add(self.pos_slider, 1, wx.EXPAND|wx.ALIGN_CENTER)
+            
+            self.time_stamp_sizer.Add(self.time_stamp_label, 1, wx.ALIGN_LEFT)
+            self.time_stamp_sizer.Add(self.time_stamp_display, 1, wx.ALIGN_RIGHT)
         
-        self.time_stamp_sizer.Add(self.time_stamp_label, 1, wx.ALIGN_LEFT)
-        self.time_stamp_sizer.Add(self.time_stamp_display, 1, wx.ALIGN_RIGHT)
-    
-        self.player_sizer.Add(self.decrease_single_step_btn, 1, wx.ALIGN_CENTER)
-        self.player_sizer.Add(self.reverse_play_pause_btn, 1, wx.ALIGN_CENTER)
-        self.player_sizer.Add(self.play_pause_btn, 1, wx.ALIGN_CENTER)
-        self.player_sizer.Add(self.increase_single_step_btn, 1, wx.ALIGN_CENTER)
-        self.player_sizer.Add(self.reset_btn, 1, wx.ALIGN_CENTER)
-    
-        self.player_time_stamp_sizer.Add(self.pos_slider_sizer, 2, wx.EXPAND|wx.ALIGN_CENTER)
-        self.player_time_stamp_sizer.Add(self.player_sizer, 2, wx.ALIGN_CENTER)
-        self.player_time_stamp_sizer.AddSpacer(10)
-        self.player_time_stamp_sizer.Add(self.time_stamp_sizer, 1, wx.ALIGN_LEFT)
+            self.player_sizer.Add(self.decrease_single_step_btn, 1, wx.ALIGN_CENTER)
+            self.player_sizer.Add(self.reverse_play_pause_btn, 1, wx.ALIGN_CENTER)
+            self.player_sizer.Add(self.play_pause_btn, 1, wx.ALIGN_CENTER)
+            self.player_sizer.Add(self.increase_single_step_btn, 1, wx.ALIGN_CENTER)
+            self.player_sizer.Add(self.reset_btn, 1, wx.ALIGN_CENTER)
+        
+            self.player_time_stamp_sizer.Add(self.pos_slider_sizer, 2, wx.EXPAND|wx.ALIGN_CENTER)
+            self.player_time_stamp_sizer.Add(self.player_sizer, 2, wx.ALIGN_CENTER)
+            self.player_time_stamp_sizer.AddSpacer(10)
+            self.player_time_stamp_sizer.Add(self.time_stamp_sizer, 1, wx.ALIGN_LEFT)
         
         #========================================================================================================================
                 
@@ -1490,8 +1492,8 @@ class RDPGUI(wx.Panel):
         #========================================================================================================================
         self.plot_sizer.Add(item=self.load_config_btn, proportion=0, flag=wx.ALIGN_LEFT|wx.EXPAND)
         
-        #if self.frame.parent == None:
-        self.plot_sizer.Add(item=self.switch_btn, proportion=0, flag=wx.ALIGN_LEFT|wx.EXPAND)
+        if self.frame.parent == None:
+            self.plot_sizer.Add(item=self.switch_btn, proportion=0, flag=wx.ALIGN_LEFT|wx.EXPAND)
             
         self.btn_sizer.Add(item=self.plot_sizer, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
         #========================================================================================================================
@@ -1520,15 +1522,15 @@ class RDPGUI(wx.Panel):
         self.sel_cbox.Bind(wx.EVT_COMBOBOX, partial(self.rdp_gui_events.evt_sel_cbox, parent=self))
         self.load_config_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_load_config_btn, parent=self))
         
-        #if self.frame.parent is None:
-        self.pos_slider.Bind(wx.EVT_COMMAND_SCROLL_THUMBTRACK, partial(self.rdp_gui_events.evt_pos_slider, parent=self))
-        self.pos_slider.Bind(wx.EVT_COMMAND_SCROLL_CHANGED, partial(self.rdp_gui_events.evt_pos_slider, parent=self))       
-        self.play_pause_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_play_pause_btn, parent=self))
-        self.reverse_play_pause_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_reverse_play_pause_btn, parent=self))
-        self.increase_single_step_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_increase_single_step_btn, parent=self))
-        self.decrease_single_step_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_decrease_single_step_btn, parent=self))
-        self.reset_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_reset_btn, parent=self))
-        self.switch_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_switch_btn, parent=self))
+        if self.frame.parent is None:
+            self.pos_slider.Bind(wx.EVT_COMMAND_SCROLL_THUMBTRACK, partial(self.rdp_gui_events.evt_pos_slider, parent=self))
+            self.pos_slider.Bind(wx.EVT_COMMAND_SCROLL_CHANGED, partial(self.rdp_gui_events.evt_pos_slider, parent=self))       
+            self.play_pause_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_play_pause_btn, parent=self))
+            self.reverse_play_pause_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_reverse_play_pause_btn, parent=self))
+            self.increase_single_step_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_increase_single_step_btn, parent=self))
+            self.decrease_single_step_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_decrease_single_step_btn, parent=self))
+            self.reset_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_reset_btn, parent=self))
+            self.switch_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_switch_btn, parent=self))
                     
         if self.frame.parent is None:
             self.add_figure_frame_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_add_figure_frame_btn, parent=self))
@@ -1536,7 +1538,7 @@ class RDPGUI(wx.Panel):
         
         # Layout
         #========================================================================================================================
-        self.panel.SetSizerAndFit(self.main_sizer)
+        self.SetSizerAndFit(self.main_sizer)
 
         #========================================================================================================================
                           
@@ -1573,7 +1575,7 @@ class RDPGUI(wx.Panel):
 
     def _load_plot_configuration(self):
         
-        dlg = rdp.dlg.load_config_dlg(self.panel, self.dir)
+        dlg = LoadConfigDialog(self, self.dir)
         
         if dlg.ShowModal() == wx.ID_CANCEL:
             return
@@ -1622,13 +1624,18 @@ class RDPGUI(wx.Panel):
             print 'File format cannot be read.'
             return
         
-        self.data, self.time_stamps = rdp.datatools.get_data(csv_f=self.dir + '/' + self.flist_sorted[self.selection], header=self.header) 
+        self.data, self.time_stamps = RDPPlot().get_data(csv_f=self.dir + '/' + self.flist_sorted[self.selection], header=self.header) 
         self.sel_cbox.SetItems(self.flist_sorted)
         self.sel_cbox.SetValue(self.sel_cbox_selection)
-        self.pos_slider.SetMax(self.slider_max)
-        self.pos_slider.SetValue(self.step)
-        self.time_stamp_display.SetLabel(str(self.time_stamps[self.step]))
-        self.rdp_frame = RDPSetupFrame(parent=self, title=self.sel_cbox_selection)
+        
+        try:
+            self.pos_slider.SetMax(self.slider_max)
+            self.pos_slider.SetValue(self.step)
+            self.time_stamp_display.SetLabel(str(self.time_stamps[self.step]))
+        except AttributeError:
+            pass
+        
+        self.rdp_frame = RDPFrame(parent=self, title=self.sel_cbox_selection) 
         self.rdp_frame.frame.proj_cbox.SetItems(self.proj_ch)
         self.rdp_frame.frame.proj_cbox.SetValue(self.proj)
         self.rdp_frame.frame.proj_method_cbox.SetValue(self.proj_method)
@@ -1736,7 +1743,7 @@ class RDPGUI(wx.Panel):
         if self.step == 0:
             
             try:
-                self.time_stamp_display.SetLabel('')
+                self.time_stamp_display.SetLabel(' ')
             except AttributeError:
                 pass
         
@@ -1846,20 +1853,22 @@ class RDPGUI(wx.Panel):
     
     
     def enforce_labelling_mode(self, plot, labelling_mode, style):
-
+        
         # Prevent scientific notation and offset
         formatter = ScalarFormatter()
         formatter.set_scientific(False) 
         formatter.set_useOffset(False)
         
+        plot.yaxis.set_major_formatter(formatter)
+        plot.yaxis.set_major_formatter(formatter)
+        
         try:
-            plot.xaxis.set_major_formatter(formatter)
-            plot.yaxis.set_major_formatter(formatter)
             plot.zaxis.set_major_formatter(formatter)
         except AttributeError:
             pass
-            
+        
         if labelling_mode == 'off':
+            plt.rcdefaults()
             plot.axes.set_xticklabels([])
             plot.axes.set_yticklabels([])
             
@@ -1883,12 +1892,8 @@ class RDPGUI(wx.Panel):
                     
             else:
                 plot.tick_params(axis='both', which='both', bottom='on', top='on', left='on', right='on')
-                
         except AttributeError:
-            if self.axis_ticks == False:
-                plt.axis('off')
-            else:
-                plt.axis('on')
+            pass
                 
         return plot
 
@@ -1905,25 +1910,25 @@ class RDPGUI(wx.Panel):
             if self.mode != 'snapshot sequence':
                 if self.figure is None:
                     self.figure = plt.figure(str(self.title))
-            
+                                                                       
             if self.mode == 'snapshot' or self.style == 'image':
 
                 try:
                     self.plot, self.reduced_data = rdp.plotfuncs.plot_snapshot(step = self.step, 
-                                                                                  style = self.style, 
-                                                                                  data = self.data, 
-                                                                                  header = self.header, 
-                                                                                  vmin = self.vmin,
-                                                                                  vmax = self.vmax,
-                                                                                  resolution = self.resolution, 
-                                                                                  surface_linewidth = self.surface_linewidth,
-                                                                                  proj = self.proj,
-                                                                                  linestyle = self.line_style,
-                                                                                  proj_method = self.proj_method,
-                                                                                  color = self.line_color,
-                                                                                  figure = self.figure,
-                                                                                  title = self.title)
-                                                    
+                                                                  style = self.style, 
+                                                                  data = self.data, 
+                                                                  header = self.header, 
+                                                                  vmin = self.vmin,
+                                                                  vmax = self.vmax,
+                                                                  resolution = self.resolution, 
+                                                                  surface_linewidth = self.surface_linewidth,
+                                                                  proj = self.proj,
+                                                                  linestyle = self.line_style,
+                                                                  proj_method = self.proj_method,
+                                                                  color = self.line_color,
+                                                                  figure = self.figure,
+                                                                  title = self.title)
+                                        
                     if self.style == 'heatmap' or self.style == 'surface' or self.style == 'wireframe':
                         self.figure.gca().invert_yaxis()
                                                     
@@ -1936,7 +1941,14 @@ class RDPGUI(wx.Panel):
                     dlg.ShowModal()
                     dlg.Hide()
                     wx.CallAfter(dlg.Destroy)
-
+                
+            elif self.mode == 'snapshot sequence':
+                self.save_mode = save
+                dlg = SnapshotSequenceDialog(self, -1, 'Options')
+                dlg.ShowModal()
+                dlg.Hide()
+                wx.CallAfter(dlg.Destroy)
+                        
             elif self.mode == 'time course':
                 try:
                     self.plot = rdp.plotfuncs.plot_time_course(data = self.data, 
@@ -1963,7 +1975,7 @@ class RDPGUI(wx.Panel):
                     if self.style == 'heatmap' or self.style == 'surface' or self.style == 'wireframe':
                         self.figure.gca().invert_yaxis()
                     
-                    if self.x_label == '' or self.x_label == ' ' :
+                    if self.x_label == ' ' or self.x_label == ' ' :
                         self.x_label = 'Time'
                         try:
                             self.plot.set_xlabel(self.x_label)
