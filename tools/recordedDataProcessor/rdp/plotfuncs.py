@@ -29,7 +29,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 09 23
+    Date:        2015 09 24
 
     Description: 
 
@@ -295,7 +295,7 @@ def process_image(data, header, step):
         return img_array
 
 
-def plot_snapshot(step, data, vmin, vmax, resolution, header, style, surface_linewidth, mode=' ', proj='', linestyle='solid', proj_method='average', color='#FF9600', figure=None, title=None):        
+def plot_snapshot(step, data, vmin, vmax, stride, header, style, surface_linewidth, mode=' ', proj='', linestyle='solid', proj_method='average', color='#FF9600', figure=None, title=None):        
     ndim = datatools.get_dimension(header)
     steps = data.shape[0]
             
@@ -350,9 +350,9 @@ def plot_snapshot(step, data, vmin, vmax, resolution, header, style, surface_lin
                         plot = initialize_3D_plot(mode=mode, figure=figure, title=title)
                         
                         if style == 'surface':
-                            plot.plot_surface(X_1, X_2, data,rstride=resolution, cstride=resolution,cmap='coolwarm', alpha=0.5, linewidth=surface_linewidth, rasterized=True)
+                            plot.plot_surface(X_1, X_2, data,rstride=stride, cstride=stride,cmap='coolwarm', alpha=0.5, linewidth=surface_linewidth, rasterized=True)
                         elif style == 'wireframe':
-                            plot.plot_wireframe(X_1,X_2, data, rstride=resolution,cstride=resolution, color=color, rasterized=True)
+                            plot.plot_wireframe(X_1,X_2, data, rstride=stride,cstride=stride, color=color, rasterized=True)
                         
                     elif style == 'heatmap':
                         plot = plot_heatmap(X_1=X_1, X_2=X_2, data=data, vmin=vmin, vmax=vmax, mode=mode, figure=figure)
@@ -392,9 +392,9 @@ def plot_snapshot(step, data, vmin, vmax, resolution, header, style, surface_lin
                         plot = initialize_3D_plot(mode=mode, figure=figure, title=title)
         
                         if style == 'surface': 
-                            plot.plot_surface(X_1,X_2,data,rstride=resolution, cstride=resolution,cmap='coolwarm', alpha=0.5, linewidth=surface_linewidth, rasterized=False)
+                            plot.plot_surface(X_1,X_2,data,rstride=stride, cstride=stride,cmap='coolwarm', alpha=0.5, linewidth=surface_linewidth, rasterized=False)
                         elif style == 'wireframe':
-                            plot.plot_wireframe(X_1,X_2,data, rstride=resolution,cstride=resolution, color=color)
+                            plot.plot_wireframe(X_1,X_2,data, rstride=stride,cstride=stride, color=color)
                         
                     elif style == 'heatmap':
                         plot = plot_heatmap(X_1=X_1, X_2=X_2, data=data, vmin=vmin, vmax=vmax, mode=mode, figure=figure)
@@ -406,7 +406,7 @@ def plot_snapshot(step, data, vmin, vmax, resolution, header, style, surface_lin
             pass
         
     
-def plot_snapshot_sequence(data, header, vmin, vmax, resolution, surface_linewidth, start, step_size, steps, proj, proj_method, style, linestyle='solid',
+def plot_snapshot_sequence(data, header, vmin, vmax, stride, surface_linewidth, start, step_size, steps, proj, proj_method, style, linestyle='solid',
                            x_label=None, y_label=None, z_label=None, file_name=None, file_directory=None, save_mode=False, color='#FF9600', figure=None, title=None):
     
     plot_mode = 'snapshot sequence'
@@ -416,7 +416,7 @@ def plot_snapshot_sequence(data, header, vmin, vmax, resolution, surface_linewid
                                   header = header, 
                                   vmin = vmin, 
                                   vmax = vmax, 
-                                  resolution = resolution, 
+                                  stride = stride, 
                                   step = start + (i*step_size), 
                                   style = style, 
                                   surface_linewidth = surface_linewidth,
@@ -442,7 +442,7 @@ def plot_snapshot_sequence(data, header, vmin, vmax, resolution, surface_linewid
             plt.draw()
                     
 
-def plot_time_course(data, header, vmin, vmax, resolution, surface_linewidth, proj, proj_method, style, linestyle='solid', color='#FF9600', plot=None, marker=False, step=None, 
+def plot_time_course(data, header, vmin, vmax, stride, surface_linewidth, proj, proj_method, style, linestyle='solid', color='#FF9600', plot=None, marker=False, step=None, 
                      marker_color=None, figure=None, title=None):
     
     ndim = datatools.get_dimension(header)
@@ -475,9 +475,9 @@ def plot_time_course(data, header, vmin, vmax, resolution, surface_linewidth, pr
             plot = initialize_3D_plot(figure=figure, title=title)
             
             if style == 'surface':   
-                plot.plot_surface(X_1, X_2, data, rstride=resolution, cstride=resolution, cmap='coolwarm', alpha=0.5, linewidth=surface_linewidth, rasterized=True)
+                plot.plot_surface(X_1, X_2, data, rstride=stride, cstride=stride, cmap='coolwarm', alpha=0.5, linewidth=surface_linewidth, rasterized=True)
             elif style == 'wireframe': 
-                plot.plot_wireframe(X_1, X_2, data, rstride=resolution, cstride=resolution, color=color, rasterized=True)
+                plot.plot_wireframe(X_1, X_2, data, rstride=stride, cstride=stride, color=color, rasterized=True)
         
         elif style == 'heatmap':
             plot = plot_heatmap(X_1=X_1, X_2=X_2, data=data, vmin=vmin, vmax=vmax, figure=figure)
