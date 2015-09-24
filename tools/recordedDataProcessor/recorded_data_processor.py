@@ -4,7 +4,7 @@
 ========================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+     
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -29,7 +29,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 09 23
+    Date:        2015 09 24
 
     Description: 
 
@@ -114,7 +114,7 @@ class RDPGUIEvents():
         wx.CallAfter(parent.Destroy)
     
     def evt_save_config_btn(self, event, parent):
-        dlg = rdp.dlg.save_config_dlg(parent=parent, defaulDir=parent.dir)
+        dlg = rdp.dlg.save_config_dlg(parent=parent, defaultDir=parent.dir)
         
         if dlg.ShowModal() == wx.ID_CANCEL:
             return
@@ -211,11 +211,10 @@ class RDPGUIEvents():
         
     
     def evt_add_figure_frame_btn(self, event, parent):
-                        
+        
         new_frame = RDPMainWindow(parent=parent.frame, title='', pos=None, size=None, style=None, name=None, directory=parent.dir)     
         new_frame.rdp_gui.step = parent.step   
         new_frame.Bind(wx.EVT_CLOSE, partial(self.evt_close_frame, parent=parent))
-        
         new_frame_id = new_frame.GetId()
         parent.frame_ids.append(new_frame_id)
         
@@ -225,18 +224,29 @@ class RDPGUIEvents():
     def evt_close_frame(self, event, parent):
         
         frame = event.GetEventObject()
-        frame_id = frame.GetId()
+        frame_great_parent = frame.GetParent().GetParent()
         
-        if frame_id in parent.frame_ids:
-            parent.frame_ids.remove(frame_id)
+        # Get ID of active event objects great parent/main window
+        frame_id = frame_great_parent.GetId()
+        aux_frame = frame
         
-        wx.FindWindowById(frame_id).Hide()
-    
+        # Find uppermost RDPGUI
+        while aux_frame.GetParent() != None:
+            aux_frame = aux_frame.GetParent()
+
+        aux_frame = aux_frame.GetChildren()[1]
+        
+        # Remove ID of active event object from ID list
+        if frame_id in aux_frame.frame_ids:
+            aux_frame.frame_ids.remove(frame_id)
+                
+        frame.Hide()
+        
                             
     def evt_play_pause_btn(self, event, parent):
         parent._play_pause_btn(reverse=False)
         
-
+        
     def evt_reverse_play_pause_btn(self, event, parent):
         parent._play_pause_btn(reverse=True)
         
@@ -401,7 +411,7 @@ class RDPGUIEvents():
                 plt.close(current_frame.figure)
                 current_frame.figure = None
                         
-        frame = parent.panel.GetParent()
+        frame = parent.GetParent()
         browser_panel = RDPBrowserPanel(parent=frame)
         
         # Replace plot generation frame with file browser
@@ -859,18 +869,15 @@ class RDPBrowserPanel(wx.Panel):
         
         # File browser
         self.browser = wx.GenericDirCtrl(parent=self, dir=self.frame.dir, size=(325, 450))            
-        self.sel_btn = wx.Button(parent=self, label = 'Select')
-        self.load_config_btn = wx.Button(parent=self, label = 'Load configuration')
+        self.sel_btn = wx.Button(parent=self, label = 'OK')
         self.sel_btn.Bind(wx.EVT_BUTTON, partial(rdp_gui_events.evt_sel_btn, parent=self))
-        self.load_config_btn.Bind(wx.EVT_BUTTON, partial(rdp_gui_events.evt_load_config_btn, parent=self))
         
         # Main sizer
         self.main_sizer.Add(item=self.select_directory, proportion=0, flag=wx.TOP|wx.LEFT|wx.BOTTOM, border=10)
         self.main_sizer.Add(item=self.browser, proportion=0, flag=wx.LEFT|wx.BOTTOM|wx.RIGHT|wx.EXPAND, border=10)
         self.btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.btn_sizer.Add(item=self.sel_btn, proportion=0)
-        self.btn_sizer.Add(item=self.load_config_btn, proportion=0)
-        self.main_sizer.Add(item=self.btn_sizer, proportion=0, flag=wx.LEFT|wx.BOTTOM, border=10)
+        self.main_sizer.Add(item=self.btn_sizer, proportion=0, flag=wx.ALIGN_RIGHT|wx.BOTTOM|wx.RIGHT, border=10)
         
         # Layout
         self.SetSizer(self.main_sizer)
@@ -888,7 +895,7 @@ class RDPBrowserPanel(wx.Panel):
         self.rdp_gui = RDPGUI(parent=frame)
         frame.SetSizer(self.rdp_gui.main_sizer)
         frame.Sizer.Fit(frame)
-        #wx.CallAfter(self.Hide)
+        wx.CallAfter(self.Hide)
         
         return self.rdp_gui
     
@@ -903,7 +910,7 @@ class RDPPlotFrame(wx.Frame):
         # Initialize control plot frame
         if parent.control_plot_frame == None:
             parent.control_plot_frame = wx.Frame(parent=parent, id=-1, title=str(parent.title), style=wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.CLIP_CHILDREN|wx.FRAME_NO_TASKBAR)
-            parent.control_plot_frame.Bind(wx.EVT_CLOSE, partial(self.rdp_gui_events.evt_close_figure, parent=parent))
+            parent.control_plot_frame.Bind(wx.EVT_CLOSE, partial(self.rdp_gui_events.evt_close_frame, parent=parent))
             
         parent.control_plot_frame.control_plot_panel = wx.Panel(parent=parent.control_plot_frame)
         self.notebook = wx.Notebook(parent.control_plot_frame.control_plot_panel)
@@ -1286,7 +1293,6 @@ class RDPGUI(wx.Panel):
     
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
-        
         self.rdp_gui_events = RDPGUIEvents()
         self.frame = parent        
         self.control_plot_frame = None
@@ -1575,7 +1581,7 @@ class RDPGUI(wx.Panel):
 
     def _load_plot_configuration(self):
         
-        dlg = LoadConfigDialog(self, self.dir)
+        dlg = rdp.dlg.load_config_dlg(self, self.dir)
         
         if dlg.ShowModal() == wx.ID_CANCEL:
             return
@@ -1624,7 +1630,7 @@ class RDPGUI(wx.Panel):
             print 'File format cannot be read.'
             return
         
-        self.data, self.time_stamps = RDPPlot().get_data(csv_f=self.dir + '/' + self.flist_sorted[self.selection], header=self.header) 
+        self.data, self.time_stamps = rdp.datatools.get_data(csv_f=self.dir + '/' + self.flist_sorted[self.selection], header=self.header) 
         self.sel_cbox.SetItems(self.flist_sorted)
         self.sel_cbox.SetValue(self.sel_cbox_selection)
         
@@ -1635,7 +1641,7 @@ class RDPGUI(wx.Panel):
         except AttributeError:
             pass
         
-        self.rdp_frame = RDPFrame(parent=self, title=self.sel_cbox_selection) 
+        self.rdp_frame = RDPSetupFrame(parent=self, title=self.sel_cbox_selection) 
         self.rdp_frame.frame.proj_cbox.SetItems(self.proj_ch)
         self.rdp_frame.frame.proj_cbox.SetValue(self.proj)
         self.rdp_frame.frame.proj_method_cbox.SetValue(self.proj_method)
@@ -1941,13 +1947,13 @@ class RDPGUI(wx.Panel):
                     dlg.ShowModal()
                     dlg.Hide()
                     wx.CallAfter(dlg.Destroy)
-                
-            elif self.mode == 'snapshot sequence':
-                self.save_mode = save
-                dlg = SnapshotSequenceDialog(self, -1, 'Options')
-                dlg.ShowModal()
-                dlg.Hide()
-                wx.CallAfter(dlg.Destroy)
+            
+            #elif self.mode == 'snapshot sequence':
+            #    self.save_mode = save
+            #    dlg = SnapshotSequenceDialog(self, -1, 'Options')
+            #    dlg.ShowModal()
+            #    dlg.Hide()
+            #    wx.CallAfter(dlg.Destroy)
                         
             elif self.mode == 'time course':
                 try:
