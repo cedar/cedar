@@ -16,7 +16,7 @@
     WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
     License for more details.
-
+    
     You should have received a copy of the GNU Lesser General Public License
     along with cedar. If not, see <http://www.gnu.org/licenses/>.
 
@@ -88,7 +88,7 @@ class RDPGUIEvents():
                                                                                                     header = great_parent.header, 
                                                                                                     vmin = great_parent.vmin,
                                                                                                     vmax = great_parent.vmax,
-                                                                                                    resolution = great_parent.resolution,
+                                                                                                    stride = great_parent.stride,
                                                                                                     surface_linewidth = great_parent.surface_linewidth,
                                                                                                     proj = great_parent.proj,
                                                                                                     linestyle = great_parent.line_style,
@@ -126,7 +126,7 @@ class RDPGUIEvents():
                                                         marked=parent.marked, 
                                                         step=parent.step, 
                                                         slider_max=parent.slider_max, 
-                                                        resolution=parent.resolution, 
+                                                        stride=parent.stride, 
                                                         vmax=parent.vmax, 
                                                         vmin=parent.vmin, 
                                                         proj=parent.proj, 
@@ -153,7 +153,8 @@ class RDPGUIEvents():
                                                         surface_linewidth=parent.surface_linewidth,
                                                         flist_sorted=parent.flist_sorted,
                                                         mode_ch = parent.rdp_frame.frame.mode_cbox.GetItems(),
-                                                        proj_ch=parent.rdp_frame.frame.proj_cbox.GetItems())
+                                                        proj_ch=parent.rdp_frame.frame.proj_cbox.GetItems(),
+                                                        line_style=parent.line_style)
                 
         file_path = dlg.GetPath()
 
@@ -268,7 +269,7 @@ class RDPGUIEvents():
             if current_frame.control_plot_frame:
                 
                 try:
-                    current_frame.control_plot_frame.resolution_spn.SetValue(current_frame.resolution)
+                    current_frame.control_plot_frame.stride_spn.SetValue(current_frame.stride)
                 except AttributeError:
                     
                     pass
@@ -311,9 +312,9 @@ class RDPGUIEvents():
         parent._add_time_course()
         
         
-    def evt_resolution_spn(self, event, parent):
+    def evt_stride_spn(self, event, parent):
         
-        parent.resolution = int(parent.control_plot_frame.resolution_spn.GetValue())
+        parent.stride = int(parent.control_plot_frame.stride_spn.GetValue())
         wx.CallAfter(parent._update_plot)
         
 
@@ -618,52 +619,65 @@ class RDPGUIEvents():
         
         great_parent = parent.parent
         widget = event.GetEventObject()
-        great_parent.mode = widget.GetValue()
-        widget = great_parent.color_combobox_background(value=great_parent.mode, widget=widget)
-
-        '''
-        if great_parent.figure:
-            plt.close(great_parent.figure)
-        '''
-                    
-        #else:
-        if not great_parent.figure:
-            great_parent.proj_method = ''
-            great_parent.style = ''
-            great_parent.proj = ''
-            
-            parent.proj_method_cbox.Disable()
-            parent.style_cbox.Disable()
-            
-            if 'wxMac' in wx.PlatformInfo:
-                parent.style_cbox.GetChildren()[0].SetBackgroundColour('#FFFFFF')
-                parent.proj_method_cbox.GetChildren()[0].SetBackgroundColour('#FFFFFF')
-            else:
-                parent.style_cbox.SetBackgroundColour('#FFFFFF')
-                parent.proj_method_cbox.SetBackgroundColour('#FFFFFF')
-            
-            parent.proj_cbox.SetValue(great_parent.proj)
-            parent.proj_method_cbox.SetValue(great_parent.proj_method)
-            parent.style_cbox.SetValue(great_parent.style)
-            
-        if great_parent.ndim[great_parent.selection] == 0:    
-                    
-            if great_parent.mode != 'snapshot sequence':
-                parent.panel.Hide()
-                RDPPlotFrame(parent=great_parent, panel=parent.panel) 
-                great_parent.rdp_frame.frame.Hide()
-            
-            great_parent._update_plot()
         
-        # Fill projection combobox with the fitting options
-        if great_parent.mode == 'time course':
-            parent.proj_cbox.SetItems(great_parent.proj_choice_time_course)
-            parent.proj_cbox.Enable()
-        elif great_parent.mode == 'snapshot' or great_parent.mode == 'snapshot sequence':
-            parent.proj_cbox.SetItems(great_parent.proj_choice_snapshot)
-            parent.proj_cbox.Enable()
+        if widget.GetValue() == 'time course' and ',' in str(great_parent.proj):
+            dlg = wx.MessageDialog(parent = None, 
+                                   message = 'It is not possible to build a time course out of 2-dimensional time slices.', 
+                                   caption = 'The attempted operation is not possible.', 
+                                   style = wx.OK | wx.ICON_INFORMATION | wx.CENTER | wx.STAY_ON_TOP)
+            
+            dlg.ShowModal()
+            dlg.Hide()
+            wx.CallAfter(dlg.Destroy)
+            
+            widget.SetValue('snapshot')
+            great_parent.mode = widget.GetValue()
+        
         else:
-            parent.proj_cbox.SetItems([])
+            great_parent.mode = widget.GetValue()
+            
+            '''
+            if great_parent.figure:
+                plt.close(great_parent.figure)
+            '''
+    
+            #else:
+            if not great_parent.figure:
+                great_parent.proj_method = ''
+                great_parent.style = ''
+                great_parent.proj = ''
+                
+                parent.proj_method_cbox.Disable()
+                parent.style_cbox.Disable()
+                
+                if 'wxMac' in wx.PlatformInfo:
+                    parent.style_cbox.GetChildren()[0].SetBackgroundColour('#FFFFFF')
+                    parent.proj_method_cbox.GetChildren()[0].SetBackgroundColour('#FFFFFF')
+                else:
+                    parent.style_cbox.SetBackgroundColour('#FFFFFF')
+                    parent.proj_method_cbox.SetBackgroundColour('#FFFFFF')
+                
+                parent.proj_cbox.SetValue(great_parent.proj)
+                parent.proj_method_cbox.SetValue(great_parent.proj_method)
+                parent.style_cbox.SetValue(great_parent.style)
+                
+            if great_parent.ndim[great_parent.selection] == 0:    
+                        
+                if great_parent.mode != 'snapshot sequence':
+                    parent.panel.Hide()
+                    RDPPlotFrame(parent=great_parent, panel=parent.panel) 
+                    great_parent.rdp_frame.frame.Hide()
+                    great_parent._update_plot()
+            
+            # Fill projection combobox with the fitting options
+            if great_parent.mode == 'time course':
+                parent.proj_cbox.SetItems(great_parent.proj_choice_time_course)
+                parent.proj_cbox.Enable()
+            elif great_parent.mode == 'snapshot' or great_parent.mode == 'snapshot sequence':
+                parent.proj_cbox.SetItems(great_parent.proj_choice_snapshot)
+                parent.proj_cbox.Enable()
+            else:
+                parent.proj_cbox.SetItems([])
             
            
     def evt_proj_method_cbox(self, event, parent):
@@ -869,7 +883,7 @@ class RDPBrowserPanel(wx.Panel):
         
         # File browser
         self.browser = wx.GenericDirCtrl(parent=self, dir=self.frame.dir, size=(325, 450))            
-        self.sel_btn = wx.Button(parent=self, label = 'OK')
+        self.sel_btn = wx.Button(parent=self, label = 'Select')
         self.sel_btn.Bind(wx.EVT_BUTTON, partial(rdp_gui_events.evt_sel_btn, parent=self))
         
         # Main sizer
@@ -909,7 +923,7 @@ class RDPPlotFrame(wx.Frame):
         
         # Initialize control plot frame
         if parent.control_plot_frame == None:
-            parent.control_plot_frame = wx.Frame(parent=parent, id=-1, title=str(parent.title), style=wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.CLIP_CHILDREN|wx.FRAME_NO_TASKBAR)
+            parent.control_plot_frame = wx.Frame(parent=parent, id=-1, title=str(parent.title), style=wx.MINIMIZE_BOX|wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.CLIP_CHILDREN)
             parent.control_plot_frame.Bind(wx.EVT_CLOSE, partial(self.rdp_gui_events.evt_close_frame, parent=parent))
             
         parent.control_plot_frame.control_plot_panel = wx.Panel(parent=parent.control_plot_frame)
@@ -1072,15 +1086,15 @@ class RDPPlotFrame(wx.Frame):
                 notebook_parameters_panel_sizer.Add(linewidth_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
                 notebook_parameters_panel_sizer.Add(parent.control_plot_frame.linewidth_spn, 1, wx.ALIGN_RIGHT|wx.RIGHT, border=20)
             
-            resolution_label = wx.StaticText(notebook_parameters_panel, -1, 'Resolution ')
-            parent.control_plot_frame.resolution_spn = wx.SpinCtrl(notebook_parameters_panel,  size=x_axis_label.GetSize(), min=1, max=100, value=str(parent.resolution))
-            parent.control_plot_frame.resolution_spn.Bind(wx.EVT_SPINCTRL, partial(self.rdp_gui_events.evt_resolution_spn, parent=parent))
+            stride_label = wx.StaticText(notebook_parameters_panel, -1, 'Stride')
+            parent.control_plot_frame.stride_spn = wx.SpinCtrl(notebook_parameters_panel,  size=x_axis_label.GetSize(), min=1, max=100, value=str(parent.stride))
+            parent.control_plot_frame.stride_spn.Bind(wx.EVT_SPINCTRL, partial(self.rdp_gui_events.evt_stride_spn, parent=parent))
         
-            notebook_parameters_panel_sizer.Add(resolution_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
-            notebook_parameters_panel_sizer.Add(parent.control_plot_frame.resolution_spn, 1, wx.ALIGN_RIGHT|wx.RIGHT, border=20)
+            notebook_parameters_panel_sizer.Add(stride_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
+            notebook_parameters_panel_sizer.Add(parent.control_plot_frame.stride_spn, 1, wx.ALIGN_RIGHT|wx.RIGHT, border=20)
                                                         
         # Style options for line plots
-        elif parent.style == '':
+        elif parent.style == '' or parent.style == ' ':
             line_style_options = ['solid', 'dashed', 'dash dot', 'dotted']
             line_style_label = wx.StaticText(notebook_parameters_panel, -1, label='Line style ')  
             self.line_style_cbox = wx.ComboBox(notebook_parameters_panel, size=x_axis_label.GetSize(), choices=line_style_options, value='solid', style=wx.CB_READONLY)
@@ -1307,13 +1321,13 @@ class RDPGUI(wx.Panel):
         self.step = 0
         self.step_size = 0
         self.slider_max = 0
-        self.resolution = 5
+        self.stride = 5
         self.vmin = None
         self.vmax = None
         self.proj = None
         self.proj_method = 'average'
-        self.style = ' '
-        self.mode = ' '
+        self.style = ''
+        self.mode = ''
         self.labelling_mode = 'off'
         self.flist = [record_file for record_file in os.listdir(self.dir) if record_file.lower().endswith('.csv') or record_file.lower().endswith('.data')]
         self.flist_sorted = np.asarray(rdp.datatools.sort_alphnum(self.flist))
@@ -1341,7 +1355,7 @@ class RDPGUI(wx.Panel):
         self.figure_resize = None
         self.colorbar = None
         self.axis_ticks = None
-        self.sel_cbox_selection = ' ' 
+        self.sel_cbox_selection = '' 
         self.rdp_frame = None
         self.line_style = 'solid'
         self.lines = []
@@ -1366,7 +1380,6 @@ class RDPGUI(wx.Panel):
         self.figure_azimuth = None
         self.figure_elevation = None
         self.figure_distance = None
-        
         self.surface_linewidth = 0
         
         # Labels
@@ -1565,17 +1578,17 @@ class RDPGUI(wx.Panel):
         return widget
     
     
-    def prepare_plot_configuration(self, directory, x_label, y_label, z_label, marked, step, slider_max, resolution, vmax, vmin, proj, 
+    def prepare_plot_configuration(self, directory, x_label, y_label, z_label, marked, step, slider_max, stride, vmax, vmin, proj, 
                                    proj_method, style, mode, labelling_mode, reduced_data, header, ndim, selection, sel_cbox_selection,
                                    proj_choice_time_course, proj_choice_snapshot, line_color, aux_line_color, marker_color, aux_marker_color, title, 
-                                   axis_ticks, figure_azimuth, figure_elevation, figure_distance, surface_linewidth, flist_sorted, mode_ch, proj_ch):
+                                   axis_ticks, figure_azimuth, figure_elevation, figure_distance, surface_linewidth, flist_sorted, mode_ch, proj_ch, line_style):
         
         
-        save_object = [432, directory, x_label, y_label, z_label, marked, step, slider_max, resolution, vmax, vmin, proj, 
+        save_object = [537, directory, x_label, y_label, z_label, marked, step, slider_max, stride, vmax, vmin, proj, 
                        proj_method, style, mode, labelling_mode, reduced_data, header, ndim, selection, sel_cbox_selection,
                        proj_choice_time_course, proj_choice_snapshot, line_color, aux_line_color, marker_color, aux_marker_color, title, 
-                       axis_ticks, figure_azimuth, figure_elevation, figure_distance, surface_linewidth, flist_sorted, mode_ch, proj_ch]
-                        
+                       axis_ticks, figure_azimuth, figure_elevation, figure_distance, surface_linewidth, flist_sorted, mode_ch, proj_ch, line_style]
+        
         return save_object
     
 
@@ -1588,8 +1601,15 @@ class RDPGUI(wx.Panel):
         
         file_path = dlg.GetPath()
         loaded_object = pickle.load(open(file_path, 'rb'))
+                
+        aux_frame = self
         
-        if loaded_object[0] == 432:
+        while aux_frame.GetParent() != None:
+            aux_frame = aux_frame.GetParent()
+
+        aux_frame = aux_frame.GetChildren()[1]
+                
+        if loaded_object[0] == 432 or loaded_object[0] == 537:
             self.dir = loaded_object[1]
             self.x_label = loaded_object[2] 
             self.y_label = loaded_object[3]
@@ -1597,7 +1617,7 @@ class RDPGUI(wx.Panel):
             self.marked = loaded_object[5]  
             self.step = loaded_object[6]  
             self.slider_max = loaded_object[7]  
-            self.resolution = loaded_object[8]  
+            self.stride = loaded_object[8]  
             self.vmax = loaded_object[9]  
             self.vmin = loaded_object[10]  
             self.proj = loaded_object[11]  
@@ -1625,6 +1645,9 @@ class RDPGUI(wx.Panel):
             self.flist_sorted = loaded_object[33] 
             self.mode_ch = loaded_object[34]
             self.proj_ch = loaded_object[35]
+            
+            if loaded_object[0] == 537:
+                self.line_style = loaded_object[36]
                         
         else:
             print 'File format cannot be read.'
@@ -1635,9 +1658,9 @@ class RDPGUI(wx.Panel):
         self.sel_cbox.SetValue(self.sel_cbox_selection)
         
         try:
-            self.pos_slider.SetMax(self.slider_max)
-            self.pos_slider.SetValue(self.step)
-            self.time_stamp_display.SetLabel(str(self.time_stamps[self.step]))
+            aux_frame.pos_slider.SetMax(self.slider_max)
+            aux_frame.pos_slider.SetValue(self.step)
+            aux_frame.time_stamp_display.SetLabel(str(self.time_stamps[self.step]))
         except AttributeError:
             pass
         
@@ -1674,9 +1697,16 @@ class RDPGUI(wx.Panel):
         
         self._update_plot()
         
+        
+    def _pause_player(self):
+        
+        self.increase_single_step_btn.Enable()
+        self.decrease_single_step_btn.Enable()
+        self.reset_btn.Enable()
+        
              
     def _play_pause_btn(self, reverse):
-                
+        
         if reverse == False:
             active_btn = self.play_pause_btn
             active_bitmap = self.play_bitmap
@@ -1864,17 +1894,15 @@ class RDPGUI(wx.Panel):
         formatter = ScalarFormatter()
         formatter.set_scientific(False) 
         formatter.set_useOffset(False)
-        
-        plot.yaxis.set_major_formatter(formatter)
-        plot.yaxis.set_major_formatter(formatter)
-        
+                
         try:
+            plot.yaxis.set_major_formatter(formatter)
+            plot.yaxis.set_major_formatter(formatter)
             plot.zaxis.set_major_formatter(formatter)
         except AttributeError:
             pass
         
         if labelling_mode == 'off':
-            plt.rcdefaults()
             plot.axes.set_xticklabels([])
             plot.axes.set_yticklabels([])
             
@@ -1894,10 +1922,10 @@ class RDPGUI(wx.Panel):
             
         try:
             if self.axis_ticks == False:
-                plot.tick_params(axis='both', which='both', bottom='off', top='off', left='off', right='off')
+                plt.tick_params(axis='both', which='both', bottom='off', top='off', left='off', right='off')
                     
             else:
-                plot.tick_params(axis='both', which='both', bottom='on', top='on', left='on', right='on')
+                plt.tick_params(axis='both', which='both', bottom='on', top='on', left='on', right='on')
         except AttributeError:
             pass
                 
@@ -1926,7 +1954,7 @@ class RDPGUI(wx.Panel):
                                                                   header = self.header, 
                                                                   vmin = self.vmin,
                                                                   vmax = self.vmax,
-                                                                  resolution = self.resolution, 
+                                                                  stride = self.stride, 
                                                                   surface_linewidth = self.surface_linewidth,
                                                                   proj = self.proj,
                                                                   linestyle = self.line_style,
@@ -1947,21 +1975,14 @@ class RDPGUI(wx.Panel):
                     dlg.ShowModal()
                     dlg.Hide()
                     wx.CallAfter(dlg.Destroy)
-            
-            #elif self.mode == 'snapshot sequence':
-            #    self.save_mode = save
-            #    dlg = SnapshotSequenceDialog(self, -1, 'Options')
-            #    dlg.ShowModal()
-            #    dlg.Hide()
-            #    wx.CallAfter(dlg.Destroy)
-                        
+                                    
             elif self.mode == 'time course':
                 try:
                     self.plot = rdp.plotfuncs.plot_time_course(data = self.data, 
                                                                      header = self.header, 
                                                                      vmin = self.vmin,
                                                                      vmax = self.vmax,
-                                                                     resolution = self.resolution,
+                                                                     stride = self.stride,
                                                                      surface_linewidth = self.surface_linewidth,
                                                                      plot = self.plot,
                                                                      linestyle=self.line_style,
@@ -1990,13 +2011,13 @@ class RDPGUI(wx.Panel):
                         
                 except UnboundLocalError:
                     dlg = wx.MessageDialog(parent = None, 
-                                           message = 'It is not possible to build a time course out of 2-dimensional time slices.', 
-                                           caption = 'The attempted operation is not possible.', 
-                                           style = wx.OK | wx.ICON_INFORMATION | wx.CENTER | wx.STAY_ON_TOP)
+                                            message = 'It is not possible to build a time course out of 2-dimensional time slices.', 
+                                            caption = 'The attempted operation is not possible.', 
+                                            style = wx.OK | wx.ICON_INFORMATION | wx.CENTER | wx.STAY_ON_TOP)
                     dlg.ShowModal()
                     dlg.Hide()
                     wx.CallAfter(dlg.Destroy)
-            
+                                    
             try:
                 rdp.plotfuncs.label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
             except AttributeError:
