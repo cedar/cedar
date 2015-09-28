@@ -29,7 +29,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 09 24
+    Date:        2015 09 28
 
     Description: 
 
@@ -87,7 +87,7 @@ def project(mode, steps, data, header, proj, proj_method='average'):
 
     for i in range(ndim):
         X[i] = int(header[i+2])
-                    
+        
         if proj == 'x_' + str(i+1): 
             col = (ndim-1) - i
                         
@@ -116,7 +116,7 @@ def project(mode, steps, data, header, proj, proj_method='average'):
                     
                     if j < aux_col:
                         aux_col -= 1
-
+    
                 else:
                     j += 1
                     continue
@@ -125,12 +125,13 @@ def project(mode, steps, data, header, proj, proj_method='average'):
                 new_X = np.zeros((steps, aux_X.shape[0]))
             
             new_X[i] = aux_X
-
+    
             X_1,X_2 = np.mgrid[:steps, :X[col]]
             Z = new_X
-            
+        
         except UnboundLocalError:
             raise UnboundLocalError()
+            
     
     return X_1, X_2, Z
 
@@ -210,7 +211,7 @@ def set_marker(step, data, plot, style, marker_color='#FF9600'):
             min_data = x
     #========================================================================================================================
                 
-    if style == ' ' or style == 'heatmap':
+    if style == '' or style == 'heatmap':
         # Mark step with line
         plot.axvline(x=step, color=marker_color)
         
@@ -295,7 +296,7 @@ def process_image(data, header, step):
         return img_array
 
 
-def plot_snapshot(step, data, vmin, vmax, stride, header, style, surface_linewidth, mode=' ', proj='', linestyle='solid', proj_method='average', color='#FF9600', figure=None, title=None):        
+def plot_snapshot(step, data, vmin, vmax, stride, header, style, surface_linewidth, surface_cmap, mode=' ', proj='', linestyle='solid', proj_method='average', color='#FF9600', figure=None, title=None):        
     ndim = datatools.get_dimension(header)
     steps = data.shape[0]
             
@@ -350,7 +351,7 @@ def plot_snapshot(step, data, vmin, vmax, stride, header, style, surface_linewid
                         plot = initialize_3D_plot(mode=mode, figure=figure, title=title)
                         
                         if style == 'surface':
-                            plot.plot_surface(X_1, X_2, data,rstride=stride, cstride=stride,cmap='coolwarm', alpha=0.5, linewidth=surface_linewidth, rasterized=True)
+                            plot.plot_surface(X_1, X_2, data,rstride=stride, cstride=stride,cmap=surface_cmap, alpha=0.5, linewidth=surface_linewidth, rasterized=True)
                         elif style == 'wireframe':
                             plot.plot_wireframe(X_1,X_2, data, rstride=stride,cstride=stride, color=color, rasterized=True)
                         
@@ -406,43 +407,7 @@ def plot_snapshot(step, data, vmin, vmax, stride, header, style, surface_linewid
             pass
         
     
-def plot_snapshot_sequence(data, header, vmin, vmax, stride, surface_linewidth, start, step_size, steps, proj, proj_method, style, linestyle='solid',
-                           x_label=None, y_label=None, z_label=None, file_name=None, file_directory=None, save_mode=False, color='#FF9600', figure=None, title=None):
-    
-    plot_mode = 'snapshot sequence'
-    
-    for i in range(int(steps)):
-        plot = plot_snapshot(data = data,
-                                  header = header, 
-                                  vmin = vmin, 
-                                  vmax = vmax, 
-                                  stride = stride, 
-                                  step = start + (i*step_size), 
-                                  style = style, 
-                                  surface_linewidth = surface_linewidth,
-                                  mode = plot_mode, 
-                                  proj = proj, 
-                                  linestyle = linestyle,
-                                  proj_method = proj_method,
-                                  color = color,
-                                  figure = figure,
-                                  title = title)[0]
-        
-        if style == 'heatmap' or style == 'surface' or style == 'wireframe':
-            try:
-                figure.gca().invert_yaxis()
-            except AttributeError:
-                plot.invert_yaxis()
-                
-        label_axis(plot=plot, x_label=x_label, y_label=y_label, z_label=z_label)
-        
-        if save_mode == True:
-            save_plot(plot=plot, plot_mode=plot_mode, file_name=file_name, file_directory=file_directory, save_mode='sequence', plot_number=i, figure=figure)
-        else:
-            plt.draw()
-                    
-
-def plot_time_course(data, header, vmin, vmax, stride, surface_linewidth, proj, proj_method, style, linestyle='solid', color='#FF9600', plot=None, marker=False, step=None, 
+def plot_time_course(data, header, vmin, vmax, stride, surface_linewidth, surface_cmap, proj, proj_method, style, linestyle='solid', color='#FF9600', plot=None, marker=False, step=None, 
                      marker_color=None, figure=None, title=None):
     
     ndim = datatools.get_dimension(header)
@@ -467,15 +432,17 @@ def plot_time_course(data, header, vmin, vmax, stride, surface_linewidth, proj, 
         elif ndim >= 2:
             try:
                 X_1, X_2, data = project(mode='time course', steps=steps, data=data, header=header, proj=proj, proj_method=proj_method)
-                
+            
+            
             except UnboundLocalError:
                 raise UnboundLocalError
+            
             
         if style != 'heatmap':
             plot = initialize_3D_plot(figure=figure, title=title)
             
             if style == 'surface':   
-                plot.plot_surface(X_1, X_2, data, rstride=stride, cstride=stride, cmap='coolwarm', alpha=0.5, linewidth=surface_linewidth, rasterized=True)
+                plot.plot_surface(X_1, X_2, data, rstride=stride, cstride=stride, cmap=surface_cmap, alpha=0.5, linewidth=surface_linewidth, rasterized=True)
             elif style == 'wireframe': 
                 plot.plot_wireframe(X_1, X_2, data, rstride=stride, cstride=stride, color=color, rasterized=True)
         

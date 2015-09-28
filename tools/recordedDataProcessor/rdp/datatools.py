@@ -29,7 +29,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 09 23
+    Date:        2015 09 28
 
     Description: 
 
@@ -44,6 +44,22 @@ import re
 import wx
 
 from dlg import progress_dlg
+
+def prepare_plot_configuration(directory, x_label, y_label, z_label, marked, step, slider_max, stride, vmax, vmin, proj, 
+                               proj_method, style, mode, labelling_mode, reduced_data, header, ndim, selection, sel_cbox_selection,
+                               proj_choice_time_course, proj_choice_snapshot, line_color, aux_line_color, marker_color, aux_marker_color, title, 
+                               axis_ticks, figure_azimuth, figure_elevation, figure_distance, surface_linewidth, flist_sorted, mode_ch, proj_ch, 
+                               line_style, surface_cmap):
+    
+    
+    save_object = [691, directory, x_label, y_label, z_label, marked, step, slider_max, stride, vmax, vmin, proj, 
+                   proj_method, style, mode, labelling_mode, reduced_data, header, ndim, selection, sel_cbox_selection,
+                   proj_choice_time_course, proj_choice_snapshot, line_color, aux_line_color, marker_color, aux_marker_color, title, 
+                   axis_ticks, figure_azimuth, figure_elevation, figure_distance, surface_linewidth, flist_sorted, mode_ch, proj_ch, 
+                   line_style, surface_cmap]
+    
+    return save_object
+
 
 def get_header(csv_f):
     '''Gets header from given csv file.'''
