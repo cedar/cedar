@@ -29,7 +29,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 09 23
+    Date:        2015 09 28
 
     Description: 
 
@@ -46,6 +46,18 @@ def load_config_dlg(parent, defaultDir):
                'All files (*.*)|*.*'
     
     dlg = wx.FileDialog(parent=parent, message='Load Plot configuration', wildcard=wildcard, style=wx.FD_OPEN|wx.FD_PREVIEW, defaultDir=defaultDir)
+    
+    return dlg
+
+
+def browser_dlg(parent, defaultPath):
+    
+    '''
+    wildcard = 'Pickle files (*.p)|*.p|'  \
+               'All files (*.*)|*.*'
+    '''
+    
+    dlg = wx.DirDialog(parent=parent, message='Select directory', defaultPath=defaultPath)
     
     return dlg
 
