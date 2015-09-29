@@ -29,7 +29,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 09 28
+    Date:        2015 09 29
 
     Description: 
 
@@ -42,6 +42,13 @@ import csv
 import numpy as np
 import re
 import wx
+import rdp
+import recorded_data_processor
+
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 from dlg import progress_dlg
 
@@ -141,3 +148,101 @@ def sort_alphnum(unsorted):
     alphnum_key = lambda key: [conv(c) for c in re.split('([0-9]+)', key)]
     
     return sorted(unsorted, key=alphnum_key)
+
+
+def load_plot_configuration(parent):
+    
+    dlg = rdp.dlg.load_config_dlg(parent, parent.dir)
+    
+    if dlg.ShowModal() == wx.ID_CANCEL:
+        return
+    
+    file_path = dlg.GetPath()
+    loaded_object = pickle.load(open(file_path, 'rb'))
+            
+    aux_frame = parent
+    
+    while aux_frame.GetParent() != None:
+        aux_frame = aux_frame.GetParent()
+
+    aux_frame = aux_frame.GetChildren()[1]
+            
+    parent.dir = loaded_object[1]
+    parent.x_label = loaded_object[2] 
+    parent.y_label = loaded_object[3]
+    parent.z_label = loaded_object[4]  
+    parent.marked = loaded_object[5]  
+    parent.step = loaded_object[6]  
+    parent.slider_max = loaded_object[7]  
+    parent.stride = loaded_object[8]  
+    parent.vmax = loaded_object[9]  
+    parent.vmin = loaded_object[10]  
+    parent.proj = loaded_object[11]  
+    parent.proj_method = loaded_object[12]  
+    parent.style = loaded_object[13]  
+    parent.mode = loaded_object[14]  
+    parent.labelling_mode = loaded_object[15]  
+    parent.reduced_data = loaded_object[16]  
+    parent.header = loaded_object[17]  
+    parent.ndim = loaded_object[18]  
+    parent.selection = loaded_object[19] 
+    parent.sel_cbox_selection = loaded_object[20]
+    parent.proj_choice_time_course = loaded_object[21]  
+    parent.proj_choice_snapshot = loaded_object[22]  
+    parent.line_color = loaded_object[23]  
+    parent.aux_line_color = loaded_object[24]  
+    parent.marker_color = loaded_object[25] 
+    parent.aux_marker_color = loaded_object[26] 
+    parent.title = loaded_object[27]  
+    parent.axis_ticks = loaded_object[28]  
+    parent.figure_azimuth = loaded_object[29]  
+    parent.figure_elevation = loaded_object[30]  
+    parent.figure_distance = loaded_object[31]  
+    parent.surface_linewidth = loaded_object[32]  
+    parent.flist_sorted = loaded_object[33] 
+    parent.mode_ch = loaded_object[34]
+    parent.proj_ch = loaded_object[35]
+        
+    if loaded_object[0] == 537:
+        parent.line_style = loaded_object[36]
+        
+    elif loaded_object[0] == 691:
+        parent.line_style = loaded_object[36]
+        parent.surface_cmap = loaded_object[37]
+                    
+    else:
+        dlg = wx.MessageDialog(parent = None, 
+                   message = 'RDP does not recognize the internal structure of the chosen file.', 
+                   caption = 'The chosen file cannot be read.', 
+                   style = wx.OK | wx.ICON_INFORMATION | wx.CENTER | wx.STAY_ON_TOP)
+        
+        dlg.ShowModal()
+        dlg.Hide()
+        wx.CallAfter(dlg.Destroy)
+        return
+    
+    parent.data, parent.time_stamps = rdp.datatools.get_data(csv_f=parent.dir + '/' + parent.flist_sorted[parent.selection], header=parent.header) 
+            
+    try:
+        aux_frame.pos_slider.SetMax(parent.slider_max)
+        aux_frame.pos_slider.SetValue(parent.step)
+        aux_frame.time_stamp_display.SetLabel(str(parent.time_stamps[parent.step]))
+    except AttributeError:
+        pass
+    
+    parent.rdp_frame = recorded_data_processor.RDPSetupFrame(parent=parent, title=parent.sel_cbox_selection)
+    parent.rdp_frame.frame.proj_cbox.SetItems(parent.proj_ch)
+    parent.rdp_frame.frame.proj_cbox.SetValue(str(parent.proj))
+    parent.rdp_frame.frame.proj_method_cbox.SetValue(parent.proj_method)
+    parent.rdp_frame.frame.mode_cbox.SetItems(parent.mode_ch)
+    parent.rdp_frame.frame.mode_cbox.SetValue(parent.mode)
+    parent.rdp_frame.frame.style_cbox.SetItems(parent.style_ch)
+    parent.rdp_frame.frame.style_cbox.SetValue(parent.style)
+    
+    parent.rdp_frame.frame.mode_cbox.Enable()
+    parent.rdp_frame.frame.style_cbox.Enable()
+    parent.rdp_frame.frame.proj_cbox.Enable()
+    parent.rdp_frame.frame.proj_method_cbox.Enable()
+    parent.rdp_frame.frame.panel.Hide()
+    recorded_data_processor.RDPPlotFrame(parent=parent, panel=parent.rdp_frame.frame.panel)
+    rdp.plotfuncs.update_plot(parent=parent)

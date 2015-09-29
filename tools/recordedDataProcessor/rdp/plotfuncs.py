@@ -29,7 +29,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 09 28
+    Date:        2015 09 29
 
     Description: 
 
@@ -37,6 +37,8 @@
 
 ========================================================================================================================
 '''
+import matplotlib as mpl
+mpl.use('WXAgg')
 
 import math
 import matplotlib.pyplot as plt
@@ -46,6 +48,7 @@ import re
 import wx
 
 import datatools
+import guifuncs
 
 from matplotlib.collections import PolyCollection
 from scipy import ndimage
@@ -55,26 +58,27 @@ def build_proj_ch_step(ndim, temp_proj_ch_step):
     '''Build the various projection choices for snapshot plots.'''
     
     # Empty (default) selection option
-    proj_ch_step = [' ']
-            
-    for j in range(ndim+1):
-        for k in range(len(temp_proj_ch_step)):
-            
-            # temp_proj_ch_step[k] contains 1 axis
-            if 'x_'+ str(j) == temp_proj_ch_step[k]:
-                proj_ch_step.append(temp_proj_ch_step[k])
-                
-            # temp_proj_ch_step[k] contains 2 axes
-            elif 'x_'+ str(j) in temp_proj_ch_step[k]:
-                count = 0
-                for l in range(len(re.findall('\d', temp_proj_ch_step[k]))):
-                    if int(re.findall('\d', temp_proj_ch_step[k])[l]) <= ndim:
-                        count += 1
-                        if count == 2 and temp_proj_ch_step[k] not in proj_ch_step:
-                            proj_ch_step.append(temp_proj_ch_step[k])
+    proj_ch_step = []
     
-    # sort list by length of entries
-    proj_ch_step.sort(key=lambda t: len(t))
+    if ndim != 1:
+        for j in range(ndim+1):
+            for k in range(len(temp_proj_ch_step)):
+                
+                # temp_proj_ch_step[k] contains 1 axis
+                if 'x_'+ str(j) == temp_proj_ch_step[k]:
+                    proj_ch_step.append(temp_proj_ch_step[k])
+                    
+                # temp_proj_ch_step[k] contains 2 axes
+                elif 'x_'+ str(j) in temp_proj_ch_step[k]:
+                    count = 0
+                    for l in range(len(re.findall('\d', temp_proj_ch_step[k]))):
+                        if int(re.findall('\d', temp_proj_ch_step[k])[l]) <= ndim:
+                            count += 1
+                            if count == 2 and temp_proj_ch_step[k] not in proj_ch_step:
+                                proj_ch_step.append(temp_proj_ch_step[k])
+        
+        # sort list by length of entries
+        proj_ch_step.sort(key=lambda t: len(t))
     
     return proj_ch_step
 
@@ -564,3 +568,119 @@ def save_plot(plot, plot_mode, file_name, file_directory, save_mode='single', pl
         figure.savefig(file_path, dpi=400, bbox_inches='tight', pad_inches=0.2, transparent=True)
     except RuntimeError:
         figure.savefig(file_path, dpi=400, bbox_inches='tight', pad_inches=0.2, transparent=True)
+
+
+def update_plot(parent):
+            
+    if parent.figure_canvas:   
+            
+        if parent.ndim[parent.selection] == 0:
+            plt.cla()
+        else:
+            try:
+                parent.figure.clf()
+            except AttributeError:
+                pass
+    
+    try:
+        plot(parent=parent)    
+    except AttributeError:
+        pass
+    
+    
+def plot(parent, save=False, file_path=None):
+    '''Build plot(s) to either visualize or save as pdf file'''
+     
+    if save is True:
+        save_plot(plot=parent.plot, plot_mode=parent.mode, file_name=parent.flist_sorted[parent.selection], file_directory=parent.dir, figure=parent.figure, file_path=file_path)
+        update_plot(parent=parent)
+    
+    else:         
+        
+        if parent.figure == None:
+            parent.figure = plt.figure(str(parent.title))
+                                                                   
+        if parent.mode == 'snapshot' or parent.style == 'image':
+
+            try:
+                parent.plot, parent.reduced_data = plot_snapshot(step = parent.step, 
+                                                              style = parent.style, 
+                                                              data = parent.data, 
+                                                              header = parent.header, 
+                                                              vmin = parent.vmin,
+                                                              vmax = parent.vmax,
+                                                              stride = parent.stride, 
+                                                              surface_linewidth = parent.surface_linewidth,
+                                                              surface_cmap=parent.surface_cmap,
+                                                              proj = parent.proj,
+                                                              linestyle = parent.line_style,
+                                                              proj_method = parent.proj_method,
+                                                              color = parent.line_color,
+                                                              figure = parent.figure,
+                                                              title = parent.title)
+                                                
+            except IndexError:
+                dlg = wx.MessageDialog(parent=None, 
+                                       message = 'The specified time slice does not exist.', 
+                                       caption = 'An Error has occurred.', 
+                                       style = wx.OK | wx.ICON_ERROR | wx.CENTER | wx.STAY_ON_TOP)
+                
+                dlg.ShowModal()
+                dlg.Hide()
+                wx.CallAfter(dlg.Destroy)
+                                
+        elif parent.mode == 'time course':
+            parent.plot = plot_time_course(data = parent.data, 
+                                                       header = parent.header, 
+                                                       vmin = parent.vmin,
+                                                       vmax = parent.vmax,
+                                                       stride = parent.stride,
+                                                       surface_linewidth = parent.surface_linewidth,
+                                                       surface_cmap=parent.surface_cmap,
+                                                       plot = parent.plot,
+                                                       linestyle=parent.line_style,
+                                                       proj = parent.proj,
+                                                       proj_method = parent.proj_method,
+                                                       color = parent.line_color,
+                                                       step = parent.step, 
+                                                       marker = parent.marked, 
+                                                       style = parent.style,
+                                                       marker_color = parent.marker_color,
+                                                       figure = parent.figure,
+                                                       title = parent.title)
+                            
+            if parent.ndim[parent.selection] == 0:
+                parent.lines.append(parent.plot.get_lines()[-1])
+            
+            if parent.x_label == '' or parent.x_label == ' ':
+                parent.x_label = 'Time'
+                try:
+                    parent.plot.set_xlabel(parent.x_label)
+                except AttributeError:
+                    pass
+                                
+        if parent.style == 'heatmap' or parent.style == 'surface' or parent.style == 'wireframe':
+            parent.figure.gca().invert_yaxis()
+                        
+        try:
+            label_axis(plot=parent.plot, x_label=parent.x_label, y_label=parent.y_label, z_label=parent.z_label)
+        except AttributeError:
+            pass
+                        
+        if parent.style != 'heatmap':
+            if parent.figure_azimuth is not None and parent.figure_elevation is not None:
+                parent.figure.gca(projection='3d').view_init(elev=parent.figure_elevation, azim=parent.figure_azimuth)
+                
+            if parent.figure_distance is not None:
+                parent.figure.gca(projection='3d').dist = parent.figure_distance
+                
+        if save == False:
+            parent.plot = guifuncs.enforce_labelling_mode(plot=parent.plot, labelling_mode=parent.labelling_mode, style=parent.style, axis_ticks=parent.axis_ticks)
+            try:
+                parent.figure_canvas.draw()
+            except AttributeError:
+                pass
+            
+
+def add_time_course(parent): 
+    plot(parent=parent)

@@ -1,1 +1,1 @@
-__all__ = ['datatools', 'dlg', 'guitools', 'images', 'plotfuncs']
+__all__ = ['datatools', 'dlg', 'guifuncs', 'images', 'plotfuncs']
