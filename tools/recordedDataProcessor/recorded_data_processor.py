@@ -29,7 +29,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 09 28
+    Date:        2015 09 29
 
     Description: 
 
@@ -43,7 +43,6 @@ mpl.use('WXAgg')
 
 import matplotlib.pyplot as plt
 import numpy as np
-import os
 
 try:
     import cPickle as pickle
@@ -51,7 +50,7 @@ except ImportError:
     import pickle
 
 import rdp.plotfuncs
-import rdp.guitools
+import rdp.guifuncs
 import rdp.images
 
 import sys
@@ -62,7 +61,6 @@ warnings.filterwarnings('ignore', category=UserWarning)
 import wx
 
 from functools import partial
-from matplotlib.ticker import ScalarFormatter 
 from mpl_toolkits.mplot3d import Axes3D
 
 # Prevent Eclipse warning from Axes3D import
@@ -71,8 +69,7 @@ Axes3D
 #========================================================================================================================
 
 class RDPGUIEvents():
-    
-            
+      
     def evt_cancel_button(self, event, parent):
         #Close dialog
         parent.Hide()
@@ -132,7 +129,7 @@ class RDPGUIEvents():
         value = widget.GetValue()
         parent.figure_elevation = value
         parent.figure.gca().elev = parent.figure_elevation
-        wx.CallAfter(parent._update_plot)
+        wx.CallAfter(rdp.plotfuncs.update_plot, parent)
         
         
     def evt_line_style_cbox(self, event, parent):
@@ -140,7 +137,7 @@ class RDPGUIEvents():
         value = widget.GetValue()
         great_parent = parent.parent
         great_parent.line_style = value
-        wx.CallAfter(great_parent._update_plot)
+        wx.CallAfter(rdp.plotfuncs.update_plot, great_parent)
         
         
     def evt_azimuth_spn(self, event, parent):
@@ -148,7 +145,7 @@ class RDPGUIEvents():
         value = widget.GetValue()
         parent.figure_azimuth = value      
         parent.figure.gca().azim = parent.figure_azimuth
-        wx.CallAfter(parent._update_plot)
+        wx.CallAfter(rdp.plotfuncs.update_plot, parent)
         
 
     def evt_distance_spn(self, event, parent):
@@ -156,7 +153,7 @@ class RDPGUIEvents():
         value = widget.GetValue()
         parent.figure_distance = value        
                 
-        wx.CallAfter(parent._update_plot)
+        wx.CallAfter(rdp.plotfuncs.update_plot, parent)
                 
     
     def evt_add_figure_frame_btn(self, event, parent):
@@ -192,18 +189,18 @@ class RDPGUIEvents():
         
                             
     def evt_play_pause_btn(self, event, parent):
-        parent._play_pause_btn(reverse=False)
+        rdp.guifuncs._play_pause_btn(parent=parent, reverse=False)
         
         
     def evt_reverse_play_pause_btn(self, event, parent):
-        parent._play_pause_btn(reverse=True)
+        rdp.guifuncs._play_pause_btn(parent=parent, reverse=True)
         
             
     def evt_reset_btn(self, event, parent):
         '''Reset plot to default.'''
         
         for i in range(len(parent.frame_ids)):
-            current_frame = parent._set_current_frame(i)
+            current_frame = rdp.guifuncs._set_current_frame(parent=parent, i=i)
             current_frame.step = 0
             current_frame.nstep = 0
             current_frame.step_size = 0
@@ -225,17 +222,17 @@ class RDPGUIEvents():
                 except AttributeError:
                     pass
             
-            current_frame._update_plot()
+            rdp.plotfuncs.update_plot(parent=current_frame)
             wx.Yield()  
 
     
     def evt_increase_single_step_btn(self, event, parent):
-        parent._move_single_step(increase=True)
+        rdp.guifuncs._move_single_step(parent=parent, increase=True)
         wx.Yield()
                     
     
     def evt_decrease_single_step_btn(self, event, parent):
-        parent._move_single_step(increase=False)
+        rdp.guifuncs._move_single_step(parent=parent, increase=False)
         wx.Yield()
         
     
@@ -250,31 +247,31 @@ class RDPGUIEvents():
             except AttributeError:
                 pass
                     
-        wx.CallAfter(parent._update_plot)
+        wx.CallAfter(rdp.plotfuncs.update_plot, parent)
         
     
     def evt_add_time_course(self, event, parent):
         '''Add time course to currently displayed plot.'''
         
-        parent._add_time_course()
+        rdp.plotfuncs.add_time_course(parent=parent)
         
         
     def evt_stride_spn(self, event, parent):
         
         parent.stride = int(parent.control_plot_frame.stride_spn.GetValue())
-        wx.CallAfter(parent._update_plot)
+        wx.CallAfter(rdp.plotfuncs.update_plot, parent)
         
 
     def evt_vmax_spn(self, event, parent):
         
         parent.vmax = parent.control_plot_frame.vmax_spn.GetValue()
-        wx.CallAfter(parent._update_plot)
+        wx.CallAfter(rdp.plotfuncs.update_plot, parent)
 
     
     def evt_vmin_spn(self, event, parent):
         
         parent.vmin = parent.control_plot_frame.vmin_spn.GetValue()
-        wx.CallAfter(parent._update_plot)
+        wx.CallAfter(rdp.plotfuncs.update_plot, parent)
         
     
     def evt_proj_cbox(self, event, parent):
@@ -299,7 +296,7 @@ class RDPGUIEvents():
                 
                 if parent.style != 'heatmap' and parent.ndim[parent.selection] != 0:
                     try:    
-                        parent._plot()
+                        rdp.plotfuncs.plot(parent=parent)
                     except AttributeError:
                         pass
                         
@@ -317,7 +314,7 @@ class RDPGUIEvents():
             parent.rdp_frame.frame.proj_method_cbox.SetValue(parent.proj_method)
             parent.rdp_frame.frame.style_cbox.SetValue(parent.style)
             
-        parent._update_plot()
+        rdp.plotfuncs.update_plot(parent=parent)
             
         
     def evt_reset_heatmap_boundaries_btn(self, event, parent):
@@ -327,13 +324,13 @@ class RDPGUIEvents():
         parent.control_plot_frame.vmin_spn.SetValue(0.0000)
         parent.control_plot_frame.vmax_spn.SetValue(0.0000)
         
-        wx.CallAfter(parent._update_plot)
+        wx.CallAfter(rdp.plotfuncs.update_plot, parent)
 
     
     def evt_switch_btn(self, event, parent):
         
         for i in range(len(parent.frame_ids)):
-            current_frame = parent._set_current_frame(i)
+            current_frame = rdp.guifuncs._set_current_frame(parent=parent, i=i)
             
             # Clear memory
             if current_frame.data is not None:
@@ -361,7 +358,7 @@ class RDPGUIEvents():
         step = parent.pos_slider.GetValue()
                 
         for i in range(len(parent.frame_ids)):
-            current_frame = parent._set_current_frame(i)
+            current_frame = rdp.guifuncs._set_current_frame(parent=parent, i=i)
             current_frame.step = step
         
             if i == 0:
@@ -370,14 +367,14 @@ class RDPGUIEvents():
                 current_frame.time_stamp_display.SetLabel(current_time_stamp)
                 
             # Update currently displayed plot
-            current_frame._update_plot()
+            rdp.plotfuncs.update_plot(parent=current_frame)
             wx.Yield()
         
                 
     def evt_linewidth_spn(self, event, parent):
         widget = event.GetEventObject()
         parent.surface_linewidth = float(widget.GetValue() / 20.)
-        wx.CallAfter(parent._update_plot)
+        wx.CallAfter(rdp.plotfuncs.update_plot, parent)
         
         
     def evt_surface_cmap_cbox(self, event, parent):
@@ -387,7 +384,7 @@ class RDPGUIEvents():
             parent.surface_cmap = 'binary'
         elif widget.GetValue() == 'color':
             parent.surface_cmap = 'coolwarm'
-        wx.CallAfter(parent._update_plot)
+        wx.CallAfter(rdp.plotfuncs.update_plot, parent)
         
         
     def evt_sel_cbox(self, event, parent):
@@ -422,11 +419,11 @@ class RDPGUIEvents():
             parent.rdp_frame.frame.style_cbox.SetItems(parent.style_ch)
             parent.rdp_frame.frame.mode_cbox.Enable()
         
-        parent._update_selection_data(parent.rdp_frame.frame) 
+        rdp.guifuncs.update_selection_data(parent=parent, frame=parent.rdp_frame.frame)
         RDPPlotFrame(parent=parent, panel=parent.rdp_frame.frame.panel) 
         
         try:
-            parent._update_plot()
+            rdp.plotfuncs.update_plot(parent=parent)
         except AttributeError:
             pass
 
@@ -451,7 +448,7 @@ class RDPGUIEvents():
             return
         
         file_path = dlg.GetPath()
-        parent._plot(save=True, file_path=file_path)
+        rdp.plotfuncs.plot(parent=parent, save=True, file_path=file_path)
             
             
     def evt_dir_btn(self, event, parent):
@@ -466,7 +463,8 @@ class RDPGUIEvents():
             rdp_gui = parent._initialize_rdp_gui()
             
         except AttributeError:
-            new_frame = RDPMainWindow(parent=parent, title='', pos=None, size=None, style=None, name=None, directory=parent.dir)  
+            print parent.frame.dir
+            new_frame = RDPMainWindow(parent=parent, title='', pos=None, size=None, style=None, name=None, directory=parent.frame.dir)  
             new_frame.rdp_gui.step = parent.step   
             new_frame.Bind(wx.EVT_CLOSE, partial(self.evt_close_frame, parent=parent))
         
@@ -474,7 +472,7 @@ class RDPGUIEvents():
             parent.frame_ids.append(new_frame_id)
             rdp_gui = new_frame.rdp_gui
                 
-        rdp_gui._load_plot_configuration()
+        rdp.datatools.load_plot_configuration(parent=rdp_gui)
 
         
     def evt_end_app(self, event):                
@@ -500,7 +498,7 @@ class RDPGUIEvents():
         
         # Update currently displayed plot
         if great_parent.figure and great_parent.ndim[great_parent.selection] != 0:
-            wx.CallAfter(great_parent._update_plot)
+            wx.CallAfter(rdp.plotfuncs.update_plot, great_parent)
             
             
     def evt_marker_color_ctrl(self, event, parent):
@@ -517,7 +515,7 @@ class RDPGUIEvents():
         
         # Update currently displayed plot
         if great_parent.figure:
-            wx.CallAfter(great_parent._update_plot)
+            wx.CallAfter(rdp.plotfuncs.update_plot, great_parent)
     
     
     def evt_marked_check_box(self, event, parent):
@@ -525,7 +523,7 @@ class RDPGUIEvents():
         great_parent = parent.parent
         widget = event.GetEventObject()
         great_parent.marked = widget.GetValue()
-        wx.CallAfter(great_parent._update_plot)
+        wx.CallAfter(rdp.plotfuncs.update_plot, great_parent)
     
     
     def evt_plot_labelling_cbox(self, event, parent):
@@ -533,8 +531,8 @@ class RDPGUIEvents():
         widget = event.GetEventObject()
         parent.labelling_mode = widget.GetValue()
         
-        parent._update_plot()
-        parent._update_plot()
+        rdp.plotfuncs.update_plot(parent=parent)
+        rdp.plotfuncs.update_plot(parent=parent)
             
         
     def evt_axis_ticks_cbox(self, event, parent):
@@ -546,8 +544,8 @@ class RDPGUIEvents():
         else:
             parent.axis_ticks = False
             
-        parent._update_plot()
-        parent._update_plot()
+        rdp.plotfuncs.update_plot(parent=parent)
+        rdp.plotfuncs.update_plot(parent=parent)
         
     
     def evt_mode_cbox(self, event, parent):
@@ -575,7 +573,6 @@ class RDPGUIEvents():
             parent.proj_method = ''
             parent.style = ''
             parent.proj = ''
-            
             parent.rdp_frame.frame.proj_method_cbox.Disable()
             parent.rdp_frame.frame.style_cbox.Disable()                
             parent.rdp_frame.frame.proj_method_cbox.SetValue(parent.proj_method)
@@ -583,18 +580,23 @@ class RDPGUIEvents():
             parent.rdp_frame.frame.panel.Hide()
             RDPPlotFrame(parent=parent, panel=parent.rdp_frame.frame.panel) 
             parent.rdp_frame.frame.Hide()
-                    
-        # Fill projection combobox with the fitting options
-        if parent.mode == 'time course':
-            parent.rdp_frame.frame.proj_cbox.SetItems(parent.proj_choice_time_course)
-            parent.rdp_frame.frame.proj_cbox.Enable()
-        elif parent.mode == 'snapshot':
-            parent.rdp_frame.frame.proj_cbox.SetItems(parent.proj_choice_snapshot)
-            parent.rdp_frame.frame.proj_cbox.Enable()
+            
+        if parent.ndim[parent.selection] == 1:
+            rdp.plotfuncs.update_plot(parent=parent)
+            if parent.mode == 'time course':
+                parent.rdp_frame.frame.style_cbox.Enable()
         else:
-            parent.rdp_frame.frame.proj_cbox.SetItems([])
+            # Fill projection combobox with the fitting options
+            if parent.mode == 'time course':
+                parent.rdp_frame.frame.proj_cbox.SetItems(parent.proj_choice_time_course)
+                parent.rdp_frame.frame.proj_cbox.Enable()
+            elif parent.mode == 'snapshot':
+                parent.rdp_frame.frame.proj_cbox.SetItems(parent.proj_choice_snapshot)
+                parent.rdp_frame.frame.proj_cbox.Enable()
+            else:
+                parent.rdp_frame.frame.proj_cbox.SetItems([])
+            
         
-              
     def evt_proj_method_cbox(self, event, parent):
         
         widget = event.GetEventObject()
@@ -606,7 +608,7 @@ class RDPGUIEvents():
                             
         parent.panel.Hide()
         RDPPlotFrame(parent=great_parent, panel=parent.panel) 
-        great_parent._plot()
+        rdp.plotfuncs.plot(parent=great_parent)
             
             
     def evt_style_cbox(self, event, parent):
@@ -616,9 +618,10 @@ class RDPGUIEvents():
         great_parent.style = widget.GetValue()
         
         if great_parent.mode != 'image':
-            parent.mode_cbox.Enable()
-            parent.proj_cbox.Enable()
-            parent.proj_method_cbox.Enable()
+            if great_parent.ndim[great_parent.selection] != 1:
+                parent.mode_cbox.Enable()
+                parent.proj_cbox.Enable()
+                parent.proj_method_cbox.Enable()
             
         else:
             great_parent.mode = parent.mode_cbox.GetValue()
@@ -628,7 +631,7 @@ class RDPGUIEvents():
 
         parent.panel.Hide()
         RDPPlotFrame(parent=great_parent, panel=parent.panel) 
-        great_parent._update_plot()
+        rdp.plotfuncs.update_plot(parent=great_parent)
             
             
     def evt_resize_control_plot_panel(self, event, parent):
@@ -636,13 +639,13 @@ class RDPGUIEvents():
         pix = parent.control_plot_frame.control_plot_panel.GetClientSize()
         
         parent.figure.set_size_inches(pix[0]/parent.figure.get_dpi(),
-                                    pix[1]/parent.figure.get_dpi())
+                                      pix[1]/parent.figure.get_dpi())
         
         
         x,y = parent.control_plot_frame.GetSize()  
         
         parent.figure.set_size_inches(x/parent.figure.get_dpi(),
-                                    y/parent.figure.get_dpi())
+                                      y/parent.figure.get_dpi())
         
         parent.figure_canvas.SetSize((x-1, y-1))
         parent.figure_canvas.SetSize((x, y))
@@ -682,7 +685,7 @@ class RDPStartupFrame(wx.Frame):
         self.frame.parent = parent
         self.panel = wx.Panel(parent=self.frame)
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.frame.dir = rdp.guitools.search_homedir()
+        self.frame.dir = rdp.guifuncs.search_homedir()
                
         dir_btn = wx.Button(parent=self.panel, id=-1, label='Please choose a directory containing cedar recordings')
         choose_txt2 = wx.StaticText(self.panel, -1, 'OR')
@@ -741,7 +744,7 @@ class RDPMainWindow(wx.Frame):
         # initialize frame for multi-plot purposes
         else:
             wx.Frame.__init__(self, parent=parent, title='', style=wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.FRAME_NO_TASKBAR|wx.CLIP_CHILDREN)
-            self.dir = self.parent.dir
+            #self.dir = self.parent.dir
             self.parent = parent
             self.rdp_gui = RDPGUI(parent=self)
             self.main_sizer = self.rdp_gui.main_sizer
@@ -962,7 +965,7 @@ class RDPPlotFrame(wx.Frame):
             notebook_parameters_panel_sizer.Add(item=parent.control_plot_frame.distance_label, proportion=1, flag=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
             notebook_parameters_panel_sizer.Add(item=parent.control_plot_frame.distance_spn, proportion=1, flag=wx.ALIGN_RIGHT|wx.RIGHT, border=20)
         
-        self.parent.figure_canvas = rdp.guitools.create_figure_canvas(figure=self.parent.figure, title=self.parent.title, control_plot_panel=self.parent.control_plot_frame.panel)        
+        self.parent.figure_canvas = rdp.guifuncs.create_figure_canvas(figure=self.parent.figure, title=self.parent.title, control_plot_panel=self.parent.control_plot_frame.panel)        
         self.parent.figure_canvas.mpl_connect('button_release_event', partial(self.rdp_gui_events.evt_change_plot_parameters, parent=self.parent))
         style_heading = wx.StaticText(notebook_parameters_panel, -1, 'Style')
         style_heading.SetFont(wx.Font(pointSize=10, family=wx.DEFAULT, style=wx.NORMAL, weight=wx.NORMAL))
@@ -1204,7 +1207,7 @@ class RDPGUI(wx.Panel):
         self.rdp_gui_events = RDPGUIEvents()
         self.frame = parent
         
-        self._initialize_start_values()
+        rdp.guifuncs.initialize_start_values(parent=self)
         self.frame.menu_file = wx.Menu()
         menu_load = self.frame.menu_file.Append(1, 'Load configuration')
         menu_switch = self.frame.menu_file.Append(2, 'Switch directory')
@@ -1335,483 +1338,7 @@ class RDPGUI(wx.Panel):
         RDPPlotFrame(parent=self, panel=self.rdp_frame.frame.panel)
         
         return
-    
-    
-    def _initialize_start_values(self):
-        
-        self.control_plot_frame = None
-        self.main_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.dir = self.frame.dir            
-        self.figure_size = None
-        self.x_label = '' 
-        self.y_label = '' 
-        self.z_label = '' 
-        self.marked = False
-        self.nstep = 0
-        self.step = 0
-        self.step_size = 0
-        self.slider_max = 0
-        self.stride = 5
-        self.vmin = None
-        self.vmax = None
-        self.proj = None
-        self.proj_method = 'average'
-        self.style = ''
-        self.mode = ''
-        self.labelling_mode = 'off'
-        self.flist = [record_file for record_file in os.listdir(self.dir) if record_file.lower().endswith('.csv') or record_file.lower().endswith('.data')]
-        self.flist_sorted = np.asarray(rdp.datatools.sort_alphnum(self.flist))
-        self.data = None
-        self.reduced_data = None
-        self.header = None
-        self.header_list = []
-        self.ndim = ['']
-        self.time_stamps = []
-        self.selection = 0
-        self.proj_choice_time_course = None
-        self.proj_choice_snapshot = None
-        self.plot = None
-        self.line_color = '#FF9600'
-        self.aux_line_color = '#FF9600'
-        self.marker_color = '#FF9600'
-        self.aux_marker_color = '#FF9600'
-        self.save_mode = False
-        self.frame_ids = []
-        self.frame_ids.append(self.frame.GetId())
-        self.figure = None
-        self.figure_canvas = None
-        self.figure_canvas_connection_id = None
-        self.title = '' 
-        self.figure_resize = None
-        self.colorbar = None
-        self.axis_ticks = None
-        self.sel_cbox_selection = '' 
-        self.rdp_frame = None
-        self.line_style = 'solid'
-        self.lines = []
-        
-        # Plot modes
-        self.mode_ch = ['snapshot', 'time course']
-        
-        # Projection choices for time course plot mode
-        self.proj_ch = ['x_1', 'x_2', 'x_3', 'x_4', 'x_5']
-        
-        # Projection choices for snapshot/snapshot sequence plot modes
-        self.proj_ch_step = ['x_1', 'x_2', 'x_3', 'x_4', 'x_5', 
-                             'x_1, x_2', 'x_1, x_3', 'x_1, x_4', 'x_1, x_5', 'x_2, x_3', 
-                             'x_2, x_4', 'x_2, x_5', 'x_3, x_4', 'x_3, x_5', 'x_4, x_5']
-        self.style_ch = ['heatmap', 'surface', 'wireframe']
-        self.proj_methods = ['average', 'maximum', 'sum']
-        
-        self.labelling_choices = ['off', 'LateX', 'Standard']
-        self.figure_azimuth = None
-        self.figure_elevation = None
-        self.figure_distance = None
-        self.surface_linewidth = 0
-        self.surface_cmap = 'coolwarm'
-    
-    
-    def _load_plot_configuration(self):
-        
-        dlg = rdp.dlg.load_config_dlg(self, self.dir)
-        
-        if dlg.ShowModal() == wx.ID_CANCEL:
-            return
-        
-        file_path = dlg.GetPath()
-        loaded_object = pickle.load(open(file_path, 'rb'))
-                
-        aux_frame = self
-        
-        while aux_frame.GetParent() != None:
-            aux_frame = aux_frame.GetParent()
-
-        aux_frame = aux_frame.GetChildren()[1]
-                
-        self.dir = loaded_object[1]
-        self.x_label = loaded_object[2] 
-        self.y_label = loaded_object[3]
-        self.z_label = loaded_object[4]  
-        self.marked = loaded_object[5]  
-        self.step = loaded_object[6]  
-        self.slider_max = loaded_object[7]  
-        self.stride = loaded_object[8]  
-        self.vmax = loaded_object[9]  
-        self.vmin = loaded_object[10]  
-        self.proj = loaded_object[11]  
-        self.proj_method = loaded_object[12]  
-        self.style = loaded_object[13]  
-        self.mode = loaded_object[14]  
-        self.labelling_mode = loaded_object[15]  
-        self.reduced_data = loaded_object[16]  
-        self.header = loaded_object[17]  
-        self.ndim = loaded_object[18]  
-        self.selection = loaded_object[19] 
-        self.sel_cbox_selection = loaded_object[20]
-        self.proj_choice_time_course = loaded_object[21]  
-        self.proj_choice_snapshot = loaded_object[22]  
-        self.line_color = loaded_object[23]  
-        self.aux_line_color = loaded_object[24]  
-        self.marker_color = loaded_object[25] 
-        self.aux_marker_color = loaded_object[26] 
-        self.title = loaded_object[27]  
-        self.axis_ticks = loaded_object[28]  
-        self.figure_azimuth = loaded_object[29]  
-        self.figure_elevation = loaded_object[30]  
-        self.figure_distance = loaded_object[31]  
-        self.surface_linewidth = loaded_object[32]  
-        self.flist_sorted = loaded_object[33] 
-        self.mode_ch = loaded_object[34]
-        self.proj_ch = loaded_object[35]
-            
-        if loaded_object[0] == 537:
-            self.line_style = loaded_object[36]
-            
-        elif loaded_object[0] == 691:
-            self.line_style = loaded_object[36]
-            self.surface_cmap = loaded_object[37]
                         
-        else:
-            dlg = wx.MessageDialog(parent = None, 
-                       message = 'RDP does not recognize the internal structure of the chosen file.', 
-                       caption = 'The chosen file cannot be read.', 
-                       style = wx.OK | wx.ICON_INFORMATION | wx.CENTER | wx.STAY_ON_TOP)
-            
-            dlg.ShowModal()
-            dlg.Hide()
-            wx.CallAfter(dlg.Destroy)
-            return
-        
-        self.data, self.time_stamps = rdp.datatools.get_data(csv_f=self.dir + '/' + self.flist_sorted[self.selection], header=self.header) 
-                
-        try:
-            aux_frame.pos_slider.SetMax(self.slider_max)
-            aux_frame.pos_slider.SetValue(self.step)
-            aux_frame.time_stamp_display.SetLabel(str(self.time_stamps[self.step]))
-        except AttributeError:
-            pass
-        
-        self.rdp_frame = RDPSetupFrame(parent=self, title=self.sel_cbox_selection) 
-        self.rdp_frame.frame.proj_cbox.SetItems(self.proj_ch)
-        self.rdp_frame.frame.proj_cbox.SetValue(str(self.proj))
-        self.rdp_frame.frame.proj_method_cbox.SetValue(self.proj_method)
-        self.rdp_frame.frame.mode_cbox.SetItems(self.mode_ch)
-        self.rdp_frame.frame.mode_cbox.SetValue(self.mode)
-        self.rdp_frame.frame.style_cbox.SetItems(self.style_ch)
-        self.rdp_frame.frame.style_cbox.SetValue(self.style)
-        
-        self.rdp_frame.frame.mode_cbox.Enable()
-        self.rdp_frame.frame.style_cbox.Enable()
-        self.rdp_frame.frame.proj_cbox.Enable()
-        self.rdp_frame.frame.proj_method_cbox.Enable()
-        self.rdp_frame.frame.panel.Hide()
-        RDPPlotFrame(parent=self, panel=self.rdp_frame.frame.panel)
-        self._update_plot()
-        
-        
-    def _pause_player(self):
-        
-        self.increase_single_step_btn.Enable()
-        self.decrease_single_step_btn.Enable()
-        self.reset_btn.Enable()
-        
-             
-    def _play_pause_btn(self, reverse):
-        
-        if reverse == False:
-            active_btn = self.play_pause_btn
-            active_bitmap = self.play_bitmap
-            inactive_btn = self.reverse_play_pause_btn
-            loop_range = range(self.step, self.slider_max+1)
-            
-        else:
-            active_btn = self.reverse_play_pause_btn
-            active_bitmap = self.reverse_play_bitmap
-            inactive_btn = self.play_pause_btn
-            loop_range = range(self.step, -1, -1)
-        
-        if active_btn.GetBitmapLabel() == active_bitmap:
-            active_btn.SetBitmapLabel(self.pause_bitmap)
-            
-            if self.figure:
-                
-                for i in loop_range:
-                    
-                    if active_btn.GetBitmapLabel() == active_bitmap:
-                        break
-                    else:
-                        for j in range(len(self.frame_ids)):
-                            current_frame = self._set_current_frame(j)
-                            current_frame.step = i
-                            current_frame._update_plot()
-                            wx.Yield()
-                                                               
-                        inactive_btn.Disable()
-                        self.increase_single_step_btn.Disable()
-                        self.decrease_single_step_btn.Disable()
-                        self.reset_btn.Disable()
-                        self.pos_slider.SetValue(min(self.slider_max, self.step))
-                        self.time_stamp_display.SetLabel(str(self.time_stamps[self.pos_slider.GetValue()]))
-                        
-            active_btn.SetBitmapLabel(active_bitmap)
-            
-        else:
-            active_btn.SetBitmapLabel(active_bitmap)
-        
-        inactive_btn.Enable()
-        self.increase_single_step_btn.Enable()
-        self.decrease_single_step_btn.Enable()
-        self.reset_btn.Enable()
-        
-        
-    def _move_single_step(self, increase):
-        
-        if increase is False:
-            self.step -= 1
-                        
-            try:
-                self.pos_slider.SetValue(max(0, self.step))
-            except AttributeError:
-                pass
-            
-        else:
-            self.step += 1
-                        
-            try:
-                self.pos_slider.SetValue(min(self.slider_max, self.step))
-            except AttributeError:
-                pass
-            
-        try:
-            self.time_stamp_display.SetLabel(str(self.time_stamps[self.pos_slider.GetValue()]))
-        except AttributeError:
-            pass
-            
-        if self.step == 0:
-            
-            try:
-                self.time_stamp_display.SetLabel(' ')
-            except AttributeError:
-                pass
-        
-        for i in range(len(self.frame_ids)):
-            current_frame = self._set_current_frame(i)
-            current_frame.step = self.step
-            current_frame._update_plot()
-            wx.Yield()
-            
-    
-    def _update_plot(self):
-                
-        if self.figure_canvas:   
-                
-            if self.ndim[self.selection] == 0:
-                plt.cla()
-            else:
-                try:
-                    self.figure.clf()
-                except AttributeError:
-                    pass
-        
-        try:
-            self._plot()    
-        except AttributeError:
-            pass
-                
-                   
-    def _add_time_course(self): 
-        self._plot()
-
-              
-    def _update_selection_data(self, frame):
-        '''Reset the control panel and update it with the newly selected data.'''
-        
-        self.data = None
-        self.reduced_data = None
-        self.figure_canvas = None
-                   
-        #else:
-        for i in range(len(self.frame_ids)):
-            current_frame = self._set_current_frame(i)
-            current_frame.step = self.step
-                    
-        # Generate adequate options for the projection combobox, depending on data dimensionality and plot mode
-        self.proj_choice_time_course = self.proj_ch[:self.ndim[self.selection]]
-        self.proj_choice_snapshot = rdp.plotfuncs.build_proj_ch_step(ndim=self.ndim[self.selection], temp_proj_ch_step=self.proj_ch_step)   
-        
-        # Get data and data header
-        self.header = rdp.datatools.get_header(csv_f=self.dir + '/' + self.flist_sorted[self.selection])        
-        temp_data = rdp.datatools.get_data(csv_f=self.dir + '/' + self.flist_sorted[self.selection], header=self.header)
-        
-        # If current selection is an image
-        if 'CV_8U' in self.header or 'CV_8UC3' in self.header:
-            self.axis_ticks = False
-        
-        # Enable slider and player buttons
-        if self.frame.parent == None:
-            self.pos_slider.Enable()
-            self.play_pause_btn.Enable()
-            self.reverse_play_pause_btn.Enable()
-            self.reset_btn.Enable()
-            self.decrease_single_step_btn.Enable()
-            self.increase_single_step_btn.Enable()
-        
-        # Update GUI elements with loaded data
-        self.data = temp_data[0]
-        self.time_stamps = temp_data[1]
-        self.slider_max = len(self.time_stamps)-1
-        
-        if self.frame.parent is None:
-            self.pos_slider.SetMax(self.slider_max)
-
-    
-    def _set_current_frame(self, i):
-        
-        if i == 0:
-            current_frame = self
-        else:
-            current_frame = wx.FindWindowById(self.frame_ids[i]).rdp_gui
-                            
-        return current_frame
-    
-    
-    def enforce_labelling_mode(self, plot, labelling_mode, style):
-        
-        # Prevent scientific notation and offset
-        formatter = ScalarFormatter()
-        formatter.set_scientific(False)
-        formatter.set_useOffset(False)
-                
-        try:
-            plot.yaxis.set_major_formatter(formatter)
-            plot.yaxis.set_major_formatter(formatter)
-            plot.zaxis.set_major_formatter(formatter)
-        except AttributeError:
-            pass
-        
-        if labelling_mode == 'off':
-            plot.axes.set_xticklabels([])
-            plot.axes.set_yticklabels([])
-            
-            if self.style == 'surface' or self.style == 'wireframe':
-                try:
-                    plot.axes.set_zticklabels([])
-                except AttributeError:
-                    pass
-        
-        elif labelling_mode == 'Standard':
-            plt.rcdefaults()
-        
-        else:
-            plt.rc('text', usetex=True)
-            mpl.rcParams['text.latex.unicode']=True
-            plt.rc('font', family='serif')
-            
-        try:
-            if self.axis_ticks == False:
-                plt.tick_params(axis='both', which='both', bottom='off', top='off', left='off', right='off')
-                    
-            else:
-                plt.tick_params(axis='both', which='both', bottom='on', top='on', left='on', right='on')
-        except AttributeError:
-            pass
-        
-        return plot
-
-    
-    def _plot(self, save=False, file_path=None):
-        '''Build plot(s) to either visualize or save as pdf file'''
-         
-        if save is True:
-            rdp.plotfuncs.save_plot(plot=self.plot, plot_mode=self.mode, file_name=self.flist_sorted[self.selection], file_directory=self.dir, figure=self.figure, file_path=file_path)
-            self._update_plot()
-        
-        else:         
-            
-            if self.figure == None:
-                self.figure = plt.figure(str(self.title))
-                                                                       
-            if self.mode == 'snapshot' or self.style == 'image':
-
-                try:
-                    self.plot, self.reduced_data = rdp.plotfuncs.plot_snapshot(step = self.step, 
-                                                                  style = self.style, 
-                                                                  data = self.data, 
-                                                                  header = self.header, 
-                                                                  vmin = self.vmin,
-                                                                  vmax = self.vmax,
-                                                                  stride = self.stride, 
-                                                                  surface_linewidth = self.surface_linewidth,
-                                                                  surface_cmap=self.surface_cmap,
-                                                                  proj = self.proj,
-                                                                  linestyle = self.line_style,
-                                                                  proj_method = self.proj_method,
-                                                                  color = self.line_color,
-                                                                  figure = self.figure,
-                                                                  title = self.title)
-                                                    
-                except IndexError:
-                    dlg = wx.MessageDialog(parent=None, 
-                                           message = 'The specified time slice does not exist.', 
-                                           caption = 'An Error has occurred.', 
-                                           style = wx.OK | wx.ICON_ERROR | wx.CENTER | wx.STAY_ON_TOP)
-                    
-                    dlg.ShowModal()
-                    dlg.Hide()
-                    wx.CallAfter(dlg.Destroy)
-                                    
-            elif self.mode == 'time course':
-                self.plot = rdp.plotfuncs.plot_time_course(data = self.data, 
-                                                           header = self.header, 
-                                                           vmin = self.vmin,
-                                                           vmax = self.vmax,
-                                                           stride = self.stride,
-                                                           surface_linewidth = self.surface_linewidth,
-                                                           surface_cmap=self.surface_cmap,
-                                                           plot = self.plot,
-                                                           linestyle=self.line_style,
-                                                           proj = self.proj,
-                                                           proj_method = self.proj_method,
-                                                           color = self.line_color,
-                                                           step = self.step, 
-                                                           marker = self.marked, 
-                                                           style = self.style,
-                                                           marker_color = self.marker_color,
-                                                           figure = self.figure,
-                                                           title = self.title)
-                                
-                if self.ndim[self.selection] == 0:
-                    self.lines.append(self.plot.get_lines()[-1])
-                
-                if self.x_label == '' or self.x_label == ' ':
-                    self.x_label = 'Time'
-                    try:
-                        self.plot.set_xlabel(self.x_label)
-                    except AttributeError:
-                        pass
-                                    
-            if self.style == 'heatmap' or self.style == 'surface' or self.style == 'wireframe':
-                self.figure.gca().invert_yaxis()
-                            
-            try:
-                rdp.plotfuncs.label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
-            except AttributeError:
-                pass
-                            
-            if self.style != 'heatmap':
-                if self.figure_azimuth is not None and self.figure_elevation is not None:
-                    self.figure.gca(projection='3d').view_init(elev=self.figure_elevation, azim=self.figure_azimuth)
-                    
-                if self.figure_distance is not None:
-                    self.figure.gca(projection='3d').dist = self.figure_distance
-                    
-            if save == False:
-                self.plot = self.enforce_labelling_mode(plot=self.plot, labelling_mode=self.labelling_mode, style=self.style)
-                try:
-                    self.figure_canvas.draw()
-                except AttributeError:
-                    pass
-                            
 #========================================================================================================================
 
 if __name__ == '__main__':
