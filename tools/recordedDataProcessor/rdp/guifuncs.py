@@ -29,7 +29,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 09 29
+    Date:        2015 09 30
 
     Description: 
 
@@ -63,15 +63,17 @@ def search_homedir():
     else:
         directory = os.environ['HOMEPATH']
     
-    # Walk through directories until 'cedarRecordings' is found
-    for (directory, dirs, _) in os.walk(directory):
-        for j in range(len(dirs)):
-            if dirs[j] == 'cedarRecordings':
-                new_dir = dirs[j]
-                directory = os.path.join(directory, new_dir)
-                break
-        
-        break
+    cedar_settings_file = directory + '/.cedar/auxiliariesSettings'
+    
+    f = open(cedar_settings_file)
+    flist = f.readlines()
+    
+    for i in range(len(flist)):
+        if 'recorder output directory' in flist[i]:
+            aux = str(flist[i].replace('\/','/').strip(' ').split(' ')[-1:])
+            directory = aux.strip('[').strip(']').strip('\'\"').strip('\",\\n')
+            
+    f.close()
     
     return directory
 
@@ -130,7 +132,7 @@ def enforce_labelling_mode(plot, labelling_mode, style, axis_ticks):
     return plot
 
 
-def _play_pause_btn(parent, reverse):
+def play_pause_btn(parent, reverse):
     
     if reverse == False:
         active_btn = parent.play_pause_btn
@@ -155,7 +157,7 @@ def _play_pause_btn(parent, reverse):
                     break
                 else:
                     for j in range(len(parent.frame_ids)):
-                        current_frame = _set_current_frame(parent=parent, i=j)
+                        current_frame = set_current_frame(parent=parent, i=j)
                         current_frame.step = i
                         rdp.plotfuncs.update_plot(parent=current_frame)
                         wx.Yield()
@@ -178,7 +180,7 @@ def _play_pause_btn(parent, reverse):
     parent.reset_btn.Enable()
     
     
-def _move_single_step(parent, increase):
+def move_single_step(parent, increase):
     
     if increase is False:
         parent.step -= 1
@@ -209,13 +211,13 @@ def _move_single_step(parent, increase):
             pass
     
     for i in range(len(parent.frame_ids)):
-        current_frame = _set_current_frame(parent=parent, i=i)
+        current_frame = set_current_frame(parent=parent, i=i)
         current_frame.step = parent.step
         rdp.plotfuncs.update_plot(parent=current_frame)
         wx.Yield()
         
         
-def _set_current_frame(parent, i):
+def set_current_frame(parent, i):
     if i == 0:
         current_frame = parent
     else:
@@ -307,7 +309,7 @@ def update_selection_data(parent, frame):
                
     #else:
     for i in range(len(parent.frame_ids)):
-        current_frame = rdp.guifuncs._set_current_frame(parent=parent, i=i)
+        current_frame = rdp.guifuncs.set_current_frame(parent=parent, i=i)
         current_frame.step = parent.step
                 
     # Generate adequate options for the projection combobox, depending on data dimensionality and plot mode
@@ -315,8 +317,9 @@ def update_selection_data(parent, frame):
     parent.proj_choice_snapshot = rdp.plotfuncs.build_proj_ch_step(ndim=parent.ndim[parent.selection], temp_proj_ch_step=parent.proj_ch_step)   
     
     # Get data and data header
-    parent.header = rdp.datatools.get_header(csv_f=parent.dir + '/' + parent.flist_sorted[parent.selection])        
-    temp_data = rdp.datatools.get_data(csv_f=parent.dir + '/' + parent.flist_sorted[parent.selection], header=parent.header)
+    recorded_file = parent.dir + '/' + parent.flist_sorted[parent.selection]
+    parent.header = rdp.datatools.get_csv_header(csv_f=recorded_file)        
+    temp_data = rdp.datatools.get_csv_data(csv_f=recorded_file, header=parent.header)
     
     # If current selection is an image
     if 'CV_8U' in parent.header or 'CV_8UC3' in parent.header:

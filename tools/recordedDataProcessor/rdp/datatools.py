@@ -29,7 +29,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 09 29
+    Date:        2015 09 30
 
     Description: 
 
@@ -68,10 +68,10 @@ def prepare_plot_configuration(directory, x_label, y_label, z_label, marked, ste
     return save_object
 
 
-def get_header(csv_f):
+def get_csv_header(csv_f):
     '''Gets header from given csv file.'''
     
-    csv_file = open(csv_f, 'rb')        
+    csv_file = open(csv_f, 'rb')   
     reader = csv.reader(csv_file)
     header = reader.next()
     csv_file.close()
@@ -82,9 +82,8 @@ def get_header(csv_f):
     return header  
 
 
-def get_data(csv_f, header):
+def get_csv_data(csv_f, header):
     '''Gets data and time codes from given csv file.'''
-    
     time_stamps = []
     data = None
     count = 0
@@ -139,7 +138,7 @@ def get_dimension(header):
         elif int(header[-i]) != 1:
             break
        
-    return ndim 
+    return ndim
 
 
 def sort_alphnum(unsorted):
@@ -221,7 +220,7 @@ def load_plot_configuration(parent):
         wx.CallAfter(dlg.Destroy)
         return
     
-    parent.data, parent.time_stamps = rdp.datatools.get_data(csv_f=parent.dir + '/' + parent.flist_sorted[parent.selection], header=parent.header) 
+    parent.data, parent.time_stamps = rdp.datatools.get_csv_data(csv_f=parent.dir + '/' + parent.flist_sorted[parent.selection], header=parent.header) 
             
     try:
         aux_frame.pos_slider.SetMax(parent.slider_max)

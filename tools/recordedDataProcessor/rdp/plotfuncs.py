@@ -29,7 +29,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 09 29
+    Date:        2015 09 30
 
     Description: 
 
@@ -51,6 +51,7 @@ import datatools
 import guifuncs
 
 from matplotlib.collections import PolyCollection
+from matplotlib.lines import Line2D
 from scipy import ndimage
 
 
@@ -201,18 +202,6 @@ def project2D(step, data, header, proj, proj_method='average'):
 def set_marker(step, data, plot, style, marker_color='#FF9600'):
     '''Mark the given time slice in a time course plot.'''
                 
-    min_data = 9999999
-    max_data = -9999999
-    
-    # set marker size
-    #========================================================================================================================
-    for x in np.nditer(data):
-        if x > max_data:
-            max_data = x
-        
-    for x in np.nditer(data):
-        if x < min_data:
-            min_data = x
     #========================================================================================================================
                 
     if style == '' or style == 'heatmap':
@@ -220,6 +209,19 @@ def set_marker(step, data, plot, style, marker_color='#FF9600'):
         plot.axvline(x=step, color=marker_color)
         
     else:
+        min_data = 9999999
+        max_data = -9999999
+    
+        # set marker size
+        #========================================================================================================================
+        for x in np.nditer(data):
+            if x > max_data:
+                max_data = x
+        
+        for x in np.nditer(data):
+            if x < min_data:
+                min_data = x
+                
         xs = np.arange(0, data.shape[1], 0.1)
         ys = np.zeros(xs.shape[0])
         ys.fill(min_data)
@@ -416,19 +418,17 @@ def plot_time_course(data, header, vmin, vmax, stride, surface_linewidth, surfac
     
     ndim = datatools.get_dimension(header)
     steps = data.shape[0]
+    fig = figure
+    plot = fig.gca()
+
     
-    if figure is None:
-        fig = plt.figure()
-    else:
-        fig = figure
-    
-    if plot is None:
-        plot = fig.gca()
-                
     if ndim == 0:
-        plot.plot(data, color=color, linestyle=linestyle)
+        x_values = np.arange(0, steps)
+        x_values.shape = data.shape
+        plot.plot(x_values, data, linestyle=linestyle, color=color)
+        plt.ylim(float(1.2*(data.min())), float(1.2*(data.max())))
         
-    elif ndim != 0:
+    if ndim != 0:
         if ndim == 1:
             x = int(header[2])
             X_1,X_2 = np.mgrid[:steps, :x]
@@ -437,10 +437,8 @@ def plot_time_course(data, header, vmin, vmax, stride, surface_linewidth, surfac
             try:
                 X_1, X_2, data = project(mode='time course', steps=steps, data=data, header=header, proj=proj, proj_method=proj_method)
             
-            
             except UnboundLocalError:
                 raise UnboundLocalError
-            
             
         if style != 'heatmap':
             plot = initialize_3D_plot(figure=figure, title=title)
@@ -571,22 +569,18 @@ def save_plot(plot, plot_mode, file_name, file_directory, save_mode='single', pl
 
 
 def update_plot(parent):
-            
-    if parent.figure_canvas:   
-            
-        if parent.ndim[parent.selection] == 0:
-            plt.cla()
-        else:
-            try:
-                parent.figure.clf()
-            except AttributeError:
-                pass
+                      
+    if parent.ndim[parent.selection] == 0:
+        plt.cla()
     
-    try:
-        plot(parent=parent)    
-    except AttributeError:
-        pass
+    else:
+        try:
+            parent.figure.clf()
+        except AttributeError:
+            pass
     
+    plot(parent=parent)    
+
     
 def plot(parent, save=False, file_path=None):
     '''Build plot(s) to either visualize or save as pdf file'''
@@ -631,26 +625,29 @@ def plot(parent, save=False, file_path=None):
                                 
         elif parent.mode == 'time course':
             parent.plot = plot_time_course(data = parent.data, 
-                                                       header = parent.header, 
-                                                       vmin = parent.vmin,
-                                                       vmax = parent.vmax,
-                                                       stride = parent.stride,
-                                                       surface_linewidth = parent.surface_linewidth,
-                                                       surface_cmap=parent.surface_cmap,
-                                                       plot = parent.plot,
-                                                       linestyle=parent.line_style,
-                                                       proj = parent.proj,
-                                                       proj_method = parent.proj_method,
-                                                       color = parent.line_color,
-                                                       step = parent.step, 
-                                                       marker = parent.marked, 
-                                                       style = parent.style,
-                                                       marker_color = parent.marker_color,
-                                                       figure = parent.figure,
-                                                       title = parent.title)
-                            
+                                           header = parent.header, 
+                                           vmin = parent.vmin,
+                                           vmax = parent.vmax,
+                                           stride = parent.stride,
+                                           surface_linewidth = parent.surface_linewidth,
+                                           surface_cmap=parent.surface_cmap,
+                                           plot = parent.plot,
+                                           linestyle=parent.line_style,
+                                           proj = parent.proj,
+                                           proj_method = parent.proj_method,
+                                           color = parent.line_color,
+                                           step = parent.step, 
+                                           marker = parent.marked, 
+                                           style = parent.style,
+                                           marker_color = parent.marker_color,
+                                           figure = parent.figure,
+                                           title = parent.title)
+            
             if parent.ndim[parent.selection] == 0:
-                parent.lines.append(parent.plot.get_lines()[-1])
+
+                for i in range(len(parent.lines)):
+                    if parent.lines[i].get_data() != parent.plot.get_lines()[-1].get_data():                   
+                        parent.lines.append(parent.plot.get_lines()[-1])
             
             if parent.x_label == '' or parent.x_label == ' ':
                 parent.x_label = 'Time'
@@ -682,5 +679,8 @@ def plot(parent, save=False, file_path=None):
                 pass
             
 
-def add_time_course(parent): 
-    plot(parent=parent)
+def add_time_course(parent, ydata, linestyle, color, plot):
+    x_values = np.arange(0, ydata[0].shape[0])
+    x_values.shape = ydata[0].shape
+    new_line = Line2D(x_values, ydata[0], linestyle=linestyle, color=color)
+    plot.add_line(new_line)

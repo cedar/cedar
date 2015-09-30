@@ -4,9 +4,9 @@
 ========================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-     
+    
     This file is part of cedar.
-
+    
     cedar is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by the
     Free Software Foundation, either version 3 of the License, or (at your
@@ -29,7 +29,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 09 29
+    Date:        2015 09 30
 
     Description: 
 
@@ -158,12 +158,20 @@ class RDPGUIEvents():
     
     def evt_add_figure_frame_btn(self, event, parent):
         
+        aux_frame = parent
+        
+        # Find uppermost RDPGUI
+        while aux_frame.GetParent() != None:
+            aux_frame = aux_frame.GetParent()
+
+        aux_frame = aux_frame.GetChildren()[1]
+        
         new_frame = RDPMainWindow(parent=parent.frame, title='', pos=None, size=None, style=None, name=None, directory=parent.dir)     
         new_frame.rdp_gui.step = parent.step   
         new_frame.Bind(wx.EVT_CLOSE, partial(self.evt_close_frame, parent=parent))
         new_frame_id = new_frame.GetId()
-        parent.frame_ids.append(new_frame_id)
-        wx.FindWindowById(new_frame_id).step = parent.step
+        aux_frame.frame_ids.append(new_frame_id)
+        wx.FindWindowById(new_frame_id).step = aux_frame.step
         
      
     def evt_close_frame(self, event, parent):
@@ -189,18 +197,18 @@ class RDPGUIEvents():
         
                             
     def evt_play_pause_btn(self, event, parent):
-        rdp.guifuncs._play_pause_btn(parent=parent, reverse=False)
+        rdp.guifuncs.play_pause_btn(parent=parent, reverse=False)
         
         
     def evt_reverse_play_pause_btn(self, event, parent):
-        rdp.guifuncs._play_pause_btn(parent=parent, reverse=True)
+        rdp.guifuncs.play_pause_btn(parent=parent, reverse=True)
         
             
     def evt_reset_btn(self, event, parent):
         '''Reset plot to default.'''
         
         for i in range(len(parent.frame_ids)):
-            current_frame = rdp.guifuncs._set_current_frame(parent=parent, i=i)
+            current_frame = rdp.guifuncs.set_current_frame(parent=parent, i=i)
             current_frame.step = 0
             current_frame.nstep = 0
             current_frame.step_size = 0
@@ -227,12 +235,12 @@ class RDPGUIEvents():
 
     
     def evt_increase_single_step_btn(self, event, parent):
-        rdp.guifuncs._move_single_step(parent=parent, increase=True)
+        rdp.guifuncs.move_single_step(parent=parent, increase=True)
         wx.Yield()
                     
     
     def evt_decrease_single_step_btn(self, event, parent):
-        rdp.guifuncs._move_single_step(parent=parent, increase=False)
+        rdp.guifuncs.move_single_step(parent=parent, increase=False)
         wx.Yield()
         
     
@@ -253,7 +261,7 @@ class RDPGUIEvents():
     def evt_add_time_course(self, event, parent):
         '''Add time course to currently displayed plot.'''
         
-        rdp.plotfuncs.add_time_course(parent=parent)
+        rdp.plotfuncs.add_time_course(parent=parent, ydata=parent.data, color=parent.line_color, linestyle=parent.line_style, plot=parent.plot)
         
         
     def evt_stride_spn(self, event, parent):
@@ -286,7 +294,12 @@ class RDPGUIEvents():
         if ',' not in parent.proj and parent.mode != 'time course':
             parent.style = ''
             parent.rdp_frame.frame.style_cbox.Disable()
-            parent.rdp_frame.frame.proj_method_cbox.Disable()            
+            
+            if parent.ndim[parent.selection] == 1:
+                parent.rdp_frame.frame.proj_method_cbox.Disable()
+            else:
+                parent.rdp_frame.frame.proj_method_cbox.Enable()
+                         
             parent.rdp_frame.frame.style_cbox.SetValue('')
             parent.rdp_frame.frame.proj_method_cbox.SetValue('')
             
@@ -303,7 +316,13 @@ class RDPGUIEvents():
         # Case 2: 3-dimensional plot or heatmap 
         else:
             parent.rdp_frame.frame.style_cbox.Enable()
-            parent.rdp_frame.frame.proj_method_cbox.Enable()
+            
+            if parent.ndim[parent.selection] != 2:
+                parent.rdp_frame.frame.proj_method_cbox.Enable()
+            else:
+                parent.rdp_frame.frame.proj_method_cbox.Disable()
+                parent.rdp_frame.frame.proj_method_cbox.SetValue('')
+                parent.proj_method = ''
             
         if parent.proj == '':
             parent.proj_method = ''
@@ -330,7 +349,7 @@ class RDPGUIEvents():
     def evt_switch_btn(self, event, parent):
         
         for i in range(len(parent.frame_ids)):
-            current_frame = rdp.guifuncs._set_current_frame(parent=parent, i=i)
+            current_frame = rdp.guifuncs.set_current_frame(parent=parent, i=i)
             
             # Clear memory
             if current_frame.data is not None:
@@ -358,7 +377,7 @@ class RDPGUIEvents():
         step = parent.pos_slider.GetValue()
                 
         for i in range(len(parent.frame_ids)):
-            current_frame = rdp.guifuncs._set_current_frame(parent=parent, i=i)
+            current_frame = rdp.guifuncs.set_current_frame(parent=parent, i=i)
             current_frame.step = step
         
             if i == 0:
@@ -385,6 +404,20 @@ class RDPGUIEvents():
         elif widget.GetValue() == 'color':
             parent.surface_cmap = 'coolwarm'
         wx.CallAfter(rdp.plotfuncs.update_plot, parent)
+        
+    
+    def evt_add_time_course_sel_cbox(self, event, parent):
+        widget = event.GetEventObject()
+        
+        if 'RDPGUI' not in str(type(parent)):
+            parent = parent.GetParent()
+                    
+        recorded_file = parent.dir + '/' + widget.GetValue()
+        
+        header = rdp.datatools.get_csv_header(csv_f=recorded_file)
+        data = rdp.datatools.get_csv_data(csv_f=recorded_file, header=header)
+        rdp.plotfuncs.add_time_course(parent=parent, ydata=data, linestyle=parent.line_style, color=parent.line_color, plot=parent.plot)
+        rdp.plotfuncs.update_plot(parent=parent)
         
         
     def evt_sel_cbox(self, event, parent):
@@ -452,7 +485,6 @@ class RDPGUIEvents():
             
             
     def evt_dir_btn(self, event, parent):
-        
         RDPMainWindow(parent=None, title='Recorded Data Processor', pos=None, size=None, style=None, name=None, directory=parent.frame.dir)
         parent.frame.Destroy()
         
@@ -463,7 +495,6 @@ class RDPGUIEvents():
             rdp_gui = parent._initialize_rdp_gui()
             
         except AttributeError:
-            print parent.frame.dir
             new_frame = RDPMainWindow(parent=parent, title='', pos=None, size=None, style=None, name=None, directory=parent.frame.dir)  
             new_frame.rdp_gui.step = parent.step   
             new_frame.Bind(wx.EVT_CLOSE, partial(self.evt_close_frame, parent=parent))
@@ -482,7 +513,7 @@ class RDPGUIEvents():
     def evt_sel_btn(self, event, parent):
         parent._initialize_rdp_gui()
         
-        
+
     def evt_line_color_ctrl(self, event, parent):
         great_parent = parent.parent
         widget = event.GetEventObject()
@@ -497,8 +528,8 @@ class RDPGUIEvents():
         great_parent.line_color = [red, green, blue]
         
         # Update currently displayed plot
-        if great_parent.figure and great_parent.ndim[great_parent.selection] != 0:
-            wx.CallAfter(rdp.plotfuncs.update_plot, great_parent)
+        #if great_parent.figure and great_parent.ndim[great_parent.selection] != 0:
+        wx.CallAfter(rdp.plotfuncs.update_plot, great_parent)
             
             
     def evt_marker_color_ctrl(self, event, parent):
@@ -580,7 +611,7 @@ class RDPGUIEvents():
             parent.rdp_frame.frame.panel.Hide()
             RDPPlotFrame(parent=parent, panel=parent.rdp_frame.frame.panel) 
             parent.rdp_frame.frame.Hide()
-            
+        
         if parent.ndim[parent.selection] == 1:
             rdp.plotfuncs.update_plot(parent=parent)
             if parent.mode == 'time course':
@@ -608,7 +639,7 @@ class RDPGUIEvents():
                             
         parent.panel.Hide()
         RDPPlotFrame(parent=great_parent, panel=parent.panel) 
-        rdp.plotfuncs.plot(parent=great_parent)
+        rdp.plotfuncs.update_plot(parent=great_parent)
             
             
     def evt_style_cbox(self, event, parent):
@@ -621,7 +652,8 @@ class RDPGUIEvents():
             if great_parent.ndim[great_parent.selection] != 1:
                 parent.mode_cbox.Enable()
                 parent.proj_cbox.Enable()
-                parent.proj_method_cbox.Enable()
+                if great_parent.ndim[great_parent.selection] != 2:
+                    parent.proj_method_cbox.Enable()
             
         else:
             great_parent.mode = parent.mode_cbox.GetValue()
@@ -723,7 +755,7 @@ class RDPStartupFrame(wx.Frame):
 class RDPApp(wx.App):
     def OnInit(self):        
         RDPStartupFrame(parent=None)
-                        
+        
         return True
             
 #========================================================================================================================
@@ -896,6 +928,24 @@ class RDPPlotFrame(wx.Frame):
             z_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.rdp_gui_events.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label, parent=parent))
             z_axis_txt.SetToolTipString(axes_label_tooltip_string)
             z_axis_label.SetToolTipString(axes_label_tooltip_string)
+            
+            # Options for axis ticks only available in 2D plots, considering that they do not seem to work correctly for 3D plots
+            if parent.style == 'heatmap':
+                axis_ticks_txt = wx.StaticText(notebook_parameters_panel, -1, 'Axis ticks\t')
+                axis_ticks_cbox = wx.ComboBox(notebook_parameters_panel, size=x_axis_label.GetSize(), choices=['on', 'off'], style=wx.CB_READONLY)
+                
+                if parent.axis_ticks is not None:
+                    if parent.axis_ticks is False:
+                        axis_ticks_cbox.SetValue('off')
+                    else:
+                        axis_ticks_cbox.SetValue('on')
+                else:
+                    if parent.style == 'image':
+                        axis_ticks_cbox.SetValue('off')
+                    else:
+                        axis_ticks_cbox.SetValue('on')
+                    
+                axis_ticks_cbox.Bind(wx.EVT_COMBOBOX, partial(self.rdp_gui_events.evt_axis_ticks_cbox, parent=parent))
                                                         
 
         x_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.rdp_gui_events.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label, parent=parent))
@@ -918,26 +968,13 @@ class RDPPlotFrame(wx.Frame):
         
         notebook_parameters_panel_sizer.Add(item=plot_labelling_txt, proportion=1, flag=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
         notebook_parameters_panel_sizer.Add(item=plot_labelling_cbox, proportion=1, flag=wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.RIGHT, border=20)
-    
-        axis_ticks_txt = wx.StaticText(notebook_parameters_panel, -1, 'Axis ticks\t')
-        axis_ticks_cbox = wx.ComboBox(notebook_parameters_panel, size=x_axis_label.GetSize(), choices=['on', 'off'], style=wx.CB_READONLY)
         
-        if parent.axis_ticks is not None:
-            if parent.axis_ticks is False:
-                axis_ticks_cbox.SetValue('off')
-            else:
-                axis_ticks_cbox.SetValue('on')
-        else:
-            if parent.style == 'image':
-                axis_ticks_cbox.SetValue('off')
-            else:
-                axis_ticks_cbox.SetValue('on')
-            
-        axis_ticks_cbox.Bind(wx.EVT_COMBOBOX, partial(self.rdp_gui_events.evt_axis_ticks_cbox, parent=parent))
+        try:
+            notebook_parameters_panel_sizer.Add(item=axis_ticks_txt, proportion=1, flag=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
+            notebook_parameters_panel_sizer.Add(item=axis_ticks_cbox, proportion=1, flag=wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.RIGHT, border=20)
+        except UnboundLocalError:
+            pass
         
-        notebook_parameters_panel_sizer.Add(item=axis_ticks_txt, proportion=1, flag=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=20)
-        notebook_parameters_panel_sizer.Add(item=axis_ticks_cbox, proportion=1, flag=wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.RIGHT, border=20)
-            
         if (parent.style == 'surface' or parent.style == 'wireframe') and parent.style != 'heatmap':
             
             perspective_heading = wx.StaticText(notebook_parameters_panel, -1, 'Perspective')
@@ -1070,26 +1107,28 @@ class RDPPlotFrame(wx.Frame):
             parent.control_plot_frame.vmax_spn.Bind(wx.EVT_SPINCTRL, partial(self.rdp_gui_events.evt_vmax_spn, parent=parent))
                                                     
         if parent.ndim[parent.selection] == 0:
+            '''
             parent.rdp_frame.sel_cbox = wx.ComboBox(notebook_parameters_panel, size=(150, 27), choices=parent.flist_sorted, style=wx.CB_READONLY)
-            parent.rdp_frame.sel_cbox.Bind(wx.EVT_COMBOBOX, partial(self.rdp_gui_events.evt_sel_cbox, parent=parent))
-            
+            parent.rdp_frame.sel_cbox.Bind(wx.EVT_COMBOBOX, partial(self.rdp_gui_events.evt_add_time_course_sel_cbox, parent=parent))
             add_time_course_btn = wx.Button(notebook_parameters_panel, label = 'Add time course')
             add_time_course_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_add_time_course, parent=parent))
             remove_time_course_btn = wx.Button(notebook_parameters_panel, label = 'Remove time course')
+            remove_time_course_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_add_time_course, parent=parent))
+            '''
             
-            #remove_time_course_btn.Bind(wx.EVT_BUTTON, partial(self.rdp_gui_events.evt_add_time_course, parent=parent))
             line_color_label = wx.StaticText(notebook_parameters_panel, -1, label='Line color')
-            
             self.line_color_ctrl = wx.ColourPickerCtrl(notebook_parameters_panel, -1, col=parent.aux_line_color)
             self.line_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, partial(self.rdp_gui_events.evt_line_color_ctrl, parent=self))
-            sel_label = wx.StaticText(notebook_parameters_panel, -1, 'File')            
-
             notebook_parameters_panel_sizer.Add(line_color_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
             notebook_parameters_panel_sizer.Add(self.line_color_ctrl, 1, wx.ALIGN_RIGHT)
+            
+            '''
+            sel_label = wx.StaticText(notebook_parameters_panel, -1, 'File')
             notebook_parameters_panel_sizer.Add(item=add_time_course_btn, proportion=0, flag=wx.ALIGN_LEFT|wx.EXPAND)
             notebook_parameters_panel_sizer.Add(item=remove_time_course_btn, proportion=0, flag=wx.ALIGN_RIGHT|wx.EXPAND)
             notebook_parameters_panel_sizer.Add(item=sel_label, proportion=0, flag=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
             notebook_parameters_panel_sizer.Add(item=parent.rdp_frame.sel_cbox, proportion=0, flag=wx.ALIGN_RIGHT)
+            '''
             
         notebook_parameters_panel.SetSizerAndFit(notebook_parameters_panel_sizer)  
         notebook_setup_panel.SetSizerAndFit(notebook_setup_panel_sizer)
@@ -1240,7 +1279,7 @@ class RDPGUI(wx.Panel):
             if i == 0:
                 self.ndim = []
             
-            self.header_list.append(rdp.datatools.get_header(csv_f=self.dir + '/' + self.flist_sorted[i]))
+            self.header_list.append(rdp.datatools.get_csv_header(csv_f=self.dir + '/' + self.flist_sorted[i]))
             self.ndim.append(rdp.datatools.get_dimension(self.header_list[i]))
         
         # Sizers
