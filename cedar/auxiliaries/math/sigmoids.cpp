@@ -100,33 +100,31 @@ void cedar::aux::math::sigmoid(const cv::Mat& mat, cv::Mat& result, const double
 template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::sigmoid<double>(const cv::Mat&, cv::Mat&, const double, const double);
 template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::sigmoid<float>(const cv::Mat&, cv::Mat&, const double, const double);
 
+cv::Mat cedar::aux::math::sigmoidAbs(const cv::Mat& mat, const double beta, const double threshold)
+{
+  return 0.5 * (1.0 + beta * (mat - threshold) / (1.0 + beta * cv::abs(mat - threshold)));
+}
 
 template<typename T>
 cv::Mat cedar::aux::math::sigmoidAbs(const cv::Mat& mat, const double beta, const double threshold)
 {
-  cv::Mat result = mat.clone();
-  for (int col = 0; col < mat.cols; col++)
-  {
-    for (int row = 0; row < mat.rows; row++)
-    {
-      result.at<T>(row,col) = sigmoidAbs(mat.at<T>(row,col),beta,threshold);
-    }
-  }
-  return result;
+  return sigmoidAbs(mat, beta, threshold);
 }
+
 template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::sigmoidAbs<double>(const cv::Mat&, const double, const double);
 template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::sigmoidAbs<float>(const cv::Mat&, const double, const double);
+
+//same as cv::mat sigmoidAbs but does not create new memory for result
+void cedar::aux::math::sigmoidAbs(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold)
+{
+  result = sigmoidAbs(mat, beta, threshold);
+}
+
 //same as cv::mat sigmoidAbs but does not create new memory for result
 template<typename T>
 void cedar::aux::math::sigmoidAbs(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold)
 {
-  for (int col = 0; col < mat.cols; col++)
-  {
-    for (int row = 0; row < mat.rows; row++)
-    {
-      result.at<T>(row,col) = sigmoidAbs(mat.at<T>(row,col),beta,threshold);
-    }
-  }
+  result = sigmoidAbs(mat, beta, threshold);
 }
 
 template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::sigmoidAbs<double>(const cv::Mat&, cv::Mat&, const double, const double);
