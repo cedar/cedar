@@ -75,9 +75,5 @@ double cedar::aux::math::AbsSigmoid::compute(double value) const
 
 cv::Mat cedar::aux::math::AbsSigmoid::compute(const cv::Mat& values) const
 {
-  cv::Mat result = values.clone();
-  double beta = _mBeta->getValue();
-  double threshold = this->mThreshold->getValue();
-  result = 0.5 * (1. + beta * (values - threshold) / (1. + beta * cv::abs(values - threshold)));
-  return result;
+  return sigmoidAbs(values, this->_mBeta->getValue(), this->mThreshold->getValue());
 }
