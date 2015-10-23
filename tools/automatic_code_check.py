@@ -72,6 +72,13 @@ class IssueC0002 (Issue):
                    issue_type_compatibility, 2,
                    "In line " + str(line) + ", col. " + str(column) + ": Replace the function boost::" + boost_call + " by " + replacements[boost_call] + "."
                    )
+    
+class IssueC0003 (Issue):
+  def __init__(self, line, column):
+    Issue.__init__(self, 
+                   issue_type_compatibility, 3,
+                   "In line " + str(line) + ", col. " + str(column) + ": Boost headers are included but not guarded by #ifndef Q_MOC_RUN."
+                   )
 
 class IssueM0001 (Issue):
   def __init__(self, line, column):
@@ -190,6 +197,42 @@ class CheckC0002 (REBasedCheck):
     else:
       return False
     
+class CheckC0003 (Check):
+  """
+  Checks for instances of boost::shared_dynamic_cast.
+  """
+  
+  _q_moc_run_stripper = re.compile(r"#\s*ifndef\s*Q_MOC_RUN.*?#\s*endif", re.DOTALL)
+  _boost_include_finder = re.compile(r"#\s*include\s*[\"<]boost.*[\">]")
+    
+  def __init__(self):
+    Check.__init__(self)
+
+  def check(self, issues, filename, file_contents, preprocessed_contents):
+    processed = CheckC0003._q_moc_run_stripper.sub("", preprocessed_contents)
+    
+    current_pos = 0
+    any_found = False
+    while True:
+      m = CheckC0003._boost_include_finder.search(processed, current_pos)
+      if m is None:
+        break
+        
+      any_found = True
+        
+      current_pos = m.end()
+      lines = processed[:m.start()].split("\n")
+      line_no = len(lines)
+      col_no = len(lines[-1]) + 1
+      
+      issues.add_issue(filename, IssueC0003(line_no, col_no))
+    
+      
+  def handles_file_type(self, file_type):
+    if file_type in ("h", "cpp"):
+      return True
+    else:
+      return False
     
 class CheckM0001 (REBasedCheck):
   """
@@ -291,12 +334,12 @@ class CheckC0001 (Check):
       return False
     
   def check(self, issues, filename, file_contents, preprocessed_contents):
-    matches = set(std_use_regex.findall(preprocessed_contents))
+    matches = set(CheckC0001.std_use_regex.findall(preprocessed_contents))
     filetype = filename.split('.')[-1]
     for classname in matches:
       # determine the header for the class
-      if classname in std_class_headers:
-        header = std_class_headers[classname]
+      if classname in CheckC0001.std_class_headers:
+        header = CheckC0001.std_class_headers[classname]
       else:
         header = classname
       
@@ -334,11 +377,11 @@ def check_file(filename):
   if match is None:
     return
     
-  file_type = match.groups(1)
+  file_type = match.groups(1)[0]
 
   print "Checking file", filename.split(base_directory)[-1]
   
-  checks = [CheckC0001(), CheckC0002(), CheckM0001()]
+  checks = [CheckC0001(), CheckC0002(), CheckC0003(), CheckM0001()]
   
   with open(filename, "r") as f:
     file_contents = f.read()

@@ -58,3 +58,12 @@ C0002 - Using boost::shared_dynamic_cast
 This function was removed in newer boost versions. Its replacement is boost::dynamic_pointer_cast. shared_dynamic_cast
 can be replaced by dynamic_pointer_cast directly without any other changes and works equivalently.
 
+
+Miscellaneous Issues
+====================
+
+M0002 & M0002 - Outdated copyright information
+----------------------------------------------
+
+All files should have all consecutive years since 2011 in their copyright header in a fixed format, e.g., Copyright
+2011, 2012, 2013 ...
