@@ -56,6 +56,7 @@
 #include <yarp/os/Portable.h>
 #include <yarp/os/ConnectionReader.h>
 #include <yarp/os/ConnectionWriter.h>
+#include <vector>
 
 //!@cond SKIPPED_DOCUMENTATION
 

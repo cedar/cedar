@@ -53,6 +53,8 @@
 #include <QPushButton>
 #include <map>
 #include <string>
+#include <utility>
+#include <vector>
 
 
 /*!@brief A widget for opening a set of plots for an architecture based on a configuration file.
