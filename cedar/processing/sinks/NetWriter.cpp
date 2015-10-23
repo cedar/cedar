@@ -50,6 +50,7 @@
 // SYSTEM INCLUDES
 #include <iostream>
 #include <vector>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
