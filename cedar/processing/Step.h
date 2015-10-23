@@ -69,6 +69,7 @@
 #include <set>
 #include <utility>
 #include <vector>
+#include <deque>
 
 
 /*!@brief This class represents a processing step in the processing framework.

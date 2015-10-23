@@ -65,6 +65,7 @@
 #include <QComboBox>
 #include <QLabel>
 #include <map>
+#include <vector>
 
 
 /*!@brief This is the main window of the cedar application.

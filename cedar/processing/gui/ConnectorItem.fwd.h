@@ -44,7 +44,9 @@
 #include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar

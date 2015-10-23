@@ -44,7 +44,9 @@
 #include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
-#include <boost/units/systems/si/angular_velocity.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/units/systems/si/angular_velocity.hpp>
+#endif // Q_MOC_RUN
 
 namespace cedar
 {

@@ -59,6 +59,7 @@
 #include <set>
 #include <vector>
 #include <string>
+#include <map>
 
 
 /*!@brief All settings concerning the currently visible widgets of the ui: sizes, where they are docked and so on.

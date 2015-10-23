@@ -49,6 +49,7 @@
 #include "cedar/auxiliaries/annotation/ValueRangeHint.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@brief An annotation that hints at the range of values in a matrix.
