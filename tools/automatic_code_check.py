@@ -229,7 +229,7 @@ class CheckC0003 (Check):
     
       
   def handles_file_type(self, file_type):
-    if file_type in ("h", "cpp"):
+    if file_type == "h":
       return True
     else:
       return False
@@ -321,7 +321,8 @@ class CheckC0001 (Check):
                         "max": "algorithm",
                         "istringstream": "sstream",
                         "ostringstream": "sstream",
-                        "get": "tuple"
+                        "get": "tuple",
+                        "multimap": "map"
                       }
                       
   def __init__(self):
