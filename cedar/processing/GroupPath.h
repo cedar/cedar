@@ -47,6 +47,7 @@
 #include "cedar/processing/GroupPath.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@brief a dot-separated path to an element nested in a group

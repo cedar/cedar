@@ -51,7 +51,9 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QPushButton>
-#include <boost/signals2.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2.hpp>
+#endif // Q_MOC_RUN
 #include <string>
 
 

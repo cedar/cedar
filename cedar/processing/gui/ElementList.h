@@ -55,6 +55,9 @@
 #include <QPushButton>
 #include <QStandardItem>
 #include <QGraphicsSceneDragDropEvent>
+#include <map>
+#include <string>
+#include <vector>
 
 // pseudo-nested class (because the Qt moc doesn't do real nested classes)
 namespace cedar

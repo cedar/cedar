@@ -49,6 +49,8 @@
 #include "cedar/auxiliaries/gui/Multi0DPlot.fwd.h"
 
 // SYSTEM INCLUDES
+#include <map>
+#include <string>
 
 
 /*!@brief A plot that can plot several 0d values next to each other.

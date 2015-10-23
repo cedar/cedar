@@ -56,6 +56,9 @@
   #include <boost/signals2.hpp>
   #include <boost/function.hpp>
 #endif // Q_MOC_RUN
+#include <map>
+#include <string>
+#include <vector>
 
 
 /*!@brief A widget for displaying (a filtered subset of) the elements in a cedar::proc::Group.

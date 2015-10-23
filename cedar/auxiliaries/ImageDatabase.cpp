@@ -50,6 +50,7 @@
 #include <boost/filesystem.hpp>
 #include <fstream>
 #include <algorithm>
+#include <random>
 
 cedar::aux::EnumType<cedar::aux::ImageDatabase::Type> cedar::aux::ImageDatabase::Type::mType("cedar::aux::ImageDatabase::Type::");
 

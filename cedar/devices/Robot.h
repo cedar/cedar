@@ -46,7 +46,9 @@
 #include "cedar/auxiliaries/ObjectMapParameterTemplate.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/enable_shared_from_this.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/enable_shared_from_this.hpp>
+#endif // Q_MOC_RUN
 #include <vector>
 #include <string>
 #include <map>

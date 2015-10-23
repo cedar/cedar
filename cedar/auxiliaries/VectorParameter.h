@@ -52,6 +52,7 @@
 // SYSTEM INCLUDES
 #include <vector>
 #include <algorithm>
+#include <string>
 
 namespace cedar
 {

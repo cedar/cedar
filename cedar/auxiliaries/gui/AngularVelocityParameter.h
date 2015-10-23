@@ -48,7 +48,9 @@
 
 // SYSTEM INCLUDES
 #include <QDoubleSpinBox>
-#include <boost/units/io.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/units/io.hpp>
+#endif // Q_MOC_RUN
 
 //----------------------------------------------------------------------------------------------------------------------
 // template specialization for QSpinBox

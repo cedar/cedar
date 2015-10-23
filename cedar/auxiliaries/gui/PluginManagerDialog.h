@@ -49,6 +49,7 @@
   #include <boost/signals2.hpp>
 #endif // Q_MOC_RUN
 #include <string>
+#include <vector>
 
 
 /*!@brief A widget for managing plugins.
