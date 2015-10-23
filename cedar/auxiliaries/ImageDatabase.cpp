@@ -1493,24 +1493,6 @@ void cedar::aux::ImageDatabase::selectImagesFromNRandomClasses
        const boost::optional<unsigned int>& seed
      ) const
 {
-  struct RNG
-  {
-    typedef unsigned int result_type;
-    static result_type min()
-    {
-      return 0;
-    }
-
-    static result_type max()
-    {
-      return static_cast<unsigned int>(RAND_MAX);
-    }
-
-    result_type operator()() const
-    {
-      return static_cast<unsigned int>(std::rand() % RAND_MAX);
-    }
-  };
 
   std::vector<ClassId> class_ids;
 
@@ -1519,17 +1501,16 @@ void cedar::aux::ImageDatabase::selectImagesFromNRandomClasses
     class_ids.push_back(id_name_pair.first);
   }
 
+  std::default_random_engine engine;
   if (seed)
   {
-    std::srand(seed.get());
+    engine = std::default_random_engine(seed.get());
   }
   else
   {
-    std::srand(time(0));
+    engine = std::default_random_engine(time(0));
   }
-
-  RNG rng;
-  std::shuffle(class_ids.begin(), class_ids.end(), rng);
+  std::shuffle(class_ids.begin(), class_ids.end(), engine);
 
   CEDAR_ASSERT(numberOfClasses < class_ids.size());
 
