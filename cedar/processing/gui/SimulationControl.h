@@ -59,6 +59,7 @@
 #ifndef Q_MOC_RUN
   #include <boost/signals2.hpp>
 #endif // Q_MOC_RUN
+#include <map>
 
 //!@cond SKIPPED_DOCUMENTATION
 // "Hidden" class; would be a private nested class of cedar::proc::gui::SimulationControl, but the moc cannot do that

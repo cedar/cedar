@@ -47,6 +47,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <vector>
 
 //!@cond SKIPPED_DOCUMENTATION
 /*!@brief extend the header struct to matrix data (cols, rows)
