@@ -58,3 +58,23 @@ C0002 - Using boost::shared_dynamic_cast
 This function was removed in newer boost versions. Its replacement is boost::dynamic_pointer_cast. shared_dynamic_cast
 can be replaced by dynamic_pointer_cast directly without any other changes and works equivalently.
 
+C0003 - Guarding boost includes
+----------------------------------------
+
+When using certain versions of Qt and boost, there is an incompatibility of certain macros defined in these libraries.
+These are issues we cannot fix directly; instead, we need to work around them by guarding boost includes with
+#ifndef Q_MOC_RUN. The correct version should look like this:
+
+    #ifndef Q_MOC_RUN
+        #include <boost/signals2/signal.hpp>
+    #endif
+
+
+Miscellaneous Issues
+====================
+
+M0002 & M0002 - Outdated copyright information
+----------------------------------------------
+
+All files should have all consecutive years since 2011 in their copyright header in a fixed format, e.g., Copyright
+2011, 2012, 2013 ...

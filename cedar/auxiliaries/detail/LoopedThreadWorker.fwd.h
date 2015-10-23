@@ -41,12 +41,11 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+
+// SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
-
-// SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar

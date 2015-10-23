@@ -53,6 +53,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <set>
 
 /*!@brief A convolution engine based on the FFTW library.
  */

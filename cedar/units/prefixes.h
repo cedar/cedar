@@ -40,7 +40,9 @@
 // CEDAR INCLUDES
 
 // SYSTEM INCLUDES
-#include "boost/units/systems/si/prefixes.hpp"
+#ifndef Q_MOC_RUN
+  #include <boost/units/systems/si/prefixes.hpp>
+#endif // Q_MOC_RUN
 
 namespace cedar
 {

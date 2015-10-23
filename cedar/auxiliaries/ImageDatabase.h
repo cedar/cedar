@@ -61,6 +61,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <utility>
 
 
 /*!@brief A class for finding images and annotation information from an image database.

@@ -42,7 +42,9 @@
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
-#include <boost/intrusive_ptr.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/intrusive_ptr.hpp>
+#endif // Q_MOC_RUN
 
 
 namespace cedar

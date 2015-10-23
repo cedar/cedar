@@ -49,6 +49,8 @@
 #include <QtConcurrentRun>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <vector>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members
