@@ -1356,6 +1356,7 @@ void cedar::proc::gui::Ide::newFile()
   this->setGroup(cedar::proc::gui::GroupPtr(new cedar::proc::gui::Group(this, this->mpProcessingDrawer->getScene())));
 
   this->displayFilename("unnamed file");
+  cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName("unnamed file");
 
   // set the smart connection button
   this->mpActionToggleSmartConnections->blockSignals(true);
