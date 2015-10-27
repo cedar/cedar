@@ -93,10 +93,11 @@ mWriter(),
 _mPort(new cedar::aux::StringParameter(this, "port", 
                                        "CEDAR/" 
                                        + cedar::aux::versionNumberToString(CEDAR_VERSION)
-                                       + "/MISC" ))
+                                       + "/MISC"))
 {
   // declare all data
   this->declareInput("input");
+  _mPort->setValidator(boost::bind(&cedar::proc::sinks::NetWriter::validatePortName, this, _1));
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -125,6 +126,7 @@ void cedar::proc::sinks::NetWriter::connect()
     {
       // somehow YARP doesnt work ... :( typically fatal.
       this->setState(cedar::proc::Step::STATE_EXCEPTION, "Network communication exception: " + e.exceptionInfo());
+      _mPort->setConstant(false);
       throw (e); // lets try this ...
     }
   }
@@ -216,6 +218,14 @@ void cedar::proc::sinks::NetWriter::inputConnectionChanged(const std::string& in
 
   // Finally, send data ...
   this->onTrigger();
+}
+
+void cedar::proc::sinks::NetWriter::validatePortName(const std::string& portName) const
+{
+  if (portName.find_first_of(" \r\n") != std::string::npos)
+  {
+    CEDAR_THROW(cedar::aux::ValidationFailedException, "YARP port names may not contain whitespace characters.");
+  }
 }
 
 #endif // CEDAR_USE_YARP
