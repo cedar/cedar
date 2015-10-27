@@ -218,7 +218,6 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
     {
       this->emitOutputPropertiesChangedSignal(this->generateDataName(i));
     }
-    this->onTrigger();
   }
 }
 

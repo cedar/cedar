@@ -652,9 +652,10 @@ bool cedar::proc::Step::isRecorded() const
   return false;
 }
 
+//!@todo This method is probably superfluous
 void cedar::proc::Step::callInputConnectionChanged(const std::string& slot)
 {
-  this->revalidateInputSlot(slot);
+  this->cedar::proc::Connectable::callInputConnectionChanged(slot);
 }
 
 std::map<std::string, cedar::unit::Time> cedar::proc::Step::unregisterRecordedData() const

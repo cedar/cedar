@@ -79,12 +79,28 @@ cedar::aux::Recorder::~Recorder()
   }
 }
 
+//------------------------------------------------------------------------------
+// methods
+//------------------------------------------------------------------------------
+
+cedar::aux::SerializationFormat::Id cedar::aux::Recorder::getSerializationMode() const
+{
+  return cedar::aux::SettingsSingleton::getInstance()->getSerializationFormat();
+}
+
+void cedar::aux::Recorder::setSerializationMode(cedar::aux::SerializationFormat::Id mode)
+{
+  cedar::aux::SettingsSingleton::getInstance()->setSerializationFormat(mode);
+}
+
 void cedar::aux::Recorder::step(cedar::unit::Time)
 {
+  auto mode = this->getSerializationMode();
+
   // Writing the first value of every DataSpectator queue.
   for (auto data_spectator : mDataSpectators)
   {
-    boost::static_pointer_cast<cedar::aux::DataSpectator>(data_spectator.second)->writeFirstRecordData();
+    boost::static_pointer_cast<cedar::aux::DataSpectator>(data_spectator.second)->writeFirstRecordData(mode);
   }
 }
 
@@ -104,8 +120,7 @@ void cedar::aux::Recorder::registerData(cedar::aux::ConstDataPtr toSpectate, ced
   }
 
   // create new DataSpectator and push it to the DataSpectator list
-  cedar::aux::DataSpectatorPtr spec
-    = cedar::aux::DataSpectatorPtr(new cedar::aux::DataSpectator(toSpectate, recordInterval, name));
+  cedar::aux::DataSpectatorPtr spec(new cedar::aux::DataSpectator(toSpectate, recordInterval, name));
   QWriteLocker locker(mpListLock);
   if (mDataSpectators.find(name) != mDataSpectators.end())
   {
