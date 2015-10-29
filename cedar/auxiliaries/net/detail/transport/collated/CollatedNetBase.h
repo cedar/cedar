@@ -93,7 +93,11 @@ public:
 public:
   bool open()
   {
-    return mDataPort.open( getFullPortName().c_str() );
+    if (getFullPortName().find_first_of(" \r\n") != std::string::npos)
+    {
+      return false;
+    }
+    return mDataPort.open(getFullPortName().c_str());
   }
 
   bool close()
