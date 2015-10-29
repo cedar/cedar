@@ -217,9 +217,9 @@ void cedar::proc::steps::Sum::inputConnectionChanged(const std::string& /*inputN
     }
 
     // finally, compute once and then notify subsequent steps that the output size may have changed
-    cedar::proc::Step::ReadLocker locker(this);
-    this->compute(cedar::proc::Arguments());
+    this->callComputeWithoutTriggering();
 
+    cedar::proc::Step::ReadLocker locker(this);
     const cv::Mat& output = this->mOutput->getData();
     bool changed = old_output.type() != output.type() || old_output.size != output.size;
     locker.unlock();

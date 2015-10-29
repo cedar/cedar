@@ -211,9 +211,7 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
     && cedar::aux::math::getDimensionalityOf(this->mInput->getData()) < 3
   )
   {
-    cedar::proc::Step::ReadLocker locker(this);
-    this->compute(cedar::proc::Arguments());
-    locker.unlock();
+    this->callComputeWithoutTriggering();
     for (size_t i = 0; i < this->mChannelData.size(); ++i)
     {
       this->emitOutputPropertiesChangedSignal(this->generateDataName(i));

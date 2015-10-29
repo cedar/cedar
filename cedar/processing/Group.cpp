@@ -2523,7 +2523,7 @@ void cedar::proc::Group::inputConnectionChanged(const std::string& inputName)
   {
     source->resetData();
   }
-  source->onTrigger();
+//  source->onTrigger();
 }
 
 const cedar::proc::Group::ConnectorMap& cedar::proc::Group::getConnectorMap()

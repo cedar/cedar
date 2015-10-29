@@ -92,6 +92,11 @@ _mEngine
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::aux::conv::Convolution::canConvolve(const cv::Mat& matrix, const cv::Mat& kernel) const
+{
+  return this->getEngine()->checkCapability(matrix, kernel, this->getBorderType(), this->getMode());
+}
+
 void cedar::aux::conv::Convolution::setAllowedModes(const std::set<cedar::aux::conv::Mode::Id>& modes)
 {
   this->mAllowedModes = modes;
