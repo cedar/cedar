@@ -154,9 +154,7 @@ void cedar::proc::steps::MatrixTypeConverter::inputConnectionChanged(const std::
     auto old_type = this->mConverted->getData().type();
     this->mConverted->copyAnnotationsFrom(this->mMatrix);
 
-    cedar::proc::Step::ReadLocker locker(this);
-    this->compute(cedar::proc::Arguments());
-    locker.unlock();
+    this->callComputeWithoutTriggering();
 
     if (old_type != this->mConverted->getData().type())
     {

@@ -412,9 +412,7 @@ void cedar::proc::steps::MatrixPadding::updateOutputSize()
 
     this->mPadded->setData(cv::Mat(input.dims, &dest_size.front(), input.type(), 0.0));
 
-    cedar::proc::Step::ReadLocker step_locker(this);
-    this->compute(cedar::proc::Arguments());
-    step_locker.unlock();
+    this->callComputeWithoutTriggering();
 
     if (changed)
     {

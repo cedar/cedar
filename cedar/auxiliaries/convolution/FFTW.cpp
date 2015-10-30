@@ -175,8 +175,9 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
       CEDAR_THROW
       (
         cedar::aux::RangeException,
-        "Kernel size is too big for FFTW convolution, "
-        "please decrease kernel size or switch to different convolution engine."
+        "Kernel size is too big for FFTW convolution, (dimension " + cedar::aux::toString(dim) + ": matrix is "
+        + cedar::aux::toString(matrix.size[dim]) + ", kernel is " + cedar::aux::toString(kernel.size[dim])
+        + " elements wide). Please decrease kernel size or switch to different convolution engine."
       );
     }
   }
@@ -405,6 +406,32 @@ bool cedar::aux::conv::FFTW::checkCapability
   if (!this->checkBorderTypeCapability(borderType) || !this->checkModeCapability(mode))
   {
     return false;
+  }
+
+  return true;
+}
+
+bool cedar::aux::conv::FFTW::checkCapability
+     (
+       cv::Mat matrix,
+       cv::Mat kernel,
+       cedar::aux::conv::BorderType::Id borderType,
+       cedar::aux::conv::Mode::Id mode
+     ) const
+{
+  if (!this->checkCapability(cedar::aux::math::getDimensionalityOf(matrix), cedar::aux::math::getDimensionalityOf(kernel), borderType, mode))
+  {
+    return false;
+  }
+
+  CEDAR_DEBUG_ASSERT(matrix.dims == kernel.dims);
+
+  for (int d = 0; d < matrix.dims; ++d)
+  {
+    if (matrix.size[d] < kernel.size[d])
+    {
+      return false;
+    }
   }
 
   return true;

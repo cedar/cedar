@@ -150,6 +150,9 @@ signals:
   //! Emitted whenever all trigger in this group and its subgroups are stopped.
   void allTriggersStopped();
 
+  //! Sent when the number of triggerables in warning/error states is changed
+  void triggerableStateCountsChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
@@ -688,6 +691,12 @@ public:
   //! Applies the group's time factor, i.e., sets it at the cedar::aux::SettingsSingleton.
   void applyTimeFactor();
 
+  //! Returns the number of triggerables in this group that are in a warning state
+  unsigned int getTriggerablesInWarningStateCount() const;
+
+  //! Returns the number of triggerables in this group that are in a warning state
+  unsigned int getTriggerablesInErrorStateCount() const;
+
   //!@brief connects two slots across groups, allocating connectors if necessary
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 
@@ -769,6 +778,10 @@ private:
   void disconnectTriggerInternal(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
 
   void outputConnectionRemoved(cedar::proc::DataSlotPtr slot);
+
+  void triggerableStateChanged(cedar::proc::TriggerableWeakPtr triggerable);
+
+  void uncountTriggerableState(cedar::proc::ConstTriggerablePtr triggerable);
 
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
@@ -878,6 +891,14 @@ private:
 
   //! a connection to the groupChanged signal of element
   boost::signals2::scoped_connection mParentGroupChangedConnection;
+
+  std::map<cedar::proc::ConstTriggerablePtr, boost::shared_ptr<boost::signals2::scoped_connection> > mTriggerableStateChangedConnections;
+
+  std::map<cedar::proc::ConstTriggerablePtr, cedar::proc::Triggerable::State> mPreviousTriggerableStates;
+
+  cedar::aux::LockableMember<unsigned int> mTriggerablesInWarningStates;
+
+  cedar::aux::LockableMember<unsigned int> mTriggerablesInErrorStates;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

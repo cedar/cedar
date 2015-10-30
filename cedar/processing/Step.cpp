@@ -471,6 +471,13 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   }
 }
 
+void cedar::proc::Step::callComputeWithoutTriggering(cedar::proc::ArgumentsPtr args)
+{
+  // pass a dummy trigger into the onTrigger function; this prevents subsequents steps from being triggered
+  this->onTrigger(args, cedar::proc::TriggerPtr(new cedar::proc::Trigger()));
+}
+
+
 void cedar::proc::Step::processChangedSlots()
 {
   QWriteLocker locker(this->mSlotsChangedDuringComputeCall.getLockPtr());
@@ -652,9 +659,10 @@ bool cedar::proc::Step::isRecorded() const
   return false;
 }
 
+//!@todo This method is probably superfluous
 void cedar::proc::Step::callInputConnectionChanged(const std::string& slot)
 {
-  this->revalidateInputSlot(slot);
+  this->cedar::proc::Connectable::callInputConnectionChanged(slot);
 }
 
 std::map<std::string, cedar::unit::Time> cedar::proc::Step::unregisterRecordedData() const
