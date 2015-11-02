@@ -518,7 +518,11 @@ void cedar::proc::gui::SimulationControl::startPauseSimulationClicked()
   if (running)
   {
     // stop triggers (in a separate thread because otherwise, this may lead to lockups)
+#if (BOOST_VERSION / 100000 < 2 && BOOST_VERSION / 100 % 1000 < 54) // interface change in boost::bind
     this->mStopSimulationResult = QtConcurrent::run(boost::bind<void>(&cedar::proc::Group::stopTriggers, this->mGroup->getGroup(), true));
+#else
+    this->mStopSimulationResult = QtConcurrent::run(boost::bind(&cedar::proc::Group::stopTriggers, this->mGroup->getGroup(), true));
+#endif
 
     // pause global timer
     cedar::aux::GlobalClockSingleton::getInstance()->stop();
@@ -526,8 +530,11 @@ void cedar::proc::gui::SimulationControl::startPauseSimulationClicked()
   else if (!running)
   {
     // start triggers (in a separate thread because otherwise, this may lead to lockups)
+#if (BOOST_VERSION / 100000 < 2 && BOOST_VERSION / 100 % 1000 < 54) // interface change in boost::bind
     this->mStartSimulationResult = QtConcurrent::run(boost::bind<void>(&cedar::proc::Group::startTriggers, this->mGroup->getGroup(), true));
-
+#else
+    this->mStartSimulationResult = QtConcurrent::run(boost::bind(&cedar::proc::Group::startTriggers, this->mGroup->getGroup(), true));
+#endif
     // start global timer
     //!@todo Should this happen automatically as soon as one of the triggers is started? Or should this remain the responsibility of the GUI?
     cedar::aux::GlobalClockSingleton::getInstance()->start();
