@@ -171,7 +171,11 @@ _mTimeFactor(new cedar::aux::DoubleParameter(this, "time factor", 1.0, cedar::au
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->_mConnectors->setHidden(true);
   this->_mTimeFactor->setHidden(true);
+#if (BOOST_VERSION / 100000 < 2 && BOOST_VERSION / 100 % 1000 < 54) // interface change in boost::bind
   mParentGroupChangedConnection = this->connectToGroupChanged(boost::bind<void>(&cedar::proc::Group::onParentGroupChanged, this));
+#else
+  mParentGroupChangedConnection = this->connectToGroupChanged(boost::bind(&cedar::proc::Group::onParentGroupChanged, this));
+#endif
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 }
 
@@ -316,7 +320,11 @@ void cedar::proc::Group::createScript(const std::string& type)
 
    std::string class_name, rest;
    cedar::aux::splitLast(type, ".", rest, class_name);
-   std::string script_name = findNewIdentifier(cedar::proc::Group::camelCaseToSpaces(class_name), boost::bind<bool>(&cedar::proc::Group::checkScriptNameExists, this, _1));
+#if (BOOST_VERSION / 100000 < 2 && BOOST_VERSION / 100 % 1000 < 54) // interface change in boost::bind
+   std::string script_name = findNewIdentifier(cedar::proc::Group::camelCaseToSpaces(class_name), boost::bind<void>(&cedar::proc::Group::checkScriptNameExists, this, _1));
+#else
+   std::string script_name = findNewIdentifier(cedar::proc::Group::camelCaseToSpaces(class_name), boost::bind(&cedar::proc::Group::checkScriptNameExists, this, _1));
+#endif
    script->setName(script_name);
 
    this->addScript(script);
