@@ -334,7 +334,7 @@ bool cedar::aux::gui::MatrixSlicePlot3D::doConversion()
     }
 
     default:
-      QString text = QString("Unhandled matrix type %1.").arg(cloned_mat.type());
+      QString text = QString("Unhandled matrix type ") + QString::fromStdString(cedar::aux::math::matrixTypeToString(cloned_mat));
       this->setInfo(text.toStdString());
       return false;
   }
