@@ -78,6 +78,12 @@ public:
   //! paints the icon
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr);
 
+  //! Prepares the item for writing out to SVG.
+  void prepareSvgExport();
+
+  //! Undoes the changes needed for writing out to SVG.
+  void unprepareSvgExport();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

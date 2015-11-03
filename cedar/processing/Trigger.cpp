@@ -146,6 +146,14 @@ std::string nameTrigger(cedar::proc::TriggerPtr trigger)
   return nameTrigger(trigger.get());
 }
 
+size_t cedar::proc::Trigger::getTriggerCount() const
+{
+  QReadLocker lock(this->mListeners.getLockPtr());
+  size_t count = this->mListeners.member().size();
+  lock.unlock();
+  return count;
+}
+
 bool cedar::proc::Trigger::canTrigger(cedar::proc::TriggerablePtr target) const
 {
   std::string reason;
@@ -742,6 +750,7 @@ void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr triggerable)
 {
   auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
 
+  size_t count = 0;
   QWriteLocker lock(this->mListeners.getLockPtr());
   std::vector<cedar::proc::TriggerablePtr>::iterator iter;
   iter = this->find(triggerable);
@@ -749,11 +758,19 @@ void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr triggerable)
   {
     this->mListeners.member().push_back(triggerable);
     triggerable->triggeredBy(this_ptr);
-
+    count = this->mListeners.member().size();
     lock.unlock();
+
     std::set<cedar::proc::Trigger*> visited;
     this->updateTriggeringOrder(visited);
   }
+  else
+  {
+    count = this->mListeners.member().size();
+    lock.unlock();
+  }
+
+  this->signalTriggerCountChanged(count);
 }
 
 bool cedar::proc::Trigger::isListener(cedar::proc::TriggerablePtr triggerable) const
@@ -772,16 +789,25 @@ void cedar::proc::Trigger::removeListener(cedar::proc::Triggerable* triggerable)
   auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
 
   QWriteLocker lock(this->mListeners.getLockPtr());
+  size_t count;
   auto iter = this->find(triggerable);
   if (iter != this->mListeners.member().end())
   {
     this->mListeners.member().erase(iter);
     triggerable->noLongerTriggeredBy(this_ptr);
 
+    count = this->mListeners.member().size();
     lock.unlock();
     std::set<cedar::proc::Trigger*> visited;
     this->updateTriggeringOrder(visited);
   }
+  else
+  {
+    count = this->mListeners.member().size();
+    lock.unlock();
+  }
+
+  this->signalTriggerCountChanged(count);
 }
 
 std::vector<cedar::proc::TriggerablePtr>::iterator cedar::proc::Trigger::find(cedar::proc::Triggerable* triggerable)

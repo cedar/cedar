@@ -462,6 +462,9 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
+  this->buildStatusBar();
+
+
   this->newFile();
 
   this->restoreSettings();
@@ -566,7 +569,6 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
 
   this->showTriggerConnections(mpActionToggleTriggerVisibility->isChecked());
-  this->buildStatusBar();
   this->startTimer(100);
 
   auto messages = cedar::proc::gui::SettingsSingleton::getInstance()->getUnreadOneTimeMessages();
@@ -744,8 +746,71 @@ void cedar::proc::gui::Ide::setSimulationControlsEnabled(bool enabled)
 
 void cedar::proc::gui::Ide::buildStatusBar()
 {
+  // add labels for showing steps that are in bad states
+
+  // warning
+  mpWarningStateIcon = new QLabel();
+  this->statusBar()->addPermanentWidget(mpWarningStateIcon, 0);
+  mpWarningStateCount = new QLabel();
+  mpWarningStateCount->setToolTip("This counter indicates the number of steps in a warning state.");
+  this->statusBar()->addPermanentWidget(mpWarningStateCount, 0);
+
+  // error
+  mpErrorStateIcon = new QLabel();
+  this->statusBar()->addPermanentWidget(mpErrorStateIcon, 0);
+  mpErrorStateCount = new QLabel();
+  mpErrorStateCount->setToolTip("This counter indicates the number of steps in a warning state.");
+  this->statusBar()->addPermanentWidget(mpErrorStateCount, 0);
+  this->resetWarningAndErrorStateIndicators();
+
+  // add a blank widget as a spacer
+  this->statusBar()->addPermanentWidget(new QWidget(), 1);
+
   this->mpGlobalTimeLabel = new QLabel("simulation time");
   this->statusBar()->addPermanentWidget(this->mpGlobalTimeLabel, 0);
+}
+
+void cedar::proc::gui::Ide::triggerableStateCountsChanged()
+{
+  if (!this->mGroup || !this->mGroup->getGroup())
+  {
+    return;
+  }
+
+  unsigned int warnings = this->mGroup->getGroup()->getTriggerablesInWarningStateCount();
+  unsigned int errors = this->mGroup->getGroup()->getTriggerablesInErrorStateCount();
+  int icon_size = 16;
+  this->mpWarningStateCount->setVisible(warnings != 0);
+  this->mpErrorStateCount->setVisible(errors != 0);
+  this->mpWarningStateCount->setText(QString("%1").arg(warnings));
+  this->mpErrorStateCount->setText(QString("%1").arg(errors));
+
+  if (errors != 0)
+  {
+    QIcon error_icon(":/cedar/auxiliaries/gui/error.svg");
+    this->mpErrorStateIcon->setPixmap(error_icon.pixmap(icon_size, icon_size));
+  }
+  else
+  {
+    // this is the only way to actually hide the label -- with a pixmap qt will still show it if setVisible(false) is called
+    this->mpErrorStateIcon->setPixmap(QPixmap());
+  }
+
+  if (warnings != 0)
+  {
+    QIcon warning_icon(":/cedar/auxiliaries/gui/warning.svg");
+    this->mpWarningStateIcon->setPixmap(warning_icon.pixmap(icon_size, icon_size));
+  }
+  else
+  {
+    // this is the only way to actually hide the label -- with a pixmap qt will still show it if setVisible(false) is called
+    this->mpWarningStateIcon->setPixmap(QPixmap());
+  }
+}
+
+void cedar::proc::gui::Ide::resetWarningAndErrorStateIndicators()
+{
+  this->triggerableStateCountsChanged();
 }
 
 void cedar::proc::gui::Ide::timerEvent(QTimerEvent*)
@@ -1917,17 +1982,19 @@ cedar::proc::gui::GroupPtr cedar::proc::gui::Ide::getGroup()
 
 void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
 {
+  this->resetWarningAndErrorStateIndicators();
   this->mGroup = group;
   this->mGroup->toggleTriggerColors(this->mpActionToggleTriggerColor->isChecked());
 
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(triggerStarted()), this, SLOT(triggerStarted()));
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(allTriggersStopped()), this, SLOT(allTriggersStopped()));
 
+  QObject::connect(this->mGroup->getGroup().get(), SIGNAL(triggerableStateCountsChanged()), this, SLOT(triggerableStateCountsChanged()));
+
   this->mpProcessingDrawer->getScene()->setGroup(group);
   this->mpPropertyTable->clear();
   this->mpRecorderWidget->clear();
   this->mpActionShowHideGrid->setChecked(this->mpProcessingDrawer->getScene()->getSnapToGrid());
-
 
   this->updateTriggerStartStopThreadCallers();
 

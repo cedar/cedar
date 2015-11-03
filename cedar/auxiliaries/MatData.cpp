@@ -106,21 +106,19 @@ std::string cedar::aux::MatData::getDescription() const
   return description;
 }
 
-void cedar::aux::MatData::serialize(std::ostream& stream) const
+void cedar::aux::MatData::serialize(std::ostream& stream, cedar::aux::SerializationFormat::Id mode) const
 {
-  this->serializeHeader(stream);
+  this->serializeHeader(stream, mode);
   stream << std::endl;
-  this->serializeData(stream);
+  this->serializeData(stream, mode);
 }
 
-void cedar::aux::MatData::deserialize(std::istream& stream)
+void cedar::aux::MatData::deserialize(std::istream& stream, cedar::aux::SerializationFormat::Id mode)
 {
+  //!@todo The serialization mode should be deduced from the header, no need to pass it here.
   // read header
   std::string header;
   std::getline(stream, header);
-
-  std::string data;
-  std::getline(stream, data);
 
   std::vector<std::string> header_entries;
   cedar::aux::split(header, ",", header_entries);
@@ -135,7 +133,13 @@ void cedar::aux::MatData::deserialize(std::istream& stream)
   std::vector<int> sizes;
 
   // read the matrix size
-  for (size_t i = 2; i < header_entries.size(); ++i)
+  size_t offset = 0;
+  if (header_entries.back() == "compact")
+  {
+    offset = 1;
+    CEDAR_NON_CRITICAL_ASSERT(mode == cedar::aux::SerializationFormat::Compact);
+  }
+  for (size_t i = 2; i < header_entries.size() - offset; ++i)
   {
     sizes.push_back(cedar::aux::fromString<int>(header_entries.at(i)));
   }
@@ -143,129 +147,180 @@ void cedar::aux::MatData::deserialize(std::istream& stream)
   cv::Mat mat(static_cast<int>(sizes.size()), &sizes.front(), mat_type);
 
   // read data
-  std::vector<std::string> data_entries;
-  cedar::aux::split(data, ",", data_entries);
-
-  std::vector<int> index(sizes.size(), 0);
-  // currently, not implemented for multiple channels
-  CEDAR_ASSERT(mat.channels() == 1);
-  for (const auto& data_str : data_entries)
+  switch (mode)
   {
-    switch (mat.type())
+    case cedar::aux::SerializationFormat::CSV:
     {
-      case CV_32F:
-        mat.at<float>(&index.front()) = cedar::aux::fromString<float>(data_str);
-        break;
+      std::string data;
+      std::getline(stream, data);
 
-      default:
-        // not implemented for this type
-        CEDAR_ASSERT(false);
-    }
-    ++index[0];
-    for (int i = 0; i < mat.dims - 1; ++i)
-    {
-      if (index[i] >= mat.size[i])
+      std::vector<std::string> data_entries;
+      cedar::aux::split(data, ",", data_entries);
+
+      std::vector<int> index(sizes.size(), 0);
+      // currently, not implemented for multiple channels
+      CEDAR_ASSERT(mat.channels() == 1);
+      for (const auto& data_str : data_entries)
       {
-        index[i] = 0;
-        ++index[i+1];
+        switch (mat.type())
+        {
+          case CV_32F:
+            mat.at<float>(&index.front()) = cedar::aux::fromString<float>(data_str);
+            break;
+
+          default:
+            // not implemented for this type
+            CEDAR_ASSERT(false);
+        }
+        ++index[0];
+        for (int i = 0; i < mat.dims - 1; ++i)
+        {
+          if (index[i] >= mat.size[i])
+          {
+            index[i] = 0;
+            ++index[i+1];
+          }
+        }
       }
-    }
+      break;
+    } // case SERIALIZE_CSV
+
+    case cedar::aux::SerializationFormat::Compact:
+    {
+      // matrix should be a linear array in memory, without gaps
+      CEDAR_DEBUG_ASSERT(mat.isContinuous());
+
+      // make sure the fail bit wasn't false before the operations
+      CEDAR_ASSERT(!stream.fail());
+
+      // initialize string with the appropriate size
+      stream.read(reinterpret_cast<char*>(mat.data), static_cast<size_t>(mat.total() * mat.elemSize()));
+
+      // make sure the fail bit wasn't set by the preceding operations
+      CEDAR_ASSERT(!stream.fail());
+
+      break;
+    } // case SERIALIZE_COMPACT
   }
 
   QWriteLocker locker(this->mpLock);
   this->setData(mat);
 }
 
-void cedar::aux::MatData::serializeData(std::ostream& stream) const
+void cedar::aux::MatData::serializeData(std::ostream& stream, cedar::aux::SerializationFormat::Id mode) const
 {
   QReadLocker locker(this->mpLock);
   //creating index that addresses an element in the n dimensional Mat
-  std::vector<int> index(mData.dims, 0);
 
-  bool first = true;
-  //iterate  as long the last dimension has exceeded
-  while (index[mData.dims-1] < mData.size[mData.dims-1])
+  switch (mode)
   {
-    if (first)
+    case cedar::aux::SerializationFormat::CSV:
     {
-      first = false;
-    }
-    else
-    {
-      stream << ",";
-    }
+      std::vector<int> index(mData.dims, 0);
 
-    // get memory address of the element.
-    uchar* element = mData.data;
-    for (int i = 0; i < mData.dims; i++)
-    {
-      //Addresses an element of the Mat. See OpenCV Documentation.
-      element += mData.step[i]*index[i];
-    }
-    //check data type
-    for (int i = 0; i < mData.channels(); i++)
-    {
-      switch (mData.depth())
+      bool first = true;
+      //iterate  as long the last dimension has exceeded
+      while (index[mData.dims-1] < mData.size[mData.dims-1])
       {
-        case CV_8U:
+        if (first)
         {
-          stream << static_cast<int>(element[i]);
-          break;
+          first = false;
         }
-        case CV_8S:
+        else
         {
-          stream << static_cast<int>(reinterpret_cast<schar*>(element)[i]);
-          break;
+          stream << ",";
         }
-        case CV_16U:
-        {
-          stream << reinterpret_cast<unsigned short*>(element)[i];
-          break;
-        }
-        case CV_16S:
-        {
-          stream << reinterpret_cast<short*>(element)[i];
-          break;
-        }
-        case CV_32S:
-        {
-          stream << reinterpret_cast<int*>(element)[i];
-          break;
-        }
-        case CV_32F:
-        {
-          stream << reinterpret_cast<float*>(element)[i];
-          break;
-        }
-        case CV_64F:
-        {
-          stream << reinterpret_cast<double*>(element)[i];
-          break;
-        }
-      }
-      if (i != mData.channels() - 1)
-      {
-        stream << ",";
-      }
-    }
 
-    //increase index
-	  //!@todo This is slow in multiple ways; a faster approach would be to iterate over the linear memory with a linear index
-    //!@todo Also, we have an iterator class for iterating over a 3d matrix
-    index[0]++;
-    for (int i = 0; i < mData.dims-1; i++)
-    {
-      if (index[i] >= mData.size[i])
-      {
-        index[i] = 0;
-        index[i+1]++;
+        // get memory address of the element.
+        uchar* element = mData.data;
+        for (int i = 0; i < mData.dims; i++)
+        {
+          //Addresses an element of the Mat. See OpenCV Documentation.
+          element += mData.step[i]*index[i];
+        }
+        //check data type
+        for (int i = 0; i < mData.channels(); i++)
+        {
+          switch (mData.depth())
+          {
+            case CV_8U:
+            {
+              stream << static_cast<int>(element[i]);
+              break;
+            }
+            case CV_8S:
+            {
+              stream << static_cast<int>(reinterpret_cast<schar*>(element)[i]);
+              break;
+            }
+            case CV_16U:
+            {
+              stream << reinterpret_cast<unsigned short*>(element)[i];
+              break;
+            }
+            case CV_16S:
+            {
+              stream << reinterpret_cast<short*>(element)[i];
+              break;
+            }
+            case CV_32S:
+            {
+              stream << reinterpret_cast<int*>(element)[i];
+              break;
+            }
+            case CV_32F:
+            {
+              stream << reinterpret_cast<float*>(element)[i];
+              break;
+            }
+            case CV_64F:
+            {
+              stream << reinterpret_cast<double*>(element)[i];
+              break;
+            }
+          }
+          if (i != mData.channels() - 1)
+          {
+            stream << ",";
+          }
+        }
+
+        //increase index
+        //!@todo This is slow in multiple ways; a faster approach would be to iterate over the linear memory with a linear index
+        //!@todo Also, we have an iterator class for iterating over a 3d matrix
+        index[0]++;
+        for (int i = 0; i < mData.dims-1; i++)
+        {
+          if (index[i] >= mData.size[i])
+          {
+            index[i] = 0;
+            index[i+1]++;
+          }
+        }
       }
+      break;
+    } // case SerializationMode::SERIALIZE_CSV
+
+    case cedar::aux::SerializationFormat::Compact:
+    {
+      // we can only handle matrices that are continuous, i.e., those, that are written linearly in memory
+      CEDAR_ASSERT(this->mData.isContinuous());
+      // create a string buffer that will hold the binary representation of all elements
+      std::string buffer(this->mData.elemSize() * this->mData.total(), '\0');
+      for (size_t i = 0; i < mData.total() * this->mData.elemSize(); ++i)
+      {
+        buffer[i] = this->mData.data[i];
+      }
+      stream.write(buffer.c_str(), buffer.size());
+      break;
     }
   }
+
 }
 
-void cedar::aux::MatData::serializeHeader(std::ostream& stream) const
+void cedar::aux::MatData::serializeHeader(std::ostream& stream, cedar::aux::SerializationFormat::Id mode) const
 {
+  //!@todo When any non-default serialization mode is used, this should probably be indicated in the header. Replace Mat by, e.g., CompactMat?
   QReadLocker locker(this->mpLock);
   stream << "Mat" << ",";
   stream << cedar::aux::math::matrixTypeToString(mData) << ",";
@@ -276,6 +331,11 @@ void cedar::aux::MatData::serializeHeader(std::ostream& stream) const
       stream << ",";
     }
     stream << mData.size[i];
+  }
+
+  if (mode == cedar::aux::SerializationFormat::Compact)
+  {
+    stream << ",compact";
   }
 }
 
