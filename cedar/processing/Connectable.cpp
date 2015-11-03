@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/casts.h"
+#include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -1232,4 +1233,56 @@ void cedar::proc::Connectable::emitOutputPropertiesChangedSignal(const std::stri
   {
     CEDAR_THROW(cedar::aux::InvalidNameException, "Tried to emit a signal from an output that does not exist.");
   }
+}
+
+std::map<std::string, cedar::unit::Time> cedar::proc::Connectable::unregisterRecordedData() const
+{
+  std::vector<cedar::proc::DataRole::Id> roles;
+  roles.push_back(cedar::proc::DataRole::BUFFER);
+  roles.push_back(cedar::proc::DataRole::OUTPUT);
+  std::map<std::string, cedar::unit::Time> removed_recorded_data;
+  for (auto role : roles)
+  {
+    // if any data of this step is recorded, we have to remove them from the recorder
+    if (this->hasSlotForRole(role))
+    {
+      // we have to check every buffer if it is registered at recorder
+      for (auto slot : this->getDataSlots(role))
+      {
+        std::string data_path = slot.second->getDataPath().toString();
+        auto data = slot.second->getData();
+        if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(data))
+        {
+          // remember the name and time
+          removed_recorded_data[data_path] = cedar::aux::RecorderSingleton::getInstance()->getRecordIntervalTime(data);
+          cedar::aux::RecorderSingleton::getInstance()->unregisterData(data);
+        }
+      }
+    }
+  }
+  return removed_recorded_data;
+}
+
+bool cedar::proc::Connectable::isRecorded() const
+{
+  std::vector<cedar::proc::DataRole::Id> slotTypes;
+  slotTypes.push_back(cedar::proc::DataRole::BUFFER);
+  slotTypes.push_back(cedar::proc::DataRole::OUTPUT);
+
+  for (unsigned int s = 0; s < slotTypes.size(); s++)
+  {
+
+    if (this->hasSlotForRole(slotTypes[s]))
+    {
+      cedar::proc::Connectable::SlotList dataSlots = this->getOrderedDataSlots(slotTypes[s]);
+      for (unsigned int i = 0; i < dataSlots.size(); i++)
+      {
+        if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(dataSlots[i]->getDataPath().toString()))
+        {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
 }

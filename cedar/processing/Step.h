@@ -271,9 +271,6 @@ public:
     return this->mBusy;
   }
 
-  //! Returns if this step is marked as being recorded.
-  bool isRecorded() const;
-
   //! Returns the last measurement that has been made for the given id.
   cedar::unit::Time getLastTimeMeasurement(unsigned int id) const;
 
@@ -449,8 +446,6 @@ private:
    *
    */
   void callInputConnectionChanged(const std::string& slot);
-
-  std::map<std::string, cedar::unit::Time> unregisterRecordedData() const;
 
   //! Processes all slots that have been changed during the compute call.
   void processChangedSlots();
