@@ -1485,6 +1485,7 @@ void cedar::proc::gui::Group::dataConnectionChanged
             con->disconnect();
             this->mpScene->removeItem(con);
             delete con;
+            return;
           }
         }
       }
