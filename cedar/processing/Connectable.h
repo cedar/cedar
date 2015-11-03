@@ -219,9 +219,11 @@ public:
    */
   virtual void emitOutputPropertiesChangedSignal(const std::string& slot);
 
-
   //! Returns if this step is marked as being recorded.
   bool isRecorded() const;
+  
+  //!@brief Checks if the connectable has a slot with the given role and name.
+  bool hasSlot(DataRole::Id role, const std::string& name, bool lock = true) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -411,9 +413,6 @@ private:
 
   //!@brief Removes a slot from the connectable.
   void removeSlot(DataRole::Id role, const std::string& name);
-
-  //!@brief Checks if the connectable has a slot with the given role and name.
-  bool hasSlot(DataRole::Id role, const std::string& name, bool lock = true) const;
 
   //! Renames a slot.
   void renameSlot(DataRole::Id role, const std::string& oldName, const std::string& newName);
