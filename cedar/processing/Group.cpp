@@ -1112,7 +1112,7 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element, bool destr
   cedar::proc::Group::ElementMap::iterator it = mElements.find(element->getName());
   if (it != this->mElements.end())
   {
-    // disconnect from revalidation signal
+    // disconnect from revalidation signal and recorder
     if (cedar::proc::ConnectablePtr connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(it->second))
     {
       //!@todo Can this be made easier by using scoped_connections?
@@ -1122,6 +1122,9 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element, bool destr
         conn_it->second.disconnect();
         this->mRevalidateConnections.erase(conn_it);
       }
+
+      // remove from recorder
+      connectable->unregisterRecordedData();
     }
     // remove element from triggerables list if it is looped
     auto triggerable = this->getElement<cedar::proc::Triggerable>(element->getName());

@@ -219,6 +219,10 @@ public:
    */
   virtual void emitOutputPropertiesChangedSignal(const std::string& slot);
 
+
+  //! Returns if this step is marked as being recorded.
+  bool isRecorded() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -489,6 +493,8 @@ private:
   SlotMap::const_iterator findSlot(cedar::proc::DataRole::Id role, const std::string& name) const;
 
   void callInputConnectionChangedFor(cedar::proc::DataSlotWeakPtr slot);
+
+  std::map<std::string, cedar::unit::Time> unregisterRecordedData() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals & connections
