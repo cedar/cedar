@@ -44,16 +44,13 @@ int main(int, char**)
 }
 
 #else // CEDAR_COMPILER_MSVC
-// we need to access the internals of the class here, specifically the widget
-#define private public
-#define protected public
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/DoubleVectorParameter.h"
+#include "DoubleVectorParameter.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
-#include "cedar/auxiliaries/gui/IntVectorParameter.h"
+#include "IntVectorParameter.h"
 #include "cedar/auxiliaries/IntVectorParameter.h"
-#include "cedar/auxiliaries/gui/UIntVectorParameter.h"
+#include "UIntVectorParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -71,7 +68,7 @@ bool testEquality(boost::intrusive_ptr<ParameterType> parameter, WidgetType* pWi
 {
   typedef typename WidgetType::WidgetAbstraction WidgetAbstraction;
 
-  if (parameter->size() != pWidget->mWidgets.size())
+  if (parameter->size() != pWidget->size())
   {
     std::cout << "Parameter and widget don't have the same size." << std::endl;
     return false;
@@ -81,7 +78,7 @@ bool testEquality(boost::intrusive_ptr<ParameterType> parameter, WidgetType* pWi
   for (size_t i = 0; i < parameter->size(); ++i)
   {
     typename WidgetType::ValueType parameter_value = parameter->at(i);
-    typename WidgetType::ValueType widget_value = WidgetAbstraction::getValue(pWidget->mWidgets[i]);
+    typename WidgetType::ValueType widget_value = WidgetAbstraction::getValue(pWidget->widgetAt(i));
     if (parameter_value != widget_value)
     {
       std::cout << "Parameter and widget differ in entry " << i << ": "
@@ -108,7 +105,18 @@ int testWidgetSpecifics(QDoubleSpinBox* pWidget)
 
   pWidget->setDecimals(4);
   pWidget->setValue(1.0);
-  pWidget->lineEdit()->setText("2.4");
+
+  // since we cannot access the line edit directly, try to get there by using the children
+  const auto& children = pWidget->children();
+  for (int i = 0; i < children.size(); ++i)
+  {
+    if (auto* line_edit = dynamic_cast<QLineEdit*>(children.at(i)))
+    {
+      line_edit->setText("2.4");
+      break;
+    }
+  }
+  //pWidget->lineEdit()->setText("2.4");
 
   // check that the widget doesn't interfere with typing by the user
   if (pWidget->text() != "2.4")
@@ -164,7 +172,7 @@ int test_parameter(T initialValue, size_t initialSize, T firstValue, T min, T ma
   }
 
   std::cout << "Setting value of first entry in the widget" << std::endl;
-  WidgetType::WidgetAbstraction::setValue(p_widget->mWidgets[0], firstValue);
+  WidgetType::WidgetAbstraction::setValue(p_widget->widgetAt(0), firstValue);
   if (!testEquality<ParameterType, WidgetType>(parameter, p_widget))
   {
     ++errors;
@@ -186,17 +194,17 @@ int test_parameter(T initialValue, size_t initialSize, T firstValue, T min, T ma
 
   std::cout << "Making parameter constant" << std::endl;
   parameter->setConstant(true);
-  for (size_t i = 0; i < p_widget->mWidgets.size(); ++i)
+  for (size_t i = 0; i < p_widget->size(); ++i)
   {
-    if (p_widget->mWidgets[i]->isEnabled())
+    if (p_widget->widgetAt(i)->isEnabled())
     {
       std::cout << "Widget " << i << " was not disabled properly." << std::endl;
       ++errors;
     }
   }
 
-  CEDAR_ASSERT(!p_widget->mWidgets.empty());
-  errors += testWidgetSpecifics(p_widget->mWidgets[0]);
+  CEDAR_ASSERT(!p_widget->empty());
+  errors += testWidgetSpecifics(p_widget->widgetAt(0));
 
   //!@todo Check that changing the value is impossible while the parameter is const
 
@@ -204,21 +212,21 @@ int test_parameter(T initialValue, size_t initialSize, T firstValue, T min, T ma
   parameter->setMinimum(min);
   parameter->setMaximum(max);
 
-  for (size_t i = 0; i < p_widget->mWidgets.size(); ++i)
+  for (size_t i = 0; i < p_widget->size(); ++i)
   {
-    if (static_cast<T>(p_widget->mWidgets[i]->minimum()) != min)
+    if (static_cast<T>(p_widget->widgetAt(i)->minimum()) != min)
     {
-      std::cout << "Wrong min in widget " << i << "; is: " << p_widget->mWidgets[i]->minimum()
+      std::cout << "Wrong min in widget " << i << "; is: " << p_widget->widgetAt(i)->minimum()
                 << ", should be: " << min << std::endl;
       ++errors;
     }
   }
 
-  for (size_t i = 0; i < p_widget->mWidgets.size(); ++i)
+  for (size_t i = 0; i < p_widget->size(); ++i)
   {
-    if (static_cast<T>(p_widget->mWidgets[i]->maximum()) != max)
+    if (static_cast<T>(p_widget->widgetAt(i)->maximum()) != max)
     {
-      std::cout << "Wrong min in widget " << i << "; is: " << p_widget->mWidgets[i]->maximum()
+      std::cout << "Wrong min in widget " << i << "; is: " << p_widget->widgetAt(i)->maximum()
                 << ", should be: " << max << std::endl;
       ++errors;
     }
@@ -263,7 +271,7 @@ int main(int argc, char** argv)
   errors += test_parameter
       <
         cedar::aux::DoubleVectorParameter,
-        cedar::aux::gui::DoubleVectorParameter,
+        DoubleVectorParameter,
         double
       >(1.0, 2, 2.0, -10.0, 10.0, 1100.0, 1200.0, 1150.0);
 
@@ -271,7 +279,7 @@ int main(int argc, char** argv)
   errors += test_parameter
       <
         cedar::aux::IntVectorParameter,
-        cedar::aux::gui::IntVectorParameter,
+        IntVectorParameter,
         int
       >(1, 2, 2, -10, 10, 1000, 1200, 1100);
 
@@ -279,7 +287,7 @@ int main(int argc, char** argv)
   errors += test_parameter
       <
         cedar::aux::UIntVectorParameter,
-        cedar::aux::gui::UIntVectorParameter,
+        UIntVectorParameter,
         unsigned int
       >(1, 2, 2, 10, 15, 1000, 1200, 1100);
 
