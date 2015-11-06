@@ -141,10 +141,6 @@ public slots:
    */
   void notify(const QString& message);
 
-  /*!@brief Changes the mode back to select when an architecture tool is finished.
-   */
-  void architectureToolFinished();
-  
   /*!@brief Slot that is connected to the start/pause simulation action.
    */
   void startPauseSimulationClicked();
