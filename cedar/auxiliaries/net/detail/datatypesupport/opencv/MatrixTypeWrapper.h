@@ -68,33 +68,50 @@ template <>
 inline void* MatrixTypeWrapper<cv::Mat>::contentAt(int index, int elemSize) const
                 // specialization for class template
 {
-  return (void*) &( mData.ptr( index % mHeader.mRows )[ (index 
-                                                     - ( index 
-                                                        % mHeader.mRows) )
-                                                     / mHeader.mRows 
-                                                     * elemSize] );
-
+//  return (void*) &( mData.ptr( index % mHeader.mRows )[ (index
+//                                                     - ( index
+//                                                        % mHeader.mRows) )
+//                                                     / mHeader.mRows
+//                                                     * elemSize] );
+  //!@todo Does this work?
+  return (void*) &(mData.data[index * elemSize]);
 }
 
 template <>
 inline cv::Mat MatrixTypeWrapper<cv::Mat>::lateInitDataFromHeader()
 {
-  return cv::Mat( mHeader.mRows,
-                    mHeader.mColumns, 
+//  return cv::Mat( mHeader.mRows,
+//                    mHeader.mColumns,
+//                    mHeader.mCVMatType, 0.0);
+  if (mHeader.mDims < 2)
+  {
+    return cv::Mat( mHeader.mSizes[0],
+                    mHeader.mSizes[1],
                     mHeader.mCVMatType, 0.0);
+  }
+  else
+  {
+    return cv::Mat( mHeader.mDims,
+                    &mHeader.mSizes.front(),
+                    mHeader.mCVMatType, 0.0);
+  }
+}
+
+template <>
+inline unsigned int MatrixTypeWrapper<cv::Mat>::getElementCount() const
+{
+  unsigned int size = 1;
+  for (size_t i = 0; i < mHeader.mSizes.size(); ++i)
+  {
+    size *= static_cast<unsigned int>(mHeader.mSizes.at(i));
+  }
+  return size;
 }
 
 template <>
 inline unsigned int MatrixTypeWrapper<cv::Mat>::getDataSize() const
 {
-  return mHeader.mElementSize * mHeader.mRows * mHeader.mColumns;
-}
-
-
-template <>
-inline unsigned int MatrixTypeWrapper<cv::Mat>::getElementCount() const
-{
-  return mHeader.mRows * mHeader.mColumns;
+  return mHeader.mElementSize * this->getElementCount();
 }
 
 template <>
@@ -117,33 +134,52 @@ template <>
 inline void* MatrixTypeWrapper< cv::Mat_<float> >::contentAt(int index, int) const
                 // specialization for class template
 {
-  return (void*)  &mData( ( index % mHeader.mRows ),
-                         ( index 
-                             - ( index 
-                                 % mHeader.mRows) )
-                         / mHeader.mRows 
-                         );
+//  return (void*)  &mData( ( index % mHeader.mRows ),
+//                         ( index
+//                             - ( index
+//                                 % mHeader.mRows) )
+//                         / mHeader.mRows
+//                         );
+  return (void*) &mData.data[index * mHeader.mElementSize];
 }
 
 template <>
 inline cv::Mat_<float> MatrixTypeWrapper< cv::Mat_<float> >::lateInitDataFromHeader()
 {
-  return cv::Mat_<float>( mHeader.mRows,
-                          mHeader.mColumns );
-}
-
-template <>
-inline unsigned int MatrixTypeWrapper< cv::Mat_<float> >::getDataSize() const
-{
-  return mHeader.mElementSize * mHeader.mRows * mHeader.mColumns;
+//  return cv::Mat_<float>( mHeader.mRows,
+//                          mHeader.mColumns );
+  if (mHeader.mDims < 2)
+  {
+    return cv::Mat_<float>(mHeader.mSizes[0],
+                    mHeader.mSizes[1],
+                    0.0);
+  }
+  else
+  {
+    return cv::Mat_<float>(mHeader.mDims,
+                    &mHeader.mSizes.front(),
+                    0.0);
+  }
 }
 
 
 template <>
 inline unsigned int MatrixTypeWrapper< cv::Mat_<float> >::getElementCount() const
 {
-  return mHeader.mRows * mHeader.mColumns;
+  unsigned int size = 1;
+  for (size_t i = 0; i < mHeader.mSizes.size(); ++i)
+  {
+    size *= static_cast<unsigned int>(mHeader.mSizes.at(i));
+  }
+  return size;
 }
+
+template <>
+inline unsigned int MatrixTypeWrapper< cv::Mat_<float> >::getDataSize() const
+{
+  return mHeader.mElementSize * this->getElementCount();
+}
+
 
 
 //!@endcond

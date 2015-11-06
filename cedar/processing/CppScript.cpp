@@ -66,13 +66,33 @@ mRunCaller(new cedar::aux::CallFunctionInThread(boost::bind(&cedar::proc::CppScr
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::CppScript::setStatus(const std::string& status)
+{
+  QWriteLocker l(this->mStatus.getLockPtr());
+  this->mStatus.member() = status;
+  l.unlock();
+
+  emit statusChanged(QString::fromStdString(status));
+}
+
+std::string cedar::proc::CppScript::getStatus() const
+{
+  QReadLocker l(this->mStatus.getLockPtr());
+  std::string copy = this->mStatus.member();
+  l.unlock();
+
+  return copy;
+}
+
 void cedar::proc::CppScript::emitScriptStartedSignal()
 {
+  this->setStatus("Script started.");
   emit scriptStarted();
 }
 
 void cedar::proc::CppScript::threadStopped()
 {
+  this->setStatus("Script stopped.");
   this->setStopRequested(false);
   emit scriptStopped();
 }
