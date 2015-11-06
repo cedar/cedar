@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        IntVectorParameter.cpp
+    File:        main.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 03 12
+    Date:        2012 01 31
 
     Description:
 
@@ -35,39 +35,26 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "IntVectorParameter.h"
-#include "cedar/auxiliaries/IntVectorParameter.h"
-#include "cedar/auxiliaries/assert.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
-#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/processing/sources/Noise.h"
 
 // SYSTEM INCLUDES
+#include <QApplication>
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-IntVectorParameter::IntVectorParameter(QWidget *pParent)
-:
-cedar::aux::gui::IntVectorParameter(pParent)
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // methods
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-bool IntVectorParameter::empty() const
+int main()
 {
-  return this->mWidgets.empty();
-}
+  while (true)
+  {
+    // this causes a memory leak somewhere within the connections established in cedar::proc::Connectable::declareData.
+    // When all the code in there is commented out, this program no longer leaks. Some of it could probably be fixed
+    // by using scoped_connections there to actually disconnect the connections created there, however, there seems to
+    // be an issue with the way boost deallocates memory referenced in signals (see
+    // https://svn.boost.org/trac/boost/ticket/8533)
+    cedar::proc::sources::Noise noise_test;
+  }
 
-unsigned int IntVectorParameter::size() const
-{
-  return this->mWidgets.size();
-}
-
-QSpinBox* IntVectorParameter::widgetAt(int i)
-{
-  return this->mWidgets.at(i);
+  return 0;
 }

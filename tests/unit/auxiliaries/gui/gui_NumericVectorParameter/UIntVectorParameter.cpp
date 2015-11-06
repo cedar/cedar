@@ -67,7 +67,7 @@ bool UIntVectorParameter::empty() const
   return this->mWidgets.empty();
 }
 
-int UIntVectorParameter::size() const
+unsigned int UIntVectorParameter::size() const
 {
   return this->mWidgets.size();
 }
