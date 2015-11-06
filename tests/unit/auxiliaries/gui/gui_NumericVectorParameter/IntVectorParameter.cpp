@@ -62,7 +62,7 @@ bool IntVectorParameter::empty() const
   return this->mWidgets.empty();
 }
 
-int IntVectorParameter::size() const
+unsigned int IntVectorParameter::size() const
 {
   return this->mWidgets.size();
 }

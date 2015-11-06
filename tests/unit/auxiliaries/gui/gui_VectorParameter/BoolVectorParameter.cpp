@@ -70,7 +70,7 @@ cedar::aux::gui::BoolVectorParameter(pParent)
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-int BoolVectorParameter::size() const
+unsigned int BoolVectorParameter::size() const
 {
   return this->mWidgets.size();
 }

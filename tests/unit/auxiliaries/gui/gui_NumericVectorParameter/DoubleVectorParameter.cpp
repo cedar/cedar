@@ -64,7 +64,7 @@ bool DoubleVectorParameter::empty() const
   return this->mWidgets.empty();
 }
 
-int DoubleVectorParameter::size() const
+unsigned int DoubleVectorParameter::size() const
 {
   return this->mWidgets.size();
 }
