@@ -38,9 +38,6 @@
 
 #ifdef CEDAR_USE_FFTW
 
-// DO NOT DO THIS ANYWHERE ELSE THAN IN UNIT TESTS - THE ONLY PURPOSE OF THIS LINE IS TO UNIT TEST A PRIVATE FUNCTION!!!
-#define private public
-
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/convolution/FFTW.h"
@@ -51,12 +48,26 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
+class FFTW : public cedar::aux::conv::FFTW
+{
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //!@brief adjusts the size of the kernel (to matrix size) and flips sectors
+    cv::Mat padTheKernel(const cv::Mat& matrix, const cv::Mat& kernel) const
+    {
+      return cedar::aux::conv::FFTW::padKernel(matrix,kernel);
+    }
+}; // FFTW
+CEDAR_GENERATE_POINTER_TYPES(FFTW);
+
 class Convolve3DTestThread : public cedar::aux::LoopedThread
 {
   public:
     Convolve3DTestThread()
     :
-    mFftw(new cedar::aux::conv::FFTW())
+    mFftw(new FFTW())
     {
       // step once to create the plan
       this->step(cedar::unit::Time(0.0 * cedar::unit::seconds));
@@ -71,7 +82,7 @@ class Convolve3DTestThread : public cedar::aux::LoopedThread
       cv::Mat result_3D = this->mFftw->convolve(matrix_3D, kernel_3D, cedar::aux::conv::BorderType::Cyclic);
     }
 
-    cedar::aux::conv::FFTWPtr mFftw;
+    FFTWPtr mFftw;
 };
 CEDAR_GENERATE_POINTER_TYPES(Convolve3DTestThread);
 
@@ -105,7 +116,7 @@ void run_test()
   int errors = 0;
   // the current test number
   int test_number = 0;
-  cedar::aux::conv::FFTWPtr fftw(new cedar::aux::conv::FFTW());
+  FFTWPtr fftw(new FFTW());
   // test stuff
   std::cout << "test no " << test_number++ << ": generic convolution test for 2-5 dimension(s)" << std::endl;
   cv::Mat matrix = cv::Mat::ones(50, 1, CV_64F);
@@ -139,7 +150,7 @@ void run_test()
   cv::Mat matrix_pad = cv::Mat::ones(6, 1, CV_64F);
   cv::Mat kernel_pad = cv::Mat::ones(3, 1, CV_64F);
   kernel_pad.at<double>(1,0) = 2.0;
-  cv::Mat padded = fftw->padKernel(matrix_pad, kernel_pad);
+  cv::Mat padded = fftw->padTheKernel(matrix_pad, kernel_pad);
   cv::Mat pad_check = (cv::Mat_<double>(6, 1) << 2.0, 1.0, 0.0, 0.0, 0.0, 1.0);
   bool different = false;
   for (int i = 0; i < padded.rows; ++i)
@@ -158,7 +169,7 @@ void run_test()
   matrix_pad = cv::Mat::ones(7, 1, CV_64F);
   kernel_pad = cv::Mat::ones(3, 1, CV_64F);
   kernel_pad.at<double>(1,0) = 2.0;
-  padded = fftw->padKernel(matrix_pad, kernel_pad);
+  padded = fftw->padTheKernel(matrix_pad, kernel_pad);
   pad_check = (cv::Mat_<double>(7, 1) << 2.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
   different = false;
   for (int i = 0; i < padded.rows; ++i)
@@ -178,7 +189,7 @@ void run_test()
   kernel_pad = cv::Mat::ones(4, 1, CV_64F);
   kernel_pad.at<double>(1,0) = 2.0;
   kernel_pad.at<double>(2,0) = 3.0;
-  padded = fftw->padKernel(matrix_pad, kernel_pad);
+  padded = fftw->padTheKernel(matrix_pad, kernel_pad);
   pad_check = (cv::Mat_<double>(6, 1) << 3.0, 1.0, 0.0, 0.0, 1.0, 2.0);
   different = false;
   for (int i = 0; i < padded.rows; ++i)
@@ -198,7 +209,7 @@ void run_test()
   kernel_pad = cv::Mat::ones(4, 1, CV_64F);
   kernel_pad.at<double>(1,0) = 2.0;
   kernel_pad.at<double>(2,0) = 3.0;
-  padded = fftw->padKernel(matrix_pad, kernel_pad);
+  padded = fftw->padTheKernel(matrix_pad, kernel_pad);
   pad_check = (cv::Mat_<double>(7, 1) << 3.0, 1.0, 0.0, 0.0, 0.0, 1.0, 2.0);
   different = false;
   for (int i = 0; i < padded.rows; ++i)
@@ -226,7 +237,7 @@ void run_test()
   }
   matrix_pad = cv::Mat(3, sizes, CV_32F);
   kernel_pad = cv::Mat(3, sizes_kernel, CV_32F);
-  padded = fftw->padKernel(matrix_pad, kernel_pad);
+  padded = fftw->padTheKernel(matrix_pad, kernel_pad);
 
   multi_thread_test();
 

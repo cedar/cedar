@@ -69,13 +69,24 @@ drop us a message if you are experiencing any problems.
 ### Ubuntu
 
 We provide a Debian meta-package, which installs all dependencies you need
-to compile cedar under Ubuntu. For the versions 12.04, 12.10, and 13.04, the following package can be downloaded from our bitbucket page.
+to compile cedar under Ubuntu. Please pick a download from below that fits to your Ubuntu version.
+(these packages also work on different Linux derivates of similar recency, e.g., Mint and Debian)
+
+For versions < 12.04, the following package can be downloaded from our bitbucket page:
+
+    wget https://bitbucket.org/cedar/dependencies/downloads/cedar-dependencies.deb 
+
+For the versions 12.04, 12.10, and 13.04, the following package can be downloaded from our bitbucket page:
 
     wget https://bitbucket.org/cedar/dependencies/downloads/cedar-dependencies-ubuntu12.xx.deb
 
-For version 13.10, you need a different package since the depending package names have changed.
+For versions 13.10 - 15.04, the following package can be downloaded from our bitbucket page:
 
     wget https://bitbucket.org/cedar/dependencies/downloads/cedar-dependencies-ubuntu13.10.deb
+    
+For version 15.10, you need a different package since the depending package names have changed:
+
+    wget https://bitbucket.org/cedar/dependencies/downloads/cedar-dependencies-ubuntu15.10.deb    
 
 You will need a program like gdebi to install the package. gdebi is able to
 install local Debian packages while taking into consideration its dependencies
