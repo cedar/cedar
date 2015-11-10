@@ -45,6 +45,7 @@
 #include "cedar/processing/gui/Connectable.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/Group.h"
+#include "cedar/auxiliaries/LockableMember.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/DataSlotItem.fwd.h"

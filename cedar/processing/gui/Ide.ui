@@ -163,7 +163,7 @@
    <addaction name="mpMenuArchitectureScripts"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="mpStatusBar"/>
   <widget class="QDockWidget" name="mpItemsWidget">
    <property name="features">
     <set>QDockWidget::DockWidgetFeatureMask</set>
@@ -244,8 +244,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -302,8 +302,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>254</width>
-              <height>429</height>
+              <width>98</width>
+              <height>28</height>
              </rect>
             </property>
             <property name="palette">

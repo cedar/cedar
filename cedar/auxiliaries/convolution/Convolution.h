@@ -108,6 +108,9 @@ public:
     return this->getEngine()->convolve(matrix, this->getBorderType(), this->getMode());
   }
 
+  //! Checks whether the convolution engine can convolve the given matrices with the parameters set in this convolution.
+  bool canConvolve(const cv::Mat& matrix, const cv::Mat& kernel) const;
+
   /*!@brief Convolves two matrices with each other using the selected engine of the convolution object.
    *
    * @param matrix The matrix to be convolved.
