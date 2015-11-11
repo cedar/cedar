@@ -73,6 +73,7 @@ Unreleased
   - Architecture scripts can now set a status that is displayed in the script manager.
   - Architecture widgets can now add buttons for calling step actions.
   - When steps go into warning/error states, the GUI now indicates this in the status bar.
+  - Deprecated the Noise source - it is misleading when using any kind of Euler integration.
 - cedar::aux
   - Added an option to save the image displayed in an image plot to its right-click menu.
   - The netreader/writers now support matrices of arbitrary dimensionality (issue #248). Unfortunately, this means that
