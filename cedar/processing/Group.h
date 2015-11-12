@@ -597,9 +597,6 @@ public:
   // onStop enables the isLooped parameter
   void onStop();
 
-  //!@brief Returns whether this step should automatically be connected to done triggers when data is connected.
-  bool isLooped() const;
-
   //!@brief this function removes all unused connectors, i.e., connectors that have zero incoming or outgoing connections
   void pruneUnusedConnectors();
 
@@ -715,6 +712,10 @@ protected:
    * @param slot The slot to revalidate.
    */
   void revalidateInputSlot(const std::string& slot);
+
+  signals:
+    //!@brief notify others of loopiness change
+    void loopedChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -907,7 +908,9 @@ protected:
   //! map of all external connectors of this group
   ConnectorMapParameterPtr _mConnectors;
 
-  //! loopiness of this group
+  /*! this parameter is kept to maintain compatibility with older cedar versions - it is no longer needed
+   *  because groups now automatically determine if they are looped
+   */
   cedar::aux::BoolParameterPtr _mIsLooped;
 
   cedar::aux::DoubleParameterPtr _mTimeFactor;

@@ -1150,7 +1150,7 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element, bool destr
 
     if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(it->second))
     {
-      group->getParameter("is looped").get()->disconnect(SIGNAL(valueChanged()), this, SLOT(onLoopedChanged()));
+      group.get()->disconnect(SIGNAL(loopedChanged()), this, SLOT(onLoopedChanged()));
       QObject::disconnect(group.get(), SIGNAL(triggerableStateCountsChanged()), this, SIGNAL(triggerableStateCountsChanged()));
     }
 
@@ -1517,7 +1517,7 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
 
   if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
   {
-    QObject::connect(group->getParameter("is looped").get(), SIGNAL(valueChanged()), this, SLOT(onLoopedChanged()));
+    QObject::connect(group.get(), SIGNAL(loopedChanged()), this, SLOT(onLoopedChanged()));
     QObject::connect(group.get(), SIGNAL(triggerableStateCountsChanged()), this, SIGNAL(triggerableStateCountsChanged()));
   }
 }
@@ -2895,7 +2895,6 @@ void cedar::proc::Group::readLinkedGroup(const std::string& groupName, const ced
       group_node.put("name", this->getUniqueIdentifier(this->getName()));
 
       this->readConfiguration(group_node);
-      this->_mIsLooped->setConstant(true);
     }
     catch (const boost::property_tree::ptree_bad_path&)
     {
@@ -3010,13 +3009,12 @@ cedar::proc::ElementPtr cedar::proc::Group::importStepFromFile(const std::string
 
 void cedar::proc::Group::setIsLooped(bool looped)
 {
-  this->_mIsLooped->setValue(looped);
+  this->mIsLooped = looped;
+  emit loopedChanged();
 }
 
 void cedar::proc::Group::onStart()
 {
-  this->_mIsLooped->setConstant(true);
-
   // if we get to this point, set the state to running
   this->setState(cedar::proc::Triggerable::STATE_RUNNING, "");
   for (auto element : this->mElements)
@@ -3030,7 +3028,6 @@ void cedar::proc::Group::onStart()
 
 void cedar::proc::Group::onStop()
 {
-  this->_mIsLooped->setConstant(false);
   // if we get to this point, set the state to running
   this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING, "");
   for (auto element : this->mElements)
@@ -3040,11 +3037,6 @@ void cedar::proc::Group::onStop()
       triggerable->callOnStop();
     }
   }
-}
-
-bool cedar::proc::Group::isLooped() const
-{
-  return this->_mIsLooped->getValue();
 }
 
 void cedar::proc::Group::pruneUnusedConnectors()
@@ -3138,7 +3130,7 @@ void cedar::proc::Group::onLoopedChanged()
       {
         // get the bool parameter
         auto triggerable = this->getElement<cedar::proc::Triggerable>(element->getName());
-//        auto is_looped = it->second->getParameter<cedar::aux::BoolParameter>("is looped");
+
         auto is_looped = triggerable->isLooped();
         // check whether we have to add or remove the element from the list of triggerables
         if (is_looped) // add
