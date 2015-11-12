@@ -340,6 +340,7 @@ void cedar::proc::gui::StepItem::setRecorded(bool status)
 	  if (this->mpRecordedDecoration)
 	  {
 	    this->removeDecoration(this->mpRecordedDecoration);
+	    this->mpRecordedDecoration.reset();
 	  }
 	}
 }
