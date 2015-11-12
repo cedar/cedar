@@ -1,0 +1,27 @@
+/*!
+
+@page ReleasesConcept Release work flow
+
+This page is dedicated to our work flow and how it leads to releases.
+
+@section FeatureLifetime The lifetime of a new feature 
+
+New features are first developed in private development branches until all interfaces have been decided on and the code 
+of the new feature is ready for a peer review. After this review done by senior cedar developers and subsequent code improvements,
+it is pushed into the repository <a href="http://www.bitbucket.org/cedar/development" title="cedar development">cedar development</a>.
+ This repository will always contain the newest code. However, if you use it, be aware that its interfaces may still change before a new release.
+New features will remain in "cedar development" until all features planned for the next version have been completed. We
+will then release a new version and push that version to the repository
+<a href="http://www.bitbucket.org/cedar/release" title="cedar release">cedar release</a>.
+As we release whenever a set of certain new features is finished, the length of release cycles is not fixed and may vary
+considerably. 
+
+@section VersionNumbers Version numbers
+cedar uses a version number comprised of three numbers: "major.minor.bugfix". When we need to fix a critical bug in cedar release, the bugfix number is increased
+by one. Each time a new feature is introduced in cedar release, we increase the minor number by one and reset the bugfix counter to zero.
+The major number is increased at will, whenever we feel cedar has progressed to "the next level", resetting both minor and bugfix counter. 
+
+@section VersionNames Version names
+Each new major release comes with a new alias. You can find a history of releases on our <a href="http://cedar.ini.rub.de/versions.html" title="versions">versions</a> page . 
+
+*/
