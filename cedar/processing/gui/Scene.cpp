@@ -338,6 +338,21 @@ void cedar::proc::gui::Scene::helpEvent(QGraphicsSceneHelpEvent* pHelpEvent)
 
 void cedar::proc::gui::Scene::exportSvg(const QString& file)
 {
+  std::vector<cedar::proc::gui::ConnectableIconView*> views;
+  for (auto item : this->items())
+  {
+    if (auto view = dynamic_cast<cedar::proc::gui::ConnectableIconView*>(item))
+    {
+      views.push_back(view);
+    }
+  }
+
+  // some item views need to make preparations for svg export, especially the DefaultConnectableIconView
+  for (auto view : views)
+  {
+    view->prepareSvgExport();
+  }
+
   QSvgGenerator generator;
   generator.setFileName(file);
   QRectF scene_rect = this->sceneRect();
@@ -347,6 +362,12 @@ void cedar::proc::gui::Scene::exportSvg(const QString& file)
   painter.begin(&generator);
   this->render(&painter);
   painter.end();
+
+
+  for (auto view : views)
+  {
+    view->unprepareSvgExport();
+  }
 }
 
 void cedar::proc::gui::Scene::setConfigurableWidget(cedar::aux::gui::Configurable* pConfigurableWidget)

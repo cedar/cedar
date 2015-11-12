@@ -126,8 +126,8 @@ void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& i
   bool output_changed = false;
   if (!this->mInput)
   {
+    output_changed = !this->mOutput->getData().empty();
     this->mOutput->setData(cv::Mat());
-    output_changed = true;
   }
   else
   {

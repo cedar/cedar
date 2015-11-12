@@ -219,6 +219,9 @@ public:
    */
   virtual void emitOutputPropertiesChangedSignal(const std::string& slot);
 
+  //! Returns if this step is marked as being recorded.
+  bool isRecorded() const;
+  
   //!@brief Checks if the connectable has a slot with the given role and name.
   bool hasSlot(DataRole::Id role, const std::string& name, bool lock = true) const;
 
@@ -489,6 +492,8 @@ private:
   SlotMap::const_iterator findSlot(cedar::proc::DataRole::Id role, const std::string& name) const;
 
   void callInputConnectionChangedFor(cedar::proc::DataSlotWeakPtr slot);
+
+  std::map<std::string, cedar::unit::Time> unregisterRecordedData() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals & connections

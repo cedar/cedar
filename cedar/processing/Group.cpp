@@ -164,6 +164,8 @@ cedar::proc::Group::Group()
 :
 Triggerable(false),
 mHoldTriggerChainUpdates(false),
+mTriggerablesInWarningStates(0),
+mTriggerablesInErrorStates(0),
 _mConnectors(new ConnectorMapParameter(this, "connectors", ConnectorMap())),
 _mIsLooped(new cedar::aux::BoolParameter(this, "is looped", false)),
 _mTimeFactor(new cedar::aux::DoubleParameter(this, "time factor", 1.0, cedar::aux::DoubleParameter::LimitType::positiveZero()))
@@ -198,6 +200,111 @@ cedar::proc::Group::~Group()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::Group::uncountTriggerableState(cedar::proc::ConstTriggerablePtr triggerable)
+{
+  // if the triggerable's state was previously known, remove it from the count
+  auto iter = this->mPreviousTriggerableStates.find(triggerable);
+  if (iter != this->mPreviousTriggerableStates.end())
+  {
+    auto prev_state = iter->second;
+    this->mPreviousTriggerableStates.erase(iter);
+
+    switch (prev_state)
+    {
+      case cedar::proc::Triggerable::STATE_EXCEPTION:
+      case cedar::proc::Triggerable::STATE_EXCEPTION_ON_START:
+      case cedar::proc::Triggerable::STATE_NOT_RUNNING:
+      {
+        QWriteLocker l(this->mTriggerablesInErrorStates.getLockPtr());
+        this->mTriggerablesInErrorStates.member() -= 1;
+        break;
+      }
+
+      case cedar::proc::Triggerable::STATE_INITIALIZING:
+      {
+        QWriteLocker l(this->mTriggerablesInWarningStates.getLockPtr());
+        this->mTriggerablesInWarningStates.member() -= 1;
+        break;
+      }
+
+      default:
+        // other states are not counted
+        CEDAR_DEBUG_NON_CRITICAL_ASSERT(false);
+        return;
+    }
+  }
+}
+
+void cedar::proc::Group::triggerableStateChanged(cedar::proc::TriggerableWeakPtr weakTriggerable)
+{
+  auto triggerable = weakTriggerable.lock();
+  CEDAR_DEBUG_NON_CRITICAL_ASSERT(triggerable);
+  if (!triggerable)
+  {
+    return;
+  }
+  auto state = triggerable->getState();
+
+  // if the triggerable was previously known, remove it from the count
+  this->uncountTriggerableState(triggerable);
+
+  // add the triggerable to the counts based on its current state
+  switch (state)
+  {
+    case cedar::proc::Triggerable::STATE_EXCEPTION:
+    case cedar::proc::Triggerable::STATE_EXCEPTION_ON_START:
+    case cedar::proc::Triggerable::STATE_INITIALIZING:
+    case cedar::proc::Triggerable::STATE_NOT_RUNNING:
+      if (state == cedar::proc::Triggerable::STATE_INITIALIZING)
+      {
+        QWriteLocker l(this->mTriggerablesInWarningStates.getLockPtr());
+        this->mTriggerablesInWarningStates.member() += 1;
+      }
+      else
+      {
+        QWriteLocker l(this->mTriggerablesInErrorStates.getLockPtr());
+        this->mTriggerablesInErrorStates.member() += 1;
+      }
+      this->mPreviousTriggerableStates[triggerable] = state;
+      break;
+
+    case cedar::proc::Triggerable::STATE_RUNNING:
+    case cedar::proc::Triggerable::STATE_UNKNOWN:
+        // these states are not communicated to the user -- do nothing
+        break;
+  }
+
+  emit triggerableStateCountsChanged();
+}
+
+unsigned int cedar::proc::Group::getTriggerablesInWarningStateCount() const
+{
+  QReadLocker l(this->mTriggerablesInWarningStates.getLockPtr());
+  unsigned int copy = this->mTriggerablesInWarningStates.member();
+  l.unlock();
+
+  for (auto group : this->findAll<cedar::proc::Group>(true))
+  {
+    copy += group->getTriggerablesInWarningStateCount();
+  }
+
+  return copy;
+}
+
+unsigned int cedar::proc::Group::getTriggerablesInErrorStateCount() const
+{
+  QReadLocker l(this->mTriggerablesInErrorStates.getLockPtr());
+  unsigned int copy = this->mTriggerablesInErrorStates.member();
+  l.unlock();
+
+  for (auto group : this->findAll<cedar::proc::Group>(false))
+  {
+    copy += group->getTriggerablesInErrorStateCount();
+  }
+
+  return copy;
+}
 
 void cedar::proc::Group::applyTimeFactor()
 {
@@ -1005,7 +1112,7 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element, bool destr
   cedar::proc::Group::ElementMap::iterator it = mElements.find(element->getName());
   if (it != this->mElements.end())
   {
-    // disconnect from revalidation signal
+    // disconnect from revalidation signal and recorder
     if (cedar::proc::ConnectablePtr connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(it->second))
     {
       //!@todo Can this be made easier by using scoped_connections?
@@ -1015,6 +1122,9 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element, bool destr
         conn_it->second.disconnect();
         this->mRevalidateConnections.erase(conn_it);
       }
+
+      // remove from recorder
+      connectable->unregisterRecordedData();
     }
     // remove element from triggerables list if it is looped
     auto triggerable = this->getElement<cedar::proc::Triggerable>(element->getName());
@@ -1027,18 +1137,38 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element, bool destr
         triggerable->callOnStop();
       }
       this->mLoopedTriggerables.member().erase(item);
+
+      // check if there are any remaining looped triggerables - if not, set group to non-looped
+      if (this->mLoopedTriggerables.member().empty())
+      {
+        looped_lock.unlock();
+        this->setIsLooped(false);
+        looped_lock.relock();
+      }
     }
     looped_lock.unlock();
 
     if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(it->second))
     {
       group->getParameter("is looped").get()->disconnect(SIGNAL(valueChanged()), this, SLOT(onLoopedChanged()));
+      QObject::disconnect(group.get(), SIGNAL(triggerableStateCountsChanged()), this, SIGNAL(triggerableStateCountsChanged()));
     }
 
     mElements.erase(it);
   }
 
   this->signalElementRemoved(element);
+
+  if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::ConstTriggerable>(element))
+  {
+    this->uncountTriggerableState(triggerable);
+    auto iter = this->mTriggerableStateChangedConnections.find(triggerable);
+    if (iter != this->mTriggerableStateChangedConnections.end())
+    {
+      this->mTriggerableStateChangedConnections.erase(iter);
+    }
+    emit triggerableStateCountsChanged();
+  }
 
   // reconnect looped triggerables to the default trigger
   if (triggerables_for_default_trigger.size() > 0 && !destructing)
@@ -1337,9 +1467,27 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
   // add this element to the list of looped elements
   if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(element))
   {
+    this->mTriggerableStateChangedConnections[triggerable] =
+      boost::shared_ptr<boost::signals2::scoped_connection>
+      (
+        new boost::signals2::scoped_connection
+        (
+          triggerable->connectToStateChanged
+          (
+            boost::bind(&cedar::proc::Group::triggerableStateChanged, this, triggerable)
+          )
+        )
+      );
+
     if (triggerable->isLooped())
     {
       QWriteLocker looped_lock(this->mLoopedTriggerables.getLockPtr());
+      if (this->mLoopedTriggerables.member().empty())
+      {
+        looped_lock.unlock();
+        this->setIsLooped(true);
+        looped_lock.relock();
+      }
       this->mLoopedTriggerables.member().push_back(triggerable);
       looped_lock.unlock();
 
@@ -1370,6 +1518,7 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
   if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
   {
     QObject::connect(group->getParameter("is looped").get(), SIGNAL(valueChanged()), this, SLOT(onLoopedChanged()));
+    QObject::connect(group.get(), SIGNAL(triggerableStateCountsChanged()), this, SIGNAL(triggerableStateCountsChanged()));
   }
 }
 
@@ -1737,7 +1886,7 @@ void cedar::proc::Group::connectSlots(const std::string& source, const std::stri
     {
       this->connectTrigger(p_source->getFinishedTrigger(), p_target);
     }
-    catch(const cedar::proc::DuplicateConnectionException&)
+    catch (const cedar::proc::DuplicateConnectionException&)
     {
       // if the triggers are already connected, that's ok.
     }
@@ -2406,7 +2555,6 @@ void cedar::proc::Group::inputConnectionChanged(const std::string& inputName)
   {
     source->resetData();
   }
-  source->onTrigger();
 }
 
 const cedar::proc::Group::ConnectorMap& cedar::proc::Group::getConnectorMap()
@@ -2998,10 +3146,15 @@ void cedar::proc::Group::onLoopedChanged()
           if (triggerable)
           {
             QWriteLocker loop_locker(this->mLoopedTriggerables.getLockPtr());
+            if (this->mLoopedTriggerables.member().empty())
+            {
+              loop_locker.unlock();
+              this->setIsLooped(true);
+              loop_locker.relock();
+            }
             this->mLoopedTriggerables.member().push_back(triggerable);
-            loop_locker.unlock();            
-            
-            if (this->numberOfStartCalls())
+            loop_locker.unlock();
+            if (this->numberOfStartCalls() > 0)
             {
               triggerable->callOnStart();
             }
@@ -3028,6 +3181,12 @@ void cedar::proc::Group::onLoopedChanged()
               triggerable->callOnStop();
             }
             this->mLoopedTriggerables.member().erase(item);
+            if (this->mLoopedTriggerables.member().empty())
+            {
+              loop_locker.unlock();
+              this->setIsLooped(false);
+              loop_locker.relock();
+            }
           }
           loop_locker.unlock();
           // check if this is the root group

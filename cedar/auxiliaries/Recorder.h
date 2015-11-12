@@ -58,10 +58,8 @@
 #include <fstream>
 
 
-
-
-  /*!@brief Singleton class for recording and saving the data registered to disk.
-   */
+/*!@brief Singleton class for recording and saving the data registered to disk.
+ */
 class cedar::aux::Recorder : public cedar::aux::LoopedThread
 {
   Q_OBJECT
@@ -162,6 +160,12 @@ public:
 
   //! Returns true if any data is set to be recorded.
   bool hasDataToRecord() const;
+
+  //! Returns the chosen serialization mode for writing data.
+  cedar::aux::SerializationFormat::Id getSerializationMode() const;
+
+  //! Sets the serialization mode for writing data.
+  void setSerializationMode(cedar::aux::SerializationFormat::Id mode);
 
 signals:
   //! Emitted whenver data is added or removed.
