@@ -204,6 +204,10 @@ std::map<unsigned int, std::set<cedar::proc::TriggerablePtr>> cedar::proc::Trigg
 }
 
 
+/*!
+ * This function explores a group sink, meaning that it establishes trigger graph edges where a trigger connection goes
+ * from the inside of a group (group sink) to the outside (group output).
+ */
 void cedar::proc::Trigger::exploreSink
      (
        cedar::proc::TriggerablePtr source,
@@ -226,6 +230,7 @@ void cedar::proc::Trigger::exploreSink
     return;
   }
 
+  // get the output slot of the surrounding group
   auto output_slot = listener_group->getOutputSlot(startSink->getName());
   CEDAR_ASSERT(output_slot);
 
@@ -240,35 +245,40 @@ void cedar::proc::Trigger::exploreSink
   }
 
   std::vector<cedar::proc::DataConnectionPtr> connections;
+  // get all data connections starting from the surrounding group's output slot
   parent_group->getDataConnectionsFrom(listener_group, output_slot->getName(), connections);
 
 #ifdef DEBUG_TRIGGER_TREE_EXPLORATION
 /* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << "  + exploring " << connections.size() << " connections" << std::endl;
 #endif
 
+  // go through the connections ...
   for (auto connection : connections)
   {
+    // ... and find out where they lead
     auto target_slot = connection->getTarget();
     auto target = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(target_slot->getParentPtr()->shared_from_this());
     CEDAR_ASSERT(target);
 
+    // if they lead to a group sink, we need to explore that sink in the same way (with a recursive call)
     if (auto sink = boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(target))
     {
-      // if the target is a group sink, we need to explore further
       this->exploreSink(source, sourceNode, sink, graph, to_explore);
     }
+    // if the target is a group, we need to explore its inputs to connect to the inside
     else if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(target))
     {
-      // if the target is a group, we need to explore its inputs
       this->exploreGroupTarget(listener_group, group, sourceNode, graph, to_explore);
     }
     else
     {
+      // otherwise, looped steps break the trigger graphs
       if (target->isLooped())
       {
         continue;
       }
 
+      // for non-looped steps, set them to be explored and add an edge to the trigger graph
       if (!graph.hasNodeForPayload(target))
       {
         graph.addNodeForPayload(target);
@@ -284,7 +294,10 @@ void cedar::proc::Trigger::exploreSink
   }
 }
 
-
+/*!
+ * This function explores a group target, meaning that it establishes trigger graph edges where a trigger connection
+ * goes from the outside of a group (input slot) into the group (group source).
+ */
 void cedar::proc::Trigger::exploreGroupTarget
      (
        cedar::proc::TriggerablePtr source,
@@ -316,6 +329,7 @@ void cedar::proc::Trigger::exploreGroupTarget
     return;
   }
 
+  // go through all the output slots of the source connectable
   for (auto slot : source_connectable->getOrderedDataSlots(cedar::proc::DataRole::OUTPUT))
   {
 #ifdef DEBUG_TRIGGER_TREE_EXPLORATION
@@ -324,6 +338,7 @@ void cedar::proc::Trigger::exploreGroupTarget
     std::vector<cedar::proc::DataConnectionPtr> connections;
     parent_group->getDataConnectionsFrom(source_connectable, slot->getName(), connections);
 
+    // go through all connections originating from the slot and check if they go to the target group
     for (auto connection : connections)
     {
       auto target_slot = connection->getTarget();
@@ -334,12 +349,15 @@ void cedar::proc::Trigger::exploreGroupTarget
 
       auto group_source = targetGroup->getElement<cedar::proc::sources::GroupSource>(target_slot->getName());
 
+      // if this is the target connection, we need to look for trigger connections starting at the group source inside
+      // the group
       if (!graph.hasNodeForPayload(group_source))
       {
         graph.addNodeForPayload(group_source);
         to_explore.push_back(group_source);
       }
 
+      // also add an edge to the graph, indicating that the group source (inside the group) is triggered by the source
       auto listener_node = graph.getNodeByPayload(group_source);
       if (!graph.edgeExists(sourceNode, listener_node))
       {
@@ -349,6 +367,32 @@ void cedar::proc::Trigger::exploreGroupTarget
   }
 }
 
+/*!
+ * Adds edges to the given graph that represent a trigger connection from one triggerable to another. These edges are
+ * directed, and the source of an edge triggers the target.
+ *
+ * Note, that this graph contains all trigger connections, even redundant ones. It can be used to determine the trigger
+ * order (by determining the longest-paths), but should not be used for triggering directly.
+ *
+ * @param source          The source of the trigger connection -- this is the real source which causes triggering, not
+ *                        the trigger from which the connection originates; for example, for a looped step, the source
+ *                        is the step itself, even though the trigger connection originates from its 'finished' trigger.
+ *
+ * @param trigger         The trigger whose connections will be explored by this function. The targets of all of its
+ *                        trigger connections will be added to the trigger graph and the to_explore list.
+ *
+ * @param graph           The trigger graph to which explored nodes are added.
+ *
+ * @param to_explore      Triggerables still to be explored. Direct successors found via connections from @em trigger
+ *                        are added to this.
+ *
+ * @param sourceIsTrigger If true, the trigger is considered the source of triggering to be added to the graph (instead
+ *                        of the source given in the @em source parameter. This is the case for looped triggers, where
+ *                        triggering starts with the trigger itself, rather than its (non-existent) owner.
+ *
+ * @param explored        A list of triggerables that have already been explored. This function will use this to check
+ *                        whether to explore triggerables, and will also add any explored triggerables to it.
+ */
 void cedar::proc::Trigger::explore
      (
        cedar::proc::TriggerablePtr source,
@@ -373,6 +417,7 @@ void cedar::proc::Trigger::explore
   }
   else
   {
+    // remember that the source was already explored
     explored.insert(source);
   }
 
@@ -437,20 +482,36 @@ void cedar::proc::Trigger::explore
   }
 }
 
+/*! This method builds a trigger graph, i.e., a directed graph that represents which triggerables are triggered by this
+ *  trigger.
+ *
+ *  This graph is made up of nodes n_i, and edges e_ij = (n_i, n_j). An edge in this graph expresses a dependency, i.e.,
+ *  that triggering n_i means that n_j has to be triggered too, but after n_j.
+ *
+ *  This method starts at the root (this trigger) and recursively calls the explore method until all trigger connections
+ *  following this trigger are processed. Special care is taken when a connection leads into a group. In this case, the
+ *  trigger graph must also contain the (non-looped) steps inside the group. When a connection leads into a group sink,
+ *  the trigger graph must also explore the steps following the corresponding slot on the outside of the group.
+ *
+ *  Note that the root of the trigger tree is the owner of the trigger (e.g., a step). If the trigger has no owner (this
+ *  is the case for looped triggers), the trigger is the root.
+ */
 void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph)
 {
 #ifdef DEBUG_TRIGGER_TREE_EXPLORATION
 /* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << " U " << nameTrigger(this) << "->buildTriggerGraph()" << std::endl;
 #endif
-  // root node corresponding to this trigger
   std::vector<cedar::proc::TriggerablePtr> to_explore;
   std::set<cedar::proc::TriggerablePtr> explored;
 
   auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
 
-  // This is a workaround for Triggerable not being able to use shared_from_this. Element has it, Triggerable does not.
+  // -- explore the root node --
+
+  // if this trigger has an owner, that owner is the root of the trigger graph
   if (this->mpOwner != nullptr)
   {
+    // This is a workaround for Triggerable not being able to use shared_from_this. Element has it, Triggerable does not.
     auto element = dynamic_cast<cedar::proc::Element*>(this->mpOwner);
     CEDAR_DEBUG_ASSERT(element != nullptr);
     auto owner_ptr = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(element->shared_from_this());
@@ -458,11 +519,13 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
 
     this->explore(owner_ptr, this_ptr, graph, to_explore, true, explored);
   }
+  // if no owner is set, the
   else
   {
     this->explore(this_ptr, this_ptr, graph, to_explore, true, explored);
   }
 
+  // -- explore until nothing is left to explore --
   while (!to_explore.empty())
   {
     cedar::proc::TriggerablePtr source = to_explore.back();
