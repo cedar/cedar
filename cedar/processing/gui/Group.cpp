@@ -1719,6 +1719,7 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
       element_item->readConfiguration(iter->second);
       this->mNextElementUiConfigurations.erase(iter);
     }
+    this->stepRecordStateChanged();
   }
 
   // see if there is a configuration for the UI item stored in the group's ui node
