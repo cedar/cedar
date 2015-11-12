@@ -65,6 +65,8 @@ known issues
     process is, but is normal. Connections also sometimes are blue for a short time.
   - When net readers and writers are in the same architecture, this can sometimes lead to crashes. This *seems* to be a
     YARP issue.
+  - cedar::proc::Group writes and reads the bool parameter "isLooped", which is no longer needed. This will be disabled
+    in the next major release.
 
 Unreleased
 ==========
@@ -74,6 +76,8 @@ Unreleased
   - Architecture widgets can now add buttons for calling step actions.
   - When steps go into warning/error states, the GUI now indicates this in the status bar.
   - Deprecated the Noise source - it is misleading when using any kind of Euler integration.
+  - Groups automatically determine if they are looped by checking if any contained elements are looped. Manually setting
+    the isLooped parameter is now obsolete.
 - cedar::aux
   - Added an option to save the image displayed in an image plot to its right-click menu.
   - The netreader/writers now support matrices of arbitrary dimensionality (issue #248). Unfortunately, this means that
