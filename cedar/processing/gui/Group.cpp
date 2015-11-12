@@ -920,7 +920,11 @@ void cedar::proc::gui::Group::addElements(const std::list<QGraphicsItem*>& eleme
       element = element_item->getElement();
 
       std::vector<QGraphicsItem*> items;
-      items.push_back(element_item);
+      for (int i = 0; i < element_item->childItems().size(); ++i)
+      {
+        items.push_back(element_item->childItems().at(i));
+      }
+
       while (!items.empty())
       {
         auto item = *items.begin();

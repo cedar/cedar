@@ -239,17 +239,21 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
     }
   }
 
+  std::vector<cedar::proc::gui::Connection*> delete_connections_stack;
   // remove connections
   for (int i = 0; i < items.size(); ++i)
   {
     // delete connections first
     if (auto p_connection = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
     {
-      p_connection->disconnectUnderlying();
+      // store for later deletion
+      delete_connections_stack.push_back(p_connection);
+
+      // take connections out of the list of graphic elements
       items[i] = nullptr;
     }
   }
-  std::vector<QGraphicsItem*> delete_stack;
+  std::vector<cedar::proc::gui::GraphicsBase*> delete_stack;
   // fill stack with elements
   for (int i = 0; i < items.size(); ++i)
   {
@@ -261,11 +265,16 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
         delete_stack.push_back(graphics_base);
       }
     }
-    else
-    {
-      delete_stack.push_back(items[i]);
-    }
   }
+
+  // delete all connections
+  while (delete_connections_stack.size() > 0)
+  {
+    cedar::proc::gui::Connection* p_current_connection = delete_connections_stack.back();
+    p_current_connection->disconnectUnderlying();
+    delete_connections_stack.pop_back();
+  }
+
   // sort stack (make it a real stack)
   std::sort(delete_stack.begin(), delete_stack.end(), this->sortElements);
   // while stack is not empty, check if any items must be added, then delete the current item
