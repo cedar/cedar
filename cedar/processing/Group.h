@@ -872,7 +872,7 @@ private:
   std::vector<ParameterLinkInfo> mParameterLinks;
 
   //! Map containing every looped thread
-  TriggerableVector mLoopedTriggerables;
+  cedar::aux::LockableMember<TriggerableVector> mLoopedTriggerables;
 
   //! List of all the custom parameters that were added to this group.
   std::vector<cedar::aux::ParameterPtr> mCustomParameters;
@@ -911,7 +911,6 @@ protected:
   cedar::aux::BoolParameterPtr _mIsLooped;
 
   cedar::aux::DoubleParameterPtr _mTimeFactor;
-
 }; // class cedar::proc::Group
 
 Q_DECLARE_METATYPE(cedar::proc::Group::ConnectionChange)
