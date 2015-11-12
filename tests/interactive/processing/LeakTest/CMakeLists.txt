@@ -26,7 +26,7 @@
 #
 #   Maintainer:  Oliver Lomp
 #   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-#   Date:        2012 07 19
+#   Date:        2015 11 06
 #
 #   Description:
 #
@@ -34,9 +34,4 @@
 #
 #=======================================================================================================================
 
-cedar_add_unit_test(gui_VectorParameter
-                    main.cpp
-                    BoolVectorParameter.cpp
-                    MOC_HEADERS
-                    BoolVectorParameter.h
-                    )
+cedar_add_interactive_test("LeakTest" LeakTest.cpp)

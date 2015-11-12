@@ -180,8 +180,10 @@ private:
     this->mpOwner = owner;
   }
 
+  //! Builds a graph of the trigger structure following this trigger.
   void buildTriggerGraph(cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph);
 
+  //! Part of the exploration done while building the trigger graph.
   void explore
   (
     cedar::proc::TriggerablePtr source,
@@ -192,6 +194,9 @@ private:
     std::set<cedar::proc::TriggerablePtr>& explored
   );
 
+  /*! Part of the exploration done while building the trigger graph. This function explores the triggers by following a
+   *  group sink.
+   */
   void exploreSink
   (
     cedar::proc::TriggerablePtr source,
@@ -201,6 +206,9 @@ private:
     std::vector<cedar::proc::TriggerablePtr>& to_explore
   );
 
+  /*! Part of the exploration done while building the trigger graph. This function explores the triggers by following a
+   *  connection that goes into a group.
+   */
   void exploreGroupTarget
   (
     cedar::proc::TriggerablePtr source,

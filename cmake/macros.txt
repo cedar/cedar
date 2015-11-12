@@ -110,8 +110,13 @@ endmacro(cedar_add_target_executable)
 
 macro(cedar_add_unit_test)
   parse_arguments(unitTest "ARGUMENTS" "" ${ARGN})
+  parse_arguments(unitTest "MOC_HEADERS" "" ${ARGN})
   car(unitTestName ${unitTest_DEFAULT_ARGS})
   cdr(unitTestSources ${unitTest_DEFAULT_ARGS})
+
+  qt_wrap_cpp(unitMocSources ${unitTest_MOC_HEADERS})
+  set(unitTestSources ${unitTestSources} ${unitMocSources})
+  
   cedar_add_test(${unitTestName} ${unitTestSources} PREFIX "unitTest" DIRECTORY ${CEDAR_UNIT_TEST_DIR} ARGUMENTS ${unitTest_ARGUMENTS} AUTOMATIC)
 endmacro(cedar_add_unit_test)
 
