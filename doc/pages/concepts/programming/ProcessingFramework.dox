@@ -1,0 +1,90 @@
+/*!
+
+@page ProcessingFrameworkConcept An introduction to cedar's processing framework
+
+@todo This needs some serious rewriting.
+
+This page gives an overview of the functionalities of the processing framework contained in cedar. Documentation of the
+relevant classes can be found in the namespace cedar::proc. Tutorials are available at @ref ProcessingFrameworkTutorial. 
+
+
+@section ProcessingGeneralDescription The Processing Framework
+
+The processing framework is a library that can be used to dynamically create architectures of classes that perform
+some sort of processing, for example, an image processing architecture or a network of dynamics. One of the basic
+assumptions of the framework is that at least parts of the processing taking place are executed in a continuous loop or
+are otherwise triggered by a changing input.
+
+There are three modes of setting up a processing architecture in this framework. One is simply via code, by calling the
+various functions offered in the cedar::proc namespace. The second method is to load an architecture from a
+configuration file. The third option is to use a graphical user interface provided with the framework. This interface
+constructs the aforementioned configuration files.
+
+
+@section concepts Concepts
+
+@subsection ProcessingIntroduction_TriggersAndSteps Steps and Triggers
+
+Any architecture in the processing framework consists of so-called processing steps. These steps perform some kind of
+computation, e.g., the iteration of a dynamical system, or a filtering operation on an image.
+
+These examples already demonstrate two fundamentally different steps: iterating a dynamical system is a process that
+must be called as often as possible, while the filtering of an image only needs to be executed when the image changes.
+In order to cope with these differences, the processing framework uses the concept of triggers. A Trigger is an entity
+that triggers a process at some connected entity. This can be a step, in which case the computation is triggered, or it
+can be another trigger which then can be connected to entities in the same way. In terms of the example, this translates
+into two different kinds of triggers: the looped trigger (cedar::proc::LoopedTrigger) which sends out trigger signals as
+often as possible, and plain triggers (cedar::proc::Trigger) which do not send any trigger signals on their own.
+
+One trigger of the latter kind is contained in each processing step: the "done" trigger. It is triggered everytime the
+step successfully completes its computation. This allows the realization of the image processing example: when a step
+providing an input image is done loading it, it triggers "done". If the filter operation is connected to the
+"done"-trigger, it will subsequently be computed as well. Done triggers are automatically connected if a data connection
+ is established (see @ref ProcessingIntroduction_DataAndConnections).
+
+Looped triggers on the other hand can be started and stopped, thus causing actual computations to take place repeatedly.
+
+
+@subsection ProcessingIntroduction_Modules Groups
+
+Groups are a feature of the processing framework. They allow grouping a number of steps into a reusable architecture.
+
+
+@subsection ProcessingIntroduction_DataAndConnections Data and Connections
+
+The second important concept of the framework is Data. Each step can declare a set of inputs, outputs and buffers
+(buffers represent internal, temporary data that you might be interested in inspecting, e.g., by plotting it). Inputs
+and outputs are called slots of a step. Output slots can be connected to input slots, which in turn passes the data 
+produced by a step to the inputs of another step. Data is always of a specific type. This helps deciding how data can
+be plotted. The type also plays an important role in checking if the output slot of a step produces data that is
+compatible with an input slot of a connected step. The validity of such a connection is graphically represented by
+three colors: a red connection symbolizes an incompatibility of data. This may hint at a mismatch in dimensionality,
+size, or type. A green connection symbolizes the opposite situation: every relevant characteristic of the data matches
+between output slot and input slot. A yellow connection hints at a potential problem with a connection. In general,
+the receiving step can operate on the output data (e.g., a matrix of same dimensionality and size), but some
+assumptions are made to process the data, which may not be desirable.
+
+Creating a data collection may also create a connection between the done trigger (see @ref ProcessingIntroduction_TriggersAndSteps)
+and the target step of the connection. This assures that once the source of a connection has computed an update on its
+data, the target step is notified and processes the output. The creation of this trigger connection depends on the target's 
+cedar::proc::Step::isLooped() flag. Steps that are not looped are supposed to process data on-demand, triggered by the
+connection to the done trigger of its source steps. Steps which are triggered by an external source (cedar::proc::LoopedTrigger) 
+are not connected to the done trigger of previous steps. 
+
+
+
+@section ProcessingBestPractices Best Practices for the Processing Framework
+
+
+@subsection ProcessingBestPractices_StoringInputs Storing Input Pointers to Save Time
+
+@todo Explain here why it makes sense to overload inputChanged and store pointers to the input
+
+
+@subsection ProcessingBestPractices_MakingCodeSafer Safer Code: Exceptions and Assertions Instead of SegFaults
+
+While this is not an issue specific to the processing framework, it is of great importance here.
+
+@todo Explain that using exceptions is important so the framework can intercept errors.
+
+*/
