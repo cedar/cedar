@@ -1128,15 +1128,25 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element, bool destr
     }
     // remove element from triggerables list if it is looped
     auto triggerable = this->getElement<cedar::proc::Triggerable>(element->getName());
-    auto item = std::find(this->mLoopedTriggerables.begin(), this->mLoopedTriggerables.end(), triggerable);
-    if (item != this->mLoopedTriggerables.end())
+    QWriteLocker looped_lock(this->mLoopedTriggerables.getLockPtr());
+    auto item = std::find(this->mLoopedTriggerables.member().begin(), this->mLoopedTriggerables.member().end(), triggerable);
+    if (item != this->mLoopedTriggerables.member().end())
     {
       if (this->numberOfStartCalls())
       {
         triggerable->callOnStop();
       }
-      this->mLoopedTriggerables.erase(item);
+      this->mLoopedTriggerables.member().erase(item);
+
+      // check if there are any remaining looped triggerables - if not, set group to non-looped
+      if (this->mLoopedTriggerables.member().empty())
+      {
+        looped_lock.unlock();
+        this->setIsLooped(false);
+        looped_lock.relock();
+      }
     }
+    looped_lock.unlock();
 
     if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(it->second))
     {
@@ -1471,7 +1481,16 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
 
     if (triggerable->isLooped())
     {
-      this->mLoopedTriggerables.push_back(triggerable);
+      QWriteLocker looped_lock(this->mLoopedTriggerables.getLockPtr());
+      if (this->mLoopedTriggerables.member().empty())
+      {
+        looped_lock.unlock();
+        this->setIsLooped(true);
+        looped_lock.relock();
+      }
+      this->mLoopedTriggerables.member().push_back(triggerable);
+      looped_lock.unlock();
+
       // if this is the root group, also connect to default trigger
       if (this->isRoot())
       {
@@ -1867,7 +1886,7 @@ void cedar::proc::Group::connectSlots(const std::string& source, const std::stri
     {
       this->connectTrigger(p_source->getFinishedTrigger(), p_target);
     }
-    catch(const cedar::proc::DuplicateConnectionException&)
+    catch (const cedar::proc::DuplicateConnectionException&)
     {
       // if the triggers are already connected, that's ok.
     }
@@ -2510,11 +2529,13 @@ void cedar::proc::Group::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::
 {
   if (this->isLooped())
   {
+    QReadLocker looped_lock(this->mLoopedTriggerables.getLockPtr());
     // trigger every looped element in this group
-    for (auto triggerable : this->mLoopedTriggerables)
+    for (auto triggerable : this->mLoopedTriggerables.member())
     {
       triggerable->onTrigger(args, trigger);
     }
+    looped_lock.unlock();
   }
 }
 
@@ -2534,7 +2555,6 @@ void cedar::proc::Group::inputConnectionChanged(const std::string& inputName)
   {
     source->resetData();
   }
-//  source->onTrigger();
 }
 
 const cedar::proc::Group::ConnectorMap& cedar::proc::Group::getConnectorMap()
@@ -2996,17 +3016,7 @@ void cedar::proc::Group::setIsLooped(bool looped)
 void cedar::proc::Group::onStart()
 {
   this->_mIsLooped->setConstant(true);
-  this->mLoopedTriggerables.clear();
-  for (auto element : this->mElements)
-  {
-    if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(element.second))
-    {
-      if (triggerable->isLooped())
-      {
-        this->mLoopedTriggerables.push_back(triggerable);
-      }
-    }
-  }
+
   // if we get to this point, set the state to running
   this->setState(cedar::proc::Triggerable::STATE_RUNNING, "");
   for (auto element : this->mElements)
@@ -3135,8 +3145,16 @@ void cedar::proc::Group::onLoopedChanged()
         {
           if (triggerable)
           {
-            this->mLoopedTriggerables.push_back(triggerable);
-            if (this->numberOfStartCalls())
+            QWriteLocker loop_locker(this->mLoopedTriggerables.getLockPtr());
+            if (this->mLoopedTriggerables.member().empty())
+            {
+              loop_locker.unlock();
+              this->setIsLooped(true);
+              loop_locker.relock();
+            }
+            this->mLoopedTriggerables.member().push_back(triggerable);
+            loop_locker.unlock();
+            if (this->numberOfStartCalls() > 0)
             {
               triggerable->callOnStart();
             }
@@ -3154,15 +3172,23 @@ void cedar::proc::Group::onLoopedChanged()
         }
         else // remove
         {
-          auto item = std::find(this->mLoopedTriggerables.begin(), this->mLoopedTriggerables.end(), triggerable);
-          if (item != this->mLoopedTriggerables.end())
+          QWriteLocker loop_locker(this->mLoopedTriggerables.getLockPtr());
+          auto item = std::find(this->mLoopedTriggerables.member().begin(), this->mLoopedTriggerables.member().end(), triggerable);
+          if (item != this->mLoopedTriggerables.member().end())
           {
-            if (this->numberOfStartCalls())
+            if (this->numberOfStartCalls() > 0)
             {
               triggerable->callOnStop();
             }
-            this->mLoopedTriggerables.erase(item);
+            this->mLoopedTriggerables.member().erase(item);
+            if (this->mLoopedTriggerables.member().empty())
+            {
+              loop_locker.unlock();
+              this->setIsLooped(false);
+              loop_locker.relock();
+            }
           }
+          loop_locker.unlock();
           // check if this is the root group
           if (this->isRoot())
           {
