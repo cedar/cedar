@@ -368,45 +368,6 @@ std::set<std::string> cedar::proc::Group::listRequiredPlugins() const
   return required_plugins;
 }
 
-std::string cedar::proc::Group::camelCaseToSpaces(const std::string& camelCasedString)
-{
-  if (camelCasedString.empty())
-  {
-    return camelCasedString;
-  }
-
-  std::string spaced;
-
-  for (size_t i = 0; i < camelCasedString.size(); ++i)
-  {
-    bool in_upper = isupper(camelCasedString.at(i));
-    bool in_lower = islower(camelCasedString.at(i));
-    if (in_upper)
-    {
-      if (i > 0 && (i + 1) < camelCasedString.size() && islower(camelCasedString.at(i + 1)) && isupper(camelCasedString.at(i - 1)))
-      {
-        spaced += " ";
-      }
-      spaced += camelCasedString.at(i);
-    }
-    else if (in_lower)
-    {
-      spaced += camelCasedString.at(i);
-      if (i > 0 && (i + 1) < camelCasedString.size() && isupper(camelCasedString.at(i + 1)))
-      {
-        spaced += " ";
-      }
-    }
-    else
-    {
-      // other case: character is not an alphabetical one
-      spaced += camelCasedString.at(i);
-    }
-  }
-
-  return spaced;
-}
-
 bool cedar::proc::Group::checkScriptNameExists(const std::string& name) const
 {
   QReadLocker locker(this->mScripts.getLockPtr());
@@ -428,9 +389,9 @@ void cedar::proc::Group::createScript(const std::string& type)
    std::string class_name, rest;
    cedar::aux::splitLast(type, ".", rest, class_name);
 #if (BOOST_VERSION / 100000 < 2 && BOOST_VERSION / 100 % 1000 < 54) // interface change in boost::bind
-   std::string script_name = findNewIdentifier(cedar::proc::Group::camelCaseToSpaces(class_name), boost::bind<void>(&cedar::proc::Group::checkScriptNameExists, this, _1));
+   std::string script_name = findNewIdentifier(cedar::aux::camelCaseToSpaces(class_name), boost::bind<void>(&cedar::proc::Group::checkScriptNameExists, this, _1));
 #else
-   std::string script_name = findNewIdentifier(cedar::proc::Group::camelCaseToSpaces(class_name), boost::bind(&cedar::proc::Group::checkScriptNameExists, this, _1));
+   std::string script_name = findNewIdentifier(cedar::aux::camelCaseToSpaces(class_name), boost::bind(&cedar::proc::Group::checkScriptNameExists, this, _1));
 #endif
    script->setName(script_name);
 
@@ -918,7 +879,7 @@ std::string cedar::proc::Group::findNewIdentifier(const std::string& basis, boos
 
 std::string cedar::proc::Group::getUniqueIdentifier(const std::string& identifier) const
 {
-  return findNewIdentifier(cedar::proc::Group::camelCaseToSpaces(identifier), boost::bind(&cedar::proc::Group::nameExistsInAnyGroup, this, _1));
+  return findNewIdentifier(cedar::aux::camelCaseToSpaces(identifier), boost::bind(&cedar::proc::Group::nameExistsInAnyGroup, this, _1));
 }
 
 bool cedar::proc::Group::nameExistsInAnyGroup(const cedar::proc::GroupPath& name) const
@@ -1017,14 +978,7 @@ void cedar::proc::Group::reset()
   for (auto name_element_pair : this->mElements)
   {
     auto element = name_element_pair.second;
-    if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
-    {
-      step->callReset();
-    }
-    else if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
-    {
-      group->reset();
-    }
+    element->callReset();
   }
 
   // restart all triggers that have been stopped
@@ -1793,15 +1747,60 @@ void cedar::proc::Group::outputConnectionRemoved(cedar::proc::DataSlotPtr slot)
   connector->updateTriggeringOrder(visited, true, false);
 }
 
-void cedar::proc::Group::connectSlots(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target)
+void cedar::proc::Group::connectSlots(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target)
 {
-  //!@todo See entry below
-  this->connectSlots(source->getParent() + "." + source->getName(), target->getParent() + "." + target->getName());
+  auto source_connectable = source->getParentPtr();
+  auto target_connectable = target->getParentPtr();
+
+  CEDAR_DEBUG_ASSERT(source_connectable && target_connectable);
+
+  if (target_connectable->ownsDataOf(source))
+  {
+    CEDAR_THROW(cedar::proc::DeadlockException, "This connection would lead to a deadlock.");
+  }
+
+  // create connection
+  cedar::proc::DataConnectionPtr new_connection(new DataConnection(source, target));
+  mDataConnections.push_back(new_connection);
+
+  // push new connection to slots
+  source->addOutgoingConnection(new_connection);
+  target->addIncomingConnection(new_connection);
+
+  auto source_as_triggerable = this->getElement<cedar::proc::Triggerable>(source->getParent());
+  auto target_as_triggerable = this->getElement<cedar::proc::Triggerable>(target->getParent());
+  //!@todo Replace isLooped || ... by a new p_target->acceptsDoneTriggerConnections() function?
+  if (!target_as_triggerable->isLooped() || boost::dynamic_pointer_cast<cedar::proc::Group>(target_as_triggerable))
+  {
+    try
+    {
+      //!@todo using the name to access the shared pointer of target parent can be solved more elegantly
+      this->connectTrigger(source_as_triggerable->getFinishedTrigger(), target_as_triggerable);
+    }
+    catch (const cedar::proc::DuplicateConnectionException&)
+    {
+      // if the triggers are already connected, that's ok.
+    }
+
+    //!@todo this has overlap with removeDataConnection - and is in addition a special case
+    // trigger the connected target once, establishing a validity of the target
+    if (!boost::dynamic_pointer_cast<cedar::proc::Group>(target_as_triggerable))
+    {
+      target_as_triggerable->onTrigger();
+    }
+  }
+
+  // inform any interested listeners of this new connection
+  this->signalDataConnectionChanged
+  (
+    source,
+    target,
+    cedar::proc::Group::CONNECTION_ADDED
+  );
 }
 
 void cedar::proc::Group::connectSlots(const std::string& source, const std::string& target)
 {
-  //!@todo Given that this function first does some complicated stuff to find the slot pointers, why doesn't it call the other connectSlots method (rather than how it is now)?
   // parse element and slot name
   std::string source_name;
   std::string source_slot_name;
@@ -1835,51 +1834,7 @@ void cedar::proc::Group::connectSlots(const std::string& source, const std::stri
 
   cedar::proc::ExternalDataPtr target_slot
     = this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot_name);
-
-  cedar::proc::ConnectablePtr target_connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(p_target);
-  CEDAR_DEBUG_ASSERT(target_connectable);
-
-  if (target_connectable->ownsDataOf(source_slot))
-  {
-    CEDAR_THROW(cedar::proc::DeadlockException, "This connection would lead to a deadlock.");
-  }
-
-  // create connection
-  cedar::proc::DataConnectionPtr new_connection(new DataConnection(source_slot, target_slot));
-  mDataConnections.push_back(new_connection);
-
-  // push new connection to slots
-  source_slot->addOutgoingConnection(new_connection);
-  target_slot->addIncomingConnection(new_connection);
-
-  CEDAR_DEBUG_ASSERT(p_target);
-  //!@todo Replace isLooped || ... by a new p_target->acceptsDoneTriggerConnections() function?
-  if (!p_target->isLooped() || boost::dynamic_pointer_cast<cedar::proc::Group>(p_target))
-  {
-    try
-    {
-      this->connectTrigger(p_source->getFinishedTrigger(), p_target);
-    }
-    catch (const cedar::proc::DuplicateConnectionException&)
-    {
-      // if the triggers are already connected, that's ok.
-    }
-
-    //!@todo this has overlap with removeDataConnection - and is in addition a special case
-    // trigger the connected target once, establishing a validity of the target
-    if (!boost::dynamic_pointer_cast<cedar::proc::Group>(p_target))
-    {
-      p_target->onTrigger();
-    }
-  }
-
-  // inform any interested listeners of this new connection
-  this->signalDataConnectionChanged
-  (
-    this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot_name),
-    this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot_name),
-    cedar::proc::Group::CONNECTION_ADDED
-  );
+  this->connectSlots(source_slot, target_slot);
 }
 
 void cedar::proc::Group::connectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target)
@@ -2086,7 +2041,6 @@ void cedar::proc::Group::readData(const cedar::aux::ConfigurationNode& root)
   }
 }
 
-
 std::set<std::string> cedar::proc::Group::getRequiredPlugins(const std::string& architectureFile)
 {
   std::set<std::string> plugins;
@@ -2290,11 +2244,12 @@ void cedar::proc::Group::updateObjectName(cedar::proc::Element* object)
   emit cedar::proc::Group::stepNameChanged(old_name, element->getName());
 }
 
-void cedar::proc::Group::getDataConnections(
-                                               cedar::proc::ConnectablePtr source,
-                                               const std::string& sourceDataName,
-                                               std::vector<cedar::proc::DataConnectionPtr>& connections
-                                             )
+void cedar::proc::Group::getDataConnections
+(
+  cedar::proc::ConnectablePtr source,
+  const std::string& sourceDataName,
+  std::vector<cedar::proc::DataConnectionPtr>& connections
+)
 {
   connections.clear();
   for (size_t i = 0; i < this->mDataConnections.size(); ++i)
@@ -2317,11 +2272,12 @@ void cedar::proc::Group::getDataConnections(
   }
 }
 
-void cedar::proc::Group::getDataConnections(
-                                               cedar::proc::ConstConnectablePtr source,
-                                               const std::string& sourceDataName,
-                                               std::vector<cedar::proc::ConstDataConnectionPtr>& connections
-                                             ) const
+void cedar::proc::Group::getDataConnections
+(
+  cedar::proc::ConstConnectablePtr source,
+  const std::string& sourceDataName,
+  std::vector<cedar::proc::ConstDataConnectionPtr>& connections
+) const
 {
   connections.clear();
   for (size_t i = 0; i < this->mDataConnections.size(); ++i)
@@ -2344,30 +2300,32 @@ void cedar::proc::Group::getDataConnections(
   }
 }
 
-void cedar::proc::Group::getDataConnectionsFrom(
-                                                   cedar::proc::ConnectablePtr source,
-                                                   const std::string& sourceDataSlotName,
-                                                   std::vector<cedar::proc::DataConnectionPtr>& connections
-                                                 )
+void cedar::proc::Group::getDataConnectionsFrom
+(
+  cedar::proc::ConnectablePtr source,
+  const std::string& sourceDataSlotName,
+  std::vector<cedar::proc::DataConnectionPtr>& connections
+)
 {
   connections.clear();
   connections.assign(source->getOutputSlot(sourceDataSlotName)->getDataConnections().begin(), source->getOutputSlot(sourceDataSlotName)->getDataConnections().end());
 }
 
-void cedar::proc::Group::getDataConnectionsTo(
-                                                 cedar::proc::ConnectablePtr target,
-                                                 const std::string& targetDataSlotName,
-                                                 std::vector<cedar::proc::DataConnectionPtr>& connections
-                                               )
+void cedar::proc::Group::getDataConnectionsTo
+(
+  cedar::proc::ConnectablePtr target,
+  const std::string& targetDataSlotName,
+  std::vector<cedar::proc::DataConnectionPtr>& connections
+)
 {
   connections.clear();
   connections.assign(target->getInputSlot(targetDataSlotName)->getDataConnections().begin(), target->getInputSlot(targetDataSlotName)->getDataConnections().end());
 }
 
 cedar::proc::Group::DataConnectionVector::iterator cedar::proc::Group::removeDataConnection
-                                                   (
-                                                     cedar::proc::Group::DataConnectionVector::iterator it
-                                                   )
+(
+  cedar::proc::Group::DataConnectionVector::iterator it
+)
 {
   //!@todo This code needs to be cleaned up, simplified and commented
   cedar::proc::DataConnectionPtr connection = *it;
@@ -2714,7 +2672,7 @@ std::vector<cedar::proc::ExternalDataPtr> cedar::proc::Group::getRealTargets
   return real_targets;
 }
 
-void cedar::proc::Group::connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target)
+void cedar::proc::Group::connectAcrossGroups(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target)
 {
   cedar::proc::Connectable* source_step = source->getParentPtr();
   cedar::proc::Connectable* target_step = target->getParentPtr();

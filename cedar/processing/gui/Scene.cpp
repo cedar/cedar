@@ -58,6 +58,7 @@
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/gui/PropertyPane.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/casts.h"
@@ -1300,12 +1301,19 @@ void cedar::proc::gui::Scene::connectSlots
     // create connection from source to connector
     const std::string input_name = "input";
     connector->addConnector(input_name, true);
-    root_group->connectSlots(source_slot, connector->getInputSlot(input_name));
+    auto owned_source_slot = cedar::aux::asserted_pointer_cast<cedar::proc::OwnedData>(source_slot);
+    root_group->connectSlots(owned_source_slot, connector->getInputSlot(input_name));
 
     // create connection from connector to target
     const std::string output_name = "output";
     connector->addConnector(output_name, false);
-    root_group->connectSlots(connector->getOutputSlot(output_name), target_slot);
+    auto external_target_slot = cedar::aux::asserted_pointer_cast<cedar::proc::ExternalData>(target_slot);
+
+    cedar::proc::Group::connectAcrossGroups
+    (
+      connector->getOutputSlot(output_name),
+      external_target_slot
+    );
 
     // connect slots in the group
     connector->connectSlots(input_name + ".output", output_name + ".input");
@@ -1315,7 +1323,11 @@ void cedar::proc::gui::Scene::connectSlots
   }
   else
   {
-    root_group->connectSlots(source_slot, target_slot);
+    cedar::proc::Group::connectAcrossGroups
+    (
+      cedar::aux::asserted_pointer_cast<cedar::proc::OwnedData>(source_slot),
+      cedar::aux::asserted_pointer_cast<cedar::proc::ExternalData>(target_slot)
+    );
   }
 }
 
