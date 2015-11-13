@@ -1019,8 +1019,8 @@ void cedar::proc::gui::Ide::duplicateSelected()
     }
   }
 
-  std::vector<std::pair<cedar::proc::Connectable*, cedar::proc::DataSlotPtr> > outgoing_slots;
-  std::vector<std::pair<cedar::proc::Connectable*, cedar::proc::DataSlotPtr> > receiving_slots;
+  std::vector<std::pair<cedar::proc::Connectable*, cedar::proc::OwnedDataPtr> > outgoing_slots;
+  std::vector<std::pair<cedar::proc::Connectable*, cedar::proc::ExternalDataPtr> > receiving_slots;
   for (auto con : duplicated_connections)
   {
     outgoing_slots.push_back(std::make_pair(con->getSource()->getParentPtr(), con->getSource()));

@@ -22,7 +22,8 @@
             "start with all": "true",
             "listeners":
             [
-                "parent step"
+                "parent step",
+                "network child"
             ]
         }
     },

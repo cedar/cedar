@@ -158,3 +158,42 @@ std::string cedar::aux::formatDuration(const cedar::unit::Time& time)
 
   return time_str;
 }
+
+std::string cedar::aux::camelCaseToSpaces(const std::string& camelCasedString)
+{
+  if (camelCasedString.empty())
+  {
+    return camelCasedString;
+  }
+
+  std::string spaced;
+
+  for (size_t i = 0; i < camelCasedString.size(); ++i)
+  {
+    bool in_upper = isupper(camelCasedString.at(i));
+    bool in_lower = islower(camelCasedString.at(i));
+    if (in_upper)
+    {
+      if (i > 0 && (i + 1) < camelCasedString.size() && islower(camelCasedString.at(i + 1)) && isupper(camelCasedString.at(i - 1)))
+      {
+        spaced += " ";
+      }
+      spaced += camelCasedString.at(i);
+    }
+    else if (in_lower)
+    {
+      spaced += camelCasedString.at(i);
+      if (i > 0 && (i + 1) < camelCasedString.size() && isupper(camelCasedString.at(i + 1)))
+      {
+        spaced += " ";
+      }
+    }
+    else
+    {
+      // other case: character is not an alphabetical one
+      spaced += camelCasedString.at(i);
+    }
+  }
+
+  return spaced;
+}

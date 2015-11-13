@@ -311,7 +311,7 @@ public:
    * @param source Source data slot.
    * @param target Target data slot.
    */
-  void connectSlots(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target);
+  void connectSlots(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
 
   /*!@brief Connects a cedar::proc::Trigger to a cedar::proc::Triggerable.
    *
@@ -695,13 +695,10 @@ public:
   unsigned int getTriggerablesInErrorStateCount() const;
 
   //!@brief connects two slots across groups, allocating connectors if necessary
-  static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
+  static void connectAcrossGroups(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
 
   //!@brief disconnects two slots across groups, removing/merging connectors if necessary
   static bool disconnectAcrossGroups(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
-
-  //! Converts camel-case instances to spaces.
-  static std::string camelCaseToSpaces(const std::string& camelCasedString);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
