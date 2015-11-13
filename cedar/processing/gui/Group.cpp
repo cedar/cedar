@@ -223,6 +223,32 @@ cedar::proc::gui::Group::~Group()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::proc::gui::DataSlotItem* cedar::proc::gui::Group::getSourceConnectorItem(cedar::proc::DataSlotPtr slot) const
+{
+  for (auto slot_gui : this->mConnectorSources)
+  {
+    if (slot_gui->getSlot() == slot)
+    {
+      return slot_gui;
+    }
+  }
+
+  return nullptr;
+}
+
+cedar::proc::gui::DataSlotItem* cedar::proc::gui::Group::getSinkConnectorItem(cedar::proc::DataSlotPtr slot) const
+{
+  for (auto slot_gui : this->mConnectorSinks)
+  {
+    if (slot_gui->getSlot() == slot)
+    {
+      return slot_gui;
+    }
+  }
+
+  return nullptr;
+}
+
 bool cedar::proc::gui::Group::canBeDragged() const
 {
   if (!cedar::proc::gui::Connectable::canBeDragged() || this->_mGeometryLocked->getValue())

@@ -134,6 +134,12 @@ public:
    */
   void fitToContents(bool grow = false);
 
+  //! Returns the GUI data slot item for the given connector slot.
+  cedar::proc::gui::DataSlotItem* getSourceConnectorItem(cedar::proc::DataSlotPtr slot) const;
+
+  //! Returns the GUI data slot item for the given connector slot.
+  cedar::proc::gui::DataSlotItem* getSinkConnectorItem(cedar::proc::DataSlotPtr slot) const;
+
   //!@brief Adds an element to the group.
   void addElement(cedar::proc::gui::GraphicsBase *pElement);
 
