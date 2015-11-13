@@ -1308,7 +1308,7 @@ void cedar::proc::gui::Scene::connectSlots
     const std::string output_name = "output";
     connector->addConnector(output_name, false);
     auto external_target_slot = cedar::aux::asserted_pointer_cast<cedar::proc::ExternalData>(target_slot);
-    //root_group->connectSlots(connector->getOutputSlot(output_name), external_target_slot);
+
     cedar::proc::Group::connectAcrossGroups
     (
       connector->getOutputSlot(output_name),
