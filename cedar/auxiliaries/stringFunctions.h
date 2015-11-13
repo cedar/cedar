@@ -470,6 +470,9 @@ namespace cedar
       std::transform(lower_case_str.begin(), lower_case_str.end(), lower_case_str.begin(), ::tolower);
       return lower_case_str;
     }
+
+    //! Converts camel-case instances to spaces.
+    std::string camelCaseToSpaces(const std::string& camelCasedString);
   }
 }
 
