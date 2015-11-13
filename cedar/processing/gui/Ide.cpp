@@ -417,18 +417,14 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
     this->loadDefaultPlugins();
   }
 
-  this->mpArchitectureToolBox->setView(this->mpProcessingDrawer);
   this->mpProcessingDrawer->setWidgets(this, this->mpPropertyTable, this->mpRecorderWidget);
 
   mpMenuWindows->addAction(this->mpItemsWidget->toggleViewAction());
-  mpMenuWindows->addAction(this->mpToolsWidget->toggleViewAction());
   mpMenuWindows->addAction(this->mpPropertiesWidget->toggleViewAction());
   mpMenuWindows->addAction(this->mpLogWidget->toggleViewAction());
 
   // set the property pane as the scene's property displayer
 
-  QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(modeFinished()),
-                   this, SLOT(architectureToolFinished()));
   QObject::connect(this->mpActionStartPauseSimulation, SIGNAL(triggered()), this, SLOT(startPauseSimulationClicked()));
   QObject::connect(this->mpThreadsSingleStep, SIGNAL(triggered()), this, SLOT(stepThreads()));
   QObject::connect(this->mpActionResetSimulation, SIGNAL(triggered()), this, SLOT(resetSimulationClicked()))
@@ -625,7 +621,6 @@ void cedar::proc::gui::Ide::lockUI(bool lock)
 {
   std::vector<QDockWidget*> widgets;
   widgets.push_back(this->mpItemsWidget);
-  widgets.push_back(this->mpToolsWidget);
   widgets.push_back(this->mpPropertiesWidget);
   widgets.push_back(this->mpLogWidget);
 
@@ -1252,7 +1247,6 @@ void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
 void cedar::proc::gui::Ide::storeSettings()
 {
   cedar::proc::gui::SettingsSingleton::getInstance()->logSettings()->getFrom(this->mpLogWidget);
-  cedar::proc::gui::SettingsSingleton::getInstance()->toolsSettings()->getFrom(this->mpToolsWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->getFrom(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->getFrom(this->mpItemsWidget);
 
@@ -1270,7 +1264,6 @@ void cedar::proc::gui::Ide::storeSettings()
 void cedar::proc::gui::Ide::restoreSettings()
 {
   cedar::proc::gui::SettingsSingleton::getInstance()->logSettings()->setTo(this->mpLogWidget);
-  cedar::proc::gui::SettingsSingleton::getInstance()->toolsSettings()->setTo(this->mpToolsWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->setTo(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->setTo(this->mpItemsWidget);
 
@@ -1315,11 +1308,6 @@ void cedar::proc::gui::Ide::updateTriggerStartStopThreadCallers()
                                  boost::bind(&cedar::proc::Group::stopTriggers, this->mGroup->getGroup(), true)
                                )
                              );
-}
-
-void cedar::proc::gui::Ide::architectureToolFinished()
-{
-  this->mpArchitectureToolBox->selectMode("mode.Select");
 }
 
 void cedar::proc::gui::Ide::notify(const QString& message)
