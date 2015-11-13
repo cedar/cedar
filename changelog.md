@@ -78,6 +78,7 @@ Unreleased
   - Deprecated the Noise source - it is misleading when using any kind of Euler integration.
   - Groups automatically determine if they are looped by checking if any contained elements are looped. Manually setting
     the isLooped parameter is now obsolete.
+  - Connections between data slots can now be established across groups.
 - cedar::aux
   - Added an option to save the image displayed in an image plot to its right-click menu.
   - The netreader/writers now support matrices of arbitrary dimensionality (issue #248). Unfortunately, this means that
