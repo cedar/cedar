@@ -1,0 +1,33 @@
+/*!
+
+@page ProjectsWithCedar Tutorial: Projects with cedar
+
+cedar provides a cmake template that allows you to quickly create a new project.
+
+To create a new project that uses this script, create a folder [your project]. Copy the files from
+[your cedar folder]/templates/project into your project folder and rename the exampleCMakeLists.txt to CMakeLists.txt.
+Next, copy the project.conf.example to project.conf and configure the contents to your specific needs.
+
+For each library or executable you want to have in your project, add a subfolder and add a line
+@code
+cedar_project_add_target
+(
+  LIBRARY folder # or EXECUTABLE
+  TARGET_NAME YourTargetName
+  MOC_HEADERS path/to/header.h # optional, if you want to moc anything
+  DEPENDS_ON YourOtherTargetNames # optional, if you have multiple targets that depends on each other
+)
+@endcode
+
+Note, that there is no need to manually specify any source or ui files. They are found automatically by the project
+script, i.e., all cpp, c, h and ui files in the folder specified by @em folder are automatically added to the project.
+
+Thus, to compile your project, go to [your project] and type
+@code
+mkdir build
+cd build
+cmake ..
+make
+@endcode
+
+*/
