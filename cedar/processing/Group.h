@@ -784,6 +784,10 @@ private:
 
   void uncountTriggerableState(cedar::proc::ConstTriggerablePtr triggerable);
 
+  void registerLoopedTriggerable(cedar::proc::TriggerablePtr triggerable);
+
+  void unregisterLoopedTriggerable(cedar::proc::TriggerablePtr triggerable);
+
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
   void onNameChanged();
