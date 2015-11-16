@@ -173,6 +173,7 @@ _mTimeFactor(new cedar::aux::DoubleParameter(this, "time factor", 1.0, cedar::au
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->_mConnectors->setHidden(true);
   this->_mTimeFactor->setHidden(true);
+  this->_mIsLooped->setHidden(true);
 #if (BOOST_VERSION / 100000 < 2 && BOOST_VERSION / 100 % 1000 < 54) // interface change in boost::bind
   mParentGroupChangedConnection = this->connectToGroupChanged(boost::bind<void>(&cedar::proc::Group::onParentGroupChanged, this));
 #else
@@ -2942,6 +2943,8 @@ cedar::proc::ElementPtr cedar::proc::Group::importStepFromFile(const std::string
 void cedar::proc::Group::setIsLooped(bool looped)
 {
   this->mIsLooped = looped;
+  // legacy parameter - this ensures backward compatibility
+  this->_mIsLooped->setValue(looped);
   emit loopedChanged();
 }
 
