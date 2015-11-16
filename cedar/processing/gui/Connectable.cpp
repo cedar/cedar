@@ -1199,7 +1199,7 @@ void cedar::proc::gui::Connectable::updateDataSlotPositions()
     const QPointF& origin = add_origins[role];
     const QPointF& direction = add_directions[role];
 
-    try
+    if (this->mConnectable->hasSlotForRole(role))
     {
       QPointF current_origin = QPointF(0, 0);
       const cedar::proc::Connectable::SlotList& slotmap = this->mConnectable->getOrderedDataSlots(role);
@@ -1220,10 +1220,6 @@ void cedar::proc::gui::Connectable::updateDataSlotPositions()
         p_item->setPos(QPointF(x - size_diff, y) + current_origin);
         current_origin += direction * (slot_size + M_DATA_SLOT_PADDING);
       }
-    }
-    catch(const cedar::proc::InvalidRoleException&)
-    {
-      // ok -- a step may not have any data for this role.
     }
   }
 }
@@ -1294,7 +1290,7 @@ void cedar::proc::gui::Connectable::demagnetizeSlots()
 
 void cedar::proc::gui::Connectable::magnetizeSlots(const QPointF& mousePositionInScene)
 {
-  double max_distance = 100.0;
+  double max_distance = 50.0;
   double scale_factor = cedar::proc::gui::SettingsSingleton::getInstance()->getDataSlotScaling();
   double scale_sensitivity = cedar::proc::gui::SettingsSingleton::getInstance()->getDataSlotScalingSensitivity();
 

@@ -161,8 +161,7 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
     this,
     SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange))
   );
-  cedar::aux::ParameterPtr looped_param = this->getGroup()->getParameter("is looped");
-  QObject::connect(looped_param.get(), SIGNAL(valueChanged()), this, SLOT(loopedChanged()));
+  QObject::connect(this->getGroup().get(), SIGNAL(loopedChanged()), this, SLOT(loopedChanged()));
 
   mDataConnectionChangedConnection = mGroup->connectToDataConnectionChangedSignal
                                      (
@@ -223,6 +222,32 @@ cedar::proc::gui::Group::~Group()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::gui::DataSlotItem* cedar::proc::gui::Group::getSourceConnectorItem(cedar::proc::DataSlotPtr slot) const
+{
+  for (auto slot_gui : this->mConnectorSources)
+  {
+    if (slot_gui->getSlot() == slot)
+    {
+      return slot_gui;
+    }
+  }
+
+  return nullptr;
+}
+
+cedar::proc::gui::DataSlotItem* cedar::proc::gui::Group::getSinkConnectorItem(cedar::proc::DataSlotPtr slot) const
+{
+  for (auto slot_gui : this->mConnectorSinks)
+  {
+    if (slot_gui->getSlot() == slot)
+    {
+      return slot_gui;
+    }
+  }
+
+  return nullptr;
+}
 
 bool cedar::proc::gui::Group::canBeDragged() const
 {
@@ -2482,8 +2507,7 @@ void cedar::proc::gui::Group::setGroup(cedar::proc::GroupPtr group)
     this,
     SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange))
   );
-  cedar::aux::ParameterPtr looped_param = this->getGroup()->getParameter("is looped");
-  QObject::connect(looped_param.get(), SIGNAL(valueChanged()), this, SLOT(loopedChanged()));
+  QObject::connect(this->getGroup().get(), SIGNAL(loopedChanged()), this, SLOT(loopedChanged()));
 
   mDataConnectionChangedConnection = mGroup->connectToDataConnectionChangedSignal
                                      (

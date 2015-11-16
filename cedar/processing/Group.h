@@ -150,6 +150,9 @@ signals:
   //! Emitted whenever all trigger in this group and its subgroups are stopped.
   void allTriggersStopped();
 
+  //! Sent when the number of triggerables in warning/error states is changed
+  void triggerableStateCountsChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
@@ -308,7 +311,7 @@ public:
    * @param source Source data slot.
    * @param target Target data slot.
    */
-  void connectSlots(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target);
+  void connectSlots(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
 
   /*!@brief Connects a cedar::proc::Trigger to a cedar::proc::Triggerable.
    *
@@ -594,9 +597,6 @@ public:
   // onStop enables the isLooped parameter
   void onStop();
 
-  //!@brief Returns whether this step should automatically be connected to done triggers when data is connected.
-  bool isLooped() const;
-
   //!@brief this function removes all unused connectors, i.e., connectors that have zero incoming or outgoing connections
   void pruneUnusedConnectors();
 
@@ -688,14 +688,17 @@ public:
   //! Applies the group's time factor, i.e., sets it at the cedar::aux::SettingsSingleton.
   void applyTimeFactor();
 
+  //! Returns the number of triggerables in this group that are in a warning state
+  unsigned int getTriggerablesInWarningStateCount() const;
+
+  //! Returns the number of triggerables in this group that are in a warning state
+  unsigned int getTriggerablesInErrorStateCount() const;
+
   //!@brief connects two slots across groups, allocating connectors if necessary
-  static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
+  static void connectAcrossGroups(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
 
   //!@brief disconnects two slots across groups, removing/merging connectors if necessary
   static bool disconnectAcrossGroups(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
-
-  //! Converts camel-case instances to spaces.
-  static std::string camelCaseToSpaces(const std::string& camelCasedString);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -706,6 +709,10 @@ protected:
    * @param slot The slot to revalidate.
    */
   void revalidateInputSlot(const std::string& slot);
+
+  signals:
+    //!@brief notify others of loopiness change
+    void loopedChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -769,6 +776,14 @@ private:
   void disconnectTriggerInternal(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
 
   void outputConnectionRemoved(cedar::proc::DataSlotPtr slot);
+
+  void triggerableStateChanged(cedar::proc::TriggerableWeakPtr triggerable);
+
+  void uncountTriggerableState(cedar::proc::ConstTriggerablePtr triggerable);
+
+  void registerLoopedTriggerable(cedar::proc::TriggerablePtr triggerable);
+
+  void unregisterLoopedTriggerable(cedar::proc::TriggerablePtr triggerable);
 
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
@@ -879,6 +894,14 @@ private:
   //! a connection to the groupChanged signal of element
   boost::signals2::scoped_connection mParentGroupChangedConnection;
 
+  std::map<cedar::proc::ConstTriggerablePtr, boost::shared_ptr<boost::signals2::scoped_connection> > mTriggerableStateChangedConnections;
+
+  std::map<cedar::proc::ConstTriggerablePtr, cedar::proc::Triggerable::State> mPreviousTriggerableStates;
+
+  cedar::aux::LockableMember<unsigned int> mTriggerablesInWarningStates;
+
+  cedar::aux::LockableMember<unsigned int> mTriggerablesInErrorStates;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -886,11 +909,12 @@ protected:
   //! map of all external connectors of this group
   ConnectorMapParameterPtr _mConnectors;
 
-  //! loopiness of this group
+  /*! this parameter is kept to maintain compatibility with older cedar versions - it is no longer needed
+   *  because groups now automatically determine if they are looped
+   */
   cedar::aux::BoolParameterPtr _mIsLooped;
 
   cedar::aux::DoubleParameterPtr _mTimeFactor;
-
 }; // class cedar::proc::Group
 
 Q_DECLARE_METATYPE(cedar::proc::Group::ConnectionChange)

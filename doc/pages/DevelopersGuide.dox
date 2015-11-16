@@ -1,9 +1,14 @@
 /*!
 
 @page DevelopersGuide Developers' Guide
-Welcome to cedar!
 
 @section Motivation Motivation
+The developers’ guide is a resource for people who would like to contribute to the core of cedar, e.g., adding
+functionality to cedar or fixing bugs directly in cedar. This guide explains how the source code is organized and which
+processes we use to test and release our software. It also highlights central concepts used in the code. The goal of
+this guide is to allow developers to efficiently locate the parts of code they wish to alter, understand how affected
+classes interact with each other and the rest of the code, and how changes may be merged back into our repositories once
+development is done.
 
 @section OrganizationalConcepts Organizational Concepts
 In these pages you can learn more about the structure and organization of cedar.
