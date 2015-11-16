@@ -264,6 +264,9 @@ public:
   //! Defines draggability of groups.
   bool canBeDragged() const;
 
+  //! Inherited, see super class.
+  bool canShowTriggerChains() const;
+
 public slots:
   /*! sets the recording state of all steps
    * @todo why is this done here? why is this done for all steps if one changes??
@@ -291,12 +294,6 @@ public slots:
 protected:
   //! handles removal of a slot
   void slotRemoved(cedar::proc::DataRole::Id role, const std::string& name);
-
-  //! Overrides Qt's hoverEnterEvent.
-  void hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent);
-
-  //! Overrides Qt's hoverLeaveEvent.
-  void hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent);
 
   /*!@brief Handles the drop event of the scene.
    *
