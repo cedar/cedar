@@ -561,9 +561,9 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
       break;
   }
 
-  // see if the mouse is moving some items
+  // see if the mouse is moving some items and there is no valid start of a connection
   //!@todo This should probably be done by overriding mouseMoveEvent etc in GraphicsBase/Connectable
-  if (pMouseEvent->button() == Qt::LeftButton)
+  if (pMouseEvent->button() == Qt::LeftButton && mpConnectionStart == nullptr)
   {
     auto items = this->items(pMouseEvent->scenePos(), Qt::IntersectsItemShape, Qt::DescendingOrder);
     // this is only the case if an item under the mouse is selected
