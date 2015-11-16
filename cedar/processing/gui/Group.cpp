@@ -368,32 +368,9 @@ void cedar::proc::gui::Group::geometryLockChanged()
   this->updateResizeHandles();
 }
 
-void cedar::proc::gui::Group::hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent)
+bool cedar::proc::gui::Group::canShowTriggerChains() const
 {
-  // only looped groups have meaningful trigger chains (which are displayed in gui::Connectable::hoverEnterEvent)
-  if (!this->getGroup()->isLooped())
-  {
-    pEvent->setAccepted(false);
-    return;
-  }
-  else
-  {
-    cedar::proc::gui::Connectable::hoverEnterEvent(pEvent);
-  }
-}
-
-void cedar::proc::gui::Group::hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent)
-{
-  // see cedar::proc::gui::Group::hoverEnterEvent
-  if (!this->getGroup()->isLooped())
-  {
-    pEvent->setAccepted(false);
-    return;
-  }
-  else
-  {
-    cedar::proc::gui::Connectable::hoverLeaveEvent(pEvent);
-  }
+  return this->getGroup()->isLooped();
 }
 
 void cedar::proc::gui::Group::elementNameChanged(const std::string&, const std::string& to)

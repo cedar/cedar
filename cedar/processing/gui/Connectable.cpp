@@ -173,6 +173,7 @@ mShowingTriggerColor(false)
 
 cedar::proc::gui::Connectable::~Connectable()
 {
+  this->hideTriggerChains();
   for(auto child_widget : mChildWidgets)
   {
     child_widget->close();
@@ -520,6 +521,12 @@ void cedar::proc::gui::Connectable::Decoration::setDescription(const QString& te
 
 void cedar::proc::gui::Connectable::hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent)
 {
+  if (!this->canShowTriggerChains())
+  {
+    pEvent->setAccepted(false);
+    return;
+  }
+
   this->showTriggerChains();
 
   // because qt doesn't send a leave event if a child is hovered over, we need to manually implement one
@@ -527,7 +534,8 @@ void cedar::proc::gui::Connectable::hoverEnterEvent(QGraphicsSceneHoverEvent* pE
   {
     if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(this->parentItem()))
     {
-      connectable->hideTriggerChains();
+      if (connectable->canShowTriggerChains())
+        connectable->hideTriggerChains();
     }
   }
 
@@ -536,6 +544,12 @@ void cedar::proc::gui::Connectable::hoverEnterEvent(QGraphicsSceneHoverEvent* pE
 
 void cedar::proc::gui::Connectable::hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent)
 {
+  if (!this->canShowTriggerChains())
+  {
+    pEvent->setAccepted(false);
+    return;
+  }
+
   this->hideTriggerChains();
 
   // because qt doesn't send an enter event if a child is left, we need to manually implement one
@@ -543,7 +557,8 @@ void cedar::proc::gui::Connectable::hoverLeaveEvent(QGraphicsSceneHoverEvent* pE
   {
     if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(this->parentItem()))
     {
-      connectable->showTriggerChains();
+      if (connectable->canShowTriggerChains())
+        connectable->showTriggerChains();
     }
   }
 
@@ -553,6 +568,11 @@ void cedar::proc::gui::Connectable::hoverLeaveEvent(QGraphicsSceneHoverEvent* pE
 void cedar::proc::gui::Connectable::translateLoopedTriggerChangedSignal()
 {
   emit triggerableParentTriggerChanged();
+}
+
+bool cedar::proc::gui::Connectable::canShowTriggerChains() const
+{
+  return true;
 }
 
 void cedar::proc::gui::Connectable::showTriggerChains()
