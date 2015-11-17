@@ -476,7 +476,12 @@ private:
 
   virtual void outputConnectionRemoved(cedar::proc::DataSlotPtr slot);
 
-  //!@brief Declares an output slot and immediately sets a non-owned data pointer for that slot.
+  /*!@brief Declares an output slot that contains data that is not owned by this connectable.
+   *
+   * This is necessary mostly in the context of groups, where data owned by a step inside the group is passed to the
+   * outside via a data slot on the group. Because the group does not own the data, a shared output must be declared
+   * using this method.
+   */
   cedar::proc::DataSlotPtr declareSharedOutput(const std::string& name, cedar::aux::DataPtr data);
 
   //! Returns the slot map for the given role. If none exists, throws an exception.

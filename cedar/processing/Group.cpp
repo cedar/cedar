@@ -1768,6 +1768,7 @@ void cedar::proc::Group::connectSlots(cedar::proc::OwnedDataPtr source, cedar::p
   source->addOutgoingConnection(new_connection);
   target->addIncomingConnection(new_connection);
 
+  //!@todo Why isn't (most of) this code in DataConnection?
   auto source_as_triggerable = this->getElement<cedar::proc::Triggerable>(source->getParent());
   auto target_as_triggerable = this->getElement<cedar::proc::Triggerable>(target->getParent());
   //!@todo Replace isLooped || ... by a new p_target->acceptsDoneTriggerConnections() function?
