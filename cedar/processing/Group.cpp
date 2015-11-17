@@ -3124,15 +3124,18 @@ void cedar::proc::Group::onLoopedChanged()
     // check if this is the root group
     if (this->isRoot())
     {
-      // check if this group was connected to a trigger
+      // check if this group was connected to a looped trigger
       for (auto trigger_connection : mTriggerConnections)
       {
         if (trigger_connection->getTarget() == group)
         {
-          // get a non-const version of the trigger and disconnect
-          auto trigger = this->getElement<cedar::proc::Trigger>(trigger_connection->getSourceTrigger()->getName());
-          this->disconnectTrigger(trigger, group);
-          break;
+          // check if name exists (processingDone triggers are not in the group), cast, and disconnect
+          if (this->nameExists(trigger_connection->getSourceTrigger()->getName()))
+          {
+            auto trigger = this->getElement<cedar::proc::LoopedTrigger>(trigger_connection->getSourceTrigger()->getName());
+            this->disconnectTrigger(trigger, group);
+            break;
+          }
         }
       }
     }

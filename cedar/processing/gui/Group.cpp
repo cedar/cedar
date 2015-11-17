@@ -2101,8 +2101,7 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
 
   color_menu->setDisabled(p_scene->getRootGroup()->showsTriggerColors());
 
-  bool can_edit_slots = this->getGroup()->getState() != cedar::proc::Triggerable::STATE_RUNNING
-                       && !this->getGroup()->isLinked();
+  bool can_edit_slots = !this->getGroup()->isLinked();
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
   QAction* p_add_input = menu.addAction("add input");
