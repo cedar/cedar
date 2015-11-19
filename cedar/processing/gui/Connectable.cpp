@@ -1373,12 +1373,13 @@ void cedar::proc::gui::Connectable::updateDecorations()
             "This element is looped."
           )
         );
+        this->addDecoration(mpLoopedDecoration);
       }
-      this->addDecoration(mpLoopedDecoration);
     }
     else if (this->mpLoopedDecoration)
     {
       this->removeDecoration(this->mpLoopedDecoration);
+      this->mpLoopedDecoration.reset();
     }
   }
 
