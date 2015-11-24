@@ -697,6 +697,9 @@ public:
   //! Converts camel-case instances to spaces.
   static std::string camelCaseToSpaces(const std::string& camelCasedString);
 
+  //! Returns if this group is marked as being recorded.
+  	bool isRecorded() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
