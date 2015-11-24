@@ -2990,7 +2990,6 @@ void cedar::proc::Group::onLoopedChanged()
       {
         // get the bool parameter
         auto triggerable = this->getElement<cedar::proc::Triggerable>(element->getName());
-//        auto is_looped = it->second->getParameter<cedar::aux::BoolParameter>("is looped");
         auto is_looped = triggerable->isLooped();
         // check whether we have to add or remove the element from the list of triggerables
         if (is_looped) // add
@@ -3038,11 +3037,13 @@ void cedar::proc::Group::onLoopedChanged()
             {
               if (trigger_connection->getTarget() == triggerable)
               {
-                // get a non-const version of the trigger and disconnect
-                auto trigger
-                  = this->getElement<cedar::proc::Trigger>(trigger_connection->getSourceTrigger()->getName());
-                this->disconnectTrigger(trigger, triggerable);
-                break;
+                // check if name exists (processingDone triggers are not in the group), cast, and disconnect
+                if (this->nameExists(trigger_connection->getSourceTrigger()->getName()))
+                {
+                  auto trigger = this->getElement<cedar::proc::LoopedTrigger>(trigger_connection->getSourceTrigger()->getName());
+                  this->disconnectTrigger(trigger, triggerable);
+                  break;
+                }
               }
             }
           }
