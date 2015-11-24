@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -56,8 +56,8 @@
 #include <QObject>
 #include <QWeakPointer>
 #ifndef Q_MOC_RUN
-  #include <boost/signals2/signal.hpp>
-  #include <boost/signals2/connection.hpp>
+#include <boost/signals2/signal.hpp>
+#include <boost/signals2/connection.hpp>
 #endif // Q_MOC_RUN
 #include <map>
 #include <vector>
@@ -71,470 +71,471 @@
  */
 class cedar::proc::gui::Group : public cedar::proc::gui::Connectable
 {
-  Q_OBJECT
+	Q_OBJECT
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // friends
-  //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::gui::GroupWidget;
-  friend class cedar::proc::gui::Scene;
+	//--------------------------------------------------------------------------------------------------------------------
+	// friends
+	//--------------------------------------------------------------------------------------------------------------------
+	friend class cedar::proc::gui::GroupWidget;
+	friend class cedar::proc::gui::Scene;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // constructors and destructor
-  //--------------------------------------------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------------------------------------------------
+	// constructors and destructor
+	//--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Group
-  (
-    QMainWindow *pMainWindow,
-    cedar::proc::gui::Scene* scene,
-    qreal width = static_cast<qreal>(250),
-    qreal height = static_cast<qreal>(250),
-    cedar::proc::GroupPtr group = cedar::proc::GroupPtr()
-  );
+	//!@brief The standard constructor.
+	Group
+	(
+			QMainWindow *pMainWindow,
+			cedar::proc::gui::Scene* scene,
+			qreal width = static_cast<qreal>(250),
+			qreal height = static_cast<qreal>(250),
+			cedar::proc::GroupPtr group = cedar::proc::GroupPtr()
+	);
 
-  //!@brief Destructor
-  ~Group();
+	//!@brief Destructor
+	~Group();
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // public methods
-  //--------------------------------------------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------------------------------------------------
+	// public methods
+	//--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief write group to file
-  void write() const;
-
-  //!@brief write configuration to path
-  void writeJson(const cedar::aux::Path& filename) const;
-
-  //!@brief read configuration from path
-  void readJson(const cedar::aux::Path& filename);
-
-  //! Checks if any connectables in the given list can be added to this group. Non-connectables are ignored.
-  bool canAddAny(const QList<QGraphicsItem*>& items) const;
-
-  /*!@brief access the underlying cedar::proc::Group
-   */
-  cedar::proc::GroupPtr getGroup();
+	//!@brief write group to file
+	void write() const;
+
+	//!@brief write configuration to path
+	void writeJson(const cedar::aux::Path& filename) const;
+
+	//!@brief read configuration from path
+	void readJson(const cedar::aux::Path& filename);
 
-  /*!@brief access the underlying cedar::proc::Group
-   */
-  cedar::proc::ConstGroupPtr getGroup() const;
+	//! Checks if any connectables in the given list can be added to this group. Non-connectables are ignored.
+	bool canAddAny(const QList<QGraphicsItem*>& items) const;
 
-  /*!@brief access the underlying cedar::proc::Group
-   */
-  void setGroup(cedar::proc::GroupPtr group);
-
-  //!@brief get the current file, to which the group configuration can be saved
-  const std::string& getFileName() const;
-
-  /*!@brief Resizes the group to exactly fit all its contents.
-   *
-   * @param grow If true, the item will only get larger, but not smaller.
-   */
-  void fitToContents(bool grow = false);
+	/*!@brief access the underlying cedar::proc::Group
+	 */
+	cedar::proc::GroupPtr getGroup();
 
-  //!@brief Adds an element to the group.
-  void addElement(cedar::proc::gui::GraphicsBase *pElement);
+	/*!@brief access the underlying cedar::proc::Group
+	 */
+	cedar::proc::ConstGroupPtr getGroup() const;
 
-  //!@brief Adds a list of elements to the group efficiently.
-  void addElements(const std::list<QGraphicsItem*>& elements);
+	/*!@brief access the underlying cedar::proc::Group
+	 */
+	void setGroup(cedar::proc::GroupPtr group);
 
-  //! Duplicates an element and places it at the given position.
-  cedar::proc::gui::Element* duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName = "");
+	//!@brief get the current file, to which the group configuration can be saved
+	const std::string& getFileName() const;
 
-  //!@brief Sets the scene containing this item.
-  void setScene(cedar::proc::gui::Scene* pScene);
+	/*!@brief Resizes the group to exactly fit all its contents.
+	 *
+	 * @param grow If true, the item will only get larger, but not smaller.
+	 */
+	void fitToContents(bool grow = false);
 
-  //!@brief reads a configuration from a node
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+	//!@brief Adds an element to the group.
+	void addElement(cedar::proc::gui::GraphicsBase *pElement);
 
-  //!@brief saves a configuration to a node
-  void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
+	//!@brief Adds a list of elements to the group efficiently.
+	void addElements(const std::list<QGraphicsItem*>& elements);
 
-  //! Disconnects the group.
-  void disconnect();
+	//! Duplicates an element and places it at the given position.
+	cedar::proc::gui::Element* duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName = "");
 
-  //! deals with changes to the group gui item
-  QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value);
+	//!@brief Sets the scene containing this item.
+	void setScene(cedar::proc::gui::Scene* pScene);
 
-  //! deals with a mouse release event
-  bool sceneEventFilter(QGraphicsItem* pWatched, QEvent* pEvent);
+	//!@brief reads a configuration from a node
+	void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
-  //! get the scene in which this group is embedded
-  cedar::proc::gui::Scene* getScene()
-  {
-    return this->mpScene;
-  }
+	//!@brief saves a configuration to a node
+	void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 
-  //! get the scene in which this group is embedded
-  cedar::proc::gui::Scene* getScene() const
-  {
-    return this->mpScene;
-  }
+	//! Disconnects the group.
+	void disconnect();
 
-  /*!@brief Sets the ui configuration for the element when it is added to the group.
-   */
-  inline void setNextElementUiConfiguration
-  (
-    cedar::proc::ElementPtr element, const cedar::aux::ConfigurationNode& uiDescription
-  )
-  {
-    this->mNextElementUiConfigurations[element.get()] = uiDescription;
-  }
+	//! deals with changes to the group gui item
+	QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value);
 
-  //! Sets the smart connection mode for all elements in this group.
-  void toggleSmartConnectionMode(bool smart)
-  {
-    this->_mSmartMode->setValue(smart);
-  }
+	//! deals with a mouse release event
+	bool sceneEventFilter(QGraphicsItem* pWatched, QEvent* pEvent);
 
-  //! Returns whether smart connection mode is used for all elements in this group.
-  bool getSmartConnection() const
-  {
-    return this->_mSmartMode->getValue();
-  }
+	//! get the scene in which this group is embedded
+	cedar::proc::gui::Scene* getScene()
+	{
+		return this->mpScene;
+	}
 
-  //! creates plot group of provided name containing all currently opened plots
-  void addPlotGroup(std::string plotGroupName);
+	//! get the scene in which this group is embedded
+	cedar::proc::gui::Scene* getScene() const
+	{
+		return this->mpScene;
+	}
 
-  //! creates plot group of provided name containing all currently opened plots
-  void editPlotGroup(std::string plotGroupName);
+	/*!@brief Sets the ui configuration for the element when it is added to the group.
+	 */
+	inline void setNextElementUiConfiguration
+	(
+			cedar::proc::ElementPtr element, const cedar::aux::ConfigurationNode& uiDescription
+	)
+	{
+		this->mNextElementUiConfigurations[element.get()] = uiDescription;
+	}
 
-  //! removes plot group of given name
-  void removePlotGroup(std::string plotGroupName);
+	//! Sets the smart connection mode for all elements in this group.
+	void toggleSmartConnectionMode(bool smart)
+	{
+		this->_mSmartMode->setValue(smart);
+	}
 
-  //! renames plot group of given name (from) to given name (to)
-  void renamePlotGroup(std::string from, std::string to);
-  
-  //! returns the name of every plot group of this group
-  std::list<std::string> getPlotGroupNames();
+	//! Returns whether smart connection mode is used for all elements in this group.
+	bool getSmartConnection() const
+	{
+		return this->_mSmartMode->getValue();
+	}
 
-  //! returns whether a name already exists in plot group list
-  bool plotGroupNameExists(const std::string& newName) const;
+	//! creates plot group of provided name containing all currently opened plots
+	void addPlotGroup(std::string plotGroupName);
 
-  //! opens the given plot group
-  void displayPlotGroup(std::string plotGroupName);
+	//! creates plot group of provided name containing all currently opened plots
+	void editPlotGroup(std::string plotGroupName);
 
-  //!@brief handles events in the context menu
-  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+	//! removes plot group of given name
+	void removePlotGroup(std::string plotGroupName);
 
-  //! Returns whether or not this group is collapsed.
-  bool isCollapsed() const
-  {
-    return this->_mIsCollapsed->getValue();
-  }
+	//! renames plot group of given name (from) to given name (to)
+	void renamePlotGroup(std::string from, std::string to);
 
-  //! search and replace every occurance of 'from' with 'to' in the plot groups node
-  void changeStepName(const std::string& from, const std::string& to);
+	//! returns the name of every plot group of this group
+	std::list<std::string> getPlotGroupNames();
 
-  //! Returns the architecture plots for this group.
-  const std::map<std::string, cedar::aux::Path>& getArchitectureWidgets() const;
+	//! returns whether a name already exists in plot group list
+	bool plotGroupNameExists(const std::string& newName) const;
 
-  //! Sets the architecture widgets for this group.
-  void setArchitectureWidgets(const std::map<std::string, cedar::aux::Path>& newWidgets);
+	//! opens the given plot group
+	void displayPlotGroup(std::string plotGroupName);
 
-  //! Displays the architecture plot with the given name.
-  void showArchitectureWidget(const std::string& name);
+	//!@brief handles events in the context menu
+	void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
-  //! Changes the visibility of all open architecture widgets
-  void toggleVisibilityOfOpenArchitectureWidgets(bool visible);
+	//! Returns whether or not this group is collapsed.
+	bool isCollapsed() const
+	{
+		return this->_mIsCollapsed->getValue();
+	}
 
-  //! Closes all open architecture widgets
-  void closeOpenArchitectureWidgets();
+	//! search and replace every occurance of 'from' with 'to' in the plot groups node
+	void changeStepName(const std::string& from, const std::string& to);
 
-  //! Returns a color for a given looped trigger
-  QBrush getColorFor(cedar::proc::LoopedTriggerPtr trigger) const;
+	//! Returns the architecture plots for this group.
+	const std::map<std::string, cedar::aux::Path>& getArchitectureWidgets() const;
 
-  void toggleTriggerColors(bool show);
+	//! Sets the architecture widgets for this group.
+	void setArchitectureWidgets(const std::map<std::string, cedar::aux::Path>& newWidgets);
 
-  //! Returns whether or not the trigger colors of elements in this group should be shown.
-  bool showsTriggerColors() const;
+	//! Displays the architecture plot with the given name.
+	void showArchitectureWidget(const std::string& name);
 
-  void updateTriggerColorState();
+	//! Changes the visibility of all open architecture widgets
+	void toggleVisibilityOfOpenArchitectureWidgets(bool visible);
 
-  //! Returns the slot item used for the given group source.
-  cedar::proc::gui::DataSlotItem* getSlotItemFor(cedar::proc::sources::GroupSourcePtr source) const;
+	//! Closes all open architecture widgets
+	void closeOpenArchitectureWidgets();
 
-  //! Returns true in this case, as deleting groups requires confirmation.
-  bool manualDeletionRequiresConfirmation() const;
+	//! Returns a color for a given looped trigger
+	QBrush getColorFor(cedar::proc::LoopedTriggerPtr trigger) const;
 
-  //! Implements supported display modes for groups.
-  bool supportsDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id id) const;
+	void toggleTriggerColors(bool show);
 
-  //! Defines draggability of groups.
-  bool canBeDragged() const;
+	//! Returns whether or not the trigger colors of elements in this group should be shown.
+	bool showsTriggerColors() const;
 
-public slots:
-  /*! sets the recording state of all steps
-   * @todo why is this done here? why is this done for all steps if one changes??
-   */
-  void stepRecordStateChanged();
+	void updateTriggerColorState();
 
-  //! set collapsedness of this group
-  void setCollapsed(bool collapsed);
+	//! Returns the slot item used for the given group source.
+	cedar::proc::gui::DataSlotItem* getSlotItemFor(cedar::proc::sources::GroupSourcePtr source) const;
 
-  //! handes a change in step name
-  void handleStepNameChanged(const std::string& from, const std::string& to);
+	//! Returns true in this case, as deleting groups requires confirmation.
+	bool manualDeletionRequiresConfirmation() const;
 
-  //! Enables/disables resizing and moving of the group.
-  void setLockGeometry(bool lock = true);
-  
-  //! Calls reset on the underlying group, i.e., resets all elements in the group displayed by this item.
-  void reset();
+	//! Implements supported display modes for groups.
+	bool supportsDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id id) const;
 
-  //! Opens a container that displays this group.
-  void openGroupContainer();
+	//! Defines draggability of groups.
+	bool canBeDragged() const;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //! handles removal of a slot
-  void slotRemoved(cedar::proc::DataRole::Id role, const std::string& name);
 
-  //! Overrides Qt's hoverEnterEvent.
-  void hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent);
+	public slots:
+	/*! sets the recording state of all steps
+	 * @todo why is this done here? why is this done for all steps if one changes??
+	 */
+	void stepRecordStateChanged();
 
-  //! Overrides Qt's hoverLeaveEvent.
-  void hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent);
+	//! set collapsedness of this group
+	void setCollapsed(bool collapsed);
 
-  /*!@brief Handles the drop event of the scene.
-   *
-   *        This method mainly instantiates elements that are dropped from the Element toolbar to create new items in
-   *        the scene.
-   */
-  void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
+	//! handes a change in step name
+	void handleStepNameChanged(const std::string& from, const std::string& to);
 
-  //! Overrides Qt's dragEnterEvent.
-  void dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent);
+	//! Enables/disables resizing and moving of the group.
+	void setLockGeometry(bool lock = true);
 
-  /*!@brief Handles the dragLeave event of the scene.
-   */
-  void dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent);
+	//! Calls reset on the underlying group, i.e., resets all elements in the group displayed by this item.
+	void reset();
 
-  /*!@brief Handles the dragMove event of the scene.
-   *
-   *        This method determines whether the contents of the drop can be handled by
-   *        cedar::proc::gui::Scene::dropEvent.
-   */
-  void dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent);
+	//! Opens a container that displays this group.
+	void openGroupContainer();
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // private methods
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  std::string getStringForElementType(cedar::proc::ConstElementPtr element) const;
+	//--------------------------------------------------------------------------------------------------------------------
+	// protected methods
+	//--------------------------------------------------------------------------------------------------------------------
+	protected:
+	//! handles removal of a slot
+	void slotRemoved(cedar::proc::DataRole::Id role, const std::string& name);
 
-  void tryToRestoreUIConfiguration
-       (
-         cedar::aux::ConfigurationNode& conf,
-         cedar::proc::ElementPtr element,
-         cedar::proc::gui::GraphicsBase* pSceneElement
-       );
+	//! Overrides Qt's hoverEnterEvent.
+	void hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent);
 
-  void tryToRestoreGroupUIConfiguration
-       (
-         cedar::aux::ConfigurationNode& conf,
-         cedar::proc::gui::GraphicsBase* pSceneElement
-       );
+	//! Overrides Qt's hoverLeaveEvent.
+	void hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent);
 
-  //! Restores the UI configurations for any elements that are in the scene.
-  void tryRestoreUIConfigurationsOfElements(cedar::aux::ConfigurationNode& conf);
+	/*!@brief Handles the drop event of the scene.
+	 *
+	 *        This method mainly instantiates elements that are dropped from the Element toolbar to create new items in
+	 *        the scene.
+	 */
+	void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
 
-  //! Adds all the steps already in the group
-  void addGuiItemsForGroup();
+	//! Overrides Qt's dragEnterEvent.
+	void dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent);
 
-  //!@brief write scene to a node
-  void writeScene(cedar::aux::ConfigurationNode& root) const;
+	/*!@brief Handles the dragLeave event of the scene.
+	 */
+	void dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent);
 
-  //!@brief Determines whether the group is the root group.
-  bool isRootGroup();
+	/*!@brief Handles the dragMove event of the scene.
+	 *
+	 *        This method determines whether the contents of the drop can be handled by
+	 *        cedar::proc::gui::Scene::dropEvent.
+	 */
+	void dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent);
 
-  void checkSlots();
+	//--------------------------------------------------------------------------------------------------------------------
+	// private methods
+	//--------------------------------------------------------------------------------------------------------------------
+	private:
+	std::string getStringForElementType(cedar::proc::ConstElementPtr element) const;
 
-  void checkDataItems();
+	void tryToRestoreUIConfiguration
+	(
+			cedar::aux::ConfigurationNode& conf,
+			cedar::proc::ElementPtr element,
+			cedar::proc::gui::GraphicsBase* pSceneElement
+	);
 
-  void updateConnectorPositions();
+	void tryToRestoreGroupUIConfiguration
+	(
+			cedar::aux::ConfigurationNode& conf,
+			cedar::proc::gui::GraphicsBase* pSceneElement
+	);
 
-  //!@brief Transforms the coordinates of a newly added child into the group's coordinate system.
-  void transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem);
+	//! Restores the UI configurations for any elements that are in the scene.
+	void tryRestoreUIConfigurationsOfElements(cedar::aux::ConfigurationNode& conf);
 
-  //!@brief a function that translates a boost signal to check a data connection into a Qt signal
-  void checkDataConnection
-       (
-         cedar::proc::ConstDataSlotPtr source,
-         cedar::proc::ConstDataSlotPtr target,
-         cedar::proc::Group::ConnectionChange change
-       );
+	//! Adds all the steps already in the group
+	void addGuiItemsForGroup();
 
-  void checkTriggerConnection(cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool added);
+	//!@brief write scene to a node
+	void writeScene(cedar::aux::ConfigurationNode& root) const;
 
-  void processElementAddedSignal(cedar::proc::ElementPtr);
+	//!@brief Determines whether the group is the root group.
+	bool isRootGroup();
 
-  void processElementRemovedSignal(cedar::proc::ConstElementPtr);
+	void checkSlots();
 
-  void readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node);
+	void checkDataItems();
 
-  void writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const;
+	void updateConnectorPositions();
 
-  void sizeChanged();
+	//!@brief Transforms the coordinates of a newly added child into the group's coordinate system.
+	void transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem);
 
-  void itemSceneHasChanged();
+	//!@brief a function that translates a boost signal to check a data connection into a Qt signal
+	void checkDataConnection
+	(
+			cedar::proc::ConstDataSlotPtr source,
+			cedar::proc::ConstDataSlotPtr target,
+			cedar::proc::Group::ConnectionChange change
+	);
 
-  void removeConnectorItem(bool isSource, const std::string& name);
+	void checkTriggerConnection(cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool added);
 
-  qreal getIconSizeForCurrentMode() const;
+	void processElementAddedSignal(cedar::proc::ElementPtr);
 
-  cedar::proc::gui::Element* getUiElementFor(cedar::proc::ElementPtr element) const;
+	void processElementRemovedSignal(cedar::proc::ConstElementPtr);
 
-  void readStickyNotes(const cedar::aux::ConfigurationNode& node);
+	void readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node);
 
-  /*!@brief this function emits a connection added signal for all connections in the underlying network.
-   * It can be used to restore connections after moving or duplicating groups
-   */
-  void restoreConnections();
+	void writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const;
 
-  void linkedChanged(bool readOnly);
+	void sizeChanged();
 
-  void lastReadConfigurationChanged();
+	void itemSceneHasChanged();
 
-  bool canResize() const;
+	void removeConnectorItem(bool isSource, const std::string& name);
 
-  void clearTriggerColorCache() const;
+	qreal getIconSizeForCurrentMode() const;
 
-  void updateAllElementsTriggerColorState() const;
+	cedar::proc::gui::Element* getUiElementFor(cedar::proc::ElementPtr element) const;
 
-  void addElementsToGroup();
+	void readStickyNotes(const cedar::aux::ConfigurationNode& node);
 
-signals:
-  //!@brief signal that is emitted when a boost signal is received
-  void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange);
+	/*!@brief this function emits a connection added signal for all connections in the underlying network.
+	 * It can be used to restore connections after moving or duplicating groups
+	 */
+	void restoreConnections();
 
-  //! Emitted whenever trigger colors need updating.
-  void triggerColorsChanged() const;
+	void linkedChanged(bool readOnly);
 
-private slots:
-  //!@brief Updates the label of the group.
-  void groupNameChanged();
+	void lastReadConfigurationChanged();
 
-  void toggleSmartConnectionMode();
+	bool canResize() const;
 
-  //!@brief handle an internal signal to create or remove gui connections
-  void dataConnectionChanged
-       (
-         QString sourceName,
-         QString sourceSlot,
-         QString targetName,
-         QString targetSlot,
-         cedar::proc::Group::ConnectionChange change
-       );
+	void clearTriggerColorCache() const;
 
-  void updateCollapsedness();
+	void updateAllElementsTriggerColorState() const;
 
-  //! Updates the position(s) and size(s) of the texts attached to this group.
-  void updateTextBounds();
+	void addElementsToGroup();
 
-  //! Updates the position and size of the icon.
-  void updateIconBounds();
+	signals:
+	//!@brief signal that is emitted when a boost signal is received
+	void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange);
 
-  void loopedChanged();
-  
-  void removeElementFromPlotGroup(const std::string& plotGroupname, const std::string& elementName);
+	//! Emitted whenever trigger colors need updating.
+	void triggerColorsChanged() const;
 
-  void openParameterEditor();
+	private slots:
+	//!@brief Updates the label of the group.
+	void groupNameChanged();
 
-  void backgroundColorActionTriggered();
+	void toggleSmartConnectionMode();
 
-  void elementNameChanged(const std::string&, const std::string&);
+	//!@brief handle an internal signal to create or remove gui connections
+	void dataConnectionChanged
+	(
+			QString sourceName,
+			QString sourceSlot,
+			QString targetName,
+			QString targetSlot,
+			cedar::proc::Group::ConnectionChange change
+	);
 
-  void geometryLockChanged();
+	void updateCollapsedness();
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // members
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-private:
-  //!@brief represented group
-  cedar::proc::GroupPtr mGroup;
+	//! Updates the position(s) and size(s) of the texts attached to this group.
+	void updateTextBounds();
 
-  //!@brief a scene, which displays the elements contained in this group
-  cedar::proc::gui::Scene* mpScene;
+	//! Updates the position and size of the icon.
+	void updateIconBounds();
 
-  //!@brief a filename from which to load a group configuration, or to which to save a configuration
-  mutable std::string mFileName;
+	void loopedChanged();
 
-  //!@brief a vector of all source connectors
-  std::vector<cedar::proc::gui::DataSlotItem*> mConnectorSources;
+	void removeElementFromPlotGroup(const std::string& plotGroupname, const std::string& elementName);
 
-  //!@brief a vector of all sink connectors
-  std::vector<cedar::proc::gui::DataSlotItem*> mConnectorSinks;
+	void openParameterEditor();
 
-  //!@brief a vector of steps, which contains all steps that should be added to the scene after reading a configuration
-  std::vector<cedar::proc::gui::StepItem*> mpStepsToAdd;
+	void backgroundColorActionTriggered();
 
-  //!@brief a vector of triggers, which contains all steps that should be added to the scene
-  //        after reading a configuration
-  std::vector<cedar::proc::gui::TriggerItem*> mpTriggersToAdd;
+	void elementNameChanged(const std::string&, const std::string&);
 
-  //!@brief a vector of steps, which contains all steps that should be added to the scene after reading a configuration
-  std::vector<cedar::proc::gui::Group*> mpGroupsToAdd;
+	void geometryLockChanged();
 
-  //! Map assigning colors to looped triggers. This is a cache to make calculations faster. The real assignment is determined algorithmically.
-  mutable std::map<cedar::proc::TriggerPtr, QBrush> mTriggerColors;
+	//--------------------------------------------------------------------------------------------------------------------
+	// members
+	//--------------------------------------------------------------------------------------------------------------------
+	protected:
+	// none yet
+	private:
+	//!@brief represented group
+	cedar::proc::GroupPtr mGroup;
 
-  boost::signals2::scoped_connection mNewElementAddedConnection;
-  boost::signals2::scoped_connection mElementRemovedConnection;
-  boost::signals2::scoped_connection mTriggerConnectionChangedConnection;
-  boost::signals2::scoped_connection mDataConnectionChangedConnection;
-  boost::signals2::scoped_connection mLinkedChangedConnection;
-  boost::signals2::scoped_connection mLastReadConfigurationChangedConnection;
+	//!@brief a scene, which displays the elements contained in this group
+	cedar::proc::gui::Scene* mpScene;
 
-  //! Fit to contents-calls are temporarily disabled if this is set to true.
-  bool mHoldFitToContents;
+	//!@brief a filename from which to load a group configuration, or to which to save a configuration
+	mutable std::string mFileName;
 
-  //! Text item used for displaying the name of the group.
-  QGraphicsTextItem* mpNameDisplay;
+	//!@brief a vector of all source connectors
+	std::vector<cedar::proc::gui::DataSlotItem*> mConnectorSources;
 
-  //! Configuration of the next element that is added to the scene.
-  std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode> mNextElementUiConfigurations;
+	//!@brief a vector of all sink connectors
+	std::vector<cedar::proc::gui::DataSlotItem*> mConnectorSinks;
 
-  cedar::proc::gui::Connectable::DecorationPtr mpLinkedDecoration;
+	//!@brief a vector of steps, which contains all steps that should be added to the scene after reading a configuration
+	std::vector<cedar::proc::gui::StepItem*> mpStepsToAdd;
 
-  std::vector<QWeakPointer<QWidget>> mArchitectureWidgetDocks;
+	//!@brief a vector of triggers, which contains all steps that should be added to the scene
+	//        after reading a configuration
+	std::vector<cedar::proc::gui::TriggerItem*> mpTriggersToAdd;
 
-  bool mShowTriggerColors;
+	//!@brief a vector of steps, which contains all steps that should be added to the scene after reading a configuration
+	std::vector<cedar::proc::gui::Group*> mpGroupsToAdd;
 
-  //! The vertical offset for data slots in the group used when the group is expanded.
-  static const qreal M_EXPANDED_SLOT_OFFSET;
+	//! Map assigning colors to looped triggers. This is a cache to make calculations faster. The real assignment is determined algorithmically.
+	mutable std::map<cedar::proc::TriggerPtr, QBrush> mTriggerColors;
 
-  //! The size of the icon in the expanded mode.
-  static const qreal M_EXPANDED_ICON_SIZE;
+	boost::signals2::scoped_connection mNewElementAddedConnection;
+	boost::signals2::scoped_connection mElementRemovedConnection;
+	boost::signals2::scoped_connection mTriggerConnectionChangedConnection;
+	boost::signals2::scoped_connection mDataConnectionChangedConnection;
+	boost::signals2::scoped_connection mLinkedChangedConnection;
+	boost::signals2::scoped_connection mLastReadConfigurationChangedConnection;
 
-  //! The size of the icon in the collapsed mode.
-  static const qreal M_COLLAPSED_ICON_SIZE;
+	//! Fit to contents-calls are temporarily disabled if this is set to true.
+	bool mHoldFitToContents;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  cedar::aux::BoolParameterPtr _mSmartMode;
+	//! Text item used for displaying the name of the group.
+	QGraphicsTextItem* mpNameDisplay;
 
-  cedar::aux::ConfigurationNode mPlotGroupsNode;
+	//! Configuration of the next element that is added to the scene.
+	std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode> mNextElementUiConfigurations;
 
-  cedar::aux::BoolParameterPtr _mIsCollapsed;
+	cedar::proc::gui::Connectable::DecorationPtr mpLinkedDecoration;
 
-  //! Disables moving/resizing the group
-  cedar::aux::BoolParameterPtr _mGeometryLocked;
+	std::vector<QWeakPointer<QWidget>> mArchitectureWidgetDocks;
 
-  //! Width of the group in its uncollapsed state.
-  cedar::aux::DoubleParameterPtr _mUncollapsedWidth;
+	bool mShowTriggerColors;
 
-  //! Height of the group in its uncollapsed state.
-  cedar::aux::DoubleParameterPtr _mUncollapsedHeight;
+	//! The vertical offset for data slots in the group used when the group is expanded.
+	static const qreal M_EXPANDED_SLOT_OFFSET;
 
-  //! Map containing all the architecture plots. Keys are the names of the plots, values the paths to the files defining them.
-  std::map<std::string, cedar::aux::Path> _mArchitectureWidgets;
+	//! The size of the icon in the expanded mode.
+	static const qreal M_EXPANDED_ICON_SIZE;
+
+	//! The size of the icon in the collapsed mode.
+	static const qreal M_COLLAPSED_ICON_SIZE;
+
+	//--------------------------------------------------------------------------------------------------------------------
+	// parameters
+	//--------------------------------------------------------------------------------------------------------------------
+	private:
+	cedar::aux::BoolParameterPtr _mSmartMode;
+
+	cedar::aux::ConfigurationNode mPlotGroupsNode;
+
+	cedar::aux::BoolParameterPtr _mIsCollapsed;
+
+	//! Disables moving/resizing the group
+	cedar::aux::BoolParameterPtr _mGeometryLocked;
+
+	//! Width of the group in its uncollapsed state.
+	cedar::aux::DoubleParameterPtr _mUncollapsedWidth;
+
+	//! Height of the group in its uncollapsed state.
+	cedar::aux::DoubleParameterPtr _mUncollapsedHeight;
+
+	//! Map containing all the architecture plots. Keys are the names of the plots, values the paths to the files defining them.
+	std::map<std::string, cedar::aux::Path> _mArchitectureWidgets;
 
 }; // class cedar::proc::gui::GroupFile
 

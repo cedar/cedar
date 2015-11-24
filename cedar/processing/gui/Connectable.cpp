@@ -2088,3 +2088,30 @@ void cedar::proc::gui::Connectable::addPlotWidget(cedar::proc::gui::PlotWidget* 
   p_dock_widget->resize(width, height);
   p_dock_widget->show();
 }
+
+void cedar::proc::gui::Connectable::setRecorded(bool status)
+{
+	if (status)
+	{
+	  if (!mpRecordedDecoration)
+	  {
+      mpRecordedDecoration = DecorationPtr(
+        new Decoration
+        (
+          this,
+          ":/decorations/record.svg",
+          "This step has one or more slots registered in the recorder."
+        )
+      );
+      this->addDecoration(this->mpRecordedDecoration);
+	  }
+	}
+	else
+	{
+	  if (this->mpRecordedDecoration)
+	  {
+	    this->removeDecoration(this->mpRecordedDecoration);
+	    this->mpRecordedDecoration.reset();
+	  }
+	}
+}

@@ -121,6 +121,8 @@ public:
       //! The connectable is hidden in the connections going to and from it.
       static const Id HIDE_IN_CONNECTIONS = 2;
 
+
+
     private:
       //! The base enum object.
       static cedar::aux::EnumType<cedar::proc::gui::Connectable::DisplayMode> mType;
@@ -269,6 +271,10 @@ public:
 
   //! Returns true if the data role is displayed, false otherwise
   static bool isRoleDisplayed(cedar::proc::DataRole::Id role);
+
+  //!@brief Sets a Decoration that shows that the step is registered in the recorder
+  void setRecorded(bool status);
+
 
 public slots:
   //! Updates whether the connectable shows the color of its trigger.

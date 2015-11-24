@@ -3064,3 +3064,27 @@ void cedar::proc::Group::onParentGroupChanged()
     }
   }
 }
+
+bool cedar::proc::Group::isRecorded() const
+{
+  std::vector<cedar::proc::DataRole::Id> slotTypes;
+  slotTypes.push_back(cedar::proc::DataRole::BUFFER);
+  slotTypes.push_back(cedar::proc::DataRole::OUTPUT);
+
+  for (unsigned int s = 0; s < slotTypes.size(); s++)
+  {
+
+    if (this->hasSlotForRole(slotTypes[s]))
+    {
+      cedar::proc::Connectable::SlotList dataSlots = this->getOrderedDataSlots(slotTypes[s]);
+      for (unsigned int i = 0; i < dataSlots.size(); i++)
+      {
+        if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(dataSlots[i]->getDataPath().toString()))
+        {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
