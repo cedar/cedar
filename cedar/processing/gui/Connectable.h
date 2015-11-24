@@ -269,6 +269,9 @@ public:
   //! Resets the display mode to the default
   void resetDisplayMode(bool resize = true);
 
+  //! Returns true if trigger chain displays (the little numbers in circles) should be displayed.
+  virtual bool canShowTriggerChains() const;
+
   //! Returns true if the data role is displayed, false otherwise
   static bool isRoleDisplayed(cedar::proc::DataRole::Id role);
 
