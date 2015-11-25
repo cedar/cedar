@@ -45,6 +45,7 @@
 #include "cedar/processing/gui/Connectable.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/Group.h"
+#include "cedar/auxiliaries/LockableMember.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/DataSlotItem.fwd.h"
@@ -132,6 +133,12 @@ public:
    * @param grow If true, the item will only get larger, but not smaller.
    */
   void fitToContents(bool grow = false);
+
+  //! Returns the GUI data slot item for the given connector slot.
+  cedar::proc::gui::DataSlotItem* getSourceConnectorItem(cedar::proc::DataSlotPtr slot) const;
+
+  //! Returns the GUI data slot item for the given connector slot.
+  cedar::proc::gui::DataSlotItem* getSinkConnectorItem(cedar::proc::DataSlotPtr slot) const;
 
   //!@brief Adds an element to the group.
   void addElement(cedar::proc::gui::GraphicsBase *pElement);

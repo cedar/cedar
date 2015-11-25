@@ -115,54 +115,11 @@ void run_test()
   root->connectTrigger(trigger, sub_1);
   root->connectTrigger(trigger, sub_2);
 
-  // precondition: looped parameter of group should be non-const
-  auto looped_p1 = sub_1->getParameter("is looped");
-  CEDAR_ASSERT(looped_p1.get() != nullptr);
-  auto looped_p2 = sub_2->getParameter("is looped");
-  CEDAR_ASSERT(looped_p2.get() != nullptr);
-
-  if (looped_p1->isConstant())
-  {
-    std::cout << "ERROR: looped parameter of sub group 1 is constant before start." << std::endl;
-    ++errors;
-  }
-
-  if (looped_p2->isConstant())
-  {
-    std::cout << "ERROR: looped parameter of sub group 2 is constant before start." << std::endl;
-    ++errors;
-  }
-
   std::cout << "starting trigger" << std::endl;
   root->startTriggers(true);
 
-  if (!looped_p1->isConstant())
-  {
-    std::cout << "ERROR: looped parameter of sub group 1 is not constant after start." << std::endl;
-    ++errors;
-  }
-
-  if (!looped_p2->isConstant())
-  {
-    std::cout << "ERROR: looped parameter of sub group 2 is not constant after start." << std::endl;
-    ++errors;
-  }
-
   std::cout << "stopping trigger" << std::endl;
   root->stopTriggers(true);
-
-
-  if (looped_p1->isConstant())
-  {
-    std::cout << "ERROR: looped parameter of sub group 1 is constant after stop." << std::endl;
-    ++errors;
-  }
-
-  if (looped_p2->isConstant())
-  {
-    std::cout << "ERROR: looped parameter of sub group 2 is constant after stop." << std::endl;
-    ++errors;
-  }
 
   std::cout << "Done. There were " << errors << " error(s)." << std::endl;
   QApplication::exit(errors);

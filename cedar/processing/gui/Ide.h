@@ -141,10 +141,6 @@ public slots:
    */
   void notify(const QString& message);
 
-  /*!@brief Changes the mode back to select when an architecture tool is finished.
-   */
-  void architectureToolFinished();
-  
   /*!@brief Slot that is connected to the start/pause simulation action.
    */
   void startPauseSimulationClicked();
@@ -370,6 +366,8 @@ private:
 
   void translateGlobalTimeFactorChangedSignal(double newValue);
 
+  void resetWarningAndErrorStateIndicators();
+
 private slots:
   void globalTimeFactorSliderChanged(int newValue);
 
@@ -392,6 +390,8 @@ private slots:
   void showOpenableDialog();
 
   void recorderDataAddedOrRemoved();
+
+  void triggerableStateCountsChanged();
 
 signals:
   void signalGlobalTimeFactorSettingChanged(double newValue);
@@ -453,6 +453,19 @@ private:
   std::map<std::string, OpenableDialogPtr> mOpenableDialogs;
 
   boost::signals2::scoped_connection mGlobalTimeFactorSettingChangedConnection;
+
+  // permanent status bar widgets
+  //! Icon that indicates steps in a warning state.
+  QLabel* mpWarningStateIcon;
+
+  //! Label that indicates how many steps are in an error state.
+  QLabel* mpWarningStateCount;
+
+  //! Icon that indicates steps in an error state.
+  QLabel* mpErrorStateIcon;
+
+  //! Label that indicates how many steps are in an error state.
+  QLabel* mpErrorStateCount;
 
 }; // class cedar::MainWindow
 

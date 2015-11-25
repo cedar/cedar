@@ -88,12 +88,22 @@ void cedar::proc::gui::DefaultConnectableIconView::setIconPath(const QString& pa
 
   // recreate icon
   this->mpIconDisplay = new QGraphicsSvgItem(path, this);
+  this->mpIconDisplay->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 
   this->mpIconDisplay->setPos(pos_x, pos_y);
   this->mpIconDisplay->setScale(scale);
+}
 
+void cedar::proc::gui::DefaultConnectableIconView::prepareSvgExport()
+{
   // setting this cache mode makes sure that when writing out an svg file, the icon will not be pixelized
   this->mpIconDisplay->setCacheMode(QGraphicsItem::NoCache);
+}
+
+void cedar::proc::gui::DefaultConnectableIconView::unprepareSvgExport()
+{
+  // setting this cache mode makes sure that when writing out an svg file, the icon will not be pixelized
+  this->mpIconDisplay->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 }
 
 void cedar::proc::gui::DefaultConnectableIconView::paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*)

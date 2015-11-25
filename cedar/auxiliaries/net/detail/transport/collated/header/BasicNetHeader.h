@@ -60,6 +60,41 @@ struct cedar::aux::net::detail::BasicNetHeader
 {
   unsigned int mMagicNumber;
   size_t       mDataSize; // this is highly-architecture dependant!
+
+  virtual unsigned int getFixedSerializationSize() const
+  {
+    return sizeof(unsigned int) // mMagicNumber
+        + sizeof(size_t); // mDataSize
+  }
+
+  virtual unsigned int getVariableSerializationSize() const
+  {
+    return 0;
+  }
+
+  virtual void serializeFixed(char* memarray)
+  {
+    char* p = memarray;
+    *reinterpret_cast<unsigned int*>(p) = this->mMagicNumber;
+    p += sizeof(unsigned int);
+    *reinterpret_cast<size_t*>(p) = this->mDataSize;
+  }
+
+  virtual void serializeVariable(char*)
+  {
+  }
+
+  virtual void deserializeFixed(const char* memarray)
+  {
+    const char* p = memarray;
+    this->mMagicNumber = *reinterpret_cast<const unsigned int*>(p);
+    p += sizeof(unsigned int);
+    this->mDataSize = *reinterpret_cast<const size_t*>(p);
+  }
+
+  virtual void deserializeVariable(const char*)
+  {
+  }
 };
 //!@endcond
 

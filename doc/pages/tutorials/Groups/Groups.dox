@@ -29,7 +29,8 @@ The following steps help you to get a hang of how to create and fill groups.
 <li> note that the group gets highlighted when you hover over it while dragging a step</li>
 <li> try to remove steps from the group by selecting them and dragging them outside the group box</li>
 <li> you can collapse the graphical representation of a group by right-clicking and choosing @em collapse</li>
-<li> you can delete a group in the same way as steps - be aware that the content of a group is deleted as well</li>
+<li> you can delete a group in the same way as steps - be aware that the content of a group is deleted as well (this is why cedar will
+ask you for confirmation; if you would like to suppress this confirmation, hold Ctrl while deleting)</li>
 </ul>
 
 Once we have grouped steps together, we want to connect them. Connections can only be created between elements of a group.
@@ -37,10 +38,9 @@ To connect up elements to the outside, we have to add @em connectors to groups. 
 group or send output to subsequent steps outside of the group.
 <ul>
 <li> try to connect steps inside the group in the usual way - nothing special here!</li>
-<li> now let's take care of connecting the group to the outside - right-click the group, choose @em add @em input, and pick a name</li>
-<li> do the same for @em add @em output</li>
-<li> you can now connect steps outside the group to the newly created inputs and outputs, and do the same with the steps inside the group</li>
-<li> you can remove group inputs and outputs in the right-click menu</li>
+<li> now let's take care of connecting the group to the outside - you can drag connections from and to elements outside of the groups to and from elements inside the group</li>
+<li> if you do so, cedar automatically adds inputs and outputs to the group and connects the elements via these newly created connectors
+<li> you can remove/rename or manually add group inputs and outputs in the right-click menu of a group</li>
 </ul>
 
 You can of course nest groups into other groups - it works the same way! Groups behave in the same way as steps - 
@@ -48,14 +48,15 @@ therefore you cannot have a group with the same name as another step or group in
  while moving around groups. The GUI will prompt a warning in the log and the group or step will not be moved.
  
 If your group contains looped elements (e.g., a field or another group with looped elements) that usually require a
- connection to a looped trigger, you can switch the whole group to being looped in the properties. The group will now take 
- care of triggering all contained looped elements. 
+ connection to a looped trigger, the group automatically switches to a looped mode. The group will now take 
+ care of triggering all contained looped elements. If you remove all looped elements from the group, it goes back to not
+ being looped.
 
 @section GroupsTutorialRefined Mastering groups
 
-Instead of using the right-click menu to add or remove connectors, you can connect steps in a group and move a subset to
- another group. @em cedar will automatically create new connectors or merge chains of connections through connectors into
- a single connection, depending on where you move the steps. You can follow the next steps to get a grasp of this principle.
+You can connect steps in a group and move a subset to another group. @em cedar will automatically create new connectors 
+or merge chains of connections through connectors into a single connection, depending on where you move the steps. You 
+can follow the next steps to get a grasp of this principle.
  
 <ul>
 <li> add three fields (we call them A, B, and C) to the canvas, connect A to B and B to C</li>
