@@ -1722,6 +1722,7 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
       element_item->readConfiguration(iter->second);
       this->mNextElementUiConfigurations.erase(iter);
     }
+    this->stepRecordStateChanged();
   }
 
   // see if there is a configuration for the UI item stored in the group's ui node
@@ -1923,12 +1924,20 @@ void cedar::proc::gui::Group::toggleSmartConnectionMode()
 
 void cedar::proc::gui::Group::stepRecordStateChanged()
 {
-	std::map<const cedar::proc::Step*, cedar::proc::gui::StepItem*> steps = this->mpScene->getStepMap();
+  std::map<const cedar::proc::Step*, cedar::proc::gui::StepItem*> steps = this->mpScene->getStepMap();
 
-	for (auto iter = steps.begin(); iter != steps.end(); ++iter)
-	{
-		iter->second->setRecorded(iter->first->isRecorded());
-	}
+  for (auto iter = steps.begin(); iter != steps.end(); ++iter)
+  {
+    iter->second->setRecorded(iter->first->isRecorded());
+  }
+
+  std::map<const cedar::proc::Group*,cedar::proc::gui::Group*> groups = this->mpScene->getGroupMap();
+
+  for (auto iter = groups.begin(); iter != groups.end(); ++iter)
+  {
+    iter->second->setRecorded(iter->first->isRecorded());
+  }
+
 }
 
 void cedar::proc::gui::Group::handleStepNameChanged(const std::string& from, const std::string& to)

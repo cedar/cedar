@@ -700,6 +700,9 @@ public:
   //!@brief disconnects two slots across groups, removing/merging connectors if necessary
   static bool disconnectAcrossGroups(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
 
+  //! Returns if this group is marked as being recorded.
+  	bool isRecorded() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

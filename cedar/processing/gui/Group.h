@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -212,7 +212,7 @@ public:
 
   //! renames plot group of given name (from) to given name (to)
   void renamePlotGroup(std::string from, std::string to);
-  
+
   //! returns the name of every plot group of this group
   std::list<std::string> getPlotGroupNames();
 
@@ -288,7 +288,7 @@ public slots:
 
   //! Enables/disables resizing and moving of the group.
   void setLockGeometry(bool lock = true);
-  
+
   //! Calls reset on the underlying group, i.e., resets all elements in the group displayed by this item.
   void reset();
 
@@ -442,7 +442,7 @@ private slots:
   void updateIconBounds();
 
   void loopedChanged();
-  
+
   void removeElementFromPlotGroup(const std::string& plotGroupname, const std::string& elementName);
 
   void openParameterEditor();
