@@ -139,7 +139,7 @@ public:
   void setLoopedTrigger(cedar::proc::LoopedTriggerPtr parent);
 
   //!@brief Returns whether this step should automatically be connected to done triggers when data is connected.
-  virtual bool isLooped() const
+  bool isLooped() const
   {
     return this->mIsLooped;
   }
