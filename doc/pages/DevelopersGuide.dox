@@ -11,14 +11,14 @@ classes interact with each other and the rest of the code, and how changes may b
 development is done.
 
 @section OrganizationalConcepts Organizational Concepts
-In these pages you can learn more about the structure and organization of cedar.
+On these pages you can learn more about the structure and organization of cedar.
 - @link FolderStructureConcept Folder structure @endlink
 - @link OverviewNamespaces Overview of cedar namespaces @endlink
 - @link ReleasesConcept Release work flow @endlink
 - @link SoftwareTestingConcept Software testing @endlink
 
 @section ProgrammingConcepts Programming Concepts
-In the following pages you can find out about general programming concepts we used throughout cedar.
+On the following pages you can find out about general programming concepts we used throughout cedar.
 - @link ParametersConcept Storing and loading parameters @endlink
 - @link ProcessingFrameworkConcept Processing framework @endlink
 - @link ThreadingConcept Threads and dynamics @endlink
