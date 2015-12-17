@@ -18,7 +18,7 @@
     <number>0</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0">
      <item>
       <widget class="QPushButton" name="mpPlayPauseButton">
        <property name="text">
@@ -27,6 +27,17 @@
        <property name="icon">
         <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
          <normaloff>:/cedar/auxiliaries/gui/start.svg</normaloff>:/cedar/auxiliaries/gui/start.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="mpAddButton">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+         <normaloff>:/cedar/auxiliaries/gui/create.svg</normaloff>:/cedar/auxiliaries/gui/create.svg</iconset>
        </property>
       </widget>
      </item>
@@ -42,17 +53,6 @@
         </size>
        </property>
       </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="mpAddButton">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
-         <normaloff>:/cedar/auxiliaries/gui/create.svg</normaloff>:/cedar/auxiliaries/gui/create.svg</iconset>
-       </property>
-      </widget>
      </item>
      <item>
       <spacer name="horizontalSpacer_2">
@@ -104,6 +104,14 @@
      <column>
       <property name="text">
        <string>Control</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>#</string>
+      </property>
+      <property name="toolTip">
+       <string>The number of elements connected to this trigger.</string>
       </property>
      </column>
      <column>

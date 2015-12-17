@@ -49,8 +49,10 @@
 
 // SYSTEM INCLUDES
 #include <QObject>
-#include <boost/utility.hpp>
-#include <boost/asio.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/utility.hpp>
+  #include <boost/asio.hpp>
+#endif // Q_MOC_RUN
 #include <string>
 
 

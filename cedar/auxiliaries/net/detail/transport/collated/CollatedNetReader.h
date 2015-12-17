@@ -161,10 +161,18 @@ public:
     }
 
     p_net_portable = mElementWrapper.read(BLOCK); // Argument: shouldWait
+
  
-    if (p_net_portable == NULL)
+    if (p_net_portable == nullptr)
     {
-      CEDAR_THROW(cedar::aux::net::NetNoNewDataException, "YARP: currently no data in buffer (reading)");
+      if (CollatedNetBase<T>::mDataPort.getInputCount() == 0)
+      {
+        CEDAR_THROW(cedar::aux::net::NetWaitingForWriterException, "YARP: currently no data in buffer (writer disconnected)");
+      }
+      else
+      {
+        CEDAR_THROW(cedar::aux::net::NetNoNewDataException, "YARP: currently no data in buffer (reading)");
+      }
     }
     else
     {

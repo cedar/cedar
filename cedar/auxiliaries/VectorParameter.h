@@ -52,6 +52,7 @@
 // SYSTEM INCLUDES
 #include <vector>
 #include <algorithm>
+#include <string>
 
 namespace cedar
 {
@@ -193,8 +194,20 @@ public:
     this->mSingleValueConst.clear();
     for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin(); iter != root.end(); ++iter)
     {
-      this->mValues.push_back(iter->second.get_value<T>());
-      this->mSingleValueConst.push_back(false);
+      try
+      {
+        this->mValues.push_back(iter->second.get_value<T>());
+        this->mSingleValueConst.push_back(false);
+      }
+      catch (const boost::property_tree::ptree_bad_data& e)
+      {
+        std::string info(e.what());
+        CEDAR_THROW
+        (
+          cedar::aux::InvalidValueException,
+          "Failed to read vector entry from string \"" + iter->second.get_value<std::string>() + "\". Boost says: ptree_bad_data. " + info
+        );
+      }
     }
   }
 
@@ -202,9 +215,8 @@ public:
   void writeToNode(cedar::aux::ConfigurationNode& root) const
   {
     cedar::aux::ConfigurationNode vector_node;
-    for (typename std::vector<T>::const_iterator iter = this->mValues.begin(); iter != this->mValues.end(); ++iter)
+    for (T value : this->mValues)
     {
-      T value = *iter;
       cedar::aux::ConfigurationNode value_node;
       value_node.put_value(value);
       vector_node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));

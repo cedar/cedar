@@ -165,7 +165,7 @@
    <addaction name="mpMenuArchitectureScripts"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="mpStatusBar"/>
   <widget class="QDockWidget" name="mpItemsWidget">
    <property name="features">
     <set>QDockWidget::DockWidgetFeatureMask</set>
@@ -204,57 +204,6 @@
      </property>
      <item>
       <widget class="cedar::aux::gui::Log" name="mpLog" native="true"/>
-     </item>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="QDockWidget" name="mpToolsWidget">
-   <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
-   </property>
-   <property name="windowTitle">
-    <string>Tools</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_4">
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="margin">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QToolBox" name="mpToolBox">
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <widget class="cedar::proc::gui::ArchitectureToolBox" name="mpArchitectureToolBox">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>116</width>
-          <height>422</height>
-         </rect>
-        </property>
-        <attribute name="label">
-         <string>Architecture tools</string>
-        </attribute>
-       </widget>
-       <widget class="QWidget" name="page_4">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>116</width>
-          <height>422</height>
-         </rect>
-        </property>
-        <attribute name="label">
-         <string>Annotation Tools</string>
-        </attribute>
-       </widget>
-      </widget>
      </item>
     </layout>
    </widget>
@@ -304,8 +253,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>254</width>
-              <height>429</height>
+              <width>98</width>
+              <height>28</height>
              </rect>
             </property>
             <property name="palette">
@@ -916,12 +865,6 @@
    <class>cedar::aux::gui::Configurable</class>
    <extends>QTableWidget</extends>
    <header>cedar/auxiliaries/gui/Configurable.h</header>
-  </customwidget>
-  <customwidget>
-   <class>cedar::proc::gui::ArchitectureToolBox</class>
-   <extends>QWidget</extends>
-   <header>cedar/processing/gui/ArchitectureToolBox.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>cedar::aux::gui::Log</class>

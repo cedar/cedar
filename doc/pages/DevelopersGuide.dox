@@ -1,18 +1,24 @@
 /*!
 
 @page DevelopersGuide Developers' Guide
-Welcome to cedar!
 
 @section Motivation Motivation
+The developers’ guide is a resource for people who would like to contribute to the core of cedar, e.g., adding
+functionality to cedar or fixing bugs directly in cedar. This guide explains how the source code is organized and which
+processes we use to test and release our software. It also highlights central concepts used in the code. The goal of
+this guide is to allow developers to efficiently locate the parts of code they wish to alter, understand how affected
+classes interact with each other and the rest of the code, and how changes may be merged back into our repositories once
+development is done.
 
 @section OrganizationalConcepts Organizational Concepts
-In these pages you can learn more about the structure and organization of cedar.
+On these pages you can learn more about the structure and organization of cedar.
 - @link FolderStructureConcept Folder structure @endlink
+- @link OverviewNamespaces Overview of cedar namespaces @endlink
 - @link ReleasesConcept Release work flow @endlink
 - @link SoftwareTestingConcept Software testing @endlink
 
 @section ProgrammingConcepts Programming Concepts
-In the following pages you can find out about general programming concepts we used throughout cedar.
+On the following pages you can find out about general programming concepts we use throughout cedar.
 - @link ParametersConcept Storing and loading parameters @endlink
 - @link ProcessingFrameworkConcept Processing framework @endlink
 - @link ThreadingConcept Threads and dynamics @endlink
@@ -20,14 +26,12 @@ In the following pages you can find out about general programming concepts we us
 - @link InterProcessCommunicationConcept Inter-process communication using YARP @endlink
 - @link UnitsConcept Physical units @endlink
 - @link BoostSignalsWrapper cedar's helper functions for boost signals @endlink
-- @ref EnumConcept
-- @ref PluginFramework
+- @link RunTimeTypeSystem cedar's runtime type system @endlink
 
-@subsection RTTS cedar's runtime type system
-
-Much of cedar's power comes from its ability to allocate object at run-time, based on user-defined type strings. A
-description of the involved concepts can be found @link RunTimeTypeSystem here@endlink.
- 
+@section PracticalDetails Practical Details
+The following pages contain specific details of some of cedar's components focussed mainly on a single class. These 
+pages supplement the doxygen documentation of the class interfaces.
+- @ref EnumConcept  
 
 @section BugFixing Bug Fixing
 If you want to fix a bug in cedar, please stick to the following process.

@@ -71,7 +71,7 @@ cedar_add_library(cedarproc
   gui/stepViews/ComponentStepView.h
   gui/AdvancedParameterLinker.h
   gui/ArchitectureConsistencyCheck.h
-  gui/ArchitectureToolBox.h
+  gui/ArchitectureWidget.h
   gui/BoostControl.h
   gui/Connectable.h
   gui/CouplingCollection.h

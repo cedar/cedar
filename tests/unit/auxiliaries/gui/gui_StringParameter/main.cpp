@@ -46,10 +46,6 @@ int main(int, char**)
 
 #else // CEDAR_COMPILER_MSVC
 
-// we need to access the internals of the class here, specifically the widget
-#define private public
-#define protected public
-
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/StringParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
@@ -91,11 +87,21 @@ int test_string(const std::string& str)
     ++errors;
   }
 
-  if (p_param->mpEdit->text().toStdString() != str)
+  // find the QLineEdit child
+  const QObjectList& children = p_param->children();
+  for (int i = 0; i < children.size(); ++i)
   {
-    std::cout << "Error: widget shows the wrong value: \""
-         << p_param->mpEdit->text().toStdString() << "\" instead of \"" << str << "\"." << std::endl;
-    ++errors;
+    // assume that the first found QLineEdit is mpEdit
+    if (const auto* line_edit = dynamic_cast<QLineEdit*>(children.at(i)))
+    {
+      if (line_edit->text().toStdString() != str)
+      {
+        std::cout << "Error: widget shows the wrong value: \""
+             << line_edit->text().toStdString() << "\" instead of \"" << str << "\"." << std::endl;
+        ++errors;
+      }
+      break;
+    }
   }
 
   std::cout << "deleting widget." << std::endl;

@@ -45,7 +45,6 @@ namespace cedar
 {
   namespace aux
   {
-    //!@brief Namespace for widget classes.
     namespace gui
     {
       //!@cond SKIPPED_DOCUMENTATION

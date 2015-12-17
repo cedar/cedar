@@ -49,11 +49,14 @@
 #include "cedar/auxiliaries/gui/Multi0DPlot.fwd.h"
 
 // SYSTEM INCLUDES
+#include <map>
+#include <string>
 
 
-/*!@todo describe.
+/*!@brief A plot that can plot several 0d values next to each other.
  *
- * @todo describe more.
+ *        This plot is intended for plotting activation of multiple nodes, such as those that are part of behavioral
+ *        organization.
  */
 class cedar::aux::gui::Multi0DPlot : public cedar::aux::gui::QwtLinePlot
 {

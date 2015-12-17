@@ -42,8 +42,10 @@
 #include "cedar/units/version.h"
 
 // SYSTEM INCLUDES
-#include <boost/units/quantity.hpp>
-#include <boost/units/systems/si/frequency.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/units/quantity.hpp>
+  #include <boost/units/systems/si/frequency.hpp>
+#endif // Q_MOC_RUN
 
 namespace cedar
 {

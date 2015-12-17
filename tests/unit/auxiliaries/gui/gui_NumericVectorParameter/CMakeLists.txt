@@ -36,4 +36,11 @@
 
 cedar_add_unit_test(gui_NumericVectorParameter
                     main.cpp
+                    DoubleVectorParameter.cpp
+                    IntVectorParameter.cpp
+                    UIntVectorParameter.cpp
+                    MOC_HEADERS
+                    DoubleVectorParameter.h
+                    IntVectorParameter.h
+                    UIntVectorParameter.h
                     )

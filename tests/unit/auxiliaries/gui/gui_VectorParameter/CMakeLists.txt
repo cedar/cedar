@@ -36,4 +36,7 @@
 
 cedar_add_unit_test(gui_VectorParameter
                     main.cpp
+                    BoolVectorParameter.cpp
+                    MOC_HEADERS
+                    BoolVectorParameter.h
                     )

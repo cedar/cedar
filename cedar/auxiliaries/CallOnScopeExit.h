@@ -46,8 +46,10 @@
 #include "cedar/auxiliaries/CallOnScopeExit.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/bind.hpp>
+  #include <boost/function.hpp>
+#endif // Q_MOC_RUN
 
 
 /*!@brief Objects of this class call a user-determined function when they go out of scope.

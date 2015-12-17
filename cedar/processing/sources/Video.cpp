@@ -182,6 +182,7 @@ void cedar::proc::sources::Video::updateVideo(bool emitOutputPropertyChanged)
   mFrameDuration = 1.0 / this->getVideoGrabber()->getFramerate() * cedar::unit::seconds;
   mTimeElapsed = 0.0 * cedar::unit::seconds;
   mRecording->setValue(this->getVideoGrabber()->isRecording());
+  this->annotateImage();
   if (emitOutputPropertyChanged)
   {
     this->emitOutputPropertiesChangedSignal("Video");

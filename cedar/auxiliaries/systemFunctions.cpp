@@ -49,6 +49,7 @@
   #include <boost/version.hpp>
 #endif
 #include <cstdlib>
+#include <sstream>
 #include <qglobal.h>
 #include <opencv2/core/version.hpp>
 

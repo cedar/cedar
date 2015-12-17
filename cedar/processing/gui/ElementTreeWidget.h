@@ -56,6 +56,9 @@
   #include <boost/signals2.hpp>
   #include <boost/function.hpp>
 #endif // Q_MOC_RUN
+#include <map>
+#include <string>
+#include <vector>
 
 
 /*!@brief A widget for displaying (a filtered subset of) the elements in a cedar::proc::Group.
@@ -107,6 +110,9 @@ public:
 
   //! Sets the group path stored in the item.
   void setItemPath(QTreeWidgetItem* pItem, const std::string& newPath);
+
+  //! Returns the item corresponding to the given element.
+  QTreeWidgetItem* findItemForElement(cedar::proc::ConstElementPtr element);
 
 signals:
   //! Used to translate a boost signal to a Qt signal.

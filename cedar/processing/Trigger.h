@@ -46,6 +46,7 @@
 #include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/LockableMember.h"
 #include "cedar/auxiliaries/GraphTemplate.h"
+#include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/sources/GroupSource.fwd.h"
@@ -140,6 +141,9 @@ public:
 
   virtual bool canConnectTo(cedar::proc::ConstTriggerablePtr target) const;
 
+  //! Returns the number of triggerables directly listening to this trigger.
+  size_t getTriggerCount() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -180,8 +184,10 @@ private:
     this->mpOwner = owner;
   }
 
+  //! Builds a graph of the trigger structure following this trigger.
   void buildTriggerGraph(cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph);
 
+  //! Part of the exploration done while building the trigger graph.
   void explore
   (
     cedar::proc::TriggerablePtr source,
@@ -192,6 +198,9 @@ private:
     std::set<cedar::proc::TriggerablePtr>& explored
   );
 
+  /*! Part of the exploration done while building the trigger graph. This function explores the triggers by following a
+   *  group sink.
+   */
   void exploreSink
   (
     cedar::proc::TriggerablePtr source,
@@ -201,6 +210,9 @@ private:
     std::vector<cedar::proc::TriggerablePtr>& to_explore
   );
 
+  /*! Part of the exploration done while building the trigger graph. This function explores the triggers by following a
+   *  connection that goes into a group.
+   */
   void exploreGroupTarget
   (
     cedar::proc::TriggerablePtr source,
@@ -225,6 +237,12 @@ protected:
 
 private:
   // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // boost signals
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  CEDAR_DECLARE_SIGNAL(TriggerCountChanged, void(size_t));
 }; // class cedar::proc::Trigger
 
 #endif // CEDAR_PROC_TRIGGER_H

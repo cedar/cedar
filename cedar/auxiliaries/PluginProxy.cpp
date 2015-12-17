@@ -238,15 +238,11 @@ std::string cedar::aux::PluginProxy::findPluginDescription(const std::string& pl
 
 bool cedar::aux::PluginProxy::canFindPlugin(const std::string& pluginName)
 {
-  try
-  {
-    cedar::aux::PluginProxy::findPlugin(pluginName);
-    return true;
-  }
-  catch (cedar::aux::PluginNotFoundException)
-  {
-    return false;
-  }
+  bool found;
+  std::vector<std::string> searched_paths;
+  cedar::aux::PluginProxy::findPluginNoThrow(pluginName, found, searched_paths);
+
+  return found;
 }
 
 std::string cedar::aux::PluginProxy::findPluginFile(const std::string& fileName)
@@ -283,36 +279,65 @@ std::string cedar::aux::PluginProxy::findPluginFile(const std::string& fileName)
 std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName)
 {
   std::vector<std::string> searched_paths;
-  searched_paths.push_back(pluginName);
+  bool found = false;
+  std::string res = cedar::aux::PluginProxy::findPluginNoThrow(pluginName, found, searched_paths);
+  if (found)
+  {
+    return res;
+  }
+  else
+  {
+    cedar::aux::PluginNotFoundException exception(searched_paths);
+    CEDAR_THROW_EXCEPTION(exception);
+  }
+}
+
+std::string cedar::aux::PluginProxy::findPluginNoThrow(const std::string& pluginName, bool& found, std::vector<std::string>& searchedPaths)
+{
+  searchedPaths.push_back(pluginName);
   if (boost::filesystem::exists(pluginName))
   {
+    found = true;
     return pluginName;
   }
 
-  auto search_paths = cedar::aux::SettingsSingleton::getInstance()->getPluginSearchPaths();
-  for (auto iter = search_paths.begin(); iter != search_paths.end(); ++iter)
+  for (const auto& workspace : cedar::aux::SettingsSingleton::getInstance()->getPluginSearchPaths())
   {
-    try
+    std::vector<std::string> searched_sub_paths;
+    bool sub_found = false;
+    std::string res = cedar::aux::PluginProxy::findPluginInWorkspaceNoThrow(pluginName, workspace, sub_found, searched_sub_paths);
+    if (sub_found)
     {
-      const std::string& workspace = *iter;
-      return cedar::aux::PluginProxy::findPlugin(pluginName, workspace);
+      found = true;
+      return res;
     }
-    catch (const cedar::aux::PluginNotFoundException& not_found)
+    else
     {
-      searched_paths.insert
-                     (
-                       searched_paths.end(),
-                       not_found.getSearchedPaths().begin(),
-                       not_found.getSearchedPaths().end()
-                     );
+      searchedPaths.insert(searchedPaths.end(), searched_sub_paths.begin(), searched_sub_paths.end());
     }
   }
 
-  cedar::aux::PluginNotFoundException exception(searched_paths);
-  CEDAR_THROW_EXCEPTION(exception);
+  found = false;
+  return std::string();
 }
 
 std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName, const std::string& workspace)
+{
+  std::vector<std::string> searched_paths;
+  bool found = false;
+  std::string res = cedar::aux::PluginProxy::findPluginInWorkspaceNoThrow(pluginName, workspace, found, searched_paths);
+  if (found)
+  {
+    return res;
+  }
+  else
+  {
+    cedar::aux::PluginNotFoundException exception(searched_paths);
+    CEDAR_THROW_EXCEPTION(exception);
+  }
+}
+
+std::string cedar::aux::PluginProxy::findPluginInWorkspaceNoThrow(const std::string& pluginName, const std::string& workspace, bool& found, std::vector<std::string>& searchedPaths)
 {
   std::string plugin_filename;
 
@@ -333,10 +358,10 @@ std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName, c
 #endif
 
   std::string loc = workspace + "/" + plugin_filename;
-  std::vector<std::string> searched_paths;
-  searched_paths.push_back(loc);
+  searchedPaths.push_back(loc);
   if (boost::filesystem::exists(loc))
   {
+    found = true;
     return loc;
   }
 
@@ -352,25 +377,25 @@ std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName, c
     std::string full_subpath = workspace + "/" + subpath;
     if (boost::filesystem::exists(full_subpath))
     {
-      try
+      bool sub_found = false;
+      std::vector<std::string> subpaths;
+      // recursively check the subpath for the plugin
+      std::string res = findPluginInWorkspaceNoThrow(pluginName, full_subpath, sub_found, subpaths);
+
+      if (sub_found)
       {
-        // recursively check the subpath for the plugin
-        return findPlugin(pluginName, full_subpath);
+        found = true;
+        return res;
       }
-      catch (const cedar::aux::PluginNotFoundException& e)
+      else
       {
-        searched_paths.insert
-                       (
-                         searched_paths.end(),
-                         e.getSearchedPaths().begin(),
-                         e.getSearchedPaths().end()
-                       );
+        searchedPaths.insert(searchedPaths.end(), subpaths.begin(), subpaths.end());
       }
     }
   }
 
-  cedar::aux::PluginNotFoundException exception(searched_paths);
-  CEDAR_THROW_EXCEPTION(exception);
+  found = false;
+  return std::string();
 }
 
 #ifdef CEDAR_OS_UNIX

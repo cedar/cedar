@@ -176,6 +176,7 @@ mShowingTriggerColor(false)
 
 cedar::proc::gui::Connectable::~Connectable()
 {
+  this->hideTriggerChains();
   for(auto child_widget : mChildWidgets)
   {
     child_widget->close();
@@ -608,6 +609,12 @@ void cedar::proc::gui::Connectable::Decoration::setDescription(const QString& te
 
 void cedar::proc::gui::Connectable::hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent)
 {
+  if (!this->canShowTriggerChains())
+  {
+    pEvent->setAccepted(false);
+    return;
+  }
+
   this->showTriggerChains();
 
   // because qt doesn't send a leave event if a child is hovered over, we need to manually implement one
@@ -615,7 +622,8 @@ void cedar::proc::gui::Connectable::hoverEnterEvent(QGraphicsSceneHoverEvent* pE
   {
     if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(this->parentItem()))
     {
-      connectable->hideTriggerChains();
+      if (connectable->canShowTriggerChains())
+        connectable->hideTriggerChains();
     }
   }
 
@@ -624,6 +632,12 @@ void cedar::proc::gui::Connectable::hoverEnterEvent(QGraphicsSceneHoverEvent* pE
 
 void cedar::proc::gui::Connectable::hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent)
 {
+  if (!this->canShowTriggerChains())
+  {
+    pEvent->setAccepted(false);
+    return;
+  }
+
   this->hideTriggerChains();
 
   // because qt doesn't send an enter event if a child is left, we need to manually implement one
@@ -631,7 +645,8 @@ void cedar::proc::gui::Connectable::hoverLeaveEvent(QGraphicsSceneHoverEvent* pE
   {
     if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(this->parentItem()))
     {
-      connectable->showTriggerChains();
+      if (connectable->canShowTriggerChains())
+        connectable->showTriggerChains();
     }
   }
 
@@ -641,6 +656,11 @@ void cedar::proc::gui::Connectable::hoverLeaveEvent(QGraphicsSceneHoverEvent* pE
 void cedar::proc::gui::Connectable::translateLoopedTriggerChangedSignal()
 {
   emit triggerableParentTriggerChanged();
+}
+
+bool cedar::proc::gui::Connectable::canShowTriggerChains() const
+{
+  return true;
 }
 
 void cedar::proc::gui::Connectable::showTriggerChains()
@@ -1267,7 +1287,7 @@ void cedar::proc::gui::Connectable::updateDataSlotPositions()
     const QPointF& origin = add_origins[role];
     const QPointF& direction = add_directions[role];
 
-    try
+    if (this->mConnectable->hasSlotForRole(role))
     {
       QPointF current_origin = QPointF(0, 0);
       const cedar::proc::Connectable::SlotList& slotmap = this->mConnectable->getOrderedDataSlots(role);
@@ -1288,10 +1308,6 @@ void cedar::proc::gui::Connectable::updateDataSlotPositions()
         p_item->setPos(QPointF(x - size_diff, y) + current_origin);
         current_origin += direction * (slot_size + M_DATA_SLOT_PADDING);
       }
-    }
-    catch(const cedar::proc::InvalidRoleException&)
-    {
-      // ok -- a step may not have any data for this role.
     }
   }
 }
@@ -1362,7 +1378,7 @@ void cedar::proc::gui::Connectable::demagnetizeSlots()
 
 void cedar::proc::gui::Connectable::magnetizeSlots(const QPointF& mousePositionInScene)
 {
-  double max_distance = 100.0;
+  double max_distance = 50.0;
   double scale_factor = cedar::proc::gui::SettingsSingleton::getInstance()->getDataSlotScaling();
   double scale_sensitivity = cedar::proc::gui::SettingsSingleton::getInstance()->getDataSlotScalingSensitivity();
 
@@ -1444,12 +1460,13 @@ void cedar::proc::gui::Connectable::updateDecorations()
             "This element is looped."
           )
         );
+        this->addDecoration(mpLoopedDecoration);
       }
-      this->addDecoration(mpLoopedDecoration);
     }
     else if (this->mpLoopedDecoration)
     {
       this->removeDecoration(this->mpLoopedDecoration);
+      this->mpLoopedDecoration.reset();
     }
   }
 
@@ -2195,4 +2212,31 @@ void cedar::proc::gui::Connectable::addPlotWidget(cedar::proc::gui::PlotWidget* 
   auto p_dock_widget = this->createDockWidgetForPlots(this->getNameForTitle(), pPlotWidget, position);
   p_dock_widget->resize(width, height);
   p_dock_widget->show();
+}
+
+void cedar::proc::gui::Connectable::setRecorded(bool status)
+{
+	if (status)
+	{
+	  if (!mpRecordedDecoration)
+	  {
+      mpRecordedDecoration = DecorationPtr(
+        new Decoration
+        (
+          this,
+          ":/decorations/record.svg",
+          "This step has one or more slots registered in the recorder."
+        )
+      );
+      this->addDecoration(this->mpRecordedDecoration);
+	  }
+	}
+	else
+	{
+	  if (this->mpRecordedDecoration)
+	  {
+	    this->removeDecoration(this->mpRecordedDecoration);
+	    this->mpRecordedDecoration.reset();
+	  }
+	}
 }

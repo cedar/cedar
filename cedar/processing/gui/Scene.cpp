@@ -58,6 +58,7 @@
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/gui/PropertyPane.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/casts.h"
@@ -239,17 +240,21 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
     }
   }
 
+  std::vector<cedar::proc::gui::Connection*> delete_connections_stack;
   // remove connections
   for (int i = 0; i < items.size(); ++i)
   {
     // delete connections first
     if (auto p_connection = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
     {
-      p_connection->disconnectUnderlying();
+      // store for later deletion
+      delete_connections_stack.push_back(p_connection);
+
+      // take connections out of the list of graphic elements
       items[i] = nullptr;
     }
   }
-  std::vector<QGraphicsItem*> delete_stack;
+  std::vector<cedar::proc::gui::GraphicsBase*> delete_stack;
   // fill stack with elements
   for (int i = 0; i < items.size(); ++i)
   {
@@ -261,11 +266,16 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
         delete_stack.push_back(graphics_base);
       }
     }
-    else
-    {
-      delete_stack.push_back(items[i]);
-    }
   }
+
+  // delete all connections
+  while (delete_connections_stack.size() > 0)
+  {
+    cedar::proc::gui::Connection* p_current_connection = delete_connections_stack.back();
+    p_current_connection->disconnectUnderlying();
+    delete_connections_stack.pop_back();
+  }
+
   // sort stack (make it a real stack)
   std::sort(delete_stack.begin(), delete_stack.end(), this->sortElements);
   // while stack is not empty, check if any items must be added, then delete the current item
@@ -329,6 +339,21 @@ void cedar::proc::gui::Scene::helpEvent(QGraphicsSceneHelpEvent* pHelpEvent)
 
 void cedar::proc::gui::Scene::exportSvg(const QString& file)
 {
+  std::vector<cedar::proc::gui::ConnectableIconView*> views;
+  for (auto item : this->items())
+  {
+    if (auto view = dynamic_cast<cedar::proc::gui::ConnectableIconView*>(item))
+    {
+      views.push_back(view);
+    }
+  }
+
+  // some item views need to make preparations for svg export, especially the DefaultConnectableIconView
+  for (auto view : views)
+  {
+    view->prepareSvgExport();
+  }
+
   QSvgGenerator generator;
   generator.setFileName(file);
   QRectF scene_rect = this->sceneRect();
@@ -338,6 +363,12 @@ void cedar::proc::gui::Scene::exportSvg(const QString& file)
   painter.begin(&generator);
   this->render(&painter);
   painter.end();
+
+
+  for (auto view : views)
+  {
+    view->unprepareSvgExport();
+  }
 }
 
 void cedar::proc::gui::Scene::setConfigurableWidget(cedar::aux::gui::Configurable* pConfigurableWidget)
@@ -375,9 +406,13 @@ void cedar::proc::gui::Scene::itemSelected()
 
       if (this->mpRecorderWidget != nullptr)
       {
-        if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(p_element->getElement()))
+        if (auto connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(p_element->getElement()))
         {
-          this->mpRecorderWidget->setConnectable(step);
+          this->mpRecorderWidget->setConnectable(connectable);
+        }
+        else
+        {
+          this->mpRecorderWidget->clear();
         }
       }
     }
@@ -548,9 +583,9 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
       break;
   }
 
-  // see if the mouse is moving some items
+  // see if the mouse is moving some items and there is no valid start of a connection
   //!@todo This should probably be done by overriding mouseMoveEvent etc in GraphicsBase/Connectable
-  if (pMouseEvent->button() == Qt::LeftButton)
+  if (pMouseEvent->button() == Qt::LeftButton && mpConnectionStart == nullptr)
   {
     auto items = this->items(pMouseEvent->scenePos(), Qt::IntersectsItemShape, Qt::DescendingOrder);
     // this is only the case if an item under the mouse is selected
@@ -1018,12 +1053,12 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
   {
     QPointF p2 = pMouseEvent->scenePos() - mpConnectionStart->scenePos();
 
-    for (auto iter = this->mStepMap.begin(); iter != this->mStepMap.end(); ++iter)
+    for (const auto& element_gui_ptr_pair : this->mElementMap)
     {
-      cedar::proc::gui::StepItem* p_step_gui = iter->second;
-      if (mpConnectionStart->canConnectTo(p_step_gui))
+      auto p_gui_connectable = dynamic_cast<cedar::proc::gui::Connectable*>(element_gui_ptr_pair.second);
+      if (p_gui_connectable && mpConnectionStart->canConnectTo(p_gui_connectable))
       {
-        p_step_gui->magnetizeSlots(pMouseEvent->scenePos());
+        p_gui_connectable->magnetizeSlots(pMouseEvent->scenePos());
       }
     }
 
@@ -1216,9 +1251,9 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
           break;
       }
 
-      if (auto p_step = dynamic_cast<cedar::proc::gui::StepItem*>(item))
+      if (auto p_connectable = dynamic_cast<cedar::proc::gui::Connectable*>(item))
       {
-        p_step->demagnetizeSlots();
+        p_connectable->demagnetizeSlots();
       }
     }
   }
@@ -1266,12 +1301,19 @@ void cedar::proc::gui::Scene::connectSlots
     // create connection from source to connector
     const std::string input_name = "input";
     connector->addConnector(input_name, true);
-    root_group->connectSlots(source_slot, connector->getInputSlot(input_name));
+    auto owned_source_slot = cedar::aux::asserted_pointer_cast<cedar::proc::OwnedData>(source_slot);
+    root_group->connectSlots(owned_source_slot, connector->getInputSlot(input_name));
 
     // create connection from connector to target
     const std::string output_name = "output";
     connector->addConnector(output_name, false);
-    root_group->connectSlots(connector->getOutputSlot(output_name), target_slot);
+    auto external_target_slot = cedar::aux::asserted_pointer_cast<cedar::proc::ExternalData>(target_slot);
+
+    cedar::proc::Group::connectAcrossGroups
+    (
+      connector->getOutputSlot(output_name),
+      external_target_slot
+    );
 
     // connect slots in the group
     connector->connectSlots(input_name + ".output", output_name + ".input");
@@ -1281,7 +1323,11 @@ void cedar::proc::gui::Scene::connectSlots
   }
   else
   {
-    root_group->connectSlots(source_slot, target_slot);
+    cedar::proc::Group::connectAcrossGroups
+    (
+      cedar::aux::asserted_pointer_cast<cedar::proc::OwnedData>(source_slot),
+      cedar::aux::asserted_pointer_cast<cedar::proc::ExternalData>(target_slot)
+    );
   }
 }
 

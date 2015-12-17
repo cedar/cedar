@@ -44,12 +44,9 @@ int main(int, char**)
 }
 
 #else // CEDAR_COMPILER_MSVC
-// we need to access the internals of the class here, specifically the widget
-#define private public
-#define protected public
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/BoolVectorParameter.h"
+#include "BoolVectorParameter.h"
 #include "cedar/auxiliaries/BoolVectorParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -66,7 +63,7 @@ bool testEquality(boost::intrusive_ptr<ParameterType> parameter, WidgetType* pWi
 {
   typedef typename WidgetType::WidgetAbstraction WidgetAbstraction;
 
-  if (parameter->size() != pWidget->mWidgets.size())
+  if (parameter->size() != pWidget->size())
   {
     std::cout << "Parameter and widget don't have the same size." << std::endl;
     return false;
@@ -76,7 +73,7 @@ bool testEquality(boost::intrusive_ptr<ParameterType> parameter, WidgetType* pWi
   for (size_t i = 0; i < parameter->size(); ++i)
   {
     typename WidgetType::ValueType parameter_value = parameter->at(i);
-    typename WidgetType::ValueType widget_value = WidgetAbstraction::getValue(pWidget->mWidgets[i]);
+    typename WidgetType::ValueType widget_value = WidgetAbstraction::getValue(pWidget->widgetAt(i));
     if (parameter_value != widget_value)
     {
       std::cout << "Parameter and widget differ in entry " << i << ": "
@@ -122,7 +119,7 @@ int test_parameter(T initialValue, size_t initialSize, T firstValue)
   }
 
   std::cout << "Setting value of first entry in the widget" << std::endl;
-  WidgetType::WidgetAbstraction::setValue(p_widget->mWidgets[0], firstValue);
+  WidgetType::WidgetAbstraction::setValue(p_widget->widgetAt(0), firstValue);
   if (!testEquality<ParameterType, WidgetType>(parameter, p_widget))
   {
     ++errors;
@@ -144,9 +141,9 @@ int test_parameter(T initialValue, size_t initialSize, T firstValue)
 
   std::cout << "Making parameter constant" << std::endl;
   parameter->setConstant(true);
-  for (size_t i = 0; i < p_widget->mWidgets.size(); ++i)
+  for (size_t i = 0; i < p_widget->size(); ++i)
   {
-    if (p_widget->mWidgets[i]->isEnabled())
+    if (p_widget->widgetAt(i)->isEnabled())
     {
       std::cout << "Widget " << i << " was not disabled properly." << std::endl;
       ++errors;
@@ -167,7 +164,7 @@ int main(int argc, char** argv)
   errors += test_parameter
       <
         cedar::aux::BoolVectorParameter,
-        cedar::aux::gui::BoolVectorParameter,
+        BoolVectorParameter,
         bool
       >(true, 2, false);
 

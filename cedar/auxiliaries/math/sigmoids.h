@@ -80,13 +80,25 @@ namespace cedar
       template<typename T>
       CEDAR_AUX_LIB_EXPORT void sigmoid(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold = 0);
 
-      //! an abs-based sigmoid for a cv::Mat
-      template<typename T>
+      //! An abs-based sigmoid for a cv::Mat; this is a computationally fast approximation of the (exp-)sigmoid.
       CEDAR_AUX_LIB_EXPORT cv::Mat sigmoidAbs(const cv::Mat& mat, const double beta, const double threshold = 0);
 
+      //! An abs-based sigmoid for a cv::Mat
+       CEDAR_DECLARE_DEPRECATED
+      (
+        template<typename T> CEDAR_AUX_LIB_EXPORT
+        cv::Mat sigmoidAbs(const cv::Mat& mat, const double beta, const double threshold = 0)
+      );
+
       //! an abs-based sigmoid for a cv::Mat, that takes the result as an argument and does not allocate new memory
-      template<typename T>
       CEDAR_AUX_LIB_EXPORT void sigmoidAbs(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold = 0);
+
+      //! an abs-based sigmoid for a cv::Mat, that takes the result as an argument and does not allocate new memory
+      CEDAR_DECLARE_DEPRECATED
+      (
+        template<typename T> CEDAR_AUX_LIB_EXPORT
+        void sigmoidAbs(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold = 0)
+      );
 
       //! a sigmoid for a vector of doubles
       CEDAR_AUX_LIB_EXPORT std::vector<double> sigmoid(const std::vector<double>& x, const double beta, const double threshold = 0);

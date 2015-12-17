@@ -119,11 +119,6 @@ void cedar::aux::gui::Settings::save()
     }
     catch (const boost::property_tree::json_parser::json_parser_error& e)
     {
-      cedar::aux::LogSingleton::getInstance()->warning
-      (
-        std::string("Error saving aux gui settings: ") + e.what(),
-        "void cedar::aux::gui::Settings::load()"
-      );
     }
   }
 }
@@ -137,11 +132,6 @@ void cedar::aux::gui::Settings::load()
   }
   catch (const boost::property_tree::json_parser::json_parser_error& e)
   {
-    cedar::aux::LogSingleton::getInstance()->warning
-    (
-      std::string("Error reading aux gui settings: ") + e.what(),
-      "void cedar::aux::gui::Settings::load()"
-    );
   }
 }
 

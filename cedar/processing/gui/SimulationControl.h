@@ -59,6 +59,7 @@
 #ifndef Q_MOC_RUN
   #include <boost/signals2.hpp>
 #endif // Q_MOC_RUN
+#include <map>
 
 //!@cond SKIPPED_DOCUMENTATION
 // "Hidden" class; would be a private nested class of cedar::proc::gui::SimulationControl, but the moc cannot do that
@@ -138,12 +139,18 @@ protected:
   //! Periodically updates the simulation quality displays.
   void timerEvent(QTimerEvent* pEvent);
 
+signals:
+  void signalTriggerCountChanged(QString path);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void elementAdded(QTreeWidgetItem* pItem, cedar::proc::ElementPtr element);
+  void elementRemoved(QTreeWidgetItem* pItem, cedar::proc::ElementPtr element);
+
   void loopedTriggerAdded(QTreeWidgetItem* pItem, cedar::proc::LoopedTriggerPtr loopedTrigger);
+  void loopedTriggerRemoved(QTreeWidgetItem* pItem, cedar::proc::LoopedTriggerPtr loopedTrigger);
 
   void updateSimulationRunningIcon(bool running);
 
@@ -167,6 +174,10 @@ private:
 
   void applyBrushToColorWidget(QWidget* pWidget, const QBrush& brush);
 
+  void updateTriggerConnectionCount(cedar::proc::LoopedTriggerPtr trigger);
+
+  void translateTriggerCountChangedSignal(size_t, cedar::proc::LoopedTriggerPtr trigger);
+
 private slots:
   void startPauseSimulationClicked();
 
@@ -182,6 +193,8 @@ private slots:
 
   void elementNameChanged();
 
+  void triggerCountChanged(QString triggerPath);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -192,6 +205,8 @@ private:
   cedar::proc::gui::GroupPtr mGroup;
 
   boost::signals2::scoped_connection mElementAddedConnection;
+
+  std::map<cedar::proc::LoopedTriggerPtr, boost::shared_ptr<boost::signals2::scoped_connection> > mTriggerCountChangedConnections;
 
   cedar::aux::LockableMember<bool> mSimulationRunning;
 
@@ -208,6 +223,18 @@ public:
 
   //! Path to the icon that indicates that the simulation is stopped.
   static QString M_PAUSED_ICON_PATH;
+
+  //! The column containing the color widget.
+  static const int M_COLUMN_COLOR_WIDGET;
+
+  //! The column containing the quality indicator.
+  static const int M_COLUMN_QUALITY_INDICATOR;
+
+  //! The column containing the number of connections of the trigger.
+  static const int M_COLUMN_CONNECTION_COUNT;
+
+  //! The column from which the parameters start.
+  static const int M_COLUMN_PARAMETERS_START;
 
 protected:
   // none yet

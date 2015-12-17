@@ -152,6 +152,17 @@ cedar::proc::gui::DataSlotItem* cedar::proc::gui::CouplingCollection::findSource
   auto source_element = std::get<0>(tuple);
   auto source_slot = std::get<1>(tuple);
 
+  if (!source_element)
+  {
+    // this happens if there is no GUI representation for the target
+    // this is currently the case for group sinks
+    CEDAR_DEBUG_ASSERT(source_slot->getParentPtr());
+    CEDAR_DEBUG_ASSERT(source_slot->getParentPtr()->getGroup());
+    auto group = source_slot->getParentPtr()->getGroup();
+    auto gui_group = cedar::aux::asserted_cast<cedar::proc::gui::Group*>(this->mpScene->getGraphicsItemFor(group));
+    return gui_group->getSourceConnectorItem(source_slot);
+  }
+
   return source_element->getSlotItems(cedar::proc::DataRole::OUTPUT)[source_slot->getName()];
 }
 
@@ -165,6 +176,17 @@ cedar::proc::gui::DataSlotItem* cedar::proc::gui::CouplingCollection::findTarget
   auto tuple = this->findTargetAndSlot();
   auto target_element = std::get<0>(tuple);
   auto target_slot = std::get<1>(tuple);
+
+  if (!target_element)
+  {
+    // this happens if there is no GUI representation for the target
+    // this is currently the case for group sinks
+    CEDAR_DEBUG_ASSERT(target_slot->getParentPtr());
+    CEDAR_DEBUG_ASSERT(target_slot->getParentPtr()->getGroup());
+    auto group = target_slot->getParentPtr()->getGroup();
+    auto gui_group = cedar::aux::asserted_cast<cedar::proc::gui::Group*>(this->mpScene->getGraphicsItemFor(group));
+    return gui_group->getSinkConnectorItem(target_slot);
+  }
 
   return target_element->getSlotItems(cedar::proc::DataRole::INPUT)[target_slot->getName()];
 }
@@ -209,7 +231,7 @@ std::tuple<cedar::proc::gui::Connectable*, cedar::proc::DataSlotPtr>
 {
   if (this->mComponents.empty())
   {
-    return std::make_tuple<cedar::proc::gui::Connectable*, cedar::proc::DataSlotPtr>(nullptr, nullptr);
+    return std::make_tuple<cedar::proc::gui::Connectable*, cedar::proc::DataSlotPtr>(nullptr, cedar::proc::DataSlotPtr());
   }
 
   auto source = this->getConnection(cedar::proc::DataRole::INPUT)->getSource();
@@ -222,11 +244,12 @@ std::tuple<cedar::proc::gui::Connectable*, cedar::proc::DataSlotPtr>
 {
   if (this->mComponents.empty())
   {
-    return std::make_tuple<cedar::proc::gui::Connectable*, cedar::proc::DataSlotPtr>(nullptr, nullptr);
+    return std::make_tuple<cedar::proc::gui::Connectable*, cedar::proc::DataSlotPtr>(nullptr, cedar::proc::DataSlotPtr());
   }
 
   auto target = this->getConnection(cedar::proc::DataRole::OUTPUT)->getTarget();
   auto target_elem = dynamic_cast<cedar::proc::gui::Connectable*>(this->mpScene->getGraphicsItemFor(target->getParentPtr()));
+
   return std::make_tuple(target_elem, target);
 }
 

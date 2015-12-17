@@ -50,6 +50,7 @@
 #include <boost/filesystem.hpp>
 #include <fstream>
 #include <algorithm>
+#include <random>
 
 cedar::aux::EnumType<cedar::aux::ImageDatabase::Type> cedar::aux::ImageDatabase::Type::mType("cedar::aux::ImageDatabase::Type::");
 
@@ -59,7 +60,7 @@ const std::string cedar::aux::ImageDatabase::M_STANDARD_OBJECT_IMAGE_ANNOTATION_
 const std::string cedar::aux::ImageDatabase::M_STANDARD_FRAME_OBJECT_ANNOTATION_NAME = "frame_object";
 const std::string cedar::aux::ImageDatabase::M_STANDARD_CLASS_ID_ANNOTATION_NAME = "class id";
 
-const std::vector<std::string> cedar::aux::ImageDatabase::M_STANDARD_KNOWN_IMAGE_FILE_EXTENSIONS = {"png"};
+const std::vector<std::string> cedar::aux::ImageDatabase::M_STANDARD_KNOWN_IMAGE_FILE_EXTENSIONS = {"png", "ppm"};
 const std::vector<std::string> cedar::aux::ImageDatabase::M_STANDARD_KNOWN_VIDEO_FILE_EXTENSIONS = {"avi", "mpeg", "mp4", "flv", "ogg", "vob", "mpg"};
 
 #ifndef CEDAR_COMPILER_MSVC
@@ -157,7 +158,7 @@ double cedar::aux::ImageDatabase::ObjectPoseAnnotation::evaluateScale(double sca
 int cedar::aux::ImageDatabase::MultiObjectPoseAnnotation::getNewKey()
 {
   int key = 0;
-  if(!this->mObjectMap.empty())
+  if (!this->mObjectMap.empty())
   {
     auto lastElement = this->mObjectMap.end();
     lastElement--;
@@ -196,7 +197,7 @@ cedar::aux::ImageDatabase::ConstAnnotationPtr
   cedar::aux::ImageDatabase::MultiObjectPoseAnnotation::getAnnotation(int id) const
 {
   auto iter = this->mObjectMap.find(id);
-  if(iter != this->mObjectMap.end())
+  if (iter != this->mObjectMap.end())
   {
     return iter->second.second;
   }
@@ -213,7 +214,7 @@ void cedar::aux::ImageDatabase::FrameAnnotation::setAnnotation(AnnotationPtr ann
 
 bool cedar::aux::ImageDatabase::FrameAnnotation::hasAnnotation(int frame) const
 {
-  if(this->getAnnotation(frame))
+  if (this->getAnnotation(frame))
   {
     return true;
   }
@@ -224,7 +225,7 @@ cedar::aux::ImageDatabase::ConstAnnotationPtr
   cedar::aux::ImageDatabase::FrameAnnotation::getAnnotation(int frame) const
 {
   auto iter = this->mFrameAnnotationMapping.find(frame);
-  if(iter != this->mFrameAnnotationMapping.end())
+  if (iter != this->mFrameAnnotationMapping.end())
   {
     return iter->second;
   }
@@ -232,31 +233,31 @@ cedar::aux::ImageDatabase::ConstAnnotationPtr
   {
     try
     {
-      cedar::aux::ImageDatabase::ObjectPoseAnnotationPtr prev = NULL;
-      cedar::aux::ImageDatabase::ObjectPoseAnnotationPtr next = NULL;
+      cedar::aux::ImageDatabase::ObjectPoseAnnotationPtr prev;
+      cedar::aux::ImageDatabase::ObjectPoseAnnotationPtr next;
       double prevFrame = 0.;
       double nextFrame = 0.;
       
       for(auto iter = this->mFrameAnnotationMapping.begin(); iter!= this->mFrameAnnotationMapping.end(); ++iter)
       {
         //find closest annotations
-        if(iter->first <= frame)
+        if (iter->first <= frame)
         {
           prev = boost::dynamic_pointer_cast<cedar::aux::ImageDatabase::ObjectPoseAnnotation>(iter->second);
           prevFrame = iter->first;
         }
-        else if(iter->first > frame)
+        else if (iter->first > frame)
         {
           next = boost::dynamic_pointer_cast<cedar::aux::ImageDatabase::ObjectPoseAnnotation>(iter->second);
           nextFrame = iter->first;
           break;
         }
       }
-      if(prev == NULL)
+      if (!prev)
       {
-        return NULL;
+        return cedar::aux::ImageDatabase::ConstAnnotationPtr();
       }
-      else if(next == NULL)
+      else if (!next)
       {
         return prev;
       }
@@ -301,11 +302,12 @@ cedar::aux::ImageDatabase::ConstAnnotationPtr
         return poseAnnotation;
       }
     }
-    catch(cedar::aux::NotFoundException e)
+    catch (cedar::aux::NotFoundException e)
     {
       CEDAR_THROW(cedar::aux::NotFoundException, "Interpolation for annotation type not implemented");
     }
-    return NULL;
+
+    return cedar::aux::ImageDatabase::ConstAnnotationPtr();
   }
 }
 
@@ -322,11 +324,11 @@ int cedar::aux::ImageDatabase::FrameAnnotation::getPrevKeyframe(int frame)
   for(auto iter = this->mFrameAnnotationMapping.begin(); iter!= this->mFrameAnnotationMapping.end(); ++iter)
   {
     //find previous annotation
-    if(iter->first < frame)
+    if (iter->first < frame)
     {
       prevFrame = iter->first;
     }
-    else if(iter->first > frame)
+    else if (iter->first > frame)
     {
       break;
     }
@@ -341,7 +343,7 @@ int cedar::aux::ImageDatabase::FrameAnnotation::getNextKeyframe(int frame)
   for(auto iter = this->mFrameAnnotationMapping.begin(); iter!= this->mFrameAnnotationMapping.end(); ++iter)
   {
     //find next annotation
-    if(iter->first > frame)
+    if (iter->first > frame)
     {
       nextFrame = iter->first;
       break;
@@ -353,7 +355,7 @@ int cedar::aux::ImageDatabase::FrameAnnotation::getNextKeyframe(int frame)
 bool cedar::aux::ImageDatabase::FrameAnnotation::isKeyframeAnnotation(int frame)
 {
   auto iter = this->mFrameAnnotationMapping.find(frame);
-  if(iter != this->mFrameAnnotationMapping.end())
+  if (iter != this->mFrameAnnotationMapping.end())
   {
     return true;
   }
@@ -605,7 +607,12 @@ cedar::aux::ImageDatabase::ConstAnnotationPtr
     {
       known_annotations = "none";
     }
-    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find an annotation with the id \"" + annotationId + "\". Known annotations are: " + known_annotations);
+    CEDAR_THROW
+    (
+      cedar::aux::NotFoundException,
+      "Could not find an annotation with the id \"" + annotationId + "\" in image " + this->getFileName() +
+          ". Known annotations are: " + known_annotations
+    );
   }
 
   return iter->second;
@@ -991,7 +998,7 @@ void cedar::aux::ImageDatabase::readMultiAnnotations(const cedar::aux::Path& pat
             rel_x = static_cast<double>(x) - region_cols/2.0;
             rel_y = static_cast<double>(y) - region_rows/2.0;
 
-            if(isFrameAnnotation)
+            if (isFrameAnnotation)
             {
               auto lastFrameAnnotation = annotation->getLastAddedAnnotation<FrameAnnotation>();
               auto poseAnnotation = lastFrameAnnotation->getAnnotation<ObjectPoseAnnotation>(frame);
@@ -1040,10 +1047,10 @@ void cedar::aux::ImageDatabase::readMultiAnnotations(const cedar::aux::Path& pat
           else if (left == "removed")
           {
             bool isRemoved = cedar::aux::fromString<bool>(right);
-            if(isRemoved && isFrameAnnotation)
+            if (isRemoved && isFrameAnnotation)
             {
               auto annotation = image->getAnnotation<MultiObjectPoseAnnotation>(M_STANDARD_MULTI_OBJECT_POSE_ANNOTATION_NAME);
-              annotation->getLastAddedAnnotation<FrameAnnotation>()->setAnnotation(NULL, frame);
+              annotation->getLastAddedAnnotation<FrameAnnotation>()->setAnnotation(cedar::aux::ImageDatabase::AnnotationPtr(), frame);
             }
           }
           else
@@ -1093,7 +1100,7 @@ void cedar::aux::ImageDatabase::scanDirectory(const cedar::aux::Path& path)
     }
   }
 
-  for (std::string file : files)
+  for (auto file : files)
   {
     std::string file_no_dir, restpath;
 
@@ -1196,7 +1203,7 @@ void cedar::aux::ImageDatabase::readCOIL100(const cedar::aux::Path& path)
   for (const auto& file : path.listFiles())
   {
     std::string extension = file.getExtension();
-    if (extension != "png")
+    if (!isKnownImageExtension(extension))
     {
       continue;
     }
@@ -1431,9 +1438,9 @@ void cedar::aux::ImageDatabase::Image::appendTags(const std::string& tags)
 {
   std::vector<std::string> tag_split;
   cedar::aux::split(tags, ",", tag_split);
-  for (auto iter = tag_split.begin(); iter != tag_split.end(); ++iter)
+  for (const auto& tag : tag_split)
   {
-    this->mTags.insert(*iter);
+    this->mTags.insert(tag);
   }
 }
 
@@ -1548,24 +1555,6 @@ void cedar::aux::ImageDatabase::selectImagesFromNRandomClasses
        const boost::optional<unsigned int>& seed
      ) const
 {
-  struct RNG
-  {
-    typedef unsigned int result_type;
-    static result_type min()
-    {
-      return 0;
-    }
-
-    static result_type max()
-    {
-      return static_cast<unsigned int>(RAND_MAX);
-    }
-
-    result_type operator()() const
-    {
-      return static_cast<unsigned int>(std::rand() % RAND_MAX);
-    }
-  };
 
   std::vector<ClassId> class_ids;
 
@@ -1574,17 +1563,16 @@ void cedar::aux::ImageDatabase::selectImagesFromNRandomClasses
     class_ids.push_back(id_name_pair.first);
   }
 
+  std::default_random_engine engine;
   if (seed)
   {
-    std::srand(seed.get());
+    engine = std::default_random_engine(seed.get());
   }
   else
   {
-    std::srand(time(0));
+    engine = std::default_random_engine(time(0));
   }
-
-  RNG rng;
-  std::shuffle(class_ids.begin(), class_ids.end(), rng);
+  std::shuffle(class_ids.begin(), class_ids.end(), engine);
 
   CEDAR_ASSERT(numberOfClasses < class_ids.size());
 

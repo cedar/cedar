@@ -201,9 +201,7 @@ void cedar::proc::experiment::StepPropertyParameter::writeToNode(cedar::aux::Con
     {
       if (mParameterCopy)
       {
-        cedar::aux::ConfigurationNode copy_node;
-        mParameterCopy->writeToNode(copy_node);
-        step_node.add_child("PropertyParameter",copy_node);
+        mParameterCopy->writeToNode(step_node);
       }
       break;
     }
@@ -436,6 +434,7 @@ void cedar::proc::experiment::StepPropertyParameter::updateParameterCopy()
           std::string type = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
           mParameterCopy = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->allocate(type);
           mParameterCopy->copyValueFrom(parameter);
+          mParameterCopy->setName("PropertyParameter");
         }
       }
       catch (cedar::aux::NotFoundException& exc) // element was not found, reset

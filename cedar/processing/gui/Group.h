@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -45,6 +45,7 @@
 #include "cedar/processing/gui/Connectable.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/Group.h"
+#include "cedar/auxiliaries/LockableMember.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/DataSlotItem.fwd.h"
@@ -133,6 +134,12 @@ public:
    */
   void fitToContents(bool grow = false);
 
+  //! Returns the GUI data slot item for the given connector slot.
+  cedar::proc::gui::DataSlotItem* getSourceConnectorItem(cedar::proc::DataSlotPtr slot) const;
+
+  //! Returns the GUI data slot item for the given connector slot.
+  cedar::proc::gui::DataSlotItem* getSinkConnectorItem(cedar::proc::DataSlotPtr slot) const;
+
   //!@brief Adds an element to the group.
   void addElement(cedar::proc::gui::GraphicsBase *pElement);
 
@@ -205,7 +212,7 @@ public:
 
   //! renames plot group of given name (from) to given name (to)
   void renamePlotGroup(std::string from, std::string to);
-  
+
   //! returns the name of every plot group of this group
   std::list<std::string> getPlotGroupNames();
 
@@ -264,6 +271,9 @@ public:
   //! Defines draggability of groups.
   bool canBeDragged() const;
 
+  //! Inherited, see super class.
+  bool canShowTriggerChains() const;
+
 public slots:
   /*! sets the recording state of all steps
    * @todo why is this done here? why is this done for all steps if one changes??
@@ -278,7 +288,7 @@ public slots:
 
   //! Enables/disables resizing and moving of the group.
   void setLockGeometry(bool lock = true);
-  
+
   //! Calls reset on the underlying group, i.e., resets all elements in the group displayed by this item.
   void reset();
 
@@ -291,12 +301,6 @@ public slots:
 protected:
   //! handles removal of a slot
   void slotRemoved(cedar::proc::DataRole::Id role, const std::string& name);
-
-  //! Overrides Qt's hoverEnterEvent.
-  void hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent);
-
-  //! Overrides Qt's hoverLeaveEvent.
-  void hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent);
 
   /*!@brief Handles the drop event of the scene.
    *
@@ -438,7 +442,7 @@ private slots:
   void updateIconBounds();
 
   void loopedChanged();
-  
+
   void removeElementFromPlotGroup(const std::string& plotGroupname, const std::string& elementName);
 
   void openParameterEditor();

@@ -50,7 +50,9 @@
 #include "cedar/devices/RobotManager.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/signals2.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2.hpp>
+#endif // Q_MOC_RUN
 #include <map>
 #include <vector>
 #include <string>
