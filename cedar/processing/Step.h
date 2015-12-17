@@ -69,6 +69,7 @@
 #include <set>
 #include <utility>
 #include <vector>
+#include <deque>
 
 
 /*!@brief This class represents a processing step in the processing framework.
@@ -210,6 +211,9 @@ public:
          cedar::proc::TriggerPtr = cedar::proc::TriggerPtr()
        );
 
+  //! The same as onTrigger, but does not trigger subsequent steps.
+  void callComputeWithoutTriggering(cedar::proc::ArgumentsPtr args = cedar::proc::ArgumentsPtr());
+
   //!@brief Gets the amount of triggers stored in this step.
   size_t getTriggerCount() const;
 
@@ -266,9 +270,6 @@ public:
   {
     return this->mBusy;
   }
-
-  //! Returns if this step is marked as being recorded.
-  bool isRecorded() const;
 
   //! Returns the last measurement that has been made for the given id.
   cedar::unit::Time getLastTimeMeasurement(unsigned int id) const;
@@ -445,8 +446,6 @@ private:
    *
    */
   void callInputConnectionChanged(const std::string& slot);
-
-  std::map<std::string, cedar::unit::Time> unregisterRecordedData() const;
 
   //! Processes all slots that have been changed during the compute call.
   void processChangedSlots();

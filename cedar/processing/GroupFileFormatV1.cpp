@@ -640,8 +640,31 @@ void cedar::proc::GroupFileFormatV1::readRecords
       {
         // this is the new format, easy to get into the recorder (we already know the data role and element)
         cedar::proc::DataPath data_path(entry.first);
-        auto elem = group->getElement<cedar::proc::Connectable>(data_path.getPathToElement());
-        auto data = elem->getData(data_path.getDataRole(), data_path.getDataName());
+
+        // check if name exists at all
+        if (!group->nameExists(data_path.getPathToElement()))
+        {
+          exceptions.push_back("Recorder: Could not find element \"" + data_path.getPathToElement().toString()  + "\" to record its data. Your configuration file might be corrupted.");
+          continue;
+        }
+
+        auto connectable = group->getElement<cedar::proc::Connectable>(data_path.getPathToElement());
+
+        // check if this is a connectable
+        if (!connectable)
+        {
+          exceptions.push_back("Recorder: Could not find element \"" + data_path.getPathToElement().toString()  + "\" to record its data. Your configuration file might be corrupted.");
+          continue;
+        }
+
+        // check if connectable has a data slot of this name
+        if (!connectable->hasSlot(data_path.getDataRole(), data_path.getDataName()))
+        {
+          exceptions.push_back("Recorder: Could not find data of name \"" + data_path.getDataName() +"\" at element \"" + data_path.getPathToElement().toString() + "\". Your configuration file might be corrupted.");
+          continue;
+        }
+
+        auto data = connectable->getData(data_path.getDataRole(), data_path.getDataName());
         cedar::aux::RecorderSingleton::getInstance()->registerData(data, entry.second, entry.first);
       }
       else

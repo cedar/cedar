@@ -47,9 +47,11 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
-#include <boost/units/quantity.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/units/quantity.hpp>
+  #include <boost/units/io.hpp>
+#endif // Q_MOC_RUN
 #include <ostream>
-#include <boost/units/io.hpp>
 
 //!@brief Holds a cv::Mat and the unit in which the values in this matrix are expressed.
 template<typename DimensionType>

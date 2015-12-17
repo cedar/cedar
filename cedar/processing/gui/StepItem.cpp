@@ -318,31 +318,32 @@ void cedar::proc::gui::StepItem::writeConfiguration(cedar::aux::ConfigurationNod
   this->cedar::proc::gui::GraphicsBase::writeConfiguration(root);
 }
 
-void cedar::proc::gui::StepItem::setRecorded(bool status)
-{
-	if (status)
-	{
-	  if (!mpRecordedDecoration)
-	  {
-      mpRecordedDecoration = DecorationPtr(
-        new Decoration
-        (
-          this,
-          ":/decorations/record.svg",
-          "This step has one or more slots registered in the recorder."
-        )
-      );
-      this->addDecoration(this->mpRecordedDecoration);
-	  }
-	}
-	else
-	{
-	  if (this->mpRecordedDecoration)
-	  {
-	    this->removeDecoration(this->mpRecordedDecoration);
-	  }
-	}
-}
+//void cedar::proc::gui::StepItem::setRecorded(bool status)
+//{
+//	if (status)
+//	{
+//	  if (!mpRecordedDecoration)
+//	  {
+//      mpRecordedDecoration = DecorationPtr(
+//        new Decoration
+//        (
+//          this,
+//          ":/decorations/record.svg",
+//          "This step has one or more slots registered in the recorder."
+//        )
+//      );
+//      this->addDecoration(this->mpRecordedDecoration);
+//	  }
+//	}
+//	else
+//	{
+//	  if (this->mpRecordedDecoration)
+//	  {
+//	    this->removeDecoration(this->mpRecordedDecoration);
+//	    this->mpRecordedDecoration.reset();
+//	  }
+//	}
+//}
 
 void cedar::proc::gui::StepItem::openActionsDock()
 {

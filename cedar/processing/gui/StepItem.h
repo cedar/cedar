@@ -125,8 +125,8 @@ public:
     const std::string& toSlot
   ) const;
 
-  //!@brief Sets a Decoration that shows that the step is registered in the recorder
-  void setRecorded(bool status);
+//  //!@brief Sets a Decoration that shows that the step is registered in the recorder
+//  void setRecorded(bool status);
 
 public slots:
   //!@brief handles changes in the state of a step (e.g. from error to non-error state)

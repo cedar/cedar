@@ -86,6 +86,9 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
     //! set the step end time
     void setLastTimeStepEnd(const boost::posix_time::ptime& time);
 
+    //! initializes the rngs
+    void initRngs();
+
 
   public:
     //! overwritten method that does the actual work

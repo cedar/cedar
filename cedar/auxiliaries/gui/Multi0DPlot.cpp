@@ -227,7 +227,14 @@ void cedar::aux::gui::Multi0DPlot::timerEvent(QTimerEvent *pEvent)
     cedar::aux::append(locks, &data->getLock(), cedar::aux::LOCK_TYPE_READ);
     cedar::aux::append(locks, &subdata->getLock(), cedar::aux::LOCK_TYPE_WRITE);
     cedar::aux::LockerBase locker(boost::bind(&cedar::aux::lock, boost::ref(locks)), boost::bind(&cedar::aux::unlock, boost::ref(locks)));
-    subdata->getData().at<float>(static_cast<int>(index), 0) = cedar::aux::math::getMatrixEntry<float>(data->getData(), 0);
+    if (!data->isEmpty() && data->getDimensionality() == 0)
+    {
+      subdata->getData().at<float>(static_cast<int>(index), 0) = cedar::aux::math::getMatrixEntry<float>(data->getData(), 0);
+    }
+    else
+    {
+      subdata->getData().at<float>(static_cast<int>(index), 0) = 0.0;
+    }
   }
 
   this->Super::timerEvent(pEvent);

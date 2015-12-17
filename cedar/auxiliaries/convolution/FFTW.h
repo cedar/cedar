@@ -53,6 +53,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <set>
 
 /*!@brief A convolution engine based on the FFTW library.
  */
@@ -111,6 +112,14 @@ public:
     cedar::aux::conv::Mode::Id mode
   ) const;
 
+  bool checkCapability
+  (
+    cv::Mat matrix,
+    cv::Mat kernel,
+    cedar::aux::conv::BorderType::Id borderType,
+    cedar::aux::conv::Mode::Id mode
+  ) const;
+
   bool checkBorderTypeCapability
   (
     cedar::aux::conv::BorderType::Id borderType
@@ -128,11 +137,13 @@ protected:
   //!@brief the internal version of the convolve method, currently called by all interface methods
   cv::Mat convolveInternal(const cv::Mat& matrix, const cv::Mat& kernel, cedar::aux::conv::BorderType::Id borderType) const;
 
+  //!@brief adjusts the size of the kernel (to matrix size) and flips sectors
+  cv::Mat padKernel(const cv::Mat& matrix, const cv::Mat& kernel) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  cv::Mat padKernel(const cv::Mat& matrix, const cv::Mat& kernel) const;
   static fftw_plan getForwardPlan(unsigned int dimensionality, std::vector<unsigned int> sizes);
   static fftw_plan getBackwardPlan(unsigned int dimensionality, std::vector<unsigned int> sizes);
   static void loadWisdom(const std::string& uniqueIdentifier);

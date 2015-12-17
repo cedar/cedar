@@ -119,6 +119,7 @@ private:
   //!@brief Resets the step and recreates the yarp connection.
   void reset();
   void connect();
+  void validatePortName(const std::string& portName) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

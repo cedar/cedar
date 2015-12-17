@@ -168,7 +168,16 @@ void cedar::dev::gui::MountedCameraViewer::draw()
   // export these to the camera in the viewer
 #ifdef CEDAR_USE_QGLVIEWER
   qglviewer::Camera* viewer_camera = this->camera();
+#if QGLVIEWER_VERSION >= 0x020600
+  qreal matrix[12];
+  for (int i = 0; i < 12; ++i)
+  {
+    matrix[i] = static_cast<qreal>(projection_matrix_double.at<double>(i));
+  }
+  viewer_camera->setFromProjectionMatrix(matrix);
+#else
   viewer_camera->setFromProjectionMatrix(projection_matrix_float.ptr<float>());
+#endif
   viewer_camera->setZNearCoefficient(0.025f);
 #endif // CEDAR_USE_QGLVIEWER
   //!@todo clean up this code

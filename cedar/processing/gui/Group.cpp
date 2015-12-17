@@ -132,13 +132,13 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
     this->mGroup = cedar::proc::GroupPtr(new cedar::proc::Group());
   }
 
+  this->setElement(mGroup);
+  this->setConnectable(mGroup);
+
   this->linkedChanged(this->mGroup->isLinked());
   this->mLinkedChangedConnection = this->mGroup->connectToLinkedChangedSignal(boost::bind(&cedar::proc::gui::Group::linkedChanged, this, _1));
   this->mLastReadConfigurationChangedConnection
     = this->mGroup->connectToLastReadConfigurationChangedSignal(boost::bind(&cedar::proc::gui::Group::lastReadConfigurationChanged, this));
-
-  this->setElement(mGroup);
-  this->setConnectable(mGroup);
 
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
@@ -161,8 +161,7 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
     this,
     SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange))
   );
-  cedar::aux::ParameterPtr looped_param = this->getGroup()->getParameter("is looped");
-  QObject::connect(looped_param.get(), SIGNAL(valueChanged()), this, SLOT(loopedChanged()));
+  QObject::connect(this->getGroup().get(), SIGNAL(loopedChanged()), this, SLOT(loopedChanged()));
 
   mDataConnectionChangedConnection = mGroup->connectToDataConnectionChangedSignal
                                      (
@@ -202,7 +201,6 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
     this,
     SLOT(handleStepNameChanged(const std::string&, const std::string&))
   );
-  this->updateDecorations();
   this->update();
 
   this->connect(this->mGroup.get(), SIGNAL(stepNameChanged(const std::string&, const std::string&)), SLOT(elementNameChanged(const std::string&, const std::string&)));
@@ -223,6 +221,32 @@ cedar::proc::gui::Group::~Group()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::gui::DataSlotItem* cedar::proc::gui::Group::getSourceConnectorItem(cedar::proc::DataSlotPtr slot) const
+{
+  for (auto slot_gui : this->mConnectorSources)
+  {
+    if (slot_gui->getSlot() == slot)
+    {
+      return slot_gui;
+    }
+  }
+
+  return nullptr;
+}
+
+cedar::proc::gui::DataSlotItem* cedar::proc::gui::Group::getSinkConnectorItem(cedar::proc::DataSlotPtr slot) const
+{
+  for (auto slot_gui : this->mConnectorSinks)
+  {
+    if (slot_gui->getSlot() == slot)
+    {
+      return slot_gui;
+    }
+  }
+
+  return nullptr;
+}
 
 bool cedar::proc::gui::Group::canBeDragged() const
 {
@@ -368,32 +392,9 @@ void cedar::proc::gui::Group::geometryLockChanged()
   this->updateResizeHandles();
 }
 
-void cedar::proc::gui::Group::hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent)
+bool cedar::proc::gui::Group::canShowTriggerChains() const
 {
-  // only looped groups have meaningful trigger chains (which are displayed in gui::Connectable::hoverEnterEvent)
-  if (!this->getGroup()->isLooped())
-  {
-    pEvent->setAccepted(false);
-    return;
-  }
-  else
-  {
-    cedar::proc::gui::Connectable::hoverEnterEvent(pEvent);
-  }
-}
-
-void cedar::proc::gui::Group::hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent)
-{
-  // see cedar::proc::gui::Group::hoverEnterEvent
-  if (!this->getGroup()->isLooped())
-  {
-    pEvent->setAccepted(false);
-    return;
-  }
-  else
-  {
-    cedar::proc::gui::Connectable::hoverLeaveEvent(pEvent);
-  }
+  return this->getGroup()->isLooped();
 }
 
 void cedar::proc::gui::Group::elementNameChanged(const std::string&, const std::string& to)
@@ -599,16 +600,18 @@ void cedar::proc::gui::Group::linkedChanged(bool linked)
           "This is a linked group, i.e., it will be loaded from its original file every time the architecture is loaded."
         )
       );
+      this->addDecoration(mpLinkedDecoration);
     }
-    this->addDecoration(mpLinkedDecoration);
   }
   else
   {
     if (this->mpLinkedDecoration)
     {
       this->removeDecoration(this->mpLinkedDecoration);
+      this->mpLinkedDecoration.reset();
     }
   }
+  this->updateDecorationPositions();
 
   this->setResizeable(!linked);
 
@@ -920,7 +923,11 @@ void cedar::proc::gui::Group::addElements(const std::list<QGraphicsItem*>& eleme
       element = element_item->getElement();
 
       std::vector<QGraphicsItem*> items;
-      items.push_back(element_item);
+      for (int i = 0; i < element_item->childItems().size(); ++i)
+      {
+        items.push_back(element_item->childItems().at(i));
+      }
+
       while (!items.empty())
       {
         auto item = *items.begin();
@@ -1485,6 +1492,7 @@ void cedar::proc::gui::Group::dataConnectionChanged
             con->disconnect();
             this->mpScene->removeItem(con);
             delete con;
+            return;
           }
         }
       }
@@ -1714,6 +1722,7 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
       element_item->readConfiguration(iter->second);
       this->mNextElementUiConfigurations.erase(iter);
     }
+    this->stepRecordStateChanged();
   }
 
   // see if there is a configuration for the UI item stored in the group's ui node
@@ -1915,12 +1924,20 @@ void cedar::proc::gui::Group::toggleSmartConnectionMode()
 
 void cedar::proc::gui::Group::stepRecordStateChanged()
 {
-	std::map<const cedar::proc::Step*, cedar::proc::gui::StepItem*> steps = this->mpScene->getStepMap();
+  std::map<const cedar::proc::Step*, cedar::proc::gui::StepItem*> steps = this->mpScene->getStepMap();
 
-	for (auto iter = steps.begin(); iter != steps.end(); ++iter)
-	{
-		iter->second->setRecorded(iter->first->isRecorded());
-	}
+  for (auto iter = steps.begin(); iter != steps.end(); ++iter)
+  {
+    iter->second->setRecorded(iter->first->isRecorded());
+  }
+
+  std::map<const cedar::proc::Group*,cedar::proc::gui::Group*> groups = this->mpScene->getGroupMap();
+
+  for (auto iter = groups.begin(); iter != groups.end(); ++iter)
+  {
+    iter->second->setRecorded(iter->first->isRecorded());
+  }
+
 }
 
 void cedar::proc::gui::Group::handleStepNameChanged(const std::string& from, const std::string& to)
@@ -2094,8 +2111,7 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
 
   color_menu->setDisabled(p_scene->getRootGroup()->showsTriggerColors());
 
-  bool can_edit_slots = this->getGroup()->getState() != cedar::proc::Triggerable::STATE_RUNNING
-                       && !this->getGroup()->isLinked();
+  bool can_edit_slots = !this->getGroup()->isLinked();
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
   QAction* p_add_input = menu.addAction("add input");
@@ -2471,13 +2487,13 @@ void cedar::proc::gui::Group::openGroupContainer()
 void cedar::proc::gui::Group::setGroup(cedar::proc::GroupPtr group)
 {
   mGroup = group;
+  this->setElement(mGroup);
+  this->setConnectable(mGroup);
+
   this->linkedChanged(this->mGroup->isLinked());
   this->mLinkedChangedConnection = this->mGroup->connectToLinkedChangedSignal(boost::bind(&cedar::proc::gui::Group::linkedChanged, this, _1));
   this->mLastReadConfigurationChangedConnection
     = this->mGroup->connectToLastReadConfigurationChangedSignal(boost::bind(&cedar::proc::gui::Group::lastReadConfigurationChanged, this));
-
-  this->setElement(mGroup);
-  this->setConnectable(mGroup);
 
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
@@ -2500,8 +2516,7 @@ void cedar::proc::gui::Group::setGroup(cedar::proc::GroupPtr group)
     this,
     SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange))
   );
-  cedar::aux::ParameterPtr looped_param = this->getGroup()->getParameter("is looped");
-  QObject::connect(looped_param.get(), SIGNAL(valueChanged()), this, SLOT(loopedChanged()));
+  QObject::connect(this->getGroup().get(), SIGNAL(loopedChanged()), this, SLOT(loopedChanged()));
 
   mDataConnectionChangedConnection = mGroup->connectToDataConnectionChangedSignal
                                      (
@@ -2541,7 +2556,6 @@ void cedar::proc::gui::Group::setGroup(cedar::proc::GroupPtr group)
     this,
     SLOT(handleStepNameChanged(const std::string&, const std::string&))
   );
-  this->updateDecorations();
   this->update();
 
   this->connect(this->mGroup.get(), SIGNAL(stepNameChanged(const std::string&, const std::string&)), SLOT(elementNameChanged(const std::string&, const std::string&)));

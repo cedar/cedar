@@ -59,6 +59,7 @@
 #include <map>
 #include <string>
 #include <set>
+#include <vector>
 
 
 /*!@brief A widget to display and manipulate the parameters of cedar::aux::Configurables.

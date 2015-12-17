@@ -53,7 +53,14 @@ int main()
   ...
 }
 @endcode
-which needs to call all your tests. The directory also needs to contain a file called CMakeLists.txt. Start
+which needs to call all your tests. The return value of this function should be non-zero if any errors occurred during
+execution. You can do this by defining a global int variable and initializing this to zero. Each time an error occurs,
+this variable is incremented. At the end of the test, you return the global variable. Make sure that incrementing the
+variable is always complemented by a descriptive error message to std::cout, ideally including the line of code this
+error appeared at (accessible through "__LINE__"). You can take a look at some of our unit tests to see how this is done
+ (for example tests/unit/math/tools/main.cpp).  
+
+The directory of your unit test needs to contain a file called CMakeLists.txt. Start
 with our template in "templates/cmakeLists.txt". Apart from the usual licensing declaration, the actual
 content of the file has to state the name of the unit test (e.g., "CrazyProcessingStep") and all C++ files
 associated with the test (e.g., "main.cpp"). 

@@ -43,6 +43,7 @@
 #include "cedar/processing/Group.h"
 
 // SYSTEM INCLUDES
+#include <boost/make_shared.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // private nested structs and classes

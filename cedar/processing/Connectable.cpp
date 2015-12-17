@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/casts.h"
+#include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -496,7 +497,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::checkInputValidity
   }
 }
 
-//!@todo Move this method to slot? (may need to use validityChanged signal)
+//!@todo Move this method to cedar::proc::DataSlot? (may need to use validityChanged signal)
 cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::updateInputValidity(cedar::proc::DataSlotWeakPtr slotWeak)
 {
   cedar::proc::DataSlotPtr slot = slotWeak.lock();
@@ -509,7 +510,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::updateInputValidity(ce
     );
   }
 
-  // if the validity is indetermined (unknown), try to find it out
+  // if the validity is undetermined (unknown), try to find it out
   if (slot->getValidity() == cedar::proc::DataSlot::VALIDITY_UNKNOWN)
   {
     // get the data object in the slot.
@@ -533,6 +534,8 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::updateInputValidity(ce
     }
     else
     {
+      // lock the slot for reading
+      //!@todo Why is this only locked in this one specific case?
       cedar::aux::Lockable::ReadLockerPtr locker;
       if (cedar::proc::OwnedDataPtr owned = boost::dynamic_pointer_cast<cedar::proc::OwnedData>(slot))
       {
@@ -543,11 +546,18 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::updateInputValidity(ce
       }
       
       auto external_data_slot = cedar::aux::asserted_pointer_cast<cedar::proc::ExternalData>(slot);
+
+      // we assume the slot is valid and look for evidence to the contrary
       validity = cedar::proc::DataSlot::VALIDITY_VALID;
+
+      // go through all data in the slot
       for (unsigned int i = 0; i < external_data_slot->getDataCount(); ++i)
       {
+        // determine the validity
         auto sub_data = external_data_slot->getData(i);
         cedar::proc::DataSlot::VALIDITY sub_data_validity = this->checkInputValidity(slot, sub_data);
+
+        // see if an error occurred; if so,
         switch (sub_data_validity)
         {
           case cedar::proc::DataSlot::VALIDITY_UNKNOWN:
@@ -562,7 +572,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::updateInputValidity(ce
             break;
 
           case cedar::proc::DataSlot::VALIDITY_WARNING:
-            // errors stay, warnings override valid
+            // if the slot was valid, switch to warning; errors, however, stay unchanged
             if (validity != cedar::proc::DataSlot::VALIDITY_ERROR)
             {
               validity = cedar::proc::DataSlot::VALIDITY_WARNING;
@@ -862,16 +872,13 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareSharedOutput
 
 cedar::proc::DataSlotPtr cedar::proc::Connectable::declareInput(const std::string& name, bool mandatory)
 {
-  cedar::proc::DataSlotPtr slot = this->declareData(DataRole::INPUT, name, mandatory);
-
-  return slot;
+  return this->declareData(DataRole::INPUT, name, mandatory);
 }
 
 cedar::proc::DataSlotPtr cedar::proc::Connectable::declareInputCollection(const std::string& name)
 {
   cedar::proc::DataSlotPtr slot = this->declareInput(name, false);
   this->makeInputCollection(name);
-
   return slot;
 }
 
@@ -1002,6 +1009,12 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
   slot->setData(data);
 
   this->checkMandatoryConnections();
+
+  if (role == cedar::proc::DataRole::INPUT)
+  {
+    // update the validity of the input
+    this->revalidateInputSlot(name);
+  }
 }
 
 void cedar::proc::Connectable::dataAddedToSlot(DataRole::Id role, cedar::proc::DataSlotWeakPtr slotWeak, cedar::aux::ConstDataPtr data)
@@ -1055,9 +1068,6 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
 void cedar::proc::Connectable::setInput(const std::string& name, cedar::aux::DataPtr data)
 {
   this->setData(DataRole::INPUT, name, data);
-
-  // update the validity of the input
-  this->getInputValidity(name);
 }
 
 void cedar::proc::Connectable::setBuffer(const std::string& name, cedar::aux::DataPtr data)
@@ -1241,4 +1251,56 @@ void cedar::proc::Connectable::emitOutputPropertiesChangedSignal(const std::stri
   {
     CEDAR_THROW(cedar::aux::InvalidNameException, "Tried to emit a signal from an output that does not exist.");
   }
+}
+
+std::map<std::string, cedar::unit::Time> cedar::proc::Connectable::unregisterRecordedData() const
+{
+  std::vector<cedar::proc::DataRole::Id> roles;
+  roles.push_back(cedar::proc::DataRole::BUFFER);
+  roles.push_back(cedar::proc::DataRole::OUTPUT);
+  std::map<std::string, cedar::unit::Time> removed_recorded_data;
+  for (auto role : roles)
+  {
+    // if any data of this step is recorded, we have to remove them from the recorder
+    if (this->hasSlotForRole(role))
+    {
+      // we have to check every buffer if it is registered at recorder
+      for (auto slot : this->getDataSlots(role))
+      {
+        std::string data_path = slot.second->getDataPath().toString();
+        auto data = slot.second->getData();
+        if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(data))
+        {
+          // remember the name and time
+          removed_recorded_data[data_path] = cedar::aux::RecorderSingleton::getInstance()->getRecordIntervalTime(data);
+          cedar::aux::RecorderSingleton::getInstance()->unregisterData(data);
+        }
+      }
+    }
+  }
+  return removed_recorded_data;
+}
+
+bool cedar::proc::Connectable::isRecorded() const
+{
+  std::vector<cedar::proc::DataRole::Id> slotTypes;
+  slotTypes.push_back(cedar::proc::DataRole::BUFFER);
+  slotTypes.push_back(cedar::proc::DataRole::OUTPUT);
+
+  for (unsigned int s = 0; s < slotTypes.size(); s++)
+  {
+
+    if (this->hasSlotForRole(slotTypes[s]))
+    {
+      cedar::proc::Connectable::SlotList dataSlots = this->getOrderedDataSlots(slotTypes[s]);
+      for (unsigned int i = 0; i < dataSlots.size(); i++)
+      {
+        if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(dataSlots[i]->getDataPath().toString()))
+        {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
 }

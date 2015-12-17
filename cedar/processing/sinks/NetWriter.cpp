@@ -50,6 +50,7 @@
 // SYSTEM INCLUDES
 #include <iostream>
 #include <vector>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -92,10 +93,11 @@ mWriter(),
 _mPort(new cedar::aux::StringParameter(this, "port", 
                                        "CEDAR/" 
                                        + cedar::aux::versionNumberToString(CEDAR_VERSION)
-                                       + "/MISC" ))
+                                       + "/MISC"))
 {
   // declare all data
   this->declareInput("input");
+  _mPort->setValidator(boost::bind(&cedar::proc::sinks::NetWriter::validatePortName, this, _1));
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -124,6 +126,7 @@ void cedar::proc::sinks::NetWriter::connect()
     {
       // somehow YARP doesnt work ... :( typically fatal.
       this->setState(cedar::proc::Step::STATE_EXCEPTION, "Network communication exception: " + e.exceptionInfo());
+      _mPort->setConstant(false);
       throw (e); // lets try this ...
     }
   }
@@ -181,14 +184,14 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::sinks::NetWriter::determineInputVal
 
   if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
   {
-    const cv::Mat& matref= mat_data->getData();
-
-    if (matref.cols <= 0
-        || matref.rows <= 0)
-    {
-      // we don't support n-Dim at the moment
-      return cedar::proc::DataSlot::VALIDITY_ERROR;
-    }
+//    const cv::Mat& matref= mat_data->getData();
+//
+//    if (matref.cols <= 0
+//        || matref.rows <= 0)
+//    {
+//      // we don't support n-Dim at the moment
+//      return cedar::proc::DataSlot::VALIDITY_ERROR;
+//    }
 
     // Mat data is accepted.
     return cedar::proc::DataSlot::VALIDITY_VALID;
@@ -215,6 +218,14 @@ void cedar::proc::sinks::NetWriter::inputConnectionChanged(const std::string& in
 
   // Finally, send data ...
   this->onTrigger();
+}
+
+void cedar::proc::sinks::NetWriter::validatePortName(const std::string& portName) const
+{
+  if (portName.find_first_of(" \r\n") != std::string::npos)
+  {
+    CEDAR_THROW(cedar::aux::ValidationFailedException, "YARP port names may not contain whitespace characters.");
+  }
 }
 
 #endif // CEDAR_USE_YARP

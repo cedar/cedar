@@ -49,6 +49,7 @@
 
 // SYSTEM INCLUDES
 #include <QDialog>
+#include <vector>
 
 
 /*!@brief A dialog for displaying one-time messages.

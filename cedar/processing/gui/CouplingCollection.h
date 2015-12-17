@@ -57,6 +57,7 @@
 // SYSTEM INCLUDES
 #include <deque>
 #include <tuple>
+#include <vector>
 
 
 /*!@brief Displays a collection of couplings between elements in processing architectures as a connection.

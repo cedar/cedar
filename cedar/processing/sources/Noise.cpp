@@ -65,6 +65,8 @@ namespace
     declaration->setIconPath(":/steps/noise.svg");
     declaration->setDescription("A step that generates normally distributed random noise.");
     declaration->deprecatedName("cedar.dynamics.Noise");
+    declaration->deprecate("This source offers little options for noise generation. In addition, it is misleading "
+        "when integrating via Euler.");
 
     declaration->declare();
 

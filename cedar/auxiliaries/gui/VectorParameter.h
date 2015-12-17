@@ -291,10 +291,10 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-private:
-  //! Vector of the widgets used for displaying the parameter entries.
+  //! Vector of the widgets used for displaying the parameter entries. (placed in protected to allow unit testing)
   std::vector<WidgetType*> mWidgets;
+private:
+  // none yet
 
 }; // class cedar::aux::gui::VectorParameter
 

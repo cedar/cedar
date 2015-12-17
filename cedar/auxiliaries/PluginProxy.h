@@ -44,8 +44,10 @@
 #include "cedar/auxiliaries/PluginProxy.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/signals2/signal.hpp>
-#include <boost/signals2/connection.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2/signal.hpp>
+  #include <boost/signals2/connection.hpp>
+#endif // Q_MOC_RUN
 #include <string>
 #include <map>
 #include <iostream>
@@ -154,6 +156,10 @@ protected:
 private:
   //!@brief Searches for the plugin description file.
   std::string findPluginDescription(const std::string& plugin_path) const;
+
+  static std::string findPluginInWorkspaceNoThrow(const std::string& plugin_path, const std::string& workspace, bool& found, std::vector<std::string>& searchedPaths);
+
+  static std::string findPluginNoThrow(const std::string& pluginName, bool& found, std::vector<std::string>& searchedPaths);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
