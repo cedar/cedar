@@ -179,6 +179,11 @@ void cedar::proc::steps::Sum::inputConnectionChanged(const std::string& /*inputN
       return;
     }
 
+    // make a copy of the output for later determining if the output actually changed
+    QWriteLocker r_l(&this->mOutput->getLock());
+    cv::Mat old_output = this->mOutput->getData().clone();
+    r_l.unlock();
+
     // then, initialize the output to the appropriate size
     for (size_t i = 0; i < this->mInputs->getDataCount(); ++i)
     {
@@ -186,7 +191,14 @@ void cedar::proc::steps::Sum::inputConnectionChanged(const std::string& /*inputN
 
       if (mat_data)
       {
-        if (mat_data->getDimensionality() == 1)
+        // first, make a copy of the input dimensionality (to avoid long locks/possible deadlocks)
+        QReadLocker input_l(&mat_data->getLock());
+        auto input_dimensionality = mat_data->getDimensionality();
+        input_l.unlock();
+
+        // then set the output
+        QWriteLocker l(&this->mOutput->getLock());
+        if (input_dimensionality == 1)
         {
           this->mOutput->setData(cedar::aux::math::canonicalRowVector(mat_data->getData() * 0.0));
         }
@@ -194,9 +206,10 @@ void cedar::proc::steps::Sum::inputConnectionChanged(const std::string& /*inputN
         {
           this->mOutput->setData(mat_data->getData() * 0.0);
         }
+        l.unlock();
 
         // we need to check all data; if one is not 0d, we need to use its size
-        if (mat_data->getDimensionality() > 0)
+        if (input_dimensionality > 0)
         {
           break;
         }
@@ -204,12 +217,16 @@ void cedar::proc::steps::Sum::inputConnectionChanged(const std::string& /*inputN
     }
 
     // finally, compute once and then notify subsequent steps that the output size may have changed
-    //!@todo Only notify when something actually changed.
+    this->callComputeWithoutTriggering();
+
     cedar::proc::Step::ReadLocker locker(this);
-    this->compute(cedar::proc::Arguments());
+    const cv::Mat& output = this->mOutput->getData();
+    bool changed = old_output.type() != output.type() || old_output.size != output.size;
     locker.unlock();
 
-    this->emitOutputPropertiesChangedSignal("sum");
-    this->onTrigger();
+    if (changed)
+    {
+      this->emitOutputPropertiesChangedSignal("sum");
+    }
   }
 }

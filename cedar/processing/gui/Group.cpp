@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -81,8 +81,8 @@
 #include <QStatusBar>
 #include <QListWidget>
 #ifndef Q_MOC_RUN
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/filesystem.hpp>
+  #include <boost/property_tree/json_parser.hpp>
+  #include <boost/filesystem.hpp>
 #endif
 #include <iostream>
 #include <functional>
@@ -106,11 +106,11 @@ const qreal cedar::proc::gui::Group::M_COLLAPSED_ICON_SIZE = cedar::proc::gui::S
 
 cedar::proc::gui::Group::Group
 (
-    QMainWindow *pMainWindow,
-    cedar::proc::gui::Scene* scene,
-    qreal width,
-    qreal height,
-    cedar::proc::GroupPtr group
+  QMainWindow *pMainWindow,
+  cedar::proc::gui::Scene* scene,
+  qreal width,
+  qreal height,
+  cedar::proc::GroupPtr group
 )
 :
 cedar::proc::gui::Connectable(width, height, cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP, pMainWindow),
@@ -138,11 +138,11 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
   this->linkedChanged(this->mGroup->isLinked());
   this->mLinkedChangedConnection = this->mGroup->connectToLinkedChangedSignal(boost::bind(&cedar::proc::gui::Group::linkedChanged, this, _1));
   this->mLastReadConfigurationChangedConnection
-  = this->mGroup->connectToLastReadConfigurationChangedSignal(boost::bind(&cedar::proc::gui::Group::lastReadConfigurationChanged, this));
+    = this->mGroup->connectToLastReadConfigurationChangedSignal(boost::bind(&cedar::proc::gui::Group::lastReadConfigurationChanged, this));
 
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
-      | QGraphicsItem::ItemIsMovable
-  );
+                               | QGraphicsItem::ItemIsMovable
+                               );
 
   mpNameDisplay = new QGraphicsTextItem(this);
   this->groupNameChanged();
@@ -156,40 +156,39 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
   QObject::connect(_mSmartMode.get(), SIGNAL(valueChanged()), this, SLOT(toggleSmartConnectionMode()));
   QObject::connect
   (
-      this,
-      SIGNAL(signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange)),
-      this,
-      SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange))
+    this,
+    SIGNAL(signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange)),
+    this,
+    SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange))
   );
-  cedar::aux::ParameterPtr looped_param = this->getGroup()->getParameter("is looped");
-  QObject::connect(looped_param.get(), SIGNAL(valueChanged()), this, SLOT(loopedChanged()));
+  QObject::connect(this->getGroup().get(), SIGNAL(loopedChanged()), this, SLOT(loopedChanged()));
 
   mDataConnectionChangedConnection = mGroup->connectToDataConnectionChangedSignal
-      (
-          boost::bind(&cedar::proc::gui::Group::checkDataConnection, this, _1, _2, _3)
-      );
+                                     (
+                                       boost::bind(&cedar::proc::gui::Group::checkDataConnection, this, _1, _2, _3)
+                                     );
   mTriggerConnectionChangedConnection = mGroup->connectToTriggerConnectionChangedSignal
-      (
-          boost::bind
-          (
-              &cedar::proc::gui::Group::checkTriggerConnection,
-              this,
-              _1,
-              _2,
-              _3
-          )
-      );
+                                        (
+                                          boost::bind
+                                          (
+                                            &cedar::proc::gui::Group::checkTriggerConnection,
+                                            this,
+                                            _1,
+                                            _2,
+                                            _3
+                                          )
+                                        );
 
   mNewElementAddedConnection
-  = mGroup->connectToNewElementAddedSignal
-  (
-      boost::bind(&cedar::proc::gui::Group::processElementAddedSignal, this, _1)
-  );
+    = mGroup->connectToNewElementAddedSignal
+      (
+        boost::bind(&cedar::proc::gui::Group::processElementAddedSignal, this, _1)
+      );
   mElementRemovedConnection
-  = mGroup->connectToElementRemovedSignal
-  (
-      boost::bind(&cedar::proc::gui::Group::processElementRemovedSignal, this, _1)
-  );
+    = mGroup->connectToElementRemovedSignal
+      (
+        boost::bind(&cedar::proc::gui::Group::processElementRemovedSignal, this, _1)
+      );
 
   this->connect(this->_mIsCollapsed.get(), SIGNAL(valueChanged()), SLOT(updateCollapsedness()));
 
@@ -197,10 +196,10 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
 
   QObject::connect
   (
-      this->mGroup.get(),
-      SIGNAL(stepNameChanged(const std::string&, const std::string&)),
-      this,
-      SLOT(handleStepNameChanged(const std::string&, const std::string&))
+    this->mGroup.get(),
+    SIGNAL(stepNameChanged(const std::string&, const std::string&)),
+    this,
+    SLOT(handleStepNameChanged(const std::string&, const std::string&))
   );
   this->update();
 
@@ -222,6 +221,32 @@ cedar::proc::gui::Group::~Group()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::gui::DataSlotItem* cedar::proc::gui::Group::getSourceConnectorItem(cedar::proc::DataSlotPtr slot) const
+{
+  for (auto slot_gui : this->mConnectorSources)
+  {
+    if (slot_gui->getSlot() == slot)
+    {
+      return slot_gui;
+    }
+  }
+
+  return nullptr;
+}
+
+cedar::proc::gui::DataSlotItem* cedar::proc::gui::Group::getSinkConnectorItem(cedar::proc::DataSlotPtr slot) const
+{
+  for (auto slot_gui : this->mConnectorSinks)
+  {
+    if (slot_gui->getSlot() == slot)
+    {
+      return slot_gui;
+    }
+  }
+
+  return nullptr;
+}
 
 bool cedar::proc::gui::Group::canBeDragged() const
 {
@@ -313,9 +338,9 @@ void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
   {
     auto elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup
         (
-            group_declaration->getClassName(),
-            target_group,
-            pEvent->modifiers().testFlag(Qt::ControlModifier)
+          group_declaration->getClassName(),
+          target_group,
+          pEvent->modifiers().testFlag(Qt::ControlModifier)
         );
     this->mpScene->getGraphicsItemFor(elem)->setPos(mapped);
   }
@@ -476,7 +501,7 @@ void cedar::proc::gui::Group::showArchitectureWidget(const std::string& name)
   if (plot_iter == this->_mArchitectureWidgets.end())
   {
     CEDAR_THROW(cedar::aux::InvalidNameException, "No architecture plot with the name \"" + name
-        + "\" was found in the group \"" + this->getGroup()->getName() + "\".");
+                                                  + "\" was found in the group \"" + this->getGroup()->getName() + "\".");
   }
 
   auto widget = new cedar::proc::gui::ArchitectureWidget(this->getGroup(), this->mpMainWindow);
@@ -568,12 +593,12 @@ void cedar::proc::gui::Group::linkedChanged(bool linked)
     if (!this->mpLinkedDecoration)
     {
       this->mpLinkedDecoration = cedar::proc::gui::Connectable::DecorationPtr(
-          new cedar::proc::gui::Connectable::Decoration
-          (
-              this,
-              ":/decorations/linked.svg",
-              "This is a linked group, i.e., it will be loaded from its original file every time the architecture is loaded."
-          )
+        new cedar::proc::gui::Connectable::Decoration
+        (
+          this,
+          ":/decorations/linked.svg",
+          "This is a linked group, i.e., it will be loaded from its original file every time the architecture is loaded."
+        )
       );
       this->addDecoration(mpLinkedDecoration);
     }
@@ -675,30 +700,30 @@ QVariant cedar::proc::gui::Group::itemChange(QGraphicsItem::GraphicsItemChange c
 
   switch (change)
   {
-  case QGraphicsItem::ItemChildAddedChange:
-  {
-    cedar::proc::gui::GraphicsBase *p_item
-    = dynamic_cast<cedar::proc::gui::GraphicsBase*>(value.value<QGraphicsItem*>());
-    if(p_item && (p_item->getGroup() & filtered_groups) != 0)
+    case QGraphicsItem::ItemChildAddedChange:
     {
-      p_item->installSceneEventFilter(this);
+      cedar::proc::gui::GraphicsBase *p_item
+        = dynamic_cast<cedar::proc::gui::GraphicsBase*>(value.value<QGraphicsItem*>());
+      if(p_item && (p_item->getGroup() & filtered_groups) != 0)
+      {
+        p_item->installSceneEventFilter(this);
+      }
+      return value;
     }
-    return value;
-  }
 
-  case QGraphicsItem::ItemChildRemovedChange:
-  {
-    cedar::proc::gui::GraphicsBase *p_item
-    = dynamic_cast<cedar::proc::gui::GraphicsBase*>(value.value<QGraphicsItem*>());
-    if(p_item && (p_item->getGroup() & filtered_groups) != 0)
+    case QGraphicsItem::ItemChildRemovedChange:
     {
-      p_item->removeSceneEventFilter(this);
+      cedar::proc::gui::GraphicsBase *p_item
+        = dynamic_cast<cedar::proc::gui::GraphicsBase*>(value.value<QGraphicsItem*>());
+      if(p_item && (p_item->getGroup() & filtered_groups) != 0)
+      {
+        p_item->removeSceneEventFilter(this);
+      }
+      return value;
     }
-    return value;
-  }
 
-  default:
-    return this->cedar::proc::gui::GraphicsBase::itemChange(change, value);
+    default:
+      return this->cedar::proc::gui::GraphicsBase::itemChange(change, value);
   }
 }
 
@@ -728,11 +753,11 @@ void cedar::proc::gui::Group::updateTextBounds()
   }
   this->mpNameDisplay->setTextWidth
   (
-      std::max
-      (
-          static_cast<qreal>(50),
-          this->width() - bounds_factor * this->getIconSizeForCurrentMode()
-      )
+    std::max
+    (
+      static_cast<qreal>(50),
+      this->width() - bounds_factor * this->getIconSizeForCurrentMode()
+    )
   );
 
   this->mpNameDisplay->setX(this->getIconSizeForCurrentMode());
@@ -928,8 +953,8 @@ void cedar::proc::gui::Group::addElements(const std::list<QGraphicsItem*>& eleme
     {
       CEDAR_THROW
       (
-          cedar::aux::UnhandledTypeException,
-          "cedar::proc::gui::Group::addElements cannot handle this type of QGraphicsItem."
+        cedar::aux::UnhandledTypeException,
+        "cedar::proc::gui::Group::addElements cannot handle this type of QGraphicsItem."
       )
     }
     CEDAR_DEBUG_ASSERT(element);
@@ -1247,7 +1272,7 @@ void cedar::proc::gui::Group::writeOpenPlotsTo(cedar::aux::ConfigurationNode& no
 void cedar::proc::gui::Group::writeScene(cedar::aux::ConfigurationNode& root) const
 {
   cedar::aux::ConfigurationNode scene;
-
+  
   // only write sticky notes for the root network
   if (this->getGroup()->isRoot())
   {
@@ -1276,17 +1301,17 @@ void cedar::proc::gui::Group::writeScene(cedar::aux::ConfigurationNode& root) co
 
   for
   (
-      cedar::proc::Group::ElementMap::const_iterator element_iter = elements.begin();
-      element_iter != elements.end();
-      ++element_iter
+    cedar::proc::Group::ElementMap::const_iterator element_iter = elements.begin();
+    element_iter != elements.end();
+    ++element_iter
   )
   {
     cedar::proc::ElementPtr element = element_iter->second;
 
     if
     (
-        boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(element)
-        || boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(element)
+      boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(element)
+      || boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(element)
     )
     {
       continue;
@@ -1298,23 +1323,23 @@ void cedar::proc::gui::Group::writeScene(cedar::aux::ConfigurationNode& root) co
     cedar::aux::ConfigurationNode node;
     switch (p_item->getGroup())
     {
-    case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP:
-      node.put("type", "step");
-      break;
+      case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP:
+        node.put("type", "step");
+        break;
 
-    case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
-      node.put("type", "trigger");
-      break;
+      case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
+        node.put("type", "trigger");
+        break;
 
-    case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP:
-    {
-      // move along, nothing to do here
-      node.put("type", "group");
-      break;
-    }
+      case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP:
+      {
+        // move along, nothing to do here
+        node.put("type", "group");
+        break;
+      }
 
-    default:
-      continue;
+      default:
+        continue;
     }
 
     if (p_item->getGroup() != cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP)
@@ -1363,30 +1388,30 @@ void cedar::proc::gui::Group::disconnect()
 }
 
 void cedar::proc::gui::Group::checkDataConnection
-(
-    cedar::proc::ConstDataSlotPtr source,
-    cedar::proc::ConstDataSlotPtr target,
-    cedar::proc::Group::ConnectionChange change
-)
+     (
+       cedar::proc::ConstDataSlotPtr source,
+       cedar::proc::ConstDataSlotPtr target,
+       cedar::proc::Group::ConnectionChange change
+     )
 {
   emit signalDataConnectionChange
-  (
-      QString::fromStdString(source->getParent()),
-      QString::fromStdString(source->getName()),
-      QString::fromStdString(target->getParent()),
-      QString::fromStdString(target->getName()),
-      change
-  );
+       (
+         QString::fromStdString(source->getParent()),
+         QString::fromStdString(source->getName()),
+         QString::fromStdString(target->getParent()),
+         QString::fromStdString(target->getName()),
+         change
+       );
 }
 
 void cedar::proc::gui::Group::dataConnectionChanged
-(
-    QString sourceName,
-    QString sourceSlot,
-    QString targetName,
-    QString targetSlot,
-    cedar::proc::Group::ConnectionChange change
-)
+     (
+       QString sourceName,
+       QString sourceSlot,
+       QString targetName,
+       QString targetSlot,
+       cedar::proc::Group::ConnectionChange change
+     )
 {
   cedar::proc::gui::DataSlotItem* source_slot = NULL;
   //!@todo Write a getGraphicsItemFor(QString/std::string) method in scene; also, maybe these items should be managed in gui::Group
@@ -1439,7 +1464,7 @@ void cedar::proc::gui::Group::dataConnectionChanged
   else
   {
     cedar::proc::gui::GraphicsBase* p_base
-    = this->mpScene->getGraphicsItemFor(this->getGroup()->getElement(targetName.toStdString()).get());
+      = this->mpScene->getGraphicsItemFor(this->getGroup()->getElement(targetName.toStdString()).get());
     if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(p_base))
     {
       target_slot = connectable->getSlotItem(cedar::proc::DataRole::INPUT, targetSlot.toStdString());
@@ -1449,43 +1474,43 @@ void cedar::proc::gui::Group::dataConnectionChanged
 
   switch (change)
   {
-  case cedar::proc::Group::CONNECTION_ADDED:
-  {
-    cedar::proc::gui::Connection* p_con = source_slot->connectTo(target_slot);
-    p_con->setSmartMode(this->getSmartConnection());
-    break;
-  }
-  case cedar::proc::Group::CONNECTION_REMOVED:
-  {
-    QList<QGraphicsItem*> items = this->mpScene->items();
-    for (int i = 0; i < items.size(); ++i)
+    case cedar::proc::Group::CONNECTION_ADDED:
     {
-      if (cedar::proc::gui::Connection* con = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
+      cedar::proc::gui::Connection* p_con = source_slot->connectTo(target_slot);
+      p_con->setSmartMode(this->getSmartConnection());
+      break;
+    }
+    case cedar::proc::Group::CONNECTION_REMOVED:
+    {
+      QList<QGraphicsItem*> items = this->mpScene->items();
+      for (int i = 0; i < items.size(); ++i)
       {
-        if (con->getSource() == source_slot && con->getTarget() == target_slot)
+        if (cedar::proc::gui::Connection* con = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
         {
-          con->disconnect();
-          this->mpScene->removeItem(con);
-          delete con;
-          return;
+          if (con->getSource() == source_slot && con->getTarget() == target_slot)
+          {
+            con->disconnect();
+            this->mpScene->removeItem(con);
+            delete con;
+            return;
+          }
         }
       }
+      break;
     }
-    break;
-  }
-  default:
-  {
-    CEDAR_ASSERT(false);
-  }
+    default:
+    {
+      CEDAR_ASSERT(false);
+    }
   }
 }
 
 void cedar::proc::gui::Group::checkTriggerConnection
-(
-    cedar::proc::TriggerPtr source,
-    cedar::proc::TriggerablePtr target,
-    bool added
-)
+     (
+       cedar::proc::TriggerPtr source,
+       cedar::proc::TriggerablePtr target,
+       bool added
+     )
 {
   if (!this->getGroup()->nameExists(source->getName()))
   {
@@ -1497,16 +1522,16 @@ void cedar::proc::gui::Group::checkTriggerConnection
    * element caused this exception.
    */
   auto source_element = dynamic_cast<cedar::proc::gui::TriggerItem*>
-  (
-      this->mpScene->getGraphicsItemFor
-      (
-          this->getGroup()->getElement(source->getName()).get()
-      )
-  );
+                        (
+                          this->mpScene->getGraphicsItemFor
+                          (
+                            this->getGroup()->getElement(source->getName()).get()
+                          )
+                        );
 
   auto target_element = this->mpScene->getGraphicsItemFor
       (
-          this->getGroup()->getElement(boost::dynamic_pointer_cast<cedar::proc::Element>(target)->getName()).get()
+        this->getGroup()->getElement(boost::dynamic_pointer_cast<cedar::proc::Element>(target)->getName()).get()
       );
   if (added)
   {
@@ -1558,11 +1583,11 @@ void cedar::proc::gui::Group::updateConnectorPositions()
     catch (const cedar::proc::InvalidRoleException&)
     {
       cedar::aux::LogSingleton::getInstance()->debugMessage
-          (
-              "Warning: could not find group output slot for connector \""
-              + slot_name + "\". Slot item may not be positioned incorrectly in the scene.",
-              "void cedar::proc::gui::Group::updateConnectorPositions()"
-          );
+      (
+        "Warning: could not find group output slot for connector \""
+          + slot_name + "\". Slot item may not be positioned incorrectly in the scene.",
+        "void cedar::proc::gui::Group::updateConnectorPositions()"
+      );
     }
   }
 
@@ -1629,10 +1654,10 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
   catch (cedar::aux::UnknownTypeException&)
   {
     cedar::aux::LogSingleton::getInstance()->debugMessage
-        (
-            "Could not get type for element " + element->getName(),
-            CEDAR_CURRENT_FUNCTION_NAME
-        );
+    (
+      "Could not get type for element " + element->getName(),
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
   }
 
   // if connector, add the corresponding item
@@ -1678,7 +1703,7 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
     CEDAR_ASSERT(p_scene_element != nullptr);
     if (p_scene_element->parentItem() != this)
     {
-      //      this->transformChildCoordinates(p_scene_element);
+//      this->transformChildCoordinates(p_scene_element);
       p_scene_element->setParentItem(this);
     }
   }
@@ -1730,10 +1755,10 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
 }
 
 void cedar::proc::gui::Group::tryToRestoreGroupUIConfiguration
-(
-    cedar::aux::ConfigurationNode& config,
-    cedar::proc::gui::GraphicsBase* pSceneElement
-)
+     (
+       cedar::aux::ConfigurationNode& config,
+       cedar::proc::gui::GraphicsBase* pSceneElement
+     )
 {
   auto groups_iter = config.find("groups");
   if (groups_iter == config.not_found())
@@ -1778,11 +1803,11 @@ void cedar::proc::gui::Group::tryRestoreUIConfigurationsOfElements(cedar::aux::C
 }
 
 void cedar::proc::gui::Group::tryToRestoreUIConfiguration
-(
-    cedar::aux::ConfigurationNode& config,
-    cedar::proc::ElementPtr element,
-    cedar::proc::gui::GraphicsBase* pSceneElement
-)
+     (
+       cedar::aux::ConfigurationNode& config,
+       cedar::proc::ElementPtr element,
+       cedar::proc::gui::GraphicsBase* pSceneElement
+     )
 {
   std::string current_type;
   try
@@ -1792,10 +1817,10 @@ void cedar::proc::gui::Group::tryToRestoreUIConfiguration
   catch (cedar::aux::UnknownTypeException&)
   {
     cedar::aux::LogSingleton::getInstance()->debugMessage
-        (
-            "Could not get type for element " + element->getName(),
-            CEDAR_CURRENT_FUNCTION_NAME
-        );
+    (
+      "Could not get type for element " + element->getName(),
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
     return;
   }
 
@@ -1915,7 +1940,6 @@ void cedar::proc::gui::Group::stepRecordStateChanged()
 
 }
 
-
 void cedar::proc::gui::Group::handleStepNameChanged(const std::string& from, const std::string& to)
 {
   this->changeStepName(from, to);
@@ -1935,8 +1959,8 @@ void cedar::proc::gui::Group::editPlotGroup(std::string plotGroupName)
   {
     CEDAR_THROW
     (
-        cedar::aux::NotFoundException,
-        "cedar::proc::gui::Group::editPlotGroup could not edit plot group. Does not exist."
+      cedar::aux::NotFoundException,
+      "cedar::proc::gui::Group::editPlotGroup could not edit plot group. Does not exist."
     );
   }
   cedar::aux::ConfigurationNode node;
@@ -1951,8 +1975,8 @@ void cedar::proc::gui::Group::removePlotGroup(std::string plotGroupName)
   {
     CEDAR_THROW
     (
-        cedar::aux::NotFoundException,
-        "cedar::proc::gui::Group::removePlotGroup could not remove plot group. Does not exist."
+      cedar::aux::NotFoundException,
+      "cedar::proc::gui::Group::removePlotGroup could not remove plot group. Does not exist."
     );
   }
 
@@ -1966,8 +1990,8 @@ void cedar::proc::gui::Group::renamePlotGroup(std::string from, std::string to)
   {
     CEDAR_THROW
     (
-        cedar::aux::NotFoundException,
-        "cedar::proc::gui::Group::renamePlotGroup could not rename plot group. Does not exist."
+      cedar::aux::NotFoundException,
+      "cedar::proc::gui::Group::renamePlotGroup could not rename plot group. Does not exist."
     );
   }
   // rename
@@ -2007,8 +2031,8 @@ void cedar::proc::gui::Group::displayPlotGroup(std::string plotGroupName)
   {
     CEDAR_THROW
     (
-        cedar::aux::NotFoundException,
-        "cedar::proc::gui::Group::displayPlotGroup could not display plot group. Does not exist."
+      cedar::aux::NotFoundException,
+      "cedar::proc::gui::Group::displayPlotGroup could not display plot group. Does not exist."
     );
   }
 
@@ -2043,7 +2067,7 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   }
 
   this->fillConnectableMenu(menu, event);
-
+  
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
   QAction* p_reset = menu.addAction("reset");
   this->connect(p_reset, SIGNAL(triggered()), SLOT(reset()));
@@ -2064,10 +2088,10 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   auto colors = cedar::proc::gui::SettingsSingleton::getInstance()->getUserDefinedColors();
   colors.push_back
   (
-      cedar::proc::gui::Settings::UserDefinedColorPtr
-      (
-          new cedar::proc::gui::Settings::UserDefinedColor("white=rgb(255,255,255)")
-      )
+    cedar::proc::gui::Settings::UserDefinedColorPtr
+    (
+      new cedar::proc::gui::Settings::UserDefinedColor("white=rgb(255,255,255)")
+    )
   );
 
   for (auto color : colors)
@@ -2087,8 +2111,7 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
 
   color_menu->setDisabled(p_scene->getRootGroup()->showsTriggerColors());
 
-  bool can_edit_slots = this->getGroup()->getState() != cedar::proc::Triggerable::STATE_RUNNING
-      && !this->getGroup()->isLinked();
+  bool can_edit_slots = !this->getGroup()->isLinked();
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
   QAction* p_add_input = menu.addAction("add input");
@@ -2169,10 +2192,10 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
 
   //!@todo Fully implement showing groups in cotnainers
   // currently, this feature is disabled because there are too many bugs
-  //  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
-  //  QAction* open_group_container = menu.addAction("open group in container");
-  //  open_group_container->setEnabled(true);
-  //  QObject::connect(open_group_container, SIGNAL(triggered()), this, SLOT(openGroupContainer()));
+//  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+//  QAction* open_group_container = menu.addAction("open group in container");
+//  open_group_container->setEnabled(true);
+//  QObject::connect(open_group_container, SIGNAL(triggered()), this, SLOT(openGroupContainer()));
 
   QAction* a = menu.exec(event->screenPos());
 
@@ -2324,7 +2347,7 @@ void cedar::proc::gui::Group::changeStepName(const std::string& from, const std:
     }
 
     we have to search and replace the old step name in every step for every group
-   */
+  */
   for(auto& plot_group : this->mPlotGroupsNode)
   {
     for(auto& plot : plot_group.second)
@@ -2365,7 +2388,7 @@ void cedar::proc::gui::Group::readStickyNotes(const cedar::aux::ConfigurationNod
       QColor color(255, 255, 110);
       if
       (
-          color_red != sticky_node.not_found()
+        color_red != sticky_node.not_found()
           && color_green != sticky_node.not_found()
           && color_blue != sticky_node.not_found()
       )
@@ -2401,8 +2424,8 @@ void cedar::proc::gui::Group::removeElementFromPlotGroup(const std::string& plot
   {
     CEDAR_THROW
     (
-        cedar::aux::NotFoundException,
-        "Plot group " + plotGroupName + " does not exist."
+      cedar::aux::NotFoundException,
+      "Plot group " + plotGroupName + " does not exist."
     );
   }
 
@@ -2470,11 +2493,11 @@ void cedar::proc::gui::Group::setGroup(cedar::proc::GroupPtr group)
   this->linkedChanged(this->mGroup->isLinked());
   this->mLinkedChangedConnection = this->mGroup->connectToLinkedChangedSignal(boost::bind(&cedar::proc::gui::Group::linkedChanged, this, _1));
   this->mLastReadConfigurationChangedConnection
-  = this->mGroup->connectToLastReadConfigurationChangedSignal(boost::bind(&cedar::proc::gui::Group::lastReadConfigurationChanged, this));
+    = this->mGroup->connectToLastReadConfigurationChangedSignal(boost::bind(&cedar::proc::gui::Group::lastReadConfigurationChanged, this));
 
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
-      | QGraphicsItem::ItemIsMovable
-  );
+                               | QGraphicsItem::ItemIsMovable
+                               );
 
   mpNameDisplay = new QGraphicsTextItem(this);
   this->groupNameChanged();
@@ -2488,40 +2511,39 @@ void cedar::proc::gui::Group::setGroup(cedar::proc::GroupPtr group)
   QObject::connect(_mSmartMode.get(), SIGNAL(valueChanged()), this, SLOT(toggleSmartConnectionMode()));
   QObject::connect
   (
-      this,
-      SIGNAL(signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange)),
-      this,
-      SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange))
+    this,
+    SIGNAL(signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange)),
+    this,
+    SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange))
   );
-  cedar::aux::ParameterPtr looped_param = this->getGroup()->getParameter("is looped");
-  QObject::connect(looped_param.get(), SIGNAL(valueChanged()), this, SLOT(loopedChanged()));
+  QObject::connect(this->getGroup().get(), SIGNAL(loopedChanged()), this, SLOT(loopedChanged()));
 
   mDataConnectionChangedConnection = mGroup->connectToDataConnectionChangedSignal
-      (
-          boost::bind(&cedar::proc::gui::Group::checkDataConnection, this, _1, _2, _3)
-      );
+                                     (
+                                       boost::bind(&cedar::proc::gui::Group::checkDataConnection, this, _1, _2, _3)
+                                     );
   mTriggerConnectionChangedConnection = mGroup->connectToTriggerConnectionChangedSignal
-      (
-          boost::bind
-          (
-              &cedar::proc::gui::Group::checkTriggerConnection,
-              this,
-              _1,
-              _2,
-              _3
-          )
-      );
+                                        (
+                                          boost::bind
+                                          (
+                                            &cedar::proc::gui::Group::checkTriggerConnection,
+                                            this,
+                                            _1,
+                                            _2,
+                                            _3
+                                          )
+                                        );
 
   mNewElementAddedConnection
-  = mGroup->connectToNewElementAddedSignal
-  (
-      boost::bind(&cedar::proc::gui::Group::processElementAddedSignal, this, _1)
-  );
+    = mGroup->connectToNewElementAddedSignal
+      (
+        boost::bind(&cedar::proc::gui::Group::processElementAddedSignal, this, _1)
+      );
   mElementRemovedConnection
-  = mGroup->connectToElementRemovedSignal
-  (
-      boost::bind(&cedar::proc::gui::Group::processElementRemovedSignal, this, _1)
-  );
+    = mGroup->connectToElementRemovedSignal
+      (
+        boost::bind(&cedar::proc::gui::Group::processElementRemovedSignal, this, _1)
+      );
 
   this->connect(this->_mIsCollapsed.get(), SIGNAL(valueChanged()), SLOT(updateCollapsedness()));
 
@@ -2529,10 +2551,10 @@ void cedar::proc::gui::Group::setGroup(cedar::proc::GroupPtr group)
 
   QObject::connect
   (
-      this->mGroup.get(),
-      SIGNAL(stepNameChanged(const std::string&, const std::string&)),
-      this,
-      SLOT(handleStepNameChanged(const std::string&, const std::string&))
+    this->mGroup.get(),
+    SIGNAL(stepNameChanged(const std::string&, const std::string&)),
+    this,
+    SLOT(handleStepNameChanged(const std::string&, const std::string&))
   );
   this->update();
 

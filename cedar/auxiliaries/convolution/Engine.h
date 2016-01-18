@@ -149,11 +149,20 @@ public:
     return this->mKernelList;
   }
 
-  //!@brief Checks if a matrix is capable of a certain type of convolution.
+  //!@brief Checks if the convolution is capable of a certain type of operation.
   virtual bool checkCapability
   (
     size_t matrixDim,
     size_t kernelDim,
+    cedar::aux::conv::BorderType::Id borderType,
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
+  ) const = 0;
+
+  //!@brief Checks if the given two matrices can be convolved by the engine.
+  virtual bool checkCapability
+  (
+    cv::Mat matrix,
+    cv::Mat kernel,
     cedar::aux::conv::BorderType::Id borderType,
     cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
   ) const = 0;

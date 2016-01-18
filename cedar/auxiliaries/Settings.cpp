@@ -56,7 +56,8 @@ cedar::aux::Settings::Settings()
 :
 cedar::aux::Configurable(),
 mGlobalTimeFactor(1.0),
-_mMemoryDebugOutput(new cedar::aux::BoolParameter(this, "memory debug output", false))
+_mMemoryDebugOutput(new cedar::aux::BoolParameter(this, "memory debug output", false)),
+_mRecorderSerializationFormat(new cedar::aux::EnumParameter(this, "recorder data format", cedar::aux::SerializationFormat::typePtr(), cedar::aux::SerializationFormat::CSV))
 {
   _mRecorderWorkspace = new cedar::aux::DirectoryParameter
                         (
@@ -140,6 +141,24 @@ cedar::aux::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::SerializationFormat::Id cedar::aux::Settings::getSerializationFormat() const
+{
+  QReadLocker l(this->_mRecorderSerializationFormat->getLock());
+  auto copy = this->_mRecorderSerializationFormat->getValue();
+  l.unlock();
+  return copy;
+}
+
+void cedar::aux::Settings::setSerializationFormat(cedar::aux::SerializationFormat::Id format)
+{
+  this->_mRecorderSerializationFormat->setValue(format, true);
+}
+
+cedar::aux::EnumParameterPtr cedar::aux::Settings::getRecorderSerializationFormatParameter() const
+{
+  return this->_mRecorderSerializationFormat;
+}
 
 void cedar::aux::Settings::setGlobalTimeFactor(double factor)
 {

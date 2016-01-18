@@ -65,11 +65,30 @@ known issues
     process is, but is normal. Connections also sometimes are blue for a short time.
   - When net readers and writers are in the same architecture, this can sometimes lead to crashes. This *seems* to be a
     YARP issue.
+  - cedar::proc::Group writes and reads the bool parameter "isLooped", which is no longer needed. This will be disabled
+    in the next major release.
 
 Unreleased
 ==========
 
-  none
+- cedar::proc
+  - Architecture scripts can now set a status that is displayed in the script manager.
+  - Architecture widgets can now add buttons for calling step actions.
+  - When steps go into warning/error states, the GUI now indicates this in the status bar.
+  - Deprecated the Noise source - it is misleading when using any kind of Euler integration.
+  - Groups automatically determine if they are looped by checking if any contained elements are looped. Manually setting
+    the isLooped parameter is now obsolete.
+  - Connections between data slots can now be established across groups.
+- cedar::aux
+  - Added an option to save the image displayed in an image plot to its right-click menu.
+  - The netreader/writers now support matrices of arbitrary dimensionality (issue #248). Unfortunately, this means that
+    older cedar versions will no longer be able to communicate with the new version as the protocol had to be changed.
+  - The data recorder can now save in two different formats: CSV (the old and standard one; this format writes data as
+    a CSV file and truncates some of the numbers, but is platform independent) and Compact (this is a largely binary
+    format; a human-readable header precedes data, but matrices are written out as they are in memory, i.e., in binary
+    format; what this looks like depends on the platform and is slightly more complex to read in, however, it uses much
+    less space than the CSV format, is therefore faster to write out, and does not truncate matrix values).
+    Which format is used can be chosen in the settings dialog of cedar.
 
 Released versions
 =================
