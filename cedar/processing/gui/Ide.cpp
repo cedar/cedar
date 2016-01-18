@@ -1283,10 +1283,12 @@ void cedar::proc::gui::Ide::updateSimulationRunningIcon(bool running)
   if (running)
   {
     this->mpActionStartPauseSimulation->setIcon(QIcon(":/cedar/auxiliaries/gui/pause.svg"));
+    this->mpThreadsSingleStep->setEnabled(false);
   }
   else
   {
     this->mpActionStartPauseSimulation->setIcon(QIcon(":/cedar/auxiliaries/gui/start.svg"));
+    this->mpThreadsSingleStep->setEnabled(true);
   }
 }
 
