@@ -321,23 +321,25 @@ bool cedar::aux::gui::MatrixSlicePlot3D::doConversion()
   }
   cv::Mat cloned_mat = mat.clone();
   locker.unlock();
+#ifdef CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
   switch(cloned_mat.type())
   {
 //  case CV_8UC1:
     case CV_32FC1:
-#ifndef CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
-  case CV_64FC1:
-#endif // CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
+//  case CV_64FC1:
     {
       this->slicesFromMat(cloned_mat);
       break;
     }
 
     default:
-      QString text = QString("Unhandled matrix type %1.").arg(cloned_mat.type());
+      QString text = QString("Unhandled matrix type ") + QString::fromStdString(cedar::aux::math::matrixTypeToString(cloned_mat));
       this->setInfo(text.toStdString());
       return false;
   }
+#else // CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
+  this->slicesFromMat(cloned_mat);
+#endif // CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
 
   return true;
 }

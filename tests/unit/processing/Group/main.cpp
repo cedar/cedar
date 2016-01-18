@@ -286,34 +286,6 @@ int test_connector_renaming()
   return errors;
 }
 
-int test_camel_case_to_string()
-{
-  int errors = 0;
-
-  auto check_string = [&] (const std::string& camelCase, const std::string& expected)
-  {
-    std::string produced = cedar::proc::Group::camelCaseToSpaces(camelCase);
-    if (produced == expected)
-    {
-      std::cout << "Properly converted \"" << camelCase << "\" to \"" << expected << "\"." << std::endl;
-    }
-    else
-    {
-      std::cout << "ERROR: \"" << camelCase << "\" was converted to \"" << produced << "\". Expected: \"" << expected << "\"." << std::endl;
-      ++errors;
-    }
-  };
-
-  std::cout << "Checking camel case to string function " << std::endl;
-  check_string("", "");
-  check_string("ThisIsATest", "This Is A Test");
-  check_string("ABBRVTest", "ABBRV Test");
-  check_string("AReallyDifficultABBRVTest", "A Really Difficult ABBRV Test");
-  check_string("Something With Spaces and lower case", "Something With Spaces and lower case");
-
-  return errors;
-}
-
 int test_looped_trigger_auto_connect_internal(cedar::proc::TriggerablePtr child)
 {
   int errors = 0;
@@ -729,7 +701,6 @@ void run_test()
   errors += test_input_revalidation();
   errors += test_connector_renaming();
   errors += test_name_exists();
-  errors += test_camel_case_to_string();
   errors += test_looped_trigger_auto_connect();
 
   // return

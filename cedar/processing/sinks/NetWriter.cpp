@@ -184,14 +184,14 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::sinks::NetWriter::determineInputVal
 
   if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
   {
-    const cv::Mat& matref= mat_data->getData();
-
-    if (matref.cols <= 0
-        || matref.rows <= 0)
-    {
-      // we don't support n-Dim at the moment
-      return cedar::proc::DataSlot::VALIDITY_ERROR;
-    }
+//    const cv::Mat& matref= mat_data->getData();
+//
+//    if (matref.cols <= 0
+//        || matref.rows <= 0)
+//    {
+//      // we don't support n-Dim at the moment
+//      return cedar::proc::DataSlot::VALIDITY_ERROR;
+//    }
 
     // Mat data is accepted.
     return cedar::proc::DataSlot::VALIDITY_VALID;

@@ -2,7 +2,8 @@
 
 @page RunTimeTypeSystem cedar's Run-Time Type System
 
-cedar's runtime type system (RTTS) comprises a few central concepts. These are explained over the following sections.
+Much of cedar's power comes from its ability to allocate object at run-time, based on user-defined type strings. cedar's
+ runtime type system (RTTS) comprises a few central concepts. These are explained over the following sections.
 
 
 @section RTTS_Factories Factory Pattern Implementation

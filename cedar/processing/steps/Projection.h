@@ -168,7 +168,7 @@ protected slots:
   //!@brief this slot is triggered whenever the size of any dimension of the output is changed by the user
   void outputDimensionSizesChanged();
   //!@brief chooses the appropriate projection method for the current input and output
-  void reconfigure();
+  void reconfigure(bool triggerSubsequent = true);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

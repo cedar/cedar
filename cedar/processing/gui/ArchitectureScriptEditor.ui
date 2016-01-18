@@ -48,7 +48,7 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../../../../cedar.development/cedar/auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+        <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
          <normaloff>:/cedar/auxiliaries/gui/trashcan.svg</normaloff>:/cedar/auxiliaries/gui/trashcan.svg</iconset>
        </property>
       </widget>
@@ -88,6 +88,11 @@
       </column>
       <column>
        <property name="text">
+        <string>status</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
         <string>type</string>
        </property>
       </column>
@@ -106,9 +111,9 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../../cedar.development/cedar/auxiliaries/gui/icons/cedar_aux_gui_icons.qrc"/>
-  <include location="../../../../cedar.development/cedar/devices/gui/cedar_dev_gui_icons.qrc"/>
-  <include location="../../../../cedar.development/cedar/processing/gui/icons/cedar_proc_gui_icons.qrc"/>
+  <include location="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc"/>
+  <include location="../../devices/gui/cedar_dev_gui_icons.qrc"/>
+  <include location="icons/cedar_proc_gui_icons.qrc"/>
  </resources>
  <connections/>
 </ui>

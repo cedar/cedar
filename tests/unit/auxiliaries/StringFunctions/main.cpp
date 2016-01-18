@@ -134,6 +134,34 @@ int test_formatDuration()
   return errors;
 }
 
+int test_camel_case_to_string()
+{
+  int errors = 0;
+
+  auto check_string = [&] (const std::string& camelCase, const std::string& expected)
+  {
+    std::string produced = cedar::aux::camelCaseToSpaces(camelCase);
+    if (produced == expected)
+    {
+      std::cout << "Properly converted \"" << camelCase << "\" to \"" << expected << "\"." << std::endl;
+    }
+    else
+    {
+      std::cout << "ERROR: \"" << camelCase << "\" was converted to \"" << produced << "\". Expected: \"" << expected << "\"." << std::endl;
+      ++errors;
+    }
+  };
+
+  std::cout << "Checking camel case to string function " << std::endl;
+  check_string("", "");
+  check_string("ThisIsATest", "This Is A Test");
+  check_string("ABBRVTest", "ABBRV Test");
+  check_string("AReallyDifficultABBRVTest", "A Really Difficult ABBRV Test");
+  check_string("Something With Spaces and lower case", "Something With Spaces and lower case");
+
+  return errors;
+}
+
 int main()
 {
   // the number of errors encountered in this test
@@ -489,6 +517,8 @@ int main()
   }
 
   errors += test_formatDuration();
+
+  errors += test_camel_case_to_string();
 
   return errors;
 }
