@@ -210,7 +210,7 @@ protected:
   }
 
   //! Colorizes the matrix.
-  cv::Mat colorizeMatrix(const cv::Mat& toColorize) const;
+  cv::Mat colorizeMatrix(const cv::Mat& toColorize);
 
   //! Colorizes the matrix with the given minimum and maximum.
   cv::Mat colorizeMatrix(const cv::Mat& toColorize, bool applyLimits, double min, double max) const;
