@@ -291,6 +291,7 @@ cv::Mat cedar::aux::ColorGradient::applyTo(const cv::Mat& matrix, bool limits, d
   {
     switch (matrix.type())
     {
+      case CV_16UC1:
       case CV_32F:
       case CV_64F:
       {
