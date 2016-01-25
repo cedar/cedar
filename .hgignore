@@ -78,3 +78,6 @@ syntax: regexp
 ^resources/meshes/PowerCubeWrist90$
 syntax: regexp
 ^tools/issues\.txt$
+
+syntax: glob
+.pydevproject
