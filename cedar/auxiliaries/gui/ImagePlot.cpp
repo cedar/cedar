@@ -231,6 +231,7 @@ bool cedar::aux::gui::ImagePlot::doConversion()
 
   switch(type)
   {
+    case CV_16UC1:
     case CV_8UC1:
     {
       cv::Mat converted = this->threeChannelGrayscale(this->mData->getData());
