@@ -331,15 +331,15 @@ namespace cedar
         switch (matrix.type())
         {
           case CV_8S:
-            return static_cast<T>(matrix.at<char>(row, col));
+            return static_cast<T>(matrix.at<int8_t>(row, col));
             break;
 
           case CV_8U:
-            return static_cast<T>(matrix.at<unsigned char>(row, col));
+            return static_cast<T>(matrix.at<uint8_t>(row, col));
             break;
 
           case CV_16UC1:
-            return static_cast<T>(matrix.at<unsigned int>(row, col));
+            return static_cast<T>(matrix.at<uint16_t>(row, col));
             break;
 
           case CV_32F:
