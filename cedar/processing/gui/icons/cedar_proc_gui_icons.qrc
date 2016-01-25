@@ -34,6 +34,7 @@
     <file>steps/flip.svg</file>
     <file>steps/gauss_input.svg</file>
     <file>steps/histogram.svg</file>
+    <file>steps/image_gradient.svg</file>
     <file>steps/mask.svg</file>
     <file>steps/matrix_transpose.svg</file>
     <file>steps/normalization.svg</file>
