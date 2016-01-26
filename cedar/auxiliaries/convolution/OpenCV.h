@@ -78,7 +78,8 @@ public:
   (
     const cv::Mat& matrix,
     cedar::aux::conv::BorderType::Id borderType,
-    cedar::aux::conv::Mode::Id mode
+    cedar::aux::conv::Mode::Id mode,
+    bool alternateEvenCenter = false
   ) const;
 
   cv::Mat convolve
@@ -87,7 +88,8 @@ public:
     const cv::Mat& kernel,
     cedar::aux::conv::BorderType::Id borderType,
     cedar::aux::conv::Mode::Id mode,
-    const std::vector<int>& anchor
+    const std::vector<int>& anchor,
+    bool alternateEvenCenter = false
   ) const;
 
   cv::Mat convolve
@@ -95,7 +97,8 @@ public:
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstKernelPtr kernel,
     cedar::aux::conv::BorderType::Id borderType,
-    cedar::aux::conv::Mode::Id mode
+    cedar::aux::conv::Mode::Id mode,
+    bool alternateEvenCenter = false
   ) const;
 
   cv::Mat convolve
@@ -103,7 +106,8 @@ public:
     const cv::Mat& matrix,
     cedar::aux::conv::ConstKernelListPtr kernelList,
     cedar::aux::conv::BorderType::Id borderType,
-    cedar::aux::conv::Mode::Id mode
+    cedar::aux::conv::Mode::Id mode,
+    bool alternateEvenCenter = false
   ) const;
 
   cv::Mat convolveSeparable
@@ -111,7 +115,8 @@ public:
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstSeparablePtr kernel,
     cedar::aux::conv::BorderType::Id borderType,
-    cedar::aux::conv::Mode::Id mode
+    cedar::aux::conv::Mode::Id mode,
+    bool alternateEvenCenter = false
   ) const;
 
   bool checkCapability
@@ -166,12 +171,24 @@ private:
 #else
     const cv::Mat::MSize& msize
 #endif
+    ,
+    bool alternateEvenCenter = false
   ) const;
 
   void translateAnchor
   (
     cv::Point& anchor,
-    cedar::aux::kernel::ConstKernelPtr kernel
+    cedar::aux::kernel::ConstKernelPtr kernel,
+    const cv::Mat& matrix,
+    bool alternateEvenCenter = false
+  ) const;
+
+  void translateAnchor
+  (
+    cv::Point& anchor,
+    std::vector<int> anchor_vector,
+    const std::vector<int>& sizes,
+    bool alternateEvenCenter = false
   ) const;
 
   cv::Mat createFullMatrix(
@@ -236,7 +253,7 @@ private:
     const cv::Mat& matrix,
     const cv::Mat& kernel,
     int cvBorderType,
-    const cv::Point& anchor
+    cv::Point anchor
   ) const;
 
   cv::Mat cvConvolve
@@ -244,7 +261,7 @@ private:
     const cv::Mat& matrix,
     const cedar::aux::kernel::ConstSeparablePtr kernel,
     int cvBorderType,
-    const cv::Point& anchor
+    cv::Point anchor
   ) const;
 
   cv::Mat cvConvolve
