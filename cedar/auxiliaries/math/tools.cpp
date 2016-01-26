@@ -113,7 +113,11 @@ void cedar::aux::math::flip(const cv::Mat& toFlip, cv::Mat& flipped, const std::
   {
     int start, diff;
 
+    // this method does not support in-place operation; therefore, if src == dst, throw an error
+    CEDAR_ASSERT(toFlip.data != flipped.data);
+
     CEDAR_DEBUG_ASSERT(toFlip.dims == 3);
+    // this makes sure the receiving matrix is properly initialized
     CEDAR_DEBUG_ASSERT(flipped.dims == 3);
 
     if (flippedDimensions.at(2))

@@ -170,6 +170,12 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
     // to alternate the kernel center, we flip all inputs and then flip the result back
     std::vector<bool> flipped;
     flipped.assign(cedar::aux::math::getDimensionalityOf(matrixIn), true);
+
+    // preallocate the flipped matrices (cedar::aux::math::flip expects this)
+    matrix = 0.0 * matrixIn.clone();
+    kernel = 0.0 * kernelIn.clone();
+
+    // flip the matrices
     cedar::aux::math::flip(matrixIn, matrix, flipped);
     cedar::aux::math::flip(kernelIn, kernel, flipped);
   }
@@ -320,7 +326,9 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
     // to alternate the kernel center, we flip all inputs and then flip the result back
     std::vector<bool> flipped;
     flipped.assign(cedar::aux::math::getDimensionalityOf(matrixIn), true);
-    cedar::aux::math::flip(returned, returned, flipped);
+    cv::Mat tmp_returned = returned.clone() * 0.0;
+    cedar::aux::math::flip(returned, tmp_returned, flipped);
+    returned = tmp_returned;
   }
 
   return returned;
