@@ -76,7 +76,8 @@ public:
   (
     const cv::Mat& matrix,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same,
+    bool alternateEvenCenter = false
   ) const;
 
   cv::Mat convolve
@@ -85,7 +86,8 @@ public:
     const cv::Mat& kernel,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
     cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same,
-    const std::vector<int>& anchor = std::vector<int>()
+    const std::vector<int>& anchor = std::vector<int>(),
+    bool alternateEvenCenter = false
   ) const;
 
   cv::Mat convolve
@@ -93,7 +95,8 @@ public:
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstKernelPtr kernel,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same,
+    bool alternateEvenCenter = false
   ) const;
 
   cv::Mat convolve
@@ -101,7 +104,8 @@ public:
     const cv::Mat& matrix,
     cedar::aux::conv::ConstKernelListPtr kernelList,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same,
+    bool alternateEvenCenter = false
   ) const;
 
   bool checkCapability
@@ -127,7 +131,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief the internal version of the convolve method, currently called by all interface methods
-  cv::Mat convolveInternal(const cv::Mat& matrix, const cv::Mat& kernel, cedar::aux::conv::BorderType::Id borderType) const;
+  cv::Mat convolveInternal
+  (
+    const cv::Mat& matrix,
+    const cv::Mat& kernel,
+    cedar::aux::conv::BorderType::Id borderType,
+    bool alternateEvenCenter
+  ) const;
 
   //!@brief adjusts the size of the kernel (to matrix size) and flips sectors
   cv::Mat padKernel(const cv::Mat& matrix, const cv::Mat& kernel) const;
