@@ -100,6 +100,9 @@ public:
    */
   cedar::proc::GroupPtr getGroup() const;
 
+  //! Returns the current status of the script.
+  std::string getStatus() const;
+
 public slots:
   /*! Ask the script nicely to stop what it is doing.
    *
@@ -114,11 +117,14 @@ signals:
   //! signal that is emitted if a script is stopped
   void scriptStopped();
 
+  //! The status message of the script changed.
+  void statusChanged(QString);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void setStatus(const std::string& status);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -147,6 +153,8 @@ private:
   cedar::proc::GroupWeakPtr mGroup;
 
   cedar::aux::LockableMember<bool> mStopRequested;
+
+  cedar::aux::LockableMember<std::string> mStatus;
 
   cedar::aux::CallFunctionInThreadPtr mRunCaller;
 

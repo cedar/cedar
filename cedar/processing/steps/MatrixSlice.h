@@ -123,6 +123,9 @@ public:
   //! Returns the range for the given dimension.
   cv::Range getRange(unsigned int dimension) const;
 
+  //! Sets the anchor for the slice.
+  void setAnchor(cedar::aux::EnumId anchor);
+
 public slots:
   //! Called when the selected range of the slice changes.
   void rangeChanged();

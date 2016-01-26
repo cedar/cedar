@@ -148,6 +148,11 @@ _mRangeUpper
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::steps::MatrixSlice::setAnchor(cedar::aux::EnumId anchor)
+{
+  this->_mAnchorType->setValue(anchor);
+}
+
 cv::Range cedar::proc::steps::MatrixSlice::getRange(unsigned int dimension) const
 {
   cv::Range range;

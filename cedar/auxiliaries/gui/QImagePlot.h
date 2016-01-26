@@ -54,6 +54,7 @@
 // SYSTEM INCLUDES
 #include <QMenu>
 #include <QLabel>
+#include <QDir>
 #include <QLinearGradient>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
@@ -209,7 +210,7 @@ protected:
   }
 
   //! Colorizes the matrix.
-  cv::Mat colorizeMatrix(const cv::Mat& toColorize) const;
+  cv::Mat colorizeMatrix(const cv::Mat& toColorize);
 
   //! Colorizes the matrix with the given minimum and maximum.
   cv::Mat colorizeMatrix(const cv::Mat& toColorize, bool applyLimits, double min, double max) const;
@@ -246,6 +247,8 @@ private slots:
   void colorJetChanged();
 
   void colorJetActionTriggered();
+
+  void saveImageActionTriggered();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -300,6 +303,9 @@ private:
 
   //! Color scale to use.
   cedar::aux::EnumParameterPtr _mColorJet;
+
+  //! Static member to remember the location of the last-saved image.
+  static cedar::aux::LockableMember<QDir> mLastSaveLocation;
 
 }; // class cedar::aux::gui::QImagePlot
 

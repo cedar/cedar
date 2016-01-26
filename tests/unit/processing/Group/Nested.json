@@ -22,7 +22,8 @@
             "start with all": "true",
             "listeners":
             [
-                "parent step"
+                "parent step",
+                "network child"
             ]
         }
     },
@@ -73,12 +74,12 @@
             },
             "name": "network child",
             "connectors": "",
-            "is looped": "false",
+            "is looped": "true",
             "time factor": "1"
         }
     },
     "name": "",
     "connectors": "",
-    "is looped": "false",
+    "is looped": "true",
     "time factor": "1"
 }

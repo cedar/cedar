@@ -124,13 +124,13 @@ private:
   void step(cedar::unit::Time time);
 
   //!@brief Writes the header for the DataPtr to the output file.
-  void writeHeader();
+  void writeHeader(cedar::aux::SerializationFormat::Id mode);
 
   //!@brief Writes the first element of the RecordData queue to the output file.
-  void writeFirstRecordData();
+  void writeFirstRecordData(cedar::aux::SerializationFormat::Id mode);
 
   //!@brief Writes the whole RecordData queue to the output file.
-  void writeAllRecordData();
+  void writeAllRecordData(cedar::aux::SerializationFormat::Id mode);
 
   //!@brief Copies the DataPtr and stores it as new RecordData in the queue.
   void record();

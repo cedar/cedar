@@ -169,3 +169,12 @@ void cedar::proc::Element::copyTo(cedar::aux::ConfigurablePtr target) const
     target->readConfiguration(root);
   }
 }
+
+void cedar::proc::Element::callReset()
+{
+  this->reset();
+}
+
+void cedar::proc::Element::reset()
+{
+}

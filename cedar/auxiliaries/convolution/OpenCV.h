@@ -127,6 +127,14 @@ public:
     cedar::aux::conv::Mode::Id mode
   ) const;
 
+  bool checkCapability
+  (
+    cv::Mat matrix,
+    cv::Mat kernel,
+    cedar::aux::conv::BorderType::Id borderType,
+    cedar::aux::conv::Mode::Id mode
+  ) const;
+
   bool checkBorderTypeCapability
   (
     cedar::aux::conv::BorderType::Id borderType
