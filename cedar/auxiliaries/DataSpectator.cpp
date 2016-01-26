@@ -91,15 +91,27 @@ void cedar::aux::DataSpectator::step(cedar::unit::Time)
 
 void cedar::aux::DataSpectator::prepareStart()
 {
+  auto mode = cedar::aux::RecorderSingleton::getInstance()->getSerializationMode();
+  std::string extension;
+  switch (mode)
+  {
+    case cedar::aux::SerializationFormat::Compact:
+      extension = "data";
+      break;
+
+    case cedar::aux::SerializationFormat::CSV:
+      extension = "csv";
+      break;
+  }
   mOutputPath = cedar::aux::RecorderSingleton::getInstance()->getOutputDirectory() + "/" +
-      boost::algorithm::replace_all_copy(mName," ","_") + ".csv";
+      boost::algorithm::replace_all_copy(mName," ","_") + "." + extension;
   mOutputStream.open(mOutputPath, std::ios::out | std::ios::app);
-  writeHeader();
+  writeHeader(mode);
 }
 
 void cedar::aux::DataSpectator::processQuit()
 {
-  writeAllRecordData();
+  writeAllRecordData(cedar::aux::RecorderSingleton::getInstance()->getSerializationMode());
   
   {
     QWriteLocker locker(mpOfstreamLock);
@@ -107,10 +119,10 @@ void cedar::aux::DataSpectator::processQuit()
   }
 }
 
-void cedar::aux::DataSpectator::writeHeader()
+void cedar::aux::DataSpectator::writeHeader(cedar::aux::SerializationFormat::Id mode)
 {
   QWriteLocker locker(mpOfstreamLock);
-  mData->serializeHeader(mOutputStream);
+  mData->serializeHeader(mOutputStream, mode);
   mOutputStream << std::endl;
 }
 
@@ -128,7 +140,7 @@ void cedar::aux::DataSpectator::record()
   mDataQueue.push_back(rec);
 }
 
-void cedar::aux::DataSpectator::writeFirstRecordData()
+void cedar::aux::DataSpectator::writeFirstRecordData(cedar::aux::SerializationFormat::Id mode)
 {
   // thread context: called from Recorder's thread.
   /* This function uses a lot of locks. It is important to don't lock the queue during the serialization (takes 25-30ms)
@@ -154,13 +166,13 @@ void cedar::aux::DataSpectator::writeFirstRecordData()
     {
       QWriteLocker locker(mpOfstreamLock);
       mOutputStream << data.mRecordTime << ",";
-      data.mData->serializeData(mOutputStream);
+      data.mData->serializeData(mOutputStream, mode);
       mOutputStream << std::endl;
     }
   }
 }
 
-void cedar::aux::DataSpectator::writeAllRecordData()
+void cedar::aux::DataSpectator::writeAllRecordData(cedar::aux::SerializationFormat::Id mode)
 {
   // thread context: called from Recorder's thread.
   // here a single lock is enough. No new recordData will be created so the list can be blocked.
@@ -175,7 +187,7 @@ void cedar::aux::DataSpectator::writeAllRecordData()
     {
       QWriteLocker locker(mpOfstreamLock);
       mOutputStream << data.mRecordTime << ",";
-      data.mData->serializeData(mOutputStream);
+      data.mData->serializeData(mOutputStream, mode);
       mOutputStream << std::endl;
     }
     mDataQueue.pop_front();

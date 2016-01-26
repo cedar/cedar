@@ -111,7 +111,7 @@ private:
   /*!@brief Converts a one-channel input matrix to a three-channel matrix that contains the one-channel matrix in all
    *        channels.
    */
-  cv::Mat threeChannelGrayscale(const cv::Mat& in) const;
+  cv::Mat threeChannelGrayscale(const cv::Mat& in);
   
   void construct();
 

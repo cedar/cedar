@@ -22,68 +22,65 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ArchitectureToolBox.h
+    File:        SerializationFormat.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 11
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2015 07 20
 
-    Description:
+    Description: Header file for the class cedar::aux::SerializationFormat.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_ARCHITECTURE_TOOLBOX_H
-#define CEDAR_PROC_GUI_ARCHITECTURE_TOOLBOX_H
+#ifndef CEDAR_AUX_SERIALIZATION_FORMAT_H
+#define CEDAR_AUX_SERIALIZATION_FORMAT_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/ToolBox.h"
-#include "cedar/processing/gui/Scene.h"
+#include "cedar/auxiliaries/EnumType.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/gui/ArchitectureToolBox.fwd.h"
+#include "cedar/auxiliaries/SerializationFormat.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief This is the toolbox that contains the architecture tools.
- *
- *        This widget can be found in cedar's GUI.
+/*!@brief Enum class for the serialization format of cedar::aux::Data.
  */
-class cedar::proc::gui::ArchitectureToolBox : public cedar::proc::gui::ToolBox
+class cedar::aux::SerializationFormat
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
+public:
+  //! Type of the enum.
+  typedef cedar::aux::EnumId Id;
+public:
+  //! Pointer to the enumeration type.
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  ArchitectureToolBox(QWidget *pParent = NULL);
-
-  //!@brief Destructor.
-  ~ArchitectureToolBox();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Sets the view that is controlled by this toolbox.
-   */
-  void setView(cedar::proc::gui::View *pView);
+  //! Constructs the enumeration values.
+  static void construct();
 
-public slots:
-  /*!@brief Slot that reacts to a change in the selected tool.
-   */
-  void selectionChanged(QString data);
+  //! Returns the enum base class.
+  static const cedar::aux::EnumBase& type();
+
+  //! Returns a pointer to the enum base class.
+  static const cedar::aux::SerializationFormat::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -100,12 +97,28 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! Write data as CSV.
+  static const Id CSV = 0;
+
+  //! Write data in a compact (binary) format.
+  static const Id Compact = 1;
+
 protected:
   // none yet
 private:
-  //! View that is controlled by this toolbox.
-  cedar::proc::gui::View *mpView;
+  static cedar::aux::EnumType<cedar::aux::SerializationFormat> mType;
 
-}; // class cedar::proc::gui::ArchitectureToolBox
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-#endif // CEDAR_PROC_GUI_ARCHITECTURE_TOOLBOX_H
+private:
+  // none yet
+
+}; // class cedar::aux::SerializationFormat
+
+#endif // CEDAR_AUX_SERIALIZATION_FORMAT_H
+

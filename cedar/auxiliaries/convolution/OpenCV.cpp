@@ -96,6 +96,22 @@ bool cedar::aux::conv::OpenCV::checkCapability
   return true;
 }
 
+bool cedar::aux::conv::OpenCV::checkCapability
+     (
+       cv::Mat matrix,
+       cv::Mat kernel,
+       cedar::aux::conv::BorderType::Id borderType,
+       cedar::aux::conv::Mode::Id mode
+     ) const
+{
+  if (!this->checkCapability(cedar::aux::math::getDimensionalityOf(matrix), cedar::aux::math::getDimensionalityOf(kernel), borderType, mode))
+  {
+    return false;
+  }
+
+  return true;
+}
+
 bool cedar::aux::conv::OpenCV::checkBorderTypeCapability
      (
        cedar::aux::conv::BorderType::Id borderType

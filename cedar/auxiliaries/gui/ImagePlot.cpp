@@ -231,10 +231,12 @@ bool cedar::aux::gui::ImagePlot::doConversion()
 
   switch(type)
   {
+    case CV_16UC1:
     case CV_8UC1:
     {
-      cv::Mat converted = this->threeChannelGrayscale(this->mData->getData());
+      cv::Mat copy = this->mData->getData().clone();
       read_lock.unlock();
+      cv::Mat converted = this->threeChannelGrayscale(copy);
       CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
       this->displayMatrix(converted);
       break;
@@ -281,19 +283,9 @@ bool cedar::aux::gui::ImagePlot::doConversion()
       // convert grayscale to three-channel matrix
       cv::Mat copy = mat.clone();
       read_lock.unlock();
-      double min, max;
-      if (this->isAutoScaling())
-      {
-        cv::minMaxLoc(copy, &min, &max);
-      }
       cv::Mat converted = this->threeChannelGrayscale(copy);
       CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
       this->displayMatrix(converted);
-
-      if (this->isAutoScaling())
-      {
-        emit minMaxChanged(min, max);
-      }
       break;
     }
 
@@ -339,7 +331,7 @@ bool cedar::aux::gui::ImagePlot::doConversion()
 }
 //!@endcond
 
-cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) const
+cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in)
 {
   CEDAR_DEBUG_ASSERT(in.channels() == 1);
 
@@ -401,6 +393,7 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
               if (this->isAutoScaling())
               {
                 cv::minMaxLoc(in, &min_val, &max_val);
+                emit minMaxChanged(min_val, max_val);
               }
               if (min_val != max_val)
               {

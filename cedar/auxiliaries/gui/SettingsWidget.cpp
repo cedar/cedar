@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
 #include <set>
@@ -68,6 +69,8 @@ QWidget(pParent)
 
   this->fillPossible2dMatDataPlots();
   QObject::connect(this->mpDefault2dMatDataPlot, SIGNAL(currentIndexChanged(int)), this, SLOT(default2dMatDataPlotChanged()));
+
+  this->mpRecordingFormatSelector->setParameter(cedar::aux::SettingsSingleton::getInstance()->getRecorderSerializationFormatParameter());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
