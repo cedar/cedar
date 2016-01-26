@@ -53,12 +53,13 @@ cv::Mat cedar::aux::conv::Engine::convolveSeparable
           const cv::Mat& matrix,
           cedar::aux::kernel::ConstSeparablePtr kernel,
           cedar::aux::conv::BorderType::Id borderType,
-          cedar::aux::conv::BorderType::Id mode
+          cedar::aux::conv::BorderType::Id mode,
+          bool alternateEvenCenter
         )
         const
 {
   // default implementation: call the normal convolve method
-  return this->convolve(matrix, cedar::aux::kernel::ConstKernelPtr(kernel), borderType, mode);
+  return this->convolve(matrix, cedar::aux::kernel::ConstKernelPtr(kernel), borderType, mode, alternateEvenCenter);
 }
 
 void cedar::aux::conv::Engine::setKernelList(cedar::aux::conv::KernelListPtr kernelList)
