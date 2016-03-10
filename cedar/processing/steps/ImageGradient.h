@@ -22,100 +22,67 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ImagePlot.h
+    File:        ImageGradient.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 22
+    Date:        2016 01 25
 
-    Description:
+    Description: Header file for the class cedar::proc::steps::ImageGradient.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_IMAGE_PLOT_H
-#define CEDAR_AUX_GUI_IMAGE_PLOT_H
+#ifndef CEDAR_PROC_STEPS_IMAGE_GRADIENT_H
+#define CEDAR_PROC_STEPS_IMAGE_GRADIENT_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/QImagePlot.h"
+#include "cedar/processing/Step.h"
+#include "cedar/processing/InputSlotHelper.h"
+#include "cedar/auxiliaries/MatData.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/MatData.fwd.h"
-#include "cedar/auxiliaries/annotation/Annotation.fwd.h"
-#include "cedar/auxiliaries/annotation/ColorSpace.fwd.h"
-#include "cedar/auxiliaries/gui/ImagePlot.fwd.h"
-#include "cedar/auxiliaries/ColorGradient.fwd.h"
+#include "cedar/processing/steps/ImageGradient.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QReadWriteLock>
-#include <vector>
 
 
-/*!@brief A plot for images.
+/*!@brief A processing step that calculates the gradient of an image.
  */
-class cedar::aux::gui::ImagePlot : public cedar::aux::gui::QImagePlot
+class cedar::proc::steps::ImageGradient : public cedar::proc::Step
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  //! Enum for quickly accessing the type of the data displayed by the viewer.
-  enum DataType
-  {
-    DATA_TYPE_IMAGE,
-    DATA_TYPE_MAT,
-    DATA_TYPE_UNKNOWN
-  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ImagePlot(QWidget *pParent = NULL);
-
-  //!@brief Constructor that plots some data.
-  ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL);
-
-  ~ImagePlot();
+  ImageGradient();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Displays the data.
-   *
-   * @param data A pointer to the data to display. If this isn't a pointer to a cedar::aux::ImageData, the function
-   *             throws.
-   * @param title title of the plot window
-   */
-  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! Reacts to a click on the image plot.
-  void plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Converts a one-channel input matrix to a three-channel matrix that contains the one-channel matrix in all
-   *        channels.
-   */
-  cv::Mat threeChannelGrayscale(const cv::Mat& in);
-  
-  void construct();
-
-  bool doConversion();
+  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -123,15 +90,31 @@ private:
 protected:
   // none yet
 private:
-  //! Data displayed by the plot.
-  cedar::aux::ConstMatDataPtr mData;
+  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
+  cedar::proc::InputSlotHelper<cedar::aux::MatData> mImage;
 
-  //! The color space annotation of the data (if present).
-  cedar::aux::annotation::ConstColorSpacePtr mDataColorSpace;
+  //!@brief The x component of the gradient.
+  cedar::aux::MatDataPtr mDX;
 
-  //! Type of the data.
-  DataType mDataType;
+  //!@brief The y component of the gradient.
+  cedar::aux::MatDataPtr mDY;
 
-}; // class cedar::aux::gui::ImagePlot
+  //!@brief The gradient orientations.
+  cedar::aux::MatDataPtr mOrientations;
 
-#endif // CEDAR_AUX_GUI_IMAGE_PLOT_H
+  //!@brief The gradient magnitudes.
+  cedar::aux::MatDataPtr mMagnitudes;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::proc::steps::ImageGradient
+
+#endif // CEDAR_PROC_STEPS_IMAGE_GRADIENT_H
+

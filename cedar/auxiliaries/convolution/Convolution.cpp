@@ -75,7 +75,8 @@ mKernelList(new cedar::aux::conv::KernelList()),
 _mEngine
 (
   new cedar::aux::conv::EngineParameter(this, "engine", cedar::aux::conv::EnginePtr(new cedar::aux::conv::OpenCV()))
-)
+),
+_mAlternateEvenKernelCenter(new cedar::aux::BoolParameter(this, "alternate even kernel center", false))
 {
   this->_mEngine->markAdvanced();
   this->selectedEngineChanged();
@@ -86,6 +87,7 @@ _mEngine
 
   QObject::connect(this->_mMode.get(), SIGNAL(valueChanged()), this, SIGNAL(configurationChanged()));
   QObject::connect(this->_mBorderType.get(), SIGNAL(valueChanged()), this, SIGNAL(configurationChanged()));
+  QObject::connect(this->_mAlternateEvenKernelCenter.get(), SIGNAL(valueChanged()), this, SIGNAL(configurationChanged()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -195,4 +197,46 @@ void cedar::aux::conv::Convolution::updateEngineCapabilities()
     const cedar::aux::Enum& enum_value = border_types.at(i);
     this->_mBorderType->setEnabled(enum_value, this->getEngine()->checkBorderTypeCapability(enum_value));
   }
+}
+
+cv::Mat cedar::aux::conv::Convolution::convolve(const cv::Mat& matrix) const
+{
+  return this->getEngine()->convolve(matrix, this->getBorderType(), this->getMode(), this->getAlternateEvenKernelCenter());
+}
+
+cv::Mat cedar::aux::conv::Convolution::convolve
+(
+  const cv::Mat& matrix,
+  const cv::Mat& kernel,
+  const std::vector<int>& anchor
+) const
+{
+  return this->getEngine()->convolve(matrix, kernel, this->getBorderType(), this->getMode(), anchor, this->getAlternateEvenKernelCenter());
+}
+
+cv::Mat cedar::aux::conv::Convolution::convolve
+(
+  const cv::Mat& matrix,
+  cedar::aux::kernel::ConstKernelPtr kernel
+) const
+{
+  return this->getEngine()->convolve(matrix, kernel, this->getBorderType(), this->getMode(), this->getAlternateEvenKernelCenter());
+}
+
+cv::Mat cedar::aux::conv::Convolution::convolveSeparable
+(
+  const cv::Mat& matrix,
+  cedar::aux::kernel::ConstSeparablePtr kernel
+) const
+{
+  return this->getEngine()->convolveSeparable(matrix, kernel, this->getBorderType(), this->getMode(), this->getAlternateEvenKernelCenter());
+}
+
+cv::Mat cedar::aux::conv::Convolution::convolve
+(
+  const cv::Mat& matrix,
+  cedar::aux::conv::ConstKernelListPtr kernelList
+) const
+{
+  return this->getEngine()->convolve(matrix, kernelList, this->getBorderType(), this->getMode(), this->getAlternateEvenKernelCenter());
 }

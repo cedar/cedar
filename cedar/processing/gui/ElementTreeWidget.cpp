@@ -112,6 +112,12 @@ void cedar::proc::gui::ElementTreeWidget::itemChanged(QTreeWidgetItem* pItem, in
     return;
   }
 
+  // if we are not allowed to edit the name, return here
+  if (!this->mNameEditingEnabled)
+  {
+    return;
+  }
+
   QString new_name = pItem->text(this->getNameColumn());
   std::string path = this->getPathFromItem(pItem);
   auto element = this->mGroup->getElement(path);

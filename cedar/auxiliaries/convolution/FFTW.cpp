@@ -95,12 +95,13 @@ cv::Mat cedar::aux::conv::FFTW::convolve
 (
   const cv::Mat& matrix,
   cedar::aux::conv::BorderType::Id borderType,
-  cedar::aux::conv::Mode::Id /* mode */
+  cedar::aux::conv::Mode::Id /* mode */,
+  bool alternateEvenCenter
 ) const
 {
   if (this->getKernelList()->size() > 0)
   {
-    return this->convolveInternal(matrix, this->getKernelList()->getCombinedKernel(), borderType);
+    return this->convolveInternal(matrix, this->getKernelList()->getCombinedKernel(), borderType, alternateEvenCenter);
   }
   else
   {
@@ -114,11 +115,12 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   const cv::Mat& kernel,
   cedar::aux::conv::BorderType::Id borderType,
   cedar::aux::conv::Mode::Id /* mode */,
-  const std::vector<int>& /* anchor */
+  const std::vector<int>& /* anchor */,
+  bool alternateEvenCenter
 ) const
 {
   this->kernelChanged();
-  return this->convolveInternal(matrix, kernel, borderType);
+  return this->convolveInternal(matrix, kernel, borderType, alternateEvenCenter);
 }
 
 cv::Mat cedar::aux::conv::FFTW::convolve
@@ -126,11 +128,12 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   const cv::Mat& matrix,
   cedar::aux::kernel::ConstKernelPtr kernel,
   cedar::aux::conv::BorderType::Id borderType,
-  cedar::aux::conv::Mode::Id /* mode */
+  cedar::aux::conv::Mode::Id /* mode */,
+  bool alternateEvenCenter
 ) const
 {
   this->kernelChanged();
-  return this->convolveInternal(matrix, kernel->getKernel(), borderType);
+  return this->convolveInternal(matrix, kernel->getKernel(), borderType, alternateEvenCenter);
 }
 
 cv::Mat cedar::aux::conv::FFTW::convolve
@@ -138,13 +141,14 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   const cv::Mat& matrix,
   cedar::aux::conv::ConstKernelListPtr kernelList,
   cedar::aux::conv::BorderType::Id borderType,
-  cedar::aux::conv::Mode::Id /* mode */
+  cedar::aux::conv::Mode::Id /* mode */,
+  bool alternateEvenCenter
 ) const
 {
   if (kernelList->size() > 0)
   {
     this->kernelChanged();
-    return this->convolveInternal(matrix, kernelList->getCombinedKernel(), borderType);
+    return this->convolveInternal(matrix, kernelList->getCombinedKernel(), borderType, alternateEvenCenter);
   }
   else
   {
@@ -154,11 +158,33 @@ cv::Mat cedar::aux::conv::FFTW::convolve
 
 cv::Mat cedar::aux::conv::FFTW::convolveInternal
         (
-          const cv::Mat& matrix,
-          const cv::Mat& kernel,
-          cedar::aux::conv::BorderType::Id /* borderType */
+          const cv::Mat& matrixIn,
+          const cv::Mat& kernelIn,
+          cedar::aux::conv::BorderType::Id /* borderType */,
+          bool alternateEvenCenter
         ) const
 {
+  cv::Mat matrix, kernel;
+  if (alternateEvenCenter)
+  {
+    // to alternate the kernel center, we flip all inputs and then flip the result back
+    std::vector<bool> flipped;
+    flipped.assign(cedar::aux::math::getDimensionalityOf(matrixIn), true);
+
+    // preallocate the flipped matrices (cedar::aux::math::flip expects this)
+    matrix = 0.0 * matrixIn.clone();
+    kernel = 0.0 * kernelIn.clone();
+
+    // flip the matrices
+    cedar::aux::math::flip(matrixIn, matrix, flipped);
+    cedar::aux::math::flip(kernelIn, kernel, flipped);
+  }
+  else
+  {
+    matrix = matrixIn;
+    kernel = kernelIn;
+  }
+
   if (cedar::aux::math::getDimensionalityOf(kernel) == 0)
   {
     return matrix * cedar::aux::math::getMatrixEntry<double>(kernel, 0, 0);
@@ -286,16 +312,27 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
     const_cast<double*>(output.ptr<double>())
   );
 
+  cv::Mat returned;
   if (matrix.type() != CV_64F)
   {
-    cv::Mat output_type;
-    output.convertTo(output_type, matrix.type());
-    return output_type;
+    output.convertTo(returned, matrix.type());
   }
   else
   {
-    return output;
+    returned = output;
   }
+
+  if (alternateEvenCenter)
+  {
+    // to alternate the kernel center, we flip all inputs and then flip the result back
+    std::vector<bool> flipped;
+    flipped.assign(cedar::aux::math::getDimensionalityOf(matrixIn), true);
+    cv::Mat tmp_returned = returned.clone() * 0.0;
+    cedar::aux::math::flip(returned, tmp_returned, flipped);
+    returned = tmp_returned;
+  }
+
+  return returned;
 }
 
 cv::Mat cedar::aux::conv::FFTW::padKernel(const cv::Mat& matrix, const cv::Mat& kernel) const

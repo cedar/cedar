@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/convolution/Engine.h"
 #include "cedar/auxiliaries/convolution/KernelList.h"
 #include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -103,10 +104,7 @@ public:
    *
    * @param matrix The matrix to be convolved with the kernels.
    */
-  inline cv::Mat convolve(const cv::Mat& matrix) const
-  {
-    return this->getEngine()->convolve(matrix, this->getBorderType(), this->getMode());
-  }
+  cv::Mat convolve(const cv::Mat& matrix) const;
 
   //! Checks whether the convolution engine can convolve the given matrices with the parameters set in this convolution.
   bool canConvolve(const cv::Mat& matrix, const cv::Mat& kernel) const;
@@ -119,37 +117,28 @@ public:
    *               center; values with a magnitude greater than half the kernel size are mapped to the nearest pixel on
    *               the edge of the kernel.
    */
-  inline cv::Mat convolve
+  cv::Mat convolve
   (
     const cv::Mat& matrix,
     const cv::Mat& kernel,
     const std::vector<int>& anchor = std::vector<int>()
-  ) const
-  {
-    return this->getEngine()->convolve(matrix, kernel, this->getBorderType(), this->getMode(), anchor);
-  }
+  ) const;
 
   /*!@brief Convolution of a matrix with a single kernel.
    */
-  inline cv::Mat convolve
+  cv::Mat convolve
   (
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstKernelPtr kernel
-  ) const
-  {
-    return this->getEngine()->convolve(matrix, kernel, this->getBorderType(), this->getMode());
-  }
+  ) const;
 
   /*!@brief Convolve with a separable kernel using the set convolution engine.
    */
-  inline cv::Mat convolveSeparable
+  cv::Mat convolveSeparable
   (
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstSeparablePtr kernel
-  ) const
-  {
-    return this->getEngine()->convolveSeparable(matrix, kernel, this->getBorderType(), this->getMode());
-  }
+  ) const;
 
   /*!@brief   Convolves a matrix with a kernel list.
    *
@@ -157,14 +146,11 @@ public:
    *          convolution object permanently and reuse said object because fewer transformations will have to be
    *          computed when the objects are reused.
    */
-  inline cv::Mat convolve
+  cv::Mat convolve
   (
     const cv::Mat& matrix,
     cedar::aux::conv::ConstKernelListPtr kernelList
-  ) const
-  {
-    return this->getEngine()->convolve(matrix, kernelList, this->getBorderType(), this->getMode());
-  }
+  ) const;
 
 
   //!@brief The convolution functor for a matrix.
@@ -248,6 +234,12 @@ public:
   inline void setMode(cedar::aux::conv::Mode::Id mode)
   {
     this->_mMode->setValue(mode);
+  }
+
+  //! Returns whether or not the kernel center should be alternated for even kernels.
+  inline bool getAlternateEvenKernelCenter() const
+  {
+    return this->_mAlternateEvenKernelCenter->getValue();
   }
 
   //!@brief Returns a pointer to the combined kernel.
@@ -360,6 +352,9 @@ private:
 
   //! The engine used for convolutions performed with this object.
   cedar::aux::conv::EngineParameterPtr _mEngine;
+
+  //! When true, the center in even kernels is shifted to the left rather than the right.
+  cedar::aux::BoolParameterPtr _mAlternateEvenKernelCenter;
 
 }; // cedar::aux::conv::Convolution
 

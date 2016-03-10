@@ -143,49 +143,85 @@ bool cedar::aux::conv::OpenCV::checkModeCapability
 void cedar::aux::conv::OpenCV::translateAnchor
      (
        cv::Point& anchor,
+       std::vector<int> anchor_vector,
+       const std::vector<int>& sizes,
+       bool alternateEvenCenter
+     ) const
+{
+  anchor = cv::Point(-1, -1);
+
+  if (alternateEvenCenter && anchor_vector.size() < 1)
+  {
+    anchor_vector.push_back(0);
+  }
+  if (alternateEvenCenter && anchor_vector.size() < 2)
+  {
+    anchor_vector.push_back(0);
+  }
+
+  std::vector<int> point;
+  point.assign(2, -1);
+
+  for (size_t i = 0; i < 2; ++i)
+  {
+    if (anchor_vector.size() > i && sizes.size() > i)
+    {
+      int size = sizes[i];
+      point[i] = cedar::aux::math::saturate(size/2 + anchor_vector.at(i), 0, size - 1);
+      if (alternateEvenCenter && size % 2 == 0 && point[i] > 0)
+      {
+        point[i] -= 1;
+      }
+    }
+  }
+
+  anchor.x = point[1]; // [1] because x is columns in opencv
+  anchor.y = point[0]; // [0] because y is rows in opencv
+}
+
+void cedar::aux::conv::OpenCV::translateAnchor
+     (
+       cv::Point& anchor,
        const std::vector<int>& anchor_vector,
 #if CEDAR_OPENCV_MAJOR_VERSION >= 3
        const cv::MatSize& msize
 #else
        const cv::Mat::MSize& msize
 #endif
+       ,
+       bool alternateEvenCenter
      ) const
 {
-  anchor = cv::Point(-1, -1);
-
-  if (anchor_vector.size() >= 1 && anchor_vector.at(0) > 0)
-  {
-    int size = msize[0];
-    anchor.x = cedar::aux::math::saturate(size/2 + anchor_vector.at(0), 0, size - 1);
-  }
-  if (anchor_vector.size() >= 2 && anchor_vector.at(1) > 0)
-  {
-    int size = msize[1];
-    anchor.y = cedar::aux::math::saturate(size/2 + anchor_vector.at(1), 0, size - 1);
-  }
+  std::vector<int> sizes(2);
+  sizes[0] = msize[0];
+  sizes[1] = msize[1];
+  this->translateAnchor(anchor, anchor_vector, sizes, alternateEvenCenter);
 }
 
 void cedar::aux::conv::OpenCV::translateAnchor
      (
        cv::Point& anchor,
-       cedar::aux::kernel::ConstKernelPtr kernel
+       cedar::aux::kernel::ConstKernelPtr kernel,
+       const cv::Mat& /* matrix */,
+       bool alternateEvenCenter
      ) const
 {
-  anchor = cv::Point(-1, -1);
-  const std::vector<int> anchor_vector = kernel->getAnchor();
-
   QReadLocker locker(kernel->getReadWriteLock());
-  if (anchor_vector.size() >= 1 && anchor_vector.at(0) > 0)
+  std::vector<int> sizes;
+  const std::vector<int> anchor_vector = kernel->getAnchor();
+  auto dim = kernel->getDimensionality();
+  cv::Mat kernel_mat = kernel->getKernel().clone();
+  for (size_t d = 0; d < dim; ++d)
   {
-    int size = static_cast<int>(kernel->getSize(0));
-    anchor.x = cedar::aux::math::saturate(size/2 + anchor_vector.at(0), 0, size - 1);
-  }
-  if (anchor_vector.size() >= 2 && anchor_vector.at(1) > 0)
-  {
-    int size = static_cast<int>(kernel->getSize(1));
-    anchor.y = cedar::aux::math::saturate(size/2 + anchor_vector.at(1), 0, size - 1);
+    sizes.push_back(static_cast<int>(kernel->getSize(d)));
   }
   locker.unlock();
+  this->translateAnchor(anchor, anchor_vector, sizes, alternateEvenCenter);
+
+  if (dim == 1 && kernel_mat.rows == 1)
+  {
+    std::swap(anchor.x, anchor.y);
+  }
 }
 
 cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
@@ -436,7 +472,8 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
           const cv::Mat& kernel,
           cedar::aux::conv::BorderType::Id borderType,
           cedar::aux::conv::Mode::Id mode,
-          const std::vector<int>& anchorVector
+          const std::vector<int>& anchorVector,
+          bool alternateEvenCenter
         ) const
 {
   CEDAR_ASSERT
@@ -452,7 +489,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
     case cedar::aux::conv::Mode::Same:
       {
         cv::Point anchor = cv::Point(-1, -1);
-        this->translateAnchor(anchor, anchorVector, kernel.size);
+        this->translateAnchor(anchor, anchorVector, kernel.size, alternateEvenCenter);
         int border_type = cedar::aux::conv::BorderType::toCvConstant(borderType);
         result = this->cvConvolve(matrix, kernel, border_type, anchor);
       }
@@ -462,7 +499,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
       {
         cv::Mat matrix_full = createFullMatrix(matrix, kernel, borderType);
         cv::Point anchor = cv::Point(-1, -1);
-        this->translateAnchor(anchor, anchorVector, kernel.size);
+        this->translateAnchor(anchor, anchorVector, kernel.size, alternateEvenCenter);
         // border type dose not matter, because cut off
         cv::Mat result_full = this->cvConvolve(matrix_full, kernel, cv::BORDER_CONSTANT, anchor);
         result = cutOutResult(result_full, matrix, kernel);
@@ -476,7 +513,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
       else
       {
         cv::Point anchor = cv::Point(-1, -1);
-        this->translateAnchor(anchor, anchorVector, kernel.size);
+        this->translateAnchor(anchor, anchorVector, kernel.size, alternateEvenCenter);
         // border type dose not matter, because cut off
         cv::Mat result_full = this->cvConvolve(matrix, kernel, cv::BORDER_CONSTANT, anchor);
         result = cutOutResult(result_full, kernel);
@@ -494,7 +531,8 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
           const cv::Mat& matrix,
           const cedar::aux::kernel::ConstKernelPtr kernel,
           cedar::aux::conv::BorderType::Id borderType,
-          cedar::aux::conv::Mode::Id mode
+          cedar::aux::conv::Mode::Id mode,
+          bool alternateEvenCenter
         ) const
 {
   CEDAR_ASSERT
@@ -510,7 +548,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
     case cedar::aux::conv::Mode::Same:
       {
         cv::Point anchor = cv::Point(-1, -1);
-        this->translateAnchor(anchor, kernel);
+        this->translateAnchor(anchor, kernel, matrix, alternateEvenCenter);
         int border_type = cedar::aux::conv::BorderType::toCvConstant(borderType);
         result = this->cvConvolve(matrix, kernel, border_type, anchor);
       }
@@ -519,7 +557,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
       {
         cv::Mat matrix_full = createFullMatrix(matrix, kernel, borderType);
         cv::Point anchor = cv::Point(-1, -1);
-        this->translateAnchor(anchor, kernel);
+        this->translateAnchor(anchor, kernel, matrix, alternateEvenCenter);
 
         // border type dose not matter, because cut off
         cv::Mat result_full = this->cvConvolve(matrix_full, kernel, cv::BORDER_CONSTANT, anchor);
@@ -536,7 +574,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
         else
         {
           cv::Point anchor = cv::Point(-1, -1);
-          this->translateAnchor(anchor, kernel);
+          this->translateAnchor(anchor, kernel, matrix, alternateEvenCenter);
           // border type dose not matter, because cut off
           cv::Mat result_full = this->cvConvolve(matrix, kernel, cv::BORDER_CONSTANT, anchor);
           result = cutOutResult(result_full, kernel);
@@ -555,7 +593,8 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
           const cv::Mat& matrix,
           cedar::aux::conv::ConstKernelListPtr kernelList,
           cedar::aux::conv::BorderType::Id borderType,
-          cedar::aux::conv::Mode::Id mode
+          cedar::aux::conv::Mode::Id mode,
+          bool alternateEvenCenter
         ) const
 {
   int border_type = cedar::aux::conv::BorderType::toCvConstant(borderType);
@@ -576,7 +615,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
       {
         cedar::aux::kernel::ConstKernelPtr kernel = kernelList->getKernel(i);
         cv::Point anchor = cv::Point(-1, -1);
-        this->translateAnchor(anchor, kernel);
+        this->translateAnchor(anchor, kernel, matrix, alternateEvenCenter);
         result += this->cvConvolve(matrix, kernel, border_type, anchor);
       }
 
@@ -594,7 +633,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
         {
           cedar::aux::kernel::ConstKernelPtr kernel = kernelList->getKernel(i);
           cv::Point anchor = cv::Point(-1, -1);
-          this->translateAnchor(anchor, kernel);
+          this->translateAnchor(anchor, kernel, matrix, alternateEvenCenter);
           result += this->cvConvolve(matrix_full, kernel, border_type, anchor);
         }
 
@@ -627,7 +666,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
           {
             cedar::aux::kernel::ConstKernelPtr kernel = kernelList->getKernel(i);
             cv::Point anchor = cv::Point(-1, -1);
-            this->translateAnchor(anchor, kernel);
+            this->translateAnchor(anchor, kernel, matrix, alternateEvenCenter);
             result += this->cvConvolve(matrix, kernel, border_type, anchor);
           }
 
@@ -656,7 +695,8 @@ cv::Mat cedar::aux::conv::OpenCV::convolveSeparable
           const cv::Mat& matrix,
           const cedar::aux::kernel::ConstSeparablePtr kernel,
           cedar::aux::conv::BorderType::Id borderType,
-          cedar::aux::conv::Mode::Id mode
+          cedar::aux::conv::Mode::Id mode,
+          bool alternateEvenCenter
         ) const
 {
   cv::Point anchor = cv::Point(-1, -1);
@@ -674,7 +714,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolveSeparable
       {
         int border_type = cedar::aux::conv::BorderType::toCvConstant(borderType);
 
-        this->translateAnchor(anchor, kernel);
+        this->translateAnchor(anchor, kernel, matrix, alternateEvenCenter);
         return cvConvolve(matrix, kernel, border_type, anchor);
       }
       break;
@@ -684,14 +724,13 @@ cv::Mat cedar::aux::conv::OpenCV::convolveSeparable
 
         int border_type = cedar::aux::conv::BorderType::toCvConstant(borderType);
 
-        this->translateAnchor(anchor, kernel);
+        this->translateAnchor(anchor, kernel, matrix, alternateEvenCenter);
         cv::Mat result_full = cvConvolve(matrix_full, kernel, border_type, anchor);
         return cutOutResult(result_full,matrix,kernel);
       }
       break;
     case cedar::aux::conv::Mode::Valid:
       {
-//        cv::Mat kernel_rows_cols = kernel->getRowsCols();
         const cv::Mat& kernel_mat = kernel->getKernel();
         if (matrix.rows < kernel_mat.rows || matrix.cols < kernel_mat.cols)
         {
@@ -701,7 +740,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolveSeparable
         {
           int border_type = cedar::aux::conv::BorderType::toCvConstant(borderType);
 
-          this->translateAnchor(anchor, kernel);
+          this->translateAnchor(anchor, kernel, matrix, alternateEvenCenter);
           cv::Mat result_full = cvConvolve(matrix, kernel, border_type, anchor);
           return cutOutResult(result_full,kernel);
         }
@@ -745,7 +784,7 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
           const cv::Mat& matrix,
           const cedar::aux::kernel::ConstSeparablePtr kernel,
           int cvBorderType,
-          const cv::Point& anchor
+          cv::Point anchor
         ) const
 {
   cv::Mat convolved;
@@ -769,6 +808,7 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
       if ((matrix.rows == 1 && kernel_mat.rows != 1) || (matrix.cols == 1 && kernel_mat.cols != 1))
       {
         kernel_mat = kernel_mat.t();
+        std::swap(anchor.x, anchor.y);
       }
 
       convolved = this->cvConvolve(matrix, kernel_mat, cvBorderType, anchor);
@@ -841,7 +881,8 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
         (
           const cv::Mat& matrix,
           cedar::aux::conv::BorderType::Id borderType,
-          cedar::aux::conv::Mode::Id mode
+          cedar::aux::conv::Mode::Id mode,
+          bool alternateEvenCenter
         ) const
 {
   CEDAR_DEBUG_ASSERT(this->getKernelList()->size() == this->mKernelTypes.size());
@@ -877,7 +918,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
                   );
 
               cv::Point anchor = cv::Point(-1, -1);
-              this->translateAnchor(anchor, kernel);
+              this->translateAnchor(anchor, kernel, matrix, alternateEvenCenter);
 
               convolved = this->cvConvolve(matrix, kernel, cv_border_type, anchor);
               break;
@@ -890,7 +931,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
               cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList()->getKernel(i);
 
               cv::Point anchor = cv::Point(-1, -1);
-              this->translateAnchor(anchor, kernel);
+              this->translateAnchor(anchor, kernel, matrix, alternateEvenCenter);
 
               QReadLocker locker(kernel->getReadWriteLock());
               cv::Mat kernel_mat = kernel->getKernel();
@@ -940,7 +981,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
                     );
 
                 cv::Point anchor = cv::Point(-1, -1);
-                this->translateAnchor(anchor, kernel);
+                this->translateAnchor(anchor, kernel, matrix, alternateEvenCenter);
 
                 convolved = this->cvConvolve(matrix_full, kernel, cv_border_type, anchor);
                 break;
@@ -953,7 +994,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
                 cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList()->getKernel(i);
 
                 cv::Point anchor = cv::Point(-1, -1);
-                this->translateAnchor(anchor, kernel);
+                this->translateAnchor(anchor, kernel, matrix, alternateEvenCenter);
 
                 QReadLocker locker(kernel->getReadWriteLock());
                 cv::Mat kernel_mat = kernel->getKernel();
@@ -1016,7 +1057,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
                       );
 
                   cv::Point anchor = cv::Point(-1, -1);
-                  this->translateAnchor(anchor, kernel);
+                  this->translateAnchor(anchor, kernel, matrix, alternateEvenCenter);
 
                   convolved = this->cvConvolve(matrix, kernel, cv_border_type, anchor);
                   break;
@@ -1028,7 +1069,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
                   cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList()->getKernel(i);
 
                   cv::Point anchor = cv::Point(-1, -1);
-                  this->translateAnchor(anchor, kernel);
+                  this->translateAnchor(anchor, kernel, matrix, alternateEvenCenter);
 
                   QReadLocker locker(kernel->getReadWriteLock());
                   cv::Mat kernel_mat = kernel->getKernel();
@@ -1073,7 +1114,7 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
   const cv::Mat& matrix,
   const cv::Mat& kernel,
   int cvBorderType,
-  const cv::Point& anchor
+  cv::Point anchor
 ) const
 {
   if (cedar::aux::math::getDimensionalityOf(matrix) > 2)
@@ -1093,12 +1134,14 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
       int center = flipped_kernel.rows / 2;
       // matrix is zero outside the image, kernel can be reduced to twice the image size
       flipped_kernel = flipped_kernel(cv::Range(center - matrix.rows, center + matrix.rows + 1), cv::Range::all());
+      anchor.y = -1;
     }
     if (flipped_kernel.cols > 2 * matrix.cols)
     {
       int center = flipped_kernel.cols / 2;
       // matrix is zero outside the image, kernel can be reduced to twice the image size
       flipped_kernel = flipped_kernel(cv::Range::all(), cv::Range(center - matrix.cols, center + matrix.cols + 1));
+      anchor.x = -1;
     }
   }
   else if (cvBorderType == cv::BORDER_WRAP)
@@ -1107,6 +1150,11 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
     // this is only possible due to the cyclic border conditions
     if (flipped_kernel.rows > matrix.rows || flipped_kernel.cols > matrix.cols)
     {
+      // in this case, the anchor should be the middle of the kernel
+      //!@todo Not sure this is the right/complete approach (the summation should take the anchor into account)
+      anchor.x = -1;
+      anchor.y = -1;
+
       cv::Mat summed = cv::Mat::zeros
                        (
                          std::min(matrix.rows, flipped_kernel.rows),

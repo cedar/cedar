@@ -86,7 +86,8 @@ public:
   (
     const cv::Mat& matrix,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same,
+    bool alternateEvenCenter = false
   ) const = 0;
 
   /*!@brief   Convolves two matrices with each other.
@@ -97,7 +98,8 @@ public:
     const cv::Mat& kernel,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
     cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same,
-    const std::vector<int>& anchor = std::vector<int>()
+    const std::vector<int>& anchor = std::vector<int>(),
+    bool alternateEvenCenter = false
   ) const = 0;
 
   /*!@brief Convolves a matrix with a kernel.
@@ -107,7 +109,8 @@ public:
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstKernelPtr kernel,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same,
+    bool alternateEvenCenter = false
   ) const = 0;
 
 
@@ -121,7 +124,8 @@ public:
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstSeparablePtr kernel,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same,
+    bool alternateEvenCenter = false
   ) const;
 
   /*!@brief Convolves a matrix with a kernel list.
@@ -131,7 +135,8 @@ public:
     const cv::Mat& matrix,
     cedar::aux::conv::ConstKernelListPtr kernelList,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same,
+    bool alternateEvenCenter = false
   ) const = 0;
 
   //!@brief method for setting the kernel list
