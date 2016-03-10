@@ -211,6 +211,11 @@ public slots:
    */
   void resetRootGroup();
 
+  /*!@brief brakes all running robots
+   */
+  void brakeAllRobots();
+
+
   /*!@brief Opens a dialog that lets the user export the current scene as an SVG
    */
   void exportSvg();
@@ -218,6 +223,10 @@ public slots:
   /*!@brief Opens a dialog that contains the robot manager widget.
    */
   void showRobotManager();
+
+  /*!@brief Opens a window that shows the simulated scene.
+   */
+  void addGlobalSceneViewer();
   
   /*!@brief Duplicates a selected step
    */

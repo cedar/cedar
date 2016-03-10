@@ -43,6 +43,8 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::Channel::Channel()
+:
+mUseCount(0)
 {
 }
 
@@ -72,16 +74,52 @@ std::ostream& cedar::dev::operator<<(std::ostream& stream, cedar::dev::ConstChan
   return stream;
 }
 
+void cedar::dev::Channel::increaseUseCount()
+{
+  QWriteLocker locker(&this->mLock);
+  bool open = (this->mUseCount == 0);
+  ++this->mUseCount;
+  locker.unlock();
+
+  if (open)
+  {
+    preOpenHook();
+    openHook();
+    postOpenHook();
+  }
+}
+
+void cedar::dev::Channel::decreaseUseCount()
+{
+  QWriteLocker locker(&this->mLock);
+  if (this->mUseCount == 0)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Not all your open() calls are matched by close() calls. Please check your code.",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
+    return;
+  }
+
+  --this->mUseCount;
+  bool close = (this->mUseCount == 0);
+  locker.unlock();
+
+  if (close)
+  {
+    preCloseHook();
+    closeHook();
+    postCloseHook();
+  }
+}
+
 void cedar::dev::Channel::open()
 {
-  preOpenHook();
-  openHook();
-  postOpenHook();
+  this->increaseUseCount();
 }
 
 void cedar::dev::Channel::close()
 {
-  preCloseHook();
-  closeHook();
-  postCloseHook();
+  this->decreaseUseCount();
 }

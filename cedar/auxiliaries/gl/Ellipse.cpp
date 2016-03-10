@@ -101,9 +101,9 @@ void cedar::aux::gl::Ellipse::draw()
   prepareDraw();
   
   // draw the Ellipse
-  if (mIsVisible)
+  if (isVisible())
   {
-    gl::setColor(mColorR, mColorG, mColorB);
-    drawEllipse(mWidth, mLength, mThickness, mResolution, mResolution, mIsDrawnAsWireFrame);
+    gl::setColor(getColorR(), getColorG(), getColorB());
+    drawEllipse(mWidth, mLength, mThickness, getResolution(), getResolution(), getIsDrawnAsWireFrame());
   }
 }

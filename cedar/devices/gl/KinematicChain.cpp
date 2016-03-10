@@ -71,7 +71,7 @@ void cedar::dev::gl::KinematicChain::draw()
 {
   prepareDraw();
 
-  if (mIsVisible)
+  if (isVisible())
   {
     drawBase();
     for (unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); j++)
@@ -138,23 +138,24 @@ void cedar::dev::gl::KinematicChain::drawBase()
     glPushMatrix();
 
     // draw the link to the first joint
-    glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
+    glColor4d(getColorR()/2, getColorG()/2, getColorB()/2, 0);
     cv::Mat proximal = mpKinematicChain->getRootTransformation()(cv::Rect(3, 0, 1, 3)).clone();
     cv::Mat distal = mpKinematicChain->getJointTransformation(0)(cv::Rect(3, 0, 1, 3)).clone();
-    cedar::aux::gl::drawCone<double>(proximal, distal, mLinkRadius, mLinkRadius, mResolution, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawCone<double>(proximal, distal, mLinkRadius, mLinkRadius, getResolution(), getIsDrawnAsWireFrame());
 
     // move to object coordinates
-    mTransformationTranspose = mpKinematicChain->getRootTransformation().t();
-    glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+    cv::Mat transformation;
+    transformation = mpKinematicChain->getRootTransformation().t();
+    glMultMatrixd((GLdouble*)transformation.data);
 
     // draw the base
-    glColor4d(mColorR, mColorG, mColorB, 0);
-    cedar::aux::gl::drawTorus(0.1, 0.015, mResolution, mResolution, mIsDrawnAsWireFrame);
-    glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
+    glColor4d(getColorR(), getColorG(), getColorB(), 0);
+    cedar::aux::gl::drawTorus(0.1, 0.015, getResolution(), getResolution(), getIsDrawnAsWireFrame());
+    glColor4d(getColorR()/2, getColorG()/2, getColorB()/2, 0);
     glTranslatef(0.0f, 0.0f, 0.005f);
-    cedar::aux::gl::drawDisk(0.0, 0.1, mResolution, mResolution, false, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawDisk(0.0, 0.1, getResolution(), getResolution(), false, getIsDrawnAsWireFrame());
     glTranslatef(0.0f, 0.0f, -0.01f);
-    cedar::aux::gl::drawDisk(0.0, 0.1, mResolution, mResolution, true, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawDisk(0.0, 0.1, getResolution(), getResolution(), true, getIsDrawnAsWireFrame());
   }
 }
 
@@ -165,19 +166,20 @@ void cedar::dev::gl::KinematicChain::drawSegment(unsigned int index)
   glPushMatrix();
   
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChain->getJointTransformation(index).t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  cv::Mat transformation;
+  transformation = mpKinematicChain->getJointTransformation(index).t();
+  glMultMatrixd((GLdouble*)transformation.data);
   
   // draw the joint
-  glColor4d(mColorR, mColorG, mColorB, 0);
-  cedar::aux::gl::drawSphere(mJointRadius, mResolution, mResolution, mIsDrawnAsWireFrame);
+  glColor4d(getColorR(), getColorG(), getColorB(), 0);
+  cedar::aux::gl::drawSphere(mJointRadius, getResolution(), getResolution(), getIsDrawnAsWireFrame());
   
   // move to origin transformation and re-save it to the stack
   glPopMatrix();
   glPushMatrix();
 
   // draw the link
-  glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
+  glColor4d(getColorR()/2, getColorG()/2, getColorB()/2, 0);
   cv::Mat proximal = mpKinematicChain->getJointTransformation(index)(cv::Rect(3, 0, 1, 3)).clone();
   cv::Mat distal;
   if (index+1 < mpKinematicChain->getNumberOfJoints())
@@ -188,7 +190,7 @@ void cedar::dev::gl::KinematicChain::drawSegment(unsigned int index)
   {
     distal = mpKinematicChain->getEndEffectorTransformation()(cv::Rect(3, 0, 1, 3)).clone();
   }
-  cedar::aux::gl::drawCone<double>(proximal, distal, mLinkRadius, mLinkRadius, mResolution, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawCone<double>(proximal, distal, mLinkRadius, mLinkRadius, getResolution(), getIsDrawnAsWireFrame());
 }
 
 void cedar::dev::gl::KinematicChain::drawEndEffector()
@@ -198,12 +200,13 @@ void cedar::dev::gl::KinematicChain::drawEndEffector()
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChain->getEndEffectorTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  cv::Mat transformation;
+  transformation = mpKinematicChain->getEndEffectorTransformation().t();
+  glMultMatrixd((GLdouble*)transformation.data);
   
   // draw the joint
-  glColor4d(mColorR, mColorG, mColorB, 0);
-  cedar::aux::gl::drawSphere(mJointRadius, mResolution, mResolution, mIsDrawnAsWireFrame);
+  glColor4d(getColorR(), getColorG(), getColorB(), 0);
+  cedar::aux::gl::drawSphere(mJointRadius, getResolution(), getResolution(), getIsDrawnAsWireFrame());
 }
 
 void cedar::dev::gl::KinematicChain::drawEndEffectorVelocity()
@@ -211,10 +214,10 @@ void cedar::dev::gl::KinematicChain::drawEndEffectorVelocity()
   // move to origin
   glPopMatrix();
   glPushMatrix();
-  glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
+  glColor4d(getColorR()/2, getColorG()/2, getColorB()/2, 0);
   cv::Mat from = mpKinematicChain->calculateEndEffectorPosition();
   cv::Mat to = from + mpKinematicChain->calculateEndEffectorVelocity();
-  cedar::aux::gl::drawArrow<double>(from, to, 0.005, 0.015, 0.05, mResolution);
+  cedar::aux::gl::drawArrow<double>(from, to, 0.005, 0.015, 0.05, getResolution());
 }
 
 void cedar::dev::gl::KinematicChain::drawEndEffectorAcceleration()
@@ -222,9 +225,9 @@ void cedar::dev::gl::KinematicChain::drawEndEffectorAcceleration()
   // move to origin
   glPopMatrix();
   glPushMatrix();
-  glColor4d(mColorR, mColorG, mColorB, 0);
+  glColor4d(getColorR(), getColorG(), getColorB(), 0);
   cv::Mat from
     = mpKinematicChain->calculateEndEffectorPosition() + mpKinematicChain->calculateEndEffectorVelocity();
   cv::Mat to = from + mpKinematicChain->calculateEndEffectorAcceleration();
-  cedar::aux::gl::drawArrow<double>(from, to, 0.005, 0.015, 0.05, mResolution);
+  cedar::aux::gl::drawArrow<double>(from, to, 0.005, 0.015, 0.05, getResolution());
 }

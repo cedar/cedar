@@ -58,7 +58,11 @@ mRegisteredGrabber("")
 
 cedar::aux::gui::Viewer::~Viewer()
 {
-  mpScene->removeViewer(this);
+  if (mpScene)
+  {
+    mpScene->removeViewer(this);
+  }
+
   if (mpGrabberLock)
   {
     delete mpGrabberLock;
@@ -76,22 +80,6 @@ void cedar::aux::gui::Viewer::init()
 #ifdef CEDAR_USE_QGLVIEWER
     restoreStateFromFile();
 #endif // CEDAR_USE_QGLVIEWER
-    cedar::aux::LogSingleton::getInstance()->debugMessage
-    (
-      "Restoring Viewer state from file.",
-      "cedar::aux::gui::Viewer",
-      "init"
-    );
-  }
-  else
-  {
-    cedar::aux::LogSingleton::getInstance()->debugMessage
-    (
-      "Not restoring Viewer state from file.",
-      "cedar::aux::gui::Viewer",
-      "init"
-    );
-
   }
   mpScene->initGl();
 }

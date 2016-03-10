@@ -56,8 +56,26 @@ cedar::dev::Component(channel)
 
 cedar::dev::kteam::Led::~Led()
 {
+  prepareComponentDestructAbsolutelyRequired();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::dev::kteam::Led::applyBrakeController()
+{
+  return true;
+}
+
+bool cedar::dev::kteam::Led::applyBrakeNow()
+{
+  return true;
+}
+
+bool cedar::dev::kteam::Led::applyCrashbrake()
+{
+  return true;
+}
+
+

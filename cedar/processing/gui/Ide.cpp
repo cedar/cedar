@@ -61,6 +61,7 @@
 #include "cedar/processing/gui/ExperimentDialog.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/devices/gui/RobotManager.h"
+#include "cedar/devices/Component.h"
 #include "cedar/auxiliaries/CommandLineParser.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/gui/PluginManagerDialog.h"
@@ -70,6 +71,7 @@
 #include "cedar/auxiliaries/PluginProxy.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
+#include "cedar/auxiliaries/gui/ViewerManager.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/units/prefixes.h"
 #include "cedar/auxiliaries/Recorder.h"
@@ -476,6 +478,11 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
                    this,
                    SLOT(showAboutDialog()));
 
+  QObject::connect(mpActionBrakeAllRobots,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(brakeAllRobots()));
+
   QObject::connect(mpActionExportSVG,
                    SIGNAL(triggered()),
                    this,
@@ -485,6 +492,11 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
                    SIGNAL(triggered()),
                    this,
                    SLOT(showRobotManager()));
+
+  QObject::connect(mpActionAddGlobalSceneViewer,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(addGlobalSceneViewer()));
 
   QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateSelected()));
   QObject::connect(mpActionCopy, SIGNAL(triggered()), this, SLOT(copyStep()));
@@ -880,6 +892,14 @@ void cedar::proc::gui::Ide::showRobotManager()
   p_dialog->show();
 }
 
+void cedar::proc::gui::Ide::addGlobalSceneViewer()
+{
+  auto viewer = cedar::aux::gui::ViewerManagerSingleton::getInstance()->getNewUnnamedViewer();
+
+  viewer->startTimer(50);
+  viewer->show();
+}
+
 void cedar::proc::gui::Ide::displayFilename(const std::string& filename)
 {
   this->setWindowTitle(this->mDefaultWindowTitle + " - " + QString::fromStdString(filename) + "[*]");
@@ -1140,6 +1160,12 @@ void cedar::proc::gui::Ide::resetRootGroup()
 {
   this->getLog()->outdateAllMessages();
   QtConcurrent::run(boost::bind(&cedar::proc::Group::reset, this->mGroup->getGroup()));
+}
+
+void cedar::proc::gui::Ide::brakeAllRobots()
+{
+  // @todo: later use this: cedar::dev::Component::startBrakingAllComponents();
+  cedar::dev::Component::startBrakingAllComponents();
 }
 
 void cedar::proc::gui::Ide::showAboutDialog()

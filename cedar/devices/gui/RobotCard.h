@@ -135,6 +135,9 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+private slots:
+  void robotNameEditValueChanged(const QString& robotName);
+
 private:
   void robotRemoved(const std::string& robotName);
 
@@ -166,6 +169,8 @@ private:
   cedar::dev::RobotPtr mRobot;
 
   boost::signals2::connection mRobotRemovedConnection;
+
+  std::string mCurrentName;
 }; // class cedar::dev::gui::RobotCard
 
 #endif // CEDAR_DEV_GUI_ROBOT_CARD_H

@@ -75,14 +75,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Sets the arm position.
-  void setArmPosition(unsigned int position);
-
   //!@brief Sets the position of the gripper (i.e., opens or closes it).
   void setGripperPosition(bool open);
-
-  //!@brief Returns the current arm position.
-  unsigned int getArmPosition();
 
   //!@brief Returns the gripper position.
   unsigned int getGripperPosition();
@@ -103,7 +97,13 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void construct();
+
+  void applyGripperPosition(cv::Mat openClose);
+
+  cv::Mat measureResistivity();
+
+  cv::Mat measureOpticalSensor();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -126,12 +126,6 @@ private:
   cedar::aux::StringParameterPtr _mCommandGetGripperPosition;
   //! answer expected when getting the gripper position
   cedar::aux::StringParameterPtr _mAnswerGetGripperPosition;
-  //! command used to set the arm position
-  cedar::aux::StringParameterPtr _mCommandSetArmPosition;
-  //! command used to get the arm position
-  cedar::aux::StringParameterPtr _mCommandGetArmPosition;
-  //! answer expected when getting the arm position
-  cedar::aux::StringParameterPtr _mAnswerGetArmPosition;
   //! command used when getting the resistance sensor of the gripper
   cedar::aux::StringParameterPtr _mCommandGetGripperResistivity;
   //! command used when getting the optical sensor of the gripper

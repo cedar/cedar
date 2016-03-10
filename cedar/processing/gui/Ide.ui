@@ -147,6 +147,8 @@
     <addaction name="separator"/>
     <addaction name="mpActionManagePlugins"/>
     <addaction name="mpActionShowRobotManager"/>
+    <addaction name="mpActionAddGlobalSceneViewer"/>
+    <addaction name="separator"/>
     <addaction name="mpActionSettings"/>
    </widget>
    <widget class="QMenu" name="mpMenuArchitectureScripts">
@@ -378,6 +380,8 @@
    <addaction name="mpActionRecord"/>
    <addaction name="mpActionSnapshot"/>
    <addaction name="separator"/>
+   <addaction name="mpActionBrakeAllRobots"/>
+   <addaction name="separator"/>
    <addaction name="mpActionDummy"/>
    <addaction name="separator"/>
    <addaction name="mpActionToggleSmartConnections"/>
@@ -497,6 +501,18 @@
     <string>About...</string>
    </property>
   </action>
+  <action name="mpActionBrakeAllRobots">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/brakeall.svg</normaloff>:/toolbaricons/brakeall.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Brake all robots</string>
+   </property>
+   <property name="toolTip">
+    <string>Brake all running robot components</string>
+   </property>
+  </action>
   <action name="mpActionExportSVG">
    <property name="text">
     <string>Export SVG ...</string>
@@ -508,6 +524,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+M</string>
+   </property>
+  </action>
+  <action name="mpActionAddGlobalSceneViewer">
+   <property name="text">
+    <string>add a Camera of the simulated scene ...</string>
    </property>
   </action>
   <action name="mpActionDuplicate">

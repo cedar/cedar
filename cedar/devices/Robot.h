@@ -40,10 +40,13 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/FileParameter.h"
-#include "cedar/devices/namespace.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/ObjectMapParameterTemplate.fwd.h"
+#include "cedar/devices/Channel.fwd.h"
+#include "cedar/devices/Component.fwd.h"
+#include "cedar/devices/ComponentSlot.fwd.h"
+#include "cedar/devices/Robot.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
