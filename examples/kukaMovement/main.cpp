@@ -36,6 +36,7 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
+#include "cedar/devices/Robot.h"
 #include "cedar/devices/kuka/gui/FriStatusWidget.h"
 #include "cedar/devices/gui/KinematicChainMonitorWidget.h"
 #include "cedar/devices/kuka/KinematicChain.h"
@@ -138,7 +139,6 @@ private:
 int main(int argc, char **argv)
 {
   std::string mode = "0";
-  std::string configuration_file = cedar::aux::locateResource("configs/kuka_lwr4.json");
 
   // help requested?
   if ((argc == 2) && (std::string(argv[1]) == "-h"))
@@ -170,21 +170,18 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create interface to the arm
-  cedar::dev::kuka::gui::FriStatusWidget* p_fri_status_widget = 0;
+  auto robot = boost::make_shared< cedar::dev::Robot >();
   cedar::dev::KinematicChainPtr arm;
+
+  cedar::dev::kuka::gui::FriStatusWidget* p_fri_status_widget = 0;
 
   if (use_hardware)
   {
-    // channel needs to be initialized manually, atm ...
-    auto fri_channel = boost::make_shared< cedar::dev::kuka::FRIChannel >();
-
     // hardware interface
-    auto lwr4 = boost::make_shared< cedar::dev::kuka::KinematicChain >();
-    lwr4->setChannel( fri_channel );
-    lwr4->readJson(configuration_file);
+    robot->readJson("resources://configs/caren/default_configuration.json");
+    arm= robot->getComponent< cedar::dev::kuka::KinematicChain >("arm");
 
-    arm = lwr4;
-
+    cedar::dev::kuka::FRIChannelPtr fri_channel = boost::dynamic_pointer_cast< cedar::dev::kuka::FRIChannel >( arm->getChannel() );
     // status widget
     p_fri_status_widget = new cedar::dev::kuka::gui::FriStatusWidget(fri_channel);
     p_fri_status_widget->startTimer(100);
@@ -192,11 +189,8 @@ int main(int argc, char **argv)
   }
   else
   {
-    auto sim = boost::make_shared< cedar::dev::SimulatedKinematicChain >();
-    sim->readJson(configuration_file);
-
-    // kein Channel
-    arm = sim;
+    robot->readJson("resource://configs/caren/simulator_configuration.json");
+    arm= robot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
   }
 
   // define some initial configurations we can choose from

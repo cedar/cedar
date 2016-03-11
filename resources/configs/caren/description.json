@@ -11,6 +11,12 @@
           {
             "requires channel": "hardware"
           }
+        },
+        "simulator":
+        {
+          "cedar.dev.SimulatedKinematicChain":
+          {
+          }
         }
       },
       "common component parameters":
@@ -245,3 +251,4 @@
     }
   }
 }
+
