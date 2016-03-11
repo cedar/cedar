@@ -36,6 +36,7 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
+#include "cedar/devices/Robot.h"
 #include "cedar/devices/SimulatedKinematicChain.h"
 #include "cedar/devices/gl/KinematicChain.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
@@ -55,9 +56,9 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated arm
-  std::string finger_one_configuration_file = cedar::aux::locateResource("configs/test_arm.json");
-  cedar::dev::KinematicChainPtr test_arm(new cedar::dev::SimulatedKinematicChain());
-  test_arm->readJson(finger_one_configuration_file);
+  auto robot = boost::make_shared< cedar::dev::Robot >();
+  robot->readJson("resource://configs/interactivetests/simple_test_arm_configuration.json"); 
+  auto test_arm = robot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
 
   // create gl visualization objects
   cedar::dev::gl::KinematicChainPtr test_arm_visualization
@@ -90,8 +91,10 @@ int main(int argc, char **argv)
 
 
   // create everything for a second arm that's connected to the end-effector of the first one
-  cedar::dev::KinematicChainPtr second_arm(new cedar::dev::SimulatedKinematicChain());
-  second_arm->readJson(finger_one_configuration_file);
+  auto robot2 = boost::make_shared< cedar::dev::Robot >();
+  robot2->readJson("resource://configs/interactivetests/simple_test_arm_configuration.json"); // test the Cora simulation
+  auto second_arm = robot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
+
 
   cedar::dev::gl::KinematicChainPtr second_arm_visualization
   (

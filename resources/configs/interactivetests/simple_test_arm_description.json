@@ -1,4 +1,19 @@
 {
+  "component slots":
+  {
+    "arm":
+    {
+      "available components":
+      {
+        "simulator":
+        {
+          "cedar.dev.SimulatedKinematicChain":
+          {
+          }
+        }
+      },
+      "common component parameters":
+      {
 	"root coordinate frame":
 	{
 		"initial translation":
@@ -31,7 +46,7 @@
 	},
     "joints":
     {
-	    "cedar.dev.robot.KinematicChain.Joint":
+	    "cedar.dev.KinematicChain.Joint":
 	    {
 	        "angle limits":
 	        {
@@ -56,7 +71,7 @@
 				"1.0"
 			]
 		},
-	    "cedar.dev.robot.KinematicChain.Joint":
+	    "cedar.dev.KinematicChain.Joint":
 	    {
 	        "angle limits":
 	        {
@@ -81,7 +96,7 @@
 				"1.0"
 			]
 		},
-	    "cedar.dev.robot.KinematicChain.Joint":
+	    "cedar.dev.KinematicChain.Joint":
 	    {
 	        "angle limits":
 	        {
@@ -106,7 +121,7 @@
 				"1.0"
 			]
 		},
-	    "cedar.dev.robot.KinematicChain.Joint":
+	    "cedar.dev.KinematicChain.Joint":
 	    {
 	        "angle limits":
 	        {
@@ -132,4 +147,11 @@
 			]
 		}
 	}
+      }
+    }
+  },
+  "available channels":
+  {
+  }
 }
+
