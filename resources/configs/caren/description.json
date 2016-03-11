@@ -19,7 +19,7 @@
           }
         }
       },
-      "common component parameters":
+      "shared component parameters":
       {
   		  "name": "KUKA LWR4",
   		  "server port": "0",

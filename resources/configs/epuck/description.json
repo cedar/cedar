@@ -25,7 +25,7 @@
           }
         }
       },
-      "common component parameters":
+      "shared component parameters":
       {
         "number of pulses per revolution": "1000",
         "encoder limits":
