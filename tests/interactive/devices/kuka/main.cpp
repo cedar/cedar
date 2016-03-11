@@ -59,7 +59,7 @@ int main(int argc, char **argv)
   std::string mode = "0";
 
   auto robot = boost::make_shared< cedar::dev::Robot >();
-  robot->readJson("resource://configs/caren/default_configuration.json");
+  robot->readJson("resource://robots/caren/default_configuration.json");
 
   QApplication a(argc, argv);
 

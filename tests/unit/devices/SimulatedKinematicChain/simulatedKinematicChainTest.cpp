@@ -764,7 +764,7 @@ void test()
 
 
   auto robot = boost::make_shared< cedar::dev::Robot >();
-  robot->readJson("resource://configs/unittests/complex_test_arm_configuration.json");
+  robot->readJson("resource://robots/unittests/complex_test_arm_configuration.json");
 
   cedar::dev::SimulatedKinematicChainPtr complex_test_arm = robot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
 

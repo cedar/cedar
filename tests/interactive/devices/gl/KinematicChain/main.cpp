@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 
   // create simulated arm
   auto robot = boost::make_shared< cedar::dev::Robot >();
-  robot->readJson("resource://configs/interactivetests/simple_test_arm_configuration.json"); 
+  robot->readJson("resource://robots/interactivetests/simple_test_arm_configuration.json"); 
   auto test_arm = robot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
 
   // create gl visualization objects
@@ -92,7 +92,7 @@ int main(int argc, char **argv)
 
   // create everything for a second arm that's connected to the end-effector of the first one
   auto robot2 = boost::make_shared< cedar::dev::Robot >();
-  robot2->readJson("resource://configs/interactivetests/simple_test_arm_configuration.json"); // test the Cora simulation
+  robot2->readJson("resource://robots/interactivetests/simple_test_arm_configuration.json"); // test the Cora simulation
   auto second_arm = robot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
 
 

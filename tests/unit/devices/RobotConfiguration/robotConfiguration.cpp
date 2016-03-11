@@ -50,8 +50,8 @@ int main(int argc, char **argv)
 
   // test loading CoRA
   {
-    std::string arm_configuration_file = cedar::aux::locateResource("configs/cora_arm.json", false);
-    std::string head_configuration_file = cedar::aux::locateResource("configs/cora_head.json", false);
+    std::string arm_configuration_file = cedar::aux::locateResource("robots/cora_arm.json", false);
+    std::string head_configuration_file = cedar::aux::locateResource("robots/cora_head.json", false);
 
     // create simulated kinematic chains
     cedar::dev::KinematicChainPtr cora_arm(new cedar::dev::SimulatedKinematicChain());
@@ -64,14 +64,14 @@ int main(int argc, char **argv)
 
   // test loading CAREN
   {
-    std::string trunk_configuration_file = cedar::aux::locateResource("configs/caren_trunk.json", false);
-    std::string arm_configuration_file = cedar::aux::locateResource("configs/kuka_lwr4.json", false);
-    std::string head_configuration_file = cedar::aux::locateResource("configs/caren_head.json", false);
-    std::string camera_middle_configuration_file = cedar::aux::locateResource("configs/caren_camera_middle.json", false);
-    std::string finger_one_configuration_file = cedar::aux::locateResource("configs/sdh_finger_one.json", false);
-    std::string finger_two_configuration_file = cedar::aux::locateResource("configs/sdh_finger_two.json", false);
-    std::string finger_three_configuration_file = cedar::aux::locateResource("configs/sdh_finger_three.json", false);
-    std::string palm_configuration_file = cedar::aux::locateResource("configs/sdh_palm.json", false);
+    std::string trunk_configuration_file = cedar::aux::locateResource("robots/caren_trunk.json", false);
+    std::string arm_configuration_file = cedar::aux::locateResource("robots/kuka_lwr4.json", false);
+    std::string head_configuration_file = cedar::aux::locateResource("robots/caren_head.json", false);
+    std::string camera_middle_configuration_file = cedar::aux::locateResource("robots/caren_camera_middle.json", false);
+    std::string finger_one_configuration_file = cedar::aux::locateResource("robots/sdh_finger_one.json", false);
+    std::string finger_two_configuration_file = cedar::aux::locateResource("robots/sdh_finger_two.json", false);
+    std::string finger_three_configuration_file = cedar::aux::locateResource("robots/sdh_finger_three.json", false);
+    std::string palm_configuration_file = cedar::aux::locateResource("robots/sdh_palm.json", false);
 
     // create simulated kinematic chains
     cedar::dev::KinematicChainPtr caren_trunk(new cedar::dev::SimulatedKinematicChain());

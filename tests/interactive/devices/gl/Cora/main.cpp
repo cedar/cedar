@@ -51,8 +51,8 @@
 
 int main(int argc, char **argv)
 {
-  std::string arm_configuration_file = cedar::aux::locateResource("configs/cora_arm.json");
-  std::string head_configuration_file = cedar::aux::locateResource("configs/cora_head.json");
+  std::string arm_configuration_file = cedar::aux::locateResource("robots/cora_arm.json");
+  std::string head_configuration_file = cedar::aux::locateResource("robots/cora_head.json");
 
   QApplication a(argc, argv);
 

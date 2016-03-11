@@ -56,7 +56,7 @@
 int main(int argc, char *argv[])
 {
   auto robot = boost::make_shared< cedar::dev::Robot >();
-  robot->readJson("resource://configs/unittests/complex_test_arm_configuration.json");
+  robot->readJson("resource://robots/unittests/complex_test_arm_configuration.json");
   auto arm = robot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
   QApplication app(argc, argv);
   cedar::dev::gui::KinematicChainWidget widget(arm);

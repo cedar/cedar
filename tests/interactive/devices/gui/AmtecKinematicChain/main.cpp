@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
   try
   {
     auto robot = boost::make_shared< cedar::dev::Robot >();
-    robot->readJson("resource://configs/cora/hardware_configuration.json");
+    robot->readJson("resource://robots/cora/hardware_configuration.json");
     auto p_kinematic_chain = robot->getComponent< cedar::dev::amtec::KinematicChain >("arm");
 
     if(!p_kinematic_chain->initDevice())

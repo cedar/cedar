@@ -51,7 +51,7 @@
 int main(int argc, char **argv)
 {
   // find resources
-  std::string configuration_file = cedar::aux::locateResource("configs/kuka_lwr4.json");
+  std::string configuration_file = cedar::aux::locateResource("robots/kuka_lwr4.json");
 
   QApplication a(argc, argv);
 
