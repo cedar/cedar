@@ -66,10 +66,17 @@ class cedar::dev::YarpChannel : public cedar::dev::NetworkChannel
   typedef cedar::aux::net::Writer<T> TypeWriter;
   CEDAR_GENERATE_POINTER_TYPES(TypeReader);
   CEDAR_GENERATE_POINTER_TYPES(TypeWriter);
+
+
+public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-public:
+
+  ~YarpChannel()
+  {
+    prepareChannelDestructAbsolutelyRequired();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
