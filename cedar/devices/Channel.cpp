@@ -50,6 +50,25 @@ mUseCount(0)
 
 cedar::dev::Channel::~Channel()
 {
+  if (!mDestructWasPrepared)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "You forgot to call prepareChannelDestructAbsolutelyRequired() in the child's destructor!",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
+  }
+}
+
+// needs to be called by the end-point of the inheritance tree
+void cedar::dev::Channel::prepareChannelDestructAbsolutelyRequired()
+{
+  if (this->isOpen())
+  {
+    close();
+  }
+
+  mDestructWasPrepared= true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -115,6 +115,9 @@ protected:
   //!@brief Executed after the code in @em closeHook.
   virtual void postCloseHook(){};
 
+  //! Call this in the inheriting classes destructor
+  void prepareChannelDestructAbsolutelyRequired();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -125,6 +128,7 @@ private:
 
   //! Decreases the use count of the channel. If the resulting use count is zero, the channel is closed.
   void decreaseUseCount();
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -137,6 +141,8 @@ protected:
 private:
   //! Use count
   unsigned int mUseCount;
+
+  bool mDestructWasPrepared; // helper bool
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

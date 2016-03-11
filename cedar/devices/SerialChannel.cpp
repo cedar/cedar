@@ -89,6 +89,7 @@ _mTimeout
 
 cedar::dev::SerialChannel::~SerialChannel()
 {
+  cedar::dev::Channel::prepareChannelDestructAbsolutelyRequired();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

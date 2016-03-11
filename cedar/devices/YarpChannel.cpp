@@ -58,4 +58,5 @@ namespace
   bool registerFnCall = registered();
 }
 
+
 #endif // CEDAR_USE_YARP
