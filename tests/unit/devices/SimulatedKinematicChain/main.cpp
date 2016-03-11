@@ -36,6 +36,7 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
+#include "cedar/devices/Robot.h"
 #include "cedar/devices/SimulatedKinematicChain.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/constants.h"
@@ -54,8 +55,12 @@ void test()
 {
   // create instance of test class
   std::cout << "testing position control ..." << std::endl;
-  cedar::dev::SimulatedKinematicChainPtr test_arm_position(new cedar::dev::SimulatedKinematicChain());
-  test_arm_position->readJson("test_arm.json");
+
+  auto posrobot = boost::make_shared< cedar::dev::Robot >();
+  posrobot->readJson("test_configuration.json");
+
+  cedar::dev::SimulatedKinematicChainPtr test_arm_position = posrobot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
+
   test_arm_position->startCommunication();
   
   //--------------------------------------------------------------------------------------------------------------------
@@ -199,8 +204,11 @@ void test()
   
   // create instance of test class
   std::cout << "testing velocity control ..." << std::endl;
-  cedar::dev::SimulatedKinematicChainPtr test_arm_velocity(new cedar::dev::SimulatedKinematicChain());
-  test_arm_velocity->readJson("test_arm.json");
+  auto velrobot = boost::make_shared< cedar::dev::Robot >();
+  velrobot->readJson("test_configuration.json");
+
+  cedar::dev::SimulatedKinematicChainPtr test_arm_velocity = velrobot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
+
   test_arm_velocity->startCommunication();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -279,8 +287,10 @@ void test()
 
   // create instance of test class
   std::cout << "testing acceleration control ..." << std::endl;
-  cedar::dev::SimulatedKinematicChainPtr test_arm_acceleration(new cedar::dev::SimulatedKinematicChain());
-  test_arm_acceleration->readJson("test_arm.json");
+  auto accelrobot = boost::make_shared< cedar::dev::Robot >();
+  accelrobot->readJson("test_configuration.json");
+
+  cedar::dev::SimulatedKinematicChainPtr test_arm_acceleration = accelrobot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
   test_arm_acceleration->startCommunication();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -362,8 +372,11 @@ void test()
 
   // create instance of test class
   std::cout << "testing exclusiveness of commands ..." << std::endl;
-  cedar::dev::SimulatedKinematicChainPtr test_arm_exclusive(new cedar::dev::SimulatedKinematicChain());
-  test_arm_exclusive->readJson("test_arm.json");
+
+  auto exclurobot = boost::make_shared< cedar::dev::Robot >();
+  exclurobot->readJson("test_configuration.json");
+
+  cedar::dev::SimulatedKinematicChainPtr test_arm_exclusive = exclurobot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
   test_arm_exclusive->startCommunication();
   try
   {
@@ -380,8 +393,11 @@ void test()
 
   // create instance of test class
   std::cout << "testing setting of initial configurations ..." << std::endl;
-  cedar::dev::SimulatedKinematicChainPtr test_arm_initial(new cedar::dev::SimulatedKinematicChain());
-  test_arm_initial->readJson("test_arm.json");
+
+  auto inirobot = boost::make_shared< cedar::dev::Robot >();
+  inirobot->readJson("test_configuration.json");
+
+  cedar::dev::SimulatedKinematicChainPtr test_arm_initial = inirobot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
 
   CEDAR_UNIT_TEST_BEGIN_EXCEPTION_FREE_CODE();
   test_arm_initial->applyInitialConfiguration("default");
@@ -406,8 +422,11 @@ void test()
 
 //  test_arm_position->applyInitialConfiguration("default");
   std::cout << "testing coordinate frames ..." << std::endl;
-  cedar::dev::SimulatedKinematicChainPtr test_coordinate_frames(new cedar::dev::SimulatedKinematicChain());
-  test_coordinate_frames->readJson("test_arm.json");
+
+  auto frobot = boost::make_shared< cedar::dev::Robot >();
+  frobot->readJson("test_configuration.json");
+
+  cedar::dev::SimulatedKinematicChainPtr test_coordinate_frames = inirobot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
   test_coordinate_frames->startCommunication();
   test_coordinate_frames->setJointAngles( cv::Mat::zeros( test_arm_position->getNumberOfJoints(), 1, CV_64F) );
   test_coordinate_frames->waitUntilCommunicated();
@@ -743,9 +762,12 @@ void test()
   p_local.at<double>(2, 0) = 1.0;
   p_local.at<double>(3, 0) = 1.0;
 
-  cedar::dev::SimulatedKinematicChainPtr complex_test_arm(new cedar::dev::SimulatedKinematicChain());
-  std::string complex_test_arm_configuration_file = cedar::aux::locateResource("configs/complex_test_arm.json", false);
-  complex_test_arm->readJson(complex_test_arm_configuration_file);
+
+  auto robot = boost::make_shared< cedar::dev::Robot >();
+  robot->readJson("resource://configs/unittests/complex_test_arm_configuration.json");
+
+  cedar::dev::SimulatedKinematicChainPtr complex_test_arm = robot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
+
   complex_test_arm->startCommunication();
 
   theta = cv::Mat(4, 1, CV_64FC1);
