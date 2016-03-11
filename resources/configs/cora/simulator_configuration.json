@@ -3,6 +3,7 @@
   "description file": "configs/cora/description.json",
   "component instantiations":
   {
-      "arm": "simulator"
+      "arm": "simulator",
+      "head": "simulator"
   }
 }

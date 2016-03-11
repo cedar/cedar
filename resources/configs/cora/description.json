@@ -3,6 +3,25 @@
   {
     "head":
     {
+      "available components":
+      {
+        "simulator":
+        {
+          "cedar.dev.SimulatedKinematicChain":
+          {
+          }
+        },
+        "hardware":
+        {
+          "cedar.dev.amtec.KinematicChain":
+          {
+	"amtec init string": "ESD:1,1000",
+	"amtec module map": [ "3", "4", "5", "6", "15", "21", "7", "8" ]
+          }
+        }
+      },
+      "common component parameters":
+      {
 	"name": "CORA head",
 	"root coordinate frame":
 	{
@@ -87,8 +106,8 @@
 			]
 		}
 	}
-
-    }
+}
+    },
     "arm":
     {
       "available components":
@@ -98,13 +117,13 @@
           "cedar.dev.SimulatedKinematicChain":
           {
           }
-        }
+        },
         "hardware":
         {
           "cedar.dev.amtec.KinematicChain":
           {
 	"amtec init string": "ESD:1,1000",
-	"amtec module map": [ "3", "4", "5", "6", "15", "21", "7", "8" ],
+	"amtec module map": [ "3", "4", "5", "6", "15", "21", "7", "8" ]
           }
         }
       },
@@ -343,9 +362,11 @@
 				"0.0"
 			]
 		}
-	}
+  }
+      }
+  }
+	},
   "available channels":
   {
   }
 }
-
