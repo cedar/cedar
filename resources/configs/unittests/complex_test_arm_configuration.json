@@ -1,7 +1,7 @@
 {
   "name": "complex test robot",
   "description file": "configs/unittests/complex_test_arm_description.json",
-  "component instantiations":
+  "component instantiations": 
   {
     "arm": "complexconfig"
   }
