@@ -283,7 +283,20 @@ void cedar::dev::RobotManager::loadRobotConfiguration
   cedar::dev::RobotPtr robot = this->getRobot(robotName);
 
   this->mRobotConfigurations[robotName] = configuration;
-  robot->readJson(configuration.absolute().toString());
+  //!@todo If this fails (e.g., because of a malformed json), the robot may be left in an undefined state (e.g., no
+  //!      channel insantiated). This can cause hard to diagnose crashes if the robot accesses the channel in its
+  //!      destructor. A better approache would be: 1) parse json; if successful: 2) create robot 3) read config...
+  try
+  {
+    robot->readJson(configuration.absolute().toString());
+  }
+  catch (const boost::property_tree::json_parser_error& e)
+  {
+    std::string message = "Json parser error for robot \"" + robotName + "\": " + std::string(e.what());
+    // print this to cout as well, as errors may lead to crashes; see todo above
+    std::cout << message << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error(message, CEDAR_CURRENT_FUNCTION_NAME);
+  }
 
   this->mRobotConfigurationLoadedSignal(robotName);
 }

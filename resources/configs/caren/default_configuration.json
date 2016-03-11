@@ -1,19 +1,8 @@
 {
   "name": "default CAREN robot",
   "description file": "configs/caren/description.json",
-  "component slots":
+  "component instantiations":
   {
-    "arm":
-    {
-      "channel": "hardware"
-    }
-  },
-  "channel configurations":
-  {
-    "hardware":
-    {
-      "port": "0",
-	  "ip address": "NULL"
-    }
+    "arm": "hardware"
   }
 }

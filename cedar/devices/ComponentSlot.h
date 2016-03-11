@@ -109,13 +109,13 @@ public:
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   //!@brief Lists all channels in this component.
-  std::vector<std::string> listChannels() const;
+  std::vector<std::string> listConfigurations() const;
 
   //!@brief Checks if a channel of the given name exists.
-  bool hasChannel(const std::string& name) const;
+  bool hasConfiguration(const std::string& name) const;
 
   //!@brief Sets the channel for this component.
-  void setChannel(const std::string& channel);
+  void instantiateConfiguration(const std::string& configurationName);
 
   //! Returns a path that identifies this component.
   std::string getPath() const;
@@ -155,7 +155,7 @@ protected:
   // none yet
 private:
   //! Type of the channel stored in this component.
-  cedar::aux::StringParameterPtr _mChannelType;
+  cedar::aux::StringParameterPtr _mConfigurationName;
 
   //! mapping of channel types to class names of components
   std::map<std::string, std::string> mComponentTypeIds;

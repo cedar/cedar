@@ -9,6 +9,7 @@
         {
           "cedar.dev.kteam.DriveSerial":
           {
+            "requires channel": "serial",
             "command set speed": "D",
             "command set encoder": "P",
             "command get encoder": "Q"
@@ -18,6 +19,7 @@
         {
           "cedar.dev.kteam.epuck.YarpDrive":
           {
+            "requires channel": "yarp",
             "motor commands port": "motorCommands",
             "encoder values port": "encoderValues"
           }
@@ -58,6 +60,7 @@
         {
           "cedar.dev.kteam.InfraredSensorSerial":
           {
+            "requires channel": "serial",
             "command get infrared": "O"
           }
         },
@@ -65,6 +68,7 @@
         {
           "cedar.dev.kteam.InfraredSensorYarp":
           {
+            "requires channel": "yarp",
             "sensor port": "ambientSensors"
           }
         }
@@ -78,6 +82,7 @@
         {
           "cedar.dev.kteam.InfraredSensorSerial":
           {
+            "requires channel": "serial",
             "command get infrared": "N"
           }
         },
@@ -85,6 +90,7 @@
         {
           "cedar.dev.kteam.InfraredSensorYarp":
           {
+            "requires channel": "yarp",
             "sensor port": "proximitySensors"
           }
         }
@@ -98,6 +104,7 @@
         {
           "cedar.dev.kteam.epuck.AccelerationSensorSerial":
           {
+            "requires channel": "serial",
             "command get acceleration": "A"
           }
         }
@@ -111,15 +118,32 @@
         {
           "cedar.dev.kteam.LedSerial":
           {
+            "requires channel": "serial",
             "command set state": "L"
           }
         }
       }
     }
   },
-  "channels":
+  "available channels":
   {
-    "serial": "cedar.dev.kteam.SerialChannel",
-    "yarp": "cedar.dev.YarpChannel<cv.Mat>"
+    "serial":
+    {
+      "cedar.dev.kteam.SerialChannel":
+      {
+        "name": "serial channel",
+        "device path": "/dev/rfcomm0",
+        "baud rate": "115200",
+        "escaped command delimiter": "\\r\\n",
+        "time out": "5.25 s"
+      }
+    },
+    "yarp":
+    {
+      "cedar.dev.YarpChannel<cv.Mat>":
+      {
+        "name": "yarp channel"
+      }
+    }
   }
 }

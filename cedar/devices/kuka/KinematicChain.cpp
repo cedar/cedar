@@ -85,11 +85,14 @@ cedar::dev::kuka::KinematicChain::~KinematicChain()
 
   if (mIsInit)
   {
-    // TODO The following line is not used at this point, the script "kukain.src" is not ready yet!
+    //!@todo The following line is not used at this point, the script "kukain.src" is not ready yet!
     // If the script "kukain.src" is started on the KUKA-LBR, the first boolean value means "Stop the FRI"
     // it won't throw an exception, because the index is 0 and therefore valid
-    mFRIChannel->getInterface()->setToKRLBool(0, true);
-    mFRIChannel->getInterface()->doDataExchange();
+    if (this->mFRIChannel)
+    {
+      mFRIChannel->getInterface()->setToKRLBool(0, true);
+      mFRIChannel->getInterface()->doDataExchange();
+    }
   }
 }
 //----------------------------------------------------------------------------------------------------------------------
