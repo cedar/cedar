@@ -39,6 +39,7 @@
 // PROJECT INCLUDES
 
 #include "cedar/auxiliaries/systemFunctions.h"
+#include "cedar/devices/Robot.h"
 #include "cedar/devices/gui/KinematicChainWidget.h"
 #include "cedar/devices/gui/KinematicChainMonitorWidget.h"
 #include "cedar/devices/SimulatedKinematicChain.h"
@@ -54,11 +55,11 @@
 
 int main(int argc, char *argv[])
 {
-  cedar::dev::KinematicChainPtr p_kinematic_chain(new cedar::dev::SimulatedKinematicChain());
-  std::string configuration_file = cedar::aux::locateResource("configs/test_arm.json");
-  p_kinematic_chain->readJson(configuration_file);
+  auto robot = boost::make_shared< cedar::dev::Robot >();
+  robot->readJson("resource://configs/unittests/complex_test_arm_configuration.json");
+  auto arm = robot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
   QApplication app(argc, argv);
-  cedar::dev::gui::KinematicChainWidget widget(p_kinematic_chain);
+  cedar::dev::gui::KinematicChainWidget widget(arm);
   widget.getMonitorWidget()->setDecimals(10);
   widget.getCommandWidget()->setDecimals(10);
   widget.getCommandWidget()->setSingleStep(0.12345);
