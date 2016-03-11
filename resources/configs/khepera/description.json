@@ -119,8 +119,18 @@
       }
     }
   },
-  "channels":
+  "available channels":
   {
-    "serial": "cedar.dev.kteam.SerialChannel"
+    "serial":
+    {
+      "cedar.dev.kteam.SerialChannel":
+      {
+	    "name": "serial channel",
+	    "device path": "/dev/ttyUSB0",
+	    "baud rate": "38400",
+	    "escaped command delimiter": "\\r\\n",
+        "time out": "5.0 s"
+      }
+    }
   }
 }

@@ -124,8 +124,8 @@ public:
   //!@returns A list of all channels of this robot.
   std::vector<std::string> listChannels() const;
 
-  //!@brief Sets the channel for all components in the robot.
-  void setChannel(const std::string& channel);
+  //!@brief Sets the configuration for all components in the robot.
+  void instantiateComponentConfiguration(const std::string& configurationName);
 
   //!@brief Sets the channel for all components in the robot.
   cedar::dev::ConstChannelPtr getChannel(const std::string& channel) const;
@@ -159,6 +159,9 @@ public:
    */
   unsigned int getNumberOfChannels() const;
 
+  //! Allocates the channel of the given name.
+  void allocateChannel(const std::string& channelName);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -181,11 +184,11 @@ private:
   //! Reads the channels and their configurations and instantiates the selected channels.
   void readChannels(const cedar::aux::ConfigurationNode& node);
 
-  //! Allocates the channel of the given name.
-  void allocateChannel(const std::string& channelName);
-
   //! Clears all components and channels.
   void clear();
+
+  //! Merges channel parameters from the description and the instantiation
+  void appendChannelConfiguration(const std::string& channelName, const cedar::aux::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -207,7 +210,7 @@ private:
   ComponentSlotParameter mComponentSlots;
 
   //! Configurable object used for storing robot setup in a separate file.
-  cedar::aux::ConfigurablePtr mRobotDescription;
+//  cedar::aux::ConfigurablePtr mRobotDescription;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
