@@ -154,7 +154,7 @@ void cedar::dev::ComponentSlot::instantiateConfiguration(const std::string& conf
 
 void cedar::dev::ComponentSlot::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
-  cedar::aux::ConfigurationNode::const_assoc_iterator common = node.find("common component parameters");
+  cedar::aux::ConfigurationNode::const_assoc_iterator common = node.find("shared component parameters");
 
   mCommonParameters = cedar::aux::ConfigurationNode();
 

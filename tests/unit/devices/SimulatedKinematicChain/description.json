@@ -14,7 +14,7 @@
         }
       },
 
-      "common component parameters": 
+      "shared component parameters": 
       {
         "name": "Test Simulated Kinematic Chain",
         "root coordinate frame": 
