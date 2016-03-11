@@ -1,157 +1,192 @@
 {
-  "component slots":
+  "component slots": 
   {
-    "arm":
+    "arm": 
     {
-      "available components":
+      "available components": 
       {
-        "testconfig":
+        "testconfig": 
         {
-          "cedar.dev.SimulatedKinematicChain":
+          "cedar.dev.SimulatedKinematicChain": 
           {
+            
           }
         }
       },
-      "common component parameters":
+
+      "common component parameters": 
       {
-  		  "name": "Test Simulated Kinematic Chain",
-        "root coordinate frame":
+        "name": "Test Simulated Kinematic Chain",
+        "root coordinate frame": 
         {
-          "initial translation":
+          "initial translation": 
           [
             "2.0",
             "0.0",
             "0.0"
           ],
-          "initial rotation":
+
+          "initial rotation": 
           [
-            "0.0", "-1.0", "0.0",
-            "1.0", "0.0", "0.0",
-            "0.0", "0.0", "1.0"
+            "0.0",
+            "-1.0",
+            "0.0",
+            "1.0",
+            "0.0",
+            "0.0",
+            "0.0",
+            "0.0",
+            "1.0"
           ]
         },
-        "end-effector coordinate frame":
+
+        "end-effector coordinate frame": 
         {
-          "initial translation":
+          "initial translation": 
           [
             "0.0",
             "2.0",
             "8.0"
           ],
-          "initial rotation":
+
+          "initial rotation": 
           [
-            "1.0", "0.0", "0.0",
-            "0.0", "1.0", "0.0",
-            "0.0", "0.0", "1.0"
+            "1.0",
+            "0.0",
+            "0.0",
+            "0.0",
+            "1.0",
+            "0.0",
+            "0.0",
+            "0.0",
+            "1.0"
           ]
         },
-        "joints":
+
+        "joints": 
         {
-          "cedar.dev.KinematicChain.Joint":
+          "cedar.dev.KinematicChain.Joint": 
           {
-              "angle limits":
-              {
-            "lower limit": "-5.0",
-            "upper limit": "5.0"
+            "angle limits": 
+            {
+              "lower limit": "-5.0",
+              "upper limit": "5.0"
+            },
+
+            "velocity limits": 
+            {
+              "lower limit": "-5.0",
+              "upper limit": "5.0"
+            },
+
+            "position": 
+            [
+              "0.0",
+              "2.0",
+              "0.0"
+            ],
+
+            "axis": 
+            [
+              "0.0",
+              "1.0",
+              "0.0"
+            ]
           },
-              "velocity limits":
-              {
-            "lower limit": "-5.0",
-            "upper limit": "5.0"
-          },
-          "position":
-          [
-            "0.0", 
-            "2.0",
-            "0.0"
-          ],
-          "axis":
-          [
-            "0.0", 
-            "1.0",
-            "0.0"
-          ]
-        },
-          "cedar.dev.KinematicChain.Joint":
+
+          "cedar.dev.KinematicChain.Joint": 
           {
-              "angle limits":
-              {
-            "lower limit": "-5.0",
-            "upper limit": "5.0"
+            "angle limits": 
+            {
+              "lower limit": "-5.0",
+              "upper limit": "5.0"
+            },
+
+            "velocity limits": 
+            {
+              "lower limit": "-5.0",
+              "upper limit": "5.0"
+            },
+
+            "position": 
+            [
+              "0.0",
+              "2.0",
+              "2.0"
+            ],
+
+            "axis": 
+            [
+              "0.0",
+              "1.0",
+              "0.0"
+            ]
           },
-              "velocity limits":
-              {
-            "lower limit": "-5.0",
-            "upper limit": "5.0"
-          },
-          "position":
-          [
-            "0.0", 
-            "2.0",
-            "2.0"
-          ],
-          "axis":
-          [
-            "0.0", 
-            "1.0",
-            "0.0"
-          ]
-        },
-          "cedar.dev.KinematicChain.Joint":
+
+          "cedar.dev.KinematicChain.Joint": 
           {
-              "angle limits":
-              {
-            "lower limit": "-5.0",
-            "upper limit": "5.0"
+            "angle limits": 
+            {
+              "lower limit": "-5.0",
+              "upper limit": "5.0"
+            },
+
+            "velocity limits": 
+            {
+              "lower limit": "-5.0",
+              "upper limit": "5.0"
+            },
+
+            "position": 
+            [
+              "0.0",
+              "2.0",
+              "4.0"
+            ],
+
+            "axis": 
+            [
+              "0.0",
+              "1.0",
+              "0.0"
+            ]
           },
-              "velocity limits":
-              {
-            "lower limit": "-5.0",
-            "upper limit": "5.0"
-          },
-          "position":
-          [
-            "0.0", 
-            "2.0",
-            "4.0"
-          ],
-          "axis":
-          [
-            "0.0", 
-            "1.0",
-            "0.0"
-          ]
-        },
-          "cedar.dev.KinematicChain.Joint":
+
+          "cedar.dev.KinematicChain.Joint": 
           {
-              "angle limits":
-              {
-            "lower limit": "-5.0",
-            "upper limit": "5.0"
-          },
-              "velocity limits":
-              {
-            "lower limit": "-5.0",
-            "upper limit": "5.0"
-          },
-          "position":
-          [
-            "0.0", 
-            "2.0",
-            "6.0"
-          ],
-          "axis":
-          [
-            "0.0", 
-            "1.0",
-            "0.0"
-          ]
+            "angle limits": 
+            {
+              "lower limit": "-5.0",
+              "upper limit": "5.0"
+            },
+
+            "velocity limits": 
+            {
+              "lower limit": "-5.0",
+              "upper limit": "5.0"
+            },
+
+            "position": 
+            [
+              "0.0",
+              "2.0",
+              "6.0"
+            ],
+
+            "axis": 
+            [
+              "0.0",
+              "1.0",
+              "0.0"
+            ]
+          }
         }
       }
-     }
     }
   },
-  "available channels":
+
+  "available channels": 
   {
+    
   }
 }
