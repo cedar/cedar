@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 
   // instantiate the robot
   cedar::dev::RobotPtr robot(new cedar::dev::Robot());
-  std::string robot_configuration = cedar::aux::locateResource("robots/epuck/default_configuration.json");
+  std::string robot_configuration = cedar::aux::locateResource("robots/epuck/serial_configuration.json");
   robot->readJson(robot_configuration);
 
   // get the drive from the robot

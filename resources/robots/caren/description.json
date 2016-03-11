@@ -5,11 +5,11 @@
     {
       "available components":
       {
-        "hardware":
+        "fri":
         {
           "cedar.dev.kuka.KinematicChain":
           {
-            "requires channel": "hardware"
+            "requires channel": "fri"
           }
         },
         "simulator":
@@ -241,7 +241,7 @@
   },
   "available channels":
   {
-    "hardware":
+    "fri":
     {
       "cedar.dev.kuka.FRIChannel":
       {

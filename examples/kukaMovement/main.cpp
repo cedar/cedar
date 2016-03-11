@@ -178,7 +178,7 @@ int main(int argc, char **argv)
   if (use_hardware)
   {
     // hardware interface
-    robot->readJson("resources://robots/caren/default_configuration.json");
+    robot->readJson("resources://robots/caren/fri_configuration.json");
     arm= robot->getComponent< cedar::dev::kuka::KinematicChain >("arm");
 
     cedar::dev::kuka::FRIChannelPtr fri_channel = boost::dynamic_pointer_cast< cedar::dev::kuka::FRIChannel >( arm->getChannel() );
