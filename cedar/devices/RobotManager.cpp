@@ -58,20 +58,20 @@ cedar::dev::RobotManager::RobotManager()
   // epuck -----------------------------------------------------------------------------------------------------------
   cedar::dev::RobotManager::Template epuck_template;
   epuck_template.setIconPath(":/cedar/dev/gui/icons/epuck_icon_256.png");
-  epuck_template.addNamedConfiguration("hardware", cedar::aux::Path("resource://configs/epuck/hardware_configuration.json"));
+  epuck_template.addNamedConfiguration("serial", cedar::aux::Path("resource://configs/epuck/seriale_configuration.json"));
   epuck_template.addNamedConfiguration("yarp/webots", cedar::aux::Path("resource://configs/epuck/yarp_configuration.json"));
   this->addRobotTemplate("epuck", epuck_template);
 
   // khepera ---------------------------------------------------------------------------------------------------------
   cedar::dev::RobotManager::Template khepera_template;
   khepera_template.setIconPath(":/cedar/dev/gui/icons/khepera_icon_256.png");
-  khepera_template.addNamedConfiguration("hardware", cedar::aux::Path("resource://configs/khepera/default_configuration.json"));
+  khepera_template.addNamedConfiguration("serial", cedar::aux::Path("resource://configs/khepera/serial_configuration.json"));
   this->addRobotTemplate("khepera", khepera_template);
 
   // kuka ---------------------------------------------------------------------------------------------------------
   cedar::dev::RobotManager::Template kuka_template;
   kuka_template.setIconPath(":/cedar/dev/gui/icons/khepera_icon_256.png");
-  kuka_template.addNamedConfiguration("hardware", cedar::aux::Path("resource://configs/caren/default_configuration.json"));
+  kuka_template.addNamedConfiguration("FRI", cedar::aux::Path("resource://configs/caren/fri_configuration.json"));
   this->addRobotTemplate("kuka", kuka_template);
 
   this->restore();

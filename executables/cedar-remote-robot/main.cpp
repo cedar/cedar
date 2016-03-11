@@ -70,7 +70,7 @@ void run()
   
   // create a hardware robot that is able to execute the motor commands
   cedar::dev::RobotPtr robot(new Robot());
-  cedar::aux::Path resource("resource://configs/epuck/hardware_configuration.json");
+  cedar::aux::Path resource("resource://configs/epuck/serial_configuration.json");
   robot->readJson(resource.absolute().toString());
   std::cout << "This is robot " << robot->getName() << ", receiving motor commands and sending encoder values" << std::endl;
 

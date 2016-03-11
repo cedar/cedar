@@ -1,8 +1,8 @@
 {
-  "name": "default CAREN robot",
+  "name": "FRI CAREN robot",
   "description file": "configs/caren/description.json",
   "component instantiations":
   {
-    "arm": "hardware"
+    "arm": "fri"
   }
 }
