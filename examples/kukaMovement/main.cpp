@@ -178,7 +178,7 @@ int main(int argc, char **argv)
   if (use_hardware)
   {
     // hardware interface
-    robot->readJson("resources://configs/caren/default_configuration.json");
+    robot->readJson("resources://robots/caren/default_configuration.json");
     arm= robot->getComponent< cedar::dev::kuka::KinematicChain >("arm");
 
     cedar::dev::kuka::FRIChannelPtr fri_channel = boost::dynamic_pointer_cast< cedar::dev::kuka::FRIChannel >( arm->getChannel() );
@@ -189,18 +189,18 @@ int main(int argc, char **argv)
   }
   else
   {
-    robot->readJson("resource://configs/caren/simulator_configuration.json");
+    robot->readJson("resource://robots/caren/simulator_configuration.json");
     arm= robot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
   }
 
   // define some initial configurations we can choose from
   double initial_config1[][1] = { {0.1}, {0.2}, {0.1}, {0.2}, {0.0}, {0.2}, {0.0} };
-  std::map< std::string, cv::Mat > initial_configs = {
+  std::map< std::string, cv::Mat > initial_robots = {
     {"near zero", cv::Mat( 7, 1, CV_64F, initial_config1) },
-    // add your configs here ...
+    // add your robots here ...
   };
 
-  arm->setInitialConfigurations( initial_configs );
+  arm->setInitialConfigurations( initial_robots );
 
   // set simulated arm to initial configuration
   if (!use_hardware)

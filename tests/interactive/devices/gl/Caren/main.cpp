@@ -57,14 +57,14 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // find resources
-  std::string trunk_configuration_file = cedar::aux::locateResource("configs/caren_trunk.json");
-  std::string arm_configuration_file = cedar::aux::locateResource("configs/kuka_lwr4.json");
-  std::string head_configuration_file = cedar::aux::locateResource("configs/caren_head.json");
-  std::string camera_middle_configuration_file = cedar::aux::locateResource("configs/caren_camera_middle.json");
-  std::string finger_one_configuration_file = cedar::aux::locateResource("configs/sdh_finger_one.json");
-  std::string finger_two_configuration_file = cedar::aux::locateResource("configs/sdh_finger_two.json");
-  std::string finger_three_configuration_file = cedar::aux::locateResource("configs/sdh_finger_three.json");
-  std::string palm_configuration_file = cedar::aux::locateResource("configs/sdh_palm.json");
+  std::string trunk_configuration_file = cedar::aux::locateResource("robots/caren_trunk.json");
+  std::string arm_configuration_file = cedar::aux::locateResource("robots/kuka_lwr4.json");
+  std::string head_configuration_file = cedar::aux::locateResource("robots/caren_head.json");
+  std::string camera_middle_configuration_file = cedar::aux::locateResource("robots/caren_camera_middle.json");
+  std::string finger_one_configuration_file = cedar::aux::locateResource("robots/sdh_finger_one.json");
+  std::string finger_two_configuration_file = cedar::aux::locateResource("robots/sdh_finger_two.json");
+  std::string finger_three_configuration_file = cedar::aux::locateResource("robots/sdh_finger_three.json");
+  std::string palm_configuration_file = cedar::aux::locateResource("robots/sdh_palm.json");
 
   // create simulated kinematic chains
   cedar::dev::KinematicChainPtr caren_trunk(new cedar::dev::SimulatedKinematicChain());

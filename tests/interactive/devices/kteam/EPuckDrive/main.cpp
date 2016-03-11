@@ -48,7 +48,7 @@ int main(int argc, char **argv)
   QApplication application(argc, argv);
 
   cedar::dev::RobotPtr robot(new cedar::dev::Robot());
-  std::string robot_configuration = cedar::aux::locateResource("configs/epuck/hardware_configuration.json");
+  std::string robot_configuration = cedar::aux::locateResource("robots/epuck/hardware_configuration.json");
   robot->readJson(robot_configuration);
 
   cedar::dev::kteam::DrivePtr drive

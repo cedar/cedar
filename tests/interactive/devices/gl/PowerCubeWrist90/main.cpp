@@ -51,7 +51,7 @@
 int main(int argc, char **argv)
 {
   // find resources
-  std::string head_configuration_file = cedar::aux::locateResource("configs/caren_head.json");
+  std::string head_configuration_file = cedar::aux::locateResource("robots/caren_head.json");
 
   QApplication a(argc, argv);
 

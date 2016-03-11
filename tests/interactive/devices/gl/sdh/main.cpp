@@ -51,10 +51,10 @@
 int main(int argc, char **argv)
 {
   // find resources
-  std::string finger_one_configuration_file = cedar::aux::locateResource("configs/sdh_finger_one.json");
-  std::string finger_two_configuration_file = cedar::aux::locateResource("configs/sdh_finger_two.json");
-  std::string finger_three_configuration_file = cedar::aux::locateResource("configs/sdh_finger_three.json");
-  std::string palm_configuration_file = cedar::aux::locateResource("configs/sdh_palm.json");
+  std::string finger_one_configuration_file = cedar::aux::locateResource("robots/sdh_finger_one.json");
+  std::string finger_two_configuration_file = cedar::aux::locateResource("robots/sdh_finger_two.json");
+  std::string finger_three_configuration_file = cedar::aux::locateResource("robots/sdh_finger_three.json");
+  std::string palm_configuration_file = cedar::aux::locateResource("robots/sdh_palm.json");
 
   QApplication a(argc, argv);
 

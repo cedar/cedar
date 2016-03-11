@@ -51,13 +51,13 @@ int main(int argc, char **argv)
 
   // open the channel to the epuck
   cedar::dev::kteam::SerialChannelPtr communication(new cedar::dev::kteam::SerialChannel());
-  std::string serial_communication_config = cedar::aux::locateResource("configs/khepera_serial_communication.json");
+  std::string serial_communication_config = cedar::aux::locateResource("robots/khepera_serial_communication.json");
   communication->readJson(serial_communication_config);
   communication->open();
 
   // initialize epuck-drive
   cedar::dev::kteam::DriveSerialPtr drive(new cedar::dev::kteam::DriveSerial(communication));
-  std::string epuck_drive_config = cedar::aux::locateResource("configs/khepera.json");
+  std::string epuck_drive_config = cedar::aux::locateResource("robots/khepera.json");
   drive->readJson(epuck_drive_config);
 
   // open the control-GUI

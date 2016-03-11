@@ -51,7 +51,7 @@
 int main(int argc, char **argv)
 {
   // find resources
-  std::string trunk_configuration_file = cedar::aux::locateResource("configs/caren_trunk.json");
+  std::string trunk_configuration_file = cedar::aux::locateResource("robots/caren_trunk.json");
 
   QApplication a(argc, argv);
 
