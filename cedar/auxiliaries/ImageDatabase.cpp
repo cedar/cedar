@@ -1627,6 +1627,14 @@ std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getTest
     std::string tag_selection = parser.getValue<std::string>("sample-testing-tags");
     images = this->getImagesByTagStr(tag_selection);
   }
+  else if (mode == "all")
+  {
+    // add all images to the test set
+    for (auto image : this->mImages)
+    {
+      images.insert(image);
+    }
+  }
   else
   {
     CEDAR_ASSERT(false && "Unknown sample selection mode.");
