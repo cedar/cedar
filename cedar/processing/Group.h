@@ -676,6 +676,9 @@ public:
   //! Lists all scripts in this group.
   std::set<cedar::proc::CppScriptPtr> getScripts() const;
 
+  //! Lists all scripts in this group in an ordered manner.
+  std::vector<cedar::proc::CppScriptPtr> getOrderedScripts() const;
+
   //! Checks if a script with the given name exists in this group.
   bool checkScriptNameExists(const std::string& name) const;
 

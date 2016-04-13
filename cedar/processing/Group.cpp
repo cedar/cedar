@@ -421,6 +421,26 @@ std::set<cedar::proc::CppScriptPtr> cedar::proc::Group::getScripts() const
   return scripts;
 }
 
+std::vector<cedar::proc::CppScriptPtr> cedar::proc::Group::getOrderedScripts() const
+{
+  std::set<std::string> script_names;
+  QReadLocker locker(this->mScripts.getLockPtr());
+  for (auto script : this->mScripts.member())
+  {
+    script_names.insert(script->getName());
+  }
+  locker.unlock();
+
+  std::vector<cedar::proc::CppScriptPtr> scripts;
+  for (const auto& script_name : script_names)
+  {
+    scripts.push_back(this->getScript(script_name));
+  }
+
+  return scripts;
+}
+
+
 cedar::proc::CppScriptPtr cedar::proc::Group::getScript(const std::string& name) const
 {
   QReadLocker locker(this->mScripts.getLockPtr());
