@@ -210,6 +210,9 @@ public:
   //! is the thread still running? (This method is NOT thread safe.)
   bool isRunningNolocking() const;
 
+  //! does this object represent the current Thread?
+  bool isCurrentThread() const;
+
   //! Reallocate the worker and thread when re-starting? Default: yes
   void setReallocateOnStart(bool);
   //! Reallocate the worker and thread when re-starting?
