@@ -1,6 +1,6 @@
 {
   "name": "simulated CAREN robot",
-  "description file": "configs/caren/description.json",
+  "description file": "robots/caren/description.json",
   "component instantiations":
   {
       "arm": "simulator"
