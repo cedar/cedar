@@ -181,6 +181,13 @@ bool cedar::aux::ThreadWrapper::isRunning() const
   return running;
 }
 
+bool cedar::aux::ThreadWrapper::isCurrentThread() const
+{
+  QMutexLocker general_access_lock(&mGeneralAccessLock);
+
+  return QThread::currentThread() == mpThread;
+}
+
 bool cedar::aux::ThreadWrapper::isRunningNolocking() const
 {
   // no locks, because they really slow things down, here ...
