@@ -120,7 +120,7 @@ cedar::proc::DataSlot::VALIDITY
     }
     if (!type_ok)
     {
-      info = "Cannot handle this matrix type.";
+      info = "Cannot handle the matrix type \"" + cedar::aux::math::matrixTypeToString(mat_data->getData()) + "\".";
       return this->validityBad();
     }
 
