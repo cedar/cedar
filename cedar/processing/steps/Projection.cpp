@@ -327,6 +327,7 @@ void cedar::proc::steps::Projection::reconfigure(bool triggerSubsequent)
   if (this->mInput->getCvType() != this->mOutput->getCvType())
   {
     this->initializeOutputMatrix();
+    this->emitOutputPropertiesChangedSignal("output");
   }
 
   // now do a final step and try to calculate an output with the new configuration
