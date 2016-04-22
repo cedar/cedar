@@ -526,7 +526,7 @@ void cedar::aux::ImageDatabase::addCommandLineOptions(cedar::aux::CommandLinePar
   parser.defineValue
   (
     "sample-testing-selection-mode",
-    "Which mode to use for selecting testing samples.",
+    "Which mode to use for selecting testing samples. Possible values: not_in_training_set, by_tag, by_class, all",
     "not_in_training_set",
     0,
     sample_selection_group_name
@@ -541,6 +541,14 @@ void cedar::aux::ImageDatabase::addCommandLineOptions(cedar::aux::CommandLinePar
     sample_selection_group_name
   );
 
+  parser.defineValue
+  (
+    "sample-testing-classes",
+    "A class name or list of class names used for testing. If blank, all classes are used. Format: \"class 1, class 2, ..., class N\"",
+    "",
+    0,
+    sample_selection_group_name
+  );
 
   parser.defineValue
   (
@@ -1682,6 +1690,21 @@ std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getTest
   {
     std::string tag_selection = parser.getValue<std::string>("sample-testing-tags");
     images = this->getImagesByTagStr(tag_selection);
+  }
+  else if (mode == "by_class")
+  {
+    std::string class_selection = parser.getValue<std::string>("sample-testing-classes");
+
+    std::vector<std::string> classes;
+    cedar::aux::split(class_selection, ",", classes);
+    images.clear();
+
+    for (const auto& class_name : classes)
+    {
+      auto normalized = cedar::aux::removeLeadingAndTrailingWhiteSpaces(class_name);
+      auto class_images = this->getImagesWithClass(this->getClass(normalized));
+      images.insert(class_images.begin(), class_images.end());
+    }
   }
   else if (mode == "all")
   {
