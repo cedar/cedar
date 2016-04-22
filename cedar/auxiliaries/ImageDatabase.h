@@ -614,6 +614,8 @@ private:
 
   void selectImagesFromFirstNClasses(std::set<ImagePtr>& images, unsigned int numberOfClasses) const;
 
+  void selectImagesByClasses(std::set<ImagePtr>& images, const std::vector<std::string> classNames) const;
+
   void selectImagesFromNRandomClasses(std::set<ImagePtr>& images, unsigned int numberOfClasses, const boost::optional<unsigned int>& seed) const;
 
   static void selectImagesWithClassesInSet(std::set<ImagePtr>& images, const std::set<ClassId>& acceptedClasses);
