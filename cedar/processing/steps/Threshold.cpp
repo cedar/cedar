@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -65,6 +65,7 @@ namespace
         "cedar.processing.steps.Threshold"
       )
     );
+
     declaration->setIconPath(":/steps/threshold.svg");
     declaration->setDescription
     (
@@ -101,7 +102,6 @@ _mUpperThresholdValue(new cedar::aux::DoubleParameter(this, "upper threshold", 2
   QObject::connect(this->_mUpperThresholdValue.get(), SIGNAL(valueChanged()), this, SLOT(recalculate()));
 
   cedar::proc::typecheck::Matrix input_check;
-  input_check.addAcceptedDimensionalityRange(0, 2);
   input_check.addAcceptedType(CV_8UC1);
   input_check.addAcceptedType(CV_32FC1);
 
@@ -143,39 +143,62 @@ void cedar::proc::steps::Threshold::inputConnectionChanged(const std::string& in
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
   this->mInputImage = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->getInput(inputName));
+
   if (this->mInputImage)
   {
     const cv::Mat& input = this->mInputImage->getData();
-    if (this->mInputImage->getDimensionality() > 2)
+    const unsigned int numDims = this->mInputImage->getDimensionality();
+
+    // Get sizes in each dimension
+    mSizes.resize(numDims);
+
+    for(unsigned int dim = 0; dim < numDims; ++dim)
     {
-      return;
+      mSizes[dim] = input.size[dim];
     }
 
-    this->mThresholdedImage->getData() = cv::Mat::zeros(input.rows, input.cols, input.type());
-    this->mLowerThreshold->getData() = cv::Mat::zeros(input.rows, input.cols, input.type());
-    this->mUpperThreshold->getData() = cv::Mat::zeros(input.rows, input.cols, input.type());
+    if (numDims == 0)
+    {
+      this->mThresholdedImage->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
+      this->mLowerThreshold->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
+      this->mUpperThreshold->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
+    }
+    else if (numDims == 1)
+    {
+      this->mThresholdedImage->getData() = cv::Mat(mSizes[0], 1, CV_32F, cv::Scalar(0));
+      this->mLowerThreshold->getData() = cv::Mat(mSizes[0], 1, CV_32F, cv::Scalar(0));
+      this->mUpperThreshold->getData() = cv::Mat(mSizes[0], 1, CV_32F, cv::Scalar(0));
+    }
+    else
+    {
+      this->mThresholdedImage->getData() = cv::Mat(numDims, mSizes.data(), CV_32F, cv::Scalar(0));
+      this->mLowerThreshold->getData() = cv::Mat(numDims, mSizes.data(), CV_32F, cv::Scalar(0));
+      this->mUpperThreshold->getData() = cv::Mat(numDims, mSizes.data(), CV_32F, cv::Scalar(0));
+    }
+
     this->mThresholdedImage->copyAnnotationsFrom(this->mInputImage);
     this->mLowerThreshold->copyAnnotationsFrom(this->mInputImage);
     this->mUpperThreshold->copyAnnotationsFrom(this->mInputImage);
 
     if(input.channels() != 1)
     {
-      return;
+        return;
     }
 
     int depth = 8;
+
     switch (input.depth())
     {
-      case CV_8U:
-        this->mMaxValue = static_cast<double>( (1 << depth) - 1 );
-        break;
+    case CV_8U:
+      this->mMaxValue = static_cast<double>( (1 << depth) - 1 );
+      break;
 
-      case CV_32F:
-        this->mMaxValue = 1.0;
-        break;
+    case CV_32F:
+      this->mMaxValue = 1.0;
+      break;
 
-      default:
-        CEDAR_THROW(cedar::aux::UnhandledValueException, "The matrix depth is not handled.");
+    default:
+      CEDAR_THROW(cedar::aux::UnhandledValueException, "The matrix depth is not handled.");
     }
 
     this->emitOutputPropertiesChangedSignal("thresholded input");
@@ -184,55 +207,126 @@ void cedar::proc::steps::Threshold::inputConnectionChanged(const std::string& in
 
 void cedar::proc::steps::Threshold::compute(const cedar::proc::Arguments&)
 {
-  const cv::Mat& input = this->mInputImage->getData();
+  const cv::Mat& input_image = this->mInputImage->getData();
   cv::Mat& thresholded_image = this->mThresholdedImage->getData();
   cv::Mat& lower_threshold_image = this->mLowerThreshold->getData();
   cv::Mat& upper_threshold_image = this->mUpperThreshold->getData();
+
+  const unsigned int numDims = this->mInputImage->getDimensionality();
+
+  // get values from parameters
   const double lower_threshold = this->_mLowerThresholdValue->getValue();
   const double upper_threshold = this->_mUpperThresholdValue->getValue();
   const double max_value = this->mMaxValue;
 
-  if (this->mApplyLowerThreshold->getValue())
+  // distinguishing 2 cases: 3d or 2d matrix. for nd-matrices, we would need to build something recursive
+  if(numDims == 3)
   {
-    cv::threshold(input, lower_threshold_image, lower_threshold, max_value,
-#if CEDAR_OPENCV_MAJOR_VERSION >= 3
-     cv::THRESH_BINARY
-#else
-     CV_THRESH_BINARY
-#endif
-     );
-  }
+    for(int i=0; i < mSizes[0]; ++i)
+    {
+      /*
+      Problem: the opencv threshold function is only implemented for 2d matrices.
+      So we extract as many slices as given in the third dimension, using a for loop over it.
+      The memory location of a slice may be adressed using the data pointer of the embedding matrix object.
+      The position of slice i then equals i*step, where step is the number of data points of a 2d slice.
+      */
 
-  if (this->mApplyUpperThreshold->getValue())
-  {
-    cv::threshold(input, upper_threshold_image, upper_threshold, max_value,
-#if CEDAR_OPENCV_MAJOR_VERSION >= 3
-     cv::THRESH_BINARY_INV
-#else
-     CV_THRESH_BINARY_INV
-#endif
-     );
-  }
+      // dont change the input slice
+      const cv::Mat input_slice(mSizes[0], mSizes[1], input_image.type(), input_image.data + input_image.step[0] * i);
 
-  if (this->mApplyLowerThreshold->getValue() && this->mApplyUpperThreshold->getValue())
-  {
-    // if both thresholds are applied, combine the results from both operations
-    cv::bitwise_and(lower_threshold_image, upper_threshold_image, thresholded_image);
-    thresholded_image *= mMaxValue;
-  }
-  else if (this->mApplyLowerThreshold->getValue())
-  {
-    // if only the lower threshold is applied, the output is just that
-    thresholded_image = lower_threshold_image.clone();
-  }
-  else if (this->mApplyUpperThreshold->getValue())
-  {
-    // if only the upper threshold is applied, the output is just that
-    thresholded_image = upper_threshold_image.clone();
+      // make slices with height and width given as parameters
+      cv::Mat thresholded_image_slice(mSizes[0], mSizes[1], thresholded_image.type(), thresholded_image.data + thresholded_image.step[0] * i);
+      cv::Mat lower_threshold_image_slice(mSizes[0], mSizes[1], lower_threshold_image.type(), lower_threshold_image.data + lower_threshold_image.step[0] * i);
+      cv::Mat upper_threshold_image_slice(mSizes[0], mSizes[1], upper_threshold_image.type(), upper_threshold_image.data + upper_threshold_image.step[0] * i);
+
+      // Apply regular threshold method on each slide, same procedure as in 1d/2d-case
+      if(this->mApplyLowerThreshold->getValue())
+      {
+        cv::threshold
+          (input_slice, lower_threshold_image_slice, lower_threshold, max_value,
+          #if CEDAR_OPENCV_MAJOR_VERSION >= 3
+            cv::THRESH_BINARY
+          #else
+            CV_THRESH_BINARY
+          #endif
+          );
+      }
+
+      if(this->mApplyUpperThreshold->getValue())
+      {
+        cv::threshold
+          (input_slice, upper_threshold_image_slice, upper_threshold, max_value,
+          #if CEDAR_OPENCV_MAJOR_VERSION >= 3
+            cv::THRESH_BINARY_INV
+          #else
+            CV_THRESH_BINARY_INV
+          #endif
+          );
+      }
+
+      if(this->mApplyLowerThreshold->getValue() && this->mApplyUpperThreshold->getValue())
+      {
+        // if both thresholds are applied, combine the results from both operations
+        cv::bitwise_and(lower_threshold_image_slice, upper_threshold_image_slice, thresholded_image_slice);
+        thresholded_image_slice *= mMaxValue;
+      }
+      else if (this->mApplyLowerThreshold->getValue())
+      {
+        thresholded_image_slice = lower_threshold_image_slice.clone();
+      }
+      else if (this->mApplyUpperThreshold->getValue())
+      {
+        thresholded_image_slice = upper_threshold_image_slice.clone();
+      }
+      else
+      {
+        thresholded_image_slice = input_image.clone();
+      }
+    }\
   }
   else
   {
-    // if nothing was applied, simply clone the input
-    thresholded_image = input.clone();
+    if(this->mApplyLowerThreshold->getValue())
+    {
+      cv::threshold
+        (input_image, lower_threshold_image, lower_threshold, max_value,
+        #if CEDAR_OPENCV_MAJOR_VERSION >= 3
+         cv::THRESH_BINARY
+        #else
+         CV_THRESH_BINARY
+        #endif
+        );
+    }
+
+    if(this->mApplyUpperThreshold->getValue())
+    {
+      cv::threshold
+        (input_image, upper_threshold_image, upper_threshold, max_value,
+        #if CEDAR_OPENCV_MAJOR_VERSION >= 3
+          cv::THRESH_BINARY_INV
+        #else
+          CV_THRESH_BINARY_INV
+         #endif
+         );
+    }
+
+    if(this->mApplyLowerThreshold->getValue() && this->mApplyUpperThreshold->getValue())
+    {
+      // if both thresholds are applied, combine the results from both operations
+      cv::bitwise_and(lower_threshold_image, upper_threshold_image, thresholded_image);
+      thresholded_image *= mMaxValue;
+    }
+    else if (this->mApplyLowerThreshold->getValue())
+    {
+      thresholded_image = lower_threshold_image.clone();
+    }
+    else if (this->mApplyUpperThreshold->getValue())
+    {
+      thresholded_image = upper_threshold_image.clone();
+    }
+    else
+    {
+      thresholded_image = input_image.clone();
+    }
   }
 }
