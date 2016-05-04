@@ -45,15 +45,16 @@
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/UIntVectorParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/steps/Threshold.fwd.h"
 
 // SYSTEM INCLUDES
 
+/*!@brief Applies a threshold to its input.*/
 
-/*!@brief Applies a threshold to its input.
- */
 class cedar::proc::steps::Threshold : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -71,8 +72,8 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet
+public slots:
+  /// none
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -119,6 +120,9 @@ private:
   //! Value to write where the image exceeds the threshold.
   double mMaxValue;
 
+  //! sizes in each dimension
+  std::vector<int> mSizes;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -141,4 +145,3 @@ private:
 }; // class cedar::proc::steps::Threshold
 
 #endif // CEDAR_PROC_STEPS_THRESHOLD_H
-
