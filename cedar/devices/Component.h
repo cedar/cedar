@@ -427,6 +427,7 @@ private:
   static std::set< cedar::dev::Component* > mRunningComponentInstances;
 
   unsigned int mTooSlowCounter;
+  unsigned int mNotReadyForCommandsCounter;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

@@ -145,6 +145,10 @@ private:
   //!@brief copy of last known status if power is on on the KUKA RC
   bool mDrivesPowerOn;
 
+  FRI_STATE mLastFriState;
+  FRI_QUALITY mLastFriQuality;
+  bool mLastDrivesPowerOn;
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
