@@ -197,10 +197,10 @@ void cedar::proc::steps::Threshold::compute(const cedar::proc::Arguments&)
   const double max_value = this->mMaxValue;
 
   // distinguishing 2 cases: 3d or 2d matrix
-  if(num_dims == 3)
+  if (num_dims == 3)
   {
-    const cv::Mat::MSize &sizes = input_image.size;
-    for(int i=0; i < sizes[0]; ++i)
+    const auto& sizes = input_image.size;
+    for (int i=0; i < sizes[0]; ++i)
     {
       /*
       Problem: the opencv threshold function is only implemented for 2d matrices.
@@ -218,7 +218,7 @@ void cedar::proc::steps::Threshold::compute(const cedar::proc::Arguments&)
       cv::Mat upper_threshold_image_slice(sizes[1], sizes[2], upper_threshold_image.type(), upper_threshold_image.data + upper_threshold_image.step[0] * i);
 
       // Apply regular threshold method on each slide, same procedure as in 1d/2d-case
-      if(this->mApplyLowerThreshold->getValue())
+      if (this->mApplyLowerThreshold->getValue())
       {
         cv::threshold
           (input_slice, lower_threshold_image_slice, lower_threshold, max_value,
@@ -230,7 +230,7 @@ void cedar::proc::steps::Threshold::compute(const cedar::proc::Arguments&)
           );
       }
 
-      if(this->mApplyUpperThreshold->getValue())
+      if (this->mApplyUpperThreshold->getValue())
       {
         cv::threshold
           (input_slice, upper_threshold_image_slice, upper_threshold, max_value,
@@ -242,7 +242,7 @@ void cedar::proc::steps::Threshold::compute(const cedar::proc::Arguments&)
           );
       }
 
-      if(this->mApplyLowerThreshold->getValue() && this->mApplyUpperThreshold->getValue())
+      if (this->mApplyLowerThreshold->getValue() && this->mApplyUpperThreshold->getValue())
       {
         // if both thresholds are applied, combine the results from both operations
         cv::bitwise_and(lower_threshold_image_slice, upper_threshold_image_slice, thresholded_image_slice);
@@ -264,7 +264,7 @@ void cedar::proc::steps::Threshold::compute(const cedar::proc::Arguments&)
   }
   else
   {
-    if(this->mApplyLowerThreshold->getValue())
+    if (this->mApplyLowerThreshold->getValue())
     {
         cv::threshold
         (input_image, lower_threshold_image, lower_threshold, max_value,
@@ -276,7 +276,7 @@ void cedar::proc::steps::Threshold::compute(const cedar::proc::Arguments&)
         );
     }
 
-    if(this->mApplyUpperThreshold->getValue())
+    if (this->mApplyUpperThreshold->getValue())
     {
       cv::threshold
         (input_image, upper_threshold_image, upper_threshold, max_value,
@@ -288,7 +288,7 @@ void cedar::proc::steps::Threshold::compute(const cedar::proc::Arguments&)
          );
     }
 
-    if(this->mApplyLowerThreshold->getValue() && this->mApplyUpperThreshold->getValue())
+    if (this->mApplyLowerThreshold->getValue() && this->mApplyUpperThreshold->getValue())
     {
       // if both thresholds are applied, combine the results from both operations
       cv::bitwise_and(lower_threshold_image, upper_threshold_image, thresholded_image);
