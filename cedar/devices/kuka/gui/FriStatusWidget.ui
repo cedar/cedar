@@ -67,7 +67,7 @@
      <item>
       <widget class="QLabel" name="mpLabelPower">
        <property name="text">
-        <string>Power</string>
+        <string>Drives</string>
        </property>
       </widget>
      </item>

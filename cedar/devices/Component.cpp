@@ -48,8 +48,11 @@
 // SYSTEM INCLUDES
 #include <boost/bind.hpp>
 #include <boost/make_shared.hpp>
+#include "boost/date_time/posix_time/posix_time.hpp"
+#include "boost/lexical_cast.hpp"
 #include <QReadLocker>
 #include <QWriteLocker>
+
 
 #define COMPONENT_CV_MAT_TYPE CV_64F
 
@@ -687,7 +690,8 @@ cedar::dev::Component::Component()
 
 cedar::dev::Component::Component(cedar::dev::ChannelPtr channel)
 :
-mChannel(channel)
+mChannel(channel),
+mTooSlowCounter(0)
 {
   init();
 }
@@ -1002,6 +1006,39 @@ void cedar::dev::Component::registerCommandHook(ComponentDataType type, CommandF
   mSubmitCommandHooks.member()[ type ] = fun;
 }
 
+void cedar::dev::Component::registerNoCommandHook(NoCommandFunctionType fun)
+{
+  QWriteLocker locker(this->mNoCommandHook.getLockPtr());
+  // cannot replace existing hook
+  if (this->mNoCommandHook.member())
+  {
+    CEDAR_THROW(cedar::dev::Component::DuplicateHookException, "A no-command hook is already set.");
+  }
+  mNoCommandHook.member() = fun;
+}
+
+void cedar::dev::Component::registerNotReadyForCommandHook(NoCommandFunctionType fun)
+{
+  QWriteLocker locker(this->mNotReadyForCommandHook.getLockPtr());
+  // cannot replace existing hook
+  if (this->mNotReadyForCommandHook.member())
+  {
+    CEDAR_THROW(cedar::dev::Component::DuplicateHookException, "A not-ready-for-command hook is already set.");
+  }
+  mNotReadyForCommandHook.member() = fun;
+}
+
+void cedar::dev::Component::registerAfterCommandBeforeMeasurementHook(NoCommandFunctionType fun)
+{
+  QWriteLocker locker(this->mAfterCommandBeforeMeasurementHook.getLockPtr());
+  // cannot replace existing hook
+  if (this->mAfterCommandBeforeMeasurementHook.member())
+  {
+    CEDAR_THROW(cedar::dev::Component::DuplicateHookException, "A after-command-before-measurement hook is already set.");
+  }
+  mAfterCommandBeforeMeasurementHook.member() = fun;
+}
+
 void cedar::dev::Component::registerMeasurementHook(ComponentDataType type, MeasurementFunctionType fun)
 {
   if (!this->mMeasurementData->hasType(type))
@@ -1016,6 +1053,11 @@ void cedar::dev::Component::registerMeasurementHook(ComponentDataType type, Meas
     CEDAR_THROW(cedar::dev::Component::DuplicateHookException, "A measurement hook is already set for \"" + this->getNameForMeasurementType(type) + "\".");
   }
   mRetrieveMeasurementHooks.member()[ type ] = fun;
+}
+
+boost::signals2::connection cedar::dev::Component::registerStartCommunicationHook(boost::function<void ()> slot)
+{
+    return mStartCommunicationHook.connect(slot);
 }
 
 void cedar::dev::Component::registerCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun)
@@ -1058,6 +1100,19 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   {
     this->mCommandData->countCommunicationError(e);
   }
+
+  // to send only once per cycle to the HW with new commands and get new measurements
+  try
+  {
+    stepAfterCommandBeforeMeasurementCommunication();
+    this->mCommandData->countSuccessfullCommunication();
+  }
+  catch (const cedar::dev::CommunicationException& e)
+  {
+    this->mCommandData->countCommunicationError(e);
+  }
+
+
   try
   {
     stepMeasurementCommunication(real_time); // note, the post-measurements transformations also take time
@@ -1066,6 +1121,43 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   catch (const cedar::dev::CommunicationException& e)
   {
     this->mMeasurementData->countCommunicationError(e);
+  }
+
+  // utitlity: warn if consistently much too slow
+  if (time > this->getCommunicationStepSize() * 1.4)
+  {
+    mTooSlowCounter++;
+
+    // dont scroll ... show warning after 5 tries and then only every few seconds
+    if (mTooSlowCounter == 5
+        || mTooSlowCounter > 1500)
+    {
+      cedar::aux::LogSingleton::getInstance()->warning(
+        "communication with component is consistently "
+        "much slower than specified: "
+        + boost::lexical_cast<std::string>( time ) 
+        + " (effective time) vs "
+        + boost::lexical_cast<std::string>( this->getCommunicationStepSize() )
+        + " (specified time)",
+        CEDAR_CURRENT_FUNCTION_NAME);
+
+      if (mTooSlowCounter > 1500)
+      {
+        mTooSlowCounter= 6;
+      }
+    }
+  }
+}
+
+void cedar::dev::Component::stepAfterCommandBeforeMeasurementCommunication()
+{
+  QReadLocker between_hook_locker(mAfterCommandBeforeMeasurementHook.getLockPtr());
+
+  auto hook_found = mAfterCommandBeforeMeasurementHook.member();
+  if (hook_found)
+  {
+    // registering this is optional
+    hook_found();
   }
 }
 
@@ -1084,9 +1176,39 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
   cedar::aux::LockSetLocker locker(locks);
 
 
+  if (!this->isReadyForCommands())
+  {
+    QReadLocker nocommand_hook_locker(mNotReadyForCommandHook.getLockPtr());
+
+    auto hook_found = mNotReadyForCommandHook.member();
+    if (hook_found)
+    {
+      // registering this is optional
+      hook_found();
+    }
+
+    if (this->mUserCommandUsed.member().size() != 0)
+    {
+      cedar::aux::LogSingleton::getInstance()->warning(
+        "commands issued but hardware is not ready for commands (yet)",
+        CEDAR_CURRENT_FUNCTION_NAME);
+    }
+    return;
+  }
+
   // if there are neither user commands nor a controller, nothing needs to be done
   if (this->mUserCommandUsed.member().size() == 0 && !this->mController.member())
   {
+    return;
+    QReadLocker nocommand_hook_locker(mNoCommandHook.getLockPtr());
+
+    auto hook_found = mNoCommandHook.member();
+    if (hook_found)
+    {
+      // registering this is optional
+      hook_found();
+    }
+
     return;
   }
 
@@ -1276,13 +1398,13 @@ void cedar::dev::Component::updateUserSideMeasurements()
 
 void cedar::dev::Component::startCommunication()
 {
+  // do not re-enter, do not stop/start at the same time
+  QMutexLocker lockerGeneral(&mGeneralAccessLock);
+
   if (this->mChannel)
   {
     this->mChannel->open();
   }
-
-  // do not re-enter, do not stop/start at the same time
-  QMutexLocker lockerGeneral(&mGeneralAccessLock);
 
   if (this->mCommandData->getInstalledTypes().empty() && this->mMeasurementData->getInstalledTypes().empty())
   {
@@ -1361,10 +1483,20 @@ bool cedar::dev::Component::isRunning()
   return mCommunicationThread->isRunning();
 }
 
-bool cedar::dev::Component::isCommunicating()
+bool cedar::dev::Component::isCommunicating() const
 {
   //@todo: add a check if the channel is waiting for async feedback
   return mCommunicationThread->isRunning();
+}
+
+bool cedar::dev::Component::isReadyForCommands() const
+{
+  return this->isCommunicating();
+}
+
+bool cedar::dev::Component::isReadyForMeasurements() const
+{
+  return this->isCommunicating(); 
 }
 
 bool cedar::dev::Component::isRunningNolocking()
@@ -1409,6 +1541,8 @@ cv::Mat cedar::dev::Component::integrateDeviceTwice(cedar::unit::Time dt, cv::Ma
   cv::Mat result = ( ( data * unitless + this->mMeasurementData->getUserBufferUnlocked(type1) )
       * unitless )
     + this->mMeasurementData->getUserBufferUnlocked(type2);
+// TODO this is wrong! 2nd term in Taylor expansion
+
   return result;
 }
 
@@ -1443,6 +1577,7 @@ cv::Mat cedar::dev::Component::differentiateDeviceTwice(cedar::unit::Time dt, cv
 //  std::cout << data << std::endl;
 //  std::cout << dt << std::endl;
 //  std::cout << "step size: " << this->mCommunicationThread->getStepSize() << std::endl;
+
   double unitless = dt / (1.0 * cedar::unit::second);
 
   if (unitless == 0.0)
@@ -1459,9 +1594,6 @@ cv::Mat cedar::dev::Component::differentiateDeviceTwice(cedar::unit::Time dt, cv
 
 void cedar::dev::Component::processStart()
 {
-  // this is the initial run:
-
-
   // todo: test that mUserCommands is empty!
   cedar::unit::Time time = 0.0 * cedar::unit::seconds;
   if (!this->mCommandData->mInitialUserSubmittedData.member().empty())
@@ -1471,11 +1603,17 @@ void cedar::dev::Component::processStart()
      
      this->mCommandData->mUserBuffer.member() = this->mCommandData->mInitialUserSubmittedData.member();
      lock1.unlock();
+
      stepCommandCommunication(time);
   }
 
   // get measurements (blocking!) when the thread is started ...
+  stepAfterCommandBeforeMeasurementCommunication();
   stepMeasurementCommunication(time);
+
+  // this is the initial run, wait for measurements to be in:
+  mStartCommunicationHook();
+
 }
 
 void cedar::dev::Component::clearUserCommand()
@@ -1574,6 +1712,18 @@ void cedar::dev::Component::setController(ComponentDataType type, cedar::dev::Co
 void cedar::dev::Component::waitUntilCommunicated() const
 {
   CEDAR_ASSERT( mCommunicationThread );
+
+  if (mCommunicationThread->isCurrentThread())
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Your are waiting for communication with the Component inside the "
+      "communicating thread.",
+      "cedar::dev::Component::waitUntilCommunicated()"
+    );
+
+  }
+
   mCommunicationThread->waitUntilStepped();
 
   // include any waiting for synchronous responses here ...
@@ -1592,7 +1742,7 @@ void cedar::dev::Component::handleCrash()
                                            );
   for( auto component = begin(mRunningComponentInstances); component != end(mRunningComponentInstances); component++ )
   {
-std::cout << "emergency crash braking Now for " << *component << std::endl;    
+std::cout << "emergency crash braking NOW for " << *component << std::endl;    
     (*component)->crashbrake();
   }
 

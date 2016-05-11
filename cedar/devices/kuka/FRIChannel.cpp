@@ -24,8 +24,8 @@
 
     File:        FRIChannel.cpp
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
+    Maintainer:  Jean-Stephane Jokeit
+    Email:       jean.stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        2013 03 19
 
     Description: Communication channel for a component or device over Yarp.
@@ -41,6 +41,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/kuka/FRIChannel.h"
+
+// SYSTEM INCLUDES
+#include <QMutexLocker>
 
 //----------------------------------------------------------------------------------------------------------------------
 // type registration
@@ -69,6 +72,7 @@ mpFriRemote(nullptr)
     ip->setDefault("NULL");
     ip->makeDefault();
   }
+
   auto port = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>( this->getParameter("port") );
   if (port)
   {
@@ -81,12 +85,25 @@ cedar::dev::kuka::FRIChannel::~FRIChannel()
 {
   if (mpFriRemote)
   {
+    QMutexLocker lock( &mFRIRemoteLock );
+
+    //this should set to mode ... ? TODO
+    mpFriRemote->setToKRLBool(0, true);
+    mpFriRemote->doDataExchange();
+
     delete mpFriRemote;
   }
 }
 
+bool cedar::dev::kuka::FRIChannel::isOpen() const
+{
+  return this->mIsOpen;
+}
+
 void cedar::dev::kuka::FRIChannel::openHook()
 {
+  QMutexLocker lock( &mFRIRemoteLock );
+
   // create a new Instance of the friRemote
   if (this->getIPAddress() != "NULL")
   {
@@ -97,7 +114,16 @@ void cedar::dev::kuka::FRIChannel::openHook()
   {
     mpFriRemote = new friRemote(this->getPort());
   }
+
   mIsOpen = true;
+}
+
+void cedar::dev::kuka::FRIChannel::closeHook()
+{
+  if (mIsOpen)
+  {
+    mIsOpen = false;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -108,9 +134,9 @@ float cedar::dev::kuka::FRIChannel::getSampleTime() const
   return mSampleTime;
 }
 
-bool cedar::dev::kuka::FRIChannel::isPowerOn() const
+bool cedar::dev::kuka::FRIChannel::isDrivesPowerOn() const
 {
-  return mPowerOn;
+  return mDrivesPowerOn;
 }
 
 FRI_STATE cedar::dev::kuka::FRIChannel::getFriState() const
@@ -123,17 +149,123 @@ FRI_QUALITY cedar::dev::kuka::FRIChannel::getFriQuality() const
   return mFriQuality;
 }
 
-void cedar::dev::kuka::FRIChannel::updateState()
+bool cedar::dev::kuka::FRIChannel::isReadyForCommands() const
 {
+  QMutexLocker lock( &mFRIRemoteLock );
+
+  if (mpFriRemote == NULL)
+    return false;
+
+  bool on = this->isDrivesPowerOn();
+  FRI_STATE state = this->getFriState();
+
+  if (on && (state == FRI_STATE_CMD))
+  {
+    return true;
+  }
+
+  return false;
+}
+
+bool cedar::dev::kuka::FRIChannel::isReadyForMeasurements() const
+{
+  QMutexLocker lock( &mFRIRemoteLock );
+
+  if (mpFriRemote == NULL)
+    return false;
+
+  FRI_STATE state = this->getFriState();
+
+  return (state == FRI_STATE_MON 
+          || state == FRI_STATE_CMD);
+}
+
+bool cedar::dev::kuka::FRIChannel::test_valid_command(cv::Mat input)
+{
+  if (input.empty())
+  {
+    cedar::aux::LogSingleton::getInstance()->warning(
+      "command matrix is empty",
+      "cedar::dev::kuka::FRIChannel::test_valid_command"
+      );
+
+    return false;
+  }
+
+  if (input.cols != 1)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning(
+      "command matrix has not 1 column",
+      "cedar::dev::kuka::FRIChannel::test_valid_command"
+      );
+    return false;
+  }
+
+  if (input.rows != LBR_MNJ)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning(
+      "command matrix does not have correct number of joints",
+      "cedar::dev::kuka::FRIChannel::test_valid_command"
+      );
+
+    return false;
+  }
+
+  // todo: test type
+  return true;
+}
+
+bool cedar::dev::kuka::FRIChannel::prepareJointPositionControl(cv::Mat newJointPositions)
+{
+  QMutexLocker lock( &mFRIRemoteLock );
+  float newJointPositionArray[LBR_MNJ];
+
+  // check for correct dimensions:
+  if (!test_valid_command(newJointPositions))
+    return false;
+
+  // fill float array for hardware:
+  for (unsigned i = 0; i < LBR_MNJ; i++)
+  {
+    newJointPositionArray[i] =  static_cast<float>( newJointPositions.at<double>(i) );
+  }
+
+// TODO: make sure we are in monitor mode!
+  mpFriRemote->doPositionControl(newJointPositionArray, false);
+    // second parameter: we when the command is given
+
+  // do data exchange only once per cycle in exchangeData()
+
+  return true;
+}
+
+cv::Mat cedar::dev::kuka::FRIChannel::getMeasuredJointPositions() const
+{
+  QMutexLocker lock( &mFRIRemoteLock );
+  cv::Mat jointPositions = cv::Mat::zeros( LBR_MNJ, 1, CV_64F );
+
+  // fill float array for hardware:
+  for (unsigned i = 0; i < LBR_MNJ; i++)
+  {
+    jointPositions.at<double>(i) = mpFriRemote->getMsrMsrJntPosition()[i];
+  }
+
+  return jointPositions;
+}
+
+void cedar::dev::kuka::FRIChannel::exchangeData()
+{
+  if (mpFriRemote == NULL)
+    return;
+
+  mpFriRemote->doDataExchange();
+
+  QMutexLocker lock( &mFRIRemoteLock ); // lock after the blocking call
+
   mFriState = mpFriRemote->getState();
   mFriQuality = mpFriRemote->getQuality();
   mSampleTime = mpFriRemote->getSampleTime();
-  mPowerOn = mpFriRemote->isPowerOn();
-}
-
-friRemote* cedar::dev::kuka::FRIChannel::getInterface()
-{
-  return mpFriRemote;
+  mDrivesPowerOn = mpFriRemote->isPowerOn();
 }
 
 #endif // CEDAR_USE_KUKA_LWR

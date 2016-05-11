@@ -24,8 +24,8 @@
 
     File:        FRIChannel.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
+    Maintainer:  Jean-Stephane Jokeit
+    Email:       jean.stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        2013 03 06
 
     Description: Communication channel for a component or device over Yarp.
@@ -44,15 +44,12 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/kuka/namespace.h"
-#include "cedar/auxiliaries/net/Reader.h"
-#include "cedar/auxiliaries/net/Writer.h"
-#include "cedar/devices/namespace.h"
 #include "cedar/devices/exceptions.h"
 #include "cedar/devices/NetworkChannel.h"
 
 // SYSTEM INCLUDES
+#include <QMutex>
 #include <fri/friremote.h>
-#include <map>
 
 /*!@brief Communication channel for a component or device over Yarp.
  *
@@ -71,10 +68,9 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  bool isOpen() const
-  {
-    return this->mIsOpen;
-  }
+  bool isOpen() const;
+  bool isReadyForCommands() const;
+  bool isReadyForMeasurements() const;
 
   /*Wrapping of some FRI-Functions that are needed for ensuring connection quality*/
 
@@ -106,32 +102,29 @@ public:
    * this especially means the dead man switch is in the right position and the robot is in command mode
    * @return true, if power is on
    */
-  bool isPowerOn() const;
+  bool isDrivesPowerOn() const;
 
-  void updateState();
+  /*! @brief control position. blocks and executes immediately */
+  bool prepareJointPositionControl(cv::Mat newJointPos);
 
-  friRemote* getInterface();
+  /*! @brief the joint positions from the last communication to the hardware */
+  cv::Mat getMeasuredJointPositions() const; 
+
+  void exchangeData();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   void openHook();
-
-  void closeHook()
-  {
-    if (mIsOpen)
-    {
-      mIsOpen = false;
-    }
-  }
+  void closeHook();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
-
+  bool test_valid_command(cv::Mat input);
+  
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -139,16 +132,18 @@ protected:
   // none yet
 private:
   bool mIsOpen;
+
   //!@brief KUKA Vendor-Interface, wrapped by this class
   friRemote* mpFriRemote;
+
   //!@brief Copy of the FRI state
   FRI_STATE mFriState;
   //!@brief Copy of the current FRI quality
   FRI_QUALITY mFriQuality;
   //!@brief Sample Time of the FRI connection
   float mSampleTime;
-  //!@brief last known status if power is on on the KUKA RC
-  bool mPowerOn;
+  //!@brief copy of last known status if power is on on the KUKA RC
+  bool mDrivesPowerOn;
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -157,7 +152,7 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  mutable QMutex mFRIRemoteLock;
 
 }; // class cedar::dev::FRIChannel
 #endif // CEDAR_USE_KUKA_LWR
