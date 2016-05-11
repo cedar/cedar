@@ -1537,11 +1537,18 @@ cv::Mat cedar::dev::Component::integrateDeviceTwice(cedar::unit::Time dt, cv::Ma
 //    std::cout << unitless << std::endl;
 //    std::cout << "Integrate twice (FIN!)!" << std::endl;
   QReadLocker lock(this->mMeasurementData->mUserBuffer.getLockPtr());
+
   //!@todo check if this uses the right time step to integrate
+  cv::Mat result = 1.0/2.0 * data.mul(data) * unitless * unitless 
+                   + this->mMeasurementData->getUserBufferUnlocked(type1)
+                     * unitless
+                   + this->mMeasurementData->getUserBufferUnlocked(type2);
+#if 0
+   // this is wrong! see 2nd term in Taylor expansion
   cv::Mat result = ( ( data * unitless + this->mMeasurementData->getUserBufferUnlocked(type1) )
       * unitless )
     + this->mMeasurementData->getUserBufferUnlocked(type2);
-// TODO this is wrong! 2nd term in Taylor expansion
+#endif
 
   return result;
 }
