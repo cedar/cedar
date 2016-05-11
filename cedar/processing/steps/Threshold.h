@@ -45,8 +45,6 @@
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/MatData.h"
-#include "cedar/auxiliaries/UIntVectorParameter.h"
-#include "cedar/auxiliaries/UIntParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/steps/Threshold.fwd.h"
@@ -119,9 +117,6 @@ private:
 
   //! Value to write where the image exceeds the threshold.
   double mMaxValue;
-
-  //! sizes in each dimension
-  std::vector<int> mSizes;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
