@@ -24,8 +24,8 @@
 
     File:        KinematicChain.h
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.ruhr-uni-bochum.de
+    Maintainer:  Jean-Stephane Jokeit
+    Email:       jean.stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        2010 11 23
 
     Description:
@@ -43,15 +43,9 @@
 #ifdef CEDAR_USE_KUKA_LWR
 
 // CEDAR INCLUDES
-#include "cedar/devices/kuka/namespace.h"
 #include "cedar/devices/KinematicChain.h"
-#include "cedar/auxiliaries/IntParameter.h"
-#include "cedar/auxiliaries/StringParameter.h"
 
 // SYSTEM INCLUDES
-#include <fri/friremote.h>
-#include <QReadWriteLock>
-#include <vector>
 
 
 /*!@brief kinematic chain interface for the KUKA LBR
@@ -79,27 +73,21 @@ public:
    *
    * @return    state
    */
-  bool isMovable() const;
-
-  /*! @brief returns angle for a specified joint
-   *
-   *  @param index  index of the joint, since the KUKA LBR has seven of them, it must be in the interval [0,6]
-   *  @return joint angle for the given index
-   */
-  virtual double getJointAngle(unsigned int index) const;
-
-  /*! @brief returns all joint angles
-   *
-   *  @return a vector filled with the joint angles
-   *  \throws std::out_of_range if index is out of range
-   */
-  virtual void setJointAngle(unsigned int index, double angle);
+  virtual bool isReadyForCommands() const override;
+  virtual bool isReadyForMeasurements() const override;
+  CEDAR_DECLARE_DEPRECATED( bool isMovable() const );
 
 
+  void prepareSendingJointAngles(cv::Mat mat);
+  cv::Mat prepareRetrievingJointAngles();
+
+  void prepareSendingNoop();
+  void prepareSendingNotReadyForCommand();
+
+  void exchangeData();
+  void postStart();
 
 
-  void sendSimulatedAngles(cv::Mat mat);
-  cv::Mat retrieveSimulatedAngles();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -118,25 +106,15 @@ private:
    */
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
-  //!@brief copies data from the FRI to member variables for access from outside the loop thread
-  void copyFromFRI();
-
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
   //!@brief true, if the object has been initialized
-  bool mIsInit;
-  //!@brief locker for read/write protection
-  mutable QReadWriteLock mLock;
-  //!@brief last commanded joint position
-  std::vector<double> mCommandedJointPosition;
-  //!@brief last measured joint Position
-  std::vector<double> mMeasuredJointPosition;
-  //!@brief the FRI channel
-  cedar::dev::kuka::FRIChannelPtr mFRIChannel;
+  bool mIsConfigured;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

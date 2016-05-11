@@ -55,6 +55,11 @@
 #include <opencv/cv.h>
 #include <boost/function.hpp>
 #include <boost/optional.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2/signal.hpp>
+  #include <boost/signals2/connection.hpp>
+  #include <boost/function.hpp>
+#endif
 #include <QReadWriteLock>
 #include <QMutex>
 #include <QObject>
@@ -75,6 +80,7 @@ class cedar::dev::Component : public QObject,
 public:
   typedef boost::function< void (cv::Mat) > CommandFunctionType;
   typedef boost::function< cv::Mat () >     MeasurementFunctionType;
+  typedef boost::function< void () > NoCommandFunctionType;
   typedef boost::function< cv::Mat (cedar::unit::Time, cv::Mat) > TransformationFunctionType;
   typedef unsigned int                      ComponentDataType;
   typedef std::map< ComponentDataType, cedar::aux::MatDataPtr > BufferDataType;
@@ -179,7 +185,7 @@ public:
   // replaced by stopCommunication()
   CEDAR_DECLARE_DEPRECATED(void stop());
   CEDAR_DECLARE_DEPRECATED(bool isRunning());
-  bool isCommunicating();
+  bool isCommunicating() const;
 
   CEDAR_DECLARE_DEPRECATED(void startTimer(double d));
   CEDAR_DECLARE_DEPRECATED(void stopTimer());
@@ -189,6 +195,11 @@ public:
   void setIdleTime(const cedar::unit::Time& time);
   void setSimulatedTime(const cedar::unit::Time& time);
   bool isRunningNolocking(); //@todo: rename to isCommunicatingNolocking() ?
+
+  //! will we move
+  virtual bool isReadyForCommands() const;
+  virtual bool isReadyForMeasurements() const;
+  
 
   cedar::unit::Time getCommunicationStepSize();
 
@@ -331,9 +342,14 @@ protected:
 
   void registerCommandHook(ComponentDataType type, CommandFunctionType fun);
   void registerMeasurementHook(ComponentDataType type, MeasurementFunctionType fun);
+  void registerNoCommandHook(NoCommandFunctionType fun);
+  void registerNotReadyForCommandHook(NoCommandFunctionType fun);
+  void registerAfterCommandBeforeMeasurementHook(NoCommandFunctionType fun);
 
   void registerCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
   void registerMeasurementTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
+
+  boost::signals2::connection registerStartCommunicationHook(boost::function<void ()> slot);
 
   void setUserSideCommandBufferIndex(ComponentDataType type, int index, double value);
   void setInitialUserSideCommandBuffer(ComponentDataType type, cv::Mat);
@@ -357,6 +373,7 @@ private:
   void stepCommunication(cedar::unit::Time); 
   void stepCommandCommunication(cedar::unit::Time);
   void stepMeasurementCommunication(cedar::unit::Time);
+  void stepAfterCommandBeforeMeasurementCommunication();
 
   void updateUserSideMeasurements();
 
@@ -386,6 +403,11 @@ private:
   cedar::aux::LockableMember<std::map<ComponentDataType, CommandFunctionType> > mSubmitCommandHooks;
   cedar::aux::LockableMember<std::map<ComponentDataType, MeasurementFunctionType> > mRetrieveMeasurementHooks;
 
+  cedar::aux::LockableMember< NoCommandFunctionType > mNoCommandHook;
+  cedar::aux::LockableMember< NoCommandFunctionType > mNotReadyForCommandHook;
+  cedar::aux::LockableMember< NoCommandFunctionType > mAfterCommandBeforeMeasurementHook;
+  boost::signals2::signal<void ()> mStartCommunicationHook;
+
   boost::optional<ComponentDataType> mDeviceCommandSelection;
 
   cedar::aux::LockableMember<std::set<ComponentDataType>> mUserCommandUsed;
@@ -403,6 +425,9 @@ private:
   cedar::unit::Time mLostTime;
 
   static std::set< cedar::dev::Component* > mRunningComponentInstances;
+
+  unsigned int mTooSlowCounter;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------

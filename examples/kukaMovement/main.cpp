@@ -76,18 +76,36 @@ public:
     cedar::aux::LocalCoordinateFramePtr target
   )
   :
-  mTarget(target)
+  mpArm(arm),
+  mTarget(target),
+  mSpeed(.05), // movement speed in m/s
+  mCloseDistance(0.02),
+  mGotTargetPosition(false)
   {
-    mpArm = arm;
-    mSpeed = .05; // movement speed, in meters / second
-    mCloseDistance = 0.02;
   };
 
 private:
+
   // step function calculating and passing the movement command for each time step
   void step(cedar::unit::Time)
   {
-    if (1)
+    if (!mpArm)
+      return;
+
+    if (!mGotTargetPosition)
+    {
+      if (!mpArm->isReadyForMeasurements())
+        return;
+
+      mTarget->setTranslation(cedar::unit::LengthMatrix(mpArm->calculateEndEffectorPosition(), 1.0 * cedar::unit::meters));
+
+      mGotTargetPosition= true;
+    }
+    else if (!mpArm->isReadyForCommands())
+    {
+      return;
+    }
+    else
     {
       // calculate direction of movement
       cv::Mat vector_to_target_hom
@@ -133,6 +151,8 @@ private:
   double mSpeed;
   //! distance below which the movement is reduced
   double mCloseDistance;
+  bool mGotTargetPosition;
+
 };
 
 
@@ -178,7 +198,7 @@ int main(int argc, char **argv)
   if (use_hardware)
   {
     // hardware interface
-    robot->readJson("resources://robots/caren/fri_configuration.json");
+    robot->readJson("resource://robots/caren/fri_configuration.json");
     arm= robot->getComponent< cedar::dev::kuka::KinematicChain >("arm");
 
     cedar::dev::kuka::FRIChannelPtr fri_channel = boost::dynamic_pointer_cast< cedar::dev::kuka::FRIChannel >( arm->getChannel() );
@@ -226,7 +246,7 @@ int main(int argc, char **argv)
 
   // create target object, visualize it and add it to the scene
   cedar::aux::LocalCoordinateFramePtr target(new cedar::aux::LocalCoordinateFrame());
-  target->setTranslation(cedar::unit::LengthMatrix(arm->calculateEndEffectorPosition(), 1.0 * cedar::unit::meters));
+
   cedar::aux::gl::ObjectVisualizationPtr sphere(new cedar::aux::gl::Sphere(target, 0.055, 0, 1, 0));
   sphere->setDrawAsWireFrame(true);
   scene->addObjectVisualization(sphere);
@@ -245,9 +265,7 @@ int main(int argc, char **argv)
 
   // create the worker thread
   WorkerThread worker(arm, target);
-  //worker.setStepSize(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
   worker.setStepSize(arm->getCommunicationStepSize());
-
   // start everything
   arm->startCommunication();
   worker.start();
