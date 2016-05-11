@@ -63,7 +63,14 @@ namespace
 
 cedar::dev::kuka::FRIChannel::FRIChannel()
 :
-mpFriRemote(nullptr)
+mpFriRemote(nullptr),
+mFriState(FRI_STATE_OFF),
+mFriQuality(FRI_QUALITY_UNACCEPTABLE),
+mSampleTime(0.0),
+mDrivesPowerOn(false),
+mLastFriState(FRI_STATE_OFF),
+mLastFriQuality(FRI_QUALITY_UNACCEPTABLE),
+mLastDrivesPowerOn(false)
 {
   // change the default for the FRI channel
   auto ip = boost::dynamic_pointer_cast<cedar::aux::StringParameter>( this->getParameter("ip address") );
@@ -258,14 +265,106 @@ void cedar::dev::kuka::FRIChannel::exchangeData()
   if (mpFriRemote == NULL)
     return;
 
-  mpFriRemote->doDataExchange();
+  //mpFriRemote->doDataExchange();
+  mpFriRemote->doSendData();
+  mpFriRemote->doReceiveData(); // this may block if HW not operational
 
   QMutexLocker lock( &mFRIRemoteLock ); // lock after the blocking call
+
+  mLastFriState = mFriState;
+  mLastFriQuality = mFriQuality;
+  mLastDrivesPowerOn = mDrivesPowerOn;
 
   mFriState = mpFriRemote->getState();
   mFriQuality = mpFriRemote->getQuality();
   mSampleTime = mpFriRemote->getSampleTime();
   mDrivesPowerOn = mpFriRemote->isPowerOn();
+
+  if (!mDrivesPowerOn && mLastDrivesPowerOn)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning(
+      "Kuka drives just lost power",
+      CEDAR_CURRENT_FUNCTION_NAME);
+  }
+
+  if (mLastFriQuality != mFriQuality)
+  {
+    switch( mFriQuality )
+    {
+      case FRI_QUALITY_UNACCEPTABLE:
+        cedar::aux::LogSingleton::getInstance()->warning(
+          "FRI quality is now unacceptable",
+          CEDAR_CURRENT_FUNCTION_NAME);
+        break;
+
+      case FRI_QUALITY_OK:
+        cedar::aux::LogSingleton::getInstance()->message(
+          "FRI quality is now good",
+          CEDAR_CURRENT_FUNCTION_NAME);
+        break;
+
+      case FRI_QUALITY_PERFECT:
+        cedar::aux::LogSingleton::getInstance()->message(
+          "FRI quality is now perfect",
+          CEDAR_CURRENT_FUNCTION_NAME);
+        break;
+
+      default:
+        cedar::aux::LogSingleton::getInstance()->message(
+          "FRI quality is now unknown",
+          CEDAR_CURRENT_FUNCTION_NAME);
+        break;
+    }
+  }
+
+  if (mFriState != mLastFriState)
+  {
+    switch( mFriState )
+    {
+      case FRI_STATE_CMD:
+        cedar::aux::LogSingleton::getInstance()->message(
+          "FRI now accepting commands (entered CMD mode)",
+          CEDAR_CURRENT_FUNCTION_NAME);
+
+        if (!mDrivesPowerOn)
+        {
+          cedar::aux::LogSingleton::getInstance()->warning(
+            "FRI drives are still off! (check emergency stops)",
+            CEDAR_CURRENT_FUNCTION_NAME);
+        }
+        break;
+
+      case FRI_STATE_MON:
+        if (mLastFriState == FRI_STATE_CMD)
+        {
+          cedar::aux::LogSingleton::getInstance()->message(
+            "FRI now not accepting commands, anymore (back to MONITOR mode)",
+            CEDAR_CURRENT_FUNCTION_NAME);
+          break;
+        }
+        else
+        {
+          cedar::aux::LogSingleton::getInstance()->message(
+            "FRI now sending measurements (entered MONITOR mode)",
+            CEDAR_CURRENT_FUNCTION_NAME);
+          break;
+        }
+        break;
+
+      case FRI_STATE_OFF:
+        cedar::aux::LogSingleton::getInstance()->message(
+          "FRI now off (in OFF mode)",
+          CEDAR_CURRENT_FUNCTION_NAME);
+        break;
+
+      default:
+        cedar::aux::LogSingleton::getInstance()->message(
+          "FRI mode is now unknown",
+          CEDAR_CURRENT_FUNCTION_NAME);
+        break;
+    }
+  }
+
 }
 
 #endif // CEDAR_USE_KUKA_LWR

@@ -691,7 +691,8 @@ cedar::dev::Component::Component()
 cedar::dev::Component::Component(cedar::dev::ChannelPtr channel)
 :
 mChannel(channel),
-mTooSlowCounter(0)
+mTooSlowCounter(0),
+mNotReadyForCommandsCounter(0)
 {
   init();
 }
@@ -1189,11 +1190,26 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
 
     if (this->mUserCommandUsed.member().size() != 0)
     {
-      cedar::aux::LogSingleton::getInstance()->warning(
-        "commands issued but hardware is not ready for commands (yet)",
-        CEDAR_CURRENT_FUNCTION_NAME);
+      mNotReadyForCommandsCounter++;
+
+      if (mNotReadyForCommandsCounter == 1)
+      {
+        cedar::aux::LogSingleton::getInstance()->warning(
+          "commands issued but hardware is not accepting commands",
+          CEDAR_CURRENT_FUNCTION_NAME);
+      }
+
+      if (mNotReadyForCommandsCounter > 500)
+      {
+          mNotReadyForCommandsCounter= 0;
+      }
     }
+
     return;
+  }
+  else
+  {
+    mNotReadyForCommandsCounter= 0;
   }
 
   // if there are neither user commands nor a controller, nothing needs to be done
