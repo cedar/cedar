@@ -297,6 +297,12 @@ void cedar::dev::kuka::FRIChannel::exchangeData()
           CEDAR_CURRENT_FUNCTION_NAME);
         break;
 
+      case FRI_QUALITY_BAD:
+        cedar::aux::LogSingleton::getInstance()->warning(
+          "FRI quality is now bad",
+          CEDAR_CURRENT_FUNCTION_NAME);
+        break;
+
       case FRI_QUALITY_OK:
         cedar::aux::LogSingleton::getInstance()->message(
           "FRI quality is now good",
