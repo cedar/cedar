@@ -1194,14 +1194,15 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
 
       if (mNotReadyForCommandsCounter == 1)
       {
+        // todo: output component name her (and for the other messages/warnings)
         cedar::aux::LogSingleton::getInstance()->warning(
-          "commands issued but hardware is not accepting commands",
+          "commands issued but component is not accepting commands",
           CEDAR_CURRENT_FUNCTION_NAME);
       }
 
       if (mNotReadyForCommandsCounter > 500)
       {
-          mNotReadyForCommandsCounter= 0;
+        mNotReadyForCommandsCounter= 0;
       }
     }
 
@@ -1758,9 +1759,9 @@ std::set<cedar::dev::Component*> cedar::dev::Component::mRunningComponentInstanc
 
 void cedar::dev::Component::handleCrash()
 {
-  cedar::aux::LogSingleton::getInstance()->message
+  cedar::aux::LogSingleton::getInstance()->error
                                            (
-                                             "Handling Crash for robotic Components",
+                                             "Handling Crash for robotic components",
                                              "cedar::dev::Component::handleCrash()"
                                            );
   for( auto component = begin(mRunningComponentInstances); component != end(mRunningComponentInstances); component++ )
@@ -1773,9 +1774,9 @@ std::cout << "emergency crash braking NOW for " << *component << std::endl;
 
 void cedar::dev::Component::brakeNowAllComponents()
 {
-  cedar::aux::LogSingleton::getInstance()->message
+  cedar::aux::LogSingleton::getInstance()->warning
                                            (
-                                             "Braking all Components (brake now)",
+                                             "Braking all robotic components now (brake now)",
                                              "cedar::dev::Component::brakeNow()"
                                            );
 
@@ -1794,7 +1795,7 @@ void cedar::dev::Component::startBrakingAllComponents()
 
   cedar::aux::LogSingleton::getInstance()->message
                                            (
-                                             "Braking all Components (start braking ...)",
+                                             "Starting to brake all robotic components (start braking ...)",
                                              "cedar::dev::Component::brakeNow()"
                                            );
 
