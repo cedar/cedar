@@ -1157,7 +1157,6 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
     }
   }
 
-std::cout << "  updating time" << std::endl;
   mRunningComponentInstancesAliveTime[ this ]= boost::posix_time::microsec_clock::local_time();
 }
 
@@ -1691,14 +1690,9 @@ void cedar::dev::Component::processStart()
      
      this->mCommandData->mUserBuffer.member() = this->mCommandData->mInitialUserSubmittedData.member();
      lock1.unlock();
-
-     stepCommandCommunication(time);
   }
 
-  // get measurements (blocking!) when the thread is started ...
-  stepAfterCommandBeforeMeasurementCommunication();
-  stepMeasurementCommunication(time);
-
+// todo: this will probably not work as expected, anymore
   // this is the initial run, wait for measurements to be in:
   mStartCommunicationHook();
 

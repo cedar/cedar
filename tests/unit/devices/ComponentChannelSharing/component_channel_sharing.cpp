@@ -55,6 +55,11 @@ public:
   {
   }
 
+  ~TestChannel()
+  {
+    prepareChannelDestructAbsolutelyRequired();
+  }
+
   bool isOpen() const
   {
     return this->mOpen;
@@ -85,6 +90,11 @@ public:
     this->installMeasurementType(0, "test");
     this->registerMeasurementHook(0, boost::bind(&TestComponent::pretendToMeasureSomething, this));
     this->setMeasurementDimensionality(0, 1);
+  }
+
+  ~TestComponent()
+  {
+    prepareComponentDestructAbsolutelyRequired();
   }
 
   bool applyBrakeController()
@@ -126,7 +136,7 @@ void run_test()
   component2->startCommunication();
 
   // wait for a bit
-  cedar::aux::sleep(cedar::unit::Time(500.0 * cedar::unit::milli * cedar::unit::seconds));
+  cedar::aux::sleep(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds));
 
   // stop the components
   component1->stopCommunication();
