@@ -48,7 +48,6 @@
 // SYSTEM INCLUDES
 #include <boost/bind.hpp>
 #include <boost/make_shared.hpp>
-#include "boost/date_time/posix_time/posix_time.hpp"
 #include "boost/lexical_cast.hpp"
 #include <QReadLocker>
 #include <QWriteLocker>
@@ -678,8 +677,17 @@ void cedar::dev::Component::init()
 
 
   mCommunicationThread->connectToStartSignal(boost::bind(&cedar::dev::Component::processStart, this));
-  mCommunicationThread->setStepSize(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
+  mCommunicationThread->setStepSize(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds)); // todo: use parameter
+
   this->mLostTime = 0.0 * cedar::unit::seconds;
+
+
+  mWatchDogThread = std::unique_ptr<cedar::aux::LoopFunctionInThread>(
+                                new cedar::aux::LoopFunctionInThread(
+                                  boost::bind(
+                                    (void(*)(cedar::unit::Time))
+                                      &cedar::dev::Component::stepStaticWatchDog,
+                                    _1) ));
 }
 
 // constructor
@@ -1148,6 +1156,9 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
       }
     }
   }
+
+std::cout << "  updating time" << std::endl;
+  mRunningComponentInstancesAliveTime[ this ]= boost::posix_time::microsec_clock::local_time();
 }
 
 void cedar::dev::Component::stepAfterCommandBeforeMeasurementCommunication()
@@ -1418,6 +1429,31 @@ void cedar::dev::Component::startCommunication()
   // do not re-enter, do not stop/start at the same time
   QMutexLocker lockerGeneral(&mGeneralAccessLock);
 
+  // start WatchDog early, before calling hardware:
+  if (!mWatchDogThread)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Watchdog thread somehow disappeared",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
+  }
+  else if (mWatchDogThread->isRunning())
+  {
+    // do not start again
+    // do nothing
+  }
+  else
+  {
+    mWatchDogThread->setStepSize( 0.2 * cedar::unit::seconds ); 
+    mWatchDogThread->start();
+  }
+  auto now = boost::posix_time::microsec_clock::local_time();
+  mRunningComponentInstancesAliveTime[ this ]= now; 
+  mRunningComponentInstancesStartTime[ this ]= now;
+
+
+// todo: the following needs to be done from the new thread - it may block the GUI ...
   if (this->mChannel)
   {
     this->mChannel->open();
@@ -1433,12 +1469,40 @@ void cedar::dev::Component::startCommunication()
   }
 
   mCommunicationThread->start();
-  mRunningComponentInstances.insert( this );
 
   // workaround to get at least several measurements to be able to differentiate
   mCommunicationThread->waitUntilStepped();
   mCommunicationThread->waitUntilStepped();
   mCommunicationThread->waitUntilStepped();
+
+}
+
+
+void cedar::dev::Component::handleStopCommunicationNonBlocking()
+{
+  mRunningComponentInstancesAliveTime.erase( this );
+  mRunningComponentInstancesStartTime.erase( this );
+
+  if (mRunningComponentInstancesAliveTime.empty())
+  {
+    if (mWatchDogThread)
+    {
+      mWatchDogThread->stop();
+    }
+  }
+}
+
+void cedar::dev::Component::destroyCommunication()
+{
+  // do not re-enter, do not stop/start at the same time
+  QMutexLocker locker_general(&mGeneralAccessLock);
+
+  // do not call mCommunicationThread->stop()
+  // maybe call requestStop() ?
+
+  handleStopCommunicationNonBlocking();
+
+  locker_general.unlock();
 }
 
 void cedar::dev::Component::stopCommunication()
@@ -1452,7 +1516,7 @@ void cedar::dev::Component::stopCommunication()
   // make sure it is actually stopped
   mCommunicationThread->stop();
 
-  mRunningComponentInstances.erase( this );
+  handleStopCommunicationNonBlocking();
 
   locker_general.unlock();
 
@@ -1754,7 +1818,8 @@ void cedar::dev::Component::waitUntilCommunicated() const
 }
 
 // static member:
-std::set<cedar::dev::Component*> cedar::dev::Component::mRunningComponentInstances;
+std::map< cedar::dev::Component*, boost::posix_time::ptime > cedar::dev::Component::mRunningComponentInstancesAliveTime;
+std::map< cedar::dev::Component*, boost::posix_time::ptime > cedar::dev::Component::mRunningComponentInstancesStartTime;
 
 
 void cedar::dev::Component::handleCrash()
@@ -1764,10 +1829,15 @@ void cedar::dev::Component::handleCrash()
                                              "Handling Crash for robotic components",
                                              "cedar::dev::Component::handleCrash()"
                                            );
-  for( auto component = begin(mRunningComponentInstances); component != end(mRunningComponentInstances); component++ )
+  for( auto component_it : mRunningComponentInstancesAliveTime )
   {
-std::cout << "emergency crash braking NOW for " << *component << std::endl;    
-    (*component)->crashbrake();
+    auto componentpointer = component_it.first;
+
+    if (componentpointer != NULL)
+    {
+std::cout << "emergency crash braking NOW for " << componentpointer << std::endl;    
+      componentpointer->crashbrake();
+    }
   }
 
 }
@@ -1780,9 +1850,14 @@ void cedar::dev::Component::brakeNowAllComponents()
                                              "cedar::dev::Component::brakeNow()"
                                            );
 
-  for( auto component = begin(mRunningComponentInstances); component != end(mRunningComponentInstances); component++ )
+  for( auto component_it : mRunningComponentInstancesAliveTime )
   {
-    (*component)->brakeNow();
+    auto componentpointer = component_it.first;
+
+    if (componentpointer != NULL)
+    {
+      componentpointer->brakeNow();
+    }
   }
 
 }
@@ -1798,16 +1873,73 @@ void cedar::dev::Component::startBrakingAllComponents()
                                              "Starting to brake all robotic components (start braking ...)",
                                              "cedar::dev::Component::brakeNow()"
                                            );
-
-  for( auto component = begin(mRunningComponentInstances); component != end(mRunningComponentInstances); component++ )
+  for( auto component_it : mRunningComponentInstancesAliveTime )
   {
-    (*component)->startBraking();
+    auto componentpointer = component_it.first;
+
+    if (componentpointer != NULL)
+    {
+      componentpointer->startBraking();
+    }
   }
 
 }
 
 bool cedar::dev::Component::anyComponentsRunning()
 {
-  return mRunningComponentInstances.size() != 0;
+  return mRunningComponentInstancesAliveTime.size() != 0;
 }
+
+// static:
+std::unique_ptr<cedar::aux::LoopFunctionInThread> cedar::dev::Component::mWatchDogThread;
+
+// static:
+void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time time)
+{
+  auto now = boost::posix_time::microsec_clock::local_time();
+
+  for( auto component_it : mRunningComponentInstancesAliveTime )
+  {    
+    auto componentpointer = component_it.first;
+    auto starttime = mRunningComponentInstancesStartTime[ component_it.first ];
+    auto lasttime = component_it.second;
+
+    if (componentpointer != NULL)
+    {
+      // note on time_period: tp1 < tp2 is TRUE IFF tp1.end < tp2.begin
+      if (boost::posix_time::time_period(lasttime,now) 
+          < boost::posix_time::time_period(lasttime + boost::posix_time::milliseconds(500), now ) )
+      {
+        // do nothing, all is well
+      }
+      else if (boost::posix_time::time_period(starttime,now) 
+               < boost::posix_time::time_period(starttime + boost::posix_time::milliseconds(2*1000), now ) )
+      {
+        // do nothing, give every component a time to initialize
+      }
+      else if (boost::posix_time::time_period(starttime,now) 
+               < boost::posix_time::time_period(starttime + boost::posix_time::milliseconds( 2*1000 + 250 ), now ) )
+      {
+        cedar::aux::LogSingleton::getInstance()->warning(
+          "waiting for Component to initialize ...",
+          CEDAR_CURRENT_FUNCTION_NAME);
+      }
+      else if (boost::posix_time::time_period(starttime,now) 
+               < boost::posix_time::time_period(starttime + boost::posix_time::milliseconds( 4*1000 ), now ) )
+      {
+        // do nothing, wait a bit longer ...
+      }
+      else
+      {
+        cedar::aux::LogSingleton::getInstance()->error(
+          "watchdog says: thread of component is dead. trying crashbrake. destroying thread.",
+          CEDAR_CURRENT_FUNCTION_NAME);
+
+        componentpointer->crashbrake();
+        componentpointer->destroyCommunication();
+      }
+    }
+  }
+}
+
 
