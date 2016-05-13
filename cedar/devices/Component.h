@@ -55,6 +55,7 @@
 #include <opencv/cv.h>
 #include <boost/function.hpp>
 #include <boost/optional.hpp>
+#include "boost/date_time/posix_time/posix_time.hpp"
 #ifndef Q_MOC_RUN
   #include <boost/signals2/signal.hpp>
   #include <boost/signals2/connection.hpp>
@@ -224,6 +225,7 @@ public:
 
   void startCommunication();
   void stopCommunication();
+  void destroyCommunication();
 
   void waitUntilCommunicated() const;
 
@@ -384,6 +386,10 @@ private:
   virtual bool applyBrakeNow() = 0;
   virtual bool applyCrashbrake();
 
+  static void stepStaticWatchDog(cedar::unit::Time);
+
+  void handleStopCommunicationNonBlocking();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -424,7 +430,9 @@ private:
   //! Integration time that is lost due to skipping stepCommunication calls.
   cedar::unit::Time mLostTime;
 
-  static std::set< cedar::dev::Component* > mRunningComponentInstances;
+  static std::map< cedar::dev::Component*, boost::posix_time::ptime > mRunningComponentInstancesAliveTime;
+  static std::map< cedar::dev::Component*, boost::posix_time::ptime > mRunningComponentInstancesStartTime;
+  static std::unique_ptr<cedar::aux::LoopFunctionInThread> mWatchDogThread;
 
   unsigned int mTooSlowCounter;
   unsigned int mNotReadyForCommandsCounter;
