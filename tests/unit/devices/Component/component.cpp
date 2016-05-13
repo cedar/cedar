@@ -195,7 +195,7 @@ public:
     this->startCommunication();
 
     std::cout << " sleeping" << std::endl;
-    cedar::aux::sleep(0.1 * cedar::unit::seconds);
+    cedar::aux::sleep(0.02 * cedar::unit::seconds);
 
     std::cout << " stopping device" << std::endl;
     this->stopCommunication();
@@ -275,7 +275,7 @@ int test_measurements()
   TestComponentPtr component(new TestComponent());
   component->installTestMeasurement();
   component->startCommunication();
-  cedar::aux::sleep(0.05 * cedar::unit::second);
+  cedar::aux::sleep(0.02 * cedar::unit::second);
   component->stopCommunication();
 
   auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(component->getMeasurementData(0));
