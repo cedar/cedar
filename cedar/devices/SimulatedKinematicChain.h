@@ -64,12 +64,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief check whether the kinematic chain is currently responsive to movement commands
-   *
-   * @return    state
-   */
-  bool isMovable() const;
-
   bool applyCrashbrake();
 
 public slots:

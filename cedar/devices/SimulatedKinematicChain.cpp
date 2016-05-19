@@ -93,11 +93,6 @@ cv::Mat cedar::dev::SimulatedKinematicChain::retrieveSimulatedAngles()
   return mSimulation[ cedar::dev::KinematicChain::JOINT_ANGLES ].clone();
 }
 
-bool cedar::dev::SimulatedKinematicChain::isMovable() const
-{
-  return true;
-}
-
 void cedar::dev::SimulatedKinematicChain::updateInitialConfiguration()
 {
   auto number_of_joints = this->getNumberOfJoints();
