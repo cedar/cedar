@@ -153,12 +153,6 @@ public:
    */
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
-  /*!@brief check whether the kinematic chain is currently responsive to movement commands
-   *
-   * @return    state
-   */
-  CEDAR_DECLARE_DEPRECATED(virtual bool isMovable() const) = 0; // TODO: js think about this
-
   /*!@brief get number of joints in this kinematic chain
    *
    * @return    number of joints
