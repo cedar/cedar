@@ -40,6 +40,7 @@
 #include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/devices/Robot.h"
+#include "cedar/devices/Component.h"
 #include "cedar/devices/ComponentSlot.h"
 #include "cedar/devices/exceptions.h"
 #include "cedar/devices/Channel.h"
@@ -145,6 +146,77 @@ void cedar::dev::Robot::closeChannels()
     cedar::dev::ChannelPtr channel = iter->second;
     channel->close();
   }
+}
+
+void cedar::dev::Robot::startCommunicationOfComponents(bool suppressUserInteractionOfComponents)
+{
+  openChannels();
+
+  for ( auto &iter : mComponentSlots )
+  {
+    auto slot = iter.second;
+    if (!slot)
+      continue;
+
+    auto component = slot->getComponent();
+
+    component->startCommunication(suppressUserInteractionOfComponents);
+  }
+}
+
+void cedar::dev::Robot::stopCommunicationOfComponents()
+{
+  for ( auto &iter : mComponentSlots )
+  {
+    auto slot = iter.second;
+    if (!slot)
+      continue;
+
+    auto component = slot->getComponent();
+
+    component->stopCommunication();
+  }
+
+  closeChannels();
+}
+
+bool cedar::dev::Robot::areSomeComponentsCommunicating() const
+{
+  for ( auto &iter : mComponentSlots )
+  {
+    auto slot = iter.second;
+    if (!slot)
+      continue;
+
+    auto component = slot->getComponent();
+
+    if (component->isCommunicating())
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool cedar::dev::Robot::areAllComponentsCommunicating() const
+{
+  for ( auto &iter : mComponentSlots )
+  {
+    auto slot = iter.second;
+
+    if (!slot)
+      return false; // js: not sure
+
+    auto component = slot->getComponent();
+
+    if (!component->isCommunicating())
+    {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 unsigned int cedar::dev::Robot::countOpenChannels() const

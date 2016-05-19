@@ -143,6 +143,28 @@ public:
     return boost::dynamic_pointer_cast<T>(component);
   }
 
+  //! Allocates the channel of the given name.
+  void allocateChannel(const std::string& channelName);
+
+  //! start the hardware, start communication
+  void startCommunicationOfComponents(bool suppressUserSideInteraction=false);
+  //! stop the hardware
+  void stopCommunicationOfComponents();
+  //  HW is on?
+  bool areSomeComponentsCommunicating() const;
+  //  HW is on?
+  bool areAllComponentsCommunicating() const;
+  
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+private:
   /*!@brief Opens all channels that are in use.
    */
   void openChannels();
@@ -159,19 +181,7 @@ public:
    */
   unsigned int getNumberOfChannels() const;
 
-  //! Allocates the channel of the given name.
-  void allocateChannel(const std::string& channelName);
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // private methods
-  //--------------------------------------------------------------------------------------------------------------------
-private:
   //!@brief Read a configuration for all registered parameters from a cedar::aux::ConfigurationNode.
   virtual void readDescription(const cedar::aux::ConfigurationNode& node);
 

@@ -700,7 +700,8 @@ cedar::dev::Component::Component(cedar::dev::ChannelPtr channel)
 :
 mChannel(channel),
 mTooSlowCounter(0),
-mNotReadyForCommandsCounter(0)
+mNotReadyForCommandsCounter(0),
+mSuppressUserInteraction(false)
 {
   init();
 }
@@ -1423,8 +1424,10 @@ void cedar::dev::Component::updateUserSideMeasurements()
   emit updatedUserMeasurementSignal();
 }
 
-void cedar::dev::Component::startCommunication()
+void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
 {
+  setSuppressUserInteraction(suppressUserSideInteraction);
+
   // do not re-enter, do not stop/start at the same time
   QMutexLocker lockerGeneral(&mGeneralAccessLock);
 
@@ -1571,12 +1574,14 @@ bool cedar::dev::Component::isCommunicating() const
 
 bool cedar::dev::Component::isReadyForCommands() const
 {
-  return this->isCommunicating();
+  return !this->getSuppressUserInteraction()
+          && this->isCommunicating();
 }
 
 bool cedar::dev::Component::isReadyForMeasurements() const
 {
-  return this->isCommunicating(); 
+  return !this->getSuppressUserInteraction()
+          && this->isCommunicating(); 
 }
 
 bool cedar::dev::Component::isRunningNolocking()
@@ -1682,7 +1687,6 @@ cv::Mat cedar::dev::Component::differentiateDeviceTwice(cedar::unit::Time dt, cv
 void cedar::dev::Component::processStart()
 {
   // todo: test that mUserCommands is empty!
-  cedar::unit::Time time = 0.0 * cedar::unit::seconds;
   if (!this->mCommandData->mInitialUserSubmittedData.member().empty())
   {
      // do as if the initial user command was the user command
@@ -1715,6 +1719,20 @@ void cedar::dev::Component::checkExclusivenessOfCommand(ComponentDataType type)
       CEDAR_THROW(CouldNotGuessCommandTypeException, "You used more than one type of commands. Component cannot handle this.");
     }
   }
+}
+
+void cedar::dev::Component::setSuppressUserInteraction(bool what)
+{
+  QMutexLocker lockerGeneral(&mGeneralAccessLock);
+
+  mSuppressUserInteraction= what;
+}
+
+bool cedar::dev::Component::getSuppressUserInteraction() const
+{
+  QMutexLocker lockerGeneral(&mGeneralAccessLock);
+
+  return mSuppressUserInteraction;
 }
 
 void cedar::dev::Component::startBraking()
@@ -1888,7 +1906,7 @@ bool cedar::dev::Component::anyComponentsRunning()
 std::unique_ptr<cedar::aux::LoopFunctionInThread> cedar::dev::Component::mWatchDogThread;
 
 // static:
-void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time time)
+void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
 {
   auto now = boost::posix_time::microsec_clock::local_time();
 
