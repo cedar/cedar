@@ -72,6 +72,7 @@ cedar::dev::RobotManager::RobotManager()
   cedar::dev::RobotManager::Template kuka_template;
   kuka_template.setIconPath(":/cedar/dev/gui/icons/khepera_icon_256.png");
   kuka_template.addNamedConfiguration("FRI", cedar::aux::Path("resource://robots/caren/fri_configuration.json"));
+  kuka_template.addNamedConfiguration("simulator", cedar::aux::Path("resource://robots/caren/simulator_configuration.json"));
   this->addRobotTemplate("kuka", kuka_template);
 
   this->restore();
