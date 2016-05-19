@@ -248,6 +248,12 @@
         "port": "0",
         "ip address": "NULL"
       }
+    },
+    "simulator":
+    {
+      "cedar.dev.kuka.SimulatedKinematicChain":
+      {
+      }
     }
   }
 }

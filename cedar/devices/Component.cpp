@@ -1352,47 +1352,51 @@ void cedar::dev::Component::stepMeasurementCommunication(cedar::unit::Time dt)
   std::vector< ComponentDataType > types_to_transform;
   std::vector< ComponentDataType > types_we_measured;
 
-  // lock measurements 
-  cedar::aux::LockSet locks;
-  cedar::aux::append(locks, this->mMeasurementData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-  cedar::aux::append(locks, this->mRetrieveMeasurementHooks.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
-  cedar::aux::LockSetLocker locker(locks);
-
-  // thinks I can get directly from HW:
-  for (const auto& type : this->mMeasurementData->getInstalledTypes())
+  if (isReadyForMeasurements())
   {
-    auto found = mRetrieveMeasurementHooks.member().find( type );
+    // lock measurements 
+    cedar::aux::LockSet locks;
+    cedar::aux::append(locks, this->mMeasurementData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+    cedar::aux::append(locks, this->mRetrieveMeasurementHooks.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+    cedar::aux::LockSetLocker locker(locks);
 
-    if (found != mRetrieveMeasurementHooks.member().end())
+    // thinks I can get directly from HW:
+    for (const auto& type : this->mMeasurementData->getInstalledTypes())
     {
-      // execute the hook:
-      this->mMeasurementData->setDeviceRetrievedBufferUnlocked(type, (found->second)() );
-      types_we_measured.push_back(type);
-    }
-    else
-    {
-      // store things we need to calculate afterwards
-      types_to_transform.push_back(type);
-    }
-  }
+      auto found = mRetrieveMeasurementHooks.member().find( type );
 
-  for (auto& missing_type : types_to_transform )
-  {
-    for (auto& measured_type : types_we_measured )
-    {
-      auto hook = this->mMeasurementData->findTransformationHook(measured_type, missing_type);
-      if (hook.is_initialized())
+      if (found != mRetrieveMeasurementHooks.member().end())
       {
-        // call measurement hook
-        this->mMeasurementData->mDeviceRetrievedData.member()[missing_type]->setData
-        (
-          hook.get()(dt, this->mMeasurementData->mDeviceRetrievedData.member()[measured_type]->getData())
-        );
+        // execute the hook:
+        this->mMeasurementData->setDeviceRetrievedBufferUnlocked(type, (found->second)() );
+        types_we_measured.push_back(type);
+      }
+      else
+      {
+        // store things we need to calculate afterwards
+        types_to_transform.push_back(type);
       }
     }
+
+    for (auto& missing_type : types_to_transform )
+    {
+      for (auto& measured_type : types_we_measured )
+      {
+        auto hook = this->mMeasurementData->findTransformationHook(measured_type, missing_type);
+        if (hook.is_initialized())
+        {
+          // call measurement hook
+          this->mMeasurementData->mDeviceRetrievedData.member()[missing_type]->setData
+          (
+            hook.get()(dt, this->mMeasurementData->mDeviceRetrievedData.member()[measured_type]->getData())
+          );
+        }
+      }
+    }
+
+    locker.unlock();
   }
 
-  locker.unlock();
   // todo: make this non-blocking for this looped thread
   updateUserSideMeasurements();
 
@@ -1426,6 +1430,19 @@ void cedar::dev::Component::updateUserSideMeasurements()
 
 void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
 {
+  cedar::aux::LogSingleton::getInstance()->message(
+    "Starting communication with component in background.",
+    CEDAR_CURRENT_FUNCTION_NAME
+  );
+
+  if (suppressUserSideInteraction)
+  {
+    cedar::aux::LogSingleton::getInstance()->message(
+      "Note, you will only have access when architecture is running.",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
+  }
+  
   setSuppressUserInteraction(suppressUserSideInteraction);
 
   // do not re-enter, do not stop/start at the same time
@@ -1482,6 +1499,8 @@ void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
 
 void cedar::dev::Component::handleStopCommunicationNonBlocking()
 {
+  // do not hold the general lock here
+
   mRunningComponentInstancesAliveTime.erase( this );
   mRunningComponentInstancesStartTime.erase( this );
 
@@ -1496,19 +1515,22 @@ void cedar::dev::Component::handleStopCommunicationNonBlocking()
 
 void cedar::dev::Component::destroyCommunication()
 {
-  // do not re-enter, do not stop/start at the same time
-  QMutexLocker locker_general(&mGeneralAccessLock);
+  // since this method can be called when the communication thread hangs,
+  // the general lock may be held.
 
   // do not call mCommunicationThread->stop()
   // maybe call requestStop() ?
 
   handleStopCommunicationNonBlocking();
-
-  locker_general.unlock();
 }
 
 void cedar::dev::Component::stopCommunication()
 {
+  cedar::aux::LogSingleton::getInstance()->message(
+    "Stopping communication with component.",
+    CEDAR_CURRENT_FUNCTION_NAME
+  );
+
   // do not re-enter, do not stop/start at the same time
   QMutexLocker locker_general(&mGeneralAccessLock);
 
@@ -1723,15 +1745,13 @@ void cedar::dev::Component::checkExclusivenessOfCommand(ComponentDataType type)
 
 void cedar::dev::Component::setSuppressUserInteraction(bool what)
 {
-  QMutexLocker lockerGeneral(&mGeneralAccessLock);
-
+  // todo: lock this but not with the general locker
   mSuppressUserInteraction= what;
 }
 
 bool cedar::dev::Component::getSuppressUserInteraction() const
 {
-  QMutexLocker lockerGeneral(&mGeneralAccessLock);
-
+  // todo: lock this but not with the general locker
   return mSuppressUserInteraction;
 }
 
@@ -1838,7 +1858,7 @@ void cedar::dev::Component::handleCrash()
 {
   cedar::aux::LogSingleton::getInstance()->error
                                            (
-                                             "Handling Crash for robotic components",
+                                             "Handling crash for robotic components",
                                              "cedar::dev::Component::handleCrash()"
                                            );
   for( auto component_it : mRunningComponentInstancesAliveTime )
