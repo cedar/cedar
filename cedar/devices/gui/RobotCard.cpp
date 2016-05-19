@@ -160,13 +160,12 @@ cedar::dev::gui::RobotCard::~RobotCard()
 void cedar::dev::gui::RobotCard::updateConnectionIcon()
 {
   cedar::dev::RobotPtr robot = cedar::dev::RobotManagerSingleton::getInstance()->getRobot(this->getRobotName());
-  unsigned int open = robot->countOpenChannels();
 
-  if (open > 0 && open == robot->getNumberOfChannels())
+  if (robot->areAllComponentsCommunicating())
   {
     this->mpConnectButton->setIcon(QIcon(":/cedar/dev/gui/icons/connected.svg"));
   }
-  else if (open > 0)
+  else if (robot->areAllComponentsCommunicating())
   {
     this->mpConnectButton->setIcon(QIcon(":/cedar/dev/gui/icons/partially_connected.svg"));
   }
@@ -193,15 +192,13 @@ void cedar::dev::gui::RobotCard::connectClicked()
   try
   {
     cedar::dev::RobotPtr robot = cedar::dev::RobotManagerSingleton::getInstance()->getRobot(this->getRobotName());
-    unsigned int open = robot->countOpenChannels();
-
-    if (open == 0)
+    if (!robot->areSomeComponentsCommunicating())
     {
-      robot->openChannels();
+      robot->startCommunicationOfComponents(true); // suppres user interaction!
     }
     else
     {
-      robot->closeChannels();
+      robot->stopCommunicationOfComponents();
     }
 
     this->updateConnectionIcon();

@@ -80,6 +80,7 @@ public:
 
       std::vector<std::string> getConfigurationNames() const;
 
+
       inline void setIconPath(const std::string& iconPath)
       {
         this->mIconPath = iconPath;
@@ -91,6 +92,7 @@ public:
       }
 
       cedar::aux::Path getConfiguration(const std::string& name) const;
+      bool hasConfiguration(const std::string& name) const;
 
     private:
       std::map<std::string, cedar::aux::Path> mNamedPaths;

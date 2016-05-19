@@ -58,20 +58,20 @@ cedar::dev::RobotManager::RobotManager()
   // epuck -----------------------------------------------------------------------------------------------------------
   cedar::dev::RobotManager::Template epuck_template;
   epuck_template.setIconPath(":/cedar/dev/gui/icons/epuck_icon_256.png");
-  epuck_template.addNamedConfiguration("serial", cedar::aux::Path("resource://configs/epuck/seriale_configuration.json"));
-  epuck_template.addNamedConfiguration("yarp/webots", cedar::aux::Path("resource://configs/epuck/yarp_configuration.json"));
+  epuck_template.addNamedConfiguration("serial", cedar::aux::Path("resource://robots/epuck/serial_configuration.json"));
+  epuck_template.addNamedConfiguration("yarp/webots", cedar::aux::Path("resource://robots/epuck/yarp_configuration.json"));
   this->addRobotTemplate("epuck", epuck_template);
 
   // khepera ---------------------------------------------------------------------------------------------------------
   cedar::dev::RobotManager::Template khepera_template;
   khepera_template.setIconPath(":/cedar/dev/gui/icons/khepera_icon_256.png");
-  khepera_template.addNamedConfiguration("serial", cedar::aux::Path("resource://configs/khepera/serial_configuration.json"));
+  khepera_template.addNamedConfiguration("serial", cedar::aux::Path("resource://robots/khepera/serial_configuration.json"));
   this->addRobotTemplate("khepera", khepera_template);
 
   // kuka ---------------------------------------------------------------------------------------------------------
   cedar::dev::RobotManager::Template kuka_template;
   kuka_template.setIconPath(":/cedar/dev/gui/icons/khepera_icon_256.png");
-  kuka_template.addNamedConfiguration("FRI", cedar::aux::Path("resource://configs/caren/fri_configuration.json"));
+  kuka_template.addNamedConfiguration("FRI", cedar::aux::Path("resource://robots/caren/fri_configuration.json"));
   this->addRobotTemplate("kuka", kuka_template);
 
   this->restore();
@@ -92,6 +92,13 @@ cedar::aux::Path cedar::dev::RobotManager::Template::getConfiguration(const std:
   CEDAR_ASSERT(iter != this->mNamedPaths.end());
 
   return iter->second;
+}
+
+bool cedar::dev::RobotManager::Template::hasConfiguration(const std::string& name) const
+{
+  auto iter = this->mNamedPaths.find(name);
+
+  return iter != this->mNamedPaths.end();
 }
 
 std::vector<std::string> cedar::dev::RobotManager::Template::getConfigurationNames() const
@@ -358,9 +365,16 @@ void cedar::dev::RobotManager::loadRobotTemplateConfiguration
   {
     auto robot_template = this->getTemplate(this->getRobotTemplateName(robotName));
 
-    cedar::aux::Path configuration = robot_template.getConfiguration(configurationName);
-    this->loadRobotConfiguration(robotName, configuration);
-    this->retrieveRobotInfo(robotName).mLoadedTemplateConfiguration = configurationName;
+    if (!robot_template.hasConfiguration(configurationName))
+    {
+      CEDAR_THROW(cedar::dev::TemplateNotFoundException, "Configuration does not exist: " + configurationName + " for robot: " + robotName);
+    }
+    else
+    {
+      cedar::aux::Path configuration = robot_template.getConfiguration(configurationName);
+      this->loadRobotConfiguration(robotName, configuration);
+      this->retrieveRobotInfo(robotName).mLoadedTemplateConfiguration = configurationName;
+    }
   }
   catch (const cedar::dev::NoTemplateLoadedException&)
   {
@@ -462,7 +476,16 @@ void cedar::dev::RobotManager::restore()
 
       if (!loaded_template_configuration.empty())
       {
-        this->loadRobotTemplateConfiguration(name, loaded_template_configuration);
+        try
+        {
+          this->loadRobotTemplateConfiguration(name, loaded_template_configuration);
+        }
+        catch( cedar::dev::TemplateNotFoundException )
+        {
+          cedar::aux::LogSingleton::getInstance()->warning(
+            "could not restore loaded configuration " + loaded_template_configuration_name + " for robot: \"" + name + "\" (from: " + config_path.absolute().toString() + ")",
+            CEDAR_CURRENT_FUNCTION_NAME);
+        }
       }
 
       if (!loaded_template_configuration_name.empty())

@@ -223,7 +223,7 @@ public:
 
   void processStart();
 
-  void startCommunication();
+  void startCommunication(bool suppressUserSideInteraction = false);
   void stopCommunication();
   void destroyCommunication();
 
@@ -317,6 +317,12 @@ public:
   //! Returns the last communication errors.
   std::vector<std::string> getLastMeasurementCommunicationErrors() const;
 
+  //! even if the communication with the hardware is running in the background  you may suppress interaction with the user-side (if parts of your architecture is not ready, for example)
+  void setSuppressUserInteraction(bool what);
+
+  //! ist user side communication allowed? @setSuppressUserInteraction
+  bool getSuppressUserInteraction() const;
+  
 signals:
   void updatedUserMeasurementSignal();
 
@@ -436,6 +442,8 @@ private:
 
   unsigned int mTooSlowCounter;
   unsigned int mNotReadyForCommandsCounter;
+
+  bool mSuppressUserInteraction;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
