@@ -1,6 +1,6 @@
 {
   "name": "webots",
-  "description file": "configs/epuck/description.json",
+  "description file": "robots/epuck/description.json",
   "component instantiations":
   {
     "drive": "yarp",

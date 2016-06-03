@@ -1,6 +1,6 @@
 {
   "name": "hardware e-puck robot",
-  "description file": "configs/epuck/description.json",
+  "description file": "robots/epuck/description.json",
   "component instantiations":
   {
     "drive": "serial",
