@@ -170,6 +170,12 @@ class cedar::dev::Component::DataCollection
       {
         this->setData(mUserBuffer, type, data);
       }
+      else
+      {
+        cedar::aux::LogSingleton::getInstance()->warning(
+          "New buffer object has wrong size or type.",
+          CEDAR_CURRENT_FUNCTION_NAME);
+      }
     }
 
     void setUserBufferUnlocked(const ComponentDataType type, const cv::Mat& data)

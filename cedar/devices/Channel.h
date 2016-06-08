@@ -91,7 +91,7 @@ public:
   void close();
 
   //!@brief Returns whether the channel is open.
-  bool isOpen();
+  virtual bool isOpen();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
