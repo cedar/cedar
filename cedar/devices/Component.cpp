@@ -159,7 +159,17 @@ class cedar::dev::Component::DataCollection
 
     void setUserBuffer(ComponentDataType type, cv::Mat data)
     {
-      this->setData(mUserBuffer, type, data);
+      // reference to the old buffer matrix
+      cv::Mat &buffer = mUserBuffer.member()[type]->getData();
+
+      // get size and type of old buffer
+      cv::Mat::MSize &buff_size = buffer.size;
+      const int buff_type = buffer.type();
+
+      if(data.size == buff_size && data.type() == buff_type)
+      {
+        this->setData(mUserBuffer, type, data);
+      }
     }
 
     void setUserBufferUnlocked(const ComponentDataType type, const cv::Mat& data)
