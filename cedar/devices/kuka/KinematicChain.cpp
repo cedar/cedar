@@ -299,12 +299,13 @@ void cedar::dev::kuka::KinematicChain::postStart()
       ,
       CEDAR_CURRENT_FUNCTION_NAME);
 
+  /*
   cedar::unit::Time second(1.0 * cedar::unit::second);
   auto mystep = static_cast<float>(this->getCommunicationStepSize() / second);
   auto remotestep = static_cast<float>(friChannel->getSampleTime());
 
-// todo: dont have remotestep yet!
-/*
+  // todo: dont have remotestep yet!
+
   if ( mystep < remotestep * 0.9
        || remotestep < mystep * 0.9 )
   {
