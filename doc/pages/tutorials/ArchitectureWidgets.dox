@@ -1,0 +1,270 @@
+/*!
+
+@page ArchitectureWidgets Tutorial: Architecture Widgets
+
+Architecture widgets allow you to inspect (and in the future, control) your architectures beyond what the cedar gui
+offers. They allow you to define plots showing data from different steps in an architecture, combined in a single,
+convenient widget.
+
+The downside of these widgets is that currently, the text files defining them have to be written by hand. However,
+writing them is not hard and can make it much easier to see what is going on in your architecture.
+
+To add an architecture widget, two things are required. One is the file defining the widget. The other is adding this
+file to your architecture.
+
+Let's assume you'd already have a file defining your architecture widget called "my_widget.json". To add this, open your
+architecture in cedar's gui. Under "Windows" you will find an entry called "architecture widgets". Hit manage, and in
+the dialog that opens, click the add button. A new row will be added. Give your plot a name, e.g., "my widget". Udner
+path, you can specify what file to look for. If you enter "my_widget.json" here, the file will be opened relative to the
+location of the architecture you have loaded (or from the folder in which you started cedar). Note, that you can also
+use any kind of cedar path specification here, e.g., "plugin://MyPlugin/my_widget.json".
+
+@todo Write a tutorial on path specifications, add a reference here.
+
+Now to the more interesting part: the contents of architecture widget files (my_widget.json in the example above).
+
+Architecture widgets (cedar::proc::gui::ArchitectureWidget) are effectively a grid layout. In each cell of the grid
+layout, you can place other plots and widgets. Thus, the file defining an architecture widget contains a list of the
+contents of the cell of your widget. The basic json file structure looks like this:
+@code
+{
+    "entries":
+    [
+         // list of cell contents (see below)
+    ]
+}
+@endcode
+Here's a simple example of what cell contents look like:
+@code
+{
+    "row": "0",
+    "column": "0",
+    "type": "label",
+    "text": "Hello World!"
+}
+@endcode
+In this example, the "text" entry is specific to the selected type, "label". However, a number of options are generic
+and apply to any content placed in a cell.
+
+
+@section ArchitectureWidgets_GenericProps Row Contents: Generic Properties
+
+Each cell can have its row and column position in the grid specified. If none are provided, they are assumed to be 0.
+
+You can also specify a "row span" and "colum span" to make the contents of a cell span multiple cells in the grid.
+
+The properties "row stretch" and "column stretch" specify how much the contents of a cell stretch with respect to others.
+A stretch of 0 means that the contents don't grow.
+
+You can also specify a "style sheet" to modify the appearance of the widget added to the cell. See Qt's documentation on
+style sheets for details.
+
+Finally, the "type" property defines what kind of widget is created in the cell. Currently, "label" and "plot" are
+supported, the latter being the default option.
+
+
+@section ArchitectureWidgets_Plots Row Contents: Plots
+
+Plots display data found in the group to whic hthe widget is attached. Definitions of plots are quite flexible. Here's
+a simple way to plot a specific data object of a step in the group: 
+@code
+{
+    "row": "0",
+    "column": "0",
+    "data": "1d field[BUFFER].activation"
+}
+@endcode
+If you load this widget, you'll notice that the plot legend shows "1d field[BUFFER].activation" for the line
+corresponding to this data. To fix this, you can change this to
+@code
+{
+    "row": "0",
+    "column": "0",
+    "data": {"activation": "1d field[BUFFER].activation"}
+}
+@endcode
+Here, the first entry in the data field specifies the legend entry of the data, the second specifies the path as before.
+
+If the plot supports multi-plotting, we may want to add more than one data object. We can do this like this: 
+@code
+{
+    "type": "plot",
+    "row": "0",
+    "column": "0",
+    "data":
+    [
+         {"activation": "1d field[BUFFER].activation"},
+        "1d field[OUPTUT].sigmoided output"
+    ]
+}
+@endcode
+Notice that you can use the same method for specifying the legend entry of the data, and that you can mix these methods
+as you like. Also, specifying "type": "plot" is no strictly necessary as the type property defaults to "plot".
+
+In some cases, e.g., for 2d fields, you may want to specify what kind of plot is opened. Say you want an image plot.
+You can write this as
+@code
+{
+    "row": "0",
+    "column": "0",
+    "plot type": "cedar.aux.gui.ImagePlot",
+    "data": {"activation": "2d field[BUFFER].activation"}
+}
+@endcode
+
+If you want to specify settings for the plots themselves, you can do so by adding a "plot configuration" node:
+@code
+{
+    "data": {"activation": "0d field[BUFFER].activation"},
+    "plot configuration":
+    {
+        "y axis limits": {"lower limit": "-5", "upper limit": "5"},
+        "apply y axis limits": "true"
+    }
+}
+@endcode
+Note that the accepted settings depend on the plot class that is opened. 
+
+@section ArchitectureWidgets_Labels Row Contents: Labels
+
+Labels can be used to put text in a cell. They have the following format:
+@code
+{
+    "row": "0",
+    "column": "0",
+    "type": "label",
+    "text": "Text you want to show"
+}
+@endcode
+
+@section ArchitectureWidgets_Templates Row Contents: Templates
+
+If you have a structure that repeats (e.g., you always plot an elementary behavior group the same way), templates may
+simplify your live. Here's an example of how to make a template called EB and add it to the architecture widget:
+@code
+{
+    "templates":
+    {
+        "EB":
+        [
+            {
+                "row": "0",
+                "column": "0",
+                "row stretch": "0",
+                "type": "label",
+                "text": "<EB NAME>"
+            },
+            {
+                "row": "1",
+                "column": "0",
+                "data":
+                [
+                    {"intention": "<EB NAME>.intention node[BUFFER].activation"},
+                    {"intention output": "<EB NAME>.intention node[OUTPUT].sigmoided activation"},
+                    {"CoS": "<EB NAME>.CoS node[BUFFER].activation"},
+                    {"CoS output": "<EB NAME>.CoS node[OUTPUT].sigmoided activation"}
+                ]
+            }
+        ]
+    },
+    "entries":
+    [
+        {
+            "row": "2",
+            "column": "0",
+            "type": "template",
+            "template name": "EB",
+            "substitutions": 
+            {
+                "<EB NAME>": "EB learn object"
+            }
+        },
+    ]
+}
+@endcode
+Note, that templates are always instantiated with relative rows/columns, i.e., the label in the above example will be in
+row 2, the plot in row 3.
+
+
+@section ArchitectureWidgets_StepActions Row Contents: Step Actions
+
+If you want to add a button to your architecture widget that lets you call actions of one or more steps (e.g., reset a
+number of fields all at the same time), you can do so using the following entry:
+
+@code
+{
+  "type": "step action",
+  "label": "will be on the button",
+  "actions":
+  [
+    {"field A": "reset"},
+    {"field B": "reset"}
+  ]
+}
+@endcode
+
+Pushing the button in the architecture widget will, in this example, reset both field A and field B.
+
+If you want to make sure the user did not click the button accidentally, add the following line to the above code:
+@code
+  "confirm": "true"
+@endcode
+When the button is clicked, a message box will pop up that asks the user for confirmation.
+
+
+@section EBPlots How to build a plot for your elementary behaviors
+
+Architecture widgets can also be used to make a plot of nodes in an architecture, e.g., to visualize the state of the
+behavioral organization.
+
+For this, we use a cedar::aux::gui::Multi0DPlot. This plot shows several zero-dimensional values in a single plot,
+representing each value as a filled circle. It looks like this:
+
+@image html doc/pages/tutorials/images/Multi0DPlotExample.png
+
+Here's an example json file describing a widget configuration:
+@code
+{
+  "configuration":
+  {
+    "default size":
+    {
+      "width": "600",
+      "height": "400"
+    }
+  },
+  "entries":
+  [
+    {
+      "plot type": "cedar.aux.gui.Multi0DPlot",
+      "data":
+      [
+        {"eb 1 intention.activation": "eb 1 intention node[BUFFER].activation"},
+        {"eb 1 intention.output": "eb 1 intention node[OUTPUT].sigmoided activation"},
+        {"eb 1 CoS.activation": "eb 1 CoS node[BUFFER].activation"},
+        {"eb 1 CoS.output": "eb 1 CoS node[OUTPUT].sigmoided activation"},
+        {"eb 2 intention.activation": "eb 2 intention node[BUFFER].activation"},
+        {"eb 2 intention.output": "eb 2 intention node[OUTPUT].sigmoided activation"},
+        {"eb 2 CoS.activation": "eb 2 CoS node[BUFFER].activation"},
+        {"eb 2 CoS.output": "eb 2 CoS node[OUTPUT].sigmoided activation"}
+      ],
+      "plot configuration":
+      {
+        "autoscaling": "false",
+        "y axis limits":
+        {
+          "lower limit": "-7",
+          "upper limit": "7"
+        }
+      }
+    }
+  ]
+}
+@endcode
+A few things to note: using data titles like "eb 1 intention.activation" means that all data belonging to "eb 1
+intention" will have the same horizontal position. I.e., activation and output of each node are plotted on top of each
+other.
+
+Setting axis limits is not necessary, but makes the plot appear less jittery. 
+
+*/
