@@ -142,3 +142,8 @@ void cedar::dev::Channel::close()
 {
   this->decreaseUseCount();
 }
+
+bool cedar::dev::Channel::isOpen()
+{
+    return this->mUseCount != 0;
+}
