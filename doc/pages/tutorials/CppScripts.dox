@@ -1,0 +1,41 @@
+/*!
+
+@page CppScriptTutorial Tutorial: C++ scripts in the cedar gui
+
+To run arbitrary code (what you would normally write into a main function in your own C++ programm) from the cedar gui,
+we have introduced the cedar::proc::CppScript class.
+
+Plugins can add classes that inherit from this, and users can then instantiate objects from these classes from the
+script manager in the menu "scripts". These scripts are added on the architecture level and are stored within the root
+group.
+
+Declaring such scripts is done in the \em pluginDeclaration function of the plugin. Let myNamespace::MyScript be a class
+that inherits cedar::proc::CppScript; this can then be declared with
+@code
+#include <cedar/processing/CppScriptDeclaration.h>
+
+// ...
+
+void pluginDeclaration(cedar::aux::PluginDeclarationListPtr plugin)
+{
+  // ...
+  plugin->add
+  (
+    cedar::proc::CppScriptDeclarationPtr
+    (
+      new cedar::proc::CppScriptDeclarationTemplate
+      <
+        myNamespace::MyScript
+      >
+      (
+        "category"
+      )
+    )
+  );
+  // ...
+}
+@endcode
+
+The actual code that is executed is then found in myNamespace::MyScript::run.
+
+*/
