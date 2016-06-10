@@ -400,7 +400,7 @@ void cedar::dev::Robot::readConfiguration(const cedar::aux::ConfigurationNode& n
 
   //!@todo Use path class here
   std::string description_file = desc_file_node->second.get_value<std::string>();
-  std::string description_resource = cedar::aux::locateResource(description_file);
+  std::string description_resource = cedar::aux::locateResource(description_file, false); // do not show in log because it scrolls and we are giving other feedback to the user that the resource has been found, anyway
   cedar::aux::ConfigurationNode description;
   boost::property_tree::read_json(description_resource, description);
   this->readDescription(description);
