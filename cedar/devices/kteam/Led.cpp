@@ -63,12 +63,12 @@ cedar::dev::kteam::Led::~Led()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::dev::kteam::Led::applyBrakeController()
+bool cedar::dev::kteam::Led::applyBrakeSlowlyController()
 {
   return true;
 }
 
-bool cedar::dev::kteam::Led::applyBrakeNow()
+bool cedar::dev::kteam::Led::applyBrakeNowController()
 {
   return true;
 }

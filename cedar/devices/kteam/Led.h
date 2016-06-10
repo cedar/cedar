@@ -88,8 +88,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  bool applyBrakeController();
-  bool applyBrakeNow();
+  bool applyBrakeSlowlyController();
+  bool applyBrakeNowController();
   bool applyCrashbrake();
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -97,12 +97,12 @@ public:
     prepareComponentDestructAbsolutelyRequired();
   }
 
-  bool applyBrakeController()
+  bool applyBrakeSlowlyController()
   {
     return true;
   }
 
-  bool applyBrakeNow()
+  bool applyBrakeNowController()
   {
     return true;
   }

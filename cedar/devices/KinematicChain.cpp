@@ -965,15 +965,25 @@ void cedar::dev::KinematicChain::updatedUserMeasurementSlot()
   mForwardKinematics->calculateTransformations();
 }
 
-bool cedar::dev::KinematicChain::applyBrakeController()
+bool cedar::dev::KinematicChain::applyBrakeSlowlyController()
 {
-  // TODO
+  setController( cedar::dev::KinematicChain::JOINT_VELOCITIES,
+                 boost::bind< cv::Mat>( [&]()
+                              {
+                                return getJointVelocities() / 4;
+                              } 
+                            ) );
   return true;
 }
 
-bool cedar::dev::KinematicChain::applyBrakeNow()
+bool cedar::dev::KinematicChain::applyBrakeNowController()
 {
-  setJointVelocities( cv::Mat::zeros( getNumberOfJoints(), 1, CV_64F ) );
+  setController( cedar::dev::KinematicChain::JOINT_VELOCITIES,
+                 boost::bind< cv::Mat>( [&]()
+                              {
+                                return cv::Mat::zeros( getNumberOfJoints(), 1, CV_64F );
+                              } 
+                            ) );
   return true;
 }
 

@@ -143,8 +143,8 @@ private:
          cedar::unit::AngularVelocity& turningRate
        ) const;
 
-  virtual bool applyBrakeNow();
-  virtual bool applyBrakeController();
+  virtual bool applyBrakeNowController();
+  virtual bool applyBrakeSlowlyController();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

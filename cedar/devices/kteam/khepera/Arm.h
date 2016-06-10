@@ -85,8 +85,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  virtual bool applyBrakeController();
-  virtual bool applyBrakeNow();
+  virtual bool applyBrakeSlowlyController();
+  virtual bool applyBrakeNowController();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

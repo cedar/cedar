@@ -230,7 +230,7 @@ public:
   void waitUntilCommunicated() const;
 
   void startBraking(); // non-blocking. will set a Controller that smoothly brakes
-  void brakeNow();     // blocking. will try to instantly reduce velocity, high inertias possible
+  void brakeNow();     // non-blocking. will set a Controller that will instantly reduce velocity to 0, be careful!
   void crashbrake();   // last-resort braking, may disconnect device or even break the robot
 
   //! Returns a list of all installed measurement types.
@@ -388,8 +388,8 @@ private:
   //!@brief checks whether a given command type conflicts with already set commands and throws an exception if this happens
   void checkExclusivenessOfCommand(ComponentDataType type);
 
-  virtual bool applyBrakeController() = 0; // returning FALSE will allow re-try
-  virtual bool applyBrakeNow() = 0;
+  virtual bool applyBrakeSlowlyController() = 0; // returning FALSE will allow re-try
+  virtual bool applyBrakeNowController() = 0;
   virtual bool applyCrashbrake();
 
   static void stepStaticWatchDog(cedar::unit::Time);
