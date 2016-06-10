@@ -62,12 +62,12 @@ cedar::dev::Sensor::~Sensor()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::dev::Sensor::applyBrakeController()
+bool cedar::dev::Sensor::applyBrakeSlowlyController()
 {
   return true;
 }
 
-bool cedar::dev::Sensor::applyBrakeNow()
+bool cedar::dev::Sensor::applyBrakeNowController()
 {
   return true;
 }

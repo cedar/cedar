@@ -217,12 +217,12 @@ public:
   }
 
 private:
-  bool applyBrakeNow()
+  bool applyBrakeNowController()
   {
     return true;
   }
 
-  bool applyBrakeController()
+  bool applyBrakeSlowlyController()
   {
     return true;
   }

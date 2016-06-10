@@ -105,8 +105,8 @@ protected:
 private:
   void initialize();
 
-  virtual bool applyBrakeController();
-  virtual bool applyBrakeNow();
+  virtual bool applyBrakeSlowlyController();
+  virtual bool applyBrakeNowController();
   virtual bool applyCrashbrake();
 
   //--------------------------------------------------------------------------------------------------------------------

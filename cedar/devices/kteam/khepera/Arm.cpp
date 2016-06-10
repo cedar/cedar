@@ -68,13 +68,13 @@ _mArmPositionLimits(new cedar::aux::math::UIntLimitsParameter(this, "arm positio
 //----------------------------------------------------------------------------------------------------------------------
 
 
-bool cedar::dev::kteam::khepera::Arm::applyBrakeNow()
+bool cedar::dev::kteam::khepera::Arm::applyBrakeNowController()
 {
   // TODO
   return false;
 }
 
-bool cedar::dev::kteam::khepera::Arm::applyBrakeController()
+bool cedar::dev::kteam::khepera::Arm::applyBrakeSlowlyController()
 {
   // TODO
   return false;

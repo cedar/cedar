@@ -1243,7 +1243,7 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
   // if there are neither user commands nor a controller, nothing needs to be done
   if (this->mUserCommandUsed.member().size() == 0 && !this->mController.member())
   {
-    return;
+    return; // TODO : why is this return here?
     QReadLocker nocommand_hook_locker(mNoCommandHook.getLockPtr());
 
     auto hook_found = mNoCommandHook.member();
@@ -1571,6 +1571,7 @@ void cedar::dev::Component::stopCommunication()
 
 void cedar::dev::Component::start()
 {
+  clearController();
   startCommunication();
 }
 
@@ -1775,7 +1776,7 @@ void cedar::dev::Component::startBraking()
 {
   clearUserCommand();
   clearController();
-  if (!applyBrakeController())
+  if (!applyBrakeSlowlyController()) // TODO: rename
   {
     //@todo try again and then default to brakeNow()
     brakeNow();
@@ -1787,7 +1788,7 @@ void cedar::dev::Component::brakeNow()
   clearUserCommand();
   clearController();
 
-  if (!applyBrakeNow())
+  if (!applyBrakeNowController())
   {
     //@todo: wait short time, try again and then panic TODO TODO
   }
@@ -1809,7 +1810,8 @@ bool cedar::dev::Component::applyCrashbrake()
   // dummy behaviour
   clearUserCommand();
   clearController();
-  if (!applyBrakeNow()) // dummy default
+
+  if (!applyBrakeNowController()) // dummy default
   {
     return false;
   }
