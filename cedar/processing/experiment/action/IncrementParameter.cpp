@@ -80,7 +80,7 @@ cedar::proc::experiment::action::IncrementParameter::IncrementParameter()
 
   // allow only UIntParameter and DoubleParameter to increase
   _mStepParameter->allowType("cedar.aux.DoubleParameter");
-  _mStepParameter->allowType("cedar.aux.UIntParameterPtr");
+  _mStepParameter->allowType("cedar.aux.UIntParameter");
 }
 
 cedar::proc::experiment::action::IncrementParameter::~IncrementParameter()
