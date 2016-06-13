@@ -240,12 +240,12 @@ namespace cedar
 
           if (exponent < 0)
           {
-            CEDAR_ASSERT(abs(exponent) == DenominatorPower);
+            CEDAR_ASSERT(std::abs(exponent) == DenominatorPower);
             denominator *= cedar::aux::parseUnitString<Denominator>(unit) / i_denominator;
           }
           else
           {
-            CEDAR_ASSERT(abs(exponent) == NumeratorPower);
+            CEDAR_ASSERT(std::abs(exponent) == NumeratorPower);
             numerator *= cedar::aux::parseUnitString<Numerator>(unit) / i_numerator;
           }
         }
