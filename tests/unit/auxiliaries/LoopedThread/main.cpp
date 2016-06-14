@@ -150,7 +150,9 @@ int testConfiguration
   CountingThread thread(stepSize, idleTime, simulatedTime, mode);
 
   thread.start();
-  thread.wait(cedar::unit::Time(1.0 * cedar::unit::second));
+  //thread.wait(cedar::unit::Time(1.0 * cedar::unit::second));
+  cedar::aux::sleep(cedar::unit::Time(1.0 * cedar::unit::second));
+
   // the thread should at least run for two iterations
   if (thread.mCounter < 2)
   {
@@ -160,7 +162,8 @@ int testConfiguration
     ++errors;
   }
   thread.stop();
-  thread.wait(cedar::unit::Time(1.0 * cedar::unit::second));
+  //thread.wait(cedar::unit::Time(1.0 * cedar::unit::second));
+  cedar::aux::sleep(cedar::unit::Time(1.0 * cedar::unit::second));
   if (thread.isRunningNolocking())
   {
     std::cout << "ERROR: the thread didn't exit properly." << std::endl;
@@ -180,7 +183,8 @@ void runTests()
 
   std::cout << "Starting a thread and let it run for 1 seconds ..." << std::endl;
   thread.start();
-  thread.wait(cedar::unit::Time(1.0 * cedar::unit::second));
+  //thread.wait(cedar::unit::Time(1.0 * cedar::unit::second));
+  cedar::aux::sleep(cedar::unit::Time(1.0 * cedar::unit::second));
   std::cout << "Stopping thread ..." << std::endl;
   thread.stop();
   if (thread.isRunningNolocking())
@@ -213,7 +217,8 @@ void runTests()
   std::cout << "Starting thread again with an artificially unreliable execution time ..." << std::endl;
   thread.setArtificalDelay(true);
   thread.start();
-  thread.wait(cedar::unit::Time(1.0 * cedar::unit::second));
+  //thread.wait(cedar::unit::Time(1.0 * cedar::unit::second));
+  cedar::aux::sleep(cedar::unit::Time(1.0 * cedar::unit::second));
   std::cout << "Stopping thread ..." << std::endl;
   thread.stop();
 
@@ -223,7 +228,8 @@ void runTests()
   std::cout << "Starting thread again with step size 0 for one millisecond ..." << std::endl;
   thread.setStepSize(cedar::unit::Time(0.0 * cedar::unit::second));
   thread.start();
-  thread.wait(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second));
+  //thread.wait(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second));
+  cedar::aux::sleep(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second));
   std::cout << "Stopping thread ..." << std::endl;
   thread.stop();
 

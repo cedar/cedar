@@ -534,4 +534,31 @@ void cedar::aux::ThreadWrapper::forceQuitThread()
   }
 }
 
+bool cedar::aux::ThreadWrapper::wait(cedar::unit::Time time)
+{
+  bool ret = false;
+
+  if (isValidThread())
+  {
+    cedar::unit::Time milli_second(1.0 * cedar::unit::milli * cedar::unit::second);
+    int time_int = static_cast<int>(time / milli_second);
+
+    // QThread.wait() takes an integer in milliseconds
+    ret = mpThread->wait(time_int);
+  }
+
+  return ret;
+}
+
+bool cedar::aux::ThreadWrapper::wait()
+{
+  bool ret = false;
+
+  if (isValidThread())
+  {
+    ret = mpThread->wait();
+  }
+
+  return ret;
+}
 
