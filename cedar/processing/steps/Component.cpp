@@ -167,9 +167,10 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputVal
   const std::string& name = slot->getName();
 
   // only commanded data are inputs
-  cedar::aux::ConstDataPtr component_data = this->getComponent()->getCommandedData(name);
+  cedar::aux::ConstData *component_data = this->getComponent()->getCommandedData(name).get();
+  cedar::aux::ConstData *that_data = data.get();
 
-  if (typeid(*component_data) == typeid(*data))
+  if (typeid(*component_data) == typeid(*that_data))
   {
     return cedar::proc::DataSlot::VALIDITY_VALID;
   }
