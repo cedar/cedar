@@ -10,7 +10,8 @@ this directory.
 @section cedar
 This folder contains the complete source code of the library. Inside, each module of cedar is contained within its own
 subdirectory (e.g., auxiliaries). The only source code that you will find outside of the cedar directory, is in form of
-the unit- and interactive tests in "tests". There is also some minor code in "executables".
+the unit- and interactive tests in "tests". There is also some minor code in "executables". The folders in here follow 
+the namespace structure of cedar. You can find an overview of namespaces @link OverviewNamespaces here @endlink.
 
 @section cmake
 This directory contains configuration files for the CMake build process. It defines how the makefiles are generated,

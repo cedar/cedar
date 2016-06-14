@@ -180,11 +180,11 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo
     return cedar::proc::gui::CONNECT_NO;
   }
 
-  // ... source and target are not in the same network
-  if (this->getSlot()->getParentPtr()->getGroup() != p_target_slot->getSlot()->getParentPtr()->getGroup())
-  {
-    return cedar::proc::gui::CONNECT_NO;
-  }
+//  // ... source and target are not in the same network
+//  if (this->getSlot()->getParentPtr()->getGroup() != p_target_slot->getSlot()->getParentPtr()->getGroup())
+//  {
+//    return cedar::proc::gui::CONNECT_NO;
+//  }
 
   // check if the source/target are connectors for networks
   if

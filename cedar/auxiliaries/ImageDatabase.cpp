@@ -58,8 +58,9 @@ const std::string cedar::aux::ImageDatabase::M_STANDARD_OBJECT_POSE_ANNOTATION_N
 const std::string cedar::aux::ImageDatabase::M_STANDARD_MULTI_OBJECT_POSE_ANNOTATION_NAME = "multi_object_pose";
 const std::string cedar::aux::ImageDatabase::M_STANDARD_OBJECT_IMAGE_ANNOTATION_NAME = "object";
 const std::string cedar::aux::ImageDatabase::M_STANDARD_FRAME_OBJECT_ANNOTATION_NAME = "frame_object";
+const std::string cedar::aux::ImageDatabase::M_STANDARD_CLASS_ID_ANNOTATION_NAME = "class id";
 
-const std::vector<std::string> cedar::aux::ImageDatabase::M_STANDARD_KNOWN_IMAGE_FILE_EXTENSIONS = {"png"};
+const std::vector<std::string> cedar::aux::ImageDatabase::M_STANDARD_KNOWN_IMAGE_FILE_EXTENSIONS = {"png", "ppm"};
 const std::vector<std::string> cedar::aux::ImageDatabase::M_STANDARD_KNOWN_VIDEO_FILE_EXTENSIONS = {"avi", "mpeg", "mp4", "flv", "ogg", "vob", "mpg"};
 
 #ifndef CEDAR_COMPILER_MSVC
@@ -84,8 +85,6 @@ mScale(1.0), mHasScale(false)
 }
 
 cedar::aux::ImageDatabase::Image::Image()
-:
-mClassId(0)
 {
 }
 
@@ -456,6 +455,31 @@ std::vector<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::shuf
   return shuffled;
 }
 
+std::vector<cedar::aux::ImageDatabase::ImagePtr>
+  cedar::aux::ImageDatabase::orderTrainingImagesByClassId(const std::set<ImagePtr>& images)
+{
+  std::set<ClassId> ids;
+
+  for (auto image : images)
+  {
+    ids.insert(image->getClassId());
+  }
+
+  std::vector<ImagePtr> ordered_samples;
+  for (auto current_id : ids)
+  {
+    for (auto image : images)
+    {
+      if (image->getClassId() == current_id)
+      {
+        ordered_samples.push_back(image);
+      }
+    }
+  }
+
+  return ordered_samples;
+}
+
 void cedar::aux::ImageDatabase::addCommandLineOptions(cedar::aux::CommandLineParser& parser)
 {
   std::string group_name = "image database settings";
@@ -502,7 +526,7 @@ void cedar::aux::ImageDatabase::addCommandLineOptions(cedar::aux::CommandLinePar
   parser.defineValue
   (
     "sample-testing-selection-mode",
-    "Which mode to use for selecting testing samples.",
+    "Which mode to use for selecting testing samples. Possible values: not_in_training_set, by_tag, by_class, all",
     "not_in_training_set",
     0,
     sample_selection_group_name
@@ -517,6 +541,14 @@ void cedar::aux::ImageDatabase::addCommandLineOptions(cedar::aux::CommandLinePar
     sample_selection_group_name
   );
 
+  parser.defineValue
+  (
+    "sample-testing-classes",
+    "A class name or list of class names used for testing. If blank, all classes are used. Format: \"class 1, class 2, ..., class N\"",
+    "",
+    0,
+    sample_selection_group_name
+  );
 
   parser.defineValue
   (
@@ -524,7 +556,8 @@ void cedar::aux::ImageDatabase::addCommandLineOptions(cedar::aux::CommandLinePar
     "An instruction on how to restrict the sample selection. Possible instructions are: \n"
     "  \"unrestricted\": no restrictions,\n"
     "  \"first N\": selects only samples belonging to one of the first N classes.\n"
-    "  \"random N [seed M]\": selects a random subset of N classes from the database. The optional seed is used to initialize the RNG.",
+    "  \"random N [seed M]\": selects a random subset of N classes from the database. The optional seed is used to initialize the RNG.\n"
+    "  \"any_of 'class A' 'class B' ... 'class N'\": only images that contain any of the specified class(es) are used.",
     "unrestricted",
     0,
     sample_selection_group_name
@@ -583,15 +616,36 @@ cedar::aux::ImageDatabase::ConstAnnotationPtr
     {
       known_annotations = "none";
     }
-    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find an annotation with the id \"" + annotationId + "\". Known annotations are: " + known_annotations);
+    CEDAR_THROW
+    (
+      cedar::aux::NotFoundException,
+      "Could not find an annotation with the id \"" + annotationId + "\" in image " + this->getFileName() +
+          ". Known annotations are: " + known_annotations
+    );
   }
 
   return iter->second;
 }
 
-void cedar::aux::ImageDatabase::Image::setClassId(ClassId classId)
+cedar::aux::ImageDatabase::ClassId cedar::aux::ImageDatabase::Image::getClassId() const
 {
-  this->mClassId = classId;
+  auto annotation = this->getAnnotation<const ClassIdAnnotation>(cedar::aux::ImageDatabase::M_STANDARD_CLASS_ID_ANNOTATION_NAME);
+  return annotation->getClassId();
+}
+
+void cedar::aux::ImageDatabase::Image::setClassId(cedar::aux::ImageDatabase::ClassId classId)
+{
+  ClassIdAnnotationPtr annotation;
+  if (this->hasAnnotation(cedar::aux::ImageDatabase::M_STANDARD_CLASS_ID_ANNOTATION_NAME))
+  {
+    annotation = this->getAnnotation<ClassIdAnnotation>(cedar::aux::ImageDatabase::M_STANDARD_CLASS_ID_ANNOTATION_NAME);
+    annotation->setClassId(classId);
+  }
+  else
+  {
+    annotation = ClassIdAnnotationPtr(new ClassIdAnnotation(classId));
+    this->setAnnotation(cedar::aux::ImageDatabase::M_STANDARD_CLASS_ID_ANNOTATION_NAME, annotation);
+  }
 }
 
 std::set<cedar::aux::ImageDatabase::ImagePtr>
@@ -1055,7 +1109,7 @@ void cedar::aux::ImageDatabase::scanDirectory(const cedar::aux::Path& path)
     }
   }
 
-  for (std::string file : files)
+  for (auto file : files)
   {
     std::string file_no_dir, restpath;
 
@@ -1090,9 +1144,26 @@ void cedar::aux::ImageDatabase::scanDirectory(const cedar::aux::Path& path)
         std::string tags = parts.at(1);
 
         ImagePtr sample(new Image());
-        sample->setClassId(this->getOrCreateClass(classname));
         sample->setFileName(file);
         sample->appendTags(tags);
+        ClassId class_id;
+        // only training images create new classes
+        try
+        {
+          if (sample->hasTag("train"))
+          {
+            class_id = this->getOrCreateClass(classname);
+          }
+          else
+          {
+            class_id = this->getClass(classname);
+          }
+          sample->setClassId(class_id);
+        }
+        catch (const cedar::aux::UnknownNameException&)
+        {
+          // happens when no id is known for the class
+        }
 
         this->appendImage(sample);
       }
@@ -1141,7 +1212,7 @@ void cedar::aux::ImageDatabase::readCOIL100(const cedar::aux::Path& path)
   for (const auto& file : path.listFiles())
   {
     std::string extension = file.getExtension();
-    if (extension != "png")
+    if (!isKnownImageExtension(extension))
     {
       continue;
     }
@@ -1376,9 +1447,9 @@ void cedar::aux::ImageDatabase::Image::appendTags(const std::string& tags)
 {
   std::vector<std::string> tag_split;
   cedar::aux::split(tags, ",", tag_split);
-  for (auto iter = tag_split.begin(); iter != tag_split.end(); ++iter)
+  for (const auto& tag : tag_split)
   {
-    this->mTags.insert(*iter);
+    this->mTags.insert(tag);
   }
 }
 
@@ -1422,37 +1493,80 @@ void cedar::aux::ImageDatabase::writeSummary(std::ostream& stream)
 void cedar::aux::ImageDatabase::selectImages(std::set<ImagePtr>& images, cedar::aux::CommandLineParser& options) const
 {
   std::string instruction_str = options.getValue<std::string>("restrict-sample-selection");
-  std::vector<std::string> instruction_parts;
-  cedar::aux::split(instruction_str, " ", instruction_parts);
+  std::string instruction, arguments;
+  cedar::aux::splitFirst(instruction_str, " ", instruction, arguments);
 
-  CEDAR_ASSERT(instruction_parts.size() > 0);
-
-  const auto& instruction = instruction_parts.at(0);
   if (instruction == "first")
   {
-    CEDAR_ASSERT(instruction_parts.size() == 2);
-    unsigned int number = cedar::aux::fromString<unsigned int>(instruction_parts.at(1));
+    CEDAR_ASSERT(!arguments.empty());
+    unsigned int number = cedar::aux::fromString<unsigned int>(arguments);
 
     this->selectImagesFromFirstNClasses(images, number);
   }
   else if (instruction == "random")
   {
-    CEDAR_ASSERT(instruction_parts.size() >= 2);
-    unsigned int number = cedar::aux::fromString<unsigned int>(instruction_parts.at(1));
+    CEDAR_ASSERT(!arguments.empty());
+    std::vector<std::string> argument_strs;
+    cedar::aux::split(arguments, " ", argument_strs);
+    CEDAR_DEBUG_ASSERT(argument_strs.size() > 0);
+    unsigned int number = cedar::aux::fromString<unsigned int>(argument_strs.at(0));
 
     boost::optional<unsigned int> seed;
 
-    for (size_t part = 2; part < instruction_parts.size(); ++part)
+    for (size_t part = 1; part < argument_strs.size(); ++part)
     {
-      const auto& part_str = instruction_parts.at(part);
+      const auto& part_str = argument_strs.at(part);
       if (part_str == "seed")
       {
-        CEDAR_ASSERT(instruction_parts.size() > part + 1)
-        seed = cedar::aux::fromString<unsigned int>(instruction_parts.at(part + 1));
+        CEDAR_ASSERT(argument_strs.size() > part + 1)
+        seed = cedar::aux::fromString<unsigned int>(argument_strs.at(part + 1));
         ++part;
       }
     }
     this->selectImagesFromNRandomClasses(images, number, seed);
+  }
+  else if (instruction == "any_of")
+  {
+    CEDAR_ASSERT(!arguments.empty());
+
+    std::vector<std::string> accepted_classes;
+
+    bool in_string = false;
+    std::string current = "";
+    for (size_t i_c = 0; i_c < arguments.size(); ++i_c)
+    {
+      char c = arguments.at(i_c);
+      if (in_string)
+      {
+        switch (c)
+        {
+          case '\'':
+            in_string = false;
+            accepted_classes.push_back(current);
+            current = "";
+            break;
+
+          default:
+            current += c;
+            break;
+        }
+      }
+      else
+      {
+        switch (c)
+        {
+          case '\'':
+            in_string = true;
+            break;
+
+          default:
+            break;
+        }
+      }
+
+    }
+
+    this->selectImagesByClasses(images, accepted_classes);
   }
   else if (instruction == "unrestricted")
   {
@@ -1463,6 +1577,18 @@ void cedar::aux::ImageDatabase::selectImages(std::set<ImagePtr>& images, cedar::
   {
     CEDAR_THROW(cedar::aux::UnknownNameException, "Instruction \"" + instruction + "\" is not known; instruction string: \"" + instruction_str + "\"");
   }
+}
+
+void cedar::aux::ImageDatabase::selectImagesByClasses(std::set<ImagePtr>& images, const std::vector<std::string> classNames) const
+{
+  std::set<ClassId> accepted_classes;
+
+  for (const auto& class_name : classNames)
+  {
+    accepted_classes.insert(this->getClass(class_name));
+  }
+
+  selectImagesWithClassesInSet(images, accepted_classes);
 }
 
 void cedar::aux::ImageDatabase::selectImagesFromFirstNClasses(std::set<ImagePtr>& images, unsigned int numberOfClasses) const
@@ -1564,6 +1690,29 @@ std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getTest
   {
     std::string tag_selection = parser.getValue<std::string>("sample-testing-tags");
     images = this->getImagesByTagStr(tag_selection);
+  }
+  else if (mode == "by_class")
+  {
+    std::string class_selection = parser.getValue<std::string>("sample-testing-classes");
+
+    std::vector<std::string> classes;
+    cedar::aux::split(class_selection, ",", classes);
+    images.clear();
+
+    for (const auto& class_name : classes)
+    {
+      auto normalized = cedar::aux::removeLeadingAndTrailingWhiteSpaces(class_name);
+      auto class_images = this->getImagesWithClass(this->getClass(normalized));
+      images.insert(class_images.begin(), class_images.end());
+    }
+  }
+  else if (mode == "all")
+  {
+    // add all images to the test set
+    for (auto image : this->mImages)
+    {
+      images.insert(image);
+    }
   }
   else
   {

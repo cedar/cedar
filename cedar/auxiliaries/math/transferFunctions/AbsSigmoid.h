@@ -55,7 +55,7 @@
  *
  *        The equation for this sigmoid is:
  *        @f[
- *           \sigma(x) = \frac{1}{2} \cdot \frac{1 + \beta \cdot (x - \theta)}{1 + \beta \cdot |x - \theta|}
+ *           \sigma(x) = \frac{1}{2} \left(1 + \frac{\beta (x - \theta)}{1 + \beta |x - \theta|}\right)
  *        @f]
  *        where \f$\theta\f$ is the threshold set for this function and \f$\beta\f$ is the steepness of the sigmoid.
  */

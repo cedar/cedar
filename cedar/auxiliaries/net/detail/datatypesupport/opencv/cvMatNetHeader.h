@@ -63,6 +63,28 @@ struct cvMatNetHeader : MatrixNetHeader
 {
 public:
   /*unsigned*/ int mCVMatType; // note: cv::Mat::cvMatType is signed
+
+  virtual unsigned int getFixedSerializationSize() const
+  {
+    return sizeof(int) // mCVMatType
+         + this->MatrixNetHeader::getFixedSerializationSize();
+  }
+
+  virtual void serializeFixed(char* memarray)
+  {
+    char* p = memarray;
+    *reinterpret_cast<int*>(p) = this->mCVMatType;
+    p += sizeof(int);
+    this->MatrixNetHeader::serializeFixed(p);
+  }
+
+  virtual void deserializeFixed(const char* memarray)
+  {
+    const char* p = memarray;
+    this->mCVMatType = *reinterpret_cast<const int*>(p);
+    p += sizeof(int);
+    this->MatrixNetHeader::deserializeFixed(p);
+  }
 };
 
 //!@endcond

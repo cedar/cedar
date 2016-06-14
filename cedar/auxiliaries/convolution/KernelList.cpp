@@ -109,8 +109,15 @@ void cedar::aux::conv::KernelList::calculateCombinedKernel()
     {
       cedar::aux::kernel::ConstKernelPtr kernel = this->getKernel(i);
       kernel->lockForRead();
-      cv::Mat kernel_mat = kernel->getKernel();
+      cv::Mat kernel_mat = kernel->getKernel().clone();
       kernel->unlock();
+
+      if (kernel_mat.empty())
+      {
+        cedar::aux::LogSingleton::getInstance()->warning("Empty kernel encountered. Skipping entry in kernel list.", CEDAR_CURRENT_FUNCTION_NAME);
+        continue;
+      }
+
       if (kernel_mat.rows > new_combined_kernel.rows || kernel_mat.cols > new_combined_kernel.cols)
       {
         int dw = std::max(0, (kernel_mat.cols - new_combined_kernel.cols + 1)/2);
