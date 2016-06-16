@@ -99,6 +99,9 @@ public:
   //! Returns the full path of the element.
   std::string getFullPath() const;
 
+  //! call the reset function of this element
+  virtual void callReset();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -118,6 +121,9 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   virtual void validateName(const std::string& newName) const;
+
+  //! resets this element
+  virtual void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

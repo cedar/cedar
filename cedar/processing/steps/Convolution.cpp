@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/steps/Convolution.h"
+#include "cedar/processing/Arguments.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
@@ -96,6 +97,8 @@ cedar::proc::steps::Convolution::Convolution()
 // outputs
 mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
 mConvolution(new cedar::aux::conv::Convolution()),
+// members
+mRevalidating(false),
 // parameters
 _mKernels
 (
@@ -163,7 +166,7 @@ void cedar::proc::steps::Convolution::recompute()
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Convolution::determineInputValidity
                                 (
-                                  cedar::proc::ConstDataSlotPtr CEDAR_DEBUG_ONLY(slot),
+                                  cedar::proc::ConstDataSlotPtr slot,
                                   cedar::aux::ConstDataPtr data
                                 ) const
 {
@@ -176,6 +179,44 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Convolution::determineInputV
     {
       return cedar::proc::DataSlot::VALIDITY_ERROR;
     }
+
+    // if a kernel is set, check if the convolution engine can convolve kernel and matrix
+    if (this->mKernel || slot->getName() == "kernel")
+    {
+      cv::Mat kernel;
+      if (slot->getName() == "kernel")
+      {
+        kernel = mat->getData();
+      }
+      else
+      {
+        kernel = this->mKernel->getData();
+      }
+
+      cv::Mat matrix;
+      if (slot->getName() == "matrix")
+      {
+        matrix = mat->getData();
+      }
+      else
+      {
+        if (!this->mMatrix)
+        {
+          return cedar::proc::DataSlot::VALIDITY_VALID;
+        }
+        matrix = this->mMatrix->getData();
+      }
+
+      if (!this->mConvolution->canConvolve(matrix, kernel))
+      {
+        return proc::DataSlot::VALIDITY_ERROR;
+      }
+      else
+      {
+        return cedar::proc::DataSlot::VALIDITY_VALID;
+      }
+    }
+
     // Mat data is accepted.
     return cedar::proc::DataSlot::VALIDITY_VALID;
   }
@@ -191,30 +232,48 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
   // Again, let's first make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(inputName == "matrix" || inputName == "kernel");
 
+  cv::Mat old_output = this->mOutput->getData().clone();
+
   if (inputName == "matrix")
   {
     // Assign the input to the member. This saves us from casting in every computation step.
     this->mMatrix = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
     // This should always work since other types should not be accepted.
-    if(!this->mMatrix)
+    if (!this->mMatrix)
     {
       return;
     }
 
     this->mOutput->copyAnnotationsFrom(this->mMatrix);
-    //!@todo This is only correct when the mode of the convolution is "same":
-    this->mOutput->setData(this->mMatrix->getData().clone());
 
     this->inputDimensionalityChanged();
+
+    if (!mRevalidating)
+    {
+      mRevalidating = true;
+      this->revalidateInputSlot("kernel");
+      mRevalidating = false;
+    }
   }
   else if (inputName == "kernel")
   {
     // Assign the input to the member. This saves us from casting in every computation step.
     this->mKernel = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
+
+    if (!mRevalidating)
+    {
+      mRevalidating = true;
+      this->revalidateInputSlot("matrix");
+      mRevalidating = false;
+    }
   }
 
-  //!@todo This should not be sent when the sizes don't change
-  this->emitOutputPropertiesChangedSignal("result");
+  this->callComputeWithoutTriggering();
+
+  if (!cedar::aux::math::matrixSizesEqual(old_output, this->mOutput->getData()))
+  {
+    this->emitOutputPropertiesChangedSignal("result");
+  }
 }
 
 void cedar::proc::steps::Convolution::inputDimensionalityChanged()

@@ -301,6 +301,10 @@ namespace cedar
      */
     std::string removeWhiteSpaces(const std::string& stringFromWhichToRemoveWhiteSpaces);
 
+    /*! Removes all white space at the beginning and end of the string.
+     */
+    std::string removeLeadingAndTrailingWhiteSpaces(const std::string& stringFromWhichToRemoveWhiteSpaces);
+
     /*!@brief Template function that converts an STL string to a simple data type.
      *
      * @param value The data value that will be converted to a string.
@@ -470,6 +474,9 @@ namespace cedar
       std::transform(lower_case_str.begin(), lower_case_str.end(), lower_case_str.begin(), ::tolower);
       return lower_case_str;
     }
+
+    //! Converts camel-case instances to spaces.
+    std::string camelCaseToSpaces(const std::string& camelCasedString);
   }
 }
 

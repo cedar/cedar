@@ -420,7 +420,7 @@ void cedar::proc::GroupFileFormatV1::writeParameterLinks
 
 void cedar::proc::GroupFileFormatV1::writeScripts(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& node) const
 {
-  for (auto script : group->getScripts())
+  for (auto script : group->getOrderedScripts())
   {
     std::string type = cedar::proc::CppScriptDeclarationManagerSingleton::getInstance()->getTypeId(script);
 

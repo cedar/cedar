@@ -52,7 +52,8 @@
 
 const int cedar::proc::gui::ArchitectureScriptEditor::M_NAME_COL = 0;
 const int cedar::proc::gui::ArchitectureScriptEditor::M_CTRL_COL = 1;
-const int cedar::proc::gui::ArchitectureScriptEditor::M_TYPE_COL = 2;
+const int cedar::proc::gui::ArchitectureScriptEditor::M_STATUS_COL = 2;
+const int cedar::proc::gui::ArchitectureScriptEditor::M_TYPE_COL = 3;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -149,6 +150,21 @@ void cedar::proc::gui::detail::ScriptControlWidget::scriptStopped()
   this->updateScriptRunningState(false);
 }
 
+
+void cedar::proc::gui::ArchitectureScriptEditor::scriptStatusChanged(QString newStatus)
+{
+  auto script = dynamic_cast<cedar::proc::CppScript*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(script);
+
+  for (int row = 0; row < this->mpScriptList->rowCount(); ++row)
+  {
+    if (this->mpScriptList->item(row, M_NAME_COL)->text() == QString::fromStdString(script->getName()))
+    {
+      this->mpScriptList->item(row, M_STATUS_COL)->setText(newStatus);
+    }
+  }
+}
+
 void cedar::proc::gui::ArchitectureScriptEditor::scriptNameChanged()
 {
   auto name_parameter = dynamic_cast<cedar::aux::StringParameter*>(QObject::sender());
@@ -174,7 +190,7 @@ void cedar::proc::gui::ArchitectureScriptEditor::refreshScriptList()
 {
   this->mpScriptList->setRowCount(0);
 
-  for (auto script : this->mGroup->getGroup()->getScripts())
+  for (auto script : this->mGroup->getGroup()->getOrderedScripts())
   {
     this->addScriptToList(QString::fromStdString(script->getName()));
   }
@@ -234,11 +250,13 @@ void cedar::proc::gui::ArchitectureScriptEditor::addScriptToList(const QString& 
 
   this->mpScriptList->setItem(row, M_NAME_COL, new QTableWidgetItem(QString::fromStdString(script->getName())));
   this->mpScriptList->setCellWidget(row, M_CTRL_COL, new cedar::proc::gui::detail::ScriptControlWidget(script));
+  this->mpScriptList->setItem(row, M_STATUS_COL, new QTableWidgetItem(QString::fromStdString(script->getStatus())));
   this->mpScriptList->setItem(row, M_TYPE_COL, new QTableWidgetItem(QString::fromStdString(script->getType())));
 
   auto name_parameter = script->getParameter("name");
   this->mUsedParameterNames[name_parameter.get()] = script->getName();
   QObject::connect(name_parameter.get(), SIGNAL(valueChanged()), this, SLOT(scriptNameChanged()));
+  QObject::connect(script.get(), SIGNAL(statusChanged(QString)), this, SLOT(scriptStatusChanged(QString)));
 }
 
 void cedar::proc::gui::ArchitectureScriptEditor::fillTypeComboBox()

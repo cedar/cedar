@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,68 +22,71 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ArchitectureToolBox.h
+    File:        Multiplexer.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 11
+    Maintainer:  Guido Knips
+    Email:       guido.knips@ini.rub.de
+    Date:        2013 12 04
 
-    Description:
+    Description: Takes a number of scalar inputs and copies them into a one-dimensional vector
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_ARCHITECTURE_TOOLBOX_H
-#define CEDAR_PROC_GUI_ARCHITECTURE_TOOLBOX_H
+#ifndef CEDAR_PROC_STEPS_MULTIPLEXER_H
+#define CEDAR_PROC_STEPS_MULTIPLEXER_H
 
-// CEDAR INCLUDES
-#include "cedar/processing/gui/ToolBox.h"
-#include "cedar/processing/gui/Scene.h"
+// LOCAL INCLUDES
+#include "cedar/processing/steps/ScalarsToVector.fwd.h"
 
-// FORWARD DECLARATIONS
-#include "cedar/processing/gui/ArchitectureToolBox.fwd.h"
+// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <cedar/processing/Step.h>
+#include <cedar/auxiliaries/MatData.h>
+#include <cedar/auxiliaries/UIntParameter.h>
+#include <vector>
 
 
-/*!@brief This is the toolbox that contains the architecture tools.
+/*!@todo describe.
  *
- *        This widget can be found in cedar's GUI.
+ * @todo describe more.
  */
-class cedar::proc::gui::ArchitectureToolBox : public cedar::proc::gui::ToolBox
+class cedar::proc::steps::ScalarsToVector : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ArchitectureToolBox(QWidget *pParent = NULL);
+  ScalarsToVector();
 
-  //!@brief Destructor.
-  ~ArchitectureToolBox();
-
+  //--------------------------------------------------------------------------------------------------------------------
+  // public slots
+  //--------------------------------------------------------------------------------------------------------------------
+public slots:
+  //@called when the vector dimension changes
+  void vectorDimensionChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Sets the view that is controlled by this toolbox.
-   */
-  void setView(cedar::proc::gui::View *pView);
-
-public slots:
-  /*!@brief Slot that reacts to a change in the selected tool.
-   */
-  void selectionChanged(QString data);
+  void inputConnectionChanged(const std::string& inputName);
+  //!@brief input verification
+  cedar::proc::DataSlot::VALIDITY determineInputValidity
+  (
+    cedar::proc::ConstDataSlotPtr slot,
+    cedar::aux::ConstDataPtr data
+  )const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -95,7 +98,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void compute(const cedar::proc::Arguments&);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -103,9 +106,25 @@ private:
 protected:
   // none yet
 private:
-  //! View that is controlled by this toolbox.
-  cedar::proc::gui::View *mpView;
+  //output vector
+  cedar::aux::MatDataPtr mOutput;
+  //input scalars
+  std::vector< cedar::aux::ConstMatDataPtr > mInputs;
 
-}; // class cedar::proc::gui::ArchitectureToolBox
+  // returns i-th slots name
+  std::string makeSlotName(const int i);
 
-#endif // CEDAR_PROC_GUI_ARCHITECTURE_TOOLBOX_H
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  //Parameter for the dimension of the output vector
+  cedar::aux::UIntParameterPtr _mOutputDimension;
+
+}; // cedar::proc::steps::Multiplexer
+
+#endif // CEDAR_PROC_STEPS_MULTIPLEXER_H
+

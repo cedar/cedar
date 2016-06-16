@@ -39,6 +39,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/PerformanceOverview.h"
+#include "cedar/processing/sources/GroupSource.h"
+#include "cedar/processing/sinks/GroupSink.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/Step.h"
 #include "cedar/units/prefixes.h"
@@ -190,6 +192,14 @@ void cedar::proc::gui::PerformanceOverview::addGroup(cedar::proc::ConstGroupPtr 
 
 void cedar::proc::gui::PerformanceOverview::addStepRow(cedar::proc::ConstStepPtr step)
 {
+  //!@todo This is a quickfix. A virtual function, isPerformanceRelevant (name?) in Step would be a better solution.
+  if (boost::dynamic_pointer_cast<cedar::proc::sources::ConstGroupSource>(step)
+      || boost::dynamic_pointer_cast<cedar::proc::sinks::ConstGroupSink>(step))
+  {
+    // group sources and sinks are ignored as they are not displayed to the user
+    return;
+  }
+
   int row = this->mpStepTimeOverview->rowCount();
   this->mpStepTimeOverview->setRowCount(row + 1);
 

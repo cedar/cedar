@@ -219,6 +219,9 @@ public:
    */
   virtual void emitOutputPropertiesChangedSignal(const std::string& slot);
 
+  //! Returns if this step is marked as being recorded.
+  bool isRecorded() const;
+  
   //!@brief Checks if the connectable has a slot with the given role and name.
   bool hasSlot(DataRole::Id role, const std::string& name, bool lock = true) const;
 
@@ -473,7 +476,12 @@ private:
 
   virtual void outputConnectionRemoved(cedar::proc::DataSlotPtr slot);
 
-  //!@brief Declares an output slot and immediately sets a non-owned data pointer for that slot.
+  /*!@brief Declares an output slot that contains data that is not owned by this connectable.
+   *
+   * This is necessary mostly in the context of groups, where data owned by a step inside the group is passed to the
+   * outside via a data slot on the group. Because the group does not own the data, a shared output must be declared
+   * using this method.
+   */
   cedar::proc::DataSlotPtr declareSharedOutput(const std::string& name, cedar::aux::DataPtr data);
 
   //! Returns the slot map for the given role. If none exists, throws an exception.
@@ -489,6 +497,8 @@ private:
   SlotMap::const_iterator findSlot(cedar::proc::DataRole::Id role, const std::string& name) const;
 
   void callInputConnectionChangedFor(cedar::proc::DataSlotWeakPtr slot);
+
+  std::map<std::string, cedar::unit::Time> unregisterRecordedData() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals & connections

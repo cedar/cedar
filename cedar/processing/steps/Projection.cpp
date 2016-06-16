@@ -171,7 +171,7 @@ void cedar::proc::steps::Projection::outputDimensionSizesChanged()
   this->emitOutputPropertiesChangedSignal("output");
 }
 
-void cedar::proc::steps::Projection::reconfigure()
+void cedar::proc::steps::Projection::reconfigure(bool triggerSubsequent)
 {
   if (!this->mInput)
   {
@@ -327,10 +327,18 @@ void cedar::proc::steps::Projection::reconfigure()
   if (this->mInput->getCvType() != this->mOutput->getCvType())
   {
     this->initializeOutputMatrix();
+    this->emitOutputPropertiesChangedSignal("output");
   }
 
   // now do a final step and try to calculate an output with the new configuration
-  this->onTrigger(cedar::proc::ArgumentsPtr());
+  if (triggerSubsequent)
+  {
+    this->onTrigger(cedar::proc::ArgumentsPtr());
+  }
+  else
+  {
+    this->callComputeWithoutTriggering();
+  }
 }
 
 void cedar::proc::steps::Projection::initializeOutputMatrix()
@@ -1064,5 +1072,5 @@ void cedar::proc::steps::Projection::inputConnectionChanged(const std::string& i
   
   this->_mDimensionMappings->initialize(input_dimensionality);
 
-  this->reconfigure();
+  this->reconfigure(false);
 }
