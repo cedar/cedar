@@ -111,7 +111,7 @@ const
 
 void cedar::proc::experiment::action::IncrementParameter::run()
 {
-  if (_mStepParameter->isParameterSelected())
+  if (!_mStepParameter->isParameterSelected())
   {
     return;
   }
