@@ -174,6 +174,6 @@ void cedar::proc::steps::MatrixTypeConverter::inputConnectionChanged(const std::
 
   if (this->mMatrix)
   {
-    this->onTrigger();
+    this->callComputeWithoutTriggering();
   }
 }
