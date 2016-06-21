@@ -1045,7 +1045,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Projection::determineInputVa
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
   if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
-    if (mat_data->isEmpty())
+    if (mat_data->isEmpty() || (mat_data->getCvType() != CV_32F && mat_data->getCvType() != CV_64F))
     {
       return cedar::proc::DataSlot::VALIDITY_ERROR;
     }

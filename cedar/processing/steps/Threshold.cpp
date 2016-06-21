@@ -149,6 +149,7 @@ void cedar::proc::steps::Threshold::inputConnectionChanged(const std::string& in
   {
     const cv::Mat& input = this->mInputImage->getData();
 
+    cv::Mat old_output = this->mThresholdedImage->getData();
     this->mThresholdedImage->getData() = cv::Mat(input.dims, input.size, input.type(), cv::Scalar(0));
     this->mLowerThreshold->getData() = cv::Mat(input.dims, input.size, input.type(), cv::Scalar(0));
     this->mUpperThreshold->getData() = cv::Mat(input.dims, input.size, input.type(), cv::Scalar(0));
@@ -157,28 +158,31 @@ void cedar::proc::steps::Threshold::inputConnectionChanged(const std::string& in
     this->mLowerThreshold->copyAnnotationsFrom(this->mInputImage);
     this->mUpperThreshold->copyAnnotationsFrom(this->mInputImage);
 
-    if(input.channels() != 1)
+    if (input.channels() != 1)
     {
-        return;
+      return;
     }
 
     int depth = 8;
 
     switch (input.depth())
     {
-    case CV_8U:
-      this->mMaxValue = static_cast<double>( (1 << depth) - 1 );
-      break;
+      case CV_8U:
+        this->mMaxValue = static_cast<double>( (1 << depth) - 1 );
+        break;
 
-    case CV_32F:
-      this->mMaxValue = 1.0;
-      break;
+      case CV_32F:
+        this->mMaxValue = 1.0;
+        break;
 
-    default:
-      CEDAR_THROW(cedar::aux::UnhandledValueException, "The matrix depth is not handled.");
+      default:
+        CEDAR_THROW(cedar::aux::UnhandledValueException, "The matrix depth is not handled.");
     }
 
-    this->emitOutputPropertiesChangedSignal("thresholded input");
+    if (!cedar::aux::math::matrixSizesEqual(old_output, this->mThresholdedImage->getData()) || old_output.type() != this->mThresholdedImage->getData().type())
+    {
+      this->emitOutputPropertiesChangedSignal("thresholded input");
+    }
   }
 }
 
