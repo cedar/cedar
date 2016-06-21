@@ -571,8 +571,14 @@ public:
   //!@brief imports a given group from a given configuration file and links it to said file
   cedar::proc::ElementPtr createLinkedGroup(const std::string& groupName, const std::string& fileName);
 
+  //!@brief imports a given group template from a given configuration file and links it to said file
+  cedar::proc::ElementPtr createLinkedTemplate(const std::string& groupName, const std::string& fileName, const std::string& templateName);
+
   //!@brief read linked content from a group
   void readLinkedGroup(const std::string& groupName, const cedar::aux::Path& fileName);
+
+  //!@brief read linked content from a group
+  void readLinkedTemplate(const std::string& templateName);
 
   //!@brief imports a given step from a given configuration file
   cedar::proc::ElementPtr importStepFromFile(const std::string& stepName, const std::string& fileName);
@@ -890,6 +896,9 @@ private:
 
   //! If non-empty, the name of the group that was imported from a file.
   std::string mLinkedGroupName;
+
+  //! If non-empty, the name of the group template that was used to create this group.
+  std::string mLinkedTemplateName;
 
   //! Flag if trigger chain updates should be executed (during connecting/loading)
   bool mHoldTriggerChainUpdates;

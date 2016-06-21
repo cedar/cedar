@@ -86,7 +86,7 @@ cedar::proc::ElementPtr cedar::proc::GroupDeclarationManager::addGroupTemplateTo
     {
       if (makeLink)
       {
-        return base->createLinkedGroup(declaration->getGroupName(), declaration->getFileName());
+        return base->createLinkedTemplate(declaration->getGroupName(), declaration->getFileName(), templateName);
       }
       else
       {
@@ -122,6 +122,19 @@ cedar::proc::ElementPtr cedar::proc::GroupDeclarationManager::addGroupTemplateTo
 const cedar::proc::GroupDeclarationManager::GroupDeclarationMap& cedar::proc::GroupDeclarationManager::getDefinitions() const
 {
   return this->mDeclarations;
+}
+
+cedar::proc::ConstGroupDeclarationPtr cedar::proc::GroupDeclarationManager::getDeclaration(const std::string& name) const
+{
+  auto decl = this->getDeclarationNoThrow(name);
+  if (decl)
+  {
+    return decl;
+  }
+  else
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find groul template declaration with name \"" + name + "\".");
+  }
 }
 
 cedar::proc::ConstGroupDeclarationPtr cedar::proc::GroupDeclarationManager::getDeclarationNoThrow(const std::string& name) const
