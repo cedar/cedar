@@ -104,7 +104,10 @@ public:
   //!@brief get all definitions
   const GroupDeclarationMap& getDefinitions() const;
 
-  //! Gets a declaration given a name. Returns a null pointer if
+  //! Gets a declaration given a name. Throws a cedar::aux::NotFoundException when the name cannot be found.
+  cedar::proc::ConstGroupDeclarationPtr getDeclaration(const std::string& name) const;
+
+  //! Gets a declaration given a name. Returns a null pointer if the name cannot be found.
   cedar::proc::ConstGroupDeclarationPtr getDeclarationNoThrow(const std::string& name) const;
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -78,8 +78,15 @@ void cedar::proc::GroupFileFormatV1::write
 
   if (group->isLinked())
   {
-    root.put("linked file", group->mLinkedGroupFile.toString(true));
-    root.put("linked group name", group->mLinkedGroupName);
+    if (group->mLinkedTemplateName.empty())
+    {
+      root.put("linked file", group->mLinkedGroupFile.toString(true));
+      root.put("linked group name", group->mLinkedGroupName);
+    }
+    else
+    {
+      root.put("linked group template", group->mLinkedTemplateName);
+    }
   }
   else
   {
@@ -274,9 +281,16 @@ void cedar::proc::GroupFileFormatV1::read
   bool linked = false;
   auto linked_file_iter = root.find("linked file");
   auto linked_name_iter = root.find("linked group name");
+  auto linked_group_tempalte_iter = root.find("linked group template");
   if (linked_file_iter != root.not_found() && linked_name_iter != root.not_found())
   {
     group->readLinkedGroup(linked_name_iter->second.get_value<std::string>(), linked_file_iter->second.get_value<std::string>());
+    linked = true;
+  }
+
+  if (linked_group_tempalte_iter != root.not_found())
+  {
+    group->readLinkedTemplate(linked_group_tempalte_iter->second.get_value<std::string>());
     linked = true;
   }
 

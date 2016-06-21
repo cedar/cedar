@@ -40,6 +40,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Group.h"
+#include "cedar/processing/GroupDeclarationManager.h"
+#include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/CppScript.h"
 #include "cedar/processing/GroupFileFormatV1.h"
 #include "cedar/processing/Step.h"
@@ -2826,6 +2828,13 @@ void cedar::proc::Group::revalidateConnections(const std::string& sender)
   }
 }
 
+void cedar::proc::Group::readLinkedTemplate(const std::string& templateName)
+{
+  auto declaration = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->getDeclaration(templateName);
+  this->mLinkedTemplateName = templateName;
+  this->readLinkedGroup(declaration->getGroupName(), declaration->getFileName());
+}
+
 void cedar::proc::Group::readLinkedGroup(const std::string& groupName, const cedar::aux::Path& fileName)
 {
   //!@todo This code is largely redundant with importGroupFromFile
@@ -2867,6 +2876,13 @@ void cedar::proc::Group::readLinkedGroup(const std::string& groupName, const ced
   }
 
   this->signalLinkedChanged(true);
+}
+
+cedar::proc::ElementPtr cedar::proc::Group::createLinkedTemplate(const std::string& groupName, const std::string& fileName, const std::string& templateName)
+{
+  auto group = cedar::aux::asserted_pointer_cast<cedar::proc::Group>(this->createLinkedGroup(groupName, fileName));
+  group->mLinkedTemplateName = templateName;
+  return group;
 }
 
 cedar::proc::ElementPtr cedar::proc::Group::createLinkedGroup(const std::string& groupName, const std::string& fileName)
