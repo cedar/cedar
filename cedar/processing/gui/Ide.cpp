@@ -887,8 +887,10 @@ void cedar::proc::gui::Ide::showRobotManager()
   auto p_dialog = new QDialog(this);
   auto p_layout = new QVBoxLayout();
   p_dialog->setLayout(p_layout);
-  p_layout->addWidget(new cedar::dev::gui::RobotManager());
-  p_dialog->setMinimumHeight(500);
+  auto p_robot_manager = new cedar::dev::gui::RobotManager();
+  QObject::connect(p_robot_manager, SIGNAL(closeRobotManager(void)), p_dialog, SLOT(close(void)));
+  p_layout->addWidget(p_robot_manager);
+  p_dialog->setMinimumHeight(800);
   p_dialog->show();
 }
 

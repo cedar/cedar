@@ -76,6 +76,8 @@ mpChannelsNode(NULL)
 
   this->mpLoadButton->setMenu(load_menu);
 
+  QObject::connect(mpCloseButton, SIGNAL(clicked(void)), this, SLOT(closeWindow()));
+
   QObject::connect(this, SIGNAL(robotNameAdded(QString)), this, SLOT(addRobotName(QString)));
 
   mRobotAddedConnection = cedar::dev::RobotManagerSingleton::getInstance()->
@@ -190,7 +192,12 @@ void cedar::dev::gui::RobotManager::fillExistingRobots()
 
 void cedar::dev::gui::RobotManager::removeClicked()
 {
-  cedar::dev::RobotManagerSingleton::getInstance()->removeRobot(this->getSelectedRobotName());
+    cedar::dev::RobotManagerSingleton::getInstance()->removeRobot(this->getSelectedRobotName());
+}
+
+void cedar::dev::gui::RobotManager::closeWindow()
+{
+    closeRobotManager();
 }
 
 void cedar::dev::gui::RobotManager::robotRemoved(const std::string& robotName)
