@@ -255,6 +255,13 @@ void cedar::dev::RobotManager::removeRobot(const std::string& robotName)
   }
 
   this->mRobotRemovedSignal(robotName);
+
+  if(this->mRobotInstances.size() == 0)
+  {
+    // if no card is left after removal, append a blank card
+    std::string name = getNewRobotName();
+    addRobotName(name);
+  }
 }
 
 cedar::dev::RobotPtr cedar::dev::RobotManager::getRobot(const std::string& robotName) const
