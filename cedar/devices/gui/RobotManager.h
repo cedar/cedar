@@ -130,7 +130,7 @@ private slots:
 
   void partSelected(QTreeWidgetItem* pCurrent, QTreeWidgetItem* pPrevious);
 
-  void simpleModeAddClicked();
+  void simpleModeAdd();
 
   void removeClicked();
 
