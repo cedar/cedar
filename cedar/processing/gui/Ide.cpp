@@ -891,7 +891,7 @@ void cedar::proc::gui::Ide::showRobotManager()
   QObject::connect(p_robot_manager, SIGNAL(closeRobotManager(void)), p_dialog, SLOT(close(void)));
   p_layout->addWidget(p_robot_manager);
   p_dialog->setMinimumHeight(800);
-  p_dialog->setWindowTitle("cedar - Robot Manager");
+  p_dialog->setWindowTitle("cedar - robot manager");
   p_dialog->show();
 }
 

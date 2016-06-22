@@ -166,6 +166,7 @@ private:
   cedar::dev::gui::RobotCardIconHolder* mpIcon;
 
   QPushButton* mpConnectButton;
+  QPushButton* mpDeleteButton;
 
   std::string mRobotTemplateName;
 
