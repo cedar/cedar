@@ -85,14 +85,16 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
 
   // delete button
   auto p_del_layout = new QVBoxLayout();
-  auto p_delete_button = new QPushButton(QIcon(":/cedar/auxiliaries/gui/trashcan.svg"), "");
-  p_delete_button->setFixedWidth(24);
-  p_delete_button->setFixedHeight(24);
-  p_delete_button->setIconSize(QSize(16, 16));
-  p_delete_button->setToolTip("Remove this robot");
 
-  p_del_layout->addWidget(p_delete_button);
-  p_del_layout->setAlignment(p_delete_button, Qt::AlignRight);
+  mpDeleteButton = new QPushButton(QIcon(":/cedar/auxiliaries/gui/trashcan.svg"), "");
+  mpDeleteButton->setFixedWidth(24);
+  mpDeleteButton->setFixedHeight(24);
+  mpDeleteButton->setIconSize(QSize(16, 16));
+  mpDeleteButton->setToolTip("Remove this robot");
+  mpDeleteButton->setEnabled(false); // prevent deleting empty placeholder card
+
+  p_del_layout->addWidget(mpDeleteButton);
+  p_del_layout->setAlignment(mpDeleteButton, Qt::AlignRight);
   p_outer_layout->addLayout(p_del_layout, 1);
 
   // robot icon
@@ -132,7 +134,7 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
 
   QObject::connect(this->mpIcon, SIGNAL(robotDropped(const QString&)), this, SLOT(robotDropped(const QString&)));
   QObject::connect(mpConfigurationSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedConfigurationChanged(int)));
-  QObject::connect(p_delete_button, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+  QObject::connect(mpDeleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
   QObject::connect(this->mpRobotNameEdit, SIGNAL(textEdited(const QString&)), this, SLOT(robotNameEditValueChanged(const QString&)));
 
   try
@@ -294,7 +296,7 @@ void cedar::dev::gui::RobotCard::selectedConfigurationChanged(int index)
   QString combo_text = this->mpConfigurationSelector->itemText(index);
   if (index == 0 && combo_text == "-- select to instantiate --")
   {
-    mpConnectButton->setDisabled(true);
+    mpConnectButton->setDisabled(true);    
     return;
   }
 
@@ -340,8 +342,10 @@ void cedar::dev::gui::RobotCard::robotDropped(const QString& robotTypeName)
       selected = this->mpConfigurationSelector->count() - 1;
     }
   }
+
   this->mpConfigurationSelector->setCurrentIndex(selected);
   this->mpConfigurationSelector->blockSignals(blocked);
+  mpDeleteButton->setEnabled(true); // a new placeholder card had to be placed, so allow deletion
 }
 
 std::string cedar::dev::gui::RobotCardIconHolder::getRobotName() const
