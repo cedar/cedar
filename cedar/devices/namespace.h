@@ -85,6 +85,7 @@ namespace cedar
     CEDAR_DECLARE_DEV_CLASS(UnresponsiveRobotException);
     CEDAR_DECLARE_DEV_CLASS(JointIndexOutOfRangeException);
     CEDAR_DECLARE_DEV_CLASS(JointNumberMismatchException);
+    CEDAR_DECLARE_DEV_CLASS(IgnoreCommunicationException);
     //!@endcond
   }
 }
