@@ -1,0 +1,198 @@
+{
+  "component slots":
+  {
+    "arm":
+    {
+      "available components":
+      {
+        "yarp":
+        {
+          "cedar.dev.YarpKinematicChain":
+          {
+            "requires channel": "yarp"
+          }
+        }
+      },
+      "shared component parameters":
+      {
+  		  "name": "Youbot",
+  		  "server port": "0",
+  		  "remote host": "NULL",
+  		  "step size": "20.0",
+  		  "idle time": "0.001",
+  		  "use fixed step size": "false",
+  		  "simulated time": "0.0",
+  		  "root coordinate frame":
+  		  {
+  		    "initial translation":
+  		    [
+  		      "0.143",
+  		      "0.0",
+  		      "0.130"
+  		    ],
+  		    "initial rotation":
+  		    [
+  		      "1.0", "0.0", "0.0",
+      		  "0.0", "1.0", "0.0",
+              "0.0", "0.0", "1.0"
+  		    ]
+  		  },
+  		  "end-effector coordinate frame":
+  		  {
+  		    "initial translation":
+  		    [
+  		      "0.212", 
+  		      "0.2568",
+  		      "0.17216"
+  		    ],
+  		    "initial rotation":
+  		    [
+  		      "1.0", "0.0", "0.0",
+  		      "0.0", "1.0", "0.0",
+  		      "0.0", "0.0", "1.0"
+  		    ]
+  		  },
+  		  "joints":
+  		  {
+  		    "cedar.dev.KinematicChain.Joint":1
+  		    {
+  		      "angle limits":
+  		      {
+  		        "lower limit": "-2.94",
+  		        "upper limit": "2.94"
+  		      },
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "0.024", 
+  		        "0.0",
+  		        "0.115"
+  		      ],
+  		      "axis":
+  		      [
+  		        "0.0", 
+  		        "0.0",
+  		        "1.0"
+  		      ]
+  		    },
+  		    "cedar.dev.KinematicChain.Joint":2
+  		    {
+  		      "angle limits":
+  		      {
+  		        "lower limit": "-1.13",
+  		        "upper limit": "1.57"
+  		      },
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "0.057", 
+  		        "0.0",
+  		        "0.115"
+  		      ],
+  		      "axis":
+  		      [
+  		        "0.0", 
+  		        "0.0",
+  		        "1.0"
+  		      ]
+  		    },
+  		    "cedar.dev.KinematicChain.Joint":3
+  		    {
+  		      "angle limits":
+  		      {
+  		        "lower limit": "-2.64",
+  		        "upper limit": "2.55"
+  		      },
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "0.212", 
+  		        "0.0",
+  		        "0.115"
+  		      ],
+  		      "axis":
+  		      [
+  		        "0.0", 
+  		        "0.0",
+  		        "1.0"
+  		      ]
+  		    },
+  		    "cedar.dev.KinematicChain.Joint":4
+  		    {
+  		      "angle limits":
+  		      {
+  		        "lower limit": "-1.79",
+  		        "upper limit": "1.79"
+  		      },
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "0.212", 
+  		        "0.135",
+  		        "0.115"
+  		      ],
+  		      "axis":
+  		      [
+  		        "0.0", 
+  		        "0.0",
+  		        "1.0"
+  		      ]
+  		    },
+  		    "cedar.dev.KinematicChain.Joint":5
+  		    {
+  		      "angle limits":
+  		      {
+  		        "lower limit": "-2.88",
+  		        "upper limit": "2.88"
+  		      },
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "0.212", 
+  		        "0.248.6",
+  		        "0.115"
+  		      ],
+  		      "axis":
+  		      [
+  		        "0.0", 
+  		        "0.0",
+  		        "-1.0"
+  		      ]
+  		    }
+  		  }
+      }
+    }
+  },
+  "available channels":
+  {
+    "yarp":
+    {
+      "cedar.dev.YarpChannel<cv.Mat>":
+      {
+      "readPortName": "webots/youbotArmStatusFramework",
+      "writePortName":"webots/youbotArmCommandsFramework"
+      }
+    }
+  }
+}
+

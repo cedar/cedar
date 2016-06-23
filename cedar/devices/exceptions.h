@@ -66,6 +66,10 @@ class cedar::dev::TimeoutException : public cedar::dev::CommunicationException
 {
 }; // class cedar::dev::TimeoutException
 
+class cedar::dev::IgnoreCommunicationException : public cedar::dev::CommunicationException
+{
+};
+
 //!@brief Exception that occurs when the operating system of the computer cannot be determined.
 class cedar::dev::UnknownOperatingSystemException : public cedar::aux::ExceptionBase
 {
@@ -120,4 +124,7 @@ class cedar::dev::JointIndexOutOfRangeException : public cedar::aux::ExceptionBa
 class cedar::dev::JointNumberMismatchException : public cedar::aux::ExceptionBase
 {
 };
+
+
+
 #endif // CEDAR_DEV_EXCEPTIONS_H
