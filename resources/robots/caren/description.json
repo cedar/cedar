@@ -12,6 +12,13 @@
             "requires channel": "fri"
           }
         },
+        "yarp":
+        {
+          "cedar.dev.YarpKinematicChain":
+          {
+            "requires channel": "yarp"
+          }
+        },
         "simulator":
         {
           "cedar.dev.SimulatedKinematicChain":
@@ -253,6 +260,14 @@
     {
       "cedar.dev.kuka.SimulatedKinematicChain":
       {
+      }
+    },
+    "yarp":
+    {
+      "cedar.dev.YarpChannel<cv.Mat>":
+      {
+      	"readPortName": "webots/carenArmStatusFramework",
+      	"writePortName":"webots/carenArmCommandsFramework"
       }
     }
   }

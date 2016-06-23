@@ -10,5 +10,7 @@
         <file>icons/partially_connected.svg</file>
         <file>icons/connecting.svg</file>
         <file>icons/drop_robot.png</file>
+        <file>icons/caren_icon_256.png</file>
+        <file>icons/youbot_icon_256.png</file>
     </qresource>
 </RCC>
