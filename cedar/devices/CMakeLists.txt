@@ -50,6 +50,7 @@ cedar_add_library(cedardev
                   Component.h
                   KinematicChain.h
                   SimulatedKinematicChain.h
+                  YarpKinematicChain.h
                   SerialChannel.h
                   Odometry.h
                   gui/KinematicChainWidget.h
