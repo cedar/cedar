@@ -134,6 +134,13 @@ bool cedar::proc::experiment::Experiment::checkValidity(std::vector<std::string>
     bool valid = this->_mActionSequences->at(i)->checkValidity(errors, warnings);
     all_valid = all_valid && valid;
   }
+ 
+  // recording should not be running:
+  if (cedar::aux::RecorderSingleton::getInstance()->isRunning() )
+  {
+    errors.push_back("Please stop recording data manually first.");
+    all_valid = false;
+  }
 
   return all_valid;
 }
@@ -214,6 +221,16 @@ void cedar::proc::experiment::Experiment::removeLog()
 
 void cedar::proc::experiment::Experiment::startExperiment()
 {
+  // be sure that no recordings are running:
+  if (cedar::aux::RecorderSingleton::getInstance()->isRunning())
+  {
+    cedar::aux::RecorderSingleton::getInstance()->stopAllRecordings();
+
+    cedar::aux::LogSingleton::getInstance()->warning(
+      "Stopped previously running Recordings. Restarting recordings for experiment ...",
+      CEDAR_CURRENT_FUNCTION_NAME);
+  }
+
   this->installLog();
   if (this->_mTrials->getValue() > 0)
   {
