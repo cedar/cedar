@@ -74,7 +74,6 @@ public:
 
   YarpChannel()
 :
-  mIsOpen(false),
   mReadPortName(new cedar::aux::StringParameter(this, "readPortName", "defaultRead")),
   mWritePortName(new cedar::aux::StringParameter(this, "writePortName", "defaultWrite"))
 {
@@ -165,11 +164,6 @@ public:
     std::cout << "7"<< std::endl;
   }
 
-  bool isOpen() const
-  {
-    return this->mIsOpen;
-  }
-
   bool isConnected() const
   {
     return true;
@@ -236,19 +230,17 @@ protected:
           it->second = TypeWriterPtr(new TypeWriter(port));
         }
       }
-      mIsOpen = true;
     }
   }
 
   void closeHook()
   {
     std::cout << "Started the CloseHook" << std::endl;
-    if (mIsOpen)
+    if (isOpen())
     {
       std::cout << "CloseHook closes!" << std::endl;
       mReaderMap.clear();
       mWriterMap.clear();
-      mIsOpen = false;
     }
   }
 
@@ -266,7 +258,6 @@ protected:
 private:
   std::map<std::string, TypeReaderPtr> mReaderMap;
   std::map<std::string, TypeWriterPtr> mWriterMap;
-  bool mIsOpen;
 
 //--------------------------------------------------------------------------------------------------------------------
 // parameters
