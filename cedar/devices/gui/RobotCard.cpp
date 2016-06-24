@@ -135,7 +135,7 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
   QObject::connect(this->mpIcon, SIGNAL(robotDropped(const QString&)), this, SLOT(robotDropped(const QString&)));
   QObject::connect(mpConfigurationSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedConfigurationChanged(int)));
   QObject::connect(mpDeleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-  QObject::connect(this->mpRobotNameEdit, SIGNAL(textEdited(const QString&)), this, SLOT(robotNameEditValueChanged(const QString&)));
+  QObject::connect(this->mpRobotNameEdit, SIGNAL(editingFinished(void)), this, SLOT(robotNameEditValueChanged(void)));
 
   try
   {
@@ -417,8 +417,21 @@ QListWidgetItem* cedar::dev::gui::RobotCardIconHolder::itemFromMime(QDropEvent* 
   return p_source->item(r);
 }
 
-void cedar::dev::gui::RobotCard::robotNameEditValueChanged(const QString& robotName)
+void cedar::dev::gui::RobotCard::robotNameEditValueChanged()
 {
-  cedar::dev::RobotManagerSingleton::getInstance()->renameRobot(mCurrentName, robotName.toStdString());
-  mCurrentName = robotName.toStdString();
+  const QString &robot_name = mpRobotNameEdit->text();
+
+  if(robot_name.toStdString() == mCurrentName)
+  {
+    return;
+  }
+
+  cedar::aux::LogSingleton::getInstance()->message
+  (
+    "\""+mCurrentName+"\" was renamed to \""+robot_name.toStdString()+"\"",
+    "cedar::dev::gui::RobotCard::robotNameEditValueChanged()"
+  );
+
+  cedar::dev::RobotManagerSingleton::getInstance()->renameRobot(mCurrentName, robot_name.toStdString());
+  mCurrentName = robot_name.toStdString();
 }
