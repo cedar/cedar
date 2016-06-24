@@ -102,11 +102,6 @@ cedar::dev::kuka::FRIChannel::~FRIChannel()
   }
 }
 
-bool cedar::dev::kuka::FRIChannel::isOpen() const
-{
-  return this->mIsOpen;
-}
-
 void cedar::dev::kuka::FRIChannel::openHook()
 {
   QMutexLocker lock( &mFRIRemoteLock );
@@ -121,17 +116,13 @@ void cedar::dev::kuka::FRIChannel::openHook()
   {
     mpFriRemote = new friRemote(this->getPort());
   }
-
-  mIsOpen = true;
 }
 
 void cedar::dev::kuka::FRIChannel::closeHook()
 {
-  if (mIsOpen)
-  {
-    mIsOpen = false;
-  }
+  // dummy
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // wrapped fri-functions
