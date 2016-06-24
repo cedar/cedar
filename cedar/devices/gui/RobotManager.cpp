@@ -76,7 +76,7 @@ mpChannelsNode(NULL)
 
   this->mpLoadButton->setMenu(load_menu);
 
-  QObject::connect(this->mpAddRobotButton, SIGNAL(clicked()), this, SLOT(addRobotClicked()));
+  QObject::connect(mpCloseButton, SIGNAL(clicked(void)), this, SLOT(closeWindow()));
 
   QObject::connect(this, SIGNAL(robotNameAdded(QString)), this, SLOT(addRobotName(QString)));
 
@@ -126,11 +126,7 @@ mpChannelsNode(NULL)
 
   QObject::connect(this->mpRemoveButton, SIGNAL(clicked()), this, SLOT(removeClicked()));
 
-  // simple mode
-  QObject::connect(this->mpSimpleModeAddButton, SIGNAL(clicked()), this, SLOT(simpleModeAddClicked()));
-
   this->fillSimpleRobotList();
-
   this->fillExistingRobots();
 
   this->mpSimpleRobotIconList->viewport()->setAcceptDrops(true);
@@ -180,6 +176,13 @@ void cedar::dev::gui::RobotManager::fillExistingRobots()
 {
   std::vector<std::string> robot_names = cedar::dev::RobotManagerSingleton::getInstance()->getRobotNames();
 
+  if(robot_names.size() == 0)
+  {
+    // if there is no robot yet, add an empty placeholder
+    simpleModeAdd();
+    return;
+  }
+
   for (auto robot_name_iter = robot_names.begin(); robot_name_iter != robot_names.end(); ++robot_name_iter)
   {
     const std::string& robot_name = *robot_name_iter;
@@ -189,7 +192,12 @@ void cedar::dev::gui::RobotManager::fillExistingRobots()
 
 void cedar::dev::gui::RobotManager::removeClicked()
 {
-  cedar::dev::RobotManagerSingleton::getInstance()->removeRobot(this->getSelectedRobotName());
+    cedar::dev::RobotManagerSingleton::getInstance()->removeRobot(this->getSelectedRobotName());
+}
+
+void cedar::dev::gui::RobotManager::closeWindow()
+{
+    closeRobotManager();
 }
 
 void cedar::dev::gui::RobotManager::robotRemoved(const std::string& robotName)
@@ -219,7 +227,7 @@ void cedar::dev::gui::RobotManager::fillSimpleRobotList()
   }
 }
 
-void cedar::dev::gui::RobotManager::simpleModeAddClicked()
+void cedar::dev::gui::RobotManager::simpleModeAdd()
 {
   std::string new_robot_name = cedar::dev::RobotManagerSingleton::getInstance()->getNewRobotName();
   cedar::dev::RobotManagerSingleton::getInstance()->addRobotName(new_robot_name);
@@ -498,8 +506,11 @@ void cedar::dev::gui::RobotManager::addRobotName(QString addedRobotName)
 
   // add a card for the simple mode
   auto p_card = new cedar::dev::gui::RobotCard(addedRobotName);
-  int index = std::max(0, this->mpSimpleRobotListLayout->count() - 2);
+  p_card->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
+  QObject::connect(p_card, SIGNAL(addBlankCard(void)), this, SLOT(simpleModeAdd()));
+  int index = std::max(0, this->mpSimpleRobotListLayout->count() - 1);
   this->mpSimpleRobotListLayout->insertWidget(index, p_card);
+
 }
 
 void cedar::dev::gui::RobotManager::robotAddedSignalTranslator(const std::string& addedRobotName)

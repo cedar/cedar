@@ -704,6 +704,10 @@ void cedar::dev::Component::init()
                                     (void(*)(cedar::unit::Time))
                                       &cedar::dev::Component::stepStaticWatchDog,
                                     _1) ));
+
+  mTooSlowCounter = 0;
+  mNotReadyForCommandsCounter = 0;
+  mSuppressUserInteraction = false;
 }
 
 // constructor
@@ -714,10 +718,7 @@ cedar::dev::Component::Component()
 
 cedar::dev::Component::Component(cedar::dev::ChannelPtr channel)
 :
-mChannel(channel),
-mTooSlowCounter(0),
-mNotReadyForCommandsCounter(0),
-mSuppressUserInteraction(false)
+mChannel(channel)
 {
   init();
 }
@@ -1353,7 +1354,16 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
     CEDAR_THROW(cedar::dev::Component::HookNotFoundException, "Could not find a submit hook for \"" + this->mMeasurementData->getNameForType(type_for_Device) + "\".");
   }
 
-  (hook_found->second)(ioData);
+  try
+  {
+    (hook_found->second)(ioData);
+  }
+  catch(cedar::dev::IgnoreCommunicationException &e)
+  {
+    std::cout<<"Ignore Exception catched in stepCommandCommunication!"<<std::endl;
+    // ignore, everthing is fine
+  }
+
   submit_command_hooks_locker.unlock();
 
   QWriteLocker time_locker(this->mLastStepCommandsTime.getLockPtr());
@@ -1383,9 +1393,19 @@ void cedar::dev::Component::stepMeasurementCommunication(cedar::unit::Time dt)
 
       if (found != mRetrieveMeasurementHooks.member().end())
       {
-        // execute the hook:
-        this->mMeasurementData->setDeviceRetrievedBufferUnlocked(type, (found->second)() );
-        types_we_measured.push_back(type);
+        try
+        {
+          // execute the hook:
+          this->mMeasurementData->setDeviceRetrievedBufferUnlocked(type, (found->second)() );
+          types_we_measured.push_back(type);
+        }
+        catch(cedar::dev::IgnoreCommunicationException &e)
+        {
+          // ignore, everthing is fine. keep old data
+          std::cout<<"Ignore Exception catched in stepMeasurementCommunication!"<<std::endl;
+          std::cout<<"Old Measurement is: "<< this->getPreviousDeviceSideMeasurementBuffer(type) <<std::endl;
+          this->mMeasurementData->setDeviceRetrievedBufferUnlocked(type, this->getPreviousDeviceSideMeasurementBuffer(type));
+        }
       }
       else
       {
@@ -1401,7 +1421,7 @@ void cedar::dev::Component::stepMeasurementCommunication(cedar::unit::Time dt)
         auto hook = this->mMeasurementData->findTransformationHook(measured_type, missing_type);
         if (hook.is_initialized())
         {
-          // call measurement hook
+          // call transformation hook
           this->mMeasurementData->mDeviceRetrievedData.member()[missing_type]->setData
           (
             hook.get()(dt, this->mMeasurementData->mDeviceRetrievedData.member()[measured_type]->getData())
@@ -1436,7 +1456,7 @@ void cedar::dev::Component::updateUserSideMeasurements()
   {
     this->mMeasurementData->mPreviousDeviceBuffer.member()[type]->getData() = this->mMeasurementData->mUserBuffer.member()[type]->getData().clone();
     this->mMeasurementData->mUserBuffer.member()[type]->getData() = this->mMeasurementData->mDeviceRetrievedData.member()[type]->getData().clone();
-    this->mMeasurementData->mDeviceRetrievedData.member()[type]->getData() = 0.0;
+    this->mMeasurementData->mDeviceRetrievedData.member()[type]->getData() = 0.0; // Warum 0.0 ? Warum ist das keine Matrix?
   }
 
   locker.unlock();
@@ -1947,7 +1967,7 @@ std::unique_ptr<cedar::aux::LoopFunctionInThread> cedar::dev::Component::mWatchD
 void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
 {
   auto now = boost::posix_time::microsec_clock::local_time();
-
+  std::vector<cedar::dev::Component*> components_to_delete;
   for( auto component_it : mRunningComponentInstancesAliveTime )
   {    
     auto componentpointer = component_it.first;
@@ -1985,10 +2005,14 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
           "watchdog says: thread of component is dead. trying crashbrake. destroying thread.",
           CEDAR_CURRENT_FUNCTION_NAME);
 
-        componentpointer->crashbrake();
-        componentpointer->destroyCommunication();
+        components_to_delete.push_back(componentpointer);
       }
     }
+  }
+  for(auto component : components_to_delete)
+  {
+    component->crashbrake();
+    component->destroyCommunication();
   }
 }
 

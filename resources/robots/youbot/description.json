@@ -5,30 +5,17 @@
     {
       "available components":
       {
-        "fri":
-        {
-          "cedar.dev.kuka.KinematicChain":
-          {
-            "requires channel": "fri"
-          }
-        },
         "yarp":
         {
           "cedar.dev.YarpKinematicChain":
           {
             "requires channel": "yarp"
           }
-        },
-        "simulator":
-        {
-          "cedar.dev.SimulatedKinematicChain":
-          {
-          }
         }
       },
       "shared component parameters":
       {
-  		  "name": "KUKA LWR4",
+  		  "name": "Youbot",
   		  "server port": "0",
   		  "remote host": "NULL",
   		  "step size": "20.0",
@@ -39,24 +26,24 @@
   		  {
   		    "initial translation":
   		    [
-  		      "1.0",
-  		      "-0.01",
-  		      "0.61205771365940052"
+  		      "0.143",
+  		      "0.0",
+  		      "0.130"
   		    ],
   		    "initial rotation":
   		    [
   		      "1.0", "0.0", "0.0",
-  		      "0.0", "0.5", "-0.866",
-  		      "0.0", "0.866", "0.5"
+      		  "0.0", "1.0", "0.0",
+              "0.0", "0.0", "1.0"
   		    ]
   		  },
   		  "end-effector coordinate frame":
   		  {
   		    "initial translation":
   		    [
-  		      "0.0",
-  		      "0.0",
-  		      "1.198000032000000"
+  		      "0.212", 
+  		      "0.2568",
+  		      "0.17216"
   		    ],
   		    "initial rotation":
   		    [
@@ -71,8 +58,8 @@
   		    {
   		      "angle limits":
   		      {
-  		        "lower limit": "-2.97",
-  		        "upper limit": "2.97"
+  		        "lower limit": "-2.94",
+  		        "upper limit": "2.94"
   		      },
   		      "velocity limits":
   		      {
@@ -81,9 +68,9 @@
   		      },
   		      "position":
   		      [
-  		        "0.0", 
+  		        "0.024", 
   		        "0.0",
-  		        "0.31"
+  		        "0.115"
   		      ],
   		      "axis":
   		      [
@@ -96,8 +83,8 @@
   		    {
   		      "angle limits":
   		      {
-  		        "lower limit": "-2.09",
-  		        "upper limit": "2.09"
+  		        "lower limit": "-1.13",
+  		        "upper limit": "1.57"
   		      },
   		      "velocity limits":
   		      {
@@ -106,34 +93,9 @@
   		      },
   		      "position":
   		      [
-  		        "0.0", 
+  		        "0.057", 
   		        "0.0",
-  		        "0.31"
-  		      ],
-  		      "axis":
-  		      [
-  		        "0.0", 
-  		        "-1.0",
-  		        "0.0"
-  		      ]
-  		    },
-  		    "cedar.dev.KinematicChain.Joint":
-  		    {
-  		      "angle limits":
-  		      {
-  		        "lower limit": "-2.97",
-  		        "upper limit": "2.97"
-  		      },
-  		      "velocity limits":
-  		      {
-  		        "lower limit": "-2.27",
-  		        "upper limit": "2.27"
-  		      },
-  		      "position":
-  		      [
-  		        "0.0", 
-  		        "0.0",
-  		        "0.71"
+  		        "0.115"
   		      ],
   		      "axis":
   		      [
@@ -146,44 +108,19 @@
   		    {
   		      "angle limits":
   		      {
-  		        "lower limit": "-2.09",
-  		        "upper limit": "2.09"
+  		        "lower limit": "-2.64",
+  		        "upper limit": "2.55"
   		      },
   		      "velocity limits":
   		      {
-  		        "lower limit": "-2.27",
-  		        "upper limit": "2.27"
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
   		      },
   		      "position":
   		      [
-  		        "0.0", 
+  		        "0.212", 
   		        "0.0",
-  		        "0.71"
-  		      ],
-  		      "axis":
-  		      [
-  		        "0.0", 
-  		        "1.0",
-  		        "0.0"
-  		      ]
-  		    },
-  		    "cedar.dev.KinematicChain.Joint":
-  		    {
-  		      "angle limits":
-  		      {
-  		        "lower limit": "-2.96",
-  		        "upper limit": "2.97"
-  		      },
-  		      "velocity limits":
-  		      {
-  		        "lower limit": "-2.27",
-  		        "upper limit": "2.27"
-  		      },
-  		      "position":
-  		      [
-  		        "0.0", 
-  		        "0.0",
-  		        "1.1"
+  		        "0.115"
   		      ],
   		      "axis":
   		      [
@@ -196,50 +133,50 @@
   		    {
   		      "angle limits":
   		      {
-  		        "lower limit": "-2.09",
-  		        "upper limit": "2.09"
+  		        "lower limit": "-1.79",
+  		        "upper limit": "1.79"
   		      },
   		      "velocity limits":
   		      {
-  		        "lower limit": "-3.14159",
-  		        "upper limit": "3.14159"
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
   		      },
   		      "position":
   		      [
-  		        "0.0", 
-  		        "0.0",
-  		        "1.1"
-  		      ],
-  		      "axis":
-  		      [
-  		        "0.0", 
-  		        "-1.0",
-  		        "0.0"
-  		      ]
-  		    },
-  		    "cedar.dev.KinematicChain.Joint":
-  		    {
-  		      "angle limits":
-  		      {
-  		        "lower limit": "-2.97",
-  		        "upper limit": "2.97"
-  		      },
-  		      "velocity limits":
-  		      {
-  		        "lower limit": "-3.14159",
-  		        "upper limit": "3.14159"
-  		      },
-  		      "position":
-  		      [
-  		        "0.0", 
-  		        "0.0",
-  		        "1.185099998"
+  		        "0.212", 
+  		        "0.135",
+  		        "0.115"
   		      ],
   		      "axis":
   		      [
   		        "0.0", 
   		        "0.0",
   		        "1.0"
+  		      ]
+  		    },
+  		    "cedar.dev.KinematicChain.Joint":
+  		    {
+  		      "angle limits":
+  		      {
+  		        "lower limit": "-2.88",
+  		        "upper limit": "2.88"
+  		      },
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "0.212", 
+  		        "0.2486",
+  		        "0.115"
+  		      ],
+  		      "axis":
+  		      [
+  		        "0.0", 
+  		        "0.0",
+  		        "-1.0"
   		      ]
   		    }
   		  }
@@ -248,26 +185,12 @@
   },
   "available channels":
   {
-    "fri":
-    {
-      "cedar.dev.kuka.FRIChannel":
-      {
-        "port": "0",
-        "ip address": "NULL"
-      }
-    },
-    "simulator":
-    {
-      "cedar.dev.kuka.SimulatedKinematicChain":
-      {
-      }
-    },
     "yarp":
     {
       "cedar.dev.YarpChannel<cv.Mat>":
       {
-      	"readPortName": "webots/carenArmStatusFramework",
-      	"writePortName":"webots/carenArmCommandsFramework"
+      "readPortName": "webots/youbotArmStatusFramework",
+      "writePortName":"webots/youbotArmCommandsFramework"
       }
     }
   }

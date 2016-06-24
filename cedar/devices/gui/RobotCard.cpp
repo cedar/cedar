@@ -83,58 +83,80 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
   auto p_outer_layout = new QVBoxLayout();
   p_outer_layout->setContentsMargins(contents_margins, contents_margins, contents_margins, contents_margins);
 
-  // header
-  auto p_header_layout = new QHBoxLayout();
-  p_header_layout->setContentsMargins(contents_margins, contents_margins, contents_margins, contents_margins);
-  p_outer_layout->addLayout(p_header_layout, 0);
-  mpRobotNameEdit = new QLineEdit();
-  p_header_layout->addWidget(mpRobotNameEdit);
-  mpRobotNameEdit->setText(robotName);
-  mCurrentName = robotName.toStdString();
-  auto p_recycle_button = new QPushButton(QIcon(":/cedar/auxiliaries/gui/trashcan.svg"), "");
-  p_recycle_button->setFixedWidth(24);
-  p_recycle_button->setFixedHeight(24);
-  p_recycle_button->setIconSize(QSize(16, 16));
-  p_header_layout->addWidget(p_recycle_button);
+  // delete button
+  auto p_del_layout = new QVBoxLayout();
 
-  // center
+  mpDeleteButton = new QPushButton(QIcon(":/cedar/auxiliaries/gui/trashcan.svg"), "");
+  mpDeleteButton->setFixedWidth(24);
+  mpDeleteButton->setFixedHeight(24);
+  mpDeleteButton->setIconSize(QSize(16, 16));
+  mpDeleteButton->setToolTip("Remove this robot");
+  mpDeleteButton->setEnabled(false); // prevent deleting empty placeholder card
+
+  p_del_layout->addWidget(mpDeleteButton);
+  p_del_layout->setAlignment(mpDeleteButton, Qt::AlignRight);
+  p_outer_layout->addLayout(p_del_layout, 1);
+
+  // robot icon
   this->mpIcon = new cedar::dev::gui::RobotCardIconHolder(this);
   p_outer_layout->addWidget(this->mpIcon, 1);
 
-  // footer
-  auto p_footer_layout = new QHBoxLayout();
-  p_footer_layout->setContentsMargins(contents_margins, contents_margins, contents_margins, contents_margins);
-  p_outer_layout->addLayout(p_footer_layout, 0);
-  mpConfigurationSelector = new QComboBox();
-  p_footer_layout->addWidget(mpConfigurationSelector, 1);
+  // connect button
+  auto p_connect_layout = new QHBoxLayout();
+  p_connect_layout->setContentsMargins(contents_margins, contents_margins, contents_margins, contents_margins);
+  this->mpConnectButton = new QPushButton(QIcon(":/cedar/dev/gui/icons/not_connected.svg"), "");\
+  mpConnectButton->setToolTip("Click to connect the selected instance");
+  mpConnectButton->setIconSize(QSize(64, 64));
+  mpConnectButton->setFixedWidth(64);
+  mpConnectButton->setFixedHeight(64);
+  p_connect_layout->addWidget(this->mpConnectButton, 0);
 
-  this->mpConnectButton = new QPushButton(QIcon(":/cedar/dev/gui/icons/not_connected.svg"), "");
-  QSizePolicy policy = this->mpConnectButton->sizePolicy();
-  policy.setVerticalPolicy(QSizePolicy::Expanding);
-  this->mpConnectButton->setSizePolicy(policy);
-  p_footer_layout->addWidget(this->mpConnectButton, 0);
   QObject::connect(this->mpConnectButton, SIGNAL(clicked()), this, SLOT(connectClicked()));
+  p_outer_layout->addLayout(p_connect_layout, 0);
+
+  // connection configure box
+  auto p_connect_config_layout = new QHBoxLayout();
+  p_connect_config_layout->setContentsMargins(contents_margins, contents_margins, contents_margins, contents_margins);
+  mpConfigurationSelector = new QComboBox();
+  p_connect_config_layout->addWidget(mpConfigurationSelector, 1);
+  p_outer_layout->addLayout(p_connect_config_layout, 0);
+
+  // name layout
+  auto p_name_layout = new QHBoxLayout();
+  mpRobotNameEdit = new QLineEdit();
+  p_name_layout->addWidget(mpRobotNameEdit);
+  mpRobotNameEdit->setText(robotName);
+  mCurrentName = robotName.toStdString();
+  p_outer_layout->addLayout(p_name_layout, 0);
 
   this->setLayout(p_outer_layout);
 
+
   QObject::connect(this->mpIcon, SIGNAL(robotDropped(const QString&)), this, SLOT(robotDropped(const QString&)));
   QObject::connect(mpConfigurationSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedConfigurationChanged(int)));
-  QObject::connect(p_recycle_button, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-  QObject::connect(this->mpRobotNameEdit, SIGNAL(textEdited(const QString&)), this, SLOT(robotNameEditValueChanged(const QString&)));
+  QObject::connect(mpDeleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+  QObject::connect(this->mpRobotNameEdit, SIGNAL(editingFinished(void)), this, SLOT(robotNameEditValueChanged(void)));
 
   try
   {
     this->setRobotTemplate
-          (
-            cedar::dev::RobotManagerSingleton::getInstance()->getRobotTemplateName(robotName.toStdString())
-          );
+      (
+        cedar::dev::RobotManagerSingleton::getInstance()->getRobotTemplateName(robotName.toStdString())
+      );
   }
   catch (const cedar::dev::TemplateNotFoundException&)
   {
     // ok -- nothing to do here
   }
 
-  this->updateConnectionIcon();
+  // if the currently selected index is the selection hint or there is no possible selection, gray out the connect button
+  if(mpConfigurationSelector->currentIndex()==0 || mpConfigurationSelector->count()==0)
+  {
+    mpConnectButton->setDisabled(true);
+  }else
+  { // if not, set the correct icon
+    this->updateConnectionIcon();
+  }
 }
 
 cedar::dev::gui::RobotCardIconHolder::RobotCardIconHolder(cedar::dev::gui::RobotCard* pCard)
@@ -146,6 +168,8 @@ mpCard(pCard)
   this->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
   this->setBackgroundRole(QPalette::Light);
   this->setMinimumHeight(200);
+  QIcon icon(":/cedar/dev/gui/icons/drop_robot.png");
+  this->setPixmap(icon.pixmap(QSize(190, 190)));
 }
 
 cedar::dev::gui::RobotCard::~RobotCard()
@@ -164,14 +188,28 @@ void cedar::dev::gui::RobotCard::updateConnectionIcon()
   if (robot->areAllComponentsCommunicating())
   {
     this->mpConnectButton->setIcon(QIcon(":/cedar/dev/gui/icons/connected.svg"));
+    this->mpConnectButton->setToolTip("Fully connected");
+    this->mpConnectButton->setStyleSheet(
+       "QPushButton { \
+           background: rgb(222, 10, 244);\
+           color: rgb(233, 10, 255);\
+       }");
   }
   else if (robot->areAllComponentsCommunicating())
   {
     this->mpConnectButton->setIcon(QIcon(":/cedar/dev/gui/icons/partially_connected.svg"));
+    this->mpConnectButton->setToolTip("Patially connected");
+    this->mpConnectButton->setStyleSheet(
+       "QPushButton { \
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,\
+                stop:0 white, stop: 0.4 rgba(10, 10, 10, 40), stop:1 rgb(233, 10, 255, 255));\
+       }");
   }
   else
   {
     this->mpConnectButton->setIcon(QIcon(":/cedar/dev/gui/icons/not_connected.svg"));
+    this->mpConnectButton->setToolTip("Not connected");
+    this->mpConnectButton->setStyleSheet(""); // reset yellow background to default
   }
 }
 
@@ -258,21 +296,27 @@ void cedar::dev::gui::RobotCard::selectedConfigurationChanged(int index)
   QString combo_text = this->mpConfigurationSelector->itemText(index);
   if (index == 0 && combo_text == "-- select to instantiate --")
   {
+    mpConnectButton->setDisabled(true);    
     return;
   }
 
+  mpConnectButton->setDisabled(false);
   cedar::dev::RobotManagerSingleton::getInstance()->loadRobotTemplateConfiguration(this->getRobotName(), combo_text.toStdString());
 }
 
 void cedar::dev::gui::RobotCard::robotDropped(const QString& robotTypeName)
 {
   auto robot_template = cedar::dev::RobotManagerSingleton::getInstance()->getTemplate(robotTypeName.toStdString());
-
   this->mRobotTemplateName = robotTypeName.toStdString();
+
+  if(this->mpConfigurationSelector->count() == 0)
+  {
+    // if a robot has been dropped into an empty card, create a new blank card before filling this one
+    addBlankCard();
+  }
 
   bool blocked = this->mpConfigurationSelector->blockSignals(true);
   this->mpConfigurationSelector->clear();
-
   this->mpConfigurationSelector->addItem("-- select to instantiate --");
 
   auto configuration_names = robot_template.getConfigurationNames();
@@ -298,8 +342,10 @@ void cedar::dev::gui::RobotCard::robotDropped(const QString& robotTypeName)
       selected = this->mpConfigurationSelector->count() - 1;
     }
   }
+
   this->mpConfigurationSelector->setCurrentIndex(selected);
   this->mpConfigurationSelector->blockSignals(blocked);
+  mpDeleteButton->setEnabled(true); // a new placeholder card had to be placed, so allow deletion
 }
 
 std::string cedar::dev::gui::RobotCardIconHolder::getRobotName() const
@@ -371,8 +417,21 @@ QListWidgetItem* cedar::dev::gui::RobotCardIconHolder::itemFromMime(QDropEvent* 
   return p_source->item(r);
 }
 
-void cedar::dev::gui::RobotCard::robotNameEditValueChanged(const QString& robotName)
+void cedar::dev::gui::RobotCard::robotNameEditValueChanged()
 {
-  cedar::dev::RobotManagerSingleton::getInstance()->renameRobot(mCurrentName, robotName.toStdString());
-  mCurrentName = robotName.toStdString();
+  const QString &robot_name = mpRobotNameEdit->text();
+
+  if(robot_name.toStdString() == mCurrentName)
+  {
+    return;
+  }
+
+  cedar::aux::LogSingleton::getInstance()->message
+  (
+    "\""+mCurrentName+"\" was renamed to \""+robot_name.toStdString()+"\"",
+    "cedar::dev::gui::RobotCard::robotNameEditValueChanged()"
+  );
+
+  cedar::dev::RobotManagerSingleton::getInstance()->renameRobot(mCurrentName, robot_name.toStdString());
+  mCurrentName = robot_name.toStdString();
 }

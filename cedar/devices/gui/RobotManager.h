@@ -84,6 +84,8 @@ signals:
 
   void robotConfigurationLoaded(QString addedRobotName);
 
+  void closeRobotManager();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -130,10 +132,11 @@ private slots:
 
   void partSelected(QTreeWidgetItem* pCurrent, QTreeWidgetItem* pPrevious);
 
-  void simpleModeAddClicked();
+  void simpleModeAdd();
 
   void removeClicked();
 
+  void closeWindow();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
