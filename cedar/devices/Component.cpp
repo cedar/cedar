@@ -1244,7 +1244,6 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
   // if there are neither user commands nor a controller, nothing needs to be done
   if (this->mUserCommandUsed.member().size() == 0 && !this->mController.member())
   {
-    return; // TODO : why is this return here?
     QReadLocker nocommand_hook_locker(mNoCommandHook.getLockPtr());
 
     auto hook_found = mNoCommandHook.member();
