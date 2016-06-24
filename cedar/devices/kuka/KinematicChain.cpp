@@ -68,8 +68,7 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::kuka::KinematicChain::KinematicChain() :
-mIsConfigured(false)
+cedar::dev::kuka::KinematicChain::KinematicChain()
 {
   // register the hooks, which the Component class needs to talk to the hardware:
  
@@ -98,19 +97,8 @@ cedar::dev::kuka::KinematicChain::~KinematicChain()
 //----------------------------------------------------------------------------------------------------------------------
 // public member functions
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::kuka::KinematicChain::readConfiguration(const cedar::aux::ConfigurationNode& node)
-{
-  this->cedar::dev::KinematicChain::readConfiguration(node);
-
-  mIsConfigured = true;
-
-}
-
 bool cedar::dev::kuka::KinematicChain::isReadyForCommands() const
 {
-  if (!mIsConfigured)
-    return false;
-
   auto friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
   if (!friChannel)
     return false;
@@ -120,9 +108,6 @@ bool cedar::dev::kuka::KinematicChain::isReadyForCommands() const
 
 bool cedar::dev::kuka::KinematicChain::isReadyForMeasurements() const
 {
-  if (!mIsConfigured)
-    return false;
-
   auto friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
   if (!friChannel)
     return false;
@@ -133,15 +118,12 @@ bool cedar::dev::kuka::KinematicChain::isReadyForMeasurements() const
 // deprecated:
 bool cedar::dev::kuka::KinematicChain::isMovable() const
 {
-  if (!mIsConfigured)
-    return false;
-
   return this->isReadyForCommands();
 }
 
 void cedar::dev::kuka::KinematicChain::prepareSendingNoop()
 {
-  if (!mIsConfigured)
+  if (!isConfigured())
     return;
 
   auto friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
@@ -162,7 +144,7 @@ void cedar::dev::kuka::KinematicChain::prepareSendingNoop()
 
 void cedar::dev::kuka::KinematicChain::prepareSendingJointAngles(cv::Mat mat)
 {
-  if (!mIsConfigured)
+  if (!isConfigured())
     return;
 
   auto friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
@@ -247,7 +229,7 @@ cv::Mat cedar::dev::kuka::KinematicChain::prepareRetrievingJointAngles()
 {
   auto friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
 
-  if (!mIsConfigured)
+  if (!isConfigured())
     return cv::Mat();
 
   if (!friChannel)
@@ -265,7 +247,7 @@ void cedar::dev::kuka::KinematicChain::postStart()
 {
   // perform various usability checks:
 
-  if (!mIsConfigured)
+  if (!isConfigured())
   {
     cedar::aux::LogSingleton::getInstance()->error(
       "you forgot to call readConfiguration()",

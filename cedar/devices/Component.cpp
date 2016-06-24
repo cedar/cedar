@@ -1633,14 +1633,16 @@ bool cedar::dev::Component::isCommunicating() const
 
 bool cedar::dev::Component::isReadyForCommands() const
 {
-  return !this->getSuppressUserInteraction()
-          && this->isCommunicating();
+  return isConfigured()
+         && !this->getSuppressUserInteraction()
+         && this->isCommunicating();
 }
 
 bool cedar::dev::Component::isReadyForMeasurements() const
 {
-  return !this->getSuppressUserInteraction()
-          && this->isCommunicating(); 
+  return isConfigured()
+         && !this->getSuppressUserInteraction()
+         && this->isCommunicating(); 
 }
 
 bool cedar::dev::Component::isRunningNolocking()
