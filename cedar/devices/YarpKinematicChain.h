@@ -93,10 +93,8 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
-  cedar::aux::StringParameterPtr mReadPortName;
-  cedar::aux::StringParameterPtr mWritePortName;
-
+ std::string readPort;
+ std::string writePort;
 };
 // class cedar::dev::YarpKinematicChain
 

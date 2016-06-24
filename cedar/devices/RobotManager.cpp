@@ -70,7 +70,6 @@ cedar::dev::RobotManager::RobotManager()
 
   // kuka ---------------------------------------------------------------------------------------------------------
   cedar::dev::RobotManager::Template kuka_template;
-//  kuka_template.setIconPath(":/cedar/dev/gui/icons/khepera_icon_256.png");
   kuka_template.setIconPath(":/cedar/dev/gui/icons/caren_icon_256.png");
   kuka_template.addNamedConfiguration("FRI", cedar::aux::Path("resource://robots/caren/fri_configuration.json"));
   kuka_template.addNamedConfiguration("simulator", cedar::aux::Path("resource://robots/caren/simulator_configuration.json"));
@@ -80,7 +79,6 @@ cedar::dev::RobotManager::RobotManager()
   // youbot
   cedar::dev::RobotManager::Template youbot_template;
   youbot_template.setIconPath(":/cedar/dev/gui/icons/youbot_icon_256.png");
-//  youbot_template.setIconPath(":/cedar/dev/gui/icons/youbot_icon_256.png");
   youbot_template.addNamedConfiguration("yarp",cedar::aux::Path("resource://robots/youbot/yarp_configuration.json"));
   this->addRobotTemplate("youbot",youbot_template);
 
