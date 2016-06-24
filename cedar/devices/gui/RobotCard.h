@@ -139,7 +139,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private slots:
-  void robotNameEditValueChanged(const QString& robotName);
+  void robotNameEditValueChanged();
 
 private:
   void robotRemoved(const std::string& robotName);
