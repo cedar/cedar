@@ -72,6 +72,15 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 
+  YarpChannel()
+:
+  mIsOpen(false),
+  mReadPortName(new cedar::aux::StringParameter(this, "readPortName", "defaultRead")),
+  mWritePortName(new cedar::aux::StringParameter(this, "writePortName", "defaultWrite"))
+{
+
+}
+
   ~YarpChannel()
   {
     prepareChannelDestructAbsolutelyRequired();
@@ -265,7 +274,8 @@ private:
 protected:
 // none yet
 private:
-// none yet
+  cedar::aux::StringParameterPtr mReadPortName;
+  cedar::aux::StringParameterPtr mWritePortName;
 
 };
 // class cedar::dev::YarpChannel

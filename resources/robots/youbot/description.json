@@ -54,7 +54,7 @@
   		  },
   		  "joints":
   		  {
-  		    "cedar.dev.KinematicChain.Joint":1
+  		    "cedar.dev.KinematicChain.Joint":
   		    {
   		      "angle limits":
   		      {
@@ -79,7 +79,7 @@
   		        "1.0"
   		      ]
   		    },
-  		    "cedar.dev.KinematicChain.Joint":2
+  		    "cedar.dev.KinematicChain.Joint":
   		    {
   		      "angle limits":
   		      {
@@ -104,7 +104,7 @@
   		        "1.0"
   		      ]
   		    },
-  		    "cedar.dev.KinematicChain.Joint":3
+  		    "cedar.dev.KinematicChain.Joint":
   		    {
   		      "angle limits":
   		      {
@@ -129,7 +129,7 @@
   		        "1.0"
   		      ]
   		    },
-  		    "cedar.dev.KinematicChain.Joint":4
+  		    "cedar.dev.KinematicChain.Joint":
   		    {
   		      "angle limits":
   		      {
@@ -154,7 +154,7 @@
   		        "1.0"
   		      ]
   		    },
-  		    "cedar.dev.KinematicChain.Joint":5
+  		    "cedar.dev.KinematicChain.Joint":
   		    {
   		      "angle limits":
   		      {
@@ -169,7 +169,7 @@
   		      "position":
   		      [
   		        "0.212", 
-  		        "0.248.6",
+  		        "0.2486",
   		        "0.115"
   		      ],
   		      "axis":
