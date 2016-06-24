@@ -38,6 +38,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/namespace.h"
+#include "cedar/devices/SimulatedKinematicChain.fwd.h"
 #include "cedar/devices/KinematicChain.h"
 
 // SYSTEM INCLUDES
