@@ -164,11 +164,6 @@ public:
     std::cout << "7"<< std::endl;
   }
 
-  bool isConnected() const
-  {
-    return true;
-  }
-
   void addReaderPort(const std::string& port)
   {
     std::cout << "Add Reader Port: " << port << std::endl;
