@@ -1116,39 +1116,43 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   // lock was acquired, let's make sure its unlocked
   cedar::aux::CallOnScopeExit unlocker(boost::bind(&QMutex::unlock, &this->mGeneralAccessLock));
 
-  // its important to get the currently scheduled commands out first
-  // (think safety first). this assumes serial communication, of course
-  try
+  if (!mChannel
+      || (mChannel && mChannel->isOpen()) )
   {
-    stepCommandCommunication(real_time);
-    this->mCommandData->countSuccessfullCommunication();
-  }
-  catch (const cedar::dev::CommunicationException& e)
-  {
-    this->mCommandData->countCommunicationError(e);
-  }
+    // its important to get the currently scheduled commands out first
+    // (think safety first). this assumes serial communication, of course
+    try
+    {
+      stepCommandCommunication(real_time);
+      this->mCommandData->countSuccessfullCommunication();
+    }
+    catch (const cedar::dev::CommunicationException& e)
+    {
+      this->mCommandData->countCommunicationError(e);
+    }
 
-  // to send only once per cycle to the HW with new commands and get new measurements
-  try
-  {
-    stepAfterCommandBeforeMeasurementCommunication();
-    this->mCommandData->countSuccessfullCommunication();
-  }
-  catch (const cedar::dev::CommunicationException& e)
-  {
-    this->mCommandData->countCommunicationError(e);
-  }
+    // to send only once per cycle to the HW with new commands and get new measurements
+    try
+    {
+      stepAfterCommandBeforeMeasurementCommunication();
+      this->mCommandData->countSuccessfullCommunication();
+    }
+    catch (const cedar::dev::CommunicationException& e)
+    {
+      this->mCommandData->countCommunicationError(e);
+    }
 
 
-  try
-  {
-    stepMeasurementCommunication(real_time); // note, the post-measurements transformations also take time
-    this->mMeasurementData->countSuccessfullCommunication();
-  }
-  catch (const cedar::dev::CommunicationException& e)
-  {
-    this->mMeasurementData->countCommunicationError(e);
-  }
+    try
+    {
+      stepMeasurementCommunication(real_time); // note, the post-measurements transformations also take time
+      this->mMeasurementData->countSuccessfullCommunication();
+    }
+    catch (const cedar::dev::CommunicationException& e)
+    {
+      this->mMeasurementData->countCommunicationError(e);
+    }
+  } // end: channel is open
 
   // utitlity: warn if consistently much too slow
   if (time > this->getCommunicationStepSize() * 1.4)
