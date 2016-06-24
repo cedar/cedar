@@ -99,13 +99,6 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief This method initializes the object.
-   *
-   * This method is called from all constructors of the class.
-   * @param commandMode establish command mode if true
-   */
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -113,8 +106,6 @@ protected:
   // none yet
 
 private:
-  //!@brief true, if the object has been initialized
-  bool mIsConfigured;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
