@@ -126,6 +126,9 @@ public:
 public slots:
   void robotDropped(const QString& robotName);
 
+signals:
+  void addBlankCard();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -136,7 +139,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private slots:
-  void robotNameEditValueChanged(const QString& robotName);
+  void robotNameEditValueChanged();
 
 private:
   void robotRemoved(const std::string& robotName);
@@ -163,6 +166,7 @@ private:
   cedar::dev::gui::RobotCardIconHolder* mpIcon;
 
   QPushButton* mpConnectButton;
+  QPushButton* mpDeleteButton;
 
   std::string mRobotTemplateName;
 
