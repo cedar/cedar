@@ -47,6 +47,9 @@
 // FORWARD DECLARATIONS
 #include "cedar/devices/YarpKinematicChain.fwd.h"
 
+
+#ifdef CEDAR_USE_YARP
+
 /*!@todo describe.
  *
  * @todo describe more.
@@ -97,5 +100,7 @@ private:
  std::string writePort;
 };
 // class cedar::dev::YarpKinematicChain
+
+#endif // CEDAR_USE_YARP
 
 #endif // CEDAR_DEV_YARP_KINEMATIC_CHAIN_H

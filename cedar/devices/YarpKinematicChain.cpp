@@ -50,6 +50,8 @@
 
 // SYSTEM INCLUDES
 
+#ifdef CEDAR_USE_YARP
+
 //----------------------------------------------------------------------------------------------------------------------
 // type registration
 //----------------------------------------------------------------------------------------------------------------------
@@ -92,7 +94,7 @@ cedar::dev::YarpKinematicChain::~YarpKinematicChain()
 
 void cedar::dev::YarpKinematicChain::postStart()
 {
-  auto yarpChannel = boost::static_pointer_cast < cedar::dev::YarpChannel<cv::Mat> > (this->getChannel());
+  auto yarpChannel = boost::static_pointer_cast< cedar::dev::YarpChannel<cv::Mat> >(this->getChannel());
   if (!yarpChannel)
   {
     cedar::aux::LogSingleton::getInstance()->error("Lost yarpChannel pointer", CEDAR_CURRENT_FUNCTION_NAME);
@@ -144,3 +146,6 @@ bool cedar::dev::YarpKinematicChain::applyCrashbrake()
 
   return false;
 }
+
+#endif // #ifdef CEDAR_USE_YARP
+

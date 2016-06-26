@@ -43,6 +43,7 @@
 #ifdef CEDAR_USE_YARP
 
 // CEDAR INCLUDES
+#include "cedar/devices/YarpChannel.fwd.h"
 #include "cedar/auxiliaries/net/Reader.h"
 #include "cedar/auxiliaries/net/Writer.h"
 #include "cedar/devices/namespace.h"
