@@ -53,10 +53,10 @@
 
 // SYSTEM INCLUDES
 #include <opencv/cv.h>
-#include <boost/function.hpp>
-#include <boost/optional.hpp>
-#include "boost/date_time/posix_time/posix_time.hpp"
 #ifndef Q_MOC_RUN
+  #include <boost/function.hpp>
+  #include <boost/optional.hpp>
+  #include "boost/date_time/posix_time/posix_time.hpp"
   #include <boost/signals2/signal.hpp>
   #include <boost/signals2/connection.hpp>
   #include <boost/function.hpp>
