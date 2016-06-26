@@ -1872,6 +1872,12 @@ void cedar::dev::Component::setController(ComponentDataType type, cedar::dev::Co
   mController.member() = ControllerCollectionPtr( new cedar::dev::Component::ControllerCollection{ type, fun } );
 }
 
+void cedar::dev::Component::clearAll()
+{
+  this->clearController();
+  this->clearUserCommand();
+}
+
 void cedar::dev::Component::waitUntilCommunicated() const
 {
   CEDAR_ASSERT( mCommunicationThread );

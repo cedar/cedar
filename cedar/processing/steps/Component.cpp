@@ -426,3 +426,10 @@ void cedar::proc::steps::Component::componentChangedSlot()
   this->_mGroup->setConstant(!component->hasCommandGroups());
   this->_mGroup->setComponent(component);
 }
+
+void cedar::proc::steps::Component::reset()
+{
+  auto component = this->getComponent();
+  component->clearAll();
+}
+

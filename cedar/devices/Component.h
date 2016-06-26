@@ -277,6 +277,8 @@ public:
   //!@brief this function resets the internally used user command and allows to subsequently use a different type
   void clearUserCommand();
 
+  //!@brief clear all buffers and controllers
+  void clearAll();
 
   //! Defines a new command group.
   void defineCommandGroup(const std::string& groupName);

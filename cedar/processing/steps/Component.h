@@ -167,6 +167,8 @@ private:
 
   void rebuildOutputs();
 
+  void reset();
+
 private slots:
   void componentChangedSlot();
 
