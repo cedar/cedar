@@ -57,7 +57,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::ObjectVisualization>
       (
-        "Simulated Scene",
+        "Visualization",
         "cedar.processing.steps.ObjectVisualization"
       )
     );
