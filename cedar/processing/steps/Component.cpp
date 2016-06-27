@@ -66,7 +66,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::Component, cedar::proc::gui::ComponentStepView>
       (
-        "Devices",
+        "Robotics",
         "cedar.processing.steps.Component"
       )
     );
