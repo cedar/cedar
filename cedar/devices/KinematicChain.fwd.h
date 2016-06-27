@@ -24,8 +24,8 @@
 
     File:        KinematicChain.fwd.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Maintainer:  Jean-Stephane Jokeit   
+    Email:       jean-stephane.jokeit@ini.rub.de
     Date:        2014 07 23
 
     Description: Forward declaration file for the class cedar::dev::KinematicChain.

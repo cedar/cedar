@@ -24,8 +24,8 @@
 
     File:        Component.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
+    Maintainer:  Jean-Stephane Jokeit
+    Email:       jean-stephane.jokeit@ini.rub.de
     Date:        2012 11 26
 
     Description: Abstract component of a robot (e.g., a kinematic chain).
