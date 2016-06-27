@@ -1,0 +1,47 @@
+{
+  "component slots":
+  {
+    "component slot 1":
+    {
+      "available components":
+      {
+        "configuration 1":
+        {
+          "cedar.tests.unit.dev.Robot.TestComponent":
+          {
+            "requires channel": "channel 1",
+            "parameter 1": "1"
+          }
+        },
+        "configuration 2":
+        {
+          "cedar.tests.unit.dev.Robot.TestComponent":
+          {
+            "requires channel": "channel 2",
+            "parameter 1": "2"
+          }
+        }
+      },
+      "shared component parameters":
+      {
+        "parameter 2": "2"
+      }
+    }
+  },
+  "available channels":
+  {
+    "channel 1":
+    {
+      "cedar.tests.unit.dev.Robot.TestChannel":
+      {
+        "info": "channel 1 info 1"
+      }
+    },
+    "channel 2":
+    {
+      "cedar.tests.unit.dev.Robot.TestChannel":
+      {
+      }
+    }
+  }
+}

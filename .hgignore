@@ -1,0 +1,83 @@
+syntax: glob
+.qglviewer*
+.project
+build
+bin
+lib
+logs
+*.log
+*.orig
+Linux-*
+Darwin-*
+debug*
+release*
+Debug*
+moc*
+obj*
+ui*
+core
+*.new
+.cproject
+.project
+.cdtproject
+Contents
+MacOS
+nsClassTemplate
+*.o
+*.so
+*.so.1
+*.so.1.0
+*.so.1.0.0
+*.pro
+*.proj
+*.app
+*.xcodeproj
+dist
+.externalToolBuilders
+.settings
+.Settings
+*.svn
+*.tmproj
+*.lo
+*.la
+*.al
+*.libs
+*.so.*
+*.a
+*.pyc
+*.pyo
+*.rej
+*~
+.*.swp
+.DS_Store
+.cvsignore
+.wrproject
+CMakeCache.txt
+cmake_install.cmake
+CMakeFiles
+test_*.py
+Makefile*
+CMakeDefines.h
+build/*
+cedar/doc/*
+CTestTestfile.cmake
+*/lib.h
+cedar/processing/Testing/Temporary/*
+
+syntax: regexp
+^tests/unit/processing/ArchitectureIO/architecture1\.json$
+syntax: regexp
+^cedar\.conf$
+
+syntax: regexp
+^tests/unit/processing/Network/Nested\.json$
+
+syntax: regexp
+^resources/meshes/PowerCube110$
+syntax: regexp
+^resources/meshes/PowerCubeWrist90$
+syntax: regexp
+^tools/issues\.txt$
+
+syntax: glob
+.pydevproject
