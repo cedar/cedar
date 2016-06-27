@@ -316,7 +316,7 @@ void cedar::dev::Robot::performConsistencyCheck() const
       {
         cedar::aux::LogSingleton::getInstance()->warning
         (
-          "The slot \"" + slot_name + "\" has no mapping for channel \"" + name + "\".",
+          "Check the configuration file: The slot \"" + slot_name + "\" has no mapping for channel \"" + name + "\".",
           "void cedar::dev::Robot::performConsistencyCheck() const"
         );
       }

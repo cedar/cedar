@@ -310,7 +310,8 @@ void cedar::dev::RobotManager::loadRobotConfiguration
   //!      destructor. A better approache would be: 1) parse json; if successful: 2) create robot 3) read config...
   try
   {
-    robot->readJson(configuration.absolute().toString());
+    robot->readJson(configuration.absolute(false).toString());
+      // don't scroll with loading messages
   }
   catch (const boost::property_tree::json_parser_error& e)
   {
