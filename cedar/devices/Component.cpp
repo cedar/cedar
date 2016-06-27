@@ -2022,19 +2022,26 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
 
 std::string cedar::dev::Component::prettifyName() const
 {
-  auto slot = mSlot.lock();
-
-  if (!slot)
-    return "uninitialized robotic component";
-
-  auto config = slot->getConfigurationName();
-
   std::string ret; 
+  auto slot = mSlot.lock();
+ 
+  ret = this->getName();
 
-  ret = slot->getName();
+  if (ret.length() <= 0)
+  {
+    ret = slot->getName();
 
-  if (config.length() > 0)
-    ret+= " (" + config + ")";
+    if (!slot)
+      return "uninitialized robotic component";
+  }
+
+  if (slot)
+  {
+    auto config = slot->getConfigurationName();
+
+    if (config.length() > 0)
+      ret+= " (" + config + ")";
+  }
 
   return ret;
 }
