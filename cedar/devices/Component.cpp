@@ -2012,17 +2012,17 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
       else
       {
         cedar::aux::LogSingleton::getInstance()->error(
-          "watchdog says: thread of component is dead. trying crashbrake. destroying thread.",
+          "Watchdog says: thread of component is dead. Trying to brake now. You are advised to stop the the component manually.",
           CEDAR_CURRENT_FUNCTION_NAME);
 
         components_to_delete.push_back(componentpointer);
       }
     }
   }
+
   for(auto component : components_to_delete)
   {
-    component->crashbrake();
-    component->destroyCommunication();
+    component->brakeNow();
   }
 }
 
