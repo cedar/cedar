@@ -1469,19 +1469,18 @@ void cedar::dev::Component::updateUserSideMeasurements()
 
 void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
 {
-  cedar::aux::LogSingleton::getInstance()->message(
-    "Starting communication with component in background.",
-    CEDAR_CURRENT_FUNCTION_NAME
-  );
+  std::string s= "";
 
   if (suppressUserSideInteraction)
   {
-    cedar::aux::LogSingleton::getInstance()->message(
-      "Note, you will only have access when architecture is running.",
-      CEDAR_CURRENT_FUNCTION_NAME
-    );
+    s= " Don't forget to start your architecture to interact.";
   }
-  
+
+  cedar::aux::LogSingleton::getInstance()->message(
+    "Starting communication with component in background." + s,
+    CEDAR_CURRENT_FUNCTION_NAME
+  );
+
   setSuppressUserInteraction(suppressUserSideInteraction);
 
   // do not re-enter, do not stop/start at the same time
