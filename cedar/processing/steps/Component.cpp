@@ -253,6 +253,8 @@ void cedar::proc::steps::Component::onStart()
   {
     auto component = this->getComponent();
 
+    component->clearUserCommand();
+
     // should be supressed, un-lock:
     if (component->getSuppressUserInteraction())
     {
@@ -268,6 +270,7 @@ void cedar::proc::steps::Component::onStop()
   {
     auto component = this->getComponent();
 
+    component->clearUserCommand();
     component->setSuppressUserInteraction(true);
   }
 }
