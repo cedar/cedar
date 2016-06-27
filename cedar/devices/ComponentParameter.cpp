@@ -76,7 +76,7 @@ cedar::dev::ComponentPtr cedar::dev::ComponentParameter::getValue() const
   }
   CEDAR_THROW
   (
-    cedar::dev::NoComponentSelectedException, "The parameter \"" + this->getName() + "\" does not point to a component."
+    cedar::dev::NoComponentSelectedException, "No robotic component selected for \"" + this->getName() + "\". Please set the parameter to an initialized robot from the robot manager."
   );
 }
 
