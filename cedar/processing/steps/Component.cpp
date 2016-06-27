@@ -436,3 +436,10 @@ void cedar::proc::steps::Component::reset()
   component->clearAll();
 }
 
+void cedar::proc::steps::Component::inputConnectionChanged(const std::string& /*inputName*/)
+{
+  auto component = this->getComponent();
+  component->clearUserCommand();
+}
+
+
