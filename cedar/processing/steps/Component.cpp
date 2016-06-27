@@ -260,6 +260,13 @@ void cedar::proc::steps::Component::onStart()
     {
       component->setSuppressUserInteraction(false);
     }
+
+    if (!component->isRunning())
+    {
+      cedar::aux::LogSingleton::getInstance()->message(
+        "Component is not connected, yet. Open the Robot Manager to connect.",
+        CEDAR_CURRENT_FUNCTION_NAME);
+    }
   }
 }
 
