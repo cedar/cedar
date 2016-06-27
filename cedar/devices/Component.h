@@ -176,8 +176,8 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   static void handleCrash(); // called from the IDE
-  static void brakeNowAllComponents(); 
-  static void startBrakingAllComponents(); 
+  static void startBrakingAllComponentsNow(); 
+  static void startBrakingAllComponentsSlowly(); 
   static bool anyComponentsRunning();
 
   // replaced by startCommunication()
@@ -229,8 +229,8 @@ public:
 
   void waitUntilCommunicated() const;
 
-  void startBraking(); // non-blocking. will set a Controller that smoothly brakes
-  void brakeNow();     // non-blocking. will set a Controller that will instantly reduce velocity to 0, be careful!
+  void startBrakingSlowly(); // non-blocking. will set a Controller that smoothly brakes
+  void startBrakingNow();     // non-blocking. will set a Controller that will instantly reduce velocity to 0, be careful!
   void crashbrake();   // last-resort braking, may disconnect device or even break the robot
 
   //! Returns a list of all installed measurement types.

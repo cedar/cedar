@@ -253,16 +253,19 @@ void cedar::proc::steps::Component::onStart()
   {
     auto component = this->getComponent();
 
-    // paranoid: should already be running, but you never know ...
-    if (!component->isCommunicating())
-    {
-      component->startCommunication(true);  // suppress user interaction
-    }
+    component->clearUserCommand();
 
     // should be supressed, un-lock:
     if (component->getSuppressUserInteraction())
     {
       component->setSuppressUserInteraction(false);
+    }
+
+    if (!component->isRunning())
+    {
+      cedar::aux::LogSingleton::getInstance()->message(
+        "Component is not connected, yet. Open the Robot Manager to connect.",
+        CEDAR_CURRENT_FUNCTION_NAME);
     }
   }
 }
@@ -274,11 +277,15 @@ void cedar::proc::steps::Component::onStop()
   {
     auto component = this->getComponent();
 
-    // let it communicate, but dont pass from or to user-side
-    //component->stopCommunication();
-
+    component->clearUserCommand();
     component->setSuppressUserInteraction(true);
-    component->startBraking();
+
+    if (component->isRunning())
+    {
+      cedar::aux::LogSingleton::getInstance()->warning(
+        "Component is still connected and running.",
+        CEDAR_CURRENT_FUNCTION_NAME);
+    }
   }
 }
 
@@ -298,6 +305,9 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
     auto time = component->retrieveLastStepCommandsDuration();
     this->setTimeMeasurement(this->mCommandTimeId, time);
   }
+
+  // unlock the suppression of user commands when the architecture is running
+  component->setSuppressUserInteraction(false);
 
   // if no inputs are present, there is nothing to do (i.e., no inputs have to be passed to the component)
   if (!this->hasSlotForRole(cedar::proc::DataRole::INPUT))
@@ -432,4 +442,11 @@ void cedar::proc::steps::Component::reset()
   auto component = this->getComponent();
   component->clearAll();
 }
+
+void cedar::proc::steps::Component::inputConnectionChanged(const std::string& /*inputName*/)
+{
+  auto component = this->getComponent();
+  component->clearUserCommand();
+}
+
 

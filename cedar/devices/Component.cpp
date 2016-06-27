@@ -1469,19 +1469,18 @@ void cedar::dev::Component::updateUserSideMeasurements()
 
 void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
 {
-  cedar::aux::LogSingleton::getInstance()->message(
-    "Starting communication with component in background.",
-    CEDAR_CURRENT_FUNCTION_NAME
-  );
+  std::string s= "";
 
   if (suppressUserSideInteraction)
   {
-    cedar::aux::LogSingleton::getInstance()->message(
-      "Note, you will only have access when architecture is running.",
-      CEDAR_CURRENT_FUNCTION_NAME
-    );
+    s= " Don't forget to start your architecture to interact.";
   }
-  
+
+  cedar::aux::LogSingleton::getInstance()->message(
+    "Starting communication with component in background." + s,
+    CEDAR_CURRENT_FUNCTION_NAME
+  );
+
   setSuppressUserInteraction(suppressUserSideInteraction);
 
   // do not re-enter, do not stop/start at the same time
@@ -1582,9 +1581,6 @@ void cedar::dev::Component::stopCommunication()
   handleStopCommunicationNonBlocking();
 
   locker_general.unlock();
-
-  // finally, step once to apply the brake commands
-  brakeNow();
 
   if (this->mChannel)
   {
@@ -1797,36 +1793,46 @@ bool cedar::dev::Component::getSuppressUserInteraction() const
   return mSuppressUserInteraction;
 }
 
-void cedar::dev::Component::startBraking()
+void cedar::dev::Component::startBrakingSlowly()
 {
   clearUserCommand();
   clearController();
-  if (!applyBrakeSlowlyController()) // TODO: rename
+  if (!applyBrakeSlowlyController()) 
   {
-    //@todo try again and then default to brakeNow()
-    brakeNow();
+    cedar::aux::LogSingleton::getInstance()->warning(
+      "Couldn't brake component slowly, braking fast instead.",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
+
+    this->startBrakingNow();
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->message(
+      "Braking component (slowly)",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
   }
 }
 
-void cedar::dev::Component::brakeNow()
+void cedar::dev::Component::startBrakingNow()
 {
   clearUserCommand();
   clearController();
 
   if (!applyBrakeNowController())
   {
-    //@todo: wait short time, try again and then panic TODO TODO
+    cedar::aux::LogSingleton::getInstance()->warning(
+      "Could not brake component (quickly)",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
   }
   else
   {
-    // force sending the command
-    this->mCommunicationThread->singleStep();
-
-    // paranoid:
-    clearUserCommand(); 
-    clearController();
-
-    // TODO: we also need to test if the vel measurements are 0
+    cedar::aux::LogSingleton::getInstance()->warning(
+      "Braking component hard.",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
   }
 }
 
@@ -1853,7 +1859,7 @@ void cedar::dev::Component::crashbrake()
 {
   if (!applyCrashbrake())
   {
-    std::cout << "[cedar PANIC] the shit has hit the fan!" << std::endl;
+    std::cout << "[cedar PANIC] crashbrake failed. The shit has hit the fan!" << std::endl;
   }
   else
   {
@@ -1923,44 +1929,29 @@ std::cout << "emergency crash braking NOW for " << componentpointer << std::endl
 
 }
 
-void cedar::dev::Component::brakeNowAllComponents()
+void cedar::dev::Component::startBrakingAllComponentsNow()
 {
-  cedar::aux::LogSingleton::getInstance()->warning
-                                           (
-                                             "Braking all robotic components now (brake now)",
-                                             "cedar::dev::Component::brakeNow()"
-                                           );
-
   for( auto component_it : mRunningComponentInstancesAliveTime )
   {
     auto componentpointer = component_it.first;
 
     if (componentpointer != NULL)
     {
-      componentpointer->brakeNow();
+      componentpointer->startBrakingNow();
     }
   }
 
 }
 
-void cedar::dev::Component::startBrakingAllComponents()
+void cedar::dev::Component::startBrakingAllComponentsSlowly()
 {
-  //!@todo: when startBraking works everywhere, delete these lines:
-  brakeNowAllComponents();
-  return;
-
-  cedar::aux::LogSingleton::getInstance()->message
-                                           (
-                                             "Starting to brake all robotic components (start braking ...)",
-                                             "cedar::dev::Component::brakeNow()"
-                                           );
   for( auto component_it : mRunningComponentInstancesAliveTime )
   {
     auto componentpointer = component_it.first;
 
     if (componentpointer != NULL)
     {
-      componentpointer->startBraking();
+      componentpointer->startBrakingSlowly();
     }
   }
 
@@ -2013,17 +2004,17 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
       else
       {
         cedar::aux::LogSingleton::getInstance()->error(
-          "watchdog says: thread of component is dead. trying crashbrake. destroying thread.",
+          "Watchdog says: thread of component is dead. Trying to brake now. You are advised to stop the the component manually.",
           CEDAR_CURRENT_FUNCTION_NAME);
 
         components_to_delete.push_back(componentpointer);
       }
     }
   }
+
   for(auto component : components_to_delete)
   {
-    component->crashbrake();
-    component->destroyCommunication();
+    component->startBrakingNow();
   }
 }
 
