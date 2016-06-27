@@ -324,7 +324,10 @@ public:
 
   //! ist user side communication allowed? @setSuppressUserInteraction
   bool getSuppressUserInteraction() const;
-  
+ 
+  //! a human readable (short) name that describes the component
+  std::string prettifyName() const;
+
 signals:
   void updatedUserMeasurementSignal();
 
@@ -442,6 +445,7 @@ private:
   static std::map< cedar::dev::Component*, boost::posix_time::ptime > mRunningComponentInstancesStartTime;
   static std::unique_ptr<cedar::aux::LoopFunctionInThread> mWatchDogThread;
 
+  // todo: make these lockable
   unsigned int mTooSlowCounter;
   unsigned int mNotReadyForCommandsCounter;
 
