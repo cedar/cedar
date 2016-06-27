@@ -37,6 +37,7 @@
 
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/LoopFunctionInThread.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -74,7 +75,8 @@ void runTests()
   loop->start();
 
   Time waiting_time(2.0 * seconds);
-  loop->wait(waiting_time);
+  loop->wait();
+  cedar::aux::sleep(waiting_time);
 
   if (count_loops != MAX_LOOPS)
     errors++;
