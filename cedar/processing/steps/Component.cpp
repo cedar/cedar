@@ -264,7 +264,7 @@ void cedar::proc::steps::Component::onStart()
     if (!component->isRunning())
     {
       cedar::aux::LogSingleton::getInstance()->message(
-        "Component is not connected, yet. Open the Robot Manager to connect.",
+        component->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.",
         CEDAR_CURRENT_FUNCTION_NAME);
     }
   }
@@ -283,7 +283,7 @@ void cedar::proc::steps::Component::onStop()
     if (component->isRunning())
     {
       cedar::aux::LogSingleton::getInstance()->warning(
-        "Component is still connected and running.",
+        component->prettifyName() + " is still connected and running.",
         CEDAR_CURRENT_FUNCTION_NAME);
     }
   }

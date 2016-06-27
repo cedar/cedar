@@ -120,6 +120,12 @@ public:
   //! Returns a path that identifies this component.
   std::string getPath() const;
 
+  //! Return the name of the slot
+  std::string getName() const;
+
+  //! Return the name of the configuration
+  std::string getConfigurationName() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
