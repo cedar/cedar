@@ -3,6 +3,7 @@
   "description file": "robots/youbot/description.json",
   "component instantiations":
   {
-    "arm": "yarp"
+    "arm": "yarp",
+    "chassis": "yarp"
   }
 }
