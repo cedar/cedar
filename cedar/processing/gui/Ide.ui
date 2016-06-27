@@ -380,8 +380,6 @@
    <addaction name="separator"/>
    <addaction name="mpActionDummy"/>
    <addaction name="separator"/>
-   <addaction name="mpActionToggleSmartConnections"/>
-   <addaction name="mpActionShowHideGrid"/>
    <addaction name="mpActionToggleTriggerVisibility"/>
    <addaction name="mpActionToggleTriggerColor"/>
    <addaction name="mpActionClosePlots"/>
