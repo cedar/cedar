@@ -278,7 +278,7 @@ void cedar::proc::steps::Component::onStop()
     //component->stopCommunication();
 
     component->setSuppressUserInteraction(true);
-    component->startBraking();
+    component->startBrakingSlowly();
   }
 }
 

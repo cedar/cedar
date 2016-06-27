@@ -131,7 +131,7 @@ void cedar::dev::gui::KinematicChainCommandWidget::stopMovement()
 {
   mpKeepMovingBox->setChecked(false);
 
-  mpKinematicChain->brakeNow();
+  mpKinematicChain->startBrakingSlowly();
 
 #if 0
   mpKinematicChain->clearUserCommand();
