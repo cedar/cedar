@@ -53,6 +53,8 @@ cedar_add_library(cedardev
                   YarpKinematicChain.h
                   SerialChannel.h
                   Odometry.h
+                  Vehicle.h
+                  YarpVehicle.h
                   gui/KinematicChainWidget.h
                   gui/KinematicChainMonitorWidget.h
                   gui/KinematicChainCommandWidget.h

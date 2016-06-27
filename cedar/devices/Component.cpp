@@ -633,7 +633,7 @@ protected:
   }
 };
 
-// comamnd data is also a measruement collection because the actual result of commanding the values is measured
+// command data is also a measruement collection because the actual result of commanding the values is measured
 class cedar::dev::Component::CommandDataCollection : public cedar::dev::Component::MeasurementDataCollection
 {
 public:

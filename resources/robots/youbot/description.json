@@ -9,13 +9,15 @@
         {
           "cedar.dev.YarpKinematicChain":
           {
-            "requires channel": "yarp"
+            "requires channel": "yarp",
+            "readPortName": "webots/youbotArmStatusFramework",
+      		"writePortName":"webots/youbotArmCommandsFramework"
           }
         }
       },
       "shared component parameters":
       {
-  		  "name": "Youbot",
+  		  "name": "YoubotArm",
   		  "server port": "0",
   		  "remote host": "NULL",
   		  "step size": "20.0",
@@ -180,8 +182,88 @@
   		      ]
   		    }
   		  }
+  		 
+  		  
       }
-    }
+    },
+    "chassis":
+     {
+      "available components":
+      {
+        "yarp":
+        {
+          "cedar.dev.YarpVehicle":
+          {
+            "requires channel": "yarp",
+            "readPortName": "webots/youbotWheelStatusFramework",
+      		"writePortName":"webots/youbotWheelCommandsFramework"
+          }
+        }
+      },
+      "shared component parameters":
+      {
+  		  "name": "YoubotChassis",
+  		  "wheels":
+  		  {
+  		  "cedar.dev.Vehicle.Wheel":
+  		    {
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "0.228", 
+  		        "0.158",
+  		        "0.050"
+  		      ]
+  		    },
+  		   "cedar.dev.Vehicle.Wheel":
+  		    {
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "0.228", 
+  		        "-0.158",
+  		        "0.050"
+  		      ]
+  		    },
+  		    "cedar.dev.Vehicle.Wheel":
+  		    {
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "-0.228", 
+  		        "0.158",
+  		        "0.050"
+  		      ]
+  		    },
+  		    "cedar.dev.Vehicle.Wheel":
+  		    {
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "-0.228", 
+  		        "-0.158",
+  		        "0.050"
+  		      ]
+  		    } 
+  		  }
+      }
+     }
   },
   "available channels":
   {
@@ -189,8 +271,6 @@
     {
       "cedar.dev.YarpChannel<cv.Mat>":
       {
-      "readPortName": "webots/youbotArmStatusFramework",
-      "writePortName":"webots/youbotArmCommandsFramework"
       }
     }
   }

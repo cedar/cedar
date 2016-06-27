@@ -16,7 +16,9 @@
         {
           "cedar.dev.YarpKinematicChain":
           {
-            "requires channel": "yarp"
+            "requires channel": "yarp",
+            "readPortName": "webots/carenArmStatusFramework",
+      		"writePortName":"webots/carenArmCommandsFramework"
           }
         },
         "simulator":
@@ -266,8 +268,6 @@
     {
       "cedar.dev.YarpChannel<cv.Mat>":
       {
-      	"readPortName": "webots/carenArmStatusFramework",
-      	"writePortName":"webots/carenArmCommandsFramework"
       }
     }
   }
