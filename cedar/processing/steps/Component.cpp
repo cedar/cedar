@@ -279,6 +279,13 @@ void cedar::proc::steps::Component::onStop()
 
     component->clearUserCommand();
     component->setSuppressUserInteraction(true);
+
+    if (component->isRunning())
+    {
+      cedar::aux::LogSingleton::getInstance()->warning(
+        "Component is still connected and running.",
+        CEDAR_CURRENT_FUNCTION_NAME);
+    }
   }
 }
 
