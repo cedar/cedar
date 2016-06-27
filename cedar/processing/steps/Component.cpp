@@ -299,6 +299,9 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
     this->setTimeMeasurement(this->mCommandTimeId, time);
   }
 
+  // unlock the suppression of user commands when the architecture is running
+  component->setSuppressUserInteraction(false);
+
   // if no inputs are present, there is nothing to do (i.e., no inputs have to be passed to the component)
   if (!this->hasSlotForRole(cedar::proc::DataRole::INPUT))
   {
