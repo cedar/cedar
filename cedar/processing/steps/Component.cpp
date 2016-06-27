@@ -253,12 +253,6 @@ void cedar::proc::steps::Component::onStart()
   {
     auto component = this->getComponent();
 
-    // paranoid: should already be running, but you never know ...
-    if (!component->isCommunicating())
-    {
-      component->startCommunication(true);  // suppress user interaction
-    }
-
     // should be supressed, un-lock:
     if (component->getSuppressUserInteraction())
     {
@@ -274,11 +268,7 @@ void cedar::proc::steps::Component::onStop()
   {
     auto component = this->getComponent();
 
-    // let it communicate, but dont pass from or to user-side
-    //component->stopCommunication();
-
     component->setSuppressUserInteraction(true);
-    component->startBrakingSlowly();
   }
 }
 
