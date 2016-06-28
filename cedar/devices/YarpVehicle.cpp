@@ -71,6 +71,7 @@ cedar::dev::YarpVehicle::YarpVehicle()
   registerStartCommunicationHook(boost::bind(&cedar::dev::YarpVehicle::postStart, this));
 
   this->applyDeviceCommandsAs(cedar::dev::YarpVehicle::WHEEL_VELOCITIES);
+//  std::cout<<"YarpVehicle Constructor! Meine WheelListe hat folgende Größe: "<< getNumberOfWheels()<<std::endl;
 }
 
 cedar::dev::YarpVehicle::~YarpVehicle()
@@ -83,6 +84,7 @@ cedar::dev::YarpVehicle::~YarpVehicle()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::YarpVehicle::postStart()
 {
+//  std::cout<<"YarpVehicle:postStart : Meine WheelListe hat folgende größe: "<< getNumberOfWheels()<<std::endl;
   auto yarpChannel = boost::static_pointer_cast< cedar::dev::YarpChannel<cv::Mat> >(this->getChannel());
   if (!yarpChannel)
   {
@@ -116,7 +118,7 @@ cv::Mat cedar::dev::YarpVehicle::retrieveVelocities()
     return cv::Mat();
   }
   auto ret = yarpChannel->read(mReadPort->getValue());
-  std::cout << "  yarp vehicle: " << ret << std::endl;
+//  std::cout << "  yarp vehicle: " << ret << std::endl;
   return ret;
 }
 
