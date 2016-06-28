@@ -202,6 +202,8 @@ protected:
 private:
   void init();
 
+  void initializefromWheelList();
+
   virtual bool applyBrakeSlowlyController();
 
   virtual bool applyBrakeNowController();

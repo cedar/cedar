@@ -440,6 +440,7 @@ class cedar::dev::Component::DataCollection
 
     cedar::aux::ConstMatDataPtr getData(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type) const
     {
+      std::cout<<"This Component::DataCollection::getData()! Type: "<< type<<std::endl;
       if (!this->hasType(type))
       {
         CEDAR_THROW(cedar::dev::Component::TypeNotFoundException, "The given type does not exist.");
