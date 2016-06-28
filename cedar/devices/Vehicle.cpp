@@ -86,7 +86,7 @@ _mpVelocityLimits
   )
 )
 {
-
+//  std::cout<<"Wheel Constructor is called!"<<std::endl;
 }
 
 
@@ -106,13 +106,14 @@ cedar::dev::Vehicle::~Vehicle()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::Vehicle::init()
 {
-  connect
-  (
-    this,
-    SIGNAL(updatedUserMeasurementSignal()),
-    this,
-    SLOT(updatedUserMeasurementSlot()), Qt::DirectConnection
-  );
+//  connect
+//  (
+//    this,
+//    SIGNAL(updatedUserMeasurementSignal()),
+//    this,
+//    SLOT(updatedUserMeasurementSlot()), Qt::DirectConnection
+//  );
+  //Todo:Check if we need a similar mechanism!
 
   installCommandAndMeasurementType(cedar::dev::Vehicle::WHEEL_VELOCITIES, "Wheel Velocities");
   installCommandAndMeasurementType(cedar::dev::Vehicle::WHEEL_ACCELERATIONS, "Wheel Accelerations");
@@ -137,6 +138,27 @@ void cedar::dev::Vehicle::init()
     cedar::dev::Vehicle::WHEEL_ACCELERATIONS,
     boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, _2, cedar::dev::Vehicle::WHEEL_VELOCITIES)
   );
+
+  //Todo: Ask J-S about the necessity of this
+  cedar::dev::Vehicle::WheelPtr default_wheel(new cedar::dev::Vehicle::Wheel);
+  default_wheel->_mpPosition->pushBack(0);
+  default_wheel->_mpPosition->pushBack(0);
+  default_wheel->_mpPosition->pushBack(0);
+  default_wheel->_mpVelocityLimits->setLowerLimit(-2 * cedar::aux::math::pi);
+  default_wheel->_mpVelocityLimits->setUpperLimit(2 * cedar::aux::math::pi);
+  this->mWheels->pushBack(default_wheel);
+  initializefromWheelList();
+}
+
+void cedar::dev::Vehicle::initializefromWheelList()
+{
+
+  auto num = getNumberOfWheels();
+//  std::cout<<"Set the Command and Mesurement Dimension: "<< num<< std::endl;
+  setCommandAndMeasurementDimensionality( cedar::dev::Vehicle::WHEEL_ACCELERATIONS, num );
+  setCommandAndMeasurementDimensionality( cedar::dev::Vehicle::WHEEL_VELOCITIES, num );
+
+
 }
 
 unsigned int cedar::dev::Vehicle::getNumberOfWheels() const
@@ -286,4 +308,5 @@ bool cedar::dev::Vehicle::applyBrakeNowController()
 void cedar::dev::Vehicle::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   cedar::aux::NamedConfigurable::readConfiguration(node);
+  initializefromWheelList();
 }
