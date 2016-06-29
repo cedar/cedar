@@ -1371,6 +1371,19 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
     return;
   }
 
+  // check for NaNs, assuming one element per row
+  for(int i=0; i < ioData.rows; ++i)
+  {
+    if(std::isnan(ioData.at<double>(i, 0)))
+    {
+      ioData.at<double>(i, 0) = 0;
+
+      cedar::aux::LogSingleton::getInstance()->warning(
+        this->prettifyName()+": ioData at " + cedar::aux::toString(i) + " is not a number. Setting it to 0 and continue.",
+        CEDAR_CURRENT_FUNCTION_NAME);
+    }
+  }
+
   QReadLocker submit_command_hooks_locker(mSubmitCommandHooks.getLockPtr());
   auto hook_found = mSubmitCommandHooks.member().find(type_for_Device);
   if (hook_found == mSubmitCommandHooks.member().end())
