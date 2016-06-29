@@ -1,0 +1,8 @@
+{
+  "name": "FRI CAREN robot",
+  "description file": "robots/caren/description.json",
+  "component instantiations":
+  {
+    "arm": "fri"
+  }
+}
