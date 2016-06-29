@@ -1,0 +1,68 @@
+/*!
+
+@page GroupsTutorial Groups Tutorials for the Processing Framework
+
+This tutorial is a step-by-step instruction that introduces the concept of groups in @em cedar's GUI. This page contains the following sections:
+
+<ol>
+  <li>@ref GroupsTutorialBasics</li>
+  <li>@ref GroupsTutorialRefined</li>
+</ol>
+
+@section BeforeYouStart Before you start
+Before you start, keep in mind that this software is still under development and save often. You will surely encounter
+ exceptions and crashes along the way. We are continuously improving @em cedar and feedback of any kind is welcome.
+ 
+@section StartingUpCedar Starting up cedar
+Please start your processing gui right now. If you do not know how to do this, take a look at 
+@link ProcessingGuiTutorial this @endlink tutorial.  
+
+@section GroupsTutorialBasics Basics of groups
+
+The following steps help you to get a hang of how to create and fill groups.
+
+<ul>
+<li> go to the @em Utilities tab and drag a @em Group into the architecture canvas</li>
+<li> click inside the newly created box - this selects the group</li>
+<li> you can now alter the group's name in the properties section or resize the box by dragging its corners</li>
+<li> add steps to the group by dragging them from the elements area directly into the group or by dragging already created steps from the canvas into the group</li>
+<li> note that the group gets highlighted when you hover over it while dragging a step</li>
+<li> try to remove steps from the group by selecting them and dragging them outside the group box</li>
+<li> you can collapse the graphical representation of a group by right-clicking and choosing @em collapse</li>
+<li> you can delete a group in the same way as steps - be aware that the content of a group is deleted as well (this is why cedar will
+ask you for confirmation; if you would like to suppress this confirmation, hold Ctrl while deleting)</li>
+</ul>
+
+Once we have grouped steps together, we want to connect them. Connections can only be created between elements of a group.
+To connect up elements to the outside, we have to add @em connectors to groups. Connectors either forward input into a 
+group or send output to subsequent steps outside of the group.
+<ul>
+<li> try to connect steps inside the group in the usual way - nothing special here!</li>
+<li> now let's take care of connecting the group to the outside - you can drag connections from and to elements outside of the groups to and from elements inside the group</li>
+<li> if you do so, cedar automatically adds inputs and outputs to the group and connects the elements via these newly created connectors
+<li> you can remove/rename or manually add group inputs and outputs in the right-click menu of a group</li>
+</ul>
+
+You can of course nest groups into other groups - it works the same way! Groups behave in the same way as steps - 
+therefore you cannot have a group with the same name as another step or group in a parent group. You might run into this
+ while moving around groups. The GUI will prompt a warning in the log and the group or step will not be moved.
+ 
+If your group contains looped elements (e.g., a field or another group with looped elements) that usually require a
+ connection to a looped trigger, the group automatically switches to a looped mode. The group will now take 
+ care of triggering all contained looped elements. If you remove all looped elements from the group, it goes back to not
+ being looped.
+
+@section GroupsTutorialRefined Mastering groups
+
+You can connect steps in a group and move a subset to another group. @em cedar will automatically create new connectors 
+or merge chains of connections through connectors into a single connection, depending on where you move the steps. You 
+can follow the next steps to get a grasp of this principle.
+ 
+<ul>
+<li> add three fields (we call them A, B, and C) to the canvas, connect A to B and B to C</li>
+<li> add a group to the canvas, drag B into the group - @em cedar automatically creates connectors</li>
+<li> move C into the group as well - a connector is removed and B and C are directly connected</li>
+<li> move B out of the group - although the group still has one input connector, the connector between A and B was
+ removed and a new one was created to connect B and C</li>
+</ul>
+*/

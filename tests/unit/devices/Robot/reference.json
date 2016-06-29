@@ -1,0 +1,137 @@
+{
+  "component slots":
+  {
+    "drive":
+    {
+      "channel to component mapping":
+      {
+        "serial": "cedar::dev::kteam::DriveSerial",
+        "network": "cedar::dev::kteam::DriveNetwork"
+      },
+      "available components":
+      {
+        "cedar::dev::kteam::DriveSerial":
+        {
+          "channel": "epuck_serial",
+          "command set speed": "D",
+          "command set encoder": "P",
+          "command get encoder": "Q"
+        },
+        "cedar::dev::kteam::DriveNetwork":
+        {
+          "channel": "epuck_network",
+          "command set speed": "D",
+          "command set encoder": "P",
+          "command get encoder": "Q"
+        }
+      },
+      "shared component parameters":
+      {
+        "forward velocity limits":
+        {
+          "lower limit": "-1.0",
+          "upper limit": "1.0"
+        },
+        "turning rate limits":
+        {
+          "lower limit": "-3.141",
+          "upper limit": "3.141"
+        },
+        "wheel distance": "0.053",
+        "wheel radius": "0.0205",
+        "hardware speed limits":
+        {
+          "lower limit": "-1.0",
+          "upper limit": "1.0"
+        },
+        "number of pulses per revolution": "1000",
+        "encoder limits":
+        {
+          "lower limit": "-32768",
+          "upper limit": "32767"
+        }
+      }
+    },
+    "proximity sensor":
+    {
+      "channel to component mapping":
+      {
+        "serial": "cedar::dev::kteam::InfraredSensorSerial"
+      },
+      "available components":
+      {
+        "cedar::dev::kteam::InfraredSensorSerial":
+        {
+          "channel": "epuck_serial",
+          "command get infrared": "N"
+        }
+      }
+    },
+    "ambient light sensor":
+    {
+      "channel to component mapping":
+      {
+        "serial": "cedar::dev::kteam::InfraredSensorSerial"
+      },
+      "available components":
+      {
+        "cedar::dev::kteam::InfraredSensorSerial":
+        {
+          "channel": "epuck_serial",
+          "command get infrared": "O"
+        }
+      }
+    },
+    "acceleration sensor":
+    {
+      "channel to component mapping":
+      {
+        "serial": "cedar::dev::kteam::epuck::AccelerationSensorSerial"
+      },
+      "available components":
+      {
+        "cedar::dev::kteam::epuck::AccelerationSensorSerial":
+        {
+          "channel": "epuck_serial",
+          "command get acceleration": "A"
+        }
+      }
+    },
+    "led":
+    {
+      "channel to component mapping":
+      {
+        "serial": "cedar::dev::kteam::LedSerial"
+      },
+      "available components":
+      {
+        "cedar::dev::kteam::LedSerial":
+        {
+          "channel": "epuck_serial",
+          "command set state": "L"
+        }
+      }
+    }
+  },
+  "channels":
+  {
+    "epuck_serial":
+    {
+      "cedar::dev::kteam::SerialChannel":
+      {
+        "end of command string": "\\r\\n",
+        "country flag": "0",
+        "time out": "250000",
+        "latency": "10000"
+      }
+    },
+    "epuck_network":
+    {
+      "cedar::dev::kteam::NetworkChannel":
+      {
+        "hostname": "epuck.ini.rub.de",
+        "port": "9559"
+      }
+    }
+  }
+}
