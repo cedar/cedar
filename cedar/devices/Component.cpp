@@ -1363,10 +1363,13 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
     ioData = userData.clone();
   }
 
-
   if( !( mCheckCommandHook.member()(type_for_Device, ioData) ) )
-    return; // warning?
-
+  {
+    cedar::aux::LogSingleton::getInstance()->error(
+       "Could not call command check function.",
+        CEDAR_CURRENT_FUNCTION_NAME);
+    return;
+  }
 
   QReadLocker submit_command_hooks_locker(mSubmitCommandHooks.getLockPtr());
   auto hook_found = mSubmitCommandHooks.member().find(type_for_Device);
