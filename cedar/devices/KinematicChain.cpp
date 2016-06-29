@@ -561,7 +561,6 @@ void cedar::dev::KinematicChain::init()
   this->addConfigurableChild("root coordinate frame", mForwardKinematics->getRootCoordinateFrame());
   this->addConfigurableChild("end-effector coordinate frame", mForwardKinematics->getEndEffectorCoordinateFrame());
 
-
   cedar::dev::KinematicChain::JointPtr default_joint(new cedar::dev::KinematicChain::Joint);
   default_joint->_mpPosition->pushBack(0);
   default_joint->_mpPosition->pushBack(0);
@@ -598,7 +597,9 @@ bool cedar::dev::KinematicChain::applyLimits(const cedar::dev::Component::Compon
       break;
 
     default:
-      // Todo: Meldung ausgeben
+      cedar::aux::LogSingleton::getInstance()->warning(
+         "Component data type " + cedar::aux::toString(type) + " is not known.",
+          CEDAR_CURRENT_FUNCTION_NAME);
       return false;
   }
 
@@ -633,7 +634,7 @@ void cedar::dev::KinematicChain::applyAngleLimits(cv::Mat& angles)
     if(angle == lower_limit)
     {
         cedar::aux::LogSingleton::getInstance()->warning(
-           "Joint " + cedar::aux::toString(i) + ": angle " + cedar::aux::toString(old_angle) + " has been capped at " + cedar::aux::toString(lower_limit),
+           this->prettifyName()+", joint " + cedar::aux::toString(i) + ": angle " + cedar::aux::toString(old_angle) + " has been capped at " + cedar::aux::toString(lower_limit),
             CEDAR_CURRENT_FUNCTION_NAME);
     }
 
@@ -642,7 +643,7 @@ void cedar::dev::KinematicChain::applyAngleLimits(cv::Mat& angles)
     if(angle == upper_limit)
     {
         cedar::aux::LogSingleton::getInstance()->warning(
-           "Joint " + cedar::aux::toString(i) + ": angle " + cedar::aux::toString(old_angle) + " has been capped at " + cedar::aux::toString(upper_limit),
+           this->prettifyName()+", joint " + cedar::aux::toString(i) + ": angle " + cedar::aux::toString(old_angle) + " has been capped at " + cedar::aux::toString(upper_limit),
             CEDAR_CURRENT_FUNCTION_NAME);
     }
 
@@ -666,7 +667,7 @@ void cedar::dev::KinematicChain::applyVelocityLimits(cv::Mat& velocities)
     if(velocity == lower_limit)
     {
         cedar::aux::LogSingleton::getInstance()->warning(
-           "Joint " + cedar::aux::toString(i) + ": velocity " + cedar::aux::toString(old_velocity) + " has been capped at " + cedar::aux::toString(lower_limit),
+           this->prettifyName()+", joint " + cedar::aux::toString(i) + ": velocity " + cedar::aux::toString(old_velocity) + " has been capped at " + cedar::aux::toString(lower_limit),
             CEDAR_CURRENT_FUNCTION_NAME);
     }
 
@@ -675,7 +676,7 @@ void cedar::dev::KinematicChain::applyVelocityLimits(cv::Mat& velocities)
     if(velocity == upper_limit)
     {
         cedar::aux::LogSingleton::getInstance()->warning(
-           "Joint " + cedar::aux::toString(i) + ": velocity " + cedar::aux::toString(old_velocity) + " has been capped at " + cedar::aux::toString(upper_limit),
+           this->prettifyName()+", joint " + cedar::aux::toString(i) + ": velocity " + cedar::aux::toString(old_velocity) + " has been capped at " + cedar::aux::toString(upper_limit),
             CEDAR_CURRENT_FUNCTION_NAME);
     }
 
@@ -698,7 +699,7 @@ void cedar::dev::KinematicChain::applyAccelerationLimits(cv::Mat& accelerations)
     if(acceleration == lower_limit)
     {
         cedar::aux::LogSingleton::getInstance()->warning(
-           "Joint " + cedar::aux::toString(i) + ": acceleration " + cedar::aux::toString(old_acceleration) + " has been capped at " + cedar::aux::toString(lower_limit),
+           this->prettifyName()+", joint " + cedar::aux::toString(i) + ": acceleration " + cedar::aux::toString(old_acceleration) + " has been capped at " + cedar::aux::toString(lower_limit),
             CEDAR_CURRENT_FUNCTION_NAME);
     }
 
@@ -707,12 +708,11 @@ void cedar::dev::KinematicChain::applyAccelerationLimits(cv::Mat& accelerations)
     if(acceleration == upper_limit)
     {
         cedar::aux::LogSingleton::getInstance()->warning(
-           "Joint " + cedar::aux::toString(i) + ": acceleration " + cedar::aux::toString(old_acceleration) + " has been capped at " + cedar::aux::toString(upper_limit),
+           this->prettifyName()+", joint " + cedar::aux::toString(i) + ": acceleration " + cedar::aux::toString(old_acceleration) + " has been capped at " + cedar::aux::toString(upper_limit),
             CEDAR_CURRENT_FUNCTION_NAME);
     }
 
     accelerations.at<double>(i, 0) = acceleration;
-
   }
 }
 
