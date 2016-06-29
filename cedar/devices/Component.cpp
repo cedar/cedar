@@ -973,7 +973,8 @@ void cedar::dev::Component::applyDeviceCommandsAs(ComponentDataType type)
 void cedar::dev::Component::setUserSideCommandBuffer(ComponentDataType type, cv::Mat data)
 {
   this->checkExclusivenessOfCommand(type);
-  QWriteLocker locker(this->mUserCommandUsed.getLockPtr());
+  QWriteLocker locker(this->mUserCommandUsed.getLockPtr());    
+
   this->mCommandData->setUserBuffer(type, data);
   this->mUserCommandUsed.member().insert(type);
 }
@@ -1087,6 +1088,17 @@ void cedar::dev::Component::registerMeasurementHook(ComponentDataType type, Meas
 boost::signals2::connection cedar::dev::Component::registerStartCommunicationHook(boost::function<void ()> slot)
 {
     return mStartCommunicationHook.connect(slot);
+}
+
+void cedar::dev::Component::registerCheckCommandHook(cedar::dev::Component::CommandCheckFunctionType fun)
+{
+  QWriteLocker locker(this->mCheckCommandHook.getLockPtr());
+  // cannot replace existing hook
+  if (this->mCheckCommandHook.member())
+  {
+    CEDAR_THROW(cedar::dev::Component::DuplicateHookException, "A check-command hook is already set.");
+  }
+  mCheckCommandHook.member() = fun;
 }
 
 void cedar::dev::Component::registerCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun)
@@ -1351,6 +1363,11 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
   {
     ioData = userData.clone();
   }
+
+
+  if( !( mCheckCommandHook.member()(type_for_Device, ioData) ) )
+    return; // warning?
+
 
   QReadLocker submit_command_hooks_locker(mSubmitCommandHooks.getLockPtr());
   auto hook_found = mSubmitCommandHooks.member().find(type_for_Device);

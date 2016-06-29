@@ -126,6 +126,20 @@ _mpVelocityLimits
     0.0,
     2 * cedar::aux::math::pi
   )
+),
+_mpAccelerationLimits
+(
+  new cedar::aux::math::LimitsParameter<double>
+  (
+    this,
+    "acceleration limits",
+    -2 * cedar::aux::math::pi,
+    -2 * cedar::aux::math::pi,
+    0.0,
+    2 * cedar::aux::math::pi,
+    0.0,
+    2 * cedar::aux::math::pi
+  )
 )
 {
 
@@ -533,6 +547,17 @@ void cedar::dev::KinematicChain::init()
       )
   );
 
+  registerCheckCommandHook
+  (
+    boost::bind
+    (
+      &cedar::dev::KinematicChain::applyLimits,
+      this,
+      _1,
+      _2
+    )
+  );
+
   this->addConfigurableChild("root coordinate frame", mForwardKinematics->getRootCoordinateFrame());
   this->addConfigurableChild("end-effector coordinate frame", mForwardKinematics->getEndEffectorCoordinateFrame());
 
@@ -548,10 +573,36 @@ void cedar::dev::KinematicChain::init()
   default_joint->_mpAngleLimits->setUpperLimit(2 * cedar::aux::math::pi);
   default_joint->_mpVelocityLimits->setLowerLimit(-2 * cedar::aux::math::pi);
   default_joint->_mpVelocityLimits->setUpperLimit(2 * cedar::aux::math::pi);
+  default_joint->_mpAccelerationLimits->setLowerLimit(-2 * cedar::aux::math::pi);
+  default_joint->_mpAccelerationLimits->setUpperLimit(2 * cedar::aux::math::pi);
   this->mpJoints->pushBack(default_joint);
   initializeFromJointList();
 
   checkInitialConfigurations();
+}
+
+bool cedar::dev::KinematicChain::applyLimits(const cedar::dev::Component::ComponentDataType &type, cv::Mat &data)
+{
+  switch(type)
+  {
+    case cedar::dev::KinematicChain::JOINT_ANGLES:
+      applyAngleLimits(data);
+      break;
+
+    case cedar::dev::KinematicChain::JOINT_VELOCITIES:
+      applyVelocityLimits(data);
+      break;
+
+    case cedar::dev::KinematicChain::JOINT_ACCELERATIONS:
+      applyAccelerationLimits(data);
+      break;
+
+    default:
+      // Todo: Meldung ausgeben
+      return false;
+  }
+
+  return true;
 }
 
 void cedar::dev::KinematicChain::initializeFromJointList()
@@ -567,31 +618,39 @@ void cedar::dev::KinematicChain::initializeFromJointList()
 
 }
 
-void cedar::dev::KinematicChain::applyAngleLimits(cv::Mat& /*angles*/)
+void cedar::dev::KinematicChain::applyAngleLimits(cv::Mat& angles)
 {
-// TODO: jokeit, why is this commented-out?
-//  for (unsigned i = 0; i < getNumberOfJoints(); i++)
-//  {
-//    double angle = angles.at<double>(i, 0);
-//    angle = std::max<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
-//    angle = std::min<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
-//    angles.at<double>(i, 0) = angle;
-//  }
+  for (unsigned i = 0; i < getNumberOfJoints(); i++)
+  {
+    double angle = angles.at<double>(i, 0);
+    angle = std::max<double>(angle, getJoint(i)->_mpAngleLimits->getLowerLimit());
+    angle = std::min<double>(angle, getJoint(i)->_mpAngleLimits->getUpperLimit());
+    angles.at<double>(i, 0) = angle;
+  }
 }
 
 
-void cedar::dev::KinematicChain::applyVelocityLimits(cv::Mat& /*velocities*/)
+void cedar::dev::KinematicChain::applyVelocityLimits(cv::Mat& velocities)
 {
-// TODO: jokeit, why is this commented-out?
-//  for (unsigned i = 0; i < getNumberOfJoints(); i++)
-//  {
-//    double velocity = velocities.at<double>(i, 0);
-//    velocity = std::max<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min);
-//    velocity = std::min<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max);
-//    velocities.at<double>(i, 0) = velocity;
-//  }
+  for (unsigned i = 0; i < getNumberOfJoints(); i++)
+  {
+    double velocity = velocities.at<double>(i, 0);
+    velocity = std::max<double>(velocity, getJoint(i)->_mpVelocityLimits->getLowerLimit());
+    velocity = std::min<double>(velocity, getJoint(i)->_mpVelocityLimits->getUpperLimit());
+    velocities.at<double>(i, 0) = velocity;
+  }
 }
 
+void cedar::dev::KinematicChain::applyAccelerationLimits(cv::Mat& accelerations)
+{
+  for (unsigned i = 0; i < getNumberOfJoints(); i++)
+  {
+    double acceleration = accelerations.at<double>(i, 0);
+    acceleration = std::max<double>(acceleration, getJoint(i)->_mpAccelerationLimits->getLowerLimit());
+    acceleration = std::min<double>(acceleration, getJoint(i)->_mpAccelerationLimits->getUpperLimit());
+    accelerations.at<double>(i, 0) = acceleration;
+  }
+}
 
 cedar::aux::LocalCoordinateFramePtr cedar::dev::KinematicChain::getEndEffectorCoordinateFrame()
 {
