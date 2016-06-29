@@ -47,6 +47,9 @@
 // FORWARD DECLARATIONS
 #include "cedar/devices/YarpKinematicChain.fwd.h"
 
+
+#ifdef CEDAR_USE_YARP
+
 /*!@todo describe.
  *
  * @todo describe more.
@@ -72,7 +75,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  bool applyCrashbrake();
+  bool applyCrashbrake() override;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -90,12 +93,14 @@ private:
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
-  // members
+  // parameters
   //--------------------------------------------------------------------------------------------------------------------
 private:
- std::string readPort;
- std::string writePort;
+  cedar::aux::StringParameterPtr mReadPort;
+  cedar::aux::StringParameterPtr mWritePort;
 };
 // class cedar::dev::YarpKinematicChain
+
+#endif // CEDAR_USE_YARP
 
 #endif // CEDAR_DEV_YARP_KINEMATIC_CHAIN_H

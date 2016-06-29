@@ -49,6 +49,8 @@
 #endif // Q_MOC_RUN
 
 
+#ifdef CEDAR_USE_YARP
+
 namespace cedar
 {
   namespace dev
@@ -59,6 +61,7 @@ namespace cedar
   }
 }
 
+#endif // CEDAR_USE_YARP
 
 #endif // CEDAR_DEV_YARP_KINEMATIC_CHAIN_FWD_H
 

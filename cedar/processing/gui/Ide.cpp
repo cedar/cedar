@@ -1167,8 +1167,7 @@ void cedar::proc::gui::Ide::resetRootGroup()
 
 void cedar::proc::gui::Ide::brakeAllRobots()
 {
-  // @todo: later use this: cedar::dev::Component::startBrakingAllComponents();
-  cedar::dev::Component::startBrakingAllComponents();
+  cedar::dev::Component::startBrakingAllComponentsSlowly();
 }
 
 void cedar::proc::gui::Ide::showAboutDialog()

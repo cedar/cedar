@@ -22,38 +22,41 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Gripper.h
+    File:        YarpVehicle.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2012 11 26
+    Maintainer:  Jan Tekülve
+    Email:       jan.tekuelve@ini.rub.de
+    Date:        2016 06 27
 
-    Description: Gripper that can be attached to the Khepera robot.
+    Description: Header file for the class cedar::dev::YarpVehicle.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KTEAM_KHEPERA_GRIPPER_H
-#define CEDAR_DEV_KTEAM_KHEPERA_GRIPPER_H
+#ifndef CEDAR_DEV_YARP_VEHICLE_H
+#define CEDAR_DEV_YARP_VEHICLE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
+#include "cedar/devices/Vehicle.h"
+#include "cedar/devices/YarpChannel.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/kteam/namespace.h"
-#include "cedar/devices/kteam/khepera/namespace.h"
-#include "cedar/devices/Component.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/devices/YarpVehicle.fwd.h"
 
 // SYSTEM INCLUDES
+#ifdef CEDAR_USE_YARP
 
-
-/*!@brief Gripper that can be attached to the Khepera robot.
+/*!@todo describe.
  *
  * @todo describe more.
  */
-class cedar::dev::kteam::khepera::Gripper : public cedar::dev::Component
+class cedar::dev::YarpVehicle : public cedar::dev::Vehicle
 {
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -63,71 +66,46 @@ class cedar::dev::kteam::khepera::Gripper : public cedar::dev::Component
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Gripper();
-
-  //!@brief The standard constructor.
-  Gripper(cedar::dev::ChannelPtr channel);
+  YarpVehicle();
 
   //!@brief Destructor
-  virtual ~Gripper();
+  virtual ~YarpVehicle();
 
   //--------------------------------------------------------------------------------------------------------------------
-  // public methods
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  //!@brief Opens the gripper.
-  void openGripper();
+    // public methods
+    //--------------------------------------------------------------------------------------------------------------------
+  public:
+    bool applyCrashbrake() override;
 
-  //!@brief Closes the gripper.
-  void closeGripper();
+    //--------------------------------------------------------------------------------------------------------------------
+    // private methods
+    //--------------------------------------------------------------------------------------------------------------------
+  private:
 
-  //!@brief Sets the position of the gripper (i.e., opens or closes it).
-  virtual void setGripperPosition(bool open) = 0;
-
-  //!@brief Returns the gripper position.
-  virtual unsigned int getGripperPosition() = 0;
-
-  //!@brief Returns the current measurement of the optical sensor in the Khepera's gripper.
-  virtual unsigned int getGripperOpticalSensor() = 0;
-
-  //!@brief Returns the current measurement of the resistivity sensor in the Khepera's gripper.
-  virtual unsigned int getGripperResistivity() = 0;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
+    void postStart();
+    void sendVelocities(cv::Mat mat);
+    cv::Mat retrieveVelocities();
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // private methods
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  void initialize();
-
-  virtual bool applyBrakeSlowlyController() override;
-  virtual bool applyBrakeNowController() override;
-  virtual bool applyCrashbrake() override;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  static unsigned int GRIPPER_POSITION;
-  static unsigned int RESISTIVITY;
-  static unsigned int OPTICAL_SENSOR;
-
-private:
   // none yet
-
+private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
 private:
-  // none yet
-}; // class cedar::dev::kteam::khepera::Gripper
+ cedar::aux::StringParameterPtr mReadPort;
+ cedar::aux::StringParameterPtr mWritePort;
 
-#endif // CEDAR_DEV_KTEAM_KHEPERA_GRIPPER_H
+}; // class cedar::dev::YarpVehicle
+
+#endif //CEDAR_USE_YARP
+
+#endif // CEDAR_DEV_YARP_VEHICLE_H
 

@@ -24,8 +24,8 @@
 
     File:        Component.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
+    Maintainer:  Jean-Stephane Jokeit
+    Email:       jean-stephane.jokeit@ini.rub.de
     Date:        2012 11 23
 
     Description: Abstract component of a robot (e.g., a kinematic chain).
@@ -53,10 +53,10 @@
 
 // SYSTEM INCLUDES
 #include <opencv/cv.h>
-#include <boost/function.hpp>
-#include <boost/optional.hpp>
-#include "boost/date_time/posix_time/posix_time.hpp"
 #ifndef Q_MOC_RUN
+  #include <boost/function.hpp>
+  #include <boost/optional.hpp>
+  #include "boost/date_time/posix_time/posix_time.hpp"
   #include <boost/signals2/signal.hpp>
   #include <boost/signals2/connection.hpp>
   #include <boost/function.hpp>
@@ -177,8 +177,8 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   static void handleCrash(); // called from the IDE
-  static void brakeNowAllComponents(); 
-  static void startBrakingAllComponents(); 
+  static void startBrakingAllComponentsNow(); 
+  static void startBrakingAllComponentsSlowly(); 
   static bool anyComponentsRunning();
 
   // replaced by startCommunication()
@@ -230,8 +230,8 @@ public:
 
   void waitUntilCommunicated() const;
 
-  void startBraking(); // non-blocking. will set a Controller that smoothly brakes
-  void brakeNow();     // non-blocking. will set a Controller that will instantly reduce velocity to 0, be careful!
+  void startBrakingSlowly(); // non-blocking. will set a Controller that smoothly brakes
+  void startBrakingNow();     // non-blocking. will set a Controller that will instantly reduce velocity to 0, be careful!
   void crashbrake();   // last-resort braking, may disconnect device or even break the robot
 
   //! Returns a list of all installed measurement types.
@@ -278,6 +278,8 @@ public:
   //!@brief this function resets the internally used user command and allows to subsequently use a different type
   void clearUserCommand();
 
+  //!@brief clear all buffers and controllers
+  void clearAll();
 
   //! Defines a new command group.
   void defineCommandGroup(const std::string& groupName);
@@ -323,7 +325,10 @@ public:
 
   //! ist user side communication allowed? @setSuppressUserInteraction
   bool getSuppressUserInteraction() const;
-  
+ 
+  //! a human readable (short) name that describes the component
+  std::string prettifyName() const;
+
 signals:
   void updatedUserMeasurementSignal();
 
@@ -444,6 +449,7 @@ private:
   static std::map< cedar::dev::Component*, boost::posix_time::ptime > mRunningComponentInstancesStartTime;
   static std::unique_ptr<cedar::aux::LoopFunctionInThread> mWatchDogThread;
 
+  // todo: make these lockable
   unsigned int mTooSlowCounter;
   unsigned int mNotReadyForCommandsCounter;
 

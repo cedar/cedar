@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KinematicChain.fwd.h
+    File:        YarpVehicle.fwd.h
 
-    Maintainer:  Jean-Stephane Jokeit   
-    Email:       jean-stephane.jokeit@ini.rub.de
-    Date:        2014 07 23
+    Maintainer:  Jan Tekülve
+    Email:       jan.tekuelve@ini.rub.de
+    Date:        2016 06 27
 
-    Description: Forward declaration file for the class cedar::dev::KinematicChain.
+    Description: Forward declaration file for the class cedar::dev::YarpVehicle.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KINEMATIC_CHAIN_FWD_H
-#define CEDAR_DEV_KINEMATIC_CHAIN_FWD_H
+#ifndef CEDAR_DEV_YARP_VEHICLE_FWD_H
+#define CEDAR_DEV_YARP_VEHICLE_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -48,17 +48,18 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
+#ifdef CEDAR_USE_YARP
 
 namespace cedar
 {
   namespace dev
   {
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_DEV_CLASS(KinematicChain);
+    CEDAR_DECLARE_DEV_CLASS(YarpVehicle);
     //!@endcond
   }
 }
+#endif //CEDAR_USE_YARP
 
-
-#endif // CEDAR_DEV_KINEMATIC_CHAIN_FWD_H
+#endif // CEDAR_DEV_YARP_VEHICLE_FWD_H
 

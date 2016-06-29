@@ -24,8 +24,8 @@
 
     File:        Component.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
+    Maintainer:  Jean-Stephane Jokeit
+    Email:       jean-stephane.jokeit@ini.rub.de
     Date:        2012 11 26
 
     Description: Abstract component of a robot (e.g., a kinematic chain).
@@ -37,6 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/Component.h"
 #include "cedar/devices/Channel.h"
+#include "cedar/devices/ComponentSlot.h"
 #include "cedar/devices/exceptions.h"
 #include "cedar/auxiliaries/LoopFunctionInThread.h"
 #include "cedar/auxiliaries/Timer.h"
@@ -439,6 +440,7 @@ class cedar::dev::Component::DataCollection
 
     cedar::aux::ConstMatDataPtr getData(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type) const
     {
+      std::cout<<"This Component::DataCollection::getData()! Type: "<< type<<std::endl;
       if (!this->hasType(type))
       {
         CEDAR_THROW(cedar::dev::Component::TypeNotFoundException, "The given type does not exist.");
@@ -633,7 +635,7 @@ protected:
   }
 };
 
-// comamnd data is also a measruement collection because the actual result of commanding the values is measured
+// command data is also a measruement collection because the actual result of commanding the values is measured
 class cedar::dev::Component::CommandDataCollection : public cedar::dev::Component::MeasurementDataCollection
 {
 public:
@@ -739,7 +741,7 @@ cedar::dev::Component::~Component()
   {
     cedar::aux::LogSingleton::getInstance()->error
     (
-      "You forgot to call prepareComponentDestructAbsolutelyRequired() in the child's destructor!",
+      "You forgot to call prepareComponentDestructAbsolutelyRequired() in the child's destructor of " + prettifyName() + "!",
       CEDAR_CURRENT_FUNCTION_NAME
     );
   }
@@ -1128,39 +1130,43 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   // lock was acquired, let's make sure its unlocked
   cedar::aux::CallOnScopeExit unlocker(boost::bind(&QMutex::unlock, &this->mGeneralAccessLock));
 
-  // its important to get the currently scheduled commands out first
-  // (think safety first). this assumes serial communication, of course
-  try
+  if (!mChannel
+      || (mChannel && mChannel->isOpen()) )
   {
-    stepCommandCommunication(real_time);
-    this->mCommandData->countSuccessfullCommunication();
-  }
-  catch (const cedar::dev::CommunicationException& e)
-  {
-    this->mCommandData->countCommunicationError(e);
-  }
+    // its important to get the currently scheduled commands out first
+    // (think safety first). this assumes serial communication, of course
+    try
+    {
+      stepCommandCommunication(real_time);
+      this->mCommandData->countSuccessfullCommunication();
+    }
+    catch (const cedar::dev::CommunicationException& e)
+    {
+      this->mCommandData->countCommunicationError(e);
+    }
 
-  // to send only once per cycle to the HW with new commands and get new measurements
-  try
-  {
-    stepAfterCommandBeforeMeasurementCommunication();
-    this->mCommandData->countSuccessfullCommunication();
-  }
-  catch (const cedar::dev::CommunicationException& e)
-  {
-    this->mCommandData->countCommunicationError(e);
-  }
+    // to send only once per cycle to the HW with new commands and get new measurements
+    try
+    {
+      stepAfterCommandBeforeMeasurementCommunication();
+      this->mCommandData->countSuccessfullCommunication();
+    }
+    catch (const cedar::dev::CommunicationException& e)
+    {
+      this->mCommandData->countCommunicationError(e);
+    }
 
 
-  try
-  {
-    stepMeasurementCommunication(real_time); // note, the post-measurements transformations also take time
-    this->mMeasurementData->countSuccessfullCommunication();
-  }
-  catch (const cedar::dev::CommunicationException& e)
-  {
-    this->mMeasurementData->countCommunicationError(e);
-  }
+    try
+    {
+      stepMeasurementCommunication(real_time); // note, the post-measurements transformations also take time
+      this->mMeasurementData->countSuccessfullCommunication();
+    }
+    catch (const cedar::dev::CommunicationException& e)
+    {
+      this->mMeasurementData->countCommunicationError(e);
+    }
+  } // end: channel is open
 
   // utitlity: warn if consistently much too slow
   if (time > this->getCommunicationStepSize() * 1.4)
@@ -1172,7 +1178,7 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
         || mTooSlowCounter > 1500)
     {
       cedar::aux::LogSingleton::getInstance()->warning(
-        "communication with component is consistently "
+        "communication with " + prettifyName() + " is consistently "
         "much slower than specified: "
         + boost::lexical_cast<std::string>( time ) 
         + " (effective time) vs "
@@ -1236,7 +1242,7 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
       {
         // todo: output component name her (and for the other messages/warnings)
         cedar::aux::LogSingleton::getInstance()->warning(
-          "commands issued but component is not accepting commands",
+          "Commands issued but " + prettifyName() + " is not accepting commands",
           CEDAR_CURRENT_FUNCTION_NAME);
       }
 
@@ -1256,7 +1262,6 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
   // if there are neither user commands nor a controller, nothing needs to be done
   if (this->mUserCommandUsed.member().size() == 0 && !this->mController.member())
   {
-    return; // TODO : why is this return here?
     QReadLocker nocommand_hook_locker(mNoCommandHook.getLockPtr());
 
     auto hook_found = mNoCommandHook.member();
@@ -1298,7 +1303,7 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
       CEDAR_THROW
       (
         CouldNotGuessCommandTypeException,
-        "Could not guess the type of the command because too many commands have been set. Set commands are: " + set_commands
+        "Could not guess the type of the command because too many commands have been set for " + prettifyName() +". Set commands are: " + set_commands
       );
     }
 
@@ -1483,19 +1488,18 @@ void cedar::dev::Component::updateUserSideMeasurements()
 
 void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
 {
-  cedar::aux::LogSingleton::getInstance()->message(
-    "Starting communication with component in background.",
-    CEDAR_CURRENT_FUNCTION_NAME
-  );
+  std::string s= "";
 
   if (suppressUserSideInteraction)
   {
-    cedar::aux::LogSingleton::getInstance()->message(
-      "Note, you will only have access when architecture is running.",
-      CEDAR_CURRENT_FUNCTION_NAME
-    );
+    s= " Don't forget to start your architecture to interact.";
   }
-  
+
+  cedar::aux::LogSingleton::getInstance()->message(
+    "Starting communication with " + prettifyName() + " in the background." + s,
+    CEDAR_CURRENT_FUNCTION_NAME
+  );
+
   setSuppressUserInteraction(suppressUserSideInteraction);
 
   // do not re-enter, do not stop/start at the same time
@@ -1506,7 +1510,7 @@ void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
   {
     cedar::aux::LogSingleton::getInstance()->error
     (
-      "Watchdog thread somehow disappeared",
+      "Watchdog thread of " + prettifyName() + " somehow disappeared",
       CEDAR_CURRENT_FUNCTION_NAME
     );
   }
@@ -1535,7 +1539,7 @@ void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
   {
     cedar::aux::LogSingleton::getInstance()->warning
     (
-      "No commands or measurements set in device",
+      "No commands or measurements set in " + prettifyName() + ".",
       CEDAR_CURRENT_FUNCTION_NAME
     );
   }
@@ -1580,7 +1584,7 @@ void cedar::dev::Component::destroyCommunication()
 void cedar::dev::Component::stopCommunication()
 {
   cedar::aux::LogSingleton::getInstance()->message(
-    "Stopping communication with component.",
+    "Stopping communication with " + prettifyName() + ".",
     CEDAR_CURRENT_FUNCTION_NAME
   );
 
@@ -1596,9 +1600,6 @@ void cedar::dev::Component::stopCommunication()
   handleStopCommunicationNonBlocking();
 
   locker_general.unlock();
-
-  // finally, step once to apply the brake commands
-  brakeNow();
 
   if (this->mChannel)
   {
@@ -1650,14 +1651,16 @@ bool cedar::dev::Component::isCommunicating() const
 
 bool cedar::dev::Component::isReadyForCommands() const
 {
-  return !this->getSuppressUserInteraction()
-          && this->isCommunicating();
+  return isConfigured()
+         && !this->getSuppressUserInteraction()
+         && this->isCommunicating();
 }
 
 bool cedar::dev::Component::isReadyForMeasurements() const
 {
-  return !this->getSuppressUserInteraction()
-          && this->isCommunicating(); 
+  return isConfigured()
+         && !this->getSuppressUserInteraction()
+         && this->isCommunicating(); 
 }
 
 bool cedar::dev::Component::isRunningNolocking()
@@ -1792,7 +1795,7 @@ void cedar::dev::Component::checkExclusivenessOfCommand(ComponentDataType type)
     if (this->mUserCommandUsed.member().find(type) == this->mUserCommandUsed.member().end())
     {
       // a different command type is already set, throw!
-      CEDAR_THROW(CouldNotGuessCommandTypeException, "You used more than one type of commands. Component cannot handle this.");
+      CEDAR_THROW(CouldNotGuessCommandTypeException, "You used more than one type of commands. Component " + prettifyName() + " cannot handle this.");
     }
   }
 }
@@ -1809,36 +1812,46 @@ bool cedar::dev::Component::getSuppressUserInteraction() const
   return mSuppressUserInteraction;
 }
 
-void cedar::dev::Component::startBraking()
+void cedar::dev::Component::startBrakingSlowly()
 {
   clearUserCommand();
   clearController();
-  if (!applyBrakeSlowlyController()) // TODO: rename
+  if (!applyBrakeSlowlyController()) 
   {
-    //@todo try again and then default to brakeNow()
-    brakeNow();
+    cedar::aux::LogSingleton::getInstance()->warning(
+      "Couldn't brake " + prettifyName() + " slowly, braking fast instead.",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
+
+    this->startBrakingNow();
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->message(
+      "Braking " + prettifyName() + " (slowly)",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
   }
 }
 
-void cedar::dev::Component::brakeNow()
+void cedar::dev::Component::startBrakingNow()
 {
   clearUserCommand();
   clearController();
 
   if (!applyBrakeNowController())
   {
-    //@todo: wait short time, try again and then panic TODO TODO
+    cedar::aux::LogSingleton::getInstance()->warning(
+      "Could not brake " + prettifyName() + " (quickly)",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
   }
   else
   {
-    // force sending the command
-    this->mCommunicationThread->singleStep();
-
-    // paranoid:
-    clearUserCommand(); 
-    clearController();
-
-    // TODO: we also need to test if the vel measurements are 0
+    cedar::aux::LogSingleton::getInstance()->warning(
+      "Braking " + prettifyName() + " hard.",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
   }
 }
 
@@ -1865,7 +1878,7 @@ void cedar::dev::Component::crashbrake()
 {
   if (!applyCrashbrake())
   {
-    std::cout << "[cedar PANIC] the shit has hit the fan!" << std::endl;
+    std::cout << "[cedar PANIC] crashbrake failed. The shit has hit the fan!" << std::endl;
   }
   else
   {
@@ -1884,6 +1897,12 @@ void cedar::dev::Component::setController(ComponentDataType type, cedar::dev::Co
   mController.member() = ControllerCollectionPtr( new cedar::dev::Component::ControllerCollection{ type, fun } );
 }
 
+void cedar::dev::Component::clearAll()
+{
+  this->clearController();
+  this->clearUserCommand();
+}
+
 void cedar::dev::Component::waitUntilCommunicated() const
 {
   CEDAR_ASSERT( mCommunicationThread );
@@ -1892,7 +1911,8 @@ void cedar::dev::Component::waitUntilCommunicated() const
   {
     cedar::aux::LogSingleton::getInstance()->warning
     (
-      "Your are waiting for communication with the Component inside the "
+      "Your are waiting for communication with the Component "
+      + prettifyName() + " inside the "
       "communicating thread.",
       "cedar::dev::Component::waitUntilCommunicated()"
     );
@@ -1929,44 +1949,29 @@ std::cout << "emergency crash braking NOW for " << componentpointer << std::endl
 
 }
 
-void cedar::dev::Component::brakeNowAllComponents()
+void cedar::dev::Component::startBrakingAllComponentsNow()
 {
-  cedar::aux::LogSingleton::getInstance()->warning
-                                           (
-                                             "Braking all robotic components now (brake now)",
-                                             "cedar::dev::Component::brakeNow()"
-                                           );
-
   for( auto component_it : mRunningComponentInstancesAliveTime )
   {
     auto componentpointer = component_it.first;
 
     if (componentpointer != NULL)
     {
-      componentpointer->brakeNow();
+      componentpointer->startBrakingNow();
     }
   }
 
 }
 
-void cedar::dev::Component::startBrakingAllComponents()
+void cedar::dev::Component::startBrakingAllComponentsSlowly()
 {
-  //!@todo: when startBraking works everywhere, delete these lines:
-  brakeNowAllComponents();
-  return;
-
-  cedar::aux::LogSingleton::getInstance()->message
-                                           (
-                                             "Starting to brake all robotic components (start braking ...)",
-                                             "cedar::dev::Component::brakeNow()"
-                                           );
   for( auto component_it : mRunningComponentInstancesAliveTime )
   {
     auto componentpointer = component_it.first;
 
     if (componentpointer != NULL)
     {
-      componentpointer->startBraking();
+      componentpointer->startBrakingSlowly();
     }
   }
 
@@ -2008,7 +2013,7 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
                < boost::posix_time::time_period(starttime + boost::posix_time::milliseconds( 2*1000 + 250 ), now ) )
       {
         cedar::aux::LogSingleton::getInstance()->warning(
-          "waiting for Component to initialize ...",
+          "waiting for " + componentpointer->prettifyName() + " to initialize ...",
           CEDAR_CURRENT_FUNCTION_NAME);
       }
       else if (boost::posix_time::time_period(starttime,now) 
@@ -2019,18 +2024,43 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
       else
       {
         cedar::aux::LogSingleton::getInstance()->error(
-          "watchdog says: thread of component is dead. trying crashbrake. destroying thread.",
+          "Watchdog says: thread of " + componentpointer->prettifyName() + " is dead. Trying to brake now. You are advised to stop the the component manually.",
           CEDAR_CURRENT_FUNCTION_NAME);
 
         components_to_delete.push_back(componentpointer);
       }
     }
   }
+
   for(auto component : components_to_delete)
   {
-    component->crashbrake();
-    component->destroyCommunication();
+    component->startBrakingNow();
   }
 }
 
+std::string cedar::dev::Component::prettifyName() const
+{
+  std::string ret; 
+  auto slot = mSlot.lock();
+ 
+  ret = this->getName();
+
+  if (ret.length() <= 0)
+  {
+    ret = slot->getName();
+
+    if (!slot)
+      return "uninitialized robotic component";
+  }
+
+  if (slot)
+  {
+    auto config = slot->getConfigurationName();
+
+    if (config.length() > 0)
+      ret+= " (" + config + ")";
+  }
+
+  return ret;
+}
 

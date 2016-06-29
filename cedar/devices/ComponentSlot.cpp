@@ -205,3 +205,14 @@ cedar::dev::ComponentPtr cedar::dev::ComponentSlot::getComponent()
 
   return this->mComponent;
 }
+
+std::string cedar::dev::ComponentSlot::getName() const
+{
+  return this->mName;
+}
+
+std::string cedar::dev::ComponentSlot::getConfigurationName() const
+{
+  return this->_mConfigurationName->getValue();
+}
+

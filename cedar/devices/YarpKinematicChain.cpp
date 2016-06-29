@@ -50,6 +50,8 @@
 
 // SYSTEM INCLUDES
 
+#ifdef CEDAR_USE_YARP
+
 //----------------------------------------------------------------------------------------------------------------------
 // type registration
 //----------------------------------------------------------------------------------------------------------------------
@@ -70,8 +72,8 @@ namespace
 
 cedar::dev::YarpKinematicChain::YarpKinematicChain()
     :
-      readPort("readPort"),
-      writePort("writePort")
+    mReadPort(new cedar::aux::StringParameter(this, "readPortName", "readPortYarpChain")),
+    mWritePort(new cedar::aux::StringParameter(this, "writePortName", "writePortYarpChain"))
 {
   registerCommandHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::YarpKinematicChain::sendAngles, this, _1));
   registerMeasurementHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::YarpKinematicChain::retrieveAngles, this));
@@ -92,7 +94,7 @@ cedar::dev::YarpKinematicChain::~YarpKinematicChain()
 
 void cedar::dev::YarpKinematicChain::postStart()
 {
-  auto yarpChannel = boost::static_pointer_cast < cedar::dev::YarpChannel<cv::Mat> > (this->getChannel());
+  auto yarpChannel = boost::static_pointer_cast< cedar::dev::YarpChannel<cv::Mat> >(this->getChannel());
   if (!yarpChannel)
   {
     cedar::aux::LogSingleton::getInstance()->error("Lost yarpChannel pointer", CEDAR_CURRENT_FUNCTION_NAME);
@@ -100,17 +102,17 @@ void cedar::dev::YarpKinematicChain::postStart()
   }
   else
   {
-    auto readPortparameter = boost::dynamic_pointer_cast < cedar::aux::StringParameter > (yarpChannel->getParameter("readPortName"));
-    readPort = readPortparameter->getValue();
+//    auto readPortparameter = boost::dynamic_pointer_cast < cedar::aux::StringParameter > (yarpChannel->getParameter("readPortName"));
+//    readPort = readPortparameter->getValue();
+//
+//    auto writePortparameter = boost::dynamic_pointer_cast < cedar::aux::StringParameter > (yarpChannel->getParameter("writePortName"));
+//    writePort = writePortparameter->getValue();
+//
+//    std::cout << "ReadPort: " << readPort << std::endl;
+//    std::cout << "WritePort: " << writePort << std::endl;
 
-    auto writePortparameter = boost::dynamic_pointer_cast < cedar::aux::StringParameter > (yarpChannel->getParameter("writePortName"));
-    writePort = writePortparameter->getValue();
-
-    std::cout << "ReadPort: " << readPort << std::endl;
-    std::cout << "WritePort: " << writePort << std::endl;
-
-    yarpChannel->addReaderPort(readPort);
-    yarpChannel->addWriterPort(writePort);
+    yarpChannel->addReaderPort(mReadPort->getValue());
+    yarpChannel->addWriterPort(mWritePort->getValue());
   }
 }
 
@@ -122,7 +124,7 @@ void cedar::dev::YarpKinematicChain::sendAngles(cv::Mat mat)
     cedar::aux::LogSingleton::getInstance()->error("Lost yarpChannel pointer", CEDAR_CURRENT_FUNCTION_NAME);
     return;
   }
-  yarpChannel->write(mat, writePort);
+  yarpChannel->write(mat, mWritePort->getValue());
 }
 
 cv::Mat cedar::dev::YarpKinematicChain::retrieveAngles()
@@ -133,7 +135,7 @@ cv::Mat cedar::dev::YarpKinematicChain::retrieveAngles()
     cedar::aux::LogSingleton::getInstance()->error("Lost yarpChannel pointer", CEDAR_CURRENT_FUNCTION_NAME);
     return cv::Mat();
   }
-  auto ret = yarpChannel->read(readPort);
+  auto ret = yarpChannel->read(mReadPort->getValue());
   std::cout << "  yarp kin chain: " << ret << std::endl;
   return ret;
 }
@@ -144,3 +146,6 @@ bool cedar::dev::YarpKinematicChain::applyCrashbrake()
 
   return false;
 }
+
+#endif // #ifdef CEDAR_USE_YARP
+

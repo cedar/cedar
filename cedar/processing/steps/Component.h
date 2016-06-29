@@ -167,6 +167,10 @@ private:
 
   void rebuildOutputs();
 
+  void reset();
+
+  virtual void inputConnectionChanged(const std::string& inputName);
+
 private slots:
   void componentChangedSlot();
 

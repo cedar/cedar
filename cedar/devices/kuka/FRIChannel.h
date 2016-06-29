@@ -68,7 +68,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  bool isOpen() const;
   bool isReadyForCommands() const;
   bool isReadyForMeasurements() const;
 
@@ -131,8 +130,6 @@ private:
 protected:
   // none yet
 private:
-  bool mIsOpen;
-
   //!@brief KUKA Vendor-Interface, wrapped by this class
   friRemote* mpFriRemote;
 

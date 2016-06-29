@@ -24,8 +24,8 @@
 
     File:        KinematicChain.cpp
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
+    Maintainer:  Jean-Stephane Jokeit   
+    Email:       jean-stephane.jokeit@ini.rub.de
     Date:        2010 11 15
 
     Description: Chain of joints (e.g., a robotic arm).
