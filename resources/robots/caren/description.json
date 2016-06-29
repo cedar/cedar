@@ -246,6 +246,83 @@
   		    }
   		  }
       }
+    },
+    "trunk":
+    {
+    "available components":
+      {
+        "yarp":
+        {
+          "cedar.dev.YarpKinematicChain":
+          {
+            "requires channel": "yarp",
+            "readPortName": "webots/carenTrunkStatusFramework",
+      		"writePortName":"webots/carenTrunkCommandsFramework"
+          }
+        }
+      },
+      "shared component parameters":
+      {
+			"name": "Caren trunk",
+			"root coordinate frame":
+			{
+				"initial translation":
+				[
+					"0.0",
+					"0.0",
+					"0.36"
+				],
+				"initial rotation":
+				[
+					"-1.0", "0.0", "0.0",
+					"0.0", "-1.0", "0.0",
+					"0.0", "0.0", "1.0"
+				]
+			},
+			"end-effector coordinate frame":
+			{
+				"initial translation":
+				[
+					"0.0",
+					"-0.055",
+					"0.24"
+				],
+				"initial rotation":
+				[
+					"1.0", "0.0", "0.0",
+					"0.0", "0.0", "-1.0",
+					"0.0", "1.0", "0.0"
+				]
+			},
+		    "joints":
+		    {
+			    "cedar.dev.KinematicChain.Joint":
+			    {
+			        "angle limits":
+			        {
+						"lower limit": "-3.1415927",
+						"upper limit": "3.1415927"
+					},
+			        "velocity limits":
+			        {
+						"lower limit": "-5.0",
+						"upper limit": "5.0"
+					},
+					"position":
+					[
+						"0.0", 
+						"0.0",
+						"0.0"
+					],
+					"axis":
+					[
+						"0.0", 
+						"0.0",
+						"1.0"
+					]
+				}
+			}
+		}
     }
   },
   "available channels":
