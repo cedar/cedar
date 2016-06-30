@@ -119,12 +119,18 @@ bool cedar::dev::ComponentSlot::hasConfiguration(const std::string& name) const
 
 void cedar::dev::ComponentSlot::instantiateConfiguration(const std::string& configurationName)
 {
+  CEDAR_ASSERT(!configurationName.empty());
+
   this->_mConfigurationName->setValue(configurationName);
 
   auto iter = mComponentTypeIds.find(configurationName);
 
-  //TODO proper exception
-  CEDAR_ASSERT(iter != mComponentTypeIds.end());
+  if (iter == mComponentTypeIds.end())
+  {
+    CEDAR_THROW(cedar::aux::UnknownTypeException, 
+      "Configuration \"" + configurationName + "\" for \"" + this->getName() 
+      + "\" is missing. Check the file under resources/robots/.");
+  }
 
   cedar::aux::ConfigurationNode configuration;
   configuration.insert(configuration.end(), this->mCommonParameters.begin(), this->mCommonParameters.end());
