@@ -3,6 +3,7 @@
   "description file": "robots/caren/description.json",
   "component instantiations":
   {
-      "arm": "simulator"
+      "arm": "simulator",
+      "trunk":"arm"
   }
 }
