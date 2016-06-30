@@ -708,6 +708,7 @@ void cedar::dev::Component::init()
 
   mTooSlowCounter = 0;
   mNotReadyForCommandsCounter = 0;
+  mWatchDogCounter = 0;
   mSuppressUserInteraction = false;
 }
 
@@ -1528,6 +1529,7 @@ void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
       "Watchdog thread of " + prettifyName() + " somehow disappeared",
       CEDAR_CURRENT_FUNCTION_NAME
     );
+    return;
   }
   else if (mWatchDogThread->isRunning())
   {
@@ -1831,6 +1833,9 @@ void cedar::dev::Component::startBrakingSlowly()
 {
   clearUserCommand();
   clearController();
+
+  // todo: test that brake is not already running ...
+
   if (!applyBrakeSlowlyController()) 
   {
     cedar::aux::LogSingleton::getInstance()->warning(
@@ -1853,6 +1858,8 @@ void cedar::dev::Component::startBrakingNow()
 {
   clearUserCommand();
   clearController();
+
+  // todo: test that brake is not already running ...
 
   if (!applyBrakeNowController())
   {
@@ -2002,6 +2009,8 @@ bool cedar::dev::Component::anyComponentsRunning()
 
 // static:
 std::unique_ptr<cedar::aux::LoopFunctionInThread> cedar::dev::Component::mWatchDogThread;
+// static:
+unsigned int cedar::dev::Component::mWatchDogCounter = 0;
 
 // static:
 void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
@@ -2041,9 +2050,17 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
       }
       else
       {
-        cedar::aux::LogSingleton::getInstance()->error(
-          "Watchdog says: thread of " + componentpointer->prettifyName() + " is dead. Trying to brake now. You are advised to stop the the component manually.",
-          CEDAR_CURRENT_FUNCTION_NAME);
+        // dont scroll:
+        mWatchDogCounter++;
+
+        if (mWatchDogCounter == 1
+            || mWatchDogCounter > 1500)
+        {
+          cedar::aux::LogSingleton::getInstance()->error(
+              "Watchdog says: thread of " + componentpointer->prettifyName() + " is hanging. You are advised to stop the the component manually.",
+              CEDAR_CURRENT_FUNCTION_NAME);
+          mWatchDogCounter = 0;
+        }
 
         components_to_delete.push_back(componentpointer);
       }
