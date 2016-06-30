@@ -452,6 +452,7 @@ private:
   // todo: make these lockable
   unsigned int mTooSlowCounter;
   unsigned int mNotReadyForCommandsCounter;
+  static unsigned int mWatchDogCounter; 
 
   bool mSuppressUserInteraction;
 
@@ -478,14 +479,14 @@ namespace cedar
     typedef cedar::aux::FactoryManager<cedar::dev::ComponentPtr> ComponentManager;
 
     //!@brief The singleton object of the ComponentManager.
-//    typedef cedar::aux::Singleton<cedar::dev::ComponentManager> ComponentManagerSingleton;
+    //    typedef cedar::aux::Singleton<cedar::dev::ComponentManager> ComponentManagerSingleton;
 
     // this will be used for managing declarations; we still have to define a declaration class (see below)
-   typedef cedar::aux::DeclarationManagerTemplate<cedar::dev::ComponentPtr> ComponentDeclarationManager;
+    typedef cedar::aux::DeclarationManagerTemplate<cedar::dev::ComponentPtr> ComponentDeclarationManager;
 
-   typedef cedar::aux::Singleton<cedar::dev::ComponentDeclarationManager> ComponentDeclarationManagerSingleton;
+    typedef cedar::aux::Singleton<cedar::dev::ComponentDeclarationManager> ComponentDeclarationManagerSingleton;
 
-   typedef cedar::aux::FactoryManager<cedar::dev::ComponentPtr> ComponentFactoryManager;
+    typedef cedar::aux::FactoryManager<cedar::dev::ComponentPtr> ComponentFactoryManager;
   }
 }
 CEDAR_DEV_SINGLETON(ComponentManager);
