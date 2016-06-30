@@ -56,7 +56,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::steps::InverseKinematicsPseudoStep>("Devices", "cedar.processing.steps.InverseKinematicsPseudoStep"));
+    ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::steps::InverseKinematicsPseudoStep>("Robotics", "cedar.processing.steps.InverseKinematicsPseudoStep"));
 //    declaration->setIconPath(":/cedar/dev/gui/icons/generic_hardware_icon.svg");
     //todo:Icon generieren
     declaration->declare();
