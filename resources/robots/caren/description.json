@@ -259,6 +259,12 @@
             "readPortName": "webots/carenTrunkStatusFramework",
       		"writePortName":"webots/carenTrunkCommandsFramework"
           }
+        },
+        "simulator":
+        {
+          "cedar.dev.SimulatedKinematicChain":
+          {
+          }
         }
       },
       "shared component parameters":
