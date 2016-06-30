@@ -1946,7 +1946,7 @@ std::map< cedar::dev::Component*, boost::posix_time::ptime > cedar::dev::Compone
 
 void cedar::dev::Component::handleCrash()
 {
-  cedar::aux::LogSingleton::getInstance()->error
+  cedar::aux::LogSingleton::getInstance()->warning
                                            (
                                              "Handling crash for robotic components",
                                              "cedar::dev::Component::handleCrash()"
@@ -1957,8 +1957,11 @@ void cedar::dev::Component::handleCrash()
 
     if (componentpointer != NULL)
     {
-std::cout << "emergency crash braking NOW for " << componentpointer << std::endl;    
-      componentpointer->crashbrake();
+      if (componentpointer->isCommunicating())
+      {
+std::cout << "crash detection: emergency crash braking for " << componentpointer->prettifyName() << ", pointer: " << componentpointer << std::endl;    
+        componentpointer->crashbrake();
+      }
     }
   }
 
