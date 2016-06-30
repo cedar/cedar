@@ -4,6 +4,6 @@
   "component instantiations":
   {
       "arm": "simulator",
-      "trunk":"arm"
+      "trunk":"simulator"
   }
 }
