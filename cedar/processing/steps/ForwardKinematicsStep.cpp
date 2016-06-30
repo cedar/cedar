@@ -59,7 +59,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::steps::ForwardKinematicsStep>("Devices", "cedar.processing.steps.ForwardKinematicsStep"));
+    ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::steps::ForwardKinematicsStep>("Robotics", "cedar.processing.steps.ForwardKinematicsStep"));
 //    declaration->setIconPath(":/cedar/dev/gui/icons/generic_hardware_icon.svg");
     //todo:Icon generieren
     declaration->declare();
