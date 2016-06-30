@@ -86,6 +86,7 @@ public:
   typedef unsigned int                      ComponentDataType;
   typedef std::map< ComponentDataType, cedar::aux::MatDataPtr > BufferDataType;
   typedef boost::function< cv::Mat() >      ControllerCallback;
+  typedef boost::function< bool(const ComponentDataType&, cv::Mat& ) > CommandCheckFunctionType;
 
 private:
   typedef std::map< ComponentDataType, TransformationFunctionType > InnerTransformationHookContainerType;
@@ -364,6 +365,8 @@ protected:
 
   boost::signals2::connection registerStartCommunicationHook(boost::function<void ()> slot);
 
+  void registerCheckCommandHook(CommandCheckFunctionType fun);
+
   void setUserSideCommandBufferIndex(ComponentDataType type, int index, double value);
   void setInitialUserSideCommandBuffer(ComponentDataType type, cv::Mat);
 
@@ -424,6 +427,7 @@ private:
   cedar::aux::LockableMember< NoCommandFunctionType > mNotReadyForCommandHook;
   cedar::aux::LockableMember< NoCommandFunctionType > mAfterCommandBeforeMeasurementHook;
   boost::signals2::signal<void ()> mStartCommunicationHook;
+  cedar::aux::LockableMember< CommandCheckFunctionType > mCheckCommandHook;
 
   boost::optional<ComponentDataType> mDeviceCommandSelection;
 

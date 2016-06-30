@@ -99,6 +99,8 @@ public:
     cedar::aux::math::DoubleLimitsParameterPtr _mpAngleLimits;
     //! minimum and maximum velocity values
     cedar::aux::math::DoubleLimitsParameterPtr _mpVelocityLimits;
+    //! minimum and maximum acceleration values
+    cedar::aux::math::DoubleLimitsParameterPtr _mpAccelerationLimits;
   };
 
 public:
@@ -555,8 +557,12 @@ protected:
 private:
   void init();
   void initializeFromJointList();
+
+  bool applyLimits(const ComponentDataType &type, cv::Mat &data);
+
   void applyAngleLimits(cv::Mat& angles);
   void applyVelocityLimits(cv::Mat& velocities);
+  void applyAccelerationLimits(cv::Mat &accelerations);
 
   //!@brief set the currently valid initial configuration, do not move the manipulator
   // 
@@ -601,6 +607,7 @@ private:
   std::string mCurrentInitialConfiguration;
   //!@brief lock for the initial configuration datas
   QReadWriteLock mCurrentInitialConfigurationLock;
+
 }; // class cedar::dev::robot::KinematicChain
 
 #include "cedar/auxiliaries/FactoryManager.h"
