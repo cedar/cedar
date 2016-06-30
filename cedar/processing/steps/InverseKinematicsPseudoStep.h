@@ -22,20 +22,20 @@
  Institute:   Ruhr-Universitaet Bochum
  Institut fuer Neuroinformatik
 
- File:        ForwardKinematicsStep.h
+ File:        InverseKinematicsStep.h
 
  Maintainer:  Jan Tekülve
  Email:       jan.tekuelve@ini.rub.de
- Date:        2016 06 28
+ Date:        2016 06 29
 
- Description: Header file for the class cedar::proc::steps::ForwardKinematicsStep.
+ Description: Header file for the class cedar::proc::steps::InverseKinematicsStep.
 
  Credits:
 
  ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_FORWARD_KINEMATICS_STEP_H
-#define CEDAR_PROC_STEPS_FORWARD_KINEMATICS_STEP_H
+#ifndef CEDAR_PROC_STEPS_INVERSE_KINEMATICS_STEP_H
+#define CEDAR_PROC_STEPS_INVERSE_KINEMATICS_STEP_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -46,7 +46,7 @@
 #include "cedar/auxiliaries/MatData.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/ForwardKinematicsStep.fwd.h"
+#include "cedar/processing/steps/InverseKinematicsPseudoStep.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -54,7 +54,7 @@
  *
  * @todo describe more.
  */
-class cedar::proc::steps::ForwardKinematicsStep : public cedar::proc::Step
+class cedar::proc::steps::InverseKinematicsPseudoStep : public cedar::proc::Step
 {
 Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
@@ -66,31 +66,28 @@ Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ForwardKinematicsStep();
+  InverseKinematicsPseudoStep();
 
   //!@brief Destructor
-  virtual ~ForwardKinematicsStep();
+  virtual ~InverseKinematicsPseudoStep();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //! get the component
-    inline cedar::dev::ComponentPtr getComponent() const
-    {
-      return this->_mComponent->getValue();
-    }
+  inline cedar::dev::ComponentPtr getComponent() const
+  {
+    return this->_mComponent->getValue();
+  }
 
-    bool hasComponent() const;
-
-    //todo:do we need the componentchanged signal?
+  bool hasComponent() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-
+  cedar::proc::DataSlot::VALIDITY determineInputValidity(cedar::proc::ConstDataSlotPtr  slot, cedar::aux::ConstDataPtr data) const;
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -107,9 +104,8 @@ private slots:
 protected:
   // none yet
 private:
-  cedar::aux::MatDataPtr mOutputPos;
   cedar::aux::MatDataPtr mOutputVelocity;
-  cedar::aux::MatDataPtr mOutputAcceleration;
+  std::string mInputVelocityName;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -119,9 +115,8 @@ protected:
 
 private:
   cedar::dev::ComponentParameterPtr _mComponent;
-  // none yet
 
 };
-// class cedar::proc::steps::ForwardKinematicsStep
+// class cedar::proc::steps::InverseKinematicsStep
 
-#endif // CEDAR_PROC_STEPS_FORWARD_KINEMATICS_STEP_H
+#endif // CEDAR_PROC_STEPS_INVERSE_KINEMATICS_STEP_H
