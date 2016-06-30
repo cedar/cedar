@@ -1192,7 +1192,10 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
     }
   }
 
-  mRunningComponentInstancesAliveTime[ this ]= boost::posix_time::microsec_clock::local_time();
+  if(mRunningComponentInstancesAliveTime.find(this)!= mRunningComponentInstancesAliveTime.end())
+  {
+    mRunningComponentInstancesAliveTime[ this ]= boost::posix_time::microsec_clock::local_time();
+  }
 }
 
 void cedar::dev::Component::stepAfterCommandBeforeMeasurementCommunication()
