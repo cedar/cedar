@@ -22,13 +22,13 @@
  Institute:   Ruhr-Universitaet Bochum
  Institut fuer Neuroinformatik
 
- File:        ForwardKinematicsStep.cpp
+ File:        InverseKinematicsStep.cpp
 
  Maintainer:  Jan Tekülve
  Email:       jan.tekuelve@ini.rub.de
- Date:        2016 06 28
+ Date:        2016 06 29
 
- Description: Source file for the class cedar::proc::steps::ForwardKinematicsStep.
+ Description: Source file for the class cedar::proc::steps::InverseKinematicsStep.
 
  Credits:
 
@@ -38,20 +38,17 @@
 #include "cedar/configuration.h"
 
 // CLASS HEADER
-#include "cedar/processing/steps/ForwardKinematicsStep.h"
+#include "cedar/processing/steps/InverseKinematicsPseudoStep.h"
 
+// CEDAR INCLUDES
 // CEDAR INCLUDES
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 
 #include "cedar/devices/exceptions.h"
 #include "cedar/devices/KinematicChain.h"
-
 // SYSTEM INCLUDES
 
-//----------------------------------------------------------------------------------------------------------------------
-// declaration
-//----------------------------------------------------------------------------------------------------------------------
 namespace
 {
   bool declare()
@@ -59,7 +56,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::steps::ForwardKinematicsStep>("Robotics", "cedar.processing.steps.ForwardKinematicsStep"));
+    ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::steps::InverseKinematicsPseudoStep>("Devices", "cedar.processing.steps.InverseKinematicsPseudoStep"));
 //    declaration->setIconPath(":/cedar/dev/gui/icons/generic_hardware_icon.svg");
     //todo:Icon generieren
     declaration->declare();
@@ -74,40 +71,47 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::steps::ForwardKinematicsStep::ForwardKinematicsStep()
+cedar::proc::steps::InverseKinematicsPseudoStep::InverseKinematicsPseudoStep()
     :
       cedar::proc::Step(true),
-      mOutputPos(new cedar::aux::MatData(cv::Mat())),
       mOutputVelocity(new cedar::aux::MatData(cv::Mat())),
-      mOutputAcceleration(new cedar::aux::MatData(cv::Mat())),
+      mInputVelocityName("Cartesian velocity"),
       _mComponent(new cedar::dev::ComponentParameter(this, "component"))
 {
+  this->declareInput(mInputVelocityName);
   QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SLOT(rebuildOutputs()));
 }
 
-cedar::proc::steps::ForwardKinematicsStep::~ForwardKinematicsStep()
+cedar::proc::steps::InverseKinematicsPseudoStep::~InverseKinematicsPseudoStep()
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::steps::ForwardKinematicsStep::compute(const cedar::proc::Arguments&)
+void cedar::proc::steps::InverseKinematicsPseudoStep::compute(const cedar::proc::Arguments&)
 {
-  if (this->hasComponent())
+  cedar::aux::ConstDataPtr inputData = this->getInputSlot(mInputVelocityName)->getData();
+
+  if (this->hasComponent() && boost::dynamic_pointer_cast<const cedar::aux::MatData>(inputData))
   {
+    cv::Mat cartesianVelocityMat = inputData->getData<cv::Mat>().clone();
     auto component = this->getComponent();
     cedar::dev::KinematicChainPtr kinChain = boost::dynamic_pointer_cast < cedar::dev::KinematicChain > (component);
     if (kinChain)
     {
-      mOutputPos->setData(kinChain->calculateEndEffectorPosition());
-      mOutputVelocity->setData(kinChain->calculateEndEffectorVelocity());
-      mOutputAcceleration->setData(kinChain->calculateEndEffectorAcceleration());
+      cv::Mat Jacobian = kinChain->calculateEndEffectorJacobian();
+      cv::Mat jacobian_pseudo_inverse = cv::Mat::zeros(kinChain->getNumberOfJoints(), 2, CV_64FC1);
+      cv::invert(Jacobian, jacobian_pseudo_inverse, cv::DECOMP_SVD);
+
+      cv::Mat joint_velocities = jacobian_pseudo_inverse * cartesianVelocityMat;
+
+      mOutputVelocity->setData(joint_velocities);
     }
   }
 }
 
-bool cedar::proc::steps::ForwardKinematicsStep::hasComponent() const
+bool cedar::proc::steps::InverseKinematicsPseudoStep::hasComponent() const
 {
   try
   {
@@ -119,25 +123,31 @@ bool cedar::proc::steps::ForwardKinematicsStep::hasComponent() const
   }
 }
 
-void cedar::proc::steps::ForwardKinematicsStep::reset()
+void cedar::proc::steps::InverseKinematicsPseudoStep::reset()
 {
   auto component = this->getComponent();
   component->clearAll();
 }
 
-void cedar::proc::steps::ForwardKinematicsStep::rebuildOutputs()
+cedar::proc::DataSlot::VALIDITY cedar::proc::steps::InverseKinematicsPseudoStep::determineInputValidity(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data) const
+{
+  cedar::aux::ConstMatDataPtr _input = boost::dynamic_pointer_cast < cedar::aux::ConstMatData > (data);
+  if (_input && _input->getDimensionality() == 1 && slot->getName() == mInputVelocityName && cedar::aux::math::get1DMatrixSize(_input->getData()) == 3)
+  {
+    return cedar::proc::DataSlot::VALIDITY_VALID;
+  }
+
+  return cedar::proc::DataSlot::VALIDITY_ERROR;
+}
+
+void cedar::proc::steps::InverseKinematicsPseudoStep::rebuildOutputs()
 {
   this->removeAllSlots(cedar::proc::DataRole::OUTPUT);
   auto component = this->getComponent();
   cedar::dev::KinematicChainPtr kinChain = boost::dynamic_pointer_cast < cedar::dev::KinematicChain > (component);
   if (kinChain)
   {
-    mOutputPos->setData(cv::Mat::zeros(kinChain->getNumberOfJoints(), 1, CV_64FC1));
     mOutputVelocity->setData(cv::Mat::zeros(kinChain->getNumberOfJoints(), 1, CV_64FC1));
-    mOutputAcceleration->setData(cv::Mat::zeros(kinChain->getNumberOfJoints(), 1, CV_64FC1));
-    this->declareOutput("Cartesian position", mOutputPos);
-    this->declareOutput("Cartesian velocity", mOutputVelocity);
-    this->declareOutput("Cartesian acceleration", mOutputAcceleration);
+    this->declareOutput("joint velocity", mOutputVelocity);
   }
 }
-
