@@ -245,11 +245,21 @@ void cedar::dev::gui::RobotCard::connectClicked()
   {
     this->mpConnectButton->setIcon(QIcon(":/cedar/auxiliaries/gui/error.svg"));
     this->mpConnectButton->setToolTip(QString::fromStdString(e.exceptionInfo()));
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Connecting failed: " + e.exceptionInfo(),
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
   }
   catch (const std::exception& e)
   {
     this->mpConnectButton->setIcon(QIcon(":/cedar/auxiliaries/gui/error.svg"));
     this->mpConnectButton->setToolTip(e.what());
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      e.what(),
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
   }
 
   this->mpConnectButton->setEnabled(true);
