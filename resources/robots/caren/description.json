@@ -30,7 +30,7 @@
       },
       "shared component parameters":
       {
-  		  "name": "KUKA LWR4",
+  		  "name": "CarenArm",
   		  "server port": "0",
   		  "remote host": "NULL",
   		  "step size": "20.0",
@@ -269,7 +269,7 @@
       },
       "shared component parameters":
       {
-			"name": "Caren trunk",
+			"name": "CarenTrunk",
 			"root coordinate frame":
 			{
 				"initial translation":
