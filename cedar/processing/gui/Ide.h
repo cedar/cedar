@@ -456,6 +456,8 @@ private:
   //! Label used for displaying the current global time.
   QLabel* mpGlobalTimeLabel;
 
+  QLabel* mpRunningComponentsLabel;
+
   cedar::aux::LockableMember<bool> mSimulationRunning;
 
   //! Map from name to an openable dialog

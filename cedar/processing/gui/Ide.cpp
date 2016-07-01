@@ -772,6 +772,11 @@ void cedar::proc::gui::Ide::buildStatusBar()
 
   // add a blank widget as a spacer
   this->statusBar()->addPermanentWidget(new QWidget(), 1);
+  this->mpRunningComponentsLabel = new QLabel("");
+  this->statusBar()->addPermanentWidget(this->mpRunningComponentsLabel, 0);
+
+  // add a blank widget as a spacer
+  this->statusBar()->addPermanentWidget(new QWidget(), 1);
 
   this->mpGlobalTimeLabel = new QLabel("simulation time");
   this->statusBar()->addPermanentWidget(this->mpGlobalTimeLabel, 0);
@@ -825,6 +830,18 @@ void cedar::proc::gui::Ide::timerEvent(QTimerEvent*)
   cedar::unit::Time time = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
   std::string formatted_time = cedar::aux::formatDuration(time);
   this->mpGlobalTimeLabel->setText(QString("simulation time: ") + QString::fromStdString(formatted_time));
+
+  std::string components_desc = cedar::dev::Component::describeAllRunningComponents();
+  if (!components_desc.empty())
+  {
+    this->mpRunningComponentsLabel->setText(
+          QString("running: ") 
+          + QString("<span style='color:rgb(233, 10, 255, 255)'>%1</span>").arg(QString::fromStdString(components_desc) ) );
+  }
+  else
+  {
+    this->mpRunningComponentsLabel->setText( QString("") );
+  }
 }
 
 void cedar::proc::gui::Ide::setArchitectureChanged(bool changed)

@@ -180,6 +180,7 @@ public:
   static void startBrakingAllComponentsNow(); 
   static void startBrakingAllComponentsSlowly(); 
   static bool anyComponentsRunning();
+  static std::string describeAllRunningComponents();
 
   // replaced by startCommunication()
   CEDAR_DECLARE_DEPRECATED(void start());
