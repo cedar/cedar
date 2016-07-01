@@ -1,0 +1,40 @@
+/*!
+
+@page UsersGuide Users' Guide
+
+@section Motivation Motivation
+
+@section Tutorials Tutorials
+We provide a number of tutorials for certain parts of cedar, for which some additional guidance may be
+beneficial or even necessary.
+@subsection BeginnersTutorials Beginners' Tutorials
+- @link ProcessingGuiTutorial Processing gui @endlink
+- @link DFTTutorial DFT tutorial @endlink
+- @link GroupsTutorial Groups tutorial @endlink
+- @ref ProjectsWithCedar
+- @link ProcessingFrameworkTutorial Processing framework @endlink
+- @link ArchitectureWidgets Architecture Widgets @endlink
+- @ref ConfigurableAndParameters
+- @link TemplatesTutorial Group and Element Templates tutorial @endlink
+- @link CommandLineParser cedar's command line parser@endlink
+- @link ExperimentFrameworkTutorial Experiment framework @endlink
+@subsection AdvancedTutorials Advanced Tutorials
+- @ref LoggingWithCedar
+- @ref ProvidingCompatibility
+- @link PluginsInCode Loading plugins @endlink
+- @link CppScriptTutorial C++ scripts in the cedar gui @endlink
+
+@section ProgrammingConcepts Programming Concepts
+In the following pages you can find out about general programming concepts we used throughout the framework. If you are
+interested in implementation details, you may have a look at the following topics. 
+- @link ParametersConcept Storing and loading parameters @endlink
+- @link ProcessingFrameworkConcept Processing framework @endlink
+- @link ThreadingConcept Threads and dynamics @endlink
+- @link ExperimentFrameworkConcept Experiment framework @endlink
+- @link InterProcessCommunicationConcept Inter-process communication using YARP @endlink
+- @link UnitsConcept Physical units @endlink
+- @ref EnumConcept
+- @ref CedarPaths
+
+
+*/
