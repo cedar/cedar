@@ -1136,6 +1136,10 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   if (!mChannel
       || (mChannel && mChannel->isOpen()) )
   {
+    // possibly abort a bit more quickly
+    if (!mCommunicationThread || mCommunicationThread->stopRequested())
+      return;
+
     // its important to get the currently scheduled commands out first
     // (think safety first). this assumes serial communication, of course
     try
@@ -1148,6 +1152,10 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
       this->mCommandData->countCommunicationError(e);
     }
 
+    // possibly abort a bit more quickly
+    if (!mCommunicationThread || mCommunicationThread->stopRequested())
+      return;
+
     // to send only once per cycle to the HW with new commands and get new measurements
     try
     {
@@ -1159,6 +1167,9 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
       this->mCommandData->countCommunicationError(e);
     }
 
+    // possibly abort a bit more quickly
+    if (!mCommunicationThread || mCommunicationThread->stopRequested())
+      return;
 
     try
     {
