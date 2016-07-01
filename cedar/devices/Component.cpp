@@ -1177,13 +1177,20 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
     if (mTooSlowCounter == 5
         || mTooSlowCounter > 1500)
     {
+      std::string s = "";
+
+      if (mTooSlowCounter > 5)
+      {
+        s = " (repeated " + boost::lexical_cast<std::string>(mTooSlowCounter) + " times)";
+      }
+
       cedar::aux::LogSingleton::getInstance()->warning(
-        "communication with " + prettifyName() + " is consistently "
+        "Communication with " + prettifyName() + " is consistently "
         "much slower than specified: "
         + boost::lexical_cast<std::string>( time ) 
         + " (effective time) vs "
         + boost::lexical_cast<std::string>( this->getCommunicationStepSize() )
-        + " (specified time)",
+        + " (specified time)" + s,
         CEDAR_CURRENT_FUNCTION_NAME);
 
       if (mTooSlowCounter > 1500)
@@ -1241,11 +1248,20 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
     {
       mNotReadyForCommandsCounter++;
 
-      if (mNotReadyForCommandsCounter == 1)
+      if (mNotReadyForCommandsCounter == 1
+         || mNotReadyForCommandsCounter > 500)
       {
+        std::string s = "";
+
+        if (mNotReadyForCommandsCounter > 5)
+        {
+          s = " (repeated " + boost::lexical_cast<std::string>(mNotReadyForCommandsCounter) + " times)";
+        }
+
+
         // todo: output component name her (and for the other messages/warnings)
         cedar::aux::LogSingleton::getInstance()->warning(
-          "Commands issued but " + prettifyName() + " is not accepting commands",
+          "Commands issued but " + prettifyName() + " is not accepting commands" + s,
           CEDAR_CURRENT_FUNCTION_NAME);
       }
 
@@ -2059,8 +2075,16 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
         if (mWatchDogCounter == 1
             || mWatchDogCounter > 1500)
         {
+          std::string s = "";
+          
+          if (mWatchDogCounter > 1500)
+          {
+            s = " (repeated " + boost::lexical_cast<std::string>(mWatchDogCounter) + " times)";
+          }
+
           cedar::aux::LogSingleton::getInstance()->error(
-              "Watchdog says: thread of " + componentpointer->prettifyName() + " is hanging. You are advised to stop the the component manually.",
+              "Watchdog says: thread of " + componentpointer->prettifyName() + " is hanging. You are advised to stop the the component manually." 
+              + s,
               CEDAR_CURRENT_FUNCTION_NAME);
           mWatchDogCounter = 0;
         }
