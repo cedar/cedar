@@ -2129,6 +2129,31 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
   }
 }
 
+// static:
+std::string cedar::dev::Component::describeAllRunningComponents()
+{
+  std::string s;
+
+  for( auto component_it : mRunningComponentInstancesAliveTime )
+  {
+    auto componentpointer = component_it.first;
+
+    if (componentpointer != NULL)
+    {
+      if (s.empty())
+      {
+        s= componentpointer->prettifyName();
+      }
+      else
+      {
+        s += ", " + componentpointer->prettifyName();
+      }
+    }
+  }
+
+  return s;
+}
+
 std::string cedar::dev::Component::prettifyName() const
 {
   std::string ret; 
