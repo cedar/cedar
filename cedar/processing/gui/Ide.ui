@@ -91,6 +91,14 @@
     <addaction name="mpActionRecord"/>
     <addaction name="mpActionSnapshot"/>
    </widget>
+   <widget class="QMenu" name="menuRobots">
+    <property name="title">
+     <string>Robots</string>
+    </property>
+    <addaction name="mpActionShowRobotManager"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionBrakeAllRobots"/>
+   </widget>
    <widget class="QMenu" name="mpMenuWindows">
     <property name="title">
      <string>Windows</string>
@@ -146,7 +154,6 @@
     <addaction name="mpActionParameterLinker"/>
     <addaction name="separator"/>
     <addaction name="mpActionManagePlugins"/>
-    <addaction name="mpActionShowRobotManager"/>
     <addaction name="mpActionAddGlobalSceneViewer"/>
     <addaction name="separator"/>
     <addaction name="mpActionSettings"/>
@@ -160,6 +167,7 @@
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuSimulation"/>
+   <addaction name="menuRobots"/>
    <addaction name="mpToolsMenu"/>
    <addaction name="mpMenuWindows"/>
    <addaction name="mpMenuArchitectureScripts"/>
