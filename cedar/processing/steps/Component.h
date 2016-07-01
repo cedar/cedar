@@ -171,6 +171,11 @@ private:
 
   virtual void inputConnectionChanged(const std::string& inputName);
 
+  void brakeSlowly();
+  void brakeHard();
+  void connectManually();
+  void disconnectManually();
+
 private slots:
   void componentChangedSlot();
 

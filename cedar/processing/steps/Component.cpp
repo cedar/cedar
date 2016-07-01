@@ -222,6 +222,11 @@ _mGroup(new cedar::proc::details::ComponentStepGroupParameter(this, "command gro
 
   this->mMeasurementTimeId = this->registerTimeMeasurement("step measurements time");
   this->mCommandTimeId = this->registerTimeMeasurement("step commands time");
+
+  this->registerFunction( "brake slowly", boost::bind(&cedar::proc::steps::Component::brakeSlowly, this ) );
+  this->registerFunction( "brake hard", boost::bind(&cedar::proc::steps::Component::brakeHard, this ) );
+  this->registerFunction( "disconnect", boost::bind(&cedar::proc::steps::Component::disconnectManually, this ) );
+  this->registerFunction( "connect", boost::bind(&cedar::proc::steps::Component::connectManually, this ) );
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -477,7 +482,51 @@ void cedar::proc::steps::Component::reset()
 void cedar::proc::steps::Component::inputConnectionChanged(const std::string& /*inputName*/)
 {
   auto component = this->getComponent();
+
+  if (!component)
+    return;
+
   component->clearUserCommand();
+}
+
+void cedar::proc::steps::Component::brakeSlowly()
+{
+  auto component = this->getComponent();
+
+  if (!component)
+    return;
+
+  component->startBrakingSlowly();
+}
+
+void cedar::proc::steps::Component::brakeHard()
+{
+  auto component = this->getComponent();
+
+  if (!component)
+    return;
+
+  component->startBrakingNow();
+}
+
+void cedar::proc::steps::Component::connectManually()
+{
+  auto component = this->getComponent();
+
+  if (!component)
+    return;
+
+  component->startCommunication();
+}
+
+void cedar::proc::steps::Component::disconnectManually()
+{
+  auto component = this->getComponent();
+
+  if (!component)
+    return;
+
+  component->stopCommunication();
 }
 
 
