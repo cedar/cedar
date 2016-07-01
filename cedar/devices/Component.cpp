@@ -1401,7 +1401,7 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
   }
   catch(cedar::dev::IgnoreCommunicationException &e)
   {
-    std::cout<<"Ignore Exception catched in stepCommandCommunication!"<<std::endl;
+//    std::cout<<"Ignore Exception catched in stepCommandCommunication!"<<std::endl;
     // ignore, everthing is fine
   }
 
@@ -1443,8 +1443,8 @@ void cedar::dev::Component::stepMeasurementCommunication(cedar::unit::Time dt)
         catch(cedar::dev::IgnoreCommunicationException &e)
         {
           // ignore, everthing is fine. keep old data
-          std::cout<<"Ignore Exception catched in stepMeasurementCommunication!"<<std::endl;
-          std::cout<<"Old Measurement is: "<< this->getPreviousDeviceSideMeasurementBuffer(type) <<std::endl;
+//          std::cout<<"Ignore Exception catched in stepMeasurementCommunication!"<<std::endl;
+//          std::cout<<"Old Measurement is: "<< this->getPreviousDeviceSideMeasurementBuffer(type) <<std::endl;
           this->mMeasurementData->setDeviceRetrievedBufferUnlocked(type, this->getPreviousDeviceSideMeasurementBuffer(type));
         }
       }

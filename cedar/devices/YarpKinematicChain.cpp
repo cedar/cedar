@@ -136,7 +136,7 @@ cv::Mat cedar::dev::YarpKinematicChain::retrieveAngles()
     return cv::Mat();
   }
   auto ret = yarpChannel->read(mReadPort->getValue());
-  std::cout << "  yarp kin chain: " << ret << std::endl;
+//  std::cout << "  yarp kin chain: " << ret << std::endl;
   return ret;
 }
 
