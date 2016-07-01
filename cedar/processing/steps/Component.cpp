@@ -246,6 +246,29 @@ void cedar::proc::steps::Component::selectedGroupChanged()
   this->rebuildInputs();
 }
 
+void cedar::proc::steps::Component::testStates(cedar::dev::ComponentPtr component)
+{
+  if (!component->isRunning())
+  {
+    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, 
+        component->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.");
+  }
+  else if (!component->isReadyForMeasurements())
+  {
+    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, 
+      component->prettifyName() + " is not ready to receive measurments, yet.");
+  }
+  else if (!component->isReadyForCommands())
+  {
+    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, 
+      component->prettifyName() + " is not ready to send commands, yet.");
+  }
+  else
+  {
+    this->resetState();
+  }
+}
+
 void cedar::proc::steps::Component::onStart()
 {
   this->_mComponent->setConstant(true);
@@ -260,6 +283,8 @@ void cedar::proc::steps::Component::onStart()
     {
       component->setSuppressUserInteraction(false);
     }
+
+    testStates(component);
 
     if (!component->isRunning())
     {
@@ -286,12 +311,18 @@ void cedar::proc::steps::Component::onStop()
         component->prettifyName() + " is still connected and running.",
         CEDAR_CURRENT_FUNCTION_NAME);
     }
+    else
+    {
+      this->resetState();
+    }
   }
 }
 
 void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
 {
   auto component = this->getComponent();
+
+  this->testStates(component);
 
   // update time measurements
   if (component->hasLastStepMeasurementsDuration())
