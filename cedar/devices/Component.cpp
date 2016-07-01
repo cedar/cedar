@@ -1706,6 +1706,12 @@ bool cedar::dev::Component::isReadyForMeasurements() const
          && this->isCommunicating(); 
 }
 
+bool cedar::dev::Component::isReadyForEverything() const
+{
+  return this->isReadyForMeasurements()
+         && this->isReadyForCommands();
+}
+
 bool cedar::dev::Component::isRunningNolocking()
 {
   return mCommunicationThread->isRunningNolocking();

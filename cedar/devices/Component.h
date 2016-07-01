@@ -201,6 +201,7 @@ public:
   //! will we move
   virtual bool isReadyForCommands() const;
   virtual bool isReadyForMeasurements() const;
+  bool isReadyForEverything() const;
   
 
   cedar::unit::Time getCommunicationStepSize();
