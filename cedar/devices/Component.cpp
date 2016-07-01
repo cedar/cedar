@@ -748,12 +748,15 @@ cedar::dev::Component::~Component()
 
   // the thread will stopped when mCommunicationThread is destructed, anyway, but we
   // try to send the stop request as early as possible ...
+  mWatchDogThread->requestStop();
   mCommunicationThread->requestStop();
+
 
   // virtual can't be called in the inherit. This is why all children
   // must call it!
   //brakeNow();
 
+  mWatchDogThread->stop();
   mCommunicationThread->stop();
 }
 
