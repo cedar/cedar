@@ -91,7 +91,6 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
   mpDeleteButton->setFixedHeight(24);
   mpDeleteButton->setIconSize(QSize(16, 16));
   mpDeleteButton->setToolTip("Remove this robot");
-  mpDeleteButton->setEnabled(false); // prevent deleting empty placeholder card
 
   p_del_layout->addWidget(mpDeleteButton);
   p_del_layout->setAlignment(mpDeleteButton, Qt::AlignRight);
@@ -131,6 +130,16 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
 
   this->setLayout(p_outer_layout);
 
+  // prevent any action on an empty placeholder card
+  mpDeleteButton->setEnabled(false);
+  mpConfigurationSelector->setEnabled(false);
+  mpRobotNameEdit->setEnabled(false);
+  mpConnectButton->setEnabled(false);
+
+  // fade out everything out of circle
+  this->setStyleSheet("QFrame { \
+       background: rgba(128, 128, 128, 255) }");
+
 
   QObject::connect(this->mpIcon, SIGNAL(robotDropped(const QString&)), this, SLOT(robotDropped(const QString&)));
   QObject::connect(mpConfigurationSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedConfigurationChanged(int)));
@@ -147,15 +156,6 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
   catch (const cedar::dev::TemplateNotFoundException&)
   {
     // ok -- nothing to do here
-  }
-
-  // if the currently selected index is the selection hint or there is no possible selection, gray out the connect button
-  if(mpConfigurationSelector->currentIndex()==0 || mpConfigurationSelector->count()==0)
-  {
-    mpConnectButton->setDisabled(true);
-  }else
-  { // if not, set the correct icon
-    this->updateConnectionIcon();
   }
 }
 
@@ -354,8 +354,25 @@ void cedar::dev::gui::RobotCard::robotDropped(const QString& robotTypeName)
   }
 
   this->mpConfigurationSelector->setCurrentIndex(selected);
+
+  // if the currently selected index is the selection hint or there is no possible selection, gray out the connect button
+  if(selected==0 || mpConfigurationSelector->count()==0)
+  {
+    mpConnectButton->setDisabled(true);
+  }else
+  { // if not, set the correct icon
+    this->updateConnectionIcon();
+  }
+
   this->mpConfigurationSelector->blockSignals(blocked);
-  mpDeleteButton->setEnabled(true); // a new placeholder card had to be placed, so allow deletion
+
+  // a new placeholder card has already bene placed, so allow for actions here
+  mpDeleteButton->setEnabled(true);
+  mpConfigurationSelector->setEnabled(true);
+  mpRobotNameEdit->setEnabled(true);
+  mpConnectButton->setEnabled(true);
+
+  this->setStyleSheet("");
 }
 
 std::string cedar::dev::gui::RobotCardIconHolder::getRobotName() const

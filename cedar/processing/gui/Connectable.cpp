@@ -238,7 +238,7 @@ cedar::proc::gui::Connectable::DeviceQualityDecoration::DeviceQualityDecoration
   cedar::proc::steps::ComponentPtr step
 )
 :
-cedar::proc::gui::Connectable::Decoration(pParent, ":/cedar/dev/gui/icons/connecting.svg", QString()),
+cedar::proc::gui::Connectable::Decoration(pParent, ":/cedar/dev/gui/icons/not_connected.svg", QString()),
 mStep(step)
 {
   // update the quality once every second
@@ -264,7 +264,6 @@ void cedar::proc::gui::Connectable::DeviceQualityDecoration::timerEvent(QTimerEv
   {
     return;
   }
-
 
   if (this->mStep->isStarted())
   {
@@ -1467,7 +1466,7 @@ void cedar::proc::gui::Connectable::updateDecorations()
     {
       this->removeDecoration(this->mpLoopedDecoration);
       this->mpLoopedDecoration.reset();
-    }
+    }    
   }
 
   if (auto component = boost::dynamic_pointer_cast<cedar::proc::steps::Component>(this->getConnectable()))
