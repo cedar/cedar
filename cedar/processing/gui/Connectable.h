@@ -175,7 +175,7 @@ protected:
       //! sets the description at the icon
       virtual void setDescription(const QString& text);
 
-    private:
+  private:
       QGraphicsSvgItem* mpIcon;
 
       QGraphicsRectItem* mpRectangle;
