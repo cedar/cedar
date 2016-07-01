@@ -13,7 +13,7 @@
    height="410.64285"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.3.1 r9886"
+   inkscape:version="0.48.4 r9939"
    sodipodi:docname="brakeall.svg">
   <defs
      id="defs4" />
@@ -25,7 +25,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="200.88005"
+     inkscape:cx="210.19518"
      inkscape:cy="197.26094"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -36,8 +36,8 @@
      fit-margin-bottom="40"
      inkscape:window-width="1294"
      inkscape:window-height="834"
-     inkscape:window-x="222"
-     inkscape:window-y="94"
+     inkscape:window-x="239"
+     inkscape:window-y="194"
      inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
@@ -58,7 +58,7 @@
      transform="translate(-153.07143,-239.36218)">
     <text
        xml:space="preserve"
-       style="font-size:195.01116942999999537px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:#000000;font-family:Times New Roman;-inkscape-font-specification:Times New Roman;stroke-opacity:1"
+       style="font-size:195.01116942999999537px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#333333;fill-opacity:1;stroke:#000000;font-family:Times New Roman;-inkscape-font-specification:Times New Roman;stroke-opacity:1"
        x="228.72937"
        y="405.67996"
        id="text3132"
@@ -68,6 +68,6 @@
          id="tspan3134"
          x="228.72937"
          y="405.67996"
-         style="font-size:162.50929260000000909px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ff0000;font-family:Arial;-inkscape-font-specification:Arial;stroke:#000000;stroke-opacity:1">BRAKE</tspan></text>
+         style="font-size:162.50929260000000909px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#333333;font-family:Arial;-inkscape-font-specification:Arial;stroke:#000000;stroke-opacity:1">BRAKE</tspan></text>
   </g>
 </svg>

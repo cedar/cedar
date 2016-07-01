@@ -706,9 +706,9 @@ void cedar::dev::Component::init()
                                       &cedar::dev::Component::stepStaticWatchDog,
                                     _1) ));
 
-  mTooSlowCounter = 0;
-  mNotReadyForCommandsCounter = 0;
-  mWatchDogCounter = 0;
+  mTooSlowCounter.member() = 0;
+  mNotReadyForCommandsCounter.member() = 0;
+  mWatchDogCounter.member() = 0;
   mSuppressUserInteraction = false;
 }
 
@@ -748,12 +748,15 @@ cedar::dev::Component::~Component()
 
   // the thread will stopped when mCommunicationThread is destructed, anyway, but we
   // try to send the stop request as early as possible ...
+  mWatchDogThread->requestStop();
   mCommunicationThread->requestStop();
+
 
   // virtual can't be called in the inherit. This is why all children
   // must call it!
   //brakeNow();
 
+  mWatchDogThread->stop();
   mCommunicationThread->stop();
 }
 
@@ -1171,24 +1174,33 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   // utitlity: warn if consistently much too slow
   if (time > this->getCommunicationStepSize() * 1.4)
   {
-    mTooSlowCounter++;
+    QWriteLocker lock(&mTooSlowCounter.getLock());
+
+    mTooSlowCounter.member()++;
 
     // dont scroll ... show warning after 5 tries and then only every few seconds
-    if (mTooSlowCounter == 5
-        || mTooSlowCounter > 1500)
+    if (mTooSlowCounter.member() == 5
+        || mTooSlowCounter.member() > 1500)
     {
+      std::string s = "";
+
+      if (mTooSlowCounter.member() > 5)
+      {
+        s = " (repeated " + boost::lexical_cast<std::string>(mTooSlowCounter.member()) + " times)";
+      }
+
       cedar::aux::LogSingleton::getInstance()->warning(
-        "communication with " + prettifyName() + " is consistently "
+        "Communication with " + prettifyName() + " is consistently "
         "much slower than specified: "
         + boost::lexical_cast<std::string>( time ) 
         + " (effective time) vs "
         + boost::lexical_cast<std::string>( this->getCommunicationStepSize() )
-        + " (specified time)",
+        + " (specified time)" + s,
         CEDAR_CURRENT_FUNCTION_NAME);
 
-      if (mTooSlowCounter > 1500)
+      if (mTooSlowCounter.member() > 1500)
       {
-        mTooSlowCounter= 6;
+        mTooSlowCounter.member()= 6;
       }
     }
   }
@@ -1237,21 +1249,33 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
       hook_found();
     }
 
+    QWriteLocker lock(&mNotReadyForCommandsCounter.getLock());
+
     if (this->mUserCommandUsed.member().size() != 0)
     {
-      mNotReadyForCommandsCounter++;
+      mNotReadyForCommandsCounter.member()++;
 
-      if (mNotReadyForCommandsCounter == 1)
+      if (mNotReadyForCommandsCounter.member() == 1
+         || mNotReadyForCommandsCounter.member() > 500)
       {
+        std::string s = "";
+
+        if (mNotReadyForCommandsCounter.member() > 5)
+        {
+          s = " (repeated " + boost::lexical_cast<std::string>(mNotReadyForCommandsCounter.member()) + " times)";
+        }
+
+
         // todo: output component name her (and for the other messages/warnings)
         cedar::aux::LogSingleton::getInstance()->warning(
-          "Commands issued but " + prettifyName() + " is not accepting commands",
+          "Commands issued but " + prettifyName() + " is not accepting commands" + s,
           CEDAR_CURRENT_FUNCTION_NAME);
       }
 
-      if (mNotReadyForCommandsCounter > 500)
+      if (mNotReadyForCommandsCounter.member() > 500)
       {
-        mNotReadyForCommandsCounter= 0;
+
+        mNotReadyForCommandsCounter.member()= 0;
       }
     }
 
@@ -1259,7 +1283,9 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
   }
   else
   {
-    mNotReadyForCommandsCounter= 0;
+    QWriteLocker lock(&mNotReadyForCommandsCounter.getLock());
+
+    mNotReadyForCommandsCounter.member()= 0;
   }
 
   // if there are neither user commands nor a controller, nothing needs to be done
@@ -1683,6 +1709,12 @@ bool cedar::dev::Component::isReadyForMeasurements() const
          && this->isCommunicating(); 
 }
 
+bool cedar::dev::Component::isReadyForEverything() const
+{
+  return this->isReadyForMeasurements()
+         && this->isReadyForCommands();
+}
+
 bool cedar::dev::Component::isRunningNolocking()
 {
   return mCommunicationThread->isRunningNolocking();
@@ -2013,7 +2045,7 @@ bool cedar::dev::Component::anyComponentsRunning()
 // static:
 std::unique_ptr<cedar::aux::LoopFunctionInThread> cedar::dev::Component::mWatchDogThread;
 // static:
-unsigned int cedar::dev::Component::mWatchDogCounter = 0;
+cedar::aux::LockableMember<unsigned int> cedar::dev::Component::mWatchDogCounter = 0;
 
 // static:
 void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
@@ -2054,15 +2086,25 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
       else
       {
         // dont scroll:
-        mWatchDogCounter++;
+        QWriteLocker lock(&mWatchDogCounter.getLock());
 
-        if (mWatchDogCounter == 1
-            || mWatchDogCounter > 1500)
+        mWatchDogCounter.member()++;
+
+        if (mWatchDogCounter.member() == 1
+            || mWatchDogCounter.member() > 1500)
         {
+          std::string s = "";
+          
+          if (mWatchDogCounter.member() > 1500)
+          {
+            s = " (repeated " + boost::lexical_cast<std::string>(mWatchDogCounter.member()) + " times)";
+          }
+
           cedar::aux::LogSingleton::getInstance()->error(
-              "Watchdog says: thread of " + componentpointer->prettifyName() + " is hanging. You are advised to stop the the component manually.",
+              "Watchdog says: thread of " + componentpointer->prettifyName() + " is hanging. You are advised to stop the the component manually." 
+              + s,
               CEDAR_CURRENT_FUNCTION_NAME);
-          mWatchDogCounter = 0;
+          mWatchDogCounter.member() = 0;
         }
 
         components_to_delete.push_back(componentpointer);

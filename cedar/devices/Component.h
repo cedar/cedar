@@ -201,6 +201,7 @@ public:
   //! will we move
   virtual bool isReadyForCommands() const;
   virtual bool isReadyForMeasurements() const;
+  bool isReadyForEverything() const;
   
 
   cedar::unit::Time getCommunicationStepSize();
@@ -450,9 +451,9 @@ private:
   static std::unique_ptr<cedar::aux::LoopFunctionInThread> mWatchDogThread;
 
   // todo: make these lockable
-  unsigned int mTooSlowCounter;
-  unsigned int mNotReadyForCommandsCounter;
-  static unsigned int mWatchDogCounter; 
+  cedar::aux::LockableMember<unsigned int> mTooSlowCounter;
+  cedar::aux::LockableMember<unsigned int> mNotReadyForCommandsCounter;
+  static cedar::aux::LockableMember<unsigned int> mWatchDogCounter; 
 
   bool mSuppressUserInteraction;
 
