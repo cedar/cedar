@@ -1,0 +1,12 @@
+{
+  "name": "hardware e-puck robot",
+  "description file": "robots/epuck/description.json",
+  "component instantiations":
+  {
+    "drive": "serial",
+    "ambient light sensor": "serial",
+    "proximity sensor": "serial",
+    "acceleration sensor": "serial",
+    "led": "serial"
+  }
+}

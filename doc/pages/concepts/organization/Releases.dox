@@ -1,0 +1,49 @@
+/*!
+
+@page ReleasesConcept Release work flow
+
+This page is dedicated to our work flow and how it leads to releases.
+
+@section FeatureLifetime The lifetime of a new feature 
+
+New features are first developed in private development branches until all interfaces have been decided on and the code 
+of the new feature is ready for a peer review. After this review done by senior cedar developers and subsequent code improvements,
+it is pushed into the repository <a href="http://www.bitbucket.org/cedar/development" title="cedar development">cedar development</a>.
+ This repository will always contain the newest code. However, if you use it, be aware that its interfaces may still change before a new release.
+New features will remain in "cedar development" until all features planned for the next version have been completed. We
+will then release a new version and push that version to the repository
+<a href="http://www.bitbucket.org/cedar/release" title="cedar release">cedar release</a>.
+As we release whenever a set of certain new features is finished, the length of release cycles is not fixed and may vary
+considerably. 
+
+@section VersionNumbers Version numbers
+cedar uses a version number comprised of three numbers: "major.minor.bugfix". When we need to fix a critical bug in cedar release, the bugfix number is increased
+by one. Each time a new feature is introduced in cedar release, we increase the minor number by one and reset the bugfix counter to zero.
+The major number is increased at will, whenever we feel cedar has progressed to "the next level", resetting both minor and bugfix counter. 
+
+@section VersionNames Version names
+Each new major release comes with a new alias. You can find a history of releases on our <a href="http://cedar.ini.rub.de/versions.html" title="versions">versions</a> page.
+
+@section PrivateMergePrep Preparing for merge with private development branch
+This section explains what we do before pushing from a private branch of cedar to @em development.
+
+- check that all important changes have been entered into the changelog
+- no superfluous debugging remnants, such as std::cout and blocks of commented code
+- check that code adheres to coding style
+- are unit tests present for new features?
+- if elements/configurables are added, make sure that parameter and data names follow the established standards
+- check that all unit tests run 
+
+@section ReleasePrep Preparing for pushing development to release (a.k.a., doing a release)
+This section explains what we do before pushing from @em development to @em release.
+- do the checks done for merging with private development branches
+- go over the todo items in the source code and make sure that nothing crucial has been overlooked
+- declare all classes deprecated that are scheduled for removal and fix resulting warnings within cedar
+- on GCC, compile with -Wpedantic and fix warnings that can be fixed
+- test build on as many configurations as possible
+- edit changelog and move unreleased entries to new version number, clear unreleased section
+- in the same file, check and fix the known issues section
+- update version number in the changelog, build system (in cmake/version.txt), and in the image for the cedar gui (cedar/processing/gui/images/current_version_image.svg)
+
+After doing this list, we push to release, update the cedar website, and send a release announcement to cedar-announce. 
+*/
