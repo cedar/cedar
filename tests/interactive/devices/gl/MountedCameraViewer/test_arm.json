@@ -1,0 +1,135 @@
+{
+	"root coordinate frame":
+	{
+		"initial translation":
+		[
+			"0.0",
+			"0.0",
+			"0.3"
+		],
+		"initial rotation":
+		[
+			"1.0", "0.0", "0.0",
+			"0.0", "1.0", "0.0",
+			"0.0", "0.0", "1.0"
+		]
+	},
+	"end-effector coordinate frame":
+	{
+		"initial translation":
+		[
+			"0.0",
+			"1.2",
+			"0.2"
+		],
+		"initial rotation":
+		[
+			"1.0", "0.0", "0.0",
+			"0.0", "0.0", "1.0",
+			"0.0", "-1.0", "0.0"
+		]
+	},
+    "joints":
+    {
+	    "cedar.dev.KinematicChain.Joint":
+	    {
+	        "angle limits":
+	        {
+				"lower limit": "-1000.0",
+				"upper limit": "1000.0"
+			},
+	        "velocity limits":
+	        {
+				"lower limit": "-5.0",
+				"upper limit": "5.0"
+			},
+			"position":
+			[
+				"0.0", 
+				"0.0",
+				"0.2"
+			],
+			"axis":
+			[
+				"0.0", 
+				"0.0",
+				"1.0"
+			]
+		},
+	    "cedar.dev.KinematicChain.Joint":
+	    {
+	        "angle limits":
+	        {
+				"lower limit": "-1000.0",
+				"upper limit": "1000.0"
+			},
+	        "velocity limits":
+	        {
+				"lower limit": "-5.0",
+				"upper limit": "5.0"
+			},
+			"position":
+			[
+				"0.0", 
+				"0.3",
+				"0.2"
+			],
+			"axis":
+			[
+				"0.0", 
+				"0.0",
+				"1.0"
+			]
+		},
+	    "cedar.dev.KinematicChain.Joint":
+	    {
+	        "angle limits":
+	        {
+				"lower limit": "-1000.0",
+				"upper limit": "1000.0"
+			},
+	        "velocity limits":
+	        {
+				"lower limit": "-5.0",
+				"upper limit": "5.0"
+			},
+			"position":
+			[
+				"0.0", 
+				"0.6",
+				"0.2"
+			],
+			"axis":
+			[
+				"0.0", 
+				"0.0",
+				"1.0"
+			]
+		},
+	    "cedar.dev.KinematicChain.Joint":
+	    {
+	        "angle limits":
+	        {
+				"lower limit": "-1000.0",
+				"upper limit": "1000.0"
+			},
+	        "velocity limits":
+	        {
+				"lower limit": "-5.0",
+				"upper limit": "5.0"
+			},
+			"position":
+			[
+				"0.0", 
+				"0.9",
+				"0.2"
+			],
+			"axis":
+			[
+				"0.0", 
+				"0.0",
+				"1.0"
+			]
+		}
+	}
+}
