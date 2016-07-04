@@ -107,8 +107,11 @@
      <property name="title">
       <string>Architecture widgets</string>
      </property>
-     <addaction name="actionNone"/>
     </widget>
+    <addaction name="mpActionClosePlots"/>
+    <addaction name="mpActionToggleVisibilityOfPlots"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionAddGlobalSceneViewer"/>
     <addaction name="separator"/>
     <addaction name="mpMenuArchitecturePlots"/>
     <addaction name="separator"/>
@@ -141,9 +144,6 @@
     <addaction name="mpActionShowHideGrid"/>
     <addaction name="mpActionToggleSmartConnections"/>
     <addaction name="mpActionToggleTriggerColor"/>
-    <addaction name="separator"/>
-    <addaction name="mpActionClosePlots"/>
-    <addaction name="mpActionToggleVisibilityOfPlots"/>
    </widget>
    <widget class="QMenu" name="mpToolsMenu">
     <property name="title">
@@ -153,7 +153,6 @@
     <addaction name="mpActionParameterLinker"/>
     <addaction name="separator"/>
     <addaction name="mpActionManagePlugins"/>
-    <addaction name="mpActionAddGlobalSceneViewer"/>
     <addaction name="separator"/>
     <addaction name="mpActionSettings"/>
    </widget>
