@@ -607,6 +607,8 @@ private:
   std::string mCurrentInitialConfiguration;
   //!@brief lock for the initial configuration datas
   QReadWriteLock mCurrentInitialConfigurationLock;
+  //!@brief remember the number of limit excesses per joint, in order to not send them again.
+  std::vector<unsigned int> mWarned;
 
 }; // class cedar::dev::robot::KinematicChain
 

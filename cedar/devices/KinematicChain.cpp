@@ -615,13 +615,17 @@ void cedar::dev::KinematicChain::initializeFromJointList()
   setCommandAndMeasurementDimensionality( cedar::dev::KinematicChain::JOINT_ANGLES, num );
   setCommandAndMeasurementDimensionality( cedar::dev::KinematicChain::JOINT_VELOCITIES, num );
   setCommandAndMeasurementDimensionality( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, num );
-//  setCommandAndMeasurementDimensionality( cedar::dev::KinematicChain::JOINT_TORQUES, num );
+  //setCommandAndMeasurementDimensionality( cedar::dev::KinematicChain::JOINT_TORQUES, num );
 
+  // warning vector shall contain warning counters, each for every different kind of limit excess (angle, velocity, acceleration)
+  mWarned.resize(num * 3);
 }
 
 void cedar::dev::KinematicChain::applyAngleLimits(cv::Mat& angles)
 {
-  for (unsigned i = 0; i < getNumberOfJoints(); i++)
+  const unsigned int num_joints = getNumberOfJoints();
+
+  for (unsigned i = 0; i < num_joints; i++)
   {
     double angle = angles.at<double>(i, 0);
     const double old_angle = angle;
@@ -632,19 +636,33 @@ void cedar::dev::KinematicChain::applyAngleLimits(cv::Mat& angles)
     angle = std::max<double>(angle, lower_limit);
 
     if(angle == lower_limit)
-    {
+    {            
+      if(mWarned[i] % 1000 == 0)
+      {
         cedar::aux::LogSingleton::getInstance()->warning(
-           this->prettifyName()+", joint " + cedar::aux::toString(i) + ": angle " + cedar::aux::toString(old_angle) + " has been capped at " + cedar::aux::toString(lower_limit),
-            CEDAR_CURRENT_FUNCTION_NAME);
+          this->prettifyName()+", joint " + cedar::aux::toString(i) + ": angle " + cedar::aux::toString(old_angle) + " has been capped at " + cedar::aux::toString(lower_limit),
+          CEDAR_CURRENT_FUNCTION_NAME);
+
+        mWarned[i] = 0;
+      }
+
+      ++mWarned[i];
     }
 
     angle = std::min<double>(angle, upper_limit);
 
     if(angle == upper_limit)
     {
+      if(mWarned[i] % 1000 == 0)
+      {
         cedar::aux::LogSingleton::getInstance()->warning(
-           this->prettifyName()+", joint " + cedar::aux::toString(i) + ": angle " + cedar::aux::toString(old_angle) + " has been capped at " + cedar::aux::toString(upper_limit),
-            CEDAR_CURRENT_FUNCTION_NAME);
+          this->prettifyName()+", joint " + cedar::aux::toString(i) + ": angle " + cedar::aux::toString(old_angle) + " has been capped at " + cedar::aux::toString(upper_limit),
+          CEDAR_CURRENT_FUNCTION_NAME);
+
+        mWarned[i] = 0;
+      }
+
+      ++mWarned[i];
     }
 
     angles.at<double>(i, 0) = angle;
@@ -654,7 +672,9 @@ void cedar::dev::KinematicChain::applyAngleLimits(cv::Mat& angles)
 
 void cedar::dev::KinematicChain::applyVelocityLimits(cv::Mat& velocities)
 {
-  for (unsigned i = 0; i < getNumberOfJoints(); i++)
+  const unsigned int num_joints = getNumberOfJoints();
+
+  for (unsigned i = 0; i < num_joints; i++)
   {
     double velocity = velocities.at<double>(i, 0);
     const double old_velocity = velocity;
@@ -666,18 +686,31 @@ void cedar::dev::KinematicChain::applyVelocityLimits(cv::Mat& velocities)
 
     if(velocity == lower_limit)
     {
+      if(mWarned[num_joints+i] % 1000 == 0)
+      {
         cedar::aux::LogSingleton::getInstance()->warning(
-           this->prettifyName()+", joint " + cedar::aux::toString(i) + ": velocity " + cedar::aux::toString(old_velocity) + " has been capped at " + cedar::aux::toString(lower_limit),
-            CEDAR_CURRENT_FUNCTION_NAME);
+          this->prettifyName()+", joint " + cedar::aux::toString(i) + ": velocity " + cedar::aux::toString(old_velocity) + " has been capped at " + cedar::aux::toString(lower_limit),
+          CEDAR_CURRENT_FUNCTION_NAME);
+
+        mWarned[num_joints+i] = 0;
+      }
+
+      ++mWarned[num_joints+i];
     }
 
     velocity = std::min<double>(velocity, upper_limit);
 
     if(velocity == upper_limit)
     {
+      if(mWarned[num_joints+i] % 1000 == 0)
+      {
         cedar::aux::LogSingleton::getInstance()->warning(
-           this->prettifyName()+", joint " + cedar::aux::toString(i) + ": velocity " + cedar::aux::toString(old_velocity) + " has been capped at " + cedar::aux::toString(upper_limit),
-            CEDAR_CURRENT_FUNCTION_NAME);
+          this->prettifyName()+", joint " + cedar::aux::toString(i) + ": velocity " + cedar::aux::toString(old_velocity) + " has been capped at " + cedar::aux::toString(upper_limit),
+          CEDAR_CURRENT_FUNCTION_NAME);
+        mWarned[num_joints+i] = 0;
+      }
+
+      ++mWarned[num_joints+i];
     }
 
     velocities.at<double>(i, 0) = velocity;
@@ -686,7 +719,9 @@ void cedar::dev::KinematicChain::applyVelocityLimits(cv::Mat& velocities)
 
 void cedar::dev::KinematicChain::applyAccelerationLimits(cv::Mat& accelerations)
 {
-  for (unsigned i = 0; i < getNumberOfJoints(); i++)
+  const unsigned int num_joints = getNumberOfJoints();
+
+  for (unsigned i = 0; i < num_joints; i++)
   {
     double acceleration = accelerations.at<double>(i, 0);
     const double old_acceleration = acceleration;
@@ -698,18 +733,30 @@ void cedar::dev::KinematicChain::applyAccelerationLimits(cv::Mat& accelerations)
 
     if(acceleration == lower_limit)
     {
+      if(mWarned[2*num_joints + i] % 1000 == 0)
+      {
         cedar::aux::LogSingleton::getInstance()->warning(
-           this->prettifyName()+", joint " + cedar::aux::toString(i) + ": acceleration " + cedar::aux::toString(old_acceleration) + " has been capped at " + cedar::aux::toString(lower_limit),
-            CEDAR_CURRENT_FUNCTION_NAME);
+          this->prettifyName()+", joint " + cedar::aux::toString(i) + ": acceleration " + cedar::aux::toString(old_acceleration) + " has been capped at " + cedar::aux::toString(lower_limit),
+          CEDAR_CURRENT_FUNCTION_NAME);
+        mWarned[2*num_joints + i] = 0;
+      }
+
+      ++mWarned[2*num_joints + i];
     }
 
     acceleration = std::min<double>(acceleration, upper_limit);
 
     if(acceleration == upper_limit)
     {
+      if(mWarned[2*num_joints + i] % 1000 == 0)
+      {
         cedar::aux::LogSingleton::getInstance()->warning(
-           this->prettifyName()+", joint " + cedar::aux::toString(i) + ": acceleration " + cedar::aux::toString(old_acceleration) + " has been capped at " + cedar::aux::toString(upper_limit),
-            CEDAR_CURRENT_FUNCTION_NAME);
+          this->prettifyName()+", joint " + cedar::aux::toString(i) + ": acceleration " + cedar::aux::toString(old_acceleration) + " has been capped at " + cedar::aux::toString(upper_limit),
+          CEDAR_CURRENT_FUNCTION_NAME);
+        mWarned[2*num_joints + i] = 0;
+      }
+
+      ++mWarned[2*num_joints + i];
     }
 
     accelerations.at<double>(i, 0) = acceleration;
