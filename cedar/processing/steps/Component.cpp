@@ -253,7 +253,7 @@ void cedar::proc::steps::Component::selectedGroupChanged()
 
 void cedar::proc::steps::Component::testStates(cedar::dev::ComponentPtr component)
 {
-  if (!component->isRunning())
+  if (!component->isCommunicating())
   {
     this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, 
         component->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.");
@@ -291,7 +291,7 @@ void cedar::proc::steps::Component::onStart()
 
     testStates(component);
 
-    if (!component->isRunning())
+    if (!component->isCommunicating())
     {
       cedar::aux::LogSingleton::getInstance()->message(
         component->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.",
@@ -310,7 +310,7 @@ void cedar::proc::steps::Component::onStop()
     component->clearUserCommand();
     component->setSuppressUserInteraction(true);
 
-    if (component->isRunning())
+    if (component->isCommunicating())
     {
       cedar::aux::LogSingleton::getInstance()->warning(
         component->prettifyName() + " is still connected and running.",
