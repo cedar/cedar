@@ -2071,7 +2071,7 @@ void cedar::proc::gui::Ide::updateArchitectureWidgetsMenu()
   QMenu* menu = this->mpMenuArchitecturePlots;
   menu->clear();
 
-  auto manage_action = menu->addAction("manage");
+  auto manage_action = menu->addAction("Manage ...");
   QObject::connect(manage_action, SIGNAL(triggered()), this, SLOT(showManageArchitectureWidgetsDialog()));
   menu->addSeparator();
 
@@ -2094,10 +2094,11 @@ void cedar::proc::gui::Ide::updateArchitectureWidgetsMenu()
 void cedar::proc::gui::Ide::updateArchitectureScriptsMenu()
 {
   QMenu* menu = this->mpMenuArchitectureScripts;
-  menu->clear();
+
+  //menu->clear(); dont delete the .ui menu items
 
   // add an action to open the script manager
-  auto manage_action = menu->addAction("manage");
+  auto manage_action = menu->addAction("C++ scripts ...");
   QObject::connect(manage_action, SIGNAL(triggered()), this, SLOT(showManageArchitectureScriptsDialog()));
   menu->addSeparator();
 
