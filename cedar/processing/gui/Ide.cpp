@@ -124,7 +124,7 @@ public:
 
   void addToMenu(QMenu* menu)
   {
-    this->mpMenuAction = new QAction(QString::fromStdString(this->getName()) + " ...", menu);
+    this->mpMenuAction = new QAction(QString::fromStdString(this->getName()) + "...", menu);
     if (!this->mIconPath.isEmpty())
     {
       this->mpMenuAction->setIcon(QIcon(this->mIconPath));
@@ -2071,7 +2071,7 @@ void cedar::proc::gui::Ide::updateArchitectureWidgetsMenu()
   QMenu* menu = this->mpMenuArchitecturePlots;
   menu->clear();
 
-  auto manage_action = menu->addAction("Manage ...");
+  auto manage_action = menu->addAction("Manage...");
   QObject::connect(manage_action, SIGNAL(triggered()), this, SLOT(showManageArchitectureWidgetsDialog()));
   menu->addSeparator();
 
@@ -2098,7 +2098,7 @@ void cedar::proc::gui::Ide::updateArchitectureScriptsMenu()
   //menu->clear(); dont delete the .ui menu items
 
   // add an action to open the script manager
-  auto manage_action = menu->addAction("C++ scripts ...");
+  auto manage_action = menu->addAction("C++ scripts...");
   QObject::connect(manage_action, SIGNAL(triggered()), this, SLOT(showManageArchitectureScriptsDialog()));
   menu->addSeparator();
 
