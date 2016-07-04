@@ -514,7 +514,7 @@
     <string>Brake all robots</string>
    </property>
    <property name="toolTip">
-    <string>Brake all running robot components</string>
+    <string>Brake all connected robotic components (slowly).</string>
    </property>
   </action>
   <action name="mpActionExportSVG">
@@ -667,7 +667,7 @@
     <string>Toggle visibility of plots</string>
    </property>
    <property name="toolTip">
-    <string>Hides/shows all open plots</string>
+    <string>Hide/show all open plots</string>
    </property>
   </action>
   <action name="mpActionNewPlotGroup">
@@ -823,7 +823,7 @@
     <string>Color elements by thread</string>
    </property>
    <property name="toolTip">
-    <string>Toggle visibility of thread colors.</string>
+    <string>Hide/show threads via colors</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+T</string>
@@ -839,7 +839,7 @@
   </action>
   <action name="mpActionShowRecentNotifications">
    <property name="text">
-    <string>Show recent notifications...</string>
+    <string>Show recent cedar major changes ...</string>
    </property>
   </action>
   <action name="mpActionLockUIPositions">
