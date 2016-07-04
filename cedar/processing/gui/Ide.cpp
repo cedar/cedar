@@ -250,7 +250,7 @@ class cedar::proc::gui::Ide::OpenableSimulationControl : public cedar::proc::gui
 public:
   OpenableSimulationControl()
   :
-  OpenableDialog("Simulation control", ":/toolbaricons/simulation_control.svg", "simulation control")
+  OpenableDialog("Thread control", ":/toolbaricons/simulation_control.svg", "thread control")
   {
     this->setIsInToolbar(true);
   }
