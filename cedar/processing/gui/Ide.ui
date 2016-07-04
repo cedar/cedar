@@ -388,12 +388,19 @@
    <addaction name="mpActionRecord"/>
    <addaction name="mpActionSnapshot"/>
    <addaction name="separator"/>
-   <addaction name="mpActionBrakeAllRobots"/>
+
+   <addaction name="mpActionToggleTriggerColor"/>
    <addaction name="separator"/>
+
+
    <addaction name="mpActionDummy"/>
    <addaction name="separator"/>
-   <addaction name="mpActionToggleTriggerColor"/>
+
    <addaction name="mpActionToggleVisibilityOfPlots"/>
+
+   <addaction name="separator"/>
+   <addaction name="mpActionBrakeAllRobots"/>
+
 
    <addaction name="mpActionDisplayPlotGroup"/>
    <addaction name="mpActionNewPlotGroup"/>
