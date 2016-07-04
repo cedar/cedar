@@ -105,7 +105,7 @@
     </property>
     <widget class="QMenu" name="mpMenuArchitecturePlots">
      <property name="title">
-      <string>architecture widgets</string>
+      <string>Architecture widgets</string>
      </property>
      <addaction name="actionNone"/>
     </widget>
@@ -457,7 +457,7 @@
      <normaloff>:/cedar/auxiliaries/gui/start.svg</normaloff>:/cedar/auxiliaries/gui/start.svg</iconset>
    </property>
    <property name="text">
-    <string>start/pause simulation</string>
+    <string>Start/Pause simulation</string>
    </property>
    <property name="toolTip">
     <string>Starts and pauses the simulation.</string>
@@ -532,7 +532,7 @@
   </action>
   <action name="mpActionAddGlobalSceneViewer">
    <property name="text">
-    <string>add a Camera of the simulated scene ...</string>
+    <string>Add a Camera of the simulated scene ...</string>
    </property>
   </action>
   <action name="mpActionDuplicate">
@@ -564,7 +564,7 @@
      <normalon>:/toolbaricons/show_triggers.svg</normalon>:/toolbaricons/hide_triggers.svg</iconset>
    </property>
    <property name="text">
-    <string>toggle visibility</string>
+    <string>Toggle visibility</string>
    </property>
    <property name="toolTip">
     <string>Toggle color of threads.</string>
@@ -590,7 +590,7 @@
     <string>Single-step each thread</string>
    </property>
    <property name="toolTip">
-    <string>execute a single step with each thread</string>
+    <string>Execute a single step with each thread</string>
    </property>
    <property name="shortcut">
     <string>Ctrl++</string>
@@ -618,10 +618,10 @@
      <normaloff>:/toolbaricons/close_all_plots.svg</normaloff>:/toolbaricons/close_all_plots.svg</iconset>
    </property>
    <property name="text">
-    <string>closes all plots</string>
+    <string>Close all plots</string>
    </property>
    <property name="toolTip">
-    <string>closes all plots</string>
+    <string>Closes all plots</string>
    </property>
   </action>
   <action name="mpActionRecord">
@@ -637,7 +637,7 @@
      <selectedon>:/cedar/auxiliaries/gui/recordStop.svg</selectedon>:/cedar/auxiliaries/gui/record.svg</iconset>
    </property>
    <property name="text">
-    <string>record</string>
+    <string>Record</string>
    </property>
    <property name="toolTip">
     <string notr="true">Record all registered slots.</string>
@@ -664,10 +664,10 @@
      <normaloff>:/toolbaricons/toggle_visibility_of_plots.svg</normaloff>:/toolbaricons/toggle_visibility_of_plots.svg</iconset>
    </property>
    <property name="text">
-    <string>toggle visibility of plots</string>
+    <string>Toggle visibility of plots</string>
    </property>
    <property name="toolTip">
-    <string>hides/shows all open plots</string>
+    <string>Hides/shows all open plots</string>
    </property>
   </action>
   <action name="mpActionNewPlotGroup">
@@ -679,7 +679,7 @@
     <string>New Plot Group</string>
    </property>
    <property name="toolTip">
-    <string>add a plot group</string>
+    <string>Add a plot group</string>
    </property>
   </action>
   <action name="mpActionRenamePlotGroup">
@@ -691,7 +691,7 @@
     <string>Rename Current Plot Group</string>
    </property>
    <property name="toolTip">
-    <string>rename selected plot group</string>
+    <string>Rename selected plot group</string>
    </property>
   </action>
   <action name="mpActionDisplayPlotGroup">
@@ -703,7 +703,7 @@
     <string>Display Plot Group</string>
    </property>
    <property name="toolTip">
-    <string>display selected plot group</string>
+    <string>Display selected plot group</string>
    </property>
   </action>
   <action name="mpActionDeletePlotGroup">
@@ -715,7 +715,7 @@
     <string>Delete Plot Group</string>
    </property>
    <property name="toolTip">
-    <string>delete selected plot group</string>
+    <string>Delete selected plot group</string>
    </property>
   </action>
   <action name="mpActionPerformanceOverview">
@@ -773,7 +773,7 @@
     <string>Find</string>
    </property>
    <property name="toolTip">
-    <string>find an element</string>
+    <string>Find an step</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
@@ -793,7 +793,7 @@
      <normaloff>:/cedar/auxiliaries/gui/reset.svg</normaloff>:/cedar/auxiliaries/gui/reset.svg</iconset>
    </property>
    <property name="text">
-    <string>reset simulation</string>
+    <string>Reset simulation</string>
    </property>
    <property name="toolTip">
     <string>Resets the simulation, i.e., calls reset on the architecture and rewinds the global timer.</string>
@@ -808,7 +808,7 @@
     <string>Store Open Plots in Current Plot Group</string>
    </property>
    <property name="toolTip">
-    <string>store open plots in selected plot group</string>
+    <string>Store open plots in selected plot group</string>
    </property>
   </action>
   <action name="mpActionToggleTriggerColor">
