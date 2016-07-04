@@ -135,6 +135,19 @@ public:
     this->actionAdded();
   }
 
+  void addToMenuBack(QMenu* menu)
+  {
+    this->mpMenuAction = new QAction(QString::fromStdString(this->getName()) + "...", menu);
+    if (!this->mIconPath.isEmpty())
+    {
+      this->mpMenuAction->setIcon(QIcon(this->mIconPath));
+    }
+    this->mpMenuAction->setData(QString::fromStdString(this->getName()));
+    menu->insertAction(menu->actions().back(), this->mpMenuAction);
+
+    this->actionAdded();
+  }
+
   void show(QWidget* parent, cedar::proc::gui::GroupPtr group)
   {
     if (this->mpDock == nullptr)
@@ -559,12 +572,12 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   openable_dialogs.push_back(OpenableDialogPtr(new OpenableSimulationControl()));
   openable_dialogs.push_back(boost_ctrl);
 
-  // need to iterate in reverse, actions are always added at the beginning of the menu
+  // need to iterate in reverse, actions are added at end of menu (jokeit: 2016, before: at front)
   for (auto iter = openable_dialogs.rbegin(); iter != openable_dialogs.rend(); ++iter)
   {
     auto openable_dialog = *iter;
     this->mOpenableDialogs[openable_dialog->getName()] = openable_dialog;
-    openable_dialog->addToMenu(this->mpToolsMenu);
+    openable_dialog->addToMenuBack(this->mpToolsMenu); // add to back
     QObject::connect(openable_dialog->getMenuAction(), SIGNAL(triggered()), this, SLOT(showOpenableDialog()));
     if (openable_dialog->isInToolbar())
     {

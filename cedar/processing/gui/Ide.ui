@@ -155,6 +155,7 @@
     <addaction name="mpActionManagePlugins"/>
     <addaction name="separator"/>
     <addaction name="mpActionSettings"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="mpMenuArchitectureScripts">
     <property name="title">
@@ -513,7 +514,7 @@
     <string>Brake all robots</string>
    </property>
    <property name="toolTip">
-    <string>Brake all connected robotic components (slowly).</string>
+    <string>Brake all connected robotic components (slowly)</string>
    </property>
   </action>
   <action name="mpActionExportSVG">
