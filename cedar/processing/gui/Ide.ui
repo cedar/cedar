@@ -522,7 +522,7 @@
   </action>
   <action name="mpActionExportSVG">
    <property name="text">
-    <string>Export SVG ...</string>
+    <string>Save canvas ...</string>
    </property>
   </action>
   <action name="mpActionShowRobotManager">
