@@ -570,12 +570,13 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   auto boost_ctrl = OpenableDialogPtr(new OpenableBoostControl(this->mpProcessingDrawer));
 
   std::vector<OpenableDialogPtr> openable_dialogs;
-  openable_dialogs.push_back(OpenableDialogPtr(new OpenableArchitectureConsistencyCheck(this->mpProcessingDrawer)));
+
   openable_dialogs.push_back(OpenableDialogPtr(new OpenableSimulationControl()));
   openable_dialogs.push_back(boost_ctrl);
+  openable_dialogs.push_back(OpenableDialogPtr(new OpenableArchitectureConsistencyCheck(this->mpProcessingDrawer)));
 
-  // need to iterate in reverse, actions are added at end of menu (jokeit: 2016, before: at front)
-  for (auto iter = openable_dialogs.rbegin(); iter != openable_dialogs.rend(); ++iter)
+  // actions are added at end of menu (jokeit: 2016, before: at front, iterated in reverse)
+  for (auto iter = openable_dialogs.begin(); iter != openable_dialogs.end(); ++iter)
   {
     auto openable_dialog = *iter;
     this->mOpenableDialogs[openable_dialog->getName()] = openable_dialog;
