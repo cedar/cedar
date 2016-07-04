@@ -841,10 +841,10 @@
      <normaloff>:/toolbaricons/show_trigger_colors.svg</normaloff>:/toolbaricons/show_trigger_colors.svg</iconset>
    </property>
    <property name="text">
-    <string>Color elements by thread</string>
+    <string>Colorize steps by thread</string>
    </property>
    <property name="toolTip">
-    <string>Hide/show threads via colors</string>
+    <string>Hide/show thread association via colors</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+T</string>
