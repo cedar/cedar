@@ -411,11 +411,13 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   QObject::connect(this->mpGlobalTimeFactor, SIGNAL(valueChanged(double)), this, SLOT(globalTimeFactorSpinboxChanged(double)));
 
-  this->mpToolBar->insertSeparator(this->mpActionRecord);
+//  this->mpToolBar->insertSeparator(this->mpActionRecord);
 
   // PlotGroupsComboBox, insert it before the displayplotgroup action
   this->mpPlotGroupsComboBox = new QComboBox;
-  this->mpToolBar->insertWidget(this->mpActionDisplayPlotGroup, this->mpPlotGroupsComboBox);
+//  this->mpPlotGroupsComboBox->setVisible(false); // jokeit, 2016
+//  this->mpToolBar->insertWidget(this->mpActionDisplayPlotGroup, this->mpPlotGroupsComboBox);
+
 
 
   // set window title
