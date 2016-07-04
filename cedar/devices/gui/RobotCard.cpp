@@ -138,8 +138,7 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
 
   // fade out everything out of circle
   this->setStyleSheet("QFrame { \
-       background: rgba(128, 128, 128, 255) }");
-
+       background: rgba(156, 156, 156, 255) }");
 
   QObject::connect(this->mpIcon, SIGNAL(robotDropped(const QString&)), this, SLOT(robotDropped(const QString&)));
   QObject::connect(mpConfigurationSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedConfigurationChanged(int)));
