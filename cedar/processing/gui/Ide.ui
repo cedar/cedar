@@ -424,7 +424,7 @@
   </action>
   <action name="mpActionSaveAs">
    <property name="text">
-    <string>Save as ...</string>
+    <string>Save as...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
@@ -432,7 +432,7 @@
   </action>
   <action name="mpActionLoad">
    <property name="text">
-    <string>Open file ...</string>
+    <string>Open file...</string>
    </property>
    <property name="toolTip">
     <string>Load an architecture file</string>
@@ -448,7 +448,7 @@
   </action>
   <action name="mpActionManagePlugins">
    <property name="text">
-    <string>Manage plugins ...</string>
+    <string>Manage plugins...</string>
    </property>
   </action>
   <action name="mpActionStartPauseSimulation">
@@ -468,7 +468,7 @@
   </action>
   <action name="mpActionLoadPlugin">
    <property name="text">
-    <string>Load plugin ...</string>
+    <string>Load plugin...</string>
    </property>
   </action>
   <action name="mpActionShowHideGrid">
@@ -519,12 +519,12 @@
   </action>
   <action name="mpActionExportSVG">
    <property name="text">
-    <string>Save canvas ...</string>
+    <string>Save canvas...</string>
    </property>
   </action>
   <action name="mpActionShowRobotManager">
    <property name="text">
-    <string>Robot manager ...</string>
+    <string>Robot manager...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+M</string>
@@ -532,7 +532,7 @@
   </action>
   <action name="mpActionAddGlobalSceneViewer">
    <property name="text">
-    <string>Add a Camera of the simulated scene ...</string>
+    <string>Add a Camera of the simulated scene...</string>
    </property>
   </action>
   <action name="mpActionDuplicate">
@@ -720,12 +720,12 @@
   </action>
   <action name="mpActionPerformanceOverview">
    <property name="text">
-    <string>Performance overview ...</string>
+    <string>Performance overview...</string>
    </property>
   </action>
   <action name="mpActionExperiments">
    <property name="text">
-    <string>Experiments ...</string>
+    <string>Experiments...</string>
    </property>
    <property name="toolTip">
     <string>Framwork for starting experiments</string>
@@ -749,12 +749,12 @@
   </action>
   <action name="mpActionParameterLinker">
    <property name="text">
-    <string>Parameter linking ...</string>
+    <string>Parameter linking...</string>
    </property>
   </action>
   <action name="mpActionSaveSerializableData">
    <property name="text">
-    <string>Save serializable data ...</string>
+    <string>Save serializable data...</string>
    </property>
    <property name="toolTip">
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a location to save all data in slots that are marked as serializable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -762,7 +762,7 @@
   </action>
   <action name="mpActionLoadSerializableData">
    <property name="text">
-    <string>Load serializable data ...</string>
+    <string>Load serializable data...</string>
    </property>
    <property name="toolTip">
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a file from which to load data in slots that are marked as serializable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -839,7 +839,7 @@
   </action>
   <action name="mpActionShowRecentNotifications">
    <property name="text">
-    <string>Show recent cedar major changes ...</string>
+    <string>Recent major changes...</string>
    </property>
   </action>
   <action name="mpActionLockUIPositions">
