@@ -157,6 +157,16 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
   {
     // ok -- nothing to do here
   }
+
+  // if the currently selected index is the selection hint or there is no possible selection, gray out the connect button
+  if(mpConfigurationSelector->currentIndex() ==0 || mpConfigurationSelector->count()==0)
+  {
+    mpConnectButton->setDisabled(true);
+  }else
+  { // if not, set the correct icon
+    this->updateConnectionIcon();
+  }
+
 }
 
 cedar::dev::gui::RobotCardIconHolder::RobotCardIconHolder(cedar::dev::gui::RobotCard* pCard)
@@ -183,6 +193,7 @@ cedar::dev::gui::RobotCard::~RobotCard()
 
 void cedar::dev::gui::RobotCard::updateConnectionIcon()
 {
+  this->mpConnectButton->setEnabled(true);
   cedar::dev::RobotPtr robot = cedar::dev::RobotManagerSingleton::getInstance()->getRobot(this->getRobotName());
 
   if (robot->areAllComponentsCommunicating())
@@ -354,23 +365,12 @@ void cedar::dev::gui::RobotCard::robotDropped(const QString& robotTypeName)
   }
 
   this->mpConfigurationSelector->setCurrentIndex(selected);
-
-  // if the currently selected index is the selection hint or there is no possible selection, gray out the connect button
-  if(selected==0 || mpConfigurationSelector->count()==0)
-  {
-    mpConnectButton->setDisabled(true);
-  }else
-  { // if not, set the correct icon
-    this->updateConnectionIcon();
-  }
-
   this->mpConfigurationSelector->blockSignals(blocked);
 
   // a new placeholder card has already bene placed, so allow for actions here
   mpDeleteButton->setEnabled(true);
   mpConfigurationSelector->setEnabled(true);
   mpRobotNameEdit->setEnabled(true);
-  mpConnectButton->setEnabled(true);
 
   this->setStyleSheet("");
 }
