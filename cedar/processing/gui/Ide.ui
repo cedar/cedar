@@ -567,7 +567,7 @@
     <string>toggle visibility</string>
    </property>
    <property name="toolTip">
-    <string>Toggle visibility of triggers.</string>
+    <string>Toggle color of threads.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
@@ -587,10 +587,10 @@
      <normaloff>:/cedar/auxiliaries/gui/singleStep.svg</normaloff>:/cedar/auxiliaries/gui/singleStep.svg</iconset>
    </property>
    <property name="text">
-    <string>Single-step each trigger</string>
+    <string>Single-step each thread</string>
    </property>
    <property name="toolTip">
-    <string>execute a single step with each trigger</string>
+    <string>execute a single step with each thread</string>
    </property>
    <property name="shortcut">
     <string>Ctrl++</string>
@@ -820,10 +820,10 @@
      <normaloff>:/toolbaricons/show_trigger_colors.svg</normaloff>:/toolbaricons/show_trigger_colors.svg</iconset>
    </property>
    <property name="text">
-    <string>Color elements by trigger</string>
+    <string>Color elements by thread</string>
    </property>
    <property name="toolTip">
-    <string>Toggle visibility of trigger colors.</string>
+    <string>Toggle visibility of thread colors.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+T</string>
