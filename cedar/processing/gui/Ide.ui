@@ -394,13 +394,12 @@
    <addaction name="separator"/>
    <addaction name="mpActionToggleTriggerColor"/>
    <addaction name="mpActionToggleVisibilityOfPlots"/>
-   <addaction name="separator"/>
+
    <addaction name="mpActionDisplayPlotGroup"/>
    <addaction name="mpActionNewPlotGroup"/>
    <addaction name="mpActionRenamePlotGroup"/>
    <addaction name="mpActionEditPlotGroup"/>
    <addaction name="mpActionDeletePlotGroup"/>
-   <addaction name="separator"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
@@ -671,6 +670,9 @@
    </property>
   </action>
   <action name="mpActionNewPlotGroup">
+   <property name="visible">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/new.svg</normaloff>:/toolbaricons/new.svg</iconset>
@@ -683,6 +685,9 @@
    </property>
   </action>
   <action name="mpActionRenamePlotGroup">
+   <property name="visible">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/edit.svg</normaloff>:/toolbaricons/edit.svg</iconset>
@@ -695,6 +700,9 @@
    </property>
   </action>
   <action name="mpActionDisplayPlotGroup">
+   <property name="visible">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/display.svg</normaloff>:/toolbaricons/display.svg</iconset>
@@ -707,6 +715,9 @@
    </property>
   </action>
   <action name="mpActionDeletePlotGroup">
+   <property name="visible">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/trash.svg</normaloff>:/toolbaricons/trash.svg</iconset>
@@ -800,6 +811,9 @@
    </property>
   </action>
   <action name="mpActionEditPlotGroup">
+   <property name="visible">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/store_plotgroup.svg</normaloff>:/toolbaricons/store_plotgroup.svg</iconset>
