@@ -113,7 +113,7 @@ private:
 protected:
   // none yet
 private:
-  cedar::dev::ComponentSlotPtr mComponent;
+  boost::weak_ptr<cedar::dev::ComponentSlot> mWeakComponent;
 
 }; // class cedar::dev::ComponentParameter
 

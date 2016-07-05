@@ -194,14 +194,23 @@ cedar::aux::ParameterTemplate<std::string>(owner, name, "")
 
 void cedar::proc::details::ComponentStepGroupParameter::setComponent(cedar::dev::ComponentPtr component)
 {
-  this->mComponent = component;
-
+  this->mWeakComponent = component;
   emit componentChanged();
 }
 
 cedar::dev::ComponentPtr cedar::proc::details::ComponentStepGroupParameter::getComponent()
 {
-  return this->mComponent;
+  if(auto component = this->mWeakComponent.lock())
+  {
+    return component;
+  }
+  else
+  {
+   CEDAR_THROW
+   (
+     cedar::dev::NoComponentSelectedException, "No robotic component selected for \"" + this->getName() + "\". Please set the parameter to an initialized robot from the robot manager."
+   );
+  }
 }
 
 
@@ -228,6 +237,12 @@ _mGroup(new cedar::proc::details::ComponentStepGroupParameter(this, "command gro
   this->registerFunction( "disconnect", boost::bind(&cedar::proc::steps::Component::disconnectManually, this ) );
   this->registerFunction( "connect", boost::bind(&cedar::proc::steps::Component::connectManually, this ) );
 }
+
+cedar::proc::steps::Component::~Component()
+{
+  std::cout<<"Destructor!! ComponentStep"<<std::endl;
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
