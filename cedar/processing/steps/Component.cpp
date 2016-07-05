@@ -276,7 +276,7 @@ void cedar::proc::steps::Component::testStates(cedar::dev::ComponentPtr componen
   else if (!component->isReadyForMeasurements())
   {
     this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, 
-      component->prettifyName() + " is not ready to receive measurments, yet.");
+      component->prettifyName() + " is not ready to receive measurements, yet.");
   }
   else if (!component->isReadyForCommands())
   {

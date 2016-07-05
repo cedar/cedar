@@ -97,12 +97,39 @@ void cedar::proc::steps::ForwardKinematicsStep::compute(const cedar::proc::Argum
   if (this->hasComponent())
   {
     auto component = this->getComponent();
+    this->testStates(component);
+
     cedar::dev::KinematicChainPtr kinChain = boost::dynamic_pointer_cast < cedar::dev::KinematicChain > (component);
     if (kinChain)
     {
       mOutputPos->setData(kinChain->calculateEndEffectorPosition());
       mOutputVelocity->setData(kinChain->calculateEndEffectorVelocity());
       mOutputAcceleration->setData(kinChain->calculateEndEffectorAcceleration());
+    }
+  }
+}
+
+void cedar::proc::steps::ForwardKinematicsStep::onStart()
+{
+  if (this->hasComponent())
+  {
+    auto component = this->getComponent();
+    testStates(component);
+  }
+}
+
+void cedar::proc::steps::ForwardKinematicsStep::onStop()
+{
+  if (this->hasComponent())
+  {
+    auto component = this->getComponent();
+    if (component->isCommunicating())
+    {
+      cedar::aux::LogSingleton::getInstance()->warning(component->prettifyName() + " is still connected and running.", CEDAR_CURRENT_FUNCTION_NAME);
+    }
+    else
+    {
+      this->resetState();
     }
   }
 }
@@ -138,6 +165,22 @@ void cedar::proc::steps::ForwardKinematicsStep::rebuildOutputs()
     this->declareOutput("Cartesian position", mOutputPos);
     this->declareOutput("Cartesian velocity", mOutputVelocity);
     this->declareOutput("Cartesian acceleration", mOutputAcceleration);
+  }
+}
+
+void cedar::proc::steps::ForwardKinematicsStep::testStates(cedar::dev::ComponentPtr component)
+{
+  if (!component->isCommunicating())
+  {
+    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, component->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.");
+  }
+  else if (!component->isReadyForMeasurements())
+  {
+    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, component->prettifyName() + " is not ready to receive measurements, yet.");
+  }
+  else
+  {
+    this->resetState();
   }
 }
 
