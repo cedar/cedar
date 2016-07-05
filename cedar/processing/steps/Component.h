@@ -95,6 +95,7 @@ namespace cedar
         void setComponent(cedar::dev::ComponentPtr component);
 
         cedar::dev::ComponentPtr getComponent();
+        bool hasComponent();
 
       signals:
         void componentChanged();
