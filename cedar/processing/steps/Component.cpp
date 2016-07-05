@@ -122,18 +122,18 @@ void cedar::proc::details::ComponentStepGroupParameterWidget::rebuildGroupList()
   auto parameter = boost::dynamic_pointer_cast<cedar::proc::details::ComponentStepGroupParameter>(this->getParameter());
   CEDAR_ASSERT(parameter);
 
-  auto component = parameter->getComponent();
   std::string current = parameter->getValue();
 
   bool blocked = this->mpSelector->blockSignals(true);
   this->mpSelector->clear();
 
-
   this->mpSelector->addItem("all");
   int select = 0;
 
-  if (component)
+
+  if (parameter->hasComponent())
   {
+    auto component = parameter->getComponent();
     auto groups = component->listCommandGroups();
 
     for (const auto& group : groups)
@@ -196,6 +196,11 @@ void cedar::proc::details::ComponentStepGroupParameter::setComponent(cedar::dev:
 {
   this->mWeakComponent = component;
   emit componentChanged();
+}
+
+bool cedar::proc::details::ComponentStepGroupParameter::hasComponent()
+{
+  return mWeakComponent.use_count() != 0;
 }
 
 cedar::dev::ComponentPtr cedar::proc::details::ComponentStepGroupParameter::getComponent()
@@ -340,6 +345,9 @@ void cedar::proc::steps::Component::onStop()
 
 void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
 {
+  if (!this->hasComponent())
+    return;
+
   auto component = this->getComponent();
 
   this->testStates(component);
