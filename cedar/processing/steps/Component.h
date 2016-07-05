@@ -45,6 +45,7 @@
 #include "cedar/devices/ComponentParameter.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/MatData.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/steps/Component.fwd.h"
@@ -197,6 +198,7 @@ private:
   //! Id used for signaling "step command" times
   unsigned int mCommandTimeId;
 
+  std::map<std::string, cedar::aux::MatDataPtr>  mOutputs;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
