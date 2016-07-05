@@ -99,7 +99,7 @@ namespace cedar
         void componentChanged();
 
       private:
-        cedar::dev::ComponentPtr mComponent;
+        boost::weak_ptr<cedar::dev::Component> mWeakComponent;
       };
       CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ComponentStepGroupParameter);
     }
@@ -125,6 +125,8 @@ public:
 public:
   //!@brief The standard constructor.
   Component();
+
+  virtual ~Component();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

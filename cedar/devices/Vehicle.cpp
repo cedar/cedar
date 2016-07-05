@@ -99,6 +99,7 @@ cedar::dev::Vehicle::Vehicle()
 
 cedar::dev::Vehicle::~Vehicle()
 {
+  prepareComponentDestructAbsolutelyRequired();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
