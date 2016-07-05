@@ -97,16 +97,40 @@ void cedar::proc::steps::InverseKinematicsPseudoStep::compute(const cedar::proc:
   {
     cv::Mat cartesianVelocityMat = inputData->getData<cv::Mat>().clone();
     auto component = this->getComponent();
+    this->testStates(component);
     cedar::dev::KinematicChainPtr kinChain = boost::dynamic_pointer_cast < cedar::dev::KinematicChain > (component);
     if (kinChain)
     {
       cv::Mat Jacobian = kinChain->calculateEndEffectorJacobian();
       cv::Mat jacobian_pseudo_inverse = cv::Mat::zeros(kinChain->getNumberOfJoints(), 2, CV_64FC1);
       cv::invert(Jacobian, jacobian_pseudo_inverse, cv::DECOMP_SVD);
-
       cv::Mat joint_velocities = jacobian_pseudo_inverse * cartesianVelocityMat;
-
       mOutputVelocity->setData(joint_velocities);
+    }
+  }
+}
+
+void cedar::proc::steps::InverseKinematicsPseudoStep::onStart()
+{
+  if (this->hasComponent())
+  {
+    auto component = this->getComponent();
+    testStates(component);
+  }
+}
+
+void cedar::proc::steps::InverseKinematicsPseudoStep::onStop()
+{
+  if (this->hasComponent())
+  {
+    auto component = this->getComponent();
+    if (component->isCommunicating())
+    {
+      cedar::aux::LogSingleton::getInstance()->warning(component->prettifyName() + " is still connected and running.", CEDAR_CURRENT_FUNCTION_NAME);
+    }
+    else
+    {
+      this->resetState();
     }
   }
 }
@@ -149,5 +173,21 @@ void cedar::proc::steps::InverseKinematicsPseudoStep::rebuildOutputs()
   {
     mOutputVelocity->setData(cv::Mat::zeros(kinChain->getNumberOfJoints(), 1, CV_64FC1));
     this->declareOutput("joint velocity", mOutputVelocity);
+  }
+}
+
+void cedar::proc::steps::InverseKinematicsPseudoStep::testStates(cedar::dev::ComponentPtr component)
+{
+  if (!component->isCommunicating())
+  {
+    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, component->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.");
+  }
+  else if (!component->isReadyForMeasurements())
+  {
+    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, component->prettifyName() + " is not ready to receive measurements, yet.");
+  }
+  else
+  {
+    this->resetState();
   }
 }

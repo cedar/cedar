@@ -94,10 +94,16 @@ protected:
 private:
   void compute(const cedar::proc::Arguments&);
 
+  void onStart();
+
+  void onStop();
+
   void reset();
 
 private slots:
   void rebuildOutputs();
+
+  void testStates(cedar::dev::ComponentPtr component);
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

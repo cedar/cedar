@@ -76,14 +76,14 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //! get the component
-    inline cedar::dev::ComponentPtr getComponent() const
-    {
-      return this->_mComponent->getValue();
-    }
+  inline cedar::dev::ComponentPtr getComponent() const
+  {
+    return this->_mComponent->getValue();
+  }
 
-    bool hasComponent() const;
+  bool hasComponent() const;
 
-    //todo:do we need the componentchanged signal?
+  //todo:do we need the componentchanged signal?
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -97,10 +97,18 @@ protected:
 private:
   void compute(const cedar::proc::Arguments&);
 
+  void onStart();
+
+  void onStop();
+
   void reset();
+
+  void testStates();
 
 private slots:
   void rebuildOutputs();
+
+  void testStates(cedar::dev::ComponentPtr component);
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
