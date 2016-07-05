@@ -194,14 +194,23 @@ cedar::aux::ParameterTemplate<std::string>(owner, name, "")
 
 void cedar::proc::details::ComponentStepGroupParameter::setComponent(cedar::dev::ComponentPtr component)
 {
-  this->mComponent = component;
-
+  this->mWeakComponent = component;
   emit componentChanged();
 }
 
 cedar::dev::ComponentPtr cedar::proc::details::ComponentStepGroupParameter::getComponent()
 {
-  return this->mComponent;
+  if(auto component = this->mWeakComponent.lock())
+  {
+    return component;
+  }
+  else
+  {
+   CEDAR_THROW
+   (
+     cedar::dev::NoComponentSelectedException, "No robotic component selected for \"" + this->getName() + "\". Please set the parameter to an initialized robot from the robot manager."
+   );
+  }
 }
 
 
@@ -229,6 +238,12 @@ _mGroup(new cedar::proc::details::ComponentStepGroupParameter(this, "command gro
   this->registerFunction( "connect", boost::bind(&cedar::proc::steps::Component::connectManually, this ) );
 }
 
+cedar::proc::steps::Component::~Component()
+{
+  std::cout<<"Destructor!! ComponentStep"<<std::endl;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -253,7 +268,7 @@ void cedar::proc::steps::Component::selectedGroupChanged()
 
 void cedar::proc::steps::Component::testStates(cedar::dev::ComponentPtr component)
 {
-  if (!component->isRunning())
+  if (!component->isCommunicating())
   {
     this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, 
         component->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.");
@@ -291,7 +306,7 @@ void cedar::proc::steps::Component::onStart()
 
     testStates(component);
 
-    if (!component->isRunning())
+    if (!component->isCommunicating())
     {
       cedar::aux::LogSingleton::getInstance()->message(
         component->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.",
@@ -310,7 +325,7 @@ void cedar::proc::steps::Component::onStop()
     component->clearUserCommand();
     component->setSuppressUserInteraction(true);
 
-    if (component->isRunning())
+    if (component->isCommunicating())
     {
       cedar::aux::LogSingleton::getInstance()->warning(
         component->prettifyName() + " is still connected and running.",
