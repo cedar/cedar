@@ -131,14 +131,14 @@ class cedar::dev::Component::DataCollection
       return found;
     }
 
-    void setDimensionality(cedar::dev::Component::ComponentDataType type, unsigned int dim)
+    void setDimensionality(cedar::dev::Component::ComponentDataType type, DimensionalityType dim)
     {
       mInstalledDimensions[type] = dim;
 
       this->resetBuffers(type);
     }
 
-    unsigned int getDimensionality(cedar::dev::Component::ComponentDataType type) const
+    cedar::dev::Component::DimensionalityType getDimensionality(cedar::dev::Component::ComponentDataType type) const
     {
       auto iter = this->mInstalledDimensions.find(type);
       if (iter == this->mInstalledDimensions.end())
@@ -551,7 +551,9 @@ class cedar::dev::Component::DataCollection
         );
       }
       auto dim = found->second;
-      bufferData.member()[type]->setData(cv::Mat::zeros(dim, 1, COMPONENT_CV_MAT_TYPE));
+
+      // todo: check for higher-order tensors
+      bufferData.member()[type]->setData(cv::Mat::zeros(dim[0], dim[1], COMPONENT_CV_MAT_TYPE));
     }
 
   public:
@@ -565,7 +567,7 @@ class cedar::dev::Component::DataCollection
     cedar::aux::LockableMember<BufferDataType> mPreviousDeviceBuffer; // was: mPreviousDeviceMeasurementsBuffer
 
   private:
-    std::map<ComponentDataType, unsigned int> mInstalledDimensions;
+    std::map<ComponentDataType, cedar::dev::Component::DimensionalityType> mInstalledDimensions;
 
     cedar::aux::LockableMember<TransformationHookContainerType> mTransformationHooks;
 
@@ -836,7 +838,7 @@ std::vector<cedar::dev::Component::ComponentDataType> cedar::dev::Component::get
   return this->mCommandData->getTypesInGroup(groupName);
 }
 
-unsigned int cedar::dev::Component::getCommandDimensionality(ComponentDataType type) const
+cedar::dev::Component::DimensionalityType cedar::dev::Component::getCommandDimensionality(ComponentDataType type) const
 {
   return this->mCommandData->getDimensionality(type);
 }
@@ -901,20 +903,42 @@ cedar::aux::DataPtr cedar::dev::Component::getDeviceCommandData(const ComponentD
   return this->mCommandData->getDeviceData(type);
 }
 
-void cedar::dev::Component::setCommandDimensionality(ComponentDataType type, unsigned int dim)
+void cedar::dev::Component::setCommandDimensionality(ComponentDataType type, DimensionalityType dim)
 {
   this->mCommandData->setDimensionality(type, dim);
 }
 
-void cedar::dev::Component::setMeasurementDimensionality(ComponentDataType type, unsigned int dim)
+void cedar::dev::Component::setMeasurementDimensionality(ComponentDataType type, DimensionalityType dim)
 {
   this->mMeasurementData->setDimensionality(type, dim);
 }
 
-void cedar::dev::Component::setCommandAndMeasurementDimensionality(ComponentDataType type, unsigned int dim)
+void cedar::dev::Component::setCommandAndMeasurementDimensionality(ComponentDataType type, DimensionalityType dim)
 {
   setCommandDimensionality(type, dim);
   setMeasurementDimensionality(type, dim);
+}
+
+void cedar::dev::Component::setCommandDimensionality(ComponentDataType type, unsigned int dim)
+{
+  DimensionalityType fulldim{ dim };
+
+  this->mCommandData->setDimensionality(type, fulldim);
+}
+
+void cedar::dev::Component::setMeasurementDimensionality(ComponentDataType type, unsigned int dim)
+{
+  DimensionalityType fulldim{ dim };
+
+  this->mMeasurementData->setDimensionality(type, fulldim);
+}
+
+void cedar::dev::Component::setCommandAndMeasurementDimensionality(ComponentDataType type, unsigned int dim)
+{
+  DimensionalityType fulldim{ dim, 1 };
+
+  setCommandDimensionality(type, fulldim);
+  setMeasurementDimensionality(type, fulldim);
 }
 
 void cedar::dev::Component::installCommandType(ComponentDataType type, const std::string& name)

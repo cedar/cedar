@@ -87,6 +87,7 @@ public:
   typedef std::map< ComponentDataType, cedar::aux::MatDataPtr > BufferDataType;
   typedef boost::function< cv::Mat() >      ControllerCallback;
   typedef boost::function< bool(const ComponentDataType&, cv::Mat& ) > CommandCheckFunctionType;
+  typedef std::vector< unsigned long>      DimensionalityType;
 
 private:
   typedef std::map< ComponentDataType, TransformationFunctionType > InnerTransformationHookContainerType;
@@ -273,7 +274,7 @@ public:
   void applyDeviceCommandsAs(ComponentDataType type);
 
   //! Returns the dimensionality (size) of the given command type.
-  unsigned int getCommandDimensionality(ComponentDataType type) const;
+  DimensionalityType getCommandDimensionality(ComponentDataType type) const;
 
   void setUserSideCommandBuffer(ComponentDataType type, cv::Mat);
 
@@ -352,8 +353,14 @@ protected:
   void installMeasurementType(ComponentDataType type, const std::string& name);
   void installCommandAndMeasurementType(ComponentDataType type, const std::string& name);
 
+  void setCommandDimensionality(ComponentDataType type, DimensionalityType dim);
+  void setMeasurementDimensionality(ComponentDataType type, DimensionalityType dim);
+  void setCommandAndMeasurementDimensionality(ComponentDataType type, DimensionalityType dim);
+  //! legacy
   void setCommandDimensionality(ComponentDataType type, unsigned int dim);
+  //! legacy
   void setMeasurementDimensionality(ComponentDataType type, unsigned int dim);
+  //! legacy
   void setCommandAndMeasurementDimensionality(ComponentDataType type, unsigned int dim);
 
   void registerCommandHook(ComponentDataType type, CommandFunctionType fun);

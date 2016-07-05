@@ -433,7 +433,8 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputVal
 
     auto type = this->getComponent()->getCommandTypeForName(name);
     // check that the matrix has the same dimensionality as the command it is connecting to
-    unsigned int size = this->getComponent()->getCommandDimensionality(type);
+    auto fulldim = this->getComponent()->getCommandDimensionality(type);
+    auto size= fulldim[0];
 
     if (size == 1 && mat_data->getDimensionality() == 0)
     {
