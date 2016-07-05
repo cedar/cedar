@@ -179,6 +179,7 @@ private:
   void brakeHard();
   void connectManually();
   void disconnectManually();
+  void openRobotManager();
 
 private slots:
   void componentChangedSlot();
