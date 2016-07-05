@@ -270,17 +270,17 @@ void cedar::proc::steps::Component::testStates(cedar::dev::ComponentPtr componen
 {
   if (!component->isCommunicating())
   {
-    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, 
+    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING,
         component->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.");
   }
   else if (!component->isReadyForMeasurements())
   {
-    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, 
+    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING,
       component->prettifyName() + " is not ready to receive measurements, yet.");
   }
   else if (!component->isReadyForCommands())
   {
-    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, 
+    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING,
       component->prettifyName() + " is not ready to send commands, yet.");
   }
   else
@@ -380,6 +380,24 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
       component->setUserSideCommandBuffer(command_type, mat_data->getData());
     }
   }
+
+  // retrieve Data from the component and copy it to the output slots of the component
+    auto measurements = component->getInstalledMeasurementTypes();
+    for (const auto& measurement : measurements)
+    {
+      std::string name = component->getNameForMeasurementType(measurement);
+      auto measurementData = component->getMeasurementData(measurement);
+      if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(measurementData))
+      {
+        cv::Mat measurementMat = measurementData->getData<cv::Mat>().clone();
+        std::string name = component->getNameForMeasurementType(measurement);
+        if(auto outPutPtr = mOutputs.at(name))
+        {
+          outPutPtr->setData(measurementMat);
+        }
+      }
+    }
+
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputValidity
@@ -461,14 +479,21 @@ void cedar::proc::steps::Component::rebuildInputs()
 void cedar::proc::steps::Component::rebuildOutputs()
 {
   this->removeAllSlots(cedar::proc::DataRole::OUTPUT);
+  mOutputs.clear();
   auto component = this->getComponent();
   auto measurements = component->getInstalledMeasurementTypes();
 
   for (const auto& measurement : measurements)
   {
     std::string name = component->getNameForMeasurementType(measurement);
-    auto data = component->getMeasurementData(measurement);
-    this->declareOutput(name, data);
+    auto measurementData = component->getMeasurementData(measurement);
+    if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(measurementData))
+    {
+      cv::Mat measurementMat = measurementData->getData<cv::Mat>().clone();
+      cedar::aux::MatDataPtr dataPtr = cedar::aux::MatDataPtr(new cedar::aux::MatData(measurementMat));
+      this->declareOutput(name, dataPtr);
+      mOutputs.insert(std::pair<std::string,cedar::aux::MatDataPtr>(name,dataPtr));
+    }
   }
 }
 
