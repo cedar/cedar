@@ -133,7 +133,7 @@ public:
       = cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame())
   );
 
-  ~KinematicChain();
+  virtual ~KinematicChain();
 
   //--------------------------------------------------------------------------------------------------------------------
   // Qt slots

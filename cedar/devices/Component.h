@@ -170,7 +170,7 @@ public:
   Component(cedar::dev::ChannelPtr channel);
 
   //!@brief Destructor
-  ~Component();
+  virtual ~Component();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
