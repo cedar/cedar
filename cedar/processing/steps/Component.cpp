@@ -42,6 +42,8 @@
 #include "cedar/processing/steps/Component.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/gui/IdeApplication.h"
+#include "cedar/processing/gui/Ide.h"
 #include "cedar/devices/Component.h"
 #include "cedar/devices/exceptions.h"
 #include "cedar/auxiliaries/Data.h"
@@ -241,6 +243,7 @@ _mGroup(new cedar::proc::details::ComponentStepGroupParameter(this, "command gro
   this->registerFunction( "brake hard", boost::bind(&cedar::proc::steps::Component::brakeHard, this ) );
   this->registerFunction( "disconnect", boost::bind(&cedar::proc::steps::Component::disconnectManually, this ) );
   this->registerFunction( "connect", boost::bind(&cedar::proc::steps::Component::connectManually, this ) );
+  this->registerFunction( "open Robot Manager", boost::bind(&cedar::proc::steps::Component::openRobotManager, this ) );
 }
 
 cedar::proc::steps::Component::~Component()
@@ -577,4 +580,18 @@ void cedar::proc::steps::Component::disconnectManually()
   component->stopCommunication();
 }
 
+void cedar::proc::steps::Component::openRobotManager()
+{
+  auto app = QCoreApplication::instance();
+  if (app)
+  {
+    auto pointer = dynamic_cast< cedar::proc::gui::IdeApplication* >(app);
+    if (pointer)
+    {
+      auto ide = pointer->getIde();
+
+      ide->showRobotManager();
+    }
+  }
+}
 
