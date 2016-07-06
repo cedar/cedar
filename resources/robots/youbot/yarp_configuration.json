@@ -4,6 +4,7 @@
   "component instantiations":
   {
     "arm": "yarp",
-    "chassis": "yarp"
+    "chassis": "yarp",
+    "camera" : "yarp"
   }
 }

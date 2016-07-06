@@ -188,7 +188,7 @@ double cedar::dev::KinematicChain::getJointAngle(unsigned int index) const
 
 cv::Mat cedar::dev::KinematicChain::getJointAngles() const
 {
-  return getUserSideMeasurementBuffer( JOINT_ANGLES );
+  return getUserSideMeasurementBuffer(JOINT_ANGLES);
 }
 
 cv::Mat cedar::dev::KinematicChain::getCachedJointAngles() const

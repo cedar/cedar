@@ -22,33 +22,29 @@
  Institute:   Ruhr-Universitaet Bochum
  Institut fuer Neuroinformatik
 
- File:        Vehicle.h
+ File:        Camera.h
 
  Maintainer:  Jan Tekülve
  Email:       jan.tekuelve@ini.rub.de
- Date:        2016 06 24
+ Date:        2016 07 05
 
- Description: Header file for the class cedar::dev::Vehicle.
+ Description: Header file for the class cedar::dev::Camera.
 
  Credits:
 
  ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_VEHICLE_H
-#define CEDAR_DEV_VEHICLE_H
+#ifndef CEDAR_DEV_CAMERA_H
+#define CEDAR_DEV_CAMERA_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-#include "cedar/devices/Component.h"
-#include "cedar/auxiliaries/NamedConfigurable.h"
-#include "cedar/auxiliaries/ObjectListParameterTemplate.h"
-#include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
-#include "cedar/auxiliaries/DoubleVectorParameter.h"
 
 // CEDAR INCLUDES
-
+#include "cedar/devices/Sensor.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 // FORWARD DECLARATIONS
-#include "cedar/devices/Vehicle.fwd.h"
+#include "cedar/devices/Camera.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -56,71 +52,35 @@
  *
  * @todo describe more.
  */
-class cedar::dev::Vehicle : public cedar::dev::Component
+class cedar::dev::Camera : public cedar::dev::Sensor
 {
-Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-
-public:
-  //!@brief describes the hardware properties of a joint.
-  struct CEDAR_DEV_LIB_EXPORT Wheel : cedar::aux::Configurable
-  {
-    //! constructor
-    Wheel();
-    //! position of the joint in robot root coordinates
-    cedar::aux::DoubleVectorParameterPtr _mpPosition;
-    //! minimum and maximum velocity values
-    cedar::aux::math::DoubleLimitsParameterPtr _mpVelocityLimits;
-  };
-
-  //! smart pointer definition for the Joint struct
-  typedef boost::shared_ptr<cedar::dev::Vehicle::Wheel> WheelPtr;
-  //!@brief a parameter for a list of joint objects
-  typedef cedar::aux::ObjectListParameterTemplate<cedar::dev::Vehicle::Wheel> WheelListParameter;
-  //!@brief a factory that allows allocating joints
-  typedef cedar::aux::FactoryManager<cedar::dev::Vehicle::WheelPtr> WheelFactoryManager;
-
-  //!@cond SKIPPED_DOCUMENTATION
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(WheelListParameter);
-  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Vehicle();
+  Camera();
 
   //!@brief Destructor
-  virtual ~Vehicle();
+  virtual ~Camera();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  virtual cv::Mat getData();
 
-  unsigned int getNumberOfWheels() const;
+  std::vector< unsigned long > getPictureSizes();
 
-  double getWheelVelocity(unsigned int index) const;
+  unsigned int getPictureSizeX();
 
-  cv::Mat getWheelVelocities() const;
-
-  virtual double getWheelAcceleration(unsigned int index) const;
-
-  cv::Mat getWheelAccelerations() const;
-
-  void setWheelVelocity(unsigned int index, double velocity);
-
-  void setWheelVelocities(const cv::Mat& velocities);
-
-  void setWheelAcceleration(unsigned int index, double acceleration);
-
-  void setWheelAccelerations(const cv::Mat& accelerations);
+  unsigned int getPictureSizeY();
 
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -133,18 +93,13 @@ protected:
 private:
   void init();
 
-  void initializefromWheelList();
-
-  virtual bool applyBrakeSlowlyController();
-
-  virtual bool applyBrakeNowController();
+  void initializeFromConfiguration();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  static const cedar::dev::Component::ComponentDataType WHEEL_VELOCITIES;
-  static const cedar::dev::Component::ComponentDataType WHEEL_ACCELERATIONS;
+  static const cedar::dev::Component::ComponentDataType CAMERA_PICTURE;
 protected:
   // none yet
 private:
@@ -154,26 +109,14 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  WheelListParameterPtr mWheels;
+  // none yet
 
 private:
+  cedar::aux::UIntParameterPtr xDim;
+  cedar::aux::UIntParameterPtr yDim;
   // none yet
 
 };
-// class cedar::dev::Vehicle
+// class cedar::dev::Camera
 
-#include "cedar/auxiliaries/FactoryManager.h"
-
-CEDAR_DEV_EXPORT_SINGLETON(cedar::dev::Vehicle::WheelFactoryManager);
-
-namespace cedar
-{
-  namespace dev
-  {
-    //!@brief The singleton instance of the joint factory manager.
-    typedef cedar::aux::Singleton<cedar::dev::Vehicle::WheelFactoryManager> WheelFactoryManagerSingleton;
-  }
-}
-
-
-#endif // CEDAR_DEV_VEHICLE_H
+#endif // CEDAR_DEV_CAMERA_H

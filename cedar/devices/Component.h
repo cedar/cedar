@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/LoopFunctionInThread.h"
 #include "cedar/auxiliaries/LockableMember.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/devices/Channel.h"
 
 // FORWARD DECLARATIONS
@@ -387,6 +388,8 @@ protected:
 
   void prepareComponentDestructAbsolutelyRequired();
 
+  int getMeasurementMatrixType();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -471,6 +474,7 @@ private:
 protected:
   // none yet
 private:
+  cedar::aux::StringParameterPtr mMatrixType;
   // none yet
 }; // class cedar::dev::Component
 
