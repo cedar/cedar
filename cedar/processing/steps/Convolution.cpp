@@ -246,7 +246,22 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
 
     this->mOutput->copyAnnotationsFrom(this->mMatrix);
 
+    const auto& list = this->getConvolution()->getKernelList();
+    std::vector<bool> blocked(list->size());
+
+    // Block signals from the kernel because they might otherwise call onTrigger (via kernelChanged -> recompute), which leads to trouble in inputConnectionChanged.
+    for (size_t i = 0; i < list->size(); ++i)
+    {
+      blocked[i] = list->getKernel(i)->blockSignals(true);
+    }
+
     this->inputDimensionalityChanged();
+
+    // restore blocked state for each kernel
+    for (size_t i = 0; i < list->size(); ++i)
+    {
+      list->getKernel(i)->blockSignals(blocked[i]);
+    }
 
     if (!mRevalidating)
     {
@@ -267,10 +282,12 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
       mRevalidating = false;
     }
   }
-
   this->callComputeWithoutTriggering();
 
-  if (!cedar::aux::math::matrixSizesEqual(old_output, this->mOutput->getData()))
+  if
+  (
+    !mRevalidating // if the step is revalidating, the revalidating call will also check this after revalidation is complete.
+    && (!cedar::aux::math::matrixSizesEqual(old_output, this->mOutput->getData()) || old_output.type() != this->mOutput->getData().type()))
   {
     this->emitOutputPropertiesChangedSignal("result");
   }
@@ -300,7 +317,7 @@ void cedar::proc::steps::Convolution::readConfiguration(const cedar::aux::Config
 
   // reconnect compute signal & recompute the step
   QObject::connect(this->mConvolution.get(), SIGNAL(configurationChanged()), this, SLOT(recompute()));
-  this->recompute();
+  this->callComputeWithoutTriggering();
 
   // reconnect slots
   mKernelAddedConnection

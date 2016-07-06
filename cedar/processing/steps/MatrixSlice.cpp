@@ -318,7 +318,7 @@ void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
     }
 
     // make sure that lower and upper don't exceed the matrix size
-    lower = cedar::aux::math::Limits<int>::limit(lower, 0, dim_size);
+    lower = cedar::aux::math::Limits<int>::limit(lower, 0, dim_size - 1);
     upper = cedar::aux::math::Limits<int>::limit(upper, 0, dim_size);
 
     this->mRanges.at(input_dimension) = cv::Range(lower, upper);

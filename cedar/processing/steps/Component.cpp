@@ -424,6 +424,12 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputVal
     return cedar::proc::DataSlot::VALIDITY_WARNING;
   }
 
+  // only commanded data are inputs
+// ? lost in some merge
+//  cedar::aux::ConstData *component_data = this->getComponent()->getCommandedData(name).get();
+//  cedar::aux::ConstData *that_data = data.get();
+//  if (typeid(*component_data) == typeid(*that_data))
+
   if (auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
     if (mat_data->getData().type() != CV_64F)

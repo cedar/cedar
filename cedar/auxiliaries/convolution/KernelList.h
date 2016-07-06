@@ -97,6 +97,12 @@ public:
     return this->mKernels.at(i);
   }
 
+  //!@brief access a kernel at given index
+  inline cedar::aux::kernel::KernelPtr getKernel(size_t i)
+  {
+    return this->mKernels.at(i);
+  }
+
   //!@brief returns the size of kernels in this list
   inline size_t size() const
   {

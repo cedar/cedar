@@ -96,7 +96,7 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::steps::TransferFunction::TransferFunction()
 :
-mOutput(new cedar::aux::MatData(cv::Mat::zeros(5, 5, CV_32F))),
+mOutput(new cedar::aux::MatData(cv::Mat())),
 _mTransferFunction
 (
   new cedar::proc::steps::TransferFunction::TransferFunctionParameter
@@ -146,15 +146,15 @@ void cedar::proc::steps::TransferFunction::inputConnectionChanged(const std::str
   }
 
   // set input data to output data
-  cv::Mat old_mat = this->mOutput->getData();
+  cv::Mat old_mat = this->mOutput->getData().clone();
   cv::Mat new_mat = this->mInput->getData().clone() * 0.0;
   this->mOutput->setData(new_mat);
 
-  if (!cedar::aux::math::matrixSizesEqual(old_mat, new_mat))
+  // trigger
+  this->callComputeWithoutTriggering();
+
+  if (!cedar::aux::math::matrixSizesEqual(old_mat, new_mat) || old_mat.type() != new_mat.type())
   {
     this->emitOutputPropertiesChangedSignal("sigmoided output");
   }
-
-  // trigger
-  this->onTrigger();
 }

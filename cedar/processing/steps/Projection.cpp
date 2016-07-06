@@ -327,6 +327,7 @@ void cedar::proc::steps::Projection::reconfigure(bool triggerSubsequent)
   if (this->mInput->getCvType() != this->mOutput->getCvType())
   {
     this->initializeOutputMatrix();
+    this->emitOutputPropertiesChangedSignal("output");
   }
 
   // now do a final step and try to calculate an output with the new configuration
@@ -1044,7 +1045,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Projection::determineInputVa
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
   if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
-    if (mat_data->isEmpty())
+    if (mat_data->isEmpty() || (mat_data->getCvType() != CV_32F && mat_data->getCvType() != CV_64F))
     {
       return cedar::proc::DataSlot::VALIDITY_ERROR;
     }

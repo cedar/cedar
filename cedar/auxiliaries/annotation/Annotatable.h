@@ -104,7 +104,10 @@ public:
   {
     for (size_t i = 0; i < this->mAnnotations.size(); ++i)
     {
-      if (typeid(*this->mAnnotations[i]) == typeid(T))
+      const cedar::aux::annotation::Annotation *annotation = this->mAnnotations[i].get();
+
+      // dont evaluate inside the typeid, explicitly derefer the AnnotationPtr
+      if (typeid(*annotation) == typeid(T))
       {
         return true;
       }
@@ -149,7 +152,10 @@ private:
   {
     for (size_t i = 0; i < this->mAnnotations.size(); ++i)
     {
-      if (typeid(*this->mAnnotations[i]) == typeid(T))
+      const cedar::aux::annotation::Annotation *annotation = this->mAnnotations[i].get();
+
+      // dont evaluate inside the typeid, explicitly derefer the AnnotationPtr
+      if (typeid(*annotation) == typeid(T))
       {
         return i;
       }
@@ -161,9 +167,14 @@ private:
   //!@brief Finds the index an annotation based on the type of a given object.
   size_t findAnnotation(cedar::aux::annotation::AnnotationPtr annotation) const
   {
+    const cedar::aux::annotation::Annotation *that_annotation = annotation.get();
+
     for (size_t i = 0; i < this->mAnnotations.size(); ++i)
     {
-      if (typeid(*this->mAnnotations[i]) == typeid(*annotation))
+      const cedar::aux::annotation::Annotation *this_annotation = this->mAnnotations[i].get();
+
+      // dont evaluate inside the typeid, explicitly derefer the AnnotationPtr
+      if (typeid(*this_annotation) == typeid(*that_annotation))
       {
         return i;
       }
@@ -176,9 +187,14 @@ private:
    */
   bool hasAnnotation(cedar::aux::annotation::AnnotationPtr annotation) const
   {
+    const cedar::aux::annotation::Annotation *that_annotation = annotation.get();
+
     for (size_t i = 0; i < this->mAnnotations.size(); ++i)
     {
-      if (typeid(*this->mAnnotations[i]) == typeid(*annotation))
+      const cedar::aux::annotation::Annotation *this_annotation = this->mAnnotations[i].get();
+
+      // dont evaluate inside the typeid, explicitly derefer the AnnotationPtr
+      if (typeid(*this_annotation) == typeid(*that_annotation))
       {
         return true;
       }

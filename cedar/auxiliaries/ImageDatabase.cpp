@@ -526,7 +526,7 @@ void cedar::aux::ImageDatabase::addCommandLineOptions(cedar::aux::CommandLinePar
   parser.defineValue
   (
     "sample-testing-selection-mode",
-    "Which mode to use for selecting testing samples.",
+    "Which mode to use for selecting testing samples. Possible values: not_in_training_set, by_tag, by_class, all",
     "not_in_training_set",
     0,
     sample_selection_group_name
@@ -541,6 +541,14 @@ void cedar::aux::ImageDatabase::addCommandLineOptions(cedar::aux::CommandLinePar
     sample_selection_group_name
   );
 
+  parser.defineValue
+  (
+    "sample-testing-classes",
+    "A class name or list of class names used for testing. If blank, all classes are used. Format: \"class 1, class 2, ..., class N\"",
+    "",
+    0,
+    sample_selection_group_name
+  );
 
   parser.defineValue
   (
@@ -548,7 +556,8 @@ void cedar::aux::ImageDatabase::addCommandLineOptions(cedar::aux::CommandLinePar
     "An instruction on how to restrict the sample selection. Possible instructions are: \n"
     "  \"unrestricted\": no restrictions,\n"
     "  \"first N\": selects only samples belonging to one of the first N classes.\n"
-    "  \"random N [seed M]\": selects a random subset of N classes from the database. The optional seed is used to initialize the RNG.",
+    "  \"random N [seed M]\": selects a random subset of N classes from the database. The optional seed is used to initialize the RNG.\n"
+    "  \"any_of 'class A' 'class B' ... 'class N'\": only images that contain any of the specified class(es) are used.",
     "unrestricted",
     0,
     sample_selection_group_name
@@ -1484,37 +1493,80 @@ void cedar::aux::ImageDatabase::writeSummary(std::ostream& stream)
 void cedar::aux::ImageDatabase::selectImages(std::set<ImagePtr>& images, cedar::aux::CommandLineParser& options) const
 {
   std::string instruction_str = options.getValue<std::string>("restrict-sample-selection");
-  std::vector<std::string> instruction_parts;
-  cedar::aux::split(instruction_str, " ", instruction_parts);
+  std::string instruction, arguments;
+  cedar::aux::splitFirst(instruction_str, " ", instruction, arguments);
 
-  CEDAR_ASSERT(instruction_parts.size() > 0);
-
-  const auto& instruction = instruction_parts.at(0);
   if (instruction == "first")
   {
-    CEDAR_ASSERT(instruction_parts.size() == 2);
-    unsigned int number = cedar::aux::fromString<unsigned int>(instruction_parts.at(1));
+    CEDAR_ASSERT(!arguments.empty());
+    unsigned int number = cedar::aux::fromString<unsigned int>(arguments);
 
     this->selectImagesFromFirstNClasses(images, number);
   }
   else if (instruction == "random")
   {
-    CEDAR_ASSERT(instruction_parts.size() >= 2);
-    unsigned int number = cedar::aux::fromString<unsigned int>(instruction_parts.at(1));
+    CEDAR_ASSERT(!arguments.empty());
+    std::vector<std::string> argument_strs;
+    cedar::aux::split(arguments, " ", argument_strs);
+    CEDAR_DEBUG_ASSERT(argument_strs.size() > 0);
+    unsigned int number = cedar::aux::fromString<unsigned int>(argument_strs.at(0));
 
     boost::optional<unsigned int> seed;
 
-    for (size_t part = 2; part < instruction_parts.size(); ++part)
+    for (size_t part = 1; part < argument_strs.size(); ++part)
     {
-      const auto& part_str = instruction_parts.at(part);
+      const auto& part_str = argument_strs.at(part);
       if (part_str == "seed")
       {
-        CEDAR_ASSERT(instruction_parts.size() > part + 1)
-        seed = cedar::aux::fromString<unsigned int>(instruction_parts.at(part + 1));
+        CEDAR_ASSERT(argument_strs.size() > part + 1)
+        seed = cedar::aux::fromString<unsigned int>(argument_strs.at(part + 1));
         ++part;
       }
     }
     this->selectImagesFromNRandomClasses(images, number, seed);
+  }
+  else if (instruction == "any_of")
+  {
+    CEDAR_ASSERT(!arguments.empty());
+
+    std::vector<std::string> accepted_classes;
+
+    bool in_string = false;
+    std::string current = "";
+    for (size_t i_c = 0; i_c < arguments.size(); ++i_c)
+    {
+      char c = arguments.at(i_c);
+      if (in_string)
+      {
+        switch (c)
+        {
+          case '\'':
+            in_string = false;
+            accepted_classes.push_back(current);
+            current = "";
+            break;
+
+          default:
+            current += c;
+            break;
+        }
+      }
+      else
+      {
+        switch (c)
+        {
+          case '\'':
+            in_string = true;
+            break;
+
+          default:
+            break;
+        }
+      }
+
+    }
+
+    this->selectImagesByClasses(images, accepted_classes);
   }
   else if (instruction == "unrestricted")
   {
@@ -1525,6 +1577,18 @@ void cedar::aux::ImageDatabase::selectImages(std::set<ImagePtr>& images, cedar::
   {
     CEDAR_THROW(cedar::aux::UnknownNameException, "Instruction \"" + instruction + "\" is not known; instruction string: \"" + instruction_str + "\"");
   }
+}
+
+void cedar::aux::ImageDatabase::selectImagesByClasses(std::set<ImagePtr>& images, const std::vector<std::string> classNames) const
+{
+  std::set<ClassId> accepted_classes;
+
+  for (const auto& class_name : classNames)
+  {
+    accepted_classes.insert(this->getClass(class_name));
+  }
+
+  selectImagesWithClassesInSet(images, accepted_classes);
 }
 
 void cedar::aux::ImageDatabase::selectImagesFromFirstNClasses(std::set<ImagePtr>& images, unsigned int numberOfClasses) const
@@ -1626,6 +1690,29 @@ std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getTest
   {
     std::string tag_selection = parser.getValue<std::string>("sample-testing-tags");
     images = this->getImagesByTagStr(tag_selection);
+  }
+  else if (mode == "by_class")
+  {
+    std::string class_selection = parser.getValue<std::string>("sample-testing-classes");
+
+    std::vector<std::string> classes;
+    cedar::aux::split(class_selection, ",", classes);
+    images.clear();
+
+    for (const auto& class_name : classes)
+    {
+      auto normalized = cedar::aux::removeLeadingAndTrailingWhiteSpaces(class_name);
+      auto class_images = this->getImagesWithClass(this->getClass(normalized));
+      images.insert(class_images.begin(), class_images.end());
+    }
+  }
+  else if (mode == "all")
+  {
+    // add all images to the test set
+    for (auto image : this->mImages)
+    {
+      images.insert(image);
+    }
   }
   else
   {

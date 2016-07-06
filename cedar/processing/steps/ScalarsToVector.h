@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,93 +22,71 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GroupDeclarationManager.h
+    File:        Multiplexer.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2014 02 14
+    Maintainer:  Guido Knips
+    Email:       guido.knips@ini.rub.de
+    Date:        2013 12 04
 
-    Description: Header file for the class cedar::proc::GroupDeclarationManager.
+    Description: Takes a number of scalar inputs and copies them into a one-dimensional vector
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GROUP_DECLARATION_MANAGER_H
-#define CEDAR_PROC_GROUP_DECLARATION_MANAGER_H
+#ifndef CEDAR_PROC_STEPS_MULTIPLEXER_H
+#define CEDAR_PROC_STEPS_MULTIPLEXER_H
 
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
+// LOCAL INCLUDES
+#include "cedar/processing/steps/ScalarsToVector.fwd.h"
 
-// CEDAR INCLUDES
-#include "cedar/auxiliaries/Singleton.h"
-
-// FORWARD DECLARATIONS
-#include "cedar/processing/GroupDeclarationManager.fwd.h"
-#include "cedar/processing/GroupDeclaration.fwd.h"
-#include "cedar/processing/Group.fwd.h"
-#include "cedar/processing/Element.fwd.h"
+// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <map>
+#include <cedar/processing/Step.h>
+#include <cedar/auxiliaries/MatData.h>
+#include <cedar/auxiliaries/UIntParameter.h>
+#include <vector>
 
-/*!@brief Manages declarations of group templates.
+
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::proc::GroupDeclarationManager
+class cedar::proc::steps::ScalarsToVector : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // friends
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::aux::Singleton<cedar::proc::GroupDeclarationManager>;
+  Q_OBJECT
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
 
-public:
-  //--------------------------------------------------------------------------------------------------------------------
-  // typedefs
-  //--------------------------------------------------------------------------------------------------------------------
-  //! a map of template names to group template definitions
-  typedef std::map<std::string, cedar::proc::ConstGroupDeclarationPtr> GroupDeclarationMap;
-private:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  //!@brief The standard constructor.
-  GroupDeclarationManager();
-
 public:
-  //!@brief Destructor
-  virtual ~GroupDeclarationManager();
+  //!@brief The standard constructor.
+  ScalarsToVector();
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // public slots
+  //--------------------------------------------------------------------------------------------------------------------
+public slots:
+  //@called when the vector dimension changes
+  void vectorDimensionChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief add a new declaration to the manager
-  void addDeclaration(cedar::proc::ConstGroupDeclarationPtr declaration);
-
-  /*! Adds a group template to the given group.
-   *
-   * @param templateName Name of the template to add.
-   * @param base Group to which the template is added.
-   * @param makeLink Whether the created group should be a link. Linked groups are added read-only and load the
-   *                 corresponding template from its file every time the base group is loaded.
-   * @return A pointer to the added group.
-   */
-  cedar::proc::ElementPtr addGroupTemplateToGroup
+  void inputConnectionChanged(const std::string& inputName);
+  //!@brief input verification
+  cedar::proc::DataSlot::VALIDITY determineInputValidity
   (
-    const std::string& templateName,
-    cedar::proc::GroupPtr base,
-    bool makeLink = false
-  )
-  const;
-
-  //!@brief get all definitions
-  const GroupDeclarationMap& getDefinitions() const;
-
-  //! Gets a declaration given a name. Throws a cedar::aux::NotFoundException when the name cannot be found.
-  cedar::proc::ConstGroupDeclarationPtr getDeclaration(const std::string& name) const;
-
-  //! Gets a declaration given a name. Returns a null pointer if the name cannot be found.
-  cedar::proc::ConstGroupDeclarationPtr getDeclarationNoThrow(const std::string& name) const;
+    cedar::proc::ConstDataSlotPtr slot,
+    cedar::aux::ConstDataPtr data
+  )const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -120,7 +98,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void compute(const cedar::proc::Arguments&);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -128,7 +106,13 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  //output vector
+  cedar::aux::MatDataPtr mOutput;
+  //input scalars
+  std::vector< cedar::aux::ConstMatDataPtr > mInputs;
+
+  // returns i-th slots name
+  std::string makeSlotName(const int i);
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -137,12 +121,10 @@ protected:
   // none yet
 
 private:
-  //! List of all declarations.
-  GroupDeclarationMap mDeclarations;
+  //Parameter for the dimension of the output vector
+  cedar::aux::UIntParameterPtr _mOutputDimension;
 
-}; // class cedar::proc::GroupDeclarationManager
+}; // cedar::proc::steps::Multiplexer
 
-CEDAR_PROC_SINGLETON(GroupDeclarationManager);
-
-#endif // CEDAR_PROC_GROUP_DECLARATION_MANAGER_H
+#endif // CEDAR_PROC_STEPS_MULTIPLEXER_H
 

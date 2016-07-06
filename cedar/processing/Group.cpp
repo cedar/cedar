@@ -40,6 +40,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Group.h"
+#include "cedar/processing/GroupDeclarationManager.h"
+#include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/CppScript.h"
 #include "cedar/processing/GroupFileFormatV1.h"
 #include "cedar/processing/Step.h"
@@ -420,6 +422,26 @@ std::set<cedar::proc::CppScriptPtr> cedar::proc::Group::getScripts() const
   }
   return scripts;
 }
+
+std::vector<cedar::proc::CppScriptPtr> cedar::proc::Group::getOrderedScripts() const
+{
+  std::set<std::string> script_names;
+  QReadLocker locker(this->mScripts.getLockPtr());
+  for (auto script : this->mScripts.member())
+  {
+    script_names.insert(script->getName());
+  }
+  locker.unlock();
+
+  std::vector<cedar::proc::CppScriptPtr> scripts;
+  for (const auto& script_name : script_names)
+  {
+    scripts.push_back(this->getScript(script_name));
+  }
+
+  return scripts;
+}
+
 
 cedar::proc::CppScriptPtr cedar::proc::Group::getScript(const std::string& name) const
 {
@@ -2806,6 +2828,13 @@ void cedar::proc::Group::revalidateConnections(const std::string& sender)
   }
 }
 
+void cedar::proc::Group::readLinkedTemplate(const std::string& templateName)
+{
+  auto declaration = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->getDeclaration(templateName);
+  this->mLinkedTemplateName = templateName;
+  this->readLinkedGroup(declaration->getGroupName(), declaration->getFileName());
+}
+
 void cedar::proc::Group::readLinkedGroup(const std::string& groupName, const cedar::aux::Path& fileName)
 {
   //!@todo This code is largely redundant with importGroupFromFile
@@ -2847,6 +2876,13 @@ void cedar::proc::Group::readLinkedGroup(const std::string& groupName, const ced
   }
 
   this->signalLinkedChanged(true);
+}
+
+cedar::proc::ElementPtr cedar::proc::Group::createLinkedTemplate(const std::string& groupName, const std::string& fileName, const std::string& templateName)
+{
+  auto group = cedar::aux::asserted_pointer_cast<cedar::proc::Group>(this->createLinkedGroup(groupName, fileName));
+  group->mLinkedTemplateName = templateName;
+  return group;
 }
 
 cedar::proc::ElementPtr cedar::proc::Group::createLinkedGroup(const std::string& groupName, const std::string& fileName)

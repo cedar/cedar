@@ -190,7 +190,7 @@ void cedar::proc::gui::ArchitectureScriptEditor::refreshScriptList()
 {
   this->mpScriptList->setRowCount(0);
 
-  for (auto script : this->mGroup->getGroup()->getScripts())
+  for (auto script : this->mGroup->getGroup()->getOrderedScripts())
   {
     this->addScriptToList(QString::fromStdString(script->getName()));
   }

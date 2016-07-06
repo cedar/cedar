@@ -301,6 +301,10 @@ namespace cedar
      */
     std::string removeWhiteSpaces(const std::string& stringFromWhichToRemoveWhiteSpaces);
 
+    /*! Removes all white space at the beginning and end of the string.
+     */
+    std::string removeLeadingAndTrailingWhiteSpaces(const std::string& stringFromWhichToRemoveWhiteSpaces);
+
     /*!@brief Template function that converts an STL string to a simple data type.
      *
      * @param value The data value that will be converted to a string.

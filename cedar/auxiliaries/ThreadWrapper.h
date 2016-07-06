@@ -149,23 +149,11 @@ public:
   bool stopRequested();
 
 
+  //! wait for the thread to finish. The calling thread will pause! deprecated: use without timing parameter or use requestStop() and sleep() to avoid subtle bugs.
+  CEDAR_DECLARE_DEPRECATED(bool wait(cedar::unit::Time time));
   //! wait for the thread to finish. The calling thread will pause!
-  inline bool wait(cedar::unit::Time time = std::numeric_limits<double>::max() * cedar::unit::seconds)
-  {
-    bool ret = false;
-
-    if (isValidThread())
-    {
-      cedar::unit::Time milli_second(1.0 * cedar::unit::milli * cedar::unit::second);
-      int time_int = static_cast<int>(time / milli_second);
-
-      // QThread.wait() takes an integer in milliseconds
-      ret = mpThread->wait(time_int);
-    }
-
-    return ret;
-  }
-
+  bool wait();
+  
   /*! connect to the signal that is sent when the thread will be stopped via stop()
    * In most cases, you would want to call connectToQuitSignal()!
    *

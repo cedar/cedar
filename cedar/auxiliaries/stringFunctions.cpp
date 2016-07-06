@@ -59,6 +59,13 @@ std::string cedar::aux::removeWhiteSpaces(const std::string& stringFromWhichToRe
   return result;
 }
 
+std::string cedar::aux::removeLeadingAndTrailingWhiteSpaces(const std::string& stringFromWhichToRemoveWhiteSpaces)
+{
+  size_t leading = stringFromWhichToRemoveWhiteSpaces.find_first_not_of(" \r\n\t");
+  size_t trailing = stringFromWhichToRemoveWhiteSpaces.find_last_not_of(" \r\n\t");
+  return stringFromWhichToRemoveWhiteSpaces.substr(leading, (trailing - leading + 1));
+}
+
 std::string cedar::aux::formatDuration(const cedar::unit::Time& time)
 {
   struct TimeSubdiv

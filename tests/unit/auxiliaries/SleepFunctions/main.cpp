@@ -61,7 +61,8 @@ bool checkTime(long expiredMilliseconds, cedar::unit::Time expectedTime)
   }
   else
   {
-    threshold = 5; // deviations of up to 5 milliseconds are allowed
+    threshold = 8; // deviations of up to 5 milliseconds are allowed
+                   // jokeit: the timer seems to be less accurate on Macs
   }
   return fabs(static_cast<double>(expiredMilliseconds) - expected_milliseconds) < threshold;
 }
