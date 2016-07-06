@@ -213,10 +213,7 @@ cedar::dev::ComponentPtr cedar::proc::details::ComponentStepGroupParameter::getC
   }
   else
   {
-   CEDAR_THROW
-   (
-     cedar::dev::NoComponentSelectedException, "No robotic component selected for \"" + this->getName() + "\". Please set the parameter to an initialized robot from the robot manager."
-   );
+   return NULL;
   }
 }
 

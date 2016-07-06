@@ -263,7 +263,28 @@
   		    } 
   		  }
       }
-     }
+     },
+     "camera":
+     {
+      "available components":
+      {
+        "yarp":
+        {
+          "cedar.dev.YarpCamera":
+          {
+            "requires channel": "yarp",
+            "readPortName": "webots/youbotColorCameraStatusFramework"
+          }
+        }
+      },
+      "shared component parameters":
+      {
+  		  "name": "YoubotCamera",
+  		  "pictureSizeX" : "200",
+  		  "pictureSizeY" : "200",
+  		  "cvMatType" : "CV_8UC3"
+  	  }
+  	 }
   },
   "available channels":
   {

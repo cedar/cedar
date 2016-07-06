@@ -63,8 +63,7 @@
 class cedar::dev::Component::DataCollection
 {
   public:
-    DataCollection()
-    :
+    DataCollection():
     mCommunicationErrorCount(20)
     {
     }
@@ -131,11 +130,11 @@ class cedar::dev::Component::DataCollection
       return found;
     }
 
-    void setDimensionality(cedar::dev::Component::ComponentDataType type, DimensionalityType dim)
+    void setDimensionality(cedar::dev::Component::ComponentDataType type, DimensionalityType dim, int matrixType)
     {
       mInstalledDimensions[type] = dim;
 
-      this->resetBuffers(type);
+      this->resetBuffers(type, matrixType);
     }
 
     cedar::dev::Component::DimensionalityType getDimensionality(cedar::dev::Component::ComponentDataType type) const
@@ -148,14 +147,14 @@ class cedar::dev::Component::DataCollection
       return iter->second;
     }
 
-    void resetUserBufferUnlocked(cedar::dev::Component::ComponentDataType type)
+    void resetUserBufferUnlocked(cedar::dev::Component::ComponentDataType type, int matrixType)
     {
-      this->resetBufferUnlocked(mUserBuffer, type);
+      this->resetBufferUnlocked(mUserBuffer, type, matrixType);
     }
 
-    void resetPreviousDeviceBufferUnlocked(ComponentDataType type)
+    void resetPreviousDeviceBufferUnlocked(ComponentDataType type,int matrixType)
     {
-      this->resetBufferUnlocked(mPreviousDeviceBuffer, type);
+      this->resetBufferUnlocked(mPreviousDeviceBuffer, type, matrixType);
     }
 
     void setUserBuffer(ComponentDataType type, cv::Mat data)
@@ -413,7 +412,7 @@ class cedar::dev::Component::DataCollection
       this->lazyInitializeUnlocked(mInitialUserSubmittedData, type);
     }
 
-    virtual void resetBuffers(cedar::dev::Component::ComponentDataType type)
+    virtual void resetBuffers(cedar::dev::Component::ComponentDataType type, int matrixType)
     {
       cedar::aux::LockSet lock_set;
       cedar::aux::append(lock_set, mUserBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
@@ -422,9 +421,9 @@ class cedar::dev::Component::DataCollection
       cedar::aux::LockSetLocker locker(lock_set);
       if (this->hasType(type))
       {
-        this->resetBufferUnlocked(mUserBuffer, type);
-        this->resetBufferUnlocked(mPreviousDeviceBuffer, type);
-        this->resetBufferUnlocked(mInitialUserSubmittedData, type);
+        this->resetBufferUnlocked(mUserBuffer, type, matrixType);
+        this->resetBufferUnlocked(mPreviousDeviceBuffer, type, matrixType);
+        this->resetBufferUnlocked(mInitialUserSubmittedData, type, matrixType);
       }
     }
 
@@ -538,7 +537,7 @@ class cedar::dev::Component::DataCollection
       }
     }
 
-    void resetBufferUnlocked(cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type)
+    void resetBufferUnlocked(cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type,int matrixType)
     {
       auto found = mInstalledDimensions.find(type);
 
@@ -553,7 +552,7 @@ class cedar::dev::Component::DataCollection
       auto dim = found->second;
 
       // todo: check for higher-order tensors
-      bufferData.member()[type]->setData(cv::Mat::zeros(dim[0], dim[1], COMPONENT_CV_MAT_TYPE));
+      bufferData.member()[type]->setData(cv::Mat::zeros(dim[0], dim[1], matrixType));
     }
 
   public:
@@ -582,6 +581,7 @@ class cedar::dev::Component::DataCollection
 
     //! The last things that went wrong during communication.
     cedar::aux::LockableMember<std::deque<std::string> > mLastCommunicationErrorMessages;
+
 };
 
 class cedar::dev::Component::MeasurementDataCollection : public cedar::dev::Component::DataCollection
@@ -607,9 +607,9 @@ public:
     this->setDataUnlocked(mDeviceRetrievedData, type, data);
   }
 
-  void resetDeviceRetrievedBufferUnlocked(ComponentDataType type)
+  void resetDeviceRetrievedBufferUnlocked(ComponentDataType type ,int matrixType)
   {
-    this->resetBufferUnlocked(mDeviceRetrievedData, type);
+    this->resetBufferUnlocked(mDeviceRetrievedData, type, matrixType);
   }
 
 public:
@@ -624,14 +624,14 @@ protected:
     this->lazyInitializeUnlocked(mDeviceRetrievedData, type);
   }
 
-  virtual void resetBuffers(cedar::dev::Component::ComponentDataType type)
+  virtual void resetBuffers(cedar::dev::Component::ComponentDataType type, int matrixType)
   {
-    this->DataCollection::resetBuffers(type);
+    this->DataCollection::resetBuffers(type, matrixType);
 
     QWriteLocker locker(mDeviceRetrievedData.getLockPtr());
     if (this->hasType(type))
     {
-      this->resetBufferUnlocked(mDeviceRetrievedData, type);
+      this->resetBufferUnlocked(mDeviceRetrievedData, type, matrixType);
     }
   }
 };
@@ -650,9 +650,9 @@ public:
     this->setDataUnlocked(mDeviceSubmittedData, type, data);
   }
 
-  void resetDeviceSubmittedBufferUnlocked(ComponentDataType type)
+  void resetDeviceSubmittedBufferUnlocked(ComponentDataType type, int matrixType)
   {
-    this->resetBufferUnlocked(mDeviceSubmittedData, type);
+    this->resetBufferUnlocked(mDeviceSubmittedData, type, matrixType);
   }
 
 public:
@@ -668,14 +668,14 @@ protected:
     this->lazyInitializeUnlocked(mDeviceSubmittedData, type);
   }
 
-  virtual void resetBuffers(cedar::dev::Component::ComponentDataType type)
+  virtual void resetBuffers(cedar::dev::Component::ComponentDataType type, int matrixType)
   {
-    this->MeasurementDataCollection::resetBuffers(type);
+    this->MeasurementDataCollection::resetBuffers(type, matrixType);
 
     QWriteLocker locker(mDeviceSubmittedData.getLockPtr());
     if (this->hasType(type))
     {
-      this->resetBufferUnlocked(mDeviceSubmittedData, type);
+      this->resetBufferUnlocked(mDeviceSubmittedData, type, matrixType);
     }
   }
 };
@@ -716,13 +716,16 @@ void cedar::dev::Component::init()
 
 // constructor
 cedar::dev::Component::Component()
+:
+    mMatrixType(new cedar::aux::StringParameter(this, "cvMatType", "CV_64F"))
 {
   init();
 }
 
 cedar::dev::Component::Component(cedar::dev::ChannelPtr channel)
 :
-mChannel(channel)
+mChannel(channel),
+mMatrixType(new cedar::aux::StringParameter(this, "cvMatType", "CV_64F"))
 {
   init();
 }
@@ -905,12 +908,12 @@ cedar::aux::DataPtr cedar::dev::Component::getDeviceCommandData(const ComponentD
 
 void cedar::dev::Component::setCommandDimensionality(ComponentDataType type, DimensionalityType dim)
 {
-  this->mCommandData->setDimensionality(type, dim);
+  this->mCommandData->setDimensionality(type, dim,this->getMeasurementMatrixType());
 }
 
 void cedar::dev::Component::setMeasurementDimensionality(ComponentDataType type, DimensionalityType dim)
 {
-  this->mMeasurementData->setDimensionality(type, dim);
+  this->mMeasurementData->setDimensionality(type, dim,this->getMeasurementMatrixType());
 }
 
 void cedar::dev::Component::setCommandAndMeasurementDimensionality(ComponentDataType type, DimensionalityType dim)
@@ -923,14 +926,14 @@ void cedar::dev::Component::setCommandDimensionality(ComponentDataType type, uns
 {
   DimensionalityType fulldim{ dim };
 
-  this->mCommandData->setDimensionality(type, fulldim);
+  this->mCommandData->setDimensionality(type, fulldim,this->getMeasurementMatrixType());
 }
 
 void cedar::dev::Component::setMeasurementDimensionality(ComponentDataType type, unsigned int dim)
 {
   DimensionalityType fulldim{ dim };
 
-  this->mMeasurementData->setDimensionality(type, fulldim);
+  this->mMeasurementData->setDimensionality(type, fulldim,this->getMeasurementMatrixType());
 }
 
 void cedar::dev::Component::setCommandAndMeasurementDimensionality(ComponentDataType type, unsigned int dim)
@@ -959,6 +962,7 @@ void cedar::dev::Component::installCommandAndMeasurementType(ComponentDataType t
 
 void cedar::dev::Component::resetComponent()
 {
+  int matrixType = this->getMeasurementMatrixType();
   {
     cedar::aux::LockSet locks;
     cedar::aux::append(locks, this->mMeasurementData->mUserBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
@@ -968,9 +972,9 @@ void cedar::dev::Component::resetComponent()
 
     for (auto& type : this->mMeasurementData->getInstalledTypesUnlocked())
     {
-      this->mMeasurementData->resetUserBufferUnlocked(type);
-      this->mMeasurementData->resetPreviousDeviceBufferUnlocked(type);
-      this->mMeasurementData->resetDeviceRetrievedBufferUnlocked(type);
+      this->mMeasurementData->resetUserBufferUnlocked(type, matrixType);
+      this->mMeasurementData->resetPreviousDeviceBufferUnlocked(type, matrixType);
+      this->mMeasurementData->resetDeviceRetrievedBufferUnlocked(type, matrixType);
     }
   }
 
@@ -982,8 +986,8 @@ void cedar::dev::Component::resetComponent()
 
     for(auto& type : this->mCommandData->getInstalledTypes())
     {
-      this->mCommandData->resetUserBufferUnlocked(type);
-      this->mCommandData->resetDeviceSubmittedBufferUnlocked(type);
+      this->mCommandData->resetUserBufferUnlocked(type,matrixType);
+      this->mCommandData->resetDeviceSubmittedBufferUnlocked(type,matrixType);
     }
   }
 }
@@ -1817,7 +1821,7 @@ cv::Mat cedar::dev::Component::differentiateDevice(cedar::unit::Time dt, cv::Mat
 
   if (unitless == 0.0)
   {
-    return cv::Mat::zeros( data.rows, data.cols, CV_64F ); 
+    return cv::Mat::zeros( data.rows, data.cols, this->getMeasurementMatrixType() );
   }
 
 //  std::cout << unitless << std::endl;
@@ -1840,7 +1844,7 @@ cv::Mat cedar::dev::Component::differentiateDeviceTwice(cedar::unit::Time dt, cv
 
   if (unitless == 0.0)
   {
-    return cv::Mat::zeros( data.rows, data.cols, CV_64F ); 
+    return cv::Mat::zeros( data.rows, data.cols, this->getMeasurementMatrixType() );
   }
 // todo: check locking here
   //!@todo check if this uses the right time step to differentiate
@@ -2202,5 +2206,36 @@ std::string cedar::dev::Component::prettifyName() const
   }
 
   return ret;
+}
+
+int cedar::dev::Component::getMeasurementMatrixType()
+{
+  std::string typeString = mMatrixType->getValue();
+
+  if(typeString == "CV_32F" || typeString == "CV_32FC1" )
+     return CV_32F;
+  else if(typeString == "CV_32FC2")
+    return CV_32FC2;
+  else if(typeString == "CV_32FC3")
+    return CV_32FC3;
+  else if(typeString == "CV_64F" || typeString == "CV_64FC1" )
+         return CV_64F;
+  else if(typeString == "CV_64FC2")
+      return CV_64FC2;
+  else if(typeString == "CV_64FC3")
+      return CV_64FC3;
+  else if(typeString == "CV_8U" || typeString == "CV_8UC1" )
+           return CV_8U;
+  else if(typeString == "CV_8UC2")
+        return CV_8UC2;
+  else if(typeString == "CV_8UC3")
+        return CV_8UC3;
+  else if(typeString == "CV_8UC4")
+         return CV_8UC4;
+  else
+  {
+    std::cout<<"The type: "<< typeString <<" given in the cvMatType parameter is not supported yet. Using the default value CV_64F"<<std::endl;
+    return CV_64F;
+  }
 }
 
