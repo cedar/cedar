@@ -47,8 +47,14 @@ endif(CEDAR_USE_LIB_DC1394)
 
 cedar_add_library(cedardev
                   MOC_HEADERS
+                  Component.h
+                  KinematicChain.h
+                  SimulatedKinematicChain.h
+                  YarpKinematicChain.h
                   SerialChannel.h
                   Odometry.h
+                  Vehicle.h
+                  YarpVehicle.h
                   gui/KinematicChainWidget.h
                   gui/KinematicChainMonitorWidget.h
                   gui/KinematicChainCommandWidget.h

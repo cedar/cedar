@@ -63,23 +63,37 @@ cedar::dev::ComponentParameter::~ComponentParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::dev::ComponentParameter::hasComponentSlot() const
+{
+  if(auto component = this->mWeakComponent.lock())
+  {
+  return static_cast<bool>(component);
+  }
+  else
+  {
+    return false;
+  }
+}
+
 cedar::dev::ComponentPtr cedar::dev::ComponentParameter::getValue() const
 {
-  if (this->mComponent)
+  if (this->hasComponentSlot())
   {
-    return this->mComponent->getComponent();
+    auto sharedComponent = this->mWeakComponent.lock();
+    return sharedComponent->getComponent();
   }
   CEDAR_THROW
   (
-    cedar::dev::NoComponentSelectedException, "The parameter" + this->getName() + "does not point to a component."
+    cedar::dev::NoComponentSelectedException, "No robotic component selected for \"" + this->getName() + "\". Please set the parameter to an initialized robot from the robot manager."
   );
 }
 
 std::string cedar::dev::ComponentParameter::getStringRepresentation() const
 {
-  if (this->mComponent)
+
+  if (auto component = this->mWeakComponent.lock())
   {
-    return this->mComponent->getPath();
+    return component->getPath();
   }
   else
   {
@@ -89,7 +103,7 @@ std::string cedar::dev::ComponentParameter::getStringRepresentation() const
 
 void cedar::dev::ComponentParameter::setValue(cedar::dev::ComponentSlotPtr component)
 {
-  this->mComponent = component;
+  this->mWeakComponent = component;
   this->emitChangedSignal();
 }
 
@@ -113,5 +127,5 @@ void cedar::dev::ComponentParameter::writeToNode(cedar::aux::ConfigurationNode& 
 void cedar::dev::ComponentParameter::makeDefault()
 {
   //!@todo Can this be set to something proper?
-  mComponent.reset();
+  this->mWeakComponent.reset();
 }

@@ -97,9 +97,9 @@ void cedar::dev::gui::KinematicChainCommandWidget::setSingleStep(double singleSt
 
 void cedar::dev::gui::KinematicChainCommandWidget::changeWorkingMode(int mode)
 {
-  // the kinematic chain has no working mode, anymore. this only has
-  // relevance for the user of this widget.
+  // we have to reset the used command in here
   mpModeBox->setCurrentIndex(mode);
+  mpKinematicChain->clearUserCommand();
   update();
 }
 
@@ -129,12 +129,19 @@ void cedar::dev::gui::KinematicChainCommandWidget::commandJoints()
 
 void cedar::dev::gui::KinematicChainCommandWidget::stopMovement()
 {
-  // js: don't need to change the user selection mpModeBox->setCurrentIndex(1);
-  for(unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
+  mpKeepMovingBox->setChecked(false);
+
+  mpKinematicChain->startBrakingSlowly();
+
+#if 0
+  mpKinematicChain->clearUserCommand();
+  for (unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
   {
     mpKinematicChain->setJointVelocity(j, 0);
   }
+#endif  
   update();
+  //mpKinematicChain->clearUserCommand();
 }
 
 void cedar::dev::gui::KinematicChainCommandWidget::update()
@@ -222,7 +229,7 @@ void cedar::dev::gui::KinematicChainCommandWidget::initWindow()
   connect(copy_button, SIGNAL(pressed()), this, SLOT(update()));
 
   // stop button
-  QPushButton* stop_button = new QPushButton(QApplication::translate("KinematicChainWindow", "stop!"));
+  QPushButton* stop_button = new QPushButton(QApplication::translate("KinematicChainWindow", "brake now!"));
   mpGridLayout->addWidget(stop_button, 4, 0);
   connect(stop_button, SIGNAL(pressed()), this, SLOT(stopMovement()));
 

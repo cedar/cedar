@@ -38,6 +38,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/namespace.h"
+#include "cedar/devices/SimulatedKinematicChain.fwd.h"
 #include "cedar/devices/KinematicChain.h"
 
 // SYSTEM INCLUDES
@@ -50,6 +51,7 @@
  */
 class cedar::dev::SimulatedKinematicChain : public cedar::dev::KinematicChain
 {
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -63,36 +65,31 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief check whether the kinematic chain is currently responsive to movement commands
-   *
-   * @return    state
-   */
-  bool isMovable() const;
+  bool applyCrashbrake() override;
 
-  /*!@brief get current state of a single joint angle
-   *
-   * @return    joint angle value
-   */
-  double getJointAngle(unsigned int index) const;
-  
-  /*!@brief set current state of a single joint angle
-   *
-   * @param index    specifies the joint
-   * @param angle    new joint angle value
-   */
-  void setJointAngle(unsigned int index, double angle);
-  
-
+public slots:
+  //!@brief reacts to a change in the number of joints and sets an almost-zero initial configuration
+  void updateInitialConfiguration();
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+
+  void sendSimulatedAngles(cv::Mat mat);
+  cv::Mat retrieveSimulatedAngles();
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+
   // none yet
   
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  std::map< ComponentDataType, cv::Mat > mSimulation;
+  mutable QReadWriteLock mSimulationLock;
 
 }; // class cedar::dev::SimulatedKinematicChain
 #endif // CEDAR_DEV_SIMULATED_KINEMATIC_CHAIN_H

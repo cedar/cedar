@@ -40,10 +40,13 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/FileParameter.h"
-#include "cedar/devices/namespace.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/ObjectMapParameterTemplate.fwd.h"
+#include "cedar/devices/Channel.fwd.h"
+#include "cedar/devices/Component.fwd.h"
+#include "cedar/devices/ComponentSlot.fwd.h"
+#include "cedar/devices/Robot.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -121,8 +124,8 @@ public:
   //!@returns A list of all channels of this robot.
   std::vector<std::string> listChannels() const;
 
-  //!@brief Sets the channel for all components in the robot.
-  void setChannel(const std::string& channel);
+  //!@brief Sets the configuration for all components in the robot.
+  void instantiateComponentConfiguration(const std::string& configurationName);
 
   //!@brief Sets the channel for all components in the robot.
   cedar::dev::ConstChannelPtr getChannel(const std::string& channel) const;
@@ -140,6 +143,28 @@ public:
     return boost::dynamic_pointer_cast<T>(component);
   }
 
+  //! Allocates the channel of the given name.
+  void allocateChannel(const std::string& channelName);
+
+  //! start the hardware, start communication
+  void startCommunicationOfComponents(bool suppressUserSideInteraction=false);
+  //! stop the hardware
+  void stopCommunicationOfComponents();
+  //  HW is on?
+  bool areSomeComponentsCommunicating() const;
+  //  HW is on?
+  bool areAllComponentsCommunicating() const;
+  
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+private:
   /*!@brief Opens all channels that are in use.
    */
   void openChannels();
@@ -156,16 +181,7 @@ public:
    */
   unsigned int getNumberOfChannels() const;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // private methods
-  //--------------------------------------------------------------------------------------------------------------------
-private:
   //!@brief Read a configuration for all registered parameters from a cedar::aux::ConfigurationNode.
   virtual void readDescription(const cedar::aux::ConfigurationNode& node);
 
@@ -178,11 +194,11 @@ private:
   //! Reads the channels and their configurations and instantiates the selected channels.
   void readChannels(const cedar::aux::ConfigurationNode& node);
 
-  //! Allocates the channel of the given name.
-  void allocateChannel(const std::string& channelName);
-
   //! Clears all components and channels.
   void clear();
+
+  //! Merges channel parameters from the description and the instantiation
+  void appendChannelConfiguration(const std::string& channelName, const cedar::aux::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -204,7 +220,7 @@ private:
   ComponentSlotParameter mComponentSlots;
 
   //! Configurable object used for storing robot setup in a separate file.
-  cedar::aux::ConfigurablePtr mRobotDescription;
+//  cedar::aux::ConfigurablePtr mRobotDescription;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

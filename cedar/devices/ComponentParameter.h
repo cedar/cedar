@@ -41,8 +41,12 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/devices/Component.fwd.h"
+#include "cedar/devices/ComponentSlot.fwd.h"
+#include "cedar/devices/ComponentParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -88,6 +92,9 @@ public:
   //! Returns the string-representation of the currently selected component.
   std::string getStringRepresentation() const;
 
+  //! Checks if a component has been assigned to the component slot in this parameter.
+  bool hasComponentSlot() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -106,7 +113,7 @@ private:
 protected:
   // none yet
 private:
-  cedar::dev::ComponentSlotPtr mComponent;
+  boost::weak_ptr<cedar::dev::ComponentSlot> mWeakComponent;
 
 }; // class cedar::dev::ComponentParameter
 

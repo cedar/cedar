@@ -68,6 +68,7 @@ cedar_add_library(cedarproc
   gui/ArchitectureScriptEditor.h
   gui/stepViews/BoostView.h
   gui/stepViews/StaticGainView.h
+  gui/stepViews/ComponentStepView.h
   gui/AdvancedParameterLinker.h
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureWidget.h
@@ -106,6 +107,8 @@ cedar_add_library(cedarproc
   steps/ColorConversion.h
   steps/ComponentMultiply.h
   steps/CoordinateTransformation.h
+  steps/ForwardKinematicsStep.h
+  steps/InverseKinematicsPseudoStep.h
   steps/MatrixMultiply.h
   steps/MatrixPadding.h
   steps/MatrixSlice.h

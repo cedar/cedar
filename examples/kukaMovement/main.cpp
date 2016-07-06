@@ -36,8 +36,10 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
+#include "cedar/devices/Robot.h"
 #include "cedar/devices/kuka/gui/FriStatusWidget.h"
 #include "cedar/devices/gui/KinematicChainMonitorWidget.h"
+#include "cedar/devices/kuka/KinematicChain.h"
 #include "cedar/devices/KinematicChain.h"
 #include "cedar/devices/gl/KinematicChain.h"
 #include "cedar/devices/gl/KukaArm.h"
@@ -74,22 +76,36 @@ public:
     cedar::aux::LocalCoordinateFramePtr target
   )
   :
-  mTarget(target)
+  mpArm(arm),
+  mTarget(target),
+  mSpeed(.05), // movement speed in m/s
+  mCloseDistance(0.02),
+  mGotTargetPosition(false)
   {
-    mpArm = arm;
-    mSpeed = .05; // movement speed, in meters / second
-    mCloseDistance = 0.02;
   };
 
 private:
+
   // step function calculating and passing the movement command for each time step
   void step(cedar::unit::Time)
   {
-    // update state variables
-    mpArm->updateTransformations();
+    if (!mpArm)
+      return;
 
-    // if movable, calculate and pass movement command
-    if (mpArm->isMovable())
+    if (!mGotTargetPosition)
+    {
+      if (!mpArm->isReadyForMeasurements())
+        return;
+
+      mTarget->setTranslation(cedar::unit::LengthMatrix(mpArm->calculateEndEffectorPosition(), 1.0 * cedar::unit::meters));
+
+      mGotTargetPosition= true;
+    }
+    else if (!mpArm->isReadyForCommands())
+    {
+      return;
+    }
+    else
     {
       // calculate direction of movement
       cv::Mat vector_to_target_hom
@@ -135,13 +151,15 @@ private:
   double mSpeed;
   //! distance below which the movement is reduced
   double mCloseDistance;
+  bool mGotTargetPosition;
+
 };
 
 
 int main(int argc, char **argv)
 {
   std::string mode = "0";
-  std::string configuration_file = cedar::aux::locateResource("configs/kuka_lwr4.json");
+
   // help requested?
   if ((argc == 2) && (std::string(argv[1]) == "-h"))
   { // Check the value of argc. If not enough parameters have been passed, inform user and exit.
@@ -162,6 +180,7 @@ int main(int argc, char **argv)
     }
   }
   bool use_hardware = false;
+
   if (mode == "hardware")
   {
     use_hardware = true;
@@ -171,40 +190,43 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create interface to the arm
-  cedar::dev::kuka::gui::FriStatusWidget* p_fri_status_widget = 0;
+  auto robot = boost::make_shared< cedar::dev::Robot >();
   cedar::dev::KinematicChainPtr arm;
+
+  cedar::dev::kuka::gui::FriStatusWidget* p_fri_status_widget = 0;
 
   if (use_hardware)
   {
     // hardware interface
-    cedar::dev::kuka::KinematicChainPtr lwr4(new cedar::dev::kuka::KinematicChain());
-    lwr4->readJson(configuration_file);
-    arm = lwr4;
+    robot->readJson("resource://robots/caren/fri_configuration.json");
+    arm= robot->getComponent< cedar::dev::kuka::KinematicChain >("arm");
+
+    cedar::dev::kuka::FRIChannelPtr fri_channel = boost::dynamic_pointer_cast< cedar::dev::kuka::FRIChannel >( arm->getChannel() );
     // status widget
-    p_fri_status_widget = new cedar::dev::kuka::gui::FriStatusWidget(lwr4);
+    p_fri_status_widget = new cedar::dev::kuka::gui::FriStatusWidget(fri_channel);
     p_fri_status_widget->startTimer(100);
     p_fri_status_widget->show();
   }
   else
   {
-    // simulated arm
-    cedar::dev::KinematicChainPtr sim(new cedar::dev::SimulatedKinematicChain());
-    sim->readJson(configuration_file);
-    arm = sim;
-
+    robot->readJson("resource://robots/caren/simulator_configuration.json");
+    arm= robot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
   }
 
   // define some initial configurations we can choose from
   double initial_config1[][1] = { {0.1}, {0.2}, {0.1}, {0.2}, {0.0}, {0.2}, {0.0} };
-  std::map< std::string, cv::Mat > initial_configs = {
+  std::map< std::string, cv::Mat > initial_robots = {
     {"near zero", cv::Mat( 7, 1, CV_64F, initial_config1) },
-    // add your configs here ...
+    // add your robots here ...
   };
-  arm->setInitialConfigurations( initial_configs );
+
+  arm->setInitialConfigurations( initial_robots );
 
   // set simulated arm to initial configuration
   if (!use_hardware)
+  {
     arm->applyInitialConfiguration("near zero");
+  }
 
   // create the scene for the visualization
   cedar::aux::gl::ScenePtr scene(new cedar::aux::gl::Scene);
@@ -224,8 +246,7 @@ int main(int argc, char **argv)
 
   // create target object, visualize it and add it to the scene
   cedar::aux::LocalCoordinateFramePtr target(new cedar::aux::LocalCoordinateFrame());
-  arm->updateTransformations();
-  target->setTranslation(cedar::unit::LengthMatrix(arm->calculateEndEffectorPosition(), 1.0 * cedar::unit::meters));
+
   cedar::aux::gl::ObjectVisualizationPtr sphere(new cedar::aux::gl::Sphere(target, 0.055, 0, 1, 0));
   sphere->setDrawAsWireFrame(true);
   scene->addObjectVisualization(sphere);
@@ -244,18 +265,15 @@ int main(int argc, char **argv)
 
   // create the worker thread
   WorkerThread worker(arm, target);
-  worker.setStepSize(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
-
+  worker.setStepSize(arm->getCommunicationStepSize());
   // start everything
-  arm->start();
+  arm->startCommunication();
   worker.start();
   a.exec();
 
   // clean up
   worker.stop();
-  worker.wait();
-  arm->stop();
-  arm->wait();
+  arm->stopCommunication();
   if (use_hardware)
   {
     delete p_fri_status_widget;

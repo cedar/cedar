@@ -97,21 +97,10 @@ class cedar::aux::CallOnScopeExit
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CallOnScopeExit(const boost::function<void ()>& function)
-  :
-  mFunctionToCall(function),
-  mCall(true)
-  {
-  }
+  CallOnScopeExit(const boost::function<void ()>& function);
 
   //!@brief Destructor
-  virtual ~CallOnScopeExit()
-  {
-    if (this->mCall)
-    {
-      this->mFunctionToCall();
-    }
-  }
+  virtual ~CallOnScopeExit();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -120,26 +109,22 @@ public:
   /*! Calls the function. It will then no longer be called when the object is destroyed, unless
     * cedar::aux::CallOnScopeExit::resetCall is called.
     */
-  void callNow()
-  {
-    this->mCall = false;
-    this->mFunctionToCall();
-  }
+  void callNow();
 
   /*! Resets the internal call variable, meaning, that the function will again be called when the object is destroyed.
    *
    * @see cedar::aux::CallOnScopeExit::callNow
    */
-  void resetCall()
-  {
-    this->mCall = true;
-  }
+  void resetCall();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  /*! This needs to be called by derived classes if the function to be called on scope exit accesses members of the
+   *  Derived classes. Otherwise, these classes will access invalid memory.
+   */
+  void preDestruct();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

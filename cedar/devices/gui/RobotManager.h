@@ -84,6 +84,8 @@ signals:
 
   void robotConfigurationLoaded(QString addedRobotName);
 
+  void closeRobotManager();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -113,6 +115,8 @@ private:
 
   void fillExistingRobots();
 
+  void robotRenamed(const std::string& oldName, const std::string& newName);
+
 private slots:
   void loadConfigurationTriggered();
 
@@ -128,10 +132,11 @@ private slots:
 
   void partSelected(QTreeWidgetItem* pCurrent, QTreeWidgetItem* pPrevious);
 
-  void simpleModeAddClicked();
+  void simpleModeAdd();
 
   void removeClicked();
 
+  void closeWindow();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -141,6 +146,7 @@ private:
   boost::signals2::connection mRobotAddedConnection;
   boost::signals2::connection mRobotConfigurationChangedConnection;
   boost::signals2::connection mRobotRemovedConnection;
+  boost::signals2::scoped_connection mRobotRenamedConnection;
 
   QTreeWidgetItem* mpComponentsNode;
   QTreeWidgetItem* mpChannelsNode;

@@ -58,6 +58,9 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
+  /*!@brief constructor*/
+  Block();
+
   /*!@brief constructor. 
    * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    * @param length extension of the block in x-direction of the object coordinate frame

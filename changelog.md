@@ -90,6 +90,24 @@ Unreleased
     less space than the CSV format, is therefore faster to write out, and does not truncate matrix values).
     Which format is used can be chosen in the settings dialog of cedar.
 
+Robotics Components
+===================
+
+- The new robotics framework unifies the communication with hardware in the new Component class. A corresponding Component step allows for easy and standarized interaction inside the GUI, thus allowing you to switch your robot component (or switch from hardware to simulation).
+- Configuration of robot hardware is stored in the JSON format in the ressources folder
+- GUI: connect to your Robot in the new Robot manager
+- GUI: create a Component step and link it to the desired hardware Component (of your robot)
+- code: The Component class handles the buffering of incoming and outgoing data and threaded processing of it.
+- code: Children of Components implement their variations of accessing the Component buffers. Typical Children are: KinematicChain
+- code: The Robot class now acts as a container for Components. the way to intstantiate a component and robot is now:
+
+  auto robot = boost::make_shared< cedar::dev::Robot >;
+  robot->readJson("resource://robots/myrobot/myconfiguration.json");
+  auto arm = robot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
+
+- code: The children of the Channel class implement the methods talking to the hardware. There is only one Channel type of a kind in any Robot. Typical channels are: simulation, serial.
+
+
 Released versions
 =================
 

@@ -38,13 +38,15 @@
 #define CEDAR_DEV_COMPONENT_SLOT_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/MapParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/FactoryManager.fwd.h"
+#include "cedar/devices/Component.fwd.h"
+#include "cedar/devices/ComponentSlot.fwd.h"
+#include "cedar/devices/Robot.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -93,7 +95,9 @@ public:
    */
   inline cedar::dev::RobotPtr getRobot() const
   {
-    return mRobot;
+    auto robot = mRobot.lock();
+    CEDAR_ASSERT(robot);
+    return robot;
   }
 
   /*!@brief Returns the component currently docked to this component slot.
@@ -105,16 +109,22 @@ public:
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   //!@brief Lists all channels in this component.
-  std::vector<std::string> listChannels() const;
+  std::vector<std::string> listConfigurations() const;
 
   //!@brief Checks if a channel of the given name exists.
-  bool hasChannel(const std::string& name) const;
+  bool hasConfiguration(const std::string& name) const;
 
   //!@brief Sets the channel for this component.
-  void setChannel(const std::string& channel);
+  void instantiateConfiguration(const std::string& configurationName);
 
   //! Returns a path that identifies this component.
   std::string getPath() const;
+
+  //! Return the name of the slot
+  std::string getName() const;
+
+  //! Return the name of the configuration
+  std::string getConfigurationName() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -136,7 +146,7 @@ protected:
 
 private:
   //! robot the component slot belongs to
-  cedar::dev::RobotPtr mRobot;
+  cedar::dev::RobotWeakPtr mRobot;
 
   //! component that is currently docked to this slot
   cedar::dev::ComponentPtr mComponent;
@@ -151,7 +161,7 @@ protected:
   // none yet
 private:
   //! Type of the channel stored in this component.
-  cedar::aux::StringParameterPtr _mChannelType;
+  cedar::aux::StringParameterPtr _mConfigurationName;
 
   //! mapping of channel types to class names of components
   std::map<std::string, std::string> mComponentTypeIds;

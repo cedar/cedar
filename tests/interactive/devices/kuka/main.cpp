@@ -36,7 +36,10 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
+#include "cedar/devices/Robot.h"
 #include "cedar/devices/kuka/gui/FriStatusWidget.h"
+#include "cedar/devices/kuka/FRIChannel.h"
+#include "cedar/devices/kuka/KinematicChain.h"
 #include "cedar/devices/gui/KinematicChainWidget.h"
 #include "cedar/devices/KinematicChain.h"
 #include "cedar/devices/gl/KinematicChain.h"
@@ -54,19 +57,28 @@ using cedar::dev::kuka::gui::FriStatusWidget;
 int main(int argc, char **argv)
 {
   std::string mode = "0";
-  std::string configuration_file = cedar::aux::locateResource("configs/kuka_lwr4.json");
+
+  auto robot = boost::make_shared< cedar::dev::Robot >();
+  robot->readJson("resource://robots/caren/fri_configuration.json");
+
   QApplication a(argc, argv);
-  FriStatusWidget* p_fri_status_widget = 0;
-  cedar::dev::gui::KinematicChainWidget* p_kinematic_chain_widget = 0;
+
+  FriStatusWidget* p_fri_status_widget;
+  cedar::dev::gui::KinematicChainWidget* p_kinematic_chain_widget;
 
   // create the hardware interface
-  cedar::dev::kuka::KinematicChainPtr p_arm(new cedar::dev::kuka::KinematicChain());
-  p_arm->readJson(configuration_file);
-  p_fri_status_widget = new FriStatusWidget(p_arm);
+  auto p_arm = robot->getComponent< cedar::dev::kuka::KinematicChain >("arm");
+
+  cedar::dev::kuka::FRIChannelPtr fri_channel
+    = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(p_arm->getChannel());
+  p_fri_status_widget = new FriStatusWidget(fri_channel);
   p_fri_status_widget->startTimer(100);
   p_fri_status_widget->show();
   p_kinematic_chain_widget = new cedar::dev::gui::KinematicChainWidget(p_arm);
   p_kinematic_chain_widget->show();
+
+  p_arm->setJointVelocities( cv::Mat::zeros( p_arm->getNumberOfJoints(), 1, CV_64F ) );
+  p_arm->startCommunication();
 
   a.exec();
 

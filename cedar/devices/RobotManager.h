@@ -44,6 +44,10 @@
 #include "cedar/devices/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/Path.h"
+#include "cedar/auxiliaries/boostSignalsHelper.h"
+
+// FORWARD DECLARATION
+#include "cedar/devices/RobotManager.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -76,6 +80,7 @@ public:
 
       std::vector<std::string> getConfigurationNames() const;
 
+
       inline void setIconPath(const std::string& iconPath)
       {
         this->mIconPath = iconPath;
@@ -87,6 +92,7 @@ public:
       }
 
       cedar::aux::Path getConfiguration(const std::string& name) const;
+      bool hasConfiguration(const std::string& name) const;
 
     private:
       std::map<std::string, cedar::aux::Path> mNamedPaths;
@@ -116,6 +122,8 @@ public:
   void addRobotName(const std::string& robotName);
 
   void removeRobot(const std::string& robotName);
+
+  void renameRobot(const std::string& robotName, const std::string& newName);
 
   void loadRobotConfiguration(const std::string& robotName, const cedar::aux::Path& configuration);
 
@@ -174,6 +182,13 @@ public:
    *         The slot must be given in the form "robot name.slot name".
    */
   cedar::dev::ComponentSlotPtr findComponentSlot(const std::string& componentPath) const;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // signals
+  //--------------------------------------------------------------------------------------------------------------------
+  // signals a change in a robot's name; first parameter: old name, second: new name.
+public:
+  CEDAR_DECLARE_SIGNAL(RobotNameChanged, void (const std::string&, const std::string&));
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

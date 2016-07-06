@@ -35,8 +35,8 @@
 #=======================================================================================================================
 
 # set cedar version information
-set (CEDAR_VERSION_MAJOR 5)
-set (CEDAR_VERSION_MINOR 1)
+set (CEDAR_VERSION_MAJOR 6)
+set (CEDAR_VERSION_MINOR 0)
 set (CEDAR_VERSION_BUGFIX 0)
 set (CEDAR_VERSION_CODENAME "overdue oud")
 

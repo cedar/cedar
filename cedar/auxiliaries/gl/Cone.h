@@ -56,6 +56,8 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
+  Cone();
+
   /*!@brief constructor. 
    * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    * @param radius radius of the cone
