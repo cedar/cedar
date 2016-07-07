@@ -76,7 +76,6 @@ cedar::dev::YarpCamera::~YarpCamera()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::YarpCamera::postStart()
 {
-//  std::cout<<"YarpVehicle:postStart : Meine WheelListe hat folgende größe: "<< getNumberOfWheels()<<std::endl;
   auto yarpChannel = boost::static_pointer_cast < cedar::dev::YarpChannel<cv::Mat> > (this->getChannel());
   if (!yarpChannel)
   {
@@ -98,12 +97,6 @@ cv::Mat cedar::dev::YarpCamera::retrievePicture()
     return cv::Mat();
   }
   auto picture = yarpChannel->read(mReadPort->getValue());
-//  if (picture.rows > 0 && picture.cols > 0)
-//  {
-//    std::cout << "Picture received! Rows: "<<picture.rows<< " Cols: "<<picture.cols<< " Data: " << picture << std::endl;
-//  picture.convertTo(picture, CV_32FC3);
-//    std::cout << "Converted Picture! " <<picture.rows<< " Cols: "<<picture.cols<< " Data: " << picture << std::endl;
-//  }
   return picture;
 }
 #endif //CEDAR_USE_YARP

@@ -47,6 +47,7 @@
 #include "cedar/devices/Component.h"
 #include "cedar/devices/exceptions.h"
 #include "cedar/auxiliaries/Data.h"
+#include "cedar/devices/Sensor.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
@@ -368,7 +369,26 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
   // unlock the suppression of user commands when the architecture is running
   component->setSuppressUserInteraction(false);
 
+  // retrieve Data from the component and copy it to the output slots of the component
+      auto measurements = component->getInstalledMeasurementTypes();
+      for (const auto& measurement : measurements)
+      {
+        std::string name = component->getNameForMeasurementType(measurement);
+        auto measurementData = component->getMeasurementData(measurement);
+        if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(measurementData))
+        {
+          cv::Mat measurementMat = measurementData->getData<cv::Mat>().clone();
+          std::string name = component->getNameForMeasurementType(measurement);
+          if(auto outPutPtr = mOutputs.at(name))
+          {
+            outPutPtr->setData(measurementMat);
+          }
+        }
+      }
+
+
   // if no inputs are present, there is nothing to do (i.e., no inputs have to be passed to the component)
+  // JT: This is dangerous as it does not allow to put non-input related code below this line!
   if (!this->hasSlotForRole(cedar::proc::DataRole::INPUT))
   {
     return;
@@ -388,24 +408,6 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
       component->setUserSideCommandBuffer(command_type, mat_data->getData());
     }
   }
-
-  // retrieve Data from the component and copy it to the output slots of the component
-    auto measurements = component->getInstalledMeasurementTypes();
-    for (const auto& measurement : measurements)
-    {
-      std::string name = component->getNameForMeasurementType(measurement);
-      auto measurementData = component->getMeasurementData(measurement);
-      if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(measurementData))
-      {
-        cv::Mat measurementMat = measurementData->getData<cv::Mat>().clone();
-        std::string name = component->getNameForMeasurementType(measurement);
-        if(auto outPutPtr = mOutputs.at(name))
-        {
-          outPutPtr->setData(measurementMat);
-        }
-      }
-    }
-
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputValidity
