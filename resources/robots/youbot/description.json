@@ -203,6 +203,7 @@
       "shared component parameters":
       {
   		  "name": "YoubotChassis",
+  		  "wheelRadius" : "0.050",
   		  "wheels":
   		  {
   		  "cedar.dev.Vehicle.Wheel":
