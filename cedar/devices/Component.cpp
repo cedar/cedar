@@ -1432,12 +1432,17 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
     ioData = userData.clone();
   }
 
-  if( !( mCheckCommandHook.member()(type_for_Device, ioData) ) )
+
+  if(this->mCheckCommandHook.member())
   {
-    cedar::aux::LogSingleton::getInstance()->error(
-       "Could not call command check function.",
-        CEDAR_CURRENT_FUNCTION_NAME);
-    return;
+    std::cout<<"We have a mCheckCommandHook! We now check "<< type_for_Device << " and " << ioData <<std::endl;
+    if( !( mCheckCommandHook.member()(type_for_Device, ioData) ) )
+    {
+      cedar::aux::LogSingleton::getInstance()->error(
+         "Could not call command check function.",
+          CEDAR_CURRENT_FUNCTION_NAME);
+      return;
+    }
   }
 
   // check for NaNs, assuming one element per row

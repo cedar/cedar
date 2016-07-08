@@ -366,46 +366,45 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
     this->setTimeMeasurement(this->mCommandTimeId, time);
   }
 
-  // unlock the suppression of user commands when the architecture is running
+//  std::cout<<"1"<<std::endl;
+//  // unlock the suppression of user commands when the architecture is running
   component->setSuppressUserInteraction(false);
-
-  // retrieve Data from the component and copy it to the output slots of the component
-      auto measurements = component->getInstalledMeasurementTypes();
-      for (const auto& measurement : measurements)
-      {
-        std::string name = component->getNameForMeasurementType(measurement);
-        auto measurementData = component->getMeasurementData(measurement);
-        if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(measurementData))
-        {
-          cv::Mat measurementMat = measurementData->getData<cv::Mat>().clone();
-          std::string name = component->getNameForMeasurementType(measurement);
-          if(auto outPutPtr = mOutputs.at(name))
-          {
-            outPutPtr->setData(measurementMat);
-          }
-        }
-      }
-
-
-  // if no inputs are present, there is nothing to do (i.e., no inputs have to be passed to the component)
-  // JT: This is dangerous as it does not allow to put non-input related code below this line!
-  if (!this->hasSlotForRole(cedar::proc::DataRole::INPUT))
+//  std::cout<<"2"<<std::endl;
+//  // retrieve Data from the component and copy it to the output slots of the component
+  auto measurements = component->getInstalledMeasurementTypes();
+//  std::cout<<"3"<<std::endl;
+  for (const auto& measurement : measurements)
   {
-    return;
-  }
-
-  // copy data from the input slots to the command slots of the component
-  for (auto name_slot_pair : this->getDataSlots(cedar::proc::DataRole::INPUT))
-  {
-    const auto& name = name_slot_pair.first;
-    auto slot = name_slot_pair.second;
-
-    auto command_type = component->getCommandTypeForName(name);
-
-    auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(slot->getData());
-    if (mat_data)
+    std::string name = component->getNameForMeasurementType(measurement);
+    auto measurementData = component->getMeasurementData(measurement);
+    if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(measurementData))
     {
-      component->setUserSideCommandBuffer(command_type, mat_data->getData());
+      cv::Mat measurementMat = measurementData->getData<cv::Mat>().clone();
+      std::string name = component->getNameForMeasurementType(measurement);
+      if(auto outPutPtr = mOutputs.at(name))
+      {
+        outPutPtr->setData(measurementMat);
+      }
+    }
+  }
+//
+//
+//  // if no inputs are present, there is nothing to do (i.e., no inputs have to be passed to the component)
+  if (this->hasSlotForRole(cedar::proc::DataRole::INPUT))
+  {
+    // copy data from the input slots to the command slots of the component
+    for (auto name_slot_pair : this->getDataSlots(cedar::proc::DataRole::INPUT))
+    {
+      const auto& name = name_slot_pair.first;
+      auto slot = name_slot_pair.second;
+
+      auto command_type = component->getCommandTypeForName(name);
+
+      auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(slot->getData());
+      if (mat_data)
+      {
+        component->setUserSideCommandBuffer(command_type, mat_data->getData());
+      }
     }
   }
 }

@@ -329,7 +329,70 @@
 				}
 			}
 		}
-    }
+    },
+    "camera0":
+     {
+      "available components":
+      {
+        "yarp":
+        {
+          "cedar.dev.YarpCamera":
+          {
+            "requires channel": "yarp",
+            "readPortName": "webots/carenCamera0StatusFramework"
+          }
+        }
+      },
+      "shared component parameters":
+      {
+  		  "name": "CarenCamera0",
+  		  "pictureSizeX" : "150",
+  		  "pictureSizeY" : "150",
+  		  "cvMatType" : "CV_8UC3"
+  	  }
+  	 },
+  	 "camera1":
+     {
+      "available components":
+      {
+        "yarp":
+        {
+          "cedar.dev.YarpCamera":
+          {
+            "requires channel": "yarp",
+            "readPortName": "webots/carenCamera1StatusFramework"
+          }
+        }
+      },
+      "shared component parameters":
+      {
+  		  "name": "CarenCamera1",
+  		  "pictureSizeX" : "150",
+  		  "pictureSizeY" : "150",
+  		  "cvMatType" : "CV_8UC3"
+  	  }
+  	 },
+  	 "camera2":
+     {
+      "available components":
+      {
+        "yarp":
+        {
+          "cedar.dev.YarpCamera":
+          {
+            "requires channel": "yarp",
+            "readPortName": "webots/carenCamera2StatusFramework"
+          }
+        }
+      },
+      "shared component parameters":
+      {
+  		  "name": "CarenCamera2",
+  		  "pictureSizeX" : "150",
+  		  "pictureSizeY" : "150",
+  		  "cvMatType" : "CV_8UC3"
+  	  }
+  	 }
   },
   "available channels":
   {
