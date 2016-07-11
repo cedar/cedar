@@ -241,6 +241,9 @@ cedar::proc::gui::Connectable::DeviceQualityDecoration::DeviceQualityDecoration
 cedar::proc::gui::Connectable::Decoration(pParent, ":/cedar/dev/gui/icons/not_connected.svg", QString()),
 mStep(step)
 {
+  // register hooks for the initial component
+  updateHooks();
+
   // update the quality once every second
   this->startTimer(500);
 }
@@ -248,6 +251,55 @@ mStep(step)
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Connectable::DeviceQualityDecoration::updateHooks()
+{
+  mStep->getComponent()->registerConnectedHook(boost::bind(&cedar::proc::gui::Connectable::Decoration::updateIconConnected, this));
+  mStep->getComponent()->registerDisconnectedHook(boost::bind(&cedar::proc::gui::Connectable::Decoration::updateIconDisconnected, this));
+}
+
+void cedar::proc::gui::Connectable::Decoration::updateIconConnected()
+{
+  updateIcon(true);
+}
+
+void cedar::proc::gui::Connectable::Decoration::updateIconDisconnected()
+{
+  updateIcon(false);
+}
+
+void cedar::proc::gui::Connectable::Decoration::updateIcon(const bool isConnected)
+{
+  delete this->mpIcon;
+
+  QString icon_path;
+  QBrush brush;
+
+  if(isConnected)
+  {
+    icon_path = ":/cedar/dev/gui/icons/connected.svg";
+    brush = QBrush(QColor(222, 10, 244, 255));
+  }
+  else
+  {
+    icon_path = ":/cedar/dev/gui/icons/not_connected.svg";
+    brush = QBrush(QColor(Qt::white));
+  }
+
+  this->mpRectangle->setBrush(brush);
+
+  this->mpIcon = new QGraphicsSvgItem
+                 (
+                   icon_path,
+                   this->mpRectangle
+                 );
+
+  // setting this cache mode makes sure that when writing out an svg file, the icon will not be pixelized
+  this->mpIcon->setCacheMode(QGraphicsItem::NoCache);
+
+  qreal h = this->mpIcon->boundingRect().height();
+  this->mpIcon->setScale(cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE / h);
+}
 
 void cedar::proc::gui::Connectable::Decoration::setToolTip(const QString& toolTip)
 {
@@ -266,22 +318,10 @@ void cedar::proc::gui::Connectable::DeviceQualityDecoration::timerEvent(QTimerEv
   }
 
   if (this->mStep->isStarted())
-  {
+  {          
     auto component = this->mStep->getComponent();
     double command_errors, measurement_errors;
     component->getCommunicationErrorRates(command_errors, measurement_errors);
-
-    static cedar::aux::ColorGradient gradient;
-    if (gradient.empty())
-    {
-      // initialize gradient
-      gradient.setStop(0.0, QColor(0, 220, 0));
-      // yellow starts much earlier so errors are more noticeable
-      gradient.setStop(0.1, QColor(220, 220, 0));
-      gradient.setStop(1.0, QColor(220, 0, 0));
-    }
-
-    this->setBackgroundColor(gradient.getColor(std::max(command_errors, measurement_errors)));
 
     QString tool_tip = QString("<table><tr><td>command quality:</td><td>%1%</td></tr><tr><td>measurement quality:</td><td>%2%</td></tr></table>")
                        .arg(100.0 * (1.0 - command_errors), -1, 'f', 0)
@@ -308,10 +348,6 @@ void cedar::proc::gui::Connectable::DeviceQualityDecoration::timerEvent(QTimerEv
     }
 
     this->setToolTip(tool_tip);
-  }
-  else
-  {
-    this->setBackgroundColor(Qt::white);
   }
 }
 
@@ -1033,7 +1069,7 @@ cedar::proc::gui::DataSlotItem const* cedar::proc::gui::Connectable::getSlotItem
 }
 
 void cedar::proc::gui::Connectable::slotAdded(cedar::proc::DataRole::Id role, const std::string& name)
-{
+{    
   emit reactToSlotAddedSignal(role, QString::fromStdString(name));
 }
 
@@ -1048,7 +1084,7 @@ void cedar::proc::gui::Connectable::reactToSlotAdded(cedar::proc::DataRole::Id r
   if (isRoleDisplayed(role))
   {
     this->addDataItemFor(this->getConnectable()->getSlot(role, name.toStdString()));
-    this->updateAttachedItems();
+    this->updateAttachedItems();      
   }
 }
 
@@ -1071,6 +1107,7 @@ void cedar::proc::gui::Connectable::reactToSlotRenamed(cedar::proc::DataRole::Id
   p_item = name_iter->second;
   name_map.erase(name_iter);
   name_map[newName.toStdString()] = p_item;
+
   this->updateAttachedItems();
 }
 
@@ -1153,6 +1190,11 @@ void cedar::proc::gui::Connectable::updateAttachedItems()
 {
   this->updateDataSlotPositions();
   this->updateDecorationPositions();
+
+  if(mDeviceQuality)
+  {
+    this->mDeviceQuality->updateHooks();
+  }
 }
 
 cedar::proc::ConnectablePtr cedar::proc::gui::Connectable::getConnectable()
@@ -1229,6 +1271,7 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
 
     this->mDecorations.push_back(decoration);
   }
+
   this->updateDecorations();
   this->updateTriggerColorState();
 
@@ -1238,7 +1281,7 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
         (
           boost::bind(&cedar::proc::gui::Connectable::translateLoopedTriggerChangedSignal, this)
         );
-  }
+  }   
 }
 
 void cedar::proc::gui::Connectable::updateDataSlotPositions()
@@ -1473,8 +1516,9 @@ void cedar::proc::gui::Connectable::updateDecorations()
   {
     if (!this->mDeviceQuality)
     {
-      this->mDeviceQuality = DeviceQualityDecorationPtr(new DeviceQualityDecoration(this, component));
+      this->mDeviceQuality = DeviceQualityDecorationPtr(new DeviceQualityDecoration(this, component));      
     }
+
     this->addDecoration(mDeviceQuality);
   }
   else
@@ -1484,7 +1528,6 @@ void cedar::proc::gui::Connectable::updateDecorations()
       this->removeDecoration(this->mDeviceQuality);
     }
   }
-
 
   this->updateDecorationPositions();
 }

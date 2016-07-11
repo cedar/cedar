@@ -175,7 +175,14 @@ protected:
       //! sets the description at the icon
       virtual void setDescription(const QString& text);
 
-  private:
+      //! hooks for different connection signals
+      void updateIconConnected();
+      void updateIconDisconnected();
+
+      //! icon update method, masked by hooks above
+      void updateIcon(const bool isConnected);
+
+    private:
       QGraphicsSvgItem* mpIcon;
 
       QGraphicsRectItem* mpRectangle;
@@ -191,6 +198,7 @@ protected:
   {
     public:
       DeviceQualityDecoration(QGraphicsItem* pParent, cedar::proc::steps::ComponentPtr step);
+      void updateHooks();
 
     protected:
       void timerEvent(QTimerEvent*);
