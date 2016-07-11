@@ -476,9 +476,9 @@ void cedar::dev::Robot::readComponentSlotInstantiations(const cedar::aux::Config
       continue;
     }
     const std::string& configuration_name = slot_iter->second.get_value<std::string>();
-//    this->allocateChannel(channel_name);
+    //this->allocateChannel(channel_name);
     this->getComponentSlot(slot_name)->instantiateConfiguration(configuration_name);
-  }
+  }    
 }
 
 void cedar::dev::Robot::allocateChannel(const std::string& channelName)

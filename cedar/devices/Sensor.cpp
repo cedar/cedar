@@ -56,6 +56,7 @@ cedar::dev::Sensor::Sensor(cedar::dev::ChannelPtr)
 
 cedar::dev::Sensor::~Sensor()
 {
+  prepareComponentDestructAbsolutelyRequired();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
