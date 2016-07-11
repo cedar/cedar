@@ -341,6 +341,7 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
   locker.unlock();
 
   this->signalSlotRemoved(role, name);
+
 }
 
 bool cedar::proc::Connectable::hasSlot(DataRole::Id role, const std::string& name, bool lock) const

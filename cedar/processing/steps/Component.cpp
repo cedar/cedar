@@ -198,6 +198,7 @@ cedar::aux::ParameterTemplate<std::string>(owner, name, "")
 void cedar::proc::details::ComponentStepGroupParameter::setComponent(cedar::dev::ComponentPtr component)
 {
   this->mWeakComponent = component;
+
   emit componentChanged();
 }
 

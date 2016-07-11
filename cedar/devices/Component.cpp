@@ -1121,6 +1121,16 @@ boost::signals2::connection cedar::dev::Component::registerStartCommunicationHoo
     return mStartCommunicationHook.connect(slot);
 }
 
+boost::signals2::connection cedar::dev::Component::registerConnectedHook(boost::function<void ()> slot)
+{
+    return mConnectedHook.connect(slot);
+}
+
+boost::signals2::connection cedar::dev::Component::registerDisconnectedHook(boost::function<void ()> slot)
+{
+    return mDisconnectedHook.connect(slot);
+}
+
 void cedar::dev::Component::registerCheckCommandHook(cedar::dev::Component::CommandCheckFunctionType fun)
 {
   QWriteLocker locker(this->mCheckCommandHook.getLockPtr());
@@ -1641,6 +1651,8 @@ void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
   mCommunicationThread->waitUntilStepped();
   mCommunicationThread->waitUntilStepped();
 
+  mConnectedHook();
+
 }
 
 
@@ -1695,17 +1707,21 @@ void cedar::dev::Component::stopCommunication()
   {
     this->mChannel->close();
   }
+
+  mDisconnectedHook();
 }
 
 void cedar::dev::Component::start()
 {
   clearController();
   startCommunication();
+  mConnectedHook();
 }
 
 void cedar::dev::Component::stop()
 {
   stopCommunication();
+  mDisconnectedHook();
 }
 
 cedar::unit::Time cedar::dev::Component::getCommunicationStepSize()
@@ -1871,9 +1887,10 @@ void cedar::dev::Component::processStart()
      lock1.unlock();
   }
 
-// todo: this will probably not work as expected, anymore
+  // todo: this will probably not work as expected, anymore
   // this is the initial run, wait for measurements to be in:
   mStartCommunicationHook();
+  mConnectedHook();
 
 }
 

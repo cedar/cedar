@@ -333,6 +333,10 @@ public:
   //! a human readable (short) name that describes the component
   std::string prettifyName() const;
 
+  //! public hooks intended for GUI communication
+  boost::signals2::connection registerConnectedHook(boost::function<void ()> slot);
+  boost::signals2::connection registerDisconnectedHook(boost::function<void ()> slot);
+
 signals:
   void updatedUserMeasurementSignal();
 
@@ -438,7 +442,11 @@ private:
   cedar::aux::LockableMember< NoCommandFunctionType > mNoCommandHook;
   cedar::aux::LockableMember< NoCommandFunctionType > mNotReadyForCommandHook;
   cedar::aux::LockableMember< NoCommandFunctionType > mAfterCommandBeforeMeasurementHook;
+
   boost::signals2::signal<void ()> mStartCommunicationHook;
+  boost::signals2::signal<void ()> mConnectedHook;
+  boost::signals2::signal<void ()> mDisconnectedHook;
+
   cedar::aux::LockableMember< CommandCheckFunctionType > mCheckCommandHook;
 
   boost::optional<ComponentDataType> mDeviceCommandSelection;
