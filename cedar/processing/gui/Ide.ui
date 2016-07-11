@@ -146,7 +146,6 @@
     <addaction name="mpActionParameterLinker"/>
     <addaction name="separator"/>
     <addaction name="mpActionManagePlugins"/>
-    <addaction name="mpActionShowRobotManager"/>
     <addaction name="mpActionSettings"/>
    </widget>
    <widget class="QMenu" name="mpMenuArchitectureScripts">
