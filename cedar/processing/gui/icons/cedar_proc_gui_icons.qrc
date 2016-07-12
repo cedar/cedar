@@ -93,5 +93,6 @@
         <file>processing_ide_app_icon.svg</file>
         <file>processing_ide_app_icon_48.png</file>
         <file>steps/forward_kinematic.svg</file>
+        <file>steps/inverse_kinematic.svg</file>
     </qresource>
 </RCC>
