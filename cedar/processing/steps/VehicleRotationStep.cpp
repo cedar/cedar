@@ -53,8 +53,7 @@ namespace
     using cedar::proc::ElementDeclarationTemplate;
 
     ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::steps::VehicleRotationStep>("Robotics", "cedar.processing.steps.VehicleRotationStep"));
-//    declaration->setIconPath(":/cedar/dev/gui/icons/generic_hardware_icon.svg");
-    //todo:Icon generieren
+    declaration->setIconPath(":/steps/vehicle_rotation.svg");
     declaration->declare();
 
     return true;
