@@ -254,8 +254,11 @@ mStep(step)
 
 void cedar::proc::gui::Connectable::DeviceQualityDecoration::updateHooks()
 {
-  mStep->getComponent()->registerConnectedHook(boost::bind(&cedar::proc::gui::Connectable::Decoration::updateIconConnected, this));
-  mStep->getComponent()->registerDisconnectedHook(boost::bind(&cedar::proc::gui::Connectable::Decoration::updateIconDisconnected, this));
+  if(auto component =  mStep->getComponent())
+  {
+    component->registerConnectedHook(boost::bind(&cedar::proc::gui::Connectable::Decoration::updateIconConnected, this));
+    component->registerDisconnectedHook(boost::bind(&cedar::proc::gui::Connectable::Decoration::updateIconDisconnected, this));
+  }
 }
 
 void cedar::proc::gui::Connectable::Decoration::updateIconConnected()

@@ -77,15 +77,16 @@ bool cedar::dev::ComponentParameter::hasComponentSlot() const
 
 cedar::dev::ComponentPtr cedar::dev::ComponentParameter::getValue() const
 {
+  //TODO: I am not sure if this is the correct handling here.
   if (this->hasComponentSlot())
   {
     auto sharedComponent = this->mWeakComponent.lock();
     return sharedComponent->getComponent();
   }
-  CEDAR_THROW
-  (
-    cedar::dev::NoComponentSelectedException, "No robotic component selected for \"" + this->getName() + "\". Please set the parameter to an initialized robot from the robot manager."
-  );
+  else
+  {
+    return NULL;
+  }
 }
 
 std::string cedar::dev::ComponentParameter::getStringRepresentation() const

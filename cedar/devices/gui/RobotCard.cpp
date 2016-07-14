@@ -352,16 +352,18 @@ void cedar::dev::gui::RobotCard::robotDropped(const QString& robotTypeName)
     // nothing loaded, nothing to do
   }
 
-  // fill configuration list
+  int selected = 0;
   for (size_t i = 0; i < configuration_names.size(); ++i)
   {
     const std::string configuration = configuration_names.at(i);
     this->mpConfigurationSelector->addItem(QString::fromStdString(configuration));
+    if (configuration == loaded_configuration)
+    {
+      selected = this->mpConfigurationSelector->count() - 1;
+    }
   }
 
-  // for a newly dropped robot, set the current connection configuration to 0
-  this->mpConfigurationSelector->setCurrentIndex(0);
-
+  this->mpConfigurationSelector->setCurrentIndex(selected);
   this->mpConfigurationSelector->blockSignals(blocked);
 
   // a new placeholder card has already bene placed, so allow for actions here
