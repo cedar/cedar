@@ -228,6 +228,15 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
     " can be done in the right-click menu.</p>"
     "<p>Please refer to the changelog for more details."
   );
+
+  this->addOneTimeMessage
+  (
+    CEDAR_MAKE_VERSION(5, 1, 0), // introduces in this version
+    "netreader/writer changes",
+    "Netreader/writer changes",
+    "<p>Due to a change in the netreader/writers data protocol older cedar versions will no longer be able to communicate with the new version. Please make sure that all your cedar installations are updated.</p>"
+  );
+
 }
 
 cedar::proc::gui::Settings::UserDefinedColor::UserDefinedColor(const std::string& stringToParse)

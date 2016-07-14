@@ -70,7 +70,23 @@ known issues
 
 Unreleased
 ==========
+Nothing here. This is a released version.
 
+Released versions
+=================
+
+The following are the changes made in the release versions.
+
+Version 5.1.0
+-------------
+- cedar
+  - fixed issues with compatibility with opencv 2 and 3
+  - fixed some issues under OSX
+
+- tools
+  - overhaul of the data processing tool (plotting of recorded data)
+  - image database improvements 
+  
 - cedar::proc
   - Architecture scripts can now set a status that is displayed in the script manager.
   - Architecture widgets can now add buttons for calling step actions.
@@ -90,10 +106,6 @@ Unreleased
     less space than the CSV format, is therefore faster to write out, and does not truncate matrix values).
     Which format is used can be chosen in the settings dialog of cedar.
 
-Released versions
-=================
-
-The following are the changes made in the release versions.
 
 Version 5.0.0
 -------------
