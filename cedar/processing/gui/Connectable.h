@@ -145,7 +145,11 @@ protected:
         {
           delete mpIcon;
         }
-        delete mpRectangle;
+        if(mpRectangle != nullptr)
+        {
+          delete mpRectangle;
+        }
+        isDestructed = true;
       }
 
       //! Sets the position of the decoration.
@@ -190,6 +194,8 @@ protected:
       QString mIconFile;
 
       QColor mDefaultBackground;
+
+      bool isDestructed = false;
   };
 
   CEDAR_GENERATE_POINTER_TYPES(Decoration);
