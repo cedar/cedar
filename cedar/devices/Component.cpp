@@ -2175,7 +2175,10 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
 
   for(auto component : components_to_delete)
   {
-    component->startBrakingNow();
+//    component->startBrakingNow();
+    cedar::aux::LogSingleton::getInstance()->warning(
+                  "The component" +component->prettifyName()+ " is not braked by the watchdog anymore!" ,
+                  CEDAR_CURRENT_FUNCTION_NAME);
   }
 }
 
