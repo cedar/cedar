@@ -549,10 +549,16 @@ class cedar::dev::Component::DataCollection
           "Cannot reset buffer: no dimensionality set for \"" + this->getNameForType(type) + "\"."
         );
       }
+
       auto dim = found->second;
 
+      const int ndims = dim[0];
+
+      // check if a second component (size) exists at all
+      const int sz = dim[1] ? dim[1] : 1;
+
       // todo: check for higher-order tensors
-      bufferData.member()[type]->setData(cv::Mat::zeros(dim[0], dim[1], matrixType));
+      bufferData.member()[type]->setData(cv::Mat::zeros(ndims, sz, matrixType));
     }
 
   public:
