@@ -80,6 +80,7 @@ cedar::dev::RobotManager::RobotManager()
   cedar::dev::RobotManager::Template youbot_template;
   youbot_template.setIconPath(":/cedar/dev/gui/icons/youbot_icon_256.png");
   youbot_template.addNamedConfiguration("yarp",cedar::aux::Path("resource://robots/youbot/yarp_configuration.json"));
+  youbot_template.addNamedConfiguration("simulator",cedar::aux::Path("resource://robots/youbot/simulator_configuration.json"));
   this->addRobotTemplate("youbot",youbot_template);
 
   this->restore();

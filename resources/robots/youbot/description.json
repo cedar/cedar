@@ -13,6 +13,12 @@
             "readPortName": "webots/youbotArmStatusFramework",
       		"writePortName":"webots/youbotArmCommandsFramework"
           }
+        },
+        "simulator":
+        {
+          "cedar.dev.SimulatedKinematicChain":
+          {
+          }
         }
       },
       "shared component parameters":
@@ -197,6 +203,12 @@
             "requires channel": "yarp",
             "readPortName": "webots/youbotWheelStatusFramework",
       		"writePortName":"webots/youbotWheelCommandsFramework"
+          }
+        },
+        "simulator":
+        {
+          "cedar.dev.SimulatedVehicle":
+          {
           }
         }
       },
