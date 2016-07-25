@@ -131,7 +131,7 @@ class cedar::dev::Component::DataCollection
     }
 
     void setDimensionality(cedar::dev::Component::ComponentDataType type, DimensionalityType dim, int matrixType)
-    {
+    {      
       mInstalledDimensions[type] = dim;
 
       this->resetBuffers(type, matrixType);
@@ -555,7 +555,11 @@ class cedar::dev::Component::DataCollection
       const int ndims = dim[0];
 
       // check if a second component (size) exists at all
-      const int sz = dim[1] ? dim[1] : 1;
+      int sz = dim[1] ? dim[1] : 1;
+
+      // check if second component exceeds a senseful limit
+      const int max_dim = 1000;
+      sz = sz > max_dim ? sz : max_dim;
 
       // todo: check for higher-order tensors
       bufferData.member()[type]->setData(cv::Mat::zeros(ndims, sz, matrixType));
