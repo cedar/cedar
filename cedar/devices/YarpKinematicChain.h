@@ -54,6 +54,7 @@
  *
  * @todo describe more.
  */
+
 class cedar::dev::YarpKinematicChain : public cedar::dev::KinematicChain
 {
 Q_OBJECT
