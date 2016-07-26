@@ -552,17 +552,8 @@ class cedar::dev::Component::DataCollection
 
       auto dim = found->second;
 
-      const int ndims = dim[0];
-
-      // check if a second component (size) exists at all
-      int sz = dim[1] ? dim[1] : 1;
-
-      // check if second component exceeds a senseful limit
-      const int max_dim = 1000;
-      sz = sz > max_dim ? sz : max_dim;
-
       // todo: check for higher-order tensors
-      bufferData.member()[type]->setData(cv::Mat::zeros(ndims, sz, matrixType));
+      bufferData.member()[type]->setData(cv::Mat::zeros(dim[0], dim[1], matrixType));
     }
 
   public:
@@ -934,14 +925,14 @@ void cedar::dev::Component::setCommandAndMeasurementDimensionality(ComponentData
 
 void cedar::dev::Component::setCommandDimensionality(ComponentDataType type, unsigned int dim)
 {
-  DimensionalityType fulldim{ dim };
+  DimensionalityType fulldim{ dim, 1 };
 
   this->mCommandData->setDimensionality(type, fulldim,this->getMeasurementMatrixType());
 }
 
 void cedar::dev::Component::setMeasurementDimensionality(ComponentDataType type, unsigned int dim)
 {
-  DimensionalityType fulldim{ dim };
+  DimensionalityType fulldim{ dim, 1};
 
   this->mMeasurementData->setDimensionality(type, fulldim,this->getMeasurementMatrixType());
 }
