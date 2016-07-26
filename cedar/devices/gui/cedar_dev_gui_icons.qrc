@@ -12,5 +12,7 @@
         <file>icons/drop_robot.png</file>
         <file>icons/caren_icon_256.png</file>
         <file>icons/youbot_icon_256.png</file>
+        <file>icons/caren_trunk_256.png</file>
+        <file>icons/caren_arm_256.png</file>
     </qresource>
 </RCC>
