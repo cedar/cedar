@@ -204,6 +204,8 @@ void cedar::dev::gui::RobotCard::updateConnectionIcon()
            background: rgb(222, 10, 244);\
            color: rgb(233, 10, 255);\
        }");
+
+    this->mpConfigurationSelector->setEnabled(false);
   }
   else if (robot->areAllComponentsCommunicating())
   {
@@ -214,12 +216,15 @@ void cedar::dev::gui::RobotCard::updateConnectionIcon()
                 background: qlineargradient(x1:0, y1:0, x2:1, y2:1,\
                 stop:0 white, stop: 0.4 rgba(10, 10, 10, 40), stop:1 rgb(233, 10, 255, 255));\
        }");
+
+    this->mpConfigurationSelector->setEnabled(false);
   }
   else
   {
     this->mpConnectButton->setIcon(QIcon(":/cedar/dev/gui/icons/not_connected.svg"));
     this->mpConnectButton->setToolTip("Not connected");
     this->mpConnectButton->setStyleSheet(""); // reset yellow background to default
+    this->mpConfigurationSelector->setEnabled(true);
   }
 }
 
