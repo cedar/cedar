@@ -198,6 +198,8 @@ double cedar::dev::Vehicle::calculateCenterToWheelDistance()
       }
     }
   }
+
+  std::cout<<"Init: CenterToWheelDistance is:"<< distance<<std::endl;
   return distance;
 }
 

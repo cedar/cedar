@@ -41,10 +41,12 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/Step.h"
+#include "cedar/dynamics/Dynamics.h"
 #include "cedar/devices/ComponentParameter.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/devices/exceptions.h"
+#include "cedar/auxiliaries/EnumType.h"
+#include "cedar/auxiliaries/EnumParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/steps/VehicleRotationStep.fwd.h"
@@ -55,12 +57,48 @@
  *
  * @todo describe more.
  */
-class cedar::proc::steps::VehicleRotationStep : public cedar::proc::Step
+class cedar::proc::steps::VehicleRotationStep : public cedar::dyn::Dynamics
 {
   Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  //!@brief Enum class for FunctionTypes
+  class AngularMeasurementUnit
+  {
+  public:
+    //! the id of an enum entry
+    typedef cedar::aux::EnumId Id;
+
+    //! constructs the enum for all ids
+    static void construct()
+    {
+      mType.type()->def(cedar::aux::Enum(Rad, "RAD"));
+      mType.type()->def(cedar::aux::Enum(Degree, "DEGREE"));
+    }
+
+    //! @returns A const reference to the base enum object.
+    static const cedar::aux::EnumBase& type()
+    {
+      return *(mType.type());
+    }
+
+    //! @returns A pointer to the base enum object.
+    static const cedar::proc::DataRole::TypePtr& typePtr()
+    {
+      return mType.type();
+    }
+
+  public:
+    //! flag for using linear weight relations with zero at the center
+    static const Id Rad = 0;
+    //! flag for linear weights with a noise term at the outskirts
+    static const Id Degree = 1;
+
+  private:
+    static cedar::aux::EnumType<AngularMeasurementUnit> mType;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -93,7 +131,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-  void compute(const cedar::proc::Arguments&);
+  void eulerStep(const cedar::unit::Time& time);
 
   void onStart();
 
@@ -122,6 +160,7 @@ protected:
 
 private:
   cedar::dev::ComponentParameterPtr _mComponent;
+  cedar::aux::EnumParameterPtr mUnitType;
 
 };
 // class cedar::proc::steps::VehicleRotationStep

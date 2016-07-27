@@ -65,12 +65,16 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::aux::EnumType<cedar::proc::steps::VehicleRotationStep::AngularMeasurementUnit> cedar::proc::steps::VehicleRotationStep::AngularMeasurementUnit::mType("FunctionType::");
+
 cedar::proc::steps::VehicleRotationStep::VehicleRotationStep()
     :
-      cedar::proc::Step(true),
       mOutputVelocity(new cedar::aux::MatData(cv::Mat())),
       mInputVelocityName("rotation velocity"),
-      _mComponent(new cedar::dev::ComponentParameter(this, "component"))
+      _mComponent(new cedar::dev::ComponentParameter(this, "component")),
+      mUnitType(
+                new cedar::aux::EnumParameter(this, "input unit", cedar::proc::steps::VehicleRotationStep::AngularMeasurementUnit::typePtr(),
+                    AngularMeasurementUnit::Rad))
 {
   this->declareInput(mInputVelocityName);
   QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SLOT(rebuildOutputs()));
@@ -83,20 +87,27 @@ cedar::proc::steps::VehicleRotationStep::~VehicleRotationStep()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::steps::VehicleRotationStep::compute(const cedar::proc::Arguments&)
+void cedar::proc::steps::VehicleRotationStep::eulerStep(const cedar::unit::Time& time)
 {
   cedar::aux::ConstDataPtr inputData = this->getInputSlot(mInputVelocityName)->getData();
 
   if (this->hasComponent() && boost::dynamic_pointer_cast<const cedar::aux::MatData>(inputData))
   {
     cv::Mat rotationVelocityMat = inputData->getData<cv::Mat>().clone();
+
+    //Ensure that we work with Rad Values
+    if(mUnitType->getValue() == AngularMeasurementUnit::Degree)
+    {
+      rotationVelocityMat = rotationVelocityMat * (M_PI /(180.0));
+    }
+
     auto component = this->getComponent();
     this->testStates(component);
-    cedar::dev::VehiclePtr vehicle = boost::dynamic_pointer_cast < cedar::dev::Vehicle > (component);
-    if (vehicle)
+    if (auto vehicle = boost::dynamic_pointer_cast < cedar::dev::Vehicle > (component))
     {
       cv::Mat wheelRotations = vehicle->getWheelRotations(rotationVelocityMat.at<float>(0,0));
-//      cv::Mat wheel_velocities = wheelRotationDirections * rotationVelocityMat;
+      double timeFactor = time / cedar::unit::Time(1 * cedar::unit::milli * cedar::unit::seconds);
+      wheelRotations = timeFactor * wheelRotations;
       mOutputVelocity->setData(wheelRotations);
     }
   }
