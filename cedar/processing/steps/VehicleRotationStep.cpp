@@ -106,8 +106,8 @@ void cedar::proc::steps::VehicleRotationStep::eulerStep(const cedar::unit::Time&
     if (auto vehicle = boost::dynamic_pointer_cast < cedar::dev::Vehicle > (component))
     {
       cv::Mat wheelRotations = vehicle->getWheelRotations(rotationVelocityMat.at<float>(0,0));
-      double timeFactor = time / cedar::unit::Time(1 * cedar::unit::milli * cedar::unit::seconds);
-      wheelRotations = timeFactor * wheelRotations;
+//      double timeFactor = time / cedar::unit::Time(1 * cedar::unit::milli * cedar::unit::seconds);
+//      wheelRotations = wheelRotations * timeFactor;
       mOutputVelocity->setData(wheelRotations);
     }
   }
