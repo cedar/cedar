@@ -22,13 +22,13 @@
  Institute:   Ruhr-Universitaet Bochum
  Institut fuer Neuroinformatik
 
- File:        VehicleRotationStep.h
+ File:        VehicleRotation.h
 
  Maintainer:  Jan Tekülve
  Email:       jan.tekuelve@ini.rub.de
  Date:        2016 07 07
 
- Description: Header file for the class cedar::proc::steps::VehicleRotationStep.
+ Description: Header file for the class cedar::proc::steps::VehicleRotation.
 
  Credits:
 
@@ -41,7 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/Dynamics.h"
+#include "cedar/processing/Step.h"
 #include "cedar/devices/ComponentParameter.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/devices/exceptions.h"
@@ -49,7 +49,7 @@
 #include "cedar/auxiliaries/EnumParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/VehicleRotationStep.fwd.h"
+#include "cedar/processing/steps/VehicleRotation.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -57,7 +57,7 @@
  *
  * @todo describe more.
  */
-class cedar::proc::steps::VehicleRotationStep : public cedar::dyn::Dynamics
+class cedar::proc::steps::VehicleRotation : public cedar::proc::Step
 {
   Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
@@ -105,10 +105,10 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  VehicleRotationStep();
+  VehicleRotation();
 
   //!@brief Destructor
-  virtual ~VehicleRotationStep();
+  virtual ~VehicleRotation();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -131,6 +131,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+  void compute(const cedar::proc::Arguments& arguments);
+
   void eulerStep(const cedar::unit::Time& time);
 
   void onStart();
@@ -161,8 +163,9 @@ protected:
 private:
   cedar::dev::ComponentParameterPtr _mComponent;
   cedar::aux::EnumParameterPtr mUnitType;
+  unsigned int mTimestepMeasurementId;
 
 };
-// class cedar::proc::steps::VehicleRotationStep
+// class cedar::proc::steps::VehicleRotation
 
 #endif // CEDAR_PROC_STEPS_VEHICLE_ROTATION_STEP_H

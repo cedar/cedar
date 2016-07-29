@@ -122,7 +122,7 @@ cedar_add_library(cedarproc
   steps/ScalarDivision.h
   steps/Threshold.h
   steps/TransferFunction.h
-  steps/VehicleRotationStep.h
+  steps/VehicleRotation.h
   sources/Boost.h
   sources/Noise.h
   sources/Picture.h

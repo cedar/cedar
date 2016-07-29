@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_VEHICLE_ROTATION_STEP_FWD_H
-#define CEDAR_PROC_STEPS_VEHICLE_ROTATION_STEP_FWD_H
+#ifndef CEDAR_PROC_STEPS_VEHICLE_ROTATION_FWD_H
+#define CEDAR_PROC_STEPS_VEHICLE_ROTATION_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -56,12 +56,12 @@ namespace cedar
     namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(VehicleRotationStep);
+      CEDAR_DECLARE_PROC_CLASS(VehicleRotation);
       //!@endcond
     }
   }
 }
 
 
-#endif // CEDAR_PROC_STEPS_VEHICLE_ROTATION_STEP_FWD_H
+#endif // CEDAR_PROC_STEPS_VEHICLE_ROTATION_FWD_H
 
