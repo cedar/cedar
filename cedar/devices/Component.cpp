@@ -163,7 +163,7 @@ class cedar::dev::Component::DataCollection
       cv::Mat &buffer = mUserBuffer.member()[type]->getData();
 
       // get size and type of old buffer
-      cv::Mat::MSize &buff_size = buffer.size;
+      auto &buff_size = buffer.size;
       const int buff_type = buffer.type();
 
       if(data.size == buff_size && data.type() == buff_type)
