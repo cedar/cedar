@@ -22,13 +22,13 @@
  Institute:   Ruhr-Universitaet Bochum
  Institut fuer Neuroinformatik
 
- File:        VehicleRotationStep.cpp
+ File:        VehicleRotation.cpp
 
  Maintainer:  Jan Tekülve
  Email:       jan.tekuelve@ini.rub.de
  Date:        2016 07 07
 
- Description: Source file for the class cedar::proc::steps::VehicleRotationStep.
+ Description: Source file for the class cedar::proc::steps::VehicleRotation.
 
  Credits:
 
@@ -38,12 +38,13 @@
 #include "cedar/configuration.h"
 
 // CLASS HEADER
-#include "cedar/processing/steps/VehicleRotationStep.h"
+#include "cedar/processing/steps/VehicleRotation.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/devices/Vehicle.h"
+#include "cedar/processing/StepTime.h"
 // SYSTEM INCLUDES
 namespace
 {
@@ -52,8 +53,9 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::steps::VehicleRotationStep>("Robotics", "cedar.processing.steps.VehicleRotationStep"));
+    ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::steps::VehicleRotation>("Robotics", "cedar.processing.steps.VehicleRotation"));
     declaration->setIconPath(":/steps/vehicle_rotation.svg");
+    declaration->deprecatedName("cedar.processing.steps.VehicleRotationStep");
     declaration->declare();
 
     return true;
@@ -65,29 +67,47 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::EnumType<cedar::proc::steps::VehicleRotationStep::AngularMeasurementUnit> cedar::proc::steps::VehicleRotationStep::AngularMeasurementUnit::mType("FunctionType::");
+cedar::aux::EnumType<cedar::proc::steps::VehicleRotation::AngularMeasurementUnit> cedar::proc::steps::VehicleRotation::AngularMeasurementUnit::mType("FunctionType::");
 
-cedar::proc::steps::VehicleRotationStep::VehicleRotationStep()
+cedar::proc::steps::VehicleRotation::VehicleRotation()
     :
+    cedar::proc::Step(true),
       mOutputVelocity(new cedar::aux::MatData(cv::Mat())),
       mInputVelocityName("rotation velocity"),
       _mComponent(new cedar::dev::ComponentParameter(this, "component")),
       mUnitType(
-                new cedar::aux::EnumParameter(this, "input unit", cedar::proc::steps::VehicleRotationStep::AngularMeasurementUnit::typePtr(),
+                new cedar::aux::EnumParameter(this, "input unit", cedar::proc::steps::VehicleRotation::AngularMeasurementUnit::typePtr(),
                     AngularMeasurementUnit::Rad))
 {
   this->declareInput(mInputVelocityName);
   QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SLOT(rebuildOutputs()));
+  this->mTimestepMeasurementId = this->registerTimeMeasurement("time step");
 }
 
-cedar::proc::steps::VehicleRotationStep::~VehicleRotationStep()
+cedar::proc::steps::VehicleRotation::~VehicleRotation()
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::steps::VehicleRotationStep::eulerStep(const cedar::unit::Time& time)
+void cedar::proc::steps::VehicleRotation::compute(const cedar::proc::Arguments& arguments)
+{
+  try
+  {
+    const cedar::proc::StepTime& step_time = dynamic_cast<const cedar::proc::StepTime&>(arguments);
+
+    this->setTimeMeasurement(this->mTimestepMeasurementId, step_time.getStepTime());
+
+    this->eulerStep(step_time.getStepTime());
+  }
+  catch (const std::bad_cast& e)
+  {
+    CEDAR_THROW(cedar::proc::InvalidArgumentsException, "Bad arguments passed to dynamics. Expected StepTime.");
+  }
+}
+
+void cedar::proc::steps::VehicleRotation::eulerStep(const cedar::unit::Time& time)
 {
   cedar::aux::ConstDataPtr inputData = this->getInputSlot(mInputVelocityName)->getData();
 
@@ -113,7 +133,7 @@ void cedar::proc::steps::VehicleRotationStep::eulerStep(const cedar::unit::Time&
   }
 }
 
-void cedar::proc::steps::VehicleRotationStep::onStart()
+void cedar::proc::steps::VehicleRotation::onStart()
 {
   if (this->hasComponent())
   {
@@ -122,7 +142,7 @@ void cedar::proc::steps::VehicleRotationStep::onStart()
   }
 }
 
-void cedar::proc::steps::VehicleRotationStep::onStop()
+void cedar::proc::steps::VehicleRotation::onStop()
 {
   if (this->hasComponent())
   {
@@ -138,7 +158,7 @@ void cedar::proc::steps::VehicleRotationStep::onStop()
   }
 }
 
-bool cedar::proc::steps::VehicleRotationStep::hasComponent() const
+bool cedar::proc::steps::VehicleRotation::hasComponent() const
 {
   try
   {
@@ -150,13 +170,13 @@ bool cedar::proc::steps::VehicleRotationStep::hasComponent() const
   }
 }
 
-void cedar::proc::steps::VehicleRotationStep::reset()
+void cedar::proc::steps::VehicleRotation::reset()
 {
   auto component = this->getComponent();
   component->clearAll();
 }
 
-cedar::proc::DataSlot::VALIDITY cedar::proc::steps::VehicleRotationStep::determineInputValidity(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data) const
+cedar::proc::DataSlot::VALIDITY cedar::proc::steps::VehicleRotation::determineInputValidity(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data) const
 {
   cedar::aux::ConstMatDataPtr _input = boost::dynamic_pointer_cast < cedar::aux::ConstMatData > (data);
   if (_input && _input->getDimensionality() == 0 && slot->getName() == mInputVelocityName && _input->getData().type() == CV_32F)
@@ -167,7 +187,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::VehicleRotationStep::determi
   return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
-void cedar::proc::steps::VehicleRotationStep::rebuildOutputs()
+void cedar::proc::steps::VehicleRotation::rebuildOutputs()
 {
   this->removeAllSlots(cedar::proc::DataRole::OUTPUT);
   auto component = this->getComponent();
@@ -179,7 +199,7 @@ void cedar::proc::steps::VehicleRotationStep::rebuildOutputs()
   }
 }
 
-void cedar::proc::steps::VehicleRotationStep::testStates(cedar::dev::ComponentPtr component)
+void cedar::proc::steps::VehicleRotation::testStates(cedar::dev::ComponentPtr component)
 {
   if (!component->isCommunicating())
   {
