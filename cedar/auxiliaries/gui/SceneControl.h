@@ -38,6 +38,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/ui_SceneControl.h"
+#include "cedar/auxiliaries/gui/Viewer.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/SceneControl.fwd.h"
