@@ -19,7 +19,16 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <property name="margin">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
      <number>0</number>
     </property>
     <item row="0" column="0">
@@ -38,7 +47,16 @@
         <string>architecture</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2" rowstretch="1">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
         <property name="spacing">
@@ -46,6 +64,16 @@
         </property>
         <item row="0" column="0">
          <widget class="cedar::proc::gui::View" name="mpProcessingDrawer"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabSceneControl">
+       <attribute name="title">
+        <string>simulator</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <widget class="cedar::aux::gui::SceneControl" name="mpSceneControl" native="true"/>
         </item>
        </layout>
       </widget>
@@ -59,7 +87,7 @@
      <x>0</x>
      <y>0</y>
      <width>983</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -186,7 +214,16 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_2">
     <layout class="QHBoxLayout" name="horizontalLayout">
-     <property name="margin">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
@@ -207,7 +244,16 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_3">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <property name="margin">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
@@ -228,7 +274,16 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_5">
     <layout class="QVBoxLayout" name="verticalLayout_2">
-     <property name="margin">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
@@ -261,8 +316,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>28</height>
+              <width>254</width>
+              <height>495</height>
              </rect>
             </property>
             <property name="palette">
@@ -388,20 +443,13 @@
    <addaction name="mpActionRecord"/>
    <addaction name="mpActionSnapshot"/>
    <addaction name="separator"/>
-
    <addaction name="mpActionToggleTriggerColor"/>
    <addaction name="separator"/>
-
-
    <addaction name="mpActionDummy"/>
    <addaction name="separator"/>
-
    <addaction name="mpActionToggleVisibilityOfPlots"/>
-
    <addaction name="separator"/>
    <addaction name="mpActionBrakeAllRobots"/>
-
-
    <addaction name="mpActionDisplayPlotGroup"/>
    <addaction name="mpActionNewPlotGroup"/>
    <addaction name="mpActionRenamePlotGroup"/>
@@ -489,7 +537,7 @@
     <string>Toggle grid</string>
    </property>
    <property name="toolTip">
-      <string>Toggles the grid in the architecture pane. Steps will align to this grid.</string>
+    <string>Toggles the grid in the architecture pane. Steps will align to this grid.</string>
    </property>
   </action>
   <action name="mpRecentFiles">
@@ -677,9 +725,6 @@
    </property>
   </action>
   <action name="mpActionNewPlotGroup">
-   <property name="visible">
-    <bool>false</bool>
-   </property>
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/new.svg</normaloff>:/toolbaricons/new.svg</iconset>
@@ -690,11 +735,11 @@
    <property name="toolTip">
     <string>Add a plot group</string>
    </property>
-  </action>
-  <action name="mpActionRenamePlotGroup">
    <property name="visible">
     <bool>false</bool>
    </property>
+  </action>
+  <action name="mpActionRenamePlotGroup">
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/edit.svg</normaloff>:/toolbaricons/edit.svg</iconset>
@@ -705,11 +750,11 @@
    <property name="toolTip">
     <string>Rename selected plot group</string>
    </property>
-  </action>
-  <action name="mpActionDisplayPlotGroup">
    <property name="visible">
     <bool>false</bool>
    </property>
+  </action>
+  <action name="mpActionDisplayPlotGroup">
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/display.svg</normaloff>:/toolbaricons/display.svg</iconset>
@@ -720,11 +765,11 @@
    <property name="toolTip">
     <string>Display selected plot group</string>
    </property>
-  </action>
-  <action name="mpActionDeletePlotGroup">
    <property name="visible">
     <bool>false</bool>
    </property>
+  </action>
+  <action name="mpActionDeletePlotGroup">
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/trash.svg</normaloff>:/toolbaricons/trash.svg</iconset>
@@ -734,6 +779,9 @@
    </property>
    <property name="toolTip">
     <string>Delete selected plot group</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="mpActionPerformanceOverview">
@@ -818,9 +866,6 @@
    </property>
   </action>
   <action name="mpActionEditPlotGroup">
-   <property name="visible">
-    <bool>false</bool>
-   </property>
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/store_plotgroup.svg</normaloff>:/toolbaricons/store_plotgroup.svg</iconset>
@@ -830,6 +875,9 @@
    </property>
    <property name="toolTip">
     <string>Store open plots in selected plot group</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="mpActionToggleTriggerColor">
@@ -909,10 +957,16 @@
    <header>cedar/processing/gui/ElementList.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>cedar::aux::gui::SceneControl</class>
+   <extends>QWidget</extends>
+   <header>cedar/auxiliaries/gui/SceneControl.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources>
-  <include location="icons/cedar_proc_gui_icons.qrc"/>
   <include location="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc"/>
+  <include location="icons/cedar_proc_gui_icons.qrc"/>
  </resources>
  <connections>
   <connection>
