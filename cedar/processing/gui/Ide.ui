@@ -69,7 +69,7 @@
       </widget>
       <widget class="QWidget" name="tabSceneControl">
        <attribute name="title">
-        <string>simulated scene control</string>
+        <string>simulator</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
