@@ -44,24 +44,24 @@
 
 cedar::aux::gui::SceneControl::SceneControl(QWidget* parent)
 :
-QWidget(parent)
+QWidget(parent),
+mpScene(new cedar::aux::gl::Scene)
 {
   this->setupUi(this);
 
-  // create the scene for the visualization
-  cedar::aux::gl::ScenePtr scene(new cedar::aux::gl::Scene);
-  scene->setSceneLimit(1);
-  scene->drawFloor(true);
+  // initialize scene
+  mpScene->setSceneLimit(1);
+  mpScene->drawFloor(true);
 
-  // widget containing object manipulation controls
-  mpSceneWidget = new cedar::aux::gui::SceneWidget(scene, this);
+  // initialize widget containing object manipulation controls
+  mpSceneWidget = new cedar::aux::gui::SceneWidget(mpScene, this);
   mpSceneWidget->setObjectName(QString::fromUtf8("mpSceneWidget"));
   horizontalLayout->addWidget(mpSceneWidget);
 
   // create an initial viewer widget
-  mpView = new cedar::aux::gui::Viewer(scene);
+  mpView = new cedar::aux::gui::Viewer(mpScene);
   mpView->show();
-  mpView->setSceneRadius(scene->getSceneLimit());
+  mpView->setSceneRadius(mpScene->getSceneLimit());
   mpView->camera()->setPosition(qglviewer::Vec(0.0, 0.0, 4.0));
   mpView->camera()->lookAt(qglviewer::Vec(0.0, 0.0, 0.0));
   mpView->startTimer(25);

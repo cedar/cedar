@@ -59,6 +59,9 @@ public:
   /*!@brief the destructor */
   ~SceneControl(){}
 
+private:
+  cedar::aux::gl::ScenePtr mpScene;
+
 }; // class cedar::aux:gui::SceneControl
 
 #endif // CEDAR_AUX_GUI_SCENE_CONTROL_H
