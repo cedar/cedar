@@ -21,14 +21,7 @@
     <widget class="cedar::aux::gui::SceneWidget" name="mpSceneWidget" native="true"/>
    </item>
    <item>
-    <widget class="QFrame" name="mpSceneFrame">
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-    </widget>
+    <widget class="cedar::aux::gui::Viewer" name="mpView" native="true"/>
    </item>
   </layout>
  </widget>
@@ -37,6 +30,12 @@
    <class>cedar::aux::gui::SceneWidget</class>
    <extends>QWidget</extends>
    <header>cedar/auxiliaries/gui/SceneWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cedar::aux::gui::Viewer</class>
+   <extends>QWidget</extends>
+   <header>cedar/auxiliaries/gui/Viewer.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -306,31 +306,25 @@ void cedar::aux::gui::SceneWidget::init()
 {
 
   updateObjectSelectionComboBox();
-//  // fill combo box with names of objects in the scene
-//  for (int i=0; i<mpScene->getNumberOfObjectVisualizations(); i++)
-//  {
-//    mpComboBoxName->addItem
-//    (
-//      QString(mpScene->getObjectVisualization(i)->getLocalCoordinateFrame()->getName().c_str())
-//    );
-//  }
-  
-  // initialize rigid body visualization widget
-  mpObjectVisualizationWidget = new cedar::aux::gui::ObjectVisualizationWidget(mpScene->getObjectVisualization(0));
-  mpGridLayout->addWidget(mpObjectVisualizationWidget, 2, 0, 1, 2);
-
-  // initialize rigid body widget
-  mpLocalCoordinateFrameWidget = new cedar::aux::gui::LocalCoordinateFrameWidget
-  (
-    mpScene->getObjectVisualization(0)->getLocalCoordinateFrame()
-  );
-  mpGridLayout->addWidget(mpLocalCoordinateFrameWidget, 4, 0, 1, 2);
-
 
   if (mpScene->isEmpty())
   {
     mpObjectSettingsBox->setEnabled(false);
   }
+  else
+  {
+    // initialize rigid body visualization widget
+    mpObjectVisualizationWidget = new cedar::aux::gui::ObjectVisualizationWidget(mpScene->getObjectVisualization(0));
+    mpGridLayout->addWidget(mpObjectVisualizationWidget, 2, 0, 1, 2);
+
+    // initialize rigid body widget
+    mpLocalCoordinateFrameWidget = new cedar::aux::gui::LocalCoordinateFrameWidget
+    (
+      mpScene->getObjectVisualization(0)->getLocalCoordinateFrame()
+    );
+    mpGridLayout->addWidget(mpLocalCoordinateFrameWidget, 4, 0, 1, 2);
+  }
+
   setActiveVisualization();
 
   // set widget properties
