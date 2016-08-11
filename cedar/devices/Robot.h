@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/FileParameter.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/ObjectMapParameterTemplate.fwd.h"
@@ -220,7 +221,10 @@ private:
   ComponentSlotParameter mComponentSlots;
 
   //! Configurable object used for storing robot setup in a separate file.
-//  cedar::aux::ConfigurablePtr mRobotDescription;
+  //cedar::aux::ConfigurablePtr mRobotDescription;
+
+  //! The robots visual representation in the internal simulator
+  cedar::aux::gl::ObjectVisualizationPtr mVisualisation;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

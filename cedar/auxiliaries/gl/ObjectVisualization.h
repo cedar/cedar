@@ -389,7 +389,7 @@ namespace cedar
   }
 }
 
-CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::math::ObjectVisualizationManager);
+CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::gl::ObjectVisualizationManager);
 
 
 #endif  // CEDAR_AUX_GL_OBJECT_VISUALIZATION_H
