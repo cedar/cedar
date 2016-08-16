@@ -329,30 +329,6 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
   // read using default procedure (where possible)
   // this->mRobotDescription->readConfiguration(node);
 
-  // read out and allocate the visualization class
-  auto vis_class_node = node.find("GL visualisation class");
-  if (vis_class_node == node.not_found())
-  {
-    // no class named? use an invisible block as dummy visualization pointer
-    mVisualisation = cedar::aux::gl::ObjectVisualizationManagerSingleton::getInstance()->allocate("cedar.aux.gl.Block");
-    mVisualisation->setVisibility(false);
-  }
-  else
-  {
-    const std::string& class_name = vis_class_node->second.data();
-
-    if(class_name == "none")
-    {
-      // explicitly no visualisation? also use an invisible block
-      mVisualisation = cedar::aux::gl::ObjectVisualizationManagerSingleton::getInstance()->allocate("cedar.aux.gl.Block");
-      mVisualisation->setVisibility(false);
-    }
-    else
-    {
-      mVisualisation = cedar::aux::gl::ObjectVisualizationManagerSingleton::getInstance()->allocate(class_name);
-    }
-  }
-
   // read the component slots
   auto desc_file_node = node.find("component slots");
   if (desc_file_node == node.not_found())
@@ -395,6 +371,32 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
       mChannelTypes[channel_name] = channel_type;
 
       this->appendChannelConfiguration(channel_name, channel_description_iter->second);
+    }
+  }
+
+  // read out and allocate the visualization class (after component initialisation!)
+  auto vis_class_node = node.find("GL visualisation class");
+  if (vis_class_node == node.not_found())
+  {
+    // no class named? use an invisible block as dummy visualization pointer
+    mVisualisation = cedar::aux::gl::ObjectVisualizationManagerSingleton::getInstance()->allocate("cedar.aux.gl.Block");
+    mVisualisation->setVisibility(false);
+  }
+  else
+  {
+    const std::string& class_name = vis_class_node->second.data();
+
+    if(class_name == "none")
+    {
+      // explicitly no visualisation? also use an invisible block
+      mVisualisation = cedar::aux::gl::ObjectVisualizationManagerSingleton::getInstance()->allocate("cedar.aux.gl.Block");
+      mVisualisation->setVisibility(false);
+    }
+    else
+    {
+      mVisualisation = cedar::aux::gl::ObjectVisualizationManagerSingleton::getInstance()->allocate(class_name);
+      mVisualisation->setRobotPtr(cedar::dev::RobotPtr(this));
+      mVisualisation->initializeGl();
     }
   }
 
