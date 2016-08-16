@@ -53,7 +53,19 @@ mGrabberConnected(false),
 mReadFromFile(readFromFile),
 mRegisteredGrabber("")
 {
-  mpScene->addViewer(this);
+    mpScene->addViewer(this);
+}
+
+cedar::aux::gui::Viewer::Viewer(bool readFromFile)
+:
+mpScene(cedar::aux::gl::ScenePtr(new cedar::aux::gl::Scene)),
+mpGrabberLock(NULL),
+mGrabberBuffer(cv::Mat()),
+mGrabberConnected(false),
+mReadFromFile(readFromFile),
+mRegisteredGrabber("")
+{
+
 }
 
 cedar::aux::gui::Viewer::~Viewer()
@@ -81,6 +93,7 @@ void cedar::aux::gui::Viewer::init()
     restoreStateFromFile();
 #endif // CEDAR_USE_QGLVIEWER
   }
+
   mpScene->initGl();
 }
 
