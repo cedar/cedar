@@ -388,4 +388,3 @@ void cedar::aux::gl::ObjectVisualization::setVisibility(bool state)
 { 
   _mIsVisible->setValue( state, true );
 }
-

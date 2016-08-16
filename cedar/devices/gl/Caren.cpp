@@ -48,32 +48,22 @@
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
+// register class with the object visualization factory manager
+//----------------------------------------------------------------------------------------------------------------------
+
+namespace
+{
+    bool registered
+        = cedar::aux::gl::ObjectVisualizationManagerSingleton::getInstance()->registerType<cedar::dev::gl::CarenPtr>();   
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::gl::Caren::Caren
-(
-  cedar::dev::KinematicChainPtr trunk,
-  cedar::dev::KinematicChainPtr arm,
-  cedar::dev::KinematicChainPtr head,
-  cedar::dev::KinematicChainPtr palm,
-  cedar::dev::KinematicChainPtr fingerOne,
-  cedar::dev::KinematicChainPtr fingerTwo,
-  cedar::dev::KinematicChainPtr fingerThree
-)
+cedar::dev::gl::Caren::Caren()
 :
-cedar::aux::gl::ObjectVisualization(trunk->getRootCoordinateFrame()),
-mTrunk(trunk),
-mArm(arm),
-mHead(head),
-mPalm(palm),
-mFingerOne(fingerOne),
-mFingerTwo(fingerTwo),
-mFingerThree(fingerThree),
-mTrunkVisualization(new cedar::dev::gl::PowerCube110(trunk)),
-mArmVisualization(new cedar::dev::gl::KukaArm(arm)),
-mHandVisualization(new cedar::dev::gl::Sdh(fingerOne, fingerTwo, fingerThree, palm)),
-mHeadVisualization(new cedar::dev::gl::PowerCubeWrist90(head))
+cedar::aux::gl::ObjectVisualization(cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame), "Caren", 1, 1, 1)
 {
 
 }
@@ -89,10 +79,36 @@ cedar::dev::gl::Caren::~Caren()
 
 void cedar::dev::gl::Caren::initializeGl()
 {
+  // assuming mRobot actually has the required components.
+  // Therefore commenting out all components that are not declared in Carens description.json.
+  // Todo: find a clever way to perform checks. maybe try/catch on every component?
+
+  //cedar::dev::KinematicChainPtr head = boost::dynamic_pointer_cast <cedar::dev::KinematicChain> ( mRobot->getComponent("head"));
+  //cedar::dev::KinematicChainPtr palm = boost::dynamic_pointer_cast <cedar::dev::KinematicChain> ( mRobot->getComponent("palm"));
+  //cedar::dev::KinematicChainPtr fingerOne = boost::dynamic_pointer_cast <cedar::dev::KinematicChain> (mRobot->getComponent("fingerOne"));
+  //cedar::dev::KinematicChainPtr fingerTwo = boost::dynamic_pointer_cast <cedar::dev::KinematicChain> (mRobot->getComponent("fingerTwo"));
+  //cedar::dev::KinematicChainPtr fingerThree = boost::dynamic_pointer_cast <cedar::dev::KinematicChain> (mRobot->getComponent("fingerThree"));
+
+  mTrunk = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(mRobot->getComponent("trunk"));
+  mArm = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(mRobot->getComponent("arm"));
+
+  //mHead = head;
+  //mPalm = palm;
+  //mFingerOne = fingerOne;
+  //mFingerTwo = fingerTwo;
+  //mFingerThree = fingerThree;
+
+  mTrunkVisualization = cedar::dev::gl::KinematicChainPtr( new cedar::dev::gl::PowerCube110(mTrunk) );
+  mArmVisualization = cedar::dev::gl::KinematicChainPtr( new cedar::dev::gl::KukaArm(mArm) );
+
+  //mHandVisualization = cedar::dev::gl::SdhPtr( new cedar::dev::gl::Sdh(fingerOne, fingerTwo, fingerThree, palm) );
+  //mHeadVisualization = cedar::dev::gl::KinematicChainPtr( new cedar::dev::gl::PowerCubeWrist90(head) );
+
   mTrunkVisualization->initializeGl();
   mArmVisualization->initializeGl();
-  mHandVisualization->initializeGl();
-  mHeadVisualization->initializeGl();
+  //mHandVisualization->initializeGl();
+  //mHeadVisualization->initializeGl();
+
 }
 
 void cedar::dev::gl::Caren::draw()

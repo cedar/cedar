@@ -50,6 +50,8 @@
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/IntParameter.h"
+#include "cedar/devices/namespace.h"
+#include "cedar/devices/Robot.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -61,7 +63,7 @@
  *
  */
 class cedar::aux::gl::ObjectVisualization : public QObject, public cedar::aux::Configurable
-{
+{    
   //--------------------------------------------------------------------------------------------------------------------
   // structs
   //--------------------------------------------------------------------------------------------------------------------
@@ -186,6 +188,14 @@ public:
    */
   cedar::aux::LocalCoordinateFramePtr getLocalCoordinateFrame();
 
+  /*!@brief set method to access the robot pointer
+   */
+  void setRobotPtr(const cedar::dev::RobotPtr robot)
+  {
+    mRobot = robot;
+  }
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -234,6 +244,9 @@ public slots:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief pointer to a robot, using which component data may be referred (for visualisation purpose)
+  cedar::dev::RobotPtr mRobot;
+
 private:
   //!@brief geometric type of the object
   std::string mObjectType;
@@ -347,7 +360,6 @@ private:
 
 // Parameters:
 
-  
   //!@brief object color in RGB, R channel
   cedar::aux::DoubleParameterPtr _mColorR;
   //!@brief object color in RGB, G channel

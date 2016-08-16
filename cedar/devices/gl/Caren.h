@@ -54,17 +54,10 @@ class cedar::dev::gl::Caren : public cedar::aux::gl::ObjectVisualization
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
   //!@brief constructor
-  Caren
-  (
-    cedar::dev::KinematicChainPtr trunk,
-    cedar::dev::KinematicChainPtr arm,
-    cedar::dev::KinematicChainPtr head,
-    cedar::dev::KinematicChainPtr palm,
-    cedar::dev::KinematicChainPtr fingerOne,
-    cedar::dev::KinematicChainPtr fingerTwo,
-    cedar::dev::KinematicChainPtr fingerThree
-  );
+  Caren();
+
   //!@brief destructor
   ~Caren();
 
@@ -79,7 +72,7 @@ public:
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------------------------------------  
 protected:
 
   //--------------------------------------------------------------------------------------------------------------------

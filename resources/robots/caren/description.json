@@ -1,5 +1,5 @@
 {
-  "GL visualisation class" : "cedar.aux.gl.Block",
+  "GL visualisation class" : "cedar.dev.gl.Caren",
   "component slots":
   {
     "arm":
