@@ -59,6 +59,11 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::aux::gui::SceneWidget::SceneWidget(QWidget *parent)
+{
+
+}
+
 cedar::aux::gui::SceneWidget::SceneWidget(cedar::aux::gl::ScenePtr p_scene, QWidget*)
 :
 mpScene(p_scene)
