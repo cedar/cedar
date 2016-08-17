@@ -82,3 +82,8 @@ mpScene(new cedar::aux::gl::Scene)
 
   QMetaObject::connectSlotsByName(this);
 }
+
+void cedar::aux::gui::SceneControl::addVisualization(const cedar::aux::gl::ObjectVisualizationPtr &p_visual)
+{
+  mpScene->addObjectVisualization(p_visual);
+}
