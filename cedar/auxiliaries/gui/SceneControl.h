@@ -59,6 +59,8 @@ public:
   /*!@brief the destructor */
   ~SceneControl(){}
 
+  void addVisualization(const cedar::aux::gl::ObjectVisualizationPtr &p_visual);
+
 private:
   cedar::aux::gl::ScenePtr mpScene;
 
