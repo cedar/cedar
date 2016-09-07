@@ -378,7 +378,7 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
   auto vis_class_node = node.find("GL visualisation class");
   if (vis_class_node != node.not_found() && vis_class_node->second.data() != "none")
   {
-    mVisualisation = cedar::aux::gl::ObjectVisualizationManagerSingleton::getInstance()->allocate(vis_class_node->second.data());
+    mVisualisation = cedar::dev::gl::RobotVisualisationManagerSingleton::getInstance()->allocate(vis_class_node->second.data());
     mVisualisation->setRobotPtr(cedar::dev::RobotPtr(this));
     mVisualisation->initializeGl();
     // send a signal to SceneControl here
