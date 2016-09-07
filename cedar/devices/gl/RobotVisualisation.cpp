@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,50 +22,32 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        RobotVisualisation.cpp
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 11 30
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 02 28
 
-    Description: Namespace file for cedar::dev::gl.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_GL_NAMESPACE_H
-#define CEDAR_DEV_GL_NAMESPACE_H
-
 // CEDAR INCLUDES
-#include "cedar/devices/lib.h"
+#include "cedar/devices/gl/RobotVisualisation.h"
 
-// SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/smart_ptr.hpp>
-#endif
-
-namespace cedar
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+cedar::dev::gl::RobotVisualisation::RobotVisualisation(aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+                                                       const std::string &objectType, double colorR, double colorG, double colorB)
+  : cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, objectType, colorR, colorG, colorB)
 {
-  namespace dev
-  {
-    //!@brief Namespace for gl classes.
-    namespace gl
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_DEV_CLASS(KinematicChain);
-      CEDAR_DECLARE_DEV_CLASS(AmtecChain);
-      CEDAR_DECLARE_DEV_CLASS(CoraArm);
-      CEDAR_DECLARE_DEV_CLASS(CoraHead);
-      CEDAR_DECLARE_DEV_CLASS(KukaArm);
-      CEDAR_DECLARE_DEV_CLASS(Sdh);
-      CEDAR_DECLARE_DEV_CLASS(PowerCube110);
-      CEDAR_DECLARE_DEV_CLASS(PowerCubeWrist90);
-      CEDAR_DECLARE_DEV_CLASS(Caren);
-      CEDAR_DECLARE_DEV_CLASS(RobotVisualisation);
-      //!@endcond
-    }
-  }
+
 }
 
-#endif // CEDAR_DEV_GL_NAMESPACE_H
+cedar::dev::gl::RobotVisualisation::~RobotVisualisation()
+{
+
+}

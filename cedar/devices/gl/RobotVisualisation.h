@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Caren.h
+    File:        RobotVisualisation.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
@@ -34,21 +34,25 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_GL_CAREN_H
-#define CEDAR_DEV_ROBOT_GL_CAREN_H
+#ifndef CEDAR_DEV_ROBOTVIS_H
+#define CEDAR_DEV_ROBOTVIS_H
 
 // CEDAR INCLUDES
 #include "cedar/devices/gl/namespace.h"
-#include "cedar/devices/KinematicChain.h"
-#include "cedar/devices/gl/RobotVisualisation.h"
+#include "cedar/devices/namespace.h"
+#include "cedar/devices/Robot.h"
+#include "cedar/devices/gl/RobotVisualisation.fwd.h"
+
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief Visualization of Caren
+/*!@brief Robot visualisation interface
  *
- * This class provides a simple OpenGL visualization of Caren.
+ * This class serves as an interface between robot visualisations and generic cedar::aux::gl::ObjectVisualization
  */
-class cedar::dev::gl::Caren : public cedar::dev::gl::RobotVisualisation
+
+class cedar::dev::gl::RobotVisualisation : public cedar::aux::gl::ObjectVisualization
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -56,54 +60,60 @@ class cedar::dev::gl::Caren : public cedar::dev::gl::RobotVisualisation
 public:
 
   //!@brief constructor
-  Caren();
+  RobotVisualisation(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+                         const std::string& objectType = "no type",
+                         double colorR = 1.0,
+                         double colorG = 0.0,
+                         double colorB = 0.0
+                     );
 
   //!@brief destructor
-  ~Caren();
+  ~RobotVisualisation();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief draws a visualization of the object in the current GL context
-  void draw(void);
+
   //!@brief the visualization initializes resources in the current GL context
-  virtual void initializeGl();
+  virtual void initializeGl() = 0;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // protected methods
-  //--------------------------------------------------------------------------------------------------------------------  
-protected:
+  //!@brief draws a visualization of the object in the current GL context
+  virtual void draw() = 0;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // private methods
-  //--------------------------------------------------------------------------------------------------------------------
+  //!@brief set method to access the robot pointer
+  void setRobotPtr(const cedar::dev::RobotPtr robot)
+  {
+    mRobot = robot;
+  }
+
 private:
-  //!@brief draws the base
-  void drawBase();
-  //!@brief draws the head
-  void drawHead();
-  //!@brief draws a single camera
-  void drawCamera();
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // members
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-private:
-  cedar::dev::KinematicChainPtr mTrunk;
-  cedar::dev::KinematicChainPtr mArm;
-  cedar::dev::KinematicChainPtr mHead;
-  cedar::dev::KinematicChainPtr mPalm;
-  cedar::dev::KinematicChainPtr mFingerOne;
-  cedar::dev::KinematicChainPtr mFingerTwo;
-  cedar::dev::KinematicChainPtr mFingerThree;
-  cedar::dev::gl::KinematicChainPtr mTrunkVisualization;
-  cedar::dev::gl::KinematicChainPtr mArmVisualization;
-  cedar::dev::gl::SdhPtr mHandVisualization;
-  cedar::dev::gl::KinematicChainPtr mHeadVisualization;
+  //!@brief pointer to a robot, using which component data may be referred (for visualisation purpose)
+  cedar::dev::RobotPtr mRobot;
 
-}; // class cedar::dev::gl::Caren
-#endif // CEDAR_DEV_ROBOT_GL_CAREN_H
+}; // class cedar::dev::gl::RobotVisualisation
+
+#include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/Singleton.h"
+
+namespace cedar
+{
+  namespace dev
+  {
+    namespace gl
+    {
+      //!@brief The manager of all sigmoind instances
+      typedef cedar::aux::FactoryManager<RobotVisualisationPtr> RobotVisualisationManager;
+
+      //!@brief The singleton object of the TransferFunctionFactory.
+      typedef cedar::aux::Singleton<RobotVisualisationManager> RobotVisualisationManagerSingleton;
+    }
+  }
+}
+
+CEDAR_AUX_EXPORT_SINGLETON(cedar::dev::gl::RobotVisualisationManager);
+
+
+#endif // CEDAR_DEV_ROBOTVIS_H
 

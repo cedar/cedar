@@ -50,8 +50,6 @@
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/IntParameter.h"
-#include "cedar/devices/namespace.h"
-#include "cedar/devices/Robot.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -188,14 +186,6 @@ public:
    */
   cedar::aux::LocalCoordinateFramePtr getLocalCoordinateFrame();
 
-  /*!@brief set method to access the robot pointer
-   */
-  void setRobotPtr(const cedar::dev::RobotPtr robot)
-  {
-    mRobot = robot;
-  }
-
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -244,8 +234,7 @@ public slots:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief pointer to a robot, using which component data may be referred (for visualisation purpose)
-  cedar::dev::RobotPtr mRobot;
+  // currently nobody here
 
 private:
   //!@brief geometric type of the object

@@ -63,7 +63,7 @@ namespace
 
 cedar::dev::gl::Caren::Caren()
 :
-cedar::aux::gl::ObjectVisualization(cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame), "Caren", 1, 1, 1)
+cedar::dev::gl::RobotVisualisation(cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame), "Caren", 1, 1, 1)
 {
 
 }

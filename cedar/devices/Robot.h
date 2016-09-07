@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/FileParameter.h"
-#include "cedar/auxiliaries/gl/ObjectVisualization.h"
+#include "cedar/devices/gl/RobotVisualisation.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/ObjectMapParameterTemplate.fwd.h"
@@ -48,6 +48,7 @@
 #include "cedar/devices/Component.fwd.h"
 #include "cedar/devices/ComponentSlot.fwd.h"
 #include "cedar/devices/Robot.fwd.h"
+
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -224,7 +225,7 @@ private:
   //cedar::aux::ConfigurablePtr mRobotDescription;
 
   //! The robots visual representation in the internal simulator
-  cedar::aux::gl::ObjectVisualizationPtr mVisualisation;
+  cedar::dev::gl::RobotVisualisationPtr mVisualisation;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
