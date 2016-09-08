@@ -183,7 +183,7 @@ mpCard(pCard)
 
 cedar::dev::gui::RobotCard::~RobotCard()
 {
-  this->mRobotRemovedConnection.disconnect();
+  this->mRobotRemovedConnection.disconnect();    
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -224,9 +224,6 @@ private:
   //! Configurable object used for storing robot setup in a separate file.
   //cedar::aux::ConfigurablePtr mRobotDescription;
 
-  //! The robots visual representation in the internal simulator
-  cedar::dev::gl::RobotVisualisationPtr mVisualisation;
-
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------

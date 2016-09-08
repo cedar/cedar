@@ -88,6 +88,9 @@ public:
   }
 
 private:
+  // nothing here
+
+protected:
 
   //!@brief pointer to a robot, using which component data may be referred (for visualisation purpose)
   cedar::dev::RobotPtr mRobot;
