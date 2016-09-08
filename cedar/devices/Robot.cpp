@@ -378,13 +378,18 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
   auto vis_class_node = node.find("GL visualisation class");
   if (vis_class_node != node.not_found() && vis_class_node->second.data() != "none")
   {
-    mVisualisation = cedar::dev::gl::RobotVisualisationManagerSingleton::getInstance()->allocate(vis_class_node->second.data());
-    mVisualisation->setRobotPtr(cedar::dev::RobotPtr(this));
-    mVisualisation->initializeGl();
+
+    // The robots visual representation in the internal simulator
+    cedar::dev::gl::RobotVisualisationPtr visualisation;
+    visualisation = cedar::dev::gl::RobotVisualisationManagerSingleton::getInstance()->allocate(vis_class_node->second.data());
+    visualisation->setRobotPtr(this->shared_from_this());
+    visualisation->initializeGl();
+
     // send a signal to SceneControl here
   }
 
   this->performConsistencyCheck();
+
 }
 
 void cedar::dev::Robot::clear()
