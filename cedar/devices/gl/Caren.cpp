@@ -54,7 +54,7 @@
 namespace
 {
     bool registered
-        = cedar::aux::gl::ObjectVisualizationManagerSingleton::getInstance()->registerType<cedar::dev::gl::CarenPtr>();   
+        = cedar::dev::gl::RobotVisualisationManagerSingleton::getInstance()->registerType<cedar::dev::gl::CarenPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
