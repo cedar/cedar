@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/FileParameter.h"
+#include "cedar/auxiliaries/gui/SceneControl.h"
 #include "cedar/devices/gl/RobotVisualisation.h"
 
 // FORWARD DECLARATIONS
@@ -156,6 +157,7 @@ public:
   bool areSomeComponentsCommunicating() const;
   //  HW is on?
   bool areAllComponentsCommunicating() const;
+
   
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

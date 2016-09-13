@@ -66,4 +66,19 @@ private:
 
 }; // class cedar::aux:gui::SceneControl
 
+#include "cedar/auxiliaries/Singleton.h"
+
+namespace cedar
+{
+  namespace aux
+  {
+    namespace gui
+    {
+      CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::aux::gui::SceneControl>);
+      typedef cedar::aux::Singleton<cedar::aux::gui::SceneControl> GlobalSceneSingleton;
+    }
+  }
+}
+
+
 #endif // CEDAR_AUX_GUI_SCENE_CONTROL_H
