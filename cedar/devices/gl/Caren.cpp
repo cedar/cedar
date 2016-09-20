@@ -79,7 +79,6 @@ cedar::dev::gl::Caren::~Caren()
 
 void cedar::dev::gl::Caren::initializeGl()
 {
-    /*
   // assuming mRobot actually has the required components.
   // Therefore commenting out all components that are not declared in Carens description.json.
   // Todo: find a clever way to perform checks. maybe try/catch on every component?
@@ -109,7 +108,6 @@ void cedar::dev::gl::Caren::initializeGl()
   mArmVisualization->initializeGl();
   //mHandVisualization->initializeGl();
   //mHeadVisualization->initializeGl();
- */
 }
 
 void cedar::dev::gl::Caren::draw()
