@@ -234,15 +234,13 @@ public slots:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // currently nobody here
+  //!@brief pointer to the LocalCoordinateFrame of the visualized object
+  cedar::aux::LocalCoordinateFramePtr mpLocalCoordinateFrame;
 
 private:
   //!@brief geometric type of the object
   std::string mObjectType;
  
-  //!@brief pointer to the LocalCoordinateFrame of the visualized object
-  cedar::aux::LocalCoordinateFramePtr mpLocalCoordinateFrame;
-
 protected:
 
   //!@brief encodes the different materials

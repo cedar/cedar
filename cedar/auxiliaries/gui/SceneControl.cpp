@@ -56,6 +56,7 @@ mpScene(new cedar::aux::gl::Scene)
   this->setFocusPolicy(Qt::StrongFocus);
 
   // initialize scene
+  mpScene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
   mpScene->setSceneLimit(2);
   mpScene->drawFloor(true);
 
@@ -81,9 +82,4 @@ mpScene(new cedar::aux::gl::Scene)
   retranslateUi(this);
 
   QMetaObject::connectSlotsByName(this);
-}
-
-void cedar::aux::gui::SceneControl::addVisualization(const cedar::aux::gl::ObjectVisualizationPtr &p_visual)
-{
-  mpScene->addObjectVisualization(p_visual);
 }

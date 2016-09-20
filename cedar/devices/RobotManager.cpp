@@ -235,6 +235,7 @@ void cedar::dev::RobotManager::renameRobot(const std::string& robotName, const s
     CEDAR_THROW(cedar::aux::NotFoundException, "A robot with the name \"" + newName + "\" already exists.");
   }
   mRobotInstances[newName] = old_robot->second;
+  old_robot->second->setVisualisationName(newName); //TODO: somehow inform SceneWidgets selection box about the name change
   this->mRobotInstances.erase(old_robot);
 
   auto old_info = mRobotInfos.find(robotName);
@@ -304,6 +305,7 @@ void cedar::dev::RobotManager::loadRobotConfiguration
      )
 {
   cedar::dev::RobotPtr robot = this->getRobot(robotName);
+  robot->setVisualisationName(robotName);
 
   this->mRobotConfigurations[robotName] = configuration;
   //!@todo If this fails (e.g., because of a malformed json), the robot may be left in an undefined state (e.g., no

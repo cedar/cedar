@@ -39,6 +39,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/ui_SceneControl.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
+#include "cedar/auxiliaries/gl/GlobalScene.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/SceneControl.fwd.h"
@@ -59,26 +60,9 @@ public:
   /*!@brief the destructor */
   ~SceneControl(){}
 
-  void addVisualization(const cedar::aux::gl::ObjectVisualizationPtr &p_visual);
-
 private:
   cedar::aux::gl::ScenePtr mpScene;
 
 }; // class cedar::aux:gui::SceneControl
-
-#include "cedar/auxiliaries/Singleton.h"
-
-namespace cedar
-{
-  namespace aux
-  {
-    namespace gui
-    {
-      CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::aux::gui::SceneControl>);
-      typedef cedar::aux::Singleton<cedar::aux::gui::SceneControl> GlobalSceneSingleton;
-    }
-  }
-}
-
 
 #endif // CEDAR_AUX_GUI_SCENE_CONTROL_H
