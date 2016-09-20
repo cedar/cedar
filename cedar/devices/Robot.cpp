@@ -374,6 +374,12 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
     }
   }
 
+  this->performConsistencyCheck();
+
+}
+
+void cedar::dev::Robot::readVisualisation(const cedar::aux::ConfigurationNode &node)
+{
   // read out and allocate the visualization class (after component initialisation!)
   auto vis_class_node = node.find("GL visualisation class");
 
@@ -390,9 +396,6 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
     cedar::aux::gui::GlobalSceneSingleton::getInstance()->addVisualization(p_object_visualisation);
 
   }
-
-  this->performConsistencyCheck();
-
 }
 
 void cedar::dev::Robot::clear()
@@ -427,6 +430,8 @@ void cedar::dev::Robot::readConfiguration(const cedar::aux::ConfigurationNode& n
 
   this->readChannels(node);
   this->readComponentSlotInstantiations(node);
+
+  this->readVisualisation(description);
 }
 
 void cedar::dev::Robot::readChannels(const cedar::aux::ConfigurationNode& node)
