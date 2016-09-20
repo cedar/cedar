@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/FileParameter.h"
-#include "cedar/auxiliaries/gui/SceneControl.h"
+#include "cedar/auxiliaries/gl/GlobalScene.h"
 #include "cedar/devices/gl/RobotVisualisation.h"
 
 // FORWARD DECLARATIONS
@@ -158,10 +158,14 @@ public:
   //  HW is on?
   bool areAllComponentsCommunicating() const;
 
+  std::string getVisualisationName() const;
+  void setVisualisationName(const std::string &visualisationName);
+
   
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
+
 protected:
   // none yet
 
@@ -228,6 +232,9 @@ private:
 
   //! Configurable object used for storing robot setup in a separate file.
   //cedar::aux::ConfigurablePtr mRobotDescription;
+
+  //! the name of the robot in SceneWidget, given in RobotManager
+  std::string mVisualisationName;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

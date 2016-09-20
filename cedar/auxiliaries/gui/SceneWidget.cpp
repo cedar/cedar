@@ -296,14 +296,21 @@ void cedar::aux::gui::SceneWidget::updateObjectSelectionComboBox()
 {
   mpComboBoxName->blockSignals(true);
   mpComboBoxName->clear();
+
   // fill combo box with names of objects in the scene
-  for (int i=0; i<mpScene->getNumberOfObjectVisualizations(); i++)
+  for (int i=0; i<mpScene->getNumberOfObjectVisualizations(); ++i)
   {
+
     mpComboBoxName->addItem
     (
-      QString(mpScene->getObjectVisualization(i)->getLocalCoordinateFrame()->getName().c_str())
+      QString::fromStdString
+      (
+        mpScene->getObjectVisualization(i)->getLocalCoordinateFrame()->getName()
+      )
     );
+
   }
+
   mpComboBoxName->blockSignals(false);
 }
 

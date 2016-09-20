@@ -95,8 +95,8 @@ cedar::aux::gl::ObjectVisualization::ObjectVisualization
   double colorB
 )
 :
-mObjectType(objectType),
 mpLocalCoordinateFrame(pLocalCoordinateFrame),
+mObjectType(objectType),
 _mColorR( new cedar::aux::DoubleParameter( this, "red RGB color", colorR, 0.0, 1.0) ),
 _mColorG( new cedar::aux::DoubleParameter( this, "green RGB color", colorG, 0.0, 1.0) ),
 _mColorB( new cedar::aux::DoubleParameter( this, "blue RGB color", colorB, 0.0, 1.0) ),
