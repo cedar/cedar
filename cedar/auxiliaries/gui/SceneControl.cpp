@@ -73,8 +73,10 @@ mpScene(new cedar::aux::gl::Scene)
   mpView = new cedar::aux::gui::Viewer(mpScene);
   mpView->show();
   mpView->setSceneRadius(mpScene->getSceneLimit());
+#ifdef CEDAR_USE_QGLVIEWER
   mpView->camera()->setPosition(qglviewer::Vec(0.0, 0.0, 4.0));
   mpView->camera()->lookAt(qglviewer::Vec(0.0, 0.0, 0.0));
+#endif
   mpView->startTimer(25);
   mpView->setObjectName(QString::fromUtf8("mpView"));
   horizontalLayout->addWidget(mpView);
