@@ -61,6 +61,33 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::dev::gl::Caren::Caren
+(
+  cedar::dev::KinematicChainPtr trunk,
+  cedar::dev::KinematicChainPtr arm,
+  cedar::dev::KinematicChainPtr head,
+  cedar::dev::KinematicChainPtr palm,
+  cedar::dev::KinematicChainPtr fingerOne,
+  cedar::dev::KinematicChainPtr fingerTwo,
+  cedar::dev::KinematicChainPtr fingerThree
+)
+:
+cedar::dev::gl::RobotVisualisation(cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame), "Caren", 1, 1, 1),
+mTrunk(trunk),
+mArm(arm),
+mHead(head),
+mPalm(palm),
+mFingerOne(fingerOne),
+mFingerTwo(fingerTwo),
+mFingerThree(fingerThree),
+mTrunkVisualization(new cedar::dev::gl::PowerCube110(trunk)),
+mArmVisualization(new cedar::dev::gl::KukaArm(arm)),
+mHandVisualization(new cedar::dev::gl::Sdh(fingerOne, fingerTwo, fingerThree, palm)),
+mHeadVisualization(new cedar::dev::gl::PowerCubeWrist90(head))
+{
+
+}
+
 cedar::dev::gl::Caren::Caren()
 :
 cedar::dev::gl::RobotVisualisation(cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame), "Caren", 1, 1, 1)
