@@ -107,7 +107,7 @@ void cedar::proc::steps::VehicleRotation::compute(const cedar::proc::Arguments& 
   }
 }
 
-void cedar::proc::steps::VehicleRotation::eulerStep(const cedar::unit::Time& time)
+void cedar::proc::steps::VehicleRotation::eulerStep(const cedar::unit::Time&)
 {
   cedar::aux::ConstDataPtr inputData = this->getInputSlot(mInputVelocityName)->getData();
 
