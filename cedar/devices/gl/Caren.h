@@ -55,6 +55,18 @@ class cedar::dev::gl::Caren : public cedar::dev::gl::RobotVisualisation
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  //!@brief constructor for interactive tests
+  Caren
+  (
+    cedar::dev::KinematicChainPtr trunk,
+    cedar::dev::KinematicChainPtr arm,
+    cedar::dev::KinematicChainPtr head,
+    cedar::dev::KinematicChainPtr palm,
+    cedar::dev::KinematicChainPtr fingerOne,
+    cedar::dev::KinematicChainPtr fingerTwo,
+    cedar::dev::KinematicChainPtr fingerThree
+  );
+
   //!@brief constructor
   Caren();
 

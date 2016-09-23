@@ -127,6 +127,4 @@ namespace cedar
   }
 }
 
-
 #endif // CEDAR_AUX_GL_GLOBAL_SCENE_H
-

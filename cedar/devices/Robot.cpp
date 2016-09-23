@@ -374,6 +374,12 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
     }
   }
 
+  this->performConsistencyCheck();
+
+}
+
+void cedar::dev::Robot::readVisualisation(const cedar::aux::ConfigurationNode &node)
+{
   // read out and allocate the visualization class (after component initialisation!)
   auto vis_class_node = node.find("GL visualisation class");
 
@@ -387,12 +393,9 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
     p_robot_visualisation->initializeGl();
 
     const cedar::aux::gl::ObjectVisualizationPtr p_object_visualisation = boost::dynamic_pointer_cast<cedar::aux::gl::ObjectVisualization>(p_robot_visualisation);
-    cedar::aux::gui::GlobalSceneSingleton::getInstance()->addVisualization(p_object_visualisation);
+    cedar::aux::gl::GlobalSceneSingleton::getInstance()->addObjectVisualization(p_object_visualisation);
 
   }
-
-  this->performConsistencyCheck();
-
 }
 
 void cedar::dev::Robot::clear()
@@ -427,6 +430,8 @@ void cedar::dev::Robot::readConfiguration(const cedar::aux::ConfigurationNode& n
 
   this->readChannels(node);
   this->readComponentSlotInstantiations(node);
+
+  this->readVisualisation(description);
 }
 
 void cedar::dev::Robot::readChannels(const cedar::aux::ConfigurationNode& node)
@@ -463,11 +468,21 @@ void cedar::dev::Robot::appendChannelConfiguration(const std::string& channelNam
   }
 }
 
+std::string cedar::dev::Robot::getVisualisationName() const
+{
+    return mVisualisationName;
+}
+
+void cedar::dev::Robot::setVisualisationName(const std::string &visualisationName)
+{
+    mVisualisationName = visualisationName;
+}
+
 void cedar::dev::Robot::readComponentSlotInstantiations(const cedar::aux::ConfigurationNode& node)
 {
-  std::vector<std::string> component_slots = this->listComponentSlots();
+    std::vector<std::string> component_slots = this->listComponentSlots();
 
-  auto component_instantiations_iter = node.find("component instantiations");
+    auto component_instantiations_iter = node.find("component instantiations");
   if (component_instantiations_iter == node.not_found())
   {
     CEDAR_THROW

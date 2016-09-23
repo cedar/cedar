@@ -56,6 +56,7 @@ mpScene(new cedar::aux::gl::Scene)
   this->setFocusPolicy(Qt::StrongFocus);
 
   // initialize scene
+  mpScene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
   mpScene->setSceneLimit(2);
   mpScene->drawFloor(true);
 
@@ -72,8 +73,10 @@ mpScene(new cedar::aux::gl::Scene)
   mpView = new cedar::aux::gui::Viewer(mpScene);
   mpView->show();
   mpView->setSceneRadius(mpScene->getSceneLimit());
+#ifdef CEDAR_USE_QGLVIEWER
   mpView->camera()->setPosition(qglviewer::Vec(0.0, 0.0, 4.0));
   mpView->camera()->lookAt(qglviewer::Vec(0.0, 0.0, 0.0));
+#endif
   mpView->startTimer(25);
   mpView->setObjectName(QString::fromUtf8("mpView"));
   horizontalLayout->addWidget(mpView);
@@ -81,9 +84,4 @@ mpScene(new cedar::aux::gl::Scene)
   retranslateUi(this);
 
   QMetaObject::connectSlotsByName(this);
-}
-
-void cedar::aux::gui::SceneControl::addVisualization(const cedar::aux::gl::ObjectVisualizationPtr &p_visual)
-{
-  mpScene->addObjectVisualization(p_visual);
 }
