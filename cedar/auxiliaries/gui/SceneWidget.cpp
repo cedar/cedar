@@ -222,6 +222,25 @@ void cedar::aux::gui::SceneWidget::updateWidget()
   mpDoubleSpinBoxRadius->setEnabled(false);
   mpDoubleSpinBoxThickness->setEnabled(false);
 
+  if(mpScene->isEmpty())
+  {
+    return;
+  }
+  else
+  {
+    // initialize rigid body visualization widget
+    mpObjectVisualizationWidget = new cedar::aux::gui::ObjectVisualizationWidget(mpScene->getObjectVisualization(0));
+    mpGridLayout->addWidget(mpObjectVisualizationWidget, 2, 0, 1, 2);
+
+    // initialize rigid body widget
+    mpLocalCoordinateFrameWidget = new cedar::aux::gui::LocalCoordinateFrameWidget
+    (
+      mpScene->getObjectVisualization(0)->getLocalCoordinateFrame()
+    );
+
+    mpGridLayout->addWidget(mpLocalCoordinateFrameWidget, 4, 0, 1, 2);
+  }
+
   if (mpActiveVisualization->getObjectVisualizationType().compare("Cylinder") == 0)
   {
     // enable those elements that apply
@@ -297,8 +316,21 @@ void cedar::aux::gui::SceneWidget::updateObjectSelectionComboBox()
   mpComboBoxName->blockSignals(true);
   mpComboBoxName->clear();
 
+  const int numObjects = mpScene->getNumberOfObjectVisualizations();
+
+  if(numObjects == 0)
+  {
+    mpComboBoxName->setEnabled(false);
+    mpDeleteObjectPushButton->setEnabled(false);
+  }
+  else
+  {
+    mpComboBoxName->setEnabled(true);
+    mpDeleteObjectPushButton->setEnabled(true);
+  }
+
   // fill combo box with names of objects in the scene
-  for (int i=0; i<mpScene->getNumberOfObjectVisualizations(); ++i)
+  for (int i=0; i<numObjects; ++i)
   {
 
     mpComboBoxName->addItem
@@ -311,6 +343,7 @@ void cedar::aux::gui::SceneWidget::updateObjectSelectionComboBox()
 
   }
 
+  setActiveVisualization();
   mpComboBoxName->blockSignals(false);
 }
 
@@ -318,25 +351,7 @@ void cedar::aux::gui::SceneWidget::init()
 {
 
   updateObjectSelectionComboBox();
-
-  if (mpScene->isEmpty())
-  {
-    mpObjectSettingsBox->setEnabled(false);
-  }
-  else
-  {
-    // initialize rigid body visualization widget
-    mpObjectVisualizationWidget = new cedar::aux::gui::ObjectVisualizationWidget(mpScene->getObjectVisualization(0));
-    mpGridLayout->addWidget(mpObjectVisualizationWidget, 2, 0, 1, 2);
-
-    // initialize rigid body widget
-    mpLocalCoordinateFrameWidget = new cedar::aux::gui::LocalCoordinateFrameWidget
-    (
-      mpScene->getObjectVisualization(0)->getLocalCoordinateFrame()
-    );
-    mpGridLayout->addWidget(mpLocalCoordinateFrameWidget, 4, 0, 1, 2);
-  }
-
+  updateWidget();
   setActiveVisualization();
 
   // set widget properties
