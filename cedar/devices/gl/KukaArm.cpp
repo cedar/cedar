@@ -174,109 +174,103 @@ void cedar::dev::gl::KukaArm::drawBase()
 
 void cedar::dev::gl::KukaArm::drawBaseBlock()
 {
+  glBegin(GL_TRIANGLES);
 
-//  cedar::aux::gl::drawCross(0.1);
+  // base plate of the arm
+  glNormal3d(0.0, -0.5, 0.866);
+  glVertex3d(-.09, -.055, .06411542731880106);
+  glVertex3d(-.09, .035, 0.22);
+  glVertex3d(.09, .035, 0.22);
 
-//  glTranslated(0.0, 0.0, 0.02);
-//  cedar::aux::gl::drawBlock(.18, .11, .04, false);
+  glVertex3d(.09, .035, 0.22);
+  glVertex3d(.09, -.055, .06411542731880106);
+  glVertex3d(-.09, -.055, .06411542731880106);
 
-    glBegin(GL_TRIANGLES);
+  // below the base plate
+  glNormal3d(0.0, -1.0, 0.0);
+  glVertex3d(-.09, -.055, .0);
+  glVertex3d(-.09, -.055, .06411542731880106);
+  glVertex3d(.09, -.055, .06411542731880106);
 
-    // base plate of the arm
-    glNormal3d(0.0, -0.5, 0.866);
-    glVertex3d(-.09, -.055, .06411542731880106);
-    glVertex3d(-.09, .035, 0.22);
-    glVertex3d(.09, .035, 0.22);
+  glVertex3d(-.09, -.055, .0);
+  glVertex3d(.09, -.055, .06411542731880106);
+  glVertex3d(.09, -.055, .0);
 
-    glVertex3d(.09, .035, 0.22);
-    glVertex3d(.09, -.055, .06411542731880106);
-    glVertex3d(-.09, -.055, .06411542731880106);
+  // right side
+  glNormal3d(-1.0, 0.0, 0.0);
+  glVertex3d(-.09, .055, 0.0);
+  glVertex3d(-.09, .055, .06411542731880106);
+  glVertex3d(-.09, -.055, 0.0);
 
-    // below the base plate
-    glNormal3d(0.0, -1.0, 0.0);
-    glVertex3d(-.09, -.055, .0);
-    glVertex3d(-.09, -.055, .06411542731880106);
-    glVertex3d(.09, -.055, .06411542731880106);
+  glVertex3d(-.09, .055, .06411542731880106);
+  glVertex3d(-.09, -.055, .06411542731880106);
+  glVertex3d(-.09, -.055, 0.0);
 
-    glVertex3d(-.09, -.055, .0);
-    glVertex3d(.09, -.055, .06411542731880106);
-    glVertex3d(.09, -.055, .0);
+  glVertex3d(-.09, .055, .06411542731880106);
+  glVertex3d(-.09, .055, 0.22);
+  glVertex3d(-.09, .035, .06411542731880106);
 
-    // right side
-    glNormal3d(-1.0, 0.0, 0.0);
-    glVertex3d(-.09, .055, 0.0);
-    glVertex3d(-.09, .055, .06411542731880106);
-    glVertex3d(-.09, -.055, 0.0);
+  glVertex3d(-.09, .055, 0.22);
+  glVertex3d(-.09, .035, 0.22);
+  glVertex3d(-.09, .035, .06411542731880106);
 
-    glVertex3d(-.09, .055, .06411542731880106);
-    glVertex3d(-.09, -.055, .06411542731880106);
-    glVertex3d(-.09, -.055, 0.0);
+  glVertex3d(-.09, .035, .06411542731880106);
+  glVertex3d(-.09, .035, 0.22);
+  glVertex3d(-.09, -.055, .06411542731880106);
 
-    glVertex3d(-.09, .055, .06411542731880106);
-    glVertex3d(-.09, .055, 0.22);
-    glVertex3d(-.09, .035, .06411542731880106);
+  // left side
+  glNormal3d(1.0, 0.0, 0.0);
+  glVertex3d(.09, .055, 0.0);
+  glVertex3d(.09, .055, .06411542731880106);
+  glVertex3d(.09, -.055, 0.0);
 
-    glVertex3d(-.09, .055, 0.22);
-    glVertex3d(-.09, .035, 0.22);
-    glVertex3d(-.09, .035, .06411542731880106);
+  glVertex3d(.09, .055, .06411542731880106);
+  glVertex3d(.09, -.055, .06411542731880106);
+  glVertex3d(.09, -.055, 0.0);
 
-    glVertex3d(-.09, .035, .06411542731880106);
-    glVertex3d(-.09, .035, 0.22);
-    glVertex3d(-.09, -.055, .06411542731880106);
+  glVertex3d(.09, .055, .06411542731880106);
+  glVertex3d(.09, .055, 0.22);
+  glVertex3d(.09, .035, .06411542731880106);
 
-    // left side
-    glNormal3d(1.0, 0.0, 0.0);
-    glVertex3d(.09, .055, 0.0);
-    glVertex3d(.09, .055, .06411542731880106);
-    glVertex3d(.09, -.055, 0.0);
+  glVertex3d(.09, .055, 0.22);
+  glVertex3d(.09, .035, 0.22);
+  glVertex3d(.09, .035, .06411542731880106);
 
-    glVertex3d(.09, .055, .06411542731880106);
-    glVertex3d(.09, -.055, .06411542731880106);
-    glVertex3d(.09, -.055, 0.0);
+  glVertex3d(.09, .035, .06411542731880106);
+  glVertex3d(.09, .035, 0.22);
+  glVertex3d(.09, -.055, .06411542731880106);
 
-    glVertex3d(.09, .055, .06411542731880106);
-    glVertex3d(.09, .055, 0.22);
-    glVertex3d(.09, .035, .06411542731880106);
+  // top
+  glNormal3d(0.0, 0.0, 1.0);
+  glVertex3d(-.09, .055, .22);
+  glVertex3d(.09, .055, .22);
+  glVertex3d(.09, .035, .22);
 
-    glVertex3d(.09, .055, 0.22);
-    glVertex3d(.09, .035, 0.22);
-    glVertex3d(.09, .035, .06411542731880106);
+  glVertex3d(-.09, .055, .22);
+  glVertex3d(.09, .035, .22);
+  glVertex3d(-.09, .035, .22);
 
-    glVertex3d(.09, .035, .06411542731880106);
-    glVertex3d(.09, .035, 0.22);
-    glVertex3d(.09, -.055, .06411542731880106);
+  // bottom
+  glNormal3d(0.0, 0.0, -1.0);
+  glVertex3d(-.09, .055, .0);
+  glVertex3d(.09, .055, .0);
+  glVertex3d(.09, -.055, .0);
 
-    // top
-    glNormal3d(0.0, 0.0, 1.0);
-    glVertex3d(-.09, .055, .22);
-    glVertex3d(.09, .055, .22);
-    glVertex3d(.09, .035, .22);
+  glVertex3d(-.09, .055, .0);
+  glVertex3d(.09, -.055, .0);
+  glVertex3d(-.09, -.055, .0);
 
-    glVertex3d(-.09, .055, .22);
-    glVertex3d(.09, .035, .22);
-    glVertex3d(-.09, .035, .22);
+  // back
+  glNormal3d(0.0, 1.0, 0.0);
+  glVertex3d(-.09, .055, .0);
+  glVertex3d(.09, .055, .0);
+  glVertex3d(.09, .055, .22);
 
-    // bottom
-    glNormal3d(0.0, 0.0, -1.0);
-    glVertex3d(-.09, .055, .0);
-    glVertex3d(.09, .055, .0);
-    glVertex3d(.09, -.055, .0);
+  glVertex3d(-.09, .055, .0);
+  glVertex3d(.09, .055, .22);
+  glVertex3d(-.09, .055, .22);
 
-    glVertex3d(-.09, .055, .0);
-    glVertex3d(.09, -.055, .0);
-    glVertex3d(-.09, -.055, .0);
-
-    // back
-    glNormal3d(0.0, 1.0, 0.0);
-    glVertex3d(-.09, .055, .0);
-    glVertex3d(.09, .055, .0);
-    glVertex3d(.09, .055, .22);
-
-    glVertex3d(-.09, .055, .0);
-    glVertex3d(.09, .055, .22);
-    glVertex3d(-.09, .055, .22);
-
-    glEnd();
+  glEnd();
 }
 
 void cedar::dev::gl::KukaArm::drawSegment(unsigned int index)
