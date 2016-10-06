@@ -40,7 +40,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::gl::RobotVisualisation::RobotVisualisation(aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+cedar::dev::gl::RobotVisualisation::RobotVisualisation(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
                                                        const std::string &objectType, double colorR, double colorG, double colorB)
   : cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, objectType, colorR, colorG, colorB)
 {

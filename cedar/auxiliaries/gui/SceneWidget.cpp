@@ -229,13 +229,13 @@ void cedar::aux::gui::SceneWidget::updateWidget()
   else
   {
     // initialize rigid body visualization widget
-    mpObjectVisualizationWidget = new cedar::aux::gui::ObjectVisualizationWidget(mpScene->getObjectVisualization(0));
+    mpObjectVisualizationWidget = new cedar::aux::gui::ObjectVisualizationWidget(mpActiveVisualization);
     mpGridLayout->addWidget(mpObjectVisualizationWidget, 2, 0, 1, 2);
 
     // initialize rigid body widget
     mpLocalCoordinateFrameWidget = new cedar::aux::gui::LocalCoordinateFrameWidget
     (
-      mpScene->getObjectVisualization(0)->getLocalCoordinateFrame()
+      mpActiveVisualization->getLocalCoordinateFrame()
     );
 
     mpGridLayout->addWidget(mpLocalCoordinateFrameWidget, 4, 0, 1, 2);
