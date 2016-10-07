@@ -68,6 +68,7 @@ namespace cedar
     CEDAR_DECLARE_DEV_CLASS(NetworkChannel);
     CEDAR_DECLARE_DEV_CLASS(Odometry);
     CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
+    CEDAR_DECLARE_DEV_CLASS(SimulatedCamera);
 
     // exceptions
     CEDAR_DECLARE_DEV_CLASS(ChannelConfigurationNotFoundException);

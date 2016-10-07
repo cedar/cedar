@@ -380,6 +380,7 @@ void cedar::dev::RobotManager::loadRobotTemplateConfiguration
        const std::string& configurationName
      )
 {
+
   try
   {
     auto robot_template = this->getTemplate(this->getRobotTemplateName(robotName));
