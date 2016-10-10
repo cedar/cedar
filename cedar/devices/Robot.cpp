@@ -480,9 +480,9 @@ void cedar::dev::Robot::setVisualisationName(const std::string &visualisationNam
 
 void cedar::dev::Robot::readComponentSlotInstantiations(const cedar::aux::ConfigurationNode& node)
 {
-    std::vector<std::string> component_slots = this->listComponentSlots();
+  std::vector<std::string> component_slots = this->listComponentSlots();
 
-    auto component_instantiations_iter = node.find("component instantiations");
+  auto component_instantiations_iter = node.find("component instantiations");
   if (component_instantiations_iter == node.not_found())
   {
     CEDAR_THROW

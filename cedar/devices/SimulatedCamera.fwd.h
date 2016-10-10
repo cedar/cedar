@@ -22,32 +22,43 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        RobotVisualisation.cpp
+    File:        SimulatedCamera.fwd.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 02 28
+    Maintainer:  firu
+    Email:       nico.kuerschner@ini.ruhr-uni-bochum.de
+    Date:        2016 10 07
 
-    Description:
+    Description: Forward declaration file for the class cedar::dev::SimulatedCamera.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_DEV_SIMULATED_CAMERA_FWD_H
+#define CEDAR_DEV_SIMULATED_CAMERA_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
-#include "cedar/devices/gl/RobotVisualisation.h"
+#include "cedar/devices/lib.h"
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-cedar::dev::gl::RobotVisualisation::RobotVisualisation(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
-                                                       const std::string &objectType, double colorR, double colorG, double colorB)
-  : cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, objectType, colorR, colorG, colorB)
+// SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
+
+
+namespace cedar
 {
-
+  namespace dev
+  {
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_DEV_CLASS(SimulatedCamera);
+    //!@endcond
+  }
 }
 
-cedar::dev::gl::RobotVisualisation::~RobotVisualisation()
-{
 
-}
+#endif // CEDAR_DEV_SIMULATED_CAMERA_FWD_H
+

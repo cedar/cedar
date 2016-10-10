@@ -118,8 +118,11 @@ void cedar::dev::gl::Caren::initializeGl()
   //cedar::dev::KinematicChainPtr fingerTwo = boost::dynamic_pointer_cast <cedar::dev::KinematicChain> (mRobot->getComponent("fingerTwo"));
   //cedar::dev::KinematicChainPtr fingerThree = boost::dynamic_pointer_cast <cedar::dev::KinematicChain> (mRobot->getComponent("fingerThree"));
 
-  //mTrunk = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(mRobot->getComponent("trunk"));
-  //mArm = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(mRobot->getComponent("arm"));
+  mTrunk = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(mRobot->getComponent("trunk"));
+  mArm = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(mRobot->getComponent("arm"));
+
+  mTrunk->updatedUserMeasurementSlot();
+  mArm->updatedUserMeasurementSlot();
 
   //mHead = head;
   //mPalm = palm;
@@ -127,23 +130,23 @@ void cedar::dev::gl::Caren::initializeGl()
   //mFingerTwo = fingerTwo;
   //mFingerThree = fingerThree;
 
-  //mTrunkVisualization = cedar::dev::gl::KinematicChainPtr( new cedar::dev::gl::PowerCube110(mTrunk) );
-  //mArmVisualization = cedar::dev::gl::KinematicChainPtr( new cedar::dev::gl::KukaArm(mArm) );
+  mTrunkVisualization = cedar::dev::gl::KinematicChainPtr( new cedar::dev::gl::PowerCube110(mTrunk));
+  mArmVisualization = cedar::dev::gl::KukaArmPtr( new cedar::dev::gl::KukaArm(mArm));
 
   //mHandVisualization = cedar::dev::gl::SdhPtr( new cedar::dev::gl::Sdh(fingerOne, fingerTwo, fingerThree, palm) );
   //mHeadVisualization = cedar::dev::gl::KinematicChainPtr( new cedar::dev::gl::PowerCubeWrist90(head) );
 
-  //mTrunkVisualization->initializeGl();
-  //mArmVisualization->initializeGl();
+  mTrunkVisualization->initializeGl();
+  mArmVisualization->initializeGl();
   //mHandVisualization->initializeGl();
   //mHeadVisualization->initializeGl();
 }
 
 void cedar::dev::gl::Caren::draw()
 {
-  //drawBase();
-  //mTrunkVisualization->draw();
-  //mArmVisualization->draw();
+  drawBase();
+  mTrunkVisualization->draw();
+  mArmVisualization->draw();
   //mHandVisualization->draw();
   //mHeadVisualization->draw();
   //drawHead();
@@ -159,6 +162,7 @@ void cedar::dev::gl::Caren::drawBase()
   cv::Mat transformation;
   transformation = mTrunk->getRootTransformation().t();
   glMultMatrixd((GLdouble*)transformation.data);
+
   // go to table frame
   glTranslated(0, 0, -0.36);
   glRotated(180, 0, 0, 1);
@@ -186,7 +190,6 @@ void cedar::dev::gl::Caren::drawBase()
   // neck plate
   glTranslated(0, 0.1875, 0.0225);
   cedar::aux::gl::drawBlock(.045, .045, .07, 0.07, .01, 0.0, getIsDrawnAsWireFrame());
-
 
   setMaterial(NO_MATERIAL);
 
