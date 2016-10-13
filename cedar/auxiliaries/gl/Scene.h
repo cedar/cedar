@@ -116,6 +116,11 @@ public:
    * @param index index of the object in the scene
    */
   void deleteObjectVisualization(int index);
+
+  /*!@brief removes an object from the scene via its name
+   * @param name name of the object in the scene
+   */
+  void deleteObjectVisualization(const std::string &name);
   
   /*!@brief removes all objects from the scene */
   void clear();

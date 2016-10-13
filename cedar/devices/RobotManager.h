@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
+#include "cedar/devices/gl/RobotVisualisation.h"
 
 // FORWARD DECLARATION
 #include "cedar/devices/RobotManager.fwd.h"

@@ -235,7 +235,6 @@ void cedar::dev::RobotManager::renameRobot(const std::string& robotName, const s
     CEDAR_THROW(cedar::aux::NotFoundException, "A robot with the name \"" + newName + "\" already exists.");
   }
   mRobotInstances[newName] = old_robot->second;
-  old_robot->second->setVisualisationName(newName); //TODO: somehow inform SceneWidgets selection box about the name change
   this->mRobotInstances.erase(old_robot);
 
   auto old_info = mRobotInfos.find(robotName);
@@ -305,9 +304,12 @@ void cedar::dev::RobotManager::loadRobotConfiguration
      )
 {
   cedar::dev::RobotPtr robot = this->getRobot(robotName);
-  robot->setVisualisationName(robotName);
 
   this->mRobotConfigurations[robotName] = configuration;
+
+  // remove robot from visualisation
+  cedar::aux::gl::GlobalSceneSingleton::getInstance()->deleteObjectVisualization(robotName);
+
   //!@todo If this fails (e.g., because of a malformed json), the robot may be left in an undefined state (e.g., no
   //!      channel insantiated). This can cause hard to diagnose crashes if the robot accesses the channel in its
   //!      destructor. A better approache would be: 1) parse json; if successful: 2) create robot 3) read config...
@@ -322,6 +324,13 @@ void cedar::dev::RobotManager::loadRobotConfiguration
     // print this to cout as well, as errors may lead to crashes; see todo above
     std::cout << message << std::endl;
     cedar::aux::LogSingleton::getInstance()->error(message, CEDAR_CURRENT_FUNCTION_NAME);
+  }
+
+  if(configuration.getFileNameWithoutExtension() == "simulator_configuration")
+  {
+    cedar::aux::gl::ObjectVisualizationPtr p_object_visualisation = boost::dynamic_pointer_cast<cedar::aux::gl::ObjectVisualization>(robot->getVisualisationPtr());
+    p_object_visualisation->setObjectName(QString::fromStdString(robotName));
+    cedar::aux::gl::GlobalSceneSingleton::getInstance()->addObjectVisualization(p_object_visualisation);
   }
 
   this->mRobotConfigurationLoadedSignal(robotName);
@@ -393,7 +402,7 @@ void cedar::dev::RobotManager::loadRobotTemplateConfiguration
     {
       cedar::aux::Path configuration = robot_template.getConfiguration(configurationName);
       this->loadRobotConfiguration(robotName, configuration);
-      this->retrieveRobotInfo(robotName).mLoadedTemplateConfiguration = configurationName;
+      this->retrieveRobotInfo(robotName).mLoadedTemplateConfiguration = configurationName;      
     }
   }
   catch (const cedar::dev::NoTemplateLoadedException&)
