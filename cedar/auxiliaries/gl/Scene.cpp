@@ -119,6 +119,20 @@ void cedar::aux::gl::Scene::deleteObjectVisualization(int index)
   mSceneChanged();
 }
 
+void cedar::aux::gl::Scene::deleteObjectVisualization(const std::string &name)
+{
+    QWriteLocker write_locker(&mObjectVisualizationLock);
+
+    for(int i=0; i<mObjectVisualizations.size(); ++i)
+    {
+      if(mObjectVisualizations.at(i)->objectName().toStdString() == name)
+      {
+        mObjectVisualizations.removeAt(i);
+        mSceneChanged();
+      }
+    }
+}
+
 void cedar::aux::gl::Scene::clear()
 {
   mObjectVisualizations.clear();
