@@ -52,31 +52,20 @@ mpScene(new cedar::aux::gl::Scene)
     this->setObjectName(QString::fromUtf8("SceneControl"));
   }
 
-  this->resize(741, 369);
   this->setFocusPolicy(Qt::StrongFocus);
 
   // initialize scene
   mpScene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
-  mpScene->setSceneLimit(2);
+  mpScene->setSceneLimit(5);
   mpScene->drawFloor(true);
 
   horizontalLayout = new QHBoxLayout(this);
   horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
 
-  // initialize widget containing object manipulation controls
-  mpSceneWidget = new cedar::aux::gui::SceneWidget(mpScene, this);
-  mpSceneWidget->setObjectName(QString::fromUtf8("mpSceneWidget"));
-
-  horizontalLayout->addWidget(mpSceneWidget);
-
   // create a viewer widget
   mpView = new cedar::aux::gui::Viewer(mpScene);
   mpView->show();
   mpView->setSceneRadius(mpScene->getSceneLimit());
-#ifdef CEDAR_USE_QGLVIEWER
-  mpView->camera()->setPosition(qglviewer::Vec(0.0, 0.0, 4.0));
-  mpView->camera()->lookAt(qglviewer::Vec(0.0, 0.0, 0.0));
-#endif
   mpView->startTimer(25);
   mpView->setObjectName(QString::fromUtf8("mpView"));
   horizontalLayout->addWidget(mpView);
