@@ -234,6 +234,14 @@ void cedar::dev::RobotManager::renameRobot(const std::string& robotName, const s
   {
     CEDAR_THROW(cedar::aux::NotFoundException, "A robot with the name \"" + newName + "\" already exists.");
   }
+
+  //rename visualisation instance
+  cedar::aux::gl::ObjectVisualizationPtr p_object_visualisation = boost::dynamic_pointer_cast<cedar::aux::gl::ObjectVisualization>(old_robot->second->getVisualisationPtr());
+  if(p_object_visualisation)
+  {
+    p_object_visualisation->setObjectName(QString::fromStdString(newName));
+  }
+
   mRobotInstances[newName] = old_robot->second;
   this->mRobotInstances.erase(old_robot);
 
@@ -255,6 +263,9 @@ void cedar::dev::RobotManager::removeRobot(const std::string& robotName)
     CEDAR_THROW(cedar::aux::UnknownNameException, "Could not find a robot by the name \"" + robotName + "\".");
   }
   this->mRobotInstances.erase(instance_iter);
+
+  // remove robot from visualisation
+  cedar::aux::gl::GlobalSceneSingleton::getInstance()->deleteObjectVisualization(robotName);
 
   auto info_iter = this->mRobotInfos.find(robotName);
   if (info_iter != this->mRobotInfos.end())
@@ -316,7 +327,7 @@ void cedar::dev::RobotManager::loadRobotConfiguration
   try
   {
     robot->readJson(configuration.absolute(false).toString());
-      // don't scroll with loading messages
+    // don't scroll with loading messages
   }
   catch (const boost::property_tree::json_parser_error& e)
   {
@@ -329,8 +340,11 @@ void cedar::dev::RobotManager::loadRobotConfiguration
   if(configuration.getFileNameWithoutExtension() == "simulator_configuration")
   {
     cedar::aux::gl::ObjectVisualizationPtr p_object_visualisation = boost::dynamic_pointer_cast<cedar::aux::gl::ObjectVisualization>(robot->getVisualisationPtr());
-    p_object_visualisation->setObjectName(QString::fromStdString(robotName));
-    cedar::aux::gl::GlobalSceneSingleton::getInstance()->addObjectVisualization(p_object_visualisation);
+    if(p_object_visualisation)
+    {
+      p_object_visualisation->setObjectName(QString::fromStdString(robotName));
+      cedar::aux::gl::GlobalSceneSingleton::getInstance()->addObjectVisualization(p_object_visualisation);
+    }
   }
 
   this->mRobotConfigurationLoadedSignal(robotName);
