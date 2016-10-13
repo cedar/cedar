@@ -340,6 +340,9 @@ void cedar::dev::gui::RobotCard::robotDropped(const QString& robotTypeName)
     addBlankCard();
   }
 
+  // remove former robot from visualisation
+  cedar::aux::gl::GlobalSceneSingleton::getInstance()->deleteObjectVisualization(this->mpRobotNameEdit->text().toStdString());
+
   bool blocked = this->mpConfigurationSelector->blockSignals(true);
   this->mpConfigurationSelector->clear();
   this->mpConfigurationSelector->addItem("-- select to instantiate --");
