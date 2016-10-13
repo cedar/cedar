@@ -37,7 +37,7 @@
        <enum>QTabWidget::Triangular</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="documentMode">
        <bool>true</bool>
@@ -67,9 +67,9 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabSceneControl">
+      <widget class="QWidget" name="tabVisualisation">
        <attribute name="title">
-        <string>simulator</string>
+        <string>visualisation</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
@@ -316,8 +316,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>254</width>
-              <height>495</height>
+              <width>98</width>
+              <height>28</height>
              </rect>
             </property>
             <property name="palette">
@@ -965,8 +965,8 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc"/>
   <include location="icons/cedar_proc_gui_icons.qrc"/>
+  <include location="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc"/>
  </resources>
  <connections>
   <connection>
