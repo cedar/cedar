@@ -37,7 +37,7 @@
        <enum>QTabWidget::Triangular</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="documentMode">
        <bool>true</bool>
@@ -316,8 +316,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>28</height>
+              <width>254</width>
+              <height>495</height>
              </rect>
             </property>
             <property name="palette">
@@ -965,8 +965,8 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="icons/cedar_proc_gui_icons.qrc"/>
   <include location="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc"/>
+  <include location="icons/cedar_proc_gui_icons.qrc"/>
  </resources>
  <connections>
   <connection>

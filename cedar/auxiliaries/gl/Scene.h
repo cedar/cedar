@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/Scene.fwd.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
+#include "cedar/auxiliaries/gl/drawShapes.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/Viewer.fwd.h"
