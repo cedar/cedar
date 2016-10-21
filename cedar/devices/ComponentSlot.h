@@ -126,9 +126,13 @@ public:
   //! Return the name of the configuration
   std::string getConfigurationName() const;
 
+  //! returns the component icon path
+  QString getIconPath() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
+
 protected:
   // none yet
 
@@ -153,6 +157,9 @@ private:
 
   //! Name of the component.
   std::string mName;
+
+  //! Path of the component icon
+  QString mIconPath;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

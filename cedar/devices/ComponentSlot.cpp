@@ -196,6 +196,12 @@ void cedar::dev::ComponentSlot::readConfiguration(const cedar::aux::Configuratio
     }
   }
 
+  auto icon_path_iter = node.find("icon path");
+  if (icon_path_iter != node.not_found())
+  {
+    mIconPath = QString::fromStdString(icon_path_iter->second.get_value<std::string>());
+  }
+
   this->cedar::aux::Configurable::readConfiguration(node);
 }
 
@@ -222,3 +228,7 @@ std::string cedar::dev::ComponentSlot::getConfigurationName() const
   return this->_mConfigurationName->getValue();
 }
 
+QString cedar::dev::ComponentSlot::getIconPath() const
+{
+    return mIconPath;
+}
