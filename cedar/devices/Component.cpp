@@ -867,6 +867,12 @@ cedar::dev::Component::ComponentDataType cedar::dev::Component::getMeasurementTy
   return this->mMeasurementData->getTypeForName(name);
 }
 
+QString cedar::dev::Component::getIconPath() const
+{
+    auto slot = mSlot.lock();
+    return slot->getIconPath();
+}
+
 std::set<cedar::dev::Component::ComponentDataType> cedar::dev::Component::getInstalledMeasurementTypes() const
 {
   return this->mMeasurementData->getInstalledTypes();
