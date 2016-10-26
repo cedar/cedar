@@ -82,6 +82,15 @@ void cedar::proc::gui::ComponentStepView::updateIcon()
     // get the component
     auto component = component_step->getComponent();
 
+    // check if an icon path has been definded in the components configuration
+    QString icon_path = component->getIconPath();
+    if (!icon_path.isEmpty())
+    {
+      // no declaration found, use default icon
+      this->setIconPath(icon_path);
+      return;
+    }
+
     // find the declaration of the component from the component manager
     cedar::dev::ConstComponentDeclarationPtr declaration;
     try

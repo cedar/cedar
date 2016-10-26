@@ -272,6 +272,9 @@ public:
   //! Returns the measurement type associated with the given name.
   ComponentDataType getMeasurementTypeForName(const std::string& name) const;
 
+  //! Returns the icon path that might have been set in the description
+  QString getIconPath() const;
+
   void applyDeviceCommandsAs(ComponentDataType type);
 
   //! Returns the dimensionality (size) of the given command type.

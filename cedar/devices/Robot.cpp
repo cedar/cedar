@@ -385,16 +385,10 @@ void cedar::dev::Robot::readVisualisation(const cedar::aux::ConfigurationNode &n
 
   if (vis_class_node != node.not_found() && vis_class_node->second.data() != "none")
   {
-
-    // The robots visual representation in the internal simulator
-    cedar::dev::gl::RobotVisualisationPtr p_robot_visualisation;
-    p_robot_visualisation = cedar::dev::gl::RobotVisualisationManagerSingleton::getInstance()->allocate(vis_class_node->second.data());
-    p_robot_visualisation->setRobotPtr(this->shared_from_this());
-    p_robot_visualisation->initializeGl();
-
-    const cedar::aux::gl::ObjectVisualizationPtr p_object_visualisation = boost::dynamic_pointer_cast<cedar::aux::gl::ObjectVisualization>(p_robot_visualisation);
-    cedar::aux::gl::GlobalSceneSingleton::getInstance()->addObjectVisualization(p_object_visualisation);
-
+    // The robots visual representation in the internal simulator    
+    mpRobotVisualisation = cedar::dev::gl::RobotVisualisationManagerSingleton::getInstance()->allocate(vis_class_node->second.data());
+    mpRobotVisualisation->setRobotPtr(this->shared_from_this());
+    mpRobotVisualisation->initializeGl();
   }
 }
 
@@ -468,14 +462,9 @@ void cedar::dev::Robot::appendChannelConfiguration(const std::string& channelNam
   }
 }
 
-std::string cedar::dev::Robot::getVisualisationName() const
+cedar::dev::gl::RobotVisualisationPtr cedar::dev::Robot::getVisualisationPtr() const
 {
-    return mVisualisationName;
-}
-
-void cedar::dev::Robot::setVisualisationName(const std::string &visualisationName)
-{
-    mVisualisationName = visualisationName;
+    return mpRobotVisualisation;
 }
 
 void cedar::dev::Robot::readComponentSlotInstantiations(const cedar::aux::ConfigurationNode& node)
@@ -511,7 +500,7 @@ void cedar::dev::Robot::readComponentSlotInstantiations(const cedar::aux::Config
     const std::string& configuration_name = slot_iter->second.get_value<std::string>();
     //this->allocateChannel(channel_name);
     this->getComponentSlot(slot_name)->instantiateConfiguration(configuration_name);
-  }    
+  }      
 }
 
 void cedar::dev::Robot::allocateChannel(const std::string& channelName)

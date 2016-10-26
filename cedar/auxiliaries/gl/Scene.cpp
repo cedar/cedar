@@ -119,6 +119,20 @@ void cedar::aux::gl::Scene::deleteObjectVisualization(int index)
   mSceneChanged();
 }
 
+void cedar::aux::gl::Scene::deleteObjectVisualization(const std::string &name)
+{
+    QWriteLocker write_locker(&mObjectVisualizationLock);
+
+    for(int i=0; i<mObjectVisualizations.size(); ++i)
+    {
+      if(mObjectVisualizations.at(i)->objectName().toStdString() == name)
+      {
+        mObjectVisualizations.removeAt(i);
+        mSceneChanged();
+      }
+    }
+}
+
 void cedar::aux::gl::Scene::clear()
 {
   mObjectVisualizations.clear();
@@ -142,27 +156,26 @@ void cedar::aux::gl::Scene::draw()
   
   // draw the floor
   if (mIsDrawingFloor)
-  {
-    // Draw the ground
-    glColor3f(1.0, 1.0, 1.0);
-    const float numberOfPatches = 100;
-    glNormal3f(0.0, 0.0, 1.0);
-    for (int j=0; j<numberOfPatches; ++j)
+  {     
+    glTranslated(-mSceneLimit, -mSceneLimit, 0);
+    for (int i=-mSceneLimit; i < mSceneLimit; i++)
     {
-      glBegin(GL_QUAD_STRIP);
-        for (int i=0; i<=numberOfPatches; ++i)
+      for (int j=-mSceneLimit; j < mSceneLimit; j++)
+      {
+        if(((i+j) % 2) == 0)
         {
-          glVertex2f(
-                      (mSceneLimit*2*i/numberOfPatches-mSceneLimit),
-                      (mSceneLimit*2*j/numberOfPatches-mSceneLimit) 
-                    );
-          glVertex2f(
-                      (mSceneLimit*2*i/numberOfPatches-mSceneLimit),
-                      (mSceneLimit*2*(j+1)/numberOfPatches-mSceneLimit)
-                    );
+          gl::setColor(0, 0, 0);
         }
-      glEnd();
-    }
+        else
+        {
+          gl::setColor(1, 1, 1);
+        } // end if
+        drawBlock(1, 1, 0.01, false);
+        glTranslated(0, 1, 0);
+      } // end for (cols)
+      glTranslated(1, -2*mSceneLimit, 0);
+    } // end for (rows)
+    glTranslated(mSceneLimit, mSceneLimit, 0);
   }
 }
 

@@ -158,14 +158,11 @@ public:
   //  HW is on?
   bool areAllComponentsCommunicating() const;
 
-  std::string getVisualisationName() const;
-  void setVisualisationName(const std::string &visualisationName);
+  cedar::dev::gl::RobotVisualisationPtr getVisualisationPtr() const;
 
-  
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
-
+  //--------------------------------------------------------------------------------------------------------------------  
 protected:
   // none yet
 
@@ -235,6 +232,9 @@ private:
 
   //! the name of the robot in SceneWidget, given in RobotManager
   std::string mVisualisationName;
+
+  //! a pointer to the actual visualisation of the robot
+  cedar::dev::gl::RobotVisualisationPtr mpRobotVisualisation;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

@@ -110,7 +110,7 @@ void cedar::dev::gl::Caren::initializeGl()
   // Therefore commenting out all components that are not declared in Carens description.json.
   // Todo: find a clever way to perform checks. maybe try/catch on every component?
 
-  mpLocalCoordinateFrame->setName(mRobot->getVisualisationName());
+  mpLocalCoordinateFrame->setName(mRobot->getVisualisationPtr()->objectName().toStdString());
 
   //cedar::dev::KinematicChainPtr head = boost::dynamic_pointer_cast <cedar::dev::KinematicChain> ( mRobot->getComponent("head"));
   //cedar::dev::KinematicChainPtr palm = boost::dynamic_pointer_cast <cedar::dev::KinematicChain> ( mRobot->getComponent("palm"));
@@ -121,6 +121,7 @@ void cedar::dev::gl::Caren::initializeGl()
   mTrunk = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(mRobot->getComponent("trunk"));
   mArm = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(mRobot->getComponent("arm"));
 
+  // initialize with legitimate values
   mTrunk->updatedUserMeasurementSlot();
   mArm->updatedUserMeasurementSlot();
 
