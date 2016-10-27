@@ -4,7 +4,7 @@
   {
     "arm":
     {
-	  "icon path" : ":/cedar/dev/gui/icons/caren_arm.svg",
+      "icon path" : ":/cedar/dev/gui/icons/caren_arm.svg",
       "available components":
       {
         "fri":
@@ -251,8 +251,8 @@
     },
     "trunk":
     {
-	"icon path" : ":/cedar/dev/gui/icons/caren_trunk.svg",
-    "available components":
+      "icon path" : ":/cedar/dev/gui/icons/caren_trunk.svg",
+      "available components":
       {
         "yarp":
         {
