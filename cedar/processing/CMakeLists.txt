@@ -102,6 +102,7 @@ cedar_add_library(cedarproc
   gui/WidgetContainerItem.h
   sources/BoxInput.h
   sources/GaussInput.h
+  steps/AttrDynTargetAcquisition.h
   steps/Component.h
   steps/Convolution.h
   steps/ColorConversion.h
@@ -123,6 +124,7 @@ cedar_add_library(cedarproc
   steps/Threshold.h
   steps/TransferFunction.h
   steps/VehicleRotation.h
+  steps/VectorsPlaneAngle.h
   sources/Boost.h
   sources/Noise.h
   sources/Picture.h
