@@ -317,6 +317,10 @@ std::string cedar::dev::gui::RobotCard::getRobotName() const
 
 void cedar::dev::gui::RobotCard::selectedConfigurationChanged(int index)
 {
+
+  // remove former visualisation
+  cedar::aux::gl::GlobalSceneSingleton::getInstance()->deleteObjectVisualization(this->getRobotName());
+
   // index 0 is the selection hint
   QString combo_text = this->mpConfigurationSelector->itemText(index);
   if (index == 0 && combo_text == "-- select to instantiate --")
@@ -339,9 +343,6 @@ void cedar::dev::gui::RobotCard::robotDropped(const QString& robotTypeName)
     // if a robot has been dropped into an empty card, create a new blank card before filling this one
     addBlankCard();
   }
-
-  // remove former robot from visualisation
-  cedar::aux::gl::GlobalSceneSingleton::getInstance()->deleteObjectVisualization(this->mpRobotNameEdit->text().toStdString());
 
   bool blocked = this->mpConfigurationSelector->blockSignals(true);
   this->mpConfigurationSelector->clear();
@@ -372,6 +373,7 @@ void cedar::dev::gui::RobotCard::robotDropped(const QString& robotTypeName)
   }
 
   this->mpConfigurationSelector->setCurrentIndex(selected);
+  this->selectedConfigurationChanged(selected);
   this->mpConfigurationSelector->blockSignals(blocked);
 
   // a new placeholder card has already bene placed, so allow for actions here

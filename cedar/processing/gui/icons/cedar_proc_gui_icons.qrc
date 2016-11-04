@@ -95,5 +95,7 @@
         <file>steps/forward_kinematic.svg</file>
         <file>steps/inverse_kinematic.svg</file>
         <file>steps/vehicle_rotation.svg</file>
+        <file>steps/attr_dyn_target_acquisition.svg</file>
+        <file>steps/vectors_plane_angle.svg</file>
     </qresource>
 </RCC>
