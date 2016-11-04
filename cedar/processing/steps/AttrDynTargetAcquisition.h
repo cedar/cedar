@@ -55,11 +55,8 @@ class cedar::proc::steps::AttrDynTargetAcquisition : public cedar::proc::Step
 
 
   private:
-
     void compute(const cedar::proc::Arguments&);
     void inputConnectionChanged(const std::string& inputName);
-
-
     double mLastTimeStamp;
 
     // input
@@ -70,15 +67,14 @@ class cedar::proc::steps::AttrDynTargetAcquisition : public cedar::proc::Step
 protected:
   
     // output
-    cedar::aux::MatDataPtr mpVelocityCorrection;
-    cedar::aux::MatDataPtr mpTargetAcquisition;
+    cedar::aux::MatDataPtr mpForwardAcceleration;
+    cedar::aux::MatDataPtr mpRotationalAcceleration;
 
     // params
     cedar::aux::DoubleParameterPtr mpAlphaDir;
     cedar::aux::DoubleParameterPtr mpAlphaVel;
     cedar::aux::DoubleParameterPtr mpSDes;
     cedar::aux::DoubleParameterPtr mpMaxInfluenceAngle;
-
 
 };
 

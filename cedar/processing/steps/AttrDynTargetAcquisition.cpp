@@ -45,19 +45,19 @@ cedar::proc::steps::AttrDynTargetAcquisition::AttrDynTargetAcquisition()
   :
   cedar::proc::Step(true),
   mLastTimeStamp(0),
-  mpVelocityCorrection(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_64F))),
-  mpTargetAcquisition(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_64F))),
+  mpForwardAcceleration(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_64F))),
+  mpRotationalAcceleration(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_64F))),
   mpAlphaDir(new cedar::aux::DoubleParameter(this,"update rate alpha_dir", 0.2,  0, 1)),
   mpAlphaVel(new cedar::aux::DoubleParameter(this,"update rate alpha_vel", 0.2,  0, 1)),
   mpSDes(new cedar::aux::DoubleParameter(this,"desired target vel s_des", 0.1, 0.0, 10)),
   mpMaxInfluenceAngle(new cedar::aux::DoubleParameter(this,"maximal influence angle", 30., 0.0, 90.))
 {
   this->declareInput("current velocity vector");
-  this->declareInput("influence angle");
-  this->declareInput("orthogonal influence vector");
+  this->declareInput("angle");
+  this->declareInput("orthogonal acceleration vector");
 
-  this->declareOutput("velocity correction", mpVelocityCorrection);
-  this->declareOutput("target acquisition velocity change", mpTargetAcquisition);
+  this->declareOutput("forward acceleration", mpForwardAcceleration);
+  this->declareOutput("rotational acceleration", mpRotationalAcceleration);
 
 }
 
@@ -68,7 +68,7 @@ cedar::proc::steps::AttrDynTargetAcquisition::AttrDynTargetAcquisition()
 void cedar::proc::steps::AttrDynTargetAcquisition::compute(const cedar::proc::Arguments&)
 {
 
-  cedar::unit::Time estimate(0.02 * boost::units::si::seconds);
+  const cedar::unit::Time estimate(0.02 * boost::units::si::seconds); // why?
   double delta_t_stabilization;
   try
   {
@@ -80,47 +80,40 @@ void cedar::proc::steps::AttrDynTargetAcquisition::compute(const cedar::proc::Ar
     std::cout <<  "caught an exception, no round time yet" << std::endl;
   }
 
-  double angle =  mpAngle->getData().at<double>(0,0);
-  double max_angle = mpMaxInfluenceAngle->getValue() * (M_PI / 360. );
-  if (angle > max_angle)
-    angle = max_angle;
-  double f_dir = - mpAlphaDir->getValue() * sin( angle ); //dynamics
+  const double angle =  std::max(mpAngle->getData().at<double>(0, 0),  mpMaxInfluenceAngle->getValue() * (2 * M_PI / 360));
+  const double f_dir = - mpAlphaDir->getValue() * sin(angle); //dynamics
+
   cv::Mat F_dir = mpOrthogonalInfluence->getData() * f_dir;
-  if ( isnan(F_dir.at<double>(0,0)) || isnan(F_dir.at<double>(1,0)) ||isnan(F_dir.at<double>(2,0)) )
+  if(isnan(F_dir.at<double>(0,0)) || isnan(F_dir.at<double>(1,0)) ||isnan(F_dir.at<double>(2,0)))
   {
-    std::cout << "NaN@F_dir,AttrDynTargetAcquisition" << std::endl;
+    std::cout << "NaN@F_dir, AttrDynTargetAcquisition" << std::endl; //Todo: log some error
     F_dir = cv::Mat::zeros(3, 1, CV_64F);
   }
-  //std::cout << "F_dir:" <<  F_dir << std::endl;
-  mpTargetAcquisition->setData( F_dir * delta_t_stabilization );
 
-
-
-
+  mpRotationalAcceleration->setData(F_dir * delta_t_stabilization);
 
   cv::Mat currentVelocity = mpCurrentVelocity->getData().clone();
-  //double s = cv::norm(currentVelocity);
   double s = 0.;
-  for( int i = 0; i < 3; i++ )
-    s += pow( currentVelocity.at<double>(i,0),2. );
-  s = sqrt(s);
-  
-  if(s == 0)
+
+  for( int i = 0; i < 3; ++i)
   {
-    //std::cout << "s==0@AttrDynTargetAcquisition" << std::endl;
+    s += pow(currentVelocity.at<double>(i,0), 2);
   }
 
-  double s_des = mpSDes->getValue();
-  double alpha_vel = mpAlphaVel->getValue();
-  double f_vel = - alpha_vel * ( s - s_des ); //dynamics
+  s = sqrt(s);
+  
+  const double s_des = mpSDes->getValue();
+  const double alpha_vel = mpAlphaVel->getValue();
+  const double f_vel = - alpha_vel * ( s - s_des ); //dynamics
   cv::Mat F_vel = currentVelocity * (f_vel / s);
-  if ( isnan(F_vel.at<double>(0,0)) || isnan(F_vel.at<double>(1,0)) ||isnan(F_vel.at<double>(2,0)) )
+
+  if (isnan(F_vel.at<double>(0,0)) || isnan(F_vel.at<double>(1,0)) ||isnan(F_vel.at<double>(2,0)))
   {
     std::cout << "NaN@F_vel,AttrDynTargetAcquisition" << std::endl;
     F_vel = cv::Mat::zeros(3, 1, CV_64F);
   }
-  //std::cout << "F_vel:" <<  F_vel << std::endl;
-  mpVelocityCorrection->setData( F_vel * delta_t_stabilization );
+
+  mpForwardAcceleration->setData(F_vel * delta_t_stabilization);
 }
 
 //// validity check
@@ -153,11 +146,11 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::AttrDynTargetAcquisition::de
 }
 
 void cedar::proc::steps::AttrDynTargetAcquisition::inputConnectionChanged(const std::string& inputName){
-  if (inputName == "influence angle")
+  if (inputName == "angle")
   {
     mpAngle = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
   }
-  else if (inputName == "orthogonal influence vector")
+  else if (inputName == "orthogonal acceleration vector")
   {
     mpOrthogonalInfluence = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
   }
