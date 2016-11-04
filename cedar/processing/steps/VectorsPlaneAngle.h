@@ -37,13 +37,13 @@
 #ifndef VECTORS_PLANE_ANGLE_H_
 #define VECTORS_PLANE_ANGLE_H_
 
-#include <cedar/processing/Step.h> // if we are going to inherit from cedar::proc::Step, we have to include the header
+#include <cedar/processing/Step.h>
 #include <cedar/auxiliaries/MatData.h>
 #include "cedar/processing/steps/VectorsPlaneAngle.fwd.h"
 
 class cedar::proc::steps::VectorsPlaneAngle : public cedar::proc::Step
 {
-    Q_OBJECT
+  Q_OBJECT
   public:
     VectorsPlaneAngle();
     cedar::proc::DataSlot::VALIDITY determineInputValidity
@@ -52,24 +52,18 @@ class cedar::proc::steps::VectorsPlaneAngle : public cedar::proc::Step
                                       cedar::aux::ConstDataPtr data
                                     ) const;
 
-
   private:
     void compute(const cedar::proc::Arguments&);
     void inputConnectionChanged(const std::string& inputName);
 
     // input
-    cedar::aux::ConstMatDataPtr mpReferenceVector;
-    cedar::aux::ConstMatDataPtr mpInfluenceVector;
-
+    cedar::aux::ConstMatDataPtr mpCurrentPositionVector;
+    cedar::aux::ConstMatDataPtr mpTargetDifferenceVector;
 
     // output
     cedar::aux::MatDataPtr mpAngle;
     cedar::aux::MatDataPtr mpPlaneNormal;
-    cedar::aux::MatDataPtr mpOrthogonalInfluence;
-
-
-
-
+    cedar::aux::MatDataPtr mpOrthogonalAcceleration;
 };
 
 #endif /* VECTORS_PLANE_ANGLE_H_ */
