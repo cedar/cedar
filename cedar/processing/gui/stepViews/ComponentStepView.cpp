@@ -75,7 +75,7 @@ void cedar::proc::gui::ComponentStepView::updateIcon()
   auto component_step = boost::dynamic_pointer_cast<cedar::proc::steps::ConstComponent>(this->getConnectable());
   CEDAR_DEBUG_ASSERT(component_step);
 
-  QString default_icon_path = ":/cedar/dev/gui/icons/generic_hardware_icon.svg";
+  const QString default_icon_path = ":/cedar/dev/gui/icons/generic_hardware_icon.svg";
 
   if (component_step->hasComponent())
   {
@@ -86,7 +86,7 @@ void cedar::proc::gui::ComponentStepView::updateIcon()
     QString icon_path = component->getIconPath();
     if (!icon_path.isEmpty())
     {
-      // no declaration found, use default icon
+      // defined icon path found, use it
       this->setIconPath(icon_path);
       return;
     }

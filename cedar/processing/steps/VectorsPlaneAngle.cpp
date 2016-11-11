@@ -118,7 +118,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::VectorsPlaneAngle::determine
 {
   //all inputs have same type
   cedar::aux::ConstMatDataPtr _input = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
-  if( slot->getName() == "reference vector" || slot->getName() == "influence vector")
+  if( slot->getName() == "endeffector position vector" || slot->getName() == "difference vector to target location")
   {
     if (_input && _input->getDimensionality() == 1 && cedar::aux::math::get1DMatrixSize(_input->getData()) == 3 && _input->getData().type() == CV_64F)
     {

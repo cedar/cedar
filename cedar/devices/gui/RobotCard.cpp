@@ -373,7 +373,6 @@ void cedar::dev::gui::RobotCard::robotDropped(const QString& robotTypeName)
   }
 
   this->mpConfigurationSelector->setCurrentIndex(selected);
-  this->selectedConfigurationChanged(selected);
   this->mpConfigurationSelector->blockSignals(blocked);
 
   // a new placeholder card has already bene placed, so allow for actions here
