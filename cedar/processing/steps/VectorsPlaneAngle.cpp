@@ -132,11 +132,11 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::VectorsPlaneAngle::determine
 
 void cedar::proc::steps::VectorsPlaneAngle::inputConnectionChanged(const std::string& inputName)
 {
-  if (inputName == "reference vector")
+  if (inputName == "endeffector position vector")
   {
     mpCurrentPositionVector = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
   }
-  else if (inputName == "influence vector")
+  else if (inputName == "difference vector to target location")
   {
     mpTargetDifferenceVector = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
   }
