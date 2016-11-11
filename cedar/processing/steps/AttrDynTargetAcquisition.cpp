@@ -125,12 +125,12 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::AttrDynTargetAcquisition::de
 {
   //all inputs have same type
   cedar::aux::ConstMatDataPtr _input = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
-  if( slot->getName() == "influence angle" )
+  if( slot->getName() == "angle" )
   {
     if (_input && _input->getDimensionality() == 0 && _input->getData().type() == CV_64F)
       return cedar::proc::DataSlot::VALIDITY_VALID;
   }
-  else if( slot->getName() == "orthogonal influence vector" )
+  else if( slot->getName() == "orthogonal acceleration vector" )
   {
     if (_input && _input->getDimensionality() == 1 && cedar::aux::math::get1DMatrixSize(_input->getData()) == 3 && _input->getData().type() == CV_64F)
       return cedar::proc::DataSlot::VALIDITY_VALID;
