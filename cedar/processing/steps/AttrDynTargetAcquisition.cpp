@@ -83,37 +83,46 @@ void cedar::proc::steps::AttrDynTargetAcquisition::compute(const cedar::proc::Ar
   const double angle =  std::max(mpAngle->getData().at<double>(0, 0),  mpMaxInfluenceAngle->getValue() * (2 * M_PI / 360));
   const double f_dir = - mpAlphaDir->getValue() * sin(angle); //dynamics
 
-  cv::Mat F_dir = mpOrthogonalInfluence->getData() * f_dir;
-  if(isnan(F_dir.at<double>(0,0)) || isnan(F_dir.at<double>(1,0)) ||isnan(F_dir.at<double>(2,0)))
+  cv::Mat w_dir = mpOrthogonalAcceleration->getData() * f_dir;
+  if(isnan(w_dir.at<double>(0,0)) || isnan(w_dir.at<double>(1,0)) ||isnan(w_dir.at<double>(2,0)))
   {
     std::cout << "NaN@F_dir, AttrDynTargetAcquisition" << std::endl; //Todo: log some error
-    F_dir = cv::Mat::zeros(3, 1, CV_64F);
+    w_dir = cv::Mat::zeros(3, 1, CV_64F);
   }
 
-  mpRotationalAcceleration->setData(F_dir * delta_t_stabilization);
+  mpRotationalAcceleration->setData(w_dir * delta_t_stabilization);
 
-  cv::Mat currentVelocity = mpCurrentVelocity->getData().clone();
-  double s = 0.;
+  cv::Mat current_vel = mpCurrentVelocity->getData().clone();
+
+  // we have a problem if v = (0, 0, 0) ... there goes a quick fix, that _really_ bothers me a lot:
+  if(current_vel.at<double>(0) == 0 && current_vel.at<double>(1) == 0 && current_vel.at<double>(2) == 0)
+  {
+    current_vel.at<double>(0) = 1; // act as if there was velocity in x direction to start dynamics
+  }
+
+  double s = 0;
 
   for( int i = 0; i < 3; ++i)
   {
-    s += pow(currentVelocity.at<double>(i,0), 2);
+    s += pow(current_vel.at<double>(i,0), 2);
   }
 
   s = sqrt(s);
+
   
   const double s_des = mpSDes->getValue();
   const double alpha_vel = mpAlphaVel->getValue();
   const double f_vel = - alpha_vel * ( s - s_des ); //dynamics
-  cv::Mat F_vel = currentVelocity * (f_vel / s);
 
-  if (isnan(F_vel.at<double>(0,0)) || isnan(F_vel.at<double>(1,0)) ||isnan(F_vel.at<double>(2,0)))
+  cv::Mat F_acc = current_vel * (f_vel / s);
+
+  if (isnan(F_acc.at<double>(0,0)) || isnan(F_acc.at<double>(1,0)) ||isnan(F_acc.at<double>(2,0)))
   {
     std::cout << "NaN@F_vel,AttrDynTargetAcquisition" << std::endl;
-    F_vel = cv::Mat::zeros(3, 1, CV_64F);
+    F_acc = cv::Mat::zeros(3, 1, CV_64F);
   }
 
-  mpForwardAcceleration->setData(F_vel * delta_t_stabilization);
+  mpForwardAcceleration->setData(F_acc * delta_t_stabilization);
 }
 
 //// validity check
@@ -152,7 +161,7 @@ void cedar::proc::steps::AttrDynTargetAcquisition::inputConnectionChanged(const 
   }
   else if (inputName == "orthogonal acceleration vector")
   {
-    mpOrthogonalInfluence = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
+    mpOrthogonalAcceleration = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
   }
   else if (inputName == "current velocity vector")
   {

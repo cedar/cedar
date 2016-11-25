@@ -57,12 +57,11 @@ class cedar::proc::steps::VectorsPlaneAngle : public cedar::proc::Step
     void inputConnectionChanged(const std::string& inputName);
 
     // input
-    cedar::aux::ConstMatDataPtr mpCurrentPositionVector;
-    cedar::aux::ConstMatDataPtr mpTargetDifferenceVector;
+    cedar::aux::ConstMatDataPtr mpEndeffectorVelocity;
+    cedar::aux::ConstMatDataPtr mpDifferenceVector;
 
     // output
     cedar::aux::MatDataPtr mpAngle;
-    cedar::aux::MatDataPtr mpPlaneNormal;
     cedar::aux::MatDataPtr mpOrthogonalAcceleration;
 };
 

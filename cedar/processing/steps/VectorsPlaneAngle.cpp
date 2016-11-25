@@ -43,14 +43,12 @@ namespace
 cedar::proc::steps::VectorsPlaneAngle::VectorsPlaneAngle()
   :
   mpAngle(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_64F))),
-  mpPlaneNormal(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_64F))),
   mpOrthogonalAcceleration(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_64F)))
 {
-  this->declareInput("endeffector position vector");
-  this->declareInput("difference vector to target location");
+  this->declareInput("endeffector velocity");
+  this->declareInput("endeffector target position difference");
 
   this->declareOutput("angle", mpAngle);
-  this->declareOutput("plane normal", mpPlaneNormal);
   this->declareOutput("orthogonal acceleration", mpOrthogonalAcceleration);
 
 }
@@ -61,52 +59,44 @@ cedar::proc::steps::VectorsPlaneAngle::VectorsPlaneAngle()
 
 void cedar::proc::steps::VectorsPlaneAngle::compute(const cedar::proc::Arguments&)
 {
-  if(!mpCurrentPositionVector || !mpTargetDifferenceVector)
+  if(!mpEndeffectorVelocity || !mpDifferenceVector)
   {
     // TODO: log some error
     return;
   }
 
-  cv::Mat current_pos = mpCurrentPositionVector->getData().clone();
-  cv::Mat diff_current_target = mpTargetDifferenceVector->getData().clone();
+  cv::Mat current_vel = mpEndeffectorVelocity->getData().clone();
+  const cv::Mat &current_pos_diff = mpDifferenceVector->getData();
 
-  // calculate angle as phi=(v x (v x k))/(|v||k|)
-  const double dot = current_pos.dot(diff_current_target);
-  const double norm = cv::norm(current_pos) * cv::norm(diff_current_target);
-  double angle;
-
-  if(norm == 0)
+  // we have a problem if v = (0, 0, 0) ... there goes a quick fix, that bothers me a lot:
+  if(current_vel.at<double>(0) == 0 && current_vel.at<double>(1) == 0 && current_vel.at<double>(2) == 0)
   {
-    angle = 0;
-  }  
-  else
+    current_vel = current_pos_diff.cross(current_pos_diff); // make something orthogonal
+  }
+
+  // calculate angle as phi = acos(v.k / |v||k|)
+  const double dot = current_vel.dot(current_pos_diff);
+  const double norm = cv::norm(current_vel) * cv::norm(current_pos_diff);
+  double angle = 0;
+
+  if(norm != 0)
   {
     angle = acos(dot / norm);
-  }
+  }    
 
   mpAngle->getData().at<double>(0,0) = angle;  
 
-  //plane normal
-  cv::Mat planeNormal = current_pos.cross( diff_current_target );
-  const double norm_plane = cv::norm(planeNormal);
+  // direction of most effective change w_dir = v x ( v x k ) * ( |v| / |v x (v x k)| )
+  cv::Mat w_dir = current_vel.cross(current_vel.cross( current_pos_diff ));
+  const double norm_inf_dir = cv::norm(w_dir);
 
-  if(norm_plane != 0)
+  if(norm_inf_dir != 0)
   {
-    planeNormal /= norm_plane;
+    w_dir /= norm_inf_dir;
   }
 
-  mpPlaneNormal->setData(planeNormal);
-
-  cv::Mat influenceDir = current_pos.cross( planeNormal );
-  const double norm_inf_dir = cv::norm(influenceDir);
-
-  if( norm_inf_dir != 0)
-  {
-    influenceDir /= norm_inf_dir;
-  }
-
-  influenceDir *= cv::norm(current_pos); //can change the influence dir vector to 0, if reference was 0
-  mpOrthogonalAcceleration->setData(influenceDir);
+  w_dir *= cv::norm(current_vel); //can change the influence dir vector to 0, if reference was 0
+  mpOrthogonalAcceleration->setData(w_dir);
 }
 
 //// validity check
@@ -118,7 +108,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::VectorsPlaneAngle::determine
 {
   //all inputs have same type
   cedar::aux::ConstMatDataPtr _input = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
-  if( slot->getName() == "endeffector position vector" || slot->getName() == "difference vector to target location")
+  if( slot->getName() == "endeffector velocity" || slot->getName() == "endeffector target position difference")
   {
     if (_input && _input->getDimensionality() == 1 && cedar::aux::math::get1DMatrixSize(_input->getData()) == 3 && _input->getData().type() == CV_64F)
     {
@@ -132,13 +122,13 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::VectorsPlaneAngle::determine
 
 void cedar::proc::steps::VectorsPlaneAngle::inputConnectionChanged(const std::string& inputName)
 {
-  if (inputName == "endeffector position vector")
+  if (inputName == "endeffector velocity")
   {
-    mpCurrentPositionVector = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
+    mpEndeffectorVelocity = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
   }
-  else if (inputName == "difference vector to target location")
+  else if (inputName == "endeffector target position difference")
   {
-    mpTargetDifferenceVector = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
+    mpDifferenceVector = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
   }
 }
 

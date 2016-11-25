@@ -62,7 +62,7 @@ class cedar::proc::steps::AttrDynTargetAcquisition : public cedar::proc::Step
     // input
     cedar::aux::ConstMatDataPtr mpCurrentVelocity;
     cedar::aux::ConstMatDataPtr mpAngle;
-    cedar::aux::ConstMatDataPtr mpOrthogonalInfluence;
+    cedar::aux::ConstMatDataPtr mpOrthogonalAcceleration;
 
 protected:
   
