@@ -47,10 +47,10 @@ cedar::proc::steps::AttrDynTargetAcquisition::AttrDynTargetAcquisition()
   mLastTimeStamp(0),
   mpForwardAcceleration(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_64F))),
   mpRotationalAcceleration(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_64F))),
-  mpAlphaDir(new cedar::aux::DoubleParameter(this,"update rate alpha_dir", 0.2,  0, 1)),
-  mpAlphaVel(new cedar::aux::DoubleParameter(this,"update rate alpha_vel", 0.2,  0, 1)),
-  mpSDes(new cedar::aux::DoubleParameter(this,"desired target vel s_des", 0.1, 0.0, 10)),
-  mpMaxInfluenceAngle(new cedar::aux::DoubleParameter(this,"maximal influence angle", 30., 0.0, 90.))
+  mpLambdaRot(new cedar::aux::DoubleParameter(this,"rotational acceleration prefactor", 0.2,  0, 1)),
+  mpLambdaFwd(new cedar::aux::DoubleParameter(this,"forward acceleration prefactor", 0.2,  0, 1)),
+  mpSDes(new cedar::aux::DoubleParameter(this,"desired forward acceleration", 0.1, 0.0, 10)),
+  mpMaxAngle(new cedar::aux::DoubleParameter(this,"maximal angle", 30., 0.0, 90.))
 {
   this->declareInput("current velocity vector");
   this->declareInput("angle");
@@ -67,62 +67,42 @@ cedar::proc::steps::AttrDynTargetAcquisition::AttrDynTargetAcquisition()
 
 void cedar::proc::steps::AttrDynTargetAcquisition::compute(const cedar::proc::Arguments&)
 {
+  const double angle =  std::max(mpAngle->getData().at<double>(0, 0),  mpMaxAngle->getValue() * (2 * M_PI / 360)); // we also perform this check in the component
+  const double f_rot = -mpLambdaRot->getValue() * sin(angle); //rotational dynamics
+  cv::Mat w_rot = mpOrthogonalAcceleration->getData() * f_rot;
 
-  const cedar::unit::Time estimate(0.02 * boost::units::si::seconds); // why?
-  double delta_t_stabilization;
-  try
+  if(isnan(w_rot.at<double>(0,0)) || isnan(w_rot.at<double>(1,0)) ||isnan(w_rot.at<double>(2,0)))
   {
-    delta_t_stabilization =  this->getRoundTimeAverage() / estimate;
-  }
-  catch ( ... )
-  {
-    delta_t_stabilization = 1.;
-    std::cout <<  "caught an exception, no round time yet" << std::endl;
+    std::cout << "Rotational acceleration is NaN, setting it to 0" << std::endl; //Todo: log some error
+    w_rot = cv::Mat::zeros(3, 1, CV_64F);
   }
 
-  const double angle =  std::max(mpAngle->getData().at<double>(0, 0),  mpMaxInfluenceAngle->getValue() * (2 * M_PI / 360));
-  const double f_dir = - mpAlphaDir->getValue() * sin(angle); //dynamics
+  mpRotationalAcceleration->setData(w_rot);
 
-  cv::Mat w_dir = mpOrthogonalAcceleration->getData() * f_dir;
-  if(isnan(w_dir.at<double>(0,0)) || isnan(w_dir.at<double>(1,0)) ||isnan(w_dir.at<double>(2,0)))
-  {
-    std::cout << "NaN@F_dir, AttrDynTargetAcquisition" << std::endl; //Todo: log some error
-    w_dir = cv::Mat::zeros(3, 1, CV_64F);
-  }
-
-  mpRotationalAcceleration->setData(w_dir * delta_t_stabilization);
-
-  cv::Mat current_vel = mpCurrentVelocity->getData().clone();
-
-  // we have a problem if v = (0, 0, 0) ... there goes a quick fix, that _really_ bothers me a lot:
-  if(current_vel.at<double>(0) == 0 && current_vel.at<double>(1) == 0 && current_vel.at<double>(2) == 0)
-  {
-    current_vel.at<double>(0) = 1; // act as if there was velocity in x direction to start dynamics
-  }
-
-  double s = 0;
-
-  for( int i = 0; i < 3; ++i)
-  {
-    s += pow(current_vel.at<double>(i,0), 2);
-  }
-
-  s = sqrt(s);
-
-  
+  const cv::Mat current_vel = mpCurrentVelocity->getData().clone();
+  const double speed = cv::norm(current_vel);
   const double s_des = mpSDes->getValue();
-  const double alpha_vel = mpAlphaVel->getValue();
-  const double f_vel = - alpha_vel * ( s - s_des ); //dynamics
+  const double lambda_fwd = mpLambdaFwd->getValue();
 
-  cv::Mat F_acc = current_vel * (f_vel / s);
+  cv::Mat F_acc;
+
+  if(speed <= std::numeric_limits<double>::epsilon())
+  {
+    F_acc = current_vel + 0.001; // make a tiny step into target direction
+  }
+  else
+  {
+    const double f_fwd = -lambda_fwd * (speed - s_des); //forward dynamics
+    F_acc = (current_vel / speed) * f_fwd;
+  }
 
   if (isnan(F_acc.at<double>(0,0)) || isnan(F_acc.at<double>(1,0)) ||isnan(F_acc.at<double>(2,0)))
   {
-    std::cout << "NaN@F_vel,AttrDynTargetAcquisition" << std::endl;
+    std::cout << "Forward acceleration is NaN, setting it to 0" << std::endl;
     F_acc = cv::Mat::zeros(3, 1, CV_64F);
   }
 
-  mpForwardAcceleration->setData(F_acc * delta_t_stabilization);
+  mpForwardAcceleration->setData(F_acc);
 }
 
 //// validity check

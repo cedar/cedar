@@ -68,12 +68,6 @@ void cedar::proc::steps::VectorsPlaneAngle::compute(const cedar::proc::Arguments
   cv::Mat current_vel = mpEndeffectorVelocity->getData().clone();
   const cv::Mat &current_pos_diff = mpDifferenceVector->getData();
 
-  // we have a problem if v = (0, 0, 0) ... there goes a quick fix, that bothers me a lot:
-  if(current_vel.at<double>(0) == 0 && current_vel.at<double>(1) == 0 && current_vel.at<double>(2) == 0)
-  {
-    current_vel = current_pos_diff.cross(current_pos_diff); // make something orthogonal
-  }
-
   // calculate angle as phi = acos(v.k / |v||k|)
   const double dot = current_vel.dot(current_pos_diff);
   const double norm = cv::norm(current_vel) * cv::norm(current_pos_diff);
