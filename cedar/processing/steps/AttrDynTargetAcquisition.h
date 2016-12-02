@@ -71,10 +71,10 @@ protected:
     cedar::aux::MatDataPtr mpRotationalAcceleration;
 
     // params
-    cedar::aux::DoubleParameterPtr mpAlphaDir;
-    cedar::aux::DoubleParameterPtr mpAlphaVel;
+    cedar::aux::DoubleParameterPtr mpLambdaRot;
+    cedar::aux::DoubleParameterPtr mpLambdaFwd;
     cedar::aux::DoubleParameterPtr mpSDes;
-    cedar::aux::DoubleParameterPtr mpMaxInfluenceAngle;
+    cedar::aux::DoubleParameterPtr mpMaxAngle;
 
 };
 
