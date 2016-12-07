@@ -74,3 +74,11 @@ mpScene(new cedar::aux::gl::Scene)
 
   QMetaObject::connectSlotsByName(this);
 }
+
+void cedar::aux::gui::SceneControl::openNamelessViewer()
+{
+  auto viewer = new cedar::aux::gui::Viewer(mpScene);
+  viewer->show();
+  viewer->setSceneRadius(mpScene->getSceneLimit());
+  viewer->startTimer(25);
+}
