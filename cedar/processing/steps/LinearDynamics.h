@@ -58,7 +58,7 @@ class cedar::proc::steps::LinearDynamics : public cedar::proc::Step
     void inputConnectionChanged(const std::string& inputName);
 
     // input
-    cedar::aux::ConstMatDataPtr mpVelocity;
+    cedar::aux::ConstMatDataPtr mpSpeed;
 
 protected:
     // output

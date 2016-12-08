@@ -44,12 +44,12 @@ namespace
 cedar::proc::steps::LinearDynamics::LinearDynamics()
   :
   cedar::proc::Step(true),
-  mpAcceleration(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_64F))),
-  mpLambda(new cedar::aux::DoubleParameter(this,"dynamics prefactor", 0.2,  0, 1)),
-  mpSDes(new cedar::aux::DoubleParameter(this,"desired acceleration", 0.1, 0.0, 10))
+  mpAcceleration(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_64F))),
+  mpLambda(new cedar::aux::DoubleParameter(this,"lambda", 0.2,  0, 1)),
+  mpSDes(new cedar::aux::DoubleParameter(this,"desired speed", 0.1, 0.0, 10))
 {
-  this->declareInput("velocity vector");
-  this->declareOutput("acceleration vector", mpAcceleration);
+  this->declareInput("speed");
+  this->declareOutput("acceleration", mpAcceleration);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -58,31 +58,13 @@ cedar::proc::steps::LinearDynamics::LinearDynamics()
 
 void cedar::proc::steps::LinearDynamics::compute(const cedar::proc::Arguments&)
 {
-  const cv::Mat &velocity = mpVelocity->getData();
+  const double &s = mpSpeed->getData().at<double>(0, 0);
   const double &s_des = mpSDes->getValue();
   const double &lambda = mpLambda->getValue();
 
-  const double s = cv::norm(velocity);
+  const double acceleration = -lambda * (s - s_des); //dynamics
 
-  cv::Mat acceleration;
-
-  if(s <= std::numeric_limits<double>::epsilon())
-  {
-    acceleration = velocity + 2*std::numeric_limits<double>::epsilon(); // make a tiny step into target direction
-  }
-  else
-  {
-    const double f_fwd = -lambda * (s - s_des); //dynamics
-    acceleration = (velocity / s) * f_fwd;
-  }
-
-  if (isnan(acceleration.at<double>(0,0)) || isnan(acceleration.at<double>(1,0)) ||isnan(acceleration.at<double>(2,0)))
-  {
-    std::cout << "LinearDynamics acceleration is NaN, setting it to 0" << std::endl;
-    acceleration = cv::Mat::zeros(3, 1, CV_64F);
-  }
-
-  mpAcceleration->setData(acceleration);
+  mpAcceleration->getData().at<double>(0, 0) = acceleration;
 }
 
 //// validity check
@@ -94,9 +76,9 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::LinearDynamics::determineInp
 {
   //all inputs have same type
   cedar::aux::ConstMatDataPtr _input = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
-  if( slot->getName() == "velocity vector")
+  if( slot->getName() == "speed")
   {
-    if (_input && _input->getDimensionality() == 1 && cedar::aux::math::get1DMatrixSize(_input->getData()) >= 3 && _input->getData().type() == CV_64F)
+    if (_input && _input->getDimensionality() == 0 && _input->getData().type() == CV_64F)
     {
       return cedar::proc::DataSlot::VALIDITY_VALID;
     }
@@ -108,8 +90,8 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::LinearDynamics::determineInp
 
 void cedar::proc::steps::LinearDynamics::inputConnectionChanged(const std::string& inputName)
 {
-  if (inputName == "velocity vector")
+  if (inputName == "speed")
   {
-    mpVelocity = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
+    mpSpeed = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->getInput(inputName));
   }
 }

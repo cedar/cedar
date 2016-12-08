@@ -53,29 +53,20 @@ class cedar::proc::steps::SinusDynamics : public cedar::proc::Step
                                       cedar::aux::ConstDataPtr data
                                     ) const;
 
-
   private:
     void compute(const cedar::proc::Arguments&);
     void inputConnectionChanged(const std::string& inputName);
-    double mLastTimeStamp;
 
     // input
-    cedar::aux::ConstMatDataPtr mpCurrentVelocity;
     cedar::aux::ConstMatDataPtr mpAngle;
-    cedar::aux::ConstMatDataPtr mpOrthogonalAcceleration;
 
 protected:
-  
     // output
-    cedar::aux::MatDataPtr mpForwardAcceleration;
-    cedar::aux::MatDataPtr mpRotationalAcceleration;
+    cedar::aux::MatDataPtr mpAngleChange;
 
     // params
     cedar::aux::DoubleParameterPtr mpLambda;
-    cedar::aux::DoubleParameterPtr mpLambdaFwd;
-    cedar::aux::DoubleParameterPtr mpSDes;
     cedar::aux::DoubleParameterPtr mpMaxAngle;
-
 };
 
 #endif /* SINUS_DYNAMICS_H_ */
