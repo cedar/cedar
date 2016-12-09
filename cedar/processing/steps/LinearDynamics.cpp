@@ -46,7 +46,7 @@ cedar::proc::steps::LinearDynamics::LinearDynamics()
   cedar::proc::Step(true),
   mpAcceleration(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_64F))),
   mpLambda(new cedar::aux::DoubleParameter(this,"lambda", 0.2,  0, 1)),
-  mpSDes(new cedar::aux::DoubleParameter(this,"desired speed", 0.1, 0.0, 10))
+  mpSDes(new cedar::aux::DoubleParameter(this, "fixed point", 0.1, 0.0, 10))
 {
   this->declareInput("speed");
   this->declareOutput("acceleration", mpAcceleration);
