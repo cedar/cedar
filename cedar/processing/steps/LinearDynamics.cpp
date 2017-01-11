@@ -62,7 +62,7 @@ void cedar::proc::steps::LinearDynamics::compute(const cedar::proc::Arguments&)
   const double &s_des = mpSDes->getValue();
   const double &lambda = mpLambda->getValue();
 
-  const double acceleration = -lambda * (s - s_des); //dynamics
+  const double acceleration = lambda * (s - s_des); //dynamics
 
   mpAcceleration->getData().at<double>(0, 0) = acceleration;
 }

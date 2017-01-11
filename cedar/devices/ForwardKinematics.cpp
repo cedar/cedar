@@ -53,7 +53,6 @@ cedar::dev::ForwardKinematics::ForwardKinematics(KinematicChain *chain, cedar::a
   : mpKinematicChain(chain),
     mpRootCoordinateFrame(new cedar::aux::LocalCoordinateFrame()),
     mpEndEffectorCoordinateFrame(pEndEffector)
-
 {
 }
 
@@ -122,9 +121,6 @@ cv::Mat cedar::dev::ForwardKinematics::getJointTransformation(unsigned int index
   mTransformationsLock.unlock();
   return T;
 }
-
-
-
 
 void cedar::dev::ForwardKinematics::calculateCartesianJacobian
 (

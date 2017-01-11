@@ -58,7 +58,7 @@ cedar::proc::steps::SinusDynamics::SinusDynamics()
 void cedar::proc::steps::SinusDynamics::compute(const cedar::proc::Arguments&)
 {
   const double &phi = mpAngle->getData().at<double>(0, 0); // std::max(mpAngle->getData().at<double>(0, 0),  mpMaxAngle->getValue() * (2 * M_PI / 360)); // we also perform this check in the component
-  const double phi_dot = -mpLambda->getValue() * sin(phi); //sinus dynamics
+  const double phi_dot = mpLambda->getValue() * sin(phi); //sinus dynamics
 
   mpAngleChange->getData().at<double>(0, 0) = phi_dot;
 }
