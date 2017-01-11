@@ -66,7 +66,6 @@ protected:
 
     // params
     cedar::aux::DoubleParameterPtr mpLambda;
-    cedar::aux::DoubleParameterPtr mpMaxAngle;
 };
 
 #endif /* SINUS_DYNAMICS_H_ */

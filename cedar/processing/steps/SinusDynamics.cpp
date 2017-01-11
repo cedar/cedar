@@ -45,8 +45,7 @@ cedar::proc::steps::SinusDynamics::SinusDynamics()
   :
   cedar::proc::Step(true),
   mpAngleChange(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_64F))),
-  mpLambda(new cedar::aux::DoubleParameter(this,"lambda", 0.2,  0, 1)),
-  mpMaxAngle(new cedar::aux::DoubleParameter(this,"maximal angle", 30., 0.0, 90.))
+  mpLambda(new cedar::aux::DoubleParameter(this,"lambda", 0.0))
 {
   this->declareInput("angle");
   this->declareOutput("angle change", mpAngleChange);
@@ -58,7 +57,7 @@ cedar::proc::steps::SinusDynamics::SinusDynamics()
 
 void cedar::proc::steps::SinusDynamics::compute(const cedar::proc::Arguments&)
 {
-  const double &phi =  std::max(mpAngle->getData().at<double>(0, 0),  mpMaxAngle->getValue() * (2 * M_PI / 360)); // we also perform this check in the component
+  const double &phi = mpAngle->getData().at<double>(0, 0); // std::max(mpAngle->getData().at<double>(0, 0),  mpMaxAngle->getValue() * (2 * M_PI / 360)); // we also perform this check in the component
   const double phi_dot = -mpLambda->getValue() * sin(phi); //sinus dynamics
 
   mpAngleChange->getData().at<double>(0, 0) = phi_dot;
