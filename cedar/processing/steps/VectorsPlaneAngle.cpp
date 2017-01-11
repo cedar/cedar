@@ -43,7 +43,7 @@ cedar::proc::steps::VectorsPlaneAngle::VectorsPlaneAngle()
   :
   mpAngle(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_64F))),
   mpOrthogonalAcceleration(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_64F))),
-  _mVisualiseTarget(new cedar::aux::BoolParameter(this, "visualise target", false))
+  _mVisualiseTarget(new cedar::aux::BoolParameter(this, "visualise target position", false))
 {
   this->declareInput("endeffector velocity");
   this->declareInput("endeffector position");
@@ -64,7 +64,11 @@ void cedar::proc::steps::VectorsPlaneAngle::compute(const cedar::proc::Arguments
 {
   if(!mpEndeffectorVelocity || !mpEndeffectorPosition || !mpTargetPosition)
   {
-    // TODO: log some error
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Not all inputs to VectorsPlaneAngle are valid. Please check your architecture.",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
     return;
   }
 
@@ -149,12 +153,13 @@ void cedar::proc::steps::VectorsPlaneAngle::visualisationChanged()
   // add or remove visualisation
   if(_mVisualiseTarget->getValue())
   {
+
     mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
     (
       new cedar::aux::gl::Sphere
         (
           cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-          0.05, 0.05, 0.9, 0.05
+          0.05, 0.9, 0.9, 0.05
         )
     );
 
