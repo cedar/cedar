@@ -3,7 +3,6 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include <math.h>
 
-
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
@@ -43,15 +42,17 @@ namespace
 cedar::proc::steps::VectorsPlaneAngle::VectorsPlaneAngle()
   :
   mpAngle(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_64F))),
-  mpPlaneNormal(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_64F))),
-  mpOrthogonalInfluence(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_64F)))
+  mpOrthogonalAcceleration(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_64F))),
+  _mVisualiseTarget(new cedar::aux::BoolParameter(this, "visualise target position", false))
 {
-  this->declareInput("reference vector");
-  this->declareInput("influence vector");
+  this->declareInput("endeffector velocity");
+  this->declareInput("endeffector position");
+  this->declareInput("target position");
 
   this->declareOutput("angle", mpAngle);
-  this->declareOutput("plane normal", mpPlaneNormal);
-  this->declareOutput("orthogonal influence", mpOrthogonalInfluence);
+  this->declareOutput("orthogonal acceleration", mpOrthogonalAcceleration);
+
+  QObject::connect(_mVisualiseTarget.get(), SIGNAL(valueChanged()), this, SLOT(visualisationChanged()));
 
 }
 
@@ -61,47 +62,51 @@ cedar::proc::steps::VectorsPlaneAngle::VectorsPlaneAngle()
 
 void cedar::proc::steps::VectorsPlaneAngle::compute(const cedar::proc::Arguments&)
 {
-  if(!mpReferenceVector || !mpInfluenceVector)
-    return;
-
-  cv::Mat referenceVector = mpReferenceVector->getData().clone();
-  cv::Mat influenceVector =  mpInfluenceVector->getData().clone();
-
-  //angle
-  double dot = referenceVector.dot( influenceVector );
-  double norm_ref = cv::norm(referenceVector);
-  double norm_inf = cv::norm(influenceVector);
-  double norm = norm_ref * norm_inf;
-  double angle;
-  if( norm == 0. )
+  if(!mpEndeffectorVelocity || !mpEndeffectorPosition || !mpTargetPosition)
   {
-    angle = 0;
-  //  std::cout << "Plane Angle: 0 norm" << std::endl;
-  }  
-  else
-    angle = acos( dot / norm ); //possible devision by 0!
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Not all inputs to VectorsPlaneAngle are valid. Please check your architecture.",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
+    return;
+  }
+
+  const cv::Mat &current_vel = mpEndeffectorVelocity->getData();
+
+  // calculate distance from current endeffector position to target position
+  const cv::Mat current_pos_diff = mpTargetPosition->getData() - mpEndeffectorPosition->getData();
+
+  if(_mVisualiseTarget->getValue())
+  {
+    mVisualisationPtr->getLocalCoordinateFrame()->setTranslation(mpTargetPosition->getData().at<cedar::unit::Length>(0),
+                                                                 mpTargetPosition->getData().at<cedar::unit::Length>(1),
+                                                                 mpTargetPosition->getData().at<cedar::unit::Length>(2));
+  }
+
+  // calculate angle as phi = acos(v.k / |v||k|)
+  const double dot = current_vel.dot(current_pos_diff);
+  const double norm = cv::norm(current_vel) * cv::norm(current_pos_diff);
+  double angle = 0;
+
+  if(norm != 0)
+  {
+    angle = acos(dot / norm);
+  }    
+
   mpAngle->getData().at<double>(0,0) = angle;  
 
-  //plane normal
-  cv::Mat planeNormal = referenceVector.cross( influenceVector );
-  double norm_plane = cv::norm(planeNormal);
-  if( norm_plane != 0. )
-    planeNormal /= norm_plane;
-  mpPlaneNormal->setData(planeNormal);
-  //planeNormal.copyTo(mpPlaneNormal->getData() );
-  //for(int i = 0; i < 3; i++)
-  //  mpPlaneNormal->getData().at<double>(i,0) = planeNormal.at<double>(i,0);
+  // direction of most effective change w_dir = v x ( v x k ) * ( |v| / |v x (v x k)| )
+  cv::Mat w_dir = current_vel.cross(current_vel.cross( current_pos_diff ));
+  const double norm_inf_dir = cv::norm(w_dir);
 
-  //influence direction
-  cv::Mat influenceDir = referenceVector.cross( planeNormal );
-  double norm_inf_dir = cv::norm(influenceDir);
-  if( norm_inf_dir != 0. )
-    influenceDir /= norm_inf_dir;
-  influenceDir *= norm_ref; //can change the influence dir vector to 0, if reference was 0
-  mpOrthogonalInfluence->setData(influenceDir);
-  //influenceDir.copyTo(mpOrthogonalInfluence->getData() );
-  //for(int i = 0; i < 3; i++)
-  //  mpOrthogonalInfluence->getData().at<double>(i,0) = influenceDir.at<double>(i,0);
+  if(norm_inf_dir != 0)
+  {
+    w_dir /= norm_inf_dir;
+  }
+
+  w_dir *= cv::norm(current_vel); //can change the influence dir vector to 0, if reference was 0
+  mpOrthogonalAcceleration->setData(w_dir);
 }
 
 //// validity check
@@ -113,24 +118,63 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::VectorsPlaneAngle::determine
 {
   //all inputs have same type
   cedar::aux::ConstMatDataPtr _input = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
-  if( slot->getName() == "reference vector" || slot->getName() == "influence vector")
+  if( slot->getName() == "endeffector velocity" || slot->getName() == "endeffector position" || slot->getName() == "target position")
   {
     if (_input && _input->getDimensionality() == 1 && cedar::aux::math::get1DMatrixSize(_input->getData()) == 3 && _input->getData().type() == CV_64F)
+    {
       return cedar::proc::DataSlot::VALIDITY_VALID;
+    }
   }
   
   // else
   return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
-void cedar::proc::steps::VectorsPlaneAngle::inputConnectionChanged(const std::string& inputName){
-  if (inputName == "reference vector")
+void cedar::proc::steps::VectorsPlaneAngle::inputConnectionChanged(const std::string& inputName)
+{
+  if (inputName == "endeffector velocity")
   {
-    mpReferenceVector = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
+    mpEndeffectorVelocity = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
   }
-  else if (inputName == "influence vector")
+  else if (inputName == "endeffector position")
   {
-    mpInfluenceVector = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
+    mpEndeffectorPosition = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
+  }
+  else if (inputName == "target position")
+  {
+    mpTargetPosition = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
+  }
+}
+
+void cedar::proc::steps::VectorsPlaneAngle::visualisationChanged()
+{
+  auto scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
+
+  // add or remove visualisation
+  if(_mVisualiseTarget->getValue())
+  {
+
+    mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
+    (
+      new cedar::aux::gl::Sphere
+        (
+          cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
+          0.05, 0.9, 0.9, 0.05
+        )
+    );
+
+    if(mpTargetPosition)
+    {
+      mVisualisationPtr->getLocalCoordinateFrame()->setTranslation(mpTargetPosition->getData().at<cedar::unit::Length>(0),
+                                                                   mpTargetPosition->getData().at<cedar::unit::Length>(1),
+                                                                   mpTargetPosition->getData().at<cedar::unit::Length>(2));
+    }
+
+    _mVisualisationID = scene->addObjectVisualization(mVisualisationPtr);
+  }
+  else
+  {
+    scene->deleteObjectVisualization(_mVisualisationID);
   }
 }
 

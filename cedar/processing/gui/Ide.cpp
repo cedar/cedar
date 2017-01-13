@@ -71,7 +71,6 @@
 #include "cedar/auxiliaries/PluginProxy.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
-#include "cedar/auxiliaries/gui/ViewerManager.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/units/prefixes.h"
 #include "cedar/auxiliaries/Recorder.h"
@@ -930,10 +929,7 @@ void cedar::proc::gui::Ide::showRobotManager()
 
 void cedar::proc::gui::Ide::addGlobalSceneViewer()
 {
-  auto viewer = cedar::aux::gui::ViewerManagerSingleton::getInstance()->getNewUnnamedViewer();
-
-  viewer->startTimer(50);
-  viewer->show();
+  this->mpSceneControl->openNamelessViewer();
 }
 
 void cedar::proc::gui::Ide::displayFilename(const std::string& filename)

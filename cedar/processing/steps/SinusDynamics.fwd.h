@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015, 2016 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,26 +22,26 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ViewerManager.fwd.h
+    File:        SinusDynamics.fwd.h
 
-    Maintainer:  jokeit
-    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        2014 10 21
+    Maintainer:  Nico Kuerschner
+    Email:       nico.kuerschner@ini.rub.de
+    Date:        2016 08 12
 
-    Description: Forward declaration file for the class cedar::aux::gui::ViewerManager.
+    Description: Forward declaration file for the class cedar::proc::steps::SinusDynamics
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_VIEWER_MANAGER_FWD_H
-#define CEDAR_AUX_GUI_VIEWER_MANAGER_FWD_H
+#ifndef CEDAR_PROC_STEPS_SINUS_DYNAMICS_FWD_H
+#define CEDAR_PROC_STEPS_SINUS_DYNAMICS_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -51,17 +51,17 @@
 
 namespace cedar
 {
-  namespace aux
+  namespace proc
   {
-    namespace gui
+    namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_AUX_CLASS(ViewerManager);
+      CEDAR_DECLARE_PROC_CLASS(SinusDynamics);
       //!@endcond
     }
   }
 }
 
 
-#endif // CEDAR_AUX_GUI_VIEWER_MANAGER_FWD_H
+#endif // CEDAR_PROC_STEPS_SINUS_DYNAMICS_FWD_H
 

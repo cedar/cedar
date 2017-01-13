@@ -22,35 +22,31 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        VectorsPlaneAngle.cpp
+    File:        SinusDynamics.h
 
-    Maintainer:  Mathäus Muzalewski
-    Email:       mathaeus.muzalewski@ruhr-uni-bochum.de
-    Date:        2014 August 28th
+    Maintainer:  Nico Kuerschner
+    Email:       nico.kuerschner@ini.rub.de
+    Date:        2016 08 12
 
-    Description: Takes two vectors and computes the angle, the plane normal vector and the scaled vector of most directional influence 
+    Description: Step for the implementation of an attractor dynamics approach by Hendrik Reimann, ISR 2010 
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef VECTORS_PLANE_ANGLE_H_
-#define VECTORS_PLANE_ANGLE_H_
+#ifndef SINUS_DYNAMICS_H_
+#define SINUS_DYNAMICS_H_
 
-#include <cedar/processing/Step.h>
+#include <cedar/processing/Step.h> // if we are going to inherit from cedar::proc::Step, we have to include the header
 #include <cedar/auxiliaries/MatData.h>
+#include <cedar/auxiliaries/DoubleParameter.h>
+#include "cedar/processing/steps/SinusDynamics.fwd.h"
 
-// includes for visualisation
-#include "cedar/auxiliaries/gl/GlobalScene.h"
-#include "cedar/auxiliaries/gl/Sphere.h"
-
-#include "cedar/processing/steps/VectorsPlaneAngle.fwd.h"
-
-class cedar::proc::steps::VectorsPlaneAngle : public cedar::proc::Step
+class cedar::proc::steps::SinusDynamics : public cedar::proc::Step
 {
-  Q_OBJECT
+    Q_OBJECT
   public:
-    VectorsPlaneAngle();
+    SinusDynamics();
     cedar::proc::DataSlot::VALIDITY determineInputValidity
                                     (
                                       cedar::proc::ConstDataSlotPtr slot,
@@ -62,25 +58,14 @@ class cedar::proc::steps::VectorsPlaneAngle : public cedar::proc::Step
     void inputConnectionChanged(const std::string& inputName);
 
     // input
-    cedar::aux::ConstMatDataPtr mpEndeffectorVelocity;
-    cedar::aux::ConstMatDataPtr mpEndeffectorPosition;
-    cedar::aux::ConstMatDataPtr mpTargetPosition;
+    cedar::aux::ConstMatDataPtr mpAngle;
 
+protected:
     // output
-    cedar::aux::MatDataPtr mpAngle;
-    cedar::aux::MatDataPtr mpOrthogonalAcceleration;   
+    cedar::aux::MatDataPtr mpAngleChange;
 
-  private slots:
-    void visualisationChanged();
-
-  protected:
-    //!@brief Visualise the target position in scene or not
-    cedar::aux::BoolParameterPtr _mVisualiseTarget;
-
-    // corresponding visualisation id to perform deletion
-    int _mVisualisationID;
-
-    cedar::aux::gl::ObjectVisualizationPtr mVisualisationPtr;
+    // params
+    cedar::aux::DoubleParameterPtr mpLambda;
 };
 
-#endif /* VECTORS_PLANE_ANGLE_H_ */
+#endif /* SINUS_DYNAMICS_H_ */

@@ -1452,7 +1452,7 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
 
   if(this->mCheckCommandHook.member())
   {
-    std::cout<<"We have a mCheckCommandHook! We now check "<< type_for_Device << " and " << ioData <<std::endl;
+    //std::cout<<"We have a mCheckCommandHook! We now check "<< type_for_Device << " and " << ioData <<std::endl;
     if( !( mCheckCommandHook.member()(type_for_Device, ioData) ) )
     {
       cedar::aux::LogSingleton::getInstance()->error(

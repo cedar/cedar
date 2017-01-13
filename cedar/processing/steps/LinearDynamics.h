@@ -22,64 +22,51 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        AttrDynTargetAcquisition.cpp
+    File:        LinearDynamics.cpp
 
-    Maintainer:  Mathäus Muzalewski
-    Email:       mathaeus.muzalewski@ruhr-uni-bochum.de
-    Date:        2014 August 28th
+    Maintainer:  Nico Kuerschner
+    Email:       nico.kuerschner@ini.rub.de
+    Date:        2016 08 12
 
-    Description: Step for the implementation of an attractor dynamics approach by Hendrik Reimann, ISR 2010 
+    Description: Step for the implementation of an attractor dynamics approach by Hendrik Reimann, ISR 2010
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef ATTR_DYN_TARGET_ACQUISITION_H_
-#define ATTR_DYN_TARGET_ACQUISITION_H_
+#ifndef LINEAR_DYNAMICS_H_
+#define LINEAR_DYNAMICS_H_
 
 #include <cedar/processing/Step.h> // if we are going to inherit from cedar::proc::Step, we have to include the header
 #include <cedar/auxiliaries/MatData.h>
 #include <cedar/auxiliaries/DoubleParameter.h>
-#include "cedar/processing/steps/AttrDynTargetAcquisition.fwd.h"
+#include "cedar/processing/steps/LinearDynamics.fwd.h"
 
-class cedar::proc::steps::AttrDynTargetAcquisition : public cedar::proc::Step
+class cedar::proc::steps::LinearDynamics : public cedar::proc::Step
 {
     Q_OBJECT
   public:
-    AttrDynTargetAcquisition();
+    LinearDynamics();
     cedar::proc::DataSlot::VALIDITY determineInputValidity
                                     (
                                       cedar::proc::ConstDataSlotPtr slot,
                                       cedar::aux::ConstDataPtr data
                                     ) const;
 
-
   private:
-
     void compute(const cedar::proc::Arguments&);
     void inputConnectionChanged(const std::string& inputName);
 
-
-    double mLastTimeStamp;
-
     // input
-    cedar::aux::ConstMatDataPtr mpCurrentVelocity;
-    cedar::aux::ConstMatDataPtr mpAngle;
-    cedar::aux::ConstMatDataPtr mpOrthogonalInfluence;
+    cedar::aux::ConstMatDataPtr mpSpeed;
 
 protected:
-  
     // output
-    cedar::aux::MatDataPtr mpVelocityCorrection;
-    cedar::aux::MatDataPtr mpTargetAcquisition;
+    cedar::aux::MatDataPtr mpAcceleration;
 
     // params
-    cedar::aux::DoubleParameterPtr mpAlphaDir;
-    cedar::aux::DoubleParameterPtr mpAlphaVel;
+    cedar::aux::DoubleParameterPtr mpLambda;
     cedar::aux::DoubleParameterPtr mpSDes;
-    cedar::aux::DoubleParameterPtr mpMaxInfluenceAngle;
-
-
 };
 
-#endif /* ATTR_DYN_TARGET_ACQUISITION_H_ */
+#endif /* LINEAR_DYNAMICS_H_ */
