@@ -164,11 +164,11 @@ void cedar::aux::gl::Scene::draw()
       {
         if(((i+j) % 2) == 0)
         {
-          gl::setColor(0, 0, 0);
+          gl::setColor(0.333, 0.333, 0.333);
         }
         else
         {
-          gl::setColor(1, 1, 1);
+          gl::setColor(0.666, 0.666, 0.666);
         } // end if
         drawBlock(1, 1, 0.01, false);
         glTranslated(0, 1, 0);
