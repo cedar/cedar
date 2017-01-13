@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CLASS HEADER
-#include "cedar/processing/steps/InverseKinematicsPseudoStep.h"
+#include "cedar/processing/steps/PseudoInverseKinematics.h"
 
 // CEDAR INCLUDES
 // CEDAR INCLUDES
@@ -56,7 +56,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::steps::InverseKinematicsPseudoStep>("Robotics", "cedar.processing.steps.InverseKinematicsPseudoStep"));
+    ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::steps::PseudoInverseKinematics>("Robotics", "cedar.processing.steps.PseudoInverseKinematics"));
     declaration->setIconPath(":/steps/inverse_kinematic.svg");
     declaration->declare();
 
@@ -70,7 +70,7 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::steps::InverseKinematicsPseudoStep::InverseKinematicsPseudoStep()
+cedar::proc::steps::PseudoInverseKinematics::PseudoInverseKinematics()
     :
       cedar::proc::Step(true),
       mOutputVelocity(new cedar::aux::MatData(cv::Mat())),
@@ -81,14 +81,14 @@ cedar::proc::steps::InverseKinematicsPseudoStep::InverseKinematicsPseudoStep()
   QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SLOT(rebuildOutputs()));
 }
 
-cedar::proc::steps::InverseKinematicsPseudoStep::~InverseKinematicsPseudoStep()
+cedar::proc::steps::PseudoInverseKinematics::~PseudoInverseKinematics()
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::steps::InverseKinematicsPseudoStep::compute(const cedar::proc::Arguments&)
+void cedar::proc::steps::PseudoInverseKinematics::compute(const cedar::proc::Arguments&)
 {
   cedar::aux::ConstDataPtr inputData = this->getInputSlot(mInputVelocityName)->getData();
 
@@ -109,7 +109,7 @@ void cedar::proc::steps::InverseKinematicsPseudoStep::compute(const cedar::proc:
   }
 }
 
-void cedar::proc::steps::InverseKinematicsPseudoStep::onStart()
+void cedar::proc::steps::PseudoInverseKinematics::onStart()
 {
   if (this->hasComponent())
   {
@@ -118,7 +118,7 @@ void cedar::proc::steps::InverseKinematicsPseudoStep::onStart()
   }
 }
 
-void cedar::proc::steps::InverseKinematicsPseudoStep::onStop()
+void cedar::proc::steps::PseudoInverseKinematics::onStop()
 {
   if (this->hasComponent())
   {
@@ -134,7 +134,7 @@ void cedar::proc::steps::InverseKinematicsPseudoStep::onStop()
   }
 }
 
-bool cedar::proc::steps::InverseKinematicsPseudoStep::hasComponent() const
+bool cedar::proc::steps::PseudoInverseKinematics::hasComponent() const
 {
   try
   {
@@ -146,13 +146,13 @@ bool cedar::proc::steps::InverseKinematicsPseudoStep::hasComponent() const
   }
 }
 
-void cedar::proc::steps::InverseKinematicsPseudoStep::reset()
+void cedar::proc::steps::PseudoInverseKinematics::reset()
 {
   auto component = this->getComponent();
   component->clearAll();
 }
 
-cedar::proc::DataSlot::VALIDITY cedar::proc::steps::InverseKinematicsPseudoStep::determineInputValidity(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data) const
+cedar::proc::DataSlot::VALIDITY cedar::proc::steps::PseudoInverseKinematics::determineInputValidity(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data) const
 {
   cedar::aux::ConstMatDataPtr _input = boost::dynamic_pointer_cast < cedar::aux::ConstMatData > (data);
   if (_input && _input->getDimensionality() == 1 && slot->getName() == mInputVelocityName && cedar::aux::math::get1DMatrixSize(_input->getData()) == 3)
@@ -163,7 +163,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::InverseKinematicsPseudoStep:
   return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
-void cedar::proc::steps::InverseKinematicsPseudoStep::rebuildOutputs()
+void cedar::proc::steps::PseudoInverseKinematics::rebuildOutputs()
 {
   this->removeAllSlots(cedar::proc::DataRole::OUTPUT);
   auto component = this->getComponent();
@@ -175,7 +175,7 @@ void cedar::proc::steps::InverseKinematicsPseudoStep::rebuildOutputs()
   }
 }
 
-void cedar::proc::steps::InverseKinematicsPseudoStep::testStates(cedar::dev::ComponentPtr component)
+void cedar::proc::steps::PseudoInverseKinematics::testStates(cedar::dev::ComponentPtr component)
 {
   if (!component->isCommunicating())
   {

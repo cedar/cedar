@@ -46,7 +46,7 @@
 #include "cedar/auxiliaries/MatData.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/InverseKinematicsPseudoStep.fwd.h"
+#include "cedar/processing/steps/PseudoInverseKinematics.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -54,7 +54,7 @@
  *
  * @todo describe more.
  */
-class cedar::proc::steps::InverseKinematicsPseudoStep : public cedar::proc::Step
+class cedar::proc::steps::PseudoInverseKinematics : public cedar::proc::Step
 {
 Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
@@ -66,10 +66,10 @@ Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  InverseKinematicsPseudoStep();
+  PseudoInverseKinematics();
 
   //!@brief Destructor
-  virtual ~InverseKinematicsPseudoStep();
+  virtual ~PseudoInverseKinematics();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
