@@ -77,6 +77,9 @@ class cedar::proc::steps::VectorsPlaneAngle : public cedar::proc::Step
     //!@brief Visualise the target position in scene or not
     cedar::aux::BoolParameterPtr _mVisualiseTarget;
 
+    //!@brief Visualisation color (red or green)
+    cedar::aux::BoolParameterPtr _mVisualisationColour;
+
     // corresponding visualisation id to perform deletion
     int _mVisualisationID;
 
