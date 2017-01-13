@@ -66,6 +66,7 @@ protected:
 
     // params
     cedar::aux::DoubleParameterPtr mpLambda;
+    cedar::aux::DoubleParameterPtr mpPsi;
 };
 
 #endif /* SINUS_DYNAMICS_H_ */
