@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        VectorsPlaneAngle.fwd.h
+    File:        LinearDynamics.fwd.h
 
     Maintainer:  Nico Kuerschner
     Email:       nico.kuerschner@ini.rub.de
-    Date:        2016 03 11
+    Date:        2016 08 12
 
-    Description: Forward declaration file for the class cedar::proc::steps::AttrDynTargetAcquisition
+    Description: Forward declaration file for the class cedar::proc::steps::LinearDynamics
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_ATTR_DYN_TARGET_ACQUISITION_FWD_H
-#define CEDAR_PROC_STEPS_ATTR_DYN_TARGET_ACQUISITION_FWD_H
+#ifndef CEDAR_PROC_STEPS_LINEAR_DYNAMICS_FWD_H
+#define CEDAR_PROC_STEPS_LINEAR_DYNAMICS_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -56,12 +56,12 @@ namespace cedar
     namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(AttrDynTargetAcquisition);
+      CEDAR_DECLARE_PROC_CLASS(LinearDynamics);
       //!@endcond
     }
   }
 }
 
 
-#endif // CEDAR_PROC_STEPS_ATTR_DYN_TARGET_ACQUISITION_FWD_H
+#endif // CEDAR_PROC_STEPS_LINEAR_DYNAMICS_FWD_H
 

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,30 +22,30 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ViewerManager.h
+    File:        Norm.h
 
-    Maintainer:  jokeit
-    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        2014 10 21
+    Maintainer:  Nico Kuerschner
+    Email:       Nico.Kuerschner@ini.rub.de
+    Date:        2016 12 08
 
-    Description: Header file for the class cedar::aux::gui::ViewerManager.
+    Description: Header file for the class cedar::proc::steps::Norm.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_VIEWER_MANAGER_H
-#define CEDAR_AUX_GUI_VIEWER_MANAGER_H
+#ifndef CEDAR_PROC_STEPS_NORM_H
+#define CEDAR_PROC_STEPS_NORM_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/Singleton.h"
-#include "cedar/auxiliaries/gui/Viewer.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/MatData.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/gui/ViewerManager.fwd.h"
+#include "cedar/processing/steps/Norm.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -54,13 +54,8 @@
  *
  * @todo describe more.
  */
-class cedar::aux::gui::ViewerManager
+class cedar::proc::steps::Norm : public cedar::proc::Step
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // friends
-  //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::aux::Singleton<cedar::aux::gui::ViewerManager>;
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -70,16 +65,16 @@ class cedar::aux::gui::ViewerManager
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ViewerManager();
+  Norm();
 
   //!@brief Destructor
-  virtual ~ViewerManager();
+  virtual ~Norm();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cedar::aux::gui::ViewerPtr getNewUnnamedViewer();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -97,10 +92,16 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-private:
-  std::vector< cedar::aux::gui::ViewerPtr > mViewers;
+  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
+  cedar::aux::ConstMatDataPtr mInput;
 
+  //!@brief The data containing the output.
+  cedar::aux::MatDataPtr mOutput;
+
+private:
+
+  void compute(const cedar::proc::Arguments&);
+  void inputConnectionChanged(const std::string& inputName);
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -110,19 +111,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::gui::ViewerManager
+}; // class cedar::proc::steps::Norm
 
-namespace cedar
-{
-  namespace aux
-  {
-    namespace gui
-    {
-      //!@brief The singleton instance of the robot manager.
-      typedef cedar::aux::Singleton<cedar::aux::gui::ViewerManager> ViewerManagerSingleton;
-    }
-  }
-}
-
-#endif // CEDAR_AUX_GUI_VIEWER_MANAGER_H
+#endif // CEDAR_PROC_STEPS_NORM_H
 

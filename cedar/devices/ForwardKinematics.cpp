@@ -53,7 +53,6 @@ cedar::dev::ForwardKinematics::ForwardKinematics(KinematicChain *chain, cedar::a
   : mpKinematicChain(chain),
     mpRootCoordinateFrame(new cedar::aux::LocalCoordinateFrame()),
     mpEndEffectorCoordinateFrame(pEndEffector)
-
 {
 }
 
@@ -122,9 +121,6 @@ cv::Mat cedar::dev::ForwardKinematics::getJointTransformation(unsigned int index
   mTransformationsLock.unlock();
   return T;
 }
-
-
-
 
 void cedar::dev::ForwardKinematics::calculateCartesianJacobian
 (
@@ -346,6 +342,7 @@ cv::Mat cedar::dev::ForwardKinematics::calculateSpatialJacobianTemporalDerivativ
   cv::Mat J = cv::Mat::zeros(6, mpKinematicChain->getNumberOfJoints(), CV_64FC1);
   for (unsigned int i=0; i<=index; i++)
   {
+    mTransformationsLock.lockForRead();
     // create i-th column
     cv::Mat column = cv::Mat::zeros(6, 1, CV_64FC1);
     column = calculateTwistTemporalDerivative(i);
@@ -354,6 +351,7 @@ cv::Mat cedar::dev::ForwardKinematics::calculateSpatialJacobianTemporalDerivativ
     {
       J.at<double>(j, i) = column.at<double>(j, 0);
     }
+    mTransformationsLock.unlock();
   }
   return J;
 }
