@@ -46,7 +46,7 @@
 #include "cedar/auxiliaries/MatData.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/ForwardKinematicsStep.fwd.h"
+#include "cedar/processing/steps/ForwardKinematics.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -54,7 +54,7 @@
  *
  * @todo describe more.
  */
-class cedar::proc::steps::ForwardKinematicsStep : public cedar::proc::Step
+class cedar::proc::steps::ForwardKinematics : public cedar::proc::Step
 {
 Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
@@ -66,10 +66,10 @@ Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ForwardKinematicsStep();
+  ForwardKinematics();
 
   //!@brief Destructor
-  virtual ~ForwardKinematicsStep();
+  virtual ~ForwardKinematics();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -130,6 +130,6 @@ private:
   // none yet
 
 };
-// class cedar::proc::steps::ForwardKinematicsStep
+// class cedar::proc::steps::ForwardKinematics
 
 #endif // CEDAR_PROC_STEPS_FORWARD_KINEMATICS_STEP_H
