@@ -177,4 +177,3 @@ void cedar::proc::steps::VectorsPlaneAngle::visualisationChanged()
     scene->deleteObjectVisualization(_mVisualisationID);
   }
 }
-
