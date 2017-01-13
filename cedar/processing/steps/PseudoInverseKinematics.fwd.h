@@ -56,7 +56,7 @@ namespace cedar
     namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(InverseKinematicsPseudoStep);
+      CEDAR_DECLARE_PROC_CLASS(PseudoInverseKinematics);
       //!@endcond
     }
   }
