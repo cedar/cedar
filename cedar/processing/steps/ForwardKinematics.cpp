@@ -22,13 +22,13 @@
  Institute:   Ruhr-Universitaet Bochum
  Institut fuer Neuroinformatik
 
- File:        ForwardKinematicsStep.cpp
+ File:        ForwardKinematics.cpp
 
  Maintainer:  Jan Tekülve
  Email:       jan.tekuelve@ini.rub.de
  Date:        2016 06 28
 
- Description: Source file for the class cedar::proc::steps::ForwardKinematicsStep.
+ Description: Source file for the class cedar::proc::steps::ForwardKinematics.
 
  Credits:
 
@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CLASS HEADER
-#include "cedar/processing/steps/ForwardKinematicsStep.h"
+#include "cedar/processing/steps/ForwardKinematics.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/ElementDeclaration.h"
@@ -59,7 +59,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::steps::ForwardKinematicsStep>("Robotics", "cedar.processing.steps.ForwardKinematicsStep"));
+    ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::steps::ForwardKinematics>("Robotics", "cedar.processing.steps.ForwardKinematics"));
     declaration->setIconPath(":/steps/forward_kinematic.svg");
     declaration->declare();
 
@@ -73,7 +73,7 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::steps::ForwardKinematicsStep::ForwardKinematicsStep()
+cedar::proc::steps::ForwardKinematics::ForwardKinematics()
     :
       cedar::proc::Step(true),
       mOutputPos(new cedar::aux::MatData(cv::Mat())),
@@ -84,14 +84,14 @@ cedar::proc::steps::ForwardKinematicsStep::ForwardKinematicsStep()
   QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SLOT(rebuildOutputs()));
 }
 
-cedar::proc::steps::ForwardKinematicsStep::~ForwardKinematicsStep()
+cedar::proc::steps::ForwardKinematics::~ForwardKinematics()
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::steps::ForwardKinematicsStep::compute(const cedar::proc::Arguments&)
+void cedar::proc::steps::ForwardKinematics::compute(const cedar::proc::Arguments&)
 {
   if (this->hasComponent())
   {
@@ -108,7 +108,7 @@ void cedar::proc::steps::ForwardKinematicsStep::compute(const cedar::proc::Argum
   }
 }
 
-void cedar::proc::steps::ForwardKinematicsStep::onStart()
+void cedar::proc::steps::ForwardKinematics::onStart()
 {
   if (this->hasComponent())
   {
@@ -117,7 +117,7 @@ void cedar::proc::steps::ForwardKinematicsStep::onStart()
   }
 }
 
-void cedar::proc::steps::ForwardKinematicsStep::onStop()
+void cedar::proc::steps::ForwardKinematics::onStop()
 {
   if (this->hasComponent())
   {
@@ -133,7 +133,7 @@ void cedar::proc::steps::ForwardKinematicsStep::onStop()
   }
 }
 
-bool cedar::proc::steps::ForwardKinematicsStep::hasComponent() const
+bool cedar::proc::steps::ForwardKinematics::hasComponent() const
 {
   try
   {
@@ -145,13 +145,13 @@ bool cedar::proc::steps::ForwardKinematicsStep::hasComponent() const
   }
 }
 
-void cedar::proc::steps::ForwardKinematicsStep::reset()
+void cedar::proc::steps::ForwardKinematics::reset()
 {
   auto component = this->getComponent();
   component->clearAll();
 }
 
-void cedar::proc::steps::ForwardKinematicsStep::rebuildOutputs()
+void cedar::proc::steps::ForwardKinematics::rebuildOutputs()
 {
   this->removeAllSlots(cedar::proc::DataRole::OUTPUT);
   auto component = this->getComponent();
@@ -167,7 +167,7 @@ void cedar::proc::steps::ForwardKinematicsStep::rebuildOutputs()
   }
 }
 
-void cedar::proc::steps::ForwardKinematicsStep::testStates(cedar::dev::ComponentPtr component)
+void cedar::proc::steps::ForwardKinematics::testStates(cedar::dev::ComponentPtr component)
 {
   if (!component->isCommunicating())
   {

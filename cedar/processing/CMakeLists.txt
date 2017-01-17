@@ -109,8 +109,8 @@ cedar_add_library(cedarproc
   steps/ColorConversion.h
   steps/ComponentMultiply.h
   steps/CoordinateTransformation.h
-  steps/ForwardKinematicsStep.h
-  steps/InverseKinematicsPseudoStep.h
+  steps/ForwardKinematics.h
+  steps/PseudoInverseKinematics.h
   steps/MatrixMultiply.h
   steps/MatrixPadding.h
   steps/MatrixSlice.h

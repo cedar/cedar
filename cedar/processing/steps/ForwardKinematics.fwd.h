@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ObjectVisualization.fwd.h
+    File:        ForwardKinematicsStep.fwd.h
 
-    Maintainer:  jokeit
-    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        2014 10 21
+    Maintainer:  Jan Tekülve
+    Email:       jan.tekuelve@ini.rub.de
+    Date:        2016 06 28
 
-    Description: Forward declaration file for the class cedar::proc::steps::ObjectVisualization.
+    Description: Forward declaration file for the class cedar::proc::steps::ForwardKinematicsStep.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_OBJECT_VISUALIZATION_FWD_H
-#define CEDAR_PROC_STEPS_OBJECT_VISUALIZATION_FWD_H
+#ifndef CEDAR_PROC_STEPS_FORWARD_KINEMATICS_STEP_FWD_H
+#define CEDAR_PROC_STEPS_FORWARD_KINEMATICS_STEP_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -56,12 +56,12 @@ namespace cedar
     namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(ObjectVisualization);
+      CEDAR_DECLARE_PROC_CLASS(ForwardKinematics);
       //!@endcond
     }
   }
 }
 
 
-#endif // CEDAR_PROC_STEPS_OBJECT_VISUALIZATION_FWD_H
+#endif // CEDAR_PROC_STEPS_FORWARD_KINEMATICS_STEP_FWD_H
 

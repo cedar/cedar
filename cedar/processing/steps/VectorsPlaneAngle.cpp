@@ -43,7 +43,8 @@ cedar::proc::steps::VectorsPlaneAngle::VectorsPlaneAngle()
   :
   mpAngle(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_64F))),
   mpOrthogonalAcceleration(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_64F))),
-  _mVisualiseTarget(new cedar::aux::BoolParameter(this, "visualise target position", false))
+  _mVisualiseTarget(new cedar::aux::BoolParameter(this, "visualise target position", false)),
+  _mVisualisationColour(new cedar::aux::BoolParameter(this, "visualisation is obstacle", false))
 {
   this->declareInput("endeffector velocity");
   this->declareInput("endeffector position");
@@ -53,7 +54,6 @@ cedar::proc::steps::VectorsPlaneAngle::VectorsPlaneAngle()
   this->declareOutput("orthogonal acceleration", mpOrthogonalAcceleration);
 
   QObject::connect(_mVisualiseTarget.get(), SIGNAL(valueChanged()), this, SLOT(visualisationChanged()));
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -154,12 +154,21 @@ void cedar::proc::steps::VectorsPlaneAngle::visualisationChanged()
   if(_mVisualiseTarget->getValue())
   {
 
+    float r = 0;
+    float g = 1;
+
+    if(_mVisualisationColour->getValue())
+    {
+      r=1;
+      g=0;
+    }
+
     mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
     (
       new cedar::aux::gl::Sphere
         (
           cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-          0.05, 0.9, 0.9, 0.05
+          0.05, r, g, 0
         )
     );
 
@@ -177,4 +186,3 @@ void cedar::proc::steps::VectorsPlaneAngle::visualisationChanged()
     scene->deleteObjectVisualization(_mVisualisationID);
   }
 }
-

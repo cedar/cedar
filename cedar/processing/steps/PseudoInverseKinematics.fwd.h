@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ForwardKinematicsStep.fwd.h
+    File:        InverseKinematicsStep.fwd.h
 
     Maintainer:  Jan Tekülve
     Email:       jan.tekuelve@ini.rub.de
-    Date:        2016 06 28
+    Date:        2016 06 29
 
-    Description: Forward declaration file for the class cedar::proc::steps::ForwardKinematicsStep.
+    Description: Forward declaration file for the class cedar::proc::steps::InverseKinematicsStep.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_FORWARD_KINEMATICS_STEP_FWD_H
-#define CEDAR_PROC_STEPS_FORWARD_KINEMATICS_STEP_FWD_H
+#ifndef CEDAR_PROC_STEPS_INVERSE_KINEMATICS_STEP_FWD_H
+#define CEDAR_PROC_STEPS_INVERSE_KINEMATICS_STEP_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -56,12 +56,12 @@ namespace cedar
     namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(ForwardKinematicsStep);
+      CEDAR_DECLARE_PROC_CLASS(PseudoInverseKinematics);
       //!@endcond
     }
   }
 }
 
 
-#endif // CEDAR_PROC_STEPS_FORWARD_KINEMATICS_STEP_FWD_H
+#endif // CEDAR_PROC_STEPS_INVERSE_KINEMATICS_STEP_FWD_H
 
