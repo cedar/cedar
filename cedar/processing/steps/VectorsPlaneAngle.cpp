@@ -46,9 +46,10 @@ cedar::proc::steps::VectorsPlaneAngle::VectorsPlaneAngle()
   _mVisualiseTarget(new cedar::aux::BoolParameter(this, "visualise target position", false)),
   _mVisualisationColour(new cedar::aux::BoolParameter(this, "visualisation is obstacle", false))
 {
-  this->declareInput("endeffector velocity");
-  this->declareInput("endeffector position");
+
   this->declareInput("target position");
+  this->declareInput("endeffector position");
+  this->declareInput("endeffector velocity");
 
   this->declareOutput("angle", mpAngle);
   this->declareOutput("orthogonal acceleration", mpOrthogonalAcceleration);
