@@ -323,7 +323,7 @@
          <property name="title">
           <string>Item Configuration</string>
          </property>
-         <layout class="QFormLayout" name="formLayout">
+         <layout class="QGridLayout" name="gridLayout_3">
           <item row="0" column="0">
            <widget class="cedar::aux::gui::PropertyPane" name="mpPropertyPane" native="true"/>
           </item>
