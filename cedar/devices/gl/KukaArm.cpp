@@ -282,7 +282,7 @@ void cedar::dev::gl::KukaArm::drawSegment(unsigned int index)
   // move to object coordinates
   cv::Mat transformation;
   transformation = mpKinematicChain->getJointTransformation(index).t();
-  glMultMatrixd((GLdouble*)transformation.data);
+  glMultMatrixf((GLfloat*)transformation.data);
 
   if (isDrawingLocalCoordinateFrame())
   {

@@ -44,7 +44,7 @@ namespace
 cedar::proc::steps::SinusDynamics::SinusDynamics()
   :
   cedar::proc::Step(true),
-  mpAngleChange(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_64F))),
+  mpAngleChange(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
   mpLambda(new cedar::aux::DoubleParameter(this,"lambda", 0.0)),
   mpPsi(new cedar::aux::DoubleParameter(this, "fixed point", 0.0))
 {
@@ -58,10 +58,10 @@ cedar::proc::steps::SinusDynamics::SinusDynamics()
 
 void cedar::proc::steps::SinusDynamics::compute(const cedar::proc::Arguments&)
 {
-  const double &phi = mpAngle->getData().at<double>(0, 0);
-  const double phi_dot = mpLambda->getValue() * sin(phi - mpPsi->getValue()); //sinus dynamics
+  const float &phi = mpAngle->getData().at<float>(0, 0);
+  const float phi_dot = mpLambda->getValue() * sin(phi - mpPsi->getValue()); //sinus dynamics
 
-  mpAngleChange->getData().at<double>(0, 0) = phi_dot;
+  mpAngleChange->getData().at<float>(0, 0) = phi_dot;
 }
 
 //// validity check
@@ -75,7 +75,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::SinusDynamics::determineInpu
   cedar::aux::ConstMatDataPtr _input = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   if( slot->getName() == "angle" )
   {
-    if (_input && _input->getDimensionality() == 0 && _input->getData().type() == CV_64F)
+    if (_input && _input->getDimensionality() == 0 && _input->getData().type() == CV_32F)
     {
       return cedar::proc::DataSlot::VALIDITY_VALID;
     }

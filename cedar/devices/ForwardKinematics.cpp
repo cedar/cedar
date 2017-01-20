@@ -79,34 +79,34 @@ void cedar::dev::ForwardKinematics::initializeFromJointList()
   cv::Mat xi;
   cv::Mat T;
   cv::Mat p;
-  cv::Mat omega = cv::Mat::zeros(3, 1, CV_64FC1);
+  cv::Mat omega = cv::Mat::zeros(3, 1, CV_32FC1);
   for (unsigned int j=0; j < mpKinematicChain->getNumberOfJoints(); j++)
   {
     // create and store twist
     cedar::dev::KinematicChain::JointPtr joint = mpKinematicChain->getJoint(j);
-    p = cv::Mat::zeros(3, 1, CV_64FC1);
-    p.at<double>(0, 0) = joint->_mpPosition->at(0);
-    p.at<double>(1, 0) = joint->_mpPosition->at(1);
-    p.at<double>(2, 0) = joint->_mpPosition->at(2);
-    omega = cv::Mat::zeros(3, 1, CV_64FC1);
-    omega.at<double>(0, 0) = joint->_mpAxis->at(0);
-    omega.at<double>(1, 0) = joint->_mpAxis->at(1);
-    omega.at<double>(2, 0) = joint->_mpAxis->at(2);
-    xi = cedar::aux::math::twistCoordinates<double>(p, omega);
+    p = cv::Mat::zeros(3, 1, CV_32FC1);
+    p.at<float>(0, 0) = joint->_mpPosition->at(0);
+    p.at<float>(1, 0) = joint->_mpPosition->at(1);
+    p.at<float>(2, 0) = joint->_mpPosition->at(2);
+    omega = cv::Mat::zeros(3, 1, CV_32FC1);
+    omega.at<float>(0, 0) = joint->_mpAxis->at(0);
+    omega.at<float>(1, 0) = joint->_mpAxis->at(1);
+    omega.at<float>(2, 0) = joint->_mpAxis->at(2);
+    xi = cedar::aux::math::twistCoordinates<float>(p, omega);
     mReferenceJointTwists.push_back(xi.clone());
 
     // create and store transformation matrix to joint coordinate frame
-    T = cv::Mat::eye(4, 4, CV_64FC1);
-    T.at<double>(0, 3) = joint->_mpPosition->at(0);
-    T.at<double>(1, 3) = joint->_mpPosition->at(1);
-    T.at<double>(2, 3) = joint->_mpPosition->at(2);
+    T = cv::Mat::eye(4, 4, CV_32FC1);
+    T.at<float>(0, 3) = joint->_mpPosition->at(0);
+    T.at<float>(1, 3) = joint->_mpPosition->at(1);
+    T.at<float>(2, 3) = joint->_mpPosition->at(2);
     mReferenceJointTransformations.push_back(T.clone());
 
     // create storage variables for intermediate results
-    mTwistExponentials.push_back(cv::Mat::eye(4, 4, CV_64FC1));
-    mProductsOfExponentials.push_back(cv::Mat::eye(4, 4, CV_64FC1));
-    mJointTransformations.push_back(cv::Mat::eye(4, 4, CV_64FC1));
-    mJointTwists.push_back(cv::Mat::eye(6, 1, CV_64FC1));
+    mTwistExponentials.push_back(cv::Mat::eye(4, 4, CV_32FC1));
+    mProductsOfExponentials.push_back(cv::Mat::eye(4, 4, CV_32FC1));
+    mJointTransformations.push_back(cv::Mat::eye(4, 4, CV_32FC1));
+    mJointTwists.push_back(cv::Mat::eye(6, 1, CV_32FC1));
   }
 
   // end-effector
@@ -156,18 +156,18 @@ void cedar::dev::ForwardKinematics::calculateCartesianJacobian
   cv::Mat column;
   for (unsigned int j = 0; j <=  jointIndex; j++)
   {
-    column = cedar::aux::math::wedgeTwist<double>
+    column = cedar::aux::math::wedgeTwist<float>
              (
-               cedar::aux::math::rigidToAdjointTransformation<double>(mpRootCoordinateFrame->getTransformation())
+               cedar::aux::math::rigidToAdjointTransformation<float>(mpRootCoordinateFrame->getTransformation())
                * mJointTwists[j]
              )
              * mpRootCoordinateFrame->getTransformation() // change point to world coordinates
              * mJointTransformations[jointIndex] // change point to root coordinates
              * point_local;
     // export
-    result.at<double>(0, j) = column.at<double>(0, 0);
-    result.at<double>(1, j) = column.at<double>(1, 0);
-    result.at<double>(2, j) = column.at<double>(2, 0);
+    result.at<float>(0, j) = column.at<float>(0, 0);
+    result.at<float>(1, j) = column.at<float>(1, 0);
+    result.at<float>(2, j) = column.at<float>(2, 0);
   }
   mTransformationsLock.unlock();
 }
@@ -179,7 +179,7 @@ cv::Mat cedar::dev::ForwardKinematics::calculateCartesianJacobian
           unsigned int coordinateFrame
         )
 {
-  cv::Mat J = cv::Mat::zeros(3, mpKinematicChain->getNumberOfJoints(), CV_64FC1);
+  cv::Mat J = cv::Mat::zeros(3, mpKinematicChain->getNumberOfJoints(), CV_32FC1);
   calculateCartesianJacobian(point, jointIndex, J, coordinateFrame);
   return J;
 }
@@ -220,19 +220,19 @@ void cedar::dev::ForwardKinematics::calculateCartesianJacobianTemporalDerivative
   mTransformationsLock.lockForRead();
   for (unsigned int j = 0; j <= jointIndex; j++)
   {
-    S1 = cedar::aux::math::wedgeTwist<double>(calculateTwistTemporalDerivative(j)) * point_world;
-    S2 = cedar::aux::math::wedgeTwist<double>
+    S1 = cedar::aux::math::wedgeTwist<float>(calculateTwistTemporalDerivative(j)) * point_world;
+    S2 = cedar::aux::math::wedgeTwist<float>
          (
-           cedar::aux::math::rigidToAdjointTransformation<double>(mpRootCoordinateFrame->getTransformation())
+           cedar::aux::math::rigidToAdjointTransformation<float>(mpRootCoordinateFrame->getTransformation())
            *mJointTwists[j]
          )
          * calculateVelocity(point_world, jointIndex, cedar::dev::KinematicChain::WORLD_COORDINATES);
 
     column = S1 + S2;
     // export
-    result.at<double>(0, j) = column.at<double>(0, 0);
-    result.at<double>(1, j) = column.at<double>(1, 0);
-    result.at<double>(2, j) = column.at<double>(2, 0);
+    result.at<float>(0, j) = column.at<float>(0, 0);
+    result.at<float>(1, j) = column.at<float>(1, 0);
+    result.at<float>(2, j) = column.at<float>(2, 0);
   }
   mTransformationsLock.unlock();
 }
@@ -244,7 +244,7 @@ cv::Mat cedar::dev::ForwardKinematics::calculateCartesianJacobianTemporalDerivat
           unsigned int coordinateFrame
         )
 {
-  cv::Mat J = cv::Mat::zeros(3, mpKinematicChain->getNumberOfJoints(), CV_64FC1);
+  cv::Mat J = cv::Mat::zeros(3, mpKinematicChain->getNumberOfJoints(), CV_32FC1);
   calculateCartesianJacobianTemporalDerivative(point, jointIndex, J, coordinateFrame);
   return J;
 }
@@ -276,7 +276,7 @@ cv::Mat cedar::dev::ForwardKinematics::calculateVelocity
       break;
     }
   }
-  return cedar::aux::math::wedgeTwist<double>
+  return cedar::aux::math::wedgeTwist<float>
          (
            calculateSpatialJacobian(jointIndex) * mpKinematicChain->getJointVelocities()
          )
@@ -314,8 +314,8 @@ cv::Mat cedar::dev::ForwardKinematics::calculateAcceleration
   cv::Mat J_dot = calculateSpatialJacobianTemporalDerivative(jointIndex);
   cv::Mat T1 = J_dot * mpKinematicChain->getJointVelocities();
   cv::Mat T2 = J * mpKinematicChain->getJointAccelerations();
-  cv::Mat S1 = cedar::aux::math::wedgeTwist<double>(T1 + T2) * point_world;
-  cv::Mat S2 = cedar::aux::math::wedgeTwist<double>(calculateSpatialJacobian(jointIndex)
+  cv::Mat S1 = cedar::aux::math::wedgeTwist<float>(T1 + T2) * point_world;
+  cv::Mat S2 = cedar::aux::math::wedgeTwist<float>(calculateSpatialJacobian(jointIndex)
                * mpKinematicChain->getJointVelocities())
            * calculateVelocity(point_world, jointIndex, cedar::dev::KinematicChain::WORLD_COORDINATES);
   return S1 + S2;
@@ -323,33 +323,33 @@ cv::Mat cedar::dev::ForwardKinematics::calculateAcceleration
 
 cv::Mat cedar::dev::ForwardKinematics::calculateSpatialJacobian(unsigned int index)
 {
-  cv::Mat jacobian = cv::Mat::zeros(6, mpKinematicChain->getNumberOfJoints(), CV_64FC1);
+  cv::Mat jacobian = cv::Mat::zeros(6, mpKinematicChain->getNumberOfJoints(), CV_32FC1);
   mTransformationsLock.lockForRead();
   for (unsigned int j = 0; j <= index; j++)
   {
     for (int i = 0; i < 6; i++)
     {
-      jacobian.at<double>(i, j) = mJointTwists[j].at<double>(i, 0);
+      jacobian.at<float>(i, j) = mJointTwists[j].at<float>(i, 0);
     }
   }
   mTransformationsLock.unlock();
-  return cedar::aux::math::rigidToAdjointTransformation<double>(mpRootCoordinateFrame->getTransformation())*jacobian;
+  return cedar::aux::math::rigidToAdjointTransformation<float>(mpRootCoordinateFrame->getTransformation())*jacobian;
 }
 
 cv::Mat cedar::dev::ForwardKinematics::calculateSpatialJacobianTemporalDerivative(unsigned int index)
 {
   // create k-th column
-  cv::Mat J = cv::Mat::zeros(6, mpKinematicChain->getNumberOfJoints(), CV_64FC1);
+  cv::Mat J = cv::Mat::zeros(6, mpKinematicChain->getNumberOfJoints(), CV_32FC1);
   for (unsigned int i=0; i<=index; i++)
   {
     mTransformationsLock.lockForRead();
     // create i-th column
-    cv::Mat column = cv::Mat::zeros(6, 1, CV_64FC1);
+    cv::Mat column = cv::Mat::zeros(6, 1, CV_32FC1);
     column = calculateTwistTemporalDerivative(i);
     // export to matrix
     for (unsigned int j=0; j<6; j++)
     {
-      J.at<double>(j, i) = column.at<double>(j, 0);
+      J.at<float>(j, i) = column.at<float>(j, 0);
     }
     mTransformationsLock.unlock();
   }
@@ -359,14 +359,14 @@ cv::Mat cedar::dev::ForwardKinematics::calculateSpatialJacobianTemporalDerivativ
 cv::Mat cedar::dev::ForwardKinematics::calculateTwistTemporalDerivative(unsigned int jointIndex)
 {
   // calculate transformation to (j-1)-th joint frame
-  cv::Mat g = cv::Mat::zeros(4, 4, CV_64FC1);
+  cv::Mat g = cv::Mat::zeros(4, 4, CV_32FC1);
   // g is a product of j-1 exponentials, so the temporal derivative is a sum with j-1 summands
   for (unsigned int k = 0; k < jointIndex; k++)
   {
     /*******************************************************************************************************************
      * the k-th summand, deriving the factor with positive sign theta_k
      ******************************************************************************************************************/
-    cv::Mat s_k = cv::Mat::eye(4, 4, CV_64FC1); // summand where the factor with the positive sign theta_k is derived
+    cv::Mat s_k = cv::Mat::eye(4, 4, CV_32FC1); // summand where the factor with the positive sign theta_k is derived
     // factors before the k-th
     for (unsigned int j = 0; j < k; j++)
     {
@@ -382,7 +382,7 @@ cv::Mat cedar::dev::ForwardKinematics::calculateTwistTemporalDerivative(unsigned
 
     }
     // k-th factor is derived by time
-    s_k = s_k * cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[k]) * mTwistExponentials[k];
+    s_k = s_k * cedar::aux::math::wedgeTwist<float>(mReferenceJointTwists[k]) * mTwistExponentials[k];
 
 //    if((jointIndex == 2) && (k == 1))
 //    {
@@ -390,8 +390,8 @@ cv::Mat cedar::dev::ForwardKinematics::calculateTwistTemporalDerivative(unsigned
 //
 //      std::cout << "s_k:" << std::endl;
 //      cedar::aux::math::write(s_k);
-//      std::cout << "cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[k]):" << std::endl;
-//      cedar::aux::math::write(cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[k]));
+//      std::cout << "cedar::aux::math::wedgeTwist<float>(mReferenceJointTwists[k]):" << std::endl;
+//      cedar::aux::math::write(cedar::aux::math::wedgeTwist<float>(mReferenceJointTwists[k]));
 //      std::cout << "mTwistExponentials[k]:" << std::endl;
 //      cedar::aux::math::write(mTwistExponentials[k]);
 //    }
@@ -407,7 +407,7 @@ cv::Mat cedar::dev::ForwardKinematics::calculateTwistTemporalDerivative(unsigned
 //        cedar::aux::math::write(s_k);
 //      }
     }
-    s_k = s_k * cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[jointIndex])
+    s_k = s_k * cedar::aux::math::wedgeTwist<float>(mReferenceJointTwists[jointIndex])
               * mProductsOfExponentials[jointIndex-1].inv();
 //    if((jointIndex == 2) && (k == 1))
 //    {
@@ -419,7 +419,7 @@ cv::Mat cedar::dev::ForwardKinematics::calculateTwistTemporalDerivative(unsigned
      ******************************************************************************************************************/
     cv::Mat t_k; // summand where the factor with the negative sign theta_k is derived
     t_k = mProductsOfExponentials[jointIndex-1]
-            * cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[jointIndex]);
+            * cedar::aux::math::wedgeTwist<float>(mReferenceJointTwists[jointIndex]);
     // factors before the k-th
     for (unsigned int j = jointIndex-1; j > k; j--)
     {
@@ -427,7 +427,7 @@ cv::Mat cedar::dev::ForwardKinematics::calculateTwistTemporalDerivative(unsigned
       t_k = t_k * mTwistExponentials[j].inv();
     }
     // k-th factor is derived by time
-    t_k = t_k * cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[k]) * mTwistExponentials[k].inv();
+    t_k = t_k * cedar::aux::math::wedgeTwist<float>(mReferenceJointTwists[k]) * mTwistExponentials[k].inv();
     // factors after the k-th
     for (int j = k-1; j >= 0; j--)
     {
@@ -461,12 +461,12 @@ cv::Mat cedar::dev::ForwardKinematics::calculateTwistTemporalDerivative(unsigned
 //  {
 //    cedar::aux::math::write(mTwistExponentials[l]);
 //  }
-//  std::cout << "cedar::aux::math::veeTwist<double>(g):" << std::endl;
-//  cedar::aux::math::write(cedar::aux::math::veeTwist<double>(g));
+//  std::cout << "cedar::aux::math::veeTwist<float>(g):" << std::endl;
+//  cedar::aux::math::write(cedar::aux::math::veeTwist<float>(g));
 //  std::cout << "------------------------------------------------------" << std::endl;
 
   // adjoint of the calculated sum times the j-th twist is the derivative
-  return cedar::aux::math::veeTwist<double>(g);
+  return cedar::aux::math::veeTwist<float>(g);
  }
 
 cv::Mat cedar::dev::ForwardKinematics::calculateEndEffectorPosition()
@@ -526,7 +526,7 @@ void cedar::dev::ForwardKinematics::calculateTransformations()
 {
   mTransformationsLock.lockForWrite();
   // first joint
-  cedar::aux::math::expTwist<double>
+  cedar::aux::math::expTwist<float>
   (
     mReferenceJointTwists[0],
     mpKinematicChain->getJointAngle(0),
@@ -538,7 +538,7 @@ void cedar::dev::ForwardKinematics::calculateTransformations()
   // other joints
   for (unsigned int i = 1; i < mpKinematicChain->getNumberOfJoints(); i++)
   {
-    cedar::aux::math::expTwist<double>
+    cedar::aux::math::expTwist<float>
     (
       mReferenceJointTwists[i],
       mpKinematicChain->getJointAngle(i),
@@ -546,7 +546,7 @@ void cedar::dev::ForwardKinematics::calculateTransformations()
     );
     mProductsOfExponentials[i] = mProductsOfExponentials[i - 1] * mTwistExponentials[i];
     mJointTransformations[i] = mProductsOfExponentials[i] * mReferenceJointTransformations[i];
-    mJointTwists[i] = cedar::aux::math::rigidToAdjointTransformation<double>
+    mJointTwists[i] = cedar::aux::math::rigidToAdjointTransformation<float>
                       (
                         mProductsOfExponentials[i]
                       )

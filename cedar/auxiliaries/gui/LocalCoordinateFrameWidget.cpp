@@ -270,9 +270,14 @@ void cedar::aux::gui::LocalCoordinateFrameWidget::positionChanged(double)
 {
   mpLocalCoordinateFrame->setTranslation
   (
-    mpTranslationXSpinBox->value() * cedar::unit::DEFAULT_LENGTH_UNIT,
-    mpTranslationYSpinBox->value() * cedar::unit::DEFAULT_LENGTH_UNIT,
-    mpTranslationZSpinBox->value() * cedar::unit::DEFAULT_LENGTH_UNIT
+    std::vector<float>
+    (
+      {
+        float(mpTranslationXSpinBox->value()),
+        float(mpTranslationYSpinBox->value()),
+        float(mpTranslationZSpinBox->value())
+      }
+    )
   );
 }
 

@@ -84,7 +84,7 @@ namespace
 
 cedar::proc::steps::Norm::Norm()
     :
-    mOutput(new cedar::aux::MatData(cv::Mat(1, 1, CV_64F)))
+    mOutput(new cedar::aux::MatData(cv::Mat(1, 1, CV_32F)))
 {  
   this->declareOutput("output", mOutput);
   cedar::proc::DataSlotPtr input = this->declareInput("input");
@@ -100,7 +100,7 @@ cedar::proc::steps::Norm::~Norm()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::steps::Norm::compute(const cedar::proc::Arguments&)
 {
-  mOutput->getData().at<double>(0, 0) = cv::norm(this->mInput->getData());
+  mOutput->getData().at<float>(0, 0) = cv::norm(this->mInput->getData());
 }
 
 void cedar::proc::steps::Norm::inputConnectionChanged(const std::string& inputName)

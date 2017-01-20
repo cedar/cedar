@@ -158,9 +158,9 @@ void cedar::proc::steps::ForwardKinematics::rebuildOutputs()
   cedar::dev::KinematicChainPtr kinChain = boost::dynamic_pointer_cast < cedar::dev::KinematicChain > (component);
   if (kinChain)
   {
-    mOutputPos->setData(cv::Mat::zeros(kinChain->getNumberOfJoints(), 1, CV_64FC1));
-    mOutputVelocity->setData(cv::Mat::zeros(kinChain->getNumberOfJoints(), 1, CV_64FC1));
-    mOutputAcceleration->setData(cv::Mat::zeros(kinChain->getNumberOfJoints(), 1, CV_64FC1));
+    mOutputPos->setData(cv::Mat::zeros(kinChain->getNumberOfJoints(), 1, CV_32FC1));
+    mOutputVelocity->setData(cv::Mat::zeros(kinChain->getNumberOfJoints(), 1, CV_32FC1));
+    mOutputAcceleration->setData(cv::Mat::zeros(kinChain->getNumberOfJoints(), 1, CV_32FC1));
     this->declareOutput("Cartesian position", mOutputPos);
     this->declareOutput("Cartesian velocity", mOutputVelocity);
     this->declareOutput("Cartesian acceleration", mOutputAcceleration);

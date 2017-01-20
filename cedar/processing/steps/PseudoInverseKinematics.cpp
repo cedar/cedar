@@ -101,7 +101,7 @@ void cedar::proc::steps::PseudoInverseKinematics::compute(const cedar::proc::Arg
     if (kinChain)
     {
       cv::Mat Jacobian = kinChain->calculateEndEffectorJacobian();
-      cv::Mat jacobian_pseudo_inverse = cv::Mat::zeros(kinChain->getNumberOfJoints(), 2, CV_64FC1);
+      cv::Mat jacobian_pseudo_inverse = cv::Mat::zeros(kinChain->getNumberOfJoints(), 2, CV_32FC1);
       cv::invert(Jacobian, jacobian_pseudo_inverse, cv::DECOMP_SVD);
       cv::Mat joint_velocities = jacobian_pseudo_inverse * cartesianVelocityMat;
       mOutputVelocity->setData(joint_velocities);
@@ -170,7 +170,7 @@ void cedar::proc::steps::PseudoInverseKinematics::rebuildOutputs()
   cedar::dev::KinematicChainPtr kinChain = boost::dynamic_pointer_cast < cedar::dev::KinematicChain > (component);
   if (kinChain)
   {
-    mOutputVelocity->setData(cv::Mat::zeros(kinChain->getNumberOfJoints(), 1, CV_64FC1));
+    mOutputVelocity->setData(cv::Mat::zeros(kinChain->getNumberOfJoints(), 1, CV_32FC1));
     this->declareOutput("joint velocity", mOutputVelocity);
   }
 }

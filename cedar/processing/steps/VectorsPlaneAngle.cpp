@@ -41,8 +41,8 @@ namespace
 
 cedar::proc::steps::VectorsPlaneAngle::VectorsPlaneAngle()
   :
-  mpAngle(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_64F))),
-  mpOrthogonalAcceleration(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_64F))),
+  mpAngle(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
+  mpOrthogonalAcceleration(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_32F))),
   _mVisualiseTarget(new cedar::aux::BoolParameter(this, "visualise target position", false)),
   _mVisualisationColour(new cedar::aux::BoolParameter(this, "visualisation is obstacle", false))
 {
@@ -80,26 +80,34 @@ void cedar::proc::steps::VectorsPlaneAngle::compute(const cedar::proc::Arguments
 
   if(_mVisualiseTarget->getValue())
   {
-    mVisualisationPtr->getLocalCoordinateFrame()->setTranslation(mpTargetPosition->getData().at<cedar::unit::Length>(0),
-                                                                 mpTargetPosition->getData().at<cedar::unit::Length>(1),
-                                                                 mpTargetPosition->getData().at<cedar::unit::Length>(2));
+    mVisualisationPtr->getLocalCoordinateFrame()->setTranslation
+              (
+                std::vector<float>
+                (
+                  {
+                    mpTargetPosition->getData().at<float>(0),
+                    mpTargetPosition->getData().at<float>(1),
+                    mpTargetPosition->getData().at<float>(2)
+                  }
+                )
+              );
   }
 
   // calculate angle as phi = acos(v.k / |v||k|)
-  const double dot = current_vel.dot(current_pos_diff);
-  const double norm = cv::norm(current_vel) * cv::norm(current_pos_diff);
-  double angle = 0;
+  const float dot = current_vel.dot(current_pos_diff);
+  const float norm = cv::norm(current_vel) * cv::norm(current_pos_diff);
+  float angle = 0;
 
   if(norm != 0)
   {
     angle = acos(dot / norm);
   }    
 
-  mpAngle->getData().at<double>(0,0) = angle;  
+  mpAngle->getData().at<float>(0,0) = angle;
 
   // direction of most effective change w_dir = v x ( v x k ) * ( |v| / |v x (v x k)| )
   cv::Mat w_dir = current_vel.cross(current_vel.cross( current_pos_diff ));
-  const double norm_inf_dir = cv::norm(w_dir);
+  const float norm_inf_dir = cv::norm(w_dir);
 
   if(norm_inf_dir != 0)
   {
@@ -121,7 +129,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::VectorsPlaneAngle::determine
   cedar::aux::ConstMatDataPtr _input = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   if( slot->getName() == "endeffector velocity" || slot->getName() == "endeffector position" || slot->getName() == "target position")
   {
-    if (_input && _input->getDimensionality() == 1 && cedar::aux::math::get1DMatrixSize(_input->getData()) == 3 && _input->getData().type() == CV_64F)
+    if (_input && _input->getDimensionality() == 1 && cedar::aux::math::get1DMatrixSize(_input->getData()) == 3 && _input->getData().type() == CV_32F)
     {
       return cedar::proc::DataSlot::VALIDITY_VALID;
     }
