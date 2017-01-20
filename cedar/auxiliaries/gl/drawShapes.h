@@ -56,7 +56,7 @@ namespace cedar
        * @param G G value of RGB color
        * @param B B value of RGB color
        */
-      CEDAR_AUX_LIB_EXPORT void setColor(double R, double G, double B);
+      CEDAR_AUX_LIB_EXPORT void setColor(float R, float G, float B);
 
       /*!@brief  draws a rectangular block in the current coordinate frame
        * @param length extension in x-direction of current coordinate frame
@@ -64,7 +64,7 @@ namespace cedar
        * @param height extension in z-direction of current coordinate frame
        * @param wireFrame decides whether to draw full surfaces or only a wire frame
        */
-      CEDAR_AUX_LIB_EXPORT void drawBlock(double length, double width, double height, bool wireFrame = false);
+      CEDAR_AUX_LIB_EXPORT void drawBlock(float length, float width, float height, bool wireFrame = false);
       
       /*!@brief  draws a rectangular block in the current coordinate frame
        * @param front extension in positive x-direction of current coordinate frame
@@ -77,12 +77,12 @@ namespace cedar
        */
       CEDAR_AUX_LIB_EXPORT void drawBlock
       (
-        double front,
-        double back,
-        double right,
-        double left,
-        double up,
-        double down,
+        float front,
+        float back,
+        float right,
+        float left,
+        float up,
+        float down,
         bool wireFrame = false
       );
 
@@ -96,10 +96,10 @@ namespace cedar
        */
       CEDAR_AUX_LIB_EXPORT
       void drawCone(
-                     double floor,
-                     double ceiling,
-                     double radiusFloor,
-                     double radiusCeiling,
+                     float floor,
+                     float ceiling,
+                     float radiusFloor,
+                     float radiusCeiling,
                      int slices,
                      bool wireFrame = false
                    );
@@ -116,8 +116,8 @@ namespace cedar
       void drawCone(
                      const cv::Mat& start,
                      const cv::Mat& end,
-                     double radiusStart,
-                     double radiusEnd,
+                     float radiusStart,
+                     float radiusEnd,
                      int slices,
                      bool wireFrame = false
                    );
@@ -135,9 +135,9 @@ namespace cedar
       void drawArrow(
                       const cv::Mat& start,
                       const cv::Mat& end,
-                      double shaftRadius,
-                      double headRadius,
-                      double headLength,
+                      float shaftRadius,
+                      float headRadius,
+                      float headLength,
                       int patches,
                       bool wireFrame = false
                     );
@@ -150,7 +150,7 @@ namespace cedar
        */
       CEDAR_AUX_LIB_EXPORT
       void drawSphere(
-                       double radius,
+                       float radius,
                        int slices,
                        int stacks,
                        bool wireFrame = false
@@ -166,8 +166,8 @@ namespace cedar
        */
       CEDAR_AUX_LIB_EXPORT
       void drawDisk(
-                     double innerRadius,
-                     double outerRadius,
+                     float innerRadius,
+                     float outerRadius,
                      int slices,
                      int loops,
                      bool invert = false,
@@ -182,9 +182,9 @@ namespace cedar
        */ 
       CEDAR_AUX_LIB_EXPORT
       void drawPyramid(
-                        double length,
-                        double width,
-                        double height,
+                        float length,
+                        float width,
+                        float height,
                         bool wireFrame = false
                       );
       
@@ -194,7 +194,7 @@ namespace cedar
        * @param wireFrame decides whether to draw full surfaces or only a wire frame
        */ 
       CEDAR_AUX_LIB_EXPORT
-      void drawPrism(double width, double height, bool wireFrame = false);
+      void drawPrism(float width, float height, bool wireFrame = false);
       
       /*!@brief  draws a torus around a circle in the xy-plane of the current frame
        * @param radius the radius of the circle in the xy-plane the torus is drawn around
@@ -205,8 +205,8 @@ namespace cedar
        */ 
       CEDAR_AUX_LIB_EXPORT
       void drawTorus(
-                      double radius,
-                      double thickness,
+                      float radius,
+                      float thickness,
                       int slices,
                       int stacks,
                       bool wireFrame = false
@@ -222,9 +222,9 @@ namespace cedar
        */ 
       CEDAR_AUX_LIB_EXPORT
       void drawEllipse(
-                        double a,
-                        double b,
-                        double thickness,
+                        float a,
+                        float b,
+                        float thickness,
                         int slices,
                         int stacks,
                         bool wireFrame = false
@@ -234,14 +234,14 @@ namespace cedar
        * @param length length of each arrow in direction of the base vectors
        */
       CEDAR_AUX_LIB_EXPORT
-      void drawAxes(double length);
+      void drawAxes(float length);
 
       /*!@brief draws a hair line cross along the axes of the current coordinate frame
        * @param length length of each line
        * @param width width of each line
        */
       CEDAR_AUX_LIB_EXPORT
-      void drawCross(double length, double width = 1);
+      void drawCross(float length, float width = 1);
     }
   }
 }

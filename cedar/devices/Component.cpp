@@ -54,7 +54,7 @@
 #include <QWriteLocker>
 
 
-#define COMPONENT_CV_MAT_TYPE CV_64F
+#define COMPONENT_CV_MAT_TYPE CV_32F
 
 //----------------------------------------------------------------------------------------------------------------------
 // private class
@@ -183,12 +183,12 @@ class cedar::dev::Component::DataCollection
       this->setDataUnlocked(mUserBuffer, type, data);
     }
 
-    void setUserBufferIndex(ComponentDataType type, int index, double value)
+    void setUserBufferIndex(ComponentDataType type, int index, float value)
     {
       this->setDataIndex(mUserBuffer, type, index, value);
     }
 
-    void setUserBufferIndexUnlocked(const ComponentDataType type, int index, double value)
+    void setUserBufferIndexUnlocked(const ComponentDataType type, int index, float value)
     {
       this->setDataIndexUnlocked(mUserBuffer, type, index, value);
     }
@@ -208,7 +208,7 @@ class cedar::dev::Component::DataCollection
       return this->getData(this->mUserBuffer, type);
     }
 
-    double getUserBufferIndex(ComponentDataType type, int index) const
+    float getUserBufferIndex(ComponentDataType type, int index) const
     {
       return this->getBufferIndex(mUserBuffer, type, index);
     }
@@ -218,7 +218,7 @@ class cedar::dev::Component::DataCollection
       return this->getBufferUnlocked(mUserBuffer, type);
     }
 
-    double getUserDataIndexUnlocked(ComponentDataType type, int index) const
+    float getUserDataIndexUnlocked(ComponentDataType type, int index) const
     {
       return this->getBufferIndexUnlocked(mUserBuffer, type, index);
     }
@@ -233,12 +233,12 @@ class cedar::dev::Component::DataCollection
       return this->getBufferUnlocked(mPreviousDeviceBuffer, type);
     }
 
-    double getPreviousDeviceBufferIndex(ComponentDataType type, int index) const
+    float getPreviousDeviceBufferIndex(ComponentDataType type, int index) const
     {
       return this->getBufferIndex(mPreviousDeviceBuffer, type, index);
     }
 
-    double getPreviousDeviceBufferIndexUnlocked(ComponentDataType type, int index) const
+    float getPreviousDeviceBufferIndexUnlocked(ComponentDataType type, int index) const
     {
       return this->getBufferIndexUnlocked(mPreviousDeviceBuffer, type, index);
     }
@@ -353,10 +353,10 @@ class cedar::dev::Component::DataCollection
       return copy;
     }
 
-    double getCommunicationErrorRate() const
+    float getCommunicationErrorRate() const
     {
       QReadLocker locker(this->mCommunicationErrorCount.getLockPtr());
-      double error_rate = 0.0;
+      float error_rate = 0.0;
       if (this->mCommunicationErrorCount.member().size() > 0)
       {
         error_rate = this->mCommunicationErrorCount.member().getAverage();
@@ -486,7 +486,7 @@ class cedar::dev::Component::DataCollection
       return found->second->getData();
     }
 
-    double getBufferIndex(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type, int index) const
+    float getBufferIndex(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type, int index) const
     {
       QReadLocker lock(bufferData.getLockPtr());
 
@@ -494,10 +494,10 @@ class cedar::dev::Component::DataCollection
       return ret;
     }
 
-    double getBufferIndexUnlocked(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type, int index) const
+    float getBufferIndexUnlocked(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type, int index) const
     {
       CEDAR_DEBUG_ASSERT(getBufferUnlocked(bufferData, type).rows > index);
-      return getBufferUnlocked(bufferData, type).at<double>(index, 0);
+      return getBufferUnlocked(bufferData, type).at<float>(index, 0);
     }
 
     void setData(cedar::aux::LockableMember<BufferDataType>& bufferData, const ComponentDataType type, const cv::Mat& data)
@@ -511,16 +511,16 @@ class cedar::dev::Component::DataCollection
       bufferData.member()[type]->setData(data.clone());
     }
 
-    void setDataIndex(cedar::aux::LockableMember<BufferDataType>& bufferData, const ComponentDataType type, int index, double value)
+    void setDataIndex(cedar::aux::LockableMember<BufferDataType>& bufferData, const ComponentDataType type, int index, float value)
     {
       QWriteLocker lock(bufferData.getLockPtr());
       setDataIndexUnlocked(bufferData, type, index, value);
     }
 
-    void setDataIndexUnlocked(cedar::aux::LockableMember<BufferDataType>& bufferData, const ComponentDataType type, int index, double value)
+    void setDataIndexUnlocked(cedar::aux::LockableMember<BufferDataType>& bufferData, const ComponentDataType type, int index, float value)
     {
       CEDAR_DEBUG_ASSERT(bufferData.member()[type]);
-      bufferData.member()[type]->getData().at<double>(index, 0) = value;
+      bufferData.member()[type]->getData().at<float>(index, 0) = value;
     }
 
     void lazyInitializeUnlocked(cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type)
@@ -578,7 +578,7 @@ class cedar::dev::Component::DataCollection
     cedar::aux::LockableMember<std::map<std::string, std::vector<cedar::dev::Component::ComponentDataType> > > mGroups;
 
     //! A member that contains the counts of errors for the last stepCommunication* calls.
-    cedar::aux::LockableMember<cedar::aux::MovingAverage<double> > mCommunicationErrorCount;
+    cedar::aux::LockableMember<cedar::aux::MovingAverage<float> > mCommunicationErrorCount;
 
     //! The last things that went wrong during communication.
     cedar::aux::LockableMember<std::deque<std::string> > mLastCommunicationErrorMessages;
@@ -718,7 +718,7 @@ void cedar::dev::Component::init()
 // constructor
 cedar::dev::Component::Component()
 :
-    mMatrixType(new cedar::aux::StringParameter(this, "cvMatType", "CV_64F"))
+    mMatrixType(new cedar::aux::StringParameter(this, "cvMatType", "CV_32F"))
 {
   init();
 }
@@ -726,7 +726,7 @@ cedar::dev::Component::Component()
 cedar::dev::Component::Component(cedar::dev::ChannelPtr channel)
 :
 mChannel(channel),
-mMatrixType(new cedar::aux::StringParameter(this, "cvMatType", "CV_64F"))
+mMatrixType(new cedar::aux::StringParameter(this, "cvMatType", "CV_32F"))
 {
   init();
 }
@@ -780,7 +780,7 @@ std::vector<std::string> cedar::dev::Component::getLastMeasurementCommunicationE
   return this->mMeasurementData->getLastErrors();
 }
 
-void cedar::dev::Component::getCommunicationErrorRates(double& commands, double& measurements) const
+void cedar::dev::Component::getCommunicationErrorRates(float& commands, float& measurements) const
 {
   commands = this->mCommandData->getCommunicationErrorRate();
   measurements = this->mMeasurementData->getCommunicationErrorRate();
@@ -1030,7 +1030,7 @@ void cedar::dev::Component::setInitialUserSideCommandBuffer(ComponentDataType ty
 }
 
 
-void cedar::dev::Component::setUserSideCommandBufferIndex(ComponentDataType type, int index, double value)
+void cedar::dev::Component::setUserSideCommandBufferIndex(ComponentDataType type, int index, float value)
 {
   this->checkExclusivenessOfCommand(type);
   QWriteLocker locker(this->mUserCommandUsed.getLockPtr());
@@ -1043,7 +1043,7 @@ cv::Mat cedar::dev::Component::getUserSideMeasurementBuffer(ComponentDataType ty
   return this->mMeasurementData->getUserBuffer(type);
 }
 
-double cedar::dev::Component::getUserSideMeasurementBufferIndex(ComponentDataType type, int index) const
+float cedar::dev::Component::getUserSideMeasurementBufferIndex(ComponentDataType type, int index) const
 {
   return this->mMeasurementData->getUserBufferIndex(type, index);
 }
@@ -1053,7 +1053,7 @@ cv::Mat cedar::dev::Component::getPreviousDeviceSideMeasurementBuffer(ComponentD
   return this->mMeasurementData->getPreviousDeviceBuffer(type);
 }
 
-double cedar::dev::Component::getPreviousDeviceSideMeasurementBufferIndex(ComponentDataType type, int index) const
+float cedar::dev::Component::getPreviousDeviceSideMeasurementBufferIndex(ComponentDataType type, int index) const
 {
   return this->mMeasurementData->getPreviousDeviceBufferIndex(type, index);
 }
@@ -1465,9 +1465,9 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
   // check for NaNs, assuming one element per row
   for(int i=0; i < ioData.rows; ++i)
   {
-    if(std::isnan(ioData.at<double>(i, 0)))
+    if(std::isnan(ioData.at<float>(i, 0)))
     {
-      ioData.at<double>(i, 0) = 0;
+      ioData.at<float>(i, 0) = 0;
 
       cedar::aux::LogSingleton::getInstance()->warning(
         this->prettifyName()+": ioData at " + cedar::aux::toString(i) + " is not a number. Setting it to 0 and continue.",
@@ -1787,7 +1787,7 @@ bool cedar::dev::Component::isRunningNolocking()
   return mCommunicationThread->isRunningNolocking();
 }
 
-void cedar::dev::Component::startTimer(double)
+void cedar::dev::Component::startTimer(float)
 {
   // this does nothing. think
 }
@@ -1801,7 +1801,7 @@ cv::Mat cedar::dev::Component::integrateDevice(cedar::unit::Time dt, cv::Mat dat
 //  std::cout << "Integrate once!" << std::endl;
 //  std::cout << data << std::endl;
 //  std::cout << this->mMeasurementData->getUserBufferUnlocked(type) << std::endl;
-  double unitless = dt / (1.0 * cedar::unit::second);
+  float unitless = dt / (1.0 * cedar::unit::second);
 //  std::cout << unitless << std::endl;
 //  std::cout << "Integrate once (FIN!)!" << std::endl;
   QReadLocker lock(this->mMeasurementData->mUserBuffer.getLockPtr());
@@ -1816,7 +1816,7 @@ cv::Mat cedar::dev::Component::integrateDeviceTwice(cedar::unit::Time dt, cv::Ma
 //    std::cout << data << std::endl;
 //    std::cout << this->mMeasurementData->getUserBufferUnlocked(type1) << std::endl;
 //    std::cout << this->mMeasurementData->getUserBufferUnlocked(type2) << std::endl;
-  double unitless = dt / (1.0 * cedar::unit::second);
+  float unitless = dt / (1.0 * cedar::unit::second);
 //    std::cout << unitless << std::endl;
 //    std::cout << "Integrate twice (FIN!)!" << std::endl;
   QReadLocker lock(this->mMeasurementData->mUserBuffer.getLockPtr());
@@ -1845,7 +1845,7 @@ cv::Mat cedar::dev::Component::differentiateDevice(cedar::unit::Time dt, cv::Mat
 //  std::cout << "step size: " << this->mCommunicationThread->getStepSize() << std::endl;
 //  std::cout << this->mMeasurementData->getUserBufferUnlocked(type) << std::endl;
 
-  double unitless = dt / (1.0 * cedar::unit::second);
+  float unitless = dt / (1.0 * cedar::unit::second);
 
   if (unitless == 0.0)
   {
@@ -1868,7 +1868,7 @@ cv::Mat cedar::dev::Component::differentiateDeviceTwice(cedar::unit::Time dt, cv
 //  std::cout << dt << std::endl;
 //  std::cout << "step size: " << this->mCommunicationThread->getStepSize() << std::endl;
 
-  double unitless = dt / (1.0 * cedar::unit::second);
+  float unitless = dt / (1.0 * cedar::unit::second);
 
   if (unitless == 0.0)
   {
@@ -2267,7 +2267,7 @@ int cedar::dev::Component::getMeasurementMatrixType()
   else
   {
     std::cout<<"The type: "<< typeString <<" given in the cvMatType parameter is not supported yet. Using the default value CV_64F"<<std::endl;
-    return CV_64F;
+    return CV_32F;
   }
 }
 

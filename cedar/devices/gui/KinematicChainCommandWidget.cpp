@@ -105,10 +105,10 @@ void cedar::dev::gui::KinematicChainCommandWidget::changeWorkingMode(int mode)
 
 void cedar::dev::gui::KinematicChainCommandWidget::commandJoints()
 {
-  std::vector<double> command_vector;
+  std::vector<float> command_vector;
   for(unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
   {
-    command_vector.push_back(mCommandBoxes[i]->value());
+    command_vector.push_back(float(mCommandBoxes[i]->value()));
   }
 
   switch(mpModeBox->currentIndex())

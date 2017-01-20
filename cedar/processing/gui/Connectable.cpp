@@ -268,7 +268,7 @@ void cedar::proc::gui::Connectable::DeviceQualityDecoration::timerEvent(QTimerEv
   if (this->mStep->isStarted())
   {
     auto component = this->mStep->getComponent();
-    double command_errors, measurement_errors;
+    float command_errors, measurement_errors;
     component->getCommunicationErrorRates(command_errors, measurement_errors);
 
     QString tool_tip = QString("<table><tr><td>command quality:</td><td>%1%</td></tr><tr><td>measurement quality:</td><td>%2%</td></tr></table>").arg(100.0 * (1.0 - command_errors), -1, 'f', 0).arg(

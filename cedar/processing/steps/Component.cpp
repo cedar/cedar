@@ -431,7 +431,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputVal
 
   if (auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
-    if (mat_data->getData().type() != CV_64F)
+    if (mat_data->getData().type() != CV_32F)
     {
       return cedar::proc::DataSlot::VALIDITY_ERROR;
     }
