@@ -64,6 +64,7 @@ QWidget(pParent)
   // slot item growth settings
   this->mpSlotGrowthEnabled->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDataSlotScalingEnabled);
   this->mpGrowthFactor->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDataSlotScaling);
+  this->mpSnapGridSize->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mSnapGridSize);
   this->mpSensitivity->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDataSlotScalingSensitivity);
   this->mpHighlightConnections->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mHighlightConnections);
   this->mpHighlightHoveredConnection->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mHighlightHoveredConnections);

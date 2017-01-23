@@ -101,6 +101,8 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   this->_mDataSlotScalingSensitivity
     = new cedar::aux::DoubleParameter(slot_growth.get(), "sensitivity", 10.0, growth_limits);
 
+  this->_mSnapGridSize
+          = new cedar::aux::DoubleParameter(ui_settings.get(), "snap grid size", 30.0, growth_limits);
 
   this->mSnapToGrid = cedar::aux::BoolParameterPtr
                       (

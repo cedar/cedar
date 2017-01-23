@@ -42,6 +42,7 @@
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/processing/gui/Settings.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsScene>
@@ -126,7 +127,7 @@ const std::vector<cedar::proc::gui::ResizeHandle::Direction>& cedar::proc::gui::
 
 QVariant cedar::proc::gui::ResizeHandle::itemChange(GraphicsItemChange change, const QVariant& value)
 {
-  qreal grid_size = 8.0;
+  qreal grid_size = cedar::proc::gui::SettingsSingleton::getInstance()->getSnapGridSize();
   QPointF new_value = value.toPointF();
 
   switch (change)
