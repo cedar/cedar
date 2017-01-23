@@ -306,6 +306,7 @@ void cedar::dev::gui::RobotCard::robotRemoved(const std::string& robotName)
 {
   if (robotName == this->getRobotName())
   {
+    cedar::dev::RobotManagerSingleton::getInstance()->setRobotTemplateConfigurationName(robotName, "");
     this->deleteLater();
   }
 }
