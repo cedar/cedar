@@ -96,10 +96,10 @@
         <file>steps/inverse_kinematic.svg</file>
         <file>steps/vehicle_rotation.svg</file>
         <file>steps/attr_dyn_target_acquisition.svg</file>
-        <file>steps/vectors_plane_angle.svg</file>
         <file>steps/scalars_to_vector.svg</file>
         <file>steps/linear_dynamics.svg</file>
         <file>steps/sinus_dynamics.svg</file>
         <file>steps/norm.svg</file>
+        <file>steps/rotation_on_plane.svg</file>
     </qresource>
 </RCC>
