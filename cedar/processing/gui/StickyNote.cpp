@@ -140,7 +140,9 @@ void cedar::proc::gui::StickyNote::paint(QPainter *painter, const QStyleOptionGr
 
 void cedar::proc::gui::StickyNote::keyPressEvent(QKeyEvent* event)
 {
-  if (isSelected() && event->key() ==  Qt::Key_Delete)
+  if (isSelected() 
+      && (event->key() == Qt::Key_Delete
+          || event->key() == Qt::Key_Backspace) )
   {
     mpParent->removeStickyNote(this);
   }
