@@ -173,7 +173,7 @@ public:
    * @param index    specifies the joint
    * @return    joint angle value
    */
-  double getJointAngle(unsigned int index) const;
+  float getJointAngle(unsigned int index) const;
 
   /*!@brief get current state of all joint angles
    *
@@ -199,7 +199,7 @@ public:
    * @param index    specifies the joint
    * @return    joint velocity value
    */
-  double getJointVelocity(unsigned int index) const;
+  float getJointVelocity(unsigned int index) const;
 
   /*!@brief get current state of all joint velocities
    *
@@ -221,7 +221,7 @@ public:
    * @param index    specifies the joint
    * @return    joint acceleration value
    */
-  virtual double getJointAcceleration(unsigned int index) const;
+  virtual float getJointAcceleration(unsigned int index) const;
 
   /*!@brief get current state of all joint accelerations
    *
@@ -243,7 +243,7 @@ public:
    * @param index    specifies the joint
    * @param angle    new joint angle value
    */
-  void setJointAngle(unsigned int index, double angle);
+  void setJointAngle(unsigned int index, float angle);
 
   /*!@brief set current state of all joint angles
    *
@@ -255,7 +255,7 @@ public:
    *
    * @param angles    vector of new joint angle values
    */
-  void setJointAngles(const std::vector<double>& angles);
+  void setJointAngles(const std::vector<float>& angles);
 
   /*!@brief set current state of a single joint velocity
    *
@@ -268,7 +268,7 @@ public:
    * @param velocity    new joint velocity value
    * @return true iff your subclass handles velocity itself
    */
-  void setJointVelocity(unsigned int index, double velocity);
+  void setJointVelocity(unsigned int index, float velocity);
 
   /*!@brief set current state of all joint velocities
    *
@@ -277,7 +277,7 @@ public:
    * method, then you have to return true here. By returning true you indicate
    * to the KinematicChain base class that no integration is necessary.
    *
-   * Note that it is sufficient to override setJointVelocity(unsigned int, double).
+   * Note that it is sufficient to override setJointVelocity(unsigned int, float).
    *
    * @param velocities    vector of new joint velocity values
    * @return true iff your subclass handles velocity itself
@@ -291,12 +291,12 @@ public:
    * method, then you have to return true here. By returning true you indicate
    * to the KinematicChain base class that no integration is necessary.
    *
-   * Note that it is sufficient to override setJointVelocity(unsigned int, double).
+   * Note that it is sufficient to override setJointVelocity(unsigned int, float).
    *
    * @param velocities    vector of new joint velocity values
    * @return true iff your subclass handles velocity itself
    */
-  void setJointVelocities(const std::vector<double>& velocities);
+  void setJointVelocities(const std::vector<float>& velocities);
 
   /*!@brief set current state of a single joint acceleration
    *
@@ -309,7 +309,7 @@ public:
    * @param acceleration    new joint acceleration value
    * @return true iff your subclass handles acceleration itself
    */
-  void setJointAcceleration(unsigned int index, double acceleration);
+  void setJointAcceleration(unsigned int index, float acceleration);
 
   /*!@brief set current state of all joint velocities
    *
@@ -333,7 +333,7 @@ public:
    * @param accelerations    vector of new joint velocity values
    * @return true iff your subclass handles acceleration itself
    */
-  void setJointAccelerations(const std::vector<double>& accelerations);
+  void setJointAccelerations(const std::vector<float>& accelerations);
 
   /*!@brief returns a smart-pointer to the local coordinate frame of the end-effector
    *

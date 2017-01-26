@@ -132,7 +132,7 @@ void cedar::dev::gl::PowerCube110::drawSegment(unsigned int index)
   // move to object coordinates
   cv::Mat transformation;
   transformation = mpKinematicChain->getJointTransformation(index).t();
-  glMultMatrixd((GLdouble*)transformation.data);
+  glMultMatrixf((GLfloat*)transformation.data);
   glRotated(90.0, 1.0, 0.0, 0.0);
   glRotated(-90.0, 0.0, 1.0, 0.0);
 

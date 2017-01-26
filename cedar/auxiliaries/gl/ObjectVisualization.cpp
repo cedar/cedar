@@ -211,7 +211,7 @@ void cedar::aux::gl::ObjectVisualization::prepareDraw()
   // move to object coordinates
   cv::Mat transformation;
   transformation = mpLocalCoordinateFrame->getTransformation().t();
-  glMultMatrixd((GLdouble*)transformation.data);
+  glMultMatrixf((GLfloat*)transformation.data);
 
   // draw local coordinate frame
   drawLocalCoordinateFrame();

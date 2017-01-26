@@ -1,5 +1,5 @@
 // LOCAL INCLUDES
-#include "VectorsPlaneAngle.h"
+#include "RotationOnPlane.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include <math.h>
 
@@ -15,16 +15,16 @@ namespace
 
     ElementDeclarationPtr declaration
     (
-      new ElementDeclarationTemplate<cedar::proc::steps::VectorsPlaneAngle>
+      new ElementDeclarationTemplate<cedar::proc::steps::RotationOnPlane>
       (
         "Robotics",
-        "cedar.processing.steps.VectorsPlaneAngle"
+        "cedar.processing.steps.RotationOnPlane"
       )
     );
-    declaration->setIconPath(":/steps/vectors_plane_angle.svg");
+    declaration->setIconPath(":/steps/rotation_on_plane.svg");
     declaration->setDescription
     (
-      "Obtain angle, plane normal and orthogonal influence from given reference and influence"
+      "Obtain angle and orthogonal acceleration, given target position, eef position, eef velocity"
     );
 
     declaration->declare();
@@ -39,16 +39,17 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::steps::VectorsPlaneAngle::VectorsPlaneAngle()
+cedar::proc::steps::RotationOnPlane::RotationOnPlane()
   :
-  mpAngle(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_64F))),
-  mpOrthogonalAcceleration(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_64F))),
+  mpAngle(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
+  mpOrthogonalAcceleration(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_32F))),
   _mVisualiseTarget(new cedar::aux::BoolParameter(this, "visualise target position", false)),
   _mVisualisationColour(new cedar::aux::BoolParameter(this, "visualisation is obstacle", false))
 {
-  this->declareInput("endeffector velocity");
-  this->declareInput("endeffector position");
+
   this->declareInput("target position");
+  this->declareInput("endeffector position");
+  this->declareInput("endeffector velocity");
 
   this->declareOutput("angle", mpAngle);
   this->declareOutput("orthogonal acceleration", mpOrthogonalAcceleration);
@@ -60,13 +61,13 @@ cedar::proc::steps::VectorsPlaneAngle::VectorsPlaneAngle()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::steps::VectorsPlaneAngle::compute(const cedar::proc::Arguments&)
+void cedar::proc::steps::RotationOnPlane::compute(const cedar::proc::Arguments&)
 {
   if(!mpEndeffectorVelocity || !mpEndeffectorPosition || !mpTargetPosition)
   {
     cedar::aux::LogSingleton::getInstance()->error
     (
-      "Not all inputs to VectorsPlaneAngle are valid. Please check your architecture.",
+      "Not all inputs to RotationOnPlane are valid. Please check your architecture.",
       CEDAR_CURRENT_FUNCTION_NAME
     );
     return;
@@ -79,26 +80,34 @@ void cedar::proc::steps::VectorsPlaneAngle::compute(const cedar::proc::Arguments
 
   if(_mVisualiseTarget->getValue())
   {
-    mVisualisationPtr->getLocalCoordinateFrame()->setTranslation(mpTargetPosition->getData().at<cedar::unit::Length>(0),
-                                                                 mpTargetPosition->getData().at<cedar::unit::Length>(1),
-                                                                 mpTargetPosition->getData().at<cedar::unit::Length>(2));
+    mVisualisationPtr->getLocalCoordinateFrame()->setTranslation
+              (
+                std::vector<float>
+                (
+                  {
+                    mpTargetPosition->getData().at<float>(0),
+                    mpTargetPosition->getData().at<float>(1),
+                    mpTargetPosition->getData().at<float>(2)
+                  }
+                )
+              );
   }
 
   // calculate angle as phi = acos(v.k / |v||k|)
-  const double dot = current_vel.dot(current_pos_diff);
-  const double norm = cv::norm(current_vel) * cv::norm(current_pos_diff);
-  double angle = 0;
+  const float dot = current_vel.dot(current_pos_diff);
+  const float norm = cv::norm(current_vel) * cv::norm(current_pos_diff);
+  float angle = 0;
 
   if(norm != 0)
   {
     angle = acos(dot / norm);
   }    
 
-  mpAngle->getData().at<double>(0,0) = angle;  
+  mpAngle->getData().at<float>(0,0) = angle;
 
   // direction of most effective change w_dir = v x ( v x k ) * ( |v| / |v x (v x k)| )
   cv::Mat w_dir = current_vel.cross(current_vel.cross( current_pos_diff ));
-  const double norm_inf_dir = cv::norm(w_dir);
+  const float norm_inf_dir = cv::norm(w_dir);
 
   if(norm_inf_dir != 0)
   {
@@ -110,7 +119,7 @@ void cedar::proc::steps::VectorsPlaneAngle::compute(const cedar::proc::Arguments
 }
 
 //// validity check
-cedar::proc::DataSlot::VALIDITY cedar::proc::steps::VectorsPlaneAngle::determineInputValidity
+cedar::proc::DataSlot::VALIDITY cedar::proc::steps::RotationOnPlane::determineInputValidity
   (
    cedar::proc::ConstDataSlotPtr slot,
    cedar::aux::ConstDataPtr data
@@ -120,7 +129,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::VectorsPlaneAngle::determine
   cedar::aux::ConstMatDataPtr _input = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   if( slot->getName() == "endeffector velocity" || slot->getName() == "endeffector position" || slot->getName() == "target position")
   {
-    if (_input && _input->getDimensionality() == 1 && cedar::aux::math::get1DMatrixSize(_input->getData()) == 3 && _input->getData().type() == CV_64F)
+    if (_input && _input->getDimensionality() == 1 && cedar::aux::math::get1DMatrixSize(_input->getData()) == 3 && _input->getData().type() == CV_32F)
     {
       return cedar::proc::DataSlot::VALIDITY_VALID;
     }
@@ -130,7 +139,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::VectorsPlaneAngle::determine
   return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
-void cedar::proc::steps::VectorsPlaneAngle::inputConnectionChanged(const std::string& inputName)
+void cedar::proc::steps::RotationOnPlane::inputConnectionChanged(const std::string& inputName)
 {
   if (inputName == "endeffector velocity")
   {
@@ -146,7 +155,7 @@ void cedar::proc::steps::VectorsPlaneAngle::inputConnectionChanged(const std::st
   }
 }
 
-void cedar::proc::steps::VectorsPlaneAngle::visualisationChanged()
+void cedar::proc::steps::RotationOnPlane::visualisationChanged()
 {
   auto scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
 

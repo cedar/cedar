@@ -170,7 +170,7 @@ unsigned int cedar::dev::KinematicChain::getNumberOfJoints() const
   return mpJoints->size();
 }
 
-double cedar::dev::KinematicChain::getJointAngle(unsigned int index) const
+float cedar::dev::KinematicChain::getJointAngle(unsigned int index) const
 {
   if (index >= this->getNumberOfJoints())
   {
@@ -201,7 +201,7 @@ cv::Mat cedar::dev::KinematicChain::getJointAnglesMatrix() const
   return getJointAngles();
 }
 
-double cedar::dev::KinematicChain::getJointVelocity(unsigned int index) const
+float cedar::dev::KinematicChain::getJointVelocity(unsigned int index) const
 {
   if (index >= this->getNumberOfJoints())
   {
@@ -232,7 +232,7 @@ cv::Mat cedar::dev::KinematicChain::getJointVelocitiesMatrix() const
   return getJointVelocities();
 }
 
-double cedar::dev::KinematicChain::getJointAcceleration(unsigned int index) const
+float cedar::dev::KinematicChain::getJointAcceleration(unsigned int index) const
 {
   if (index >= this->getNumberOfJoints())
   {
@@ -262,7 +262,7 @@ cv::Mat cedar::dev::KinematicChain::getJointAccelerationsMatrix() const
   return getJointAccelerations();
 }
 
-void cedar::dev::KinematicChain::setJointAngle(unsigned int index, double value)
+void cedar::dev::KinematicChain::setJointAngle(unsigned int index, float value)
 {
   if (index >= this->getNumberOfJoints())
   {
@@ -274,14 +274,14 @@ void cedar::dev::KinematicChain::setJointAngle(unsigned int index, double value)
     );
   }
   //!@todo use applyVelocityLimits()?
-  value = std::max<double>(value, getJoint(index)->_mpAngleLimits->getLowerLimit());
-  value= std::min<double>(value, getJoint(index)->_mpAngleLimits->getUpperLimit());
+  value = std::max<float>(value, getJoint(index)->_mpAngleLimits->getLowerLimit());
+  value= std::min<float>(value, getJoint(index)->_mpAngleLimits->getUpperLimit());
   //!@todo doesn't this function also check for violations of joint range?
   setUserSideCommandBufferIndex(JOINT_ANGLES, index, value);
 }
 
 
-void cedar::dev::KinematicChain::setJointAngles(const std::vector<double>& angles)
+void cedar::dev::KinematicChain::setJointAngles(const std::vector<float>& angles)
 {
   //!@todo: for security reasons setting angles should be only allowed in STOP or ANGLE mode. except initial set!
 
@@ -325,17 +325,17 @@ void cedar::dev::KinematicChain::setJointAngles(const cv::Mat& angles)
   for (unsigned i = 0; i < getNumberOfJoints(); i++)
   {
     //!@todo: use applyAngleLimits() ?
-    double angle = angles.at<double>(i,0);
-    angle = std::max<double>(angle, getJoint(i)->_mpAngleLimits->getLowerLimit());
-    angle = std::min<double>(angle, getJoint(i)->_mpAngleLimits->getUpperLimit());
+    float angle = angles.at<float>(i,0);
+    angle = std::max<float>(angle, getJoint(i)->_mpAngleLimits->getLowerLimit());
+    angle = std::min<float>(angle, getJoint(i)->_mpAngleLimits->getUpperLimit());
 
-    new_angles.at<double>(i,0) = angle;
+    new_angles.at<float>(i,0) = angle;
   }
   //!@todo doesn't this function also check for violations of joint range?
   setUserSideCommandBuffer(JOINT_ANGLES, new_angles);
 }
 
-void cedar::dev::KinematicChain::setJointVelocity(unsigned int index, double velocity)
+void cedar::dev::KinematicChain::setJointVelocity(unsigned int index, float velocity)
 {
   if (index >= this->getNumberOfJoints())
   {
@@ -347,13 +347,13 @@ void cedar::dev::KinematicChain::setJointVelocity(unsigned int index, double vel
     );
   }
   //!@todo use applyVelocityLimits()?
-  velocity = std::max<double>(velocity, getJoint(index)->_mpVelocityLimits->getLowerLimit());
-  velocity = std::min<double>(velocity, getJoint(index)->_mpVelocityLimits->getUpperLimit());
+  velocity = std::max<float>(velocity, getJoint(index)->_mpVelocityLimits->getLowerLimit());
+  velocity = std::min<float>(velocity, getJoint(index)->_mpVelocityLimits->getUpperLimit());
   //!@todo doesn't this function also check for violations of joint range?
   setUserSideCommandBufferIndex(JOINT_VELOCITIES, index, velocity);
 }
 
-void cedar::dev::KinematicChain::setJointVelocities(const std::vector<double>& velocities)
+void cedar::dev::KinematicChain::setJointVelocities(const std::vector<float>& velocities)
 {
   if (velocities.size() != getNumberOfJoints())
   {
@@ -398,7 +398,7 @@ void cedar::dev::KinematicChain::setJointVelocities(const cv::Mat& velocities)
   setUserSideCommandBuffer( JOINT_VELOCITIES, new_vels );
 }
 
-void cedar::dev::KinematicChain::setJointAcceleration(unsigned int index, double acceleration)
+void cedar::dev::KinematicChain::setJointAcceleration(unsigned int index, float acceleration)
 {
   if (index >= this->getNumberOfJoints())
   {
@@ -413,7 +413,7 @@ void cedar::dev::KinematicChain::setJointAcceleration(unsigned int index, double
   setUserSideCommandBufferIndex(JOINT_ACCELERATIONS, index, acceleration);
 }
 
-void cedar::dev::KinematicChain::setJointAccelerations(const std::vector<double>& accelerations)
+void cedar::dev::KinematicChain::setJointAccelerations(const std::vector<float>& accelerations)
 {
   if (accelerations.size() != getNumberOfJoints())
   {
@@ -627,13 +627,13 @@ void cedar::dev::KinematicChain::applyAngleLimits(cv::Mat& angles)
 
   for (unsigned i = 0; i < num_joints; i++)
   {
-    double angle = angles.at<double>(i, 0);
-    const double old_angle = angle;
+    float angle = angles.at<float>(i, 0);
+    const float old_angle = angle;
 
-    const double &lower_limit = getJoint(i)->_mpAngleLimits->getLowerLimit();
-    const double &upper_limit = getJoint(i)->_mpAngleLimits->getUpperLimit();
+    const float &lower_limit = getJoint(i)->_mpAngleLimits->getLowerLimit();
+    const float &upper_limit = getJoint(i)->_mpAngleLimits->getUpperLimit();
 
-    angle = std::max<double>(angle, lower_limit);
+    angle = std::max<float>(angle, lower_limit);
 
     if(angle == lower_limit)
     {            
@@ -649,7 +649,7 @@ void cedar::dev::KinematicChain::applyAngleLimits(cv::Mat& angles)
       ++mWarned[i];
     }
 
-    angle = std::min<double>(angle, upper_limit);
+    angle = std::min<float>(angle, upper_limit);
 
     if(angle == upper_limit)
     {
@@ -665,7 +665,7 @@ void cedar::dev::KinematicChain::applyAngleLimits(cv::Mat& angles)
       ++mWarned[i];
     }
 
-    angles.at<double>(i, 0) = angle;
+    angles.at<float>(i, 0) = angle;
   }
 }
 
@@ -676,13 +676,13 @@ void cedar::dev::KinematicChain::applyVelocityLimits(cv::Mat& velocities)
 
   for (unsigned i = 0; i < num_joints; i++)
   {
-    double velocity = velocities.at<double>(i, 0);
-    const double old_velocity = velocity;
+    float velocity = velocities.at<float>(i, 0);
+    const float old_velocity = velocity;
 
-    const double &lower_limit = getJoint(i)->_mpVelocityLimits->getLowerLimit();
-    const double &upper_limit = getJoint(i)->_mpVelocityLimits->getUpperLimit();
+    const float &lower_limit = getJoint(i)->_mpVelocityLimits->getLowerLimit();
+    const float &upper_limit = getJoint(i)->_mpVelocityLimits->getUpperLimit();
 
-    velocity = std::max<double>(velocity, lower_limit);
+    velocity = std::max<float>(velocity, lower_limit);
 
     if(velocity == lower_limit)
     {
@@ -698,7 +698,7 @@ void cedar::dev::KinematicChain::applyVelocityLimits(cv::Mat& velocities)
       ++mWarned[num_joints+i];
     }
 
-    velocity = std::min<double>(velocity, upper_limit);
+    velocity = std::min<float>(velocity, upper_limit);
 
     if(velocity == upper_limit)
     {
@@ -713,7 +713,7 @@ void cedar::dev::KinematicChain::applyVelocityLimits(cv::Mat& velocities)
       ++mWarned[num_joints+i];
     }
 
-    velocities.at<double>(i, 0) = velocity;
+    velocities.at<float>(i, 0) = velocity;
   }
 }
 
@@ -723,13 +723,13 @@ void cedar::dev::KinematicChain::applyAccelerationLimits(cv::Mat& accelerations)
 
   for (unsigned i = 0; i < num_joints; i++)
   {
-    double acceleration = accelerations.at<double>(i, 0);
-    const double old_acceleration = acceleration;
+    float acceleration = accelerations.at<float>(i, 0);
+    const float old_acceleration = acceleration;
 
-    const double &lower_limit = getJoint(i)->_mpVelocityLimits->getLowerLimit();
-    const double &upper_limit = getJoint(i)->_mpVelocityLimits->getUpperLimit();
+    const float &lower_limit = getJoint(i)->_mpVelocityLimits->getLowerLimit();
+    const float &upper_limit = getJoint(i)->_mpVelocityLimits->getUpperLimit();
 
-    acceleration = std::max<double>(acceleration, lower_limit);
+    acceleration = std::max<float>(acceleration, lower_limit);
 
     if(acceleration == lower_limit)
     {
@@ -744,7 +744,7 @@ void cedar::dev::KinematicChain::applyAccelerationLimits(cv::Mat& accelerations)
       ++mWarned[2*num_joints + i];
     }
 
-    acceleration = std::min<double>(acceleration, upper_limit);
+    acceleration = std::min<float>(acceleration, upper_limit);
 
     if(acceleration == upper_limit)
     {
@@ -759,7 +759,7 @@ void cedar::dev::KinematicChain::applyAccelerationLimits(cv::Mat& accelerations)
       ++mWarned[2*num_joints + i];
     }
 
-    accelerations.at<double>(i, 0) = acceleration;
+    accelerations.at<float>(i, 0) = acceleration;
   }
 }
 
@@ -974,7 +974,7 @@ void cedar::dev::KinematicChain::checkInitialConfigurations()
   {
     rlock.unlock();
     // ... set a default initial configuration:
-    addInitialConfiguration("zeros", cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1) );
+    addInitialConfiguration("zeros", cv::Mat::zeros(getNumberOfJoints(), 1, CV_32FC1) );
     // note, this recurses back to checkInitialConfigurations() but not into this if-branch
     return;
   }
@@ -1151,7 +1151,7 @@ bool cedar::dev::KinematicChain::applyBrakeNowController()
   setController( cedar::dev::KinematicChain::JOINT_VELOCITIES,
                  boost::bind< cv::Mat>( [&]()
                               {
-                                return cv::Mat::zeros( getNumberOfJoints(), 1, CV_64F );
+                                return cv::Mat::zeros( getNumberOfJoints(), 1, CV_32F );
                               } 
                             ) );
   return true;

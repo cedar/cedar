@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        VectorsPlaneAngle.cpp
+    File:        RotationOnPlane.cpp
 
-    Maintainer:  Mathäus Muzalewski
-    Email:       mathaeus.muzalewski@ruhr-uni-bochum.de
-    Date:        2014 August 28th
+    Maintainer:  Nico Kuerschner
+    Email:       Nico.Kuerschner@ini.ruhr-uni-bochum.de
+    Date:        2017 January 25th
 
-    Description: Takes two vectors and computes the angle, the plane normal vector and the scaled vector of most directional influence 
+    Description: Takes two vectors and computes the angle, the plane normal vector and the scaled vector of most directional influence
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef VECTORS_PLANE_ANGLE_H_
-#define VECTORS_PLANE_ANGLE_H_
+#ifndef ROTATION_ON_PLANE_H_
+#define ROTATION_ON_PLANE_H_
 
 #include <cedar/processing/Step.h>
 #include <cedar/auxiliaries/MatData.h>
@@ -44,13 +44,13 @@
 #include "cedar/auxiliaries/gl/GlobalScene.h"
 #include "cedar/auxiliaries/gl/Sphere.h"
 
-#include "cedar/processing/steps/VectorsPlaneAngle.fwd.h"
+#include "cedar/processing/steps/RotationOnPlane.fwd.h"
 
-class cedar::proc::steps::VectorsPlaneAngle : public cedar::proc::Step
+class cedar::proc::steps::RotationOnPlane : public cedar::proc::Step
 {
   Q_OBJECT
   public:
-    VectorsPlaneAngle();
+    RotationOnPlane();
     cedar::proc::DataSlot::VALIDITY determineInputValidity
                                     (
                                       cedar::proc::ConstDataSlotPtr slot,
@@ -68,7 +68,7 @@ class cedar::proc::steps::VectorsPlaneAngle : public cedar::proc::Step
 
     // output
     cedar::aux::MatDataPtr mpAngle;
-    cedar::aux::MatDataPtr mpOrthogonalAcceleration;   
+    cedar::aux::MatDataPtr mpOrthogonalAcceleration;
 
   private slots:
     void visualisationChanged();
@@ -86,4 +86,4 @@ class cedar::proc::steps::VectorsPlaneAngle : public cedar::proc::Step
     cedar::aux::gl::ObjectVisualizationPtr mVisualisationPtr;
 };
 
-#endif /* VECTORS_PLANE_ANGLE_H_ */
+#endif /* ROTATION_ON_PLANE_H_ */

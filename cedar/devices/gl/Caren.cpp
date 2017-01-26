@@ -164,7 +164,7 @@ void cedar::dev::gl::Caren::drawBase()
   // go to trunk frame
   cv::Mat transformation;
   transformation = mTrunk->getRootTransformation().t();
-  glMultMatrixd((GLdouble*)transformation.data);
+  glMultMatrixf((GLfloat*)transformation.data);
 
   // go to table frame
   glTranslated(0, 0, -0.36);

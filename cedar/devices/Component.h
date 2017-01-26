@@ -192,7 +192,7 @@ public:
   CEDAR_DECLARE_DEPRECATED(bool isRunning());
   bool isCommunicating() const;
 
-  CEDAR_DECLARE_DEPRECATED(void startTimer(double d));
+  CEDAR_DECLARE_DEPRECATED(void startTimer(float d));
   CEDAR_DECLARE_DEPRECATED(void stopTimer());
 
   //!@ check if these functions have to be exposed at all (may at least be changed to protected visibility)
@@ -319,7 +319,7 @@ public:
   cedar::unit::Time retrieveLastStepCommandsDuration();
 
   //! Returns the error rate (number of communications failed / number of communications sent) for commands and measurements.
-  void getCommunicationErrorRates(double& commands, double& measurements) const;
+  void getCommunicationErrorRates(float& commands, float& measurements) const;
 
   //! Returns the last communication errors.
   std::vector<std::string> getLastCommandCommunicationErrors() const;
@@ -384,14 +384,14 @@ protected:
 
   void registerCheckCommandHook(CommandCheckFunctionType fun);
 
-  void setUserSideCommandBufferIndex(ComponentDataType type, int index, double value);
+  void setUserSideCommandBufferIndex(ComponentDataType type, int index, float value);
   void setInitialUserSideCommandBuffer(ComponentDataType type, cv::Mat);
 
   cv::Mat getUserSideMeasurementBuffer(ComponentDataType type) const;
-  double  getUserSideMeasurementBufferIndex(ComponentDataType type, int index) const;
+  float  getUserSideMeasurementBufferIndex(ComponentDataType type, int index) const;
 
   cv::Mat getPreviousDeviceSideMeasurementBuffer(ComponentDataType type) const;
-  double  getPreviousDeviceSideMeasurementBufferIndex(ComponentDataType type, int index) const;
+  float  getPreviousDeviceSideMeasurementBufferIndex(ComponentDataType type, int index) const;
 
   void prepareComponentDestructAbsolutelyRequired();
 

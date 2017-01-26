@@ -54,7 +54,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::LocalCoordinateFrame::LocalCoordinateFrame()
 :
-mTransformation(cv::Mat::eye(4, 4, CV_64FC1)),
+mTransformation(cv::Mat::eye(4, 4, CV_32FC1)),
 _mInitialTranslation
 (
   new cedar::aux::DoubleVectorParameter
@@ -91,18 +91,18 @@ void cedar::aux::LocalCoordinateFrame::readConfiguration(const cedar::aux::Confi
   cedar::aux::NamedConfigurable::readConfiguration(node);
 
   CEDAR_ASSERT(_mInitialRotation->size() >= 9);
-  mTransformation.at<double>(0, 3) = _mInitialTranslation->at(0);
-  mTransformation.at<double>(1, 3) = _mInitialTranslation->at(1);
-  mTransformation.at<double>(2, 3) = _mInitialTranslation->at(2);
-  mTransformation.at<double>(0, 0) = _mInitialRotation->at(0);
-  mTransformation.at<double>(0, 1) = _mInitialRotation->at(1);
-  mTransformation.at<double>(0, 2) = _mInitialRotation->at(2);
-  mTransformation.at<double>(1, 0) = _mInitialRotation->at(3);
-  mTransformation.at<double>(1, 1) = _mInitialRotation->at(4);
-  mTransformation.at<double>(1, 2) = _mInitialRotation->at(5);
-  mTransformation.at<double>(2, 0) = _mInitialRotation->at(6);
-  mTransformation.at<double>(2, 1) = _mInitialRotation->at(7);
-  mTransformation.at<double>(2, 2) = _mInitialRotation->at(8);
+  mTransformation.at<float>(0, 3) = _mInitialTranslation->at(0);
+  mTransformation.at<float>(1, 3) = _mInitialTranslation->at(1);
+  mTransformation.at<float>(2, 3) = _mInitialTranslation->at(2);
+  mTransformation.at<float>(0, 0) = _mInitialRotation->at(0);
+  mTransformation.at<float>(0, 1) = _mInitialRotation->at(1);
+  mTransformation.at<float>(0, 2) = _mInitialRotation->at(2);
+  mTransformation.at<float>(1, 0) = _mInitialRotation->at(3);
+  mTransformation.at<float>(1, 1) = _mInitialRotation->at(4);
+  mTransformation.at<float>(1, 2) = _mInitialRotation->at(5);
+  mTransformation.at<float>(2, 0) = _mInitialRotation->at(6);
+  mTransformation.at<float>(2, 1) = _mInitialRotation->at(7);
+  mTransformation.at<float>(2, 2) = _mInitialRotation->at(8);
 }
 
 cedar::unit::LengthMatrix cedar::aux::LocalCoordinateFrame::getTranslation() const
@@ -118,17 +118,17 @@ cedar::unit::LengthMatrix cedar::aux::LocalCoordinateFrame::getTranslation() con
 
 cedar::unit::Length cedar::aux::LocalCoordinateFrame::getTranslationX() const
 {
-  return mTransformation.at<double>(0, 3) * cedar::unit::DEFAULT_LENGTH_UNIT;
+  return double(mTransformation.at<float>(0, 3)) * cedar::unit::DEFAULT_LENGTH_UNIT;
 }
 
 cedar::unit::Length cedar::aux::LocalCoordinateFrame::getTranslationY() const
 {
-  return mTransformation.at<double>(1, 3) * cedar::unit::DEFAULT_LENGTH_UNIT;
+  return double(mTransformation.at<float>(1, 3)) * cedar::unit::DEFAULT_LENGTH_UNIT;
 }
 
 cedar::unit::Length cedar::aux::LocalCoordinateFrame::getTranslationZ() const
 {
-  return mTransformation.at<double>(2, 3) * cedar::unit::DEFAULT_LENGTH_UNIT;
+  return double(mTransformation.at<float>(2, 3)) * cedar::unit::DEFAULT_LENGTH_UNIT;
 }
 
 cv::Mat cedar::aux::LocalCoordinateFrame::getRotation() const
@@ -162,28 +162,28 @@ void cedar::aux::LocalCoordinateFrame::setTranslation
      )
 {
   QWriteLocker locker(&mLock);
-  mTransformation.at<double>(0, 3) = x / cedar::unit::DEFAULT_LENGTH_UNIT;
-  mTransformation.at<double>(1, 3) = y / cedar::unit::DEFAULT_LENGTH_UNIT;
-  mTransformation.at<double>(2, 3) = z / cedar::unit::DEFAULT_LENGTH_UNIT;
+  mTransformation.at<float>(0, 3) = x / cedar::unit::DEFAULT_LENGTH_UNIT;
+  mTransformation.at<float>(1, 3) = y / cedar::unit::DEFAULT_LENGTH_UNIT;
+  mTransformation.at<float>(2, 3) = z / cedar::unit::DEFAULT_LENGTH_UNIT;
 }
 
 void cedar::aux::LocalCoordinateFrame::setTranslation(const cedar::unit::LengthMatrix& translation)
 {
-  double conversion_factor = translation.unit / cedar::unit::DEFAULT_LENGTH_UNIT;
+  float conversion_factor = translation.unit / cedar::unit::DEFAULT_LENGTH_UNIT;
 
   QWriteLocker locker(&mLock);
-  mTransformation.at<double>(0, 3) = translation.matrix.at<double>(0, 0) * conversion_factor;
-  mTransformation.at<double>(1, 3) = translation.matrix.at<double>(1, 0) * conversion_factor;
-  mTransformation.at<double>(2, 3) = translation.matrix.at<double>(2, 0) * conversion_factor;
+  mTransformation.at<float>(0, 3) = translation.matrix.at<float>(0, 0) * conversion_factor;
+  mTransformation.at<float>(1, 3) = translation.matrix.at<float>(1, 0) * conversion_factor;
+  mTransformation.at<float>(2, 3) = translation.matrix.at<float>(2, 0) * conversion_factor;
 }
 
-void cedar::aux::LocalCoordinateFrame::setTranslation(const std::vector<cedar::unit::Length >& translation)
+void cedar::aux::LocalCoordinateFrame::setTranslation(const std::vector<float >& translation)
 {
   QWriteLocker locker(&mLock);
   CEDAR_ASSERT(translation.size() >=3);
-  mTransformation.at<double>(0, 3) = translation[0] / cedar::unit::DEFAULT_LENGTH_UNIT;
-  mTransformation.at<double>(1, 3) = translation[1] / cedar::unit::DEFAULT_LENGTH_UNIT;
-  mTransformation.at<double>(2, 3) = translation[2] / cedar::unit::DEFAULT_LENGTH_UNIT;
+  mTransformation.at<float>(0, 3) = translation[0]; // cedar::unit::DEFAULT_LENGTH_UNIT;
+  mTransformation.at<float>(1, 3) = translation[1]; // cedar::unit::DEFAULT_LENGTH_UNIT;
+  mTransformation.at<float>(2, 3) = translation[2]; // cedar::unit::DEFAULT_LENGTH_UNIT;
 }
 
 void cedar::aux::LocalCoordinateFrame::translate
@@ -194,14 +194,14 @@ void cedar::aux::LocalCoordinateFrame::translate
      )
 {
   QWriteLocker locker(&mLock);
-  mTransformation.at<double>(0, 3) = mTransformation.at<double>(0, 3) + x / cedar::unit::DEFAULT_LENGTH_UNIT;
-  mTransformation.at<double>(1, 3) = mTransformation.at<double>(1, 3) + y / cedar::unit::DEFAULT_LENGTH_UNIT;
-  mTransformation.at<double>(2, 3) = mTransformation.at<double>(2, 3) + z / cedar::unit::DEFAULT_LENGTH_UNIT;
+  mTransformation.at<float>(0, 3) = mTransformation.at<float>(0, 3) + x / cedar::unit::DEFAULT_LENGTH_UNIT;
+  mTransformation.at<float>(1, 3) = mTransformation.at<float>(1, 3) + y / cedar::unit::DEFAULT_LENGTH_UNIT;
+  mTransformation.at<float>(2, 3) = mTransformation.at<float>(2, 3) + z / cedar::unit::DEFAULT_LENGTH_UNIT;
 }
 
 void cedar::aux::LocalCoordinateFrame::translate(const cedar::unit::LengthMatrix& translation)
 {
-  double conversion_factor = translation.unit / cedar::unit::DEFAULT_LENGTH_UNIT;
+  float conversion_factor = translation.unit / cedar::unit::DEFAULT_LENGTH_UNIT;
 
   QWriteLocker locker(&mLock);
   mTransformation(cv::Rect(3, 0, 1, 3))
@@ -217,65 +217,65 @@ void cedar::aux::LocalCoordinateFrame::translate
   QWriteLocker locker(&mLock);
   CEDAR_ASSERT(translation.size() >=3);
 
-  mTransformation.at<double>(0, 3)
-    = mTransformation.at<double>(0, 3)
+  mTransformation.at<float>(0, 3)
+    = mTransformation.at<float>(0, 3)
     + translation[0] / cedar::unit::DEFAULT_LENGTH_UNIT;
 
-  mTransformation.at<double>(1, 3)
-    = mTransformation.at<double>(1, 3)
+  mTransformation.at<float>(1, 3)
+    = mTransformation.at<float>(1, 3)
     + translation[1] / cedar::unit::DEFAULT_LENGTH_UNIT;
 
-  mTransformation.at<double>(2, 3)
-    = mTransformation.at<double>(2, 3)
+  mTransformation.at<float>(2, 3)
+    = mTransformation.at<float>(2, 3)
     + translation[2] / cedar::unit::DEFAULT_LENGTH_UNIT;
 }
 
 void cedar::aux::LocalCoordinateFrame::setRotation(const cv::Mat& rotation)
 {
   QWriteLocker locker(&mLock);
-  mTransformation.at<double>(0, 0) = rotation.at<double>(0, 0);
-  mTransformation.at<double>(0, 1) = rotation.at<double>(0, 1);
-  mTransformation.at<double>(0, 2) = rotation.at<double>(0, 2);
-  mTransformation.at<double>(1, 0) = rotation.at<double>(1, 0);
-  mTransformation.at<double>(1, 1) = rotation.at<double>(1, 1);
-  mTransformation.at<double>(1, 2) = rotation.at<double>(1, 2);
-  mTransformation.at<double>(2, 0) = rotation.at<double>(2, 0);
-  mTransformation.at<double>(2, 1) = rotation.at<double>(2, 1);
-  mTransformation.at<double>(2, 2) = rotation.at<double>(2, 2);
+  mTransformation.at<float>(0, 0) = rotation.at<float>(0, 0);
+  mTransformation.at<float>(0, 1) = rotation.at<float>(0, 1);
+  mTransformation.at<float>(0, 2) = rotation.at<float>(0, 2);
+  mTransformation.at<float>(1, 0) = rotation.at<float>(1, 0);
+  mTransformation.at<float>(1, 1) = rotation.at<float>(1, 1);
+  mTransformation.at<float>(1, 2) = rotation.at<float>(1, 2);
+  mTransformation.at<float>(2, 0) = rotation.at<float>(2, 0);
+  mTransformation.at<float>(2, 1) = rotation.at<float>(2, 1);
+  mTransformation.at<float>(2, 2) = rotation.at<float>(2, 2);
 }
 
-void cedar::aux::LocalCoordinateFrame::setRotation(const std::vector<double>& rotation)
+void cedar::aux::LocalCoordinateFrame::setRotation(const std::vector<float>& rotation)
 {
   QWriteLocker locker(&mLock);
   CEDAR_ASSERT(rotation.size() >=9);
-  mTransformation.at<double>(0, 0) = rotation[0];
-  mTransformation.at<double>(0, 1) = rotation[1];
-  mTransformation.at<double>(0, 2) = rotation[2];
-  mTransformation.at<double>(1, 0) = rotation[3];
-  mTransformation.at<double>(1, 1) = rotation[4];
-  mTransformation.at<double>(1, 2) = rotation[5];
-  mTransformation.at<double>(2, 0) = rotation[6];
-  mTransformation.at<double>(2, 1) = rotation[7];
-  mTransformation.at<double>(2, 2) = rotation[8];
+  mTransformation.at<float>(0, 0) = rotation[0];
+  mTransformation.at<float>(0, 1) = rotation[1];
+  mTransformation.at<float>(0, 2) = rotation[2];
+  mTransformation.at<float>(1, 0) = rotation[3];
+  mTransformation.at<float>(1, 1) = rotation[4];
+  mTransformation.at<float>(1, 2) = rotation[5];
+  mTransformation.at<float>(2, 0) = rotation[6];
+  mTransformation.at<float>(2, 1) = rotation[7];
+  mTransformation.at<float>(2, 2) = rotation[8];
 }
 void cedar::aux::LocalCoordinateFrame::rotate(unsigned int axis, const cedar::unit::PlaneAngle& angle)
 {
   QWriteLocker locker(&mLock);
   mTransformation(cv::Rect(0, 0, 3, 3))
     = mTransformation(cv::Rect(0, 0, 3, 3))
-    * cedar::aux::math::expAxis<double>(mUnitAxes[axis], angle / cedar::unit::DEFAULT_PLANE_ANGLE_UNIT);
+    * cedar::aux::math::expAxis<float>(mUnitAxes[axis], angle / cedar::unit::DEFAULT_PLANE_ANGLE_UNIT);
 }
 
 void cedar::aux::LocalCoordinateFrame::init()
 {
-  mTransformation = cv::Mat::eye(4, 4, CV_64FC1);
-  cv::Mat x_axis = cv::Mat::zeros(3, 1, CV_64FC1);
-  x_axis.at<double>(0, 0) = 1;
+  mTransformation = cv::Mat::eye(4, 4, CV_32FC1);
+  cv::Mat x_axis = cv::Mat::zeros(3, 1, CV_32FC1);
+  x_axis.at<float>(0, 0) = 1;
   mUnitAxes.push_back(x_axis);
-  cv::Mat y_axis = cv::Mat::zeros(3, 1, CV_64FC1);
-  y_axis.at<double>(1, 0) = 1;
+  cv::Mat y_axis = cv::Mat::zeros(3, 1, CV_32FC1);
+  y_axis.at<float>(1, 0) = 1;
   mUnitAxes.push_back(y_axis);
-  cv::Mat z_axis = cv::Mat::zeros(3, 1, CV_64FC1);
-  z_axis.at<double>(2, 0) = 1;
+  cv::Mat z_axis = cv::Mat::zeros(3, 1, CV_32FC1);
+  z_axis.at<float>(2, 0) = 1;
   mUnitAxes.push_back(z_axis);
 }
