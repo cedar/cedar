@@ -44,7 +44,7 @@ namespace
 cedar::proc::steps::LinearDynamics::LinearDynamics()
   :
   cedar::proc::Step(true),
-  mpAcceleration(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_64F))),
+  mpAcceleration(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
   mpLambda(new cedar::aux::DoubleParameter(this,"lambda", 0.0)),
   mpSDes(new cedar::aux::DoubleParameter(this, "fixed point", 0.0))
 {
@@ -58,13 +58,13 @@ cedar::proc::steps::LinearDynamics::LinearDynamics()
 
 void cedar::proc::steps::LinearDynamics::compute(const cedar::proc::Arguments&)
 {
-  const double &s = mpSpeed->getData().at<double>(0, 0);
-  const double &s_des = mpSDes->getValue();
-  const double &lambda = mpLambda->getValue();
+  const float &s = mpSpeed->getData().at<float>(0, 0);
+  const float &s_des = mpSDes->getValue();
+  const float &lambda = mpLambda->getValue();
 
-  const double acceleration = lambda * (s - s_des); //dynamics
+  const float acceleration = lambda * (s - s_des); //dynamics
 
-  mpAcceleration->getData().at<double>(0, 0) = acceleration;
+  mpAcceleration->getData().at<float>(0, 0) = acceleration;
 }
 
 //// validity check
@@ -78,7 +78,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::LinearDynamics::determineInp
   cedar::aux::ConstMatDataPtr _input = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   if( slot->getName() == "speed")
   {
-    if (_input && _input->getDimensionality() == 0 && _input->getData().type() == CV_64F)
+    if (_input && _input->getDimensionality() == 0 && _input->getData().type() == CV_32F)
     {
       return cedar::proc::DataSlot::VALIDITY_VALID;
     }
