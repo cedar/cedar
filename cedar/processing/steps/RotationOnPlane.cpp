@@ -183,9 +183,15 @@ void cedar::proc::steps::RotationOnPlane::visualisationChanged()
 
     if(mpTargetPosition)
     {
-      mVisualisationPtr->getLocalCoordinateFrame()->setTranslation(mpTargetPosition->getData().at<cedar::unit::Length>(0),
-                                                                   mpTargetPosition->getData().at<cedar::unit::Length>(1),
-                                                                   mpTargetPosition->getData().at<cedar::unit::Length>(2));
+      mVisualisationPtr->getLocalCoordinateFrame()->setTranslation(std::vector<float>
+                                                                   (
+                                                                     {
+                                                                       mpTargetPosition->getData().at<float>(0),
+                                                                       mpTargetPosition->getData().at<float>(1),
+                                                                       mpTargetPosition->getData().at<float>(2)
+                                                                     }
+                                                                   ));
+
     }
 
     _mVisualisationID = scene->addObjectVisualization(mVisualisationPtr);
