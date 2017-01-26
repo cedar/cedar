@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -286,6 +286,12 @@ public:
     return this->_mDataSlotScalingSensitivity->getValue();
   }
 
+  //! Size of the SnapGrid, when enabled
+  double getSnapGridSize() const
+  {
+    return this->_mSnapGridSize->getValue();
+  }
+
   //! Returns wheter data slots should scalse based on the distance of the mouse.
   bool getDataSlotScalingEnabled() const
   {
@@ -450,6 +456,9 @@ private:
 
   //! Sensitivity for slot items growth when the mouse approaches them while connecting.
   cedar::aux::DoubleParameterPtr _mDataSlotScalingSensitivity;
+
+  //! Size of the Snapgrid, when snapping is enabled
+  cedar::aux::DoubleParameterPtr _mSnapGridSize;
 
   //! Maximum number of entries in the recent files list.
   cedar::aux::UIntParameterPtr _mMaxFileHistorySize;

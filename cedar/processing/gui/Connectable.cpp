@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
- Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
  This file is part of cedar.
 
@@ -1650,7 +1650,7 @@ void cedar::proc::gui::Connectable::assignTriggerClicked()
 
 void cedar::proc::gui::Connectable::fillPlotMenu(QMenu& menu, QGraphicsSceneContextMenuEvent* event)
 {
-  QMenu* p_data = menu.addMenu("data");
+  QMenu* p_data = menu.addMenu("plot");
   p_data->setIcon(QIcon(":/menus/data.svg"));
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------

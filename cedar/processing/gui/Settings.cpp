@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -101,6 +101,8 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   this->_mDataSlotScalingSensitivity
     = new cedar::aux::DoubleParameter(slot_growth.get(), "sensitivity", 10.0, growth_limits);
 
+  this->_mSnapGridSize
+          = new cedar::aux::DoubleParameter(ui_settings.get(), "snap grid size", 30.0, growth_limits);
 
   this->mSnapToGrid = cedar::aux::BoolParameterPtr
                       (
@@ -228,6 +230,15 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
     " can be done in the right-click menu.</p>"
     "<p>Please refer to the changelog for more details."
   );
+
+  this->addOneTimeMessage
+  (
+    CEDAR_MAKE_VERSION(5, 1, 0), // introduces in this version
+    "netreader/writer changes",
+    "Netreader/writer changes",
+    "<p>Due to a change in the netreader/writers data protocol older cedar versions will no longer be able to communicate with the new version. Please make sure that all your cedar installations are updated.</p>"
+  );
+
 }
 
 cedar::proc::gui::Settings::UserDefinedColor::UserDefinedColor(const std::string& stringToParse)

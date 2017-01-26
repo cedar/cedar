@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/casts.h"
+#include "cedar/processing/gui/Settings.h"
 
 // SYSTEM INCLUDES
 #include <QPainter>
@@ -759,7 +760,7 @@ void cedar::proc::gui::GraphicsBase::itemSelectedChanged(bool selected)
 
 QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, const QVariant & value)
 {
-  qreal grid_size = 8.0;
+  qreal grid_size = cedar::proc::gui::SettingsSingleton::getInstance()->getSnapGridSize();
   switch (change)
   {
     case QGraphicsItem::ItemPositionChange:
