@@ -1641,7 +1641,7 @@ void cedar::proc::gui::Connectable::assignTriggerClicked()
 
 void cedar::proc::gui::Connectable::fillPlotMenu(QMenu& menu, QGraphicsSceneContextMenuEvent* event)
 {
-  QMenu* p_data = menu.addMenu("data");
+  QMenu* p_data = menu.addMenu("plot");
   p_data->setIcon(QIcon(":/menus/data.svg"));
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
