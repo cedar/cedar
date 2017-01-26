@@ -2,7 +2,7 @@
 """
 ========================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -43,7 +43,7 @@ from fileinput import FileInput
 #  Script configuration
 
 # putting 2013 here would produce a copyright notice covering the years 2011, 2012, and 2013
-last_year_of_copyright = 2015
+last_year_of_copyright = 2017
 # the default value assumes that you execute the script in the tools directory of the cedar repository
 top_path = "../.."
 # file extensions for the files scanned
