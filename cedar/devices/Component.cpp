@@ -1321,7 +1321,6 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
           s = " (repeated " + boost::lexical_cast<std::string>(mNotReadyForCommandsCounter.member()) + " times)";
         }
 
-
         // todo: output component name her (and for the other messages/warnings)
         cedar::aux::LogSingleton::getInstance()->warning(
           "Commands issued but " + prettifyName() + " is not accepting commands" + s,
@@ -1330,7 +1329,6 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
 
       if (mNotReadyForCommandsCounter.member() > 500)
       {
-
         mNotReadyForCommandsCounter.member()= 0;
       }
     }

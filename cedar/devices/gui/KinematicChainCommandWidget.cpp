@@ -104,27 +104,20 @@ void cedar::dev::gui::KinematicChainCommandWidget::changeWorkingMode(int mode)
 }
 
 void cedar::dev::gui::KinematicChainCommandWidget::commandJoints()
-{
-  std::vector<float> command_vector;
+{  
+  // unlock the suppression of user commands when the architecture is running
+  mpKinematicChain->setSuppressUserInteraction(false);
+
+  auto command_type = mpKinematicChain->getCommandTypeForName(mpModeBox->currentText().toStdString());
+  auto mat_data = cv::Mat(1, 7, CV_32F);
+
   for(unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
   {
-    command_vector.push_back(float(mCommandBoxes[i]->value()));
+    mat_data.at<float>(1, i) = float(mCommandBoxes[i]->value());
   }
 
-  switch(mpModeBox->currentIndex())
-  {
-  case 0:
-    mpKinematicChain->setJointAngles(command_vector);
-    break;
-  case 1:
-    mpKinematicChain->setJointVelocities(command_vector);
-    break;
-  case 2:
-    mpKinematicChain->setJointAccelerations(command_vector);
-    break;
-  default:
-    CEDAR_THROW(cedar::aux::UnhandledValueException, "This value is not handled here.");
-  }
+  mpKinematicChain->setUserSideCommandBuffer(command_type, mat_data);
+  mpKinematicChain->setSuppressUserInteraction(true);
 }
 
 void cedar::dev::gui::KinematicChainCommandWidget::stopMovement()
@@ -209,9 +202,9 @@ void cedar::dev::gui::KinematicChainCommandWidget::initWindow()
   mode_label->setAlignment(Qt::AlignLeft);
   mpGridLayout->addWidget(mode_label, 0, 0);
   mpModeBox = new QComboBox();
-  mpModeBox->addItem(QString("position"));
-  mpModeBox->addItem(QString("velocity"));
-  mpModeBox->addItem(QString("acceleration"));
+  mpModeBox->addItem(QString("Joint Angles"));
+  mpModeBox->addItem(QString("Joint Velocities"));
+  mpModeBox->addItem(QString("Joint Accelerations"));
 
   mpModeBox->setCurrentIndex(0);
 
