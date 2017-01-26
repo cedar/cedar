@@ -66,42 +66,44 @@ int main()
     cedar::aux::math::pi * cedar::unit::meters
   );
   if (
-         !cedar::aux::math::isZero<double>
+         !cedar::aux::math::isZero<float>
           (
             local_coordinate_frame.getTranslationX() / cedar::unit::DEFAULT_LENGTH_UNIT - 1337.0
           )
-      || !cedar::aux::math::isZero<double>
+      || !cedar::aux::math::isZero<float>
           (
             local_coordinate_frame.getTranslationY() / cedar::unit::DEFAULT_LENGTH_UNIT - 0.0
           )
-      || !cedar::aux::math::isZero<double>
+      || !cedar::aux::math::isZero<float>
           (
             local_coordinate_frame.getTranslationZ() / cedar::unit::DEFAULT_LENGTH_UNIT - cedar::aux::math::pi
           )
       )
   {
     errors++;
-    std::cout << "ERROR with setTranslation(double, double, double) or getTranslationX/Y/Z()" << std::endl;
+    std::cout << "ERROR with setTranslation(float, float, float) or getTranslationX/Y/Z()" << std::endl;
   }
 
   cedar::unit::LengthMatrix p1(cv::Mat::ones(4, 1, CV_64FC1), 1 * cedar::unit::meters);
-  p1.matrix.at<double>(0, 0) = 555.555;
-  p1.matrix.at<double>(1, 0) = 2;
-  p1.matrix.at<double>(2, 0) = sqrt(3.0);
+  p1.matrix.at<float>(0, 0) = 555.555;
+  p1.matrix.at<float>(1, 0) = 2;
+  p1.matrix.at<float>(2, 0) = sqrt(3.0);
 
   local_coordinate_frame.setTranslation(p1);
   cedar::unit::LengthMatrix p2 = local_coordinate_frame.getTranslation();
   if (
-      p2.matrix.at<double>(0, 0) != 555.555
-      || p2.matrix.at<double>(1, 0) != 2.0
-      || p2.matrix.at<double>(2, 0) != sqrt(3.0)
-      || p2.matrix.at<double>(3, 0) != 1.0
+      p2.matrix.at<float>(0, 0) != 555.555
+      || p2.matrix.at<float>(1, 0) != 2.0
+      || p2.matrix.at<float>(2, 0) != sqrt(3.0)
+      || p2.matrix.at<float>(3, 0) != 1.0
       )
   {
     errors++;
     std::cout << "ERROR with setTranslation(Mat) or getTranslation()" << std::endl;
   }
 
+#if 0
+// setTransformation( vector of cedar::unit::Length ) currently unavailable
   std::vector<cedar::unit::Length> translation;
   translation.push_back(1.2 * cedar::unit::meters);
   translation.push_back(3.4 * cedar::unit::meters);
@@ -109,15 +111,16 @@ int main()
   local_coordinate_frame.setTranslation(translation);
   cedar::unit::LengthMatrix p3 = local_coordinate_frame.getTranslation();
   if (
-      p3.matrix.at<double>(0, 0) != 1.2
-      || p3.matrix.at<double>(1, 0) != 3.4
-      || p3.matrix.at<double>(2, 0) != 5.6
-      || p3.matrix.at<double>(3, 0) != 1.0
+      p3.matrix.at<float>(0, 0) != 1.2
+      || p3.matrix.at<float>(1, 0) != 3.4
+      || p3.matrix.at<float>(2, 0) != 5.6
+      || p3.matrix.at<float>(3, 0) != 1.0
       )
   {
     errors++;
-    std::cout << "ERROR with setTranslation(std::vector<double>) or getTranslation()" << std::endl;
+    std::cout << "ERROR with setTranslation(std::vector<float>) or getTranslation()" << std::endl;
   }
+
 
   local_coordinate_frame.translate(1.2 * cedar::unit::meters, 3.4 * cedar::unit::meters, 5.6 * cedar::unit::meters);
   if (
@@ -127,20 +130,20 @@ int main()
       )
   {
     errors++;
-    std::cout << "ERROR with translate(double, double, double)" << std::endl;
+    std::cout << "ERROR with translate(float, float, float)" << std::endl;
   }
 
   p1.matrix = cv::Mat::ones(4, 1, CV_64FC1);
-  p1.matrix.at<double>(0, 0) = -0.4;
-  p1.matrix.at<double>(1, 0) = -0.8;
-  p1.matrix.at<double>(2, 0) = 0.8;
+  p1.matrix.at<float>(0, 0) = -0.4;
+  p1.matrix.at<float>(1, 0) = -0.8;
+  p1.matrix.at<float>(2, 0) = 0.8;
   local_coordinate_frame.translate(p1);
   p2 = local_coordinate_frame.getTranslation();
   if (
-      p2.matrix.at<double>(0, 0) != 2.0
-      || p2.matrix.at<double>(1, 0) != 6.0
-      || p2.matrix.at<double>(2, 0) != 12.0
-      || p2.matrix.at<double>(3, 0) != 1.0
+      p2.matrix.at<float>(0, 0) != 2.0
+      || p2.matrix.at<float>(1, 0) != 6.0
+      || p2.matrix.at<float>(2, 0) != 12.0
+      || p2.matrix.at<float>(3, 0) != 1.0
       )
   {
     errors++;
@@ -150,15 +153,16 @@ int main()
   local_coordinate_frame.translate(translation);
   p3 = local_coordinate_frame.getTranslation();
   if (
-      p3.matrix.at<double>(0, 0) != 3.2
-      || p3.matrix.at<double>(1, 0) != 9.4
-      || p3.matrix.at<double>(2, 0) != 17.6
-      || p3.matrix.at<double>(3, 0) != 1.0
+      p3.matrix.at<float>(0, 0) != 3.2
+      || p3.matrix.at<float>(1, 0) != 9.4
+      || p3.matrix.at<float>(2, 0) != 17.6
+      || p3.matrix.at<float>(3, 0) != 1.0
       )
   {
     errors++;
-    std::cout << "ERROR with translate(std::vector<double>)" << std::endl;
+    std::cout << "ERROR with translate(std::vector<float>)" << std::endl;
   }
+#endif
 
   //--------------------------------------------------------------------------------------------------------------------
   // rotate
@@ -176,25 +180,25 @@ int main()
   cv::Mat D = local_coordinate_frame.getTransformation();
   if
   (
-    !cedar::aux::math::isZero(D.at<double>(0, 0) - sqrt(2.0)/2)
-    || !cedar::aux::math::isZero(D.at<double>(0, 1) - 0.0)
-    || !cedar::aux::math::isZero(D.at<double>(0, 2) - sqrt(2.0)/2)
+    !cedar::aux::math::isZero(D.at<float>(0, 0) - sqrt(2.0)/2)
+    || !cedar::aux::math::isZero(D.at<float>(0, 1) - 0.0)
+    || !cedar::aux::math::isZero(D.at<float>(0, 2) - sqrt(2.0)/2)
 
-    || !cedar::aux::math::isZero(D.at<double>(1, 0) - sqrt(2.0)/2)
-    || !cedar::aux::math::isZero(D.at<double>(1, 1) - 0)
-    || !cedar::aux::math::isZero(D.at<double>(1, 2) - -sqrt(2.0)/2)
+    || !cedar::aux::math::isZero(D.at<float>(1, 0) - sqrt(2.0)/2)
+    || !cedar::aux::math::isZero(D.at<float>(1, 1) - 0)
+    || !cedar::aux::math::isZero(D.at<float>(1, 2) - -sqrt(2.0)/2)
 
-    || !cedar::aux::math::isZero(D.at<double>(2, 0) - 0)
-    || !cedar::aux::math::isZero(D.at<double>(2, 1) - 1)
-    || !cedar::aux::math::isZero(D.at<double>(2, 2) - 0)
+    || !cedar::aux::math::isZero(D.at<float>(2, 0) - 0)
+    || !cedar::aux::math::isZero(D.at<float>(2, 1) - 1)
+    || !cedar::aux::math::isZero(D.at<float>(2, 2) - 0)
 
-    || !cedar::aux::math::isZero(D.at<double>(0, 3) - 0)
-    || !cedar::aux::math::isZero(D.at<double>(1, 3) - 0)
-    || !cedar::aux::math::isZero(D.at<double>(2, 3) - 0)
-    || !cedar::aux::math::isZero(D.at<double>(3, 0) - 0)
-    || !cedar::aux::math::isZero(D.at<double>(3, 1) - 0)
-    || !cedar::aux::math::isZero(D.at<double>(3, 2) - 0)
-    || !cedar::aux::math::isZero(D.at<double>(3, 3) - 1)
+    || !cedar::aux::math::isZero(D.at<float>(0, 3) - 0)
+    || !cedar::aux::math::isZero(D.at<float>(1, 3) - 0)
+    || !cedar::aux::math::isZero(D.at<float>(2, 3) - 0)
+    || !cedar::aux::math::isZero(D.at<float>(3, 0) - 0)
+    || !cedar::aux::math::isZero(D.at<float>(3, 1) - 0)
+    || !cedar::aux::math::isZero(D.at<float>(3, 2) - 0)
+    || !cedar::aux::math::isZero(D.at<float>(3, 3) - 1)
   )
   {
     errors++;
@@ -202,24 +206,24 @@ int main()
   }
 
   cv::Mat R = cv::Mat::zeros(4, 4, CV_64FC1);
-  R.at<double>(0, 1) = -1;
-  R.at<double>(1, 2) = -1;
-  R.at<double>(2, 0) = 1;
+  R.at<float>(0, 1) = -1;
+  R.at<float>(1, 2) = -1;
+  R.at<float>(2, 0) = 1;
   local_coordinate_frame.setRotation(R);
   cv::Mat R_prime = local_coordinate_frame.getRotation();
   if
   (
-    !cedar::aux::math::isZero(R_prime.at<double>(0, 0) - 0)
-    || !cedar::aux::math::isZero(R_prime.at<double>(0, 1) - -1)
-    || !cedar::aux::math::isZero(R_prime.at<double>(0, 2) - 0)
+    !cedar::aux::math::isZero(R_prime.at<float>(0, 0) - 0)
+    || !cedar::aux::math::isZero(R_prime.at<float>(0, 1) - -1)
+    || !cedar::aux::math::isZero(R_prime.at<float>(0, 2) - 0)
 
-    || !cedar::aux::math::isZero(R_prime.at<double>(1, 0) - 0)
-    || !cedar::aux::math::isZero(R_prime.at<double>(1, 1) - 0)
-    || !cedar::aux::math::isZero(R_prime.at<double>(1, 2) - -1)
+    || !cedar::aux::math::isZero(R_prime.at<float>(1, 0) - 0)
+    || !cedar::aux::math::isZero(R_prime.at<float>(1, 1) - 0)
+    || !cedar::aux::math::isZero(R_prime.at<float>(1, 2) - -1)
 
-    || !cedar::aux::math::isZero(R_prime.at<double>(2, 0) - 1)
-    || !cedar::aux::math::isZero(R_prime.at<double>(2, 1) - 0)
-    || !cedar::aux::math::isZero(R_prime.at<double>(2, 2) - 0)
+    || !cedar::aux::math::isZero(R_prime.at<float>(2, 0) - 1)
+    || !cedar::aux::math::isZero(R_prime.at<float>(2, 1) - 0)
+    || !cedar::aux::math::isZero(R_prime.at<float>(2, 2) - 0)
   )
   {
     errors++;
@@ -228,7 +232,7 @@ int main()
 
   cedar::aux::write(R_prime);
 
-  std::vector<double> rotation;
+  std::vector<float> rotation;
   rotation.push_back(0);
   rotation.push_back(0);
   rotation.push_back(1);
@@ -241,21 +245,21 @@ int main()
   local_coordinate_frame.setRotation(rotation);
   R_prime = local_coordinate_frame.getRotation();
   if (
-      !cedar::aux::math::isZero(R_prime.at<double>(0, 0) - 0)
-      || !cedar::aux::math::isZero(R_prime.at<double>(0, 1) - 0)
-      || !cedar::aux::math::isZero(R_prime.at<double>(0, 2) - 1)
+      !cedar::aux::math::isZero(R_prime.at<float>(0, 0) - 0)
+      || !cedar::aux::math::isZero(R_prime.at<float>(0, 1) - 0)
+      || !cedar::aux::math::isZero(R_prime.at<float>(0, 2) - 1)
 
-      || !cedar::aux::math::isZero(R_prime.at<double>(1, 0) - 0)
-      || !cedar::aux::math::isZero(R_prime.at<double>(1, 1) - 1)
-      || !cedar::aux::math::isZero(R_prime.at<double>(1, 2) - 0)
+      || !cedar::aux::math::isZero(R_prime.at<float>(1, 0) - 0)
+      || !cedar::aux::math::isZero(R_prime.at<float>(1, 1) - 1)
+      || !cedar::aux::math::isZero(R_prime.at<float>(1, 2) - 0)
 
-      || !cedar::aux::math::isZero(R_prime.at<double>(2, 0) - 1)
-      || !cedar::aux::math::isZero(R_prime.at<double>(2, 1) - 0)
-      || !cedar::aux::math::isZero(R_prime.at<double>(2, 2) - 0)
+      || !cedar::aux::math::isZero(R_prime.at<float>(2, 0) - 1)
+      || !cedar::aux::math::isZero(R_prime.at<float>(2, 1) - 0)
+      || !cedar::aux::math::isZero(R_prime.at<float>(2, 2) - 0)
       )
   {
     errors++;
-    std::cout << "ERROR with setRotation(std::vector<double>)" << std::endl;
+    std::cout << "ERROR with setRotation(std::vector<float>)" << std::endl;
   }
 
   cedar::aux::write(R_prime);
@@ -265,32 +269,32 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: transformation" << std::endl;
   cv::Mat T = cv::Mat::ones(4, 4, CV_64FC1);
-  T.at<double>(0, 0) = 0;
-  T.at<double>(1, 0) = 1;
-  T.at<double>(2, 0) = 0;
-  T.at<double>(0, 1) = -1;
-  T.at<double>(1, 1) = 0;
-  T.at<double>(2, 1) = 0;
-  T.at<double>(0, 2) = 0;
-  T.at<double>(1, 2) = 0;
-  T.at<double>(2, 2) = 1;
-  T.at<double>(0, 3) = 5;
-  T.at<double>(1, 3) = 6;
-  T.at<double>(2, 3) = 7;
+  T.at<float>(0, 0) = 0;
+  T.at<float>(1, 0) = 1;
+  T.at<float>(2, 0) = 0;
+  T.at<float>(0, 1) = -1;
+  T.at<float>(1, 1) = 0;
+  T.at<float>(2, 1) = 0;
+  T.at<float>(0, 2) = 0;
+  T.at<float>(1, 2) = 0;
+  T.at<float>(2, 2) = 1;
+  T.at<float>(0, 3) = 5;
+  T.at<float>(1, 3) = 6;
+  T.at<float>(2, 3) = 7;
   local_coordinate_frame.setTransformation(T);
   if (
-      local_coordinate_frame.getTransformation().at<double>(0, 0) != 0.0
-      || local_coordinate_frame.getTransformation().at<double>(1, 0) != 1.0
-      || local_coordinate_frame.getTransformation().at<double>(2, 0) != 0.0
-      || local_coordinate_frame.getTransformation().at<double>(0, 1) != -1.0
-      || local_coordinate_frame.getTransformation().at<double>(1, 1) != 0.0
-      || local_coordinate_frame.getTransformation().at<double>(2, 1) != 0.0
-      || local_coordinate_frame.getTransformation().at<double>(0, 2) != 0.0
-      || local_coordinate_frame.getTransformation().at<double>(1, 2) != 0.0
-      || local_coordinate_frame.getTransformation().at<double>(2, 2) != 1.0
-      || local_coordinate_frame.getTransformation().at<double>(0, 3) != 5.0
-      || local_coordinate_frame.getTransformation().at<double>(1, 3) != 6.0
-      || local_coordinate_frame.getTransformation().at<double>(2, 3) != 7.0
+      local_coordinate_frame.getTransformation().at<float>(0, 0) != 0.0
+      || local_coordinate_frame.getTransformation().at<float>(1, 0) != 1.0
+      || local_coordinate_frame.getTransformation().at<float>(2, 0) != 0.0
+      || local_coordinate_frame.getTransformation().at<float>(0, 1) != -1.0
+      || local_coordinate_frame.getTransformation().at<float>(1, 1) != 0.0
+      || local_coordinate_frame.getTransformation().at<float>(2, 1) != 0.0
+      || local_coordinate_frame.getTransformation().at<float>(0, 2) != 0.0
+      || local_coordinate_frame.getTransformation().at<float>(1, 2) != 0.0
+      || local_coordinate_frame.getTransformation().at<float>(2, 2) != 1.0
+      || local_coordinate_frame.getTransformation().at<float>(0, 3) != 5.0
+      || local_coordinate_frame.getTransformation().at<float>(1, 3) != 6.0
+      || local_coordinate_frame.getTransformation().at<float>(2, 3) != 7.0
       )
   {
     errors++;
@@ -307,22 +311,22 @@ int main()
   std::cout << "called cofigured_local_coordinate_frame.readJson()" << std::endl;
   cv::Mat C = configured_local_coordinate_frame.getTransformation();
   if (
-      !cedar::aux::math::isZero(C.at<double>(0, 0) - cos(cedar::aux::math::pi/6))
-      || !cedar::aux::math::isZero(C.at<double>(0, 1) - 0)
-      || !cedar::aux::math::isZero(C.at<double>(0, 2) - -0.5)
-      || !cedar::aux::math::isZero(C.at<double>(1, 0) - 0)
-      || !cedar::aux::math::isZero(C.at<double>(1, 1) - 1)
-      || !cedar::aux::math::isZero(C.at<double>(1, 2) - 0)
-      || !cedar::aux::math::isZero(C.at<double>(2, 0) - 0.5)
-      || !cedar::aux::math::isZero(C.at<double>(2, 1) - 0)
-      || !cedar::aux::math::isZero(C.at<double>(2, 2) - cos(cedar::aux::math::pi/6))
-      || !cedar::aux::math::isZero(C.at<double>(0, 3) - 2.0)
-      || !cedar::aux::math::isZero(C.at<double>(1, 3) - 2.2)
-      || !cedar::aux::math::isZero(C.at<double>(2, 3) - 2.5)
-      || !cedar::aux::math::isZero(C.at<double>(3, 0) - 0)
-      || !cedar::aux::math::isZero(C.at<double>(3, 1) - 0)
-      || !cedar::aux::math::isZero(C.at<double>(3, 2) - 0)
-      || !cedar::aux::math::isZero(C.at<double>(3, 3) - 1)
+      !cedar::aux::math::isZero(C.at<float>(0, 0) - cos(cedar::aux::math::pi/6))
+      || !cedar::aux::math::isZero(C.at<float>(0, 1) - 0)
+      || !cedar::aux::math::isZero(C.at<float>(0, 2) - -0.5)
+      || !cedar::aux::math::isZero(C.at<float>(1, 0) - 0)
+      || !cedar::aux::math::isZero(C.at<float>(1, 1) - 1)
+      || !cedar::aux::math::isZero(C.at<float>(1, 2) - 0)
+      || !cedar::aux::math::isZero(C.at<float>(2, 0) - 0.5)
+      || !cedar::aux::math::isZero(C.at<float>(2, 1) - 0)
+      || !cedar::aux::math::isZero(C.at<float>(2, 2) - cos(cedar::aux::math::pi/6))
+      || !cedar::aux::math::isZero(C.at<float>(0, 3) - 2.0)
+      || !cedar::aux::math::isZero(C.at<float>(1, 3) - 2.2)
+      || !cedar::aux::math::isZero(C.at<float>(2, 3) - 2.5)
+      || !cedar::aux::math::isZero(C.at<float>(3, 0) - 0)
+      || !cedar::aux::math::isZero(C.at<float>(3, 1) - 0)
+      || !cedar::aux::math::isZero(C.at<float>(3, 2) - 0)
+      || !cedar::aux::math::isZero(C.at<float>(3, 3) - 1)
       )
   {
     errors++;
