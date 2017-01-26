@@ -1418,7 +1418,7 @@ void cedar::proc::gui::Connectable::buildConnectTriggerMenu(
   auto group = gui_group->getGroup();
 
   {
-    QAction* action = pMenu->addAction("no trigger");
+    QAction* action = pMenu->addAction("no thread");
     if (current)
     {
       action->setEnabled(current.get().get() != nullptr);
@@ -1460,7 +1460,7 @@ void cedar::proc::gui::Connectable::fillConnectableMenu(QMenu& menu, QGraphicsSc
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
-  QMenu* p_assign_trigger = menu.addMenu("assign to trigger");
+  QMenu* p_assign_trigger = menu.addMenu("assign to thread");
 
   auto gui_group = this->getGuiGroup();
 
