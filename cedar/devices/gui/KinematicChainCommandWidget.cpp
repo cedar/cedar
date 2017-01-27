@@ -105,19 +105,16 @@ void cedar::dev::gui::KinematicChainCommandWidget::changeWorkingMode(int mode)
 
 void cedar::dev::gui::KinematicChainCommandWidget::commandJoints()
 {  
-  // unlock the suppression of user commands when the architecture is running
-  mpKinematicChain->setSuppressUserInteraction(false);
-
+  mpKinematicChain->processStart();
   auto command_type = mpKinematicChain->getCommandTypeForName(mpModeBox->currentText().toStdString());
-  auto mat_data = cv::Mat(1, 7, CV_32F);
+  auto mat_data = cv::Mat(7, 1, CV_32F);
 
   for(unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
   {
-    mat_data.at<float>(1, i) = float(mCommandBoxes[i]->value());
+    mat_data.at<float>(i, 0) = float(mCommandBoxes[i]->value());
   }
 
-  mpKinematicChain->setUserSideCommandBuffer(command_type, mat_data);
-  mpKinematicChain->setSuppressUserInteraction(true);
+  mpKinematicChain->setUserSideCommandBuffer(command_type, mat_data);  
 }
 
 void cedar::dev::gui::KinematicChainCommandWidget::stopMovement()
