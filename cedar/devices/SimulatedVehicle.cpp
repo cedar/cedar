@@ -109,10 +109,10 @@ cv::Mat cedar::dev::SimulatedVehicle::retrieveSimulatedVelocities()
 //    {
 //      this->deleteInitialConfiguration("default");
 //    }
-//    this->addInitialConfiguration("default", cv::Mat::zeros(number_of_wheels, 1, CV_64F));
+//    this->addInitialConfiguration("default", cv::Mat::zeros(number_of_wheels, 1, CV_32F));
 //    this->applyInitialConfiguration("default");
-//    mSimulation[cedar::dev::Vehicle::WHEEL_VELOCITIES] = cv::Mat::zeros(number_of_wheels, 1, CV_64F);
-//    mSimulation[cedar::dev::Vehicle::WHEEL_ACCELERATIONS] = cv::Mat::zeros(number_of_wheels, 1, CV_64F);
+//    mSimulation[cedar::dev::Vehicle::WHEEL_VELOCITIES] = cv::Mat::zeros(number_of_wheels, 1, CV_32F);
+//    mSimulation[cedar::dev::Vehicle::WHEEL_ACCELERATIONS] = cv::Mat::zeros(number_of_wheels, 1, CV_32F);
 //  }
 //}
 
@@ -121,9 +121,9 @@ bool cedar::dev::SimulatedVehicle::applyCrashbrake()
   QWriteLocker lock(&mSimulationLock);
 
   mSimulation[ cedar::dev::Vehicle::WHEEL_VELOCITIES ] =
-    cv::Mat::zeros( this->getNumberOfWheels(), 1, CV_64F );
+    cv::Mat::zeros( this->getNumberOfWheels(), 1, CV_32F );
   mSimulation[ cedar::dev::Vehicle::WHEEL_ACCELERATIONS] =
-    cv::Mat::zeros( this->getNumberOfWheels(), 1, CV_64F );
+    cv::Mat::zeros( this->getNumberOfWheels(), 1, CV_32F );
 
   return true;
 }

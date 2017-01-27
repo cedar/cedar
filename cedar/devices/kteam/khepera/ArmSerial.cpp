@@ -87,16 +87,16 @@ cedar::dev::kteam::khepera::ArmSerial::~ArmSerial()
 
 void cedar::dev::kteam::khepera::ArmSerial::applyArmPosition(cv::Mat angle)
 {
-  CEDAR_DEBUG_ASSERT(angle.type() == CV_64F);
+  CEDAR_DEBUG_ASSERT(angle.type() == CV_32F);
   CEDAR_DEBUG_ASSERT(angle.rows > 0);
   CEDAR_DEBUG_ASSERT(angle.cols > 0);
-  double value = angle.at<double>(0, 0);
+  float value = angle.at<float>(0, 0);
   this->setArmPosition(static_cast<unsigned int>(180.0 * value / cedar::aux::math::pi));
 }
 
 cv::Mat cedar::dev::kteam::khepera::ArmSerial::measureArmPosition()
 {
-  return cv::Mat(1, 1, CV_64F, static_cast<double>(this->getArmPosition()) / 180.0 * cedar::aux::math::pi);
+  return cv::Mat(1, 1, CV_32F, static_cast<float>(this->getArmPosition()) / 180.0 * cedar::aux::math::pi);
 }
 
 void cedar::dev::kteam::khepera::ArmSerial::setArmPosition(unsigned int position)

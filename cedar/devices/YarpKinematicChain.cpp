@@ -142,7 +142,7 @@ cv::Mat cedar::dev::YarpKinematicChain::retrieveAngles()
 
 bool cedar::dev::YarpKinematicChain::applyCrashbrake()
 {
-//    cv::Mat::zeros( getNumberOfJoints(), 1, CV_64F );
+//    cv::Mat::zeros( getNumberOfJoints(), 1, CV_32F );
 
   return false;
 }

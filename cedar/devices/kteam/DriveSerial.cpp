@@ -125,7 +125,7 @@ void cedar::dev::kteam::DriveSerial::sendMovementCommand()
 cv::Mat cedar::dev::kteam::DriveSerial::retrieveEncoders() const
 {
   // the left and right encoder value will be saved in this vector
-  cv::Mat encoders = cv::Mat(2, 1, CV_64F);
+  cv::Mat encoders = cv::Mat(2, 1, CV_32F);
 
   // send the command to receive the values of the encoders
   std::string answer
@@ -142,7 +142,7 @@ cv::Mat cedar::dev::kteam::DriveSerial::retrieveEncoders() const
   checkStreamValidity(answer_stream, false);
 
   // read the left encoder value
-  answer_stream >> encoders.at<double>(0,0);
+  answer_stream >> encoders.at<float>(0,0);
   checkStreamValidity(answer_stream, false);
 
   // skip the colon separating the encoder values
@@ -150,7 +150,7 @@ cv::Mat cedar::dev::kteam::DriveSerial::retrieveEncoders() const
   checkStreamValidity(answer_stream, false);
 
   // read the right encoder value
-  answer_stream >> encoders.at<double>(1,0);
+  answer_stream >> encoders.at<float>(1,0);
   checkStreamValidity(answer_stream, true);
 
   return encoders;
@@ -160,7 +160,7 @@ void cedar::dev::kteam::DriveSerial::sendEncoders(const cv::Mat &mat)
 {
   // create a command string which will set the encoder values
   std::ostringstream command;
-  command << _mCommandSetEncoder->getValue() << "," << mat.at<double>(0,0) << "," << mat.at<double>(1,0);
+  command << _mCommandSetEncoder->getValue() << "," << mat.at<float>(0,0) << "," << mat.at<float>(1,0);
 
   std::string answer = convertToSerialChannel(getChannel())->writeAndReadLocked(command.str());
 

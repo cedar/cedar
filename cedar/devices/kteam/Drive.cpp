@@ -105,10 +105,10 @@ _mEncoderLimits(new cedar::aux::math::IntLimitsParameter(this, "encoder limits",
 
 cedar::unit::Length cedar::dev::kteam::Drive::getDistancePerPulse() const
 {
-  return 2.0 * cedar::aux::math::pi * getWheelRadius() / getNumberOfPulsesPerRevolution();
+  return 2.0 * cedar::aux::math::pi * getWheelRadius() / double(getNumberOfPulsesPerRevolution());
 }
 
-double cedar::dev::kteam::Drive::getNumberOfPulsesPerRevolution() const
+float cedar::dev::kteam::Drive::getNumberOfPulsesPerRevolution() const
 {
   return _mNumberOfPulsesPerRevolution->getValue();
 }
@@ -181,33 +181,33 @@ std::vector<int> cedar::dev::kteam::Drive::getEncoders() const
   cv::Mat mat = getUserSideMeasurementBuffer( ENCODERS );
   std::vector<int> ret;
 
-  ret.push_back( mat.at<double>(0,0) );
-  ret.push_back( mat.at<double>(1,0) );
+  ret.push_back( mat.at<float>(0,0) );
+  ret.push_back( mat.at<float>(1,0) );
 
   return ret;
 }
 
 void cedar::dev::kteam::Drive::setEncoders(const std::vector<int>& encoders)
 {
-  cv::Mat mat = cv::Mat(2, 1, CV_64F);
+  cv::Mat mat = cv::Mat(2, 1, CV_32F);
 
-  mat.at<double>(0,0) = encoders[0];
-  mat.at<double>(1,0) = encoders[1];
+  mat.at<float>(0,0) = encoders[0];
+  mat.at<float>(1,0) = encoders[1];
 
   setUserSideCommandBuffer( ENCODERS, mat );
 }
 
 cv::Mat cedar::dev::kteam::Drive::pulsesToWheelSpeed(cedar::unit::Time, cv::Mat, ComponentDataType type)
 {
-  cv::Mat mat = cv::Mat(2, 1, CV_64F);
+  cv::Mat mat = cv::Mat(2, 1, CV_32F);
   std::vector<cedar::unit::Frequency> wheel_speed_pulses;
   auto data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->getMeasurementData(type));
   QReadLocker read_lock(&(data->getLock()));
   cv::Mat pulses = data->getData();
-  wheel_speed_pulses.push_back(cedar::unit::Frequency(pulses.at<double>(0,0) * cedar::unit::hertz));
-  wheel_speed_pulses.push_back(cedar::unit::Frequency(pulses.at<double>(1,0) * cedar::unit::hertz));
+  wheel_speed_pulses.push_back(cedar::unit::Frequency(pulses.at<float>(0,0) * cedar::unit::hertz));
+  wheel_speed_pulses.push_back(cedar::unit::Frequency(pulses.at<float>(1,0) * cedar::unit::hertz));
   auto speed = this->convertPulsesToWheelSpeed(wheel_speed_pulses);
-  mat.at<double>(0,0) = speed.at(0) / cedar::unit::meters_per_second;
-  mat.at<double>(1,0) = speed.at(1) / cedar::unit::meters_per_second;
+  mat.at<float>(0,0) = speed.at(0) / cedar::unit::meters_per_second;
+  mat.at<float>(1,0) = speed.at(1) / cedar::unit::meters_per_second;
   return mat;
 }
