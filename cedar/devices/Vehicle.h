@@ -104,19 +104,19 @@ public:
 
   unsigned int getNumberOfWheels() const;
 
-  double getWheelVelocity(unsigned int index) const;
+  float getWheelVelocity(unsigned int index) const;
 
   cv::Mat getWheelVelocities() const;
 
-  virtual double getWheelAcceleration(unsigned int index) const;
+  virtual float getWheelAcceleration(unsigned int index) const;
 
   cv::Mat getWheelAccelerations() const;
 
-  void setWheelVelocity(unsigned int index, double velocity);
+  void setWheelVelocity(unsigned int index, float velocity);
 
   void setWheelVelocities(const cv::Mat& velocities);
 
-  void setWheelAcceleration(unsigned int index, double acceleration);
+  void setWheelAcceleration(unsigned int index, float acceleration);
 
   void setWheelAccelerations(const cv::Mat& accelerations);
 
@@ -142,7 +142,7 @@ private:
 
   virtual bool applyBrakeNowController();
 
-  double calculateCenterToWheelDistance();
+  float calculateCenterToWheelDistance();
 
   cv::Mat calculateWheelRotationDirections();
 
@@ -166,7 +166,7 @@ protected:
   cv::Mat mWheelRotationDirections;
 
 private:
-  double mCenterToWheelDistance; //We assume that wheels are always arranged around a given centerpoint with this distance.
+  float mCenterToWheelDistance; //We assume that wheels are always arranged around a given centerpoint with this distance.
 
 };
 // class cedar::dev::Vehicle
