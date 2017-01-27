@@ -108,24 +108,24 @@ void cedar::dev::kteam::khepera::GripperSerial::construct()
 
 void cedar::dev::kteam::khepera::GripperSerial::applyGripperPosition(cv::Mat openClose)
 {
-  CEDAR_DEBUG_ASSERT(openClose.type() == CV_64F);
+  CEDAR_DEBUG_ASSERT(openClose.type() == CV_32F);
   CEDAR_DEBUG_ASSERT(openClose.rows > 0);
   CEDAR_DEBUG_ASSERT(openClose.cols > 0);
-  double value = openClose.at<double>(0, 0);
+  float value = openClose.at<float>(0, 0);
   this->setGripperPosition(value >= 1.0);
 }
 
 cv::Mat cedar::dev::kteam::khepera::GripperSerial::measureResistivity()
 {
-  cv::Mat measured(1, 1, CV_64F);
-  measured.at<double>(0, 0) = static_cast<double>(this->getGripperResistivity());
+  cv::Mat measured(1, 1, CV_32F);
+  measured.at<float>(0, 0) = static_cast<float>(this->getGripperResistivity());
   return measured;
 }
 
 cv::Mat cedar::dev::kteam::khepera::GripperSerial::measureOpticalSensor()
 {
-  cv::Mat measured(1, 1, CV_64F);
-  measured.at<double>(0, 0) = static_cast<double>(this->getGripperOpticalSensor());
+  cv::Mat measured(1, 1, CV_32F);
+  measured.at<float>(0, 0) = static_cast<float>(this->getGripperOpticalSensor());
   return measured;
 }
 

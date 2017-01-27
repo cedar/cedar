@@ -73,7 +73,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Returns the number of pulses per wheel-revolution.
-  double getNumberOfPulsesPerRevolution() const;
+  float getNumberOfPulsesPerRevolution() const;
 
   //!@brief Returns the distance a wheel moves for a single pulse [in m].
   cedar::unit::Length getDistancePerPulse() const;
