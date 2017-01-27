@@ -203,6 +203,22 @@ void cedar::proc::Step::registerFunction(const std::string& actionName, boost::f
   this->mActions[actionName] = std::make_pair(function, autoLock);
 }
 
+void cedar::proc::Step::unregisterFunction(const std::string& actionName)
+{
+  this->mActions.erase(mActions.find(actionName));
+}
+
+bool cedar::proc::Step::isRegistered(const std::string& actionName)
+{
+  if (this->mActions.find(actionName) != this->mActions.end())
+  {
+    return true;
+  }
+
+  return false;
+}
+
+
 void cedar::proc::Step::callAction(const std::string& name)
 {
   // find the action

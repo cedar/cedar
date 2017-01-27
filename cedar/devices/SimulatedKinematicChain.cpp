@@ -103,11 +103,11 @@ void cedar::dev::SimulatedKinematicChain::updateInitialConfiguration()
     {
       this->deleteInitialConfiguration("default");
     }
-    this->addInitialConfiguration("default", cv::Mat::zeros(number_of_joints, 1, CV_64F) + 0.001);
+    this->addInitialConfiguration("default", cv::Mat::zeros(number_of_joints, 1, CV_32F) + 0.001);
     this->applyInitialConfiguration("default");
-    mSimulation[cedar::dev::KinematicChain::JOINT_ANGLES] = cv::Mat::zeros(number_of_joints, 1, CV_64F);
-    mSimulation[cedar::dev::KinematicChain::JOINT_VELOCITIES] = cv::Mat::zeros(number_of_joints, 1, CV_64F);
-    mSimulation[cedar::dev::KinematicChain::JOINT_ACCELERATIONS] = cv::Mat::zeros(number_of_joints, 1, CV_64F);
+    mSimulation[cedar::dev::KinematicChain::JOINT_ANGLES] = cv::Mat::zeros(number_of_joints, 1, CV_32F);
+    mSimulation[cedar::dev::KinematicChain::JOINT_VELOCITIES] = cv::Mat::zeros(number_of_joints, 1, CV_32F);
+    mSimulation[cedar::dev::KinematicChain::JOINT_ACCELERATIONS] = cv::Mat::zeros(number_of_joints, 1, CV_32F);
   }
 }
 
@@ -116,9 +116,9 @@ bool cedar::dev::SimulatedKinematicChain::applyCrashbrake()
   QWriteLocker lock(&mSimulationLock);
 
   mSimulation[ cedar::dev::KinematicChain::JOINT_VELOCITIES ] = 
-    cv::Mat::zeros( getNumberOfJoints(), 1, CV_64F );
+    cv::Mat::zeros( getNumberOfJoints(), 1, CV_32F );
   mSimulation[ cedar::dev::KinematicChain::JOINT_ACCELERATIONS ] = 
-    cv::Mat::zeros( getNumberOfJoints(), 1, CV_64F );
+    cv::Mat::zeros( getNumberOfJoints(), 1, CV_32F );
 
   return true;
 }

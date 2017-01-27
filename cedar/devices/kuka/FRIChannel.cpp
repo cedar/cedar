@@ -240,12 +240,12 @@ bool cedar::dev::kuka::FRIChannel::prepareJointPositionControl(cv::Mat newJointP
 cv::Mat cedar::dev::kuka::FRIChannel::getMeasuredJointPositions() const
 {
   QMutexLocker lock( &mFRIRemoteLock );
-  cv::Mat jointPositions = cv::Mat::zeros( LBR_MNJ, 1, CV_64F );
+  cv::Mat jointPositions = cv::Mat::zeros( LBR_MNJ, 1, CV_32F );
 
   // fill float array for hardware:
   for (unsigned i = 0; i < LBR_MNJ; i++)
   {
-    jointPositions.at<double>(i) = mpFriRemote->getMsrMsrJntPosition()[i];
+    jointPositions.at<float>(i) = mpFriRemote->getMsrMsrJntPosition()[i];
   }
 
   return jointPositions;

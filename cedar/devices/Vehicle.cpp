@@ -141,9 +141,9 @@ void cedar::dev::Vehicle::initializefromWheelList()
   std::cout<<"The wheel radius is: "<< mWheelRadius->getValue()<<std::endl;
 }
 
-double cedar::dev::Vehicle::calculateCenterToWheelDistance()
+float cedar::dev::Vehicle::calculateCenterToWheelDistance()
 {
-  double distance = 0;
+  float distance = 0;
   auto num = getNumberOfWheels();
   if (num <= 1)
   {
@@ -151,9 +151,9 @@ double cedar::dev::Vehicle::calculateCenterToWheelDistance()
   }
   else
   {
-    double sumX = 0;
-    double sumY = 0;
-    double sumZ = 0;
+    float sumX = 0;
+    float sumY = 0;
+    float sumZ = 0;
     for (unsigned int i = 0; i < num; i++)
     {
       auto posVector = mWheels->at(i)->_mpPosition->getValue();
@@ -168,21 +168,21 @@ double cedar::dev::Vehicle::calculateCenterToWheelDistance()
         CEDAR_THROW(cedar::dev::JointNumberMismatchException, "The configuration file lacks three dimensional position coordinates for all wheels of" + this->getName());
       }
     }
-    double centerX = sumX / double(num);
-    double centerY = sumY / double(num);
-    double centerZ = sumZ / double(num);
+    float centerX = sumX / float(num);
+    float centerY = sumY / float(num);
+    float centerZ = sumZ / float(num);
 
     std::cout << "center of the loaded vehicle is at: " << centerX << "," << centerY << "," << centerZ << std::endl;
     //We assume all wheels have the same distance to the center, but check anyway.
-    double oldDistance = 0;
+    float oldDistance = 0;
     for (unsigned int i = 0; i < num; i++)
     {
       auto posVector = mWheels->at(i)->_mpPosition->getValue();
       if (posVector.size() == 3)
       {
-        double posX = posVector[0];
-        double posY = posVector[1];
-        double posZ = posVector[2];
+        float posX = posVector[0];
+        float posY = posVector[1];
+        float posZ = posVector[2];
 
         distance = sqrt(pow(posX - centerX, 2) + pow(posY - centerY, 2) + pow(posZ - centerZ, 2));
         if (i != 0 && distance != oldDistance)
@@ -206,7 +206,7 @@ double cedar::dev::Vehicle::calculateCenterToWheelDistance()
 cv::Mat cedar::dev::Vehicle::calculateWheelRotationDirections()
 {
   auto num = getNumberOfWheels();
-  cv::Mat wheelRotationDirections = cv::Mat::zeros(num, 1, CV_64F);
+  cv::Mat wheelRotationDirections = cv::Mat::zeros(num, 1, CV_32F);
 
   //Split the wheels in two groups according to the axis that differs among the first two wheels
   //Note this only works if the wheels are located symmetrically around a given center point
@@ -220,7 +220,7 @@ cv::Mat cedar::dev::Vehicle::calculateWheelRotationDirections()
       if(i == 0)
       {
         firstPos = posVector;
-        wheelRotationDirections.at<double>(i,0) = 1.0;
+        wheelRotationDirections.at<float>(i,0) = 1.0;
       }
       else if(i == 1)
       {
@@ -233,17 +233,17 @@ cv::Mat cedar::dev::Vehicle::calculateWheelRotationDirections()
         else
           CEDAR_THROW(cedar::dev::JointNumberMismatchException, "Two wheels are located at the same position. Check your Config File");
 
-        wheelRotationDirections.at<double>(i,0) = -1.0;
+        wheelRotationDirections.at<float>(i,0) = -1.0;
       }
       else
       {
         if(posVector.at(splitAxis) == firstPos.at(splitAxis))
         {
-          wheelRotationDirections.at<double>(i,0) = 1.0;
+          wheelRotationDirections.at<float>(i,0) = 1.0;
         }
         else
         {
-          wheelRotationDirections.at<double>(i,0) = -1.0;
+          wheelRotationDirections.at<float>(i,0) = -1.0;
         }
       }
 
@@ -263,7 +263,7 @@ unsigned int cedar::dev::Vehicle::getNumberOfWheels() const
   return mWheels->size();
 }
 
-double cedar::dev::Vehicle::getWheelVelocity(unsigned int index) const
+float cedar::dev::Vehicle::getWheelVelocity(unsigned int index) const
 {
   if (index >= this->getNumberOfWheels())
   {
@@ -279,7 +279,7 @@ cv::Mat cedar::dev::Vehicle::getWheelVelocities() const
   return getUserSideMeasurementBuffer(WHEEL_VELOCITIES);
 }
 
-double cedar::dev::Vehicle::getWheelAcceleration(unsigned int index) const
+float cedar::dev::Vehicle::getWheelAcceleration(unsigned int index) const
 {
   if (index >= this->getNumberOfWheels())
   {
@@ -295,7 +295,7 @@ cv::Mat cedar::dev::Vehicle::getWheelAccelerations() const
   return getUserSideMeasurementBuffer(WHEEL_ACCELERATIONS);
 }
 
-void cedar::dev::Vehicle::setWheelVelocity(unsigned int index, double velocity)
+void cedar::dev::Vehicle::setWheelVelocity(unsigned int index, float velocity)
 {
   if (index >= this->getNumberOfWheels())
   {
@@ -303,8 +303,8 @@ void cedar::dev::Vehicle::setWheelVelocity(unsigned int index, double velocity)
         "Wheel index " + cedar::aux::toString(index) + " exceeds number of joints, which is " + cedar::aux::toString(this->getNumberOfWheels()) + ".");
   }
 //!@todo use applyVelocityLimits()?
-//  velocity = std::max<double>(velocity, getJoint(index)->_mpVelocityLimits->getLowerLimit());
-//  velocity = std::min<double>(velocity, getJoint(index)->_mpVelocityLimits->getUpperLimit());
+//  velocity = std::max<float>(velocity, getJoint(index)->_mpVelocityLimits->getLowerLimit());
+//  velocity = std::min<float>(velocity, getJoint(index)->_mpVelocityLimits->getUpperLimit());
 //!@todo doesn't this function also check for violations of joint range?
   setUserSideCommandBufferIndex(WHEEL_VELOCITIES, index, velocity);
 }
@@ -325,7 +325,7 @@ void cedar::dev::Vehicle::setWheelVelocities(const cv::Mat& velocities)
   setUserSideCommandBuffer(WHEEL_VELOCITIES, new_vels);
 }
 
-void cedar::dev::Vehicle::setWheelAcceleration(unsigned int index, double acceleration)
+void cedar::dev::Vehicle::setWheelAcceleration(unsigned int index, float acceleration)
 {
   if (index >= this->getNumberOfWheels())
   {
@@ -364,7 +364,7 @@ bool cedar::dev::Vehicle::applyBrakeNowController()
 {
   setController(cedar::dev::Vehicle::WHEEL_VELOCITIES, boost::bind < cv::Mat > ([&]()
   {
-    return cv::Mat::zeros( getNumberOfWheels(), 1, CV_64F );
+    return cv::Mat::zeros( getNumberOfWheels(), 1, CV_32F );
   }));
   return true;
 }
@@ -377,8 +377,8 @@ void cedar::dev::Vehicle::readConfiguration(const cedar::aux::ConfigurationNode&
 
 cv::Mat cedar::dev::Vehicle::getWheelRotations(float robotRotationChange)
 {
-  double distancePerWheel = robotRotationChange * mCenterToWheelDistance;
-  double rotationPerWheel = distancePerWheel / mWheelRadius->getValue();
+  float distancePerWheel = robotRotationChange * mCenterToWheelDistance;
+  float rotationPerWheel = distancePerWheel / mWheelRadius->getValue();
 
   cv::Mat wheelRotations = mWheelRotationDirections * rotationPerWheel;
   return wheelRotations;
