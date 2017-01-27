@@ -8,6 +8,7 @@ lib
 logs
 *.log
 *.orig
+*.user
 Linux-*
 Darwin-*
 debug*
