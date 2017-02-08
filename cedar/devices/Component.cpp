@@ -1657,7 +1657,6 @@ void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
   mCommunicationThread->waitUntilStepped();
 
   mConnectedHook();
-
 }
 
 

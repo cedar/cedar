@@ -904,10 +904,10 @@ void cedar::dev::KinematicChain::setInitialConfigurations(std::map<std::string, 
 {
   QWriteLocker wlock(&mCurrentInitialConfigurationLock);
 
-  mInitialConfigurations.clear();
+  //mInitialConfigurations.clear();
   for (auto it = configs.begin(); it != configs.end(); ++it)
   {
-    mInitialConfigurations[ it->first ] = it->second.clone();
+    mInitialConfigurations[it->first] = it->second.clone();
     // it is important to clone the cv::Mats!
   }
 
@@ -920,11 +920,11 @@ void cedar::dev::KinematicChain::addInitialConfiguration(const std::string &name
   QWriteLocker wlock(&mCurrentInitialConfigurationLock);
 
   auto found = mInitialConfigurations.find(name);
+
+  // if it already exists, simply override
   if (found != mInitialConfigurations.end())
   {
-    CEDAR_THROW(cedar::aux::DuplicateNameException ,
-                "You are adding the initial configuration name '"
-                  + name + "' which already exists. Delete it first." );
+    mInitialConfigurations.erase(found);
   }
 
   mInitialConfigurations[ name ] = config.clone();
@@ -1005,27 +1005,14 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
 {
   QReadLocker rlock(&mCurrentInitialConfigurationLock);
 
-  clearUserCommand();
-
   auto f = mInitialConfigurations.find(name);
   if (f != mInitialConfigurations.end())
   {
     rlock.unlock();
 
     setCurrentInitialConfiguration(name);
+    setInitialUserSideCommandBuffer(cedar::dev::KinematicChain::JOINT_ANGLES, f->second);
 
-// TODO: --> to its own virtual method ...
-    // better to drive slowly to this configuration ...
-    if (0) // TODO: !isSimulated()) // dont do this in simulated mode
-    {
-      // TODO: need to implement an automatic mode
-    }
-    else
-    {
-      // @todo: !
-      setInitialUserSideCommandBuffer(cedar::dev::KinematicChain::JOINT_ANGLES, f->second);
-      //setJointAngles( f->second );
-    }
     return;
   }
 
@@ -1034,6 +1021,7 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
     InitialConfigurationNotFoundException,
     "You tried to apply an initial configuration that was not registered."
   );
+
 }
 
 
