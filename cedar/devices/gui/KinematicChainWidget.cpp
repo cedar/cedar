@@ -88,7 +88,8 @@ void cedar::dev::gui::KinematicChainWidget::init(cedar::dev::KinematicChainPtr k
   p_layout->addWidget(mpCommandWidget, 0, 1);
   this->setLayout(p_layout);
 
-  this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  //this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  this->setFixedHeight(375);
 }
 
 cedar::dev::gui::KinematicChainMonitorWidget* cedar::dev::gui::KinematicChainWidget::getMonitorWidget()
