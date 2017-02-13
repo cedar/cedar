@@ -496,8 +496,9 @@ class cedar::dev::Component::DataCollection
 
     float getBufferIndexUnlocked(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type, int index) const
     {
-      CEDAR_DEBUG_ASSERT(getBufferUnlocked(bufferData, type).rows > index);
-      return getBufferUnlocked(bufferData, type).at<float>(index, 0);
+      const auto &buffer = getBufferUnlocked(bufferData, type);
+      CEDAR_DEBUG_ASSERT(buffer.rows > index);
+      return buffer.at<float>(index, 0);
     }
 
     void setData(cedar::aux::LockableMember<BufferDataType>& bufferData, const ComponentDataType type, const cv::Mat& data)
@@ -1022,10 +1023,14 @@ void cedar::dev::Component::setInitialUserSideCommandBuffer(ComponentDataType ty
   if (this->isCommunicating())
   {
     // cannot set initial commands if a component is already running
-    CEDAR_THROW(AlreadyCommunicatingException, "Cannot set initial commands if device is communicating.");
+    cedar::aux::LogSingleton::getInstance()->error(
+      "Cannot apply initial configuration command buffer, as device is already communicating.",
+      CEDAR_CURRENT_FUNCTION_NAME);
+    return;
   }
 
   QWriteLocker(this->mCommandData->mInitialUserSubmittedData.getLockPtr());
+  std::cout << data;
   this->mCommandData->mInitialUserSubmittedData.member()[type]->setData(data.clone());
 }
 
@@ -1519,17 +1524,15 @@ void cedar::dev::Component::stepMeasurementCommunication(cedar::unit::Time dt)
 
       if (found != mRetrieveMeasurementHooks.member().end())
       {
-        try
+        // execute the hook:
+        const cv::Mat data = (found->second)();
+        if(data.rows != 0 && data.cols != 0)
         {
-          // execute the hook:
-          this->mMeasurementData->setDeviceRetrievedBufferUnlocked(type, (found->second)() );
+          this->mMeasurementData->setDeviceRetrievedBufferUnlocked(type, data);
           types_we_measured.push_back(type);
         }
-        catch(cedar::dev::IgnoreCommunicationException &e)
+        else
         {
-          // ignore, everthing is fine. keep old data
-//          std::cout<<"Ignore Exception catched in stepMeasurementCommunication!"<<std::endl;
-//          std::cout<<"Old Measurement is: "<< this->getPreviousDeviceSideMeasurementBuffer(type) <<std::endl;
           this->mMeasurementData->setDeviceRetrievedBufferUnlocked(type, this->getPreviousDeviceSideMeasurementBuffer(type));
         }
       }
@@ -1836,25 +1839,32 @@ cv::Mat cedar::dev::Component::integrateDeviceTwice(cedar::unit::Time dt, cv::Ma
 // todo: also used for commands
 cv::Mat cedar::dev::Component::differentiateDevice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type)
 {
-//  std::cout << "Differentiate once!" << std::endl;
-//  std::cout << data << std::endl;
-//  std::cout << dt << std::endl;
-//  std::cout << "step size: " << this->mCommunicationThread->getStepSize() << std::endl;
-//  std::cout << this->mMeasurementData->getUserBufferUnlocked(type) << std::endl;
+  //std::cout << "Differentiate once!" << std::endl;
+  //std::cout << data << std::endl;
+  //std::cout << dt << std::endl;
+  //std::cout << "step size: " << this->mCommunicationThread->getStepSize() << std::endl;
+  //std::cout << this->mMeasurementData->getUserBufferUnlocked(type) << std::endl;
 
   float unitless = dt / (1.0 * cedar::unit::second);
 
   if (unitless == 0.0)
   {
-    return cv::Mat::zeros( data.rows, data.cols, this->getMeasurementMatrixType() );
+    return cv::Mat::zeros(data.rows, data.cols, this->getMeasurementMatrixType());
+  }
+
+  if(data.rows == 0 || data.cols == 0) // have no data? no problem! here, take mine
+  {
+    data = cv::Mat::zeros(this->mMeasurementData->getUserBufferUnlocked(type).rows,
+                          this->mMeasurementData->getUserBufferUnlocked(type).cols,
+                          this->getMeasurementMatrixType());
   }
 
 //  std::cout << unitless << std::endl;
 //  std::cout << "Differentiate once (FIN!)!" << std::endl;
 // todo: check locking here
+  cv::Mat last_data = this->mMeasurementData->getUserBufferUnlocked(type);
   //!@todo check if this uses the right time step to differentiate
-  return ( data - this->mMeasurementData->getUserBufferUnlocked(type) )
-         / unitless;
+  return ( data - last_data ) / unitless;
 }
 
 // todo: also used for commands
@@ -1871,7 +1881,15 @@ cv::Mat cedar::dev::Component::differentiateDeviceTwice(cedar::unit::Time dt, cv
   {
     return cv::Mat::zeros( data.rows, data.cols, this->getMeasurementMatrixType() );
   }
-// todo: check locking here
+
+  if(data.rows == 0 || data.cols == 0) // have no data? no problem! here, take mine
+  {
+    data = cv::Mat::zeros(this->mMeasurementData->getUserBufferUnlocked(type1).rows,
+                          this->mMeasurementData->getUserBufferUnlocked(type1).cols,
+                          this->getMeasurementMatrixType());
+  }
+
+  // todo: check locking here
   //!@todo check if this uses the right time step to differentiate
   cv::Mat result = (( data - this->mMeasurementData->getUserBufferUnlocked(type1) )  / unitless
       - this->mMeasurementData->getUserBufferUnlocked(type2) ) / unitless;
@@ -1888,6 +1906,10 @@ void cedar::dev::Component::processStart()
      QWriteLocker lock1(this->mCommandData->mUserBuffer.getLockPtr());
      
      this->mCommandData->mUserBuffer.member() = this->mCommandData->mInitialUserSubmittedData.member();
+     //for(int i=0; i < this->mCommandData->mUserBuffer.member().size(); ++i)
+     //{
+     //  std::cout << this->mCommandData->mUserBuffer.member()[i] << "\n";
+     //}
      lock1.unlock();
   }
 

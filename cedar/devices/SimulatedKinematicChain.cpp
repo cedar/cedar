@@ -66,7 +66,7 @@ cedar::dev::SimulatedKinematicChain::SimulatedKinematicChain()
 
   this->applyDeviceCommandsAs(cedar::dev::KinematicChain::JOINT_ANGLES);
 
-  connect(this->mpJoints.get(), SIGNAL(valueChanged()), this, SLOT(updateInitialConfiguration()));
+  connect(this->mpJoints.get(), SIGNAL(valueChanged()), this, SLOT(updateInitialConfiguration())); //I dont see the point of this right now, appears to cause bugs
 }
 
 cedar::dev::SimulatedKinematicChain::~SimulatedKinematicChain()
@@ -96,12 +96,13 @@ cv::Mat cedar::dev::SimulatedKinematicChain::retrieveSimulatedAngles()
 void cedar::dev::SimulatedKinematicChain::updateInitialConfiguration()
 {
   auto number_of_joints = this->getNumberOfJoints();
+  return;
 
   if (number_of_joints > 0)
   {
     if (this->hasInitialConfiguration("default"))
     {
-      this->deleteInitialConfiguration("default");
+      this->deleteInitialConfiguration("default"); // this gets overwritten number_of_joints times due to strange signaling
     }
     this->addInitialConfiguration("default", cv::Mat::zeros(number_of_joints, 1, CV_32F) + 0.001);
     this->applyInitialConfiguration("default");

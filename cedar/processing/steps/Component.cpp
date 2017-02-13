@@ -525,20 +525,16 @@ void cedar::proc::steps::Component::componentChangedSlot()
   }
 
   cedar::dev::ComponentPtr lComponent = _mComponent->getValue();
-  auto ptr = boost::dynamic_pointer_cast<cedar::dev::KinematicChain>(lComponent);
-  const std::string action_name = "open Kinematic Chain Widget";
 
-  if(ptr != nullptr)
+  if(boost::dynamic_pointer_cast<cedar::dev::KinematicChain>(lComponent))
   {
+    const std::string action_name = "open Kinematic Chain Widget";
+
     if(!this->isRegistered(action_name))
     {
       this->registerFunction(action_name, boost::bind(&cedar::proc::steps::Component::openKinematicChainWidget, this ));
     }
-  }
-  else
-  {
-    this->unregisterFunction(action_name);
-  }
+  }  
 
   this->rebuildOutputs();
   this->rebuildInputs();

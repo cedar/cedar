@@ -230,19 +230,20 @@ int main(int argc, char **argv)
 
   // create the scene for the visualization
   cedar::aux::gl::ScenePtr scene(new cedar::aux::gl::Scene);
-  scene->setSceneLimit(2);
+  scene->setSceneLimit(5);
   scene->drawFloor(true);
 
   // create the viewer for the visualization
   cedar::aux::gui::Viewer viewer(scene);
   viewer.show();
   viewer.setSceneRadius(scene->getSceneLimit());
-  viewer.startTimer(50);
+  viewer.startTimer(25);
 
   // create an arm visualization and add it to the scene
-  cedar::dev::gl::KinematicChainPtr arm_visualization(new cedar::dev::gl::KukaArm(arm));
-  arm_visualization->setDisplayEndEffectorVelocity(false);
-  scene->addObjectVisualization(arm_visualization);
+  cedar::dev::gl::KukaArmPtr arm_visualisation(new cedar::dev::gl::KukaArm(arm));
+  arm_visualisation->initializeGl();
+  arm_visualisation->setDisplayEndEffectorVelocity(false);
+  scene->addObjectVisualization(arm_visualisation);
 
   // create target object, visualize it and add it to the scene
   cedar::aux::LocalCoordinateFramePtr target(new cedar::aux::LocalCoordinateFrame());
