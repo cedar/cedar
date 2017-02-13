@@ -1006,24 +1006,27 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
   QReadLocker rlock(&mCurrentInitialConfigurationLock);
 
   auto f = mInitialConfigurations.find(name);
+
   if (f != mInitialConfigurations.end())
   {
     rlock.unlock();
 
     setCurrentInitialConfiguration(name);
+    //std::cout << f->second;
     setInitialUserSideCommandBuffer(cedar::dev::KinematicChain::JOINT_ANGLES, f->second);
 
     return;
   }
-
-  CEDAR_THROW
-  (
-    InitialConfigurationNotFoundException,
-    "You tried to apply an initial configuration that was not registered."
-  );
+  else
+  {
+    CEDAR_THROW
+    (
+      InitialConfigurationNotFoundException,
+      "You tried to apply an initial configuration that was not registered."
+    );
+  }
 
 }
-
 
 void cedar::dev::KinematicChain::applyInitialConfiguration(unsigned int index)
 {

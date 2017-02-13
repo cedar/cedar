@@ -411,14 +411,7 @@ void cedar::dev::gui::KinematicChainCommandWidget::changeInitialConfig()
 
 void cedar::dev::gui::KinematicChainCommandWidget::applyInitialConfig()
 {
-  try
-  {
-    mpKinematicChain->applyInitialConfiguration(mpIniconfBox->currentText().toStdString());
-
-  }catch(...)
-  {
-    return;
-  }
+  mpKinematicChain->applyInitialConfiguration(mpIniconfBox->currentText().toStdString());
 }
 
 void cedar::dev::gui::KinematicChainCommandWidget::deleteInitialConfig()

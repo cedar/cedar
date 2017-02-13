@@ -315,7 +315,6 @@ void cedar::aux::gl::ObjectVisualization::drawElement
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   }
 
-
   // draw
   glShadeModel(GL_SMOOTH);
   glDrawElements(GL_TRIANGLES, numberOfFaces*3, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
