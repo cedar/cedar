@@ -121,7 +121,7 @@ void cedar::dev::gui::KinematicChainCommandWidget::commandJoints()
       mpKinematicChain->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.",
       CEDAR_CURRENT_FUNCTION_NAME);
   }
-  mpKinematicChain->processStart();
+
   auto command_type = mpKinematicChain->getCommandTypeForName(mpModeBox->currentText().toStdString());
   auto mat_data = cv::Mat(7, 1, CV_32F);
 
