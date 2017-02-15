@@ -225,7 +225,7 @@ bool cedar::dev::kuka::FRIChannel::prepareJointPositionControl(cv::Mat newJointP
   // fill float array for hardware:
   for (unsigned i = 0; i < LBR_MNJ; i++)
   {
-    newJointPositionArray[i] =  static_cast<float>( newJointPositions.at<double>(i) );
+    newJointPositionArray[i] =  static_cast<float>( newJointPositions.at<float>(i) );
   }
 
 // TODO: make sure we are in monitor mode!

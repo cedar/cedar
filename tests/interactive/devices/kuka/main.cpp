@@ -77,7 +77,6 @@ int main(int argc, char **argv)
   p_kinematic_chain_widget = new cedar::dev::gui::KinematicChainWidget(p_arm);
   p_kinematic_chain_widget->show();
 
-  p_arm->setJointVelocities( cv::Mat::zeros( p_arm->getNumberOfJoints(), 1, CV_32F ) );
   p_arm->startCommunication();
 
   a.exec();
