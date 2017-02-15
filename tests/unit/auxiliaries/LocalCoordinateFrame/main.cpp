@@ -84,7 +84,7 @@ int main()
     std::cout << "ERROR with setTranslation(float, float, float) or getTranslationX/Y/Z()" << std::endl;
   }
 
-  cedar::unit::LengthMatrix p1(cv::Mat::ones(4, 1, CV_64FC1), 1 * cedar::unit::meters);
+  cedar::unit::LengthMatrix p1(cv::Mat::ones(4, 1, CV_32FC1), 1 * cedar::unit::meters);
   p1.matrix.at<float>(0, 0) = 555.555;
   p1.matrix.at<float>(1, 0) = 2;
   p1.matrix.at<float>(2, 0) = sqrt(3.0);
@@ -133,7 +133,7 @@ int main()
     std::cout << "ERROR with translate(float, float, float)" << std::endl;
   }
 
-  p1.matrix = cv::Mat::ones(4, 1, CV_64FC1);
+  p1.matrix = cv::Mat::ones(4, 1, CV_32FC1);
   p1.matrix.at<float>(0, 0) = -0.4;
   p1.matrix.at<float>(1, 0) = -0.8;
   p1.matrix.at<float>(2, 0) = 0.8;
@@ -205,7 +205,7 @@ int main()
     std::cout << "ERROR with rotate()" << std::endl;
   }
 
-  cv::Mat R = cv::Mat::zeros(4, 4, CV_64FC1);
+  cv::Mat R = cv::Mat::zeros(4, 4, CV_32FC1);
   R.at<float>(0, 1) = -1;
   R.at<float>(1, 2) = -1;
   R.at<float>(2, 0) = 1;
@@ -268,7 +268,7 @@ int main()
   // transformation
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: transformation" << std::endl;
-  cv::Mat T = cv::Mat::ones(4, 4, CV_64FC1);
+  cv::Mat T = cv::Mat::ones(4, 4, CV_32FC1);
   T.at<float>(0, 0) = 0;
   T.at<float>(1, 0) = 1;
   T.at<float>(2, 0) = 0;

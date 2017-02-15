@@ -67,7 +67,7 @@ int main(int argc, char **argv)
   finger_three->readJson(finger_three_configuration_file);
   cedar::dev::KinematicChainPtr palm(new cedar::dev::SimulatedKinematicChain());
   palm->readJson(palm_configuration_file);
-//  finger_one->getRootCoordinateFrame()->setTransformation(cv::Mat::eye(4, 4, CV_64FC1));
+//  finger_one->getRootCoordinateFrame()->setTransformation(cv::Mat::eye(4, 4, CV_32FC1));
 
   // create gl visualization objects
   cedar::dev::gl::SdhPtr hand_visualization
