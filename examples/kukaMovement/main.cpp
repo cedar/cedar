@@ -114,14 +114,14 @@ private:
       if (norm(vector_to_target) == 0)
       {
         // target reached
-        mpArm->setJointVelocities(cv::Mat::zeros(mpArm->getNumberOfJoints(), 1, CV_64FC1));
+        mpArm->setJointVelocities(cv::Mat::zeros(mpArm->getNumberOfJoints(), 1, CV_32FC1));
       }
       else
       {
         cv::Mat direction = vector_to_target * (1 / norm(vector_to_target));
 
         // calculate speed of movement
-        double speed = mSpeed;
+        float speed = mSpeed;
         if (norm(vector_to_target) < mCloseDistance)
         {
           speed = norm(vector_to_target);
@@ -132,7 +132,7 @@ private:
 
         // transform to joint velocity vector using simple Jacobian pseudo-inverse approach
         cv::Mat Jacobian = mpArm->calculateEndEffectorJacobian();
-        cv::Mat jacobian_pseudo_inverse = cv::Mat::zeros(mpArm->getNumberOfJoints(), 3, CV_64FC1);
+        cv::Mat jacobian_pseudo_inverse = cv::Mat::zeros(mpArm->getNumberOfJoints(), 3, CV_32FC1);
         cv::invert(Jacobian, jacobian_pseudo_inverse, cv::DECOMP_SVD);
         cv::Mat joint_velocities = jacobian_pseudo_inverse * desired_velocity;
 
@@ -148,9 +148,9 @@ private:
   //! target
   cedar::aux::LocalCoordinateFramePtr mTarget;
   //! movement speed towards target
-  double mSpeed;
+  float mSpeed;
   //! distance below which the movement is reduced
-  double mCloseDistance;
+  float mCloseDistance;
   bool mGotTargetPosition;
 
 };
@@ -214,9 +214,9 @@ int main(int argc, char **argv)
   }
 
   // define some initial configurations we can choose from
-  double initial_config1[][1] = { {0.1}, {0.2}, {0.1}, {0.2}, {0.0}, {0.2}, {0.0} };
+  float initial_config1[][1] = { {0.1}, {0.2}, {0.1}, {0.2}, {0.0}, {0.2}, {0.0} };
   std::map< std::string, cv::Mat > initial_robots = {
-    {"near zero", cv::Mat( 7, 1, CV_64F, initial_config1) },
+    {"near zero", cv::Mat( 7, 1, CV_32F, initial_config1) },
     // add your robots here ...
   };
 
