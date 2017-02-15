@@ -3,6 +3,10 @@
   "description file": "robots/caren/description.json",
   "component instantiations":
   {
-    "arm": "fri"
+    "arm": "fri",
+    "trunk" : "simulator",
+    "camera0" : "simulator",
+    "camera1" : "simulator",
+    "camera2" : "simulator"
   }
 }

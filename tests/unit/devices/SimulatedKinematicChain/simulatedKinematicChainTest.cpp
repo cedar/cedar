@@ -181,7 +181,7 @@ void test()
   // cv::Mat of angle values
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: cv::Mat angle functions" << std::endl;
-  cv::Mat angle_matrix = cv::Mat::zeros(4, 1, CV_64FC1);
+  cv::Mat angle_matrix = cv::Mat::zeros(4, 1, CV_32FC1);
   angle_matrix.at<float>(0, 0) = 0.1;
   angle_matrix.at<float>(1, 0) = 0.2;
   angle_matrix.at<float>(2, 0) = 0.3;
@@ -263,7 +263,7 @@ void test()
   // cv::Mat of angle values
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: cv::Mat velocity functions" << std::endl;
-  cv::Mat velocity_matrix = cv::Mat::zeros(4, 1, CV_64FC1);
+  cv::Mat velocity_matrix = cv::Mat::zeros(4, 1, CV_32FC1);
   velocity_matrix.at<float>(0, 0) = 0.1;
   velocity_matrix.at<float>(1, 0) = 0.2;
   velocity_matrix.at<float>(2, 0) = 0.3;
@@ -347,7 +347,7 @@ void test()
   // cv::Mat of acceleration values
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: cv::Mat Acceleration functions" << std::endl;
-  cv::Mat acceleration_matrix = cv::Mat::zeros(4, 1, CV_64FC1);
+  cv::Mat acceleration_matrix = cv::Mat::zeros(4, 1, CV_32FC1);
   acceleration_matrix.at<float>(0, 0) = 0.001;
   acceleration_matrix.at<float>(1, 0) = 0.002;
   acceleration_matrix.at<float>(2, 0) = 0.003;
@@ -428,7 +428,7 @@ void test()
 
   cedar::dev::SimulatedKinematicChainPtr test_coordinate_frames = inirobot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
   test_coordinate_frames->startCommunication();
-  test_coordinate_frames->setJointAngles( cv::Mat::zeros( test_arm_position->getNumberOfJoints(), 1, CV_64F) );
+  test_coordinate_frames->setJointAngles( cv::Mat::zeros( test_arm_position->getNumberOfJoints(), 1, CV_32F) );
   test_coordinate_frames->waitUntilCommunicated();
   //cedar::aux::sleep(test_coordinate_frames->getDeviceStepSize() * 1.5);
   test_coordinate_frames->stopCommunication();
@@ -608,10 +608,10 @@ void test()
   // Jacobians
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: Jacobians" << std::endl;
-  cv::Mat origin = cv::Mat::zeros( 4, 1, CV_64FC1 );
+  cv::Mat origin = cv::Mat::zeros( 4, 1, CV_32FC1 );
   origin.at<float>( 3, 0 ) = 1;
-  cv::Mat jacobian_1 = cv::Mat::zeros(3, 4, CV_64FC1);
-  cv::Mat jacobian_3 = cv::Mat::zeros(3, 4, CV_64FC1);
+  cv::Mat jacobian_1 = cv::Mat::zeros(3, 4, CV_32FC1);
+  cv::Mat jacobian_3 = cv::Mat::zeros(3, 4, CV_32FC1);
   jacobian_1 = test_coordinate_frames->calculateCartesianJacobian(origin, 1, cedar::dev::KinematicChain::LOCAL_COORDINATES);
   jacobian_3 = test_coordinate_frames->calculateCartesianJacobian(origin, 3, cedar::dev::KinematicChain::LOCAL_COORDINATES);
   if (
@@ -758,7 +758,7 @@ void test()
   cv::Mat thetaDot;
   cv::Mat thetaTwoDot;
 
-  cv::Mat p_local = cv::Mat::zeros(4, 1, CV_64FC1);
+  cv::Mat p_local = cv::Mat::zeros(4, 1, CV_32FC1);
   p_local.at<float>(2, 0) = 1.0;
   p_local.at<float>(3, 0) = 1.0;
 
@@ -770,9 +770,9 @@ void test()
 
   complex_test_arm->startCommunication();
 
-  theta = cv::Mat(4, 1, CV_64FC1);
-  thetaDot = cv::Mat(4, 1, CV_64FC1);
-  thetaTwoDot = cv::Mat(4, 1, CV_64FC1);
+  theta = cv::Mat(4, 1, CV_32FC1);
+  thetaDot = cv::Mat(4, 1, CV_32FC1);
+  thetaTwoDot = cv::Mat(4, 1, CV_32FC1);
   cv::randn(theta, cv::Scalar(0), cv::Scalar(1));
   cv::randn(thetaDot, cv::Scalar(0), cv::Scalar(1));
   cv::randn(thetaTwoDot, cv::Scalar(0), cv::Scalar(1));
