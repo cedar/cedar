@@ -109,7 +109,7 @@ namespace cedar
  *        Matrices displayed by this plot are plotted as a three-dimensional surface, where the x- and y-coordinates are
  *        assumed to be the indices of the 2d matrix while the z-coordinate is the value stored within the matrix.
  */
-class cedar::aux::gui::QwtSurfacePlot : public PlotInterface
+class cedar::aux::gui::QwtSurfacePlot : public cedar::aux::gui::PlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
