@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_QWT_SURFACE_PLOT_INPUT_HANDLER_FWD_H
-#define CEDAR_AUX_GUI_QWT_SURFACE_PLOT_INPUT_HANDLER_FWD_H
+#ifndef CEDAR_AUX_GUI_QT5_SURFACE_PLOT_INPUT_HANDLER_FWD_H
+#define CEDAR_AUX_GUI_QT5_SURFACE_PLOT_INPUT_HANDLER_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"

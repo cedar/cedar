@@ -13,6 +13,18 @@ find_library(qwt_LIBS
   NAMES qwt-qt4 qwt
   PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
 )
+# find library in set of paths
+if(NOT CEDAR_USE_QT5)
+  find_library(qwt_LIBS
+    NAMES qwt-qt4 qwt
+    PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
+  )
+else(NOT CEDAR_USE_QT5)
+  find_library(qwt_LIBS
+    NAMES qwt-qt5 qwt
+    PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
+  )
+endif(NOT CEDAR_USE_QT5)
 # now check if anything is missing
 if(qwt_INCLUDE_DIRS AND qwt_LIBS)
   set(qwt_FOUND true)
