@@ -87,7 +87,11 @@
 #include <QInputDialog>
 #include <QTableWidget>
 #ifndef Q_MOC_RUN
-  #include <boost/property_tree/detail/json_parser_error.hpp>
+  #if (BOOST_VERSION / 100000 < 2 && BOOST_VERSION / 100 % 1000 < 61) 
+    #include <boost/property_tree/detail/json_parser_error.hpp>  
+  #else
+    #include <boost/property_tree/json_parser/error.hpp>
+  #endif
   #include <boost/version.hpp>
 #endif
 #include <vector>
