@@ -311,7 +311,12 @@ void cedar::proc::gui::DataSlotItem::generateTooltip()
   else
   {
     tool_tip += QString::fromStdString(cedar::proc::DataRole::type().get(this->mSlot->getRole()).prettyString());
+#ifdef CEDAR_USE_QT5
+    tool_tip += ": <b>" + QString(QString::fromStdString(this->mSlot->getText())).toHtmlEscaped() + "</b>";
+#else
     tool_tip += ": <b>" + Qt::escape(QString::fromStdString(this->mSlot->getText())) + "</b>";
+#endif
+ 	// Qt::escape(QString::fromStdString(this->mSlot->getText())) + "</b>"; // QT4 Version
   }
   if (this->mSlot->getData())
   {

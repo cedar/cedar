@@ -191,8 +191,13 @@ QWidget(pParent)
   this->mpPropertyTree->setHeaderLabels(header_labels);
 
   // make first section stretch
+#ifdef CEDAR_USE_QT5
+  this->mpPropertyTree->header()->setSectionResizeMode(PARAMETER_NAME_COLUMN, QHeaderView::Interactive);
+  this->mpPropertyTree->header()->setSectionResizeMode(PARAMETER_EDITOR_COLUMN, QHeaderView::Stretch);
+#else
   this->mpPropertyTree->header()->setResizeMode(PARAMETER_NAME_COLUMN, QHeaderView::Interactive);
   this->mpPropertyTree->header()->setResizeMode(PARAMETER_EDITOR_COLUMN, QHeaderView::Stretch);
+#endif
   this->mpPropertyTree->header()->resizeSection(PARAMETER_NAME_COLUMN, 150);
 
   QObject::connect(this, SIGNAL(parameterAdded(int, QString)), this, SLOT(parameterAddedSlot(int, QString)));

@@ -46,7 +46,11 @@
 #include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
-#include <QtConcurrentRun>
+#ifdef CEDAR_USE_QT5
+  #include <QtConcurrent/QtConcurrentRun>
+#else
+  #include <QtConcurrentRun>
+#endif
 #include <QHBoxLayout>
 #include <QLabel>
 #include <vector>
@@ -159,8 +163,11 @@ mSimulationRunning(false)
 
   this->mpTree->setNameColumn(1);
   this->mpTree->setNameEditingEnabled(true);
+#ifdef CEDAR_USE_QT5
+  this->mpTree->header()->setSectionResizeMode(this->mpTree->getNameColumn(), QHeaderView::Stretch);
+#else
   this->mpTree->header()->setResizeMode(this->mpTree->getNameColumn(), QHeaderView::Stretch);
-
+#endif
   this->sortItems();
 
   this->mElementAddedConnection = this->mpTree->connectToElementAddedSignal

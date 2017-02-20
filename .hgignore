@@ -59,6 +59,7 @@ test_*.py
 Makefile*
 CMakeDefines.h
 build/*
+.idea/*
 cedar/doc/*
 CTestTestfile.cmake
 */lib.h

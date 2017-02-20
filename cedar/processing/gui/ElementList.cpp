@@ -60,6 +60,7 @@
 #include <QIcon>
 #include <QMenu>
 #include <vector>
+#include <QMimeData>
 
 // ---------------------------------------------------------------------------------------------------------------------
 //  the following code makes sure that a plugin declaration can be passed around within qt via drag & drop

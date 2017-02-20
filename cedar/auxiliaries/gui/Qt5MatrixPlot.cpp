@@ -42,26 +42,14 @@
 
 // CEDAR INCLUDES
 #include "cedar/configuration.h"
-#include "cedar/auxiliaries/gui/Settings.h"
-#include "cedar/auxiliaries/gui/MatrixPlot.h"
-#include "cedar/auxiliaries/gui/ColorValueRGBA.h"
+
 #ifdef CEDAR_USE_QT5
+
+#include "cedar/auxiliaries/gui/Qt5MatrixPlot.h"
 #include "cedar/auxiliaries/gui/Qt5LinePlot.h"
-  #include "cedar/auxiliaries/gui/Qt5SurfacePlot.h"
-  #include "cedar/auxiliaries/gui/Qt5HistoryPlot0D.h"
-#endif // CEDAR_USE_QT5
-#ifdef CEDAR_USE_QWT
-#include "cedar/auxiliaries/gui/QwtLinePlot.h"
-  #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
-#endif // CEDAR_USE_QWT
-#ifdef CEDAR_USE_QWTPLOT3D
-#include "cedar/auxiliaries/gui/QwtSurfacePlot.h"
-#endif // CEDAR_USE_QWTPLOT3D
+#include "cedar/auxiliaries/gui/Qt5SurfacePlot.h"
+#include "cedar/auxiliaries/gui/Qt5HistoryPlot0D.h"
 #include "cedar/auxiliaries/gui/ImagePlot.h"
-#ifdef CEDAR_USE_VTK
-#include "cedar/auxiliaries/gui/VtkLinePlot.h"
-#include "cedar/auxiliaries/gui/VtkSurfacePlot.h"
-#endif // CEDAR_USE_VTK
 #include "cedar/auxiliaries/gui/MatrixSlicePlot3D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
@@ -81,14 +69,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 // type registration
 //----------------------------------------------------------------------------------------------------------------------
+
 namespace
 {
   bool registerPlot()
   {
     using cedar::aux::MatData;
-    using cedar::aux::gui::MatrixPlot;
+    using cedar::aux::gui::Qt5MatrixPlot;
 
-    typedef cedar::aux::gui::PlotDeclarationTemplate<MatData, MatrixPlot> DeclarationType;
+    typedef cedar::aux::gui::PlotDeclarationTemplate<MatData, Qt5MatrixPlot> DeclarationType;
 
     boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
     declaration->declare();
@@ -99,15 +88,20 @@ namespace
   bool registered = registerPlot();
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+// static members
+//----------------------------------------------------------------------------------------------------------------------
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::MatrixPlot::MatrixPlot(QWidget *pParent)
-        :
-        cedar::aux::gui::MultiPlotInterface(pParent),
-        mpCurrentPlotWidget(nullptr),
-        mTitle("")
+cedar::aux::gui::Qt5MatrixPlot::Qt5MatrixPlot(QWidget *pParent)
+:
+cedar::aux::gui::MultiPlotInterface(pParent),
+mpCurrentPlotWidget(NULL),
+mTitle("")
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
   this->setLayout(p_layout);
@@ -120,7 +114,7 @@ cedar::aux::gui::MatrixPlot::MatrixPlot(QWidget *pParent)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::MatrixPlot::readConfiguration(const cedar::aux::ConfigurationNode& configuration)
+void cedar::aux::gui::Qt5MatrixPlot::readConfiguration(const cedar::aux::ConfigurationNode& configuration)
 {
   if (auto configurable = dynamic_cast<cedar::aux::Configurable*>(this->mpCurrentPlotWidget))
   {
@@ -128,7 +122,7 @@ void cedar::aux::gui::MatrixPlot::readConfiguration(const cedar::aux::Configurat
   }
 }
 
-void cedar::aux::gui::MatrixPlot::writeConfiguration(cedar::aux::ConfigurationNode& configuration) const
+void cedar::aux::gui::Qt5MatrixPlot::writeConfiguration(cedar::aux::ConfigurationNode& configuration) const
 {
   if (auto configurable = dynamic_cast<cedar::aux::Configurable*>(this->mpCurrentPlotWidget))
   {
@@ -136,48 +130,46 @@ void cedar::aux::gui::MatrixPlot::writeConfiguration(cedar::aux::ConfigurationNo
   }
 }
 
-bool cedar::aux::gui::MatrixPlot::canAppend(cedar::aux::ConstDataPtr data) const
+bool cedar::aux::gui::Qt5MatrixPlot::canAppend(cedar::aux::ConstDataPtr data) const
 {
+ // std::cout << "canAppend" << std::endl;
   if (this->mpCurrentPlotWidget == nullptr)
   {
+   // std::cout << "canAppend false" << std::endl;
     return false;
   }
   else if
-          (
-          cedar::aux::gui::MultiPlotInterface* p_multi_plot
-                  = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget)
-          )
+  (
+    auto p_multi_plot = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget)
+  )
   {
+   // std::cout << "canAppend" << p_multi_plot->canAppend(data) << std::endl;
     return p_multi_plot->canAppend(data);
   }
   else
   {
+   // std::cout << "canAppend false" << std::endl;
     return false;
   }
 }
 
-void cedar::aux::gui::MatrixPlot::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
+void cedar::aux::gui::Qt5MatrixPlot::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   CEDAR_DEBUG_ASSERT(this->mpCurrentPlotWidget != nullptr);
-  cedar::aux::gui::MultiPlotInterface *p_multi_plot
-          = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget);
+  auto p_multi_plot = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget);
 
   CEDAR_DEBUG_ASSERT(p_multi_plot != nullptr);
   p_multi_plot->append(data, title);
   mTitle = title;
 }
 
-bool cedar::aux::gui::MatrixPlot::canDetach(cedar::aux::ConstDataPtr data) const
+bool cedar::aux::gui::Qt5MatrixPlot::canDetach(cedar::aux::ConstDataPtr data) const
 {
   if (this->mpCurrentPlotWidget == nullptr)
   {
     return false;
   }
-  else if
-          (
-          cedar::aux::gui::MultiPlotInterface* p_multi_plot
-                  = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget)
-          )
+  else if (auto p_multi_plot = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget))
   {
     return p_multi_plot->canDetach(data);
   }
@@ -187,23 +179,22 @@ bool cedar::aux::gui::MatrixPlot::canDetach(cedar::aux::ConstDataPtr data) const
   }
 }
 
-void cedar::aux::gui::MatrixPlot::doDetach(cedar::aux::ConstDataPtr data)
+void cedar::aux::gui::Qt5MatrixPlot::doDetach(cedar::aux::ConstDataPtr data)
 {
   CEDAR_DEBUG_ASSERT(this->mpCurrentPlotWidget != nullptr);
-  cedar::aux::gui::MultiPlotInterface *p_multi_plot
-          = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget);
+  auto p_multi_plot = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget);
 
   CEDAR_DEBUG_ASSERT(p_multi_plot != nullptr);
   p_multi_plot->detach(data);
 }
 
-void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
+void cedar::aux::gui::Qt5MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   this->mData= boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   if (!this->mData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                "Cannot cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot::plot.");
+                "Cannot cast to cedar::aux::MatData in cedar::aux::gui::Qt5Matrix::plot.");
   }
 
   if (this->mpCurrentPlotWidget)
@@ -222,11 +213,8 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
   switch (dims)
   {
 
-
-
-#ifdef CEDAR_USE_QT5
     case 0:
-      this->mpCurrentPlotWidget = new cedar::aux::gui::Qt5HistoryPlot0D(this->mData, title);
+    this->mpCurrentPlotWidget = new cedar::aux::gui::Qt5HistoryPlot0D(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
 
@@ -234,50 +222,12 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
       this->mpCurrentPlotWidget = new cedar::aux::gui::Qt5LinePlot(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
-#elif defined CEDAR_USE_QWT
-    case 0:
-      this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
-      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
-      break;
-
-    case 1:
-      this->mpCurrentPlotWidget = new cedar::aux::gui::QwtLinePlot(this->mData, title);
-      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
-      break;
-
-#elif defined CEDAR_USE_VTK
-    case 1:
-      this->mpCurrentPlotWidget = new cedar::aux::gui::VtkLinePlot(this->mData, title);
-      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
-      break;
-#endif //CEDAR_USE_QT5
+//
 
     case 2:
     {
-      std::string plot_class = cedar::aux::gui::SettingsSingleton::getInstance()->getDefault2dMatDataPlot();
-#ifdef CEDAR_USE_QWTPLOT3D
-      if (plot_class == "cedar::aux::gui::QwtSurfacePlot")
-      {
-        this->mpCurrentPlotWidget = new cedar::aux::gui::QwtSurfacePlot(this->mData, title);
-      }
-#endif // CEDAR_USE_QWTPLOT3D
-#ifdef CEDAR_USE_QT5
-      if  (plot_class == "cedar::aux::gui::Qt5SurfacePlot")
-      {
-		    this->mpCurrentPlotWidget = new cedar::aux::gui::Qt5SurfacePlot(this->mData, title);
-	    }
-#endif //CEDAR_USE_QT5
-#ifdef CEDAR_USE_VTK
-      if (plot_class == "cedar::aux::gui::VtkSurfacePlot")
-      {
-        this->mpCurrentPlotWidget = new cedar::aux::gui::VtkSurfacePlot(this->mData, title);
-      }
-#endif // CEDAR_USE_VTK
-
-      if (plot_class == "cedar::aux::gui::ImagePlot" || this->mpCurrentPlotWidget == nullptr)
-      {
-        this->mpCurrentPlotWidget = new cedar::aux::gui::ImagePlot(this->mData, title);
-      }
+//
+      this->mpCurrentPlotWidget = new cedar::aux::gui::Qt5SurfacePlot(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
     }
@@ -291,7 +241,7 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
 
     case UINT_MAX:
     {
-      std::string message = "The matrix plot widget can not handle empty matrices.";
+      std::string message = "The QT5 matrix plot widget can not handle empty matrices.";
       message += "\nPress here to refresh the plot after you have changed the dimensionality.";
       this->mpCurrentPlotWidget = new QPushButton(QString::fromStdString(message));
       connect(this->mpCurrentPlotWidget, SIGNAL(pressed()), this, SLOT(processChangedData()));
@@ -300,7 +250,7 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
 
     default:
     {
-      std::string message = "The matrix plot widget can not handle a matrix with the given dimensionality (";
+      std::string message = "The QT5 matrix plot widget can not handle a matrix with the given dimensionality (";
       message += cedar::aux::toString(mat.dims);
       message += ").\nPress here to refresh the plot after you have changed the dimensionality.";
       this->mpCurrentPlotWidget = new QPushButton(QString::fromStdString(message));
@@ -311,18 +261,15 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
   mTitle = title;
 }
 
-void cedar::aux::gui::MatrixPlot::processChangedData()
+
+void cedar::aux::gui::Qt5MatrixPlot::processChangedData()
 {
   if (mpCurrentPlotWidget)
   {
-    if
-            (
-            cedar::aux::gui::MultiPlotInterface* p_multi
-                    = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(mpCurrentPlotWidget)
-            )
+    if (auto p_multi = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(mpCurrentPlotWidget))
     {
       // first, recover data from multiplot
-      cedar::aux::gui::MultiPlotInterface::DataMap map = p_multi->getDataTitleMap();
+      auto map = p_multi->getDataTitleMap();
       //QWriteLocker map_locker(p_multi->getLock());
       auto iter = map.begin();
       if (iter != map.end())
@@ -344,3 +291,5 @@ void cedar::aux::gui::MatrixPlot::processChangedData()
     }
   }
 }
+
+#endif // CEDAR_USE_QT5
