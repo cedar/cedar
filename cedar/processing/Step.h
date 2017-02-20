@@ -56,7 +56,11 @@
 
 // SYSTEM INCLUDES
 #include <QThread>
-#include <QtConcurrentRun>
+#ifdef CEDAR_USE_QT5
+  #include <QtConcurrent/QtConcurrentRun>
+#else
+  #include <QtConcurrentRun>
+#endif
 #include <QFuture>
 #include <QReadWriteLock>
 #include <QMutex>

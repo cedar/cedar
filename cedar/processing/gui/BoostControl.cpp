@@ -75,8 +75,13 @@ mpView(view)
   };
   this->mpBoostTree->setFilter(boost::bind<bool>(filter_boosts, _1));
 
+#ifdef CEDAR_USE_QT5
+  this->mpBoostTree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+  this->mpBoostTree->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+#else
   this->mpBoostTree->header()->setResizeMode(0, QHeaderView::Stretch);
   this->mpBoostTree->header()->setResizeMode(1, QHeaderView::ResizeToContents);
+#endif
 
   this->mBoostAddedConnection = this->mpBoostTree->connectToElementAddedSignal
       (

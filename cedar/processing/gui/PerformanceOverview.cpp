@@ -142,8 +142,11 @@ mTimerId(0)
   QObject::connect(this->mpRefreshButton, SIGNAL(clicked()), this, SLOT(refresh()));
 
   // make the first section (step name) stretch
+#ifdef CEDAR_USE_QT5
+  this->mpStepTimeOverview->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+#else
   this->mpStepTimeOverview->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
-
+#endif
   // sort everything by the compute time (second column)
   this->mpStepTimeOverview->sortByColumn(1);
 
