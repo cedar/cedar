@@ -9,10 +9,18 @@ find_path(qwtplot3d_INCLUDE_DIRS
   PATHS ${CEDAR_DEPENDENCY_QWTPLOT3D}
 )
 # find library in set of paths
-find_library(qwtplot3d_LIBS
-  NAMES qwtplot3d
-  PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
-)
+
+
+
+# find library in set of paths
+if(NOT CEDAR_USE_QT5)
+  find_library(qwtplot3d_LIBS
+              NAMES qwtplot3d
+              PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
+              )
+else(NOT CEDAR_USE_QT5)
+  message("--qwtplot3d will not be used in favor of the Qt5.7 Plots")
+endif(NOT CEDAR_USE_QT5)
 
 # now check if anything is missing
 if(qwtplot3d_INCLUDE_DIRS AND qwtplot3d_LIBS)

@@ -36,11 +36,6 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-#TODO: Check if the three variables are replaced accordingly
-#set(CEDAR_USE_QT5 TRUE)
-#set(QT_VERSION 5)
-#set(CMAKE_PREFIX_PATH "/opt/Qt/5.7/gcc_64/lib/cmake")
-
 # set the cedar home directory to the current directory
 set(CEDAR_HOME ${CMAKE_CURRENT_SOURCE_DIR} CACHE PATH "Home of cedar; should NOT be altered.")
 

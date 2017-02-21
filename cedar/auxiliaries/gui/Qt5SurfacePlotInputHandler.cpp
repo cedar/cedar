@@ -84,17 +84,26 @@ cedar::aux::gui::Qt5SurfacePlotInputHandler::Qt5SurfacePlotInputHandler(cedar::a
 
 void cedar::aux::gui::Qt5SurfacePlotInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
 {
-  if (Qt::MiddleButton == event->button())
+  if (Qt::LeftButton == event->button())
   {
-    // Map Functionality from Middle Button to Right Button!
+    // Map Functionality from Right Button to Left Button!
     QMouseEvent *switchedEvent = new QMouseEvent(QEvent::MouseButtonPress, event->localPos(), Qt::RightButton,
-                                                 Qt::MiddleButton, event->modifiers());
+                                                 Qt::RightButton, event->modifiers());
     QtDataVisualization::Q3DInputHandler::mousePressEvent(switchedEvent, mousePos);
-  } else if (Qt::RightButton == event->button())
+  }
+  else if (Qt::MiddleButton == event->button())
   {
+    // Map Functionality from Left Button to Middle Button!
+    QMouseEvent *switchedEvent = new QMouseEvent(QEvent::MouseButtonPress, event->localPos(), Qt::LeftButton,
+                                                 Qt::LeftButton, event->modifiers());
+    QtDataVisualization::Q3DInputHandler::mousePressEvent(switchedEvent, mousePos);
+  }  else if (Qt::RightButton == event->button())
+  {
+    // Call the ContextMenu with the Right Button
     callContextMenu(event->globalPos());
   } else
   {
+    // Default Button Behavior
     QtDataVisualization::Q3DInputHandler::mousePressEvent(event, mousePos);
   }
 }
