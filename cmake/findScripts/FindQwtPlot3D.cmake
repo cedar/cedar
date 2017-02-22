@@ -18,16 +18,21 @@ if(NOT CEDAR_USE_QT5)
               NAMES qwtplot3d
               PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
               )
-else(NOT CEDAR_USE_QT5)
-  message("--qwtplot3d will not be used in favor of the Qt5.7 Plots")
-endif(NOT CEDAR_USE_QT5)
+
 
 # now check if anything is missing
-if(qwtplot3d_INCLUDE_DIRS AND qwtplot3d_LIBS)
-  set(qwtplot3d_INCLUDE_DIRS "${qwtplot3d_INCLUDE_DIRS}/..")
-  set(qwtplot3d_FOUND true)
-else(qwtplot3d_INCLUDE_DIRS AND qwtplot3d_LIBS)
+  if(qwtplot3d_INCLUDE_DIRS AND qwtplot3d_LIBS)
+    set(qwtplot3d_INCLUDE_DIRS "${qwtplot3d_INCLUDE_DIRS}/..")
+    set(qwtplot3d_FOUND true)
+  else(qwtplot3d_INCLUDE_DIRS AND qwtplot3d_LIBS)
+    set(qwtplot3d_FOUND false)
+    set(qwtplot3d_LIBS "")
+    set(qwtplot3d_INCLUDE_DIRS "")
+  endif(qwtplot3d_INCLUDE_DIRS AND qwtplot3d_LIBS )
+
+else(NOT CEDAR_USE_QT5)
+  message("--qwtplot3d will not be used in favor of the Qt5.7 Plots")
   set(qwtplot3d_FOUND false)
   set(qwtplot3d_LIBS "")
   set(qwtplot3d_INCLUDE_DIRS "")
-endif(qwtplot3d_INCLUDE_DIRS AND qwtplot3d_LIBS)
+endif(NOT CEDAR_USE_QT5)
