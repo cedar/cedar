@@ -370,8 +370,11 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
   }
 
 //  std::cout<<"1"<<std::endl;
-//  // unlock the suppression of user commands when the architecture is running
-  component->setSuppressUserInteraction(false);
+//  // unlock the suppression of user commands when the architecture is running ... only once please
+  if(component->getSuppressUserInteraction())
+  {
+    component->setSuppressUserInteraction(false);
+  }
 //  std::cout<<"2"<<std::endl;
 //  // retrieve Data from the component and copy it to the output slots of the component
   auto measurements = component->getInstalledMeasurementTypes();

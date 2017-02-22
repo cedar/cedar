@@ -427,7 +427,7 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  bool mControllerFinished = true;
 
 private:
   cedar::dev::ChannelPtr mChannel;
@@ -441,7 +441,7 @@ private:
 
   cedar::aux::LockableMember<std::map<ComponentDataType, CommandFunctionType> > mSubmitCommandHooks;
   cedar::aux::LockableMember<std::map<ComponentDataType, MeasurementFunctionType> > mRetrieveMeasurementHooks;
-
+  cedar::aux::LockableMember<ControllerCollectionPtr> mController;
   cedar::aux::LockableMember< NoCommandFunctionType > mNoCommandHook;
   cedar::aux::LockableMember< NoCommandFunctionType > mNotReadyForCommandHook;
   cedar::aux::LockableMember< NoCommandFunctionType > mAfterCommandBeforeMeasurementHook;
@@ -455,8 +455,6 @@ private:
   boost::optional<ComponentDataType> mDeviceCommandSelection;
 
   cedar::aux::LockableMember<std::set<ComponentDataType>> mUserCommandUsed;
-
-  cedar::aux::LockableMember<ControllerCollectionPtr> mController;
 
   cedar::aux::LockableMember<boost::optional<cedar::unit::Time> > mLastStepMeasurementsTime;
   cedar::aux::LockableMember<boost::optional<cedar::unit::Time> > mLastStepCommandsTime;
@@ -483,7 +481,7 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+ // none yet
 private:
   cedar::aux::StringParameterPtr mMatrixType;
   // none yet

@@ -247,7 +247,7 @@ void cedar::dev::gui::RobotCard::connectClicked()
     cedar::dev::RobotPtr robot = cedar::dev::RobotManagerSingleton::getInstance()->getRobot(this->getRobotName());
     if (!robot->areSomeComponentsCommunicating())
     {
-      robot->startCommunicationOfComponents(true); // suppres user interaction!
+      robot->startCommunicationOfComponents(true); // suppres user interaction!... why?
     }
     else
     {

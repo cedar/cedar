@@ -44,6 +44,7 @@
 #include "cedar/devices/gl/KinematicChain.h"
 #include "cedar/devices/gl/KukaArm.h"
 #include "cedar/devices/SimulatedKinematicChain.h"
+#include "cedar/devices/gl/PowerCube110.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
@@ -192,6 +193,7 @@ int main(int argc, char **argv)
   // create interface to the arm
   auto robot = boost::make_shared< cedar::dev::Robot >();
   cedar::dev::KinematicChainPtr arm;
+  cedar::dev::KinematicChainPtr trunk;
 
   cedar::dev::kuka::gui::FriStatusWidget* p_fri_status_widget = 0;
 
@@ -199,7 +201,8 @@ int main(int argc, char **argv)
   {
     // hardware interface
     robot->readJson("resource://robots/caren/fri_configuration.json");
-    arm= robot->getComponent< cedar::dev::kuka::KinematicChain >("arm");
+    arm = robot->getComponent< cedar::dev::kuka::KinematicChain >("arm");
+    trunk = robot->getComponent< cedar::dev::SimulatedKinematicChain >("trunk");
 
     cedar::dev::kuka::FRIChannelPtr fri_channel = boost::dynamic_pointer_cast< cedar::dev::kuka::FRIChannel >( arm->getChannel() );
     // status widget
@@ -210,7 +213,8 @@ int main(int argc, char **argv)
   else
   {
     robot->readJson("resource://robots/caren/simulator_configuration.json");
-    arm= robot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
+    arm = robot->getComponent< cedar::dev::SimulatedKinematicChain >("arm");
+    trunk = robot->getComponent< cedar::dev::SimulatedKinematicChain >("trunk");
   }
 
   // define some initial configurations we can choose from
@@ -243,11 +247,19 @@ int main(int argc, char **argv)
   cedar::dev::gl::KukaArmPtr arm_visualisation(new cedar::dev::gl::KukaArm(arm));
   arm_visualisation->initializeGl();
   arm_visualisation->setDisplayEndEffectorVelocity(false);
+
+  trunk->setEndEffector(arm->getRootCoordinateFrame());
+
+  cedar::dev::gl::KinematicChainPtr trunk_visualisation = cedar::dev::gl::KinematicChainPtr( new cedar::dev::gl::PowerCube110(trunk));
+
+  trunk_visualisation->initializeGl();
+  arm_visualisation->initializeGl();
+
+  scene->addObjectVisualization(trunk_visualisation);
   scene->addObjectVisualization(arm_visualisation);
 
   // create target object, visualize it and add it to the scene
   cedar::aux::LocalCoordinateFramePtr target(new cedar::aux::LocalCoordinateFrame());
-
   cedar::aux::gl::ObjectVisualizationPtr sphere(new cedar::aux::gl::Sphere(target, 0.055, 0, 1, 0));
   sphere->setDrawAsWireFrame(true);
   scene->addObjectVisualization(sphere);

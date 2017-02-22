@@ -1012,10 +1012,31 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
     rlock.unlock();
 
     setCurrentInitialConfiguration(name);
-    //std::cout << f->second;
-    setInitialUserSideCommandBuffer(cedar::dev::KinematicChain::JOINT_ANGLES, f->second);
 
-    return;
+    mControllerFinished = false;
+    setController(cedar::dev::KinematicChain::JOINT_VELOCITIES,
+                  boost::bind< cv::Mat >
+                  (
+                    [&]()
+                    {
+                      const cv::Mat xdot = -1 * (getJointAngles() - mInitialConfigurations.find(mCurrentInitialConfiguration)->second);
+
+                      mControllerFinished = true;
+                      for(int i = 0; i<xdot.rows; ++i)
+                      {
+                        if(std::abs(xdot.at<float>(i, 0)) >= 10000 * std::numeric_limits<float>::epsilon())
+                        {
+                          //std::cout << i << ": " << xdot.at<float>(i, 0) << " ";
+                          mControllerFinished = false;
+                          break;
+                        }
+                      }
+                      //std::cout << "\n";
+
+                      return xdot;
+                    }
+                  )
+                 );
   }
   else
   {
@@ -1025,7 +1046,6 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
       "You tried to apply an initial configuration that was not registered."
     );
   }
-
 }
 
 void cedar::dev::KinematicChain::applyInitialConfiguration(unsigned int index)
@@ -1133,7 +1153,7 @@ bool cedar::dev::KinematicChain::applyBrakeSlowlyController()
                               {
                                 return getJointVelocities() / 4;
                               } 
-                            ) );
+                            ));
   return true;
 }
 
@@ -1144,7 +1164,7 @@ bool cedar::dev::KinematicChain::applyBrakeNowController()
                               {
                                 return cv::Mat::zeros( getNumberOfJoints(), 1, CV_32F );
                               } 
-                            ) );
+                            ));
   return true;
 }
 

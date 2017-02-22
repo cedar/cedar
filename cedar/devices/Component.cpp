@@ -702,7 +702,6 @@ void cedar::dev::Component::init()
 
   this->mLostTime = 0.0 * cedar::unit::seconds;
 
-
   mWatchDogThread = std::unique_ptr<cedar::aux::LoopFunctionInThread>(
                                 new cedar::aux::LoopFunctionInThread(
                                   boost::bind(
@@ -1295,9 +1294,8 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
   cedar::aux::LockSet locks;
   cedar::aux::append(locks, this->mUserCommandUsed.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
   cedar::aux::append(locks, this->mSubmitCommandHooks.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
-  cedar::aux::append(locks, this->mController.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+  cedar::aux::append(locks, this->mController.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
   cedar::aux::LockSetLocker locker(locks);
-
 
   if (!this->isReadyForCommands())
   {
@@ -1368,10 +1366,16 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
     CEDAR_THROW(NoSubmitHooksException, "No submit hooks defined for commands.");
   }
 
-  if (this->mController.member())
+  if (!mControllerFinished) // has the controller still something to do?
   {
     type_from_user = this->mController.member()->mBufferType;
-    userData = (this->mController.member()->mCallback)();
+    userData = (this->mController.member()->mCallback());
+
+    if(mControllerFinished)
+    {
+      locker.unlock();
+      this->clearController();
+    }
   }
   else // do not use Controller Callback:
   {
@@ -1393,16 +1397,17 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
         CouldNotGuessCommandTypeException,
         "Could not guess the type of the command because too many commands have been set for " + prettifyName() +". Set commands are: " + set_commands
       );
+
     }
 
     // we know the map has exactly one entry
     type_from_user = *(this->mUserCommandUsed.member().begin());
 
-    {
-      QReadLocker lock(this->mCommandData->mUserBuffer.getLockPtr());
-      userData = this->mCommandData->getUserBufferUnlocked(type_from_user).clone();
-    }
+    QReadLocker lock(this->mCommandData->mUserBuffer.getLockPtr());
+    userData = this->mCommandData->getUserBufferUnlocked(type_from_user).clone();
+
   }
+
   locker.unlock();
 
   //  this->mUserCommandUsed.clear();
@@ -1429,7 +1434,6 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
     type_for_Device = mSubmitCommandHooks.member().begin()->first;
   }
 
-
   // do we need to transform the input?
   if (type_for_Device != type_from_user)
   {
@@ -1451,7 +1455,6 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
   {
     ioData = userData.clone();
   }
-
 
   if(this->mCheckCommandHook.member())
   {
@@ -1942,7 +1945,7 @@ void cedar::dev::Component::checkExclusivenessOfCommand(ComponentDataType type)
 void cedar::dev::Component::setSuppressUserInteraction(bool what)
 {
   // todo: lock this but not with the general locker
-  mSuppressUserInteraction= what;
+  mSuppressUserInteraction = what;
 }
 
 bool cedar::dev::Component::getSuppressUserInteraction() const
@@ -2016,8 +2019,6 @@ bool cedar::dev::Component::applyCrashbrake()
   return true;
 }
 
-
-
 void cedar::dev::Component::crashbrake()
 {
   if (!applyCrashbrake())
@@ -2038,7 +2039,7 @@ void cedar::dev::Component::clearController()
 void cedar::dev::Component::setController(ComponentDataType type, cedar::dev::Component::ControllerCallback fun)
 {
   QWriteLocker locker(mController.getLockPtr());
-  mController.member() = ControllerCollectionPtr( new cedar::dev::Component::ControllerCollection{ type, fun } );
+  mController.member() = ControllerCollectionPtr( new cedar::dev::Component::ControllerCollection{ type, fun} );
 }
 
 void cedar::dev::Component::clearAll()
@@ -2201,7 +2202,7 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
 
   for(auto component : components_to_delete)
   {
-//    component->startBrakingNow();
+    //component->startBrakingNow();
     cedar::aux::LogSingleton::getInstance()->warning(
                   "The component" +component->prettifyName()+ " is not braked by the watchdog anymore!" ,
                   CEDAR_CURRENT_FUNCTION_NAME);
