@@ -24,8 +24,8 @@
 
     File:        KinematicChain.cpp
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.ruhr-uni-bochum.de
+    Maintainer:  Jean-Stephane Jokeit
+    Email:       jean.stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        2010 11 23
 
     Description:
@@ -40,263 +40,268 @@
 #ifdef CEDAR_USE_KUKA_LWR
 
 // CEDAR INCLUDES
-#include "cedar/devices/KinematicChain.h"
+#include "cedar/devices/kuka/FRIChannel.h"
 #include "cedar/devices/kuka/KinematicChain.h"
+#include "cedar/devices/KinematicChain.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/LimitsParameter.h"
 #include "cedar/units/Time.h"
-#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
-#include <algorithm>
+#include "boost/lexical_cast.hpp"
+
+//----------------------------------------------------------------------------------------------------------------------
+// type registration
+//----------------------------------------------------------------------------------------------------------------------
+
+namespace
+{
+  bool registered()
+  {
+    cedar::dev::ComponentManagerSingleton::getInstance()->registerType<cedar::dev::kuka::KinematicChainPtr>();
+    return true;
+  }
+
+  bool registerFnCall = registered();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::kuka::KinematicChain::KinematicChain()
-:
-mCommandedJointPosition(LBR_MNJ, 0),
-mMeasuredJointPosition(LBR_MNJ, 0),
-_mRemoteHost(new cedar::aux::StringParameter(this, "remote host", "NULL")),
-_mServerPort(new cedar::aux::IntParameter(this, "server port", 0))
 {
-  mIsInit = false;
-  mpFriRemote = NULL;
-//  init();
+  // register the hooks, which the Component class needs to talk to the hardware:
+ 
+  // update buffered commands
+  registerCommandHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::kuka::KinematicChain::prepareSendingJointAngles, this, _1));
+  // update buffered measurements
+  registerMeasurementHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::kuka::KinematicChain::prepareRetrievingJointAngles, this));
+
+  // call this once per cycle, after the new (buffered) commands are known and before the new (buffered) measured datas are required. will trigger the actual sending/receiving of data
+  registerAfterCommandBeforeMeasurementHook(boost::bind(&cedar::dev::kuka::KinematicChain::exchangeData, this));
+
+  // this is called when the user didnt write anything (new) to the command buffers
+  registerNoCommandHook(boost::bind(&cedar::dev::kuka::KinematicChain::prepareSendingNoop, this));
+  // this is called when the hardware signals that it isnt ready to talk yet
+  registerNotReadyForCommandHook(boost::bind(&cedar::dev::kuka::KinematicChain::prepareSendingNoop, this));
+
+  // call this after starting to talk to hardware
+  registerStartCommunicationHook(boost::bind(&cedar::dev::kuka::KinematicChain::postStart, this));
 }
 
 cedar::dev::kuka::KinematicChain::~KinematicChain()
 {
-  if(mIsInit)
-  {
-    // stop the looped Thread
-    stop();
-    wait();
-    // TODO The following line is not used at this point, the script "kukain.src" is not ready yet!
-    // If the script "kukain.src" is started on the KUKA-LBR, the first boolean value means "Stop the FRI"
-    // it won't throw an exception, because the index is 0 and therefore valid
-    mpFriRemote->setToKRLBool(0, true);
-    mpFriRemote->doDataExchange();
-    // Free Memory
-    if(mpFriRemote)
-    {
-      delete mpFriRemote;
-    }
-  }
+  prepareComponentDestructAbsolutelyRequired(); // for safety, see Component
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 // public member functions
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::kuka::KinematicChain::readConfiguration(const cedar::aux::ConfigurationNode& node)
+bool cedar::dev::kuka::KinematicChain::isReadyForCommands() const
 {
-  this->cedar::dev::KinematicChain::readConfiguration(node);
+  auto friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
+  if (!friChannel)
+    return false;
 
-  // create a new Instance of the friRemote
-  if (_mRemoteHost->getValue() != "NULL")
-  {
-    // friRemote cannot handle const char*
-    mpFriRemote = new friRemote(_mServerPort->getValue(), const_cast<char*>(_mRemoteHost->getValue().c_str()));
-  }
-  else
-  {
-    mpFriRemote = new friRemote(_mServerPort->getValue());
-  }
-  //copy default values from the FRI
-  copyFromFRI();
-
-  //set step size and idle time for the looped thread
-  cedar::unit::Time step_size(12.0 * cedar::unit::milli * cedar::unit::seconds);
-  setStepSize(step_size);
-
-  cedar::unit::Time idle_time(0.01 * cedar::unit::milli * cedar::unit::seconds);
-  setIdleTime(idle_time);
-
-  //start the thread
-  start();
-
-  mIsInit = true;
+  return friChannel->isReadyForCommands();
 }
 
+bool cedar::dev::kuka::KinematicChain::isReadyForMeasurements() const
+{
+  auto friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
+  if (!friChannel)
+    return false;
+
+  return friChannel->isReadyForMeasurements();
+}
+
+// deprecated:
 bool cedar::dev::kuka::KinematicChain::isMovable() const
 {
-  mLock.lockForRead();
-  bool on = mPowerOn;
-  FRI_STATE state = getFriState();
-  mLock.unlock();
-
-  if (on && (state == FRI_STATE_CMD))
-  {
-    return true;
-  }
-  return false;
+  return this->isReadyForCommands();
 }
 
-double cedar::dev::kuka::KinematicChain::getJointAngle(unsigned int index) const
+void cedar::dev::kuka::KinematicChain::prepareSendingNoop()
 {
-  double a = 0;
-  try
-  {
-    mLock.lockForRead();
-    a = mMeasuredJointPosition.at(index);
-    mLock.unlock();
-  }
-  catch (std::out_of_range& e)
-  {
-    //properly unlock, before throwing
-    mLock.unlock();
+  if (!isConfigured())
+    return;
 
-    throw;
-  }
-  return a;
-}
-
-
-void cedar::dev::kuka::KinematicChain::setJointAngle(unsigned int index, double angle)
-{
-  try
+  auto friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
+  if (!friChannel)
   {
-    mLock.lockForWrite();
-    mCommandedJointPosition.at(index) = angle;
-    mLock.unlock();
-  }
-  catch (std::out_of_range& e)
-  {
-    //properly unlock, before throwing
-      mLock.unlock();
-      throw;
-  }
-}
-
-/*
- * Overwritten start function of KinematicChain
- * the function inherited from KinematicChain does some things we do not want.
- */
-void cedar::dev::kuka::KinematicChain::start()
-{
-  if (isRunningNolocking())
-  {
+    cedar::aux::LogSingleton::getInstance()->error(
+      "lost FRI Channel pointer",
+      CEDAR_CURRENT_FUNCTION_NAME);
     return;
   }
 
-  //QThread::start();
-  cedar::dev::KinematicChain::start();
+  cv::Mat measuredJointPositions;
+  measuredJointPositions = friChannel->getMeasuredJointPositions();
+
+  // the FRI protocol requires us to mirror the measured data
+  friChannel->prepareJointPositionControl(measuredJointPositions);
 }
-//----------------------------------------------------------------------------------------------------------------------
-// private member functions
-//----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::kuka::KinematicChain::step(cedar::unit::Time)
+
+void cedar::dev::kuka::KinematicChain::prepareSendingJointAngles(cv::Mat mat)
 {
-  // if the thread has not been initialized, do nothing
-  if (mIsInit)
+  if (!isConfigured())
+    return;
+
+  auto friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
+  friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
+  if (!friChannel)
   {
-    mLock.lockForWrite();
+    cedar::aux::LogSingleton::getInstance()->error(
+      "lost FRI Channel pointer",
+      CEDAR_CURRENT_FUNCTION_NAME);
+    return;
+  }
+
+  // todo: test for maxima in joint geometry
+
+  // we only land here if we are ready to prepareSending commands
+  friChannel->prepareJointPositionControl(mat);
+
+
+/*
+todo: delete this section.
+  // if the thread has not been initialized, do nothing
+  if (mIsConfigured)
+  {
+    friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
+    mLock.lockForWrite(); // todo: QWriteLocker lock( &mLock );
     // float array for copying joint position to fri
     float commanded_joint[LBR_MNJ];
     // initialize it with current measured position. This value will be overwritten in any case
-    // so this is just for safety
     for (unsigned i = 0; i < LBR_MNJ; i++)
     {
       commanded_joint[i] = mMeasuredJointPosition.at(i);
     }
+
     // update joint angle and joint velocity if necessary (and only if in command mode)
     // this will leave commanded_joint uninitialized, however, in this case it won't be used by doPositionControl()
-    if (mpFriRemote->isPowerOn() && mpFriRemote->getState() == FRI_STATE_CMD)
+    if (friChannel->isPowerOn() && friChannel->getFriState() == FRI_STATE_CMD)
     {
-      // TODO: js, this needs to be rewritten. Was a check on working mode
-      switch (1)
+      if (mat.rows == LBR_MNJ)
       {
-        case 1:
-        // increase speed for all joints
-        setJointVelocities(getCachedJointVelocities() + getCachedJointAccelerations() * mpFriRemote->getSampleTime());
-        case 2:
-          // change position for all joints
-          for (unsigned i=0; i<LBR_MNJ; i++)
-          {
-            mCommandedJointPosition.at(i) += getJointVelocity(i) * mpFriRemote->getSampleTime();
-          }
-        case 3:
-          for(unsigned i=0; i<LBR_MNJ; i++)
-          {
-            // if the joint position exceeds the one in the reference geometry, reset the angle
-            mCommandedJointPosition.at(i)
-              = std::max<double>(mCommandedJointPosition.at(i), getJoint(i)->_mpAngleLimits->getLowerLimit());
-            mCommandedJointPosition.at(i)
-              = std::min<double>(mCommandedJointPosition.at(i), getJoint(i)->_mpAngleLimits->getUpperLimit());
-            // copy commanded joint position
-            commanded_joint[i] = float(mCommandedJointPosition[i]);
-          }
-          break;
-        default:
-          cedar::aux::LogSingleton::getInstance()->error
-          (
-            "Invalid working mode in KinematicChain::step(double) (I'm afraid I can't let you do that, dave.)",
-            "cedar::dev::kuka::KinematicChain::step(double)"
-          );
+        for(unsigned i=0; i<LBR_MNJ; i++)
+        {
+          mCommandedJointPosition.at(i) = static_cast<float>(mat.at<double>(i,0));
+          // if the joint position exceeds the one in the reference geometry, reset the angle
+          mCommandedJointPosition.at(i)
+            = std::max<double>(mCommandedJointPosition.at(i), getJoint(i)->_mpAngleLimits->getLowerLimit());
+          mCommandedJointPosition.at(i)
+            = std::min<double>(mCommandedJointPosition.at(i), getJoint(i)->_mpAngleLimits->getUpperLimit());
+          // copy commanded joint position
+          commanded_joint[i] = float(mCommandedJointPosition[i]);
+        }
       }
     }
     mLock.unlock();
 
     // now copy position data and do the data exchange
-    mpFriRemote->doPositionControl(commanded_joint);
-
-    // lock and copy data back
-    mLock.lockForWrite();
-    copyFromFRI();
-    mLock.unlock();
+    friChannel->doPositionControl(commanded_joint);
   }
+*/
 }
 
-void cedar::dev::kuka::KinematicChain::copyFromFRI()
+void cedar::dev::kuka::KinematicChain::prepareSendingNotReadyForCommand()
 {
-  mFriState = mpFriRemote->getState();
-  mFriQuality = mpFriRemote->getQuality();
-  mSampleTime = mpFriRemote->getSampleTime();
-  mPowerOn = mpFriRemote->isPowerOn();
-  // use temporary float-array to receive the returned variables
-  float *pJointPos = mpFriRemote->getMsrMsrJntPosition();
-  for (unsigned i=0; i<LBR_MNJ; i++)
+  this->prepareSendingNoop();
+}
+
+void cedar::dev::kuka::KinematicChain::exchangeData()
+{
+  auto friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
+
+  if (!friChannel)
   {
-    mMeasuredJointPosition[i] = double(pJointPos[i]);
+    cedar::aux::LogSingleton::getInstance()->error(
+      "lost FRI Channel pointer",
+      CEDAR_CURRENT_FUNCTION_NAME);
+    return;
   }
-  // if not in command mode or Power is not on, reset commanded position to measured position
-  if (mpFriRemote->getState() != FRI_STATE_CMD || !mpFriRemote->isPowerOn())
+
+  friChannel->exchangeData();
+}
+
+cv::Mat cedar::dev::kuka::KinematicChain::prepareRetrievingJointAngles()
+{
+  auto friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
+
+  if (!isConfigured())
+    return cv::Mat();
+
+  if (!friChannel)
   {
-    mCommandedJointPosition = mMeasuredJointPosition;
+    cedar::aux::LogSingleton::getInstance()->error(
+      "lost FRI Channel pointer",
+      CEDAR_CURRENT_FUNCTION_NAME);
+    return cv::Mat();
   }
-}
-//----------------------------------------------------------------------------------------------------------------------
-// wrapped fri-functions
-//----------------------------------------------------------------------------------------------------------------------
-FRI_STATE cedar::dev::kuka::KinematicChain::getFriState() const
-{
-  mLock.lockForRead();
-  FRI_STATE s = mFriState;
-  mLock.unlock();
-  return s;
+ 
+  return friChannel->getMeasuredJointPositions();
 }
 
-FRI_QUALITY cedar::dev::kuka::KinematicChain::getFriQuality() const
+void cedar::dev::kuka::KinematicChain::postStart()
 {
-  mLock.lockForRead();
-  FRI_QUALITY q = mFriQuality;
-  mLock.unlock();
-  return q;
+  // perform various usability checks:
+
+  if (!isConfigured())
+  {
+    cedar::aux::LogSingleton::getInstance()->error(
+      "you forgot to call readConfiguration()",
+      CEDAR_CURRENT_FUNCTION_NAME);
+  }
+
+  auto friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
+
+  if (!friChannel)
+  {
+    cedar::aux::LogSingleton::getInstance()->error(
+      "lost FRI Channel pointer",
+      CEDAR_CURRENT_FUNCTION_NAME);
+    return;
+  }
+
+  if (!friChannel->isReadyForMeasurements())
+  {
+    cedar::aux::LogSingleton::getInstance()->error(
+      "FRI not ready for measurements. Did you forget to activate FRI "
+      "remotely?",
+      CEDAR_CURRENT_FUNCTION_NAME);
+  }
+
+  // print some usefull information:
+  cedar::aux::LogSingleton::getInstance()->message(
+      "started Kuka FRI communication\n"
+// todo: dont have this yet
+//      "FRI sample time:  " 
+//        + boost::lexical_cast<std::string>( friChannel->getSampleTime() )
+      ,
+      CEDAR_CURRENT_FUNCTION_NAME);
+
+  /*
+  cedar::unit::Time second(1.0 * cedar::unit::second);
+  auto mystep = static_cast<float>(this->getCommunicationStepSize() / second);
+  auto remotestep = static_cast<float>(friChannel->getSampleTime());
+
+  // todo: dont have remotestep yet!
+
+  if ( mystep < remotestep * 0.9
+       || remotestep < mystep * 0.9 )
+  {
+    cedar::aux::LogSingleton::getInstance()->warning(
+      "the FRI ist configured with a step time of " 
+      + boost::lexical_cast<std::string>(remotestep) +
+      " and this thread (Component Kuka Kinematic Chain) with a step time of " 
+      + boost::lexical_cast<std::string>(mystep),
+      "cedar::dev::kuka::KinematiChain::postStart"
+      );
+  }
+*/
 }
 
-float cedar::dev::kuka::KinematicChain::getSampleTime() const
-{
-  mLock.lockForRead();
-  float t = mSampleTime;
-  mLock.unlock();
-  return t;
-}
 
-bool cedar::dev::kuka::KinematicChain::isPowerOn() const
-{
-  mLock.lockForRead();
-  bool on = mPowerOn;
-  mLock.unlock();
-  return on;
-}
 #endif // CEDAR_USE_KUKA_FRI
 

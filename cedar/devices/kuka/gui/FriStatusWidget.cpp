@@ -53,7 +53,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::kuka::gui::FriStatusWidget::FriStatusWidget(cedar::dev::kuka::KinematicChainPtr pKukaIn, QWidget *parent)
+cedar::dev::kuka::gui::FriStatusWidget::FriStatusWidget(cedar::dev::kuka::FRIChannelPtr pKukaIn, QWidget *parent)
 :
 cedar::aux::gui::BaseWidget("FriStatusWidget", parent)
 {
@@ -89,7 +89,7 @@ void cedar::dev::kuka::gui::FriStatusWidget::updateInformation()
   mpLabelStateData->setText(state_names[mpKukaIn->getFriState()].c_str());
   mpLabelQualData->setText(quality_names[mpKukaIn->getFriQuality()].c_str());
   // set text for power status
-  if (mpKukaIn->isPowerOn())
+  if (mpKukaIn->isDrivesPowerOn())
   {
     mpLabelPowerData->setText("ON");
   }

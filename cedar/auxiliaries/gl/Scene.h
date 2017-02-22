@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/Scene.fwd.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
+#include "cedar/auxiliaries/gl/drawShapes.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/Viewer.fwd.h"
@@ -116,6 +117,11 @@ public:
    * @param index index of the object in the scene
    */
   void deleteObjectVisualization(int index);
+
+  /*!@brief removes an object from the scene via its name
+   * @param name name of the object in the scene
+   */
+  void deleteObjectVisualization(const std::string &name);
   
   /*!@brief removes all objects from the scene */
   void clear();

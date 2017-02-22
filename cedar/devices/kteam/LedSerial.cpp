@@ -87,6 +87,7 @@ _mCommandSetState(new cedar::aux::StringParameter(this, "command set state", "L"
 
 cedar::dev::kteam::LedSerial::~LedSerial()
 {
+  prepareComponentDestructAbsolutelyRequired();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

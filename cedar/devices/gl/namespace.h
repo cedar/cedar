@@ -62,6 +62,7 @@ namespace cedar
       CEDAR_DECLARE_DEV_CLASS(PowerCube110);
       CEDAR_DECLARE_DEV_CLASS(PowerCubeWrist90);
       CEDAR_DECLARE_DEV_CLASS(Caren);
+      CEDAR_DECLARE_DEV_CLASS(RobotVisualisation);
       //!@endcond
     }
   }

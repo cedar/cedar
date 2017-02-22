@@ -59,6 +59,7 @@ namespace cedar
     {
       //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_DEV_CLASS(KinematicChain);
+      CEDAR_DECLARE_DEV_CLASS(FRIChannel);
       //!@endcond
     }
   }

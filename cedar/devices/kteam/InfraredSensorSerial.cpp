@@ -41,6 +41,7 @@
 #include "cedar/devices/kteam/InfraredSensorSerial.h"
 #include "cedar/devices/kteam/SerialChannel.h"
 #include "cedar/devices/kteam/serialChannelHelperFunctions.h"
+#include "cedar/devices/ComponentDeclaration.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -50,6 +51,13 @@
 #include <vector>
 #include <string>
 
+
+//----------------------------------------------------------------------------------------------------------------------
+// static members
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::dev::Component::ComponentDataType cedar::dev::kteam::InfraredSensorSerial::M_IR_VALUES_ID = 0;
+
 //----------------------------------------------------------------------------------------------------------------------
 // type registration
 //----------------------------------------------------------------------------------------------------------------------
@@ -58,8 +66,17 @@ namespace
 {
   bool registered()
   {
-    cedar::dev::ComponentManagerSingleton::getInstance()->
-        registerType<cedar::dev::kteam::InfraredSensorSerialPtr>();
+    cedar::dev::ComponentDeclarationPtr declaration
+    (
+      new cedar::dev::ComponentDeclarationTemplate<cedar::dev::kteam::InfraredSensorSerial>
+      (
+        "Sensors"
+      )
+    );
+
+    declaration->setIconPath(":/cedar/dev/gui/icons/ir_sensor_icon.svg");
+
+    declaration->declare();
     return true;
   }
 
@@ -75,11 +92,15 @@ cedar::dev::kteam::InfraredSensorSerial::InfraredSensorSerial()
 _mCommandGetInfrared(new cedar::aux::StringParameter(this, "command get infrared", "N")),
 mValues(new cedar::aux::MatData(cv::Mat::zeros(1, 8, CV_32F)))
 {
-  this->addMeasuredData("proximity", mValues, boost::bind(&cedar::dev::kteam::InfraredSensorSerial::updateIrValues, this));
+  this->installMeasurementType(M_IR_VALUES_ID, "IR values");
+  this->setMeasurementDimensionality(M_IR_VALUES_ID, 8);
+  this->registerMeasurementHook(M_IR_VALUES_ID, boost::bind(&cedar::dev::kteam::InfraredSensorSerial::updateIrValues, this));
+//  this->addMeasuredData("proximity", mValues, boost::bind(&cedar::dev::kteam::InfraredSensorSerial::updateIrValues, this));
 }
 
 cedar::dev::kteam::InfraredSensorSerial::~InfraredSensorSerial()
 {
+  prepareComponentDestructAbsolutelyRequired();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -91,10 +112,11 @@ cv::Mat cedar::dev::kteam::InfraredSensorSerial::getData()
   return mValues->getData();
 }
 
-void cedar::dev::kteam::InfraredSensorSerial::updateIrValues()
+cv::Mat cedar::dev::kteam::InfraredSensorSerial::updateIrValues()
 {
   // the left and right encoder value will be saved in this vector
-  cv::Mat& infrared_values = this->mValues->getData();
+  //!@todo This allocates a new matrix every time the values are retrieved -- not a problem here due to the small size, but what about other cases? (e.g., camera image)
+  cv::Mat infrared_values = cv::Mat::zeros(8, 1, CV_32F);
 
   // cast the channel into a serial channel
   cedar::dev::kteam::SerialChannelPtr serial_channel = convertToSerialChannel(getChannel());
@@ -126,4 +148,6 @@ void cedar::dev::kteam::InfraredSensorSerial::updateIrValues()
     "Received infrared values"
   );
 #endif // DEBUG_VERBOSE
+
+  return infrared_values;
 }

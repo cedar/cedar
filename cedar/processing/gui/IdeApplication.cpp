@@ -42,6 +42,7 @@
 #include "cedar/processing/gui/IdeApplication.h"
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/devices/sensors/visual/Grabber.h"
+#include "cedar/devices/Component.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/CommandLineParser.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
@@ -113,6 +114,8 @@ cedar::proc::gui::IdeApplication::~IdeApplication()
 
 void cedar::proc::gui::IdeApplication::signalHandler(int signal_id)
 {
+  static bool cleanupRunning;
+
   std::string signal_name;
   switch (signal_id)
   {
@@ -145,7 +148,11 @@ void cedar::proc::gui::IdeApplication::signalHandler(int signal_id)
     std::cout << "A stack trace has been written to " << file_path << std::endl;
   }
 
-  cedar::proc::gui::IdeApplication::cleanupAfterCrash();
+  if (!cleanupRunning) // do not recures if any of this throws ...
+  {
+    cleanupRunning= true;
+    cedar::proc::gui::IdeApplication::cleanupAfterCrash();
+  }
 
   // reset the abort signal to avoid infinite recursion
   signal(SIGABRT, SIG_DFL);
@@ -211,6 +218,7 @@ int cedar::proc::gui::IdeApplication::exec()
 void cedar::proc::gui::IdeApplication::cleanupAfterCrash()
 {
   cedar::dev::sensors::visual::Grabber::emergencyCleanup();
+  cedar::dev::Component::handleCrash();
   QApplication::exit(-1);
 }
 

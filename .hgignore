@@ -1,4 +1,5 @@
 syntax: glob
+.hgrc
 .qglviewer*
 .project
 build
@@ -7,6 +8,7 @@ lib
 logs
 *.log
 *.orig
+*.user
 Linux-*
 Darwin-*
 debug*

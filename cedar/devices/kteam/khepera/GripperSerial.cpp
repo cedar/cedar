@@ -38,12 +38,13 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/casts.h"
-#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/math/UIntLimitsParameter.h"
 #include "cedar/devices/kteam/khepera/GripperSerial.h"
 #include "cedar/devices/kteam/serialChannelHelperFunctions.h"
 #include "cedar/devices/kteam/SerialChannel.h"
+#include "cedar/auxiliaries/math/UIntLimitsParameter.h"
+#include "cedar/auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 #include <sstream>
@@ -70,46 +71,63 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::dev::kteam::khepera::GripperSerial::GripperSerial()
-:
-_mCommandSetGripperPosition(new cedar::aux::StringParameter(this, "command set gripper position", "T,1,D")),
-_mCommandGetGripperPosition(new cedar::aux::StringParameter(this, "command get gripper position", "T,1,H,0")),
-_mAnswerGetGripperPosition(new cedar::aux::StringParameter(this, "answer get gripper position", "t,1,h")),
-_mCommandSetArmPosition(new cedar::aux::StringParameter(this, "command set arm position", "T,1,E")),
-_mCommandGetArmPosition(new cedar::aux::StringParameter(this, "command get arm position", "T,1,H,1")),
-_mAnswerGetArmPosition(new cedar::aux::StringParameter(this, "answer get arm position", "t,1,h")),
-_mCommandGetGripperResistivity(new cedar::aux::StringParameter(this, "command get gripper resistivity", "T,1,F")),
-_mCommandGetGripperOpticalSensor
-(
-  new cedar::aux::StringParameter(this, "command get gripper optical sensor", "T,1,G")
-)
 {
+  this->construct();
 }
 
 // constructor taking an externally created channel
 cedar::dev::kteam::khepera::GripperSerial::GripperSerial(cedar::dev::kteam::SerialChannelPtr channel)
 :
-cedar::dev::kteam::khepera::Gripper(cedar::aux::asserted_pointer_cast<cedar::dev::Channel>(channel)),
-_mCommandSetGripperPosition(new cedar::aux::StringParameter(this, "command set gripper position", "T,1,D")),
-_mCommandGetGripperPosition(new cedar::aux::StringParameter(this, "command get gripper position", "T,1,H,0")),
-_mAnswerGetGripperPosition(new cedar::aux::StringParameter(this, "answer get gripper position", "t,1,h")),
-_mCommandSetArmPosition(new cedar::aux::StringParameter(this, "command set arm position", "T,1,E")),
-_mCommandGetArmPosition(new cedar::aux::StringParameter(this, "command get arm position", "T,1,H,1")),
-_mAnswerGetArmPosition(new cedar::aux::StringParameter(this, "answer get arm position", "t,1,h")),
-_mCommandGetGripperResistivity(new cedar::aux::StringParameter(this, "command get gripper resistivity", "T,1,F")),
-_mCommandGetGripperOpticalSensor
-(
-  new cedar::aux::StringParameter(this, "command get gripper optical sensor", "T,1,G")
-)
+cedar::dev::kteam::khepera::Gripper(cedar::aux::asserted_pointer_cast<cedar::dev::Channel>(channel))
 {
+  this->construct();
 }
 
 cedar::dev::kteam::khepera::GripperSerial::~GripperSerial()
 {
+  prepareComponentDestructAbsolutelyRequired();
+}
+
+void cedar::dev::kteam::khepera::GripperSerial::construct()
+{
+  this->_mCommandSetGripperPosition = new cedar::aux::StringParameter(this, "command set gripper position", "T,1,D");
+  this->_mCommandGetGripperPosition = new cedar::aux::StringParameter(this, "command get gripper position", "T,1,H,0");
+  this->_mAnswerGetGripperPosition = new cedar::aux::StringParameter(this, "answer get gripper position", "t,1,h");
+  this->_mCommandGetGripperResistivity = new cedar::aux::StringParameter(this, "command get gripper resistivity", "T,1,F");
+  this->_mCommandGetGripperOpticalSensor = new cedar::aux::StringParameter(this, "command get gripper optical sensor", "T,1,G");
+
+  this->registerCommandHook(GRIPPER_POSITION, boost::bind(&cedar::dev::kteam::khepera::GripperSerial::applyGripperPosition, this, _1));
+
+  this->registerMeasurementHook(RESISTIVITY, boost::bind(&cedar::dev::kteam::khepera::GripperSerial::measureResistivity, this));
+  this->registerMeasurementHook(OPTICAL_SENSOR, boost::bind(&cedar::dev::kteam::khepera::GripperSerial::measureOpticalSensor, this));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dev::kteam::khepera::GripperSerial::applyGripperPosition(cv::Mat openClose)
+{
+  CEDAR_DEBUG_ASSERT(openClose.type() == CV_32F);
+  CEDAR_DEBUG_ASSERT(openClose.rows > 0);
+  CEDAR_DEBUG_ASSERT(openClose.cols > 0);
+  float value = openClose.at<float>(0, 0);
+  this->setGripperPosition(value >= 1.0);
+}
+
+cv::Mat cedar::dev::kteam::khepera::GripperSerial::measureResistivity()
+{
+  cv::Mat measured(1, 1, CV_32F);
+  measured.at<float>(0, 0) = static_cast<float>(this->getGripperResistivity());
+  return measured;
+}
+
+cv::Mat cedar::dev::kteam::khepera::GripperSerial::measureOpticalSensor()
+{
+  cv::Mat measured(1, 1, CV_32F);
+  measured.at<float>(0, 0) = static_cast<float>(this->getGripperOpticalSensor());
+  return measured;
+}
 
 void cedar::dev::kteam::khepera::GripperSerial::setGripperPosition(bool position)
 {
@@ -128,58 +146,6 @@ void cedar::dev::kteam::khepera::GripperSerial::setGripperPosition(bool position
 
   // check whether the answer begins with the correct character
   checkSerialCommunicationAnswer(answer, _mCommandSetGripperPosition->getValue());
-}
-
-void cedar::dev::kteam::khepera::GripperSerial::setArmPosition(unsigned int position)
-{
-  position = _mArmPositionLimits->getValue().limit(position);
-
-  // create a command string which will set the arm position
-  std::ostringstream command;
-  command << _mCommandSetArmPosition->getValue() << "," << position;
-  // send the command string
-  std::string answer
-    = convertToSerialChannel(getChannel())->writeAndReadLocked(command.str());
-
-  // check whether the answer begins with the correct character
-  checkSerialCommunicationAnswer(answer, _mCommandSetArmPosition->getValue());
-}
-
-unsigned int cedar::dev::kteam::khepera::GripperSerial::getArmPosition()
-{
-  // position of the arm
-  unsigned int position;
-
-  // send a command string to the robot to receive the current acceleration values
-  std::string answer
-    = convertToSerialChannel(getChannel())->writeAndReadLocked(_mCommandGetArmPosition->getValue());
-
-  // check whether the first character of the answer is correct
-  checkSerialCommunicationAnswer(answer, _mCommandGetArmPosition->getValue(), _mAnswerGetArmPosition->getValue());
-
-  // create a string stream on the received answer
-  std::istringstream answer_stream;
-  answer_stream.str(answer);
-
-  // skip 'a,' at the beginning of the answer
-  answer_stream.ignore(_mAnswerGetArmPosition->getValue().size() + 1);
-  checkStreamValidity(answer_stream, false);
-
-  // read the acceleration along the x-axis
-  answer_stream >> position;
-  checkStreamValidity(answer_stream, true);
-
-#ifdef DEBUG_VERBOSE
-  // print a debug message that everything worked
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-  (
-    "Successfully received position value of the arm",
-    "cedar::dev::kteam::khepera::GripperSerial",
-    "Read arm position"
-  );
-#endif // DEBUG_VERBOSE
-
-  return position;
 }
 
 unsigned int cedar::dev::kteam::khepera::GripperSerial::getGripperPosition()

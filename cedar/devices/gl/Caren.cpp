@@ -48,6 +48,16 @@
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
+// register class with the object visualization factory manager
+//----------------------------------------------------------------------------------------------------------------------
+
+namespace
+{
+    bool registered
+        = cedar::dev::gl::RobotVisualisationManagerSingleton::getInstance()->registerType<cedar::dev::gl::CarenPtr>();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -62,7 +72,7 @@ cedar::dev::gl::Caren::Caren
   cedar::dev::KinematicChainPtr fingerThree
 )
 :
-cedar::aux::gl::ObjectVisualization(trunk->getRootCoordinateFrame()),
+cedar::dev::gl::RobotVisualisation(cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame), "Caren", 1, 1, 1),
 mTrunk(trunk),
 mArm(arm),
 mHead(head),
@@ -78,6 +88,13 @@ mHeadVisualization(new cedar::dev::gl::PowerCubeWrist90(head))
 
 }
 
+cedar::dev::gl::Caren::Caren()
+:
+cedar::dev::gl::RobotVisualisation(cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame), "Caren", 1, 1, 1)
+{
+
+}
+
 cedar::dev::gl::Caren::~Caren()
 {
 
@@ -89,10 +106,43 @@ cedar::dev::gl::Caren::~Caren()
 
 void cedar::dev::gl::Caren::initializeGl()
 {
+  // assuming mRobot actually has the required components.
+  // Therefore commenting out all components that are not declared in Carens description.json.
+  // Todo: find a clever way to perform checks. maybe try/catch on every component?
+
+  mpLocalCoordinateFrame->setName(mRobot->getVisualisationPtr()->objectName().toStdString());
+
+  //cedar::dev::KinematicChainPtr head = boost::dynamic_pointer_cast <cedar::dev::KinematicChain> ( mRobot->getComponent("head"));
+  //cedar::dev::KinematicChainPtr palm = boost::dynamic_pointer_cast <cedar::dev::KinematicChain> ( mRobot->getComponent("palm"));
+  //cedar::dev::KinematicChainPtr fingerOne = boost::dynamic_pointer_cast <cedar::dev::KinematicChain> (mRobot->getComponent("fingerOne"));
+  //cedar::dev::KinematicChainPtr fingerTwo = boost::dynamic_pointer_cast <cedar::dev::KinematicChain> (mRobot->getComponent("fingerTwo"));
+  //cedar::dev::KinematicChainPtr fingerThree = boost::dynamic_pointer_cast <cedar::dev::KinematicChain> (mRobot->getComponent("fingerThree"));
+
+  mTrunk = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(mRobot->getComponent("trunk"));
+  mArm = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(mRobot->getComponent("arm"));
+
+  mTrunk->setEndEffector(mArm->getRootCoordinateFrame());
+
+  // initialize with legitimate values
+  mTrunk->updatedUserMeasurementSlot();
+  mArm->updatedUserMeasurementSlot();
+
+  //mHead = head;
+  //mPalm = palm;
+  //mFingerOne = fingerOne;
+  //mFingerTwo = fingerTwo;
+  //mFingerThree = fingerThree;
+
+  mTrunkVisualization = cedar::dev::gl::KinematicChainPtr( new cedar::dev::gl::PowerCube110(mTrunk));
+  mArmVisualization = cedar::dev::gl::KukaArmPtr( new cedar::dev::gl::KukaArm(mArm));
+
+  //mHandVisualization = cedar::dev::gl::SdhPtr( new cedar::dev::gl::Sdh(fingerOne, fingerTwo, fingerThree, palm) );
+  //mHeadVisualization = cedar::dev::gl::KinematicChainPtr( new cedar::dev::gl::PowerCubeWrist90(head) );
+
   mTrunkVisualization->initializeGl();
   mArmVisualization->initializeGl();
-  mHandVisualization->initializeGl();
-  mHeadVisualization->initializeGl();
+  //mHandVisualization->initializeGl();
+  //mHeadVisualization->initializeGl();
 }
 
 void cedar::dev::gl::Caren::draw()
@@ -100,9 +150,9 @@ void cedar::dev::gl::Caren::draw()
   drawBase();
   mTrunkVisualization->draw();
   mArmVisualization->draw();
-  mHandVisualization->draw();
-  mHeadVisualization->draw();
-  drawHead();
+  //mHandVisualization->draw();
+  //mHeadVisualization->draw();
+  //drawHead();
 }
 
 void cedar::dev::gl::Caren::drawBase()
@@ -112,36 +162,37 @@ void cedar::dev::gl::Caren::drawBase()
   glPushMatrix();
 
   // go to trunk frame
-  mTransformationTranspose = mTrunk->getRootTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  cv::Mat transformation;
+  transformation = mTrunk->getRootTransformation().t();
+  glMultMatrixf((GLfloat*)transformation.data);
+
   // go to table frame
   glTranslated(0, 0, -0.36);
   glRotated(180, 0, 0, 1);
 
   // table plate
   setMaterial(WHITE);
-  cedar::aux::gl::drawBlock(.728, .12, 1.4985, .3745, .0, 0.06, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.728, .12, 1.4985, .3745, .0, 0.06, getIsDrawnAsWireFrame());
 
   setMaterial(CHROME);
   // table connector plate
-  cedar::aux::gl::drawBlock(.1, .1, 1.4575, .3425, .012, 0, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.1, .1, 1.4575, .3425, .012, 0, getIsDrawnAsWireFrame());
   // base plate
   glTranslated(0, 0, 0.012);
-  cedar::aux::gl::drawBlock(.1, .1, 0.075, .165, .012, 0, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.1, .1, 0.075, .165, .012, 0, getIsDrawnAsWireFrame());
   // trunk block
   glTranslated(0, 0, 0.012);
-  cedar::aux::gl::drawBlock(.07, .07, 0.075, .165, .225, 0, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.07, .07, 0.075, .165, .225, 0, getIsDrawnAsWireFrame());
 
   // vertical neck bar
   glTranslated(0, -0.1875, -0.012);
-  cedar::aux::gl::drawBlock(.0225, .0225, 0.0225, .0225, .823, 0, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.0225, .0225, 0.0225, .0225, .823, 0, getIsDrawnAsWireFrame());
   // horizontal neck bar
   glTranslated(0, 0, 0.8005);
-  cedar::aux::gl::drawBlock(.0225, .0225, .2475, 0.0225, .0225, 0.0225, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.0225, .0225, .2475, 0.0225, .0225, 0.0225, getIsDrawnAsWireFrame());
   // neck plate
   glTranslated(0, 0.1875, 0.0225);
-  cedar::aux::gl::drawBlock(.045, .045, .07, 0.07, .01, 0.0, mIsDrawnAsWireFrame);
-
+  cedar::aux::gl::drawBlock(.045, .045, .07, 0.07, .01, 0.0, getIsDrawnAsWireFrame());
 
   setMaterial(NO_MATERIAL);
 
@@ -157,12 +208,13 @@ void cedar::dev::gl::Caren::drawHead()
   glPushMatrix();
 
   // go to head end-effector frame
-  mTransformationTranspose = mHead->getEndEffectorTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  cv::Mat transformation;
 
+  transformation = mHead->getEndEffectorTransformation().t();
+  glMultMatrixd((GLdouble*)transformation.data);
   // draw camera base plate
   setMaterial(CHROME);
-  cedar::aux::gl::drawBlock(.045, .045, .125, 0.125, .008, 0.0, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.045, .045, .125, 0.125, .008, 0.0, getIsDrawnAsWireFrame());
 
   // draw middle camera
   glTranslated(0.016, 0.0, 0.008);
@@ -187,26 +239,26 @@ void cedar::dev::gl::Caren::drawCamera()
 
   // draw body of the camera
   setMaterial(CHROME);
-  cedar::aux::gl::drawBlock(.029, .029, .022, 0.022, .033, 0.0, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.029, .029, .022, 0.022, .033, 0.0, getIsDrawnAsWireFrame());
 
   // move to lens
   glTranslated(0.029, 0.0, 0.0165);
   glRotated(90, 0, 1, 0);
 
   // lens holder
-  cedar::aux::gl::drawCone(0, .008, .0145, .0145, mResolution, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawCone(0, .008, .0145, .0145, getResolution(), getIsDrawnAsWireFrame());
   glTranslated(0.0, 0.0, 0.008);
-  cedar::aux::gl::drawDisk(.0145, .018, mResolution, mResolution, true, mIsDrawnAsWireFrame);
-  cedar::aux::gl::drawCone(0, .0065, .018, .018, mResolution, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawDisk(.0145, .018, getResolution(), getResolution(), true, getIsDrawnAsWireFrame());
+  cedar::aux::gl::drawCone(0, .0065, .018, .018, getResolution(), getIsDrawnAsWireFrame());
   glTranslated(0.0, 0.0, 0.0065);
   setMaterial(BLACK);
-  cedar::aux::gl::drawDisk(.018, .02, mResolution, mResolution, true, mIsDrawnAsWireFrame);
-  cedar::aux::gl::drawCone(0, .029, .02, .02, mResolution, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawDisk(.018, .02, getResolution(), getResolution(), true, getIsDrawnAsWireFrame());
+  cedar::aux::gl::drawCone(0, .029, .02, .02, getResolution(), getIsDrawnAsWireFrame());
   glTranslated(0.0, 0.0, 0.024);
-  cedar::aux::gl::drawDisk(.0, .02, mResolution, mResolution, false, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawDisk(.0, .02, getResolution(), getResolution(), false, getIsDrawnAsWireFrame());
   glTranslated(0.0, 0.0, -0.01);
   setMaterial(CHROME);
-  cedar::aux::gl::drawSphere(0.015, mResolution, mResolution, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawSphere(0.015, getResolution(), getResolution(), getIsDrawnAsWireFrame());
   // get back to previous transformation
   glPopMatrix();
 }

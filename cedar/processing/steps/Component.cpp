@@ -38,16 +38,24 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/gui/stepViews/ComponentStepView.h"
 #include "cedar/processing/steps/Component.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/gui/IdeApplication.h"
+#include "cedar/processing/gui/Ide.h"
 #include "cedar/devices/Component.h"
 #include "cedar/devices/exceptions.h"
 #include "cedar/auxiliaries/Data.h"
+#include "cedar/devices/Sensor.h"
+#include "cedar/devices/KinematicChain.h"
+#include "cedar/devices/gui/KinematicChainWidget.h"
 
 // SYSTEM INCLUDES
+#include <QHBoxLayout>
 #include <typeinfo>
 #include <vector>
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // declaration
@@ -61,9 +69,9 @@ namespace
 
     ElementDeclarationPtr declaration
     (
-      new ElementDeclarationTemplate<cedar::proc::steps::Component>
+      new ElementDeclarationTemplate<cedar::proc::steps::Component, cedar::proc::gui::ComponentStepView>
       (
-        "Devices",
+        "Robotics",
         "cedar.processing.steps.Component"
       )
     );
@@ -76,6 +84,143 @@ namespace
   bool declared = declare();
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+// GUI for the group parameter
+//----------------------------------------------------------------------------------------------------------------------
+
+namespace
+{
+  bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->add
+      <
+        cedar::proc::details::ComponentStepGroupParameter,
+        cedar::proc::details::ComponentStepGroupParameterWidget
+      >();
+}
+
+cedar::proc::details::ComponentStepGroupParameterWidget::ComponentStepGroupParameterWidget()
+{
+  auto layout = new QHBoxLayout();
+  layout->setContentsMargins(0, 0, 0, 0);
+  this->setLayout(layout);
+
+  this->mpSelector = new QComboBox();
+  layout->addWidget(this->mpSelector);
+
+  QObject::connect(this->mpSelector, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(selectedGroupChanged(const QString&)));
+}
+
+void cedar::proc::details::ComponentStepGroupParameterWidget::parameterChanged()
+{
+  auto parameter = boost::dynamic_pointer_cast<cedar::proc::details::ComponentStepGroupParameter>(this->getParameter());
+  CEDAR_ASSERT(parameter);
+
+  this->rebuildGroupList();
+
+  this->applyProperties();
+
+  QObject::connect(parameter.get(), SIGNAL(componentChanged()), this, SLOT(componentChanged()));
+}
+
+void cedar::proc::details::ComponentStepGroupParameterWidget::rebuildGroupList()
+{
+  auto parameter = boost::dynamic_pointer_cast<cedar::proc::details::ComponentStepGroupParameter>(this->getParameter());
+  CEDAR_ASSERT(parameter);
+
+  std::string current = parameter->getValue();
+
+  bool blocked = this->mpSelector->blockSignals(true);
+  this->mpSelector->clear();
+
+  this->mpSelector->addItem("all");
+  int select = 0;
+
+
+  if (parameter->hasComponent())
+  {
+    auto component = parameter->getComponent();
+    auto groups = component->listCommandGroups();
+
+    for (const auto& group : groups)
+    {
+      if (group == current)
+      {
+        select = this->mpSelector->count();
+      }
+      this->mpSelector->addItem(QString::fromStdString(group));
+    }
+  }
+  this->mpSelector->setCurrentIndex(select);
+  this->mpSelector->blockSignals(blocked);
+}
+
+void cedar::proc::details::ComponentStepGroupParameterWidget::propertiesChanged()
+{
+  this->applyProperties();
+}
+
+void cedar::proc::details::ComponentStepGroupParameterWidget::applyProperties()
+{
+  auto parameter = boost::dynamic_pointer_cast<cedar::proc::details::ComponentStepGroupParameter>(this->getParameter());
+  CEDAR_ASSERT(parameter);
+
+  this->mpSelector->setDisabled(parameter->isConstant());
+}
+
+void cedar::proc::details::ComponentStepGroupParameterWidget::componentChanged()
+{
+  this->rebuildGroupList();
+}
+
+void cedar::proc::details::ComponentStepGroupParameterWidget::selectedGroupChanged(const QString& group)
+{
+  auto parameter = boost::dynamic_pointer_cast<cedar::proc::details::ComponentStepGroupParameter>(this->getParameter());
+  CEDAR_ASSERT(parameter);
+
+  if (group == "all")
+  {
+    parameter->setValue(std::string());
+  }
+  else
+  {
+    parameter->setValue(group.toStdString());
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// group parameter
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::details::ComponentStepGroupParameter::ComponentStepGroupParameter(cedar::aux::Configurable* owner, const std::string& name)
+:
+cedar::aux::ParameterTemplate<std::string>(owner, name, "")
+{
+}
+
+void cedar::proc::details::ComponentStepGroupParameter::setComponent(cedar::dev::ComponentPtr component)
+{
+  this->mWeakComponent = component;
+  emit componentChanged();
+}
+
+bool cedar::proc::details::ComponentStepGroupParameter::hasComponent()
+{
+  return mWeakComponent.use_count() != 0;
+}
+
+cedar::dev::ComponentPtr cedar::proc::details::ComponentStepGroupParameter::getComponent()
+{
+  if(auto component = this->mWeakComponent.lock())
+  {
+    return component;
+  }
+  else
+  {
+   return NULL;
+  }
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -83,79 +228,188 @@ namespace
 cedar::proc::steps::Component::Component()
 :
 cedar::proc::Step(true),
-mConnectedOnStart(false),
-_mComponent(new cedar::dev::ComponentParameter(this, "component"))
+_mComponent(new cedar::dev::ComponentParameter(this, "component")),
+_mGroup(new cedar::proc::details::ComponentStepGroupParameter(this, "command group"))
 {
-  QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SLOT(componentChanged()));
+  this->_mGroup->setConstant(true);
+
+  QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SLOT(componentChangedSlot()));
+  QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SIGNAL(componentChanged()));
+  QObject::connect(this->_mGroup.get(), SIGNAL(valueChanged()), this, SLOT(selectedGroupChanged()));
+
+  this->mMeasurementTimeId = this->registerTimeMeasurement("step measurements time");
+  this->mCommandTimeId = this->registerTimeMeasurement("step commands time");
+
+  this->registerFunction( "brake slowly", boost::bind(&cedar::proc::steps::Component::brakeSlowly, this ) );
+  this->registerFunction( "brake hard", boost::bind(&cedar::proc::steps::Component::brakeHard, this ) );
+  this->registerFunction( "disconnect", boost::bind(&cedar::proc::steps::Component::disconnectManually, this ) );
+  this->registerFunction( "connect", boost::bind(&cedar::proc::steps::Component::connectManually, this ) );
+  this->registerFunction( "open Robot Manager", boost::bind(&cedar::proc::steps::Component::openRobotManager, this ) );
 }
+
+cedar::proc::steps::Component::~Component()
+{
+  std::cout<<"Destructor!! ComponentStep"<<std::endl;
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::steps::Component::onStart()
+bool cedar::proc::steps::Component::hasComponent() const
 {
   try
   {
-    if (auto component = this->getComponent())
-    {
-      if (auto channel = component->getChannel())
-      {
-        if (!channel->isOpen())
-        {
-          this->mConnectedOnStart = true;
-          channel->open();
-        }
-      }
-    }
+    return this->_mComponent->hasComponentSlot() && static_cast<bool>(this->_mComponent->getValue());
   }
-  catch (cedar::dev::NoComponentSelectedException)
+  catch (const cedar::dev::NoComponentSelectedException&)
   {
-    // ok, don't do anything in this case.
+    return false;
+  }
+}
+
+
+void cedar::proc::steps::Component::selectedGroupChanged()
+{
+  this->rebuildInputs();
+}
+
+void cedar::proc::steps::Component::testStates(cedar::dev::ComponentPtr component)
+{
+  if (!component->isCommunicating())
+  {
+    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING,
+        component->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.");
+  }
+  else if (!component->isReadyForMeasurements())
+  {
+    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING,
+      component->prettifyName() + " is not ready to receive measurements, yet.");
+  }
+  else if (!component->isReadyForCommands())
+  {
+    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING,
+      component->prettifyName() + " is not ready to send commands, yet.");
+  }
+  else
+  {
+    this->resetState();
+  }
+}
+
+void cedar::proc::steps::Component::onStart()
+{
+  this->_mComponent->setConstant(true);
+  if (this->hasComponent())
+  {
+    auto component = this->getComponent();
+
+    component->clearUserCommand();
+
+    // should be supressed, un-lock:
+    if (component->getSuppressUserInteraction())
+    {
+      component->setSuppressUserInteraction(false);
+    }
+
+    testStates(component);
+
+    if (!component->isCommunicating())
+    {
+      cedar::aux::LogSingleton::getInstance()->message(
+        component->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.",
+        CEDAR_CURRENT_FUNCTION_NAME);
+    }
   }
 }
 
 void cedar::proc::steps::Component::onStop()
 {
-  try
+  this->_mComponent->setConstant(false);
+  if (this->hasComponent())
   {
-    if (auto component = this->getComponent())
+    auto component = this->getComponent();
+
+    component->clearUserCommand();
+    component->setSuppressUserInteraction(true);
+
+    if (component->isCommunicating())
     {
-      if (auto channel = component->getChannel())
-      {
-        if (this->mConnectedOnStart)
-        {
-          channel->close();
-          this->mConnectedOnStart = false;
-        }
-      }
+      cedar::aux::LogSingleton::getInstance()->warning(
+        component->prettifyName() + " is still connected and running.",
+        CEDAR_CURRENT_FUNCTION_NAME);
     }
-  }
-  catch (cedar::dev::NoComponentSelectedException)
-  {
-    // ok, don't do anything in this case.
+    else
+    {
+      this->resetState();
+    }
   }
 }
 
 void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
 {
-  this->getComponent()->updateMeasuredValues();
+  if (!this->hasComponent())
+    return;
 
-  // read values from the inputs
-  std::vector<std::string> data_names = this->getComponent()->getDataNames(cedar::dev::Component::COMMANDED);
-  for (auto name_iter = data_names.begin(); name_iter != data_names.end(); ++name_iter)
+  auto component = this->getComponent();
+
+  this->testStates(component);
+
+  // update time measurements
+  if (component->hasLastStepMeasurementsDuration())
   {
-    const std::string& name = *name_iter;
-    cedar::aux::ConstDataPtr data = this->getInput(name);
-
-    if (data)
-    {
-      this->getComponent()->getCommandedData(name)->copyValueFrom(data);
-    }
+    auto time = component->retrieveLastStepMeasurementsDuration();
+    this->setTimeMeasurement(this->mMeasurementTimeId, time);
   }
 
-  // update the commands
-  this->getComponent()->updateCommandedValues();
+  if (component->hasLastStepCommandsDuration())
+  {
+    auto time = component->retrieveLastStepCommandsDuration();
+    this->setTimeMeasurement(this->mCommandTimeId, time);
+  }
+
+//  std::cout<<"1"<<std::endl;
+//  // unlock the suppression of user commands when the architecture is running
+  component->setSuppressUserInteraction(false);
+//  std::cout<<"2"<<std::endl;
+//  // retrieve Data from the component and copy it to the output slots of the component
+  auto measurements = component->getInstalledMeasurementTypes();
+//  std::cout<<"3"<<std::endl;
+  for (const auto& measurement : measurements)
+  {
+    std::string name = component->getNameForMeasurementType(measurement);
+    auto measurementData = component->getMeasurementData(measurement);
+    if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(measurementData))
+    {
+      cv::Mat measurementMat = measurementData->getData<cv::Mat>().clone();
+      std::string name = component->getNameForMeasurementType(measurement);
+      if(auto outPutPtr = mOutputs.at(name))
+      {
+        outPutPtr->setData(measurementMat);
+      }
+    }
+  }
+//
+//
+//  // if no inputs are present, there is nothing to do (i.e., no inputs have to be passed to the component)
+  if (this->hasSlotForRole(cedar::proc::DataRole::INPUT))
+  {
+    // copy data from the input slots to the command slots of the component
+    for (auto name_slot_pair : this->getDataSlots(cedar::proc::DataRole::INPUT))
+    {
+      const auto& name = name_slot_pair.first;
+      auto slot = name_slot_pair.second;
+
+      auto command_type = component->getCommandTypeForName(name);
+
+      auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(slot->getData());
+      if (mat_data)
+      {
+        component->setUserSideCommandBuffer(command_type, mat_data->getData());
+      }
+    }
+  }
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputValidity
@@ -166,62 +420,207 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputVal
 {
   const std::string& name = slot->getName();
 
-  // only commanded data are inputs
-  cedar::aux::ConstData *component_data = this->getComponent()->getCommandedData(name).get();
-  cedar::aux::ConstData *that_data = data.get();
+  if (!this->hasComponent())
+  {
+    return cedar::proc::DataSlot::VALIDITY_WARNING;
+  }
 
-  if (typeid(*component_data) == typeid(*that_data))
+  // only commanded data are inputs
+// ? lost in some merge
+//  cedar::aux::ConstData *component_data = this->getComponent()->getCommandedData(name).get();
+//  cedar::aux::ConstData *that_data = data.get();
+//  if (typeid(*component_data) == typeid(*that_data))
+
+  if (auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
-    return cedar::proc::DataSlot::VALIDITY_VALID;
+    if (mat_data->getData().type() != CV_32F)
+    {
+      return cedar::proc::DataSlot::VALIDITY_ERROR;
+    }
+
+    auto type = this->getComponent()->getCommandTypeForName(name);
+    // check that the matrix has the same dimensionality as the command it is connecting to
+    auto fulldim = this->getComponent()->getCommandDimensionality(type);
+    auto size= fulldim[0];
+
+    if (size == 1 && mat_data->getDimensionality() == 0)
+    {
+      return cedar::proc::DataSlot::VALIDITY_VALID;
+    }
+
+    if ((size > 1 && mat_data->getDimensionality() != 1))
+    {
+      return cedar::proc::DataSlot::VALIDITY_ERROR;
+    }
+
+    if (size == cedar::aux::math::get1DMatrixSize(mat_data->getData()))
+    {
+      return cedar::proc::DataSlot::VALIDITY_VALID;
+    }
   }
-  else
-  {
-    return cedar::proc::DataSlot::VALIDITY_ERROR;
-  }
+
+  // if nothing valid was found, return an error
+  return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
-void cedar::proc::steps::Component::componentChanged()
+void cedar::proc::steps::Component::rebuildInputs()
 {
-  //!@todo Clearing all slots means that all connections are lost. This is bad! Existing slots should remain.
-  this->removeAllDataSlots();
+  this->removeAllSlots(cedar::proc::DataRole::INPUT);
 
-  cedar::dev::ComponentPtr component;
-  try
-  {
-    component = this->_mComponent->getValue();
-  }
-  catch (cedar::dev::NoComponentSelectedException& exc)
+  if (!this->hasComponent())
   {
     return;
   }
 
-  // static because this doesn't change for different instances
-  static std::vector<cedar::dev::Component::DataType> types;
-  if (types.empty())
+  auto component = this->getComponent();
+  std::vector<cedar::dev::Component::ComponentDataType> commands;
+
+  std::string selected_group = this->_mGroup->getValue();
+  if (selected_group.empty())
   {
-    types.push_back(cedar::dev::Component::COMMANDED);
-    types.push_back(cedar::dev::Component::MEASURED);
+    auto installed_set = component->getInstalledCommandTypes();
+    commands.assign(installed_set.begin(), installed_set.end());
+  }
+  else
+  {
+    commands = component->getCommandsInGroup(selected_group);
   }
 
-  for (auto type_it = types.begin(); type_it != types.end(); ++type_it)
+  for (const auto& command : commands)
   {
-    cedar::dev::Component::DataType type = *type_it;
+    std::string name = component->getNameForCommandType(command);
+    //!@todo On inputConnectionChanged, incoming data must be set at the component.
+    this->declareInput(name, false);
+  }
+}
 
-    std::vector<std::string> data_names = component->getDataNames(type);
 
-    for (auto name_iter = data_names.begin(); name_iter != data_names.end(); ++name_iter)
+void cedar::proc::steps::Component::rebuildOutputs()
+{
+  this->removeAllSlots(cedar::proc::DataRole::OUTPUT);
+  mOutputs.clear();
+  auto component = this->getComponent();
+  auto measurements = component->getInstalledMeasurementTypes();
+
+  for (const auto& measurement : measurements)
+  {
+    std::string name = component->getNameForMeasurementType(measurement);
+    auto measurementData = component->getMeasurementData(measurement);
+    if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(measurementData))
     {
-      const std::string& name = *name_iter;
-      switch (type)
-      {
-        case cedar::dev::Component::COMMANDED:
-          this->declareInput(name, false);
-          break;
-
-        case cedar::dev::Component::MEASURED:
-          this->declareOutput(name, component->getMeasuredData(name));
-          break;
-      }
+      cv::Mat measurementMat = measurementData->getData<cv::Mat>().clone();
+      cedar::aux::MatDataPtr dataPtr = cedar::aux::MatDataPtr(new cedar::aux::MatData(measurementMat));
+      this->declareOutput(name, dataPtr);
+      mOutputs.insert(std::pair<std::string,cedar::aux::MatDataPtr>(name,dataPtr));
     }
   }
 }
+
+void cedar::proc::steps::Component::componentChangedSlot()
+{
+  //!@todo Clearing all slots means that all connections are lost. This is bad! Existing slots should remain.
+  if (!this->hasComponent())
+  {
+    return;
+  }
+
+  cedar::dev::ComponentPtr lComponent = _mComponent->getValue();
+
+  if(boost::dynamic_pointer_cast<cedar::dev::KinematicChain>(lComponent))
+  {
+    const std::string action_name = "open Kinematic Chain Widget";
+
+    if(!this->isRegistered(action_name))
+    {
+      this->registerFunction(action_name, boost::bind(&cedar::proc::steps::Component::openKinematicChainWidget, this ));
+    }
+  }  
+
+  this->rebuildOutputs();
+  this->rebuildInputs();
+
+  auto component = this->getComponent();
+  this->_mGroup->setConstant(!component->hasCommandGroups());
+  this->_mGroup->setComponent(component);
+}
+
+void cedar::proc::steps::Component::reset()
+{
+  auto component = this->getComponent();
+  component->clearAll();
+}
+
+void cedar::proc::steps::Component::inputConnectionChanged(const std::string& /*inputName*/)
+{
+  auto component = this->getComponent();
+
+  if (!component)
+    return;
+
+  component->clearUserCommand();
+}
+
+void cedar::proc::steps::Component::brakeSlowly()
+{
+  auto component = this->getComponent();
+
+  if (!component)
+    return;
+
+  component->startBrakingSlowly();
+}
+
+void cedar::proc::steps::Component::brakeHard()
+{
+  auto component = this->getComponent();
+
+  if (!component)
+    return;
+
+  component->startBrakingNow();
+}
+
+void cedar::proc::steps::Component::connectManually()
+{
+  auto component = this->getComponent();
+
+  if (!component)
+    return;
+
+  component->startCommunication();
+}
+
+void cedar::proc::steps::Component::disconnectManually()
+{
+  auto component = this->getComponent();
+
+  if (!component)
+    return;
+
+  component->stopCommunication();
+}
+
+void cedar::proc::steps::Component::openRobotManager()
+{
+  auto app = QCoreApplication::instance();
+  if (app)
+  {
+    auto pointer = dynamic_cast< cedar::proc::gui::IdeApplication* >(app);
+    if (pointer)
+    {
+      auto ide = pointer->getIde();
+
+      ide->showRobotManager();
+    }
+  }
+}
+
+void cedar::proc::steps::Component::openKinematicChainWidget()
+{
+  cedar::dev::ComponentPtr lComponent = _mComponent->getValue();
+  auto pKinematicChain = boost::dynamic_pointer_cast<cedar::dev::KinematicChain>(lComponent);
+
+  cedar::dev::gui::KinematicChainWidget *pWidget = new cedar::dev::gui::KinematicChainWidget(pKinematicChain);
+  pWidget->show();
+}
+

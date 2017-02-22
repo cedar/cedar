@@ -52,7 +52,7 @@ cedar::dev::ComponentSlot::ComponentSlot(cedar::dev::RobotPtr robot, const std::
 :
 mRobot(robot),
 mName(name),
-_mChannelType(new cedar::aux::StringParameter(this, "channel type", ""))
+_mConfigurationName(new cedar::aux::StringParameter(this, "configuration name", ""))
 {
 }
 
@@ -97,7 +97,7 @@ std::ostream& cedar::dev::operator<<(std::ostream& stream, cedar::dev::Component
   return stream;
 }
 
-std::vector<std::string> cedar::dev::ComponentSlot::listChannels() const
+std::vector<std::string> cedar::dev::ComponentSlot::listConfigurations() const
 {
   std::vector<std::string> list;
   for (auto iter = this->mComponentTypeIds.begin(); iter != this->mComponentTypeIds.end(); ++iter)
@@ -112,25 +112,30 @@ std::string cedar::dev::ComponentSlot::getPath() const
   return cedar::dev::RobotManagerSingleton::getInstance()->getRobotName(this->getRobot()) + "." + this->mName;
 }
 
-bool cedar::dev::ComponentSlot::hasChannel(const std::string& name) const
+bool cedar::dev::ComponentSlot::hasConfiguration(const std::string& name) const
 {
   return this->mComponentTypeIds.find(name) != this->mComponentTypeIds.end();
 }
 
-void cedar::dev::ComponentSlot::setChannel(const std::string& channel)
+void cedar::dev::ComponentSlot::instantiateConfiguration(const std::string& configurationName)
 {
-  _mChannelType->setValue(channel);
+  CEDAR_ASSERT(!configurationName.empty());
 
-  //TODO who is responsible for calling this?
-  auto iter = mComponentTypeIds.find(channel);
+  this->_mConfigurationName->setValue(configurationName);
 
-  //TODO proper exception
-  CEDAR_ASSERT(iter != mComponentTypeIds.end());
+  auto iter = mComponentTypeIds.find(configurationName);
+
+  if (iter == mComponentTypeIds.end())
+  {
+    CEDAR_THROW(cedar::aux::UnknownTypeException, 
+      "Configuration \"" + configurationName + "\" for \"" + this->getName() 
+      + "\" is missing. Check the file under resources/robots/.");
+  }
 
   cedar::aux::ConfigurationNode configuration;
   configuration.insert(configuration.end(), this->mCommonParameters.begin(), this->mCommonParameters.end());
 
-  auto conf_iter = this->_mComponentConfigurations.find(channel);
+  auto conf_iter = this->_mComponentConfigurations.find(configurationName);
 
   if (conf_iter != this->_mComponentConfigurations.end())
   {
@@ -138,7 +143,16 @@ void cedar::dev::ComponentSlot::setChannel(const std::string& channel)
     configuration.insert(configuration.end(), tree.begin(), tree.end());
   }
 
-  this->getComponent()->setChannel(this->mRobot->getChannel(channel));
+  auto required_channel_iter = configuration.find("requires channel");
+  if (required_channel_iter != configuration.not_found())
+  {
+    std::string channel_name = required_channel_iter->second.get_value<std::string>();
+    if (!this->getRobot()->hasChannelInstance(channel_name))
+    {
+      this->getRobot()->allocateChannel(channel_name);
+    }
+    this->getComponent()->setChannel(this->getRobot()->getChannel(channel_name));
+  }
 
   this->getComponent()->readConfiguration(configuration);
 }
@@ -146,7 +160,7 @@ void cedar::dev::ComponentSlot::setChannel(const std::string& channel)
 
 void cedar::dev::ComponentSlot::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
-  cedar::aux::ConfigurationNode::const_assoc_iterator common = node.find("common component parameters");
+  cedar::aux::ConfigurationNode::const_assoc_iterator common = node.find("shared component parameters");
 
   mCommonParameters = cedar::aux::ConfigurationNode();
 
@@ -182,18 +196,39 @@ void cedar::dev::ComponentSlot::readConfiguration(const cedar::aux::Configuratio
     }
   }
 
+  auto icon_path_iter = node.find("icon path");
+  if (icon_path_iter != node.not_found())
+  {
+    mIconPath = QString::fromStdString(icon_path_iter->second.get_value<std::string>());
+  }
+
   this->cedar::aux::Configurable::readConfiguration(node);
 }
 
 cedar::dev::ComponentPtr cedar::dev::ComponentSlot::getComponent()
 {
-  if (!mComponent)
+  if (!this->mComponent)
   {
-    std::string channel_type = _mChannelType->getValue();
-    std::string component_type_id = mComponentTypeIds[channel_type];
-    mComponent = FactorySingleton::getInstance()->allocate(component_type_id);
-    mComponent->setSlot(this->shared_from_this());
+    std::string channel_type = this->_mConfigurationName->getValue();
+    std::string component_type_id = this->mComponentTypeIds[channel_type];
+    this->mComponent = FactorySingleton::getInstance()->allocate(component_type_id);
+    this->mComponent->setSlot(this->shared_from_this());
   }
 
-  return mComponent;
+  return this->mComponent;
+}
+
+std::string cedar::dev::ComponentSlot::getName() const
+{
+  return this->mName;
+}
+
+std::string cedar::dev::ComponentSlot::getConfigurationName() const
+{
+  return this->_mConfigurationName->getValue();
+}
+
+QString cedar::dev::ComponentSlot::getIconPath() const
+{
+    return mIconPath;
 }

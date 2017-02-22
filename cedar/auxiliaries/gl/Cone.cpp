@@ -38,11 +38,33 @@
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/gl/Cone.h"
 
+#include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/Singleton.h"
+
 // SYSTEM INCLUDES
+
+//----------------------------------------------------------------------------------------------------------------------
+// register class with the object visualization factory manager
+//----------------------------------------------------------------------------------------------------------------------
+
+namespace
+{
+    bool registered
+        = cedar::aux::gl::ObjectVisualizationManagerSingleton::getInstance()->registerType<cedar::aux::gl::ConePtr>();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::gl::Cone::Cone()
+:
+// todo: I'm not sure about the default value (value ranges) here
+cedar::aux::gl::ObjectVisualization(cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame), "generic Cone", 0.5, 0.5, 0.5),
+mRadius(0.01),
+mHeight(0.01)
+{
+}
 
 cedar::aux::gl::Cone::Cone
 (
@@ -69,10 +91,10 @@ void cedar::aux::gl::Cone::draw()
   prepareDraw();
   
   // draw object
-  if (mIsVisible)
+  if (isVisible())
   {
-    gl::setColor(mColorR, mColorG, mColorB);
-    drawCone(0, mHeight, mRadius, 0, mResolution*2, mIsDrawnAsWireFrame);
+    gl::setColor(getColorR(), getColorG(), getColorB());
+    drawCone(0, mHeight, mRadius, 0, getResolution()*2, getIsDrawnAsWireFrame());
   }
 }
 

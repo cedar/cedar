@@ -139,7 +139,7 @@ public slots:
   /*!@brief set the translation of the object frame origin in the world frame
    * @param translation new translation vector in homogeneous coordinates
    */
-  void setTranslation(const std::vector<cedar::unit::Length>& translation);
+  void setTranslation(const std::vector<float> &translation);
 
   /*!@brief add the provided values to the translation of the local frame origin in the world frame
    * @param x additional translation along the x-axis
@@ -171,7 +171,7 @@ public slots:
   /*!@brief set the rotation of the object frame in the world frame
    * @param  rotation new rotation matrix
    */
-  void setRotation(const std::vector<double>& rotation);
+  void setRotation(const std::vector<float>& rotation);
 
   /*!@brief rotates the object around one of the main axes of the object frame
    * @param axis    index of the axis to rotate around, between 0 and 2

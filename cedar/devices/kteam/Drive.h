@@ -73,7 +73,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Returns the number of pulses per wheel-revolution.
-  double getNumberOfPulsesPerRevolution() const;
+  float getNumberOfPulsesPerRevolution() const;
 
   //!@brief Returns the distance a wheel moves for a single pulse [in m].
   cedar::unit::Length getDistancePerPulse() const;
@@ -82,20 +82,22 @@ public:
   cedar::aux::math::IntLimitsParameterPtr getEncoderLimits() const;
 
   //!@brief Returns the current encoder value of the left and right wheel.
-  virtual std::vector<int> getEncoders() const = 0;
+  std::vector<int> getEncoders() const;
 
   /*!@brief Sets the encoder values of both wheels.
    * @param[in] encoders encoder value for the left and right wheel
    */
-  virtual void setEncoders(const std::vector<int>& encoders) = 0;
+  void setEncoders(const std::vector<int>& encoders);
 
   //! @see base class.
-  virtual void reset();
+  CEDAR_DECLARE_DEPRECATED( void reset(); );
 
   /*!@brief Sets the speed of the left and right wheel.
    * @param[in] wheelSpeedPulses The wheel speed of the left and right wheel to be set [in pulses/s].
    */
   virtual void setWheelSpeedPulses(const std::vector<cedar::unit::Frequency>& wheelSpeedPulses);
+
+  cv::Mat pulsesToWheelSpeed(cedar::unit::Time dt, cv::Mat input, ComponentDataType type);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -116,10 +118,15 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   // none yet
+  void init();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  static const cedar::dev::Component::ComponentDataType ENCODERS;
+  static const cedar::dev::Component::ComponentDataType ENCODERS_CHANGE;
+
 protected:
   // none yet
 private:

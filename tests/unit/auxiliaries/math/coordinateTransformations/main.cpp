@@ -49,11 +49,11 @@ int main(int, char**)
   int errors = 0;
 
   std::cout << "test: sphericalToCartesian<double>" << std::endl;
-  cv::Mat horst = cv::Mat::zeros(3, 1, CV_64FC1);
+  cv::Mat horst = cv::Mat::zeros(3, 1, CV_32FC1);
   horst.at<double>(0, 0) = sqrt(2.0);
   horst.at<double>(1, 0) = cedar::aux::math::pi/2.0;
   horst.at<double>(2, 0) = cedar::aux::math::pi/4.0;
-  cv::Mat kevin(3, 1, CV_64FC1);
+  cv::Mat kevin(3, 1, CV_32FC1);
   cedar::aux::math::sphericalToCartesian<double>(horst, kevin);
   if (
        cedar::aux::math::isZero(kevin.at<double>(0, 0) -1.0)
