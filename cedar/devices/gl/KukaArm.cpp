@@ -52,7 +52,11 @@ cedar::dev::gl::KukaArm::KukaArm(cedar::dev::KinematicChainPtr pKinematicChain)
 :
 cedar::dev::gl::KinematicChain(pKinematicChain)
 {
-  loadData();
+  try
+  {
+    loadData();
+  }
+  catch(...){}
 }
 
 cedar::dev::gl::KukaArm::~KukaArm()

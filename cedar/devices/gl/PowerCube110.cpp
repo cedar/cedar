@@ -62,7 +62,11 @@ cedar::dev::gl::PowerCube110::PowerCube110
 :
 cedar::dev::gl::KinematicChain(kinematicChain)
 {
-  loadData();
+  try
+  {
+    loadData();
+  }
+  catch(...){}
 }
 
 cedar::dev::gl::PowerCube110::~PowerCube110()
