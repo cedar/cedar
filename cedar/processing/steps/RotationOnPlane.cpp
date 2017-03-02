@@ -105,17 +105,17 @@ void cedar::proc::steps::RotationOnPlane::compute(const cedar::proc::Arguments&)
 
   mpAngle->getData().at<float>(0,0) = angle;
 
-  // direction of most effective change w_dir = v x ( v x k ) * ( |v| / |v x (v x k)| )
-  cv::Mat w_dir = current_vel.cross(current_vel.cross( current_pos_diff ));
-  const float norm_inf_dir = cv::norm(w_dir);
+  // direction of most effective change w_dir = (k x v) x v * ( ||v|| / ||(k x v) x v|| )
+  cv::Mat w_dir = current_pos_diff.cross(current_vel).cross(current_vel);
+  float norm_term = 0;
 
-  if(norm_inf_dir != 0)
+  const float norm_w_dir = cv::norm(w_dir);
+  if(norm_w_dir != 0)
   {
-    w_dir /= norm_inf_dir;
+    norm_term = cv::norm(current_vel) / norm_w_dir;
   }
 
-  w_dir *= cv::norm(current_vel); //can change the influence dir vector to 0, if reference was 0
-  mpOrthogonalAcceleration->setData(w_dir);
+  mpOrthogonalAcceleration->setData(w_dir * norm_term);
 }
 
 //// validity check
