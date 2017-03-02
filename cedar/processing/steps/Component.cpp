@@ -330,9 +330,7 @@ void cedar::proc::steps::Component::onStop()
   if (this->hasComponent())
   {
     auto component = this->getComponent();
-
     component->clearUserCommand();
-    component->setSuppressUserInteraction(true);
 
     if (component->isCommunicating())
     {
