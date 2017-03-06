@@ -171,6 +171,7 @@ void cedar::dev::gl::KukaArm::drawBase()
   this->drawElement(mBaseRingVertexVboId, mBaseRingIndexVboId, mBaseRingFacesNumber);
   // move to the base of the block and draw it
   glRotated(90.0, 1.0, 0.0, 0.0);
+  glRotated(180.0, 0.0, 1.0, 0.0);
   glTranslated(0.0, -0.055, -0.13);
   drawBaseBlock();
   setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
@@ -436,7 +437,4 @@ void cedar::dev::gl::KukaArm::loadData()
   QString wrist_ring_index_data_file_name
   = QString(cedar::aux::locateResource("meshes/kuka_lwr/wrist_ring_index.txt").c_str());
   loadIndexData(wrist_ring_index_data_file_name, mWristRingFacesNumber, mWristRingIndex);
-
-
 }
-

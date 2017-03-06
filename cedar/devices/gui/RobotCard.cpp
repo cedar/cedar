@@ -103,7 +103,7 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
   // connect button
   auto p_connect_layout = new QHBoxLayout();
   p_connect_layout->setContentsMargins(contents_margins, contents_margins, contents_margins, contents_margins);
-  this->mpConnectButton = new QPushButton(QIcon(":/cedar/dev/gui/icons/not_connected.svg"), "");\
+  this->mpConnectButton = new QPushButton(QIcon(":/cedar/dev/gui/icons/not_connected.svg"), "");
   mpConnectButton->setToolTip("Click to connect the selected instance");
   mpConnectButton->setIconSize(QSize(64, 64));
   mpConnectButton->setFixedWidth(64);
