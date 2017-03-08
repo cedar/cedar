@@ -52,6 +52,7 @@
 #include <QListWidget>
 #include <QModelIndex>
 #include <QMessageBox>
+#include <QMimeData>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
