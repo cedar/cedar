@@ -517,8 +517,10 @@ void cedar::proc::gui::Group::showArchitectureWidget(const std::string& name)
 
   auto dock = this->createDockWidget(name, widget);
   dock->show();
+  QSharedPointer<QWidget> debugPointer = QSharedPointer<QWidget>(dock);
+  QWeakPointer<QWidget> debugWeakPointer = QWeakPointer<QWidget>(debugPointer); 
 
-  this->mArchitectureWidgetDocks.push_back(dock);
+  this->mArchitectureWidgetDocks.push_back(debugWeakPointer);
 }
 
 void cedar::proc::gui::Group::toggleVisibilityOfOpenArchitectureWidgets(bool visible)

@@ -547,6 +547,7 @@ macro(cedar_qt5_wrap_ui outfiles)
       ARGS ${ui_options} -o ${outfile} ${infile}
       MAIN_DEPENDENCY ${infile})
     set(${outfiles} ${${outfiles}} ${outfile})
+	#message("   DEBUG UIC_EXECUTABLE ${QT_UIC_EXECUTABLE}")
   endforeach (it)
 
 endmacro(cedar_qt5_wrap_ui)

@@ -64,7 +64,7 @@ mpWorker(NULL)
 
 cedar::aux::ThreadWrapper::~ThreadWrapper()
 {
-  //std::cout << "destructor for this: " << this << " and thread " << mpThread << std::endl;  
+  //std::cout << "destructor for this: " << this << " and thread " << mpThread << std::endl;
 
   // If other threads enter start() or stop() after this point,
   // they will test mDestructing and abort.
@@ -72,19 +72,20 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
     // note: you don't want them to wait for the destructor, but to abort
     //       as quickly as possible. Thats why we dont use a lock, here.
     // note: mDestructing is only written-to here!
-
+#ifdef DEBUG
   if (!mDestructingMutex.tryLock())
   {
     // You have a BIG problem.
     // This check is just performed for user-convenience, it tests
     // for a major flaw in the ownership-handling of this object and
     // may help finding errors. The destructor should not be called twice!
-    CEDAR_THROW(cedar::aux::ThreadingErrorException, 
+    CEDAR_THROW(cedar::aux::ThreadingErrorException,
                 "cedar::aux::ThreadWrapper::~ThreadWrapper() called twice! "
                 "Ownership is probably being released by two separate "
                 "threads at the same time.");
     // note: never unlock
   }
+#endif // DEBUG
 
   // If other threads had already entered start() or stop(), _we_ wait:
   QMutexLocker locker(&mGeneralAccessLock);
@@ -95,7 +96,7 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
                    // or spin the destructed lock)
 
   // we also wait for finishedThread() to execute:
-  mFinishedThreadMutex.lock(); 
+  mFinishedThreadMutex.lock();
   mFinishedThreadMutex.unlock();
 
   // //////////////////////////////////////////////////////////////////////////
@@ -109,7 +110,7 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
   QReadLocker thread_worker_readlock(&mThreadAndWorkerLock);
   if (validWorker())
   {
-    requestStop(); // set stopped state first, 
+    requestStop(); // set stopped state first,
                    // note: this may help some workers to exit cleanly/quickly
   }
 
@@ -123,7 +124,7 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
     if (QThread::currentThread() != mpThread)
     {
       // need to wait for the thread to finish of its own accord, to make sure
-      // the worker doesnt continue with work() (or step()) after we 
+      // the worker doesnt continue with work() (or step()) after we
       // have been detructed
       auto old_thread = this->mpThread;
       thread_worker_readlock.unlock();
