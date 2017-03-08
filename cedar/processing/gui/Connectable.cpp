@@ -199,6 +199,15 @@ void cedar::proc::gui::Connectable::DeviceQualityDecoration::updateHooks()
   {
     component->registerConnectedHook(boost::bind(&cedar::proc::gui::Connectable::Decoration::updateIconConnected, this));
     component->registerDisconnectedHook(boost::bind(&cedar::proc::gui::Connectable::Decoration::updateIconDisconnected, this));
+
+    if(component->isRunningNolocking())
+    {
+      updateIconConnected();
+    }
+    else
+    {
+      updateIconDisconnected();
+    }
   }
 }
 
