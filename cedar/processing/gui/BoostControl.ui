@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BoostControl</class>
+ <widget class="QWidget" name="BoostControl">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>382</width>
+    <height>326</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Boost Control</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="margin">
+    <number>2</number>
+   </property>
+   <item>
+    <widget class="cedar::proc::gui::ElementTreeWidget" name="mpBoostTree">
+     <attribute name="headerStretchLastSection">
+      <bool>false</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>Boost</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Active</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Strength</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>cedar::proc::gui::ElementTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>cedar/processing/gui/ElementTreeWidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

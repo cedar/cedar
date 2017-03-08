@@ -1,0 +1,27 @@
+/*!
+@page ExperimentFrameworkTutorial Tutorial for the Experiment Framework
+
+This tutorial covers the basics of the experiment framework. If you are not yet familiar with the concepts of this part of cedar, please first visit the concept page of the @link ExperimentFrameworkConcept experiment framework @endlink.
+
+@section EFTutorialBasics Basics
+The entry point for experiments in cedar is the GUI shown below, which can be found by choosing Tools->Experiments from the menu bar.
+
+@image html doc/pages/tutorials/ExperimentFramework/images/experiment_gui_startup.png "This is the GUI representation of an experiment. There is one action sequence with an OnEachTrial condition and no assigned actions. Functional regions are marked and labeled in red."
+
+The top-right corner contains buttons to save and load experiments, as well as create a new one. The bottom-right corner allows to start and stop an experiment. The largest area of the GUI on the left allows the user to specify named action sequences with a condition triggering the listed actions. The plus button adds a new action sequence and the "Add Action" button adds a new action to the given action sequence.
+
+@section EFTutorialExample Example
+To give an example of an experiment, we first have to assemble a small architecture: add a Gauss input, connect it to a NeuralField and connect a LoopedTrigger to the field. Open up the experiment dialog to set up a new experiment for this architecture.
+
+@image html doc/pages/tutorials/ExperimentFramework/images/experiment_architecture.png "The architecture."
+
+Change the condition of the initial ActionSequence to OnEachTrial. As an action, pick SetParameterValue. Set the element assigned to this action to the Gauss input, the property to "amplitude", and the value to "7.0".
+
+@image html doc/pages/tutorials/ExperimentFramework/images/experiment_first_action_sequence.png "The first action sequence."
+
+Add a second ActionSequence by pressing the plus button at the bottom. Choose the OnMatrixValue condition, pick the neural field as element and its sigmoided activation as property. Uncheck the full matrix option, and adjust the value to the right to "0.5" (at least one entry of sigmoided activation has to be larger than 0.5). Add an EndTrial action and add a message. 
+
+@image html doc/pages/tutorials/ExperimentFramework/images/experiment_second_action_sequence.png "The second action sequence."
+
+The experiment is now set up. You may want to alter the amount of trials by adjusting the number on the top left. Make sure to save your experiment. You can now press the start button on the bottom right to start the experiment. The global timer will start to run and the trial number on the top left will increase once a trial has finished.
+*/
