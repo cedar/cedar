@@ -37,12 +37,28 @@
 #
 #=======================================================================================================================
 
-find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml QtSvg REQUIRED)
-if(QT4_FOUND)
+set(CEDAR_CONF_FILE ${CEDAR_HOME}/cedar.conf CACHE FILEPATH "Default configuration file of cedar.")
+# check if the config file exists
+if (NOT EXISTS ${CEDAR_CONF_FILE})
+  message(FATAL_ERROR "The cedar.conf file could not be found. Please create it, e.g., by copying cedar.conf.example to ${CEDAR_CONF_FILE} and filling out the proper values.")
+endif(NOT EXISTS ${CEDAR_CONF_FILE})
+
+message (STATUS "including ${CEDAR_CONF_FILE} configuration file")
+include(${CEDAR_CONF_FILE})
+if(NOT CEDAR_USE_QT5)
+  find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml QtSvg REQUIRED)
+else(NOT CEDAR_USE_QT5)
+  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
+  find_package(QT57)
+endif(NOT CEDAR_USE_QT5)
+
+if(QT4_FOUND AND NOT CEDAR_USE_QT5)
   include(@QT_USE_FILE@)
-else(QT4_FOUND)
-  include_directories(@Qt5Widgets_INCLUDE_DIRS@ @Qt5OpenGL_INCLUDE_DIRS@ @Qt5Xml_INCLUDE_DIRS@)
-endif(QT4_FOUND)
+endif(QT4_FOUND AND NOT CEDAR_USE_QT5)
+
+if(QT5_FOUND)
+  include_directories(@Qt5Widgets_INCLUDE_DIRS@ @Qt5Charts_INCLUDE_DIRS@ @Qt5DataVisualization_INCLUDE_DIRS@ @Qt53DCore_INCLUDE_DIRS@ @Qt53DExtras_INCLUDE_DIRS@ @Qt53DInput_INCLUDE_DIRS@ @Qt53DLogic_INCLUDE_DIRS@ @Qt53DRender_INCLUDE_DIRS@ @Qt5Svg_INCLUDE_DIRS@ @Qt5OpenGL_INCLUDE_DIRS@ @Qt5Xml_INCLUDE_DIRS@)
+endif(QT5_FOUND)
 
 # Include directories for cedar's dependencies
 include_directories(@CEDAR_EXPORTED_INCLUDE_DIRS@)

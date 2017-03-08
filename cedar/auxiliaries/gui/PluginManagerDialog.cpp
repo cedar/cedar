@@ -120,8 +120,13 @@ QDialog(pParent)
     boost::bind(&cedar::aux::gui::PluginManagerDialog::pluginDeclared ,this, _1)
   ));
 
+#ifdef CEDAR_USE_QT5
+  this->mpPluginList->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+  this->mpPluginList->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+#else // CEDAR_USE_QT5
   this->mpPluginList->horizontalHeader()->setResizeMode(0, QHeaderView::ResizeToContents);
   this->mpPluginList->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
+#endif // CEDAR_USE_QT5
   this->mpPluginList->horizontalHeader()->resizeSection(2, 250);
 
   QObject::connect(this->mpUpButton, SIGNAL(clicked()), this, SLOT(moveSelectedSearchPathUp()));
