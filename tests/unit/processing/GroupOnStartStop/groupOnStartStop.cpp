@@ -45,7 +45,11 @@
 
 // SYSTEM INCLUDES
 #include <QApplication>
-#include <QtConcurrentRun>
+#ifdef CEDAR_USE_QT5
+  #include <QtConcurrent/QtConcurrentRun>
+#else
+  #include <QtConcurrentRun>
+#endif
 #include <QFuture>
 
 

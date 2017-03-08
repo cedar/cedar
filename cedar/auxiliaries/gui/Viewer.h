@@ -51,6 +51,7 @@
 // SYSTEM INCLUDES
 #ifdef CEDAR_USE_QGLVIEWER
 #include <qglviewer.h>
+#include <QGLViewer/manipulatedFrame.h>
 #else
 #include <QWidget>
 #endif // CEDAR_USE_QGLVIEWER

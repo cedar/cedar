@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        QwtSurfacePlot.h
+    File:        Qt5SurfacePlot.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -38,30 +38,28 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_QWT_SURFACE_PLOT_H
-#define CEDAR_AUX_GUI_QWT_SURFACE_PLOT_H
+#ifndef CEDAR_AUX_GUI_QT5_SURFACE_PLOT_H
+#define CEDAR_AUX_GUI_QT5_SURFACE_PLOT_H
 
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_QWTPLOT3D
-
+#ifdef CEDAR_USE_QT5
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/PlotInterface.h"
+#include "cedar/auxiliaries/gui/Qt5SurfacePlotInputHandler.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
-#include "cedar/auxiliaries/gui/QwtSurfacePlot.fwd.h"
+#include "cedar/auxiliaries/gui/Qt5SurfacePlot.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
-#include <qwtplot3d/qwt3d_gridplot.h>
-#include <qwtplot3d/qwt3d_function.h>
-#include <qwtplot3d/qwt3d_plot3d.h>
-#include <qwtplot3d/qwt3d_io.h>
 #include <vector>
 #include <string>
+#include <QtDataVisualization/Q3DSurface>
+#include <QtDataVisualization/QHeightMapSurfaceDataProxy>
 
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar
@@ -72,16 +70,16 @@ namespace cedar
     {
       namespace detail
       {
-        /* This is an internal class of QwtSurfacePlot that cannot be nested because Qt's moc doesn't support nested classes.
+        /* This is an internal class of Qt5SurfacePlot that cannot be nested because Qt's moc doesn't support nested classes.
          *
-         * Don't use it outside of the QwtSurfacePlot!
+         * Don't use it outside of the Qt5SurfacePlot!
          */
-        class QwtSurfacePlotWorker : public QObject
+        class Qt5SurfacePlotWorker : public QObject
         {
           Q_OBJECT
 
           public:
-            QwtSurfacePlotWorker(cedar::aux::gui::QwtSurfacePlot* pPlot)
+            Qt5SurfacePlotWorker(cedar::aux::gui::Qt5SurfacePlot* pPlot)
             :
             mpPlot(pPlot)
             {
@@ -94,9 +92,9 @@ namespace cedar
             void done();
 
           public:
-            cedar::aux::gui::QwtSurfacePlot *mpPlot;
+            cedar::aux::gui::Qt5SurfacePlot *mpPlot;
         };
-        CEDAR_GENERATE_POINTER_TYPES(QwtSurfacePlotWorker);
+        CEDAR_GENERATE_POINTER_TYPES(Qt5SurfacePlotWorker);
       }
     }
   }
@@ -109,7 +107,7 @@ namespace cedar
  *        Matrices displayed by this plot are plotted as a three-dimensional surface, where the x- and y-coordinates are
  *        assumed to be the indices of the 2d matrix while the z-coordinate is the value stored within the matrix.
  */
-class cedar::aux::gui::QwtSurfacePlot : public cedar::aux::gui::PlotInterface
+class cedar::aux::gui::Qt5SurfacePlot : public PlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -119,7 +117,8 @@ class cedar::aux::gui::QwtSurfacePlot : public cedar::aux::gui::PlotInterface
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::aux::gui::detail::QwtSurfacePlotWorker;
+  friend class cedar::aux::gui::detail::Qt5SurfacePlotWorker;
+  friend class cedar::aux::gui::Qt5SurfacePlotInputHandler;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -129,24 +128,34 @@ private:
   {
     public:
       Perspective(const std::string& name = "perspective",
-                  double rotationX = 0, double rotationY = 0, double rotationZ = 0,
-                  double scaleX = 1, double scaleY = 1, double scaleZ = 1,
-                  double shiftX = 0, double shiftY = 0, double shiftZ = 0,
-                  double zoom = 1);
-
-      void applyTo(Qwt3D::Plot3D* pPlot);
+                  QtDataVisualization::Q3DCamera::CameraPreset camPreset = QtDataVisualization::Q3DCamera::CameraPresetNone,
+                  double rotationX = 0, double rotationY = 0);
 
       const std::string& getName() const
       {
         return this->mName;
       }
 
+      QtDataVisualization::Q3DCamera::CameraPreset getPreset()
+      {
+        return this->mCamPreset;
+      }
+
+      double getRotationX()
+      {
+        return this->mRotation[0];
+      }
+
+      double getRotationY()
+      {
+        return this->mRotation[1];
+      }
+
+
     private:
       std::string mName;
-      double mRotation[3];
-      double mScale[3];
-      double mShift[3];
-      double mZoom;
+      QtDataVisualization::Q3DCamera::CameraPreset mCamPreset;
+      double mRotation[2];
   };
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -154,13 +163,13 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  QwtSurfacePlot(QWidget *pParent = NULL);
+  Qt5SurfacePlot(QWidget *pParent = NULL);
 
   //!@brief Constructor expecting a DataPtr.
-  QwtSurfacePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL);
+  Qt5SurfacePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL);
 
   //!@brief Destructor
-  ~QwtSurfacePlot();
+  ~Qt5SurfacePlot();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -170,6 +179,8 @@ public:
   void plot(cedar::aux::ConstDataPtr matData, const std::string& title);
   //!@brief show or hide the plot grid
   void showGrid(bool show);
+
+  void setBold(bool isBold);
   //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
 
@@ -182,7 +193,7 @@ signals:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief create and handle the context menu
-  void contextMenuEvent(QContextMenuEvent * pEvent);
+//  void contextMenuEvent(QContextMenuEvent * pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -218,8 +229,24 @@ private:
   //! flag if plot grid should be displayed
   bool mShowGridLines;
 
+  bool mIsBold;
+
+  cedar::aux::gui::Qt5SurfacePlotInputHandler *m_inputHandler;
+
+  double y_min;
+  double y_max;
+
   //! the plot object
-  Qwt3D::GridPlot* mpPlot;
+//  Qwt3D::GridPlot* mpPlot;
+
+  QtDataVisualization::QSurfaceDataArray *dataArray;
+
+  QtDataVisualization::Q3DSurface *m_graph;
+
+  QtDataVisualization::QSurfaceDataProxy *m_sqrtSinProxy;
+
+  QtDataVisualization::QSurface3DSeries *m_sqrtSinSeries;
+
 
   //! vector of possible perspectives
   std::vector<Perspective> mPerspectives;
@@ -230,15 +257,15 @@ private:
   //! column count of data
   size_t mDataCols;
 
-  //! 2D array data
-  Qwt3D::Triple** mppArrayData;
-
   //! Thread in which conversion of mat data to qwt triple is done.
   QThread* mpWorkerThread;
 
-  //! Worker object.
-  cedar::aux::gui::detail::QwtSurfacePlotWorkerPtr mWorker;
-}; // class cedar::aux::gui::QwtSurfacePlot
+  //! For locking the plot itself.
+  QReadWriteLock *mpLock;
 
-#endif // CEDAR_USE_QWTPLOT3D
-#endif // CEDAR_AUX_GUI_QWT_SURFACE_PLOT_H
+  //! Worker object.
+  cedar::aux::gui::detail::Qt5SurfacePlotWorkerPtr mWorker;
+}; // class cedar::aux::gui::Qt5SurfacePlot
+
+#endif // CEDAR_USE_QT5
+#endif // CEDAR_AUX_GUI_QT5_SURFACE_PLOT_H

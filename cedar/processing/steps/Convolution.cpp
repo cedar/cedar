@@ -356,6 +356,10 @@ unsigned int cedar::proc::steps::Convolution::getDimensionality() const
   {
     return cedar::aux::math::getDimensionalityOf(this->mMatrix->getData());
   }
+  else if (this->_mKernels->size() > 0)
+  {
+    return this->_mKernels->at(0)->getDimensionality();
+  }
   else
   {
     return 2;
