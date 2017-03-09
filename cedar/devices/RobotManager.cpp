@@ -337,14 +337,11 @@ void cedar::dev::RobotManager::loadRobotConfiguration
     cedar::aux::LogSingleton::getInstance()->error(message, CEDAR_CURRENT_FUNCTION_NAME);
   }
 
-  if(configuration.getFileNameWithoutExtension() == "simulator_configuration")
+  cedar::aux::gl::ObjectVisualizationPtr p_object_visualisation = boost::dynamic_pointer_cast<cedar::aux::gl::ObjectVisualization>(robot->getVisualisationPtr());
+  if(p_object_visualisation)
   {
-    cedar::aux::gl::ObjectVisualizationPtr p_object_visualisation = boost::dynamic_pointer_cast<cedar::aux::gl::ObjectVisualization>(robot->getVisualisationPtr());
-    if(p_object_visualisation)
-    {
-      p_object_visualisation->setObjectName(QString::fromStdString(robotName));
-      cedar::aux::gl::GlobalSceneSingleton::getInstance()->addObjectVisualization(p_object_visualisation);
-    }
+    p_object_visualisation->setObjectName(QString::fromStdString(robotName));
+    cedar::aux::gl::GlobalSceneSingleton::getInstance()->addObjectVisualization(p_object_visualisation);
   }
 
   this->mRobotConfigurationLoadedSignal(robotName);
