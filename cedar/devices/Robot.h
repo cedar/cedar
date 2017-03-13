@@ -199,6 +199,9 @@ private:
   //! Reads and instantiates the slots given in the configuration.
   void readComponentSlotInstantiations(const cedar::aux::ConfigurationNode& node);
 
+  //! Reads and stacks the component connections.
+  void readComponentConnections(const cedar::aux::ConfigurationNode& node);
+
   //! Reads the channels and their configurations and instantiates the selected channels.
   void readChannels(const cedar::aux::ConfigurationNode& node);
 
