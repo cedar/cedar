@@ -44,6 +44,7 @@
 #include "cedar/devices/ComponentSlot.h"
 #include "cedar/devices/exceptions.h"
 #include "cedar/devices/Channel.h"
+#include "cedar/devices/KinematicChain.h"
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
@@ -376,6 +377,7 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
 
   this->performConsistencyCheck();
 
+  // connect components
 }
 
 void cedar::dev::Robot::readVisualisation(const cedar::aux::ConfigurationNode &node)
@@ -426,6 +428,35 @@ void cedar::dev::Robot::readConfiguration(const cedar::aux::ConfigurationNode& n
   this->readComponentSlotInstantiations(node);
 
   this->readVisualisation(description);
+  this->readComponentConnections(description);
+}
+
+void cedar::dev::Robot::readComponentConnections(const cedar::aux::ConfigurationNode& node)
+{
+  auto component_connections_iter = node.find("component connections");
+
+  if(component_connections_iter != node.not_found())
+  {
+    for (auto iter = component_connections_iter->second.begin(); iter != component_connections_iter->second.end(); ++iter)
+    {
+      const std::string name1 = iter->first;
+      const std::string name2 = iter->second.get_value<std::string>();
+
+      try
+      {
+        cedar::dev::KinematicChainPtr root = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(this->getComponent(name1));
+        cedar::dev::KinematicChainPtr eef = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(this->getComponent(name2));
+
+        root->setEndEffector(eef->getRootCoordinateFrame());
+      }
+      catch(...)
+      {
+        std::string message = "Could not stack \""+name2+"\" on \""+name1+"\" for robot \"" + this->getName() + "\" ... ignoring that and continue.";
+        std::cout << message << std::endl;
+        cedar::aux::LogSingleton::getInstance()->error(message, CEDAR_CURRENT_FUNCTION_NAME);
+      }
+    }
+  }
 }
 
 void cedar::dev::Robot::readChannels(const cedar::aux::ConfigurationNode& node)

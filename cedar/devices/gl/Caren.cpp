@@ -121,8 +121,6 @@ void cedar::dev::gl::Caren::initializeGl()
   mTrunk = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(mRobot->getComponent("trunk"));
   mArm = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(mRobot->getComponent("arm"));
 
-  mTrunk->setEndEffector(mArm->getRootCoordinateFrame());
-
   // initialize with legitimate values
   mTrunk->updatedUserMeasurementSlot();
   mArm->updatedUserMeasurementSlot();
