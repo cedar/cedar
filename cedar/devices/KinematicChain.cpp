@@ -1024,7 +1024,7 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
                       mControllerFinished = true;
                       for(int i = 0; i<xdot.rows; ++i)
                       {
-                        if(std::abs(xdot.at<float>(i, 0)) >= 10000 * std::numeric_limits<float>::epsilon())
+                        if(std::abs(xdot.at<float>(i, 0)) >= 100000 * std::numeric_limits<float>::epsilon())
                         {
                           //std::cout << i << ": " << xdot.at<float>(i, 0) << " ";
                           mControllerFinished = false;
