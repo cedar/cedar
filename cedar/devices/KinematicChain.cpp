@@ -1012,6 +1012,7 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
     rlock.unlock();
 
     setCurrentInitialConfiguration(name);
+    setSuppressUserInteraction(false);
 
     mControllerFinished = false;
     setController(cedar::dev::KinematicChain::JOINT_VELOCITIES,
