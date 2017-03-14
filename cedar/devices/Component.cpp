@@ -2034,6 +2034,7 @@ void cedar::dev::Component::clearController()
 {
   QWriteLocker locker(mController.getLockPtr());
   mController.member().reset();
+  mControllerFinished = true;
 }
 
 void cedar::dev::Component::setController(ComponentDataType type, cedar::dev::Component::ControllerCallback fun)
