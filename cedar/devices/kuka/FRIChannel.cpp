@@ -121,6 +121,13 @@ void cedar::dev::kuka::FRIChannel::openHook()
 void cedar::dev::kuka::FRIChannel::closeHook()
 {
   // dummy
+  if (mpFriRemote)
+  {
+    QMutexLocker lock( &mFRIRemoteLock );
+    mpFriRemote->setToKRLBool(0, true);
+    mpFriRemote->doDataExchange();
+    delete mpFriRemote;
+  }
 }
 
 
