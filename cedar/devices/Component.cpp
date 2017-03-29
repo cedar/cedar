@@ -2180,11 +2180,11 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
         mWatchDogCounter.member()++;
 
         if (mWatchDogCounter.member() == 1
-            || mWatchDogCounter.member() > 1500)
+            || mWatchDogCounter.member() > 5000)
         {
           std::string s = "";
           
-          if (mWatchDogCounter.member() > 1500)
+          if (mWatchDogCounter.member() > 5000)
           {
             s = " (repeated " + boost::lexical_cast<std::string>(mWatchDogCounter.member()) + " times)";
           }
