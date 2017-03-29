@@ -1371,6 +1371,17 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
     type_from_user = this->mController.member()->mBufferType;
     userData = (this->mController.member()->mCallback());
 
+    mControllerFinished = true;
+
+    for(int i = 0; i<userData.rows; ++i)
+    {
+      if(std::abs(userData.at<float>(i, 0)) >= 100000 * std::numeric_limits<float>::epsilon())
+      {
+        mControllerFinished = false;
+        break;
+      }
+    }
+
     if(mControllerFinished)
     {
       locker.unlock();
@@ -1961,7 +1972,7 @@ void cedar::dev::Component::startBrakingSlowly()
 
   // todo: test that brake is not already running ...
 
-  if (!applyBrakeSlowlyController()) 
+  if (!applyBrakeSlowlyController())
   {
     cedar::aux::LogSingleton::getInstance()->warning(
       "Couldn't brake " + prettifyName() + " slowly, braking fast instead.",

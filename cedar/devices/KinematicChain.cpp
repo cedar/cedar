@@ -1021,19 +1021,6 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
                     [&]()
                     {
                       const cv::Mat xdot = -1 * (getJointAngles() - mInitialConfigurations.find(mCurrentInitialConfiguration)->second);
-
-                      mControllerFinished = true;
-                      for(int i = 0; i<xdot.rows; ++i)
-                      {
-                        if(std::abs(xdot.at<float>(i, 0)) >= 100000 * std::numeric_limits<float>::epsilon())
-                        {
-                          //std::cout << i << ": " << xdot.at<float>(i, 0) << " ";
-                          mControllerFinished = false;
-                          break;
-                        }
-                      }
-                      //std::cout << "\n";
-
                       return xdot;
                     }
                   )
@@ -1149,10 +1136,29 @@ void cedar::dev::KinematicChain::updatedUserMeasurementSlot()
 
 bool cedar::dev::KinematicChain::applyBrakeSlowlyController()
 {
+  mControllerFinished = false;
   setController( cedar::dev::KinematicChain::JOINT_VELOCITIES,
                  boost::bind< cv::Mat>( [&]()
                               {
-                                return getJointVelocities() / 4;
+                                const cv::Mat xdot = getJointVelocities() / 4;
+
+                                bool fin = true;
+                                for(int i = 0; i<xdot.rows; ++i)
+                                {
+                                  if(std::abs(xdot.at<float>(i, 0)) >= 1000000 * std::numeric_limits<float>::epsilon())
+                                  {
+                                    fin = false;
+                                  }
+                                }
+
+                                if(fin)
+                                {
+                                  return cv::Mat::zeros( getNumberOfJoints(), 1, CV_32F );
+                                }
+                                else
+                                {
+                                  return getJointVelocities() / 4;
+                                }
                               } 
                             ));
   return true;
@@ -1160,6 +1166,7 @@ bool cedar::dev::KinematicChain::applyBrakeSlowlyController()
 
 bool cedar::dev::KinematicChain::applyBrakeNowController()
 {
+  mControllerFinished = false;
   setController( cedar::dev::KinematicChain::JOINT_VELOCITIES,
                  boost::bind< cv::Mat>( [&]()
                               {
