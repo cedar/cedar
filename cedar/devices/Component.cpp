@@ -1232,7 +1232,7 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   } // end: channel is open
 
   // utitlity: warn if consistently much too slow
-  if (time > this->getCommunicationStepSize() * 1.4)
+  if (time > this->getCommunicationStepSize() * 2.0)
   {
     QWriteLocker lock(&mTooSlowCounter.getLock());
 
