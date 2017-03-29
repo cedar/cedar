@@ -135,6 +135,13 @@ void cedar::dev::gui::KinematicChainCommandWidget::commandJoints()
 
 void cedar::dev::gui::KinematicChainCommandWidget::stopMovement()
 {
+  if (!mpKinematicChain->isCommunicating())
+  {
+    cedar::aux::LogSingleton::getInstance()->message(
+      mpKinematicChain->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.",
+      CEDAR_CURRENT_FUNCTION_NAME);
+  }
+
   mpKeepMovingBox->setChecked(false);
   mpKinematicChain->startBrakingSlowly();
 
@@ -411,6 +418,13 @@ void cedar::dev::gui::KinematicChainCommandWidget::changeInitialConfig()
 
 void cedar::dev::gui::KinematicChainCommandWidget::applyInitialConfig()
 {
+  if (!mpKinematicChain->isCommunicating())
+  {
+    cedar::aux::LogSingleton::getInstance()->message(
+      mpKinematicChain->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.",
+      CEDAR_CURRENT_FUNCTION_NAME);
+  }
+
   mpKinematicChain->applyInitialConfiguration(mpIniconfBox->currentText().toStdString());
 }
 
