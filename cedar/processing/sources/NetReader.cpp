@@ -101,6 +101,7 @@ _mPort(new cedar::aux::StringParameter(this, "port",
   this->declareOutput("output", mOutput);
 
   //add actions that emits the output properties changed signal
+
   this->registerFunction
   (
     "emit output properties changed signal",
