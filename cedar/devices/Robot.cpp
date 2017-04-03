@@ -352,7 +352,7 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
       const cedar::aux::ConfigurationNode& slot_config = slot_iter->second;
 
       cedar::dev::ComponentSlotPtr slot(new cedar::dev::ComponentSlot(this->shared_from_this(), slot_name));
-      slot->readConfiguration(slot_config);
+      slot->readConfiguration(slot_config);      
       mComponentSlots[slot_name] = slot;
     }
   }

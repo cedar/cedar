@@ -515,7 +515,7 @@ public:
    *
    * @return    vector of string: the names of initial configurations
    */
-  std::vector<std::string> getInitialConfigurationIndices();
+  std::vector<std::string> getInitialConfigurationNames();
 
   /*!@brief get index number of the current initial configuration
    *
@@ -541,10 +541,9 @@ public:
   void setInitialConfigurations(std::map<std::string, cv::Mat> configs);
   //!@brief set the currently valid initial configuration and apply it (i.e. move the manipulator to that configuration)
   void applyInitialConfiguration(const std::string& name);
-  //!@brief apply the named initial configuration by index
-  //
-  // Prefer using @applyInitialConfiguration(string) for accessing named configurations
-  void applyInitialConfiguration(unsigned int i);
+
+  //!@brief read initial configurations out of chain specific file
+  void readInitialConfigurations();
 
   //----------------------------------------------------------------------------
   // protected methods

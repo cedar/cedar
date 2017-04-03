@@ -346,35 +346,11 @@ void cedar::dev::gui::KinematicChainCommandWidget::loadInitialConfigurations()
 {
   mpIniconfBox->clear();
 
-  const std::string filename = "initial_configurations_"+ mpKinematicChain->getName() + ".json";
-  cedar::aux::Path file_path = cedar::aux::Path::globalCofigurationBaseDirectory() + filename;
+  std::vector<std::string> lConfNames = mpKinematicChain->getInitialConfigurationNames();
 
-  cedar::aux::ConfigurationNode configs;
-  try
+  for (const std::string &confName : lConfNames)
   {
-    boost::property_tree::read_json(file_path.toString(), configs);
-  }
-  catch (const boost::property_tree::json_parser::json_parser_error& e)
-  {
-    cedar::aux::LogSingleton::getInstance()->warning
-    (
-      "Could not read initial configurations. Maybe there is no such file yet. Boost says: \"" + std::string(e.what()) + "\".",
-      "cedar::dev::gui::KinematicChainInitialConfigWidget::KinematicChainInitialConfigWidget()"
-    );
-  }
-
-  for (auto child_iter = configs.begin(); child_iter != configs.end(); ++child_iter)
-  {
-    mpIniconfBox->addItem(QString::fromStdString(child_iter->first));
-    cv::Mat joints = cv::Mat::zeros(mpKinematicChain->getNumberOfJoints(), 1, CV_32F);
-
-    for (uint i=0; i<mpKinematicChain->getNumberOfJoints(); ++i)
-    {
-      float angle = configs.get<float>(child_iter->first+"."+std::to_string(i));
-      joints.at<float>(i, 0) = angle;
-    }
-
-    mpKinematicChain->addInitialConfiguration(child_iter->first, joints);
+    mpIniconfBox->addItem(QString::fromStdString(confName));
   }
 
   mpIniconfBox->setCurrentIndex(0);

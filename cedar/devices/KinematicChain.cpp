@@ -55,6 +55,9 @@
 #endif
 #include <algorithm>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
 namespace
 {
   bool registered()
@@ -162,6 +165,7 @@ void cedar::dev::KinematicChain::readConfiguration(const cedar::aux::Configurati
 {
   cedar::aux::NamedConfigurable::readConfiguration(node);
   initializeFromJointList();
+  readInitialConfigurations();
   getRootCoordinateFrame()->setName(this->getName());
 }
 
@@ -1036,31 +1040,42 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
   }
 }
 
-void cedar::dev::KinematicChain::applyInitialConfiguration(unsigned int index)
+void cedar::dev::KinematicChain::readInitialConfigurations()
 {
-  QReadLocker rlock(&mCurrentInitialConfigurationLock);
+  QWriteLocker wlock(&mCurrentInitialConfigurationLock);
 
-  if (index >= mInitialConfigurations.size())
+  const std::string filename = "initial_configurations_"+ this->getName() + ".json";
+  cedar::aux::Path file_path = cedar::aux::Path::globalCofigurationBaseDirectory() + filename;
+
+  mInitialConfigurations.clear(); // remove meaningless defaults
+  wlock.unlock();
+
+  cedar::aux::ConfigurationNode configs;
+
+  try
   {
-    CEDAR_THROW
+    boost::property_tree::read_json(file_path.toString(), configs);
+  }
+  catch (const boost::property_tree::json_parser::json_parser_error& e)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
     (
-      InitialConfigurationNotFoundException,
-      "You tried to apply an initial configuration with index "
-                       + boost::lexical_cast<std::string>(index)
-                       + "' which doesn't exist. Size: "
-                       + boost::lexical_cast<std::string>(mInitialConfigurations.size())
+      "Could not read initial configurations. Maybe there is no such file yet. Boost says: \"" + std::string(e.what()) + "\".",
+      "cedar::dev::gui::KinematicChainInitialConfigWidget::KinematicChainInitialConfigWidget()"
     );
   }
 
-  unsigned int j = 0;
-  for (auto it = mInitialConfigurations.begin(); it != mInitialConfigurations.end(); it++ )
+  for (auto child_iter = configs.begin(); child_iter != configs.end(); ++child_iter)
   {
-    if (index == j)
+    cv::Mat joints = cv::Mat::zeros(this->getNumberOfJoints(), 1, CV_32F);
+
+    for (uint i=0; i < this->getNumberOfJoints(); ++i)
     {
-      rlock.unlock();
-      return applyInitialConfiguration(it->first);
+      float angle = configs.get<float>(child_iter->first+"."+std::to_string(i));
+      joints.at<float>(i, 0) = angle;
     }
-    j++;
+
+    this->addInitialConfiguration(child_iter->first, joints);
   }
 }
 
@@ -1100,7 +1115,7 @@ cv::Mat cedar::dev::KinematicChain::getInitialConfiguration(const std::string& n
   return f->second;
 }
 
-std::vector<std::string> cedar::dev::KinematicChain::getInitialConfigurationIndices()
+std::vector<std::string> cedar::dev::KinematicChain::getInitialConfigurationNames()
 {
   QReadLocker lock(&mCurrentInitialConfigurationLock);
   std::vector<std::string> result;
