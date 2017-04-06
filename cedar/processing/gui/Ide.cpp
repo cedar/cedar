@@ -1535,7 +1535,10 @@ bool cedar::proc::gui::Ide::loadSerializableData()
   QString file = QFileDialog::getOpenFileName(this, // parent
                                               "Select which data file to load", // caption
                                               last_dir->getValue().absolutePath(), // initial directory
-                                              "data (*.data)" // filter(s), separated by ';;'
+                                              "data (*.data)", // filter(s), separated by ';;'
+                                              0,
+                                              // js: Workaround for freezing file dialogs in QT5 (?)
+                                              QFileDialog::DontUseNativeDialog
                                               );
 
   if (!file.isEmpty())
@@ -1592,7 +1595,10 @@ void cedar::proc::gui::Ide::load()
   QString file = QFileDialog::getOpenFileName(this, // parent
                                               "Select which file to load", // caption
                                               last_dir->getValue().absolutePath(), // initial directory
-                                              "json (*.json)" // filter(s), separated by ';;'
+                                              "json (*.json)", // filter(s), separated by ';;'
+                                              0,
+                                              // js: Workaround for freezing file dialogs in QT5 (?)
+                                              QFileDialog::DontUseNativeDialog
                                               );
 
   if (!file.isEmpty())
