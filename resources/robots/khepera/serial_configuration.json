@@ -1,0 +1,13 @@
+{
+  "name": "default Khepera robot",
+  "description file": "configs/khepera/description.json",
+  "component instantiations":
+  {
+    "drive": "serial",
+    "ambient light sensor": "serial",
+    "proximity sensor": "serial",
+    "led": "serial",
+    "arm": "serial",
+    "gripper": "serial"
+  }
+}

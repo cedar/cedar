@@ -1,0 +1,428 @@
+{
+    "meta":
+    {
+        "format": "1"
+    },
+    "steps":
+    {
+        "cedar.processing.sources.BoxInput":
+        {
+            "name": "box left",
+            "amplitude": "1",
+            "reference level": "0",
+            "dimensionality": "1",
+            "widths":
+            [
+                "1"
+            ],
+            "left bounds":
+            [
+                "0"
+            ],
+            "sizes":
+            [
+                "2"
+            ]
+        },
+        "cedar.processing.sources.BoxInput":
+        {
+            "name": "box right",
+            "amplitude": "1",
+            "reference level": "0",
+            "dimensionality": "1",
+            "widths":
+            [
+                "1"
+            ],
+            "left bounds":
+            [
+                "1"
+            ],
+            "sizes":
+            [
+                "2"
+            ]
+        },
+        "cedar.processing.Projection":
+        {
+            "name": "left",
+            "dimension mapping":
+            {
+                "0": "4294967295"
+            },
+            "output dimensionality": "0",
+            "output dimension sizes": "",
+            "compression type": "AVERAGE"
+        },
+        "cedar.processing.MatrixSlice":
+        {
+            "name": "left irs",
+            "range lower":
+            [
+                "5"
+            ],
+            "range upper":
+            [
+                "8"
+            ]
+        },
+        "cedar.processing.StaticGain":
+        {
+            "name": "left motor command",
+            "gain factor": "0.001"
+        },
+        "cedar.processing.steps.Convolution":
+        {
+            "name": "new Convolution",
+            "kernels": "",
+            "convolution":
+            {
+                "borderType": "Zero",
+                "mode": "Same",
+                "engine":
+                {
+                    "type": "cedar.aux.conv.OpenCV"
+                }
+            }
+        },
+        "cedar.processing.steps.Convolution":
+        {
+            "name": "new Convolution 2",
+            "kernels": "",
+            "convolution":
+            {
+                "borderType": "Zero",
+                "mode": "Same",
+                "engine":
+                {
+                    "type": "cedar.aux.conv.OpenCV"
+                }
+            }
+        },
+        "cedar.processing.steps.MatrixTypeConverter":
+        {
+            "name": "new MatrixTypeConverter",
+            "target type": "Double"
+        },
+        "cedar.processing.steps.Sum":
+        {
+            "name": "new Sum"
+        },
+        "cedar.processing.Projection":
+        {
+            "name": "right",
+            "dimension mapping":
+            {
+                "0": "4294967295"
+            },
+            "output dimensionality": "0",
+            "output dimension sizes": "",
+            "compression type": "AVERAGE"
+        },
+        "cedar.processing.MatrixSlice":
+        {
+            "name": "right irs",
+            "range lower":
+            [
+                "0"
+            ],
+            "range upper":
+            [
+                "3"
+            ]
+        },
+        "cedar.processing.StaticGain":
+        {
+            "name": "right motor command",
+            "gain factor": "0.001"
+        },
+        "cedar.processing.steps.Component":
+        {
+            "name": "sensors",
+            "component": "hardware epuck.proximity sensor",
+            "command group": ""
+        },
+        "cedar.processing.TransferFunction":
+        {
+            "name": "transfer left",
+            "function":
+            {
+                "type": "cedar.aux.math.LinearTransferFunction",
+                "factor": "1",
+                "offset": "0"
+            }
+        },
+        "cedar.processing.TransferFunction":
+        {
+            "name": "transfer right",
+            "function":
+            {
+                "type": "cedar.aux.math.LinearTransferFunction",
+                "factor": "1",
+                "offset": "0"
+            }
+        },
+        "cedar.processing.steps.Component":
+        {
+            "name": "wheels",
+            "component": "hardware epuck.drive",
+            "command group": "differential drive interface"
+        }
+    },
+    "triggers":
+    {
+        "cedar.processing.LoopedTrigger":
+        {
+            "name": "new LoopedTrigger",
+            "step size": "0.001 s",
+            "idle time": "1e-05 s",
+            "simulated time": "0.001 s",
+            "loop mode": "Fixed",
+            "listeners":
+            [
+                "sensors",
+                "wheels"
+            ]
+        }
+    },
+    "connections":
+    [
+        {
+            "source": "sensors.IR values",
+            "target": "left irs.matrix"
+        },
+        {
+            "source": "sensors.IR values",
+            "target": "right irs.matrix"
+        },
+        {
+            "source": "left irs.slice",
+            "target": "left.input"
+        },
+        {
+            "source": "right irs.slice",
+            "target": "right.input"
+        },
+        {
+            "source": "left.output",
+            "target": "transfer left.input"
+        },
+        {
+            "source": "right.output",
+            "target": "transfer right.input"
+        },
+        {
+            "source": "transfer left.sigmoided output",
+            "target": "left motor command.input"
+        },
+        {
+            "source": "transfer right.sigmoided output",
+            "target": "right motor command.input"
+        },
+        {
+            "source": "box left.box input",
+            "target": "new Convolution.matrix"
+        },
+        {
+            "source": "left motor command.output",
+            "target": "new Convolution.kernel"
+        },
+        {
+            "source": "box right.box input",
+            "target": "new Convolution 2.matrix"
+        },
+        {
+            "source": "right motor command.output",
+            "target": "new Convolution 2.kernel"
+        },
+        {
+            "source": "new Convolution.result",
+            "target": "new Sum.terms"
+        },
+        {
+            "source": "new Convolution 2.result",
+            "target": "new Sum.terms"
+        },
+        {
+            "source": "new Sum.sum",
+            "target": "new MatrixTypeConverter.matrix"
+        },
+        {
+            "source": "new MatrixTypeConverter.converted matrix",
+            "target": "wheels.Wheel Speed"
+        }
+    ],
+    "name": "",
+    "connectors": "",
+    "is looped": "false",
+    "ui":
+    [
+        {
+            "type": "step",
+            "step": "box left",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-104",
+            "positionY": "-304"
+        },
+        {
+            "type": "step",
+            "step": "box right",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-104",
+            "positionY": "-104"
+        },
+        {
+            "type": "step",
+            "step": "left",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-360",
+            "positionY": "-232"
+        },
+        {
+            "type": "step",
+            "step": "left irs",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-448",
+            "positionY": "-232"
+        },
+        {
+            "type": "step",
+            "step": "left motor command",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-168",
+            "positionY": "-232"
+        },
+        {
+            "type": "step",
+            "step": "new Convolution",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-16",
+            "positionY": "-232"
+        },
+        {
+            "type": "step",
+            "step": "new Convolution 2",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-16",
+            "positionY": "-168"
+        },
+        {
+            "type": "trigger",
+            "trigger": "new LoopedTrigger",
+            "width": "30",
+            "height": "30",
+            "positionX": "-144",
+            "positionY": "-544"
+        },
+        {
+            "type": "step",
+            "step": "new MatrixTypeConverter",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "144",
+            "positionY": "-208"
+        },
+        {
+            "type": "step",
+            "step": "new Sum",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "72",
+            "positionY": "-208"
+        },
+        {
+            "type": "step",
+            "step": "right",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-360",
+            "positionY": "-168"
+        },
+        {
+            "type": "step",
+            "step": "right irs",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-448",
+            "positionY": "-168"
+        },
+        {
+            "type": "step",
+            "step": "right motor command",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-168",
+            "positionY": "-168"
+        },
+        {
+            "type": "step",
+            "step": "sensors",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "-712",
+            "positionY": "-200"
+        },
+        {
+            "type": "step",
+            "step": "transfer left",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-256",
+            "positionY": "-232"
+        },
+        {
+            "type": "step",
+            "step": "transfer right",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-256",
+            "positionY": "-168"
+        },
+        {
+            "type": "step",
+            "step": "wheels",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "224",
+            "positionY": "-208"
+        }
+    ],
+    "ui generic":
+    {
+        "group": "",
+        "open plots": "",
+        "plot groups": "",
+        "architecture widgets": "",
+        "width": "250",
+        "height": "250",
+        "smart mode": "false",
+        "collapsed": "false",
+        "uncollapsed width": "250",
+        "uncollapsed height": "250",
+        "positionX": "0",
+        "positionY": "0"
+    }
+}

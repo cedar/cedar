@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/cedar/dev/gui">
+        <file>icons/epuck_icon_256.png</file>
+        <file>icons/generic_hardware_icon.svg</file>
+        <file>icons/ir_sensor_icon.svg</file>
+        <file>icons/khepera_icon_256.png</file>
+        <file>icons/select_component.svg</file>
+        <file>icons/not_connected.svg</file>
+        <file>icons/connected.svg</file>
+        <file>icons/partially_connected.svg</file>
+        <file>icons/connecting.svg</file>
+        <file>icons/drop_robot.png</file>
+        <file>icons/caren_icon_256.png</file>
+        <file>icons/youbot_icon_256.png</file>
+        <file>icons/caren_arm.svg</file>
+        <file>icons/caren_trunk.svg</file>
+    </qresource>
+</RCC>
