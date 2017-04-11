@@ -61,7 +61,7 @@
 cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
 {
   // associate robot with this card
-  this->mRobot = cedar::dev::RobotManagerSingleton::getInstance()->getRobot(robotName.toStdString());
+  this->mrRobot = cedar::dev::RobotManagerSingleton::getInstance()->getRobot(robotName.toStdString());
 
   this->mRobotRemovedConnection
     = cedar::dev::RobotManagerSingleton::getInstance()->connectToRobotRemovedSignal
@@ -167,6 +167,7 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
     this->updateConnectionIcon();
   }
 
+  robotNameEditValueChanged();
 }
 
 cedar::dev::gui::RobotCardIconHolder::RobotCardIconHolder(cedar::dev::gui::RobotCard* pCard)
@@ -456,19 +457,19 @@ QListWidgetItem* cedar::dev::gui::RobotCardIconHolder::itemFromMime(QDropEvent* 
 
 void cedar::dev::gui::RobotCard::robotNameEditValueChanged()
 {
-  const QString &robot_name = mpRobotNameEdit->text();
+  const std::string robot_name = mpRobotNameEdit->text().toStdString();
 
-  if(robot_name.toStdString() == mCurrentName)
+  if(robot_name == mCurrentName)
   {
     return;
   }
 
   cedar::aux::LogSingleton::getInstance()->message
   (
-    "\""+mCurrentName+"\" was renamed to \""+robot_name.toStdString()+"\"",
+    "\""+mCurrentName+"\" was renamed to \""+robot_name+"\"",
     "cedar::dev::gui::RobotCard::robotNameEditValueChanged()"
   );
 
-  cedar::dev::RobotManagerSingleton::getInstance()->renameRobot(mCurrentName, robot_name.toStdString());
-  mCurrentName = robot_name.toStdString();
+  cedar::dev::RobotManagerSingleton::getInstance()->renameRobot(mCurrentName, robot_name);
+  mCurrentName = robot_name;
 }

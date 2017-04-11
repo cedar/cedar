@@ -495,7 +495,7 @@ void cedar::dev::Robot::appendChannelConfiguration(const std::string& channelNam
 
 cedar::dev::gl::RobotVisualisationPtr cedar::dev::Robot::getVisualisationPtr() const
 {
-    return mpRobotVisualisation;
+  return mpRobotVisualisation;
 }
 
 void cedar::dev::Robot::readComponentSlotInstantiations(const cedar::aux::ConfigurationNode& node)

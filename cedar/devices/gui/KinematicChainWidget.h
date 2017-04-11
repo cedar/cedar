@@ -91,6 +91,8 @@ public:
    */
   cedar::dev::gui::KinematicChainCommandWidget* getCommandWidget();
 
+  std::string getPath() const;
+
   //----------------------------------------------------------------------------
   // protected methods
   //----------------------------------------------------------------------------
@@ -116,7 +118,7 @@ protected:
 private:
   cedar::dev::gui::KinematicChainMonitorWidget* mpMonitorWidget;
   cedar::dev::gui::KinematicChainCommandWidget* mpCommandWidget;
-
+  cedar::dev::KinematicChainPtr mpKinematicChain;
 };
 
 #endif // CEDAR_DEV_GUI_KINEMATIC_CHAIN_WIDGET_H

@@ -525,29 +525,6 @@ void cedar::proc::steps::Component::componentChangedSlot()
     return;
   }
 
-  cedar::dev::ComponentPtr lComponent = _mComponent->getValue();
-
-  if(auto kinChain = boost::dynamic_pointer_cast<cedar::dev::KinematicChain>(lComponent))
-  {
-    const std::string actionName = "open Kinematic Chain Widget";
-
-    if(!this->isRegistered(actionName))
-    {
-      this->registerFunction(actionName, boost::bind(&cedar::proc::steps::Component::openKinematicChainWidget, this ));
-    }
-
-    std::vector<std::string> initialConfigNames = kinChain->getInitialConfigurationNames();
-
-    for(std::string confName : initialConfigNames)
-    {
-      if(!this->isRegistered("apply "+confName))
-      {
-        boost::function< void() > fun = boost::bind(&cedar::dev::KinematicChain::applyInitialConfiguration, kinChain, confName);
-        this->registerFunction("apply "+confName, fun);
-      }
-    }
-  }  
-
   this->rebuildOutputs();
   this->rebuildInputs();
 
@@ -621,18 +598,7 @@ void cedar::proc::steps::Component::openRobotManager()
     if (pointer)
     {
       auto ide = pointer->getIde();
-
       ide->showRobotManager();
     }
   }
 }
-
-void cedar::proc::steps::Component::openKinematicChainWidget()
-{
-  cedar::dev::ComponentPtr lComponent = _mComponent->getValue();
-  auto pKinematicChain = boost::dynamic_pointer_cast<cedar::dev::KinematicChain>(lComponent);
-
-  cedar::dev::gui::KinematicChainWidget *pWidget = new cedar::dev::gui::KinematicChainWidget(pKinematicChain);
-  pWidget->show();
-}
-
