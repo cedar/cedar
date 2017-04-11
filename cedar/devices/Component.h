@@ -340,13 +340,6 @@ public:
   boost::signals2::connection registerConnectedHook(boost::function<void ()> slot);
   boost::signals2::connection registerDisconnectedHook(boost::function<void ()> slot);
 
-signals:
-  void updatedUserMeasurementSignal();
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
   inline cedar::dev::ComponentSlotWeakPtr getSlot()
   {
     return this->mSlot;
@@ -356,6 +349,14 @@ protected:
   {
     this->mSlot = slot;
   }
+
+signals:
+  void updatedUserMeasurementSignal();
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
 
   void installCommandType(ComponentDataType type, const std::string& name);
   void installMeasurementType(ComponentDataType type, const std::string& name);

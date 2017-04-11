@@ -57,6 +57,10 @@
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/GroupDeclarationManager.h"
+#include "cedar/devices/RobotManager.h"
+#include "cedar/devices/ComponentSlot.h"
+#include "cedar/devices/KinematicChain.h"
+#include "cedar/devices/gui/KinematicChainWidget.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/stringFunctions.h"
@@ -82,6 +86,7 @@
 #include <QListWidget>
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/json_parser.hpp>
+  #include <boost/pointer_cast.hpp>
   #include <boost/filesystem.hpp>
 #endif
 #include <iostream>
@@ -1094,6 +1099,7 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
   if (root.find("ui generic") != root.not_found())
   {
     auto node = root.get_child("ui generic");
+
     this->cedar::proc::gui::Connectable::readConfiguration(node);
     // restore plots that were open when architecture was last saved
     auto plot_list = node.find("open plots");
@@ -1161,12 +1167,44 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
   this->updateCollapsedness();
 }
 
+void cedar::proc::gui::Group::openKinematicChainWidget(const std::string& path)
+{
+  try
+  {
+    cedar::dev::ComponentSlotPtr p_component_slot = cedar::dev::RobotManagerSingleton::getInstance()->findComponentSlot(path);
+
+    if(auto pKinematicChain = boost::dynamic_pointer_cast<cedar::dev::KinematicChain>(p_component_slot->getComponent()))
+    {
+      cedar::dev::gui::KinematicChainWidget *pWidget = new cedar::dev::gui::KinematicChainWidget(pKinematicChain);
+      auto qwidget = this->createDockWidget(path, pWidget);
+      qwidget->show();
+    }
+  }
+  catch (...)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Failed to open Kinematic Chain Widget for \"" + path + "\". Most probably the robot does not exist anymore. Ignoring.",
+      "cedar::proc::gui::Group::readKinematicChainWidgetList(const cedar::aux::ConfigurationNode& node)"
+    );
+  }
+}
+
 void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node)
 {
   std::set<std::string> removed_elements;
   for(auto it : node)
   {
+
+    // Both KinematicChainWidget and Viewer are no PlotWidgets, so treat them separately here
+    if(it.first == "KinematicChainWidget")
+    {
+        this->openKinematicChainWidget(it.second.data());
+        continue;
+    }
+
     std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
+
     try
     {
       // is it a connectable?

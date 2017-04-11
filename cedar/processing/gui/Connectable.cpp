@@ -58,6 +58,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/devices/Component.h"
+#include "cedar/devices/gui/KinematicChainWidget.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/gui/Configurable.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
@@ -2073,12 +2074,19 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
   {
     // all widgets in the mChildWidgets Vector should be QDockWidgets that contain a QWidget
     QWidget* dock_widget_child = cedar::aux::asserted_cast<QDockWidget*>(childWidget)->widget();
-    // The contained QWidget may be of different types, we're only interested in the cedar::proc::gui::PlotWidget ones
+
+    // The contained QWidget may be of different types
     if (cedar::aux::objectTypeToString(dock_widget_child) == "cedar::proc::gui::PlotWidget")
     {
       cedar::aux::ConfigurationNode value_node;
       static_cast<cedar::proc::gui::PlotWidget*>(dock_widget_child)->writeConfiguration(value_node);
       node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));
+    }
+
+    if (cedar::aux::objectTypeToString(dock_widget_child) == "cedar::dev::gui::KinematicChainWidget")
+    {
+      const std::string component_path = static_cast<cedar::dev::gui::KinematicChainWidget*>(dock_widget_child)->getPath();
+      node.add("KinematicChainWidget", component_path);
     }
   }
 }

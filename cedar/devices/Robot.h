@@ -233,9 +233,6 @@ private:
   //! Configurable object used for storing robot setup in a separate file.
   //cedar::aux::ConfigurablePtr mRobotDescription;
 
-  //! the name of the robot in SceneWidget, given in RobotManager
-  std::string mVisualisationName;
-
   //! a pointer to the actual visualisation of the robot
   cedar::dev::gl::RobotVisualisationPtr mpRobotVisualisation;
 
