@@ -170,7 +170,7 @@ private:
 
   std::string mRobotTemplateName;
 
-  cedar::dev::RobotPtr mRobot;
+  cedar::dev::RobotPtr mrRobot;
 
   boost::signals2::connection mRobotRemovedConnection;
 
