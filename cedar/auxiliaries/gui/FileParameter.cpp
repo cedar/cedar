@@ -132,7 +132,11 @@ void cedar::aux::gui::FileParameter::onBrowseClicked()
   switch (parameter->getMode())
   {
     case cedar::aux::FileParameter::READ:
-      value = QFileDialog::getOpenFileName(this, "Select a file to read", parameter->getValue().absolutePath());
+      value = QFileDialog::getOpenFileName(this, "Select a file to read",
+                             parameter->getValue().absolutePath(),
+                             0, 0, 
+                             QFileDialog::DontUseNativeDialog
+                             );
       break;
 
     case cedar::aux::FileParameter::WRITE:

@@ -1548,7 +1548,9 @@ void cedar::proc::gui::Connectable::loadDataClicked()
   QString filename = QFileDialog::getOpenFileName
                      (
                        this->mpMainWindow,
-                       "Select a file to load"
+                       "Select a file to load",
+                       0, 0, 0, 
+                       QFileDialog::DontUseNativeDialog
                      );
 
   if (!filename.isEmpty())
