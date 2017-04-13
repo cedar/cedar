@@ -164,48 +164,6 @@ void cedar::dev::kuka::KinematicChain::prepareSendingJointAngles(cv::Mat mat)
 
   // we only land here if we are ready to prepareSending commands
   friChannel->prepareJointPositionControl(mat);
-
-
-/*
-todo: delete this section.
-  // if the thread has not been initialized, do nothing
-  if (mIsConfigured)
-  {
-    friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
-    mLock.lockForWrite(); // todo: QWriteLocker lock( &mLock );
-    // float array for copying joint position to fri
-    float commanded_joint[LBR_MNJ];
-    // initialize it with current measured position. This value will be overwritten in any case
-    for (unsigned i = 0; i < LBR_MNJ; i++)
-    {
-      commanded_joint[i] = mMeasuredJointPosition.at(i);
-    }
-
-    // update joint angle and joint velocity if necessary (and only if in command mode)
-    // this will leave commanded_joint uninitialized, however, in this case it won't be used by doPositionControl()
-    if (friChannel->isPowerOn() && friChannel->getFriState() == FRI_STATE_CMD)
-    {
-      if (mat.rows == LBR_MNJ)
-      {
-        for(unsigned i=0; i<LBR_MNJ; i++)
-        {
-          mCommandedJointPosition.at(i) = static_cast<float>(mat.at<double>(i,0));
-          // if the joint position exceeds the one in the reference geometry, reset the angle
-          mCommandedJointPosition.at(i)
-            = std::max<double>(mCommandedJointPosition.at(i), getJoint(i)->_mpAngleLimits->getLowerLimit());
-          mCommandedJointPosition.at(i)
-            = std::min<double>(mCommandedJointPosition.at(i), getJoint(i)->_mpAngleLimits->getUpperLimit());
-          // copy commanded joint position
-          commanded_joint[i] = float(mCommandedJointPosition[i]);
-        }
-      }
-    }
-    mLock.unlock();
-
-    // now copy position data and do the data exchange
-    friChannel->doPositionControl(commanded_joint);
-  }
-*/
 }
 
 void cedar::dev::kuka::KinematicChain::prepareSendingNotReadyForCommand()
