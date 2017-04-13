@@ -2255,10 +2255,10 @@ std::string cedar::dev::Component::prettifyName() const
 
   if (ret.length() <= 0)
   {
-    ret = slot->getName();
-
     if (!slot)
       return "uninitialized robotic component";
+
+    ret = slot->getName();
   }
 
   if (slot)

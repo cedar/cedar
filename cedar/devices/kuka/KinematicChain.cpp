@@ -70,12 +70,15 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::kuka::KinematicChain::KinematicChain()
 {
+
   // register the hooks, which the Component class needs to talk to the hardware:
  
   // update buffered commands
   registerCommandHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::kuka::KinematicChain::prepareSendingJointAngles, this, _1));
   // update buffered measurements
   registerMeasurementHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::kuka::KinematicChain::prepareRetrievingJointAngles, this));
+  registerMeasurementHook(cedar::dev::KinematicChain::JOINT_TORQUES, boost::bind(&cedar::dev::kuka::KinematicChain::prepareRetrievingJointTorques, this));
+  registerMeasurementHook(cedar::dev::KinematicChain::EXTERNAL_JOINT_TORQUES, boost::bind(&cedar::dev::kuka::KinematicChain::prepareRetrievingExternalJointTorques, this));
 
   // call this once per cycle, after the new (buffered) commands are known and before the new (buffered) measured datas are required. will trigger the actual sending/receiving of data
   registerAfterCommandBeforeMeasurementHook(boost::bind(&cedar::dev::kuka::KinematicChain::exchangeData, this));
@@ -241,6 +244,42 @@ cv::Mat cedar::dev::kuka::KinematicChain::prepareRetrievingJointAngles()
   }
  
   return friChannel->getMeasuredJointPositions();
+}
+
+cv::Mat cedar::dev::kuka::KinematicChain::prepareRetrievingJointTorques()
+{
+  auto friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
+
+  if (!isConfigured())
+    return cv::Mat();
+
+  if (!friChannel)
+  {
+    cedar::aux::LogSingleton::getInstance()->error(
+      "lost FRI Channel pointer",
+      CEDAR_CURRENT_FUNCTION_NAME);
+    return cv::Mat();
+  }
+ 
+  return friChannel->getMeasuredJointTorques();
+}
+
+cv::Mat cedar::dev::kuka::KinematicChain::prepareRetrievingExternalJointTorques()
+{
+  auto friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
+
+  if (!isConfigured())
+    return cv::Mat();
+
+  if (!friChannel)
+  {
+    cedar::aux::LogSingleton::getInstance()->error(
+      "lost FRI Channel pointer",
+      CEDAR_CURRENT_FUNCTION_NAME);
+    return cv::Mat();
+  }
+ 
+  return friChannel->getMeasuredExternalJointTorques();
 }
 
 void cedar::dev::kuka::KinematicChain::postStart()

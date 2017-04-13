@@ -238,6 +238,18 @@ public:
   // Replaced by getJointAccelerations()
   CEDAR_DECLARE_DEPRECATED(cv::Mat getCachedJointAccelerations() const);
 
+  /*!@brief get current state of measured joint torques, if available
+   *
+   * @return    vector of joint angles
+   */
+  cv::Mat getJointTorques() const;
+
+  /*!@brief get current state of measured external joint torques if available
+   *
+   * @return    vector of joint angles
+   */
+  cv::Mat getExternalJointTorques() const;
+
   /*!@brief set current state of a single joint angle
    *
    * @param index    specifies the joint
@@ -590,6 +602,8 @@ public:
   static const cedar::dev::Component::ComponentDataType JOINT_VELOCITIES;
   static const cedar::dev::Component::ComponentDataType JOINT_ACCELERATIONS;
   static const cedar::dev::Component::ComponentDataType JOINT_TORQUES;
+  static const cedar::dev::Component::ComponentDataType EXTERNAL_JOINT_TORQUES;
+  static const cedar::dev::Component::ComponentDataType ADDITIONAL_JOINT_TORQUES;
 
 protected:
   //! vector of all joints
