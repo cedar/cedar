@@ -105,6 +105,7 @@ public:
 
   /*! @brief control position. blocks and executes immediately */
   bool prepareJointPositionControl(cv::Mat newJointPos);
+  bool prepareJointTorqueControl(cv::Mat newJointPos);
 
   /*! @brief the joint positions from the last communication to the hardware */
   cv::Mat getMeasuredJointPositions() const; 
