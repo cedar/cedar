@@ -63,7 +63,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::MatrixPadding>
       (
-        "Utilities",
+        "Arrays",
         "cedar.processing.MatrixPadding"
       )
     );

@@ -62,7 +62,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::MatrixTypeConverter>
       (
-        "Utilities",
+        "Programming",
         "cedar.processing.steps.MatrixTypeConverter"
       )
     );
