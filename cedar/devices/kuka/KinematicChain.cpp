@@ -75,6 +75,8 @@ cedar::dev::kuka::KinematicChain::KinematicChain()
  
   // update buffered commands
   registerCommandHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::kuka::KinematicChain::prepareSendingJointAngles, this, _1));
+  registerCommandHook(cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES,
+  boost::bind(&cedar::dev::kuka::KinematicChain::prepareSendingJointTorques, this, _1));
   // update buffered measurements
   registerMeasurementHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::kuka::KinematicChain::prepareRetrievingJointAngles, this));
   registerMeasurementHook(cedar::dev::KinematicChain::JOINT_TORQUES, boost::bind(&cedar::dev::kuka::KinematicChain::prepareRetrievingJointTorques, this));
@@ -164,6 +166,26 @@ void cedar::dev::kuka::KinematicChain::prepareSendingJointAngles(cv::Mat mat)
 
   // we only land here if we are ready to prepareSending commands
   friChannel->prepareJointPositionControl(mat);
+}
+
+void cedar::dev::kuka::KinematicChain::prepareSendingJointTorques(cv::Mat mat)
+{
+  if (!isConfigured())
+    return;
+
+  auto friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
+  friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
+  if (!friChannel)
+  {
+    cedar::aux::LogSingleton::getInstance()->error(
+      "lost FRI Channel pointer",
+      CEDAR_CURRENT_FUNCTION_NAME);
+    return;
+  }
+
+
+  // we only land here if we are ready to prepareSending commands
+  friChannel->prepareJointTorqueControl(mat);
 }
 
 void cedar::dev::kuka::KinematicChain::prepareSendingNotReadyForCommand()
