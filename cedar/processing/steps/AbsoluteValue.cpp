@@ -61,7 +61,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::AbsoluteValue>
       (
-        "Math Utilities",
+        "Algebra",
         "cedar.processing.AbsoluteValue"
       )
     );

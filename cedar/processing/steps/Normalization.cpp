@@ -60,7 +60,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::Normalization>
       (
-        "Utilities",
+        "Algebra",
         "cedar.processing.Normalization"
       )
     );

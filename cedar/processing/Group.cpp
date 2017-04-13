@@ -102,7 +102,7 @@ namespace
                           (
                             new ElementDeclarationTemplate<cedar::proc::Group>
                             (
-                              "Utilities",
+                              "Programming",
                               "cedar.processing.Group"
                             )
                           );

@@ -60,7 +60,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::RemoveMean>
       (
-        "Utilities",
+        "Algebra",
         "cedar.processing.RemoveMean"
       )
     );
