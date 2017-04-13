@@ -108,6 +108,8 @@ public:
 
   /*! @brief the joint positions from the last communication to the hardware */
   cv::Mat getMeasuredJointPositions() const; 
+  cv::Mat getMeasuredJointTorques() const; 
+  cv::Mat getMeasuredExternalJointTorques() const; 
 
   void exchangeData();
 

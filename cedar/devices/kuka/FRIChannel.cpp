@@ -258,6 +258,34 @@ cv::Mat cedar::dev::kuka::FRIChannel::getMeasuredJointPositions() const
   return jointPositions;
 }
 
+cv::Mat cedar::dev::kuka::FRIChannel::getMeasuredExternalJointTorques() const
+{
+  QMutexLocker lock( &mFRIRemoteLock );
+  cv::Mat jointPositions = cv::Mat::zeros( LBR_MNJ, 1, CV_32F );
+
+  // fill float array for hardware:
+  for (unsigned i = 0; i < LBR_MNJ; i++)
+  {
+    jointPositions.at<float>(i) = mpFriRemote->getMsrEstExtJntTrq()[i];
+  }
+
+  return jointPositions;
+}
+
+cv::Mat cedar::dev::kuka::FRIChannel::getMeasuredJointTorques() const
+{
+  QMutexLocker lock( &mFRIRemoteLock );
+  cv::Mat jointPositions = cv::Mat::zeros( LBR_MNJ, 1, CV_32F );
+
+  // fill float array for hardware:
+  for (unsigned i = 0; i < LBR_MNJ; i++)
+  {
+    jointPositions.at<float>(i) = mpFriRemote->getMsrJntTrq()[i];
+  }
+
+  return jointPositions;
+}
+
 void cedar::dev::kuka::FRIChannel::exchangeData()
 {
   if (mpFriRemote == NULL)

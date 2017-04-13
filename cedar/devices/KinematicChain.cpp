@@ -80,6 +80,8 @@ const cedar::dev::Component::ComponentDataType cedar::dev::KinematicChain::JOINT
 const cedar::dev::Component::ComponentDataType cedar::dev::KinematicChain::JOINT_VELOCITIES = 2;
 const cedar::dev::Component::ComponentDataType cedar::dev::KinematicChain::JOINT_ACCELERATIONS = 3;
 const cedar::dev::Component::ComponentDataType cedar::dev::KinematicChain::JOINT_TORQUES = 4;
+const cedar::dev::Component::ComponentDataType cedar::dev::KinematicChain::EXTERNAL_JOINT_TORQUES = 5;
+const cedar::dev::Component::ComponentDataType cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES = 6;
 
 //------------------------------------------------------------------------------
 // constructors and destructor
@@ -264,6 +266,16 @@ cv::Mat cedar::dev::KinematicChain::getCachedJointAccelerations() const
 cv::Mat cedar::dev::KinematicChain::getJointAccelerationsMatrix() const
 {
   return getJointAccelerations();
+}
+
+cv::Mat cedar::dev::KinematicChain::getJointTorques() const
+{
+  return getUserSideMeasurementBuffer(JOINT_TORQUES);
+}
+
+cv::Mat cedar::dev::KinematicChain::getExternalJointTorques() const
+{
+  return getUserSideMeasurementBuffer(EXTERNAL_JOINT_TORQUES);
 }
 
 void cedar::dev::KinematicChain::setJointAngle(unsigned int index, float value)
@@ -472,10 +484,35 @@ void cedar::dev::KinematicChain::init()
     SLOT(updatedUserMeasurementSlot()), Qt::DirectConnection
   );
 
+  const std::string groupName1 = "all kinematic joint controls";
+  defineCommandGroup(groupName1);
   installCommandAndMeasurementType(cedar::dev::KinematicChain::JOINT_ANGLES, "Joint Angles");
   installCommandAndMeasurementType(cedar::dev::KinematicChain::JOINT_VELOCITIES, "Joint Velocities");
   installCommandAndMeasurementType(cedar::dev::KinematicChain::JOINT_ACCELERATIONS, "Joint Accelerations");
-//  installCommandAndMeasurementType(cedar::dev::KinematicChain::JOINT_TORQUES, "Joint Torques");
+  addCommandTypeToGroup( groupName1, cedar::dev::KinematicChain::JOINT_ANGLES );
+  addCommandTypeToGroup( groupName1, cedar::dev::KinematicChain::JOINT_VELOCITIES );
+  addCommandTypeToGroup( groupName1, cedar::dev::KinematicChain::JOINT_ACCELERATIONS );
+
+  const std::string groupName1a = "joint angle control";
+  defineCommandGroup(groupName1a);
+  addCommandTypeToGroup( groupName1a, cedar::dev::KinematicChain::JOINT_ANGLES );
+  const std::string groupName1b= "joint angle velocity control";
+  defineCommandGroup(groupName1b);
+  addCommandTypeToGroup(groupName1b, cedar::dev::KinematicChain::JOINT_VELOCITIES );
+
+  const std::string groupName1c = "joint angle acceleration control";
+  defineCommandGroup(groupName1c);
+  addCommandTypeToGroup( groupName1c, cedar::dev::KinematicChain::JOINT_ACCELERATIONS );
+
+  // add torque control an measurements
+  installMeasurementType(cedar::dev::KinematicChain::JOINT_TORQUES, "Joint Torques");
+  installMeasurementType(cedar::dev::KinematicChain::EXTERNAL_JOINT_TORQUES, "External Joint Torques");
+
+  const std::string groupName2 = "joint torque control";
+  defineCommandGroup(groupName2);
+  installCommandType(cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES, "Additional Joint Torques");
+  addCommandTypeToGroup( groupName2, cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES);
+
 
   registerCommandTransformationHook
   (
@@ -600,6 +637,8 @@ bool cedar::dev::KinematicChain::applyLimits(const cedar::dev::Component::Compon
       applyAccelerationLimits(data);
       break;
 
+    case cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES:
+      // TODO
     default:
       cedar::aux::LogSingleton::getInstance()->warning(
          "Component data type " + cedar::aux::toString(type) + " is not known.",
@@ -619,7 +658,9 @@ void cedar::dev::KinematicChain::initializeFromJointList()
   setCommandAndMeasurementDimensionality( cedar::dev::KinematicChain::JOINT_ANGLES, num );
   setCommandAndMeasurementDimensionality( cedar::dev::KinematicChain::JOINT_VELOCITIES, num );
   setCommandAndMeasurementDimensionality( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, num );
-  //setCommandAndMeasurementDimensionality( cedar::dev::KinematicChain::JOINT_TORQUES, num );
+  setMeasurementDimensionality( cedar::dev::KinematicChain::JOINT_TORQUES, num );
+  setMeasurementDimensionality( cedar::dev::KinematicChain::EXTERNAL_JOINT_TORQUES, num );
+  setCommandDimensionality( cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES, num );
 
   // warning vector shall contain warning counters, each for every different kind of limit excess (angle, velocity, acceleration)
   mWarned.resize(num * 3);
@@ -1024,7 +1065,16 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
                   (
                     [&]()
                     {
-                      const cv::Mat xdot = -1 * (getJointAngles() - mInitialConfigurations.find(mCurrentInitialConfiguration)->second);
+                      cv::Mat xdot;
+                      auto findCurrent = mInitialConfigurations.find(mCurrentInitialConfiguration);
+
+                      if (findCurrent == mInitialConfigurations.end())
+                      {
+                        xdot= 0 * getJointAngles();
+                        return xdot;
+                      }
+
+                      xdot = -1 * (getJointAngles() - findCurrent->second);
                       return xdot;
                     }
                   )
