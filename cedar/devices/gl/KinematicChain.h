@@ -80,25 +80,25 @@ public:
 
   /*!@brief sets the joint radius to the new value
    */
-  double getJointRadius();
+  float getJointRadius();
 
   /*!@brief sets the link radius to the new value
    *
    * @return radius
    */
-  double getLinkRadius();
+  float getLinkRadius();
 
   /*!@brief sets the joint radius to the new value
    *
    * @return radius
    */
-  void setJointRadius(double value);
+  void setJointRadius(float value);
 
   /*!@brief sets the link radius to the new value
    *
    * @param value new radius
    */
-  void setLinkRadius(double value);
+  void setLinkRadius(float value);
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -136,9 +136,9 @@ protected:
 
 private:
   //! radius of the joints
-  double mJointRadius;
+  float mJointRadius;
   //! radius of the links
-  double mLinkRadius;
+  float mLinkRadius;
 
 }; // class cedar::dev::gl::KinematicChain
 #endif // CEDAR_DEV_GL_KINEMATIC_CHAIN_H

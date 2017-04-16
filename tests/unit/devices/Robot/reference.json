@@ -25,7 +25,7 @@
           "command get encoder": "Q"
         }
       },
-      "common component parameters":
+      "shared component parameters":
       {
         "forward velocity limits":
         {

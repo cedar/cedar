@@ -78,9 +78,9 @@ void cedar::aux::gl::Sphere::draw()
   prepareDraw();
   
   // draw the sphere
-  if (mIsVisible)
+  if (isVisible())
   {
-    gl::setColor(mColorR, mColorG, mColorB);
-    drawSphere(mRadius, mResolution*2, mResolution, mIsDrawnAsWireFrame);
+    gl::setColor(getColorR(), getColorG(), getColorB());
+    drawSphere(mRadius, getResolution()*2, getResolution(), getIsDrawnAsWireFrame());
   }
 }

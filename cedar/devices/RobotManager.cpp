@@ -58,15 +58,30 @@ cedar::dev::RobotManager::RobotManager()
   // epuck -----------------------------------------------------------------------------------------------------------
   cedar::dev::RobotManager::Template epuck_template;
   epuck_template.setIconPath(":/cedar/dev/gui/icons/epuck_icon_256.png");
-  epuck_template.addNamedConfiguration("hardware", cedar::aux::Path("resource://configs/epuck/hardware_configuration.json"));
-  epuck_template.addNamedConfiguration("yarp/webots", cedar::aux::Path("resource://configs/epuck/yarp_configuration.json"));
+  epuck_template.addNamedConfiguration("serial", cedar::aux::Path("resource://robots/epuck/serial_configuration.json"));
+  epuck_template.addNamedConfiguration("yarp/webots", cedar::aux::Path("resource://robots/epuck/yarp_configuration.json"));
   this->addRobotTemplate("epuck", epuck_template);
 
   // khepera ---------------------------------------------------------------------------------------------------------
   cedar::dev::RobotManager::Template khepera_template;
   khepera_template.setIconPath(":/cedar/dev/gui/icons/khepera_icon_256.png");
-  khepera_template.addNamedConfiguration("hardware", cedar::aux::Path("resource://configs/khepera/default_configuration.json"));
+  khepera_template.addNamedConfiguration("serial", cedar::aux::Path("resource://robots/khepera/serial_configuration.json"));
   this->addRobotTemplate("khepera", khepera_template);
+
+  // kuka ---------------------------------------------------------------------------------------------------------
+  cedar::dev::RobotManager::Template kuka_template;
+  kuka_template.setIconPath(":/cedar/dev/gui/icons/caren_icon_256.png");
+  kuka_template.addNamedConfiguration("FRI", cedar::aux::Path("resource://robots/caren/fri_configuration.json"));
+  kuka_template.addNamedConfiguration("simulator", cedar::aux::Path("resource://robots/caren/simulator_configuration.json"));
+  kuka_template.addNamedConfiguration("yarp", cedar::aux::Path("resource://robots/caren/yarp_configuration.json"));
+  this->addRobotTemplate("kuka", kuka_template);
+
+  // youbot
+  cedar::dev::RobotManager::Template youbot_template;
+  youbot_template.setIconPath(":/cedar/dev/gui/icons/youbot_icon_256.png");
+  youbot_template.addNamedConfiguration("yarp",cedar::aux::Path("resource://robots/youbot/yarp_configuration.json"));
+  youbot_template.addNamedConfiguration("simulator",cedar::aux::Path("resource://robots/youbot/simulator_configuration.json"));
+  this->addRobotTemplate("youbot",youbot_template);
 
   this->restore();
 }
@@ -86,6 +101,13 @@ cedar::aux::Path cedar::dev::RobotManager::Template::getConfiguration(const std:
   CEDAR_ASSERT(iter != this->mNamedPaths.end());
 
   return iter->second;
+}
+
+bool cedar::dev::RobotManager::Template::hasConfiguration(const std::string& name) const
+{
+  auto iter = this->mNamedPaths.find(name);
+
+  return iter != this->mNamedPaths.end();
 }
 
 std::vector<std::string> cedar::dev::RobotManager::Template::getConfigurationNames() const
@@ -201,6 +223,38 @@ void cedar::dev::RobotManager::addRobotName(const std::string& robotName)
   this->mRobotNameAddedSignal(robotName);
 }
 
+void cedar::dev::RobotManager::renameRobot(const std::string& robotName, const std::string& newName)
+{
+  auto old_robot = mRobotInstances.find(robotName);
+  if (old_robot == mRobotInstances.end())
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "A robot with the name \"" + robotName + "\" could not be found.");
+  }
+  if (mRobotInstances.find(newName) != mRobotInstances.end())
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "A robot with the name \"" + newName + "\" already exists.");
+  }
+
+  //rename visualisation instance
+  cedar::aux::gl::ObjectVisualizationPtr p_object_visualisation = boost::dynamic_pointer_cast<cedar::aux::gl::ObjectVisualization>(old_robot->second->getVisualisationPtr());
+  if(p_object_visualisation)
+  {
+    p_object_visualisation->setObjectName(QString::fromStdString(newName));
+  }
+
+  mRobotInstances[newName] = old_robot->second;
+  this->mRobotInstances.erase(old_robot);
+
+  auto old_info = mRobotInfos.find(robotName);
+  if (old_info != mRobotInfos.end())
+  {
+    mRobotInfos[newName] = old_info->second;
+    mRobotInfos.erase(old_info);
+  }
+
+  this->signalRobotNameChanged(robotName, newName);
+}
+
 void cedar::dev::RobotManager::removeRobot(const std::string& robotName)
 {
   auto instance_iter = mRobotInstances.find(robotName);
@@ -210,6 +264,9 @@ void cedar::dev::RobotManager::removeRobot(const std::string& robotName)
   }
   this->mRobotInstances.erase(instance_iter);
 
+  // remove robot from visualisation
+  cedar::aux::gl::GlobalSceneSingleton::getInstance()->deleteObjectVisualization(robotName);
+
   auto info_iter = this->mRobotInfos.find(robotName);
   if (info_iter != this->mRobotInfos.end())
   {
@@ -217,6 +274,13 @@ void cedar::dev::RobotManager::removeRobot(const std::string& robotName)
   }
 
   this->mRobotRemovedSignal(robotName);
+
+  if(this->mRobotInstances.size() == 0)
+  {
+    // if no card is left after removal, append a blank card
+    std::string name = getNewRobotName();
+    addRobotName(name);
+  }
 }
 
 cedar::dev::RobotPtr cedar::dev::RobotManager::getRobot(const std::string& robotName) const
@@ -253,7 +317,32 @@ void cedar::dev::RobotManager::loadRobotConfiguration
   cedar::dev::RobotPtr robot = this->getRobot(robotName);
 
   this->mRobotConfigurations[robotName] = configuration;
-  robot->readJson(configuration.absolute().toString());
+
+  // remove robot from visualisation
+  cedar::aux::gl::GlobalSceneSingleton::getInstance()->deleteObjectVisualization(robotName);
+
+  //!@todo If this fails (e.g., because of a malformed json), the robot may be left in an undefined state (e.g., no
+  //!      channel insantiated). This can cause hard to diagnose crashes if the robot accesses the channel in its
+  //!      destructor. A better approache would be: 1) parse json; if successful: 2) create robot 3) read config...
+  try
+  {
+    robot->readJson(configuration.absolute(false).toString());
+    // don't scroll with loading messages
+  }
+  catch (const boost::property_tree::json_parser_error& e)
+  {
+    std::string message = "Json parser error for robot \"" + robotName + "\": " + std::string(e.what());
+    // print this to cout as well, as errors may lead to crashes; see todo above
+    std::cout << message << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error(message, CEDAR_CURRENT_FUNCTION_NAME);
+  }
+
+  cedar::aux::gl::ObjectVisualizationPtr p_object_visualisation = boost::dynamic_pointer_cast<cedar::aux::gl::ObjectVisualization>(robot->getVisualisationPtr());
+  if(p_object_visualisation)
+  {
+    p_object_visualisation->setObjectName(QString::fromStdString(robotName));
+    cedar::aux::gl::GlobalSceneSingleton::getInstance()->addObjectVisualization(p_object_visualisation);
+  }
 
   this->mRobotConfigurationLoadedSignal(robotName);
 }
@@ -311,13 +400,21 @@ void cedar::dev::RobotManager::loadRobotTemplateConfiguration
        const std::string& configurationName
      )
 {
+
   try
   {
     auto robot_template = this->getTemplate(this->getRobotTemplateName(robotName));
 
-    cedar::aux::Path configuration = robot_template.getConfiguration(configurationName);
-    this->loadRobotConfiguration(robotName, configuration);
-    this->retrieveRobotInfo(robotName).mLoadedTemplateConfiguration = configurationName;
+    if (!robot_template.hasConfiguration(configurationName))
+    {
+      CEDAR_THROW(cedar::dev::TemplateNotFoundException, "Configuration does not exist: " + configurationName + " for robot: " + robotName);
+    }
+    else
+    {
+      cedar::aux::Path configuration = robot_template.getConfiguration(configurationName);
+      this->loadRobotConfiguration(robotName, configuration);
+      this->retrieveRobotInfo(robotName).mLoadedTemplateConfiguration = configurationName;      
+    }
   }
   catch (const cedar::dev::NoTemplateLoadedException&)
   {
@@ -333,16 +430,31 @@ void cedar::dev::RobotManager::store() const
 
   cedar::aux::ConfigurationNode root, robots;
 
-  for (auto iter = this->mRobotInfos.begin(); iter != this->mRobotInfos.end(); ++iter)
+  // serialized templated robots
+  for (const auto& name_robot_pair : this->mRobotInstances)
   {
-    const std::string& robot_name = iter->first;
-    auto robot_info = iter->second;
+    const auto& robot_name = name_robot_pair.first;
 
     cedar::aux::ConfigurationNode robot;
     robot.put("name", robot_name);
-    robot.put("template name", robot_info.mTemplateName);
-    robot.put("loaded template configuration", robot_info.mLoadedTemplateConfiguration);
-    robot.put("loaded template configuration name", robot_info.mLoadedTemplateConfigurationName);
+
+    auto info_iter = this->mRobotInfos.find(robot_name);
+    if (info_iter != this->mRobotInfos.end())
+    {
+      auto robot_info = info_iter->second;
+      robot.put("template name", robot_info.mTemplateName);
+      robot.put("loaded template configuration", robot_info.mLoadedTemplateConfiguration);
+      robot.put("loaded template configuration name", robot_info.mLoadedTemplateConfigurationName);
+
+    }
+    else
+    {
+      auto config_iter = this->mRobotConfigurations.find(robot_name);
+      if (config_iter != this->mRobotConfigurations.end())
+      {
+        robot.put("configuration", config_iter->second);
+      }
+    }
 
     robots.push_back(cedar::aux::ConfigurationNode::value_type("robot", robot));
   }
@@ -372,7 +484,8 @@ void cedar::dev::RobotManager::restore()
 
   robots = root.get_child("robots");
 
-  for(auto child_iter = robots.begin(); child_iter != robots.end(); ++child_iter)
+  //!@todo Needs error handling.
+  for (auto child_iter = robots.begin(); child_iter != robots.end(); ++child_iter)
   {
     if (child_iter->first != "robot")
     {
@@ -385,13 +498,17 @@ void cedar::dev::RobotManager::restore()
     const cedar::aux::ConfigurationNode& robot = child_iter->second;
 
     std::string name = robot.get<std::string>("name");
-    std::string template_name = robot.get<std::string>("template name");
-    std::string loaded_template_configuration = robot.get<std::string>("loaded template configuration");
-    std::string loaded_template_configuration_name = robot.get<std::string>("loaded template configuration name");
-    if (!name.empty())
+    if (name.empty())
     {
-      this->addRobotName(name);
+      continue;
+    }
+    this->addRobotName(name);
 
+    if (robot.find("template name") != robot.not_found())
+    {
+      std::string template_name = robot.get<std::string>("template name");
+      std::string loaded_template_configuration = robot.get<std::string>("loaded template configuration");
+      std::string loaded_template_configuration_name = robot.get<std::string>("loaded template configuration name");
       if (!template_name.empty())
       {
         this->setRobotTemplateName(name, template_name);
@@ -399,12 +516,30 @@ void cedar::dev::RobotManager::restore()
 
       if (!loaded_template_configuration.empty())
       {
-        this->loadRobotTemplateConfiguration(name, loaded_template_configuration);
+        try
+        {
+          this->loadRobotTemplateConfiguration(name, loaded_template_configuration);
+        }
+        catch( cedar::dev::TemplateNotFoundException )
+        {
+          cedar::aux::LogSingleton::getInstance()->warning(
+            "could not restore loaded configuration " + loaded_template_configuration_name + " for robot: \"" + name + "\" (from: " + config_path.absolute().toString() + ")",
+            CEDAR_CURRENT_FUNCTION_NAME);
+        }
       }
 
       if (!loaded_template_configuration_name.empty())
       {
         this->setRobotTemplateConfigurationName(name, loaded_template_configuration_name);
+      }
+    }
+    else
+    {
+      auto config_iter = robot.find("configuration");
+      if (config_iter != robot.not_found())
+      {
+        auto config = config_iter->second.get_value<std::string>();
+        this->loadRobotConfiguration(name, config);
       }
     }
   }

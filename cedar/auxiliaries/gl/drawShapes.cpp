@@ -42,12 +42,12 @@
 
 // SYSTEM INCLUDES
 
-void cedar::aux::gl::setColor(double R, double G, double B)
+void cedar::aux::gl::setColor(float R, float G, float B)
 {
-  glColor4d(R, G, B, 0);
+  glColor4f(R, G, B, 0);
 }
 
-void cedar::aux::gl::drawBlock(double l, double w, double h, bool wireFrame)
+void cedar::aux::gl::drawBlock(float l, float w, float h, bool wireFrame)
 {
   if (wireFrame)
   {
@@ -55,41 +55,41 @@ void cedar::aux::gl::drawBlock(double l, double w, double h, bool wireFrame)
   }
   glBegin(GL_QUADS);
   // front
-  glNormal3d(-1.0, 0.0, 0.0);
-  glVertex3d(-l/2, -w/2, -h/2);
-  glVertex3d(-l/2, w/2, -h/2);
-  glVertex3d(-l/2, w/2, h/2);
-  glVertex3d(-l/2, -w/2, h/2);
+  glNormal3f(-1.0, 0.0, 0.0);
+  glVertex3f(-l/2, -w/2, -h/2);
+  glVertex3f(-l/2, w/2, -h/2);
+  glVertex3f(-l/2, w/2, h/2);
+  glVertex3f(-l/2, -w/2, h/2);
   // right
-  glNormal3d(0.0, 1.0, 0.0);
-  glVertex3d(-l/2, w/2, -h/2);
-  glVertex3d(l/2, w/2, -h/2);
-  glVertex3d(l/2, w/2, h/2);
-  glVertex3d(-l/2, w/2, h/2);
+  glNormal3f(0.0, 1.0, 0.0);
+  glVertex3f(-l/2, w/2, -h/2);
+  glVertex3f(l/2, w/2, -h/2);
+  glVertex3f(l/2, w/2, h/2);
+  glVertex3f(-l/2, w/2, h/2);
   // bottom
-  glNormal3d(0.0, 0.0, -1.0);
-  glVertex3d(-l/2, -w/2, -h/2);
-  glVertex3d(l/2, -w/2, -h/2);
-  glVertex3d(l/2, w/2, -h/2);
-  glVertex3d(-l/2, w/2, -h/2);
+  glNormal3f(0.0, 0.0, -1.0);
+  glVertex3f(-l/2, -w/2, -h/2);
+  glVertex3f(l/2, -w/2, -h/2);
+  glVertex3f(l/2, w/2, -h/2);
+  glVertex3f(-l/2, w/2, -h/2);
   // back
-  glNormal3d(1.0, 0.0, 0.0);
-  glVertex3d(l/2, -w/2, -h/2);
-  glVertex3d(l/2, w/2, -h/2);
-  glVertex3d(l/2, w/2, h/2);
-  glVertex3d(l/2, -w/2, h/2);
+  glNormal3f(1.0, 0.0, 0.0);
+  glVertex3f(l/2, -w/2, -h/2);
+  glVertex3f(l/2, w/2, -h/2);
+  glVertex3f(l/2, w/2, h/2);
+  glVertex3f(l/2, -w/2, h/2);
   // left
-  glNormal3d(0.0, -1.0, 0.0);
-  glVertex3d(-l/2, -w/2, -h/2);
-  glVertex3d(l/2, -w/2, -h/2);
-  glVertex3d(l/2, -w/2, h/2);
-  glVertex3d(-l/2, -w/2, h/2);
+  glNormal3f(0.0, -1.0, 0.0);
+  glVertex3f(-l/2, -w/2, -h/2);
+  glVertex3f(l/2, -w/2, -h/2);
+  glVertex3f(l/2, -w/2, h/2);
+  glVertex3f(-l/2, -w/2, h/2);
   // top
-  glNormal3d(0.0, 0.0, 1.0);
-  glVertex3d(-l/2, -w/2, h/2);
-  glVertex3d(l/2, -w/2, h/2);
-  glVertex3d(l/2, w/2, h/2);
-  glVertex3d(-l/2, w/2, h/2);
+  glNormal3f(0.0, 0.0, 1.0);
+  glVertex3f(-l/2, -w/2, h/2);
+  glVertex3f(l/2, -w/2, h/2);
+  glVertex3f(l/2, w/2, h/2);
+  glVertex3f(-l/2, w/2, h/2);
   glEnd();
   if (wireFrame)
   {
@@ -99,12 +99,12 @@ void cedar::aux::gl::drawBlock(double l, double w, double h, bool wireFrame)
 
 void cedar::aux::gl::drawBlock
 (
-  double front,
-  double back,
-  double right,
-  double left,
-  double up,
-  double down,
+  float front,
+  float back,
+  float right,
+  float left,
+  float up,
+  float down,
   bool wireFrame
 )
 {
@@ -117,10 +117,10 @@ void cedar::aux::gl::drawBlock
 
 
 void cedar::aux::gl::drawCone(
-                               double floor,
-                               double ceiling,
-                               double radiusFloor,
-                               double radiusCeiling,
+                               float floor,
+                               float ceiling,
+                               float radiusFloor,
+                               float radiusCeiling,
                                int slices,
                                bool wireFrame
                              )
@@ -144,8 +144,8 @@ template<typename T>
 void cedar::aux::gl::drawCone(
                                const cv::Mat& start,
                                const cv::Mat& end,
-                               double radiusStart,
-                               double radiusEnd,
+                               float radiusStart,
+                               float radiusEnd,
                                int slices,
                                bool wireFrame
                              )
@@ -163,7 +163,7 @@ void cedar::aux::gl::drawCone(
   // make z-axis collinear with the cone center line
   cv::Mat z = cv::Mat::zeros(3, 1, start.type());
   z.at<T>(2, 0) = 1;
-  double alpha = acos( line.dot(z) / cv::norm(line) );
+  float alpha = acos( line.dot(z) / cv::norm(line) );
   if (alpha != 0)
   {
     cv::Mat axis = z.cross(line);
@@ -176,32 +176,22 @@ void cedar::aux::gl::drawCone(
 }
 
 template CEDAR_AUX_LIB_EXPORT
-  void cedar::aux::gl::drawCone<double>(
+  void cedar::aux::gl::drawCone<float>(
                                           const cv::Mat&,
                                           const cv::Mat&,
-                                          double,
-                                          double,
+                                          float,
+                                          float,
                                           int,
                                           bool
                                         );
-
-template CEDAR_AUX_LIB_EXPORT
-  void cedar::aux::gl::drawCone<float>(
-                                         const cv::Mat&,
-                                         const cv::Mat&,
-                                         double,
-                                         double,
-                                         int,
-                                         bool
-                                       );
 
 template<typename T>
 void cedar::aux::gl::drawArrow(
                                 const cv::Mat& start,
                                 const cv::Mat& end,
-                                double shaftRadius,
-                                double headRadius,
-                                double headLength,
+                                float shaftRadius,
+                                float headRadius,
+                                float headLength,
                                 int patches,
                                 bool wireFrame
                               )
@@ -227,24 +217,15 @@ void cedar::aux::gl::drawArrow(
 template CEDAR_AUX_LIB_EXPORT void cedar::aux::gl::drawArrow<float>(
                                                                      const cv::Mat& start,
                                                                      const cv::Mat& end,
-                                                                     double shaftRadius,
-                                                                     double headRadius,
-                                                                     double headLength,
+                                                                     float shaftRadius,
+                                                                     float headRadius,
+                                                                     float headLength,
                                                                      int patches,
                                                                      bool wireFrame
                                                                    );
-template CEDAR_AUX_LIB_EXPORT void cedar::aux::gl::drawArrow<double>(
-                                                                      const cv::Mat& start,
-                                                                      const cv::Mat& end,
-                                                                      double shaftRadius,
-                                                                      double headRadius,
-                                                                      double headLength,
-                                                                      int patches,
-                                                                      bool wireFrame
-                                                                    );
 
 void cedar::aux::gl::drawSphere(
-                                 double radius,
+                                 float radius,
                                  int slices,
                                  int stacks,
                                  bool wireFrame
@@ -264,8 +245,8 @@ void cedar::aux::gl::drawSphere(
 }
 
 void cedar::aux::gl::drawDisk(
-                               double innerRadius,
-                               double outerRadius,
+                               float innerRadius,
+                               float outerRadius,
                                int slices,
                                int loops,
                                bool invert,
@@ -295,9 +276,9 @@ void cedar::aux::gl::drawDisk(
 
 //!@todo origin should be at the center of the base rectangle
 void cedar::aux::gl::drawPyramid(
-                                  double length,
-                                  double width,
-                                  double height,
+                                  float length,
+                                  float width,
+                                  float height,
                                   bool wireFrame
                                 )
 {
@@ -307,37 +288,37 @@ void cedar::aux::gl::drawPyramid(
   }
   glBegin( GL_TRIANGLES);
   // front
-  glNormal3d(0.0, 1.0, 0.0);
-  glVertex3d(0, 0, height/2);                     // Top Of Triangle (Front)
-  glVertex3d(-length/2, width/2, -height/2);      // Left Of Triangle (Front)
-  glVertex3d(length/2, width/2, -height/2);       // Right Of Triangle (Front)
+  glNormal3f(0.0, 1.0, 0.0);
+  glVertex3f(0, 0, height/2);                     // Top Of Triangle (Front)
+  glVertex3f(-length/2, width/2, -height/2);      // Left Of Triangle (Front)
+  glVertex3f(length/2, width/2, -height/2);       // Right Of Triangle (Front)
   
   // right side
-  glNormal3d(1.0, 0.0, 0.0);
-  glVertex3d(0, 0, height/2);                     // Top Of Triangle (Right)
-  glVertex3d(length/2,  width/2, -height/2);      // Left Of Triangle (Right)
-  glVertex3d(length/2, -width/2, -height/2);      // Right Of Triangle (Right)
+  glNormal3f(1.0, 0.0, 0.0);
+  glVertex3f(0, 0, height/2);                     // Top Of Triangle (Right)
+  glVertex3f(length/2,  width/2, -height/2);      // Left Of Triangle (Right)
+  glVertex3f(length/2, -width/2, -height/2);      // Right Of Triangle (Right)
   
   // back
-  glNormal3d(0.0, -1.0, 0.0);
-  glVertex3d(0, 0, height/2);                     // Top Of Triangle (Back)
-  glVertex3d(length/2, -width/2, -height/2);      // Left Of Triangle (Back)
-  glVertex3d(-length/2, -width/2, -height/2);      // Right Of Triangle (Back)
+  glNormal3f(0.0, -1.0, 0.0);
+  glVertex3f(0, 0, height/2);                     // Top Of Triangle (Back)
+  glVertex3f(length/2, -width/2, -height/2);      // Left Of Triangle (Back)
+  glVertex3f(-length/2, -width/2, -height/2);      // Right Of Triangle (Back)
   
   // left side
-  glNormal3d(-1.0, 0.0, 0.0);
-  glVertex3d(0, 0, height/2);                     // Top Of Triangle (Left)
-  glVertex3d(-length/2, -width/2, -height/2);      // Left Of Triangle (Left)
-  glVertex3d(-length/2,  width/2, -height/2);      // Right Of Triangle (Left)
+  glNormal3f(-1.0, 0.0, 0.0);
+  glVertex3f(0, 0, height/2);                     // Top Of Triangle (Left)
+  glVertex3f(-length/2, -width/2, -height/2);      // Left Of Triangle (Left)
+  glVertex3f(-length/2,  width/2, -height/2);      // Right Of Triangle (Left)
   glEnd();
   
   glBegin(GL_QUADS);
   // base
-  glNormal3d(0.0, 0.0, -1.0);
-  glVertex3d(-length/2,  width/2, -height/2);      // Left Of Triangle (Front)
-  glVertex3d(length/2,  width/2, -height/2);      // Right Of Triangle (Front)
-  glVertex3d(length/2, -width/2, -height/2);      // Right Of Triangle (Back)
-  glVertex3d(-length/2, -width/2, -height/2);      // Left Of Triangle (Back)
+  glNormal3f(0.0, 0.0, -1.0);
+  glVertex3f(-length/2,  width/2, -height/2);      // Left Of Triangle (Front)
+  glVertex3f(length/2,  width/2, -height/2);      // Right Of Triangle (Front)
+  glVertex3f(length/2, -width/2, -height/2);      // Right Of Triangle (Back)
+  glVertex3f(-length/2, -width/2, -height/2);      // Left Of Triangle (Back)
   glEnd();
   if (wireFrame)
   {
@@ -345,7 +326,7 @@ void cedar::aux::gl::drawPyramid(
   }
 }
 
-void cedar::aux::gl::drawPrism(double width, double height, bool wireFrame)
+void cedar::aux::gl::drawPrism(float width, float height, bool wireFrame)
 {
   if (wireFrame)
   {
@@ -353,36 +334,36 @@ void cedar::aux::gl::drawPrism(double width, double height, bool wireFrame)
   }
   glBegin(GL_TRIANGLES);          // Start Drawing The Pyramid
   // bottom
-  glNormal3d(0.0, 0.0, -1.0);
-  glVertex3d(0, -width/2, 0);
-  glVertex3d(sqrt(3.0)*width/2, 0, 0);
-  glVertex3d(0, width/2, 0);
+  glNormal3f(0.0, 0.0, -1.0);
+  glVertex3f(0, -width/2, 0);
+  glVertex3f(sqrt(3.0)*width/2, 0, 0);
+  glVertex3f(0, width/2, 0);
   // top
-  glNormal3d(0.0, 0.0, 1.0);
-  glVertex3d(0, -width/2, height);
-  glVertex3d(sqrt(3.0)*width/2, 0, height);
-  glVertex3d(0, width/2, height);
+  glNormal3f(0.0, 0.0, 1.0);
+  glVertex3f(0, -width/2, height);
+  glVertex3f(sqrt(3.0)*width/2, 0, height);
+  glVertex3f(0, width/2, height);
   glEnd();
   
   glBegin(GL_QUADS);
   // front left
-  glNormal3d(.33, -.66, 0.0);
-  glVertex3d(0, -width/2, height);
-  glVertex3d(sqrt(3.0)*width/2, 0, height);
-  glVertex3d(sqrt(3.0)*width/2, 0, 0);
-  glVertex3d(0, -width/2, 0);
+  glNormal3f(.33, -.66, 0.0);
+  glVertex3f(0, -width/2, height);
+  glVertex3f(sqrt(3.0)*width/2, 0, height);
+  glVertex3f(sqrt(3.0)*width/2, 0, 0);
+  glVertex3f(0, -width/2, 0);
   // front right
-  glNormal3d(.33, .66, 0.0);
-  glVertex3d(sqrt(3.0)*width/2, 0, 0);
-  glVertex3d(0, width/2, 0);
-  glVertex3d(0, width/2, height);
-  glVertex3d(sqrt(3.0)*width/2, 0, height);
+  glNormal3f(.33, .66, 0.0);
+  glVertex3f(sqrt(3.0)*width/2, 0, 0);
+  glVertex3f(0, width/2, 0);
+  glVertex3f(0, width/2, height);
+  glVertex3f(sqrt(3.0)*width/2, 0, height);
   // back
-  glNormal3d(-1.0, 0.0, 0.0);
-  glVertex3d(0, -width/2, 0);
-  glVertex3d(0, width/2, 0);
-  glVertex3d(0, width/2, height);
-  glVertex3d(0, -width/2, height);
+  glNormal3f(-1.0, 0.0, 0.0);
+  glVertex3f(0, -width/2, 0);
+  glVertex3f(0, width/2, 0);
+  glVertex3f(0, width/2, height);
+  glVertex3f(0, -width/2, height);
   
   glEnd();
   if (wireFrame)
@@ -392,8 +373,8 @@ void cedar::aux::gl::drawPrism(double width, double height, bool wireFrame)
 }
 
 void cedar::aux::gl::drawTorus(
-                                double radius,
-                                double thickness,
+                                float radius,
+                                float thickness,
                                 int slices,
                                 int stacks,
                                 bool wireFrame
@@ -404,9 +385,9 @@ void cedar::aux::gl::drawTorus(
 }
 
 void cedar::aux::gl::drawEllipse(
-                                  double _a,
-                                  double _b,
-                                  double thickness,
+                                  float _a,
+                                  float _b,
+                                  float thickness,
                                   int slices,
                                   int stacks,
                                   bool wireFrame
@@ -415,7 +396,7 @@ void cedar::aux::gl::drawEllipse(
   float a = static_cast<float>(_a);
   float b = static_cast<float>(_b);
   float t = static_cast<float>(thickness);
-  //  double t = thickness;
+  //  float t = thickness;
   float d = 4.0/3.0*(sqrt(2.0)-1);
 
 
@@ -619,39 +600,39 @@ void cedar::aux::gl::drawEllipse(
   }
 }
 
-void cedar::aux::gl::drawAxes(double length)
+void cedar::aux::gl::drawAxes(float length)
 {
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  cv::Mat o = cv::Mat::zeros(3, 1, CV_64FC1);
-  cv::Mat x = cv::Mat::zeros(3, 1, CV_64FC1);
-  x.at<double>(0, 0) = length;
-  cv::Mat y = cv::Mat::zeros(3, 1, CV_64FC1);
-  y.at<double>(1, 0) = length;
-  cv::Mat z = cv::Mat::zeros(3, 1, CV_64FC1);
-  z.at<double>(2, 0) = length;
+  cv::Mat o = cv::Mat::zeros(3, 1, CV_32FC1);
+  cv::Mat x = cv::Mat::zeros(3, 1, CV_32FC1);
+  x.at<float>(0, 0) = length;
+  cv::Mat y = cv::Mat::zeros(3, 1, CV_32FC1);
+  y.at<float>(1, 0) = length;
+  cv::Mat z = cv::Mat::zeros(3, 1, CV_32FC1);
+  z.at<float>(2, 0) = length;
   setColor(1, 0, 0);
-  drawArrow<double>(o, x, length*0.015, length*0.04, length*0.2, 10);
+  drawArrow<float>(o, x, length*0.015, length*0.04, length*0.2, 10);
   setColor(0, 1, 0);
-  drawArrow<double>(o, y, length*0.015, length*0.04, length*0.2, 10);
+  drawArrow<float>(o, y, length*0.015, length*0.04, length*0.2, 10);
   setColor(0, 0, 1);
-  drawArrow<double>(o, z, length*0.015, length*0.04, length*0.2, 10);
+  drawArrow<float>(o, z, length*0.015, length*0.04, length*0.2, 10);
 }
 
-void cedar::aux::gl::drawCross(double length, double width)
+void cedar::aux::gl::drawCross(float length, float width)
 {
   glLineWidth(width);
   glBegin(GL_LINES);
-  glVertex3d(-length, 0, 0);
-  glVertex3d(length, 0, 0);
+  glVertex3f(-length, 0, 0);
+  glVertex3f(length, 0, 0);
   glEnd();
 
   glBegin(GL_LINES);
-  glVertex3d(0, -length, 0);
-  glVertex3d(0, length, 0);
+  glVertex3f(0, -length, 0);
+  glVertex3f(0, length, 0);
   glEnd();
 
   glBegin(GL_LINES);
-  glVertex3d(0, 0, -length);
-  glVertex3d(0, 0, length);
+  glVertex3f(0, 0, -length);
+  glVertex3f(0, 0, length);
   glEnd();
 }

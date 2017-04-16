@@ -73,7 +73,7 @@ void checkSerialCommunicationAnswer
   if (answer.empty() || answer.compare(0, expected_answer.size(), expected_answer, 0, expected_answer.size()) != 0)
   {
     // ... throw an exception
-    std::string exception_message = "Unexpected answer during serial communication: " + answer;
+    std::string exception_message = "Unexpected answer during serial communication: " + answer + " Expecting: " + expectedAnswer;
     CEDAR_THROW
     (
       cedar::dev::SerialCommunicationException,

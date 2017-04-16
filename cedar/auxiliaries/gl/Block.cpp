@@ -37,12 +37,35 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/gl/Block.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
+#include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
+// register class with the object visualization factory manager
+//----------------------------------------------------------------------------------------------------------------------
+
+namespace
+{
+    bool registered
+        = cedar::aux::gl::ObjectVisualizationManagerSingleton::getInstance()->registerType<cedar::aux::gl::BlockPtr>();
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+cedar::aux::gl::Block::Block()
+:
+// todo: I'm not sure about the default value (value ranges) here
+cedar::aux::gl::ObjectVisualization(cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame), "generic Block", 0.5, 0.5, 0.5),
+mLength(0.01),
+mWidth(0.01),
+mHeight(0.01)
+{
+}
 
 cedar::aux::gl::Block::Block
 (
@@ -71,10 +94,10 @@ void cedar::aux::gl::Block::draw()
   prepareDraw();
   
   // draw object
-  if (mIsVisible)
+  if (isVisible())
   {
-    cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
-    drawBlock(mLength, mWidth, mHeight, mIsDrawnAsWireFrame);
+    cedar::aux::gl::setColor(getColorR(), getColorG(), getColorB());
+    drawBlock(mLength, mWidth, mHeight, getIsDrawnAsWireFrame());
   }
 }
 

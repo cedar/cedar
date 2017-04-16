@@ -47,6 +47,7 @@
 #include "cedar/devices/kteam/namespace.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/devices/YarpChannel.fwd.h"
 #include "cedar/auxiliaries/MatData.fwd.h"
 
 // SYSTEM INCLUDES

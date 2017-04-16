@@ -89,6 +89,7 @@ _mTimeout
 
 cedar::dev::SerialChannel::~SerialChannel()
 {
+  cedar::dev::Channel::prepareChannelDestructAbsolutelyRequired();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -130,9 +131,18 @@ std::string cedar::dev::SerialChannel::writeAndReadLocked(const std::string& com
 
 void cedar::dev::SerialChannel::write(std::string command)
 {
+  CEDAR_ASSERT(this->isOpen());
+
   // append the command delimiter to the sent command
   command.append(mCommandDelimiter);
-  boost::asio::write(mPort, boost::asio::buffer(command.c_str(), command.size()));
+  try
+  {
+    boost::asio::write(mPort, boost::asio::buffer(command.c_str(), command.size()));
+  }
+  catch (const std::exception& e)
+  {
+    CEDAR_THROW(cedar::dev::SerialChannel::WriteException, "Error during writing. Error is: " + std::string(e.what()));
+  }
 
 #ifdef DEBUG_VERBOSE
   std::ostringstream message;
@@ -174,85 +184,93 @@ void cedar::dev::SerialChannel::setupRead()
 
 std::string cedar::dev::SerialChannel::read()
 {
-  // set the current reading status to "in progress"
-  mReadResult = readInProgress;
-  // counter for the number of transferred bytes
-  mBytesTransferred = 0;
-
-  // set up the read process
-  setupRead();
-
-  // start the timer for the timeout
-  boost::posix_time::seconds timeout_boost_seconds(getTimeout() / cedar::unit::Time(1.0 * cedar::unit::second));
-  mTimer.expires_from_now(boost::posix_time::time_duration(timeout_boost_seconds));
-  // wait for the timeout to expire and call cedar::dev::SerialChannel::timeoutExpired when it does
-  mTimer.async_wait(boost::bind(&cedar::dev::SerialChannel::timeoutExpired, this, boost::asio::placeholders::error));
-
-  // Run, Forrest, Run!
-  for (;;)
+  try
   {
-    // start the reading process
-    // run_one() will block until the delimiter is found, in which case readCompleted() is called,
-    // or the timeout expires, in which case timeoutExpired() is called
-    mIoService.run_one();
+    // set the current reading status to "in progress"
+    mReadResult = readInProgress;
+    // counter for the number of transferred bytes
+    mBytesTransferred = 0;
 
-    switch(mReadResult)
+    // set up the read process
+    setupRead();
+
+    // start the timer for the timeout
+    boost::posix_time::seconds timeout_boost_seconds(getTimeout() / cedar::unit::Time(1.0 * cedar::unit::second));
+    mTimer.expires_from_now(boost::posix_time::time_duration(timeout_boost_seconds));
+    // wait for the timeout to expire and call cedar::dev::SerialChannel::timeoutExpired when it does
+    mTimer.async_wait(boost::bind(&cedar::dev::SerialChannel::timeoutExpired, this, boost::asio::placeholders::error));
+
+    // Run, Forrest, Run!
+    for (;;)
     {
-      // if the read was successful
-      case readSuccess:
-      {
-        mTimer.cancel();
-        // from the counted number of bytes, substract the size of the command delimiter
-        mBytesTransferred -= mCommandDelimiter.size();
-        std::istream input_stream(&mReadData);
-        // allocate a string for the answer
-        std::string answer(mBytesTransferred, '\0');
-        // fill the string from the buffer
-        input_stream.read(&answer[0], mBytesTransferred);
-        // remove the delimiter from the stream
-        input_stream.ignore(mCommandDelimiter.size());
+      // start the reading process
+      // run_one() will block until the delimiter is found, in which case readCompleted() is called,
+      // or the timeout expires, in which case timeoutExpired() is called
+      mIoService.run_one();
 
-        #ifdef DEBUG_VERBOSE
+      switch(mReadResult)
+      {
+        // if the read was successful
+        case readSuccess:
+        {
+          mTimer.cancel();
+          // from the counted number of bytes, substract the size of the command delimiter
+          mBytesTransferred -= mCommandDelimiter.size();
+          std::istream input_stream(&mReadData);
+          // allocate a string for the answer
+          std::string answer(mBytesTransferred, '\0');
+          // fill the string from the buffer
+          input_stream.read(&answer[0], mBytesTransferred);
+          // remove the delimiter from the stream
+          input_stream.ignore(mCommandDelimiter.size());
+
+          #ifdef DEBUG_VERBOSE
+            std::ostringstream message;
+            message << "Successfully received data ("
+                    << mBytesTransferred
+                    << " Byte(s) read from '"
+                    << getDevicePath()
+                    << "')\n";
+
+            cedar::aux::LogSingleton::getInstance()->message
+            (
+              message.str(),
+              "cedar::dev::SerialChannel",
+              "Successfully received data"
+            );
+          #endif
+
+          return answer;
+        }
+        // if the timeout expired
+        case readTimeoutExpired:
+        {
+          mPort.cancel();
+          CEDAR_THROW(cedar::dev::TimeoutException, "Timeout expired on receiving data on the serial channel.");
+          continue;
+        }
+        // if an error occurred on read
+        case readError:
+        {
+          mTimer.cancel();
+          mPort.cancel();
+
           std::ostringstream message;
-          message << "Successfully received data ("
-                  << mBytesTransferred
-                  << " Byte(s) read from '"
-                  << getDevicePath()
-                  << "')\n";
-
-          cedar::aux::LogSingleton::getInstance()->message
-          (
-            message.str(),
-            "cedar::dev::SerialChannel",
-            "Successfully received data"
-          );
-        #endif
-
-        return answer;
-      }
-      // if the timeout expired
-      case readTimeoutExpired:
-      {
-        mPort.cancel();
-        CEDAR_THROW(cedar::dev::TimeoutException, "Timeout expired on receiving data on the serial channel.");
-      }
-      // if an error occurred on read
-      case readError:
-      {
-        mTimer.cancel();
-        mPort.cancel();
-
-        std::ostringstream message;
-        message << "Boost system error while receiving data on the serial channel. Error code: "
-                << boost::system::error_code();
-        CEDAR_THROW(cedar::dev::SerialCommunicationException, message.str());
-      }
-      // if the reading is still in progress
-      case readInProgress:
-      {
-        // remain in the loop
+          message << "Boost system error while receiving data on the serial channel. Error code: "
+                  << boost::system::error_code();
+          CEDAR_THROW(cedar::dev::SerialCommunicationException, message.str());
+        }
+        // if the reading is still in progress
+        case readInProgress:
+        {
+          // remain in the loop
+        }
       }
     }
+  }
+  catch (const boost::system::system_error& e)
+  {
+    CEDAR_THROW(BoostException, "A boost exception occurred: " + std::string(e.what()));
   }
 }
 
@@ -334,6 +352,7 @@ bool cedar::dev::SerialChannel::isOpen() const
 
 void cedar::dev::SerialChannel::openHook()
 {
+  QWriteLocker lock(&(this->mLock));
   // the following parameters are not to be changed while the port is open
   _mDevicePath->setConstant(true);
   _mEscapedCommandDelimiter->setConstant(true);
@@ -346,19 +365,54 @@ void cedar::dev::SerialChannel::openHook()
   }
 
   // open the serial port
-  mPort.open(_mDevicePath->getValue());
-  mPort.set_option(boost::asio::serial_port_base::baud_rate(_mBaudRate->getValue()));
+  //!@todo Handle errors during opening
+  boost::system::error_code error;
+  error = mPort.open(_mDevicePath->getValue(), error);
 
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-  (
-    "Successfully opened port " + getDevicePath(),
-    "cedar::dev::SerialChannel",
-    "Serial channel opened"
-  );
+  if (error)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Error opening serial port: " + std::string(error.message()),
+      CEDAR_CURRENT_FUNCTION_NAME,
+      "Serial channel error"
+    );
+  }
+
+  error = mPort.set_option(boost::asio::serial_port_base::baud_rate(_mBaudRate->getValue()), error);
+  if (error)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Error setting baud rate: " + std::string(error.message()),
+      CEDAR_CURRENT_FUNCTION_NAME,
+      "Serial channel error"
+    );
+  }
+
+  if (mPort.is_open())
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Successfully opened port " + getDevicePath(),
+      CEDAR_CURRENT_FUNCTION_NAME,
+      "Serial channel opened"
+    );
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Port " + getDevicePath() + " not opened.",
+      CEDAR_CURRENT_FUNCTION_NAME,
+      "Serial channel error"
+    );
+  }
 }
 
 void cedar::dev::SerialChannel::closeHook()
 {
+  QWriteLocker lock(&(this->mLock));
   if (!isOpen())
   {
     return;
