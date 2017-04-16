@@ -1,0 +1,33 @@
+/*!
+
+@page OverviewNamespaces Overview of the cedar namespaces
+This is a brief overview of cedar (top-level) namespaces. You can find auto-generated descriptions <a href=namespaces.html>
+here</a> and an overview of the folder structure @link FolderStructureConcept here@endlink.
+
+@section unit
+The namespace @em cedar::unit contains classes that provide physical units for numeric variables. These are mostly a wrapper 
+for the boost unit interface. It also contains a definition of a matrix containing numeric values with attached units.
+
+@section aux
+The namespace @em cedar::aux contains a lot of auxiliary functionality, covering threading, singletons, parameters, enums, and 
+more. The sub-namespace @em cedar::aux::net contains a wrapper for a YARP module providing network transparency of data. The
+sub-namespace @em cedar::aux::gui contains basic gui elements. @em cedar::aux::math and @em aux::conv provide additional mathematical
+tools.  
+
+@section dev
+The namespace @em cedar::dev contains hardware-wrapping code, both for sensors and actuators. Grabbers are placed in the 
+sub-namespace @em cedar::dev::sensors. Robotic hardware can be found in separate sub-namespaces: @em cedar::dev::amtec for Schunk Powercubes,
+@em cedar::dev::kteam for Kheperas and ePucks, @em cedar::dev::kuka for FRI support of the Kuka light-weight robot 4. Sub-namespace @em cedar::dev::gl
+contains building blocks for kinematically simulating parts of robots or combinations of those. 
+ 
+@section proc
+The namespace @em cedar::proc contains the basic interfaces for the processing framework, which is the core of cedar. Classes
+such as cedar::proc::Element, cedar::proc::Connectable, cedar::proc::Step, and cedar::proc::Group provide management of
+elements, data, connections, and more. @em cedar::proc::steps, @em cedar::proc::sources, and @em cedar::proc::sinks contain a core set of
+elements for processing. @em cedar::proc::gui contains all gui classes that make the cedar gui. 
+
+@section dyn
+The namespace @em cedar::dyn contains the cedar::dyn::Dynamics superclass and additional elements for processing, such as
+dynamic fields and memory traces.
+
+*/

@@ -1,0 +1,210 @@
+/*!
+
+@page PluginFramework cedar's Plugin Framework
+
+@todo This is just a sketch, needs more detail.
+
+cedar's plugin framework is extensible and flexible. Its main functionality comes from two concepts: factory managers,
+which can dynamically allocate objects of different classes that share a common base class; and, declarations, which
+enrich such factories with additional information.
+
+Factory managers (cedar::aux::FactoryManager) store associations between string identifiers and factories
+(cedar::aux::Factory). Factories, in turn, can be used to create new objects of a specific class at runtime.
+Thus, factory managers are responsible for dynamically allocating objects of different types at run time (i.e., you can
+ask a factory manager to create an object of a type that is specified by the user).
+
+Plugins use declarations (cedar::aux::PluginDeclaration) to declare new classes that can be added to factory managers if
+the user chooses to load a plugin. They may also contain additional information, such as a description of the class they
+declare.
+
+@section Example An example for a plugin class
+
+Let's say you want to make a class @em Base extensible by a plugin system. Your class header looks something like this:
+@code
+  class cedar::aux::Base
+  {
+    // lots of stuff and at least one virtual method; remember the virtual descrutor!
+  };
+@endcode
+
+@subsection ReadyingCustomClass Readying your class for the plugin system
+
+To enable plugins for your base class, add the following at the end of the header, after the class declaration:
+@code
+namespace cedar
+{
+  namespace aux
+  {
+    // this will be used for managing declarations; we still have to define a declaration class (see below)
+    typedef
+      cedar::aux::DeclarationManagerTemplate<cedar::aux::BasePtr>
+      BaseDeclarationManager;
+
+    // singleton for BaseDeclarationManager -- this is where all declarations are kept
+    typedef
+      cedar::aux::Singleton<cedar::proc::BaseDeclarationManager>
+      BaseDeclarationManagerSingleton;
+
+    // factory manager -- this can be used to instantiate derived classes
+    typedef
+      cedar::aux::FactoryManager<cedar::proc::BasePtr>
+      BaseFactoryManager;
+  }
+}
+
+// this makes sure the singletons work properly on windows (across DLLs)
+CEDAR_AUX_SINGLETON(BaseDeclarationManager);
+CEDAR_AUX_SINGLETON(BaseFactoryManager);
+@endcode
+
+You'll also need to
+@code
+#include "cedar/auxiliaries/DeclarationManagerTemplate.h"
+@endcode
+
+@todo Different steps might be necessary if the class is in a subnamespace of, e.g., aux; describe them here.
+
+@subsection Declaration The declaration class
+
+The declaration class carries additional information about the class being declared, such as its typename, which plugin
+it comes from etc. Basic information is stored in a base class (cedar::aux::PluginDeclarationBaseTemplate).
+
+A skeleton declaration looks like this:
+@code
+class cedar::aux::BaseDeclaration : public cedar::aux::PluginDeclarationBaseTemplate<cedar::aux::BasePtr>
+{
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // constructors and destructor
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //!@brief The standard constructor.
+  BaseDeclaration(const std::string& category, const std::string& className = "")
+  :
+  cedar::aux::PluginDeclarationBaseTemplate<cedar::aux::BasePtr>(category, className)
+  {
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  // this will be overridden in the templated version of the class below
+  virtual void declare() const = 0;
+
+  // this is mainly used to group together declarations when displaying them to the user 
+  std::string getPluginType() const
+  {
+    return "base";
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // members
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::aux::BaseDeclaration
+
+template <class DerivedClass> // derived class will be filled in the plugins
+class cedar::aux::BaseDeclarationTemplate
+    :
+    // this is a bit of a weird mechanism that is here for downwards-compatibility
+    public cedar::aux::PluginDeclarationTemplate
+    <
+      cedar::aux::BasePtr, // class that the plugin derives from
+      boost::shared_ptr<DerivedClass>, // the actual class being declared (given by the template)
+      cedar::aux::BaseDeclaration // the PluginDeclarationTemplate will inherit this
+    >
+{
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef
+      cedar::aux::PluginDeclarationTemplate
+      <
+        cedar::aux::BasePtr,
+        boost::shared_ptr<DerivedClass>,
+        cedar::aux::BaseDeclaration
+      >
+      DeclarationSuper;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // constructors and destructor
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  BaseDeclarationTemplate(const std::string& category, const std::string& classId = "")
+  :
+  DeclarationSuper
+  (
+    category,
+    classId
+  )
+  {
+  }
+
+  void declare() const
+  {
+    DeclarationSuper::declare();
+  }
+}; // class cedar::aux::BaseDeclarationTemplate
+@endcode
+
+@subsection DeclaringThings Declaring classes in plugins
+
+Plugins will usually have a function where they declare their classes. For the example above, assume we have a class
+Derived which inherits Base. The declaration now looks like this:
+@code
+void pluginDeclaration(cedar::aux::PluginDeclarationListPtr plugin)
+{
+  plugin->add
+  (
+    cedar::proc::BaseDeclarationPtr
+    (
+      new cedar::proc::BaseDeclarationTemplate
+      <
+        DerivedClass
+      >
+      (
+        "category"
+      )
+    )
+  );
+}
+@endcode
+
+@subsection Instantiating Instantiating new objects
+
+New objects can now be instantiated like this:
+@code
+   auto object = cedar::proc::BaseFactoryManagerSingleton::getInstance()->allocate("Derived");
+@endcode
+
+*/

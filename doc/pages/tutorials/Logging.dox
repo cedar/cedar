@@ -1,0 +1,111 @@
+/*!
+
+@page LoggingWithCedar Tutorial: Logging with cedar
+
+cedar now ships with a flexible logging system that allows messages to be displayed in either the console, a gui or some
+other, used-defined palce. Thus, there are two sides to using this interface: sending messages to the log and handling
+incoming messages.
+
+@section Logging_SendingMessages Sending Messages
+
+Sending messages is pretty straightforward:
+@code
+// include the log header ...
+#include <cedar/auxiliaries/Log.h>
+
+// ... and somewhere in your code, write this:
+  cedar::aux::LogSingleton::getInstance()->message
+  (
+    "This is the actual message",
+    "your::function::name(const std::string&)", // this is the source of the message (see below)
+    "title" // optional
+  );
+@endcode
+
+The source should always be the function from which the message is sent. It is used only to filter messages and is
+currently not displayed to the user.
+
+There are also different types of messages that can be sent to the log. In the above example, a message is sent, however
+you can also send warnings, errors etc. See cedar::aux::Log for all possible functions.
+
+A special type of message is the allocation/deallocation message. It notes in the log that an object has been created or
+destroyed. These messages are only generated in debug builds, and can be sent as follows:
+@code
+your::Class::Class()
+{
+  // write this in every constructor of the class; it is recommended to make this the first statement.
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+  
+  // ...
+}
+
+your::Class::~Class() // destructor
+{
+  // it is also recommended to do this at the beginning of the destructor.
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
+  
+  // ...
+}
+@endcode
+
+
+
+@section Logging_HandlingLogMessages Handling Log Messages
+
+Any message sent via the log mechanism described above goes through a central instance: the Log's singleton object.
+This gives us the advantage of being able to flexibly redirect those messages to any desired sink, depending on what
+program is currently being run.
+
+By default, all messages are sent to the console. However, in applications with graphical user interfaces, this is
+usually not desired. Therefore, cedar offers a standard log-widget, cedar::aux::gui::Log. Creating such a widget and
+calling its installHandlers() method already takes care of actually displaying all messages in the given log.
+
+If these log methods are not sufficient for your needs, you can also write your own logger. Simply create a new class
+that inherits cedar::aux::LogInterface and implement the message function which is called whenever any type of message
+is entered into the log singleton.
+
+As a last step, your program must register your own log interface to be one receiving messages. This can be done with
+the following piece of code:
+@code
+#include "YourLogInterface.h"
+#include <cedar/auxiliaries/Log.h>
+
+int main(int argc, char** argv)
+{
+  YourLogInterfacePtr logger(new YourLogInterface());
+  cedar::aux::LogSingleton::getInstance()->addLogger(logger);
+  // do stuff
+}
+@endcode
+And that's it! If you don't want to let all messages go to your logger, you have some more advanced options explained
+below.
+
+
+@section Filtering Filtering
+
+Consider the following situation: You've written a small log widget that only displays the log messages it receives.
+After a while you notice that things get out of hand, and you don't see the important messages any more. Now, if you
+don't want to spend time coding a better log widget, you can solve this by only letting it display the messages you
+are looking for. For example, assume you are only interested in debug messages. Then you can filter like this:
+@code
+#include "YourLogInterface.h"
+#include <cedar/auxiliaries/Log.h>
+#include <cedar/auxiliaries/logFilter/Type.h>
+
+int main(int argc, char** argv)
+{
+  YourLogInterfacePtr logger(new YourLogInterface()); // this filters based on type
+  cedar::aux::logFilter::TypePtr filter(new cedar::aux::logFilter::Type(cedar::aux::LOG_LEVEL_DEBUG));
+  cedar::aux::LogSingleton::getInstance()->addLogger(logger, filter);
+  // do stuff
+}
+@endcode
+Now your log only receives debug messages (note, that these are only sent in debug builds).
+
+By default, messages will be sent to all loggers associated with filters that accept them. Thus, if you have two debug
+loggers, both will receive each message. If you don't want this behavior, you can set the "RemovesMessages" property of
+the logger to true. Note, that the first logger that accept the message and removes messages will be the one receiving
+the messages.
+
+
+*/
