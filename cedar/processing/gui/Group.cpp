@@ -1062,11 +1062,13 @@ void cedar::proc::gui::Group::write() const
   this->writeJson(this->mFileName);
 }
 
-void cedar::proc::gui::Group::writeJson(const cedar::aux::Path& filename) const
+void cedar::proc::gui::Group::writeTo(std::string file) const
 {
-  this->mFileName = filename.toString();
-  cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
+  this->internalWriteJson(file);
+}
 
+void cedar::proc::gui::Group::internalWriteJson(const cedar::aux::Path& filename) const
+{
   cedar::aux::ConfigurationNode root;
 
   this->mGroup->writeConfiguration(root);
@@ -1075,6 +1077,14 @@ void cedar::proc::gui::Group::writeJson(const cedar::aux::Path& filename) const
   write_json(filename.toString(), root);
 
   this->mGroup->writeDataFile(filename.toString() + ".data");
+}
+
+void cedar::proc::gui::Group::writeJson(const cedar::aux::Path& filename) const
+{
+  this->mFileName = filename.toString();
+  cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
+
+  internalWriteJson( filename );
 }
 
 void cedar::proc::gui::Group::readJson(const cedar::aux::Path& source)

@@ -239,6 +239,15 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
     "<p>Due to a change in the netreader/writers data protocol older cedar versions will no longer be able to communicate with the new version. Please make sure that all your cedar installations are updated.</p>"
   );
 
+  this->addOneTimeMessage
+  (
+    CEDAR_MAKE_VERSION(5, 2, 0), // introduces in this version
+    "autosave feature",
+    "Auto-Saved Architectures",
+    "<p>Cedar now automatically saves your work in progress in separate backup "
+    "files. Restore your auto-saved architectures from the Open File dialog by "
+    "selecting the file type 'backup'.</p>"
+  );
 }
 
 cedar::proc::gui::Settings::UserDefinedColor::UserDefinedColor(const std::string& stringToParse)

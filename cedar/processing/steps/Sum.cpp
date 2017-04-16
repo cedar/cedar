@@ -65,7 +65,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::Sum>
       (
-        "Math Utilities",
+        "Algebra",
         "cedar.processing.steps.Sum"
       )
     );

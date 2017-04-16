@@ -65,7 +65,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::CoordinateTransformation>
       (
-        "Math Utilities",
+        "Algebra",
         "cedar.processing.steps.CoordinateTransformation"
       )
     );

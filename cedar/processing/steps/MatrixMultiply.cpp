@@ -61,7 +61,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::MatrixMultiply>
       (
-        "Utilities",
+        "Algebra",
         "cedar.processing.MatrixMultiply"
       )
     );

@@ -58,7 +58,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::ScalarsToVector>
       (
-        "Utilities",
+        "Programming",
         "cedar.processing.ScalarsToVector"
       )
     );

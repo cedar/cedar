@@ -68,7 +68,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::UnitConverter>
       (
-        "Utilities"
+        "Programming"
       )
     );
     declaration->setIconPath(":/steps/unit_converter.svg");

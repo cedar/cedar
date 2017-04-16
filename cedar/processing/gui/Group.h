@@ -103,6 +103,7 @@ public:
 public:
   //!@brief write group to file
   void write() const;
+  void writeTo(std::string file) const;
 
   //!@brief write configuration to path
   void writeJson(const cedar::aux::Path& filename) const;
@@ -411,6 +412,8 @@ private:
   void updateAllElementsTriggerColorState() const;
 
   void addElementsToGroup();
+
+  void internalWriteJson(const cedar::aux::Path& filename) const;
 
 signals:
   //!@brief signal that is emitted when a boost signal is received

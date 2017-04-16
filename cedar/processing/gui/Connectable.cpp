@@ -1568,7 +1568,13 @@ void cedar::proc::gui::Connectable::loadDataClicked()
   cedar::proc::DataSlotPtr slot = action->data().value<cedar::proc::DataSlotPtr>();
   CEDAR_DEBUG_ASSERT(slot);
 
-  QString filename = QFileDialog::getOpenFileName(this->mpMainWindow, "Select a file to load");
+  QString filename = QFileDialog::getOpenFileName
+                     (
+                       this->mpMainWindow,
+                       "Select a file to load",
+                       0, 0, 0, 
+                       QFileDialog::DontUseNativeDialog
+                     );
 
   if (!filename.isEmpty())
   {

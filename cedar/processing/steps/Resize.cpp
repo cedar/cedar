@@ -78,7 +78,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::Resize>
       (
-        "Utilities",
+        "Arrays",
         "cedar.processing.Resize"
       )
     );

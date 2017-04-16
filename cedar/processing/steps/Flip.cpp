@@ -62,7 +62,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::Flip>
       (
-        "Utilities",
+        "Arrays",
         "cedar.processing.Flip"
       )
     );
