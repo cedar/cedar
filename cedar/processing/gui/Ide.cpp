@@ -860,7 +860,7 @@ void cedar::proc::gui::Ide::timerEvent(QTimerEvent*)
   if (!components_desc.empty())
   {
     this->mpRunningComponentsLabel->setText(
-          QString("running: ") 
+          QString("independently running: ") 
           + QString("<span style='color:rgb(233, 10, 255, 255)'>%1</span>").arg(QString::fromStdString(components_desc) ) );
   }
   else
