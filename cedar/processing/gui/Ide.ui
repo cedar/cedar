@@ -586,7 +586,7 @@
   </action>
   <action name="mpActionAddGlobalSceneViewer">
    <property name="text">
-    <string>Add a Camera of the simulated scene...</string>
+    <string>Add a camera of the scene visualisation...</string>
    </property>
   </action>
   <action name="mpActionDuplicate">
