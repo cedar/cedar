@@ -62,7 +62,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::StaticGain, cedar::proc::gui::StaticGainView>
       (
-        "Utilities",
+        "Algebra",
         "cedar.processing.StaticGain"
       )
     );
