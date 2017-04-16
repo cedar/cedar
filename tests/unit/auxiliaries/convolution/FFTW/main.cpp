@@ -77,8 +77,8 @@ class Convolve3DTestThread : public cedar::aux::LoopedThread
     {
       int sizes_3D[3] = {31, 20, 57};
       int sizes_kernel_3D[3] = {5, 4, 16};
-      cv::Mat matrix_3D(3, sizes_3D, CV_64F);
-      cv::Mat kernel_3D(3, sizes_kernel_3D, CV_64F);
+      cv::Mat matrix_3D(3, sizes_3D, CV_32F);
+      cv::Mat kernel_3D(3, sizes_kernel_3D, CV_32F);
       cv::Mat result_3D = this->mFftw->convolve(matrix_3D, kernel_3D, cedar::aux::conv::BorderType::Cyclic);
     }
 
@@ -119,36 +119,36 @@ void run_test()
   FFTWPtr fftw(new FFTW());
   // test stuff
   std::cout << "test no " << test_number++ << ": generic convolution test for 2-5 dimension(s)" << std::endl;
-  cv::Mat matrix = cv::Mat::ones(50, 1, CV_64F);
-  cv::Mat kernel = cv::Mat::ones(7, 1, CV_64F);
+  cv::Mat matrix = cv::Mat::ones(50, 1, CV_32F);
+  cv::Mat kernel = cv::Mat::ones(7, 1, CV_32F);
   cv::Mat result = fftw->convolve(matrix, kernel, cedar::aux::conv::BorderType::Cyclic);
 
-  cv::Mat matrix_2D = cv::Mat::ones(50,71, CV_64F);
-  cv::Mat kernel_2D = cv::Mat::ones(7,7, CV_64F);
+  cv::Mat matrix_2D = cv::Mat::ones(50,71, CV_32F);
+  cv::Mat kernel_2D = cv::Mat::ones(7,7, CV_32F);
   cv::Mat result_2D = fftw->convolve(matrix_2D, kernel_2D, cedar::aux::conv::BorderType::Cyclic);
   // test 3D
   int sizes_3D[3] = {31, 20, 57};
   int sizes_kernel_3D[3] = {5, 4, 16};
-  cv::Mat matrix_3D(3, sizes_3D, CV_64F);
-  cv::Mat kernel_3D(3, sizes_kernel_3D, CV_64F);
+  cv::Mat matrix_3D(3, sizes_3D, CV_32F);
+  cv::Mat kernel_3D(3, sizes_kernel_3D, CV_32F);
   cv::Mat result_3D = fftw->convolve(matrix_3D, kernel_3D, cedar::aux::conv::BorderType::Cyclic);
   // test 4D
   int sizes_4D[4] = {11, 20, 17, 12};
   int sizes_kernel_4D[4] = {5, 4, 6, 7};
-  cv::Mat matrix_4D(4, sizes_4D, CV_64F);
-  cv::Mat kernel_4D(4, sizes_kernel_4D, CV_64F);
+  cv::Mat matrix_4D(4, sizes_4D, CV_32F);
+  cv::Mat kernel_4D(4, sizes_kernel_4D, CV_32F);
   cv::Mat result_4D = fftw->convolve(matrix_4D, kernel_4D, cedar::aux::conv::BorderType::Cyclic);
   // test 5D
   int sizes_5D[5] = {13, 17, 12, 12, 10};
   int sizes_kernel_5D[5] = {5, 4, 6, 7, 6};
-  cv::Mat matrix_5D(5, sizes_5D, CV_64F);
-  cv::Mat kernel_5D(5, sizes_kernel_5D, CV_64F);
+  cv::Mat matrix_5D(5, sizes_5D, CV_32F);
+  cv::Mat kernel_5D(5, sizes_kernel_5D, CV_32F);
   cv::Mat result_5D = fftw->convolve(matrix_5D, kernel_5D, cedar::aux::conv::BorderType::Cyclic);
 
   // unit test kernel padding
   std::cout << "test no " << test_number++ << ": test kernel padding 1D" << std::endl;
-  cv::Mat matrix_pad = cv::Mat::ones(6, 1, CV_64F);
-  cv::Mat kernel_pad = cv::Mat::ones(3, 1, CV_64F);
+  cv::Mat matrix_pad = cv::Mat::ones(6, 1, CV_32F);
+  cv::Mat kernel_pad = cv::Mat::ones(3, 1, CV_32F);
   kernel_pad.at<double>(1,0) = 2.0;
   cv::Mat padded = fftw->padTheKernel(matrix_pad, kernel_pad);
   cv::Mat pad_check = (cv::Mat_<double>(6, 1) << 2.0, 1.0, 0.0, 0.0, 0.0, 1.0);
@@ -166,8 +166,8 @@ void run_test()
     std::cout << "error in padding for odd 1D kernel and even size" << std::endl;
   }
 
-  matrix_pad = cv::Mat::ones(7, 1, CV_64F);
-  kernel_pad = cv::Mat::ones(3, 1, CV_64F);
+  matrix_pad = cv::Mat::ones(7, 1, CV_32F);
+  kernel_pad = cv::Mat::ones(3, 1, CV_32F);
   kernel_pad.at<double>(1,0) = 2.0;
   padded = fftw->padTheKernel(matrix_pad, kernel_pad);
   pad_check = (cv::Mat_<double>(7, 1) << 2.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
@@ -185,8 +185,8 @@ void run_test()
     std::cout << "error in padding for odd 1D kernel and odd size" << std::endl;
   }
 
-  matrix_pad = cv::Mat::ones(6, 1, CV_64F);
-  kernel_pad = cv::Mat::ones(4, 1, CV_64F);
+  matrix_pad = cv::Mat::ones(6, 1, CV_32F);
+  kernel_pad = cv::Mat::ones(4, 1, CV_32F);
   kernel_pad.at<double>(1,0) = 2.0;
   kernel_pad.at<double>(2,0) = 3.0;
   padded = fftw->padTheKernel(matrix_pad, kernel_pad);
@@ -205,8 +205,8 @@ void run_test()
     std::cout << "error in padding for even 1D kernel and even size" << std::endl;
   }
 
-  matrix_pad = cv::Mat::ones(7, 1, CV_64F);
-  kernel_pad = cv::Mat::ones(4, 1, CV_64F);
+  matrix_pad = cv::Mat::ones(7, 1, CV_32F);
+  kernel_pad = cv::Mat::ones(4, 1, CV_32F);
   kernel_pad.at<double>(1,0) = 2.0;
   kernel_pad.at<double>(2,0) = 3.0;
   padded = fftw->padTheKernel(matrix_pad, kernel_pad);

@@ -49,6 +49,10 @@
 #include "cedar/processing/gui/PropertyPane.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Step.h"
+#include "cedar/processing/steps/Component.h"
+#include "cedar/devices/KinematicChain.h"
+#include "cedar/devices/gui/KinematicChainWidget.h"
+#include "cedar/devices/ComponentSlot.h"
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
@@ -391,12 +395,38 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   }
   else
   {
+
     for (cedar::proc::Step::ActionMap::const_iterator iter = map.begin(); iter != map.end(); ++iter)
     {
       p_actions_menu->addAction(iter->first.c_str());
     }
+
     p_actions_menu->addSeparator();
     p_actions_menu->addAction("open actions dock");
+
+    // If we have a Kinematic Chain, add specific actions
+    if(const auto component_step = boost::dynamic_pointer_cast<cedar::proc::steps::Component>(this->getStep()))
+    {
+      cedar::dev::ComponentPtr lComponent = component_step->getComponent();
+
+      if(const auto kinChain = boost::dynamic_pointer_cast<cedar::dev::KinematicChain>(lComponent))
+      {
+        p_actions_menu->addAction("open Kinematic Chain Widget");
+
+        const std::vector<std::string> initialConfigNames = kinChain->getInitialConfigurationNames();
+
+        if(!initialConfigNames.empty())
+        {
+          p_actions_menu->addSeparator();
+        }
+
+        for(const std::string &confName : initialConfigNames)
+        {
+          const QString actionName = "apply "+ QString::fromStdString(confName);
+          p_actions_menu->addAction(actionName);
+        }
+      }
+    }
   }
 
   QAction *a = menu.exec(event->screenPos());
@@ -407,21 +437,35 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   // execute an action
   if (a->parentWidget() == p_actions_menu)
   {
-    std::string action = a->text().toStdString();
-    // decide whether this is a normal action or the docking action
-    if (action != "open actions dock")
-    {
-      this->getStep()->callAction(action);
-    }
-    else
+    QString action = a->text();
+
+    // decide what to do for this action
+    if (action == "open actions dock")
     {
       this->openActionsDock();
+    }
+    else if(action == "open Kinematic Chain Widget")
+    {
+      this->openKinematicChainWidget();
+    }
+    else if(action.startsWith("apply "))
+    {
+      if(const auto component_step = boost::dynamic_pointer_cast<cedar::proc::steps::Component>(this->getStep()))
+      {
+        if(const auto kinChain = boost::dynamic_pointer_cast<cedar::dev::KinematicChain>(component_step->getComponent()))
+        {
+          const std::string confName = action.replace("apply ", "").toStdString();
+          boost::function< void() > fun = boost::bind(&cedar::dev::KinematicChain::applyInitialConfiguration, kinChain, confName);
+          fun();
+        }
+      }
     }
   }
   else
   {
     this->handleContextMenuAction(a, event);
   }
+
 }
 
 //!@todo Why isn't this function in gui::Connectable?
@@ -516,4 +560,20 @@ void cedar::proc::gui::StepItem::handleExternalActionButtons()
 {
   std::string action = cedar::aux::asserted_cast<QPushButton*>(QObject::sender())->text().toStdString();
   this->getStep()->callAction(action);
+}
+
+
+void cedar::proc::gui::StepItem::openKinematicChainWidget()
+{
+  auto component_step = boost::dynamic_pointer_cast<cedar::proc::steps::Component>(this->getStep());
+
+  cedar::dev::ComponentPtr lComponent = boost::dynamic_pointer_cast<cedar::dev::Component>(component_step->getComponent());
+  auto pKinematicChain = boost::dynamic_pointer_cast<cedar::dev::KinematicChain>(lComponent);
+
+  cedar::dev::ComponentSlotWeakPtr w_ptr = lComponent->getSlot();
+  const std::string component_path = w_ptr.lock()->getPath();
+
+  cedar::dev::gui::KinematicChainWidget *pWidget = new cedar::dev::gui::KinematicChainWidget(pKinematicChain);
+  this->createDockWidget(component_path, pWidget)->show();
+
 }

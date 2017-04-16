@@ -84,8 +84,12 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
+
   /*!@brief the constructor */
   Viewer(cedar::aux::gl::ScenePtr pScene, bool readFromFile = true);
+
+  /*!@brief the constructor without a scene pointer */
+  Viewer(bool readFromFile = true);
 
   /*!@brief the constructor */
   ~Viewer();

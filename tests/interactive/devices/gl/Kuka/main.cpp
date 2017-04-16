@@ -51,7 +51,7 @@
 int main(int argc, char **argv)
 {
   // find resources
-  std::string configuration_file = cedar::aux::locateResource("configs/kuka_lwr4.json");
+  std::string configuration_file = cedar::aux::locateResource("robots/kuka_lwr4.json");
 
   QApplication a(argc, argv);
 
@@ -88,8 +88,7 @@ int main(int argc, char **argv)
   p_scene_widget->show();
   widget_arm.show();
   viewer.startTimer(20);
-  p_kuka_arm->startTimer(20);
-  p_kuka_arm->start();
+  p_kuka_arm->startCommunication();
   a.exec();
 
   return 0;

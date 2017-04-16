@@ -378,6 +378,8 @@ private:
 
   void processElementRemovedSignal(cedar::proc::ConstElementPtr);
 
+  void openKinematicChainWidget(const std::string &path);
+
   void readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node);
 
   void writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const;

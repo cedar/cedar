@@ -59,8 +59,8 @@ void mat_read_write()
 {
   unsigned int i;
 
-  cv::Mat mat = cv::Mat::eye(SIZE, 2, CV_64F);
-  cv::Mat mat2 = cv::Mat::eye(SIZE, 2, CV_64F);
+  cv::Mat mat = cv::Mat::eye(SIZE, 2, CV_32F);
+  cv::Mat mat2 = cv::Mat::eye(SIZE, 2, CV_32F);
 
   i = 0;
   for (; i < SIZE; i++)

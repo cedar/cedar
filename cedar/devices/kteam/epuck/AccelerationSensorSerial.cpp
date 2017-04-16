@@ -72,6 +72,9 @@ cedar::dev::kteam::epuck::AccelerationSensorSerial::AccelerationSensorSerial()
 :
 _mCommandGetAcceleration(new cedar::aux::StringParameter(this, "command get acceleration", "A"))
 {
+  this->installMeasurementType(0, "acceleration");
+  this->setMeasurementDimensionality(0, 3);
+  this->registerMeasurementHook(0, boost::bind(&cedar::dev::kteam::epuck::AccelerationSensorSerial::getData, this));
 }
 
 cedar::dev::kteam::epuck::AccelerationSensorSerial::AccelerationSensorSerial
@@ -86,6 +89,7 @@ _mCommandGetAcceleration(new cedar::aux::StringParameter(this, "command get acce
 
 cedar::dev::kteam::epuck::AccelerationSensorSerial::~AccelerationSensorSerial()
 {
+  prepareComponentDestructAbsolutelyRequired();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
