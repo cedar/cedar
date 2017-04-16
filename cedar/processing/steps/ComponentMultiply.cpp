@@ -66,7 +66,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::ComponentMultiply>
       (
-        "Utilities",
+        "Algebra",
         "cedar.processing.ComponentMultiply"
       )
     );

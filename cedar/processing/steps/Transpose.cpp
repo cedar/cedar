@@ -58,7 +58,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::Transpose>
       (
-        "Math Utilities",
+        "Algebra",
         "cedar.processing.Transpose"
       )
     );
