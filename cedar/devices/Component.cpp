@@ -764,6 +764,26 @@ cedar::dev::Component::~Component()
 
   mWatchDogThread->stop();
   mCommunicationThread->stop();
+
+
+  // wait for end of communication
+  {
+    cedar::aux::LockSet locks;
+
+    // lock measurements 
+    cedar::aux::append(locks, this->mMeasurementData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+    // lock commands 
+    cedar::aux::append(locks, this->mCommandData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+
+    cedar::aux::append(locks, this->mRetrieveMeasurementHooks.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+    cedar::aux::append(locks, this->mSubmitCommandHooks.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+
+    cedar::aux::append(locks, this->mController.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+    cedar::aux::append(locks, this->mNoCommandHook.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+    cedar::aux::append(locks, this->mAfterCommandBeforeMeasurementHook.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+
+    cedar::aux::LockSetLocker locker(locks);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
