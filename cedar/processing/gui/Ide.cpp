@@ -913,7 +913,10 @@ void cedar::proc::gui::Ide::exportSvg()
   QString file = QFileDialog::getSaveFileName(this, // parent
                                               "Select where to export", // caption
                                               last_dir->getValue().absolutePath(), // initial directory;
-                                              "svg (*.svg)" // filter(s), separated by ';;'
+                                              "svg (*.svg)", // filter(s), separated by ';;'
+                                              0,
+                                              // js: Workaround for freezing file dialogs in QT5 (?)
+                                              QFileDialog::DontUseNativeDialog
                                               );
 
   if (!file.isEmpty())
@@ -1532,7 +1535,10 @@ bool cedar::proc::gui::Ide::saveSerializableDataAs()
                    this, // parent
                    "Select where to save serializable data", // caption
                    last_dir->getValue().absolutePath(), // initial directory;
-                   "data (*.data)" // filter(s), separated by ';;'
+                   "data (*.data)", // filter(s), separated by ';;'
+                   0,
+                   // js: Workaround for freezing file dialogs in QT5 (?)
+                   QFileDialog::DontUseNativeDialog
                  );
 
   if (file.isEmpty())
@@ -1584,7 +1590,10 @@ bool cedar::proc::gui::Ide::saveAs()
   QString file = QFileDialog::getSaveFileName(this, // parent
                                               "Select where to save", // caption
                                               last_dir->getValue().absolutePath(), // initial directory;
-                                              "architecture (*.json)" // filter(s), separated by ';;'
+                                              "architecture (*.json)", // filter(s), separated by ';;'
+                                              0,
+                                              // js: Workaround for freezing file dialogs in QT5 (?)
+                                              QFileDialog::DontUseNativeDialog
                                               );
 
   if (file.isEmpty())
