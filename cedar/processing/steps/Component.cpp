@@ -380,7 +380,7 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
   for (const auto& measurement : measurements)
   {
     std::string name = component->getNameForMeasurementType(measurement);
-    auto measurementData = component->getMeasurementData(measurement);
+    auto measurementData = component->getMeasurementData(measurement)->clone();
     if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(measurementData))
     {
       cv::Mat measurementMat = measurementData->getData<cv::Mat>().clone();
