@@ -111,27 +111,27 @@ cedar::proc::gui::Connectable::Connectable(qreal width, qreal height, cedar::pro
 {
   this->connect(this,
   SIGNAL(reactToSlotRemovedSignal(cedar::proc::DataRole::Id, QString)),
-  SLOT(reactToSlotRemoved(cedar::proc::DataRole::Id, QString)));
+  SLOT(reactToSlotRemoved(cedar::proc::DataRole::Id, QString)), Qt::ConnectionType::DirectConnection);
 
   this->connect(this,
   SIGNAL(reactToSlotAddedSignal(cedar::proc::DataRole::Id, QString)),
-  SLOT(reactToSlotAdded(cedar::proc::DataRole::Id, QString)));
+  SLOT(reactToSlotAdded(cedar::proc::DataRole::Id, QString)), Qt::ConnectionType::DirectConnection);
 
   this->connect(this,
   SIGNAL(reactToSlotRenamedSignal(cedar::proc::DataRole::Id, QString, QString)),
-  SLOT(reactToSlotRenamed(cedar::proc::DataRole::Id, QString, QString)));
+  SLOT(reactToSlotRenamed(cedar::proc::DataRole::Id, QString, QString)), Qt::ConnectionType::DirectConnection);
 
   this->connect(this,
   SIGNAL(triggerableStartedSignal()),
-  SLOT(triggerableStarted()));
+  SLOT(triggerableStarted()), Qt::ConnectionType::DirectConnection);
 
   this->connect(this,
   SIGNAL(triggerableStoppedSignal()),
-  SLOT(triggerableStopped()));
+  SLOT(triggerableStopped()), Qt::ConnectionType::DirectConnection);
 
   this->connect(this,
   SIGNAL(triggerableParentTriggerChanged()),
-  SLOT(updateTriggerColorState()));
+  SLOT(updateTriggerColorState()), Qt::ConnectionType::DirectConnection);
 
   mFillColorChangedConnection = this->connectToFillColorChangedSignal(boost::bind(&cedar::proc::gui::Connectable::fillColorChanged, this, _1));
 }
