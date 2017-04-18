@@ -2094,6 +2094,11 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
       const std::string component_path = static_cast<cedar::dev::gui::KinematicChainWidget*>(dock_widget_child)->getPath();
       node.add("KinematicChainWidget", component_path);
     }
+
+    if (cedar::aux::objectTypeToString(dock_widget_child) == "cedar::aux::gui::Viewer")
+    {
+      node.add("Viewer", "Viewer");
+    }
   }
 }
 

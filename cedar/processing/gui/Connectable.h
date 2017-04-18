@@ -314,6 +314,8 @@ public:
   //!@brief Sets a Decoration that shows that the step is registered in the recorder
   void setRecorded(bool status);
 
+  //! creates a dock widget
+  QWidget* createDockWidget(const std::string& title, QWidget* pWidget);
 
 public slots:
   //! Updates whether the connectable shows the color of its trigger.
@@ -430,9 +432,6 @@ protected:
 
   //! creates a dock widget for plots
   QWidget* createDockWidgetForPlots(const std::string& title, cedar::proc::gui::PlotWidget* pPlotWidget, const QPoint& position);
-
-  //! creates a dock widget
-  QWidget* createDockWidget(const std::string& title, QWidget* pWidget);
 
   //! handles context menu actions defined by this class
   void handleContextMenuAction(QAction* action, QGraphicsSceneContextMenuEvent* event);
