@@ -939,7 +939,7 @@ void cedar::proc::gui::Ide::showRobotManager()
 
 void cedar::proc::gui::Ide::addGlobalSceneViewer()
 {
-  this->mpSceneControl->openNamelessViewer();
+  this->mGroup->openSceneViewer();
 }
 
 void cedar::proc::gui::Ide::displayFilename(const std::string& filename)

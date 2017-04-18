@@ -60,7 +60,7 @@ public:
   /*!@brief the destructor */
   ~SceneControl(){}
 
-  void openNamelessViewer();
+  cedar::aux::gl::ScenePtr getScene() const;
 
 private:
   cedar::aux::gl::ScenePtr mpScene;

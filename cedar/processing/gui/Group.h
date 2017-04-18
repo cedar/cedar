@@ -180,6 +180,9 @@ public:
     return this->mpScene;
   }
 
+  //! Opens a view on the simulated scene
+  void openSceneViewer();
+
   /*!@brief Sets the ui configuration for the element when it is added to the group.
    */
   inline void setNextElementUiConfiguration
