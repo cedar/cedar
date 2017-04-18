@@ -71,14 +71,14 @@ mGroup(group)
   QObject::connect(this->mpAddButton, SIGNAL(clicked()), this, SLOT(addClicked()));
   QObject::connect(this->mpRemoveButton, SIGNAL(clicked()), this, SLOT(removeClicked()));
 
-  this->mConnectionScriptAdded = this->mGroup->getGroup()->connectToScriptAddedSignal
+  this->mConnectionScriptAdded = this->getGroup()->getGroup()->connectToScriptAddedSignal
   (
     boost::bind(&cedar::proc::gui::ArchitectureScriptEditor::translateScriptAddedSignal, this, _1)
   );
   QObject::connect(this, SIGNAL(scriptAddedInGroup(QString)), this, SLOT(addScriptToList(const QString&)));
 
 
-  this->mConnectionScriptRemoved = this->mGroup->getGroup()->connectToScriptRemovedSignal
+  this->mConnectionScriptRemoved = this->getGroup()->getGroup()->connectToScriptRemovedSignal
   (
     boost::bind(&cedar::proc::gui::ArchitectureScriptEditor::translateScriptRemovedSignal, this, _1)
   );
@@ -190,7 +190,7 @@ void cedar::proc::gui::ArchitectureScriptEditor::refreshScriptList()
 {
   this->mpScriptList->setRowCount(0);
 
-  for (auto script : this->mGroup->getGroup()->getOrderedScripts())
+  for (auto script : this->getGroup()->getGroup()->getOrderedScripts())
   {
     this->addScriptToList(QString::fromStdString(script->getName()));
   }
@@ -216,7 +216,7 @@ void cedar::proc::gui::ArchitectureScriptEditor::showItemProperties(QTableWidget
 cedar::proc::CppScriptPtr cedar::proc::gui::ArchitectureScriptEditor::getScriptFromItem(QTableWidgetItem* pItem) const
 {
   auto name = pItem->text().toStdString();
-  return this->mGroup->getGroup()->getScript(name);
+  return this->getGroup()->getGroup()->getScript(name);
 }
 
 void cedar::proc::gui::ArchitectureScriptEditor::translateScriptAddedSignal(const std::string& scriptName)
@@ -243,7 +243,7 @@ void cedar::proc::gui::ArchitectureScriptEditor::removeScriptFromList(const QStr
 
 void cedar::proc::gui::ArchitectureScriptEditor::addScriptToList(const QString& scriptName)
 {
-  auto script = this->mGroup->getGroup()->getScript(scriptName.toStdString());
+  auto script = this->getGroup()->getGroup()->getScript(scriptName.toStdString());
 
   int row = this->mpScriptList->rowCount();
   this->mpScriptList->setRowCount(row + 1);
@@ -317,7 +317,7 @@ void cedar::proc::gui::ArchitectureScriptEditor::addClicked()
     return;
   }
 
-  this->mGroup->getGroup()->createScript(data.toString().toStdString());
+  this->getGroup()->getGroup()->createScript(data.toString().toStdString());
 }
 
 void cedar::proc::gui::ArchitectureScriptEditor::removeClicked()
@@ -337,7 +337,12 @@ void cedar::proc::gui::ArchitectureScriptEditor::removeClicked()
     this->mpConfigurationEditor->clear();
     for (const auto& script_name : scripts_to_remove)
     {
-      this->mGroup->getGroup()->removeScript(script_name);
+      this->getGroup()->getGroup()->removeScript(script_name);
     }
   }
+}
+
+cedar::proc::gui::GroupPtr cedar::proc::gui::ArchitectureScriptEditor::getGroup() const
+{
+  return this->mGroup.lock();
 }
