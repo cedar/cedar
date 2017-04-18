@@ -61,6 +61,7 @@
 #include "cedar/devices/ComponentSlot.h"
 #include "cedar/devices/KinematicChain.h"
 #include "cedar/devices/gui/KinematicChainWidget.h"
+#include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/stringFunctions.h"
@@ -1197,7 +1198,19 @@ void cedar::proc::gui::Group::openKinematicChainWidget(const std::string& path)
       "Failed to open Kinematic Chain Widget for \"" + path + "\". Most probably the robot does not exist anymore. Ignoring.",
       "cedar::proc::gui::Group::readKinematicChainWidgetList(const cedar::aux::ConfigurationNode& node)"
     );
-  }
+    }
+}
+
+void cedar::proc::gui::Group::openSceneViewer()
+{
+  cedar::aux::gl::ScenePtr scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
+  cedar::aux::gui::Viewer *viewer = new cedar::aux::gui::Viewer(scene);
+
+  viewer->setWindowFlags(Qt::WindowStaysOnTopHint);
+  viewer->setSceneRadius(scene->getSceneLimit());
+  viewer->startTimer(25);
+
+  this->createDockWidget("simulated scene", viewer)->show();
 }
 
 void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node)
@@ -1209,8 +1222,14 @@ void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, con
     // Both KinematicChainWidget and Viewer are no PlotWidgets, so treat them separately here
     if(it.first == "KinematicChainWidget")
     {
-        this->openKinematicChainWidget(it.second.data());
-        continue;
+      this->openKinematicChainWidget(it.second.data());
+      continue;
+    }
+
+    if(it.second.data() == "Viewer")
+    {
+      this->openSceneViewer();
+      continue;
     }
 
     std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);

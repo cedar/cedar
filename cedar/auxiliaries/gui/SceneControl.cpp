@@ -75,11 +75,7 @@ mpScene(new cedar::aux::gl::Scene)
   QMetaObject::connectSlotsByName(this);
 }
 
-void cedar::aux::gui::SceneControl::openNamelessViewer()
+cedar::aux::gl::ScenePtr cedar::aux::gui::SceneControl::getScene() const
 {
-  auto viewer = new cedar::aux::gui::Viewer(mpScene);
-  viewer->setWindowFlags(Qt::WindowStaysOnTopHint);
-  viewer->show();
-  viewer->setSceneRadius(mpScene->getSceneLimit());
-  viewer->startTimer(25);
+  return mpScene;
 }
