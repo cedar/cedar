@@ -1079,6 +1079,16 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
                     }
                   )
                  );
+
+    if(!isCommunicating())
+    {
+        cedar::aux::LogSingleton::getInstance()->warning
+        (
+          "Applied an initial configuration for \"" + this->getName() +
+             + "\", but the component is not communicating.",
+          "cedar::dev::KinematicChain::applyInitialConfiguration"
+        );
+    }
   }
   else
   {
