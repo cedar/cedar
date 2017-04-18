@@ -67,7 +67,7 @@ bool cedar::dev::ComponentParameter::hasComponentSlot() const
 {
   if(auto component = this->mWeakComponent.lock())
   {
-  return static_cast<bool>(component);
+    return static_cast<bool>(component);
   }
   else
   {

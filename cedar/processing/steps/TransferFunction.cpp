@@ -72,7 +72,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::TransferFunction>
       (
-        "Math Utilities",
+        "Algebra",
         "cedar.processing.TransferFunction"
       )
     );

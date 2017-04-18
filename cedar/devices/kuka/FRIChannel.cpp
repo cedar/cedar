@@ -244,6 +244,31 @@ bool cedar::dev::kuka::FRIChannel::prepareJointPositionControl(cv::Mat newJointP
   return true;
 }
 
+bool cedar::dev::kuka::FRIChannel::prepareJointTorqueControl(cv::Mat newJointPositions)
+{
+  QMutexLocker lock( &mFRIRemoteLock );
+  float newJointPositionArray[LBR_MNJ];
+
+  // check for correct dimensions:
+  if (!test_valid_command(newJointPositions))
+    return false;
+
+  // fill float array for hardware:
+  for (unsigned i = 0; i < LBR_MNJ; i++)
+  {
+    newJointPositionArray[i] =  static_cast<float>( newJointPositions.at<float>(i) );
+  }
+
+// TODO: make sure we are in monitor mode!
+  mpFriRemote->doJntImpedanceControl(NULL, //  pos
+                                     NULL, NULL, // stiffnes, damping
+                                     newJointPositionArray, false);
+    // last parameter: delay when the command is given
+    // do data exchange only once per cycle in exchangeData()
+
+  return true;
+}
+
 cv::Mat cedar::dev::kuka::FRIChannel::getMeasuredJointPositions() const
 {
   QMutexLocker lock( &mFRIRemoteLock );
@@ -253,6 +278,34 @@ cv::Mat cedar::dev::kuka::FRIChannel::getMeasuredJointPositions() const
   for (unsigned i = 0; i < LBR_MNJ; i++)
   {
     jointPositions.at<float>(i) = mpFriRemote->getMsrMsrJntPosition()[i];
+  }
+
+  return jointPositions;
+}
+
+cv::Mat cedar::dev::kuka::FRIChannel::getMeasuredExternalJointTorques() const
+{
+  QMutexLocker lock( &mFRIRemoteLock );
+  cv::Mat jointPositions = cv::Mat::zeros( LBR_MNJ, 1, CV_32F );
+
+  // fill float array for hardware:
+  for (unsigned i = 0; i < LBR_MNJ; i++)
+  {
+    jointPositions.at<float>(i) = mpFriRemote->getMsrEstExtJntTrq()[i];
+  }
+
+  return jointPositions;
+}
+
+cv::Mat cedar::dev::kuka::FRIChannel::getMeasuredJointTorques() const
+{
+  QMutexLocker lock( &mFRIRemoteLock );
+  cv::Mat jointPositions = cv::Mat::zeros( LBR_MNJ, 1, CV_32F );
+
+  // fill float array for hardware:
+  for (unsigned i = 0; i < LBR_MNJ; i++)
+  {
+    jointPositions.at<float>(i) = mpFriRemote->getMsrJntTrq()[i];
   }
 
   return jointPositions;

@@ -58,6 +58,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/devices/Component.h"
+#include "cedar/devices/gui/KinematicChainWidget.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/gui/Configurable.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
@@ -110,27 +111,27 @@ cedar::proc::gui::Connectable::Connectable(qreal width, qreal height, cedar::pro
 {
   this->connect(this,
   SIGNAL(reactToSlotRemovedSignal(cedar::proc::DataRole::Id, QString)),
-  SLOT(reactToSlotRemoved(cedar::proc::DataRole::Id, QString)));
+  SLOT(reactToSlotRemoved(cedar::proc::DataRole::Id, QString)), Qt::ConnectionType::DirectConnection);
 
   this->connect(this,
   SIGNAL(reactToSlotAddedSignal(cedar::proc::DataRole::Id, QString)),
-  SLOT(reactToSlotAdded(cedar::proc::DataRole::Id, QString)));
+  SLOT(reactToSlotAdded(cedar::proc::DataRole::Id, QString)), Qt::ConnectionType::DirectConnection);
 
   this->connect(this,
   SIGNAL(reactToSlotRenamedSignal(cedar::proc::DataRole::Id, QString, QString)),
-  SLOT(reactToSlotRenamed(cedar::proc::DataRole::Id, QString, QString)));
+  SLOT(reactToSlotRenamed(cedar::proc::DataRole::Id, QString, QString)), Qt::ConnectionType::DirectConnection);
 
   this->connect(this,
   SIGNAL(triggerableStartedSignal()),
-  SLOT(triggerableStarted()));
+  SLOT(triggerableStarted()), Qt::ConnectionType::DirectConnection);
 
   this->connect(this,
   SIGNAL(triggerableStoppedSignal()),
-  SLOT(triggerableStopped()));
+  SLOT(triggerableStopped()), Qt::ConnectionType::DirectConnection);
 
   this->connect(this,
   SIGNAL(triggerableParentTriggerChanged()),
-  SLOT(updateTriggerColorState()));
+  SLOT(updateTriggerColorState()), Qt::ConnectionType::DirectConnection);
 
   mFillColorChangedConnection = this->connectToFillColorChangedSignal(boost::bind(&cedar::proc::gui::Connectable::fillColorChanged, this, _1));
 }
@@ -1567,7 +1568,13 @@ void cedar::proc::gui::Connectable::loadDataClicked()
   cedar::proc::DataSlotPtr slot = action->data().value<cedar::proc::DataSlotPtr>();
   CEDAR_DEBUG_ASSERT(slot);
 
-  QString filename = QFileDialog::getOpenFileName(this->mpMainWindow, "Select a file to load");
+  QString filename = QFileDialog::getOpenFileName
+                     (
+                       this->mpMainWindow,
+                       "Select a file to load",
+                       0, 0, 0, 
+                       QFileDialog::DontUseNativeDialog
+                     );
 
   if (!filename.isEmpty())
   {
@@ -2073,12 +2080,19 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
   {
     // all widgets in the mChildWidgets Vector should be QDockWidgets that contain a QWidget
     QWidget* dock_widget_child = cedar::aux::asserted_cast<QDockWidget*>(childWidget)->widget();
-    // The contained QWidget may be of different types, we're only interested in the cedar::proc::gui::PlotWidget ones
+
+    // The contained QWidget may be of different types
     if (cedar::aux::objectTypeToString(dock_widget_child) == "cedar::proc::gui::PlotWidget")
     {
       cedar::aux::ConfigurationNode value_node;
       static_cast<cedar::proc::gui::PlotWidget*>(dock_widget_child)->writeConfiguration(value_node);
       node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));
+    }
+
+    if (cedar::aux::objectTypeToString(dock_widget_child) == "cedar::dev::gui::KinematicChainWidget")
+    {
+      const std::string component_path = static_cast<cedar::dev::gui::KinematicChainWidget*>(dock_widget_child)->getPath();
+      node.add("KinematicChainWidget", component_path);
     }
   }
 }

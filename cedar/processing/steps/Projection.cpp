@@ -79,7 +79,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::Projection>
       (
-        "Utilities",
+        "Algebra",
         "cedar.processing.Projection"
       )
     );

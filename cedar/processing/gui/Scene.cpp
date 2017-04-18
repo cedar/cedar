@@ -1691,7 +1691,10 @@ void cedar::proc::gui::Scene::importGroup(bool link)
   QString file = QFileDialog::getOpenFileName(this->mpMainWindow, // parent
                                               "Select from which file to load a group", // caption
                                               last_dir->getValue().absolutePath(), // initial directory
-                                              "json (*.json)" // filter(s), separated by ';;'
+                                              "json (*.json)", // filter(s), separated by ';;'
+                                              0,
+                                              // js: Workaround for freezing file dialogs in QT5 (?)
+                                              QFileDialog::DontUseNativeDialog
                                               );
 
   if (!file.isEmpty())
@@ -1750,7 +1753,10 @@ void cedar::proc::gui::Scene::importStep()
   QString file = QFileDialog::getOpenFileName(this->mpMainWindow, // parent
                                               "Select from which file to load a group", // caption
                                               last_dir->getValue().absolutePath(), // initial directory
-                                              "json (*.json)" // filter(s), separated by ';;'
+                                              "json (*.json)", // filter(s), separated by ';;'
+                                              0,
+                                              // js: Workaround for freezing file dialogs in QT5 (?)
+                                              QFileDialog::DontUseNativeDialog
                                               );
 
   if (!file.isEmpty())

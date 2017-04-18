@@ -179,7 +179,10 @@ void cedar::proc::gui::ExperimentDialog::load()
             this,
             tr("Open Experiment"),
             location_dir->getValue().absolutePath(),
-            filter
+            filter,
+            0,
+            // js: Workaround for freezing file dialogs in QT5 (?)
+            QFileDialog::DontUseNativeDialog
           ).toStdString();
   if (!filename.empty())
   {

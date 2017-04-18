@@ -180,7 +180,6 @@ private:
   void connectManually();
   void disconnectManually();
   void openRobotManager();
-  void openKinematicChainWidget();
 
 private slots:
   void componentChangedSlot();

@@ -79,7 +79,10 @@ public:
 
 
   void prepareSendingJointAngles(cv::Mat mat);
+  void prepareSendingJointTorques(cv::Mat mat);
   cv::Mat prepareRetrievingJointAngles();
+  cv::Mat prepareRetrievingJointTorques();
+  cv::Mat prepareRetrievingExternalJointTorques();
 
   void prepareSendingNoop();
   void prepareSendingNotReadyForCommand();

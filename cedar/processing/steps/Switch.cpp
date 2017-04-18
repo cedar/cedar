@@ -63,7 +63,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::Switch>
       (
-        "Utilities",
+        "Programming",
         "cedar.processing.steps.Switch"
       )
     );

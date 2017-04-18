@@ -160,6 +160,7 @@ public slots:
   /*!@brief Slot that is connected to the "save" item in the file menu.
    */
   bool save();
+  bool backupSave();
 
   /*!@brief Slot that is connected to the "save as" item in the file menu.
    */
@@ -377,6 +378,8 @@ private:
 
   void resetWarningAndErrorStateIndicators();
 
+  void backupSaveCallback();
+
 private slots:
   void globalTimeFactorSliderChanged(int newValue);
 
@@ -478,6 +481,7 @@ private:
   //! Label that indicates how many steps are in an error state.
   QLabel* mpErrorStateCount;
 
+  cedar::aux::CallFunctionInThreadPtr mBackupSaveThreadWrapper;
 }; // class cedar::MainWindow
 
 #endif // CEDAR_PROC_GUI_MAIN_WINDOW_H

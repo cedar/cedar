@@ -238,6 +238,18 @@ public:
   // Replaced by getJointAccelerations()
   CEDAR_DECLARE_DEPRECATED(cv::Mat getCachedJointAccelerations() const);
 
+  /*!@brief get current state of measured joint torques, if available
+   *
+   * @return    vector of joint angles
+   */
+  cv::Mat getJointTorques() const;
+
+  /*!@brief get current state of measured external joint torques if available
+   *
+   * @return    vector of joint angles
+   */
+  cv::Mat getExternalJointTorques() const;
+
   /*!@brief set current state of a single joint angle
    *
    * @param index    specifies the joint
@@ -515,7 +527,7 @@ public:
    *
    * @return    vector of string: the names of initial configurations
    */
-  std::vector<std::string> getInitialConfigurationIndices();
+  std::vector<std::string> getInitialConfigurationNames();
 
   /*!@brief get index number of the current initial configuration
    *
@@ -541,10 +553,9 @@ public:
   void setInitialConfigurations(std::map<std::string, cv::Mat> configs);
   //!@brief set the currently valid initial configuration and apply it (i.e. move the manipulator to that configuration)
   void applyInitialConfiguration(const std::string& name);
-  //!@brief apply the named initial configuration by index
-  //
-  // Prefer using @applyInitialConfiguration(string) for accessing named configurations
-  void applyInitialConfiguration(unsigned int i);
+
+  //!@brief read initial configurations out of chain specific file
+  void readInitialConfigurations();
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -591,6 +602,8 @@ public:
   static const cedar::dev::Component::ComponentDataType JOINT_VELOCITIES;
   static const cedar::dev::Component::ComponentDataType JOINT_ACCELERATIONS;
   static const cedar::dev::Component::ComponentDataType JOINT_TORQUES;
+  static const cedar::dev::Component::ComponentDataType EXTERNAL_JOINT_TORQUES;
+  static const cedar::dev::Component::ComponentDataType ADDITIONAL_JOINT_TORQUES;
 
 protected:
   //! vector of all joints

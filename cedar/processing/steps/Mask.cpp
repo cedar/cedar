@@ -58,7 +58,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::Mask>
       (
-        "Utilities",
+        "Arrays",
         "cedar.processing.Mask"
       )
     );

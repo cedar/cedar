@@ -764,6 +764,26 @@ cedar::dev::Component::~Component()
 
   mWatchDogThread->stop();
   mCommunicationThread->stop();
+
+
+  // wait for end of communication
+  {
+    cedar::aux::LockSet locks;
+
+    // lock measurements 
+    cedar::aux::append(locks, this->mMeasurementData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+    // lock commands 
+    cedar::aux::append(locks, this->mCommandData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+
+    cedar::aux::append(locks, this->mRetrieveMeasurementHooks.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+    cedar::aux::append(locks, this->mSubmitCommandHooks.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+
+    cedar::aux::append(locks, this->mController.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+    cedar::aux::append(locks, this->mNoCommandHook.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+    cedar::aux::append(locks, this->mAfterCommandBeforeMeasurementHook.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+
+    cedar::aux::LockSetLocker locker(locks);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1232,7 +1252,7 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   } // end: channel is open
 
   // utitlity: warn if consistently much too slow
-  if (time > this->getCommunicationStepSize() * 1.4)
+  if (time > this->getCommunicationStepSize() * 2.0)
   {
     QWriteLocker lock(&mTooSlowCounter.getLock());
 
@@ -1370,6 +1390,17 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
   {
     type_from_user = this->mController.member()->mBufferType;
     userData = (this->mController.member()->mCallback());
+
+    mControllerFinished = true;
+
+    for(int i = 0; i<userData.rows; ++i)
+    {
+      if(std::abs(userData.at<float>(i, 0)) >= 100000 * std::numeric_limits<float>::epsilon())
+      {
+        mControllerFinished = false;
+        break;
+      }
+    }
 
     if(mControllerFinished)
     {
@@ -1961,7 +1992,7 @@ void cedar::dev::Component::startBrakingSlowly()
 
   // todo: test that brake is not already running ...
 
-  if (!applyBrakeSlowlyController()) 
+  if (!applyBrakeSlowlyController())
   {
     cedar::aux::LogSingleton::getInstance()->warning(
       "Couldn't brake " + prettifyName() + " slowly, braking fast instead.",
@@ -2180,11 +2211,11 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
         mWatchDogCounter.member()++;
 
         if (mWatchDogCounter.member() == 1
-            || mWatchDogCounter.member() > 1500)
+            || mWatchDogCounter.member() > 5000)
         {
           std::string s = "";
           
-          if (mWatchDogCounter.member() > 1500)
+          if (mWatchDogCounter.member() > 5000)
           {
             s = " (repeated " + boost::lexical_cast<std::string>(mWatchDogCounter.member()) + " times)";
           }
@@ -2244,10 +2275,10 @@ std::string cedar::dev::Component::prettifyName() const
 
   if (ret.length() <= 0)
   {
-    ret = slot->getName();
-
     if (!slot)
       return "uninitialized robotic component";
+
+    ret = slot->getName();
   }
 
   if (slot)

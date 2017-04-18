@@ -62,7 +62,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::MatrixSlice>
       (
-        "Utilities",
+        "Arrays",
         "cedar.processing.MatrixSlice"
       )
     );

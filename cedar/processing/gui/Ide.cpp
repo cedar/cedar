@@ -70,13 +70,15 @@
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/PluginProxy.h"
 #include "cedar/auxiliaries/Log.h"
-#include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/units/prefixes.h"
+#include "cedar/units/Time.h"
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/systemFunctions.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/version.h"
 #include "cedar/configuration.h"
 
@@ -621,6 +623,10 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   QObject::connect(this->mpActionLockUIPositions, SIGNAL(toggled(bool)), this, SLOT(lockUI(bool)));
   mpActionLockUIPositions->setChecked(true);
+
+  mBackupSaveThreadWrapper= cedar::aux::CallFunctionInThreadPtr( new cedar::aux::CallFunctionInThread( boost::bind( &cedar::proc::gui::Ide::backupSaveCallback, this ) ) );
+  mBackupSaveThreadWrapper->start();
+
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -854,7 +860,7 @@ void cedar::proc::gui::Ide::timerEvent(QTimerEvent*)
   if (!components_desc.empty())
   {
     this->mpRunningComponentsLabel->setText(
-          QString("running: ") 
+          QString("independently running: ") 
           + QString("<span style='color:rgb(233, 10, 255, 255)'>%1</span>").arg(QString::fromStdString(components_desc) ) );
   }
   else
@@ -959,7 +965,10 @@ void cedar::proc::gui::Ide::exportSvg()
   QString file = QFileDialog::getSaveFileName(this, // parent
                                               "Select where to export", // caption
                                               last_dir->getValue().absolutePath(), // initial directory;
-                                              "svg (*.svg)" // filter(s), separated by ';;'
+                                              "svg (*.svg)", // filter(s), separated by ';;'
+                                              0,
+                                              // js: Workaround for freezing file dialogs in QT5 (?)
+                                              QFileDialog::DontUseNativeDialog
                                               );
 
   if (!file.isEmpty())
@@ -1497,6 +1506,83 @@ bool cedar::proc::gui::Ide::save()
   }
 }
 
+bool cedar::proc::gui::Ide::backupSave()
+{
+  std::string backupName, baseName;
+
+  if (this->mGroup->getFileName().empty())
+  {
+    cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
+    baseName= ( last_dir->getValue().absolutePath()
+                  + QDir::separator() ).toStdString()
+                + "unnamed.json.bak";
+  }
+  else
+  {
+     baseName = this->mGroup->getFileName() + ".bak";
+  }
+
+  ////////////////// we iterate through .bak.X files:
+  const unsigned int MAX_COUNTER = 9;
+  unsigned int counter= 0;
+
+  // get the next non existing file or the oldest
+  bool use_oldest= false;
+  QDateTime oldest_time;   // oldest backup I found
+  QString   oldest_fname;
+
+  QFileInfo current_info;
+  QString   current_fname;
+  // filename schema is: baseName.bak.X
+  current_fname= QString::fromStdString( baseName + "." + std::to_string(counter
+  + 1) ); // count from 1 to MAX_COUNTER
+  current_info= QFileInfo( current_fname );
+
+  oldest_fname= current_fname;
+  oldest_time= current_info.lastModified();
+
+  backupName= current_fname.toStdString();
+
+  while( current_info.exists() ) // find the first available bak.X
+  {
+    if (current_info.lastModified() < oldest_time)
+    {
+      // ... or keep track of the oldest file bak.X (to overwrite it)
+      oldest_time= current_info.lastModified();
+      oldest_fname= current_info.absoluteFilePath();
+    }
+
+    counter++;
+    current_fname= QString::fromStdString( baseName + "." 
+                                           + std::to_string( (
+                                               counter % MAX_COUNTER ) + 1 ) ); // from bak.1 to bak.MAX_COUNTER
+    current_info= QFileInfo( current_fname );
+
+    if (counter >= MAX_COUNTER)
+    {
+      // no free bak.X file? Then we want to overwrite the oldest one.
+      // note: the oldest file is not necessarily the bak.1
+      backupName= oldest_fname.toStdString();
+      use_oldest= true;
+      break; 
+    }
+    else
+    {
+      backupName= current_fname.toStdString(); // for the next iteration
+    }
+  }
+
+  if (use_oldest)
+  {
+    // remove the oldest file
+    QFile oldest_fob( QString::fromStdString( backupName ) );
+    oldest_fob.remove();
+  }
+
+  this->mGroup->writeTo( backupName );
+  return true;
+}
+
 bool cedar::proc::gui::Ide::saveSerializableDataAs()
 {
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
@@ -1506,7 +1592,10 @@ bool cedar::proc::gui::Ide::saveSerializableDataAs()
                    this, // parent
                    "Select where to save serializable data", // caption
                    last_dir->getValue().absolutePath(), // initial directory;
-                   "data (*.data)" // filter(s), separated by ';;'
+                   "data (*.data)", // filter(s), separated by ';;'
+                   0,
+                   // js: Workaround for freezing file dialogs in QT5 (?)
+                   QFileDialog::DontUseNativeDialog
                  );
 
   if (file.isEmpty())
@@ -1535,7 +1624,10 @@ bool cedar::proc::gui::Ide::loadSerializableData()
   QString file = QFileDialog::getOpenFileName(this, // parent
                                               "Select which data file to load", // caption
                                               last_dir->getValue().absolutePath(), // initial directory
-                                              "data (*.data)" // filter(s), separated by ';;'
+                                              "data (*.data)", // filter(s), separated by ';;'
+                                              0,
+                                              // js: Workaround for freezing file dialogs in QT5 (?)
+                                              QFileDialog::DontUseNativeDialog
                                               );
 
   if (!file.isEmpty())
@@ -1555,7 +1647,10 @@ bool cedar::proc::gui::Ide::saveAs()
   QString file = QFileDialog::getSaveFileName(this, // parent
                                               "Select where to save", // caption
                                               last_dir->getValue().absolutePath(), // initial directory;
-                                              "json (*.json)" // filter(s), separated by ';;'
+                                              "architecture (*.json)", // filter(s), separated by ';;'
+                                              0,
+                                              // js: Workaround for freezing file dialogs in QT5 (?)
+                                              QFileDialog::DontUseNativeDialog
                                               );
 
   if (file.isEmpty())
@@ -1592,7 +1687,10 @@ void cedar::proc::gui::Ide::load()
   QString file = QFileDialog::getOpenFileName(this, // parent
                                               "Select which file to load", // caption
                                               last_dir->getValue().absolutePath(), // initial directory
-                                              "json (*.json)" // filter(s), separated by ';;'
+                                              "architecture (*.json);;backup (*.json.bak*)", // filter(s), separated by ';;'
+                                              0,
+                                              // js: Workaround for freezing file dialogs in QT5 (?)
+                                              QFileDialog::DontUseNativeDialog
                                               );
 
   if (!file.isEmpty())
@@ -2159,3 +2257,24 @@ cedar::proc::gui::ConstGroupPtr cedar::proc::gui::Ide::getGroup() const
 {
   return this->mGroup;
 }
+
+void cedar::proc::gui::Ide::backupSaveCallback()
+{
+  unsigned int countSmallSteps= 0;
+
+  while (!mBackupSaveThreadWrapper->stopRequested()) 
+  {
+    countSmallSteps++;
+    // auto-save every X seconds
+    if (countSmallSteps >=  60 * 10 )
+    {
+      backupSave();
+      countSmallSteps= 0;
+    }
+
+    // check every few ms if we should terminat the thread
+    cedar::aux::sleep( cedar::unit::second * 0.1 );
+  }
+}
+
+
