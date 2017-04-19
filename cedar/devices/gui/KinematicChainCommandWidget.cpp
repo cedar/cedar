@@ -180,6 +180,7 @@ void cedar::dev::gui::KinematicChainCommandWidget::saveInitialConfiguration()
   root.push_back(cedar::aux::ConfigurationNode::value_type(conf_name, joints));
   boost::property_tree::write_json(file_path.toString(), root);
 
+  mpKinematicChain->readInitialConfigurations();
   loadInitialConfigurations();
 }
 void cedar::dev::gui::KinematicChainCommandWidget::update()
@@ -305,40 +306,43 @@ void cedar::dev::gui::KinematicChainCommandWidget::initWindow()
   QFrame* seperator = new QFrame();
   seperator->setFrameShape(QFrame::HLine);
   seperator->setFrameShadow(QFrame::Sunken);
-  mpGridLayout->addWidget(seperator, 7, 0, 7, 3);
+  mpGridLayout->addWidget(seperator, 7, 0, 1, 3, Qt::AlignTop);
+
+  // initial configuration label
+  QLabel* iniconf_label = new QLabel(QApplication::translate("KinematicChainWindow", "Initial Configurations"));
+  iniconf_label->setAlignment(Qt::AlignLeft);
+  iniconf_label->setFont(font);
+  mpGridLayout->addWidget(iniconf_label, 8, 0);
 
   // initial configuration screen controls
-  QPushButton* iniconf_button = new QPushButton(QApplication::translate("KinematicChainWindow", "Save as initial configuration"));
-  mpGridLayout->addWidget(iniconf_button, 8, 2);
+  mpIniconfName = new QLineEdit("configuration name");
+  mpGridLayout->addWidget(mpIniconfName, 9, 0);
+
+  QPushButton* iniconf_button = new QPushButton(QApplication::translate("KinematicChainWindow", "Save above values as initial configuration"));
+  mpGridLayout->addWidget(iniconf_button, 9, 1, 1, 2);
   connect(iniconf_button, SIGNAL(pressed()), this, SLOT(saveInitialConfiguration()));
-
-  QLabel *name_label = new QLabel(QApplication::translate("KinematicChainWindow", "Name:"));
-  name_label->setAlignment(Qt::AlignRight);
-  mpGridLayout->addWidget(name_label, 8, 0);
-
-  mpIniconfName = new QLineEdit("Configuration 0");
-  mpGridLayout->addWidget(mpIniconfName, 8, 1);
 
   mpIniconfBox = new QComboBox();
   loadInitialConfigurations();
+
   mpIniconfBox->setCurrentIndex(0);
   changeInitialConfig();
-  mpGridLayout->addWidget(mpIniconfBox, 9, 0);
+
+  mpGridLayout->addWidget(mpIniconfBox, 10, 0);
   connect(mpIniconfBox, SIGNAL(currentIndexChanged(int)), this, SLOT(changeInitialConfig()));
 
-  // move button
+  // apply button
   QPushButton* apply_button = new QPushButton(QApplication::translate("KinematicChainWindow", "apply"));
   apply_button->setFixedWidth(150);
-  mpGridLayout->addWidget(apply_button, 9, 1);
+  mpGridLayout->addWidget(apply_button, 10, 1);
   connect(apply_button, SIGNAL(pressed()), this, SLOT(applyInitialConfig()));
 
-  // copy button
+  // delete button
   QPushButton* del_button = new QPushButton(QApplication::translate("KinematicChainWindow", "delete"));
   del_button->setFixedWidth(150);
-  mpGridLayout->addWidget(del_button, 9, 2);  
+  mpGridLayout->addWidget(del_button, 10, 2);
   connect(del_button, SIGNAL(pressed()), this, SLOT(deleteInitialConfig()));
 
-  mpGridLayout->setRowStretch(7, 2);
   setLayout(mpGridLayout);
 }
 
