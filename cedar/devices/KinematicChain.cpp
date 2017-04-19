@@ -1060,6 +1060,7 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
     setSuppressUserInteraction(false);
 
     mControllerFinished = false;
+
     setController(cedar::dev::KinematicChain::JOINT_VELOCITIES,
                   boost::bind< cv::Mat >
                   (
@@ -1070,11 +1071,33 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
 
                       if (findCurrent == mInitialConfigurations.end())
                       {
-                        xdot= 0 * getJointAngles();
+                        xdot = 0 * getJointAngles();
                         return xdot;
                       }
 
                       xdot = -1 * (getJointAngles() - findCurrent->second);
+
+                      mControllerFinished = true;
+                      const float l_max_vel = 0.5;
+
+                      for(int i = 0; i<xdot.rows; ++i)
+                      {
+                        // check some velocity limit and if the job is done
+                        if(xdot.at<float>(i, 0) > l_max_vel)
+                        {
+                          xdot.at<float>(i, 0) = l_max_vel;
+                        }
+                        else if(xdot.at<float>(i, 0) < -l_max_vel)
+                        {
+                          xdot.at<float>(i, 0) = -l_max_vel;
+                        }
+
+                        if(std::abs(xdot.at<float>(i, 0)) >= 100000 * std::numeric_limits<float>::epsilon())
+                        {
+                          mControllerFinished = false;
+                        }
+                      }
+
                       return xdot;
                     }
                   )
@@ -1217,16 +1240,16 @@ bool cedar::dev::KinematicChain::applyBrakeSlowlyController()
                               {
                                 const cv::Mat xdot = getJointVelocities() / 4;
 
-                                bool fin = true;
+                                mControllerFinished = true;
                                 for(int i = 0; i<xdot.rows; ++i)
                                 {
                                   if(std::abs(xdot.at<float>(i, 0)) >= 1000000 * std::numeric_limits<float>::epsilon())
                                   {
-                                    fin = false;
+                                    mControllerFinished = false;
                                   }
                                 }
 
-                                if(fin)
+                                if(mControllerFinished)
                                 {
                                   return cv::Mat::zeros( getNumberOfJoints(), 1, CV_32F );
                                 }
