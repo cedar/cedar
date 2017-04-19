@@ -135,6 +135,13 @@ void cedar::dev::gui::KinematicChainCommandWidget::commandJoints()
 
 void cedar::dev::gui::KinematicChainCommandWidget::stopMovement()
 {
+  if (!mpKinematicChain->isCommunicating())
+  {
+    cedar::aux::LogSingleton::getInstance()->message(
+      mpKinematicChain->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.",
+      CEDAR_CURRENT_FUNCTION_NAME);
+  }
+
   mpKeepMovingBox->setChecked(false);
   mpKinematicChain->startBrakingSlowly();
 
@@ -166,7 +173,9 @@ void cedar::dev::gui::KinematicChainCommandWidget::saveInitialConfiguration()
   // serialized joint angles
   for(unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
   {
-    joints.put(std::to_string(i), float(mCommandBoxes[i]->value()));
+    joints.put(std::to_string(i), 
+               //float(mCommandBoxes[i]->value()));
+               mpKinematicChain->getJointAngle(i) );
   }
 
   const std::string& conf_name = mpIniconfName->text().toStdString();
@@ -391,6 +400,13 @@ void cedar::dev::gui::KinematicChainCommandWidget::changeInitialConfig()
 
 void cedar::dev::gui::KinematicChainCommandWidget::applyInitialConfig()
 {
+  if (!mpKinematicChain->isCommunicating())
+  {
+    cedar::aux::LogSingleton::getInstance()->message(
+      mpKinematicChain->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.",
+      CEDAR_CURRENT_FUNCTION_NAME);
+  }
+
   mpKinematicChain->applyInitialConfiguration(mpIniconfBox->currentText().toStdString());
 }
 
