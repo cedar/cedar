@@ -2076,6 +2076,14 @@ void cedar::proc::gui::Connectable::handleContextMenuAction(QAction* action, QGr
 
 void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::ConfigurationNode& node) const
 {
+  // important: access to QT Qidgets only allowed from the GUI thread
+  //            since most calls are not thread-safe!
+  const bool isGuiThread = 
+              QThread::currentThread() == QCoreApplication::instance()->thread();
+
+  if (!isGuiThread)
+    return; // note, this disables saving of widgets via auto-backups
+
   for (auto childWidget : mChildWidgets)
   {
     // all widgets in the mChildWidgets Vector should be QDockWidgets that contain a QWidget
