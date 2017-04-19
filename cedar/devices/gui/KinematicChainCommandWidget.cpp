@@ -173,9 +173,7 @@ void cedar::dev::gui::KinematicChainCommandWidget::saveInitialConfiguration()
   // serialized joint angles
   for(unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
   {
-    joints.put(std::to_string(i), 
-               //float(mCommandBoxes[i]->value()));
-               mpKinematicChain->getJointAngle(i) );
+    joints.put(std::to_string(i), float(mCommandBoxes[i]->value()));
   }
 
   const std::string& conf_name = mpIniconfName->text().toStdString();

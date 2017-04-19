@@ -1391,17 +1391,6 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
     type_from_user = this->mController.member()->mBufferType;
     userData = (this->mController.member()->mCallback());
 
-    mControllerFinished = true;
-
-    for(int i = 0; i<userData.rows; ++i)
-    {
-      if(std::abs(userData.at<float>(i, 0)) >= 100000 * std::numeric_limits<float>::epsilon())
-      {
-        mControllerFinished = false;
-        break;
-      }
-    }
-
     if(mControllerFinished)
     {
       locker.unlock();
