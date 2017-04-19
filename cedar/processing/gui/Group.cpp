@@ -1178,16 +1178,23 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
   this->updateCollapsedness();
 }
 
-void cedar::proc::gui::Group::openKinematicChainWidget(const std::string& path)
+void cedar::proc::gui::Group::openKinematicChainWidget(const cedar::aux::ConfigurationNode& node)
 {
+  std::string path;
+
   try
-  {
+  {    
+    path = node.get<std::string>("component");
     cedar::dev::ComponentSlotPtr p_component_slot = cedar::dev::RobotManagerSingleton::getInstance()->findComponentSlot(path);
 
     if(auto pKinematicChain = boost::dynamic_pointer_cast<cedar::dev::KinematicChain>(p_component_slot->getComponent()))
     {
+      const int posx = node.get<int>("position_x");
+      const int posy = node.get<int>("position_y");
+
       cedar::dev::gui::KinematicChainWidget *pWidget = new cedar::dev::gui::KinematicChainWidget(pKinematicChain);
       auto qwidget = this->createDockWidget(path, pWidget);
+      qwidget->move(posx, posy);
       qwidget->show();
     }
   }
@@ -1222,7 +1229,7 @@ void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, con
     // Both KinematicChainWidget and Viewer are no PlotWidgets, so treat them separately here
     if(it.first == "KinematicChainWidget")
     {
-      this->openKinematicChainWidget(it.second.data());
+      this->openKinematicChainWidget(it.second);
       continue;
     }
 
