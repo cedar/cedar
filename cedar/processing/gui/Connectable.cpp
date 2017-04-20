@@ -2109,10 +2109,6 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
       node.push_back(cedar::aux::ConfigurationNode::value_type("KinematicChainWidget", value_node));
     }
 
-    if (cedar::aux::objectTypeToString(dock_widget_child) == "cedar::aux::gui::Viewer")
-    {
-      node.add("Viewer", "Viewer");
-    }
   }
 }
 

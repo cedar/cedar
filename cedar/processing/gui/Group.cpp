@@ -1178,6 +1178,39 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
   this->updateCollapsedness();
 }
 
+void cedar::proc::gui::Group::openSceneViewer(const cedar::aux::ConfigurationNode& node)
+{
+  try
+  {
+    const int posx = node.get<int>("position_x");
+    const int posy = node.get<int>("position_y");
+    const int width = node.get<int>("width");
+    const int height = node.get<int>("height");
+
+    cedar::aux::gl::ScenePtr scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
+    cedar::aux::gui::Viewer *viewer = new cedar::aux::gui::Viewer(scene);
+
+    viewer->setWindowFlags(Qt::WindowStaysOnTopHint);
+    viewer->setSceneRadius(scene->getSceneLimit());
+    viewer->startTimer(25);
+
+    auto qwidget = this->createDockWidget("simulated scene", viewer);
+    mViewers.push_back(qwidget);
+
+    qwidget->move(posx, posy);
+    qwidget->resize(width, height);
+    qwidget->show();
+  }
+  catch (...)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Failed to open a view on the simulated scener. Most probably it is not well defined. Ignoring.",
+      "cedar::proc::gui::Group::openSceneViewer(const cedar::aux::ConfigurationNode& node)"
+    );
+  }
+}
+
 void cedar::proc::gui::Group::openKinematicChainWidget(const cedar::aux::ConfigurationNode& node)
 {
   std::string path;
@@ -1205,7 +1238,7 @@ void cedar::proc::gui::Group::openKinematicChainWidget(const cedar::aux::Configu
       "Failed to open Kinematic Chain Widget for \"" + path + "\". Most probably the robot does not exist anymore. Ignoring.",
       "cedar::proc::gui::Group::readKinematicChainWidgetList(const cedar::aux::ConfigurationNode& node)"
     );
-    }
+  }
 }
 
 void cedar::proc::gui::Group::openSceneViewer()
@@ -1217,7 +1250,10 @@ void cedar::proc::gui::Group::openSceneViewer()
   viewer->setSceneRadius(scene->getSceneLimit());
   viewer->startTimer(25);
 
-  this->createDockWidget("simulated scene", viewer)->show();
+  auto dock_widget = this->createDockWidget("simulated scene", viewer);
+  dock_widget->show();
+  mViewers.push_back(dock_widget);
+
 }
 
 void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node)
@@ -1233,9 +1269,9 @@ void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, con
       continue;
     }
 
-    if(it.second.data() == "Viewer")
+    if(it.first == "Viewer")
     {
-      this->openSceneViewer();
+      this->openSceneViewer(it.second);
       continue;
     }
 
@@ -1335,6 +1371,18 @@ void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode& 
 
 void cedar::proc::gui::Group::writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const
 {
+  for (QWidget* viewer_item : mViewers)
+  {
+    cedar::aux::ConfigurationNode value_node;
+
+    value_node.add("position_x", viewer_item->pos().x());
+    value_node.add("position_y", viewer_item->pos().y());
+    value_node.add("width", viewer_item->width());
+    value_node.add("height", viewer_item->height());
+
+    node.push_back(cedar::aux::ConfigurationNode::value_type("Viewer", value_node));
+
+  }
   for (auto step_map_item : this->mpScene->getStepMap())
   {
     step_map_item.second->writeOpenChildWidgets(node);

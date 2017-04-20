@@ -182,6 +182,7 @@ public:
 
   //! Opens a view on the simulated scene
   void openSceneViewer();
+  void openSceneViewer(const cedar::aux::ConfigurationNode& node);
 
   /*!@brief Sets the ui configuration for the element when it is added to the group.
    */
@@ -475,6 +476,9 @@ private:
 
   //!@brief a filename from which to load a group configuration, or to which to save a configuration
   mutable std::string mFileName;
+
+  //!@brief a vector containing all the viewers
+  std::vector<QWidget*> mViewers;
 
   //!@brief a vector of all source connectors
   std::vector<cedar::proc::gui::DataSlotItem*> mConnectorSources;
