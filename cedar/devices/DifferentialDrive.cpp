@@ -184,12 +184,12 @@ std::vector<cedar::unit::Velocity> cedar::dev::DifferentialDrive::getWheelSpeed(
   QReadLocker data_locker(&(mat_data->getLock()));
   cv::Mat mat = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(getUserCommandData(cedar::dev::DifferentialDrive::WHEEL_SPEED))->getData();
 
-  CEDAR_DEBUG_ASSERT(mat.type() == CV_64F);
+  CEDAR_DEBUG_ASSERT(mat.type() == CV_32F);
   CEDAR_DEBUG_ASSERT(mat.rows >= 2);
   CEDAR_DEBUG_ASSERT(mat.cols >= 1);
 
-  ret.push_back(mat.at<double>(0,0) * cedar::unit::DEFAULT_VELOCITY_UNIT);
-  ret.push_back(mat.at<double>(1,0) * cedar::unit::DEFAULT_VELOCITY_UNIT);
+  ret.push_back(double(mat.at<float>(0,0)) * cedar::unit::DEFAULT_VELOCITY_UNIT);
+  ret.push_back(double(mat.at<float>(1,0)) * cedar::unit::DEFAULT_VELOCITY_UNIT);
 
   return ret;
 }
@@ -197,10 +197,10 @@ std::vector<cedar::unit::Velocity> cedar::dev::DifferentialDrive::getWheelSpeed(
 void cedar::dev::DifferentialDrive::setWheelSpeed(const std::vector<cedar::unit::Velocity>& wheelSpeed)
 {
   CEDAR_ASSERT(wheelSpeed.size() == 2);
-  cv::Mat mat = cv::Mat(2, 1, CV_64F);
+  cv::Mat mat = cv::Mat(2, 1, CV_32F);
 
-  mat.at<double>(0,0) = wheelSpeed[0] / cedar::unit::DEFAULT_VELOCITY_UNIT;
-  mat.at<double>(1,0) = wheelSpeed[1] / cedar::unit::DEFAULT_VELOCITY_UNIT;
+  mat.at<float>(0,0) = float(wheelSpeed[0] / cedar::unit::DEFAULT_VELOCITY_UNIT);
+  mat.at<float>(1,0) = float(wheelSpeed[1] / cedar::unit::DEFAULT_VELOCITY_UNIT);
 
   setUserSideCommandBuffer( cedar::dev::DifferentialDrive::WHEEL_SPEED, mat );
 }
