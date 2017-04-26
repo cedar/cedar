@@ -91,7 +91,7 @@ public:
   /*!@brief the constructor without a scene pointer */
   Viewer(bool readFromFile = true);
 
-  /*!@brief the constructor */
+  /*!@brief the destructor */
   ~Viewer();
 
   //--------------------------------------------------------------------------------------------------------------------

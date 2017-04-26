@@ -529,6 +529,23 @@ void cedar::proc::gui::Group::showArchitectureWidget(const std::string& name)
   this->mArchitectureWidgetDocks.push_back(debugWeakPointer);
 }
 
+void cedar::proc::gui::Group::removeViewer()
+{
+  auto it = mViewers.begin();
+  while (*it != QObject::sender() && it != mViewers.end())
+  {
+    it++;
+  }
+  if (*it == QObject::sender())
+  {
+    mViewers.erase(it);
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->error("Could not find a reference to the destroyed Viewer.", "cedar::proc::gui::Group::removeViewer()");
+  }
+}
+
 void cedar::proc::gui::Group::toggleVisibilityOfOpenArchitectureWidgets(bool visible)
 {
   for (auto iter = this->mArchitectureWidgetDocks.begin(); iter != this->mArchitectureWidgetDocks.end();)
@@ -1182,19 +1199,26 @@ void cedar::proc::gui::Group::openSceneViewer(const cedar::aux::ConfigurationNod
 {
   try
   {
+    cedar::aux::gl::ScenePtr scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
+
+    cedar::aux::gui::Viewer *viewer = new cedar::aux::gui::Viewer(scene);
+    viewer->setSceneRadius(scene->getSceneLimit());
+    viewer->startTimer(25);
+
+    QWidget* qwidget = this->createDockWidget("simulated scene", viewer);
+
     const int posx = node.get<int>("position_x");
     const int posy = node.get<int>("position_y");
     const int width = node.get<int>("width");
     const int height = node.get<int>("height");
 
-    cedar::aux::gl::ScenePtr scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
-    cedar::aux::gui::Viewer *viewer = new cedar::aux::gui::Viewer(scene);
-
-    viewer->setWindowFlags(Qt::WindowStaysOnTopHint);
-    viewer->setSceneRadius(scene->getSceneLimit());
-    viewer->startTimer(25);
+    qwidget->setWindowFlags(Qt::WindowStaysOnTopHint);
+    qwidget->move(posx, posy);
+    qwidget->resize(width, height);
+    qwidget->show();
 
     #ifdef CEDAR_USE_QGLVIEWER
+
     const float cposx = node.get<float>("camera position x");
     const float cposy = node.get<float>("camera position y");
     const float cposz = node.get<float>("camera position z");
@@ -1209,13 +1233,9 @@ void cedar::proc::gui::Group::openSceneViewer(const cedar::aux::ConfigurationNod
 
     #endif // CEDAR_USE_QGLVIEWER
 
+    QObject::connect(viewer, SIGNAL(destroyed()), this, SLOT(removeViewer()));
     mViewers.push_back(viewer);
 
-    auto qwidget = this->createDockWidget("simulated scene", viewer);
-
-    qwidget->move(posx, posy);
-    qwidget->resize(width, height);
-    qwidget->show();
   }
   catch (...)
   {
@@ -1265,6 +1285,7 @@ void cedar::proc::gui::Group::openSceneViewer()
   viewer->setWindowFlags(Qt::WindowStaysOnTopHint);
   viewer->setSceneRadius(scene->getSceneLimit());
   viewer->startTimer(25);
+  QObject::connect(viewer, SIGNAL(destroyed()), this, SLOT(removeViewer()));
   mViewers.push_back(viewer);
 
   auto dock_widget = this->createDockWidget("simulated scene", viewer);
@@ -1396,6 +1417,7 @@ void cedar::proc::gui::Group::writeOpenPlotsTo(cedar::aux::ConfigurationNode& no
   {
     for (QWidget* viewer_item : mViewers)
     {
+
       cedar::aux::ConfigurationNode value_node;
 
       value_node.add("position_x", viewer_item->parentWidget()->x());
