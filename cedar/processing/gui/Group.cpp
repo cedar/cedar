@@ -1194,8 +1194,24 @@ void cedar::proc::gui::Group::openSceneViewer(const cedar::aux::ConfigurationNod
     viewer->setSceneRadius(scene->getSceneLimit());
     viewer->startTimer(25);
 
+    #ifdef CEDAR_USE_QGLVIEWER
+    const float cposx = node.get<float>("camera position x");
+    const float cposy = node.get<float>("camera position y");
+    const float cposz = node.get<float>("camera position z");
+
+    const float cori0 = node.get<float>("camera orientation 0");
+    const float cori1 = node.get<float>("camera orientation 1");
+    const float cori2 = node.get<float>("camera orientation 2");
+    const float cori3 = node.get<float>("camera orientation 3");
+
+    viewer->camera()->setPosition(qglviewer::Vec(cposx, cposy, cposz));
+    viewer->camera()->setOrientation(qglviewer::Quaternion(cori0, cori1, cori2, cori3));
+
+    #endif // CEDAR_USE_QGLVIEWER
+
+    mViewers.push_back(viewer);
+
     auto qwidget = this->createDockWidget("simulated scene", viewer);
-    mViewers.push_back(qwidget);
 
     qwidget->move(posx, posy);
     qwidget->resize(width, height);
@@ -1249,10 +1265,10 @@ void cedar::proc::gui::Group::openSceneViewer()
   viewer->setWindowFlags(Qt::WindowStaysOnTopHint);
   viewer->setSceneRadius(scene->getSceneLimit());
   viewer->startTimer(25);
+  mViewers.push_back(viewer);
 
   auto dock_widget = this->createDockWidget("simulated scene", viewer);
-  dock_widget->show();
-  mViewers.push_back(dock_widget);
+  dock_widget->show();  
 
 }
 
@@ -1382,10 +1398,23 @@ void cedar::proc::gui::Group::writeOpenPlotsTo(cedar::aux::ConfigurationNode& no
     {
       cedar::aux::ConfigurationNode value_node;
 
-      value_node.add("position_x", viewer_item->pos().x());
-      value_node.add("position_y", viewer_item->pos().y());
+      value_node.add("position_x", viewer_item->parentWidget()->x());
+      value_node.add("position_y", viewer_item->parentWidget()->y());
       value_node.add("width", viewer_item->width());
       value_node.add("height", viewer_item->height());
+
+      #ifdef CEDAR_USE_QGLVIEWER
+
+      QGLViewer* qgl = boost::dynamic_pointer_cast<QGLViewer>(viewer_item);
+      value_node.add("camera position x", qgl->camera()->position().x);
+      value_node.add("camera position y", qgl->camera()->position().y);
+      value_node.add("camera position z", qgl->camera()->position().z);
+      value_node.add("camera orientation 0", qgl->camera()->orientation()[0]);
+      value_node.add("camera orientation 1", qgl->camera()->orientation()[1]);
+      value_node.add("camera orientation 2", qgl->camera()->orientation()[2]);
+      value_node.add("camera orientation 3", qgl->camera()->orientation()[3]);
+
+      #endif // CEDAR_USE_QGLVIEWER
 
       node.push_back(cedar::aux::ConfigurationNode::value_type("Viewer", value_node));
 

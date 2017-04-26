@@ -65,6 +65,8 @@
 #include <string>
 #include <list>
 
+#include "cedar/auxiliaries/gui/Viewer.h"
+
 /*!@brief The representation of a cedar::proc::Group in a cedar::proc::gui::Scene.
  *
  *        This class takes care of loading cedar::proc::Groups in a manner that allows them to be added into
@@ -478,7 +480,7 @@ private:
   mutable std::string mFileName;
 
   //!@brief a vector containing all the viewers
-  std::vector<QWidget*> mViewers;
+  std::vector<cedar::aux::gui::Viewer*> mViewers;
 
   //!@brief a vector of all source connectors
   std::vector<cedar::proc::gui::DataSlotItem*> mConnectorSources;
