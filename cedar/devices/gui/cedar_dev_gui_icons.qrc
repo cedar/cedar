@@ -14,5 +14,6 @@
         <file>icons/youbot_icon_256.png</file>
         <file>icons/caren_arm.svg</file>
         <file>icons/caren_trunk.svg</file>
+        <file>icons/caren_head.svg</file>
     </qresource>
 </RCC>

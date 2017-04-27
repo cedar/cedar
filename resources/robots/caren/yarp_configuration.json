@@ -7,6 +7,7 @@
     "trunk":"yarp",
     "camera0" : "yarp",
     "camera1" : "yarp",
-    "camera2" : "yarp"
+    "camera2" : "yarp",
+    "head" : "simulator"
   }
 }
