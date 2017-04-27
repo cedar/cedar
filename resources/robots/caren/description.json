@@ -334,6 +334,97 @@
 			}
 		}
     },
+    "head":
+    {
+      "icon path" : ":/cedar/dev/gui/icons/caren_head.svg",
+      "available components":
+      {
+        "fri":
+        {
+          "cedar.dev.kuka.KinematicChain":
+          {
+            "requires channel": "fri"
+          }
+        },
+        "yarp":
+        {
+          "cedar.dev.YarpKinematicChain":
+          {
+            "requires channel": "yarp",
+            "readPortName": "webots/carenHeadStatusFramework",
+      		"writePortName":"webots/carenHeadCommandsFramework"
+          }
+        },
+        "simulator":
+        {
+          "cedar.dev.SimulatedKinematicChain":
+          {
+          }
+        }
+      },
+      "shared component parameters":
+      {
+		"name": "CarenHead",
+		"root coordinate frame":
+		{
+			"initial translation":
+			[
+				"0.0",
+				"0.0",
+				"0.0"
+			],
+			"initial rotation":
+			[
+				"1.0", "0.0", "0.0",
+				"0.0", "1.0", "0.0",
+				"0.0", "0.0", "1.0"
+			]
+		},
+		"end-effector coordinate frame":
+		{
+			"initial translation":
+			[
+				"0.0",
+				"0.0",
+				"0.0"
+			],
+			"initial rotation":
+			[
+				"1.0", "0.0", "0.0",
+				"0.0", "1.0", "0.0",
+				"0.0", "0.0", "1.0"
+			]
+		},
+		"joints":
+		    {
+			    "cedar.dev.KinematicChain.Joint":
+			    {
+			        "angle limits":
+			        {
+						"lower limit": "-3.1415927",
+						"upper limit": "3.1415927"
+					},
+			        "velocity limits":
+			        {
+						"lower limit": "-5.0",
+						"upper limit": "5.0"
+					},
+					"position":
+					[
+						"0.0", 
+						"0.0",
+						"0.0"
+					],
+					"axis":
+					[
+						"0.0", 
+						"0.0",
+						"1.0"
+					]
+				}
+			}
+	}
+    },
     "camera0":
     {
       "available components":
@@ -441,7 +532,8 @@
   },
   "component connections": 
   {
-    "trunk": "arm"
+    "trunk": "arm",
+    "arm" : "head"
   }
 }
 
