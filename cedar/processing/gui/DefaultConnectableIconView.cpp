@@ -42,6 +42,7 @@
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include <QSvgRenderer>
 
 // SYSTEM INCLUDES
 
@@ -70,28 +71,24 @@ void cedar::proc::gui::DefaultConnectableIconView::connectableChanged()
 
 void cedar::proc::gui::DefaultConnectableIconView::setIconPath(const QString& path)
 {
-  // remember old position/scale
+  // initial position/scale
   qreal pos_x, pos_y;
   pos_x = pos_y = 0;
   qreal scale = 1.0;
 
   if (this->mpIconDisplay)
   {
-    pos_x = this->mpIconDisplay->x();
-    pos_y = this->mpIconDisplay->y();
-    scale = this->mpIconDisplay->scale();
-
-    // delete old icon
-    delete this->mpIconDisplay;
-    this->mpIconDisplay = nullptr;
+    //Use the renderer load function instead of deleting and creating objects
+    this->mpIconDisplay->renderer()->load(path);
   }
-
-  // recreate icon
-  this->mpIconDisplay = new QGraphicsSvgItem(path, this);
-  this->mpIconDisplay->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
-
-  this->mpIconDisplay->setPos(pos_x, pos_y);
-  this->mpIconDisplay->setScale(scale);
+  else
+  {
+    // create icon
+    this->mpIconDisplay = new QGraphicsSvgItem(path, this);
+    this->mpIconDisplay->setPos(pos_x, pos_y);
+    this->mpIconDisplay->setScale(scale);
+    this->mpIconDisplay->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+  }
 }
 
 void cedar::proc::gui::DefaultConnectableIconView::prepareSvgExport()

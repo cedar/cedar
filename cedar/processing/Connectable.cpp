@@ -1254,6 +1254,11 @@ void cedar::proc::Connectable::emitOutputPropertiesChangedSignal(const std::stri
   }
 }
 
+void cedar::proc::Connectable::emitOutputValueChangedSignal(const float& newDataValue)
+{
+    this->signalOutputValueChanged(newDataValue);
+}
+
 std::map<std::string, cedar::unit::Time> cedar::proc::Connectable::unregisterRecordedData() const
 {
   std::vector<cedar::proc::DataRole::Id> roles;

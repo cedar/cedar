@@ -4,6 +4,7 @@
     <file>field_image_plot.svg</file>
     <file>kernel_plot.svg</file>
     <file>steps/field_0d.svg</file>
+    <file>steps/field_0d_active.svg</file>
     <file>steps/field_1d.svg</file>
     <file>steps/field_2d.svg</file>
     <file>steps/field_3d.svg</file>

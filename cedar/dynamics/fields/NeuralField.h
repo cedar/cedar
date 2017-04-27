@@ -278,6 +278,7 @@ protected:
 private:
   boost::signals2::connection mKernelAddedConnection;
   boost::signals2::connection mKernelRemovedConnection;
+  bool mIsActive;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
