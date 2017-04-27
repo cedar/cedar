@@ -171,6 +171,7 @@ mGlobalInhibition
     cedar::aux::DoubleParameter::LimitType::negativeZero()
   )
 ),
+mIsActive(false),
 // parameters
 _mOutputActivation(new cedar::aux::BoolParameter(this, "activation as output", false)),
 _mDiscreteMetric(new cedar::aux::BoolParameter(this, "discrete metric (workaround)", false)),
@@ -543,6 +544,22 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
     // calculate output
     sigmoid_u = _mSigmoid->getValue()->compute(u);
   }
+  //Experimental Part to Update the GUI
+  if(_mDimensionality->getValue() == 0)
+  {
+    float curValue = sigmoid_u.at<float>(0,0);
+    if( curValue > 0.8 && !mIsActive )
+    {
+      this->emitOutputValueChangedSignal(curValue);
+      mIsActive = true;
+    }
+    else if(curValue < 0.8 && mIsActive)
+    {
+      this->emitOutputValueChangedSignal(curValue);
+      mIsActive = false;
+    }
+  }
+  //End of Experimental Part
   sigmoid_u_lock.unlock();
 
   QReadLocker sigmoid_u_readlock(&this->mSigmoidalActivation->getLock());
