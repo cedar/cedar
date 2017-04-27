@@ -61,6 +61,7 @@ test_*.py
 Makefile*
 CMakeDefines.h
 build/*
+cmake-build-debug/*
 .idea/*
 cedar/doc/*
 CTestTestfile.cmake

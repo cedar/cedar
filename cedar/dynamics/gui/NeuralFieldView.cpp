@@ -59,6 +59,11 @@ void cedar::dyn::gui::NeuralFieldView::connectableChanged()
   auto parameter = this->getConnectable()->getParameter("dimensionality");
   QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(updateIconDimensionality()));
 
+  auto connectable = this->getConnectable();
+//  QObject::connect(connectable,SIGNAL(OutputValueChanged(float)),this,SLOT(updateIconValue(float)));
+
+  connectable->connectToOutputValueChangedSignal(boost::bind(&cedar::dyn::gui::NeuralFieldView::updateIconValue, this, _1));
+
   this->updateIconDimensionality();
 }
 
@@ -88,3 +93,16 @@ void cedar::dyn::gui::NeuralFieldView::updateIconDimensionality()
       break;
   }
 }
+
+void cedar::dyn::gui::NeuralFieldView::updateIconValue(float newValue)
+{
+  if(newValue > 0.8)
+  {
+    this->setIconPath(":/cedar/dynamics/gui/steps/field_0d_active.svg");
+  }
+  else
+  {
+    this->setIconPath(":/cedar/dynamics/gui/steps/field_0d.svg");
+  }
+}
+
