@@ -120,6 +120,7 @@ cedar_add_library(cedarproc
   steps/RotationOnPlane.h
   steps/StaticGain.h
   steps/ScalarsToVector.h
+  steps/ShapeVisualisation.h
   steps/UnitConverter.h
   steps/Histogram.h
   steps/ScalarDivision.h

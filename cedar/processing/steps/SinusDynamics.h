@@ -60,7 +60,7 @@ class cedar::proc::steps::SinusDynamics : public cedar::proc::Step
     // input
     cedar::aux::ConstMatDataPtr mpAngle;
 
-protected:
+  protected:
     // output
     cedar::aux::MatDataPtr mpAngleChange;
 

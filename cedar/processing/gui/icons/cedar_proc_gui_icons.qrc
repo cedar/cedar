@@ -101,5 +101,6 @@
         <file>steps/sinus_dynamics.svg</file>
         <file>steps/norm.svg</file>
         <file>steps/rotation_on_plane.svg</file>
+        <file>steps/shape_visualisation.svg</file>
     </qresource>
 </RCC>

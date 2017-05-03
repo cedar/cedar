@@ -39,11 +39,6 @@
 
 #include <cedar/processing/Step.h>
 #include <cedar/auxiliaries/MatData.h>
-
-// includes for visualisation
-#include "cedar/auxiliaries/gl/GlobalScene.h"
-#include "cedar/auxiliaries/gl/Sphere.h"
-
 #include "cedar/processing/steps/RotationOnPlane.fwd.h"
 
 class cedar::proc::steps::RotationOnPlane : public cedar::proc::Step
@@ -69,21 +64,6 @@ class cedar::proc::steps::RotationOnPlane : public cedar::proc::Step
     // output
     cedar::aux::MatDataPtr mpAngle;
     cedar::aux::MatDataPtr mpOrthogonalAcceleration;
-
-  private slots:
-    void visualisationChanged();
-
-  protected:
-    //!@brief Visualise the target position in scene or not
-    cedar::aux::BoolParameterPtr _mVisualiseTarget;
-
-    //!@brief Visualisation color (red or green)
-    cedar::aux::BoolParameterPtr _mVisualisationColour;
-
-    // corresponding visualisation id to perform deletion
-    int _mVisualisationID;
-
-    cedar::aux::gl::ObjectVisualizationPtr mVisualisationPtr;
 };
 
 #endif /* ROTATION_ON_PLANE_H_ */
