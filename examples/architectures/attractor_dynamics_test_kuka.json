@@ -9,6 +9,13 @@
         {
             "name": "Component Multiply 3"
         },
+        "cedar.processing.steps.ShapeVisualisation":
+        {
+            "name": "Shape Visualisation",
+            "colour": "green",
+            "shape": "Sphere",
+            "scale": "0.02499999999999991"
+        },
         "cedar.processing.steps.Sum":
         {
             "name": "Sum 5"
@@ -29,7 +36,8 @@
                 "Rectify ForwardKinematics",
                 "Amari Clock",
                 "Dynamics To Component",
-                "Target Acquisition Dynamics"
+                "Target Acquisition Dynamics",
+                "Shape Visualisation"
             ]
         }
     },
@@ -747,9 +755,7 @@
                 },
                 "cedar.processing.steps.RotationOnPlane":
                 {
-                    "name": "Rotation On Plane",
-                    "visualise target position": "true",
-                    "visualisation is obstacle": "false"
+                    "name": "Rotation On Plane"
                 },
                 "cedar.processing.steps.SinusDynamics":
                 {
@@ -1321,6 +1327,10 @@
         {
             "source": "zero speed fix.external output 4",
             "target": "Sum 5.terms"
+        },
+        {
+            "source": "Amari Clock.external output",
+            "target": "Shape Visualisation.target position"
         }
     ],
     "name": "",
@@ -1337,6 +1347,15 @@
             "height": "40",
             "positionX": "6",
             "positionY": "-73"
+        },
+        {
+            "type": "step",
+            "step": "Shape Visualisation",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "-957",
+            "positionY": "405"
         },
         {
             "type": "step",
@@ -1364,16 +1383,16 @@
             "Viewer":
             {
                 "position_x": "911",
-                "position_y": "455",
+                "position_y": "404",
                 "width": "774",
-                "height": "333",
-                "camera position x": "2.411885738372803",
-                "camera position y": "4.216513633728027",
-                "camera position z": "4.664140701293945",
-                "camera orientation 0": "-0.2447584420442581",
-                "camera orientation 1": "-0.3755247592926025",
-                "camera orientation 2": "-0.8582570552825928",
-                "camera orientation 3": "-0.2499385625123978"
+                "height": "364",
+                "camera position x": "0.4048690404844439",
+                "camera position y": "1.893405637467202",
+                "camera position z": "1.284675518674269",
+                "camera orientation 0": "-0.0855034728112874",
+                "camera orientation 1": "-0.4664618323893668",
+                "camera orientation 2": "-0.8696999018745718",
+                "camera orientation 3": "-0.1368378446940902"
             }
         },
         "plot groups": "",
