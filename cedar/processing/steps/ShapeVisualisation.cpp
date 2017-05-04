@@ -113,13 +113,15 @@ cedar::proc::steps::ShapeVisualisation::ShapeVisualisation()
       cedar::proc::steps::ShapeVisualisation::Shape::typePtr(),
       cedar::proc::steps::ShapeVisualisation::Shape::sphere
     )
-  )
+  ),
+  _mScale(new cedar::aux::DoubleParameter(this, "scale", 0.025))
 {
   this->declareInput("target position");
   visualisationChanged();
 
   QObject::connect(this->_mColour.get(), SIGNAL(valueChanged()), this, SLOT(visualisationChanged()));
   QObject::connect(this->_mShape.get(), SIGNAL(valueChanged()), this, SLOT(visualisationChanged()));
+  QObject::connect(this->_mScale.get(), SIGNAL(valueChanged()), this, SLOT(visualisationChanged()));
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ShapeVisualisation::determineInputValidity
@@ -167,14 +169,14 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
 {
   auto scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
 
-  if(_mVisualisationID > 0)
-  {
-    scene->deleteObjectVisualization(_mVisualisationID);
-    _mVisualisationID = -1;
-  }
-
   if(mpTargetPosition)
   {
+    if(_mVisualisationID >= 0)
+    {
+      scene->deleteObjectVisualization(_mVisualisationID);
+      _mVisualisationID = -1;
+    }
+
     float r = 0;
     float g = 0;
     float b = 0;
@@ -233,6 +235,8 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
       }
     }
 
+    const float scale = _mScale->getValue();
+
     switch (this->_mShape->getValue())
     {
       default:
@@ -243,7 +247,7 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
           new cedar::aux::gl::Sphere
           (
             cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-            0.05, r, g, b
+            2*scale, r, g, b
           )
         );
         break;
@@ -256,7 +260,7 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
           new cedar::aux::gl::Block
           (
             cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-            0.05, 0.05, 0.05, r, g, b
+            3*scale, 2*scale, scale, r, g, b
           )
         );
         break;
@@ -269,7 +273,7 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
           new cedar::aux::gl::Cone
           (
             cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-            0.05, 0.05, r, g, b
+            2*scale, 2*scale, r, g, b
           )
         );
         break;
@@ -282,7 +286,7 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
           new cedar::aux::gl::Cylinder
           (
             cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-            0.05, 0.1, r, g, b
+            scale, 2*scale, r, g, b
           )
         );
         break;
@@ -295,7 +299,7 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
           new cedar::aux::gl::Prism
           (
             cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-            0.15, 0.05, r, g, b
+            3*scale, scale, r, g, b
           )
         );
         break;
@@ -308,7 +312,7 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
           new cedar::aux::gl::Pyramid
           (
             cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-            0.05, 0.1, 0.05, r, g, b
+            2*scale, 3*scale, 2*scale, r, g, b
           )
         );
         break;
@@ -321,7 +325,7 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
           new cedar::aux::gl::Torus
           (
             cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-            0.05, 0.01, r, g, b
+            3*scale, 0.5*scale, r, g, b
           )
         );
         break;

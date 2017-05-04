@@ -48,6 +48,8 @@
 #include <cedar/auxiliaries/MatData.h>
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
+#include <cedar/auxiliaries/DoubleParameter.h>
 
 // includes for visualisation
 #include "cedar/auxiliaries/gl/GlobalScene.h"
@@ -187,6 +189,9 @@ protected:
 
   //! Visualisation shape
   cedar::aux::EnumParameterPtr _mShape;
+
+  //! Visualisation shape scale
+  cedar::aux::DoubleParameterPtr _mScale;
 
 }; // class cedar::proc::steps::ShapeVisualisation
 
