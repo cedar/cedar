@@ -1799,3 +1799,10 @@ void cedar::proc::gui::Scene::importStep()
     p_message->exec();
   }
 }
+
+
+cedar::proc::gui::View* cedar::proc::gui::Scene::getParentView()
+{
+  return mpeParentView;
+}
+
