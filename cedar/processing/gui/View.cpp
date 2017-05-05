@@ -46,29 +46,30 @@
 #include <QScrollBar>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::gui::View::View(QWidget *pParent)
-:
-QGraphicsView(pParent),
-mpScene(nullptr),
-mCurrentZoomLevel(static_cast<qreal>(1.0)),
-mScrollDx(static_cast<qreal>(0.0)),
-mScrollDy(static_cast<qreal>(0.0)),
-mpScrollTimer(new QTimer(this)),
-mpMainWindow(nullptr),
-mpConigurableWidget(nullptr),
-mpRecorderWidget(nullptr)
+        :
+        QGraphicsView(pParent),
+        mpScene(nullptr),
+        mCurrentZoomLevel(static_cast<qreal>(1.0)),
+        mScrollDx(static_cast<qreal>(0.0)),
+        mScrollDy(static_cast<qreal>(0.0)),
+        mpScrollTimer(new QTimer(this)),
+        mpMainWindow(nullptr),
+        mpConigurableWidget(nullptr),
+        mpRecorderWidget(nullptr)
 {
   this->resetViewport();
   this->setInteractive(true);
   this->setDragMode(QGraphicsView::RubberBandDrag);
   this->setRenderHints(this->renderHints() | QPainter::Antialiasing
-                                           | QPainter::SmoothPixmapTransform
-                                           );
+                       | QPainter::SmoothPixmapTransform
+                      );
   this->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
   this->mpScrollTimer->setSingleShot(false);
@@ -93,11 +94,11 @@ cedar::proc::gui::View::~View()
 //----------------------------------------------------------------------------------------------------------------------
 
 void cedar::proc::gui::View::setWidgets
-(
-  QMainWindow* pMainWindow,
-  cedar::aux::gui::Configurable* pConigurableWidget,
-  cedar::proc::gui::RecorderWidget* pRecorderWidget
-)
+        (
+                QMainWindow *pMainWindow,
+                cedar::aux::gui::Configurable *pConigurableWidget,
+                cedar::proc::gui::RecorderWidget *pRecorderWidget
+        )
 {
   this->mpMainWindow = pMainWindow;
   this->mpConigurableWidget = pConigurableWidget;
@@ -265,9 +266,8 @@ void cedar::proc::gui::View::wheelEvent(QWheelEvent *pEvent)
   if (pEvent->modifiers() & Qt::ControlModifier)
   {
     double delta = static_cast<double>(pEvent->delta()) / 6000.0;
-    this->setZoomLevel( static_cast<int>((this->getZoomLevel() + delta) * 100.0) );
-  }
-  else
+    this->setZoomLevel(static_cast<int>((this->getZoomLevel() + delta) * 100.0));
+  } else
   {
     SuperClass::wheelEvent(pEvent);
   }
@@ -277,23 +277,23 @@ void cedar::proc::gui::View::scrollTimerEvent()
 {
   // move the horizontal scroll bar
   this->horizontalScrollBar()->setValue
-                               (
-                                 this->horizontalScrollBar()->value()
-                                   + this->mScrollDx * this->horizontalScrollBar()->singleStep()
-                               );
+          (
+                  this->horizontalScrollBar()->value()
+                  + this->mScrollDx * this->horizontalScrollBar()->singleStep()
+          );
 
   // move the vertical scroll bar
   this->verticalScrollBar()->setValue
-                            (
-                              this->verticalScrollBar()->value()
-                                + this->mScrollDy * this->verticalScrollBar()->singleStep()
-                            );
+          (
+                  this->verticalScrollBar()->value()
+                  + this->mScrollDy * this->verticalScrollBar()->singleStep()
+          );
 }
 
-void cedar::proc::gui::View::mouseMoveEvent(QMouseEvent* pEvent)
+void cedar::proc::gui::View::mouseMoveEvent(QMouseEvent *pEvent)
 {
   // scroll the view if connecting to something close to the edge
-  if (this->mpScene->getMode() == cedar::proc::gui::Scene::MODE_CONNECT)
+  if (this->mpScene->getMode() == cedar::proc::gui::Scene::MODE_CONNECT || this->mpScene->isDragging())
   {
     int border = 40;
     this->mScrollDx = 0;
@@ -301,8 +301,7 @@ void cedar::proc::gui::View::mouseMoveEvent(QMouseEvent* pEvent)
     if (pEvent->x() < border)
     {
       this->mScrollDx = -1;
-    }
-    else if (pEvent->x() > this->width() - border)
+    } else if (pEvent->x() > this->width() - border)
     {
       this->mScrollDx = 1;
     }
@@ -310,12 +309,10 @@ void cedar::proc::gui::View::mouseMoveEvent(QMouseEvent* pEvent)
     if (pEvent->y() < border)
     {
       this->mScrollDy = -1;
-    }
-    else if (pEvent->y() > this->height() - border)
+    } else if (pEvent->y() > this->height() - border)
     {
       this->mScrollDy = 1;
     }
-
   }
 
   // continue normal event processing
@@ -325,7 +322,7 @@ void cedar::proc::gui::View::mouseMoveEvent(QMouseEvent* pEvent)
 
 void cedar::proc::gui::View::setZoomLevel(int newLevel)
 {
-  qreal target_zoom = static_cast<qreal>(newLevel)/static_cast<qreal>(100.0);
+  qreal target_zoom = static_cast<qreal>(newLevel) / static_cast<qreal>(100.0);
   qreal factor = target_zoom / mCurrentZoomLevel;
   this->scale(factor, factor);
   mCurrentZoomLevel = target_zoom;
@@ -333,30 +330,30 @@ void cedar::proc::gui::View::setZoomLevel(int newLevel)
   emit zoomLevelChanged(static_cast<double>(mCurrentZoomLevel));
 }
 
-cedar::proc::gui::Scene* cedar::proc::gui::View::getScene()
+cedar::proc::gui::Scene *cedar::proc::gui::View::getScene()
 {
   return this->mpScene;
 }
 
-void cedar::proc::gui::View::resizeEvent(QResizeEvent * pEvent)
+void cedar::proc::gui::View::resizeEvent(QResizeEvent *pEvent)
 {
   QGraphicsView::resizeEvent(pEvent);
 }
 
 
-void cedar::proc::gui::View::setMode(cedar::proc::gui::Scene::MODE mode, const QString& param)
+void cedar::proc::gui::View::setMode(cedar::proc::gui::Scene::MODE mode, const QString &param)
 {
   switch (mode)
   {
     case cedar::proc::gui::Scene::MODE_CONNECT:
       this->setDragMode(QGraphicsView::NoDrag);
-      this->mpScrollTimer->start(100);
+      this->startScrollTimer();
       break;
 
     default:
-      if (this->mpScrollTimer->isActive())
+      if (!this->mpScene->isDragging())
       {
-        this->mpScrollTimer->stop();
+        this->stopScrollTimer();
       }
       this->setDragMode(QGraphicsView::RubberBandDrag);
       break;
@@ -364,7 +361,7 @@ void cedar::proc::gui::View::setMode(cedar::proc::gui::Scene::MODE mode, const Q
   this->mpScene->setMode(mode, param);
 }
 
-void cedar::proc::gui::View::mousePressEvent(QMouseEvent* pEvent)
+void cedar::proc::gui::View::mousePressEvent(QMouseEvent *pEvent)
 {
   if (pEvent->button() == Qt::MiddleButton)
   {
@@ -372,32 +369,42 @@ void cedar::proc::gui::View::mousePressEvent(QMouseEvent* pEvent)
     // scroll hand mode. We should probably keep track of things properly but it seems to work if you just do this.
     // I'm not sure why buttons has to be 0 here - if you just clear the left button it doesn't work.
     QMouseEvent releaseEvent(QEvent::MouseButtonRelease, pEvent->pos(), pEvent->globalPos(),
-                 Qt::LeftButton, 0, pEvent->modifiers());
+                             Qt::LeftButton, 0, pEvent->modifiers());
     QGraphicsView::mouseReleaseEvent(&releaseEvent);
 
     setDragMode(QGraphicsView::ScrollHandDrag);
     // We need to pretend it is actually the left button that was pressed!
     QMouseEvent fakeEvent(pEvent->type(), pEvent->pos(), pEvent->globalPos(),
-               Qt::LeftButton, pEvent->buttons() | Qt::LeftButton, pEvent->modifiers());
+                          Qt::LeftButton, pEvent->buttons() | Qt::LeftButton, pEvent->modifiers());
     QGraphicsView::mousePressEvent(&fakeEvent);
-  }
-  else
+  } else
   {
     QGraphicsView::mousePressEvent(pEvent);
   }
 }
 
-void cedar::proc::gui::View::mouseReleaseEvent(QMouseEvent* pEvent)
+void cedar::proc::gui::View::mouseReleaseEvent(QMouseEvent *pEvent)
 {
   if (pEvent->button() == Qt::MiddleButton)
   {
     QMouseEvent fakeEvent(pEvent->type(), pEvent->pos(), pEvent->globalPos(),
-               Qt::LeftButton, pEvent->buttons() & ~Qt::LeftButton, pEvent->modifiers());
+                          Qt::LeftButton, pEvent->buttons() & ~Qt::LeftButton, pEvent->modifiers());
     QGraphicsView::mouseReleaseEvent(&fakeEvent);
     setDragMode(QGraphicsView::RubberBandDrag);
-  }
-  else
+  } else
   {
     QGraphicsView::mouseReleaseEvent(pEvent);
   }
 }
+
+void cedar::proc::gui::View::startScrollTimer()
+{
+  this->mpScrollTimer->start(100);
+}
+
+void cedar::proc::gui::View::stopScrollTimer()
+{
+  if (this->mpScrollTimer->isActive())
+    this->mpScrollTimer->stop();
+}
+

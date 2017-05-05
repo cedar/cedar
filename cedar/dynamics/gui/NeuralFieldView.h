@@ -81,7 +81,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-  void updateIconValue(float newValue);
+  void updateActivityIcon(bool isActive);
 private slots:
   void updateIconDimensionality();
 

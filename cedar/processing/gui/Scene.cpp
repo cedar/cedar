@@ -560,7 +560,6 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
         {
           // find the first item under the mouse that inherits GraphicsBase and is connectable
           mpConnectionStart = this->findConnectableItem(items);
-
           // check if the start item is a connectable thing.
           if (mpConnectionStart != nullptr)
           {
@@ -592,6 +591,7 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
     // (resize handles make an exception, they can be dragged without being selected)
     if (items.size() > 0)
     {
+
       if (!dynamic_cast<cedar::proc::gui::ResizeHandle*>(items.at(0)))
       {
         for (int i = 0; i < items.size(); ++i)
@@ -602,6 +602,7 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
             {
               // we cannot move with a
               this->mDraggingItems = true;
+              this->mpeParentView->startScrollTimer();
             }
           }
         }
@@ -767,6 +768,7 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
     default:
     case MODE_SELECT:
       QGraphicsScene::mouseReleaseEvent(pMouseEvent);
+      this->mpeParentView->stopScrollTimer();
       break;
 
     case MODE_CONNECT:
@@ -775,6 +777,7 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
   }
 
   this->mDraggingItems = false;
+
 
   // reset highlighting of the groups from which the items are being removed
   auto selected = this->selectedItems();
@@ -1694,7 +1697,7 @@ void cedar::proc::gui::Scene::importGroup(bool link)
                                               "json (*.json)", // filter(s), separated by ';;'
                                               0,
                                               // js: Workaround for freezing file dialogs in QT5 (?)
-                                              QFileDialog::DontUseNativeDialog
+                                              QFileDialog::DontUseNativeDialog // Unfortunately it does not solve the problem of first time lag in the ini-network
                                               );
 
   if (!file.isEmpty())
@@ -1798,6 +1801,12 @@ void cedar::proc::gui::Scene::importStep()
         );
     p_message->exec();
   }
+}
+
+
+bool cedar::proc::gui::Scene::isDragging()
+{
+  return this->mDraggingItems;
 }
 
 

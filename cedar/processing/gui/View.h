@@ -128,6 +128,12 @@ public:
   //! Resets the viewport, i.e., redetermines the size of the scene and adapts the scroll bars accordingly.
   void resetViewport();
 
+  //! Starts the ScrollTimer which is responsible for extending the scene during dragging
+  void startScrollTimer();
+
+  //! Stops the ScrollTimer which is responsible for extending the scene during dragging
+  void stopScrollTimer();
+
 public slots:
   /*!@brief Changes the current zoom level of the architecture.
    */

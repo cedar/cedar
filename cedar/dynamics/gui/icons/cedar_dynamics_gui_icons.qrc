@@ -6,9 +6,13 @@
     <file>steps/field_0d.svg</file>
     <file>steps/field_0d_active.svg</file>
     <file>steps/field_1d.svg</file>
+    <file>steps/field_1d_active.svg</file>
     <file>steps/field_2d.svg</file>
+    <file>steps/field_2d_active.svg</file>
     <file>steps/field_3d.svg</file>
+    <file>steps/field_3d_active.svg</file>
     <file>steps/field_nd.svg</file>
+    <file>steps/field_nd_active.svg</file>
     <file>steps/field_generic.svg</file>
   </qresource>
 </RCC>

@@ -329,8 +329,9 @@ public:
    */
   QList<QGraphicsItem*> getSelectedParents() const;
 
-  cedar::proc::gui::View* getParentView();
+  bool isDragging();
 
+  cedar::proc::gui::View* getParentView();
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
