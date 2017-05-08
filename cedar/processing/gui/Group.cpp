@@ -50,6 +50,7 @@
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/gui/ElementList.h"
+#include "cedar/processing/gui/View.h"
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/sinks/GroupSink.h"
 #include "cedar/processing/LoopedTrigger.h"
@@ -85,6 +86,7 @@
 #include <QDialog>
 #include <QStatusBar>
 #include <QListWidget>
+#include <QScrollBar>
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/json_parser.hpp>
   #include <boost/pointer_cast.hpp>
@@ -1183,6 +1185,12 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
   {
     this->readStickyNotes(root.get_child("ui"));
   }
+
+  if (root.find("ui view") != root.not_found())
+  {
+    this->readView(root.get_child("ui view"));
+  }
+
   // update recorder icons
   this->stepRecordStateChanged();
 
@@ -1364,6 +1372,7 @@ void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, con
 void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode& root) const
 {
   this->writeScene(root);
+  this->writeView(root);
 
   cedar::aux::ConfigurationNode generic;
 
@@ -1451,6 +1460,37 @@ void cedar::proc::gui::Group::writeOpenPlotsTo(cedar::aux::ConfigurationNode& no
   {
     group_map_item.second->writeOpenChildWidgets(node);
   }
+}
+
+void cedar::proc::gui::Group::writeView(cedar::aux::ConfigurationNode& root) const
+{
+  if (this->getGroup()->isRoot())
+  {
+    // save old view settings
+    auto view = this->mpScene->getParentView();
+    if (view == nullptr)
+      return;
+
+    cedar::aux::ConfigurationNode view_node;
+    int barX, barY, sliderX, sliderY;
+    double zoom;
+
+    barX= view->horizontalScrollBar()->value();
+    barY= view->verticalScrollBar()->value();
+    sliderX= view->horizontalScrollBar()->sliderPosition();
+    sliderY= view->verticalScrollBar()->sliderPosition();
+
+    view_node.put("ScrollBarX",static_cast<int>( barX ));
+    view_node.put("ScrollBarY",static_cast<int>( barY ));
+    view_node.put("SliderPosX",static_cast<int>( sliderX ));
+    view_node.put("SliderPosY",static_cast<int>( sliderY ));
+    zoom= view->getZoomLevel();
+    view_node.put("Zoom", zoom);
+
+
+    root.add_child("ui view", view_node);
+  }
+
 }
 
 void cedar::proc::gui::Group::writeScene(cedar::aux::ConfigurationNode& root) const
@@ -2542,6 +2582,34 @@ void cedar::proc::gui::Group::changeStepName(const std::string& from, const std:
         auto node = plot.second.put("step", to);
       }
     }
+  }
+}
+
+void cedar::proc::gui::Group::readView(const cedar::aux::ConfigurationNode& node)
+{
+  if (!this->getGroup()->isRoot())
+    return;
+
+  try
+  {
+    // restore old view settings
+    double zoom = node.get<double>("Zoom");
+    int barX = node.get<int>("ScrollBarX");
+    int barY = node.get<int>("ScrollBarY");
+    int sliderX = node.get<int>("SliderPosX");
+    int sliderY = node.get<int>("SliderPosY");
+
+    auto view = this->mpScene->getParentView();
+    view->setZoomLevel( static_cast<int>(100 * zoom) ); // WTF? int interface?
+
+    view->horizontalScrollBar()->setValue(barX);
+    view->horizontalScrollBar()->setSliderPosition(sliderX);
+    view->horizontalScrollBar()->setValue(barY);
+    view->horizontalScrollBar()->setSliderPosition(sliderY);
+
+  }
+  catch(std::exception &e)
+  {
   }
 }
 

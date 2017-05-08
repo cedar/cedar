@@ -357,6 +357,7 @@ private:
 
   //!@brief write scene to a node
   void writeScene(cedar::aux::ConfigurationNode& root) const;
+  void writeView(cedar::aux::ConfigurationNode& root) const;
 
   //!@brief Determines whether the group is the root group.
   bool isRootGroup();
@@ -401,6 +402,7 @@ private:
   cedar::proc::gui::Element* getUiElementFor(cedar::proc::ElementPtr element) const;
 
   void readStickyNotes(const cedar::aux::ConfigurationNode& node);
+  void readView(const cedar::aux::ConfigurationNode& node);
 
   /*!@brief this function emits a connection added signal for all connections in the underlying network.
    * It can be used to restore connections after moving or duplicating groups

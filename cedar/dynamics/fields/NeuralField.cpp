@@ -59,6 +59,7 @@
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/units/Time.h"
+#include "cedar/auxiliaries/MatrixIterator.h"
 #include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
@@ -175,6 +176,17 @@ mIsActive(false),
 // parameters
 _mOutputActivation(new cedar::aux::BoolParameter(this, "activation as output", false)),
 _mDiscreteMetric(new cedar::aux::BoolParameter(this, "discrete metric (workaround)", false)),
+_mUpdateStepGui(new cedar::aux::BoolParameter(this, "update stepIcon according to output", true)),
+_mUpdateStepGuiThreshold
+        (
+                new cedar::aux::DoubleParameter
+                        (
+                                this,
+                                "threshold for updating the stepIcon",
+                                0.8,
+                                cedar::aux::DoubleParameter::LimitType::positiveZero()
+                        )
+        ),
 _mDimensionality
 (
   new cedar::aux::UIntParameter
@@ -234,6 +246,8 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 
   this->_mOutputActivation->markAdvanced();
   this->_mDiscreteMetric->markAdvanced();
+  this->_mUpdateStepGui->markAdvanced();
+  this->_mUpdateStepGuiThreshold->markAdvanced();
 
   // setup default kernels
   std::vector<cedar::aux::kernel::KernelPtr> kernel_defaults;
@@ -544,19 +558,42 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
     // calculate output
     sigmoid_u = _mSigmoid->getValue()->compute(u);
   }
-  //Experimental Part to Update the GUI
-  if(_mDimensionality->getValue() == 0)
+//  //Experimental Part to Update the GUI
+  if(_mUpdateStepGui->getValue())
   {
-    float curValue = sigmoid_u.at<float>(0,0);
-    if( curValue > 0.8 && !mIsActive )
+    double maximum =std::numeric_limits<double>::min();
+    if(_mDimensionality->getValue()<3)
     {
-      this->emitOutputValueChangedSignal(curValue);
-      mIsActive = true;
+      double minimum;
+      cv::minMaxLoc(sigmoid_u, &minimum, &maximum);
     }
-    else if(curValue < 0.8 && mIsActive)
+    else
     {
-      this->emitOutputValueChangedSignal(curValue);
+      // create an iterator for the input matrix
+      cedar::aux::MatrixIterator matrix_iterator(sigmoid_u);
+
+      // iterate over input matrix and find the maximum value
+      do
+      {
+        double current_value = sigmoid_u.at<float>(matrix_iterator.getCurrentIndex());
+
+        if (current_value > maximum)
+        {
+          maximum = current_value;
+        }
+      }
+      while (matrix_iterator.increment());
+    }
+
+    if( maximum > _mUpdateStepGuiThreshold->getValue() && !mIsActive )
+    {
+      mIsActive = true;
+      this->emitOutputValueChangedSignal(mIsActive);
+    }
+    else if(maximum < _mUpdateStepGuiThreshold->getValue() && mIsActive)
+    {
       mIsActive = false;
+      this->emitOutputValueChangedSignal(mIsActive);
     }
   }
   //End of Experimental Part
