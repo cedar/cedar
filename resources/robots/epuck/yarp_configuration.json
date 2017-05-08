@@ -1,0 +1,19 @@
+{
+  "name": "webots",
+  "description file": "robots/epuck/description.json",
+  "component instantiations":
+  {
+    "drive": "yarp",
+    "ambient light sensor": "yarp",
+    "proximity sensor": "yarp",
+    "acceleration sensor": "serial",
+    "led": "serial"
+  },
+  "channel parameters":
+  {
+    "serial":
+    {
+      "device path": "/dev/rfcomm0"
+    }
+  }
+}

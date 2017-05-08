@@ -1,0 +1,136 @@
+{
+  "component slots":
+  {
+    "drive":
+    {
+      "available components":
+      {
+        "serial":
+        {
+          "cedar.dev.kteam.DriveSerial":
+          {
+            "command set speed": "D",
+            "command set encoder": "G",
+            "command get encoder": "H"
+          }
+        }
+      },
+      "shared component parameters":
+      {
+        "number of pulses per revolution": "1000",
+        "encoder limits":
+        {
+          "lower limit": "-32768",
+          "upper limit": "32767"
+        },
+        "wheel distance": "0.056 m",
+        "wheel radius": "0.0205 m",
+        "hardware speed limits":
+        {
+          "lower limit": "-1.0 m s^-1",
+          "upper limit": "1.0 m s^-1"
+        },
+        "forward velocity limits":
+        {
+          "lower limit": "-1.0 m s^-1",
+          "upper limit": "1.0 m s^-1"
+        },
+        "turning rate limits":
+        {
+          "lower limit": "-3.141 rad s^-1",
+          "upper limit": "3.141 rad s^-1"
+        },
+        "arm position limits":
+        {
+          "lower limit": "190",
+          "upper limit": "249"
+        }
+      }
+    },
+    "ambient light sensor":
+    {
+      "available components":
+      {
+        "serial":
+        {
+          "cedar.dev.kteam.InfraredSensorSerial":
+          {
+            "command get infrared": "O"
+          }
+        }
+      }
+    },
+    "proximity sensor":
+    {
+      "available components":
+      {
+        "serial":
+        {
+          "cedar.dev.kteam.InfraredSensorSerial":
+          {
+            "command get infrared": "N"
+          }
+        }
+      }
+    },
+    "led":
+    {
+      "available components":
+      {
+        "serial":
+        {
+          "cedar.dev.kteam.LedSerial":
+          {
+            "command set state": "L"
+          }
+        }
+      }
+    },
+    "arm":
+    {
+      "available components":
+      {
+        "serial":
+        {
+          "cedar.dev.kteam.khepera.ArmSerial":
+          {
+            "command set arm position": "T,1,E",
+            "command get arm position": "T,1,H,1",
+            "answer get arm position": "t,1,h"
+          }
+        }
+      }
+    },
+    "gripper":
+    {
+      "available components":
+      {
+        "serial":
+        {
+          "cedar.dev.kteam.khepera.GripperSerial":
+          {
+            "command set gripper position": "T,1,D",
+            "command get gripper position": "T,1,H,0",
+            "answer get gripper position": "t,1,h",
+            "command get gripper optical sensor": "T,1,G",
+            "command get gripper resistivity": "T,1,F"
+          }
+        }
+      }
+    }
+  },
+  "available channels":
+  {
+    "serial":
+    {
+      "cedar.dev.kteam.SerialChannel":
+      {
+	    "name": "serial channel",
+	    "device path": "/dev/ttyUSB0",
+	    "baud rate": "38400",
+	    "escaped command delimiter": "\\r\\n",
+        "time out": "5.0 s"
+      }
+    }
+  }
+}
