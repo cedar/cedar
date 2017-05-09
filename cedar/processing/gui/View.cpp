@@ -148,7 +148,7 @@ void cedar::proc::gui::View::createZoomWidget()
   this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   this->mpZoomLevelSlider = new QSlider();
   this->mpZoomLevelSlider->setMinimum(5);
-  this->mpZoomLevelSlider->setMaximum(175);
+  this->mpZoomLevelSlider->setMaximum(500);
   this->mpZoomLevelSlider->setValue(100);
   this->mpZoomLevelSlider->setPageStep(5);
   this->mpZoomLevelSlider->setOrientation(Qt::Horizontal);
