@@ -150,6 +150,7 @@ void cedar::proc::gui::View::createZoomWidget()
   this->mpZoomLevelSlider->setMinimum(5);
   this->mpZoomLevelSlider->setMaximum(175);
   this->mpZoomLevelSlider->setValue(100);
+  this->mpZoomLevelSlider->setPageStep(5);
   this->mpZoomLevelSlider->setOrientation(Qt::Horizontal);
   this->mpZoomLevelSlider->setInvertedAppearance(false);
   this->mpZoomLevelSlider->setInvertedControls(false);
