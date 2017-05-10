@@ -148,10 +148,10 @@ cedar::proc::gui::Connectable::~Connectable()
   mSlotRemovedConnection.disconnect();
 }
 
-cedar::proc::gui::Connectable::Decoration::Decoration(QGraphicsItem* pParent, const QString& icon, const QString& description, const QColor& bgColor)
+cedar::proc::gui::Connectable::Decoration::Decoration(QGraphicsItem* pParent, const QString& icon, const QString& description, const QColor& bgColour)
     :
       mpIcon(nullptr),
-      mDefaultBackground(bgColor)
+      mDefaultBackground(bgColour)
 {
   qreal padding = 1;
   this->mpRectangle = new QGraphicsRectItem(-padding, -padding, cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE + 2 * padding, cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE + 2 * padding,
@@ -173,8 +173,10 @@ cedar::proc::gui::Connectable::Decoration::Decoration(QGraphicsItem* pParent, co
   QPen pen = this->mpRectangle->pen();
   pen.setWidth(1);
   pen.setColor(QColor(0, 0, 0));
+  QBrush bg(bgColour);
   this->mpRectangle->setPen(pen);
-  this->setBackgroundColor(bgColor);
+  this->mpRectangle->setBrush(bg);
+  this->setBackgroundColor(bgColour);
 }
 
 //!@todo This should really be solved differently, steps should be able to provide decorations via their declarations, rather than putting in dynamic casts here.
