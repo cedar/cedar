@@ -102,5 +102,6 @@
         <file>steps/norm.svg</file>
         <file>steps/rotation_on_plane.svg</file>
         <file>steps/shape_visualisation.svg</file>
+        <file>toolbaricons/robot_manager.svg</file>
     </qresource>
 </RCC>
