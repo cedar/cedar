@@ -66,6 +66,7 @@
 #include <list>
 
 #include "cedar/auxiliaries/gui/Viewer.h"
+#include "cedar/devices/gui/KinematicChainWidget.h"
 
 /*!@brief The representation of a cedar::proc::Group in a cedar::proc::gui::Scene.
  *
@@ -181,6 +182,9 @@ public:
   {
     return this->mpScene;
   }
+
+  //! Opens the kinematic chain control widget from saved configuration file
+  void openKinematicChainWidget(const aux::ConfigurationNode &node);
 
   //! Opens a view on the simulated scene
   void openSceneViewer();
@@ -384,8 +388,6 @@ private:
 
   void processElementRemovedSignal(cedar::proc::ConstElementPtr);
 
-  void openKinematicChainWidget(const aux::ConfigurationNode &node);
-
   void readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node);
 
   void writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const;
@@ -466,6 +468,8 @@ private slots:
 
   void removeViewer();
 
+  void removeKinematicChainWidget();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -483,6 +487,9 @@ private:
 
   //!@brief a vector containing all the viewers
   std::vector<cedar::aux::gui::Viewer*> mViewers;
+
+  //!@brief a vector containing all the KinematicChainWidget for savin purposes...
+  std::vector<cedar::dev::gui::KinematicChainWidget*> mKinematicChainWidgets;
 
   //!@brief a vector of all source connectors
   std::vector<cedar::proc::gui::DataSlotItem*> mConnectorSources;
