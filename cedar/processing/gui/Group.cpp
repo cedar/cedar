@@ -1280,6 +1280,26 @@ void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode& 
 
 void cedar::proc::gui::Group::writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const
 {
+  // important: access to QT Qidgets only allowed from the GUI thread
+
+  //            since most calls are not thread-safe!
+
+//  const bool isGuiThread =
+//          QThread::currentThread() == QCoreApplication::instance()->thread();
+//
+//  if (isGuiThread)
+//  {
+//    for (QWidget* viewer_item : mViewers)
+//    {
+//      cedar::aux::ConfigurationNode value_node;
+//      value_node.add("position_x", viewer_item->pos().x());
+//      value_node.add("position_y", viewer_item->pos().y());
+//      value_node.add("width", viewer_item->width());
+//      value_node.add("height", viewer_item->height());
+//      node.push_back(cedar::aux::ConfigurationNode::value_type("Viewer", value_node));
+//    }
+//  }
+
   for (auto step_map_item : this->mpScene->getStepMap())
   {
     step_map_item.second->writeOpenChildWidgets(node);
