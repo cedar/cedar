@@ -48,8 +48,6 @@
 #include "cedar/devices/exceptions.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/devices/Sensor.h"
-#include "cedar/devices/KinematicChain.h"
-#include "cedar/devices/gui/KinematicChainWidget.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>

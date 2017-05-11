@@ -2107,6 +2107,8 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
       value_node.add("component", component_path);
       value_node.add("position_x", dock_widget_child->parentWidget()->x());
       value_node.add("position_y", dock_widget_child->parentWidget()->y());
+      value_node.add("height", dock_widget_child->parentWidget()->height());
+      value_node.add("width", dock_widget_child->parentWidget()->width());
 
       node.push_back(cedar::aux::ConfigurationNode::value_type("KinematicChainWidget", value_node));
     }
