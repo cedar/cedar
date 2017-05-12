@@ -101,6 +101,7 @@ cedar_add_library(cedarproc
   gui/WidgetContainerItem.h
   sources/BoxInput.h
   sources/GaussInput.h
+  steps/BufferReader.h
   steps/Component.h
   steps/Convolution.h
   steps/ColorConversion.h
