@@ -449,9 +449,7 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  //!@brief group of this instance
-  GraphicsGroup mGroup;
+  // none yet
 
 private:
   //!@brief width of the GraphicsBase
@@ -461,6 +459,9 @@ private:
   cedar::aux::DoubleParameterPtr mHeight;
 
   QSizeF mMinimumSize;
+
+  //!@brief group of this instance
+  GraphicsGroup mGroup;
 
   //!@brief all groups this instance can connect to
   GraphicsGroup mAllowedConnectTargets;
