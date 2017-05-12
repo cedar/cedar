@@ -101,9 +101,9 @@ void cedar::proc::steps::ForwardKinematics::compute(const cedar::proc::Arguments
     cedar::dev::KinematicChainPtr kinChain = boost::dynamic_pointer_cast < cedar::dev::KinematicChain > (component);
     if (kinChain)
     {
-      mOutputPos->setData(kinChain->calculateEndEffectorPosition());
-      mOutputVelocity->setData(kinChain->calculateEndEffectorVelocity());
-      mOutputAcceleration->setData(kinChain->calculateEndEffectorAcceleration());
+      mOutputPos->setData(kinChain->calculateEndEffectorPosition().rowRange( cv::Range(0,3)) );
+      mOutputVelocity->setData(kinChain->calculateEndEffectorVelocity().rowRange( cv::Range(0,3)) );
+      mOutputAcceleration->setData(kinChain->calculateEndEffectorAcceleration().rowRange( cv::Range(0,3)) );
     }
   }
 }
