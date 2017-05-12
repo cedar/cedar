@@ -141,6 +141,7 @@ mSigmoidalActivation(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mLateralInteraction(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mInputSum(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mInputNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
+mMaximumLocation(new cedar::aux::MatData(cv::Mat::zeros(2, 1, CV_32F))),
 mNeuralNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mRestingLevel
 (
@@ -238,6 +239,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   this->declareBuffer("neural noise kernel", this->_mNoiseCorrelationKernelConvolution->getCombinedKernel());
   this->declareBuffer("input sum", mInputSum);
   this->declareBuffer("noise", this->mInputNoise);
+  this->declareBuffer("location of maximum", this->mMaximumLocation);
 
   this->declareOutput("sigmoided activation", mSigmoidalActivation);
   this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::ValueRangeHint(0, 1)));
@@ -565,7 +567,33 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
     if(_mDimensionality->getValue()<3)
     {
       double minimum;
-      cv::minMaxLoc(sigmoid_u, &minimum, &maximum);
+
+      if (sigmoid_u.channels() < 2 
+          && sigmoid_u.dims == 2)// one channel only
+      {
+        int minLoc[2]= {-1, -1}; // would be nice if this would work for the general nD case ...
+        int maxLoc[2]= {-1, -1};
+
+        cv::minMaxIdx(sigmoid_u, &minimum, &maximum, minLoc, maxLoc);
+                                           // only works for single channels
+
+        if (mMaximumLocation->isEmpty()
+            || mMaximumLocation->getDimensionality()
+               != static_cast<unsigned int>(sigmoid_u.dims) )
+        {
+          mMaximumLocation->getData().create( sigmoid_u.dims,
+                                             { 1 },
+                                             CV_32F );
+        }
+
+        mMaximumLocation->getData().at<float>(0,0) = maxLoc[0];
+        mMaximumLocation->getData().at<float>(1,0) = maxLoc[1];
+
+      }
+      else
+      {
+        cv::minMaxLoc(sigmoid_u, &minimum, &maximum); 
+      }
     }
     else
     {
