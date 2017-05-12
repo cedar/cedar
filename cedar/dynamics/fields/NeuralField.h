@@ -275,6 +275,9 @@ protected:
   //!@brief the noise correlation kernel
   cedar::aux::kernel::GaussPtr mNoiseCorrelationKernel;
 
+  //!@brief a vector with the location of the maximum of the activity per dimension
+  cedar::aux::MatDataPtr mMaximumLocation;
+
 private:
   boost::signals2::connection mKernelAddedConnection;
   boost::signals2::connection mKernelRemovedConnection;
