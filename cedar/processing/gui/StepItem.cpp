@@ -155,6 +155,24 @@ void cedar::proc::gui::StepItem::updateToolTip()
 {
   QString tool_tip;
 
+  std::string name = this->getStep()->getName();
+  tool_tip += "<nobr>Step <big><b>" + QString::fromStdString(name) + "</b></big></nobr>";
+
+  tool_tip += "<hr />";
+
+/*
+  std::string fullClassName = this->getStep()->getFullPath();
+  tool_tip += "<div align=\"right\"><nobr><small><i>" + QString::fromStdString(fullClassName) + "</i></small></nobr></div>";
+*/
+
+/*
+  if (!source.empty())
+  {
+    tool_tip += "<br /><b>From plugin:</b> "
+      + QString::fromStdString(source);
+  }
+*/
+
   tool_tip += "<table>";
   tool_tip += "<tr>"
                 "<th>Measurement:</th>"
