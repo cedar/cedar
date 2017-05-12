@@ -275,6 +275,9 @@ protected:
   //!@brief the noise correlation kernel
   cedar::aux::kernel::GaussPtr mNoiseCorrelationKernel;
 
+  //!@brief a vector with the location of the maximum of the activity per dimension
+  cedar::aux::MatDataPtr mMaximumLocation;
+
 private:
   boost::signals2::connection mKernelAddedConnection;
   boost::signals2::connection mKernelRemovedConnection;
@@ -289,6 +292,12 @@ protected:
 
   //!@brief Whether the field activation represents discrete nodes (this is a temporary solution).
   cedar::aux::BoolParameterPtr _mDiscreteMetric;
+
+  //!@brief Whether the StepIcon is updated according to the current output of the field
+  cedar::aux::BoolParameterPtr _mUpdateStepGui;
+
+  //!@brief The threshold for updating the GUI if _mUpdateStepGui is active
+  cedar::aux::DoubleParameterPtr _mUpdateStepGuiThreshold;
 
   //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
   cedar::aux::UIntParameterPtr _mDimensionality;

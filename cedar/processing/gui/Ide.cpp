@@ -1626,7 +1626,7 @@ bool cedar::proc::gui::Ide::loadSerializableData()
                                               "data (*.data)", // filter(s), separated by ';;'
                                               0,
                                               // js: Workaround for freezing file dialogs in QT5 (?)
-                                              QFileDialog::DontUseNativeDialog
+                                              QFileDialog::DontUseNativeDialog // Unfortunately it does not solve the problem of first time lag in the ini-network
                                               );
 
   if (!file.isEmpty())

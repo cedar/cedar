@@ -15,7 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="field_0d.svg"
+   sodipodi:docname="field_0d_active.svg"
    inkscape:export-filename="/home/lompolbx/workspace/src/cedar.fieldFramework/cedar/processing/gui/icons/steps/no_icon.png"
    inkscape:export-xdpi="9"
    inkscape:export-ydpi="9">
@@ -27,7 +27,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="623.02728"
+     inkscape:cx="454.3318"
      inkscape:cy="219.37647"
      inkscape:document-units="px"
      inkscape:current-layer="g4158"
@@ -257,7 +257,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -274,13 +274,13 @@
        transform="translate(0.99996736,3.1743446)">
       <path
          sodipodi:type="arc"
-         style="fill:#10c300;fill-opacity:1;stroke:none"
+         style="fill:#ff0000;fill-opacity:1;stroke:none"
          id="path3861"
          sodipodi:cx="192.93913"
          sodipodi:cy="180.79691"
          sodipodi:rx="78.791901"
          sodipodi:ry="78.791901"
-         d="m 271.73103,180.79691 a 78.791901,78.791901 0 1 1 -157.5838,0 78.791901,78.791901 0 1 1 157.5838,0 z"
+         d="m 271.73103,180.79691 c 0,43.51556 -35.27633,78.7919 -78.7919,78.7919 -43.51556,0 -78.7919,-35.27634 -78.7919,-78.7919 0,-43.51557 35.27634,-78.79191 78.7919,-78.79191 43.51557,0 78.7919,35.27634 78.7919,78.79191 z"
          transform="matrix(0.93589744,0,0,0.93589744,18.428795,679.98049)" />
       <path
          style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:13.76712322000000022;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans;stroke-opacity:1"

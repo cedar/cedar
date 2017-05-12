@@ -60,9 +60,7 @@ void cedar::dyn::gui::NeuralFieldView::connectableChanged()
   QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(updateIconDimensionality()));
 
   auto connectable = this->getConnectable();
-//  QObject::connect(connectable,SIGNAL(OutputValueChanged(float)),this,SLOT(updateIconValue(float)));
-
-  connectable->connectToOutputValueChangedSignal(boost::bind(&cedar::dyn::gui::NeuralFieldView::updateIconValue, this, _1));
+  connectable->connectToOutputValueChangedSignal(boost::bind(&cedar::dyn::gui::NeuralFieldView::updateActivityIcon, this, _1));
 
   this->updateIconDimensionality();
 }
@@ -94,15 +92,29 @@ void cedar::dyn::gui::NeuralFieldView::updateIconDimensionality()
   }
 }
 
-void cedar::dyn::gui::NeuralFieldView::updateIconValue(float newValue)
+void cedar::dyn::gui::NeuralFieldView::updateActivityIcon(bool isActive)
 {
-  if(newValue > 0.8)
+  auto parameter = boost::dynamic_pointer_cast<cedar::aux::ConstUIntParameter>(this->getConnectable()->getParameter("dimensionality"));
+  switch(parameter->getValue())
   {
-    this->setIconPath(":/cedar/dynamics/gui/steps/field_0d_active.svg");
-  }
-  else
-  {
-    this->setIconPath(":/cedar/dynamics/gui/steps/field_0d.svg");
+    case 0:
+      isActive ? this->setIconPath(":/cedar/dynamics/gui/steps/field_0d_active.svg") :  this->setIconPath(":/cedar/dynamics/gui/steps/field_0d.svg");
+      break;
+
+    case 1:
+      isActive ? this->setIconPath(":/cedar/dynamics/gui/steps/field_1d_active.svg") : this->setIconPath(":/cedar/dynamics/gui/steps/field_1d.svg");
+      break;
+
+    case 2:
+      isActive ? this->setIconPath(":/cedar/dynamics/gui/steps/field_2d_active.svg") : this->setIconPath(":/cedar/dynamics/gui/steps/field_2d.svg");
+      break;
+
+    case 3:
+      isActive ? this->setIconPath(":/cedar/dynamics/gui/steps/field_3d_active.svg") : this->setIconPath(":/cedar/dynamics/gui/steps/field_3d.svg");
+      break;
+    default:
+      isActive ? this->setIconPath(":/cedar/dynamics/gui/steps/field_nd_active.svg") : this->setIconPath(":/cedar/dynamics/gui/steps/field_nd.svg");
+      break;
   }
 }
 

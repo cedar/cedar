@@ -2080,8 +2080,7 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
 {
   // important: access to QT Qidgets only allowed from the GUI thread
   //            since most calls are not thread-safe!
-  const bool isGuiThread = 
-              QThread::currentThread() == QCoreApplication::instance()->thread();
+  const bool isGuiThread = QThread::currentThread() == QCoreApplication::instance()->thread();
 
   if (!isGuiThread)
     return; // note, this disables saving of widgets via auto-backups

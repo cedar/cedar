@@ -104,6 +104,7 @@ cedar_add_library(cedarproc
   sources/GaussInput.h
   steps/SinusDynamics.h
   steps/LinearDynamics.h
+  steps/BufferReader.h
   steps/Component.h
   steps/Convolution.h
   steps/ColorConversion.h
