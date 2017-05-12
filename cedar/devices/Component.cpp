@@ -688,6 +688,8 @@ protected:
 
 void cedar::dev::Component::init()
 {
+  this->mDestroying= false;
+
   this->mMeasurementData = boost::make_shared<cedar::dev::Component::MeasurementDataCollection>();
   this->mCommandData = boost::make_shared<cedar::dev::Component::CommandDataCollection>();
   mCommunicationThread = std::unique_ptr<cedar::aux::LoopFunctionInThread>(
@@ -743,6 +745,8 @@ void cedar::dev::Component::prepareComponentDestructAbsolutelyRequired()
 
 cedar::dev::Component::~Component()
 {
+  mDestroying= true;
+
   if (!mDestructWasPrepared)
   {
     cedar::aux::LogSingleton::getInstance()->error
@@ -765,6 +769,8 @@ cedar::dev::Component::~Component()
   mWatchDogThread->stop();
   mCommunicationThread->stop();
 
+  mWatchDogThread->wait();
+  mCommunicationThread->wait();
 
   // wait for end of communication
   {
@@ -1612,6 +1618,9 @@ void cedar::dev::Component::updateUserSideMeasurements()
   }
 
   locker.unlock();
+  
+  if (mDestroying)
+    return;
 
   emit updatedUserMeasurementSignal();
 }
