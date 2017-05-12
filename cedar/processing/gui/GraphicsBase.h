@@ -449,7 +449,9 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+
+  //!@brief group of this instance
+  GraphicsGroup mGroup;
 
 private:
   //!@brief width of the GraphicsBase
@@ -460,8 +462,6 @@ private:
 
   QSizeF mMinimumSize;
 
-  //!@brief group of this instance
-  GraphicsGroup mGroup;
   //!@brief all groups this instance can connect to
   GraphicsGroup mAllowedConnectTargets;
 

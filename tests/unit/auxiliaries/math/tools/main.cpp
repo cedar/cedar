@@ -185,12 +185,12 @@ int main()
   // test stuff
   errors += testMinMax(CV_8U);
   errors += testMinMax(CV_32F);
-  errors += testMinMax(CV_64F);
+  errors += testMinMax(CV_32F);
 
   errors += testMatrixAccess1D<uint8_t, uint8_t, CV_8U>();
   errors += testMatrixAccess1D<uint16_t, uint16_t, CV_16U>();
   errors += testMatrixAccess1D<float, uint32_t, CV_32F>();
-  errors += testMatrixAccess1D<double, uint64_t, CV_64F>();
+  errors += testMatrixAccess1D<double, uint64_t, CV_32F>();
 
   std::cout << "test no " << test_number++ << std::endl;
   if (cedar::aux::math::normalizeAngle(5.9) <= -cedar::aux::math::pi

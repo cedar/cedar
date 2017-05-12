@@ -68,6 +68,7 @@ cedar_add_library(cedarproc
   gui/ArchitectureScriptEditor.h
   gui/stepViews/BoostView.h
   gui/stepViews/StaticGainView.h
+  gui/stepViews/ComponentStepView.h
   gui/AdvancedParameterLinker.h
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureWidget.h
@@ -101,25 +102,32 @@ cedar_add_library(cedarproc
   gui/WidgetContainerItem.h
   sources/BoxInput.h
   sources/GaussInput.h
+  steps/SinusDynamics.h
+  steps/LinearDynamics.h
   steps/BufferReader.h
   steps/Component.h
   steps/Convolution.h
   steps/ColorConversion.h
   steps/ComponentMultiply.h
   steps/CoordinateTransformation.h
+  steps/ForwardKinematics.h
+  steps/PseudoInverseKinematics.h
   steps/MatrixMultiply.h
   steps/MatrixPadding.h
   steps/MatrixSlice.h
   steps/MatrixTypeConverter.h
   steps/Normalization.h
   steps/Flip.h
+  steps/RotationOnPlane.h
   steps/StaticGain.h
   steps/ScalarsToVector.h
+  steps/ShapeVisualisation.h
   steps/UnitConverter.h
   steps/Histogram.h
   steps/ScalarDivision.h
   steps/Threshold.h
   steps/TransferFunction.h
+  steps/VehicleRotation.h  
   sources/Boost.h
   sources/Noise.h
   sources/Picture.h

@@ -5,30 +5,43 @@
     {
       "available components":
       {
-        "channel 1":
+        "configuration 1":
         {
           "cedar.tests.unit.dev.Robot.TestComponent":
           {
+            "requires channel": "channel 1",
             "parameter 1": "1"
           }
         },
-        "channel 2":
+        "configuration 2":
         {
           "cedar.tests.unit.dev.Robot.TestComponent":
           {
+            "requires channel": "channel 2",
             "parameter 1": "2"
           }
         }
       },
-      "common component parameters":
+      "shared component parameters":
       {
         "parameter 2": "2"
       }
     }
   },
-  "channels":
+  "available channels":
   {
-    "channel 1": "cedar.tests.unit.dev.Robot.TestChannel",
-    "channel 2": "cedar.tests.unit.dev.Robot.TestChannel"
+    "channel 1":
+    {
+      "cedar.tests.unit.dev.Robot.TestChannel":
+      {
+        "info": "channel 1 info 1"
+      }
+    },
+    "channel 2":
+    {
+      "cedar.tests.unit.dev.Robot.TestChannel":
+      {
+      }
+    }
   }
 }

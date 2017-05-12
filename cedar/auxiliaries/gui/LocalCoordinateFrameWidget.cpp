@@ -245,7 +245,7 @@ void cedar::aux::gui::LocalCoordinateFrameWidget::update()
     for(unsigned int j = 0; j < 3; j++)
     {
       QLabel* p_label = static_cast<QLabel*>(mpGridLayout->itemAtPosition(i+3, (j+1)*2)->widget());
-      double r = T.at<double>(i, j);
+      float r = T.at<float>(i, j);
       if (cedar::aux::math::isZero(r))
       {
         r = 0;
@@ -258,9 +258,9 @@ void cedar::aux::gui::LocalCoordinateFrameWidget::update()
   mpTranslationXSpinBox->blockSignals(true);
   mpTranslationYSpinBox->blockSignals(true);
   mpTranslationZSpinBox->blockSignals(true);
-  mpTranslationXSpinBox->setValue(T.at<double>(0, 3));
-  mpTranslationYSpinBox->setValue(T.at<double>(1, 3));
-  mpTranslationZSpinBox->setValue(T.at<double>(2, 3));
+  mpTranslationXSpinBox->setValue(T.at<float>(0, 3));
+  mpTranslationYSpinBox->setValue(T.at<float>(1, 3));
+  mpTranslationZSpinBox->setValue(T.at<float>(2, 3));
   mpTranslationXSpinBox->blockSignals(false);
   mpTranslationYSpinBox->blockSignals(false);
   mpTranslationZSpinBox->blockSignals(false);
@@ -270,9 +270,14 @@ void cedar::aux::gui::LocalCoordinateFrameWidget::positionChanged(double)
 {
   mpLocalCoordinateFrame->setTranslation
   (
-    mpTranslationXSpinBox->value() * cedar::unit::DEFAULT_LENGTH_UNIT,
-    mpTranslationYSpinBox->value() * cedar::unit::DEFAULT_LENGTH_UNIT,
-    mpTranslationZSpinBox->value() * cedar::unit::DEFAULT_LENGTH_UNIT
+    std::vector<float>
+    (
+      {
+        float(mpTranslationXSpinBox->value()),
+        float(mpTranslationYSpinBox->value()),
+        float(mpTranslationZSpinBox->value())
+      }
+    )
   );
 }
 

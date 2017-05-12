@@ -88,16 +88,12 @@ void cedar::dev::gui::KinematicChainMonitorWidget::initWindow()
   mpGridLayout->setColumnStretch(2,2);
   mpGridLayout->setColumnStretch(3,2);
 
-  // add joint label
-  QLabel* pos_label = new QLabel(QApplication::translate("KinematicChainWindow", "pos"));
-  pos_label->setAlignment(Qt::AlignRight);
-  mpGridLayout->addWidget(pos_label, 0, 1);
-  QLabel* vel_label = new QLabel(QApplication::translate("KinematicChainWindow", "vel"));
-  vel_label->setAlignment(Qt::AlignRight);
-  mpGridLayout->addWidget(vel_label, 0, 2);
-  QLabel* acc_label = new QLabel(QApplication::translate("KinematicChainWindow", "acc"));
-  acc_label->setAlignment(Qt::AlignRight);
-  mpGridLayout->addWidget(acc_label, 0, 3);
+  QFont font;
+  font.setBold(true);
+
+  QLabel* mon_label = new QLabel(QApplication::translate("KinematicChainWindow", "Monitor"));
+  mon_label->setFont(font);
+  mpGridLayout->addWidget(mon_label, 0, 0);
 
   for(unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
   {
@@ -105,17 +101,27 @@ void cedar::dev::gui::KinematicChainMonitorWidget::initWindow()
     char labelText[10];
     sprintf(labelText, "Joint %d", i);
     QLabel *label = new QLabel(QApplication::translate("KinematicChainWindow", labelText));
-    mpGridLayout->addWidget(label, i+1, 0);
+    mpGridLayout->addWidget(label, i+2, 0);
 
     // add value labels
     for(unsigned int j = 0; j < 3; ++j)
     {
       QLabel* p_label = new QLabel;
-      p_label->setAlignment(Qt::AlignRight);
-      p_label->setText("0.00");
-      mpGridLayout->addWidget(p_label, i+1, j+1);
+      p_label->setText("0.0");
+      mpGridLayout->addWidget(p_label, i+2, j+1);
     }
   }
+
+  // add joint label
+  QLabel* pos_label = new QLabel(QApplication::translate("KinematicChainWindow", "pos"));
+  pos_label->setAlignment(Qt::AlignRight);
+  mpGridLayout->addWidget(pos_label, 1, 1);
+  QLabel* vel_label = new QLabel(QApplication::translate("KinematicChainWindow", "vel"));
+  vel_label->setAlignment(Qt::AlignRight);
+  mpGridLayout->addWidget(vel_label, 1, 2);
+  QLabel* acc_label = new QLabel(QApplication::translate("KinematicChainWindow", "acc"));
+  acc_label->setAlignment(Qt::AlignRight);
+  mpGridLayout->addWidget(acc_label, 1, 3);
 
   setLayout(mpGridLayout);
 
@@ -137,9 +143,9 @@ void cedar::dev::gui::KinematicChainMonitorWidget::update()
 {
   for(unsigned i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
   {
-    QLabel* p_angle_label = static_cast<QLabel*>(mpGridLayout->itemAtPosition(i+1, 1)->widget());
-    QLabel* p_velocity_label = static_cast<QLabel*>(mpGridLayout->itemAtPosition(i+1, 2)->widget());
-    QLabel* p_acceleration_label = static_cast<QLabel*>(mpGridLayout->itemAtPosition(i+1, 3)->widget());
+    QLabel* p_angle_label = static_cast<QLabel*>(mpGridLayout->itemAtPosition(i+2, 1)->widget());
+    QLabel* p_velocity_label = static_cast<QLabel*>(mpGridLayout->itemAtPosition(i+2, 2)->widget());
+    QLabel* p_acceleration_label = static_cast<QLabel*>(mpGridLayout->itemAtPosition(i+2, 3)->widget());
 
     p_angle_label->setText(QString("%1").arg(mpKinematicChain->getJointAngle(i), 0, 'g', mDecimals, '0'));
     p_velocity_label->setText(QString("%1").arg(mpKinematicChain->getJointVelocity(i), 0, 'g', mDecimals, '0'));

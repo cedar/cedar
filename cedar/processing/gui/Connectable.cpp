@@ -2,37 +2,37 @@
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
-    This file is part of cedar.
+ This file is part of cedar.
 
-    cedar is free software: you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
-    option) any later version.
+ cedar is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Lesser General Public License as published by the
+ Free Software Foundation, either version 3 of the License, or (at your
+ option) any later version.
 
-    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
-    WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-    License for more details.
+ cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ License for more details.
 
-    You should have received a copy of the GNU Lesser General Public License
-    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU Lesser General Public License
+ along with cedar. If not, see <http://www.gnu.org/licenses/>.
 
-========================================================================================================================
+ ========================================================================================================================
 
-    Institute:   Ruhr-Universitaet Bochum
-                 Institut fuer Neuroinformatik
+ Institute:   Ruhr-Universitaet Bochum
+ Institut fuer Neuroinformatik
 
-    File:        Connectable.cpp
+ File:        Connectable.cpp
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2013 11 13
+ Maintainer:  Stephan Zibner
+ Email:       stephan.zibner@ini.rub.de
+ Date:        2013 11 13
 
-    Description: Source file for the class cedar::proc::gui::Connectable.
+ Description: Source file for the class cedar::proc::gui::Connectable.
 
-    Credits:
+ Credits:
 
-======================================================================================================================*/
+ ======================================================================================================================*/
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -46,6 +46,7 @@
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/DefaultConnectableIconView.h"
+#include "cedar/processing/steps/Component.h"
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/DataConnection.h"
@@ -56,10 +57,13 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Triggerable.h"
+#include "cedar/devices/Component.h"
+#include "cedar/devices/gui/KinematicChainWidget.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/gui/Configurable.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
+#include "cedar/auxiliaries/ColorGradient.h"
 
 // SYSTEM INCLUDES
 #include <map>
@@ -91,90 +95,51 @@ const cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectab
 const cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectable::DisplayMode::ICON_ONLY;
 const cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectable::DisplayMode::HIDE_IN_CONNECTIONS;
 #endif // CEDAR_COMPILER_MSVC
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::Connectable::Connectable
-(
-  qreal width,
-  qreal height,
-  cedar::proc::gui::GraphicsBase::GraphicsGroup group,
-  QMainWindow* pMainWindow
-)
-:
-cedar::proc::gui::Element
-(
-  width,
-  height,
-  group,
-  cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE
-),
-mpIconView(nullptr),
-mpMainWindow(pMainWindow),
-mDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT),
-mInputOutputSlotOffset(static_cast<qreal>(0.0)),
-mPreviousFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
-mShowingTriggerColor(false)
+cedar::proc::gui::Connectable::Connectable(qreal width, qreal height, cedar::proc::gui::GraphicsBase::GraphicsGroup group, QMainWindow* pMainWindow)
+    :
+      cedar::proc::gui::Element(width, height, group, cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
+      mpIconView(nullptr),
+      mpMainWindow(pMainWindow),
+      mDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT),
+      mInputOutputSlotOffset(static_cast<qreal>(0.0)),
+      mPreviousFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
+      mShowingTriggerColor(false)
 {
-  this->connect
-        (
-          this,
-          SIGNAL(reactToSlotRemovedSignal(cedar::proc::DataRole::Id, QString)),
-          SLOT(reactToSlotRemoved(cedar::proc::DataRole::Id, QString))
-        );
+  this->connect(this,
+  SIGNAL(reactToSlotRemovedSignal(cedar::proc::DataRole::Id, QString)),
+  SLOT(reactToSlotRemoved(cedar::proc::DataRole::Id, QString)), Qt::ConnectionType::DirectConnection);
 
-  this->connect
-        (
-          this,
-          SIGNAL(reactToSlotAddedSignal(cedar::proc::DataRole::Id, QString)),
-          SLOT(reactToSlotAdded(cedar::proc::DataRole::Id, QString))
-        );
+  this->connect(this,
+  SIGNAL(reactToSlotAddedSignal(cedar::proc::DataRole::Id, QString)),
+  SLOT(reactToSlotAdded(cedar::proc::DataRole::Id, QString)), Qt::ConnectionType::DirectConnection);
 
-  this->connect
-        (
-          this,
-          SIGNAL(reactToSlotRenamedSignal(cedar::proc::DataRole::Id, QString, QString)),
-          SLOT(reactToSlotRenamed(cedar::proc::DataRole::Id, QString, QString))
-        );
+  this->connect(this,
+  SIGNAL(reactToSlotRenamedSignal(cedar::proc::DataRole::Id, QString, QString)),
+  SLOT(reactToSlotRenamed(cedar::proc::DataRole::Id, QString, QString)), Qt::ConnectionType::DirectConnection);
 
-  this->connect
-  (
-      this,
-      SIGNAL(triggerableStartedSignal()),
-      SLOT(triggerableStarted())
-  );
+  this->connect(this,
+  SIGNAL(triggerableStartedSignal()),
+  SLOT(triggerableStarted()), Qt::ConnectionType::DirectConnection);
 
-  this->connect
-  (
-      this,
-      SIGNAL(triggerableStoppedSignal()),
-      SLOT(triggerableStopped())
-  );
+  this->connect(this,
+  SIGNAL(triggerableStoppedSignal()),
+  SLOT(triggerableStopped()), Qt::ConnectionType::DirectConnection);
 
-  this->connect
-  (
-      this,
-      SIGNAL(triggerableParentTriggerChanged()),
-      SLOT(updateTriggerColorState())
-  );
+  this->connect(this,
+  SIGNAL(triggerableParentTriggerChanged()),
+  SLOT(updateTriggerColorState()), Qt::ConnectionType::DirectConnection);
 
-  mFillColorChangedConnection = this->connectToFillColorChangedSignal
-      (
-        boost::bind
-        (
-          &cedar::proc::gui::Connectable::fillColorChanged,
-          this,
-          _1
-        )
-      );
+  mFillColorChangedConnection = this->connectToFillColorChangedSignal(boost::bind(&cedar::proc::gui::Connectable::fillColorChanged, this, _1));
 }
 
 cedar::proc::gui::Connectable::~Connectable()
 {
   this->hideTriggerChains();
-  for(auto child_widget : mChildWidgets)
+  for (auto child_widget : mChildWidgets)
   {
     child_widget->close();
   }
@@ -183,50 +148,167 @@ cedar::proc::gui::Connectable::~Connectable()
   mSlotRemovedConnection.disconnect();
 }
 
-cedar::proc::gui::Connectable::Decoration::Decoration
-(
-  cedar::proc::gui::Connectable* pConnectable,
-  const QString& icon,
-  const QString& description,
-  const QColor& bgColor
-)
-:
-mDefaultBackground(bgColor)
+cedar::proc::gui::Connectable::Decoration::Decoration(QGraphicsItem* pParent, const QString& icon, const QString& description, const QColor& bgColour)
+    :
+      mpIcon(nullptr),
+      mDefaultBackground(bgColour)
 {
   qreal padding = 1;
-  this->mpRectangle = new QGraphicsRectItem
-                      (
-                        -padding,
-                        -padding,
-                        cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE + 2 * padding,
-                        cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE + 2 * padding,
-                        pConnectable
-                      );
-  this->mpIcon = new QGraphicsSvgItem
-                 (
-                   icon,
-                   this->mpRectangle
-                 );
+  this->mpRectangle = new QGraphicsRectItem(-padding, -padding, cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE + 2 * padding, cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE + 2 * padding,
+      pParent);
 
-  // setting this cache mode makes sure that when writing out an svg file, the icon will not be pixelized
-  this->mpIcon->setCacheMode(QGraphicsItem::NoCache);
+  if (!icon.isEmpty())
+  {
+    this->mpIcon = new QGraphicsSvgItem(icon, this->mpRectangle);
 
-  this->mpIcon->setToolTip(description);
+    // setting this cache mode makes sure that when writing out an svg file, the icon will not be pixelized
+    this->mpIcon->setCacheMode(QGraphicsItem::NoCache);
 
-  qreal h = this->mpIcon->boundingRect().height();
-  this->mpIcon->setScale(cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE / h);
+    qreal h = this->mpIcon->boundingRect().height();
+    this->mpIcon->setScale(cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE / h);
+  }
+
+  this->setToolTip(description);
 
   QPen pen = this->mpRectangle->pen();
   pen.setWidth(1);
   pen.setColor(QColor(0, 0, 0));
-  QBrush bg(bgColor);
+  QBrush bg(bgColour);
   this->mpRectangle->setPen(pen);
   this->mpRectangle->setBrush(bg);
+  this->setBackgroundColor(bgColour);
+}
+
+//!@todo This should really be solved differently, steps should be able to provide decorations via their declarations, rather than putting in dynamic casts here.
+cedar::proc::gui::Connectable::DeviceQualityDecoration::DeviceQualityDecoration(QGraphicsItem* pParent, cedar::proc::steps::ComponentPtr step)
+    :
+      cedar::proc::gui::Connectable::Decoration(pParent, ":/cedar/dev/gui/icons/not_connected.svg", QString()),
+      mStep(step)
+{
+  // register hooks for the initial component
+  updateHooks();
+
+  // update the quality once every second
+  this->startTimer(500);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Connectable::DeviceQualityDecoration::updateHooks()
+{
+  if (auto component = mStep->getComponent())
+  {
+    component->registerConnectedHook(boost::bind(&cedar::proc::gui::Connectable::Decoration::updateIconConnected, this));
+    component->registerDisconnectedHook(boost::bind(&cedar::proc::gui::Connectable::Decoration::updateIconDisconnected, this));
+
+    if(component->isRunningNolocking())
+    {
+      updateIconConnected();
+    }
+    else
+    {
+      updateIconDisconnected();
+    }
+  }
+}
+
+void cedar::proc::gui::Connectable::Decoration::updateIconConnected()
+{
+  updateIcon(true);
+}
+
+void cedar::proc::gui::Connectable::Decoration::updateIconDisconnected()
+{
+  updateIcon(false);
+}
+
+void cedar::proc::gui::Connectable::Decoration::updateIcon(const bool isConnected)
+{
+  if (!isDestructed)
+  {
+    if (this->mpIcon != nullptr)
+    {
+      delete this->mpIcon;
+    }
+
+    QString icon_path;
+    QBrush brush;
+
+    if (isConnected)
+    {
+      icon_path = ":/cedar/dev/gui/icons/connected.svg";
+      brush = QBrush(QColor(222, 10, 244, 255));
+    }
+    else
+    {
+      icon_path = ":/cedar/dev/gui/icons/not_connected.svg";
+      brush = QBrush(QColor(Qt::white));
+    }
+
+    if (this->mpRectangle != nullptr)
+    {
+      this->mpRectangle->setBrush(brush);
+      this->mpIcon = new QGraphicsSvgItem(icon_path, this->mpRectangle);
+
+      // setting this cache mode makes sure that when writing out an svg file, the icon will not be pixelized
+      this->mpIcon->setCacheMode(QGraphicsItem::NoCache);
+
+      qreal h = this->mpIcon->boundingRect().height();
+      this->mpIcon->setScale(cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE / h);
+    }
+  }
+}
+
+void cedar::proc::gui::Connectable::Decoration::setToolTip(const QString& toolTip)
+{
+  if (this->mpIcon != nullptr)
+  {
+    this->mpIcon->setToolTip(toolTip);
+  }
+  this->mpRectangle->setToolTip(toolTip);
+}
+
+void cedar::proc::gui::Connectable::DeviceQualityDecoration::timerEvent(QTimerEvent*)
+{
+  if (!mStep->hasComponent())
+  {
+    return;
+  }
+
+  if (this->mStep->isStarted())
+  {
+    auto component = this->mStep->getComponent();
+    float command_errors, measurement_errors;
+    component->getCommunicationErrorRates(command_errors, measurement_errors);
+
+    QString tool_tip = QString("<table><tr><td>command quality:</td><td>%1%</td></tr><tr><td>measurement quality:</td><td>%2%</td></tr></table>").arg(100.0 * (1.0 - command_errors), -1, 'f', 0).arg(
+        100.0 * (1.0 - measurement_errors), -1, 'f', 0);
+
+    auto command_error_msgs = component->getLastCommandCommunicationErrors();
+    if (!command_error_msgs.empty())
+    {
+      tool_tip += "<br /><b>Last command communication errors</b>:<br />";
+      for (const auto& error : command_error_msgs)
+      {
+        tool_tip += QString::fromStdString(error) + "<br />";
+      }
+    }
+
+    auto measurement_error_msgs = component->getLastMeasurementCommunicationErrors();
+    if (!measurement_error_msgs.empty())
+    {
+      tool_tip += "<br /><b>Last measurement communication errors</b>:<br />";
+      for (const auto& error : measurement_error_msgs)
+      {
+        tool_tip += QString::fromStdString(error) + "<br />";
+      }
+    }
+
+    this->setToolTip(tool_tip);
+  }
+}
 
 void cedar::proc::gui::Connectable::Decoration::setBackgroundColor(const QColor& background)
 {
@@ -269,7 +351,7 @@ void cedar::proc::gui::Connectable::resetDisplayMode(bool resize)
 
     case cedar::proc::gui::Settings::StepDisplayMode::TEXT_FOR_LOOPED:
     {
-      auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getConnectable());
+      auto triggerable = boost::dynamic_pointer_cast < cedar::proc::Triggerable > (this->getConnectable());
       if (triggerable && triggerable->isLooped())
       {
         this->setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT, resize);
@@ -327,7 +409,6 @@ void cedar::proc::gui::Connectable::applyDisplayMode(bool resize)
   this->update();
 }
 
-
 cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectable::getDisplayMode() const
 {
   return this->mDisplayMode;
@@ -374,7 +455,7 @@ unsigned int cedar::proc::gui::Connectable::getNumberOfSlotsFor(cedar::proc::Dat
 
 bool cedar::proc::gui::Connectable::canHideInConnections() const
 {
-  if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::ConstTriggerable>(this->getConnectable()))
+  if (auto triggerable = boost::dynamic_pointer_cast < cedar::proc::ConstTriggerable > (this->getConnectable()))
   {
     if (triggerable->isLooped())
     {
@@ -383,11 +464,8 @@ bool cedar::proc::gui::Connectable::canHideInConnections() const
   }
 
   //!@todo There might be other cases where this should work, e.g., if there is more than one slot but all connections come from the same source
-  if (this->getNumberOfSlotsFor(cedar::proc::DataRole::INPUT) == 1
-      && this->getNumberOfSlotsFor(cedar::proc::DataRole::OUTPUT) == 1
-      && this->getNumberOfConnections(cedar::proc::DataRole::INPUT) == 1
-      && this->getNumberOfConnections(cedar::proc::DataRole::OUTPUT) == 1
-      )
+  if (this->getNumberOfSlotsFor(cedar::proc::DataRole::INPUT) == 1 && this->getNumberOfSlotsFor(cedar::proc::DataRole::OUTPUT) == 1 && this->getNumberOfConnections(cedar::proc::DataRole::INPUT) == 1
+      && this->getNumberOfConnections(cedar::proc::DataRole::OUTPUT) == 1)
   {
     return true;
   }
@@ -577,7 +655,7 @@ bool cedar::proc::gui::Connectable::canShowTriggerChains() const
 
 void cedar::proc::gui::Connectable::showTriggerChains()
 {
-  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getConnectable());
+  auto triggerable = boost::dynamic_pointer_cast < cedar::proc::Triggerable > (this->getConnectable());
   if (!triggerable)
   {
     return;
@@ -590,42 +668,34 @@ void cedar::proc::gui::Connectable::showTriggerChains()
   }
 
   auto make_circle = [&](unsigned int depth, qreal x, qreal y, qreal size, QGraphicsItem* parent)
-      {
-        auto circle = new QGraphicsEllipseItem(0, 0, size, size, parent);
-        circle->setPos(x, y);
-        circle->setBrush(QBrush(Qt::white, Qt::SolidPattern));
-        QPen pen(Qt::black);
-        pen.setWidth(2);
-        circle->setPen(pen);
+  {
+    auto circle = new QGraphicsEllipseItem(0, 0, size, size, parent);
+    circle->setPos(x, y);
+    circle->setBrush(QBrush(Qt::white, Qt::SolidPattern));
+    QPen pen(Qt::black);
+    pen.setWidth(2);
+    circle->setPen(pen);
 
-        auto text = new QGraphicsSimpleTextItem(QString("%1").arg(depth + 1), circle);
+    auto text = new QGraphicsSimpleTextItem(QString("%1").arg(depth + 1), circle);
 
-        // note: this order is important; if the circle got deleted before the text, this would lead to a crash
-        this->mTriggerChainVisualization.push_back(text);
-        this->mTriggerChainVisualization.push_back(circle);
+    // note: this order is important; if the circle got deleted before the text, this would lead to a crash
+      this->mTriggerChainVisualization.push_back(text);
+      this->mTriggerChainVisualization.push_back(circle);
 
-        // center the text on the circle
-        QRectF text_bounds = text->boundingRect();
-        QRectF circle_bounds = circle->boundingRect();
-        text->setPos
-        (
+      // center the text on the circle
+      QRectF text_bounds = text->boundingRect();
+      QRectF circle_bounds = circle->boundingRect();
+      text->setPos
+      (
           (circle_bounds.width() - text_bounds.width()) / static_cast<qreal>(2),
           (circle_bounds.height() - text_bounds.height()) / static_cast<qreal>(2)
-        );
-      };
-
+      );
+    };
 
   qreal root_size = static_cast<qreal>(40.0);
   qreal item_size = static_cast<qreal>(30.0);
 
-  make_circle
-  (
-    0,
-    -root_size / static_cast<qreal>(2.0),
-    this->height() - root_size / static_cast<qreal>(2.0),
-    root_size,
-    this
-  );
+  make_circle(0, -root_size / static_cast<qreal>(2.0), this->height() - root_size / static_cast<qreal>(2.0), root_size, this);
 
   auto trigger_chain = done_trigger->getTriggeringOrder();
 
@@ -641,14 +711,14 @@ void cedar::proc::gui::Connectable::showTriggerChains()
     auto triggerable_set = depth_triggerable_set_pair.second;
     for (auto link : triggerable_set)
     {
-      auto link_element = boost::dynamic_pointer_cast<cedar::proc::Element>(link);
+      auto link_element = boost::dynamic_pointer_cast < cedar::proc::Element > (link);
       CEDAR_DEBUG_ASSERT(link_element);
       cedar::proc::gui::GraphicsBase* link_gui = scene->getGraphicsItemFor(link_element.get());
       if (!link_gui)
       {
         // can happen either for the processing done trigger of the start of the chain, or for group inputs
 
-        if (auto group_input = boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(link_element))
+        if (auto group_input = boost::dynamic_pointer_cast < cedar::proc::sources::GroupSource > (link_element))
         {
           // if the link element is a group input, place the counter there
           auto owner = group_input->getGroup();
@@ -716,7 +786,7 @@ void cedar::proc::gui::Connectable::fillColorChanged(QColor color)
 
 void cedar::proc::gui::Connectable::updateTriggerColorState()
 {
-  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getElement());
+  auto triggerable = boost::dynamic_pointer_cast < cedar::proc::Triggerable > (this->getElement());
   auto scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
   if (!triggerable || scene == nullptr)
   {
@@ -819,7 +889,7 @@ void cedar::proc::gui::Connectable::removeDecoration(cedar::proc::gui::Connectab
   {
     if (*iter == decoration)
     {
-       iter = this->mDecorations.erase(iter);
+      iter = this->mDecorations.erase(iter);
     }
     else
     {
@@ -864,7 +934,6 @@ qreal cedar::proc::gui::Connectable::getInputOutputSlotOffset() const
   return this->mInputOutputSlotOffset;
 }
 
-
 void cedar::proc::gui::Connectable::sizeChanged()
 {
   this->updateAttachedItems();
@@ -884,62 +953,35 @@ void cedar::proc::gui::Connectable::itemSelected(bool selected)
 }
 
 const cedar::proc::gui::Connectable::DataSlotNameMap&
-  cedar::proc::gui::Connectable::getSlotItems
-  (
-    cedar::proc::DataRole::Id role
-  ) const
+cedar::proc::gui::Connectable::getSlotItems(cedar::proc::DataRole::Id role) const
 {
   auto role_map = this->mSlotMap.find(role);
   if (role_map == this->mSlotMap.end())
   {
-    CEDAR_THROW
-    (
-      cedar::proc::InvalidRoleException,
-      "No slot items stored for role "
-      + cedar::proc::DataRole::type().get(role).prettyString()
-      + " in " + this->getConnectable()->getName() + "."
-    );
+    CEDAR_THROW(cedar::proc::InvalidRoleException, "No slot items stored for role " + cedar::proc::DataRole::type().get(role).prettyString() + " in " + this->getConnectable()->getName() + ".");
   }
   return role_map->second;
 }
 
-cedar::proc::gui::Connectable::DataSlotNameMap& cedar::proc::gui::Connectable::getSlotItems
-                                                (
-                                                  cedar::proc::DataRole::Id role
-                                                )
+cedar::proc::gui::Connectable::DataSlotNameMap& cedar::proc::gui::Connectable::getSlotItems(cedar::proc::DataRole::Id role)
 {
-  return const_cast<cedar::proc::gui::Connectable::DataSlotNameMap&>
-         (
-           static_cast<cedar::proc::gui::Connectable const*>(this)->getSlotItems(role)
-         );
+  return const_cast<cedar::proc::gui::Connectable::DataSlotNameMap&>(static_cast<cedar::proc::gui::Connectable const*>(this)->getSlotItems(role));
 }
 
-cedar::proc::gui::DataSlotItem* cedar::proc::gui::Connectable::getSlotItem
-                                (
-                                  cedar::proc::DataRole::Id role, const std::string& name
-                                )
+cedar::proc::gui::DataSlotItem* cedar::proc::gui::Connectable::getSlotItem(cedar::proc::DataRole::Id role, const std::string& name)
 {
-  return const_cast<cedar::proc::gui::DataSlotItem*>
-         (
-           static_cast<cedar::proc::gui::Connectable const*>(this)->getSlotItem(role, name)
-         );
+  return const_cast<cedar::proc::gui::DataSlotItem*>(static_cast<cedar::proc::gui::Connectable const*>(this)->getSlotItem(role, name));
 }
 
-cedar::proc::gui::DataSlotItem const* cedar::proc::gui::Connectable::getSlotItem
-                                      (
-                                        cedar::proc::DataRole::Id role, const std::string& name
-                                      ) const
+cedar::proc::gui::DataSlotItem const* cedar::proc::gui::Connectable::getSlotItem(cedar::proc::DataRole::Id role, const std::string& name) const
 {
   auto role_map = this->getSlotItems(role);
 
   auto iter = role_map.find(name);
   if (iter == role_map.end())
   {
-    CEDAR_THROW(cedar::aux::InvalidNameException, "No slot item named \"" + name +
-                                                  "\" found for role "
-                                                  + cedar::proc::DataRole::type().get(role).prettyString()
-                                                  + " in \"" + this->getConnectable()->getName() + "\"."
-                                                  );
+    CEDAR_THROW(cedar::aux::InvalidNameException,
+        "No slot item named \"" + name + "\" found for role " + cedar::proc::DataRole::type().get(role).prettyString() + " in \"" + this->getConnectable()->getName() + "\".");
   }
 
   return iter->second;
@@ -984,6 +1026,7 @@ void cedar::proc::gui::Connectable::reactToSlotRenamed(cedar::proc::DataRole::Id
   p_item = name_iter->second;
   name_map.erase(name_iter);
   name_map[newName.toStdString()] = p_item;
+
   this->updateAttachedItems();
 }
 
@@ -1066,14 +1109,16 @@ void cedar::proc::gui::Connectable::updateAttachedItems()
 {
   this->updateDataSlotPositions();
   this->updateDecorationPositions();
+
+  if (mDeviceQuality)
+  {
+    this->mDeviceQuality->updateHooks();
+  }
 }
 
 cedar::proc::ConnectablePtr cedar::proc::gui::Connectable::getConnectable()
 {
-  return boost::const_pointer_cast<cedar::proc::Connectable>
-         (
-           static_cast<const cedar::proc::gui::Connectable*>(this)->getConnectable()
-         );
+  return boost::const_pointer_cast < cedar::proc::Connectable > (static_cast<const cedar::proc::gui::Connectable*>(this)->getConnectable());
 }
 
 cedar::proc::ConstConnectablePtr cedar::proc::gui::Connectable::getConnectable() const
@@ -1088,11 +1133,9 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
   mSlotRenamedConnection.disconnect();
   mSlotRemovedConnection.disconnect();
 
-
   this->mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->getConnectable());
-  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId))
-  cedar::proc::ConstElementDeclarationPtr elem_decl
-    = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId);
+  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast < cedar::proc::ConstElementDeclaration > (this->mClassId))
+  cedar::proc::ConstElementDeclarationPtr elem_decl = boost::static_pointer_cast < cedar::proc::ConstElementDeclaration > (this->mClassId);
 
   if (this->mpIconView != nullptr)
   {
@@ -1104,16 +1147,13 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
   this->mpIconView->setConnectable(this->getConnectable());
 
   this->addDataItems();
-  mSlotAddedConnection
-    = connectable->connectToSlotAddedSignal(boost::bind(&cedar::proc::gui::Connectable::slotAdded, this, _1, _2));
-  mSlotRenamedConnection
-    = connectable->connectToSlotRenamedSignal(boost::bind(&cedar::proc::gui::Connectable::slotRenamed, this, _1, _2, _3));
-  mSlotRemovedConnection
-    = connectable->connectToSlotRemovedSignal(boost::bind(&cedar::proc::gui::Connectable::slotRemoved, this, _1, _2));
+  mSlotAddedConnection = connectable->connectToSlotAddedSignal(boost::bind(&cedar::proc::gui::Connectable::slotAdded, this, _1, _2));
+  mSlotRenamedConnection = connectable->connectToSlotRenamedSignal(boost::bind(&cedar::proc::gui::Connectable::slotRenamed, this, _1, _2, _3));
+  mSlotRemovedConnection = connectable->connectToSlotRemovedSignal(boost::bind(&cedar::proc::gui::Connectable::slotRemoved, this, _1, _2));
 
   this->mStartedConnection.disconnect();
   this->mStoppedConnection.disconnect();
-  if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(connectable))
+  if (auto triggerable = boost::dynamic_pointer_cast < cedar::proc::Triggerable > (connectable))
   {
     this->mStartedConnection = triggerable->connectToStartedSignal(boost::bind(&cedar::proc::gui::Connectable::translateStartedSignal, this));
     this->mStoppedConnection = triggerable->connectToStoppedSignal(boost::bind(&cedar::proc::gui::Connectable::translateStoppedSignal, this));
@@ -1129,28 +1169,17 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
       dep_msg += " " + elem_decl->getDeprecationDescription();
     }
 
-    DecorationPtr decoration
-    (
-      new Decoration
-      (
-        this,
-        ":/cedar/auxiliaries/gui/warning.svg",
-        QString::fromStdString(dep_msg),
-        QColor(255, 240, 110)
-      )
-    );
+    DecorationPtr decoration(new Decoration(this, ":/cedar/auxiliaries/gui/warning.svg", QString::fromStdString(dep_msg), QColor(255, 240, 110)));
 
     this->mDecorations.push_back(decoration);
   }
+
   this->updateDecorations();
   this->updateTriggerColorState();
 
-  if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(connectable))
+  if (auto triggerable = boost::dynamic_pointer_cast < cedar::proc::Triggerable > (connectable))
   {
-    this->mParentTriggerChangedConnection = triggerable->connectToLoopedTriggerChangedSignal
-        (
-          boost::bind(&cedar::proc::gui::Connectable::translateLoopedTriggerChangedSignal, this)
-        );
+    this->mParentTriggerChangedConnection = triggerable->connectToLoopedTriggerChangedSignal(boost::bind(&cedar::proc::gui::Connectable::translateLoopedTriggerChangedSignal, this));
   }
 }
 
@@ -1190,7 +1219,6 @@ void cedar::proc::gui::Connectable::updateDataSlotPositions()
 
     if (role == cedar::aux::Enum::UNDEFINED)
       continue;
-
 
     CEDAR_DEBUG_ASSERT(add_origins.find(role) != add_origins.end());
     CEDAR_DEBUG_ASSERT(add_directions.find(role) != add_directions.end());
@@ -1317,7 +1345,7 @@ void cedar::proc::gui::Connectable::magnetizeSlots(const QPointF& mousePositionI
     if (distance < max_distance)
     {
       changes = true;
-      qreal closeness = static_cast<qreal>(1.0) - (distance - min_distance)/(max_distance - min_distance);
+      qreal closeness = static_cast<qreal>(1.0) - (distance - min_distance) / (max_distance - min_distance);
       qreal factor = std::pow(closeness, scale_sensitivity);
       CEDAR_DEBUG_ASSERT(factor <= static_cast<qreal>(1.0));
       CEDAR_DEBUG_ASSERT(factor >= static_cast<qreal>(0.0));
@@ -1340,35 +1368,28 @@ void cedar::proc::gui::Connectable::Decoration::setPosition(const QPointF& pos)
 void cedar::proc::gui::Connectable::Decoration::setSize(double sizeFactor)
 {
   const qreal padding = 1;
-  const qreal size = static_cast<qreal>(0.8)
-                     * static_cast<qreal>(sizeFactor)
-                     * cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE;
+  const qreal size = static_cast<qreal>(0.8) * static_cast<qreal>(sizeFactor) * cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE;
   QRectF new_dims = this->mpRectangle->rect();
-  new_dims.setWidth(size + 2*padding);
-  new_dims.setHeight(size + 2*padding);
+  new_dims.setWidth(size + 2 * padding);
+  new_dims.setHeight(size + 2 * padding);
   this->mpRectangle->setRect(new_dims);
-  qreal h = this->mpIcon->boundingRect().height();
-  this->mpIcon->setScale(size / h);
+
+  if (this->mpIcon)
+  {
+    qreal h = this->mpIcon->boundingRect().height();
+    this->mpIcon->setScale(size / h);
+  }
 }
 
 void cedar::proc::gui::Connectable::updateDecorations()
 {
-  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getConnectable());
-  if (triggerable)
+  if (auto triggerable = boost::dynamic_pointer_cast < cedar::proc::Triggerable > (this->getConnectable()))
   {
     if (triggerable->isLooped())
     {
       if (!mpLoopedDecoration)
       {
-        mpLoopedDecoration = DecorationPtr
-        (
-          new Decoration
-          (
-            this,
-            ":/decorations/looped.svg",
-            "This element is looped."
-          )
-        );
+        mpLoopedDecoration = DecorationPtr(new Decoration(this, ":/decorations/looped.svg", "This element is looped."));
         this->addDecoration(mpLoopedDecoration);
       }
     }
@@ -1379,22 +1400,37 @@ void cedar::proc::gui::Connectable::updateDecorations()
     }
   }
 
+  if (auto component = boost::dynamic_pointer_cast < cedar::proc::steps::Component > (this->getConnectable()))
+  {
+    if (!this->mDeviceQuality)
+    {
+      this->mDeviceQuality = DeviceQualityDecorationPtr(new DeviceQualityDecoration(this, component));
+    }
+
+    this->addDecoration(mDeviceQuality);
+  }
+  else
+  {
+    if (this->mDeviceQuality)
+    {
+      this->removeDecoration(this->mDeviceQuality);
+    }
+  }
+
   this->updateDecorationPositions();
 }
 
-void cedar::proc::gui::Connectable::buildConnectTriggerMenu
-(
-  QMenu* pMenu,
-  const cedar::proc::gui::Group* gui_group,
-  const QObject* receiver,
-  const char* slot,
-  boost::optional<cedar::proc::LoopedTriggerPtr> current
-)
+void cedar::proc::gui::Connectable::buildConnectTriggerMenu(
+    QMenu* pMenu,
+    const cedar::proc::gui::Group* gui_group,
+    const QObject* receiver,
+    const char* slot,
+    boost::optional<cedar::proc::LoopedTriggerPtr> current)
 {
   auto group = gui_group->getGroup();
 
   {
-    QAction* action = pMenu->addAction("no trigger");
+    QAction* action = pMenu->addAction("no thread");
     if (current)
     {
       action->setEnabled(current.get().get() != nullptr);
@@ -1436,22 +1472,15 @@ void cedar::proc::gui::Connectable::fillConnectableMenu(QMenu& menu, QGraphicsSc
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
-  QMenu* p_assign_trigger = menu.addMenu("assign to trigger");
-
+  QMenu* p_assign_trigger = menu.addMenu("assign to thread");
 
   auto gui_group = this->getGuiGroup();
 
-  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getElement());
+  auto triggerable = boost::dynamic_pointer_cast < cedar::proc::Triggerable > (this->getElement());
   if (triggerable && triggerable->isLooped())
   {
-    cedar::proc::gui::Connectable::buildConnectTriggerMenu
-    (
-      p_assign_trigger,
-      gui_group,
-      this,
-      SLOT(assignTriggerClicked()),
-      triggerable->getLoopedTrigger()
-    );
+    cedar::proc::gui::Connectable::buildConnectTriggerMenu(p_assign_trigger, gui_group, this,
+    SLOT(assignTriggerClicked()), triggerable->getLoopedTrigger());
   }
   else
   {
@@ -1525,11 +1554,7 @@ void cedar::proc::gui::Connectable::saveDataClicked()
   cedar::proc::DataSlotPtr slot = action->data().value<cedar::proc::DataSlotPtr>();
   CEDAR_DEBUG_ASSERT(slot);
 
-  QString filename = QFileDialog::getSaveFileName
-                     (
-                       this->mpMainWindow,
-                       "Select a file for saving"
-                     );
+  QString filename = QFileDialog::getSaveFileName(this->mpMainWindow, "Select a file for saving");
 
   if (!filename.isEmpty())
   {
@@ -1613,7 +1638,7 @@ cedar::proc::TriggerPtr cedar::proc::gui::Connectable::getTriggerFromConnectTrig
   if (!trigger_path.empty())
   {
     auto trigger_element = group->getElement(trigger_path);
-    return boost::dynamic_pointer_cast<cedar::proc::Trigger>(trigger_element);
+    return boost::dynamic_pointer_cast < cedar::proc::Trigger > (trigger_element);
   }
   else
   {
@@ -1629,7 +1654,7 @@ void cedar::proc::gui::Connectable::assignTriggerClicked()
   auto group = this->getElement()->getGroup();
   auto trigger = getTriggerFromConnectTriggerAction(action, group);
 
-  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getElement());
+  auto triggerable = boost::dynamic_pointer_cast < cedar::proc::Triggerable > (this->getElement());
   if (trigger)
   {
     group->connectTrigger(trigger, triggerable);
@@ -1658,15 +1683,13 @@ void cedar::proc::gui::Connectable::fillPlotMenu(QMenu& menu, QGraphicsSceneCont
   QObject::connect(p_close_all_plots, SIGNAL(triggered()), this, SLOT(closeAllPlots()));
 
   //std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> > advanced_plot_map;
-  this->fillPlots(p_advanced_plotting);//, advanced_plot_map);
+  this->fillPlots(p_advanced_plotting); //, advanced_plot_map);
 
   // Actions for data plotting -----------------------------------------------------------------------------------------
   std::map<QAction*, cedar::aux::Enum> action_type_map;
   bool has_data = false;
 
-  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
-      enum_it != cedar::proc::DataRole::type().list().end();
-      ++enum_it)
+  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin(); enum_it != cedar::proc::DataRole::type().list().end(); ++enum_it)
   {
     try
     {
@@ -1708,8 +1731,8 @@ void cedar::proc::gui::Connectable::fillDefinedPlots(QMenu& menu, const QPoint& 
 {
   // get declaration of the element displayed by this item
   auto decl = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->getConnectable());
-  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(decl));
-  auto elem_decl = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(decl);
+  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast < cedar::proc::ConstElementDeclaration > (decl));
+  auto elem_decl = boost::static_pointer_cast < cedar::proc::ConstElementDeclaration > (decl);
 
   if (!elem_decl->getDefaultPlot().empty())
   {
@@ -1784,11 +1807,9 @@ void cedar::proc::gui::Connectable::addPlotAllAction(QMenu& menu, const QPoint& 
   QObject::connect(p_plot_all, SIGNAL(triggered()), this, SLOT(plotAll()));
 }
 
-void cedar::proc::gui::Connectable::fillPlots
-     (
-       QMenu* pMenu//,
-       //std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
-     )
+void cedar::proc::gui::Connectable::fillPlots(QMenu* pMenu //,
+    //std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
+    )
 {
   for (const cedar::aux::Enum& e : cedar::proc::DataRole::type().list())
   {
@@ -1854,36 +1875,18 @@ void cedar::proc::gui::Connectable::addRoleSeparator(const cedar::aux::Enum& e, 
   p_label_action->setEnabled(false);
 }
 
-void cedar::proc::gui::Connectable::showPlot
-(
-  const QPoint& position,
-  std::string& dataName,
-  const cedar::aux::Enum& role
-)
+void cedar::proc::gui::Connectable::showPlot(const QPoint& position, std::string& dataName, const cedar::aux::Enum& role)
 {
-  cedar::aux::gui::ConstPlotDeclarationPtr decl =
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(this->getConnectable()->getData(role, dataName));
+  cedar::aux::gui::ConstPlotDeclarationPtr decl = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(this->getConnectable()->getData(role, dataName));
   showPlot(position, dataName, role, decl);
 }
 
-void cedar::proc::gui::Connectable::showPlot
-(
-  const QPoint& position,
-  std::string& dataName,
-  const cedar::aux::Enum& role,
-  cedar::aux::gui::ConstPlotDeclarationPtr declaration
-)
+void cedar::proc::gui::Connectable::showPlot(const QPoint& position, std::string& dataName, const cedar::aux::Enum& role, cedar::aux::gui::ConstPlotDeclarationPtr declaration)
 {
   showPlot(position, dataName, role, declaration->getClassName());
 }
 
-void cedar::proc::gui::Connectable::showPlot
-(
-  const QPoint& position,
-  std::string& dataName,
-  const cedar::aux::Enum& role,
-  const std::string& plotClass
-)
+void cedar::proc::gui::Connectable::showPlot(const QPoint& position, std::string& dataName, const cedar::aux::Enum& role, const std::string& plotClass)
 {
   // create data-List
   cedar::proc::ElementDeclaration::DataList data_list;
@@ -1905,14 +1908,7 @@ QWidget* cedar::proc::gui::Connectable::createDockWidgetForPlots(const std::stri
   auto p_dock_widget = this->createDockWidget(title, pPlotWidget);
 
   int base_size = 200;
-  p_dock_widget->setGeometry
-  (
-    QRect
-    (
-      position,
-      QSize(base_size * pPlotWidget->getColumnCount(), base_size * pPlotWidget->getRowCount())
-    )
-  );
+  p_dock_widget->setGeometry(QRect(position, QSize(base_size * pPlotWidget->getColumnCount(), base_size * pPlotWidget->getRowCount())));
 
   return p_dock_widget;
 }
@@ -1934,8 +1930,8 @@ QWidget* cedar::proc::gui::Connectable::createDockWidget(const std::string& titl
     QObject::connect(p_dock, SIGNAL(destroyed()), this, SLOT(removeChildWidget()));
 
     QRect p = this->mpMainWindow->geometry();
-    g.setLeft(p.x() + (p.width() - g.width())/2);
-    g.setTop(p.y() + (p.height() - g.height())/2);
+    g.setLeft(p.x() + (p.width() - g.width()) / 2);
+    g.setTop(p.y() + (p.height() - g.height()) / 2);
     // changing left/top does not keep the correct width/heigh, thus, restore them
     g.setWidth(pWidget->geometry().width());
     g.setHeight(pWidget->geometry().height());
@@ -2021,11 +2017,7 @@ void cedar::proc::gui::Connectable::removeChildWidget()
   }
   else
   {
-    cedar::aux::LogSingleton::getInstance()->error
-    (
-      "Could not find a reference to the destroyed ChildWidget.",
-      "cedar::proc::gui::Connectable::removeChildWidget()"
-    );
+    cedar::aux::LogSingleton::getInstance()->error("Could not find a reference to the destroyed ChildWidget.", "cedar::proc::gui::Connectable::removeChildWidget()");
   }
 }
 
@@ -2064,7 +2056,7 @@ void cedar::proc::gui::Connectable::handleContextMenuAction(QAction* action, QGr
 
     if (list.size() == 2)
     {
-      const cedar::aux::Enum& role = cedar::proc::DataRole::type().get(enum_id);//action_type_map[a];
+      const cedar::aux::Enum& role = cedar::proc::DataRole::type().get(enum_id);       //action_type_map[a];
       this->showPlot(event->screenPos(), data_name, role);
     }
     else if (list.size() == 3)
@@ -2087,9 +2079,9 @@ void cedar::proc::gui::Connectable::handleContextMenuAction(QAction* action, QGr
 void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::ConfigurationNode& node) const
 {
   // important: access to QT Qidgets only allowed from the GUI thread
-
   //            since most calls are not thread-safe!
   const bool isGuiThread = QThread::currentThread() == QCoreApplication::instance()->thread();
+
   if (!isGuiThread)
     return; // note, this disables saving of widgets via auto-backups
 
@@ -2097,13 +2089,29 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
   {
     // all widgets in the mChildWidgets Vector should be QDockWidgets that contain a QWidget
     QWidget* dock_widget_child = cedar::aux::asserted_cast<QDockWidget*>(childWidget)->widget();
-    // The contained QWidget may be of different types, we're only interested in the cedar::proc::gui::PlotWidget ones
+
+    // The contained QWidget may be of different types
     if (cedar::aux::objectTypeToString(dock_widget_child) == "cedar::proc::gui::PlotWidget")
     {
       cedar::aux::ConfigurationNode value_node;
       static_cast<cedar::proc::gui::PlotWidget*>(dock_widget_child)->writeConfiguration(value_node);
       node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));
     }
+
+    if (cedar::aux::objectTypeToString(dock_widget_child) == "cedar::dev::gui::KinematicChainWidget")
+    {
+      cedar::aux::ConfigurationNode value_node;
+
+      const std::string component_path =  static_cast<cedar::dev::gui::KinematicChainWidget*>(dock_widget_child)->getPath();
+      value_node.add("component", component_path);
+      value_node.add("position_x", dock_widget_child->parentWidget()->x());
+      value_node.add("position_y", dock_widget_child->parentWidget()->y());
+      value_node.add("height", dock_widget_child->parentWidget()->height());
+      value_node.add("width", dock_widget_child->parentWidget()->width());
+
+      node.push_back(cedar::aux::ConfigurationNode::value_type("KinematicChainWidget", value_node));
+    }
+
   }
 }
 
@@ -2117,27 +2125,20 @@ void cedar::proc::gui::Connectable::addPlotWidget(cedar::proc::gui::PlotWidget* 
 
 void cedar::proc::gui::Connectable::setRecorded(bool status)
 {
-	if (status)
-	{
-	  if (!mpRecordedDecoration)
-	  {
-      mpRecordedDecoration = DecorationPtr(
-        new Decoration
-        (
-          this,
-          ":/decorations/record.svg",
-          "This step has one or more slots registered in the recorder."
-        )
-      );
+  if (status)
+  {
+    if (!mpRecordedDecoration)
+    {
+      mpRecordedDecoration = DecorationPtr(new Decoration(this, ":/decorations/record.svg", "This step has one or more slots registered in the recorder."));
       this->addDecoration(this->mpRecordedDecoration);
-	  }
-	}
-	else
-	{
-	  if (this->mpRecordedDecoration)
-	  {
-	    this->removeDecoration(this->mpRecordedDecoration);
-	    this->mpRecordedDecoration.reset();
-	  }
-	}
+    }
+  }
+  else
+  {
+    if (this->mpRecordedDecoration)
+    {
+      this->removeDecoration(this->mpRecordedDecoration);
+      this->mpRecordedDecoration.reset();
+    }
+  }
 }

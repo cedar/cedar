@@ -64,6 +64,7 @@ class cedar::dev::NetworkChannel : public cedar::dev::Channel
 public:
   //!@brief The standard constructor.
   NetworkChannel();
+  ~NetworkChannel();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

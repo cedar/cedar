@@ -44,6 +44,9 @@
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/TimeParameter.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/devices/SerialChannel.fwd.h"
+
 // SYSTEM INCLUDES
 #include <QObject>
 #ifndef Q_MOC_RUN
@@ -54,9 +57,17 @@
 
 
 //!@brief Channel to serial devies, based on Boost ASIO.
-class cedar::dev::SerialChannel : public QObject, public Channel
+class cedar::dev::SerialChannel : public QObject, public cedar::dev::Channel
 {
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! Exception that notifies the user if something goes wrong during writing.
+  class WriteException : public cedar::aux::ExceptionBase {};
+  class BoostException : public cedar::aux::ExceptionBase {};
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

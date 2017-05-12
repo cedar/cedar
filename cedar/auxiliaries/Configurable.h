@@ -220,6 +220,8 @@ public:
     return this->mIsAdvanced;
   }
 
+  bool isConfigured() const;
+
   /*!@brief Returns the path of the parameter, relative to this configurable.
    *
    *        If the parameter is directly attached to this object, this method returns just the name. Otherwise, it looks
@@ -412,6 +414,9 @@ private:
 
   //!@brief Whether this is an advanced configurable; usually only makes sense, when this is a child.
   bool mIsAdvanced;
+
+  //!@brief Wether a configuration has been read.
+  bool mIsConfigured;
 
   /*!@brief   The lockable used for locking this configurable and all its parameters.
    *

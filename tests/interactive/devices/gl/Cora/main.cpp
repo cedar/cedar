@@ -51,8 +51,8 @@
 
 int main(int argc, char **argv)
 {
-  std::string arm_configuration_file = cedar::aux::locateResource("configs/cora_arm.json");
-  std::string head_configuration_file = cedar::aux::locateResource("configs/cora_head.json");
+  std::string arm_configuration_file = cedar::aux::locateResource("robots/cora_arm.json");
+  std::string head_configuration_file = cedar::aux::locateResource("robots/cora_head.json");
 
   QApplication a(argc, argv);
 
@@ -90,13 +90,13 @@ int main(int argc, char **argv)
   widget_arm.show();
   widget_head.show();
 
-  p_cora_arm->startTimer(50.0);
-  p_cora_head->startTimer(50.0);
+  p_cora_arm->startCommunication();
+  p_cora_head->startCommunication();
   viewer.startTimer(50);
   a.exec();
 
-  p_cora_arm->stop();
-  p_cora_head->stop();
+  p_cora_arm->stopCommunication();
+  p_cora_head->stopCommunication();
   cedar::aux::sleep(cedar::unit::Time(1.0 * cedar::unit::second));
 
   return 0;

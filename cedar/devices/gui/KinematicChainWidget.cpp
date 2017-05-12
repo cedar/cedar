@@ -39,6 +39,7 @@
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/devices/gui/KinematicChainMonitorWidget.h"
 #include "cedar/devices/gui/KinematicChainCommandWidget.h"
+#include "cedar/devices/ComponentSlot.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -51,8 +52,7 @@
 //----------------------------------------------------------------------------
 
 cedar::dev::gui::KinematicChainWidget::KinematicChainWidget
-(
-  cedar::dev::KinematicChainPtr kinematicChain,
+(cedar::dev::KinematicChainPtr kinematicChain,
   QWidget *parent,
   Qt::WindowFlags
 )
@@ -88,7 +88,15 @@ void cedar::dev::gui::KinematicChainWidget::init(cedar::dev::KinematicChainPtr k
   p_layout->addWidget(mpCommandWidget, 0, 1);
   this->setLayout(p_layout);
 
-  this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  //this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  this->setFixedHeight(375);
+
+  mpKinematicChain = kinematicChain;
+}
+
+std::string cedar::dev::gui::KinematicChainWidget::getPath() const
+{
+  return mpKinematicChain->getSlot().lock()->getPath();
 }
 
 cedar::dev::gui::KinematicChainMonitorWidget* cedar::dev::gui::KinematicChainWidget::getMonitorWidget()
