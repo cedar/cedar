@@ -462,6 +462,7 @@ private:
 
   mutable QMutex mGeneralAccessLock;
 
+  bool mDestroying;
   bool mDestructWasPrepared; // helper bool
 
   //! Integration time that is lost due to skipping stepCommunication calls.

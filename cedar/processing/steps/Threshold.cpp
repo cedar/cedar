@@ -52,32 +52,32 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace
 {
-  bool declare()
-  {
-    using cedar::proc::ElementDeclarationPtr;
-    using cedar::proc::ElementDeclarationTemplate;
+bool declare()
+{
+  using cedar::proc::ElementDeclarationPtr;
+  using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr declaration
+  ElementDeclarationPtr declaration
+  (
+    new ElementDeclarationTemplate<cedar::proc::steps::Threshold>
     (
-      new ElementDeclarationTemplate<cedar::proc::steps::Threshold>
-      (
-        "Image Processing",
-        "cedar.processing.steps.Threshold"
-      )
-    );
+      "Image Processing",
+      "cedar.processing.steps.Threshold"
+    )
+  );
 
-    declaration->setIconPath(":/steps/threshold.svg");
-    declaration->setDescription
-    (
-      "A step that applies a threshold to an image."
-    );
+  declaration->setIconPath(":/steps/threshold.svg");
+  declaration->setDescription
+  (
+    "A step that applies a threshold to an image."
+  );
 
-    declaration->declare();
+  declaration->declare();
 
-    return true;
-  }
+  return true;
+}
 
-  bool declared = declare();
+bool declared = declare();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

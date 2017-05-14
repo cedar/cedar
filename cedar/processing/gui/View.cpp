@@ -148,8 +148,9 @@ void cedar::proc::gui::View::createZoomWidget()
   this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   this->mpZoomLevelSlider = new QSlider();
   this->mpZoomLevelSlider->setMinimum(5);
-  this->mpZoomLevelSlider->setMaximum(175);
+  this->mpZoomLevelSlider->setMaximum(500);
   this->mpZoomLevelSlider->setValue(100);
+  this->mpZoomLevelSlider->setPageStep(5);
   this->mpZoomLevelSlider->setOrientation(Qt::Horizontal);
   this->mpZoomLevelSlider->setInvertedAppearance(false);
   this->mpZoomLevelSlider->setInvertedControls(false);
@@ -238,13 +239,13 @@ void cedar::proc::gui::View::resetZoomLevel()
 
 void cedar::proc::gui::View::zoomLevelSet(double zoomLevel)
 {
-  int zoom_level = static_cast<int>(zoomLevel * 100.0);
+  int zoom_level = static_cast<int>( round( zoomLevel * 100.0 ) );
+                                     // js: round required here because numerics
   this->mpZoomLevelDisplay->setText(QString("%1%").arg(zoom_level));
 
   if (this->mpZoomLevelSlider->value() != zoom_level)
   {
     this->mpZoomLevelSlider->setValue(zoom_level);
-
     // if the slider's value wasn't changed, apply the slider's value (this happens when the new value is out of range)
     if (this->mpZoomLevelSlider->value() != zoom_level)
     {

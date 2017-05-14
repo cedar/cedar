@@ -455,6 +455,8 @@
    <addaction name="mpActionRenamePlotGroup"/>
    <addaction name="mpActionEditPlotGroup"/>
    <addaction name="mpActionDeletePlotGroup"/>
+   <addaction name="separator"/>
+   <addaction name="mpActionOpenRobotManager"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
@@ -925,6 +927,18 @@
    </property>
    <property name="toolTip">
     <string>Locks/unlocks the position of UI elements such as the log, the elements tab and so on.</string>
+   </property>
+  </action>
+  <action name="mpActionOpenRobotManager">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/robot_manager.svg</normaloff>:/toolbaricons/robot_manager.svg</iconset>
+   </property>
+   <property name="text">
+    <string>open Robot Manager</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;open Robot Manager&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </action>
  </widget>

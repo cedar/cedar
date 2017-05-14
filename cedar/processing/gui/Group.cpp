@@ -61,7 +61,6 @@
 #include "cedar/devices/RobotManager.h"
 #include "cedar/devices/ComponentSlot.h"
 #include "cedar/devices/KinematicChain.h"
-#include "cedar/devices/gui/KinematicChainWidget.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Data.h"
@@ -545,6 +544,23 @@ void cedar::proc::gui::Group::removeViewer()
   else
   {
     cedar::aux::LogSingleton::getInstance()->error("Could not find a reference to the destroyed Viewer.", "cedar::proc::gui::Group::removeViewer()");
+  }
+}
+
+void cedar::proc::gui::Group::removeKinematicChainWidget()
+{
+  auto it = mKinematicChainWidgets.begin();
+  while (*it != QObject::sender() && it != mKinematicChainWidgets.end())
+  {
+    it++;
+  }
+  if (*it == QObject::sender())
+  {
+    mKinematicChainWidgets.erase(it);
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->error("Could not find a reference to the destroyed KinematicChainWidget.", "cedar::proc::gui::Group::removeKinematicChainWidget()");
   }
 }
 
@@ -1207,23 +1223,24 @@ void cedar::proc::gui::Group::openSceneViewer(const cedar::aux::ConfigurationNod
 {
   try
   {
-    cedar::aux::gl::ScenePtr scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
-
-    cedar::aux::gui::Viewer *viewer = new cedar::aux::gui::Viewer(scene);
-    viewer->setSceneRadius(scene->getSceneLimit());
-    viewer->startTimer(25);
-
-    QWidget* qwidget = this->createDockWidget("simulated scene", viewer);
-
     const int posx = node.get<int>("position_x");
     const int posy = node.get<int>("position_y");
     const int width = node.get<int>("width");
     const int height = node.get<int>("height");
 
-    qwidget->setWindowFlags(Qt::WindowStaysOnTopHint);
-    qwidget->move(posx, posy);
-    qwidget->resize(width, height);
-    qwidget->show();
+    cedar::aux::gl::ScenePtr scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
+
+    cedar::aux::gui::Viewer *viewer = new cedar::aux::gui::Viewer(scene);
+    viewer->startTimer(25);
+    viewer->setSceneRadius(scene->getSceneLimit());
+
+    QObject::connect(viewer, SIGNAL(destroyed()), this, SLOT(removeViewer()));
+    mViewers.push_back(viewer);
+
+    QWidget* dock_widget = this->createDockWidget("simulated scene", viewer);
+    dock_widget->show();
+    dock_widget->resize(width, height);
+    dock_widget->move(posx, posy);
 
     #ifdef CEDAR_USE_QGLVIEWER
 
@@ -1240,9 +1257,6 @@ void cedar::proc::gui::Group::openSceneViewer(const cedar::aux::ConfigurationNod
     viewer->camera()->setOrientation(qglviewer::Quaternion(cori0, cori1, cori2, cori3));
 
     #endif // CEDAR_USE_QGLVIEWER
-
-    QObject::connect(viewer, SIGNAL(destroyed()), this, SLOT(removeViewer()));
-    mViewers.push_back(viewer);
 
   }
   catch (...)
@@ -1268,11 +1282,17 @@ void cedar::proc::gui::Group::openKinematicChainWidget(const cedar::aux::Configu
     {
       const int posx = node.get<int>("position_x");
       const int posy = node.get<int>("position_y");
+      const int height = node.get<int>("height");
+      const int width = node.get<int>("width");
 
       cedar::dev::gui::KinematicChainWidget *pWidget = new cedar::dev::gui::KinematicChainWidget(pKinematicChain);
-      auto qwidget = this->createDockWidget(path, pWidget);
-      qwidget->move(posx, posy);
-      qwidget->show();
+      auto dock_widget = this->createDockWidget(path, pWidget);
+      dock_widget->show();
+      dock_widget->resize(width, height);
+      dock_widget->move(posx, posy);
+
+      QObject::connect(pWidget, SIGNAL(destroyed()), this, SLOT(removeKinematicChainWidget()));
+      mKinematicChainWidgets.push_back(pWidget);
     }
   }
   catch (...)
@@ -1298,7 +1318,6 @@ void cedar::proc::gui::Group::openSceneViewer()
 
   auto dock_widget = this->createDockWidget("simulated scene", viewer);
   dock_widget->show();  
-
 }
 
 void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node)
@@ -1422,34 +1441,49 @@ void cedar::proc::gui::Group::writeOpenPlotsTo(cedar::aux::ConfigurationNode& no
   const bool isGuiThread = 
               QThread::currentThread() == QCoreApplication::instance()->thread();
 
-  if (isGuiThread)
+  if (!isGuiThread)
   {
-    for (QWidget* viewer_item : mViewers)
-    {
+    return;
+  }
 
-      cedar::aux::ConfigurationNode value_node;
+  for (QWidget* viewer_item : mViewers)
+  {
+    cedar::aux::ConfigurationNode value_node;
 
-      value_node.add("position_x", viewer_item->parentWidget()->x());
-      value_node.add("position_y", viewer_item->parentWidget()->y());
-      value_node.add("width", viewer_item->width());
-      value_node.add("height", viewer_item->height());
+    value_node.add("position_x", viewer_item->parentWidget()->x());
+    value_node.add("position_y", viewer_item->parentWidget()->y());
+    value_node.add("width", viewer_item->parentWidget()->width());
+    value_node.add("height", viewer_item->parentWidget()->height());
 
-      #ifdef CEDAR_USE_QGLVIEWER
+    #ifdef CEDAR_USE_QGLVIEWER
 
-      QGLViewer* qgl = boost::dynamic_pointer_cast<QGLViewer>(viewer_item);
-      value_node.add("camera position x", qgl->camera()->position().x);
-      value_node.add("camera position y", qgl->camera()->position().y);
-      value_node.add("camera position z", qgl->camera()->position().z);
-      value_node.add("camera orientation 0", qgl->camera()->orientation()[0]);
-      value_node.add("camera orientation 1", qgl->camera()->orientation()[1]);
-      value_node.add("camera orientation 2", qgl->camera()->orientation()[2]);
-      value_node.add("camera orientation 3", qgl->camera()->orientation()[3]);
+    QGLViewer* qgl = boost::dynamic_pointer_cast<QGLViewer>(viewer_item);
+    value_node.add("camera position x", qgl->camera()->position().x);
+    value_node.add("camera position y", qgl->camera()->position().y);
+    value_node.add("camera position z", qgl->camera()->position().z);
+    value_node.add("camera orientation 0", qgl->camera()->orientation()[0]);
+    value_node.add("camera orientation 1", qgl->camera()->orientation()[1]);
+    value_node.add("camera orientation 2", qgl->camera()->orientation()[2]);
+    value_node.add("camera orientation 3", qgl->camera()->orientation()[3]);
 
-      #endif // CEDAR_USE_QGLVIEWER
+    #endif // CEDAR_USE_QGLVIEWER
 
-      node.push_back(cedar::aux::ConfigurationNode::value_type("Viewer", value_node));
+    node.push_back(cedar::aux::ConfigurationNode::value_type("Viewer", value_node));
 
-    }
+  }
+
+  for (cedar::dev::gui::KinematicChainWidget* kcw_item : mKinematicChainWidgets)
+  {
+    cedar::aux::ConfigurationNode value_node;
+
+    value_node.add("position_x", kcw_item->parentWidget()->x());
+    value_node.add("position_y", kcw_item->parentWidget()->y());
+    value_node.add("width", kcw_item->parentWidget()->width());
+    value_node.add("height", kcw_item->parentWidget()->height());
+    const std::string component_path =  kcw_item->getPath();
+    value_node.add("component", component_path);
+
+    node.push_back(cedar::aux::ConfigurationNode::value_type("KinematicChainWidget", value_node));
   }
 
   for (auto step_map_item : this->mpScene->getStepMap())
