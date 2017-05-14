@@ -148,10 +148,10 @@ cedar::proc::gui::Connectable::~Connectable()
   mSlotRemovedConnection.disconnect();
 }
 
-cedar::proc::gui::Connectable::Decoration::Decoration(QGraphicsItem* pParent, const QString& icon, const QString& description, const QColor& bgColor)
+cedar::proc::gui::Connectable::Decoration::Decoration(QGraphicsItem* pParent, const QString& icon, const QString& description, const QColor& bgColour)
     :
       mpIcon(nullptr),
-      mDefaultBackground(bgColor)
+      mDefaultBackground(bgColour)
 {
   qreal padding = 1;
   this->mpRectangle = new QGraphicsRectItem(-padding, -padding, cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE + 2 * padding, cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE + 2 * padding,
@@ -173,8 +173,10 @@ cedar::proc::gui::Connectable::Decoration::Decoration(QGraphicsItem* pParent, co
   QPen pen = this->mpRectangle->pen();
   pen.setWidth(1);
   pen.setColor(QColor(0, 0, 0));
+  QBrush bg(bgColour);
   this->mpRectangle->setPen(pen);
-  this->setBackgroundColor(bgColor);
+  this->mpRectangle->setBrush(bg);
+  this->setBackgroundColor(bgColour);
 }
 
 //!@todo This should really be solved differently, steps should be able to provide decorations via their declarations, rather than putting in dynamic casts here.
@@ -2078,8 +2080,7 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
 {
   // important: access to QT Qidgets only allowed from the GUI thread
   //            since most calls are not thread-safe!
-  const bool isGuiThread = 
-              QThread::currentThread() == QCoreApplication::instance()->thread();
+  const bool isGuiThread = QThread::currentThread() == QCoreApplication::instance()->thread();
 
   if (!isGuiThread)
     return; // note, this disables saving of widgets via auto-backups
@@ -2105,6 +2106,8 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
       value_node.add("component", component_path);
       value_node.add("position_x", dock_widget_child->parentWidget()->x());
       value_node.add("position_y", dock_widget_child->parentWidget()->y());
+      value_node.add("height", dock_widget_child->parentWidget()->height());
+      value_node.add("width", dock_widget_child->parentWidget()->width());
 
       node.push_back(cedar::aux::ConfigurationNode::value_type("KinematicChainWidget", value_node));
     }

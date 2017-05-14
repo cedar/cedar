@@ -92,7 +92,7 @@ cedar::aux::EnumType<cedar::proc::steps::ShapeVisualisation::Shape>
 
 cedar::proc::steps::ShapeVisualisation::ShapeVisualisation()
   :
-  Step(true),
+  Step(false),
   _mVisualisationID(-1),
   _mColour
   (

@@ -60,14 +60,14 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::Norm>
       (
-        "Utilities",
+        "Algebra",
         "cedar.processing.Norm"
       )
     );
     declaration->setIconPath(":/steps/norm.svg");
     declaration->setDescription
     (
-      "Simply computes cv::norm"
+      "Calculates the norm of an input vector."
     );
 
     declaration->declare();
