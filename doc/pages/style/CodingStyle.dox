@@ -1,0 +1,96 @@
+/*!
+
+@page CodingStyle Coding Style
+
+@section CodingStyleIntroduction Introduction
+cedar sticks to a strict coding style, which is based on the UWYN 
+<a href=http://www.uwyn.com/resources/uwyn_cpp_coding_standard>coding standard</a>. The style presented on this page 
+overrides some of the content of the UWYN coding standard. If there is no rule on this page that applies for a specific
+code piece, the fallback is always the UWYN coding standard. If neither of the sources contain rules which apply, the
+code piece is most probably in alignment with cedar's style.
+
+@section CodingStyleNames Names and prefixes
+- class names start with a capital letter and have a singular form (e.g. \b Example)
+- method names start in lower case (with a verb), but every new word starts with a capital letter
+(e.g. \b getMyMember() )
+- member variables and method parameters usually start with one of the following prefixes and continue with capital
+letters for new words (e.g. \b mpMyMemberPointer )
+- prefixes (in this order):
+  - leading underscore for parameters loaded from a configuration file
+  - small m for member variables
+  - small p for raw pointer variables
+  - e.g. \b mpMyRawMemberPointer
+- local variables are all lower case, words and prefixes are separated with an underscore (e.g. \b p_local_pointer )
+- constants are all upper case, with additional prefix (e.g. \b M_MY_MEMBER_CONSTANT )
+- pointer style: \b always put the * adjacent to the pointer type (e.g. Example* getExample())
+
+@section CodingStyleBraces Braces and Parentheses
+- place braces under and inline with keywords (see @ref CodingStyleWhiteSpace)
+- always use braces, even for single line statements
+- leave one space between keywords and parentheses (e.g. if (condition) )
+- put parentheses directly after method names (e.g. myMethod(parameter) )
+
+@section CodingStyleWhiteSpace Whitespace, Tabs, Indentation
+- use only soft tabs
+- the size of a soft tab has to be exactly two whitespaces
+- do not exceed a maximum of 120 characters per line of code
+- if a single statement does not fit in 120 characters, wrap to the next line
+  - place opening brackets and parentheses right below the keyword or function call that triggers the wrap
+@code
+// assume that the following line would exceed 120 characters
+if
+(
+  condition && some other condition || another long condition
+)
+{
+  // do something
+}
+@endcode
+  - place wrapped method parameters and expressions right under each other - one per line
+@code
+// assume that the following line would exceed 120 characters
+void cedar::myNameSpace::myFunction
+     (
+       const std::string& myFirstParameter,
+       ConstThingPtr mySharedPointerOfThing
+     )
+{
+  // do something
+}
+@endcode
+  - use one soft tab as indentation for wrapped parameters (see example above)
+  - the first parameter or expression is placed in a new line below the opening bracket or parenthesis 
+  (see example above)
+  - place the closing bracket or parenthesis in a new line, inline with its opening counterpart (see example above)
+- if you wrap formulas or boolean expressions, make sure that the wrapped line starts with an operator (e.g. &&, +, /)
+  - the indentation is one soft tab (two whitespaces)
+  - if the formula contains a =, start wrapping with = and see if the wrapped line still exceeds 120 lines
+@code
+// assume that the following line exceeds the 120 character limit even after the first wrap
+int myVeryLongNameForAnEquationResult 
+  = myFirstNumber + mySecondNumber * myThirdNumber / myFourthNumber + myFifthNumber
+    - mySixthNumber
+@endcode
+- always put an empty line before comments in a header file
+- separate parameters of a function with a single whitespace
+@code
+myFunctionCall(parameter1, parameter2, parameter3);
+@endcode
+
+@section CodingStyleClassDesign Class Design
+- always initialize members
+- make sure that each destructor cleans all allocated objects and memory
+- keep your interface clean - only declare methods as public, if a user needs them
+
+@section CodingStyleGeneral General Rules
+- use smart pointers (and weak pointers) whenever possible
+- never put more than one variable declaration in a single line (i.e., do not do something like int i, j, *p_u;)
+- do not leave debug output in your code (e.g., output to std::cout) - if you need debug output on a regular basis (which you should not),
+  encapsulate debug code with #ifdef SOME_DEF [your debug code] #endif
+- if you release an object (raw pointer), first make sure that it actually exists, that you are responsible for freeing it and that
+ future attempts to release this object will be intercepted - in other words, check:
+  - if an object address is legitimate
+  - if this object was created in the course of the context that tries to release it
+  - that a local pointer to the released object is set to NULL afterwards
+
+ */

@@ -1,0 +1,84 @@
+/*!
+
+@page EnumConcept Introduction to enum classes
+
+Enum classes are used in cedar to convert enum-like values to strings. This is useful in many places, e.g., where users
+can select such values from a drop-down box.
+
+Here's an example of an enum class.
+
+The class header:
+@code
+#include "cedar/auxiliaries/EnumType.h"
+
+// FORWARD DECLARATIONS
+#include "your/enum.fwd.h"
+
+// SYSTEM INCLUDES
+
+class your::Enum
+{
+public:
+  // Type that should be used whenever values of this enum are stored. (Resolves to unsigned int)
+  typedef cedar::aux::EnumId Id;
+
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
+  // Using cedar's enum framework, this function is called to fill the enum at an appropriate time.
+  static void construct();
+
+  // Returns a pointer to the enum base, i.e., the object that holds a list of all enum values etc.
+  static const cedar::aux::EnumBase& type();
+
+  // Same as above, but returns a pointer to the object
+  static const your::Enum::TypePtr& typePtr();
+
+  // The numbers have to be given manually. They do not have to be consecutive, and can be other constants, e.g., when
+  // exposing opencv enum values
+  static const Id Value = 0;
+
+  // specifying the actual numbers here makes these constants usable in switch statements
+  static const Id OtherValue = 1;
+
+private:
+  // this is where all the enum values and string associations will get stored
+  static cedar::aux::EnumType<your::Enum> mType;
+};
+@endcode
+
+The cpp file:
+
+@code
+// the string "your::Enum" is a prefix used for the string representation of the enumeration values 
+cedar::aux::EnumType<your::Enum> your::Enum::mType("your::Enum::");
+
+// MSVC doesn't need (read: want) you to declare these again because they have values assigned in the header and thus
+// are const expressions; gcc is the opposite, thus the ifdef
+#ifndef CEDAR_COMPILER_MSVC
+const your::Enum::Id your::Enum::Value;
+const your::Enum::Id your::Enum::OtherValue;
+#endif // CEDAR_COMPILER_MSVC
+
+void your::Enum::construct()
+{
+  // this registers the different enum values; first, we pass the number, then the uniquely identifying string, then the
+  // human-readable string that will be used in user interfaces
+  mType.type()->def(cedar::aux::Enum(Value, "Value", "How the user sees this value"));
+  mType.type()->def(cedar::aux::Enum(OtherValue, "OtherValue", "This could be the same as above, but should not"));
+}
+
+// just some basic convenience code for accessing the enum object
+const cedar::aux::EnumBase& your::Enum::type()
+{
+  return *your::Enum::mType.type();
+}
+
+const your::Enum::TypePtr& your::Enum::typePtr()
+{
+  return your::Enum::mType.type();
+}
+
+@endcode
+
+@see cedar::proc::steps::NormalizationType for a full implementation of an enum class.
+ */
