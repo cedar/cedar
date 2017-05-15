@@ -2228,7 +2228,6 @@ std::cout << " TEST " << mWatchDogCounter.member() << std::endl;
           || mWatchDogCounter.member() > 5000)
       {
         std::string s = "";
-        doOutputMsg= true;
           
         if (mWatchDogCounter.member() > 5000)
         {
