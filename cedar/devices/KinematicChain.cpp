@@ -508,6 +508,8 @@ void cedar::dev::KinematicChain::init()
   installMeasurementType(cedar::dev::KinematicChain::JOINT_TORQUES, "Joint Torques");
   installMeasurementType(cedar::dev::KinematicChain::EXTERNAL_JOINT_TORQUES, "External Joint Torques");
 
+  applyDeviceCommandsAs( cedar::dev::KinematicChain::JOINT_ANGLES ); // this is a good default
+
   const std::string groupName2 = "joint torque control";
   defineCommandGroup(groupName2);
   installCommandType(cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES, "Additional Joint Torques");
