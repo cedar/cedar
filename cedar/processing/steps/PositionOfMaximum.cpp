@@ -139,7 +139,7 @@ void cedar::proc::steps::PositionOfMaximum::inputConnectionChanged(const std::st
   }
 }
 
-void cedar::proc::steps::PositionOfMaximum::compute()
+void cedar::proc::steps::PositionOfMaximum::compute(const cedar::proc::Arguments&)
 {
   double minimum, maximum;
   int minLoc[2]= {-1, -1};

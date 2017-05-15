@@ -1546,6 +1546,9 @@ void cedar::dev::Component::stepMeasurementCommunication(cedar::unit::Time dt)
     cedar::aux::append(locks, this->mRetrieveMeasurementHooks.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
     cedar::aux::LockSetLocker locker(locks);
 
+    if (mDestroying)
+      return;
+
     // thinks I can get directly from HW:
     for (const auto& type : this->mMeasurementData->getInstalledTypes())
     {
