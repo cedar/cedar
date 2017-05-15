@@ -2173,7 +2173,6 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
 {
   auto now = boost::posix_time::microsec_clock::local_time();
   std::vector<cedar::dev::Component*> components_to_delete;
-  bool doOutputMsg= false;
   bool doCountWatchdog= false;
 
   QWriteLocker lock(&mWatchDogCounter.getLock()); // anti-scrolling
@@ -2247,7 +2246,7 @@ std::cout << " TEST " << mWatchDogCounter.member() << std::endl;
   }
 
 #if 0
-  if (doOutputMsg)
+  if (doCountWatchdog)
   {
     for(auto component : components_to_delete)
     {
