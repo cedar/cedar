@@ -1341,7 +1341,7 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
       mNotReadyForCommandsCounter.member()++;
 
       if (mNotReadyForCommandsCounter.member() == 1
-         || mNotReadyForCommandsCounter.member() > 500)
+         || mNotReadyForCommandsCounter.member() > 5000)
       {
         std::string s = "";
 
@@ -1356,9 +1356,9 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
           CEDAR_CURRENT_FUNCTION_NAME);
       }
 
-      if (mNotReadyForCommandsCounter.member() > 500)
+      if (mNotReadyForCommandsCounter.member() > 5000)
       {
-        mNotReadyForCommandsCounter.member()= 0;
+        mNotReadyForCommandsCounter.member()= 1;
       }
     }
 
@@ -2232,7 +2232,7 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
         {
           s = " (repeated " + boost::lexical_cast<std::string>(mWatchDogCounter.member()) + " times)";
 
-          mWatchDogCounter.member() = 0;
+          mWatchDogCounter.member() = 1;
         }
 
         cedar::aux::LogSingleton::getInstance()->error(
