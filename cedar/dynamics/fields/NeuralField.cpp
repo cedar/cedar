@@ -61,6 +61,7 @@
 #include "cedar/units/Time.h"
 #include "cedar/auxiliaries/MatrixIterator.h"
 #include "cedar/units/prefixes.h"
+#include "cedar/processing/gui/Settings.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -561,7 +562,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
     sigmoid_u = _mSigmoid->getValue()->compute(u);
   }
 //  //Experimental Part to Update the GUI
-  if(_mUpdateStepGui->getValue())
+  if(_mUpdateStepGui->getValue() && cedar::proc::gui::SettingsSingleton::getInstance()->getUseDynamicFieldIcons() )
   {
     double maximum =std::numeric_limits<double>::min();
     if(_mDimensionality->getValue()<3)
@@ -616,12 +617,12 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
     if( maximum > _mUpdateStepGuiThreshold->getValue() && !mIsActive )
     {
       mIsActive = true;
-      this->emitOutputValueChangedSignal(mIsActive);
+      emit outPutValueChanged(mIsActive);
     }
     else if(maximum < _mUpdateStepGuiThreshold->getValue() && mIsActive)
     {
       mIsActive = false;
-      this->emitOutputValueChangedSignal(mIsActive);
+      emit outPutValueChanged(mIsActive);
     }
   }
   //End of Experimental Part

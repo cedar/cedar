@@ -292,6 +292,12 @@ public:
     return this->_mSnapGridSize->getValue();
   }
 
+  //! Size of the SnapGrid, when enabled
+  bool getUseDynamicFieldIcons() const
+  {
+    return this->_mUseDynamicFieldIcons->getValue();
+  }
+
   //! Returns wheter data slots should scalse based on the distance of the mouse.
   bool getDataSlotScalingEnabled() const
   {
@@ -459,6 +465,9 @@ private:
 
   //! Size of the Snapgrid, when snapping is enabled
   cedar::aux::DoubleParameterPtr _mSnapGridSize;
+
+  //! Use Field Icons that switch depending on a present peak
+  cedar::aux::BoolParameterPtr _mUseDynamicFieldIcons;
 
   //! Maximum number of entries in the recent files list.
   cedar::aux::UIntParameterPtr _mMaxFileHistorySize;
