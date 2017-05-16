@@ -1,14 +1,11 @@
 {
   "name": "concrete test robot",
   "description file": "RobotDescription.json",
-  "component slots":
+  "component instantiations":
   {
-    "component slot 1":
-    {
-      "channel": "channel 2"
-    }
+    "component slot 1": "configuration 2"
   },
-  "channel configurations":
+  "channel parameters":
   {
     "channel 2":
     {

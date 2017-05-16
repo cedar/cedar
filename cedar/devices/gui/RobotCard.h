@@ -126,6 +126,9 @@ public:
 public slots:
   void robotDropped(const QString& robotName);
 
+signals:
+  void addBlankCard();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -135,6 +138,9 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+private slots:
+  void robotNameEditValueChanged();
+
 private:
   void robotRemoved(const std::string& robotName);
 
@@ -160,12 +166,15 @@ private:
   cedar::dev::gui::RobotCardIconHolder* mpIcon;
 
   QPushButton* mpConnectButton;
+  QPushButton* mpDeleteButton;
 
   std::string mRobotTemplateName;
 
-  cedar::dev::RobotPtr mRobot;
+  cedar::dev::RobotPtr mrRobot;
 
   boost::signals2::connection mRobotRemovedConnection;
+
+  std::string mCurrentName;
 }; // class cedar::dev::gui::RobotCard
 
 #endif // CEDAR_DEV_GUI_ROBOT_CARD_H

@@ -56,8 +56,26 @@ cedar::dev::Sensor::Sensor(cedar::dev::ChannelPtr)
 
 cedar::dev::Sensor::~Sensor()
 {
+  prepareComponentDestructAbsolutelyRequired();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::dev::Sensor::applyBrakeSlowlyController()
+{
+  return true;
+}
+
+bool cedar::dev::Sensor::applyBrakeNowController()
+{
+  return true;
+}
+
+bool cedar::dev::Sensor::applyCrashbrake()
+{
+  return true;
+}
+
+

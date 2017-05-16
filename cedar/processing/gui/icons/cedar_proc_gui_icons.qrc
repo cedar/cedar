@@ -81,6 +81,7 @@
         <file>toolbaricons/save.svg</file>
         <file>toolbaricons/grid.svg</file>
         <file>toolbaricons/reset.svg</file>
+        <file>toolbaricons/brakeall.svg</file>
         <file>toolbaricons/show_triggers.svg</file>
         <file>toolbaricons/hide_triggers.svg</file>
         <file>toolbaricons/standard_connections.svg</file>
@@ -92,6 +93,16 @@
         <file>toolbaricons/store_plotgroup.svg</file>
         <file>processing_ide_app_icon.svg</file>
         <file>processing_ide_app_icon_48.png</file>
+        <file>steps/forward_kinematic.svg</file>
+        <file>steps/inverse_kinematic.svg</file>
+        <file>steps/vehicle_rotation.svg</file>
+        <file>steps/attr_dyn_target_acquisition.svg</file>
         <file>steps/scalars_to_vector.svg</file>
+        <file>steps/linear_dynamics.svg</file>
+        <file>steps/sinus_dynamics.svg</file>
+        <file>steps/norm.svg</file>
+        <file>steps/rotation_on_plane.svg</file>
+        <file>steps/shape_visualisation.svg</file>
+        <file>toolbaricons/robot_manager.svg</file>
     </qresource>
 </RCC>

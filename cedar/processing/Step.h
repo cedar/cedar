@@ -503,11 +503,11 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  bool isRegistered(const std::string &actionName);
+  void unregisterFunction(const std::string &actionName);
 
 private:
   // none yet
-
 }; // class cedar::proc::Step
 
 #endif // CEDAR_PROC_STEP_H

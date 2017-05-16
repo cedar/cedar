@@ -71,10 +71,10 @@ void cedar::aux::gl::Pyramid::draw()
   prepareDraw();
   
   // draw object
-  if (mIsVisible)
+  if (isVisible())
   {
-    gl::setColor(mColorR, mColorG, mColorB);
-    drawPyramid(mLength, mWidth, mHeight, mIsDrawnAsWireFrame);
+    gl::setColor(getColorR(), getColorG(), getColorB());
+    drawPyramid(mLength, mWidth, mHeight, getIsDrawnAsWireFrame());
   }
 }
 

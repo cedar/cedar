@@ -46,6 +46,16 @@
   #include <boost/intrusive_ptr.hpp>
 #endif // Q_MOC_RUN
 
+#include "cedar/devices/Channel.fwd.h"
+#include "cedar/devices/Component.fwd.h"
+#include "cedar/devices/ComponentParameter.fwd.h"
+#include "cedar/devices/ComponentSlot.fwd.h"
+#include "cedar/devices/KinematicChain.fwd.h"
+#include "cedar/devices/Robot.fwd.h"
+#include "cedar/devices/RobotManager.fwd.h"
+#include "cedar/devices/Sensor.fwd.h"
+#include "cedar/devices/SerialChannel.fwd.h"
+#include "cedar/devices/YarpChannel.fwd.h"
 
 namespace cedar
 {
@@ -53,24 +63,12 @@ namespace cedar
   namespace dev
   {
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_DEV_CLASS(Robot);
-    CEDAR_DECLARE_DEV_CLASS(ComponentSlot);
-    CEDAR_DECLARE_DEV_CLASS(Component);
-    CEDAR_DECLARE_DEV_CLASS_INTRUSIVE(ComponentParameter);
-    CEDAR_DECLARE_DEV_CLASS(Channel);
-    CEDAR_DECLARE_DEV_CLASS(SerialChannel);
     CEDAR_DECLARE_DEV_CLASS(Locomotion);
     CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
-    CEDAR_DECLARE_DEV_CLASS(KinematicChain);
     CEDAR_DECLARE_DEV_CLASS(NetworkChannel);
     CEDAR_DECLARE_DEV_CLASS(Odometry);
-    CEDAR_DECLARE_DEV_CLASS(RobotManager);
-    CEDAR_DECLARE_DEV_CLASS(Sensor);
     CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
-
-#ifdef CEDAR_USE_YARP
-    template <typename T> class YarpChannel;
-#endif
+    CEDAR_DECLARE_DEV_CLASS(SimulatedCamera);
 
     // exceptions
     CEDAR_DECLARE_DEV_CLASS(ChannelConfigurationNotFoundException);
@@ -86,6 +84,9 @@ namespace cedar
     CEDAR_DECLARE_DEV_CLASS(TimeoutException);
     CEDAR_DECLARE_DEV_CLASS(UnknownOperatingSystemException);
     CEDAR_DECLARE_DEV_CLASS(UnresponsiveRobotException);
+    CEDAR_DECLARE_DEV_CLASS(JointIndexOutOfRangeException);
+    CEDAR_DECLARE_DEV_CLASS(JointNumberMismatchException);
+    CEDAR_DECLARE_DEV_CLASS(IgnoreCommunicationException);
     //!@endcond
   }
 }

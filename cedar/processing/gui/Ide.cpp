@@ -61,6 +61,7 @@
 #include "cedar/processing/gui/ExperimentDialog.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/devices/gui/RobotManager.h"
+#include "cedar/devices/Component.h"
 #include "cedar/auxiliaries/CommandLineParser.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/gui/PluginManagerDialog.h"
@@ -128,13 +129,26 @@ public:
 
   void addToMenu(QMenu* menu)
   {
-    this->mpMenuAction = new QAction(QString::fromStdString(this->getName()) + " ...", menu);
+    this->mpMenuAction = new QAction(QString::fromStdString(this->getName()) + "...", menu);
     if (!this->mIconPath.isEmpty())
     {
       this->mpMenuAction->setIcon(QIcon(this->mIconPath));
     }
     this->mpMenuAction->setData(QString::fromStdString(this->getName()));
     menu->insertAction(menu->actions().at(0), this->mpMenuAction);
+
+    this->actionAdded();
+  }
+
+  void addToMenuBack(QMenu* menu)
+  {
+    this->mpMenuAction = new QAction(QString::fromStdString(this->getName()) + "...", menu);
+    if (!this->mIconPath.isEmpty())
+    {
+      this->mpMenuAction->setIcon(QIcon(this->mIconPath));
+    }
+    this->mpMenuAction->setData(QString::fromStdString(this->getName()));
+    menu->insertAction(menu->actions().back(), this->mpMenuAction);
 
     this->actionAdded();
   }
@@ -254,7 +268,7 @@ class cedar::proc::gui::Ide::OpenableSimulationControl : public cedar::proc::gui
 public:
   OpenableSimulationControl()
   :
-  OpenableDialog("Simulation control", ":/toolbaricons/simulation_control.svg", "simulation control")
+  OpenableDialog("Thread control", ":/toolbaricons/simulation_control.svg", "thread control")
   {
     this->setIsInToolbar(true);
   }
@@ -402,11 +416,13 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   QObject::connect(this->mpGlobalTimeFactor, SIGNAL(valueChanged(double)), this, SLOT(globalTimeFactorSpinboxChanged(double)));
 
-  this->mpToolBar->insertSeparator(this->mpActionRecord);
+//  this->mpToolBar->insertSeparator(this->mpActionRecord);
 
   // PlotGroupsComboBox, insert it before the displayplotgroup action
   this->mpPlotGroupsComboBox = new QComboBox;
-  this->mpToolBar->insertWidget(this->mpActionDisplayPlotGroup, this->mpPlotGroupsComboBox);
+//  this->mpPlotGroupsComboBox->setVisible(false); // jokeit, 2016
+//  this->mpToolBar->insertWidget(this->mpActionDisplayPlotGroup, this->mpPlotGroupsComboBox);
+
 
 
   // set window title
@@ -458,15 +474,14 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   QObject::connect(this->mpActionEditPlotGroup, SIGNAL(triggered()), this, SLOT(editPlotGroup()));
   QObject::connect(this->mpActionDisplayPlotGroup, SIGNAL(triggered()), this, SLOT(displayPlotGroup()));
   QObject::connect(this->mpActionDeletePlotGroup, SIGNAL(triggered()), this, SLOT(deletePlotGroup()));
-  
+
+  QObject::connect(this->mpActionOpenRobotManager, SIGNAL(triggered()), this, SLOT(showRobotManager()));
 
 
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
   this->buildStatusBar();
-
-
   this->newFile();
 
   this->restoreSettings();
@@ -482,6 +497,11 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
                    this,
                    SLOT(showAboutDialog()));
 
+  QObject::connect(mpActionBrakeAllRobots,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(brakeAllRobots()));
+
   QObject::connect(mpActionExportSVG,
                    SIGNAL(triggered()),
                    this,
@@ -491,6 +511,11 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
                    SIGNAL(triggered()),
                    this,
                    SLOT(showRobotManager()));
+
+  QObject::connect(mpActionAddGlobalSceneViewer,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(addGlobalSceneViewer()));
 
   QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateSelected()));
   QObject::connect(mpActionCopy, SIGNAL(triggered()), this, SLOT(copyStep()));
@@ -549,16 +574,17 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   auto boost_ctrl = OpenableDialogPtr(new OpenableBoostControl(this->mpProcessingDrawer));
 
   std::vector<OpenableDialogPtr> openable_dialogs;
-  openable_dialogs.push_back(OpenableDialogPtr(new OpenableArchitectureConsistencyCheck(this->mpProcessingDrawer)));
+
   openable_dialogs.push_back(OpenableDialogPtr(new OpenableSimulationControl()));
   openable_dialogs.push_back(boost_ctrl);
+  openable_dialogs.push_back(OpenableDialogPtr(new OpenableArchitectureConsistencyCheck(this->mpProcessingDrawer)));
 
-  // need to iterate in reverse, actions are always added at the beginning of the menu
-  for (auto iter = openable_dialogs.rbegin(); iter != openable_dialogs.rend(); ++iter)
+  // actions are added at end of menu (jokeit: 2016, before: at front, iterated in reverse)
+  for (auto iter = openable_dialogs.begin(); iter != openable_dialogs.end(); ++iter)
   {
     auto openable_dialog = *iter;
     this->mOpenableDialogs[openable_dialog->getName()] = openable_dialog;
-    openable_dialog->addToMenu(this->mpToolsMenu);
+    openable_dialog->addToMenuBack(this->mpToolsMenu); // add to back
     QObject::connect(openable_dialog->getMenuAction(), SIGNAL(triggered()), this, SLOT(showOpenableDialog()));
     if (openable_dialog->isInToolbar())
     {
@@ -770,6 +796,11 @@ void cedar::proc::gui::Ide::buildStatusBar()
 
   // add a blank widget as a spacer
   this->statusBar()->addPermanentWidget(new QWidget(), 1);
+  this->mpRunningComponentsLabel = new QLabel("");
+  this->statusBar()->addPermanentWidget(this->mpRunningComponentsLabel, 0);
+
+  // add a blank widget as a spacer
+  this->statusBar()->addPermanentWidget(new QWidget(), 1);
 
   this->mpGlobalTimeLabel = new QLabel("simulation time");
   this->statusBar()->addPermanentWidget(this->mpGlobalTimeLabel, 0);
@@ -823,6 +854,18 @@ void cedar::proc::gui::Ide::timerEvent(QTimerEvent*)
   cedar::unit::Time time = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
   std::string formatted_time = cedar::aux::formatDuration(time);
   this->mpGlobalTimeLabel->setText(QString("simulation time: ") + QString::fromStdString(formatted_time));
+
+  std::string components_desc = cedar::dev::Component::describeAllRunningComponents();
+  if (!components_desc.empty())
+  {
+    this->mpRunningComponentsLabel->setText(
+          QString("independently running: ") 
+          + QString("<span style='color:rgb(233, 10, 255, 255)'>%1</span>").arg(QString::fromStdString(components_desc) ) );
+  }
+  else
+  {
+    this->mpRunningComponentsLabel->setText( QString("") );
+  }
 }
 
 void cedar::proc::gui::Ide::setArchitectureChanged(bool changed)
@@ -885,9 +928,17 @@ void cedar::proc::gui::Ide::showRobotManager()
   auto p_dialog = new QDialog(this);
   auto p_layout = new QVBoxLayout();
   p_dialog->setLayout(p_layout);
-  p_layout->addWidget(new cedar::dev::gui::RobotManager());
-  p_dialog->setMinimumHeight(500);
+  auto p_robot_manager = new cedar::dev::gui::RobotManager();
+  QObject::connect(p_robot_manager, SIGNAL(closeRobotManager(void)), p_dialog, SLOT(close(void)));
+  p_layout->addWidget(p_robot_manager);
+  p_dialog->setMinimumHeight(800);
+  p_dialog->setWindowTitle("cedar - robot manager");
   p_dialog->show();
+}
+
+void cedar::proc::gui::Ide::addGlobalSceneViewer()
+{
+  this->mGroup->openSceneViewer();
 }
 
 void cedar::proc::gui::Ide::displayFilename(const std::string& filename)
@@ -1153,6 +1204,11 @@ void cedar::proc::gui::Ide::resetRootGroup()
 {
   this->getLog()->outdateAllMessages();
   QtConcurrent::run(boost::bind(&cedar::proc::Group::reset, this->mGroup->getGroup()));
+}
+
+void cedar::proc::gui::Ide::brakeAllRobots()
+{
+  cedar::dev::Component::startBrakingAllComponentsSlowly();
 }
 
 void cedar::proc::gui::Ide::showAboutDialog()
@@ -2128,7 +2184,7 @@ void cedar::proc::gui::Ide::updateArchitectureWidgetsMenu()
   QMenu* menu = this->mpMenuArchitecturePlots;
   menu->clear();
 
-  auto manage_action = menu->addAction("manage");
+  auto manage_action = menu->addAction("Manage...");
   QObject::connect(manage_action, SIGNAL(triggered()), this, SLOT(showManageArchitectureWidgetsDialog()));
   menu->addSeparator();
 
@@ -2151,10 +2207,11 @@ void cedar::proc::gui::Ide::updateArchitectureWidgetsMenu()
 void cedar::proc::gui::Ide::updateArchitectureScriptsMenu()
 {
   QMenu* menu = this->mpMenuArchitectureScripts;
-  menu->clear();
+
+  //menu->clear(); dont delete the .ui menu items
 
   // add an action to open the script manager
-  auto manage_action = menu->addAction("manage");
+  auto manage_action = menu->addAction("C++ scripts...");
   QObject::connect(manage_action, SIGNAL(triggered()), this, SLOT(showManageArchitectureScriptsDialog()));
   menu->addSeparator();
 

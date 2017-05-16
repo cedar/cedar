@@ -131,6 +131,13 @@ private slots:
   void stopMovement();
   void setKeepSendingState(int state);
 
+  void saveInitialConfiguration();
+  void loadInitialConfigurations();
+
+  void changeInitialConfig();
+  void applyInitialConfig();
+  void deleteInitialConfig();
+
   //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------
@@ -144,6 +151,8 @@ private:
   QGridLayout *mpGridLayout;
   QComboBox* mpModeBox;
   QCheckBox* mpKeepMovingBox;
+  QComboBox *mpIniconfBox;
+  QLineEdit* mpIniconfName;
   int mTimerId;
 };
 

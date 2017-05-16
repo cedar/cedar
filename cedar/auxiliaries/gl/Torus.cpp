@@ -89,9 +89,9 @@ void cedar::aux::gl::Torus::draw()
   prepareDraw();
   
   // draw the Torus
-  if (mIsVisible)
+  if (isVisible())
   {
-    gl::setColor(mColorR, mColorG, mColorB);
-    drawTorus(mRadius, mThickness, mResolution, mResolution, mIsDrawnAsWireFrame);
+    gl::setColor(getColorR(), getColorG(), getColorB());
+    drawTorus(mRadius, mThickness, getResolution(), getResolution(), getIsDrawnAsWireFrame());
   }
 }

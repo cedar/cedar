@@ -67,7 +67,11 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief constructor with parent widget */
+
+  /*!@brief standard constructor to be used by the Qt UI header generator*/
+  SceneWidget(QWidget* parent=0);
+
+  /*!@brief constructor with parent widget and scene pointer */
   SceneWidget(cedar::aux::gl::ScenePtr p_scene, QWidget* parent=0);
   
   /*!@brief the destructor */

@@ -267,7 +267,6 @@ double cedar::proc::steps::Normalization::safeNormInverse(double norm) const
   {
     return 1.0;
   }
-
   if (std::abs(norm) < std::numeric_limits<float>::min())
   {
     return 1.0;

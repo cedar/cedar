@@ -79,7 +79,7 @@ public:
   //!@brief Returns the current readings of the sensor.
   virtual cv::Mat getData();
 
-  void updateIrValues();
+  cv::Mat updateIrValues();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -99,7 +99,7 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  static cedar::dev::Component::ComponentDataType M_IR_VALUES_ID;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

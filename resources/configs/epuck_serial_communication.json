@@ -1,9 +1,0 @@
-{
-  "name": "serial communication",
-  "device path": "/dev/rfcomm0",
-  "baud rate": "4098",
-  "end of command string": "\\r\\n",
-  "country flag": "0",
-  "time out": "250000",
-  "latency": "10000"
-}

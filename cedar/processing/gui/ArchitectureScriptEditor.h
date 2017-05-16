@@ -97,7 +97,7 @@ namespace cedar
  */
 class cedar::proc::gui::ArchitectureScriptEditor : public QWidget, Ui_ArchitectureScriptEditor
 {
-  Q_OBJECT
+Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -108,7 +108,7 @@ class cedar::proc::gui::ArchitectureScriptEditor : public QWidget, Ui_Architectu
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ArchitectureScriptEditor(cedar::proc::gui::GroupPtr group, QWidget* pParent = nullptr);
+  ArchitectureScriptEditor(cedar::proc::gui::GroupPtr group, QWidget *pParent = nullptr);
 
 signals:
   //! signaling that a script was added to a group
@@ -147,6 +147,8 @@ private:
 
   void refreshScriptList();
 
+  cedar::proc::gui::GroupPtr getGroup() const;
+
 private slots:
   void addClicked();
 
@@ -168,7 +170,7 @@ private slots:
 protected:
   // none yet
 private:
-  cedar::proc::gui::GroupPtr mGroup;
+  cedar::proc::gui::GroupWeakPtr mGroup;
 
   boost::signals2::scoped_connection mConnectionScriptAdded;
 

@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LockType.h"
+#include "cedar/auxiliaries/LockerBase.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -92,17 +93,17 @@ namespace cedar
     inline void lock(LockSet& locks)
     {
       // The implicit ordering of the set is used to impose the canonical lock order here.
-      for (LockSet::iterator iter = locks.begin(); iter != locks.end(); ++iter)
+      for (const auto& lock_type_pair : locks)
       {
         // switch based on the lock type
-        switch (iter->second)
+        switch (lock_type_pair.second)
         {
           case cedar::aux::LOCK_TYPE_READ:
-            iter->first->lockForRead();
+            lock_type_pair.first->lockForRead();
             break;
 
           case cedar::aux::LOCK_TYPE_WRITE:
-            iter->first->lockForWrite();
+            lock_type_pair.first->lockForWrite();
             break;
 
           case cedar::aux::LOCK_TYPE_DONT_LOCK:
@@ -119,11 +120,11 @@ namespace cedar
     inline void unlock(LockSet& locks)
     {
       // The implicit ordering of the set is used to impose the canonical lock order here.
-      for (LockSet::iterator iter = locks.begin(); iter != locks.end(); ++iter)
+      for (const auto& lock_type_pair : locks)
       {
-        if (iter->second != cedar::aux::LOCK_TYPE_DONT_LOCK)
+        if (lock_type_pair.second != cedar::aux::LOCK_TYPE_DONT_LOCK)
         {
-          iter->first->unlock();
+          lock_type_pair.first->unlock();
         }
       }
     }
@@ -137,17 +138,17 @@ namespace cedar
         return;
       }
 
-      for (std::set<QReadWriteLock*>::const_iterator iter = locks.begin(); iter != locks.end(); ++iter)
+      for (const auto& lock : locks)
       {
         // switch based on the lock type
         switch (type)
         {
           case cedar::aux::LOCK_TYPE_READ:
-            (*iter)->lockForRead();
+            lock->lockForRead();
             break;
 
           case cedar::aux::LOCK_TYPE_WRITE:
-            (*iter)->lockForWrite();
+            lock->lockForWrite();
             break;
 
           case cedar::aux::LOCK_TYPE_DONT_LOCK:
@@ -166,11 +167,32 @@ namespace cedar
         return;
       }
 
-      for (std::set<QReadWriteLock*>::const_iterator iter = locks.begin(); iter != locks.end(); ++iter)
+      for (const auto& lock : locks)
       {
-        (*iter)->unlock();
+        lock->unlock();
       }
     }
+
+    /*! A RAII-based locker for cedar::aux::LockSet.
+     * @see cedar::aux::LockerBase.
+     */
+    class LockSetLocker : public cedar::aux::LockerBase
+    {
+      public:
+        //! Constructor.
+        LockSetLocker(const cedar::aux::LockSet& lockSet);
+
+        //! Destructor.
+        ~LockSetLocker();
+
+      private:
+        void applyLock();
+
+        void applyUnlock();
+
+      private:
+        cedar::aux::LockSet mLockSet;
+    };
   }
 }
 
