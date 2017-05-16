@@ -49,6 +49,8 @@
 // SYSTEM INCLUDES
 #include <QObject>
 
+#include <QReadWriteLock>
+
 
 /*!@brief Responsible for changing the icon of DNFs.
  */
@@ -81,9 +83,10 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-  void updateActivityIcon(bool isActive);
+
 private slots:
   void updateIconDimensionality();
+  void updateActivityIcon(bool isActive);
 
 
   //--------------------------------------------------------------------------------------------------------------------
