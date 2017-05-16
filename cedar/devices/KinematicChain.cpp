@@ -1080,7 +1080,7 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
                       xdot = -1 * (getJointAngles() - findCurrent->second);
 
                       mControllerFinished = true;
-                      const float l_max_vel = 0.5;
+                      const float l_max_vel = 0.1;
 
                       for(int i = 0; i<xdot.rows; ++i)
                       {
