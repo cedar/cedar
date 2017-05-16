@@ -612,7 +612,7 @@ protected:
 private:
 
   //! the forward kinematic model
-  ForwardKinematicsPtr mForwardKinematics;
+  std::unique_ptr<ForwardKinematics> mForwardKinematics;
 
   //!@brief map of the named initial configurations
   std::map<std::string, cv::Mat> mInitialConfigurations;
