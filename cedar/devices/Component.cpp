@@ -2221,7 +2221,6 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
   {
     mWatchDogCounter.member()++;
    
-std::cout << " TEST " << mWatchDogCounter.member() << std::endl;          
     for(auto component : components_to_delete)
     {
       if (mWatchDogCounter.member() == 1
