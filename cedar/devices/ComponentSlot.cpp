@@ -36,7 +36,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/ObjectMapParameterTemplate.h"
-#include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/devices/ComponentSlot.h"
 #include "cedar/devices/Component.h"
 #include "cedar/devices/RobotManager.h"

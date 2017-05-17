@@ -227,12 +227,14 @@ cedar::proc::steps::Component::Component()
 :
 cedar::proc::Step(true),
 _mComponent(new cedar::dev::ComponentParameter(this, "component")),
-_mGroup(new cedar::proc::details::ComponentStepGroupParameter(this, "command group"))
+_mGroup(new cedar::proc::details::ComponentStepGroupParameter(this, "command group")),
+_mCommunicationStepSize(new cedar::aux::DoubleParameter(this, "communication step size [ms]", 10.0, 0.01, 100))
 {
   this->_mGroup->setConstant(true);
 
   QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SLOT(componentChangedSlot()));
   QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SIGNAL(componentChanged()));
+  QObject::connect(this->_mCommunicationStepSize.get(), SIGNAL(valueChanged()), this, SLOT(communicationStepSizeChanged()));
   QObject::connect(this->_mGroup.get(), SIGNAL(valueChanged()), this, SLOT(selectedGroupChanged()));
 
   this->mMeasurementTimeId = this->registerTimeMeasurement("step measurements time");
@@ -271,6 +273,13 @@ bool cedar::proc::steps::Component::hasComponent() const
 void cedar::proc::steps::Component::selectedGroupChanged()
 {
   this->rebuildInputs();
+}
+
+void cedar::proc::steps::Component::communicationStepSizeChanged()
+{
+  const double &paramvalue = _mCommunicationStepSize->getValue();
+  const cedar::unit::Time step_size = cedar::unit::Time(paramvalue * cedar::unit::milli * cedar::unit::seconds);
+  this->getComponent()->setStepSize(step_size);
 }
 
 void cedar::proc::steps::Component::testStates(cedar::dev::ComponentPtr component)

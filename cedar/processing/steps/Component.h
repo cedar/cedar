@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/ParameterTemplate.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/steps/Component.fwd.h"
@@ -186,6 +187,8 @@ private slots:
 
   void selectedGroupChanged();
 
+  void communicationStepSizeChanged();
+
   void testStates(cedar::dev::ComponentPtr component);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -211,6 +214,9 @@ private:
   cedar::dev::ComponentParameterPtr _mComponent;
 
   cedar::proc::details::ComponentStepGroupParameterPtr _mGroup;
+
+  //! Type of the channel stored in this component.
+  cedar::aux::DoubleParameterPtr _mCommunicationStepSize;
 
 }; // class cedar::proc::steps::Component
 
