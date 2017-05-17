@@ -59,6 +59,7 @@
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/units/Time.h"
+#include "cedar/auxiliaries/MatrixIterator.h"
 #include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
@@ -140,6 +141,7 @@ mSigmoidalActivation(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mLateralInteraction(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mInputSum(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mInputNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
+mMaximumLocation(new cedar::aux::MatData(cv::Mat::zeros(2, 1, CV_32F))),
 mNeuralNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mRestingLevel
 (
@@ -175,6 +177,17 @@ mIsActive(false),
 // parameters
 _mOutputActivation(new cedar::aux::BoolParameter(this, "activation as output", false)),
 _mDiscreteMetric(new cedar::aux::BoolParameter(this, "discrete metric (workaround)", false)),
+_mUpdateStepGui(new cedar::aux::BoolParameter(this, "update stepIcon according to output", true)),
+_mUpdateStepGuiThreshold
+        (
+                new cedar::aux::DoubleParameter
+                        (
+                                this,
+                                "threshold for updating the stepIcon",
+                                0.8,
+                                cedar::aux::DoubleParameter::LimitType::positiveZero()
+                        )
+        ),
 _mDimensionality
 (
   new cedar::aux::UIntParameter
@@ -226,6 +239,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   this->declareBuffer("neural noise kernel", this->_mNoiseCorrelationKernelConvolution->getCombinedKernel());
   this->declareBuffer("input sum", mInputSum);
   this->declareBuffer("noise", this->mInputNoise);
+  this->declareBuffer("location of maximum", this->mMaximumLocation);
 
   this->declareOutput("sigmoided activation", mSigmoidalActivation);
   this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::ValueRangeHint(0, 1)));
@@ -234,6 +248,8 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 
   this->_mOutputActivation->markAdvanced();
   this->_mDiscreteMetric->markAdvanced();
+  this->_mUpdateStepGui->markAdvanced();
+  this->_mUpdateStepGuiThreshold->markAdvanced();
 
   // setup default kernels
   std::vector<cedar::aux::kernel::KernelPtr> kernel_defaults;
@@ -544,19 +560,68 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
     // calculate output
     sigmoid_u = _mSigmoid->getValue()->compute(u);
   }
-  //Experimental Part to Update the GUI
-  if(_mDimensionality->getValue() == 0)
+//  //Experimental Part to Update the GUI
+  if(_mUpdateStepGui->getValue())
   {
-    float curValue = sigmoid_u.at<float>(0,0);
-    if( curValue > 0.8 && !mIsActive )
+    double maximum =std::numeric_limits<double>::min();
+    if(_mDimensionality->getValue()<3)
     {
-      this->emitOutputValueChangedSignal(curValue);
-      mIsActive = true;
+      double minimum;
+
+      if (sigmoid_u.channels() < 2 
+          && sigmoid_u.dims == 2)// one channel only
+      {
+        int minLoc[2]= {-1, -1}; // would be nice if this would work for the general nD case ...
+        int maxLoc[2]= {-1, -1};
+
+        cv::minMaxIdx(sigmoid_u, &minimum, &maximum, minLoc, maxLoc);
+                                           // only works for single channels
+
+        if (mMaximumLocation->isEmpty()
+            || mMaximumLocation->getDimensionality()
+               != static_cast<unsigned int>(sigmoid_u.dims) )
+        {
+          mMaximumLocation->getData().create( sigmoid_u.dims,
+                                             { 1 },
+                                             CV_32F );
+        }
+
+        mMaximumLocation->getData().at<float>(0,0) = maxLoc[0];
+        mMaximumLocation->getData().at<float>(1,0) = maxLoc[1];
+
+      }
+      else
+      {
+        cv::minMaxLoc(sigmoid_u, &minimum, &maximum); 
+      }
     }
-    else if(curValue < 0.8 && mIsActive)
+    else
     {
-      this->emitOutputValueChangedSignal(curValue);
+      // create an iterator for the input matrix
+      cedar::aux::MatrixIterator matrix_iterator(sigmoid_u);
+
+      // iterate over input matrix and find the maximum value
+      do
+      {
+        double current_value = sigmoid_u.at<float>(matrix_iterator.getCurrentIndex());
+
+        if (current_value > maximum)
+        {
+          maximum = current_value;
+        }
+      }
+      while (matrix_iterator.increment());
+    }
+
+    if( maximum > _mUpdateStepGuiThreshold->getValue() && !mIsActive )
+    {
+      mIsActive = true;
+      this->emitOutputValueChangedSignal(mIsActive);
+    }
+    else if(maximum < _mUpdateStepGuiThreshold->getValue() && mIsActive)
+    {
       mIsActive = false;
+      this->emitOutputValueChangedSignal(mIsActive);
     }
   }
   //End of Experimental Part

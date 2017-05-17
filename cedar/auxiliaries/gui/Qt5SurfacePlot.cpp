@@ -56,7 +56,7 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/Log.h"
-
+#include <QtDataVisualization/QAbstract3DSeries>
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
 #include <QMenu>
@@ -64,6 +64,7 @@
 #include <QtMath>
 #include <iostream>
 #include <QLinearGradient>
+#include <QApplication>
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -127,7 +128,6 @@ void cedar::aux::gui::Qt5SurfacePlot::deleteArrayData()
 
 void cedar::aux::gui::Qt5SurfacePlot::updateArrayData()
 {
-
   cv::Mat data;
   this->mMatData->lockForRead();
   this->mMatData->getData().convertTo(data, CV_64F);
@@ -147,21 +147,22 @@ void cedar::aux::gui::Qt5SurfacePlot::updateArrayData()
   this->y_min = std::numeric_limits<double>::max();
   this->y_max = -std::numeric_limits<double>::max();
 
-  this->dataArray = new QtDataVisualization::QSurfaceDataArray;
+
+  this->dataArray = new QtDataVisualization::QSurfaceDataArray();
+
+  this->dataArray->reserve(mDataRows);
   for (size_t i = 0; i < mDataRows; ++i)
   {
-    QtDataVisualization::QSurfaceDataRow *newRow = new QtDataVisualization::QSurfaceDataRow();
+    QtDataVisualization::QSurfaceDataRow *newRow = new QtDataVisualization::QSurfaceDataRow(mDataCols);
     for (size_t j = 0; j < mDataCols; ++j)
     {
       double y = data.at<double>(i, j);
-      newRow->append(QVector3D(i, y, j));
+      (*newRow)[j].setPosition(QVector3D(i, y, j));
       this->y_min = std::min(this->y_min, y);
       this->y_max = std::max(this->y_max, y);
     }
-    this->dataArray->append(newRow);
+    *dataArray << newRow;
   }
-
-
 }
 
 //void cedar::aux::gui::Qt5SurfacePlot::Perspective::applyTo(Qwt3D::Plot3D* pPlot)
@@ -215,6 +216,9 @@ void cedar::aux::gui::Qt5SurfacePlot::init()
 
   QWidget *container = QWidget::createWindowContainer(m_graph);
 
+//  container->setAttribute(Qt::WA_PaintOnScreen);
+//  container->setAttribute(Qt::WA_NativeWindow);
+
   this->resetPerspective();
 //  m_graph->scene()->activeCamera()->setCameraPreset(QtDataVisualization::Q3DCamera::CameraPresetDirectlyAbove);
 //  m_graph->scene()->activeCamera()->setXRotation(270);
@@ -223,6 +227,7 @@ void cedar::aux::gui::Qt5SurfacePlot::init()
   m_graph->activeTheme()->setLightStrength(0.0);
   m_graph->activeTheme()->setLabelBorderEnabled(false);
   m_graph->activeTheme()->setGridEnabled(false);
+  m_graph->setShadowQuality(QtDataVisualization::QAbstract3DGraph::ShadowQualityNone);
   auto curFont = m_graph->activeTheme()->font();
   curFont.setPointSize(160);
   curFont.setBold(mIsBold);
@@ -239,8 +244,6 @@ void cedar::aux::gui::Qt5SurfacePlot::init()
 
   this->layout()->addWidget(container);
 
-  // m_graph->setShadowQuality(QtDataVisualization::QAbstract3DGraph::ShadowQualityNone);
-
   //Qt5 Example
   m_graph->setAxisX(new QtDataVisualization::QValue3DAxis);
   m_graph->setAxisY(new QtDataVisualization::QValue3DAxis);
@@ -250,7 +253,18 @@ void cedar::aux::gui::Qt5SurfacePlot::init()
   m_sqrtSinSeries = new QtDataVisualization::QSurface3DSeries(m_sqrtSinProxy);
 
   m_sqrtSinSeries->setDrawMode(QtDataVisualization::QSurface3DSeries::DrawSurface); //DrawSurfaceAndWireframe
-  m_sqrtSinSeries->setFlatShadingEnabled(false);
+
+
+//  if(m_sqrtSinSeries->isFlatShadingSupported())
+//  {
+//    std::cout<<"Flat Shading would be Supported, but we do not use it anyway!"<<std::endl;
+//  }
+  m_sqrtSinSeries->setFlatShadingEnabled(m_sqrtSinSeries->isFlatShadingSupported());
+
+
+//  std::cout<<"The initial Mesh is: " << m_sqrtSinSeries->mesh()<< std::endl;
+  m_sqrtSinSeries->setMesh(QtDataVisualization::QAbstract3DSeries::MeshCube);
+//  std::cout<<"The new Mesh is: " << m_sqrtSinSeries->mesh()<< std::endl;
 
   m_graph->axisX()->setLabelFormat("%.1f");
   m_graph->axisY()->setLabelFormat("%.1f");
@@ -298,9 +312,9 @@ void cedar::aux::gui::Qt5SurfacePlot::init()
   this->mpWorkerThread = new QThread();
   mWorker = cedar::aux::gui::detail::Qt5SurfacePlotWorkerPtr(new cedar::aux::gui::detail::Qt5SurfacePlotWorker(this));
   mWorker->moveToThread(this->mpWorkerThread);
-  QObject::connect(this, SIGNAL(convert()), mWorker.get(), SLOT(convert()));
-  QObject::connect(mWorker.get(), SIGNAL(done()), this, SLOT(conversionDone()));
-//
+  QObject::connect(this, SIGNAL(convert()), mWorker.get(), SLOT(convert()));//,Qt::DirectConnection)
+  QObject::connect(mWorker.get(), SIGNAL(done()), this, SLOT(conversionDone()));//,Qt::DirectConnection
+
   mpWorkerThread->start(QThread::LowPriority);
 }
 
@@ -315,6 +329,7 @@ void cedar::aux::gui::detail::Qt5SurfacePlotWorker::convert()
 void cedar::aux::gui::Qt5SurfacePlot::conversionDone()
 {
   QReadLocker locker(this->mpLock);
+
   m_graph->axisX()->setRange(-0.001f, mDataRows + 0.001f);
   m_graph->axisY()->setRange(this->y_min - 0.001f, this->y_max + 0.001f);
   m_graph->axisZ()->setRange(-0.001f, mDataCols + 0.001f);
@@ -326,6 +341,7 @@ void cedar::aux::gui::Qt5SurfacePlot::timerEvent(QTimerEvent * /* pEvent */)
 {
   if (this->isVisible() && this->mMatData)
   {
+//    QApplication::processEvents();//QEventLoop::ExcludeUserInputEvents
     emit convert();
   }
 }

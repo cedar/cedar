@@ -688,6 +688,8 @@ protected:
 
 void cedar::dev::Component::init()
 {
+  this->mDestroying= false;
+
   this->mMeasurementData = boost::make_shared<cedar::dev::Component::MeasurementDataCollection>();
   this->mCommandData = boost::make_shared<cedar::dev::Component::CommandDataCollection>();
   mCommunicationThread = std::unique_ptr<cedar::aux::LoopFunctionInThread>(
@@ -698,7 +700,7 @@ void cedar::dev::Component::init()
 
 
   mCommunicationThread->connectToStartSignal(boost::bind(&cedar::dev::Component::processStart, this));
-  mCommunicationThread->setStepSize(cedar::unit::Time(100.0 * cedar::unit::milli * cedar::unit::seconds)); // todo: use parameter
+  mCommunicationThread->setStepSize(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds)); // todo: use parameter
 
   this->mLostTime = 0.0 * cedar::unit::seconds;
 
@@ -743,6 +745,8 @@ void cedar::dev::Component::prepareComponentDestructAbsolutelyRequired()
 
 cedar::dev::Component::~Component()
 {
+  mDestroying= true;
+
   if (!mDestructWasPrepared)
   {
     cedar::aux::LogSingleton::getInstance()->error
@@ -765,6 +769,8 @@ cedar::dev::Component::~Component()
   mWatchDogThread->stop();
   mCommunicationThread->stop();
 
+  mWatchDogThread->wait();
+  mCommunicationThread->wait();
 
   // wait for end of communication
   {
@@ -1540,6 +1546,9 @@ void cedar::dev::Component::stepMeasurementCommunication(cedar::unit::Time dt)
     cedar::aux::append(locks, this->mRetrieveMeasurementHooks.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
     cedar::aux::LockSetLocker locker(locks);
 
+    if (mDestroying)
+      return;
+
     // thinks I can get directly from HW:
     for (const auto& type : this->mMeasurementData->getInstalledTypes())
     {
@@ -1612,6 +1621,9 @@ void cedar::dev::Component::updateUserSideMeasurements()
   }
 
   locker.unlock();
+  
+  if (mDestroying)
+    return;
 
   emit updatedUserMeasurementSignal();
 }
@@ -2161,6 +2173,10 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
 {
   auto now = boost::posix_time::microsec_clock::local_time();
   std::vector<cedar::dev::Component*> components_to_delete;
+  bool doCountWatchdog= false;
+
+  QWriteLocker lock(&mWatchDogCounter.getLock()); // anti-scrolling
+
   for( auto component_it : mRunningComponentInstancesAliveTime )
   {    
     auto componentpointer = component_it.first;
@@ -2194,40 +2210,52 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
       }
       else
       {
-        // dont scroll:
-        QWriteLocker lock(&mWatchDogCounter.getLock());
-
-        mWatchDogCounter.member()++;
-
-        if (mWatchDogCounter.member() == 1
-            || mWatchDogCounter.member() > 5000)
-        {
-          std::string s = "";
-          
-          if (mWatchDogCounter.member() > 5000)
-          {
-            s = " (repeated " + boost::lexical_cast<std::string>(mWatchDogCounter.member()) + " times)";
-          }
-
-          cedar::aux::LogSingleton::getInstance()->error(
-              "Watchdog says: thread of " + componentpointer->prettifyName() + " is hanging. You are advised to stop the the component manually." 
-              + s,
-              CEDAR_CURRENT_FUNCTION_NAME);
-          mWatchDogCounter.member() = 0;
-        }
+        doCountWatchdog++;
 
         components_to_delete.push_back(componentpointer);
       }
     }
   }
 
-  for(auto component : components_to_delete)
+  if (doCountWatchdog)
   {
-    //component->startBrakingNow();
-    cedar::aux::LogSingleton::getInstance()->warning(
-                  "The component" +component->prettifyName()+ " is not braked by the watchdog anymore!" ,
-                  CEDAR_CURRENT_FUNCTION_NAME);
+    mWatchDogCounter.member()++;
+   
+std::cout << " TEST " << mWatchDogCounter.member() << std::endl;          
+    for(auto component : components_to_delete)
+    {
+      if (mWatchDogCounter.member() == 1
+          || mWatchDogCounter.member() > 5000)
+      {
+        std::string s = "";
+          
+        if (mWatchDogCounter.member() > 5000)
+        {
+          s = " (repeated " + boost::lexical_cast<std::string>(mWatchDogCounter.member()) + " times)";
+
+          mWatchDogCounter.member() = 0;
+        }
+
+        cedar::aux::LogSingleton::getInstance()->error(
+            "Watchdog says: thread of " + component->prettifyName() + " is hanging. You are advised to stop the the component manually." 
+            + s,
+            CEDAR_CURRENT_FUNCTION_NAME);
+      }
+    }
   }
+
+#if 0
+  if (doCountWatchdog)
+  {
+    for(auto component : components_to_delete)
+    {
+      //component->startBrakingNow();
+      cedar::aux::LogSingleton::getInstance()->warning(
+                    "The component" +component->prettifyName()+ " is not braked by the watchdog anymore!" ,
+                    CEDAR_CURRENT_FUNCTION_NAME);
+    }
+  }
+#endif
 }
 
 // static:

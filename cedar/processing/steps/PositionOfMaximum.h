@@ -22,39 +22,41 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NeuralFieldView.h
+    File:        PositionOfMaximum.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2014 08 01
+    Maintainer:  Jean-Stephane Jokeit
+    Email:       
+    Date:        2017 05 14
 
-    Description: Header file for the class cedar::dyn::gui::NeuralFieldView.
+    Description: Header file for the class cedar::proc::steps::PositionOfMaximum.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DYN_GUI_NEURAL_FIELD_VIEW_H
-#define CEDAR_DYN_GUI_NEURAL_FIELD_VIEW_H
+#ifndef CEDAR_PROC_STEPS_POSITION_OF_MAXIMUM_H
+#define CEDAR_PROC_STEPS_POSITION_OF_MAXIMUM_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/DefaultConnectableIconView.h"
+#include <cedar/processing/Step.h>
+#include <cedar/processing/InputSlotHelper.h>
+#include <cedar/auxiliaries/MatData.h>
 
 // FORWARD DECLARATIONS
-#include "cedar/dynamics/gui/NeuralFieldView.fwd.h"
+#include "cedar/processing/steps/PositionOfMaximum.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QObject>
 
 
-/*!@brief Responsible for changing the icon of DNFs.
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::dyn::gui::NeuralFieldView : public QObject, public cedar::proc::gui::DefaultConnectableIconView
+class cedar::proc::steps::PositionOfMaximum : public cedar::proc::Step
 {
-  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -63,7 +65,8 @@ class cedar::dyn::gui::NeuralFieldView : public QObject, public cedar::proc::gui
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet (compiler generated)
+  //!@brief The standard constructor.
+  PositionOfMaximum();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -75,16 +78,15 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! reacts to changes in the connectable
-  void connectableChanged();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-  void updateActivityIcon(bool isActive);
-private slots:
-  void updateIconDimensionality();
+private:
+  void inputConnectionChanged(const std::string& inputName);
 
+  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -92,7 +94,11 @@ private slots:
 protected:
   // none yet
 private:
-  // none yet
+  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
+  cedar::aux::ConstMatDataPtr mInput;
+
+  //!@brief The output data.
+  cedar::aux::MatDataPtr mOutput;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -103,7 +109,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dyn::gui::NeuralFieldView
+}; // class cedar::proc::steps::PositionOfMaximum
 
-#endif // CEDAR_DYN_GUI_NEURAL_FIELD_VIEW_H
+#endif // CEDAR_PROC_STEPS_POSITION_OF_MAXIMUM_H
 

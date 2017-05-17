@@ -1254,9 +1254,9 @@ void cedar::proc::Connectable::emitOutputPropertiesChangedSignal(const std::stri
   }
 }
 
-void cedar::proc::Connectable::emitOutputValueChangedSignal(const float& newDataValue)
+void cedar::proc::Connectable::emitOutputValueChangedSignal(const bool& isActive)
 {
-    this->signalOutputValueChanged(newDataValue);
+    this->signalOutputValueChanged(isActive);
 }
 
 std::map<std::string, cedar::unit::Time> cedar::proc::Connectable::unregisterRecordedData() const

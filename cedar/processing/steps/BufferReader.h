@@ -22,37 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NeuralFieldView.h
+    File:        BufferReader.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2014 08 01
+    Date:        2012 06 06
 
-    Description: Header file for the class cedar::dyn::gui::NeuralFieldView.
+    Description: Header file for the class cedar::proc::steps::BufferReader.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DYN_GUI_NEURAL_FIELD_VIEW_H
-#define CEDAR_DYN_GUI_NEURAL_FIELD_VIEW_H
+#ifndef CEDAR_PROC_STEPS_BUFFER_READER_H
+#define CEDAR_PROC_STEPS_BUFFER_READER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/DefaultConnectableIconView.h"
+#include <cedar/processing/Step.h>
+#include <cedar/processing/InputSlotHelper.h>
+#include <cedar/auxiliaries/MatData.h>
 
 // FORWARD DECLARATIONS
-#include "cedar/dynamics/gui/NeuralFieldView.fwd.h"
+#include "cedar/processing/steps/BufferReader.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QObject>
 
 
-/*!@brief Responsible for changing the icon of DNFs.
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::dyn::gui::NeuralFieldView : public QObject, public cedar::proc::gui::DefaultConnectableIconView
+class cedar::proc::steps::BufferReader : public cedar::proc::Step
 {
   Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
@@ -63,7 +66,8 @@ class cedar::dyn::gui::NeuralFieldView : public QObject, public cedar::proc::gui
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet (compiler generated)
+  //!@brief The standard constructor.
+  BufferReader();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -75,16 +79,19 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! reacts to changes in the connectable
-  void connectableChanged();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-  void updateActivityIcon(bool isActive);
-private slots:
-  void updateIconDimensionality();
+private:
+  void compute(const cedar::proc::Arguments& arguments);
+  
 
+  inline const std::string& getPath() const
+  {
+    return this->mPath->getValue();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -92,7 +99,14 @@ private slots:
 protected:
   // none yet
 private:
-  // none yet
+  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
+  cedar::aux::ConstMatDataPtr mInput;
+
+  //!@brief The output data.
+  cedar::aux::MatDataPtr mOutput;
+
+private slots:
+  void bufferPathChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -101,9 +115,10 @@ protected:
   // none yet
 
 private:
-  // none yet
+  //!@brief Path of the buffer to be stolen
+  cedar::aux::StringParameterPtr mPath;
 
-}; // class cedar::dyn::gui::NeuralFieldView
+}; // class cedar::proc::steps::BufferReader
 
-#endif // CEDAR_DYN_GUI_NEURAL_FIELD_VIEW_H
+#endif // CEDAR_PROC_STEPS_BUFFER_READER_H
 
