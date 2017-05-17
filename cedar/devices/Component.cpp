@@ -700,7 +700,7 @@ void cedar::dev::Component::init()
 
 
   mCommunicationThread->connectToStartSignal(boost::bind(&cedar::dev::Component::processStart, this));
-  mCommunicationThread->setStepSize(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds)); // todo: use parameter
+  mCommunicationThread->setStepSize(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
 
   this->mLostTime = 0.0 * cedar::unit::seconds;
 
