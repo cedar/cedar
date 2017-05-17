@@ -107,8 +107,7 @@ parser.add_option("-o", "--overwrite", dest="overwrite",
                   default=None, action="store_true")
                   
 parser.add_option("-t", "--template", dest="template",
-                  help="When specified, selects a specific template to be used. Currently, the only option is processing_step",
-                  default=None, action="store")
+                  help="When specified, selects a specific template to be used.  Currently, the only option is 'step'. USE THIS TO CREATE NEW STEPS!", default=None, action="store")
                  
 
 (options, args) = parser.parse_args()
@@ -118,6 +117,8 @@ header_only = options.header_only
 fwd_only = options.fwd_only
 overwrite = options.overwrite
 if not options.template is None:
+    if (options.template == "step"):
+        options.template= "processing_step"
     if not os.path.exists(template_base_path + options.template):
         print "Could not find template", options.template
         sys.exit(-1)

@@ -220,7 +220,7 @@ public:
   virtual void emitOutputPropertiesChangedSignal(const std::string& slot);
 
   //!@brief Notifies the corresponding StepViews about new OutputValues and this may change the stepIcon
-  virtual void emitOutputValueChangedSignal(const float& newDataValue);
+  virtual void emitOutputValueChangedSignal(const bool& isActive);
 
   //! Returns if this step is marked as being recorded.
   bool isRecorded() const;

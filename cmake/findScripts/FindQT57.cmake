@@ -1,5 +1,5 @@
 # Find QT57 and create the following output:
-# QT_FOUND - whether FFTW was found or not
+# QT_FOUND - whether QT57 was found or not
 # Qt5_!PACKAGENAME!_INCLUDE_DIRS - the include directories for the different Qt5 Packages
 # QT_VERSION - will be set to 5
 # QT_UIC_EXECUTABLE - will be set to the 5.7 executable
