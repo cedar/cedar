@@ -278,6 +278,8 @@ public:
   //!@brief Sets a Decoration that shows that the step is registered in the recorder
   void setRecorded(bool status);
 
+  //!@brief Check wether the Plotwidget with the Label is a childWidget of the Connectable
+  bool doesPlotWidgetExist(std::string plotWidgetLabel);
 
 public slots:
   //! Updates whether the connectable shows the color of its trigger.
@@ -297,6 +299,9 @@ public slots:
 
   //!@brief toggles visibility of the plots this step has opened
   void toggleVisibilityOfPlots(bool visible = true);
+
+  //!@brief toggles visibility of the plot with the specific Label
+  void toggleVisibilityOfPlot(std::string plotWidgetLabel,bool visible = true);
 
   //!@brief plots all data (!)
   void plotAll();
@@ -402,7 +407,7 @@ protected:
   void handleContextMenuAction(QAction* action, QGraphicsSceneContextMenuEvent* event);
 
   //! write all open child widgets to a configuration node
-  void writeOpenChildWidgets(cedar::aux::ConfigurationNode& node) const;
+  void writeOpenChildWidgets(cedar::aux::ConfigurationNode& node, bool onlyVisiblePlots = false) const;
 
   /*! Returns a formatted string that can be used for labels/window titles.
    */

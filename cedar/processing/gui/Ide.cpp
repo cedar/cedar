@@ -539,6 +539,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
       this,
       SLOT(togglePlotGroupActions())
   );
+
   // make sure that we start with the right setting
   this->togglePlotGroupActions();
 
@@ -1910,6 +1911,10 @@ void cedar::proc::gui::Ide::closePlots()
   }
 
   this->mGroup->closeOpenArchitectureWidgets();
+
+  this->mGroup->setAllPlotGroupsVisibility(false);
+
+  this->togglePlotGroupActions();
 }
 
 void cedar::proc::gui::Ide::toggleVisibilityOfPlots(bool hidden)
@@ -2044,6 +2049,7 @@ void cedar::proc::gui::Ide::togglePlotGroupActions()
   if (this->mpPlotGroupsComboBox->count() == 0)
   {
     this->mpActionDisplayPlotGroup->setEnabled(false);
+    this->mpActionDisplayPlotGroup->setChecked(false);
     this->mpActionRenamePlotGroup->setEnabled(false);
     this->mpActionEditPlotGroup->setEnabled(false);
     this->mpActionDeletePlotGroup->setEnabled(false);
@@ -2051,6 +2057,14 @@ void cedar::proc::gui::Ide::togglePlotGroupActions()
   else
   {
     this->mpActionDisplayPlotGroup->setEnabled(true);
+    //Change the Pressed Button depending on the visibility status of the current group
+    QString plot_group_name = this->mpPlotGroupsComboBox->currentText();
+    if(this->mpPlotGroupsComboBox->currentIndex() != -1)
+    {
+      bool visible =  this->mGroup->isPlotGroupVisible(plot_group_name.toStdString()); // toStdString assumes ascii
+      this->mpActionDisplayPlotGroup->setChecked(visible);
+    }
+
     this->mpActionRenamePlotGroup->setEnabled(true);
     this->mpActionEditPlotGroup->setEnabled(true);
     this->mpActionDeletePlotGroup->setEnabled(true);
