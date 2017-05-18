@@ -240,7 +240,8 @@ cedar::proc::gui::PlotWidget::PlotWidget
 mConnectable(connectable),
 mGridSpacing(2),
 mColumns(2),
-mpLayout(new QGridLayout())
+mpLayout(new QGridLayout()),
+mWidgetLabel("")
 {  
   // make a copy of the data to be plotted
   this->mDataList.clear();
@@ -742,6 +743,17 @@ void cedar::proc::gui::PlotWidget::writeConfiguration(cedar::aux::ConfigurationN
   }
 }
 
+
+std::string cedar::proc::gui::PlotWidget::getWidgetLabel() const
+{
+  return this->mWidgetLabel;
+}
+
+void cedar::proc::gui::PlotWidget::setWidgetLabel(std::string label)
+{
+  this->mWidgetLabel = label;
+}
+
 // serialize the datalist for storing it in a configuration node
 cedar::aux::ConfigurationNode cedar::proc::gui::PlotWidget::serialize(const cedar::proc::ElementDeclaration::DataList& dataList) const
 {
@@ -758,8 +770,9 @@ cedar::aux::ConfigurationNode cedar::proc::gui::PlotWidget::serialize(const ceda
 }
 
 // restore plotwidget from a configuration node and add it to the respective step
-void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::aux::ConfigurationNode& node, cedar::proc::gui::Connectable* pConnectable)
+void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::aux::ConfigurationNode& node, cedar::proc::gui::Connectable* pConnectable, std::string label)
 {
+
   //!@todo These should really check if these nodes exist; if one doesn't, this will lead to trouble...
   int width = node.get<int>("width");
   int height = node.get<int>("height");
@@ -777,6 +790,10 @@ void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::a
   }
   
   auto p_plot_widget = new cedar::proc::gui::PlotWidget(pConnectable->getConnectable(), data_list);
+  if(label!="")
+  {
+    p_plot_widget->setWidgetLabel(label);
+  }
   pConnectable->addPlotWidget(p_plot_widget, x, y, width, height);
 
 

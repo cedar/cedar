@@ -160,6 +160,11 @@ public:
   //!@brief write plot configuration to a configuration node
   void writeConfiguration(cedar::aux::ConfigurationNode& root);
 
+  std::string getWidgetLabel() const;
+
+  void setWidgetLabel(std::string label);
+
+
   //!@brief returns name of step plotted by this plot
   static const std::string getStepNameFromConfiguration(const cedar::aux::ConfigurationNode& node)
   {
@@ -167,7 +172,7 @@ public:
   }
 
   //!@brief recover plot from configuration
-  static void createAndShowFromConfiguration(const cedar::aux::ConfigurationNode& node, cedar::proc::gui::Connectable* pConnectable);
+  static void createAndShowFromConfiguration(const cedar::aux::ConfigurationNode& node, cedar::proc::gui::Connectable* pConnectable, std::string label = "");
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -218,7 +223,9 @@ private:
   std::vector<boost::signals2::connection> mSignalConnections;
   std::map<cedar::aux::ConstDataPtr, LabeledPlotPtr> mPlotGridMap;
   //!@brief tuples are of this structure: <row, col>
-  std::list<std::tuple<int, int>> mFreeGridSlots; 
+  std::list<std::tuple<int, int>> mFreeGridSlots;
+
+  std::string mWidgetLabel;
 
 }; // cedar::proc::gui::PlotWidget
 

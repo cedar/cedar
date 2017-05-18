@@ -223,6 +223,9 @@ public:
   //! opens the given plot group
   void displayPlotGroup(std::string plotGroupName);
 
+  //! determines if the specific group is currently visible
+  bool isPlotGroupVisible(std::string plotGroupName);
+
   //!@brief handles events in the context menu
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
@@ -295,6 +298,8 @@ public slots:
 
   //! Opens a container that displays this group.
   void openGroupContainer();
+
+  void setAllPlotGroupsVisibility(bool visibility);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -379,9 +384,9 @@ private:
 
   void processElementRemovedSignal(cedar::proc::ConstElementPtr);
 
-  void readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node);
+//  void readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node);
 
-  void writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const;
+  void writeOpenPlotsTo(cedar::aux::ConfigurationNode& node, bool onlyVisiblePlots = false) const;
 
   void sizeChanged();
 
@@ -457,6 +462,8 @@ private slots:
   void elementNameChanged(const std::string&, const std::string&);
 
   void geometryLockChanged();
+
+  void togglePlotGroupVisibility(bool visible, cedar::aux::ConfigurationNode& node, std::string plotGroupName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

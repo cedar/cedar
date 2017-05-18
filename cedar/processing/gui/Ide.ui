@@ -651,7 +651,7 @@
     <string>New Plot Group</string>
    </property>
    <property name="toolTip">
-    <string>add a plot group</string>
+    <string>Add a new plot group, containing all open plots</string>
    </property>
   </action>
   <action name="mpActionRenamePlotGroup">
@@ -667,6 +667,9 @@
    </property>
   </action>
   <action name="mpActionDisplayPlotGroup">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/display.svg</normaloff>:/toolbaricons/display.svg</iconset>
@@ -675,7 +678,7 @@
     <string>Display Plot Group</string>
    </property>
    <property name="toolTip">
-    <string>display selected plot group</string>
+    <string>Toggle visibility of selected plot group</string>
    </property>
   </action>
   <action name="mpActionDeletePlotGroup">
@@ -780,7 +783,7 @@
     <string>Store Open Plots in Current Plot Group</string>
    </property>
    <property name="toolTip">
-    <string>store open plots in selected plot group</string>
+    <string>Overwrite selected plot group with open plots</string>
    </property>
   </action>
   <action name="mpActionToggleTriggerColor">
