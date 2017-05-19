@@ -2145,18 +2145,17 @@ void cedar::proc::gui::Group::togglePlotGroupVisibility(bool visible, cedar::aux
         auto connectable = this->getGroup()->getElement<cedar::proc::Connectable>(step_name);
         if (connectable) // check if cast worked
         {
-          auto stepMap = this->getScene()->getStepMap();
+          auto stepMap = this->getScene()->getStepMap(); // Get the gui::connectable Element for the proc::connectable
           auto foundElement = std::find_if(stepMap.begin(), stepMap.end(),
                                            [step_name](const std::pair<const cedar::proc::Step *, cedar::proc::gui::StepItem *> &t) -> bool
                                            {
-                                             return t.first->getName() == step_name;
+                                             return t.first->getFullPath() == step_name;
                                            });
           if (foundElement != stepMap.end())
           {
             auto stepItem = foundElement->second;
             if (stepItem->doesPlotWidgetExist(it.first)) //This zero needs to be the real number of plots associated with the step.
             {
-//              stepItem->toggleVisibilityOfPlots(!visible);
               stepItem->toggleVisibilityOfPlot(it.first,!visible);
             } else if (!visible)
             {
@@ -2183,11 +2182,8 @@ void cedar::proc::gui::Group::togglePlotGroupVisibility(bool visible, cedar::aux
     }
   }
 
-//  std::cout<< "Change the Value for Visible! Old Value: " << visible << std::endl;
   node.put("visible",!visible);
-//  bool newVisible = node.get<bool>("visible",false);
-//  std::cout<< " New Value: " << newVisible << std::endl;
-
+  
   if (removed_elements.size() > 0)
   {
     std::string message;
