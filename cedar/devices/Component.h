@@ -137,10 +137,10 @@ public:
   class CouldNotGuessCommandTypeException : public cedar::aux::ExceptionBase {};
 
   //! Thrown when a group name already exists.
-  class DuplicateGroupNameException : public cedar::aux::DuplicateNameException {};
+  class DuplicateUserSelectableCommandTypeSubsetNameException : public cedar::aux::DuplicateNameException {};
 
   //! Thrown when a group name cannot be found.
-  class GroupNameNotFoundException : public cedar::aux::NotFoundException {};
+  class UserSelectableCommandTypeSubsetNameNotFoundException : public cedar::aux::NotFoundException {};
 
   //! Exception that is thrown when there are no submit hooks even though they are needed.
   class NoSubmitHooksException : public cedar::aux::ExceptionBase {};
@@ -292,19 +292,19 @@ public:
   void clearAll();
 
   //! Defines a new command group.
-  void defineCommandGroup(const std::string& groupName);
+  void defineUserSelectableCommandTypeSubset(const std::string& groupName);
 
   //! Lists all available command groups.
-  std::vector<std::string> listCommandGroups() const;
+  std::vector<std::string> listUserSelectableCommandTypeSubsets() const;
 
   //! Adds a given command to the specified group.
-  void addCommandTypeToGroup(const std::string& groupName, const ComponentDataType& commandType);
+  void addCommandTypeToUserSelectableCommandTypeSubset(const std::string& groupName, const ComponentDataType& commandType);
 
   //! Checks whether any command groups are defined for this component.
-  bool hasCommandGroups() const;
+  bool hasUserSelectableCommandTypeSubsets() const;
 
   //! Returns the command types that are in the given command group.
-  std::vector<ComponentDataType> getCommandsInGroup(const std::string& groupName) const;
+  std::vector<ComponentDataType> getCommandsInUserSelectableCommandTypeSubset(const std::string& groupName) const;
 
   void clearController();
   void setController( ComponentDataType buffer, cedar::dev::Component::ControllerCallback fun );

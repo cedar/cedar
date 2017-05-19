@@ -293,60 +293,60 @@ class cedar::dev::Component::DataCollection
       return boost::optional<TransformationFunctionType>();
     }
 
-    void defineGroup(const std::string& groupName)
+    void defineUserSelectableCommandTypeSubset(const std::string& groupName)
     {
-      QWriteLocker locker(this->mGroups.getLockPtr());
-      if (this->hasGroupUnlocked(groupName))
+      QWriteLocker locker(this->mUserSelectableCommandTypeSubsets.getLockPtr());
+      if (this->hasUserSelectableCommandTypeSubsetUnlocked(groupName))
       {
-        CEDAR_THROW(cedar::dev::Component::DuplicateGroupNameException, "The group name \"" + groupName + "\" already exists.");
+        CEDAR_THROW(cedar::dev::Component::DuplicateUserSelectableCommandTypeSubsetNameException, "The group name \"" + groupName + "\" already exists.");
       }
-      this->mGroups.member()[groupName] = std::vector<cedar::dev::Component::ComponentDataType>();
+      this->mUserSelectableCommandTypeSubsets.member()[groupName] = std::vector<cedar::dev::Component::ComponentDataType>();
     }
 
-    std::vector<std::string> listGroups() const
+    std::vector<std::string> listUserSelectableCommandTypeSubsets() const
     {
-      QReadLocker locker(this->mGroups.getLockPtr());
+      QReadLocker locker(this->mUserSelectableCommandTypeSubsets.getLockPtr());
       std::vector<std::string> groups;
-      groups.reserve(this->mGroups.member().size());
-      for (const auto& group_vector_pair : this->mGroups.member())
+      groups.reserve(this->mUserSelectableCommandTypeSubsets.member().size());
+      for (const auto& group_vector_pair : this->mUserSelectableCommandTypeSubsets.member())
       {
         groups.push_back(group_vector_pair.first);
       }
       return groups;
     }
 
-    void addTypeToGroup(const std::string& groupName, const ComponentDataType& commandType)
+    void addTypeToUserSelectableCommandTypeSubset(const std::string& groupName, const ComponentDataType& commandType)
     {
-      QWriteLocker locker(this->mGroups.getLockPtr());
-      auto iter = this->mGroups.member().find(groupName);
-      if (iter == this->mGroups.member().end())
+      QWriteLocker locker(this->mUserSelectableCommandTypeSubsets.getLockPtr());
+      auto iter = this->mUserSelectableCommandTypeSubsets.member().find(groupName);
+      if (iter == this->mUserSelectableCommandTypeSubsets.member().end())
       {
-        CEDAR_THROW(GroupNameNotFoundException, "Could not find a group with the name \"" + groupName + "\".");
+        CEDAR_THROW(UserSelectableCommandTypeSubsetNameNotFoundException, "Could not find a group with the name \"" + groupName + "\".");
       }
       iter->second.push_back(commandType);
     }
 
-    bool hasGroup(const std::string& groupName)
+    bool hasUserSelectableCommandTypeSubset(const std::string& groupName)
     {
-      QReadLocker locker(this->mGroups.getLockPtr());
-      bool exists = this->hasGroupUnlocked(groupName);
+      QReadLocker locker(this->mUserSelectableCommandTypeSubsets.getLockPtr());
+      bool exists = this->hasUserSelectableCommandTypeSubsetUnlocked(groupName);
       return exists;
     }
 
-    bool hasGroups() const
+    bool hasUserSelectableCommandTypeSubsets() const
     {
-      QReadLocker locker(this->mGroups.getLockPtr());
-      bool has_groups = this->mGroups.member().size() > 0;
+      QReadLocker locker(this->mUserSelectableCommandTypeSubsets.getLockPtr());
+      bool has_groups = this->mUserSelectableCommandTypeSubsets.member().size() > 0;
       return has_groups;
     }
 
-    std::vector<ComponentDataType> getTypesInGroup(const std::string& groupName) const
+    std::vector<ComponentDataType> getTypesInUserSelectableCommandTypeSubset(const std::string& groupName) const
     {
-      QReadLocker locker(this->mGroups.getLockPtr());
-      auto iter = this->mGroups.member().find(groupName);
-      if (iter == this->mGroups.member().end())
+      QReadLocker locker(this->mUserSelectableCommandTypeSubsets.getLockPtr());
+      auto iter = this->mUserSelectableCommandTypeSubsets.member().find(groupName);
+      if (iter == this->mUserSelectableCommandTypeSubsets.member().end())
       {
-        CEDAR_THROW(GroupNameNotFoundException, "Could not find a group with the name \"" + groupName + "\".");
+        CEDAR_THROW(UserSelectableCommandTypeSubsetNameNotFoundException, "Could not find a group with the name \"" + groupName + "\".");
       }
 
       std::vector<ComponentDataType> copy = iter->second;
@@ -427,9 +427,9 @@ class cedar::dev::Component::DataCollection
       }
     }
 
-    bool hasGroupUnlocked(const std::string& groupName)
+    bool hasUserSelectableCommandTypeSubsetUnlocked(const std::string& groupName)
     {
-      return this->mGroups.member().find(groupName) != this->mGroups.member().end();
+      return this->mUserSelectableCommandTypeSubsets.member().find(groupName) != this->mUserSelectableCommandTypeSubsets.member().end();
     }
 
     cedar::aux::MatDataPtr getData(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type)
@@ -576,7 +576,7 @@ class cedar::dev::Component::DataCollection
 
     cedar::aux::LockableMember<std::map<cedar::dev::Component::ComponentDataType, std::string> > mInstalledNames;
 
-    cedar::aux::LockableMember<std::map<std::string, std::vector<cedar::dev::Component::ComponentDataType> > > mGroups;
+    cedar::aux::LockableMember<std::map<std::string, std::vector<cedar::dev::Component::ComponentDataType> > > mUserSelectableCommandTypeSubsets;
 
     //! A member that contains the counts of errors for the last stepCommunication* calls.
     cedar::aux::LockableMember<cedar::aux::MovingAverage<float> > mCommunicationErrorCount;
@@ -843,29 +843,29 @@ bool cedar::dev::Component::hasLastStepCommandsDuration() const
 }
 
 
-void cedar::dev::Component::defineCommandGroup(const std::string& groupName)
+void cedar::dev::Component::defineUserSelectableCommandTypeSubset(const std::string& groupName)
 {
-  this->mCommandData->defineGroup(groupName);
+  this->mCommandData->defineUserSelectableCommandTypeSubset(groupName);
 }
 
-std::vector<std::string> cedar::dev::Component::listCommandGroups() const
+std::vector<std::string> cedar::dev::Component::listUserSelectableCommandTypeSubsets() const
 {
-  return this->mCommandData->listGroups();
+  return this->mCommandData->listUserSelectableCommandTypeSubsets();
 }
 
-void cedar::dev::Component::addCommandTypeToGroup(const std::string& groupName, const ComponentDataType& commandType)
+void cedar::dev::Component::addCommandTypeToUserSelectableCommandTypeSubset(const std::string& groupName, const ComponentDataType& commandType)
 {
-  this->mCommandData->addTypeToGroup(groupName, commandType);
+  this->mCommandData->addTypeToUserSelectableCommandTypeSubset(groupName, commandType);
 }
 
-bool cedar::dev::Component::hasCommandGroups() const
+bool cedar::dev::Component::hasUserSelectableCommandTypeSubsets() const
 {
-  return this->mCommandData->hasGroups();
+  return this->mCommandData->hasUserSelectableCommandTypeSubsets();
 }
 
-std::vector<cedar::dev::Component::ComponentDataType> cedar::dev::Component::getCommandsInGroup(const std::string& groupName) const
+std::vector<cedar::dev::Component::ComponentDataType> cedar::dev::Component::getCommandsInUserSelectableCommandTypeSubset(const std::string& groupName) const
 {
-  return this->mCommandData->getTypesInGroup(groupName);
+  return this->mCommandData->getTypesInUserSelectableCommandTypeSubset(groupName);
 }
 
 cedar::dev::Component::DimensionalityType cedar::dev::Component::getCommandDimensionality(ComponentDataType type) const

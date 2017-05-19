@@ -485,24 +485,24 @@ void cedar::dev::KinematicChain::init()
   );
 
   const std::string groupName1 = "all kinematic joint controls";
-  defineCommandGroup(groupName1);
+  defineUserSelectableCommandTypeSubset(groupName1);
   installCommandAndMeasurementType(cedar::dev::KinematicChain::JOINT_ANGLES, "Joint Angles");
   installCommandAndMeasurementType(cedar::dev::KinematicChain::JOINT_VELOCITIES, "Joint Velocities");
   installCommandAndMeasurementType(cedar::dev::KinematicChain::JOINT_ACCELERATIONS, "Joint Accelerations");
-  addCommandTypeToGroup( groupName1, cedar::dev::KinematicChain::JOINT_ANGLES );
-  addCommandTypeToGroup( groupName1, cedar::dev::KinematicChain::JOINT_VELOCITIES );
-  addCommandTypeToGroup( groupName1, cedar::dev::KinematicChain::JOINT_ACCELERATIONS );
+  addCommandTypeToUserSelectableCommandTypeSubset( groupName1, cedar::dev::KinematicChain::JOINT_ANGLES );
+  addCommandTypeToUserSelectableCommandTypeSubset( groupName1, cedar::dev::KinematicChain::JOINT_VELOCITIES );
+  addCommandTypeToUserSelectableCommandTypeSubset( groupName1, cedar::dev::KinematicChain::JOINT_ACCELERATIONS );
 
   const std::string groupName1a = "joint angle control";
-  defineCommandGroup(groupName1a);
-  addCommandTypeToGroup( groupName1a, cedar::dev::KinematicChain::JOINT_ANGLES );
+  defineUserSelectableCommandTypeSubset(groupName1a);
+  addCommandTypeToUserSelectableCommandTypeSubset( groupName1a, cedar::dev::KinematicChain::JOINT_ANGLES );
   const std::string groupName1b= "joint angle velocity control";
-  defineCommandGroup(groupName1b);
-  addCommandTypeToGroup(groupName1b, cedar::dev::KinematicChain::JOINT_VELOCITIES );
+  defineUserSelectableCommandTypeSubset(groupName1b);
+  addCommandTypeToUserSelectableCommandTypeSubset(groupName1b, cedar::dev::KinematicChain::JOINT_VELOCITIES );
 
   const std::string groupName1c = "joint angle acceleration control";
-  defineCommandGroup(groupName1c);
-  addCommandTypeToGroup( groupName1c, cedar::dev::KinematicChain::JOINT_ACCELERATIONS );
+  defineUserSelectableCommandTypeSubset(groupName1c);
+  addCommandTypeToUserSelectableCommandTypeSubset( groupName1c, cedar::dev::KinematicChain::JOINT_ACCELERATIONS );
 
   // add torque control an measurements
   installMeasurementType(cedar::dev::KinematicChain::JOINT_TORQUES, "Joint Torques");
@@ -511,8 +511,8 @@ void cedar::dev::KinematicChain::init()
   installCommandType(cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES, "Additional Joint Torques");
 
   const std::string groupName2 = "joint torque control";
-  defineCommandGroup(groupName2);
-  addCommandTypeToGroup( groupName2, cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES);
+  defineUserSelectableCommandTypeSubset(groupName2);
+  addCommandTypeToUserSelectableCommandTypeSubset( groupName2, cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES);
 
 //  applyDeviceCommandsAs( cedar::dev::KinematicChain::JOINT_ANGLES ); // this is a good default
   //applyDeviceCommandsAs( cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES ); // this is a good default
