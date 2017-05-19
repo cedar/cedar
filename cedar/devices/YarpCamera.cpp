@@ -84,18 +84,10 @@ void cedar::dev::YarpCamera::postStart() {
 cv::Mat cedar::dev::YarpCamera::retrievePicture() {
   auto yarpChannel = boost::static_pointer_cast<cedar::dev::YarpChannel<cv::Mat> >(this->getChannel());
   if (!yarpChannel) {
-    std::cout<<"Lost yarpChannel pointer"<<std::endl;
     cedar::aux::LogSingleton::getInstance()->error("Lost yarpChannel pointer", CEDAR_CURRENT_FUNCTION_NAME);
     return cv::Mat();
   }
   auto picture = yarpChannel->read(mReadPort->getValue());
-//  if (picture.rows == 200 && picture.cols == 200) {
-//    std::cout << "Expected Camera picture was retrieved! Rows: " << picture.rows << " Cols: " << picture.cols << std::endl;
-//  } else {
-//    std::cout << "Wrong Picture Read! Rows: " << picture.rows << " Cols: " << picture.cols << std::endl;
-//    std::cout << "Maybe Clean the Ports here" << std::endl;
-//  }
-
   return picture;
 }
 
