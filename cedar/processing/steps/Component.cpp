@@ -227,7 +227,8 @@ cedar::proc::steps::Component::Component()
 :
 cedar::proc::Step(true),
 _mComponent(new cedar::dev::ComponentParameter(this, "component")),
-_mUserSelectableCommandTypeSubset(new cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameter(this, "Command Subset"))
+_mUserSelectableCommandTypeSubset(new cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameter(this,
+"Command Subset")),
 _mCommunicationStepSize(new cedar::aux::DoubleParameter(this, "communication step size [ms]", 10.0, 0.01, 100))
 {
   this->_mUserSelectableCommandTypeSubset->setConstant(true);
@@ -272,6 +273,14 @@ bool cedar::proc::steps::Component::hasComponent() const
 
 void cedar::proc::steps::Component::selectedUserSelectableCommandTypeSubsetChanged()
 {
+  if (this->hasComponent())
+  {
+    auto component = this->getComponent();
+
+    std::string selected_group = this->_mUserSelectableCommandTypeSubset->getValue();
+    component->setActiveUserSelectableCommandTypeSubset( selected_group );
+  }
+
   this->rebuildInputs();
 }
 

@@ -303,6 +303,11 @@ class cedar::dev::Component::DataCollection
       this->mUserSelectableCommandTypeSubsets.member()[groupName] = std::vector<cedar::dev::Component::ComponentDataType>();
     }
 
+    void setActiveUserSelectableCommandTypeSubset(const std::string& groupName)
+    {
+      this->mActiveUserSelectableCommandTypeSubset= groupName;
+    }
+
     std::vector<std::string> listUserSelectableCommandTypeSubsets() const
     {
       QReadLocker locker(this->mUserSelectableCommandTypeSubsets.getLockPtr());
@@ -578,6 +583,8 @@ class cedar::dev::Component::DataCollection
 
     cedar::aux::LockableMember<std::map<std::string, std::vector<cedar::dev::Component::ComponentDataType> > > mUserSelectableCommandTypeSubsets;
 
+    cedar::aux::LockableMember<std::string> mActiveUserSelectableCommandTypeSubset;
+
     //! A member that contains the counts of errors for the last stepCommunication* calls.
     cedar::aux::LockableMember<cedar::aux::MovingAverage<float> > mCommunicationErrorCount;
 
@@ -846,6 +853,11 @@ bool cedar::dev::Component::hasLastStepCommandsDuration() const
 void cedar::dev::Component::defineUserSelectableCommandTypeSubset(const std::string& groupName)
 {
   this->mCommandData->defineUserSelectableCommandTypeSubset(groupName);
+}
+
+void cedar::dev::Component::setActiveUserSelectableCommandTypeSubset(const std::string& groupName)
+{
+  this->mCommandData->setActiveUserSelectableCommandTypeSubset(groupName);
 }
 
 std::vector<std::string> cedar::dev::Component::listUserSelectableCommandTypeSubsets() const
