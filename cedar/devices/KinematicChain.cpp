@@ -76,12 +76,12 @@ namespace
 // static variables
 //------------------------------------------------------------------------------
 
-const cedar::dev::Component::ComponentDataType cedar::dev::KinematicChain::JOINT_ANGLES = 1;
-const cedar::dev::Component::ComponentDataType cedar::dev::KinematicChain::JOINT_VELOCITIES = 2;
-const cedar::dev::Component::ComponentDataType cedar::dev::KinematicChain::JOINT_ACCELERATIONS = 3;
-const cedar::dev::Component::ComponentDataType cedar::dev::KinematicChain::JOINT_TORQUES = 4;
-const cedar::dev::Component::ComponentDataType cedar::dev::KinematicChain::EXTERNAL_JOINT_TORQUES = 5;
-const cedar::dev::Component::ComponentDataType cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES = 6;
+constexpr cedar::dev::Component::ComponentDataType cedar::dev::KinematicChain::JOINT_ANGLES;
+constexpr cedar::dev::Component::ComponentDataType cedar::dev::KinematicChain::JOINT_VELOCITIES;
+constexpr cedar::dev::Component::ComponentDataType cedar::dev::KinematicChain::JOINT_ACCELERATIONS;
+constexpr cedar::dev::Component::ComponentDataType cedar::dev::KinematicChain::JOINT_TORQUES;
+constexpr cedar::dev::Component::ComponentDataType cedar::dev::KinematicChain::EXTERNAL_JOINT_TORQUES;
+constexpr cedar::dev::Component::ComponentDataType cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES;
 
 //------------------------------------------------------------------------------
 // constructors and destructor
@@ -485,35 +485,37 @@ void cedar::dev::KinematicChain::init()
   );
 
   const std::string groupName1 = "all kinematic joint controls";
-  defineCommandGroup(groupName1);
+  defineUserSelectableCommandTypeSubset(groupName1);
   installCommandAndMeasurementType(cedar::dev::KinematicChain::JOINT_ANGLES, "Joint Angles");
   installCommandAndMeasurementType(cedar::dev::KinematicChain::JOINT_VELOCITIES, "Joint Velocities");
   installCommandAndMeasurementType(cedar::dev::KinematicChain::JOINT_ACCELERATIONS, "Joint Accelerations");
-  addCommandTypeToGroup( groupName1, cedar::dev::KinematicChain::JOINT_ANGLES );
-  addCommandTypeToGroup( groupName1, cedar::dev::KinematicChain::JOINT_VELOCITIES );
-  addCommandTypeToGroup( groupName1, cedar::dev::KinematicChain::JOINT_ACCELERATIONS );
+  addCommandTypeToUserSelectableCommandTypeSubset( groupName1, cedar::dev::KinematicChain::JOINT_ANGLES );
+  addCommandTypeToUserSelectableCommandTypeSubset( groupName1, cedar::dev::KinematicChain::JOINT_VELOCITIES );
+  addCommandTypeToUserSelectableCommandTypeSubset( groupName1, cedar::dev::KinematicChain::JOINT_ACCELERATIONS );
 
   const std::string groupName1a = "joint angle control";
-  defineCommandGroup(groupName1a);
-  addCommandTypeToGroup( groupName1a, cedar::dev::KinematicChain::JOINT_ANGLES );
+  defineUserSelectableCommandTypeSubset(groupName1a);
+  addCommandTypeToUserSelectableCommandTypeSubset( groupName1a, cedar::dev::KinematicChain::JOINT_ANGLES );
   const std::string groupName1b= "joint angle velocity control";
-  defineCommandGroup(groupName1b);
-  addCommandTypeToGroup(groupName1b, cedar::dev::KinematicChain::JOINT_VELOCITIES );
+  defineUserSelectableCommandTypeSubset(groupName1b);
+  addCommandTypeToUserSelectableCommandTypeSubset(groupName1b, cedar::dev::KinematicChain::JOINT_VELOCITIES );
 
   const std::string groupName1c = "joint angle acceleration control";
-  defineCommandGroup(groupName1c);
-  addCommandTypeToGroup( groupName1c, cedar::dev::KinematicChain::JOINT_ACCELERATIONS );
+  defineUserSelectableCommandTypeSubset(groupName1c);
+  addCommandTypeToUserSelectableCommandTypeSubset( groupName1c, cedar::dev::KinematicChain::JOINT_ACCELERATIONS );
 
   // add torque control an measurements
   installMeasurementType(cedar::dev::KinematicChain::JOINT_TORQUES, "Joint Torques");
   installMeasurementType(cedar::dev::KinematicChain::EXTERNAL_JOINT_TORQUES, "External Joint Torques");
 
-  applyDeviceCommandsAs( cedar::dev::KinematicChain::JOINT_ANGLES ); // this is a good default
+  installCommandType(cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES, "Additional Joint Torques");
 
   const std::string groupName2 = "joint torque control";
-  defineCommandGroup(groupName2);
-  installCommandType(cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES, "Additional Joint Torques");
-  addCommandTypeToGroup( groupName2, cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES);
+  defineUserSelectableCommandTypeSubset(groupName2);
+  addCommandTypeToUserSelectableCommandTypeSubset( groupName2, cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES);
+
+  applyDeviceCommandsAs( cedar::dev::KinematicChain::JOINT_ANGLES ); // this is a good default
+  //applyDeviceCommandsAs( cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES ); 
 
 
   registerCommandTransformationHook
@@ -640,7 +642,17 @@ bool cedar::dev::KinematicChain::applyLimits(const cedar::dev::Component::Compon
       break;
 
     case cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES:
-      // TODO
+      // super crude security
+      double mymax; 
+      cv::minMaxLoc(data, NULL, &mymax);
+      if (mymax > 0.01)
+      {
+std::cout << "  torque control exceeded limits! " << std::endl;        
+        return false;
+      }
+
+      break;
+
     default:
       cedar::aux::LogSingleton::getInstance()->warning(
          "Component data type " + cedar::aux::toString(type) + " is not known.",
@@ -1080,7 +1092,7 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
                       xdot = -1 * (getJointAngles() - findCurrent->second);
 
                       mControllerFinished = true;
-                      const float l_max_vel = 0.5;
+                      const float l_max_vel = 0.1;
 
                       for(int i = 0; i<xdot.rows; ++i)
                       {

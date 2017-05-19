@@ -91,12 +91,12 @@ namespace
 {
   bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->add
       <
-        cedar::proc::details::ComponentStepGroupParameter,
-        cedar::proc::details::ComponentStepGroupParameterWidget
+        cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameter,
+        cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameterWidget
       >();
 }
 
-cedar::proc::details::ComponentStepGroupParameterWidget::ComponentStepGroupParameterWidget()
+cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameterWidget::ComponentStepUserSelectableCommandTypeSubsetParameterWidget()
 {
   auto layout = new QHBoxLayout();
   layout->setContentsMargins(0, 0, 0, 0);
@@ -105,24 +105,24 @@ cedar::proc::details::ComponentStepGroupParameterWidget::ComponentStepGroupParam
   this->mpSelector = new QComboBox();
   layout->addWidget(this->mpSelector);
 
-  QObject::connect(this->mpSelector, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(selectedGroupChanged(const QString&)));
+  QObject::connect(this->mpSelector, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(selectedUserSelectableCommandTypeSubsetChanged(const QString&)));
 }
 
-void cedar::proc::details::ComponentStepGroupParameterWidget::parameterChanged()
+void cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameterWidget::parameterChanged()
 {
-  auto parameter = boost::dynamic_pointer_cast<cedar::proc::details::ComponentStepGroupParameter>(this->getParameter());
+  auto parameter = boost::dynamic_pointer_cast<cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameter>(this->getParameter());
   CEDAR_ASSERT(parameter);
 
-  this->rebuildGroupList();
+  this->rebuildUserSelectableCommandTypeSubsetList();
 
   this->applyProperties();
 
   QObject::connect(parameter.get(), SIGNAL(componentChanged()), this, SLOT(componentChanged()));
 }
 
-void cedar::proc::details::ComponentStepGroupParameterWidget::rebuildGroupList()
+void cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameterWidget::rebuildUserSelectableCommandTypeSubsetList()
 {
-  auto parameter = boost::dynamic_pointer_cast<cedar::proc::details::ComponentStepGroupParameter>(this->getParameter());
+  auto parameter = boost::dynamic_pointer_cast<cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameter>(this->getParameter());
   CEDAR_ASSERT(parameter);
 
   std::string current = parameter->getValue();
@@ -137,7 +137,7 @@ void cedar::proc::details::ComponentStepGroupParameterWidget::rebuildGroupList()
   if (parameter->hasComponent())
   {
     auto component = parameter->getComponent();
-    auto groups = component->listCommandGroups();
+    auto groups = component->listUserSelectableCommandTypeSubsets();
 
     for (const auto& group : groups)
     {
@@ -152,27 +152,27 @@ void cedar::proc::details::ComponentStepGroupParameterWidget::rebuildGroupList()
   this->mpSelector->blockSignals(blocked);
 }
 
-void cedar::proc::details::ComponentStepGroupParameterWidget::propertiesChanged()
+void cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameterWidget::propertiesChanged()
 {
   this->applyProperties();
 }
 
-void cedar::proc::details::ComponentStepGroupParameterWidget::applyProperties()
+void cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameterWidget::applyProperties()
 {
-  auto parameter = boost::dynamic_pointer_cast<cedar::proc::details::ComponentStepGroupParameter>(this->getParameter());
+  auto parameter = boost::dynamic_pointer_cast<cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameter>(this->getParameter());
   CEDAR_ASSERT(parameter);
 
   this->mpSelector->setDisabled(parameter->isConstant());
 }
 
-void cedar::proc::details::ComponentStepGroupParameterWidget::componentChanged()
+void cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameterWidget::componentChanged()
 {
-  this->rebuildGroupList();
+  this->rebuildUserSelectableCommandTypeSubsetList();
 }
 
-void cedar::proc::details::ComponentStepGroupParameterWidget::selectedGroupChanged(const QString& group)
+void cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameterWidget::selectedUserSelectableCommandTypeSubsetChanged(const QString& group)
 {
-  auto parameter = boost::dynamic_pointer_cast<cedar::proc::details::ComponentStepGroupParameter>(this->getParameter());
+  auto parameter = boost::dynamic_pointer_cast<cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameter>(this->getParameter());
   CEDAR_ASSERT(parameter);
 
   if (group == "all")
@@ -189,24 +189,24 @@ void cedar::proc::details::ComponentStepGroupParameterWidget::selectedGroupChang
 // group parameter
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::details::ComponentStepGroupParameter::ComponentStepGroupParameter(cedar::aux::Configurable* owner, const std::string& name)
+cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameter::ComponentStepUserSelectableCommandTypeSubsetParameter(cedar::aux::Configurable* owner, const std::string& name)
 :
 cedar::aux::ParameterTemplate<std::string>(owner, name, "")
 {
 }
 
-void cedar::proc::details::ComponentStepGroupParameter::setComponent(cedar::dev::ComponentPtr component)
+void cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameter::setComponent(cedar::dev::ComponentPtr component)
 {
   this->mWeakComponent = component;
   emit componentChanged();
 }
 
-bool cedar::proc::details::ComponentStepGroupParameter::hasComponent()
+bool cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameter::hasComponent()
 {
   return mWeakComponent.use_count() != 0;
 }
 
-cedar::dev::ComponentPtr cedar::proc::details::ComponentStepGroupParameter::getComponent()
+cedar::dev::ComponentPtr cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameter::getComponent()
 {
   if(auto component = this->mWeakComponent.lock())
   {
@@ -227,15 +227,15 @@ cedar::proc::steps::Component::Component()
 :
 cedar::proc::Step(true),
 _mComponent(new cedar::dev::ComponentParameter(this, "component")),
-_mGroup(new cedar::proc::details::ComponentStepGroupParameter(this, "command group")),
+_mUserSelectableCommandTypeSubset(new cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameter(this, "Command Subset"))
 _mCommunicationStepSize(new cedar::aux::DoubleParameter(this, "communication step size [ms]", 10.0, 0.01, 100))
 {
-  this->_mGroup->setConstant(true);
+  this->_mUserSelectableCommandTypeSubset->setConstant(true);
 
   QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SLOT(componentChangedSlot()));
   QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SIGNAL(componentChanged()));
+  QObject::connect(this->_mUserSelectableCommandTypeSubset.get(), SIGNAL(valueChanged()), this, SLOT(selectedUserSelectableCommandTypeSubsetChanged()));
   QObject::connect(this->_mCommunicationStepSize.get(), SIGNAL(valueChanged()), this, SLOT(communicationStepSizeChanged()));
-  QObject::connect(this->_mGroup.get(), SIGNAL(valueChanged()), this, SLOT(selectedGroupChanged()));
 
   this->mMeasurementTimeId = this->registerTimeMeasurement("step measurements time");
   this->mCommandTimeId = this->registerTimeMeasurement("step commands time");
@@ -270,7 +270,7 @@ bool cedar::proc::steps::Component::hasComponent() const
 }
 
 
-void cedar::proc::steps::Component::selectedGroupChanged()
+void cedar::proc::steps::Component::selectedUserSelectableCommandTypeSubsetChanged()
 {
   this->rebuildInputs();
 }
@@ -483,7 +483,7 @@ void cedar::proc::steps::Component::rebuildInputs()
   auto component = this->getComponent();
   std::vector<cedar::dev::Component::ComponentDataType> commands;
 
-  std::string selected_group = this->_mGroup->getValue();
+  std::string selected_group = this->_mUserSelectableCommandTypeSubset->getValue();
   if (selected_group.empty())
   {
     auto installed_set = component->getInstalledCommandTypes();
@@ -491,7 +491,7 @@ void cedar::proc::steps::Component::rebuildInputs()
   }
   else
   {
-    commands = component->getCommandsInGroup(selected_group);
+    commands = component->getCommandsInUserSelectableCommandTypeSubset(selected_group);
   }
 
   for (const auto& command : commands)
@@ -536,8 +536,8 @@ void cedar::proc::steps::Component::componentChangedSlot()
   this->rebuildInputs();
 
   auto component = this->getComponent();
-  this->_mGroup->setConstant(!component->hasCommandGroups());
-  this->_mGroup->setComponent(component);
+  this->_mUserSelectableCommandTypeSubset->setConstant(!component->hasUserSelectableCommandTypeSubsets());
+  this->_mUserSelectableCommandTypeSubset->setComponent(component);
 }
 
 void cedar::proc::steps::Component::reset()

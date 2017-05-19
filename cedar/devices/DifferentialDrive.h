@@ -150,7 +150,7 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  static const cedar::dev::Component::ComponentDataType WHEEL_SPEED;
+  static constexpr cedar::dev::Component::ComponentDataType WHEEL_SPEED = 100;
 
 protected:
   // none yet
