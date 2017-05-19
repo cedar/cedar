@@ -44,6 +44,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/KinematicChain.h"
+#include "cedar/devices/Component.h"
 
 // SYSTEM INCLUDES
 
@@ -84,8 +85,8 @@ public:
   cv::Mat prepareRetrievingJointTorques();
   cv::Mat prepareRetrievingExternalJointTorques();
 
-  void prepareSendingNoop();
-  void prepareSendingNotReadyForCommand();
+  void prepareSendingNoop(const cedar::dev::Component::ComponentDataType& type);
+  void prepareSendingNotReadyForCommand(const cedar::dev::Component::ComponentDataType& type);
 
   void exchangeData();
   void postStart();

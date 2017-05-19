@@ -598,12 +598,12 @@ private:
   // members
   //----------------------------------------------------------------------------
 public:
-  static const cedar::dev::Component::ComponentDataType JOINT_ANGLES;
-  static const cedar::dev::Component::ComponentDataType JOINT_VELOCITIES;
-  static const cedar::dev::Component::ComponentDataType JOINT_ACCELERATIONS;
-  static const cedar::dev::Component::ComponentDataType JOINT_TORQUES;
-  static const cedar::dev::Component::ComponentDataType EXTERNAL_JOINT_TORQUES;
-  static const cedar::dev::Component::ComponentDataType ADDITIONAL_JOINT_TORQUES;
+  static constexpr cedar::dev::Component::ComponentDataType JOINT_ANGLES = 1;
+  static constexpr cedar::dev::Component::ComponentDataType JOINT_VELOCITIES = 2;
+  static constexpr cedar::dev::Component::ComponentDataType JOINT_ACCELERATIONS = 3;
+  static constexpr cedar::dev::Component::ComponentDataType JOINT_TORQUES = 4;
+  static constexpr cedar::dev::Component::ComponentDataType EXTERNAL_JOINT_TORQUES = 5;
+  static constexpr cedar::dev::Component::ComponentDataType ADDITIONAL_JOINT_TORQUES = 6;
 
 protected:
   //! vector of all joints
