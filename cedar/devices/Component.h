@@ -80,11 +80,14 @@ class cedar::dev::Component : public QObject,
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  typedef unsigned int                      ComponentDataType;
+
   typedef boost::function< void (cv::Mat) > CommandFunctionType;
   typedef boost::function< cv::Mat () >     MeasurementFunctionType;
-  typedef boost::function< void () > NoCommandFunctionType;
+  typedef boost::function< void (const ComponentDataType&) > NoCommandFunctionType;
+  typedef boost::function< void () > AfterCommandFunctionType;
   typedef boost::function< cv::Mat (cedar::unit::Time, cv::Mat) > TransformationFunctionType;
-  typedef unsigned int                      ComponentDataType;
+
   typedef std::map< ComponentDataType, cedar::aux::MatDataPtr > BufferDataType;
   typedef boost::function< cv::Mat() >      ControllerCallback;
   typedef boost::function< bool(const ComponentDataType&, cv::Mat& ) > CommandCheckFunctionType;
@@ -376,7 +379,7 @@ protected:
   void registerMeasurementHook(ComponentDataType type, MeasurementFunctionType fun);
   void registerNoCommandHook(NoCommandFunctionType fun);
   void registerNotReadyForCommandHook(NoCommandFunctionType fun);
-  void registerAfterCommandBeforeMeasurementHook(NoCommandFunctionType fun);
+  void registerAfterCommandBeforeMeasurementHook(AfterCommandFunctionType fun);
 
   void registerCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
   void registerMeasurementTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
@@ -445,7 +448,7 @@ private:
   cedar::aux::LockableMember<ControllerCollectionPtr> mController;
   cedar::aux::LockableMember< NoCommandFunctionType > mNoCommandHook;
   cedar::aux::LockableMember< NoCommandFunctionType > mNotReadyForCommandHook;
-  cedar::aux::LockableMember< NoCommandFunctionType > mAfterCommandBeforeMeasurementHook;
+  cedar::aux::LockableMember< AfterCommandFunctionType > mAfterCommandBeforeMeasurementHook;
 
   boost::signals2::signal<void ()> mStartCommunicationHook;
   boost::signals2::signal<void ()> mConnectedHook;

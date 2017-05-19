@@ -235,9 +235,8 @@ bool cedar::dev::kuka::FRIChannel::prepareJointPositionControl(cv::Mat newJointP
     newJointPositionArray[i] =  static_cast<float>( newJointPositions.at<float>(i) );
   }
 
-// TODO: make sure we are in monitor mode!
   mpFriRemote->doPositionControl(newJointPositionArray, false);
-    // second parameter: we when the command is given
+    // second parameter: delay when the command is given
 
   // do data exchange only once per cycle in exchangeData()
 
@@ -259,7 +258,6 @@ bool cedar::dev::kuka::FRIChannel::prepareJointTorqueControl(cv::Mat newJointPos
     newJointPositionArray[i] =  static_cast<float>( newJointPositions.at<float>(i) );
   }
 
-// TODO: make sure we are in monitor mode!
   mpFriRemote->doJntImpedanceControl(NULL, //  pos
                                      NULL, NULL, // stiffnes, damping
                                      newJointPositionArray, false);
@@ -280,6 +278,8 @@ cv::Mat cedar::dev::kuka::FRIChannel::getMeasuredJointPositions() const
     jointPositions.at<float>(i) = mpFriRemote->getMsrMsrJntPosition()[i];
   }
 
+std::cout << "  strat: " << mpFriRemote->getMsrBuf().robot.control << std::endl;
+std::cout << "  cmd flags: " << mpFriRemote->getCmdBuf().cmd.cmdFlags << std::endl;
   return jointPositions;
 }
 

@@ -1126,7 +1126,7 @@ void cedar::dev::Component::registerNotReadyForCommandHook(NoCommandFunctionType
   mNotReadyForCommandHook.member() = fun;
 }
 
-void cedar::dev::Component::registerAfterCommandBeforeMeasurementHook(NoCommandFunctionType fun)
+void cedar::dev::Component::registerAfterCommandBeforeMeasurementHook(AfterCommandFunctionType fun)
 {
   QWriteLocker locker(this->mAfterCommandBeforeMeasurementHook.getLockPtr());
   // cannot replace existing hook
@@ -1323,6 +1323,32 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
   cedar::aux::append(locks, this->mController.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
   cedar::aux::LockSetLocker locker(locks);
 
+  // evaluate command type for Device:
+  if (mDeviceCommandSelection)
+  {
+    type_for_Device = mDeviceCommandSelection.get();
+    //std::cout << "    commands restricted to ... " << type_for_Device  << std::endl;    
+  }
+  else
+  {
+    QReadLocker submit_command_hooks_locker(mSubmitCommandHooks.getLockPtr());
+    // guess Device type to use. easy if there is only one hook
+    if (mSubmitCommandHooks.member().size() != 1)
+    {
+      // heuristics: 
+      // find those command hooks which are in the current command group
+      // TODO
+
+      CEDAR_THROW
+        (
+         cedar::dev::Component::CouldNotGuessDeviceTypeException,
+         "Could not guess device type: too many submit hooks. Please select a device type manually." 
+        ); 
+    }
+
+    type_for_Device = mSubmitCommandHooks.member().begin()->first;
+  }
+
   if (!this->isReadyForCommands())
   {
     QReadLocker nocommand_hook_locker(mNotReadyForCommandHook.getLockPtr());
@@ -1331,7 +1357,7 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
     if (hook_found)
     {
       // registering this is optional
-      hook_found();
+      hook_found(type_for_Device);
     }
 
     QWriteLocker lock(&mNotReadyForCommandsCounter.getLock());
@@ -1380,7 +1406,7 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
     if (hook_found)
     {
       // registering this is optional
-      hook_found();
+      hook_found(type_for_Device);
     }
 
     return;
@@ -1438,27 +1464,7 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
 
   //  this->mUserCommandUsed.clear();
 
-  // evaluate command type for Device:
-  if (mDeviceCommandSelection)
-  {
-    type_for_Device = mDeviceCommandSelection.get();
-    //std::cout << "    commands restricted to ... " << type_for_Device  << std::endl;    
-  }
-  else
-  {
-    QReadLocker submit_command_hooks_locker(mSubmitCommandHooks.getLockPtr());
-    // guess Device type to use. easy if there is only one hook
-    if (mSubmitCommandHooks.member().size() != 1)
-    {
-      CEDAR_THROW
-        (
-         cedar::dev::Component::CouldNotGuessDeviceTypeException,
-         "Could not guess device type: too many submit hooks. Please select a device type manually." 
-        ); 
-    }
 
-    type_for_Device = mSubmitCommandHooks.member().begin()->first;
-  }
 
   // do we need to transform the input?
   if (type_for_Device != type_from_user)
