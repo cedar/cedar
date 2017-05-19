@@ -293,7 +293,9 @@ public:
 
   //! Defines a new command group.
   void defineUserSelectableCommandTypeSubset(const std::string& groupName);
-
+  //! set which subset was selected by the user
+  void setActiveUserSelectableCommandTypeSubset(const std::string& groupName);
+  
   //! Lists all available command groups.
   std::vector<std::string> listUserSelectableCommandTypeSubsets() const;
 
