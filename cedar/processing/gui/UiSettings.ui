@@ -84,7 +84,7 @@
        <widget class="cedar::aux::gui::DoubleParameter" name="mpSnapGridSize" native="true"/>
       </item>
       <item row="6" column="0">
-       <widget class="QLabel" name="label_4">
+       <widget class="QLabel" name="label_41">
         <property name="text">
          <string>Use Dynamic Field Icons</string>
         </property>
@@ -113,7 +113,7 @@
      </property>
      <layout class="QFormLayout" name="formLayout_2">
       <item row="1" column="0">
-       <widget class="QLabel" name="label_4">
+       <widget class="QLabel" name="label_42">
         <property name="text">
          <string>Growth factor</string>
         </property>
