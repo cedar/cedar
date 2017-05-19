@@ -41,6 +41,7 @@
 #include "cedar/dynamics/gui/NeuralFieldView.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/dynamics/fields/NeuralField.h"
 
 // SYSTEM INCLUDES
 
@@ -59,8 +60,10 @@ void cedar::dyn::gui::NeuralFieldView::connectableChanged()
   auto parameter = this->getConnectable()->getParameter("dimensionality");
   QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(updateIconDimensionality()));
 
-  auto connectable = this->getConnectable();
-  connectable->connectToOutputValueChangedSignal(boost::bind(&cedar::dyn::gui::NeuralFieldView::updateActivityIcon, this, _1));
+  if(auto step =  boost::dynamic_pointer_cast<const cedar::proc::Step>(this->getConnectable()))
+  {
+    QObject::connect(step.get(), SIGNAL(outPutValueChanged(bool)), this, SLOT(updateActivityIcon(bool)));
+  }
 
   this->updateIconDimensionality();
 }

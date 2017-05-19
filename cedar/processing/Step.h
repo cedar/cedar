@@ -303,6 +303,9 @@ signals:
   //!@brief Signal that is emitted whenever the step's name is changed.
   void nameChanged();
 
+  //!@brief Notifies the corresponding StepViews about new OutputValues and this may change the stepIcon
+  void outPutValueChanged(bool aboveThreshold);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

@@ -1969,6 +1969,19 @@ void cedar::proc::gui::Connectable::toggleVisibilityOfPlots(bool visible)
   }
 }
 
+void cedar::proc::gui::Connectable::toggleVisibilityOfPlot(std::string plotWidgetLabel, bool visible)
+{
+  for (auto childWidget : mChildWidgets)
+  {
+    QWidget* dock_widget_child = cedar::aux::asserted_cast<QDockWidget*>(childWidget)->widget();
+    if(auto plotWidget = dynamic_cast<cedar::proc::gui::PlotWidget *>(dock_widget_child))
+    {
+      if( plotWidget->getWidgetLabel() == plotWidgetLabel)
+        childWidget->setVisible(visible);
+    }
+  }
+}
+
 void cedar::proc::gui::Connectable::closeAllChildWidgets()
 {
   for (auto childWidget : mChildWidgets)
@@ -2076,7 +2089,7 @@ void cedar::proc::gui::Connectable::handleContextMenuAction(QAction* action, QGr
   }
 }
 
-void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::ConfigurationNode& node) const
+void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::ConfigurationNode& node, bool onlyVisiblePlots) const
 {
   // important: access to QT Qidgets only allowed from the GUI thread
   //            since most calls are not thread-safe!
@@ -2085,17 +2098,24 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
   if (!isGuiThread)
     return; // note, this disables saving of widgets via auto-backups
 
+  unsigned int plotWidgetCounter = 0;
   for (auto childWidget : mChildWidgets)
   {
-    // all widgets in the mChildWidgets Vector should be QDockWidgets that contain a QWidget
-    QWidget* dock_widget_child = cedar::aux::asserted_cast<QDockWidget*>(childWidget)->widget();
-
-    // The contained QWidget may be of different types
-    if (cedar::aux::objectTypeToString(dock_widget_child) == "cedar::proc::gui::PlotWidget")
+    if(!onlyVisiblePlots || (onlyVisiblePlots && childWidget->isVisible()))
     {
-      cedar::aux::ConfigurationNode value_node;
-      static_cast<cedar::proc::gui::PlotWidget*>(dock_widget_child)->writeConfiguration(value_node);
-      node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));
+      // all widgets in the mChildWidgets Vector should be QDockWidgets that contain a QWidget
+      QWidget *dock_widget_child = cedar::aux::asserted_cast<QDockWidget *>(childWidget)->widget();
+      // The contained QWidget may be of different types, we're only interested in the cedar::proc::gui::PlotWidget ones
+    // The contained QWidget may be of different types
+      if (cedar::aux::objectTypeToString(dock_widget_child) == "cedar::proc::gui::PlotWidget")
+      {
+        cedar::aux::ConfigurationNode value_node;
+        std::string widgetLabel = this->getConnectable()->getName() + "Widget" + boost::lexical_cast<std::string>(plotWidgetCounter);
+        static_cast<cedar::proc::gui::PlotWidget *>(dock_widget_child)->writeConfiguration(value_node);
+        static_cast<cedar::proc::gui::PlotWidget *>(dock_widget_child)->setWidgetLabel(widgetLabel);
+        node.push_back(cedar::aux::ConfigurationNode::value_type(widgetLabel,value_node));
+        plotWidgetCounter++;
+      }
     }
 
     if (cedar::aux::objectTypeToString(dock_widget_child) == "cedar::dev::gui::KinematicChainWidget")
@@ -2140,5 +2160,30 @@ void cedar::proc::gui::Connectable::setRecorded(bool status)
       this->removeDecoration(this->mpRecordedDecoration);
       this->mpRecordedDecoration.reset();
     }
+  }
+}
+
+bool cedar::proc::gui::Connectable::doesPlotWidgetExist(std::string plotWidgetLabel)
+{
+  auto it = std::find_if(mChildWidgets.begin(),mChildWidgets.end(),[plotWidgetLabel]( QWidget* childWidget)-> bool
+  {
+    QWidget* dock_widget_child = cedar::aux::asserted_cast<QDockWidget*>(childWidget)->widget();
+    if(auto plotWidget = dynamic_cast<cedar::proc::gui::PlotWidget *>(dock_widget_child))
+    {
+      return plotWidget->getWidgetLabel() == plotWidgetLabel;
+    }
+    else
+    {
+      return false;
+    }
+  });
+
+  if(it!= mChildWidgets.end())
+  {
+    return true;
+  }
+  else
+  {
+    return false;
   }
 }

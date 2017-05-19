@@ -83,6 +83,16 @@
       <item row="5" column="1">
        <widget class="cedar::aux::gui::DoubleParameter" name="mpSnapGridSize" native="true"/>
       </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Use Dynamic Field Icons</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="cedar::aux::gui::BoolParameter" name="mpUseDynamicFieldIcons" native="true"/>
+      </item>
      </layout>
     </widget>
    </item>

@@ -735,10 +735,7 @@
     <string>New Plot Group</string>
    </property>
    <property name="toolTip">
-    <string>Add a plot group</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
+    <string>Add a new plot group, containing all open plots</string>
    </property>
   </action>
   <action name="mpActionRenamePlotGroup">
@@ -750,13 +747,13 @@
     <string>Rename Current Plot Group</string>
    </property>
    <property name="toolTip">
-    <string>Rename selected plot group</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
+    <string>rename selected plot group</string>
    </property>
   </action>
   <action name="mpActionDisplayPlotGroup">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/display.svg</normaloff>:/toolbaricons/display.svg</iconset>
@@ -765,10 +762,7 @@
     <string>Display Plot Group</string>
    </property>
    <property name="toolTip">
-    <string>Display selected plot group</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
+    <string>Toggle visibility of selected plot group</string>
    </property>
   </action>
   <action name="mpActionDeletePlotGroup">
@@ -780,10 +774,7 @@
     <string>Delete Plot Group</string>
    </property>
    <property name="toolTip">
-    <string>Delete selected plot group</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
+    <string>delete selected plot group</string>
    </property>
   </action>
   <action name="mpActionPerformanceOverview">
@@ -876,10 +867,7 @@
     <string>Store Open Plots in Current Plot Group</string>
    </property>
    <property name="toolTip">
-    <string>Store open plots in selected plot group</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
+    <string>Overwrite selected plot group with open plots</string>
    </property>
   </action>
   <action name="mpActionToggleTriggerColor">

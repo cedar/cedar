@@ -1151,7 +1151,8 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
     auto plot_list = node.find("open plots");
     if (plot_list != node.not_found())
     {
-      this->readPlotList("open plots", plot_list->second);
+      togglePlotGroupVisibility(false, plot_list->second, plot_list->first);
+//      this->readPlotList("open plots", plot_list->second);
     }
     // read defined plot groups
     auto plot_groups = node.find("plot groups");
@@ -1434,7 +1435,7 @@ void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode& 
   root.add_child("ui generic", generic);
 }
 
-void cedar::proc::gui::Group::writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const
+void cedar::proc::gui::Group::writeOpenPlotsTo(cedar::aux::ConfigurationNode& node, bool onlyVisiblePlots) const
 {
   // important: access to QT Qidgets only allowed from the GUI thread
   //            since most calls are not thread-safe!
@@ -1488,11 +1489,11 @@ void cedar::proc::gui::Group::writeOpenPlotsTo(cedar::aux::ConfigurationNode& no
 
   for (auto step_map_item : this->mpScene->getStepMap())
   {
-    step_map_item.second->writeOpenChildWidgets(node);
+    step_map_item.second->writeOpenChildWidgets(node,onlyVisiblePlots);
   }
   for (auto group_map_item : this->mpScene->getGroupMap())
   {
-    group_map_item.second->writeOpenChildWidgets(node);
+    group_map_item.second->writeOpenChildWidgets(node,onlyVisiblePlots);
   }
 }
 
@@ -2206,24 +2207,29 @@ void cedar::proc::gui::Group::handleStepNameChanged(const std::string& from, con
 void cedar::proc::gui::Group::addPlotGroup(std::string plotGroupName)
 {
   cedar::aux::ConfigurationNode node;
-  this->writeOpenPlotsTo(node);
+  this->writeOpenPlotsTo(node,true);
+  node.put("visible",true);
   this->mPlotGroupsNode.put_child(plotGroupName, node);
 }
 
 void cedar::proc::gui::Group::editPlotGroup(std::string plotGroupName)
 {
-  auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
-  if(plot_group == this->mPlotGroupsNode.not_found())
-  {
-    CEDAR_THROW
-    (
-      cedar::aux::NotFoundException,
-      "cedar::proc::gui::Group::editPlotGroup could not edit plot group. Does not exist."
-    );
-  }
-  cedar::aux::ConfigurationNode node;
-  this->writeOpenPlotsTo(plot_group->second);
-  //this->mPlotGroupsNode.put_child(plotGroupName, node);
+  //In the new Behavior we just want to refresh the group with all current Open Plots thus:
+  this->removePlotGroup(plotGroupName);
+  this->addPlotGroup(plotGroupName);
+
+//  auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
+//  if(plot_group == this->mPlotGroupsNode.not_found())
+//  {
+//    CEDAR_THROW
+//    (
+//      cedar::aux::NotFoundException,
+//      "cedar::proc::gui::Group::editPlotGroup could not edit plot group. Does not exist."
+//    );
+//  }
+////  cedar::aux::ConfigurationNode node;
+//  this->writeOpenPlotsTo(plot_group->second);
+//  //this->mPlotGroupsNode.put_child(plotGroupName, node);
 }
 
 void cedar::proc::gui::Group::removePlotGroup(std::string plotGroupName)
@@ -2285,16 +2291,123 @@ bool cedar::proc::gui::Group::plotGroupNameExists(const std::string& newName) co
 void cedar::proc::gui::Group::displayPlotGroup(std::string plotGroupName)
 {
   auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
-  if(plot_group == this->mPlotGroupsNode.not_found())
+  if (plot_group == this->mPlotGroupsNode.not_found())
   {
     CEDAR_THROW
     (
-      cedar::aux::NotFoundException,
-      "cedar::proc::gui::Group::displayPlotGroup could not display plot group. Does not exist."
+            cedar::aux::NotFoundException,
+            "cedar::proc::gui::Group::displayPlotGroup could not display plot group. Does not exist."
     );
   }
+  bool visible = plot_group->second.get<bool>("visible",false);
+  this->togglePlotGroupVisibility(visible,plot_group->second, plotGroupName);
+}
 
-  this->readPlotList(plotGroupName, plot_group->second);
+bool cedar::proc::gui::Group::isPlotGroupVisible(std::string plotGroupName)
+{
+  auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
+  if (plot_group == this->mPlotGroupsNode.not_found())
+  {
+    CEDAR_THROW
+    (
+            cedar::aux::NotFoundException,
+            "cedar::proc::gui::Group::displayPlotGroup could not display plot group. Does not exist."
+    );
+  }
+  return plot_group->second.get<bool>("visible",false);
+}
+
+void cedar::proc::gui::Group::togglePlotGroupVisibility(bool visible, cedar::aux::ConfigurationNode& node, std::string plotGroupName)
+{
+  std::set<std::string> removed_elements;
+  for(auto it : node) // The way PlotItems are organized, the same StepItem may appear as multiple nodes in the configFile!
+  {
+    if(it.first != "visible") // Visible is a property of the plotgroup that is no plot!
+    {
+      std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
+      try
+      {
+        // is it a connectable?
+        auto connectable = this->getGroup()->getElement<cedar::proc::Connectable>(step_name);
+        if (connectable) // check if cast worked
+        {
+          auto stepMap = this->getScene()->getStepMap();
+          auto foundElement = std::find_if(stepMap.begin(), stepMap.end(),
+                                           [step_name](const std::pair<const cedar::proc::Step *, cedar::proc::gui::StepItem *> &t) -> bool
+                                           {
+                                             return t.first->getName() == step_name;
+                                           });
+          if (foundElement != stepMap.end())
+          {
+            auto stepItem = foundElement->second;
+            if (stepItem->doesPlotWidgetExist(it.first)) //This zero needs to be the real number of plots associated with the step.
+            {
+//              stepItem->toggleVisibilityOfPlots(!visible);
+              stepItem->toggleVisibilityOfPlot(it.first,!visible);
+            } else if (!visible)
+            {
+              auto graphics_item = this->mpScene->getGraphicsItemFor(connectable.get());
+              cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second,
+                                                                           cedar::aux::asserted_cast<cedar::proc::gui::Connectable *>(
+                                                                                   graphics_item),boost::lexical_cast<std::string>(it.first));
+            }
+          } else
+          {
+            std::cout << "Did not find: " << step_name << std::endl;
+          }
+
+
+        } else // element is not present - show error
+        {
+          removed_elements.insert(step_name);
+        }
+      }
+      catch (cedar::aux::InvalidNameException &exc)
+      {
+        removed_elements.insert(step_name);
+      }
+    }
+  }
+
+//  std::cout<< "Change the Value for Visible! Old Value: " << visible << std::endl;
+  node.put("visible",!visible);
+//  bool newVisible = node.get<bool>("visible",false);
+//  std::cout<< " New Value: " << newVisible << std::endl;
+
+  if (removed_elements.size() > 0)
+  {
+    std::string message;
+    message += "Some elements of the plot group " + plotGroupName + " do not exist anymore. These are:\n\n";
+    for (auto element : removed_elements)
+    {
+      message += "  " + element + "\n";
+    }
+    message += "\nDo you want to remove them?";
+
+    QMessageBox msgBox(this->mpMainWindow);
+    msgBox.addButton(QMessageBox::Yes);
+    msgBox.addButton(QMessageBox::No);
+    msgBox.setWindowTitle("Missing elements");
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setText(QString::fromStdString(message));
+
+    int selection = msgBox.exec();
+    if (selection == QMessageBox::Yes)
+    {
+      for (auto remove : removed_elements)
+      {
+        this->removeElementFromPlotGroup(plotGroupName, remove);
+      }
+    }
+  }
+}
+
+void cedar::proc::gui::Group::setAllPlotGroupsVisibility(bool visibility)
+{
+  for (auto &node : mPlotGroupsNode)
+  {
+    node.second.put("visible",visibility);
+  }
 }
 
 void cedar::proc::gui::Group::backgroundColorActionTriggered()
