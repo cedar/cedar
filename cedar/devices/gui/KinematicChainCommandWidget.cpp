@@ -46,6 +46,7 @@
 #include <QRadioButton>
 #include <QPushButton>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
@@ -410,13 +411,25 @@ void cedar::dev::gui::KinematicChainCommandWidget::applyInitialConfig()
 
 void cedar::dev::gui::KinematicChainCommandWidget::deleteInitialConfig()
 {
+
+  const QString conf_name = mpIniconfBox->currentText();
+
+  QMessageBox::StandardButton reply;
+  reply = QMessageBox::question(this, "Please confirm deletion", "Are you sure to delete "+conf_name+" from the list of initial configurations?",
+                                   QMessageBox::Yes|QMessageBox::No);
+
+  if (reply == QMessageBox::No)
+  {
+    return;
+  }
+
   const std::string filename = "initial_configurations_"+ mpKinematicChain->getName() + ".json";
   cedar::aux::Path file_path = cedar::aux::Path::globalCofigurationBaseDirectory() + filename;
   cedar::aux::ConfigurationNode root;
 
   try
   {
-    mpKinematicChain->deleteInitialConfiguration(mpIniconfBox->currentText().toStdString());
+    mpKinematicChain->deleteInitialConfiguration(conf_name.toStdString());
 
     boost::property_tree::read_json(file_path.toString(), root);
     const boost::property_tree::ptree::iterator found = root.to_iterator(root.find(mpIniconfBox->currentText().toStdString()));
