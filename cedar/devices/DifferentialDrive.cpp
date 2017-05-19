@@ -53,7 +53,7 @@
 // static variables
 //------------------------------------------------------------------------------
 
-const cedar::dev::Component::ComponentDataType cedar::dev::DifferentialDrive::WHEEL_SPEED = 100;
+constexpr cedar::dev::Component::ComponentDataType cedar::dev::DifferentialDrive::WHEEL_SPEED;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -64,8 +64,8 @@ void cedar::dev::DifferentialDrive::init()
   setCommandAndMeasurementDimensionality(cedar::dev::DifferentialDrive::WHEEL_SPEED, 2);
 
   std::string group = "differential drive interface";
-  this->defineCommandGroup(group);
-  this->addCommandTypeToGroup(group, cedar::dev::DifferentialDrive::WHEEL_SPEED);
+  this->defineUserSelectableCommandTypeSubset(group);
+  this->addCommandTypeToUserSelectableCommandTypeSubset(group, cedar::dev::DifferentialDrive::WHEEL_SPEED);
 }
 
 cedar::dev::DifferentialDrive::DifferentialDrive()
