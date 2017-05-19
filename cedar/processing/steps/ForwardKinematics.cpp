@@ -148,7 +148,10 @@ bool cedar::proc::steps::ForwardKinematics::hasComponent() const
 void cedar::proc::steps::ForwardKinematics::reset()
 {
   auto component = this->getComponent();
-  component->clearAll();
+  if (component)
+  {
+    component->clearAll();
+  }
 }
 
 void cedar::proc::steps::ForwardKinematics::rebuildOutputs()

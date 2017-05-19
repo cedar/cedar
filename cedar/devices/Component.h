@@ -80,11 +80,14 @@ class cedar::dev::Component : public QObject,
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  typedef unsigned int                      ComponentDataType;
+
   typedef boost::function< void (cv::Mat) > CommandFunctionType;
   typedef boost::function< cv::Mat () >     MeasurementFunctionType;
-  typedef boost::function< void () > NoCommandFunctionType;
+  typedef boost::function< void (const ComponentDataType&) > NoCommandFunctionType;
+  typedef boost::function< void () > AfterCommandFunctionType;
   typedef boost::function< cv::Mat (cedar::unit::Time, cv::Mat) > TransformationFunctionType;
-  typedef unsigned int                      ComponentDataType;
+
   typedef std::map< ComponentDataType, cedar::aux::MatDataPtr > BufferDataType;
   typedef boost::function< cv::Mat() >      ControllerCallback;
   typedef boost::function< bool(const ComponentDataType&, cv::Mat& ) > CommandCheckFunctionType;
@@ -134,10 +137,10 @@ public:
   class CouldNotGuessCommandTypeException : public cedar::aux::ExceptionBase {};
 
   //! Thrown when a group name already exists.
-  class DuplicateGroupNameException : public cedar::aux::DuplicateNameException {};
+  class DuplicateUserSelectableCommandTypeSubsetNameException : public cedar::aux::DuplicateNameException {};
 
   //! Thrown when a group name cannot be found.
-  class GroupNameNotFoundException : public cedar::aux::NotFoundException {};
+  class UserSelectableCommandTypeSubsetNameNotFoundException : public cedar::aux::NotFoundException {};
 
   //! Exception that is thrown when there are no submit hooks even though they are needed.
   class NoSubmitHooksException : public cedar::aux::ExceptionBase {};
@@ -289,19 +292,19 @@ public:
   void clearAll();
 
   //! Defines a new command group.
-  void defineCommandGroup(const std::string& groupName);
+  void defineUserSelectableCommandTypeSubset(const std::string& groupName);
 
   //! Lists all available command groups.
-  std::vector<std::string> listCommandGroups() const;
+  std::vector<std::string> listUserSelectableCommandTypeSubsets() const;
 
   //! Adds a given command to the specified group.
-  void addCommandTypeToGroup(const std::string& groupName, const ComponentDataType& commandType);
+  void addCommandTypeToUserSelectableCommandTypeSubset(const std::string& groupName, const ComponentDataType& commandType);
 
   //! Checks whether any command groups are defined for this component.
-  bool hasCommandGroups() const;
+  bool hasUserSelectableCommandTypeSubsets() const;
 
   //! Returns the command types that are in the given command group.
-  std::vector<ComponentDataType> getCommandsInGroup(const std::string& groupName) const;
+  std::vector<ComponentDataType> getCommandsInUserSelectableCommandTypeSubset(const std::string& groupName) const;
 
   void clearController();
   void setController( ComponentDataType buffer, cedar::dev::Component::ControllerCallback fun );
@@ -376,7 +379,7 @@ protected:
   void registerMeasurementHook(ComponentDataType type, MeasurementFunctionType fun);
   void registerNoCommandHook(NoCommandFunctionType fun);
   void registerNotReadyForCommandHook(NoCommandFunctionType fun);
-  void registerAfterCommandBeforeMeasurementHook(NoCommandFunctionType fun);
+  void registerAfterCommandBeforeMeasurementHook(AfterCommandFunctionType fun);
 
   void registerCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
   void registerMeasurementTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
@@ -445,7 +448,7 @@ private:
   cedar::aux::LockableMember<ControllerCollectionPtr> mController;
   cedar::aux::LockableMember< NoCommandFunctionType > mNoCommandHook;
   cedar::aux::LockableMember< NoCommandFunctionType > mNotReadyForCommandHook;
-  cedar::aux::LockableMember< NoCommandFunctionType > mAfterCommandBeforeMeasurementHook;
+  cedar::aux::LockableMember< AfterCommandFunctionType > mAfterCommandBeforeMeasurementHook;
 
   boost::signals2::signal<void ()> mStartCommunicationHook;
   boost::signals2::signal<void ()> mConnectedHook;

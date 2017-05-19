@@ -62,12 +62,12 @@ namespace cedar
     namespace details
     {
       //!@todo This mixes GUI and step -- is this ok?
-      class ComponentStepGroupParameterWidget : public cedar::aux::gui::Parameter
+      class ComponentStepUserSelectableCommandTypeSubsetParameterWidget : public cedar::aux::gui::Parameter
       {
         Q_OBJECT
 
       public:
-        ComponentStepGroupParameterWidget();
+        ComponentStepUserSelectableCommandTypeSubsetParameterWidget();
 
         void parameterChanged();
 
@@ -76,22 +76,22 @@ namespace cedar
 
         void propertiesChanged();
 
-        void rebuildGroupList();
+        void rebuildUserSelectableCommandTypeSubsetList();
 
       private slots:
         void componentChanged();
-        void selectedGroupChanged(const QString& group);
+        void selectedUserSelectableCommandTypeSubsetChanged(const QString& group);
 
       private:
         QComboBox* mpSelector;
       };
 
-      class ComponentStepGroupParameter : public cedar::aux::ParameterTemplate<std::string>
+      class ComponentStepUserSelectableCommandTypeSubsetParameter : public cedar::aux::ParameterTemplate<std::string>
       {
         Q_OBJECT
 
       public:
-        ComponentStepGroupParameter(cedar::aux::Configurable* owner, const std::string& name);
+        ComponentStepUserSelectableCommandTypeSubsetParameter(cedar::aux::Configurable* owner, const std::string& name);
 
         void setComponent(cedar::dev::ComponentPtr component);
 
@@ -104,7 +104,7 @@ namespace cedar
       private:
         boost::weak_ptr<cedar::dev::Component> mWeakComponent;
       };
-      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ComponentStepGroupParameter);
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ComponentStepUserSelectableCommandTypeSubsetParameter);
     }
   }
 }
@@ -185,7 +185,7 @@ private:
 private slots:
   void componentChangedSlot();
 
-  void selectedGroupChanged();
+  void selectedUserSelectableCommandTypeSubsetChanged();
 
   void communicationStepSizeChanged();
 
@@ -213,7 +213,7 @@ protected:
 private:
   cedar::dev::ComponentParameterPtr _mComponent;
 
-  cedar::proc::details::ComponentStepGroupParameterPtr _mGroup;
+  cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameterPtr _mUserSelectableCommandTypeSubset;
 
   //! Type of the channel stored in this component.
   cedar::aux::DoubleParameterPtr _mCommunicationStepSize;

@@ -86,9 +86,9 @@ cedar::dev::kuka::KinematicChain::KinematicChain()
   registerAfterCommandBeforeMeasurementHook(boost::bind(&cedar::dev::kuka::KinematicChain::exchangeData, this));
 
   // this is called when the user didnt write anything (new) to the command buffers
-  registerNoCommandHook(boost::bind(&cedar::dev::kuka::KinematicChain::prepareSendingNoop, this));
+  registerNoCommandHook(boost::bind(&cedar::dev::kuka::KinematicChain::prepareSendingNoop, this, _1));
   // this is called when the hardware signals that it isnt ready to talk yet
-  registerNotReadyForCommandHook(boost::bind(&cedar::dev::kuka::KinematicChain::prepareSendingNoop, this));
+  registerNotReadyForCommandHook(boost::bind(&cedar::dev::kuka::KinematicChain::prepareSendingNoop, this, _1));
 
   // call this after starting to talk to hardware
   registerStartCommunicationHook(boost::bind(&cedar::dev::kuka::KinematicChain::postStart, this));
@@ -126,7 +126,7 @@ bool cedar::dev::kuka::KinematicChain::isMovable() const
   return this->isReadyForCommands();
 }
 
-void cedar::dev::kuka::KinematicChain::prepareSendingNoop()
+void cedar::dev::kuka::KinematicChain::prepareSendingNoop(const cedar::dev::Component::ComponentDataType& type)
 {
   if (!isConfigured())
     return;
@@ -140,11 +140,38 @@ void cedar::dev::kuka::KinematicChain::prepareSendingNoop()
     return;
   }
 
-  cv::Mat measuredJointPositions;
-  measuredJointPositions = friChannel->getMeasuredJointPositions();
+  switch ( type )
+  {
+    case cedar::dev::KinematicChain::JOINT_ANGLES:
+    {
+std::cout     << "preparing for JOINT POS control " << std::endl;
+      cv::Mat measuredJointPositions;
+      measuredJointPositions = friChannel->getMeasuredJointPositions();
 
-  // the FRI protocol requires us to mirror the measured data
-  friChannel->prepareJointPositionControl(measuredJointPositions);
+      // the FRI protocol requires us to mirror the measured data
+      friChannel->prepareJointPositionControl(measuredJointPositions);
+      break;
+    }
+
+    case cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES:
+    {
+std::cout     << "preparing for JOINT TORQUE control " << std::endl;
+      cv::Mat myzeros= cv::Mat::zeros(getNumberOfJoints(), 1, CV_32FC1);
+
+      // the FRI protocol requires us to send 0 values
+      friChannel->prepareJointTorqueControl(myzeros);
+     break;
+   }
+
+    default:
+    {
+      cedar::aux::LogSingleton::getInstance()->error(
+        "don't know how to prepare for commands of type " + type,
+        CEDAR_CURRENT_FUNCTION_NAME);
+      return;
+    }
+  }
+      
 }
 
 void cedar::dev::kuka::KinematicChain::prepareSendingJointAngles(cv::Mat mat)
@@ -153,7 +180,6 @@ void cedar::dev::kuka::KinematicChain::prepareSendingJointAngles(cv::Mat mat)
     return;
 
   auto friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
-  friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
   if (!friChannel)
   {
     cedar::aux::LogSingleton::getInstance()->error(
@@ -161,8 +187,6 @@ void cedar::dev::kuka::KinematicChain::prepareSendingJointAngles(cv::Mat mat)
       CEDAR_CURRENT_FUNCTION_NAME);
     return;
   }
-
-  // todo: test for maxima in joint geometry
 
   // we only land here if we are ready to prepareSending commands
   friChannel->prepareJointPositionControl(mat);
@@ -174,7 +198,6 @@ void cedar::dev::kuka::KinematicChain::prepareSendingJointTorques(cv::Mat mat)
     return;
 
   auto friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
-  friChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
   if (!friChannel)
   {
     cedar::aux::LogSingleton::getInstance()->error(
@@ -188,9 +211,9 @@ void cedar::dev::kuka::KinematicChain::prepareSendingJointTorques(cv::Mat mat)
   friChannel->prepareJointTorqueControl(mat);
 }
 
-void cedar::dev::kuka::KinematicChain::prepareSendingNotReadyForCommand()
+void cedar::dev::kuka::KinematicChain::prepareSendingNotReadyForCommand(const cedar::dev::Component::ComponentDataType& type)
 {
-  this->prepareSendingNoop();
+  this->prepareSendingNoop(type);
 }
 
 void cedar::dev::kuka::KinematicChain::exchangeData()
