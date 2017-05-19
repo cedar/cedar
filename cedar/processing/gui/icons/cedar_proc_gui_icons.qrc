@@ -105,5 +105,6 @@
         <file>steps/shape_visualisation.svg</file>
         <file>toolbaricons/robot_manager.svg</file>
         <file>steps/virtual_camera.svg</file>
+        <file>steps/vector_to_scalars.svg</file>
     </qresource>
 </RCC>
