@@ -2101,12 +2101,11 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
   unsigned int plotWidgetCounter = 0;
   for (auto childWidget : mChildWidgets)
   {
+    // all widgets in the mChildWidgets Vector should be QDockWidgets that contain a QWidget
+    QWidget *dock_widget_child = cedar::aux::asserted_cast<QDockWidget *>(childWidget)->widget();
     if(!onlyVisiblePlots || (onlyVisiblePlots && childWidget->isVisible()))
     {
-      // all widgets in the mChildWidgets Vector should be QDockWidgets that contain a QWidget
-      QWidget *dock_widget_child = cedar::aux::asserted_cast<QDockWidget *>(childWidget)->widget();
       // The contained QWidget may be of different types, we're only interested in the cedar::proc::gui::PlotWidget ones
-    // The contained QWidget may be of different types
       if (cedar::aux::objectTypeToString(dock_widget_child) == "cedar::proc::gui::PlotWidget")
       {
         cedar::aux::ConfigurationNode value_node;
