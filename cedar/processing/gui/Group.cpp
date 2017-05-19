@@ -2337,7 +2337,7 @@ void cedar::proc::gui::Group::togglePlotGroupVisibility(bool visible, cedar::aux
           auto foundElement = std::find_if(stepMap.begin(), stepMap.end(),
                                            [step_name](const std::pair<const cedar::proc::Step *, cedar::proc::gui::StepItem *> &t) -> bool
                                            {
-                                             return t.first->getName() == step_name;
+                                             return t.first->getFullPath() == step_name;
                                            });
           if (foundElement != stepMap.end())
           {

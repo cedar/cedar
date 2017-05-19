@@ -449,7 +449,6 @@
    <addaction name="separator"/>
    <addaction name="mpActionToggleVisibilityOfPlots"/>
    <addaction name="separator"/>
-   <addaction name="mpActionBrakeAllRobots"/>
    <addaction name="mpActionDisplayPlotGroup"/>
    <addaction name="mpActionNewPlotGroup"/>
    <addaction name="mpActionRenamePlotGroup"/>
@@ -457,6 +456,7 @@
    <addaction name="mpActionDeletePlotGroup"/>
    <addaction name="separator"/>
    <addaction name="mpActionOpenRobotManager"/>
+   <addaction name="mpActionBrakeAllRobots"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
