@@ -1321,73 +1321,61 @@ void cedar::proc::gui::Group::openSceneViewer()
   dock_widget->show();  
 }
 
-void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node)
-{
-  std::set<std::string> removed_elements;
-  for(auto it : node)
-  {
-
-    // Both KinematicChainWidget and Viewer are no PlotWidgets, so treat them separately here
-    if(it.first == "KinematicChainWidget")
-    {
-      this->openKinematicChainWidget(it.second);
-      continue;
-    }
-
-    if(it.first == "Viewer")
-    {
-      this->openSceneViewer(it.second);
-      continue;
-    }
-
-    std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
-
-    try
-    {
-      // is it a connectable?
-      auto connectable = this->getGroup()->getElement<cedar::proc::Connectable>(step_name);
-      if (connectable) // check if cast worked
-      {
-        auto graphics_item = this->mpScene->getGraphicsItemFor(connectable.get());
-        cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, cedar::aux::asserted_cast<cedar::proc::gui::Connectable*>(graphics_item));
-      }
-      else // element is not present - show error
-      {
-        removed_elements.insert(step_name);
-      }
-    }
-    catch (cedar::aux::InvalidNameException& exc)
-    {
-      removed_elements.insert(step_name);
-    }
-  }
-  if (removed_elements.size() > 0)
-  {
-    std::string message;
-    message += "Some elements of the plot group " + plotGroupName + " do not exist anymore. These are:\n\n";
-    for (auto element : removed_elements)
-    {
-      message += "  " + element + "\n";
-    }
-    message += "\nDo you want to remove them?";
-
-    QMessageBox msgBox(this->mpMainWindow);
-    msgBox.addButton(QMessageBox::Yes);
-    msgBox.addButton(QMessageBox::No);
-    msgBox.setWindowTitle("Missing elements");
-    msgBox.setIcon(QMessageBox::Question);
-    msgBox.setText(QString::fromStdString(message));
-
-    int selection = msgBox.exec();
-    if (selection == QMessageBox::Yes)
-    {
-      for (auto remove : removed_elements)
-      {
-        this->removeElementFromPlotGroup(plotGroupName, remove);
-      }
-    }
-  }
-}
+//void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node)
+//{
+//  std::set<std::string> removed_elements;
+//  for(auto it : node)
+//  {
+//
+//
+//    std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
+//
+//    try
+//    {
+//      // is it a connectable?
+//      auto connectable = this->getGroup()->getElement<cedar::proc::Connectable>(step_name);
+//      if (connectable) // check if cast worked
+//      {
+//        auto graphics_item = this->mpScene->getGraphicsItemFor(connectable.get());
+//        cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, cedar::aux::asserted_cast<cedar::proc::gui::Connectable*>(graphics_item));
+//      }
+//      else // element is not present - show error
+//      {
+//        removed_elements.insert(step_name);
+//      }
+//    }
+//    catch (cedar::aux::InvalidNameException& exc)
+//    {
+//      removed_elements.insert(step_name);
+//    }
+//  }
+//  if (removed_elements.size() > 0)
+//  {
+//    std::string message;
+//    message += "Some elements of the plot group " + plotGroupName + " do not exist anymore. These are:\n\n";
+//    for (auto element : removed_elements)
+//    {
+//      message += "  " + element + "\n";
+//    }
+//    message += "\nDo you want to remove them?";
+//
+//    QMessageBox msgBox(this->mpMainWindow);
+//    msgBox.addButton(QMessageBox::Yes);
+//    msgBox.addButton(QMessageBox::No);
+//    msgBox.setWindowTitle("Missing elements");
+//    msgBox.setIcon(QMessageBox::Question);
+//    msgBox.setText(QString::fromStdString(message));
+//
+//    int selection = msgBox.exec();
+//    if (selection == QMessageBox::Yes)
+//    {
+//      for (auto remove : removed_elements)
+//      {
+//        this->removeElementFromPlotGroup(plotGroupName, remove);
+//      }
+//    }
+//  }
+//}
 
 void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode& root) const
 {
@@ -2322,6 +2310,20 @@ void cedar::proc::gui::Group::togglePlotGroupVisibility(bool visible, cedar::aux
   std::set<std::string> removed_elements;
   for(auto it : node) // The way PlotItems are organized, the same StepItem may appear as multiple nodes in the configFile!
   {
+
+    // Both KinematicChainWidget and Viewer are no PlotWidgets, so treat them separately here
+    if(it.first == "KinematicChainWidget")
+    {
+      this->openKinematicChainWidget(it.second);
+      continue;
+    }
+
+    if(it.first == "Viewer")
+    {
+      this->openSceneViewer(it.second);
+      continue;
+    }
+
     if(it.first != "visible") // Visible is a property of the plotgroup that is no plot!
     {
       std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
