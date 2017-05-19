@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>UiSettings</class>
+ <widget class="QWidget" name="UiSettings">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>656</width>
+    <height>571</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>UI Settings</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,1">
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Display Settings</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="toolTip">
+         <string>Note: these effects may lead to rendering errors. If you experience many such errors, disable these effects.</string>
+        </property>
+        <property name="text">
+         <string>Use Graphics Effects*</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="cedar::aux::gui::BoolParameter" name="mpUseGraphicsEffectsEdit" native="true"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Default step display mode</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="cedar::aux::gui::EnumParameter" name="mpStepDisplayMode" native="true"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Highlight connections of selected steps</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="cedar::aux::gui::BoolParameter" name="mpHighlightConnections" native="true"/>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Maximum number of log messages</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="cedar::aux::gui::UIntParameter" name="mpMaximumNumberOfLogMessages" native="true"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Highlight connections when hovering over slots</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="cedar::aux::gui::BoolParameter" name="mpHighlightHoveredConnection" native="true"/>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Snapgrid size</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="cedar::aux::gui::DoubleParameter" name="mpSnapGridSize" native="true"/>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_41">
+        <property name="text">
+         <string>Use Dynamic Field Icons</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="cedar::aux::gui::BoolParameter" name="mpUseDynamicFieldIcons" native="true"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>* changes only take effect after a restart of the application</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Slot item growth</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_42">
+        <property name="text">
+         <string>Growth factor</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="cedar::aux::gui::DoubleParameter" name="mpGrowthFactor" native="true"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Sensitivity</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="cedar::aux::gui::DoubleParameter" name="mpSensitivity" native="true"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Enabled</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="cedar::aux::gui::BoolParameter" name="mpSlotGrowthEnabled" native="true"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>cedar::aux::gui::EnumParameter</class>
+   <extends>QWidget</extends>
+   <header>cedar/auxiliaries/gui/EnumParameter.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cedar::aux::gui::BoolParameter</class>
+   <extends>QWidget</extends>
+   <header>cedar/auxiliaries/gui/BoolParameter.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cedar::aux::gui::DoubleParameter</class>
+   <extends>QWidget</extends>
+   <header>cedar/auxiliaries/gui/DoubleParameter.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cedar::aux::gui::UIntParameter</class>
+   <extends>QWidget</extends>
+   <header>cedar/auxiliaries/gui/UIntParameter.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
