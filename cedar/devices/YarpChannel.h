@@ -123,6 +123,7 @@ public:
     }
     catch (cedar::aux::net::NetWaitingForWriterException &e)
     {
+      //TODO: This should not be ignored!
 //      std::cout<< "Throw NetWaitingForWriterException"<<std::endl;
       CEDAR_THROW(cedar::dev::IgnoreCommunicationException, "writer is missing");
     }
@@ -174,7 +175,8 @@ public:
     }
     else
     { //TODO: exception
-      std::cout << "readerport existed already: " << port <<" . port was not added."<< std::endl;
+      std::cout << "readerport existed already: " << port <<" .was not added!"<< std::endl;
+//      this->mReaderMap[port] = TypeReaderPtr();
 //      CEDAR_ASSERT(false);
     }
   }
@@ -199,12 +201,13 @@ public:
 protected:
   void openHook()
   {
-//    std::cout << "Started the OpenHook" << std::endl;
+    std::cout << "Started the OpenHook" << std::endl;
 //    if (!mIsOpen)
-    {
+//    {
       for (auto it = mReaderMap.begin(); it != mReaderMap.end(); ++it)
       {
         const std::string& port = it->first;
+        std::cout << "Instantiate the reader for Port:" << port << std::endl;
         if (!it->second) // no object instance allocated before
         {
           try
@@ -221,12 +224,14 @@ protected:
       for (auto it = mWriterMap.begin(); it != mWriterMap.end(); ++it)
       {
         const std::string& port = it->first;
+        std::cout << "Instantiate the Writer for Port:" << port << std::endl;
         if (!it->second) // no object instance allocated before
         {
           it->second = TypeWriterPtr(new TypeWriter(port));
         }
       }
-    }
+//    }
+    std::cout << "Finished with the OpenHook!" << std::endl;
   }
 
   void closeHook()

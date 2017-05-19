@@ -305,6 +305,7 @@
     {
       "cedar.dev.YarpChannel<cv.Mat>":
       {
+		  "ip address": "134.147.176.97"
       }
     }
   }

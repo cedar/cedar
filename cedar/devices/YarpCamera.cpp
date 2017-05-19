@@ -45,10 +45,8 @@
 // SYSTEM INCLUDES
 #ifdef CEDAR_USE_YARP
 
-namespace
-{
-  bool registered()
-  {
+namespace {
+  bool registered() {
     cedar::dev::ComponentManagerSingleton::getInstance()->registerType<cedar::dev::YarpCameraPtr>();
     return true;
   }
@@ -60,43 +58,45 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::dev::YarpCamera::YarpCamera()
-    :
-      mReadPort(new cedar::aux::StringParameter(this, "readPortName", "readPortYarpCamera"))
-{
-  registerMeasurementHook(cedar::dev::Camera::CAMERA_PICTURE, boost::bind(&cedar::dev::YarpCamera::retrievePicture, this));
+        :
+        mReadPort(new cedar::aux::StringParameter(this, "readPortName", "readPortYarpCamera")) {
+  registerMeasurementHook(cedar::dev::Camera::CAMERA_PICTURE,
+                          boost::bind(&cedar::dev::YarpCamera::retrievePicture, this));
   registerStartCommunicationHook(boost::bind(&cedar::dev::YarpCamera::postStart, this));
 }
 
-cedar::dev::YarpCamera::~YarpCamera()
-{
+cedar::dev::YarpCamera::~YarpCamera() {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::YarpCamera::postStart()
-{
-  auto yarpChannel = boost::static_pointer_cast < cedar::dev::YarpChannel<cv::Mat> > (this->getChannel());
-  if (!yarpChannel)
-  {
+void cedar::dev::YarpCamera::postStart() {
+  auto yarpChannel = boost::static_pointer_cast<cedar::dev::YarpChannel<cv::Mat> >(this->getChannel());
+  if (!yarpChannel) {
     cedar::aux::LogSingleton::getInstance()->error("Lost yarpChannel pointer", CEDAR_CURRENT_FUNCTION_NAME);
     return;
-  }
-  else
-  {
+  } else {
     yarpChannel->addReaderPort(mReadPort->getValue());
   }
 }
 
-cv::Mat cedar::dev::YarpCamera::retrievePicture()
-{
-  auto yarpChannel = boost::static_pointer_cast < cedar::dev::YarpChannel<cv::Mat> > (this->getChannel());
-  if (!yarpChannel)
-  {
+cv::Mat cedar::dev::YarpCamera::retrievePicture() {
+  auto yarpChannel = boost::static_pointer_cast<cedar::dev::YarpChannel<cv::Mat> >(this->getChannel());
+  if (!yarpChannel) {
+    std::cout<<"Lost yarpChannel pointer"<<std::endl;
     cedar::aux::LogSingleton::getInstance()->error("Lost yarpChannel pointer", CEDAR_CURRENT_FUNCTION_NAME);
     return cv::Mat();
   }
   auto picture = yarpChannel->read(mReadPort->getValue());
+//  if (picture.rows == 200 && picture.cols == 200) {
+//    std::cout << "Expected Camera picture was retrieved! Rows: " << picture.rows << " Cols: " << picture.cols << std::endl;
+//  } else {
+//    std::cout << "Wrong Picture Read! Rows: " << picture.rows << " Cols: " << picture.cols << std::endl;
+//    std::cout << "Maybe Clean the Ports here" << std::endl;
+//  }
+
   return picture;
 }
+
 #endif //CEDAR_USE_YARP

@@ -114,6 +114,7 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
                         )
                       );
 
+
   this->_mElementListShowsDeprecated = new cedar::aux::BoolParameter
       (
         ui_settings.get(),
