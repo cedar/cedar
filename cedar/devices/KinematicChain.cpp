@@ -514,8 +514,8 @@ void cedar::dev::KinematicChain::init()
   defineUserSelectableCommandTypeSubset(groupName2);
   addCommandTypeToUserSelectableCommandTypeSubset( groupName2, cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES);
 
-//  applyDeviceCommandsAs( cedar::dev::KinematicChain::JOINT_ANGLES ); // this is a good default
-  //applyDeviceCommandsAs( cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES ); // this is a good default
+  applyDeviceCommandsAs( cedar::dev::KinematicChain::JOINT_ANGLES ); // this is a good default
+  //applyDeviceCommandsAs( cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES ); 
 
 
   registerCommandTransformationHook
