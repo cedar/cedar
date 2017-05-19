@@ -1,0 +1,49 @@
+/*!
+
+@page DevelopersGuide Developers' Guide
+
+@section Motivation Motivation
+The developers’ guide is a resource for people who would like to contribute to the core of cedar, e.g., adding
+functionality to cedar or fixing bugs directly in cedar. This guide explains how the source code is organized and which
+processes we use to test and release our software. It also highlights central concepts used in the code. The goal of
+this guide is to allow developers to efficiently locate the parts of code they wish to alter, understand how affected
+classes interact with each other and the rest of the code, and how changes may be merged back into our repositories once
+development is done.
+
+@section OrganizationalConcepts Organizational Concepts
+On these pages you can learn more about the structure and organization of cedar.
+- @link FolderStructureConcept Folder structure @endlink
+- @link OverviewNamespaces Overview of cedar namespaces @endlink
+- @link ReleasesConcept Release work flow @endlink
+- @link SoftwareTestingConcept Software testing @endlink
+
+@section ProgrammingConcepts Programming Concepts
+On the following pages you can find out about general programming concepts we use throughout cedar.
+- @link ParametersConcept Storing and loading parameters @endlink
+- @link ProcessingFrameworkConcept Processing framework @endlink
+- @link ThreadingConcept Threads and dynamics @endlink
+- @link ExperimentFrameworkConcept Experiment framework @endlink
+- @link InterProcessCommunicationConcept Inter-process communication using YARP @endlink
+- @link UnitsConcept Physical units @endlink
+- @link BoostSignalsWrapper cedar's helper functions for boost signals @endlink
+- @link RunTimeTypeSystem cedar's runtime type system @endlink
+
+@section PracticalDetails Practical Details
+The following pages contain specific details of some of cedar's components focussed mainly on a single class. These 
+pages supplement the doxygen documentation of the class interfaces.
+- @ref EnumConcept  
+
+@section BugFixing Bug Fixing
+If you want to fix a bug in cedar, please stick to the following process.
+-# report the bug in the <a href="https://bitbucket.org/cedar/release/issues">issue tracker</a>
+-# ask a member of the cedar development team to assign this bug to you
+-# clone the current cedar tip of the release repository if the bug appears in release, otherwise clone development (e.g., if release and development are affected, clone release)
+-# write or modify a unit test that fails due to this bug
+-# fix the bug
+-# check if the unit test now passes
+-# push the bug fix (and, of course, the unit test)
+-# resolve the bug in the issue tracker or ask a member of the cedar development team to resolve the issue for you
+
+@section CodingStyle Coding Style
+cedar sticks to a strict @link CodingStyle coding style@endlink.
+*/

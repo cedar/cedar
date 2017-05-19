@@ -1,0 +1,326 @@
+{
+    "meta":
+    {
+        "format": "1"
+    },
+    "steps":
+    {
+        "cedar.processing.steps.ChannelSplit":
+        {
+            "name": "new ChannelSplit",
+            "threaded": "false"
+        },
+        "cedar.processing.steps.ColorConversion":
+        {
+            "name": "new ColorConversion",
+            "threaded": "false",
+            "source type": "AUTO",
+            "target type": "HSV"
+        },
+        "cedar.processing.steps.Convolution":
+        {
+            "name": "new Convolution",
+            "threaded": "false",
+            "kernels":
+            {
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "2",
+                    "anchor":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "amplitude": "0.003",
+                    "sigmas":
+                    [
+                        "3",
+                        "3"
+                    ],
+                    "shifts":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "limit": "5"
+                }
+            },
+            "convolution":
+            {
+                "borderType": "Zero",
+                "mode": "Same",
+                "engine":
+                {
+                    "type": "cedar.aux.conv.OpenCV"
+                }
+            }
+        },
+        "cedar.processing.steps.MatrixTypeConverter":
+        {
+            "name": "new MatrixTypeConverter",
+            "threaded": "false",
+            "target type": "Float"
+        },
+        "cedar.dynamics.NeuralField":
+        {
+            "name": "new NeuralField",
+            "threaded": "false",
+            "resting level": "0",
+            "time scale": "100",
+            "global inhibition": "-0.001",
+            "activation as output": "false",
+            "discrete metric (workaround)": "false",
+            "dimensionality": "2",
+            "sizes":
+            [
+                "80",
+                "60"
+            ],
+            "input noise gain": "0.1",
+            "sigmoid":
+            {
+                "type": "cedar.aux.math.AbsSigmoid",
+                "threshold": "0",
+                "beta": "100"
+            },
+            "lateral kernels":
+            {
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "2",
+                    "anchor":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "amplitude": "1",
+                    "sigmas":
+                    [
+                        "3",
+                        "3"
+                    ],
+                    "shifts":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "limit": "5"
+                },
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "2",
+                    "anchor":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "amplitude": "-1",
+                    "sigmas":
+                    [
+                        "6",
+                        "6"
+                    ],
+                    "shifts":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "limit": "5"
+                }
+            },
+            "lateral kernel convolution":
+            {
+                "borderType": "Zero",
+                "mode": "Same",
+                "engine":
+                {
+                    "type": "cedar.aux.conv.OpenCV"
+                }
+            },
+            "noise correlation kernel":
+            {
+                "dimensionality": "2",
+                "anchor":
+                [
+                    "0",
+                    "0"
+                ],
+                "amplitude": "0",
+                "sigmas":
+                [
+                    "3",
+                    "3"
+                ],
+                "shifts":
+                [
+                    "0",
+                    "0"
+                ],
+                "limit": "5"
+            }
+        },
+        "cedar.processing.sources.Picture":
+        {
+            "name": "new Picture",
+            "threaded": "false",
+            "record": "false",
+            "PictureGrabber":
+            {
+                "name": "PictureGrabber",
+                "step size": "1",
+                "idle time": "0.01",
+                "simulated time": "1",
+                "loop mode": "Fixed",
+                "channels":
+                {
+                    "cedar.dev.sensors.visual.PictureChannel":
+                    {
+                        "snapshot file": ".\/snapshot.jpg",
+                        "record file": ".\/record.avi",
+                        "filename": "\/groups\/ar\/summerschool\/2013.bochum\/exercises\/cedar_tutorial\/blocks.jpg"
+                    }
+                }
+            }
+        },
+        "cedar.processing.Resize":
+        {
+            "name": "new Resize",
+            "threaded": "false",
+            "output size":
+            [
+                "80",
+                "60"
+            ],
+            "interpolation": "LINEAR"
+        }
+    },
+    "triggers":
+    {
+        "cedar.processing.LoopedTrigger":
+        {
+            "name": "new LoopedTrigger",
+            "step size": "1",
+            "idle time": "0.01",
+            "simulated time": "1",
+            "loop mode": "Fixed",
+            "wait": "true",
+            "listeners":
+            [
+                "new NeuralField"
+            ]
+        }
+    },
+    "connections":
+    [
+        {
+            "source": "new Picture.Picture",
+            "target": "new ColorConversion.input image"
+        },
+        {
+            "source": "new ColorConversion.converted image",
+            "target": "new ChannelSplit.three channel input"
+        },
+        {
+            "source": "new ChannelSplit.channel 2",
+            "target": "new MatrixTypeConverter.matrix"
+        },
+        {
+            "source": "new MatrixTypeConverter.converted matrix",
+            "target": "new Convolution.matrix"
+        },
+        {
+            "source": "new Convolution.result",
+            "target": "new Resize.input"
+        },
+        {
+            "source": "new Resize.output",
+            "target": "new NeuralField.input"
+        }
+    ],
+    "name": "root",
+    "promotedSlots": "",
+    "ui":
+    [
+        {
+            "type": "step",
+            "step": "new ChannelSplit",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-415",
+            "positionY": "2"
+        },
+        {
+            "type": "step",
+            "step": "new ColorConversion",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-507",
+            "positionY": "1"
+        },
+        {
+            "type": "step",
+            "step": "new Convolution",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-214",
+            "positionY": "2"
+        },
+        {
+            "type": "trigger",
+            "trigger": "new LoopedTrigger",
+            "width": "30",
+            "height": "30",
+            "positionX": "-17",
+            "positionY": "-99"
+        },
+        {
+            "type": "step",
+            "step": "new MatrixTypeConverter",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-303",
+            "positionY": "4"
+        },
+        {
+            "type": "step",
+            "step": "new NeuralField",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "-31",
+            "positionY": "8"
+        },
+        {
+            "type": "step",
+            "step": "new Picture",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "-720",
+            "positionY": "-2"
+        },
+        {
+            "type": "step",
+            "step": "new Resize",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-133",
+            "positionY": "9"
+        }
+    ],
+    "ui generic":
+    {
+        "network": "root",
+        "open plots": "",
+        "width": "34",
+        "height": "30",
+        "smart mode": "false",
+        "positionX": "-10",
+        "positionY": "-50"
+    }
+}
