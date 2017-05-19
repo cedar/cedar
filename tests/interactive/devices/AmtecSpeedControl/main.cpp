@@ -50,7 +50,7 @@
 
 int main(int /* argc */, char ** /* argv[] */)
 {
-  std::string configuration_file = cedar::aux::locateResource("configs/cora_arm.json");
+  std::string configuration_file = cedar::aux::locateResource("robots/cora_arm.json");
 
   try
   {

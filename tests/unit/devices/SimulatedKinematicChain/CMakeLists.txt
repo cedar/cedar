@@ -34,4 +34,4 @@
 #
 #=======================================================================================================================
 
-cedar_add_unit_test(SimulatedKinematicChain main.cpp)
+cedar_add_unit_test(SimulatedKinematicChain simulatedKinematicChainTest.cpp)

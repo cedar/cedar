@@ -462,6 +462,7 @@ private:
 
   //!@brief group of this instance
   GraphicsGroup mGroup;
+
   //!@brief all groups this instance can connect to
   GraphicsGroup mAllowedConnectTargets;
 

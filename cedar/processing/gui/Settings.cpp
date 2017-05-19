@@ -87,7 +87,7 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   ui_settings->addConfigurableChild("tools", mTools);
   ui_settings->addConfigurableChild("properties", mProperties);
   this->declareDockSettings("boost control", false);
-  this->declareDockSettings("simulation control", false);
+  this->declareDockSettings("thread control", false);
   this->declareDockSettings("architecture consistency check", false);
 
   cedar::aux::ConfigurablePtr slot_growth(new cedar::aux::Configurable());
@@ -116,6 +116,7 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
                           false
                         )
                       );
+
 
   this->_mElementListShowsDeprecated = new cedar::aux::BoolParameter
       (

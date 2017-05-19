@@ -164,6 +164,9 @@ private:
   //! Used to stop the trigger in a separate thread
   cedar::aux::CallFunctionInThreadPtr mStopCaller;
 
+  //! Tracks whether the trigger is starting/stopping
+  bool mStartingStopping;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------

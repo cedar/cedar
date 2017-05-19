@@ -58,6 +58,10 @@
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/GroupDeclarationManager.h"
+#include "cedar/devices/RobotManager.h"
+#include "cedar/devices/ComponentSlot.h"
+#include "cedar/devices/KinematicChain.h"
+#include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/stringFunctions.h"
@@ -84,6 +88,7 @@
 #include <QScrollBar>
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/json_parser.hpp>
+  #include <boost/pointer_cast.hpp>
   #include <boost/filesystem.hpp>
 #endif
 #include <iostream>
@@ -523,6 +528,40 @@ void cedar::proc::gui::Group::showArchitectureWidget(const std::string& name)
   QWeakPointer<QWidget> debugWeakPointer = QWeakPointer<QWidget>(debugPointer); 
 
   this->mArchitectureWidgetDocks.push_back(debugWeakPointer);
+}
+
+void cedar::proc::gui::Group::removeViewer()
+{
+  auto it = mViewers.begin();
+  while (*it != QObject::sender() && it != mViewers.end())
+  {
+    it++;
+  }
+  if (*it == QObject::sender())
+  {
+    mViewers.erase(it);
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->error("Could not find a reference to the destroyed Viewer.", "cedar::proc::gui::Group::removeViewer()");
+  }
+}
+
+void cedar::proc::gui::Group::removeKinematicChainWidget()
+{
+  auto it = mKinematicChainWidgets.begin();
+  while (*it != QObject::sender() && it != mKinematicChainWidgets.end())
+  {
+    it++;
+  }
+  if (*it == QObject::sender())
+  {
+    mKinematicChainWidgets.erase(it);
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->error("Could not find a reference to the destroyed KinematicChainWidget.", "cedar::proc::gui::Group::removeKinematicChainWidget()");
+  }
 }
 
 void cedar::proc::gui::Group::toggleVisibilityOfOpenArchitectureWidgets(bool visible)
@@ -1106,6 +1145,7 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
   if (root.find("ui generic") != root.not_found())
   {
     auto node = root.get_child("ui generic");
+
     this->cedar::proc::gui::Connectable::readConfiguration(node);
     // restore plots that were open when architecture was last saved
     auto plot_list = node.find("open plots");
@@ -1180,58 +1220,174 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
   this->updateCollapsedness();
 }
 
-//void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node)
-//{
-//  std::set<std::string> removed_elements;
-//  for(auto it : node)
-//  {
-//    std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
-//    try
-//    {
-//      // is it a connectable?
-//      auto connectable = this->getGroup()->getElement<cedar::proc::Connectable>(step_name);
-//      if (connectable) // check if cast worked
-//      {
-//        auto graphics_item = this->mpScene->getGraphicsItemFor(connectable.get());
-//        cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, cedar::aux::asserted_cast<cedar::proc::gui::Connectable*>(graphics_item));
-//      }
-//      else // element is not present - show error
-//      {
-//        removed_elements.insert(step_name);
-//      }
-//    }
-//    catch (cedar::aux::InvalidNameException& exc)
-//    {
-//      removed_elements.insert(step_name);
-//    }
-//  }
-//  if (removed_elements.size() > 0)
-//  {
-//    std::string message;
-//    message += "Some elements of the plot group " + plotGroupName + " do not exist anymore. These are:\n\n";
-//    for (auto element : removed_elements)
-//    {
-//      message += "  " + element + "\n";
-//    }
-//    message += "\nDo you want to remove them?";
-//
-//    QMessageBox msgBox(this->mpMainWindow);
-//    msgBox.addButton(QMessageBox::Yes);
-//    msgBox.addButton(QMessageBox::No);
-//    msgBox.setWindowTitle("Missing elements");
-//    msgBox.setIcon(QMessageBox::Question);
-//    msgBox.setText(QString::fromStdString(message));
-//
-//    int selection = msgBox.exec();
-//    if (selection == QMessageBox::Yes)
-//    {
-//      for (auto remove : removed_elements)
-//      {
-//        this->removeElementFromPlotGroup(plotGroupName, remove);
-//      }
-//    }
-//  }
-//}
+void cedar::proc::gui::Group::openSceneViewer(const cedar::aux::ConfigurationNode& node)
+{
+  try
+  {
+    const int posx = node.get<int>("position_x");
+    const int posy = node.get<int>("position_y");
+    const int width = node.get<int>("width");
+    const int height = node.get<int>("height");
+
+    cedar::aux::gl::ScenePtr scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
+
+    cedar::aux::gui::Viewer *viewer = new cedar::aux::gui::Viewer(scene);
+    viewer->startTimer(25);
+    viewer->setSceneRadius(scene->getSceneLimit());
+
+    QObject::connect(viewer, SIGNAL(destroyed()), this, SLOT(removeViewer()));
+    mViewers.push_back(viewer);
+
+    QWidget* dock_widget = this->createDockWidget("simulated scene", viewer);
+    dock_widget->show();
+    dock_widget->resize(width, height);
+    dock_widget->move(posx, posy);
+
+    #ifdef CEDAR_USE_QGLVIEWER
+
+    const float cposx = node.get<float>("camera position x");
+    const float cposy = node.get<float>("camera position y");
+    const float cposz = node.get<float>("camera position z");
+
+    const float cori0 = node.get<float>("camera orientation 0");
+    const float cori1 = node.get<float>("camera orientation 1");
+    const float cori2 = node.get<float>("camera orientation 2");
+    const float cori3 = node.get<float>("camera orientation 3");
+
+    viewer->camera()->setPosition(qglviewer::Vec(cposx, cposy, cposz));
+    viewer->camera()->setOrientation(qglviewer::Quaternion(cori0, cori1, cori2, cori3));
+
+    #endif // CEDAR_USE_QGLVIEWER
+
+  }
+  catch (...)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Failed to open a view on the simulated scener. Most probably it is not well defined. Ignoring.",
+      "cedar::proc::gui::Group::openSceneViewer(const cedar::aux::ConfigurationNode& node)"
+    );
+  }
+}
+
+void cedar::proc::gui::Group::openKinematicChainWidget(const cedar::aux::ConfigurationNode& node)
+{
+  std::string path;
+
+  try
+  {    
+    path = node.get<std::string>("component");
+    cedar::dev::ComponentSlotPtr p_component_slot = cedar::dev::RobotManagerSingleton::getInstance()->findComponentSlot(path);
+
+    if(auto pKinematicChain = boost::dynamic_pointer_cast<cedar::dev::KinematicChain>(p_component_slot->getComponent()))
+    {
+      const int posx = node.get<int>("position_x");
+      const int posy = node.get<int>("position_y");
+      const int height = node.get<int>("height");
+      const int width = node.get<int>("width");
+
+      cedar::dev::gui::KinematicChainWidget *pWidget = new cedar::dev::gui::KinematicChainWidget(pKinematicChain);
+      auto dock_widget = this->createDockWidget(path, pWidget);
+      dock_widget->show();
+      dock_widget->resize(width, height);
+      dock_widget->move(posx, posy);
+
+      QObject::connect(pWidget, SIGNAL(destroyed()), this, SLOT(removeKinematicChainWidget()));
+      mKinematicChainWidgets.push_back(pWidget);
+    }
+  }
+  catch (...)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Failed to open Kinematic Chain Widget for \"" + path + "\". Most probably the robot does not exist anymore. Ignoring.",
+      "cedar::proc::gui::Group::readKinematicChainWidgetList(const cedar::aux::ConfigurationNode& node)"
+    );
+  }
+}
+
+void cedar::proc::gui::Group::openSceneViewer()
+{
+  cedar::aux::gl::ScenePtr scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
+  cedar::aux::gui::Viewer *viewer = new cedar::aux::gui::Viewer(scene);
+
+  viewer->setWindowFlags(Qt::WindowStaysOnTopHint);
+  viewer->setSceneRadius(scene->getSceneLimit());
+  viewer->startTimer(25);
+  QObject::connect(viewer, SIGNAL(destroyed()), this, SLOT(removeViewer()));
+  mViewers.push_back(viewer);
+
+  auto dock_widget = this->createDockWidget("simulated scene", viewer);
+  dock_widget->show();  
+}
+
+void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node)
+{
+  std::set<std::string> removed_elements;
+  for(auto it : node)
+  {
+
+    // Both KinematicChainWidget and Viewer are no PlotWidgets, so treat them separately here
+    if(it.first == "KinematicChainWidget")
+    {
+      this->openKinematicChainWidget(it.second);
+      continue;
+    }
+
+    if(it.first == "Viewer")
+    {
+      this->openSceneViewer(it.second);
+      continue;
+    }
+
+    std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
+
+    try
+    {
+      // is it a connectable?
+      auto connectable = this->getGroup()->getElement<cedar::proc::Connectable>(step_name);
+      if (connectable) // check if cast worked
+      {
+        auto graphics_item = this->mpScene->getGraphicsItemFor(connectable.get());
+        cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, cedar::aux::asserted_cast<cedar::proc::gui::Connectable*>(graphics_item));
+      }
+      else // element is not present - show error
+      {
+        removed_elements.insert(step_name);
+      }
+    }
+    catch (cedar::aux::InvalidNameException& exc)
+    {
+      removed_elements.insert(step_name);
+    }
+  }
+  if (removed_elements.size() > 0)
+  {
+    std::string message;
+    message += "Some elements of the plot group " + plotGroupName + " do not exist anymore. These are:\n\n";
+    for (auto element : removed_elements)
+    {
+      message += "  " + element + "\n";
+    }
+    message += "\nDo you want to remove them?";
+
+    QMessageBox msgBox(this->mpMainWindow);
+    msgBox.addButton(QMessageBox::Yes);
+    msgBox.addButton(QMessageBox::No);
+    msgBox.setWindowTitle("Missing elements");
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setText(QString::fromStdString(message));
+
+    int selection = msgBox.exec();
+    if (selection == QMessageBox::Yes)
+    {
+      for (auto remove : removed_elements)
+      {
+        this->removeElementFromPlotGroup(plotGroupName, remove);
+      }
+    }
+  }
+}
 
 void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode& root) const
 {
@@ -1282,24 +1438,54 @@ void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode& 
 void cedar::proc::gui::Group::writeOpenPlotsTo(cedar::aux::ConfigurationNode& node, bool onlyVisiblePlots) const
 {
   // important: access to QT Qidgets only allowed from the GUI thread
-
   //            since most calls are not thread-safe!
+  const bool isGuiThread = 
+              QThread::currentThread() == QCoreApplication::instance()->thread();
 
-//  const bool isGuiThread =
-//          QThread::currentThread() == QCoreApplication::instance()->thread();
-//
-//  if (isGuiThread)
-//  {
-//    for (QWidget* viewer_item : mViewers)
-//    {
-//      cedar::aux::ConfigurationNode value_node;
-//      value_node.add("position_x", viewer_item->pos().x());
-//      value_node.add("position_y", viewer_item->pos().y());
-//      value_node.add("width", viewer_item->width());
-//      value_node.add("height", viewer_item->height());
-//      node.push_back(cedar::aux::ConfigurationNode::value_type("Viewer", value_node));
-//    }
-//  }
+  if (!isGuiThread)
+  {
+    return;
+  }
+
+  for (QWidget* viewer_item : mViewers)
+  {
+    cedar::aux::ConfigurationNode value_node;
+
+    value_node.add("position_x", viewer_item->parentWidget()->x());
+    value_node.add("position_y", viewer_item->parentWidget()->y());
+    value_node.add("width", viewer_item->parentWidget()->width());
+    value_node.add("height", viewer_item->parentWidget()->height());
+
+    #ifdef CEDAR_USE_QGLVIEWER
+
+    QGLViewer* qgl = boost::dynamic_pointer_cast<QGLViewer>(viewer_item);
+    value_node.add("camera position x", qgl->camera()->position().x);
+    value_node.add("camera position y", qgl->camera()->position().y);
+    value_node.add("camera position z", qgl->camera()->position().z);
+    value_node.add("camera orientation 0", qgl->camera()->orientation()[0]);
+    value_node.add("camera orientation 1", qgl->camera()->orientation()[1]);
+    value_node.add("camera orientation 2", qgl->camera()->orientation()[2]);
+    value_node.add("camera orientation 3", qgl->camera()->orientation()[3]);
+
+    #endif // CEDAR_USE_QGLVIEWER
+
+    node.push_back(cedar::aux::ConfigurationNode::value_type("Viewer", value_node));
+
+  }
+
+  for (cedar::dev::gui::KinematicChainWidget* kcw_item : mKinematicChainWidgets)
+  {
+    cedar::aux::ConfigurationNode value_node;
+
+    value_node.add("position_x", kcw_item->parentWidget()->x());
+    value_node.add("position_y", kcw_item->parentWidget()->y());
+    value_node.add("width", kcw_item->parentWidget()->width());
+    value_node.add("height", kcw_item->parentWidget()->height());
+    const std::string component_path =  kcw_item->getPath();
+    value_node.add("component", component_path);
+
+    node.push_back(cedar::aux::ConfigurationNode::value_type("KinematicChainWidget", value_node));
+  }
 
   for (auto step_map_item : this->mpScene->getStepMap())
   {

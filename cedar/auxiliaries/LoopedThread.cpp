@@ -40,6 +40,7 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <QWriteLocker>
@@ -173,6 +174,16 @@ void cedar::aux::LoopedThread::stopStatistics()
   }
 }
 
+void cedar::aux::LoopedThread::waitUntilStepped() const
+{
+  CEDAR_ASSERT( mpWorker ); 
+  unsigned long numberOfSteps = mpWorker->getNumberOfSteps();
+
+  while ( numberOfSteps == mpWorker->getNumberOfSteps() )
+  {
+    cedar::aux::sleep( 1.5 * getStepSize() );
+  }
+}
 
 void cedar::aux::LoopedThread::singleStep()
 {

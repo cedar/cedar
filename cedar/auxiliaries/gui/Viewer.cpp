@@ -53,12 +53,28 @@ mGrabberConnected(false),
 mReadFromFile(readFromFile),
 mRegisteredGrabber("")
 {
-  mpScene->addViewer(this);
+    mpScene->addViewer(this);
+}
+
+cedar::aux::gui::Viewer::Viewer(bool readFromFile)
+:
+mpScene(cedar::aux::gl::ScenePtr(new cedar::aux::gl::Scene)),
+mpGrabberLock(NULL),
+mGrabberBuffer(cv::Mat()),
+mGrabberConnected(false),
+mReadFromFile(readFromFile),
+mRegisteredGrabber("")
+{
+
 }
 
 cedar::aux::gui::Viewer::~Viewer()
 {
-  mpScene->removeViewer(this);
+  if (mpScene)
+  {
+    mpScene->removeViewer(this);
+  }
+
   if (mpGrabberLock)
   {
     delete mpGrabberLock;
@@ -76,23 +92,8 @@ void cedar::aux::gui::Viewer::init()
 #ifdef CEDAR_USE_QGLVIEWER
     restoreStateFromFile();
 #endif // CEDAR_USE_QGLVIEWER
-    cedar::aux::LogSingleton::getInstance()->debugMessage
-    (
-      "Restoring Viewer state from file.",
-      "cedar::aux::gui::Viewer",
-      "init"
-    );
   }
-  else
-  {
-    cedar::aux::LogSingleton::getInstance()->debugMessage
-    (
-      "Not restoring Viewer state from file.",
-      "cedar::aux::gui::Viewer",
-      "init"
-    );
 
-  }
   mpScene->initGl();
 }
 
@@ -138,9 +139,13 @@ void cedar::aux::gui::Viewer::grabBuffer()
   mpGrabberLock->lockForWrite();
   mGrabberBuffer = mat2;
   mpGrabberLock->unlock();
-#endif // CEDAR_USE_QGLVIEWER
+#endif // CEDAR_USE_QGLVIEWER  
 }
 
+QImage cedar::aux::gui::Viewer::grabFrameBuffer()
+{
+  return this->QGLWidget::grabFrameBuffer(false);
+}
 
 const cv::Mat& cedar::aux::gui::Viewer::grabImage()
 {

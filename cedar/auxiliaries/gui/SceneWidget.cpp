@@ -59,6 +59,12 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::aux::gui::SceneWidget::SceneWidget(QWidget *parent)
+:
+cedar::aux::gui::BaseWidget("SceneControl", parent)
+{
+}
+
 cedar::aux::gui::SceneWidget::SceneWidget(cedar::aux::gl::ScenePtr p_scene, QWidget*)
 :
 mpScene(p_scene)
@@ -69,7 +75,6 @@ mpScene(p_scene)
 
 cedar::aux::gui::SceneWidget::~SceneWidget()
 {
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -217,6 +222,25 @@ void cedar::aux::gui::SceneWidget::updateWidget()
   mpDoubleSpinBoxRadius->setEnabled(false);
   mpDoubleSpinBoxThickness->setEnabled(false);
 
+  if(mpScene->isEmpty())
+  {
+    return;
+  }
+  else
+  {
+    // initialize rigid body visualization widget
+    mpObjectVisualizationWidget = new cedar::aux::gui::ObjectVisualizationWidget(mpActiveVisualization);
+    mpGridLayout->addWidget(mpObjectVisualizationWidget, 2, 0, 1, 2);
+
+    // initialize rigid body widget
+    mpLocalCoordinateFrameWidget = new cedar::aux::gui::LocalCoordinateFrameWidget
+    (
+      mpActiveVisualization->getLocalCoordinateFrame()
+    );
+
+    mpGridLayout->addWidget(mpLocalCoordinateFrameWidget, 4, 0, 1, 2);
+  }
+
   if (mpActiveVisualization->getObjectVisualizationType().compare("Cylinder") == 0)
   {
     // enable those elements that apply
@@ -291,14 +315,35 @@ void cedar::aux::gui::SceneWidget::updateObjectSelectionComboBox()
 {
   mpComboBoxName->blockSignals(true);
   mpComboBoxName->clear();
-  // fill combo box with names of objects in the scene
-  for (int i=0; i<mpScene->getNumberOfObjectVisualizations(); i++)
+
+  const int numObjects = mpScene->getNumberOfObjectVisualizations();
+
+  if(numObjects == 0)
   {
+    mpComboBoxName->setEnabled(false);
+    mpDeleteObjectPushButton->setEnabled(false);
+  }
+  else
+  {
+    mpComboBoxName->setEnabled(true);
+    mpDeleteObjectPushButton->setEnabled(true);
+  }
+
+  // fill combo box with names of objects in the scene
+  for (int i=0; i<numObjects; ++i)
+  {
+
     mpComboBoxName->addItem
     (
-      QString(mpScene->getObjectVisualization(i)->getLocalCoordinateFrame()->getName().c_str())
+      QString::fromStdString
+      (
+        mpScene->getObjectVisualization(i)->getLocalCoordinateFrame()->getName()
+      )
     );
+
   }
+
+  setActiveVisualization();
   mpComboBoxName->blockSignals(false);
 }
 
@@ -306,31 +351,7 @@ void cedar::aux::gui::SceneWidget::init()
 {
 
   updateObjectSelectionComboBox();
-//  // fill combo box with names of objects in the scene
-//  for (int i=0; i<mpScene->getNumberOfObjectVisualizations(); i++)
-//  {
-//    mpComboBoxName->addItem
-//    (
-//      QString(mpScene->getObjectVisualization(i)->getLocalCoordinateFrame()->getName().c_str())
-//    );
-//  }
-  
-  // initialize rigid body visualization widget
-  mpObjectVisualizationWidget = new cedar::aux::gui::ObjectVisualizationWidget(mpScene->getObjectVisualization(0));
-  mpGridLayout->addWidget(mpObjectVisualizationWidget, 2, 0, 1, 2);
-
-  // initialize rigid body widget
-  mpLocalCoordinateFrameWidget = new cedar::aux::gui::LocalCoordinateFrameWidget
-  (
-    mpScene->getObjectVisualization(0)->getLocalCoordinateFrame()
-  );
-  mpGridLayout->addWidget(mpLocalCoordinateFrameWidget, 4, 0, 1, 2);
-
-
-  if (mpScene->isEmpty())
-  {
-    mpObjectSettingsBox->setEnabled(false);
-  }
+  updateWidget();
   setActiveVisualization();
 
   // set widget properties

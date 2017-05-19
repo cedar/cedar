@@ -52,7 +52,11 @@ cedar::dev::gl::KukaArm::KukaArm(cedar::dev::KinematicChainPtr pKinematicChain)
 :
 cedar::dev::gl::KinematicChain(pKinematicChain)
 {
-  loadData();
+  try
+  {
+    loadData();
+  }
+  catch(...){}
 }
 
 cedar::dev::gl::KukaArm::~KukaArm()
@@ -153,7 +157,7 @@ void cedar::dev::gl::KukaArm::initializeGl()
 void cedar::dev::gl::KukaArm::drawBase()
 {
   prepareDraw();
-  if (mIsDrawnAsWireFrame)
+  if (getIsDrawnAsWireFrame())
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   }
@@ -167,6 +171,7 @@ void cedar::dev::gl::KukaArm::drawBase()
   this->drawElement(mBaseRingVertexVboId, mBaseRingIndexVboId, mBaseRingFacesNumber);
   // move to the base of the block and draw it
   glRotated(90.0, 1.0, 0.0, 0.0);
+  glRotated(180.0, 0.0, 1.0, 0.0);
   glTranslated(0.0, -0.055, -0.13);
   drawBaseBlock();
   setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
@@ -174,109 +179,103 @@ void cedar::dev::gl::KukaArm::drawBase()
 
 void cedar::dev::gl::KukaArm::drawBaseBlock()
 {
+  glBegin(GL_TRIANGLES);
 
-//  cedar::aux::gl::drawCross(0.1);
+  // base plate of the arm
+  glNormal3d(0.0, -0.5, 0.866);
+  glVertex3d(-.09, -.055, .06411542731880106);
+  glVertex3d(-.09, .035, 0.22);
+  glVertex3d(.09, .035, 0.22);
 
-//  glTranslated(0.0, 0.0, 0.02);
-//  cedar::aux::gl::drawBlock(.18, .11, .04, false);
+  glVertex3d(.09, .035, 0.22);
+  glVertex3d(.09, -.055, .06411542731880106);
+  glVertex3d(-.09, -.055, .06411542731880106);
 
-    glBegin(GL_TRIANGLES);
+  // below the base plate
+  glNormal3d(0.0, -1.0, 0.0);
+  glVertex3d(-.09, -.055, .0);
+  glVertex3d(-.09, -.055, .06411542731880106);
+  glVertex3d(.09, -.055, .06411542731880106);
 
-    // base plate of the arm
-    glNormal3d(0.0, -0.5, 0.866);
-    glVertex3d(-.09, -.055, .06411542731880106);
-    glVertex3d(-.09, .035, 0.22);
-    glVertex3d(.09, .035, 0.22);
+  glVertex3d(-.09, -.055, .0);
+  glVertex3d(.09, -.055, .06411542731880106);
+  glVertex3d(.09, -.055, .0);
 
-    glVertex3d(.09, .035, 0.22);
-    glVertex3d(.09, -.055, .06411542731880106);
-    glVertex3d(-.09, -.055, .06411542731880106);
+  // right side
+  glNormal3d(-1.0, 0.0, 0.0);
+  glVertex3d(-.09, .055, 0.0);
+  glVertex3d(-.09, .055, .06411542731880106);
+  glVertex3d(-.09, -.055, 0.0);
 
-    // below the base plate
-    glNormal3d(0.0, -1.0, 0.0);
-    glVertex3d(-.09, -.055, .0);
-    glVertex3d(-.09, -.055, .06411542731880106);
-    glVertex3d(.09, -.055, .06411542731880106);
+  glVertex3d(-.09, .055, .06411542731880106);
+  glVertex3d(-.09, -.055, .06411542731880106);
+  glVertex3d(-.09, -.055, 0.0);
 
-    glVertex3d(-.09, -.055, .0);
-    glVertex3d(.09, -.055, .06411542731880106);
-    glVertex3d(.09, -.055, .0);
+  glVertex3d(-.09, .055, .06411542731880106);
+  glVertex3d(-.09, .055, 0.22);
+  glVertex3d(-.09, .035, .06411542731880106);
 
-    // right side
-    glNormal3d(-1.0, 0.0, 0.0);
-    glVertex3d(-.09, .055, 0.0);
-    glVertex3d(-.09, .055, .06411542731880106);
-    glVertex3d(-.09, -.055, 0.0);
+  glVertex3d(-.09, .055, 0.22);
+  glVertex3d(-.09, .035, 0.22);
+  glVertex3d(-.09, .035, .06411542731880106);
 
-    glVertex3d(-.09, .055, .06411542731880106);
-    glVertex3d(-.09, -.055, .06411542731880106);
-    glVertex3d(-.09, -.055, 0.0);
+  glVertex3d(-.09, .035, .06411542731880106);
+  glVertex3d(-.09, .035, 0.22);
+  glVertex3d(-.09, -.055, .06411542731880106);
 
-    glVertex3d(-.09, .055, .06411542731880106);
-    glVertex3d(-.09, .055, 0.22);
-    glVertex3d(-.09, .035, .06411542731880106);
+  // left side
+  glNormal3d(1.0, 0.0, 0.0);
+  glVertex3d(.09, .055, 0.0);
+  glVertex3d(.09, .055, .06411542731880106);
+  glVertex3d(.09, -.055, 0.0);
 
-    glVertex3d(-.09, .055, 0.22);
-    glVertex3d(-.09, .035, 0.22);
-    glVertex3d(-.09, .035, .06411542731880106);
+  glVertex3d(.09, .055, .06411542731880106);
+  glVertex3d(.09, -.055, .06411542731880106);
+  glVertex3d(.09, -.055, 0.0);
 
-    glVertex3d(-.09, .035, .06411542731880106);
-    glVertex3d(-.09, .035, 0.22);
-    glVertex3d(-.09, -.055, .06411542731880106);
+  glVertex3d(.09, .055, .06411542731880106);
+  glVertex3d(.09, .055, 0.22);
+  glVertex3d(.09, .035, .06411542731880106);
 
-    // left side
-    glNormal3d(1.0, 0.0, 0.0);
-    glVertex3d(.09, .055, 0.0);
-    glVertex3d(.09, .055, .06411542731880106);
-    glVertex3d(.09, -.055, 0.0);
+  glVertex3d(.09, .055, 0.22);
+  glVertex3d(.09, .035, 0.22);
+  glVertex3d(.09, .035, .06411542731880106);
 
-    glVertex3d(.09, .055, .06411542731880106);
-    glVertex3d(.09, -.055, .06411542731880106);
-    glVertex3d(.09, -.055, 0.0);
+  glVertex3d(.09, .035, .06411542731880106);
+  glVertex3d(.09, .035, 0.22);
+  glVertex3d(.09, -.055, .06411542731880106);
 
-    glVertex3d(.09, .055, .06411542731880106);
-    glVertex3d(.09, .055, 0.22);
-    glVertex3d(.09, .035, .06411542731880106);
+  // top
+  glNormal3d(0.0, 0.0, 1.0);
+  glVertex3d(-.09, .055, .22);
+  glVertex3d(.09, .055, .22);
+  glVertex3d(.09, .035, .22);
 
-    glVertex3d(.09, .055, 0.22);
-    glVertex3d(.09, .035, 0.22);
-    glVertex3d(.09, .035, .06411542731880106);
+  glVertex3d(-.09, .055, .22);
+  glVertex3d(.09, .035, .22);
+  glVertex3d(-.09, .035, .22);
 
-    glVertex3d(.09, .035, .06411542731880106);
-    glVertex3d(.09, .035, 0.22);
-    glVertex3d(.09, -.055, .06411542731880106);
+  // bottom
+  glNormal3d(0.0, 0.0, -1.0);
+  glVertex3d(-.09, .055, .0);
+  glVertex3d(.09, .055, .0);
+  glVertex3d(.09, -.055, .0);
 
-    // top
-    glNormal3d(0.0, 0.0, 1.0);
-    glVertex3d(-.09, .055, .22);
-    glVertex3d(.09, .055, .22);
-    glVertex3d(.09, .035, .22);
+  glVertex3d(-.09, .055, .0);
+  glVertex3d(.09, -.055, .0);
+  glVertex3d(-.09, -.055, .0);
 
-    glVertex3d(-.09, .055, .22);
-    glVertex3d(.09, .035, .22);
-    glVertex3d(-.09, .035, .22);
+  // back
+  glNormal3d(0.0, 1.0, 0.0);
+  glVertex3d(-.09, .055, .0);
+  glVertex3d(.09, .055, .0);
+  glVertex3d(.09, .055, .22);
 
-    // bottom
-    glNormal3d(0.0, 0.0, -1.0);
-    glVertex3d(-.09, .055, .0);
-    glVertex3d(.09, .055, .0);
-    glVertex3d(.09, -.055, .0);
+  glVertex3d(-.09, .055, .0);
+  glVertex3d(.09, .055, .22);
+  glVertex3d(-.09, .055, .22);
 
-    glVertex3d(-.09, .055, .0);
-    glVertex3d(.09, -.055, .0);
-    glVertex3d(-.09, -.055, .0);
-
-    // back
-    glNormal3d(0.0, 1.0, 0.0);
-    glVertex3d(-.09, .055, .0);
-    glVertex3d(.09, .055, .0);
-    glVertex3d(.09, .055, .22);
-
-    glVertex3d(-.09, .055, .0);
-    glVertex3d(.09, .055, .22);
-    glVertex3d(-.09, .055, .22);
-
-    glEnd();
+  glEnd();
 }
 
 void cedar::dev::gl::KukaArm::drawSegment(unsigned int index)
@@ -286,14 +285,15 @@ void cedar::dev::gl::KukaArm::drawSegment(unsigned int index)
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChain->getJointTransformation(index).t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  cv::Mat transformation;
+  transformation = mpKinematicChain->getJointTransformation(index).t();
+  glMultMatrixf((GLfloat*)transformation.data);
 
   if (isDrawingLocalCoordinateFrame())
   {
     cedar::aux::gl::drawAxes(0.2);
   }
-  if (mIsDrawnAsWireFrame)
+  if (getIsDrawnAsWireFrame())
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   }
@@ -351,9 +351,9 @@ void cedar::dev::gl::KukaArm::drawSegment(unsigned int index)
     this->drawElement(mWristRingVertexVboId, mWristRingIndexVboId, mWristRingFacesNumber);
     glTranslated(0, 0, -0.007099966);
     setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
-    cedar::aux::gl::drawCone(0.0, 0.02, 0.0315, 0.0315, 45, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawCone(0.0, 0.02, 0.0315, 0.0315, 45, getIsDrawnAsWireFrame());
     glTranslated(0, 0, 0.02);
-    cedar::aux::gl::drawDisk(0.0, 0.0315, 45, 10, false, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawDisk(0.0, 0.0315, 45, 10, false, getIsDrawnAsWireFrame());
     setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
   }
@@ -437,7 +437,4 @@ void cedar::dev::gl::KukaArm::loadData()
   QString wrist_ring_index_data_file_name
   = QString(cedar::aux::locateResource("meshes/kuka_lwr/wrist_ring_index.txt").c_str());
   loadIndexData(wrist_ring_index_data_file_name, mWristRingFacesNumber, mWristRingIndex);
-
-
 }
-

@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/gl/namespace.h"
 #include "cedar/devices/KinematicChain.h"
-#include "cedar/auxiliaries/gl/ObjectVisualization.h"
+#include "cedar/devices/gl/RobotVisualisation.h"
 
 // SYSTEM INCLUDES
 
@@ -48,13 +48,14 @@
  *
  * This class provides a simple OpenGL visualization of Caren.
  */
-class cedar::dev::gl::Caren : public cedar::aux::gl::ObjectVisualization
+class cedar::dev::gl::Caren : public cedar::dev::gl::RobotVisualisation
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief constructor
+
+  //!@brief constructor for interactive tests
   Caren
   (
     cedar::dev::KinematicChainPtr trunk,
@@ -65,6 +66,10 @@ public:
     cedar::dev::KinematicChainPtr fingerTwo,
     cedar::dev::KinematicChainPtr fingerThree
   );
+
+  //!@brief constructor
+  Caren();
+
   //!@brief destructor
   ~Caren();
 
@@ -79,7 +84,7 @@ public:
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------------------------------------  
 protected:
 
   //--------------------------------------------------------------------------------------------------------------------

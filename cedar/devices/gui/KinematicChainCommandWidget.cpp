@@ -45,6 +45,9 @@
 #include <QLabel>
 #include <QRadioButton>
 #include <QPushButton>
+#include <QLineEdit>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 //----------------------------------------------------------------------------
 // constructors and destructor
@@ -68,7 +71,6 @@ cedar::dev::gui::KinematicChainCommandWidget::~KinematicChainCommandWidget()
 {
 
 }
-
 
 //------------------------------------------------------------------------------
 // methods
@@ -97,49 +99,99 @@ void cedar::dev::gui::KinematicChainCommandWidget::setSingleStep(double singleSt
 
 void cedar::dev::gui::KinematicChainCommandWidget::changeWorkingMode(int mode)
 {
-  // the kinematic chain has no working mode, anymore. this only has
-  // relevance for the user of this widget.
+  // we have to reset the used command in here
   mpModeBox->setCurrentIndex(mode);
+  mpKinematicChain->clearUserCommand();
   update();
 }
 
 void cedar::dev::gui::KinematicChainCommandWidget::commandJoints()
-{
-  std::vector<double> command_vector;
-  for(unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
+{  
+  mpKinematicChain->clearUserCommand();
+
+  // should be supressed, un-lock:
+  if (mpKinematicChain->getSuppressUserInteraction())
   {
-    command_vector.push_back(mCommandBoxes[i]->value());
+    mpKinematicChain->setSuppressUserInteraction(false);
   }
 
-  switch(mpModeBox->currentIndex())
+  if (!mpKinematicChain->isCommunicating())
   {
-  case 0:
-    mpKinematicChain->setJointAngles(command_vector);
-    break;
-  case 1:
-    mpKinematicChain->setJointVelocities(command_vector);
-    break;
-  case 2:
-    mpKinematicChain->setJointAccelerations(command_vector);
-    break;
-  default:
-    CEDAR_THROW(cedar::aux::UnhandledValueException, "This value is not handled here.");
+    cedar::aux::LogSingleton::getInstance()->message(
+      mpKinematicChain->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.",
+      CEDAR_CURRENT_FUNCTION_NAME);
   }
+
+  auto command_type = mpKinematicChain->getCommandTypeForName(mpModeBox->currentText().toStdString());
+  auto mat_data = cv::Mat(7, 1, CV_32F);
+
+  for(unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
+  {
+    mat_data.at<float>(i, 0) = float(mCommandBoxes[i]->value());
+  }
+
+  mpKinematicChain->setUserSideCommandBuffer(command_type, mat_data);  
 }
 
 void cedar::dev::gui::KinematicChainCommandWidget::stopMovement()
 {
-  // js: don't need to change the user selection mpModeBox->setCurrentIndex(1);
-  for(unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
+  if (!mpKinematicChain->isCommunicating())
+  {
+    cedar::aux::LogSingleton::getInstance()->message(
+      mpKinematicChain->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.",
+      CEDAR_CURRENT_FUNCTION_NAME);
+  }
+
+  mpKeepMovingBox->setChecked(false);
+  mpKinematicChain->startBrakingSlowly();
+
+#if 0
+  mpKinematicChain->clearUserCommand();
+  for (unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
   {
     mpKinematicChain->setJointVelocity(j, 0);
   }
+#endif  
   update();
+  //mpKinematicChain->clearUserCommand();
 }
 
+void cedar::dev::gui::KinematicChainCommandWidget::saveInitialConfiguration()
+{
+  const std::string filename = "initial_configurations_"+ mpKinematicChain->getName() + ".json";
+  cedar::aux::Path file_path = cedar::aux::Path::globalCofigurationBaseDirectory() + filename;
+  cedar::aux::ConfigurationNode root, joints;
+
+  try
+  {
+    boost::property_tree::read_json(file_path.toString(), root);
+  }catch(...)
+  {
+    // file has not been initialized yet... should be no problem
+  }
+
+  // serialized joint angles
+  for(unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
+  {
+    joints.put(std::to_string(i), float(mCommandBoxes[i]->value()));
+  }
+
+  const std::string& conf_name = mpIniconfName->text().toStdString();
+
+  const boost::property_tree::ptree::iterator found = root.to_iterator(root.find(conf_name));
+  if( found != root.end())
+  {
+    root.erase(found); // overwrite existing configuration of that name
+  }
+
+  root.push_back(cedar::aux::ConfigurationNode::value_type(conf_name, joints));
+  boost::property_tree::write_json(file_path.toString(), root);
+
+  mpKinematicChain->readInitialConfigurations();
+  loadInitialConfigurations();
+}
 void cedar::dev::gui::KinematicChainCommandWidget::update()
 {
-
   // update command boxes
   CEDAR_DEBUG_ASSERT(mpKinematicChain->getNumberOfJoints() == mCommandBoxes.size());
   switch(mpModeBox->currentIndex())
@@ -174,7 +226,6 @@ void cedar::dev::gui::KinematicChainCommandWidget::update()
     CEDAR_THROW(cedar::aux::UnhandledValueException, "This is not a handled case.");
   }
 }
-
 void cedar::dev::gui::KinematicChainCommandWidget::setKeepSendingState(int state)
 {
   if (state)
@@ -190,45 +241,51 @@ void cedar::dev::gui::KinematicChainCommandWidget::setKeepSendingState(int state
     killTimer(mTimerId);
   }
 }
-
 void cedar::dev::gui::KinematicChainCommandWidget::initWindow()
 {
   setWindowTitle(QApplication::translate("KinematicChainWindow", "Command"));
 
   mpGridLayout = new QGridLayout();
 
+  QFont font;
+  font.setBold(true);
+
+  QLabel* com_label = new QLabel(QApplication::translate("KinematicChainWindow", "Commands"));
+  com_label->setFont(font);
+  mpGridLayout->addWidget(com_label, 0, 0);
+
   // mode selection
   QLabel* mode_label = new QLabel(QApplication::translate("KinematicChainWindow", "operate on:"));
   mode_label->setAlignment(Qt::AlignLeft);
-  mpGridLayout->addWidget(mode_label, 0, 0);
+  mpGridLayout->addWidget(mode_label, 1, 0);
   mpModeBox = new QComboBox();
-  mpModeBox->addItem(QString("position"));
-  mpModeBox->addItem(QString("velocity"));
-  mpModeBox->addItem(QString("acceleration"));
+  mpModeBox->addItem(QString("Joint Angles"));
+  mpModeBox->addItem(QString("Joint Velocities"));
+  mpModeBox->addItem(QString("Joint Accelerations"));
 
   mpModeBox->setCurrentIndex(0);
 
-  mpGridLayout->addWidget(mpModeBox, 1, 0);
+  mpGridLayout->addWidget(mpModeBox, 2, 0);
   connect(mpModeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(changeWorkingMode(int)));
 
   // move button
   QPushButton* move_button = new QPushButton(QApplication::translate("KinematicChainWindow", "send"));
-  mpGridLayout->addWidget(move_button, 2, 0);
+  mpGridLayout->addWidget(move_button, 3, 0);
   connect(move_button, SIGNAL(pressed()), this, SLOT(commandJoints()));
 
   // copy button
   QPushButton* copy_button = new QPushButton(QApplication::translate("KinematicChainWindow", "copy"));
-  mpGridLayout->addWidget(copy_button, 3, 0);
+  mpGridLayout->addWidget(copy_button, 4, 0);
   connect(copy_button, SIGNAL(pressed()), this, SLOT(update()));
 
   // stop button
-  QPushButton* stop_button = new QPushButton(QApplication::translate("KinematicChainWindow", "stop!"));
-  mpGridLayout->addWidget(stop_button, 4, 0);
+  QPushButton* stop_button = new QPushButton(QApplication::translate("KinematicChainWindow", "brake now!"));
+  mpGridLayout->addWidget(stop_button, 5, 0);
   connect(stop_button, SIGNAL(pressed()), this, SLOT(stopMovement()));
 
   // keep moving
   mpKeepMovingBox = new QCheckBox(QApplication::translate("KinematicChainWindow", "keep sending"));
-  mpGridLayout->addWidget(mpKeepMovingBox, 5, 0);
+  mpGridLayout->addWidget(mpKeepMovingBox, 6, 0);
   connect(mpKeepMovingBox, SIGNAL(stateChanged(int)), this, SLOT(setKeepSendingState(int)));
 
   for (unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
@@ -237,6 +294,7 @@ void cedar::dev::gui::KinematicChainCommandWidget::initWindow()
     char labelText[10];
     sprintf(labelText, "Joint %d", i);
     QLabel *label = new QLabel(QApplication::translate("KinematicChainWindow", labelText));
+    label->setAlignment(Qt::AlignRight);
     mpGridLayout->addWidget(label, i, 1);
 
     // add spinboxes
@@ -248,9 +306,131 @@ void cedar::dev::gui::KinematicChainCommandWidget::initWindow()
     mpGridLayout->addWidget(command_box, i, 2);
     mCommandBoxes.push_back(command_box);
   }
+
   update();
 
-  mpGridLayout->setColumnStretch(0,1);
-  mpGridLayout->setColumnStretch(1,2);
+  // horizontal seperator
+  QFrame* seperator = new QFrame();
+  seperator->setFrameShape(QFrame::HLine);
+  seperator->setFrameShadow(QFrame::Sunken);
+  mpGridLayout->addWidget(seperator, 7, 0, 1, 3, Qt::AlignTop);
+
+  // initial configuration label
+  QLabel* iniconf_label = new QLabel(QApplication::translate("KinematicChainWindow", "Initial Configurations"));
+  iniconf_label->setAlignment(Qt::AlignLeft);
+  iniconf_label->setFont(font);
+  mpGridLayout->addWidget(iniconf_label, 8, 0);
+
+  // initial configuration screen controls
+  mpIniconfName = new QLineEdit("configuration name");
+  mpGridLayout->addWidget(mpIniconfName, 9, 0);
+
+  QPushButton* iniconf_button = new QPushButton(QApplication::translate("KinematicChainWindow", "Save above values as initial configuration"));
+  mpGridLayout->addWidget(iniconf_button, 9, 1, 1, 2);
+  connect(iniconf_button, SIGNAL(pressed()), this, SLOT(saveInitialConfiguration()));
+
+  mpIniconfBox = new QComboBox();
+  loadInitialConfigurations();
+
+  mpIniconfBox->setCurrentIndex(0);
+  changeInitialConfig();
+
+  mpGridLayout->addWidget(mpIniconfBox, 10, 0);
+  connect(mpIniconfBox, SIGNAL(currentIndexChanged(int)), this, SLOT(changeInitialConfig()));
+
+  // apply button
+  QPushButton* apply_button = new QPushButton(QApplication::translate("KinematicChainWindow", "apply"));
+  apply_button->setFixedWidth(150);
+  mpGridLayout->addWidget(apply_button, 10, 1);
+  connect(apply_button, SIGNAL(pressed()), this, SLOT(applyInitialConfig()));
+
+  // delete button
+  QPushButton* del_button = new QPushButton(QApplication::translate("KinematicChainWindow", "delete"));
+  del_button->setFixedWidth(150);
+  mpGridLayout->addWidget(del_button, 10, 2);
+  connect(del_button, SIGNAL(pressed()), this, SLOT(deleteInitialConfig()));
+
   setLayout(mpGridLayout);
+}
+
+void cedar::dev::gui::KinematicChainCommandWidget::loadInitialConfigurations()
+{
+  mpIniconfBox->clear();
+
+  std::vector<std::string> lConfNames = mpKinematicChain->getInitialConfigurationNames();
+
+  for (const std::string &confName : lConfNames)
+  {
+    mpIniconfBox->addItem(QString::fromStdString(confName));
+  }
+
+  mpIniconfBox->setCurrentIndex(0);
+}
+
+void cedar::dev::gui::KinematicChainCommandWidget::changeInitialConfig()
+{
+
+  const std::string filename = "initial_configurations_"+ mpKinematicChain->getName() + ".json";
+  cedar::aux::Path file_path = cedar::aux::Path::globalCofigurationBaseDirectory() + filename;
+
+  cedar::aux::ConfigurationNode root;
+
+  try
+  {
+    boost::property_tree::read_json(file_path.toString(), root);
+  }catch(...)
+  {
+    return;
+  }
+
+  const std::string& conf_name = mpIniconfBox->currentText().toStdString();
+  const boost::property_tree::ptree::iterator found = root.to_iterator(root.find(conf_name));
+
+  if( found != root.end())
+  {
+    for (uint i=0; i<mpKinematicChain->getNumberOfJoints(); ++i)
+    {
+      float angle = found->second.get<float>(std::to_string(i));
+      mCommandBoxes[i]->setValue(angle);
+    }
+  }
+}
+
+void cedar::dev::gui::KinematicChainCommandWidget::applyInitialConfig()
+{
+  if (!mpKinematicChain->isCommunicating())
+  {
+    cedar::aux::LogSingleton::getInstance()->message(
+      mpKinematicChain->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.",
+      CEDAR_CURRENT_FUNCTION_NAME);
+  }
+
+  mpKinematicChain->applyInitialConfiguration(mpIniconfBox->currentText().toStdString());
+}
+
+void cedar::dev::gui::KinematicChainCommandWidget::deleteInitialConfig()
+{
+  const std::string filename = "initial_configurations_"+ mpKinematicChain->getName() + ".json";
+  cedar::aux::Path file_path = cedar::aux::Path::globalCofigurationBaseDirectory() + filename;
+  cedar::aux::ConfigurationNode root;
+
+  try
+  {
+    mpKinematicChain->deleteInitialConfiguration(mpIniconfBox->currentText().toStdString());
+
+    boost::property_tree::read_json(file_path.toString(), root);
+    const boost::property_tree::ptree::iterator found = root.to_iterator(root.find(mpIniconfBox->currentText().toStdString()));
+
+    if( found != root.end())
+    {
+      root.erase(found); // overwrite existing configuration of that name
+    }
+
+    boost::property_tree::write_json(file_path.toString(), root);
+    loadInitialConfigurations();
+
+  }catch(...)
+  {
+    return;
+  }
 }

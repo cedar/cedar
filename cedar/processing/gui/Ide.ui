@@ -19,7 +19,16 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <property name="margin">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
      <number>0</number>
     </property>
     <item row="0" column="0">
@@ -38,7 +47,16 @@
         <string>architecture</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2" rowstretch="1">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
         <property name="spacing">
@@ -46,6 +64,16 @@
         </property>
         <item row="0" column="0">
          <widget class="cedar::proc::gui::View" name="mpProcessingDrawer"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabVisualisation">
+       <attribute name="title">
+        <string>visualisation</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <widget class="cedar::aux::gui::SceneControl" name="mpSceneControl" native="true"/>
         </item>
        </layout>
       </widget>
@@ -59,7 +87,7 @@
      <x>0</x>
      <y>0</y>
      <width>983</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -91,16 +119,27 @@
     <addaction name="mpActionRecord"/>
     <addaction name="mpActionSnapshot"/>
    </widget>
+   <widget class="QMenu" name="menuRobots">
+    <property name="title">
+     <string>Robots</string>
+    </property>
+    <addaction name="mpActionShowRobotManager"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionBrakeAllRobots"/>
+   </widget>
    <widget class="QMenu" name="mpMenuWindows">
     <property name="title">
      <string>Windows</string>
     </property>
     <widget class="QMenu" name="mpMenuArchitecturePlots">
      <property name="title">
-      <string>architecture widgets</string>
+      <string>Architecture widgets</string>
      </property>
-     <addaction name="actionNone"/>
     </widget>
+    <addaction name="mpActionClosePlots"/>
+    <addaction name="mpActionToggleVisibilityOfPlots"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionAddGlobalSceneViewer"/>
     <addaction name="separator"/>
     <addaction name="mpMenuArchitecturePlots"/>
     <addaction name="separator"/>
@@ -133,33 +172,33 @@
     <addaction name="mpActionShowHideGrid"/>
     <addaction name="mpActionToggleSmartConnections"/>
     <addaction name="mpActionToggleTriggerColor"/>
-    <addaction name="separator"/>
-    <addaction name="mpActionClosePlots"/>
-    <addaction name="mpActionToggleVisibilityOfPlots"/>
    </widget>
    <widget class="QMenu" name="mpToolsMenu">
     <property name="title">
      <string>Tools</string>
     </property>
     <addaction name="mpActionPerformanceOverview"/>
-    <addaction name="mpActionExperiments"/>
     <addaction name="mpActionParameterLinker"/>
     <addaction name="separator"/>
     <addaction name="mpActionManagePlugins"/>
+    <addaction name="separator"/>
     <addaction name="mpActionSettings"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="mpMenuArchitectureScripts">
     <property name="title">
-     <string>Scripts</string>
+     <string>Scripting</string>
     </property>
+    <addaction name="mpActionExperiments"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuSimulation"/>
+   <addaction name="menuRobots"/>
    <addaction name="mpToolsMenu"/>
-   <addaction name="mpMenuWindows"/>
    <addaction name="mpMenuArchitectureScripts"/>
+   <addaction name="mpMenuWindows"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="mpStatusBar"/>
@@ -168,14 +207,23 @@
     <set>QDockWidget::DockWidgetFeatureMask</set>
    </property>
    <property name="windowTitle">
-    <string>Elements</string>
+    <string>Steps</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>4</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_2">
     <layout class="QHBoxLayout" name="horizontalLayout">
-     <property name="margin">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
@@ -196,7 +244,16 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_3">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <property name="margin">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
@@ -217,7 +274,16 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_5">
     <layout class="QVBoxLayout" name="verticalLayout_2">
-     <property name="margin">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
@@ -250,8 +316,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>28</height>
+              <width>254</width>
+              <height>495</height>
              </rect>
             </property>
             <property name="palette">
@@ -377,19 +443,20 @@
    <addaction name="mpActionRecord"/>
    <addaction name="mpActionSnapshot"/>
    <addaction name="separator"/>
+   <addaction name="mpActionToggleTriggerColor"/>
+   <addaction name="separator"/>
    <addaction name="mpActionDummy"/>
    <addaction name="separator"/>
-   <addaction name="mpActionToggleTriggerVisibility"/>
-   <addaction name="mpActionToggleTriggerColor"/>
-   <addaction name="mpActionClosePlots"/>
    <addaction name="mpActionToggleVisibilityOfPlots"/>
    <addaction name="separator"/>
+   <addaction name="mpActionBrakeAllRobots"/>
    <addaction name="mpActionDisplayPlotGroup"/>
    <addaction name="mpActionNewPlotGroup"/>
    <addaction name="mpActionRenamePlotGroup"/>
    <addaction name="mpActionEditPlotGroup"/>
    <addaction name="mpActionDeletePlotGroup"/>
    <addaction name="separator"/>
+   <addaction name="mpActionOpenRobotManager"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
@@ -413,7 +480,7 @@
   </action>
   <action name="mpActionSaveAs">
    <property name="text">
-    <string>Save as ...</string>
+    <string>Save as...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
@@ -421,7 +488,7 @@
   </action>
   <action name="mpActionLoad">
    <property name="text">
-    <string>Open file ...</string>
+    <string>Open file...</string>
    </property>
    <property name="toolTip">
     <string>Load an architecture file</string>
@@ -437,7 +504,7 @@
   </action>
   <action name="mpActionManagePlugins">
    <property name="text">
-    <string>Manage plugins ...</string>
+    <string>Manage plugins...</string>
    </property>
   </action>
   <action name="mpActionStartPauseSimulation">
@@ -446,7 +513,7 @@
      <normaloff>:/cedar/auxiliaries/gui/start.svg</normaloff>:/cedar/auxiliaries/gui/start.svg</iconset>
    </property>
    <property name="text">
-    <string>start/pause simulation</string>
+    <string>Start/Pause simulation</string>
    </property>
    <property name="toolTip">
     <string>Starts and pauses the simulation.</string>
@@ -457,7 +524,7 @@
   </action>
   <action name="mpActionLoadPlugin">
    <property name="text">
-    <string>Load plugin ...</string>
+    <string>Load plugin...</string>
    </property>
   </action>
   <action name="mpActionShowHideGrid">
@@ -472,7 +539,7 @@
     <string>Toggle grid</string>
    </property>
    <property name="toolTip">
-    <string>Toggles the grid in the architecture pane. Elements will align to this grid.</string>
+    <string>Toggles the grid in the architecture pane. Steps will align to this grid.</string>
    </property>
   </action>
   <action name="mpRecentFiles">
@@ -494,17 +561,34 @@
     <string>About...</string>
    </property>
   </action>
+  <action name="mpActionBrakeAllRobots">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/brakeall.svg</normaloff>:/toolbaricons/brakeall.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Brake all robots</string>
+   </property>
+   <property name="toolTip">
+    <string>Brake all connected robotic components (slowly)</string>
+   </property>
+  </action>
   <action name="mpActionExportSVG">
    <property name="text">
-    <string>Export SVG ...</string>
+    <string>Save canvas...</string>
    </property>
   </action>
   <action name="mpActionShowRobotManager">
    <property name="text">
-    <string>Robot manager ...</string>
+    <string>Robot manager...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+M</string>
+   </property>
+  </action>
+  <action name="mpActionAddGlobalSceneViewer">
+   <property name="text">
+    <string>Add a camera of the scene visualisation...</string>
    </property>
   </action>
   <action name="mpActionDuplicate">
@@ -536,10 +620,10 @@
      <normalon>:/toolbaricons/show_triggers.svg</normalon>:/toolbaricons/hide_triggers.svg</iconset>
    </property>
    <property name="text">
-    <string>toggle visibility</string>
+    <string>Toggle visibility</string>
    </property>
    <property name="toolTip">
-    <string>Toggle visibility of triggers.</string>
+    <string>Toggle color of threads.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
@@ -559,10 +643,10 @@
      <normaloff>:/cedar/auxiliaries/gui/singleStep.svg</normaloff>:/cedar/auxiliaries/gui/singleStep.svg</iconset>
    </property>
    <property name="text">
-    <string>Single-step each trigger</string>
+    <string>Single-step each thread</string>
    </property>
    <property name="toolTip">
-    <string>execute a single step with each trigger</string>
+    <string>Execute a single step with each thread</string>
    </property>
    <property name="shortcut">
     <string>Ctrl++</string>
@@ -590,10 +674,10 @@
      <normaloff>:/toolbaricons/close_all_plots.svg</normaloff>:/toolbaricons/close_all_plots.svg</iconset>
    </property>
    <property name="text">
-    <string>closes all plots</string>
+    <string>Close all plots</string>
    </property>
    <property name="toolTip">
-    <string>closes all plots</string>
+    <string>Closes all plots</string>
    </property>
   </action>
   <action name="mpActionRecord">
@@ -609,7 +693,7 @@
      <selectedon>:/cedar/auxiliaries/gui/recordStop.svg</selectedon>:/cedar/auxiliaries/gui/record.svg</iconset>
    </property>
    <property name="text">
-    <string>record</string>
+    <string>Record</string>
    </property>
    <property name="toolTip">
     <string notr="true">Record all registered slots.</string>
@@ -636,10 +720,10 @@
      <normaloff>:/toolbaricons/toggle_visibility_of_plots.svg</normaloff>:/toolbaricons/toggle_visibility_of_plots.svg</iconset>
    </property>
    <property name="text">
-    <string>toggle visibility of plots</string>
+    <string>Toggle visibility of plots</string>
    </property>
    <property name="toolTip">
-    <string>hides/shows all open plots</string>
+    <string>Hide/show all open plots</string>
    </property>
   </action>
   <action name="mpActionNewPlotGroup">
@@ -695,7 +779,7 @@
   </action>
   <action name="mpActionPerformanceOverview">
    <property name="text">
-    <string>Performance overview ...</string>
+    <string>Performance overview...</string>
    </property>
   </action>
   <action name="mpActionExperiments">
@@ -724,12 +808,12 @@
   </action>
   <action name="mpActionParameterLinker">
    <property name="text">
-    <string>Parameter linking ...</string>
+    <string>Parameter linking...</string>
    </property>
   </action>
   <action name="mpActionSaveSerializableData">
    <property name="text">
-    <string>Save serializable data ...</string>
+    <string>Save serializable data...</string>
    </property>
    <property name="toolTip">
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a location to save all data in slots that are marked as serializable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -737,7 +821,7 @@
   </action>
   <action name="mpActionLoadSerializableData">
    <property name="text">
-    <string>Load serializable data ...</string>
+    <string>Load serializable data...</string>
    </property>
    <property name="toolTip">
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a file from which to load data in slots that are marked as serializable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -748,7 +832,7 @@
     <string>Find</string>
    </property>
    <property name="toolTip">
-    <string>find an element</string>
+    <string>Find an step</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
@@ -768,7 +852,7 @@
      <normaloff>:/cedar/auxiliaries/gui/reset.svg</normaloff>:/cedar/auxiliaries/gui/reset.svg</iconset>
    </property>
    <property name="text">
-    <string>reset simulation</string>
+    <string>Reset simulation</string>
    </property>
    <property name="toolTip">
     <string>Resets the simulation, i.e., calls reset on the architecture and rewinds the global timer.</string>
@@ -795,10 +879,10 @@
      <normaloff>:/toolbaricons/show_trigger_colors.svg</normaloff>:/toolbaricons/show_trigger_colors.svg</iconset>
    </property>
    <property name="text">
-    <string>Color elements by trigger</string>
+    <string>Colorize steps by thread</string>
    </property>
    <property name="toolTip">
-    <string>Toggle visibility of trigger colors.</string>
+    <string>Hide/show thread association via colors</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+T</string>
@@ -814,7 +898,7 @@
   </action>
   <action name="mpActionShowRecentNotifications">
    <property name="text">
-    <string>Show recent notifications...</string>
+    <string>Recent major changes...</string>
    </property>
   </action>
   <action name="mpActionLockUIPositions">
@@ -831,6 +915,18 @@
    </property>
    <property name="toolTip">
     <string>Locks/unlocks the position of UI elements such as the log, the elements tab and so on.</string>
+   </property>
+  </action>
+  <action name="mpActionOpenRobotManager">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/robot_manager.svg</normaloff>:/toolbaricons/robot_manager.svg</iconset>
+   </property>
+   <property name="text">
+    <string>open Robot Manager</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;open Robot Manager&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </action>
  </widget>
@@ -863,10 +959,16 @@
    <header>cedar/processing/gui/ElementList.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>cedar::aux::gui::SceneControl</class>
+   <extends>QWidget</extends>
+   <header>cedar/auxiliaries/gui/SceneControl.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources>
-  <include location="icons/cedar_proc_gui_icons.qrc"/>
   <include location="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc"/>
+  <include location="icons/cedar_proc_gui_icons.qrc"/>
  </resources>
  <connections>
   <connection>

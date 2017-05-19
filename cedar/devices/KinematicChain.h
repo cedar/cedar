@@ -24,8 +24,8 @@
 
     File:        KinematicChain.h
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
+    Maintainer:  Jean-Stephane Jokeit   
+    Email:       jean-stephane.jokeit@ini.rub.de
     Date:        2010 08 30
 
     Description: Chain of joints (e.g., a robotic arm).
@@ -41,7 +41,6 @@
 #include "cedar/defines.h"
 #include "cedar/auxiliaries/math/Limits.h"
 #include "cedar/devices/lib.h"
-#include "cedar/devices/namespace.h"
 #include "cedar/devices/Component.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
@@ -49,7 +48,10 @@
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 #include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
 
+#include "cedar/devices/ForwardKinematics.fwd.h"
+
 // FORWARD DECLARATIONS
+#include "cedar/devices/KinematicChain.fwd.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -67,9 +69,10 @@
  */
 class cedar::dev::KinematicChain
 :
-public cedar::dev::Component,
-public cedar::aux::LoopedThread
+public cedar::dev::Component
 {
+  Q_OBJECT
+
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -96,6 +99,8 @@ public:
     cedar::aux::math::DoubleLimitsParameterPtr _mpAngleLimits;
     //! minimum and maximum velocity values
     cedar::aux::math::DoubleLimitsParameterPtr _mpVelocityLimits;
+    //! minimum and maximum acceleration values
+    cedar::aux::math::DoubleLimitsParameterPtr _mpAccelerationLimits;
   };
 
 public:
@@ -110,18 +115,12 @@ public:
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(JointListParameter);
   //!@endcond
 
-  //----------------------------------------------------------------------------
-  // parameters
-  //----------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------------------------------------
+  // exceptions
+  //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The different modes to operate the kinematic chain
-  enum ActionType { ANGLE, VELOCITY, ACCELERATION, STOP };
-               // TODO: jokeit:  ANGLE --> unthreaded mode
-
-protected:
-  // none yet
-private:
-  // none yet
+  //! Exception that is thrown when a type that is not installed is requested.
+  class InitialConfigurationNotFoundException : public cedar::aux::NotFoundException {};
 
   //----------------------------------------------------------------------------
   // constructors and destructor
@@ -133,24 +132,18 @@ public:
     cedar::aux::LocalCoordinateFramePtr pEndEffector
       = cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame())
   );
-  //!@brief destructor
-  virtual ~KinematicChain();
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // Qt events
-  //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief implementation of handling routine for Qt timer events
-   *
-   * @param    event
-   */
-  void timerEvent(QTimerEvent* event);
+  virtual ~KinematicChain();
 
   //--------------------------------------------------------------------------------------------------------------------
   // Qt slots
   //--------------------------------------------------------------------------------------------------------------------
 public slots:
-  //!@brief updates the geometry to the current configuration of the kinematic chain
-  void updateTransformations();
+  void updatedUserMeasurementSlot();
+
+public:
+  //!@brief updates the geometry to the current configuration of the kinematic chain DONT CALL IT YOURSELF
+  CEDAR_DECLARE_DEPRECATED( void updateTransformations() );  // TODO FORWARD KIN
 
   //----------------------------------------------------------------------------
   // public methods
@@ -161,12 +154,6 @@ public:
    * @param node json node providing the configuration
    */
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-  /*!@brief check whether the kinematic chain is currently responsive to movement commands
-   *
-   * @return    state
-   */
-  virtual bool isMovable() const = 0;
 
   /*!@brief get number of joints in this kinematic chain
    *
@@ -186,13 +173,7 @@ public:
    * @param index    specifies the joint
    * @return    joint angle value
    */
-  virtual double getJointAngle(unsigned int index) const = 0;
-
-  /*!@brief get current state of all joint angles
-   *
-   * @return    vector of joint angles
-   */
-  CEDAR_DECLARE_DEPRECATED(std::vector<double> getJointAngles() const);
+  float getJointAngle(unsigned int index) const;
 
   /*!@brief get current state of all joint angles
    *
@@ -204,20 +185,21 @@ public:
    *
    * @return    vector of joint angles
    */
-  cv::Mat getCachedJointAngles() const;
+  // replaced by getJointAngles()
+  CEDAR_DECLARE_DEPRECATED(cv::Mat getCachedJointAngles() const);
+
+  /*!@brief get current state of all joint angles
+   *
+   * @return    vector of joint angles
+   */
+  cv::Mat getJointAngles() const;
 
   /*!@brief get current state of a single joint velocity
    *
    * @param index    specifies the joint
    * @return    joint velocity value
    */
-  virtual double getJointVelocity(unsigned int index) const;
-
-  /*!@brief get current state of all joint velocities
-   *
-   * @return    vector of joint velocities
-   */
-  CEDAR_DECLARE_DEPRECATED(std::vector<double> getJointVelocities() const);
+  float getJointVelocity(unsigned int index) const;
 
   /*!@brief get current state of all joint velocities
    *
@@ -229,20 +211,17 @@ public:
    *
    * @return    vector of joint velocities
    */
-  cv::Mat getCachedJointVelocities() const;
+  cv::Mat getJointVelocities() const;
+
+  // Replaced by getJointVelocities()
+  CEDAR_DECLARE_DEPRECATED(cv::Mat getCachedJointVelocities() const);
 
   /*!@brief get current state of a single joint acceleration
    *
    * @param index    specifies the joint
    * @return    joint acceleration value
    */
-  virtual double getJointAcceleration(unsigned int index) const;
-
-  /*!@brief get current state of all joint accelerations
-   *
-   * @return    vector of joint accelerations
-   */
-  CEDAR_DECLARE_DEPRECATED(std::vector<double> getJointAccelerations() const);
+  virtual float getJointAcceleration(unsigned int index) const;
 
   /*!@brief get current state of all joint accelerations
    *
@@ -254,20 +233,29 @@ public:
    *
    * @return    vector of joint accelerations
    */
-  cv::Mat getCachedJointAccelerations() const;
+  cv::Mat getJointAccelerations() const;
 
-  /*!@brief returns the mode in which the joints positions are set (angle/velocity/acceleration)
+  // Replaced by getJointAccelerations()
+  CEDAR_DECLARE_DEPRECATED(cv::Mat getCachedJointAccelerations() const);
+
+  /*!@brief get current state of measured joint torques, if available
    *
-   * @return current working mode
+   * @return    vector of joint angles
    */
-  CEDAR_DECLARE_DEPRECATED(ActionType getWorkingMode());
+  cv::Mat getJointTorques() const;
+
+  /*!@brief get current state of measured external joint torques if available
+   *
+   * @return    vector of joint angles
+   */
+  cv::Mat getExternalJointTorques() const;
 
   /*!@brief set current state of a single joint angle
    *
    * @param index    specifies the joint
    * @param angle    new joint angle value
    */
-  virtual void setJointAngle(unsigned int index, double angle) = 0;
+  void setJointAngle(unsigned int index, float angle);
 
   /*!@brief set current state of all joint angles
    *
@@ -279,7 +267,7 @@ public:
    *
    * @param angles    vector of new joint angle values
    */
-  void setJointAngles(const std::vector<double>& angles);
+  void setJointAngles(const std::vector<float>& angles);
 
   /*!@brief set current state of a single joint velocity
    *
@@ -292,7 +280,7 @@ public:
    * @param velocity    new joint velocity value
    * @return true iff your subclass handles velocity itself
    */
-  virtual bool setJointVelocity(unsigned int index, double velocity);
+  void setJointVelocity(unsigned int index, float velocity);
 
   /*!@brief set current state of all joint velocities
    *
@@ -301,12 +289,12 @@ public:
    * method, then you have to return true here. By returning true you indicate
    * to the KinematicChain base class that no integration is necessary.
    *
-   * Note that it is sufficient to override setJointVelocity(unsigned int, double).
+   * Note that it is sufficient to override setJointVelocity(unsigned int, float).
    *
    * @param velocities    vector of new joint velocity values
    * @return true iff your subclass handles velocity itself
    */
-  bool setJointVelocities(const cv::Mat& velocities);
+  void setJointVelocities(const cv::Mat& velocities);
 
   /*!@brief set current state of all joint velocities
    *
@@ -315,12 +303,12 @@ public:
    * method, then you have to return true here. By returning true you indicate
    * to the KinematicChain base class that no integration is necessary.
    *
-   * Note that it is sufficient to override setJointVelocity(unsigned int, double).
+   * Note that it is sufficient to override setJointVelocity(unsigned int, float).
    *
    * @param velocities    vector of new joint velocity values
    * @return true iff your subclass handles velocity itself
    */
-  bool setJointVelocities(const std::vector<double>& velocities);
+  void setJointVelocities(const std::vector<float>& velocities);
 
   /*!@brief set current state of a single joint acceleration
    *
@@ -333,7 +321,7 @@ public:
    * @param acceleration    new joint acceleration value
    * @return true iff your subclass handles acceleration itself
    */
-  virtual bool setJointAcceleration(unsigned int index, double acceleration);
+  void setJointAcceleration(unsigned int index, float acceleration);
 
   /*!@brief set current state of all joint velocities
    *
@@ -345,7 +333,7 @@ public:
    * @param accelerations    vector of new joint velocity values
    * @return true iff your subclass handles acceleration itself
    */
-  bool setJointAccelerations(const cv::Mat& accelerations);
+  void setJointAccelerations(const cv::Mat& accelerations);
 
   /*!@brief set current state of all joint velocities
    *
@@ -357,41 +345,7 @@ public:
    * @param accelerations    vector of new joint velocity values
    * @return true iff your subclass handles acceleration itself
    */
-  bool setJointAccelerations(const std::vector<double>& accelerations);
-
-  /*!@brief Sets the mode in which the joints positions are set (angle/velocity/acceleration)
-   *
-   * Setting a working mode will also stop the KinematicChain to allow you to
-   * set new target values for each joint. You have to restart the
-   * KinematicChain afterwards if you want it to take care of velocities or
-   * accelerations. If your hardware lets you set these values directly you
-   * do not want to start the thread of KinematicChain.
-   *
-   * @param actionType new working mode
-   */
-  CEDAR_DECLARE_DEPRECATED(virtual void setWorkingMode(ActionType actionType));
-
-  /*!@brief Controls if real hardware values are used when integrating velocity/acceleration.
-   *
-   * For hardware that does not support velocity or acceleration control you can
-   * start the KinematicChain as a thread to simulate this behavior. For such a
-   * simulation a vector of ideal angle/velocity values is kept. But if you
-   * trust your hardware to be fast and reliable enough, you can also integrate
-   * using the current hardware values.
-   *
-   * @param useCurrentHardwareValues
-   */
-  void useCurrentHardwareValues(bool useCurrentHardwareValues);
-
-#if 0
-// TODO: remove
-  /*!@brief Starts the kinematic chain as a thread
-   *
-   * If you want to use velocity or acceleration control but your hardware
-   * does not support this, start the thread to "simulate" these values.
-   */
-  virtual void start(Priority priority = InheritPriority);
-#endif  
+  void setJointAccelerations(const std::vector<float>& accelerations);
 
   /*!@brief returns a smart-pointer to the local coordinate frame of the end-effector
    *
@@ -425,13 +379,13 @@ public:
    * @param result    Jacobian of the given point, in base coordinates, 3 \f$\times\f$ N matrix, where N = number of joints
    * @param coordinateFrame    specifies in which coordinate frame the point is represented
    */
-  void calculateCartesianJacobian
+  CEDAR_DECLARE_DEPRECATED( void calculateCartesianJacobian
   (
     const cv::Mat& point,
     unsigned int jointIndex,
     cv::Mat& result,
     unsigned int coordinateFrame
-  );
+  ) );
 
   /*!@brief calculates Cartesian Jacobian of a point/vector
    * slightly slower than calculateJacobian()
@@ -456,13 +410,13 @@ public:
    * @param result    Jacobian of the given point, in base coordinates, 3 \f$\times\f$ N matrix, where N = number of joints
    * @param coordinateFrame    specifies in which coordinate frame the point is represented
    */
-  void calculateCartesianJacobianTemporalDerivative
+  CEDAR_DECLARE_DEPRECATED(void calculateCartesianJacobianTemporalDerivative
   (
     const cv::Mat& point,
     unsigned int jointIndex,
     cv::Mat& result,
     unsigned int coordinateFrame
-  );
+  ) );
 
   /*!@brief calculates the temporal derivative of the Cartesian Jacobian of a point/vector given in homogeneous
    * coordinates of the relevant joint frame
@@ -567,13 +521,13 @@ public:
    *
    * @return    joint values of the initial configuration
    */
-  cv::Mat getInitialConfiguration(std::string name);
+  cv::Mat getInitialConfiguration(const std::string& name);
 
   /*!@brief get the vector of all initial configuration names
    *
    * @return    vector of string: the names of initial configurations
    */
-  std::vector<std::string> getInitialConfigurationIndices();
+  std::vector<std::string> getInitialConfigurationNames();
 
   /*!@brief get index number of the current initial configuration
    *
@@ -588,19 +542,20 @@ public:
   cv::Mat getCurrentInitialConfiguration();
 
   //!@brief add one initial configuration
-  void addInitialConfiguration(const std::string &name, const cv::Mat &config);
+  void addInitialConfiguration(const std::string& name, const cv::Mat& config);
   //!@brief delete one initial configuration
-  void deleteInitialConfiguration(const std::string &name);
+  void deleteInitialConfiguration(const std::string& name);
+  //!@brief check if initial configuration exists
+  bool hasInitialConfiguration(const std::string& name);
+
   //!@brief set the named map of initial configurations
-  //
   // prefer using @addInitialConfiguration
   void setInitialConfigurations(std::map<std::string, cv::Mat> configs);
   //!@brief set the currently valid initial configuration and apply it (i.e. move the manipulator to that configuration)
-  bool applyInitialConfiguration(std::string s);
-  //!@brief apply the named initial configuration by index
-  //
-  // Prefer using @applyInitialConfiguration(string) for accessing named configurations
-  bool applyInitialConfiguration(unsigned int i);
+  void applyInitialConfiguration(const std::string& name);
+
+  //!@brief read initial configurations out of chain specific file
+  void readInitialConfigurations();
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -611,79 +566,63 @@ protected:
   // private methods
   //----------------------------------------------------------------------------
 private:
-  void step(cedar::unit::Time time);
   void init();
   void initializeFromJointList();
+
+  bool applyLimits(const ComponentDataType &type, cv::Mat &data);
+
   void applyAngleLimits(cv::Mat& angles);
   void applyVelocityLimits(cv::Mat& velocities);
-
-  //!@brief calculates the transformations to the joint frames for the given joint angle vector
-  void calculateTransformations();
-
-  /*!@brief gives the temporal derivative of a joint twist in the current configuration
-   *
-   * @param jointIndex index of the joint twist
-   * @return derivative of the joint twist, 6 \f$\times\f$ 1 matrix
-   */
-  cv::Mat calculateTwistTemporalDerivative(unsigned int jointIndex);
+  void applyAccelerationLimits(cv::Mat &accelerations);
 
   //!@brief set the currently valid initial configuration, do not move the manipulator
   // 
   // See also @applyInitialConfiguration
-  bool setCurrentInitialConfiguration(const std::string &s);
+  bool setCurrentInitialConfiguration(const std::string& s);
 
   //!@brief: test validity of initial configurations
   void checkInitialConfigurations();
 
+  virtual bool applyBrakeSlowlyController();
+  virtual bool applyBrakeNowController();
+
+  //----------------------------------------------------------------------------
+  // parameters
+  //----------------------------------------------------------------------------
+protected:
+  // none yet
+private:
+  // none yet
+
   //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------
+public:
+  static const cedar::dev::Component::ComponentDataType JOINT_ANGLES;
+  static const cedar::dev::Component::ComponentDataType JOINT_VELOCITIES;
+  static const cedar::dev::Component::ComponentDataType JOINT_ACCELERATIONS;
+  static const cedar::dev::Component::ComponentDataType JOINT_TORQUES;
+  static const cedar::dev::Component::ComponentDataType EXTERNAL_JOINT_TORQUES;
+  static const cedar::dev::Component::ComponentDataType ADDITIONAL_JOINT_TORQUES;
+
 protected:
-  //!@brief current state of the joint angles, see also mAnglesLock
-  cv::Mat mJointAngles;
-  //!@brief the lock of the mJointAngles
-  mutable QReadWriteLock mAnglesLock;
-
-private:
-  bool mUseCurrentHardwareValues;
-  cv::Mat mJointVelocities;
-  mutable QReadWriteLock mVelocitiesLock;
-  cv::Mat mJointAccelerations;
-  mutable QReadWriteLock mAccelerationsLock;
-  ActionType mWorkingMode; // TODO: remove
-  mutable QReadWriteLock mWorkingModeLock; // TODO: remove
-
   //! vector of all joints
   JointListParameterPtr mpJoints;
 
-  //!@brief pointer to the root coordinate frame of the kinematic chain
-  cedar::aux::LocalCoordinateFramePtr mpRootCoordinateFrame;
-  //!@brief pointer to the local coordinate frame of the end-effector
-  cedar::aux::LocalCoordinateFramePtr mpEndEffectorCoordinateFrame;
+private:
 
-  // locking for thread safety
-  QReadWriteLock mTransformationsLock;
-  //! twist coordinates for the transformations induced by rotating the joints (assuming reference configurations)
-  std::vector<cv::Mat> mReferenceJointTwists;
-  //! transformations to the joint frames (assuming reference configurations)
-  std::vector<cv::Mat> mReferenceJointTransformations;
-  //! transformations to the end-effector frame (assuming reference configurations)
-  cv::Mat mReferenceEndEffectorTransformation;
-    //! exponentials of joint twists with specified joint angle
-  std::vector<cv::Mat> mTwistExponentials;
-  //! transformation matrices between joints, generated by exponential map of joint twists
-  std::vector<cv::Mat> mProductsOfExponentials;
-  //! transformation matrices to the joint frames in the current configuration
-  std::vector<cv::Mat> mJointTransformations;
-  //! twist coordinates for the transformations induced by rotating the joints in the curent configuration
-  std::vector<cv::Mat> mJointTwists;
+  //! the forward kinematic model
+  ForwardKinematicsPtr mForwardKinematics;
 
   //!@brief map of the named initial configurations
-  std::map< std::string, cv::Mat > mInitialConfigurations;
+  std::map<std::string, cv::Mat> mInitialConfigurations;
   //!@brief the current initial configuration name
   std::string mCurrentInitialConfiguration;
   //!@brief lock for the initial configuration datas
   QReadWriteLock mCurrentInitialConfigurationLock;
+  //!@brief remember the number of limit excesses per joint, in order to not send them again.
+  std::vector<unsigned int> mWarned;
+
 }; // class cedar::dev::robot::KinematicChain
 
 #include "cedar/auxiliaries/FactoryManager.h"
@@ -699,4 +638,3 @@ namespace cedar
   }
 }
 #endif // CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_H
-

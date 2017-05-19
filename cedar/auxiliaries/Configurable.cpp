@@ -65,7 +65,8 @@
 
 cedar::aux::Configurable::Configurable()
 :
-mIsAdvanced(false)
+mIsAdvanced(false),
+mIsConfigured(true)
 {
   this->connectToTreeChangedSignal(boost::bind(&cedar::aux::Configurable::updateLockSet, this));
 }
@@ -811,6 +812,7 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
     }
   }
 
+  mIsConfigured= true;
   this->configurationLoaded();
 }
 
@@ -871,3 +873,9 @@ void cedar::aux::Configurable::copyTo(ConfigurablePtr target) const
   this->writeConfiguration(root);
   target->readConfiguration(root);
 }
+
+bool cedar::aux::Configurable::isConfigured() const
+{
+  return mIsConfigured;
+}
+

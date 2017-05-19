@@ -45,25 +45,30 @@
 
 // SYSTEM INCLUDES
 
-//!@brief Exception that occurs when a robot does not respond to commands.
-class cedar::dev::UnresponsiveRobotException : public cedar::aux::ExceptionBase
-{
-}; // class cedar::aux::UnresponsiveRobotException
-
-//!@brief Exception that occurs when something goes wrong during serial communication with a robot.
-class cedar::dev::SerialCommunicationException : public cedar::aux::ExceptionBase
-{
-}; // class cedar::dev::SerialCommunicationException
 
 //!@brief Exception that occurs when something goes wrong during any communication with a robot.
 class cedar::dev::CommunicationException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::dev::CommunicationException
 
+//!@brief Exception that occurs when a robot does not respond to commands.
+class cedar::dev::UnresponsiveRobotException : public cedar::dev::CommunicationException
+{
+}; // class cedar::aux::UnresponsiveRobotException
+
+//!@brief Exception that occurs when something goes wrong during serial communication with a robot.
+class cedar::dev::SerialCommunicationException : public cedar::dev::CommunicationException
+{
+}; // class cedar::dev::SerialCommunicationException
+
 //!@brief Exception that occurs when a timeout expires.
-class cedar::dev::TimeoutException : public cedar::aux::ExceptionBase
+class cedar::dev::TimeoutException : public cedar::dev::CommunicationException
 {
 }; // class cedar::dev::TimeoutException
+
+class cedar::dev::IgnoreCommunicationException : public cedar::dev::CommunicationException
+{
+};
 
 //!@brief Exception that occurs when the operating system of the computer cannot be determined.
 class cedar::dev::UnknownOperatingSystemException : public cedar::aux::ExceptionBase
@@ -109,5 +114,17 @@ class cedar::dev::ChannelNotInstantiatedException : public cedar::aux::Exception
 class cedar::dev::InvalidComponentPathException : public cedar::aux::ExceptionBase
 {
 };
+
+//!@brief Thrown when a joint index is out of range.
+class cedar::dev::JointIndexOutOfRangeException : public cedar::aux::ExceptionBase
+{
+};
+
+//!@brief Thrown when a vector of joints does not match the expected number of joints.
+class cedar::dev::JointNumberMismatchException : public cedar::aux::ExceptionBase
+{
+};
+
+
 
 #endif // CEDAR_DEV_EXCEPTIONS_H
