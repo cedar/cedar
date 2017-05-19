@@ -1348,14 +1348,16 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
     if (mSubmitCommandHooks.member().size() != 1)
     {
       // heuristics: 
-      // find those command hooks which are in the current command group
-      // TODO
+      
 
-      CEDAR_THROW
+      if (this->mUserCommandUsed.member().size() != 0)
+      {
+        CEDAR_THROW
         (
          cedar::dev::Component::CouldNotGuessDeviceTypeException,
          "Could not guess device type: too many submit hooks. Please select a device type manually." 
         ); 
+      }
     }
 
     type_for_Device = mSubmitCommandHooks.member().begin()->first;
