@@ -292,6 +292,11 @@ public:
     return this->_mSnapGridSize->getValue();
   }
 
+  unsigned int getAutoSaveInterval() const
+  {
+    return this->_mAutoSaveInterval->getValue();
+  }
+
   //! Size of the SnapGrid, when enabled
   bool getUseDynamicFieldIcons() const
   {
@@ -465,6 +470,9 @@ private:
 
   //! Size of the Snapgrid, when snapping is enabled
   cedar::aux::DoubleParameterPtr _mSnapGridSize;
+
+  //! Size of the Snapgrid, when snapping is enabled
+  cedar::aux::UIntParameterPtr _mAutoSaveInterval;
 
   //! Use Field Icons that switch depending on a present peak
   cedar::aux::BoolParameterPtr _mUseDynamicFieldIcons;
