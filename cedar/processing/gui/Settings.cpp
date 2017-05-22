@@ -104,6 +104,9 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   this->_mSnapGridSize
           = new cedar::aux::DoubleParameter(ui_settings.get(), "snap grid size", 30.0, growth_limits);
 
+  this->_mAutoSaveInterval
+          = new cedar::aux::UIntParameter(ui_settings.get(), "autosave interval", 10,cedar::aux::UIntParameter::LimitType::positive());
+
   this->_mUseDynamicFieldIcons
           = new cedar::aux::BoolParameter(ui_settings.get(), "use dynamic field icons", true);
 
