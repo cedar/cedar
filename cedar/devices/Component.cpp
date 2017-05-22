@@ -173,7 +173,7 @@ class cedar::dev::Component::DataCollection
       else
       {
         cedar::aux::LogSingleton::getInstance()->warning(
-          "New buffer object has wrong size or type.",
+          "New buffer object has wrong size or type. Old Buffer Size: "+boost::lexical_cast<std::string>(buffer.rows)+","+boost::lexical_cast<std::string>(buffer.cols)+" New Size: "+boost::lexical_cast<std::string>(data.rows)+","+boost::lexical_cast<std::string>(data.cols)+". Old Buffer Type: "+boost::lexical_cast<std::string>(buff_type)+ " New Type: "+ boost::lexical_cast<std::string>(data.type()),
           CEDAR_CURRENT_FUNCTION_NAME);
       }
     }
