@@ -478,6 +478,11 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
         }
       }
     }
+    else
+    {
+      //Call the manually specified action!
+      this->getStep()->callAction(action.toStdString());
+    }
   }
   else
   {

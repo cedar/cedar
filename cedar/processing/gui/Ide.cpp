@@ -2279,7 +2279,7 @@ void cedar::proc::gui::Ide::backupSaveCallback()
   {
     countSmallSteps++;
     // auto-save every X seconds
-    if (countSmallSteps >=  60 * 10 )
+    if (countSmallSteps >=  60 * cedar::proc::gui::SettingsSingleton::getInstance()->getAutoSaveInterval() )
     {
       backupSave();
       countSmallSteps= 0;

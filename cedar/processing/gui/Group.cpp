@@ -2725,10 +2725,13 @@ void cedar::proc::gui::Group::changeStepName(const std::string& from, const std:
   {
     for(auto& plot : plot_group.second)
     {
-      auto name = plot.second.get<std::string>("step");
-      if(name == from)
+      if(!(plot.first == "visible" || plot.first == "KinematicChainWidget" || plot.first == "Viewer"))
       {
-        auto node = plot.second.put("step", to);
+        auto name = plot.second.get<std::string>("step");
+        if (name == from)
+        {
+          auto node = plot.second.put("step", to);
+        }
       }
     }
   }
