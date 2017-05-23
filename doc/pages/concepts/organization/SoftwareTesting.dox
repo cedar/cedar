@@ -1,0 +1,108 @@
+/*!
+
+@page SoftwareTestingConcept Software testing
+
+@section UnitTests Unit tests
+We strive to automate the testing of our software by providing a unit test for each vital class of cedar.
+A unit test is a piece of code that is written to test whether a class handles certain scenarios of inputs,
+parameters, or function calls in the expected way. For instance, given a class such as the following:
+@code
+class Robot
+{
+  public:
+    Robot();
+    Robot(const std::string& name);
+    void setName(const std::string& name);
+    const std::string& getName() const;
+  private:
+    std::string mName;
+};
+@endcode
+an associated unit test could check, whether both constructors create a valid object of the class "Robot",
+whether the second constructor and the method "setName" correctly set the member "mName" of the object,
+and whether the method "getName" returns the correct name.
+
+Using the ctest framework, which is part of cmake, we are able to run and check all unit tests with a single
+command. Simple issue
+@code
+$ make test
+@endcode
+in your build directory after you have compiled cedar. The result will look somewhat like the following:
+@code
+user@host:~/cedar/build$ make test
+Running tests...
+Test project /home/user/cedar/build
+      Start  1: Dynamics
+ 1/37 Test  #1: Dynamics .........................   Passed    2.25 sec
+      Start  2: ListenerManagement
+ 2/37 Test  #2: ListenerManagement ...............   Passed    0.29 sec
+      Start  3: ProjectionMapping
+ 3/37 Test  #3: ProjectionMapping ................   Passed    0.22 sec
+      Start  4: SequenceTest
+ 4/37 Test  #4: SequenceTest .....................   Passed    0.91 sec
+...
+@endcode
+
+If you would like to write a unit test for your own class, you can do so by creating a new folder in the
+appropriate module directory under "tests/unit/" (e.g., "tests/unit/processing/CrazyProcessingStep" if
+you wrote a class "CrazyProcessingStep" in the processing module). Write your C++ unit test code into a
+file and place it into this new directory. The file should also include a function
+@code
+int main()
+{
+  ...
+}
+@endcode
+which needs to call all your tests. The return value of this function should be non-zero if any errors occurred during
+execution. You can do this by defining a global int variable and initializing this to zero. Each time an error occurs,
+this variable is incremented. At the end of the test, you return the global variable. Make sure that incrementing the
+variable is always complemented by a descriptive error message to std::cout, ideally including the line of code this
+error appeared at (accessible through "__LINE__"). You can take a look at some of our unit tests to see how this is done
+ (for example tests/unit/math/tools/main.cpp).  
+
+The directory of your unit test needs to contain a file called CMakeLists.txt. Start
+with our template in "templates/cmakeLists.txt". Apart from the usual licensing declaration, the actual
+content of the file has to state the name of the unit test (e.g., "CrazyProcessingStep") and all C++ files
+associated with the test (e.g., "main.cpp"). 
+@code
+cedar_add_unit_test(CrazyProcessingStep main.cpp)                   
+@endcode
+
+After calling
+@code
+$ cmake ..
+@endcode
+from the build directory, your new unit test will be compiled and executed upon calling
+@code
+$ make test
+@endcode
+in the build directory.
+
+@section TestingCoverageAndMemCheck Coverage and memory testing
+
+You can run unit tests with a memory check tool or determine test coverage. To do so, you first need to set the
+CEDAR_COVERAGE_TEST and CEDAR_BUILD_VALGRIND_CHECK flags in your cedar.conf to 1 and compile your cedar with these
+values. You can then run memcheck-tests by calling
+@code
+$ ctest -D NightlyMemCheck
+@endcode
+in your build folder. To determine coverage, use
+@code
+$ ctest -D NightlyCoverage 
+@endcode
+instead. To run both at the same time, run 
+@code
+$ ctest -D NightlyMemoryCheck
+@endcode
+
+
+@section InteractiveTests Interactive tests
+
+While unit tests are a great tool for testing classes or deterministic processes in general, it does not
+work well for complex, noisy architectures, for behaviors of robots or other processes that require
+monitoring or interaction from a user. Instead, we use "interactive tests". They are set up in the exact
+same way as unit tests but reside in "tests/interactive" within the source tree of cedar. Usually, they
+feature some sort of console-based or graphical user interface to allows the user to monitor or interact
+with the test.
+
+*/
