@@ -1913,7 +1913,6 @@ void cedar::proc::gui::Ide::closePlots()
   this->mGroup->closeOpenArchitectureWidgets();
 
   this->mGroup->setAllPlotGroupsVisibility(false);
-
   this->togglePlotGroupActions();
 }
 
@@ -1933,6 +1932,9 @@ void cedar::proc::gui::Ide::toggleVisibilityOfPlots(bool hidden)
   }
 
   this->mGroup->toggleVisibilityOfOpenArchitectureWidgets(!hidden);
+
+  this->mGroup->setAllPlotGroupsVisibility(!hidden);
+  this->togglePlotGroupActions();
 }
 
 void cedar::proc::gui::Ide::toggleRecorder(bool status)
