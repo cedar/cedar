@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/gui/Settings.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #include "cedar/auxiliaries/gui/ColorValueRGBA.h"
+#include "cedar/auxiliaries/gui/QCLinePlot.h"
 #ifdef CEDAR_USE_QT5
 #include "cedar/auxiliaries/gui/Qt5LinePlot.h"
   #include "cedar/auxiliaries/gui/Qt5SurfacePlot.h"
@@ -222,9 +223,12 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
   switch (dims)
   {
 
-
-
-#ifdef CEDAR_USE_QT5
+#ifdef CEDAR_USE_QCUSTOMPLOT
+    case 1:
+      this->mpCurrentPlotWidget = new cedar::aux::gui::QCLinePlot(this->mData, title);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
+      break;
+#elif CEDAR_USE_QT5
     case 0:
       this->mpCurrentPlotWidget = new cedar::aux::gui::Qt5HistoryPlot0D(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
