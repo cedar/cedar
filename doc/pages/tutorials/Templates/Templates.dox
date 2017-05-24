@@ -1,0 +1,103 @@
+/*!
+
+@page TemplatesTutorial Group and Element Templates Tutorials for the Processing Framework
+
+This tutorial is a step-by-step instruction that introduces the concept of templates for groups and elements in @em cedar's GUI. This page contains the following sections:
+
+<ol>
+  <li>@ref TemplateTutorialBasics</li>
+  <li>@ref TemplateTutorialSimple</li>
+  <li>@ref TemplateTutorialRefined</li>
+  <li>@ref TemplateTutorialCode</li>
+</ol>
+
+@section BeforeYouStart Before you start
+Before you start, keep in mind that this software is still under development and save often. You will surely encounter
+ exceptions and crashes along the way. We are continuously improving @em cedar and feedback of any kind is welcome.
+ 
+@section StartingUpCedar Starting up cedar
+Please start your processing gui right now. If you do not know how to do this, take a look at 
+@link ProcessingGuiTutorial this @endlink tutorial.  
+
+@section TemplateTutorialBasics Basics of templates
+
+Templates are predefined configurations of elements and groups that you can add to any architecture. They are loaded from
+configuration files known to cedar. There are two ways of how templates become a part of your architecture: 
+
+<ol>
+  <li>Once a template is added to an architecture, it becomes part of the architecture. Changing any parameter does not 
+  effect the template itself but only the instantiation in your architecture.</li>
+  <li>A template is linked to an external configuration file. Parameters, connections, and placement of this template cannot be changed in your 
+  architecture. The element is considered as constant and only changes if the external configuration file changes (and 
+  only if you reload your own architecture).</li>
+</ol> 
+
+You decide whether to add or link a template by pressing the control key during dragging of the template from the 
+elements pane to the architecture canvas. While dragging, the lower left status bar notifies you of the currently used
+mode for this template - either adding or linking it if you release the mouse button. Try both methods with the
+following templates provided with cedar:
+<ul>
+<li> go to the @em DFT tab and drag a @em one-dimensional @em field into the architecture canvas - this creates a field
+with dimensionality one (in comparison to the default dimensionality two)</li>
+<li> add a  @em two-layer @em field from the same tab - a group with two fields appears</li>
+</ul>
+
+@section TemplateTutorialSimple Using ad-hoc templates
+There is a very simple way to use the template functionality with own configured groups or steps. In the GUI canvas,
+ right-clicking offers you to "import group/step from file". If you choose this option, a file dialog opens up, which
+ you can use to specify an architecture file from which you wish to import a group or step. Once a file is chosen, the
+ GUI gives you a list of all groups or steps on the <b>first hierarchical layer</b> of the architecture file, that is
+ all groups and elements in the root group of this file. Other elements are not accessible. Pick a name and press "OK" to
+ add the group or step to your architecture. Note that the newly created elements are not linked anymore to the 
+ configuration file from which they were loaded. Changing the parameters or configuration thus does not affect this file.
+
+@section TemplateTutorialRefined Adding own templates
+You can add your own templates to cedar by providing the names and files from which the templates should be loaded. 
+This is done by defining group declarations in a plugin. Add the following lines in plugin.cpp of your plugin to add 
+templates:
+@code
+void pluginDeclaration(cedar::aux::PluginDeclarationListPtr plugin)
+{
+    // add a group
+    cedar::proc::GroupDeclarationPtr group_declaration
+                                   (
+                                     new cedar::proc::GroupDeclaration
+                                     (
+                                         "three-layer field", // template name that appears in the gui
+                                         "resource://groupTemplates/fieldTemplates.json", // file
+                                         "three-layer", // name of group in file
+                                         "DFT" // category
+                                     )
+                                   );
+    group_declaration->setIconPath(":/steps/field_temp.svg"); // icon, can also be left empty
+    plugin->add(group_declaration);
+
+    // add a step    
+    cedar::proc::GroupDeclarationPtr field_declaration
+                                   (
+                                     new cedar::proc::GroupDeclaration
+                                     (
+                                         "three-dimensional field", // template name that appears in the gui
+                                         "resource://groupTemplates/fieldTemplates.json", // file
+                                         "three-dimensional field", // name of step in file
+                                         "DFT" // category
+                                     )
+                                   );
+    field_declaration->setIconPath(":/steps/field_temp.svg"); // icon, can also be left empty
+    plugin->add(field_declaration);
+}
+@endcode
+If you load your plugin, these templates should automatically appear in the elements section of the GUI. Note that the
+internal implementation assumes that all templates can be found in the root group of the given files.
+
+@section TemplateTutorialCode Using templates in C++ code
+You can of course use templates directly in your C++ code. The class cedar::proc::Group offers the following functions
+to add or link templates in your code. Note that these functions potentially throw exceptions if you pass none-existing
+file names or element names to the function.
+
+<ul>
+ <li>cedar::proc::Group::importGroupFromFile() adds a fully modifiable group to your architecture</li>
+ <li>cedar::proc::Group::createLinkedGroup() adds a constant group to your architecture</li>
+ <li>cedar::proc::Group::importStepFromFile() adds a fully modifiable element to your architecture</li> 
+</ul>
+*/
