@@ -155,11 +155,6 @@ cedar::proc::gui::Connectable::Decoration::Decoration(QGraphicsItem* pParent, co
 {
   qreal padding = 1;
 
-  if(icon.contains("connected")) // this is a modest hotfix to at least have the icon centered within their own frame. TODO: find out why icons may be off-centered and fix it
-  {
-    padding = 0;
-  }
-
   this->mpRectangle = new QGraphicsRectItem(-padding, -padding, cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE + 2 * padding, cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE + 2 * padding,
       pParent);
 
@@ -261,7 +256,7 @@ void cedar::proc::gui::Connectable::Decoration::updateIcon(const bool isConnecte
       // setting this cache mode makes sure that when writing out an svg file, the icon will not be pixelized
       this->mpIcon->setCacheMode(QGraphicsItem::NoCache);
 
-      qreal h = this->mpIcon->boundingRect().height();
+      qreal h = 120;
       this->mpIcon->setScale(cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE / h);
     }
   }
@@ -1383,7 +1378,8 @@ void cedar::proc::gui::Connectable::Decoration::setSize(double sizeFactor)
   if (this->mpIcon)
   {
     qreal h = this->mpIcon->boundingRect().height();
-    this->mpIcon->setScale(size / h);
+    qreal scale = size / h;
+    this->mpIcon->setScale(scale);
   }
 }
 
