@@ -229,6 +229,9 @@ void cedar::proc::gui::Connectable::Decoration::updateIcon(const bool isConnecte
 {
   if (!isDestructed)
   {
+
+    qreal h = this->mpIcon->boundingRect().height();
+
     if (this->mpIcon != nullptr)
     {
       delete this->mpIcon;
@@ -241,11 +244,13 @@ void cedar::proc::gui::Connectable::Decoration::updateIcon(const bool isConnecte
     {
       icon_path = ":/cedar/dev/gui/icons/connected.svg";
       brush = QBrush(QColor(222, 10, 244, 255));
+      h = 25;
     }
     else
     {
       icon_path = ":/cedar/dev/gui/icons/not_connected.svg";
       brush = QBrush(QColor(Qt::white));
+      h = 120;
     }
 
     if (this->mpRectangle != nullptr)
@@ -254,9 +259,7 @@ void cedar::proc::gui::Connectable::Decoration::updateIcon(const bool isConnecte
       this->mpIcon = new QGraphicsSvgItem(icon_path, this->mpRectangle);
 
       // setting this cache mode makes sure that when writing out an svg file, the icon will not be pixelized
-      this->mpIcon->setCacheMode(QGraphicsItem::NoCache);
-
-      qreal h = 120;
+      this->mpIcon->setCacheMode(QGraphicsItem::NoCache);     
       this->mpIcon->setScale(cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE / h);
     }
   }
