@@ -87,8 +87,8 @@ namespace
 cedar::proc::steps::VectorToScalars::VectorToScalars()
 :
 Step(true), //is looped, since a large number of independent inputs leads to spam of "compute canceled" messaged
-mOutputs(1, cedar::aux::MatDataPtr()),
 mInput(new cedar::aux::MatData(cv::Mat::zeros(1,1, CV_32F))),
+mOutputs(1, cedar::aux::MatDataPtr()),
 _mInputDimension (new cedar::aux::UIntParameter(this, "number of vector entries", 1,1,255))
 {
   //declareOutput(makeSlotName(0), cedar::aux::MatDataPtr());
@@ -157,7 +157,7 @@ const
   if (input)
   {
     //input must be a one dimensional vector
-    if (input->getData().cols == 1 && input->getData().rows == _mInputDimension->getValue())
+    if (input->getData().cols == 1 && static_cast<unsigned int>(input->getData().rows) == _mInputDimension->getValue())
     {
       return cedar::proc::DataSlot::VALIDITY_VALID;
     }
