@@ -144,7 +144,6 @@ void cedar::dev::kuka::KinematicChain::prepareSendingNoop(const cedar::dev::Comp
   {
     case cedar::dev::KinematicChain::JOINT_ANGLES:
     {
-std::cout     << "preparing for JOINT POS control " << std::endl;
       cv::Mat measuredJointPositions;
       measuredJointPositions = friChannel->getMeasuredJointPositions();
 
@@ -162,6 +161,7 @@ std::cout     << "preparing for JOINT TORQUE control " << std::endl;
       friChannel->prepareJointTorqueControl(myzeros);
      break;
    }
+
 
     default:
     {
