@@ -278,8 +278,6 @@ cv::Mat cedar::dev::kuka::FRIChannel::getMeasuredJointPositions() const
     jointPositions.at<float>(i) = mpFriRemote->getMsrMsrJntPosition()[i];
   }
 
-std::cout << "  strat: " << mpFriRemote->getMsrBuf().robot.control << std::endl;
-std::cout << "  cmd flags: " << mpFriRemote->getCmdBuf().cmd.cmdFlags << std::endl;
   return jointPositions;
 }
 
