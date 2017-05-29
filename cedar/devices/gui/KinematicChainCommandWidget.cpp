@@ -124,7 +124,7 @@ void cedar::dev::gui::KinematicChainCommandWidget::commandJoints()
   }
 
   auto command_type = mpKinematicChain->getCommandTypeForName(mpModeBox->currentText().toStdString());
-  auto mat_data = cv::Mat(7, 1, CV_32F);
+  auto mat_data = cv::Mat(mpKinematicChain->getNumberOfJoints(), 1, CV_32F);
 
   for(unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
   {
