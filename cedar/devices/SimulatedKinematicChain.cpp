@@ -65,8 +65,6 @@ cedar::dev::SimulatedKinematicChain::SimulatedKinematicChain()
   registerMeasurementHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedAngles, this));
 
   this->applyDeviceCommandsAs(cedar::dev::KinematicChain::JOINT_ANGLES);
-
-  connect(this->mpJoints.get(), SIGNAL(valueChanged()), this, SLOT(updateInitialConfiguration()));
 }
 
 cedar::dev::SimulatedKinematicChain::~SimulatedKinematicChain()
@@ -91,24 +89,6 @@ cv::Mat cedar::dev::SimulatedKinematicChain::retrieveSimulatedAngles()
 
 //  std::cout << "  in retrieveSimulatedAngles: " << mSimulation[ cedar::dev::KinematicChain::JOINT_ANGLES ] << std::endl;
   return mSimulation[ cedar::dev::KinematicChain::JOINT_ANGLES ].clone();
-}
-
-void cedar::dev::SimulatedKinematicChain::updateInitialConfiguration()
-{
-  auto number_of_joints = this->getNumberOfJoints();
-  if (number_of_joints > 0)
-  {
-    if (this->hasInitialConfiguration("default"))
-    {
-      this->deleteInitialConfiguration("default");
-    }
-
-    this->addInitialConfiguration("default", cv::Mat::zeros(number_of_joints, 1, CV_32F) + 0.001);
-    this->applyInitialConfiguration("default");
-    mSimulation[cedar::dev::KinematicChain::JOINT_ANGLES] = cv::Mat::zeros(number_of_joints, 1, CV_32F);
-    mSimulation[cedar::dev::KinematicChain::JOINT_VELOCITIES] = cv::Mat::zeros(number_of_joints, 1, CV_32F);
-    mSimulation[cedar::dev::KinematicChain::JOINT_ACCELERATIONS] = cv::Mat::zeros(number_of_joints, 1, CV_32F);
-  }
 }
 
 bool cedar::dev::SimulatedKinematicChain::applyCrashbrake()

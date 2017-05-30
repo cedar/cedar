@@ -1121,7 +1121,7 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
     {
         cedar::aux::LogSingleton::getInstance()->warning
         (
-          "Applied an initial configuration for \"" + this->getName() +
+          "Applied an initial configuration \"" + name + "\" for \"" + this->getName() +
              + "\", but the component is not communicating.",
           "cedar::dev::KinematicChain::applyInitialConfiguration"
         );
@@ -1160,6 +1160,8 @@ void cedar::dev::KinematicChain::readInitialConfigurations()
       "Could not read initial configurations. Maybe there is no such file yet. Boost says: \"" + std::string(e.what()) + "\".",
       "cedar::dev::gui::KinematicChainInitialConfigWidget::KinematicChainInitialConfigWidget()"
     );
+
+    return;
   }
 
   for (auto child_iter = configs.begin(); child_iter != configs.end(); ++child_iter)
