@@ -1,0 +1,180 @@
+{
+  "component slots": 
+  {
+    "arm": 
+    {
+      "available components": 
+      {
+        "complexconfig": 
+        {
+          "cedar.dev.SimulatedKinematicChain": 
+          {
+            
+          }
+        }
+      },
+
+      "shared component parameters": 
+      {
+        "name": "complex test arm",
+        "root coordinate frame": 
+        {
+          "initial translation": 
+          [
+            "0.0",
+            "0.0",
+            "0.0"
+          ],
+
+          "initial rotation": 
+          [
+            "1.0", "0.0", "0.0",
+            "0.0", "1.0", "0.0",
+            "0.0", "0.0", "1.0"
+          ]
+        },
+
+        "end-effector coordinate frame": 
+        {
+          "initial translation": 
+          [
+            "0.0",
+            "0.0",
+            "2.0"
+          ],
+
+          "initial rotation": 
+          [
+            "1.0", "0.0", "0.0",
+            "0.0", "0.0", "1.0",
+            "0.0", "-1.0", "0.0"
+          ]
+        },
+
+        "joints": 
+        {
+          "cedar.dev.KinematicChain.Joint": 
+          {
+            "angle limits": 
+            {
+              "lower limit": "-1000.0",
+              "upper limit": "1000.0"
+            },
+
+            "velocity limits": 
+            {
+              "lower limit": "-5.0",
+              "upper limit": "5.0"
+            },
+
+            "position": 
+            [
+              "0.0",
+              "0.0",
+              "0.0"
+            ],
+
+            "axis": 
+            [
+              "1.0",
+              "0.0",
+              "0.0"
+            ]
+          },
+
+          "cedar.dev.KinematicChain.Joint": 
+          {
+            "angle limits": 
+            {
+              "lower limit": "-1000.0",
+              "upper limit": "1000.0"
+            },
+
+            "velocity limits": 
+            {
+              "lower limit": "-5.0",
+              "upper limit": "5.0"
+            },
+
+            "position": 
+            [
+              "0.0",
+              "0.0",
+              "0.0"
+            ],
+
+            "axis": 
+            [
+              "0.0",
+              "1.0",
+              "0.0"
+            ]
+          },
+
+          "cedar.dev.KinematicChain.Joint": 
+          {
+            "angle limits": 
+            {
+              "lower limit": "-1000.0",
+              "upper limit": "1000.0"
+            },
+
+            "velocity limits": 
+            {
+              "lower limit": "-5.0",
+              "upper limit": "5.0"
+            },
+
+            "position": 
+            [
+              "0.0",
+              "0.0",
+              "1.0"
+            ],
+
+            "axis": 
+            [
+              "1.0",
+              "0.0",
+              "0.0"
+            ]
+          },
+
+          "cedar.dev.KinematicChain.Joint": 
+          {
+            "angle limits": 
+            {
+              "lower limit": "-1000.0",
+              "upper limit": "1000.0"
+            },
+
+            "velocity limits": 
+            {
+              "lower limit": "-5.0",
+              "upper limit": "5.0"
+            },
+
+            "position": 
+            [
+              "0.0",
+              "0.0",
+              "1.0"
+            ],
+
+            "axis": 
+            [
+              "0.0",
+              "1.0",
+              "0.0"
+            ]
+          }
+        }
+      }
+    }
+  },
+
+  "available channels": 
+  {
+    
+  }
+}
