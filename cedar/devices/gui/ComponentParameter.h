@@ -87,6 +87,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void selectComponent(cedar::dev::ComponentSlotPtr slot);
+
 private slots:
   void openComponentSelector();
 
@@ -95,6 +96,8 @@ private slots:
   void parameterChanged();
 
   void componentDoubleClicked();
+
+  void reselect(const std::string &robot_name, const std::string &slot_name);
 
 private:
   void fillRobots(QTreeWidgetItem* pItem);

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -73,6 +73,21 @@ bool cedar::dev::ComponentParameter::hasComponentSlot() const
   {
     return false;
   }
+}
+
+void cedar::dev::ComponentParameter::emitReselect()
+{
+  reselect(mRobotName, mSlotName);
+}
+
+void cedar::dev::ComponentParameter::setSlotName(const std::string &slot_name)
+{
+  mSlotName = slot_name;
+}
+
+void cedar::dev::ComponentParameter::setRobotName(const std::string &robot_name)
+{
+  mRobotName = robot_name;
 }
 
 cedar::dev::ComponentPtr cedar::dev::ComponentParameter::getValue() const

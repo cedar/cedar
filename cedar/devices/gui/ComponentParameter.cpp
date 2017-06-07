@@ -112,6 +112,7 @@ void cedar::dev::gui::ComponentParameter::parameterChanged()
 {
   this->mParameter = boost::dynamic_pointer_cast<cedar::dev::ComponentParameter>(this->getParameter());
   QObject::connect(this->mParameter.get(), SIGNAL(valueChanged()), this, SLOT(updatePathText()));
+  QObject::connect(this->mParameter.get(), SIGNAL(reselect(const std::string&, const std::string&)), this, SLOT(reselect(const std::string&, const std::string&)));
 
   bool blocked = this->mpComponentPathDisplay->blockSignals(true);
   this->updatePathText();
@@ -190,6 +191,14 @@ void cedar::dev::gui::ComponentParameter::selectComponent(cedar::dev::ComponentS
   cedar::aux::asserted_pointer_cast<cedar::dev::ComponentParameter>(this->getParameter())->setValue(slot);
 }
 
+void cedar::dev::gui::ComponentParameter::reselect(const std::string& robot_name, const std::string& slot_name)
+{
+  cedar::dev::RobotPtr robot = cedar::dev::RobotManagerSingleton::getInstance()->getRobot(robot_name);
+  CEDAR_ASSERT(robot);
+  cedar::dev::ComponentSlotPtr slot = robot->getComponentSlot(slot_name);
+  this->selectComponent(slot);
+}
+
 void cedar::dev::gui::ComponentParameter::updatePathText()
 {
   std::string text;
@@ -202,6 +211,13 @@ void cedar::dev::gui::ComponentParameter::updatePathText()
     // nothing to do -- text remains empty.
   }
   this->mpComponentPathDisplay->setText(QString::fromStdString(text));
+
+  if(!text.empty())
+  {
+    this->mParameter->setRobotName(text.substr(0, text.find(".")));
+    this->mParameter->setSlotName(text.substr(text.find(".")+1));
+  }
+
 }
 
 void cedar::dev::gui::ComponentParameter::fillRobots(QTreeWidgetItem* pItem)

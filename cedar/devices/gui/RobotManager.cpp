@@ -404,6 +404,7 @@ void cedar::dev::gui::RobotManager::robotNameSelected(int nameIndex)
 void cedar::dev::gui::RobotManager::updateRobotConfiguration(QString addedRobotName)
 {
   this->selectRobot(addedRobotName.toStdString());
+  configurationChanged();
 }
 
 void cedar::dev::gui::RobotManager::deselectRobot()

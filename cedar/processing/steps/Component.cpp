@@ -48,6 +48,7 @@
 #include "cedar/devices/exceptions.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/devices/Sensor.h"
+#include "cedar/devices/gui/RobotManager.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
@@ -246,6 +247,9 @@ _mCommunicationStepSize(new cedar::aux::DoubleParameter(this, "communication ste
   this->registerFunction( "disconnect", boost::bind(&cedar::proc::steps::Component::disconnectManually, this ) );
   this->registerFunction( "connect", boost::bind(&cedar::proc::steps::Component::connectManually, this ) );
   this->registerFunction( "open Robot Manager", boost::bind(&cedar::proc::steps::Component::openRobotManager, this ) );
+
+  boost::shared_ptr<QObject> robman = boost::dynamic_pointer_cast<QObject>(cedar::dev::gui::RobotManagerGUISingleton::getInstance());
+  QObject::connect(robman.get(), SIGNAL(configurationChanged()), this, SLOT(reselect()));
 }
 
 cedar::proc::steps::Component::~Component()
@@ -312,6 +316,11 @@ void cedar::proc::steps::Component::testStates(cedar::dev::ComponentPtr componen
   {
     this->resetState();
   }
+}
+
+void cedar::proc::steps::Component::reselect()
+{
+  this->_mComponent->emitReselect();
 }
 
 void cedar::proc::steps::Component::onStart()

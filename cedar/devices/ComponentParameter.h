@@ -56,6 +56,8 @@
  */
 class cedar::dev::ComponentParameter : public cedar::aux::Parameter
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -95,6 +97,16 @@ public:
   //! Checks if a component has been assigned to the component slot in this parameter.
   bool hasComponentSlot() const;
 
+  void emitReselect();
+
+  void setRobotName(const std::string &robot_name);
+
+  void setSlotName(const std::string &slot_name);
+
+signals:
+
+  void reselect(const std::string& robot_name, const std::string& slot_name);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -114,6 +126,9 @@ protected:
   // none yet
 private:
   boost::weak_ptr<cedar::dev::ComponentSlot> mWeakComponent;
+
+  std::string mRobotName;
+  std::string mSlotName;
 
 }; // class cedar::dev::ComponentParameter
 
