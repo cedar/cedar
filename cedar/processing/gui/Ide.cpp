@@ -798,7 +798,8 @@ void cedar::proc::gui::Ide::buildStatusBar()
   // add a blank widget as a spacer
   this->statusBar()->addPermanentWidget(new QWidget(), 1);
   this->mpRunningComponentsLabel = new QLabel("");
-  this->statusBar()->addPermanentWidget(this->mpRunningComponentsLabel, 0);
+  this->mpRunningComponentsLabel->setWordWrap(true);
+  this->statusBar()->addPermanentWidget(this->mpRunningComponentsLabel, 3);
 
   // add a blank widget as a spacer
   this->statusBar()->addPermanentWidget(new QWidget(), 1);
