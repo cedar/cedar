@@ -117,6 +117,7 @@ public:
    * @param name name of the object in the scene
    */
   void deleteObjectVisualization(const std::string &name);
+  void deleteObjectVisualizationPtr(cedar::aux::gl::ObjectVisualizationPtr &pObjectVisualization);
   
   /*!@brief removes all objects from the scene */
   void clear();
