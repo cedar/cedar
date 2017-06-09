@@ -319,6 +319,46 @@ else(AMTEC_LIBRARY_DEVICE AND AMTEC_LIBRARY_UTIL AND AMTEC_LIBRARY_NTCAN)
 endif(AMTEC_LIBRARY_DEVICE AND AMTEC_LIBRARY_UTIL AND AMTEC_LIBRARY_NTCAN)
 
 
+## PCL:
+option(CEDAR_USE_PCL "Include PCL (for Kinect) if possible." ON)
+if (CEDAR_USE_PCL)
+
+  find_package(PCL 1.7 QUIET COMPONENTS common io)
+  if(PCL_FOUND)
+    message("-- PCL library found")
+
+    include_directories(${PCL_INCLUDE_DIRS})
+    link_directories(${PCL_LIBRARY_DIRS})
+    add_definitions(${PCL_DEFINITIONS})
+
+  else(PCL_FOUND)
+    message("-- PCL library not found")
+    set(CEDAR_USE_PCL OFF)
+  endif(PCL_FOUND)
+
+endif(CEDAR_USE_PCL)
+
+option(CEDAR_USE_EIGEN3 "Include Eigen3 (for Kinect) if possible." ON)
+if (CEDAR_USE_EIGEN3)
+
+  if (PCL_FOUND)
+    find_package(Eigen3 REQUIRED)
+  else (PCL_FOUND)
+    find_package(Eigen3)
+  endif (PCL_FOUND)
+
+  if(EIGEN3_FOUND)
+    message("-- Eigen3 library found")
+    set(CEDAR_USE_EIGEN3) 
+    include_directories(${EIGEN3_INCLUDE_DIR})
+
+  endif(EIGEN3_FOUND)
+
+endif(CEDAR_USE_EIGEN3)
+
+
+
+
 ########################################################################################################################
 # cedar libraries
 file(GLOB cedarLibPaths "${CEDAR_SOURCE_DIR}/*/")
