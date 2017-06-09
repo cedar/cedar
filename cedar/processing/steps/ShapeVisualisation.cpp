@@ -125,11 +125,6 @@ cedar::proc::steps::ShapeVisualisation::ShapeVisualisation()
 
 cedar::proc::steps::ShapeVisualisation::~ShapeVisualisation()
 {
-  if(mVisualisationPtr)
-  {
-    auto scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
-    scene->deleteObjectVisualization(mVisualisationPtr->objectName().toStdString());
-  }
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ShapeVisualisation::determineInputValidity
@@ -179,7 +174,12 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
 
   if(mVisualisationPtr)
   {
-    scene->deleteObjectVisualization(mVisualisationPtr->objectName().toStdString());
+    scene->deleteObjectVisualizationPtr(mVisualisationPtr);
+
+    if(!mpTargetPosition)
+    {
+      return;
+    }
   }
 
   float r = 0;
