@@ -152,6 +152,8 @@ else(CEDAR_USE_FFTW_THREADED)
 cedar_summary_lib_found("FFTW" CEDAR_USE_FFTW)
 endif(CEDAR_USE_FFTW_THREADED)
 cedar_summary_lib_found("Yarp" CEDAR_USE_YARP)
+cedar_summary_lib_found("PCL" CEDAR_USE_PCL)
+cedar_summary_lib_found("Eigen3" CEDAR_USE_PCL)
 
 message("")
 
@@ -160,6 +162,7 @@ cedar_summary_h3("Hardware APIs")
 cedar_summary_lib_found("LibDC1394" CEDAR_USE_LIB_DC1394)
 cedar_summary_lib_found("FRI" CEDAR_USE_KUKA_LWR)
 cedar_summary_lib_found("Amtec" CEDAR_USE_AMTEC)
+
 
 message("")
 
