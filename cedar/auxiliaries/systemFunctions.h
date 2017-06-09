@@ -70,7 +70,7 @@ namespace cedar
      *          Lastly, the function looks in the cedar install directory.
      *
      */
-    CEDAR_AUX_LIB_EXPORT std::string locateResource(const std::string& resourcePath, bool showInLog = true);
+    CEDAR_AUX_LIB_EXPORT std::string locateResource(const std::string& resourcePath, bool showInLog = false);
 
     /*!@brief   Lists all the paths that are searched for resources.
      *
