@@ -1,0 +1,9 @@
+{
+  "name": "simulated CORA robot",
+  "description file": "configs/cora/description.json",
+  "component instantiations":
+  {
+      "arm": "simulator",
+      "head": "simulator"
+  }
+}

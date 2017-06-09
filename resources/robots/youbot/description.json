@@ -1,0 +1,313 @@
+{
+  "component slots":
+  {
+    "arm":
+    {
+      "available components":
+      {
+        "yarp":
+        {
+          "cedar.dev.YarpKinematicChain":
+          {
+            "requires channel": "yarp",
+            "readPortName": "webots/youbotArmStatusFramework",
+      		"writePortName":"webots/youbotArmCommandsFramework"
+          }
+        },
+        "simulator":
+        {
+          "cedar.dev.SimulatedKinematicChain":
+          {
+          }
+        }
+      },
+      "shared component parameters":
+      {
+  		  "name": "YoubotArm",
+  		  "server port": "0",
+  		  "remote host": "NULL",
+  		  "step size": "20.0",
+  		  "idle time": "0.001",
+  		  "use fixed step size": "false",
+  		  "simulated time": "0.0",
+  		  "root coordinate frame":
+  		  {
+  		    "initial translation":
+  		    [
+  		      "0.143",
+  		      "0.0",
+  		      "0.130"
+  		    ],
+  		    "initial rotation":
+  		    [
+  		      "1.0", "0.0", "0.0",
+      		  "0.0", "1.0", "0.0",
+              "0.0", "0.0", "1.0"
+  		    ]
+  		  },
+  		  "end-effector coordinate frame":
+  		  {
+  		    "initial translation":
+  		    [
+  		      "0.057", 
+  		      "0.0",
+  		      "0.57576"
+  		    ],
+  		    "initial rotation":
+  		    [
+  		      "1.0", "0.0", "0.0",
+  		      "0.0", "1.0", "0.0",
+  		      "0.0", "0.0", "1.0"
+  		    ]
+  		  },
+  		  "joints":
+  		  {
+  		    "cedar.dev.KinematicChain.Joint":
+  		    {
+  		      "angle limits":
+  		      {
+  		        "lower limit": "-2.94",
+  		        "upper limit": "2.94"
+  		      },
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "0.024", 
+  		        "0.0",
+  		        "0.115"
+  		      ],
+  		      "axis":
+  		      [
+  		        "0.0", 
+  		        "0.0",
+  		        "1.0"
+  		      ]
+  		    },
+  		    "cedar.dev.KinematicChain.Joint":
+  		    {
+  		      "angle limits":
+  		      {
+  		        "lower limit": "-1.13",
+  		        "upper limit": "1.57"
+  		      },
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "0.057", 
+  		        "0.0",
+  		        "0.115"
+  		      ],
+  		      "axis":
+  		      [
+  		        "0.0", 
+  		        "1.0",
+  		        "0.0"
+  		      ]
+  		    },
+  		    "cedar.dev.KinematicChain.Joint":
+  		    {
+  		      "angle limits":
+  		      {
+  		        "lower limit": "-2.64",
+  		        "upper limit": "2.55"
+  		      },
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "0.057", 
+  		        "0.0",
+  		        "0.270"
+  		      ],
+  		      "axis":
+  		      [
+  		        "0.0", 
+  		        "1.0",
+  		        "0.0"
+  		      ]
+  		    },
+  		    "cedar.dev.KinematicChain.Joint":
+  		    {
+  		      "angle limits":
+  		      {
+  		        "lower limit": "-1.79",
+  		        "upper limit": "1.79"
+  		      },
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "0.057", 
+  		        "0.0",
+  		        "0.405"
+  		      ],
+  		      "axis":
+  		      [
+  		        "0.0", 
+  		        "1.0",
+  		        "0.0"
+  		      ]
+  		    },
+  		    "cedar.dev.KinematicChain.Joint":
+  		    {
+  		      "angle limits":
+  		      {
+  		        "lower limit": "-2.88",
+  		        "upper limit": "2.88"
+  		      },
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "0.057", 
+  		        "0.0",
+  		        "0.5186"
+  		      ],
+  		      "axis":
+  		      [
+  		        "0.0", 
+  		        "0.0",
+  		        "-1.0"
+  		      ]
+  		    }
+  		  }
+  		 
+  		  
+      }
+    },
+    "chassis":
+     {
+      "available components":
+      {
+        "yarp":
+        {
+          "cedar.dev.YarpVehicle":
+          {
+            "requires channel": "yarp",
+            "readPortName": "webots/youbotWheelStatusFramework",
+      		"writePortName":"webots/youbotWheelCommandsFramework"
+          }
+        },
+        "simulator":
+        {
+          "cedar.dev.SimulatedVehicle":
+          {
+          }
+        }
+      },
+      "shared component parameters":
+      {
+  		  "name": "YoubotChassis",
+  		  "wheelRadius" : "0.050",
+  		  "wheels":
+  		  {
+  		  "cedar.dev.Vehicle.Wheel":
+  		    {
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "0.228", 
+  		        "0.158",
+  		        "0.050"
+  		      ]
+  		    },
+  		   "cedar.dev.Vehicle.Wheel":
+  		    {
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "0.228", 
+  		        "-0.158",
+  		        "0.050"
+  		      ]
+  		    },
+  		    "cedar.dev.Vehicle.Wheel":
+  		    {
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "-0.228", 
+  		        "0.158",
+  		        "0.050"
+  		      ]
+  		    },
+  		    "cedar.dev.Vehicle.Wheel":
+  		    {
+  		      "velocity limits":
+  		      {
+  		        "lower limit": "-1.92",
+  		        "upper limit": "1.92"
+  		      },
+  		      "position":
+  		      [
+  		        "-0.228", 
+  		        "-0.158",
+  		        "0.050"
+  		      ]
+  		    } 
+  		  }
+      }
+     },
+     "camera":
+     {
+      "available components":
+      {
+        "yarp":
+        {
+          "cedar.dev.YarpCamera":
+          {
+            "requires channel": "yarp",
+            "readPortName": "webots/youbotColorCameraStatusFramework"
+          }
+        }
+      },
+      "shared component parameters":
+      {
+  		  "name": "YoubotCamera",
+  		  "pictureSizeX" : "200",
+  		  "pictureSizeY" : "200",
+  		  "cvMatType" : "CV_8UC3"
+  	  }
+  	 }
+  },
+  "available channels":
+  {
+    "yarp":
+    {
+      "cedar.dev.YarpChannel<cv.Mat>":
+      {
+		  "ip address": "134.147.176.97"
+      }
+    }
+  }
+}
+
