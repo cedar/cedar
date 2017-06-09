@@ -111,14 +111,6 @@ int cedar::aux::gl::Scene::removeViewer(cedar::aux::gui::Viewer* pViewer)
   return 0;
 }
 
-void cedar::aux::gl::Scene::deleteObjectVisualization(int index)
-{
-  QWriteLocker write_locker(&mObjectVisualizationLock);
-
-  mObjectVisualizations.removeAt(index);
-  mSceneChanged();
-}
-
 void cedar::aux::gl::Scene::deleteObjectVisualization(const std::string &name)
 {
     QWriteLocker write_locker(&mObjectVisualizationLock);
