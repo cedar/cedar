@@ -1441,6 +1441,10 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
     {
       locker.unlock();
       this->clearController();
+
+      cedar::aux::LogSingleton::getInstance()->message(
+        "Control of " + prettifyName() + " now reverted to architecture. ",
+        CEDAR_CURRENT_FUNCTION_NAME);
     }
   }
   else // do not use Controller Callback:
