@@ -113,11 +113,6 @@ public:
    */
   int removeViewer(cedar::aux::gui::Viewer* pViewer);
 
-  /*!@brief removes an object from the scene
-   * @param index index of the object in the scene
-   */
-  void deleteObjectVisualization(int index);
-
   /*!@brief removes an object from the scene via its name
    * @param name name of the object in the scene
    */

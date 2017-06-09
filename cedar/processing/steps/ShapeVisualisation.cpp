@@ -93,7 +93,6 @@ cedar::aux::EnumType<cedar::proc::steps::ShapeVisualisation::Shape>
 cedar::proc::steps::ShapeVisualisation::ShapeVisualisation()
   :
   Step(false),
-  _mVisualisationID(-1),
   _mColour
   (
     new cedar::aux::EnumParameter
@@ -122,6 +121,15 @@ cedar::proc::steps::ShapeVisualisation::ShapeVisualisation()
   QObject::connect(this->_mColour.get(), SIGNAL(valueChanged()), this, SLOT(visualisationChanged()));
   QObject::connect(this->_mShape.get(), SIGNAL(valueChanged()), this, SLOT(visualisationChanged()));
   QObject::connect(this->_mScale.get(), SIGNAL(valueChanged()), this, SLOT(visualisationChanged()));
+}
+
+cedar::proc::steps::ShapeVisualisation::~ShapeVisualisation()
+{
+  if(mVisualisationPtr)
+  {
+    auto scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
+    scene->deleteObjectVisualization(mVisualisationPtr->objectName().toStdString());
+  }
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ShapeVisualisation::determineInputValidity
@@ -169,182 +177,166 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
 {
   auto scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
 
-  if(mpTargetPosition)
+  if(mVisualisationPtr)
   {
-    if(_mVisualisationID >= 0)
-    {
-      scene->deleteObjectVisualization(_mVisualisationID);
-      _mVisualisationID = -1;
-    }
-
-    float r = 0;
-    float g = 0;
-    float b = 0;
-
-    switch (this->_mColour->getValue())
-    {
-      default:
-      case Colour::black:
-        break;
-
-      case Colour::red:
-      {
-        r = 1;
-        break;
-      }
-
-      case Colour::green:
-      {
-        g = 1;
-        break;
-      }
-
-      case Colour::blue:
-      {
-        b = 1;
-        break;
-      }
-
-      case Colour::yellow:
-      {
-        r = 1;
-        g = 1;
-        break;
-      }
-
-      case Colour::purple:
-      {
-        r = 1;
-        b = 1;
-        break;
-      }
-
-      case Colour::cyan:
-      {
-        g = 1;
-        b = 1;
-        break;
-      }
-
-      case Colour::white:
-      {
-        r = 1;
-        g = 1;
-        b = 1;
-        break;
-      }
-    }
-
-    const float scale = _mScale->getValue();
-
-    switch (this->_mShape->getValue())
-    {
-      default:
-      case Shape::sphere:
-      {
-        mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
-        (
-          new cedar::aux::gl::Sphere
-          (
-            cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-            2*scale, r, g, b
-          )
-        );
-        break;
-      }
-
-      case Shape::block:
-      {
-        mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
-        (
-          new cedar::aux::gl::Block
-          (
-            cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-            3*scale, 2*scale, scale, r, g, b
-          )
-        );
-        break;
-      }
-
-      case Shape::cone:
-      {
-        mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
-        (
-          new cedar::aux::gl::Cone
-          (
-            cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-            2*scale, 2*scale, r, g, b
-          )
-        );
-        break;
-      }
-
-      case Shape::cylinder:
-      {
-        mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
-        (
-          new cedar::aux::gl::Cylinder
-          (
-            cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-            scale, 2*scale, r, g, b
-          )
-        );
-        break;
-      }
-
-      case Shape::prism:
-      {
-        mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
-        (
-          new cedar::aux::gl::Prism
-          (
-            cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-            3*scale, scale, r, g, b
-          )
-        );
-        break;
-      }
-
-      case Shape::pyramid:
-      {
-        mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
-        (
-          new cedar::aux::gl::Pyramid
-          (
-            cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-            2*scale, 3*scale, 2*scale, r, g, b
-          )
-        );
-        break;
-      }
-
-      case Shape::torus:
-      {
-        mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
-        (
-          new cedar::aux::gl::Torus
-          (
-            cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-            3*scale, 0.5*scale, r, g, b
-          )
-        );
-        break;
-      }
-    }
-
-    mVisualisationPtr->getLocalCoordinateFrame()->setTranslation
-    (
-      std::vector<float>
-      (
-        {
-          mpTargetPosition->getData().at<float>(0),
-          mpTargetPosition->getData().at<float>(1),
-          mpTargetPosition->getData().at<float>(2)
-        }
-      )
-    );
-
-    _mVisualisationID = scene->addObjectVisualization(mVisualisationPtr);
+    scene->deleteObjectVisualization(mVisualisationPtr->objectName().toStdString());
   }
+
+  float r = 0;
+  float g = 0;
+  float b = 0;
+
+  switch (this->_mColour->getValue())
+  {
+    default:
+    case Colour::black:
+      break;
+
+    case Colour::red:
+    {
+      r = 1;
+      break;
+    }
+
+    case Colour::green:
+    {
+      g = 1;
+      break;
+    }
+
+    case Colour::blue:
+    {
+      b = 1;
+      break;
+    }
+
+    case Colour::yellow:
+    {
+      r = 1;
+      g = 1;
+      break;
+    }
+
+    case Colour::purple:
+    {
+      r = 1;
+      b = 1;
+      break;
+    }
+
+    case Colour::cyan:
+    {
+      g = 1;
+      b = 1;
+      break;
+    }
+
+    case Colour::white:
+    {
+      r = 1;
+      g = 1;
+      b = 1;
+      break;
+    }
+  }
+
+  const float scale = _mScale->getValue();
+
+  switch (this->_mShape->getValue())
+  {
+    default:
+    case Shape::sphere:
+    {
+      mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
+      (
+        new cedar::aux::gl::Sphere
+        (
+          cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
+          2*scale, r, g, b
+        )
+      );
+      break;
+    }
+
+    case Shape::block:
+    {
+      mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
+      (
+        new cedar::aux::gl::Block
+        (
+          cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
+          3*scale, 2*scale, scale, r, g, b
+        )
+      );
+      break;
+    }
+
+    case Shape::cone:
+    {
+      mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
+      (
+        new cedar::aux::gl::Cone
+        (
+          cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
+          2*scale, 2*scale, r, g, b
+        )
+      );
+      break;
+    }
+
+    case Shape::cylinder:
+    {
+      mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
+      (
+        new cedar::aux::gl::Cylinder
+        (
+          cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
+          scale, 2*scale, r, g, b
+        )
+      );
+      break;
+    }
+
+    case Shape::prism:
+    {
+      mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
+      (
+        new cedar::aux::gl::Prism
+        (
+          cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
+          3*scale, scale, r, g, b
+        )
+      );
+      break;
+    }
+
+    case Shape::pyramid:
+    {
+      mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
+      (
+        new cedar::aux::gl::Pyramid
+        (
+          cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
+          2*scale, 3*scale, 2*scale, r, g, b
+        )
+      );
+      break;
+    }
+
+    case Shape::torus:
+    {
+      mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
+      (
+        new cedar::aux::gl::Torus
+        (
+          cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
+          3*scale, 0.5*scale, r, g, b
+        )
+      );
+      break;
+    }
+  }
+
+  scene->addObjectVisualization(mVisualisationPtr);
 
 }

@@ -163,6 +163,9 @@ class cedar::proc::steps::ShapeVisualisation : public cedar::proc::Step
 public:
   //!@brief The standard constructor.
   ShapeVisualisation();
+
+  ~ShapeVisualisation();
+
   cedar::proc::DataSlot::VALIDITY determineInputValidity
                                   (
                                     cedar::proc::ConstDataSlotPtr slot,
@@ -178,9 +181,6 @@ private:
 
 protected:
   cedar::aux::ConstMatDataPtr mpTargetPosition;
-
-  // corresponding visualisation id to perform deletion
-  int _mVisualisationID;
 
   cedar::aux::gl::ObjectVisualizationPtr mVisualisationPtr;
 

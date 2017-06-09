@@ -83,7 +83,7 @@ cedar::aux::gui::SceneWidget::~SceneWidget()
 
 void cedar::aux::gui::SceneWidget::deleteObject()
 {
-  mpScene->deleteObjectVisualization(mpComboBoxName->currentIndex());
+  mpScene->deleteObjectVisualization(mpActiveVisualization->objectName().toStdString());
 }
 
 void cedar::aux::gui::SceneWidget::setRadius(double value)
