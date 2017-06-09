@@ -1661,7 +1661,7 @@ void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
     s= " Don't forget to start your architecture to interact.";
   }
 
-  cedar::aux::LogSingleton::getInstance()->message(
+  cedar::aux::LogSingleton::getInstance()->systemInfo(
     "Starting communication with " + prettifyName() + " in the background." + s,
     CEDAR_CURRENT_FUNCTION_NAME
   );
@@ -1751,7 +1751,7 @@ void cedar::dev::Component::destroyCommunication()
 
 void cedar::dev::Component::stopCommunication()
 {
-  cedar::aux::LogSingleton::getInstance()->message(
+  cedar::aux::LogSingleton::getInstance()->systemInfo(
     "Stopping communication with " + prettifyName() + ".",
     CEDAR_CURRENT_FUNCTION_NAME
   );
@@ -2028,7 +2028,7 @@ void cedar::dev::Component::startBrakingSlowly()
   }
   else
   {
-    cedar::aux::LogSingleton::getInstance()->message(
+    cedar::aux::LogSingleton::getInstance()->systemInfo(
       "Braking " + prettifyName() + " (slowly)",
       CEDAR_CURRENT_FUNCTION_NAME
     );
@@ -2051,7 +2051,7 @@ void cedar::dev::Component::startBrakingNow()
   }
   else
   {
-    cedar::aux::LogSingleton::getInstance()->warning(
+    cedar::aux::LogSingleton::getInstance()->message(
       "Braking " + prettifyName() + " hard.",
       CEDAR_CURRENT_FUNCTION_NAME
     );
@@ -2111,7 +2111,7 @@ void cedar::dev::Component::waitUntilCommunicated() const
 
   if (mCommunicationThread->isCurrentThread())
   {
-    cedar::aux::LogSingleton::getInstance()->warning
+    cedar::aux::LogSingleton::getInstance()->error
     (
       "Your are waiting for communication with the Component "
       + prettifyName() + " inside the "
@@ -2223,7 +2223,7 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
       else if (boost::posix_time::time_period(starttime,now) 
                < boost::posix_time::time_period(starttime + boost::posix_time::milliseconds( 2*1000 + 250 ), now ) )
       {
-        cedar::aux::LogSingleton::getInstance()->warning(
+        cedar::aux::LogSingleton::getInstance()->systemInfo(
           "waiting for " + componentpointer->prettifyName() + " to initialize ...",
           CEDAR_CURRENT_FUNCTION_NAME);
       }
