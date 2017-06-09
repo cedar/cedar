@@ -268,7 +268,7 @@ void cedar::aux::Settings::loadDefaultPlugins()
       cedar::aux::PluginProxyPtr plugin = cedar::aux::PluginProxy::getPlugin(plugin_name);
       action = "loading";
       plugin->declare();
-      cedar::aux::LogSingleton::getInstance()->message
+      cedar::aux::LogSingleton::getInstance()->systemInfo
       (
         "Loaded default plugin \"" + (*iter) + "\"",
         "void cedar::proc::Manager::loadDefaultPlugins()"
