@@ -315,7 +315,7 @@ void cedar::dev::Robot::performConsistencyCheck() const
       const std::string& name = *channel_it;
       if (!slot->hasConfiguration(name))
       {
-        cedar::aux::LogSingleton::getInstance()->warning
+        cedar::aux::LogSingleton::getInstance()->systemInfo
         (
           "Check the configuration file: The slot \"" + slot_name + "\" has no mapping for channel \"" + name + "\".",
           "void cedar::dev::Robot::performConsistencyCheck() const"
@@ -334,7 +334,7 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
   auto desc_file_node = node.find("component slots");
   if (desc_file_node == node.not_found())
   {
-    cedar::aux::LogSingleton::getInstance()->warning
+    cedar::aux::LogSingleton::getInstance()->systemInfo
     (
       "Robot has no component slots in its description file.",
       "void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode&)"
@@ -521,7 +521,7 @@ void cedar::dev::Robot::readComponentSlotInstantiations(const cedar::aux::Config
     auto slot_iter = component_instantiations_node.find(slot_name);
     if (slot_iter == component_instantiations_node.not_found())
     {
-      cedar::aux::LogSingleton::getInstance()->warning
+      cedar::aux::LogSingleton::getInstance()->systemInfo
       (
         "Robot configuration is missing an entry for component slot \"" + slot_name + "\".",
         "cedar::dev::Robot::readComponentSlotInstantiations(const cedar::aux::ConfigurationNode&)"
