@@ -147,20 +147,20 @@ class cedar::dev::Component::DataCollection
       return iter->second;
     }
 
-    void resetUserBufferUnlocked(cedar::dev::Component::ComponentDataType type, int matrixType)
+    void resetUserSideBufferUnlocked(cedar::dev::Component::ComponentDataType type, int matrixType)
     {
-      this->resetBufferUnlocked(mUserBuffer, type, matrixType);
+      this->resetBufferUnlocked(mUserSideBuffer, type, matrixType);
     }
 
-    void resetPreviousDeviceBufferUnlocked(ComponentDataType type,int matrixType)
+    void resetPreviousDeviceSideBufferUnlocked(ComponentDataType type,int matrixType)
     {
-      this->resetBufferUnlocked(mPreviousDeviceBuffer, type, matrixType);
+      this->resetBufferUnlocked(mPreviousDeviceSideBuffer, type, matrixType);
     }
 
-    void setUserBuffer(ComponentDataType type, cv::Mat data)
+    void setUserSideBuffer(ComponentDataType type, cv::Mat data)
     {
       // reference to the old buffer matrix
-      cv::Mat &buffer = mUserBuffer.member()[type]->getData();
+      cv::Mat &buffer = mUserSideBuffer.member()[type]->getData();
 
       // get size and type of old buffer
       auto &buff_size = buffer.size;
@@ -168,7 +168,7 @@ class cedar::dev::Component::DataCollection
 
       if(data.size == buff_size && data.type() == buff_type)
       {
-        this->setData(mUserBuffer, type, data);
+        this->setData(mUserSideBuffer, type, data);
       }
       else
       {
@@ -178,69 +178,69 @@ class cedar::dev::Component::DataCollection
       }
     }
 
-    void setUserBufferUnlocked(const ComponentDataType type, const cv::Mat& data)
+    void setUserSideBufferUnlocked(const ComponentDataType type, const cv::Mat& data)
     {
-      this->setDataUnlocked(mUserBuffer, type, data);
+      this->setDataUnlocked(mUserSideBuffer, type, data);
     }
 
-    void setUserBufferIndex(ComponentDataType type, int index, float value)
+    void setUserSideBufferIndex(ComponentDataType type, int index, float value)
     {
-      this->setDataIndex(mUserBuffer, type, index, value);
+      this->setDataIndex(mUserSideBuffer, type, index, value);
     }
 
-    void setUserBufferIndexUnlocked(const ComponentDataType type, int index, float value)
+    void setUserSideBufferIndexUnlocked(const ComponentDataType type, int index, float value)
     {
-      this->setDataIndexUnlocked(mUserBuffer, type, index, value);
+      this->setDataIndexUnlocked(mUserSideBuffer, type, index, value);
     }
 
-    cv::Mat getUserBuffer(ComponentDataType type) const
+    cv::Mat getUserSideBuffer(ComponentDataType type) const
     {
-      return this->getBuffer(mUserBuffer, type);
+      return this->getBuffer(mUserSideBuffer, type);
     }
 
-    cedar::aux::ConstMatDataPtr getUserData(ComponentDataType type) const
+    cedar::aux::ConstMatDataPtr getUserSideData(ComponentDataType type) const
     {
-      return this->getData(this->mUserBuffer, type);
+      return this->getData(this->mUserSideBuffer, type);
     }
 
-    cedar::aux::MatDataPtr getUserData(ComponentDataType type)
+    cedar::aux::MatDataPtr getUserSideData(ComponentDataType type)
     {
-      return this->getData(this->mUserBuffer, type);
+      return this->getData(this->mUserSideBuffer, type);
     }
 
-    float getUserBufferIndex(ComponentDataType type, int index) const
+    float getUserSideBufferIndex(ComponentDataType type, int index) const
     {
-      return this->getBufferIndex(mUserBuffer, type, index);
+      return this->getBufferIndex(mUserSideBuffer, type, index);
     }
 
-    cv::Mat getUserBufferUnlocked(ComponentDataType type) const
+    cv::Mat getUserSideBufferUnlocked(ComponentDataType type) const
     {
-      return this->getBufferUnlocked(mUserBuffer, type);
+      return this->getBufferUnlocked(mUserSideBuffer, type);
     }
 
-    float getUserDataIndexUnlocked(ComponentDataType type, int index) const
+    float getUserSideDataIndexUnlocked(ComponentDataType type, int index) const
     {
-      return this->getBufferIndexUnlocked(mUserBuffer, type, index);
+      return this->getBufferIndexUnlocked(mUserSideBuffer, type, index);
     }
 
-    cv::Mat getPreviousDeviceBuffer(ComponentDataType type) const
+    cv::Mat getPreviousDeviceSideBuffer(ComponentDataType type) const
     {
-      return this->getBuffer(mPreviousDeviceBuffer, type);
+      return this->getBuffer(mPreviousDeviceSideBuffer, type);
     }
 
-    cv::Mat getPreviousDeviceBufferUnlocked(ComponentDataType type) const
+    cv::Mat getPreviousDeviceSideBufferUnlocked(ComponentDataType type) const
     {
-      return this->getBufferUnlocked(mPreviousDeviceBuffer, type);
+      return this->getBufferUnlocked(mPreviousDeviceSideBuffer, type);
     }
 
-    float getPreviousDeviceBufferIndex(ComponentDataType type, int index) const
+    float getPreviousDeviceSideBufferIndex(ComponentDataType type, int index) const
     {
-      return this->getBufferIndex(mPreviousDeviceBuffer, type, index);
+      return this->getBufferIndex(mPreviousDeviceSideBuffer, type, index);
     }
 
-    float getPreviousDeviceBufferIndexUnlocked(ComponentDataType type, int index) const
+    float getPreviousDeviceSideBufferIndexUnlocked(ComponentDataType type, int index) const
     {
-      return this->getBufferIndexUnlocked(mPreviousDeviceBuffer, type, index);
+      return this->getBufferIndexUnlocked(mPreviousDeviceSideBuffer, type, index);
     }
 
     void registerTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun)
@@ -408,27 +408,27 @@ class cedar::dev::Component::DataCollection
     virtual void lazyInitializeMembers(cedar::dev::Component::ComponentDataType type)
     {
       cedar::aux::LockSet lock_set;
-      cedar::aux::append(lock_set, mUserBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-      cedar::aux::append(lock_set, mPreviousDeviceBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-      cedar::aux::append(lock_set, mInitialUserSubmittedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+      cedar::aux::append(lock_set, mUserSideBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+      cedar::aux::append(lock_set, mPreviousDeviceSideBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+      cedar::aux::append(lock_set, mInitialUserSideSubmittedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
       cedar::aux::LockSetLocker lock_set_locker(lock_set);
-      this->lazyInitializeUnlocked(mUserBuffer, type);
-      this->lazyInitializeUnlocked(mPreviousDeviceBuffer, type);
-      this->lazyInitializeUnlocked(mInitialUserSubmittedData, type);
+      this->lazyInitializeUnlocked(mUserSideBuffer, type);
+      this->lazyInitializeUnlocked(mPreviousDeviceSideBuffer, type);
+      this->lazyInitializeUnlocked(mInitialUserSideSubmittedData, type);
     }
 
     virtual void resetBuffers(cedar::dev::Component::ComponentDataType type, int matrixType)
     {
       cedar::aux::LockSet lock_set;
-      cedar::aux::append(lock_set, mUserBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-      cedar::aux::append(lock_set, mPreviousDeviceBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-      cedar::aux::append(lock_set, mInitialUserSubmittedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+      cedar::aux::append(lock_set, mUserSideBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+      cedar::aux::append(lock_set, mPreviousDeviceSideBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+      cedar::aux::append(lock_set, mInitialUserSideSubmittedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
       cedar::aux::LockSetLocker locker(lock_set);
       if (this->hasType(type))
       {
-        this->resetBufferUnlocked(mUserBuffer, type, matrixType);
-        this->resetBufferUnlocked(mPreviousDeviceBuffer, type, matrixType);
-        this->resetBufferUnlocked(mInitialUserSubmittedData, type, matrixType);
+        this->resetBufferUnlocked(mUserSideBuffer, type, matrixType);
+        this->resetBufferUnlocked(mPreviousDeviceSideBuffer, type, matrixType);
+        this->resetBufferUnlocked(mInitialUserSideSubmittedData, type, matrixType);
       }
     }
 
@@ -565,12 +565,12 @@ class cedar::dev::Component::DataCollection
   public:
     //@todo: most of these should probably be private
 
-    cedar::aux::LockableMember<BufferDataType> mUserBuffer; // was: mUserCommandBuffer, mUserMeasurementsBuffer
+    cedar::aux::LockableMember<BufferDataType> mUserSideBuffer; // was: mUserSideCommandBuffer, mUserSideMeasurementsBuffer
 
-    cedar::aux::LockableMember<BufferDataType> mInitialUserSubmittedData; // was: mInitialUserSubmittedCommands
+    cedar::aux::LockableMember<BufferDataType> mInitialUserSideSubmittedData; // was: mInitialUserSideSubmittedCommands
 
     // Cache for the user-interface
-    cedar::aux::LockableMember<BufferDataType> mPreviousDeviceBuffer; // was: mPreviousDeviceMeasurementsBuffer
+    cedar::aux::LockableMember<BufferDataType> mPreviousDeviceSideBuffer; // was: mPreviousDeviceSideMeasurementsBuffer
 
   private:
     std::map<ComponentDataType, cedar::dev::Component::DimensionalityType> mInstalledDimensions;
@@ -596,51 +596,51 @@ class cedar::dev::Component::DataCollection
 class cedar::dev::Component::MeasurementDataCollection : public cedar::dev::Component::DataCollection
 {
 public:
-  cedar::aux::DataPtr getDeviceData(const cedar::dev::Component::ComponentDataType &type)
+  cedar::aux::DataPtr getDeviceSideData(const cedar::dev::Component::ComponentDataType &type)
   {
-    return this->getData(this->mDeviceRetrievedData, type);
+    return this->getData(this->mDeviceSideRetrievedData, type);
   }
 
-  cv::Mat getDeviceRetrievedBufferUnlocked(ComponentDataType type)
+  cv::Mat getDeviceSideRetrievedBufferUnlocked(ComponentDataType type)
   {
-    return this->getBufferUnlocked(mDeviceRetrievedData, type);
+    return this->getBufferUnlocked(mDeviceSideRetrievedData, type);
   }
 
-  void setDeviceRetrievedBuffer(ComponentDataType type, cv::Mat data)
+  void setDeviceSideRetrievedBuffer(ComponentDataType type, cv::Mat data)
   {
-    this->setData(mDeviceRetrievedData, type, data);
+    this->setData(mDeviceSideRetrievedData, type, data);
   }
 
-  void setDeviceRetrievedBufferUnlocked(ComponentDataType type, cv::Mat data)
+  void setDeviceSideRetrievedBufferUnlocked(ComponentDataType type, cv::Mat data)
   {
-    this->setDataUnlocked(mDeviceRetrievedData, type, data);
+    this->setDataUnlocked(mDeviceSideRetrievedData, type, data);
   }
 
-  void resetDeviceRetrievedBufferUnlocked(ComponentDataType type ,int matrixType)
+  void resetDeviceSideRetrievedBufferUnlocked(ComponentDataType type ,int matrixType)
   {
-    this->resetBufferUnlocked(mDeviceRetrievedData, type, matrixType);
+    this->resetBufferUnlocked(mDeviceSideRetrievedData, type, matrixType);
   }
 
 public:
-  cedar::aux::LockableMember<BufferDataType> mDeviceRetrievedData;
+  cedar::aux::LockableMember<BufferDataType> mDeviceSideRetrievedData;
 
 protected:
   void lazyInitializeMembers(cedar::dev::Component::ComponentDataType type)
   {
     this->DataCollection::lazyInitializeMembers(type);
 
-    QWriteLocker locker(mDeviceRetrievedData.getLockPtr());
-    this->lazyInitializeUnlocked(mDeviceRetrievedData, type);
+    QWriteLocker locker(mDeviceSideRetrievedData.getLockPtr());
+    this->lazyInitializeUnlocked(mDeviceSideRetrievedData, type);
   }
 
   virtual void resetBuffers(cedar::dev::Component::ComponentDataType type, int matrixType)
   {
     this->DataCollection::resetBuffers(type, matrixType);
 
-    QWriteLocker locker(mDeviceRetrievedData.getLockPtr());
+    QWriteLocker locker(mDeviceSideRetrievedData.getLockPtr());
     if (this->hasType(type))
     {
-      this->resetBufferUnlocked(mDeviceRetrievedData, type, matrixType);
+      this->resetBufferUnlocked(mDeviceSideRetrievedData, type, matrixType);
     }
   }
 };
@@ -649,42 +649,42 @@ protected:
 class cedar::dev::Component::CommandDataCollection : public cedar::dev::Component::MeasurementDataCollection
 {
 public:
-  cv::Mat getDeviceSubmittedBufferUnlocked(ComponentDataType type)
+  cv::Mat getDeviceSideSubmittedBufferUnlocked(ComponentDataType type)
   {
-    return this->getBufferUnlocked(mDeviceSubmittedData, type);
+    return this->getBufferUnlocked(mDeviceSideSubmittedData, type);
   }
 
-  void setDeviceSubmittedBufferUnlocked(ComponentDataType type, cv::Mat data)
+  void setDeviceSideSubmittedBufferUnlocked(ComponentDataType type, cv::Mat data)
   {
-    this->setDataUnlocked(mDeviceSubmittedData, type, data);
+    this->setDataUnlocked(mDeviceSideSubmittedData, type, data);
   }
 
-  void resetDeviceSubmittedBufferUnlocked(ComponentDataType type, int matrixType)
+  void resetDeviceSideSubmittedBufferUnlocked(ComponentDataType type, int matrixType)
   {
-    this->resetBufferUnlocked(mDeviceSubmittedData, type, matrixType);
+    this->resetBufferUnlocked(mDeviceSideSubmittedData, type, matrixType);
   }
 
 public:
-  // Cache for the Device-interface
-  cedar::aux::LockableMember<BufferDataType> mDeviceSubmittedData; // was: mDeviceSubmittedCommands
+  // Cache for the DeviceSide-interface
+  cedar::aux::LockableMember<BufferDataType> mDeviceSideSubmittedData; // was: mDeviceSideSubmittedCommands
 
 protected:
   void lazyInitializeMembers(cedar::dev::Component::ComponentDataType type)
   {
     this->MeasurementDataCollection::lazyInitializeMembers(type);
 
-    QWriteLocker locker(mDeviceSubmittedData.getLockPtr());
-    this->lazyInitializeUnlocked(mDeviceSubmittedData, type);
+    QWriteLocker locker(mDeviceSideSubmittedData.getLockPtr());
+    this->lazyInitializeUnlocked(mDeviceSideSubmittedData, type);
   }
 
   virtual void resetBuffers(cedar::dev::Component::ComponentDataType type, int matrixType)
   {
     this->MeasurementDataCollection::resetBuffers(type, matrixType);
 
-    QWriteLocker locker(mDeviceSubmittedData.getLockPtr());
+    QWriteLocker locker(mDeviceSideSubmittedData.getLockPtr());
     if (this->hasType(type))
     {
-      this->resetBufferUnlocked(mDeviceSubmittedData, type, matrixType);
+      this->resetBufferUnlocked(mDeviceSideSubmittedData, type, matrixType);
     }
   }
 };
@@ -721,7 +721,7 @@ void cedar::dev::Component::init()
   mTooSlowCounter.member() = 0;
   mNotReadyForCommandsCounter.member() = 0;
   mWatchDogCounter.member() = 0;
-  mSuppressUserInteraction = false;
+  mSuppressUserSideInteraction = false;
 }
 
 // constructor
@@ -784,9 +784,9 @@ cedar::dev::Component::~Component()
     cedar::aux::LockSet locks;
 
     // lock measurements 
-    cedar::aux::append(locks, this->mMeasurementData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+    cedar::aux::append(locks, this->mMeasurementData->mDeviceSideRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
     // lock commands 
-    cedar::aux::append(locks, this->mCommandData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+    cedar::aux::append(locks, this->mCommandData->mDeviceSideRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
 
     cedar::aux::append(locks, this->mRetrieveMeasurementHooks.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
     cedar::aux::append(locks, this->mSubmitCommandHooks.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
@@ -923,32 +923,32 @@ std::set<cedar::dev::Component::ComponentDataType> cedar::dev::Component::getIns
 
 cedar::aux::DataPtr cedar::dev::Component::getMeasurementData(const ComponentDataType &type)
 {
-  return this->mMeasurementData->getUserData(type);
+  return this->mMeasurementData->getUserSideData(type);
 }
 
 cedar::aux::ConstDataPtr cedar::dev::Component::getMeasurementData(const ComponentDataType &type) const
 {
-  return this->mMeasurementData->getUserData(type);
+  return this->mMeasurementData->getUserSideData(type);
 }
 
-cedar::aux::DataPtr cedar::dev::Component::getUserCommandData(const ComponentDataType &type)
+cedar::aux::DataPtr cedar::dev::Component::getUserSideCommandData(const ComponentDataType &type)
 {
-  return this->mCommandData->getUserData(type);
+  return this->mCommandData->getUserSideData(type);
 }
 
-cedar::aux::ConstDataPtr cedar::dev::Component::getUserCommandData(const ComponentDataType &type) const
+cedar::aux::ConstDataPtr cedar::dev::Component::getUserSideCommandData(const ComponentDataType &type) const
 {
-  return this->mCommandData->getUserData(type);
+  return this->mCommandData->getUserSideData(type);
 }
 
-cedar::aux::ConstDataPtr cedar::dev::Component::getDeviceCommandData(const ComponentDataType &type) const
+cedar::aux::ConstDataPtr cedar::dev::Component::getDeviceSideCommandData(const ComponentDataType &type) const
 {
-  return this->mCommandData->getDeviceData(type);
+  return this->mCommandData->getDeviceSideData(type);
 }
 
-cedar::aux::DataPtr cedar::dev::Component::getDeviceCommandData(const ComponentDataType &type)
+cedar::aux::DataPtr cedar::dev::Component::getDeviceSideCommandData(const ComponentDataType &type)
 {
-  return this->mCommandData->getDeviceData(type);
+  return this->mCommandData->getDeviceSideData(type);
 }
 
 void cedar::dev::Component::setCommandDimensionality(ComponentDataType type, DimensionalityType dim)
@@ -1010,49 +1010,49 @@ void cedar::dev::Component::resetComponent()
   int matrixType = this->getMeasurementMatrixType();
   {
     cedar::aux::LockSet locks;
-    cedar::aux::append(locks, this->mMeasurementData->mUserBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-    cedar::aux::append(locks, this->mMeasurementData->mPreviousDeviceBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-    cedar::aux::append(locks, this->mMeasurementData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+    cedar::aux::append(locks, this->mMeasurementData->mUserSideBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+    cedar::aux::append(locks, this->mMeasurementData->mPreviousDeviceSideBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+    cedar::aux::append(locks, this->mMeasurementData->mDeviceSideRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
     cedar::aux::LockSetLocker locker(locks);
 
     for (auto& type : this->mMeasurementData->getInstalledTypesUnlocked())
     {
-      this->mMeasurementData->resetUserBufferUnlocked(type, matrixType);
-      this->mMeasurementData->resetPreviousDeviceBufferUnlocked(type, matrixType);
-      this->mMeasurementData->resetDeviceRetrievedBufferUnlocked(type, matrixType);
+      this->mMeasurementData->resetUserSideBufferUnlocked(type, matrixType);
+      this->mMeasurementData->resetPreviousDeviceSideBufferUnlocked(type, matrixType);
+      this->mMeasurementData->resetDeviceSideRetrievedBufferUnlocked(type, matrixType);
     }
   }
 
   {
     cedar::aux::LockSet locks;
-    cedar::aux::append(locks, this->mCommandData->mUserBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-    cedar::aux::append(locks, this->mCommandData->mDeviceSubmittedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+    cedar::aux::append(locks, this->mCommandData->mUserSideBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+    cedar::aux::append(locks, this->mCommandData->mDeviceSideSubmittedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
     cedar::aux::LockSetLocker locker(locks);
 
     for(auto& type : this->mCommandData->getInstalledTypes())
     {
-      this->mCommandData->resetUserBufferUnlocked(type,matrixType);
-      this->mCommandData->resetDeviceSubmittedBufferUnlocked(type,matrixType);
+      this->mCommandData->resetUserSideBufferUnlocked(type,matrixType);
+      this->mCommandData->resetDeviceSideSubmittedBufferUnlocked(type,matrixType);
     }
   }
 }
 
-void cedar::dev::Component::applyDeviceCommandsAs(ComponentDataType type)
+void cedar::dev::Component::applyDeviceSideCommandsAs(ComponentDataType type)
 {
   if (!this->mCommandData->hasType(type))
   {
     CEDAR_THROW(cedar::dev::Component::TypeNotFoundException, "The given type is not installed.");
   }
-  mDeviceCommandSelection = type;
+  mDeviceSideCommandSelection = type;
 }
 
 void cedar::dev::Component::setUserSideCommandBuffer(ComponentDataType type, cv::Mat data)
 {
   this->checkExclusivenessOfCommand(type);
-  QWriteLocker locker(this->mUserCommandUsed.getLockPtr());    
+  QWriteLocker locker(this->mUserSideCommandUsed.getLockPtr());    
 
-  this->mCommandData->setUserBuffer(type, data);
-  this->mUserCommandUsed.member().insert(type);
+  this->mCommandData->setUserSideBuffer(type, data);
+  this->mUserSideCommandUsed.member().insert(type);
 }
 
 void cedar::dev::Component::setInitialUserSideCommandBuffer(ComponentDataType type, cv::Mat data)
@@ -1066,38 +1066,38 @@ void cedar::dev::Component::setInitialUserSideCommandBuffer(ComponentDataType ty
     return;
   }
 
-  QWriteLocker(this->mCommandData->mInitialUserSubmittedData.getLockPtr());
+  QWriteLocker(this->mCommandData->mInitialUserSideSubmittedData.getLockPtr());
   std::cout << data;
-  this->mCommandData->mInitialUserSubmittedData.member()[type]->setData(data.clone());
+  this->mCommandData->mInitialUserSideSubmittedData.member()[type]->setData(data.clone());
 }
 
 
 void cedar::dev::Component::setUserSideCommandBufferIndex(ComponentDataType type, int index, float value)
 {
   this->checkExclusivenessOfCommand(type);
-  QWriteLocker locker(this->mUserCommandUsed.getLockPtr());
-  this->mCommandData->setUserBufferIndex(type, index, value);
-  this->mUserCommandUsed.member().insert(type);
+  QWriteLocker locker(this->mUserSideCommandUsed.getLockPtr());
+  this->mCommandData->setUserSideBufferIndex(type, index, value);
+  this->mUserSideCommandUsed.member().insert(type);
 }
 
 cv::Mat cedar::dev::Component::getUserSideMeasurementBuffer(ComponentDataType type) const
 {
-  return this->mMeasurementData->getUserBuffer(type);
+  return this->mMeasurementData->getUserSideBuffer(type);
 }
 
 float cedar::dev::Component::getUserSideMeasurementBufferIndex(ComponentDataType type, int index) const
 {
-  return this->mMeasurementData->getUserBufferIndex(type, index);
+  return this->mMeasurementData->getUserSideBufferIndex(type, index);
 }
 
 cv::Mat cedar::dev::Component::getPreviousDeviceSideMeasurementBuffer(ComponentDataType type) const
 {
-  return this->mMeasurementData->getPreviousDeviceBuffer(type);
+  return this->mMeasurementData->getPreviousDeviceSideBuffer(type);
 }
 
 float cedar::dev::Component::getPreviousDeviceSideMeasurementBufferIndex(ComponentDataType type, int index) const
 {
-  return this->mMeasurementData->getPreviousDeviceBufferIndex(type, index);
+  return this->mMeasurementData->getPreviousDeviceSideBufferIndex(type, index);
 }
 
 void cedar::dev::Component::registerCommandHook(ComponentDataType type, CommandFunctionType fun)
@@ -1326,41 +1326,41 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
   cedar::aux::Timer timer;
 
   // todo: check locking in this function, forgot some stuff ...
-  ComponentDataType type_for_Device, type_from_user;
+  ComponentDataType type_for_DeviceSide, type_from_user;
   cv::Mat userData, ioData;
 
   cedar::aux::LockSet locks;
-  cedar::aux::append(locks, this->mUserCommandUsed.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+  cedar::aux::append(locks, this->mUserSideCommandUsed.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
   cedar::aux::append(locks, this->mSubmitCommandHooks.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
   cedar::aux::append(locks, this->mController.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
   cedar::aux::LockSetLocker locker(locks);
 
-  // evaluate command type for Device:
-  if (mDeviceCommandSelection)
+  // evaluate command type for DeviceSide:
+  if (mDeviceSideCommandSelection)
   {
-    type_for_Device = mDeviceCommandSelection.get();
-    //std::cout << "    commands restricted to ... " << type_for_Device  << std::endl;    
+    type_for_DeviceSide = mDeviceSideCommandSelection.get();
+    //std::cout << "    commands restricted to ... " << type_for_DeviceSide  << std::endl;    
   }
   else
   {
     QReadLocker submit_command_hooks_locker(mSubmitCommandHooks.getLockPtr());
-    // guess Device type to use. easy if there is only one hook
+    // guess DeviceSide type to use. easy if there is only one hook
     if (mSubmitCommandHooks.member().size() != 1)
     {
       // heuristics: 
       
 
-      if (this->mUserCommandUsed.member().size() != 0)
+      if (this->mUserSideCommandUsed.member().size() != 0)
       {
         CEDAR_THROW
         (
-         cedar::dev::Component::CouldNotGuessDeviceTypeException,
+         cedar::dev::Component::CouldNotGuessDeviceSideTypeException,
          "Could not guess device type: too many submit hooks. Please select a device type manually." 
         ); 
       }
     }
 
-    type_for_Device = mSubmitCommandHooks.member().begin()->first;
+    type_for_DeviceSide = mSubmitCommandHooks.member().begin()->first;
   }
 
   if (!this->isReadyForCommands())
@@ -1371,12 +1371,12 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
     if (hook_found)
     {
       // registering this is optional
-      hook_found(type_for_Device);
+      hook_found(type_for_DeviceSide);
     }
 
     QWriteLocker lock(&mNotReadyForCommandsCounter.getLock());
 
-    if (this->mUserCommandUsed.member().size() != 0)
+    if (this->mUserSideCommandUsed.member().size() != 0)
     {
       mNotReadyForCommandsCounter.member()++;
 
@@ -1412,7 +1412,7 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
   }
 
   // if there are neither user commands nor a controller, nothing needs to be done
-  if (this->mUserCommandUsed.member().size() == 0 && !this->mController.member())
+  if (this->mUserSideCommandUsed.member().size() == 0 && !this->mController.member())
   {
     QReadLocker nocommand_hook_locker(mNoCommandHook.getLockPtr());
 
@@ -1420,7 +1420,7 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
     if (hook_found)
     {
       // registering this is optional
-      hook_found(type_for_Device);
+      hook_found(type_for_DeviceSide);
     }
 
     return;
@@ -1451,10 +1451,10 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
   {
     // guess command type to use
     // safe only if there was only one command hook registered
-    if (this->mUserCommandUsed.member().size() > 1)
+    if (this->mUserSideCommandUsed.member().size() > 1)
     {
       std::string set_commands;
-      for (const auto &what : this->mUserCommandUsed.member())
+      for (const auto &what : this->mUserSideCommandUsed.member())
       {
         if (!set_commands.empty())
         {
@@ -1471,33 +1471,33 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
     }
 
     // we know the map has exactly one entry
-    type_from_user = *(this->mUserCommandUsed.member().begin());
+    type_from_user = *(this->mUserSideCommandUsed.member().begin());
 
-    QReadLocker lock(this->mCommandData->mUserBuffer.getLockPtr());
-    userData = this->mCommandData->getUserBufferUnlocked(type_from_user).clone();
+    QReadLocker lock(this->mCommandData->mUserSideBuffer.getLockPtr());
+    userData = this->mCommandData->getUserSideBufferUnlocked(type_from_user).clone();
 
   }
 
   locker.unlock();
 
-  //  this->mUserCommandUsed.clear();
+  //  this->mUserSideCommandUsed.clear();
 
 
 
   // do we need to transform the input?
-  if (type_for_Device != type_from_user)
+  if (type_for_DeviceSide != type_from_user)
   {
-    auto hook = this->mCommandData->findTransformationHook(type_from_user, type_for_Device);
+    auto hook = this->mCommandData->findTransformationHook(type_from_user, type_for_DeviceSide);
 
     // hook must exist
     if (!hook)
     {
       std::string user_type_str = this->mCommandData->getNameForType(type_from_user);
-      std::string device_type_str = this->mCommandData->getNameForType(type_for_Device);
+      std::string device_type_str = this->mCommandData->getNameForType(type_for_DeviceSide);
       CEDAR_THROW(cedar::dev::Component::HookNotFoundException, "Could not find a command hook from \"" + user_type_str + "\" to \"" + device_type_str + "\".");
     }
 
-    QReadLocker lock1(this->mMeasurementData->mUserBuffer.getLockPtr());
+    QReadLocker lock1(this->mMeasurementData->mUserSideBuffer.getLockPtr());
     // call hook
     ioData = hook.get()(dt, userData);
   }
@@ -1508,8 +1508,8 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
 
   if(this->mCheckCommandHook.member())
   {
-    //std::cout<<"We have a mCheckCommandHook! We now check "<< type_for_Device << " and " << ioData <<std::endl;
-    if( !( mCheckCommandHook.member()(type_for_Device, ioData) ) )
+    //std::cout<<"We have a mCheckCommandHook! We now check "<< type_for_DeviceSide << " and " << ioData <<std::endl;
+    if( !( mCheckCommandHook.member()(type_for_DeviceSide, ioData) ) )
     {
       cedar::aux::LogSingleton::getInstance()->error(
          "Could not call command check function.",
@@ -1532,10 +1532,10 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
   }
 
   QReadLocker submit_command_hooks_locker(mSubmitCommandHooks.getLockPtr());
-  auto hook_found = mSubmitCommandHooks.member().find(type_for_Device);
+  auto hook_found = mSubmitCommandHooks.member().find(type_for_DeviceSide);
   if (hook_found == mSubmitCommandHooks.member().end())
   {
-    CEDAR_THROW(cedar::dev::Component::HookNotFoundException, "Could not find a submit hook for \"" + this->mMeasurementData->getNameForType(type_for_Device) + "\".");
+    CEDAR_THROW(cedar::dev::Component::HookNotFoundException, "Could not find a submit hook for \"" + this->mMeasurementData->getNameForType(type_for_DeviceSide) + "\".");
   }
 
   try
@@ -1554,7 +1554,7 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
   this->mLastStepCommandsTime.member() = timer.elapsed();
 }
 
-// update the Device Cache
+// update the DeviceSide Cache
 void cedar::dev::Component::stepMeasurementCommunication(cedar::unit::Time dt)
 {
   cedar::aux::Timer timer;
@@ -1566,7 +1566,8 @@ void cedar::dev::Component::stepMeasurementCommunication(cedar::unit::Time dt)
   {
     // lock measurements 
     cedar::aux::LockSet locks;
-    cedar::aux::append(locks, this->mMeasurementData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+    cedar::aux::append(locks, this->mMeasurementData->mDeviceSideRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+    //cedar::aux::append(locks, this->mMeasurementData->mUserSideMeasurementsBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
     cedar::aux::append(locks, this->mRetrieveMeasurementHooks.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
     cedar::aux::LockSetLocker locker(locks);
 
@@ -1584,12 +1585,12 @@ void cedar::dev::Component::stepMeasurementCommunication(cedar::unit::Time dt)
         const cv::Mat data = (found->second)();
         if(data.rows != 0 && data.cols != 0)
         {
-          this->mMeasurementData->setDeviceRetrievedBufferUnlocked(type, data);
+          this->mMeasurementData->setDeviceSideRetrievedBufferUnlocked(type, data);
           types_we_measured.push_back(type);
         }
         else
         {
-          this->mMeasurementData->setDeviceRetrievedBufferUnlocked(type, this->getPreviousDeviceSideMeasurementBuffer(type));
+          this->mMeasurementData->setDeviceSideRetrievedBufferUnlocked(type, this->getPreviousDeviceSideMeasurementBuffer(type));
         }
       }
       else
@@ -1607,9 +1608,9 @@ void cedar::dev::Component::stepMeasurementCommunication(cedar::unit::Time dt)
         if (hook.is_initialized())
         {
           // call transformation hook
-          this->mMeasurementData->mDeviceRetrievedData.member()[missing_type]->setData
+          this->mMeasurementData->mDeviceSideRetrievedData.member()[missing_type]->setData
           (
-            hook.get()(dt, this->mMeasurementData->mDeviceRetrievedData.member()[measured_type]->getData())
+            hook.get()(dt, this->mMeasurementData->mDeviceSideRetrievedData.member()[measured_type]->getData())
           );
         }
       }
@@ -1632,16 +1633,16 @@ void cedar::dev::Component::updateUserSideMeasurements()
 
   // lock caches
   cedar::aux::LockSet locks;
-  cedar::aux::append(locks, this->mMeasurementData->mPreviousDeviceBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
-  cedar::aux::append(locks, this->mMeasurementData->mUserBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-  cedar::aux::append(locks, this->mMeasurementData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+  cedar::aux::append(locks, this->mMeasurementData->mPreviousDeviceSideBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+  cedar::aux::append(locks, this->mMeasurementData->mUserSideBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+  cedar::aux::append(locks, this->mMeasurementData->mDeviceSideRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
   cedar::aux::LockSetLocker locker(locks);
 
   for (auto type : measurement_types)
   {
-    this->mMeasurementData->mPreviousDeviceBuffer.member()[type]->getData() = this->mMeasurementData->mUserBuffer.member()[type]->getData().clone();
-    this->mMeasurementData->mUserBuffer.member()[type]->getData() = this->mMeasurementData->mDeviceRetrievedData.member()[type]->getData().clone();
-    this->mMeasurementData->mDeviceRetrievedData.member()[type]->getData() = 0.0; // Warum 0.0 ? Warum ist das keine Matrix?
+    this->mMeasurementData->mPreviousDeviceSideBuffer.member()[type]->getData() = this->mMeasurementData->mUserSideBuffer.member()[type]->getData().clone();
+    this->mMeasurementData->mUserSideBuffer.member()[type]->getData() = this->mMeasurementData->mDeviceSideRetrievedData.member()[type]->getData().clone();
+    this->mMeasurementData->mDeviceSideRetrievedData.member()[type]->getData() = 0.0; // Warum 0.0 ? Warum ist das keine Matrix?
   }
 
   locker.unlock();
@@ -1649,7 +1650,7 @@ void cedar::dev::Component::updateUserSideMeasurements()
   if (mDestroying)
     return;
 
-  emit updatedUserMeasurementSignal();
+  emit updatedUserSideMeasurementSignal();
 }
 
 void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
@@ -1666,7 +1667,7 @@ void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
     CEDAR_CURRENT_FUNCTION_NAME
   );
 
-  setSuppressUserInteraction(suppressUserSideInteraction);
+  setSuppressUserSideInteraction(suppressUserSideInteraction);
 
   // do not re-enter, do not stop/start at the same time
   QMutexLocker lockerGeneral(&mGeneralAccessLock);
@@ -1824,14 +1825,14 @@ bool cedar::dev::Component::isCommunicating() const
 bool cedar::dev::Component::isReadyForCommands() const
 {
   return isConfigured()
-         && !this->getSuppressUserInteraction()
+         && !this->getSuppressUserSideInteraction()
          && this->isCommunicating();
 }
 
 bool cedar::dev::Component::isReadyForMeasurements() const
 {
   return isConfigured()
-         && !this->getSuppressUserInteraction()
+         && !this->getSuppressUserSideInteraction()
          && this->isCommunicating(); 
 }
 
@@ -1855,54 +1856,54 @@ void cedar::dev::Component::stopTimer()
 {
 }
 
-cv::Mat cedar::dev::Component::integrateDevice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type)
+cv::Mat cedar::dev::Component::integrateComponentData(cedar::unit::Time dt, cv::Mat data, ComponentDataType type)
 {
 //  std::cout << "Integrate once!" << std::endl;
 //  std::cout << data << std::endl;
-//  std::cout << this->mMeasurementData->getUserBufferUnlocked(type) << std::endl;
+//  std::cout << this->mMeasurementData->getUserSideBufferUnlocked(type) << std::endl;
   float unitless = dt / (1.0 * cedar::unit::second);
 //  std::cout << unitless << std::endl;
 //  std::cout << "Integrate once (FIN!)!" << std::endl;
-  QReadLocker lock(this->mMeasurementData->mUserBuffer.getLockPtr());
+  QReadLocker lock(this->mMeasurementData->mUserSideBuffer.getLockPtr());
   //!@todo check if this uses the right time step to integrate
-  cv::Mat result = data * unitless + this->mMeasurementData->getUserBufferUnlocked(type);
+  cv::Mat result = data * unitless + this->mMeasurementData->getUserSideBufferUnlocked(type);
   return result;
 }
 
-cv::Mat cedar::dev::Component::integrateDeviceTwice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type1, ComponentDataType type2)
+cv::Mat cedar::dev::Component::integrateComponentDataTwice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type1, ComponentDataType type2)
 {
 //    std::cout << "Integrate twice!" << type1 << " " << type2 << std::endl;
 //    std::cout << data << std::endl;
-//    std::cout << this->mMeasurementData->getUserBufferUnlocked(type1) << std::endl;
-//    std::cout << this->mMeasurementData->getUserBufferUnlocked(type2) << std::endl;
+//    std::cout << this->mMeasurementData->getUserSideBufferUnlocked(type1) << std::endl;
+//    std::cout << this->mMeasurementData->getUserSideBufferUnlocked(type2) << std::endl;
   float unitless = dt / (1.0 * cedar::unit::second);
 //    std::cout << unitless << std::endl;
 //    std::cout << "Integrate twice (FIN!)!" << std::endl;
-  QReadLocker lock(this->mMeasurementData->mUserBuffer.getLockPtr());
+  QReadLocker lock(this->mMeasurementData->mUserSideBuffer.getLockPtr());
 
   //!@todo check if this uses the right time step to integrate
   cv::Mat result = 1.0/2.0 * data.mul(data) * unitless * unitless 
-                   + this->mMeasurementData->getUserBufferUnlocked(type1)
+                   + this->mMeasurementData->getUserSideBufferUnlocked(type1)
                      * unitless
-                   + this->mMeasurementData->getUserBufferUnlocked(type2);
+                   + this->mMeasurementData->getUserSideBufferUnlocked(type2);
 #if 0
    // this is wrong! see 2nd term in Taylor expansion
-  cv::Mat result = ( ( data * unitless + this->mMeasurementData->getUserBufferUnlocked(type1) )
+  cv::Mat result = ( ( data * unitless + this->mMeasurementData->getUserSideBufferUnlocked(type1) )
       * unitless )
-    + this->mMeasurementData->getUserBufferUnlocked(type2);
+    + this->mMeasurementData->getUserSideBufferUnlocked(type2);
 #endif
 
   return result;
 }
 
 // todo: also used for commands
-cv::Mat cedar::dev::Component::differentiateDevice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type)
+cv::Mat cedar::dev::Component::differentiateComponentData(cedar::unit::Time dt, cv::Mat data, ComponentDataType type)
 {
   //std::cout << "Differentiate once!" << std::endl;
   //std::cout << data << std::endl;
   //std::cout << dt << std::endl;
   //std::cout << "step size: " << this->mCommunicationThread->getStepSize() << std::endl;
-  //std::cout << this->mMeasurementData->getUserBufferUnlocked(type) << std::endl;
+  //std::cout << this->mMeasurementData->getUserSideBufferUnlocked(type) << std::endl;
 
   float unitless = dt / (1.0 * cedar::unit::second);
 
@@ -1913,21 +1914,21 @@ cv::Mat cedar::dev::Component::differentiateDevice(cedar::unit::Time dt, cv::Mat
 
   if(data.rows == 0 || data.cols == 0) // have no data? no problem! here, take mine
   {
-    data = cv::Mat::zeros(this->mMeasurementData->getUserBufferUnlocked(type).rows,
-                          this->mMeasurementData->getUserBufferUnlocked(type).cols,
+    data = cv::Mat::zeros(this->mMeasurementData->getUserSideBufferUnlocked(type).rows,
+                          this->mMeasurementData->getUserSideBufferUnlocked(type).cols,
                           this->getMeasurementMatrixType());
   }
 
 //  std::cout << unitless << std::endl;
 //  std::cout << "Differentiate once (FIN!)!" << std::endl;
 // todo: check locking here
-  cv::Mat last_data = this->mMeasurementData->getUserBufferUnlocked(type);
+  cv::Mat last_data = this->mMeasurementData->getUserSideBufferUnlocked(type);
   //!@todo check if this uses the right time step to differentiate
   return ( data - last_data ) / unitless;
 }
 
 // todo: also used for commands
-cv::Mat cedar::dev::Component::differentiateDeviceTwice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type1, ComponentDataType type2)
+cv::Mat cedar::dev::Component::differentiateComponentDataTwice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type1, ComponentDataType type2)
 {
 //  std::cout << "Differentiate twice!" << std::endl;
 //  std::cout << data << std::endl;
@@ -1943,31 +1944,31 @@ cv::Mat cedar::dev::Component::differentiateDeviceTwice(cedar::unit::Time dt, cv
 
   if(data.rows == 0 || data.cols == 0) // have no data? no problem! here, take mine
   {
-    data = cv::Mat::zeros(this->mMeasurementData->getUserBufferUnlocked(type1).rows,
-                          this->mMeasurementData->getUserBufferUnlocked(type1).cols,
+    data = cv::Mat::zeros(this->mMeasurementData->getUserSideBufferUnlocked(type1).rows,
+                          this->mMeasurementData->getUserSideBufferUnlocked(type1).cols,
                           this->getMeasurementMatrixType());
   }
 
   // todo: check locking here
   //!@todo check if this uses the right time step to differentiate
-  cv::Mat result = (( data - this->mMeasurementData->getUserBufferUnlocked(type1) )  / unitless
-      - this->mMeasurementData->getUserBufferUnlocked(type2) ) / unitless;
+  cv::Mat result = (( data - this->mMeasurementData->getUserSideBufferUnlocked(type1) )  / unitless
+      - this->mMeasurementData->getUserSideBufferUnlocked(type2) ) / unitless;
   return result;
 }
 
 
 void cedar::dev::Component::processStart()
 {
-  // todo: test that mUserCommands is empty!
-  if (!this->mCommandData->mInitialUserSubmittedData.member().empty())
+  // todo: test that mUserSideCommands is empty!
+  if (!this->mCommandData->mInitialUserSideSubmittedData.member().empty())
   {
      // do as if the initial user command was the user command
-     QWriteLocker lock1(this->mCommandData->mUserBuffer.getLockPtr());
+     QWriteLocker lock1(this->mCommandData->mUserSideBuffer.getLockPtr());
      
-     this->mCommandData->mUserBuffer.member() = this->mCommandData->mInitialUserSubmittedData.member();
-     //for(int i=0; i < this->mCommandData->mUserBuffer.member().size(); ++i)
+     this->mCommandData->mUserSideBuffer.member() = this->mCommandData->mInitialUserSideSubmittedData.member();
+     //for(int i=0; i < this->mCommandData->mUserSideBuffer.member().size(); ++i)
      //{
-     //  std::cout << this->mCommandData->mUserBuffer.member()[i] << "\n";
+     //  std::cout << this->mCommandData->mUserSideBuffer.member()[i] << "\n";
      //}
      lock1.unlock();
   }
@@ -1979,18 +1980,18 @@ void cedar::dev::Component::processStart()
 
 }
 
-void cedar::dev::Component::clearUserCommand()
+void cedar::dev::Component::clearUserSideCommand()
 {
-  QWriteLocker user_command_locker(this->mUserCommandUsed.getLockPtr());
-  this->mUserCommandUsed.member().clear();
+  QWriteLocker user_command_locker(this->mUserSideCommandUsed.getLockPtr());
+  this->mUserSideCommandUsed.member().clear();
 }
 
 void cedar::dev::Component::checkExclusivenessOfCommand(ComponentDataType type)
 {
-  QReadLocker user_command_locker(this->mUserCommandUsed.getLockPtr());
-  if (this->mUserCommandUsed.member().size() > 0)
+  QReadLocker user_command_locker(this->mUserSideCommandUsed.getLockPtr());
+  if (this->mUserSideCommandUsed.member().size() > 0)
   {
-    if (this->mUserCommandUsed.member().find(type) == this->mUserCommandUsed.member().end())
+    if (this->mUserSideCommandUsed.member().find(type) == this->mUserSideCommandUsed.member().end())
     {
       // a different command type is already set, throw!
       CEDAR_THROW(CouldNotGuessCommandTypeException, "You used more than one type of commands. Component " + prettifyName() + " cannot handle this.");
@@ -1998,21 +1999,21 @@ void cedar::dev::Component::checkExclusivenessOfCommand(ComponentDataType type)
   }
 }
 
-void cedar::dev::Component::setSuppressUserInteraction(bool what)
+void cedar::dev::Component::setSuppressUserSideInteraction(bool what)
 {
   // todo: lock this but not with the general locker
-  mSuppressUserInteraction = what;
+  mSuppressUserSideInteraction = what;
 }
 
-bool cedar::dev::Component::getSuppressUserInteraction() const
+bool cedar::dev::Component::getSuppressUserSideInteraction() const
 {
   // todo: lock this but not with the general locker
-  return mSuppressUserInteraction;
+  return mSuppressUserSideInteraction;
 }
 
 void cedar::dev::Component::startBrakingSlowly()
 {
-  clearUserCommand();
+  clearUserSideCommand();
   clearController();
 
   // todo: test that brake is not already running ...
@@ -2037,7 +2038,7 @@ void cedar::dev::Component::startBrakingSlowly()
 
 void cedar::dev::Component::startBrakingNow()
 {
-  clearUserCommand();
+  clearUserSideCommand();
   clearController();
 
   // todo: test that brake is not already running ...
@@ -2061,7 +2062,7 @@ void cedar::dev::Component::startBrakingNow()
 bool cedar::dev::Component::applyCrashbrake()
 {
   // dummy behaviour
-  clearUserCommand();
+  clearUserSideCommand();
   clearController();
 
   if (!applyBrakeNowController()) // dummy default
@@ -2102,7 +2103,7 @@ void cedar::dev::Component::setController(ComponentDataType type, cedar::dev::Co
 void cedar::dev::Component::clearAll()
 {
   this->clearController();
-  this->clearUserCommand();
+  this->clearUserSideCommand();
 }
 
 void cedar::dev::Component::waitUntilCommunicated() const

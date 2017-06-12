@@ -70,7 +70,7 @@ cedar::dev::SimulatedVehicle::SimulatedVehicle()
   registerCommandHook(cedar::dev::Vehicle::WHEEL_VELOCITIES, boost::bind(&cedar::dev::SimulatedVehicle::sendSimulatedVelocities, this, _1));
   registerMeasurementHook(cedar::dev::Vehicle::WHEEL_VELOCITIES, boost::bind(&cedar::dev::SimulatedVehicle::retrieveSimulatedVelocities, this));
 
-  this->applyDeviceCommandsAs(cedar::dev::Vehicle::WHEEL_VELOCITIES);
+  this->applyDeviceSideCommandsAs(cedar::dev::Vehicle::WHEEL_VELOCITIES);
 
 //  connect(this->mWheels.get(), SIGNAL(valueChanged()), this, SLOT(updateInitialConfiguration()));
 }

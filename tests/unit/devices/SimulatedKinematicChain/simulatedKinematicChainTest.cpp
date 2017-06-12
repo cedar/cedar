@@ -780,11 +780,11 @@ void test()
   complex_test_arm->setJointAngles(theta);
   complex_test_arm->waitUntilCommunicated();
 
-  complex_test_arm->clearUserCommand();
+  complex_test_arm->clearUserSideCommand();
   complex_test_arm->setJointVelocities(thetaDot);
   complex_test_arm->waitUntilCommunicated();
 
-  complex_test_arm->clearUserCommand();
+  complex_test_arm->clearUserSideCommand();
   complex_test_arm->setJointAccelerations(thetaTwoDot);
   complex_test_arm->waitUntilCommunicated();
 
@@ -828,14 +828,14 @@ void test()
   float delta_t = complex_test_arm->getCommunicationStepSize() / cedar::unit::DEFAULT_TIME_UNIT; //1e-07;
 
 //  complex_test_arm->startCommunication();
-  complex_test_arm->clearUserCommand();
+  complex_test_arm->clearUserSideCommand();
   complex_test_arm->setJointVelocities
   (
     complex_test_arm->getJointVelocities()
     + delta_t*complex_test_arm->getJointAccelerations()
   );
   complex_test_arm->waitUntilCommunicated();
-  complex_test_arm->clearUserCommand();
+  complex_test_arm->clearUserSideCommand();
   complex_test_arm->setJointAngles
   (
     complex_test_arm->getJointAngles()

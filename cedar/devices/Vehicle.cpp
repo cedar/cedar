@@ -108,13 +108,13 @@ void cedar::dev::Vehicle::init()
   installCommandAndMeasurementType(cedar::dev::Vehicle::WHEEL_ACCELERATIONS, "Wheel Accelerations");
 
   registerCommandTransformationHook(cedar::dev::Vehicle::WHEEL_ACCELERATIONS, cedar::dev::Vehicle::WHEEL_VELOCITIES,
-      boost::bind(&cedar::dev::Component::integrateDevice, this, _1, _2, cedar::dev::Vehicle::WHEEL_VELOCITIES));
+      boost::bind(&cedar::dev::Component::integrateComponentData, this, _1, _2, cedar::dev::Vehicle::WHEEL_VELOCITIES));
 
   registerMeasurementTransformationHook(cedar::dev::Vehicle::WHEEL_ACCELERATIONS, cedar::dev::Vehicle::WHEEL_VELOCITIES,
-      boost::bind(&cedar::dev::Component::integrateDevice, this, _1, _2, cedar::dev::Vehicle::WHEEL_VELOCITIES));
+      boost::bind(&cedar::dev::Component::integrateComponentData, this, _1, _2, cedar::dev::Vehicle::WHEEL_VELOCITIES));
 
   registerMeasurementTransformationHook(cedar::dev::Vehicle::WHEEL_VELOCITIES, cedar::dev::Vehicle::WHEEL_ACCELERATIONS,
-      boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, _2, cedar::dev::Vehicle::WHEEL_VELOCITIES));
+      boost::bind(&cedar::dev::Component::differentiateComponentData, this, _1, _2, cedar::dev::Vehicle::WHEEL_VELOCITIES));
 
   //Todo: Ask J-S about the necessity of this
   cedar::dev::Vehicle::WheelPtr default_wheel(new cedar::dev::Vehicle::Wheel);

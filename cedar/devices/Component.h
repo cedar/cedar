@@ -88,9 +88,11 @@ public:
   typedef boost::function< void () > AfterCommandFunctionType;
   typedef boost::function< cv::Mat (cedar::unit::Time, cv::Mat) > TransformationFunctionType;
 
-  typedef std::map< ComponentDataType, cedar::aux::MatDataPtr > BufferDataType;
-  typedef boost::function< cv::Mat() >      ControllerCallback;
   typedef boost::function< bool(const ComponentDataType&, cv::Mat& ) > CommandCheckFunctionType;
+
+  typedef boost::function< cv::Mat() >      ControllerCallback;
+
+  typedef std::map< ComponentDataType, cedar::aux::MatDataPtr > BufferDataType;
   typedef std::vector< unsigned long>      DimensionalityType;
 
 private:
@@ -131,7 +133,7 @@ public:
   class HookNotFoundException : public cedar::aux::NotFoundException {};
 
   //! Exception that is thrown when the device type could not be guessed.
-  class CouldNotGuessDeviceTypeException : public cedar::aux::ExceptionBase {};
+  class CouldNotGuessDeviceSideTypeException : public cedar::aux::ExceptionBase {};
 
   //! Exception that is thrown when the command type could not be guessed.
   class CouldNotGuessCommandTypeException : public cedar::aux::ExceptionBase {};
@@ -181,36 +183,137 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  static void handleCrash(); // called from the IDE
-  static void startBrakingAllComponentsNow(); 
-  static void startBrakingAllComponentsSlowly(); 
-  static bool anyComponentsRunning();
-  static std::string describeAllRunningComponents();
+  //! even if the communication with the hardware is running in the background  you may suppress interaction with the user-side (if parts of your architecture is not ready, for example)
+  void setSuppressUserSideInteraction(bool what);
+  //! ist user side communication allowed? @setSuppressUserSideInteraction
+  bool getSuppressUserSideInteraction() const;
+ 
+  //! a human readable (short) name that describes the component
+  std::string prettifyName() const;
 
+  void startCommunication(bool suppressUserSideInteraction = false);
+  void stopCommunication();
+  void destroyCommunication();
+  void processStart();
+  void waitUntilCommunicated() const;
   // replaced by startCommunication()
   CEDAR_DECLARE_DEPRECATED(void start());
-
   // replaced by stopCommunication()
   CEDAR_DECLARE_DEPRECATED(void stop());
   CEDAR_DECLARE_DEPRECATED(bool isRunning());
   bool isCommunicating() const;
+  bool isRunningNolocking(); //@todo: rename to isCommunicatingNolocking() ?
+  static bool anyComponentsRunning();
 
-  CEDAR_DECLARE_DEPRECATED(void startTimer(float d));
-  CEDAR_DECLARE_DEPRECATED(void stopTimer());
+  static std::string describeAllRunningComponents();
+
 
   //!@ check if these functions have to be exposed at all (may at least be changed to protected visibility)
   void setStepSize(const cedar::unit::Time& time);
   void setIdleTime(const cedar::unit::Time& time);
   void setSimulatedTime(const cedar::unit::Time& time);
-  bool isRunningNolocking(); //@todo: rename to isCommunicatingNolocking() ?
+  cedar::unit::Time getCommunicationStepSize();
 
-  //! will we move
+  CEDAR_DECLARE_DEPRECATED(void startTimer(float d));
+  CEDAR_DECLARE_DEPRECATED(void stopTimer());
+
+  //! will we move?
   virtual bool isReadyForCommands() const;
   virtual bool isReadyForMeasurements() const;
   bool isReadyForEverything() const;
   
 
-  cedar::unit::Time getCommunicationStepSize();
+
+
+
+
+
+  static void handleCrash(); // called from the IDE
+  static void startBrakingAllComponentsNow(); 
+  static void startBrakingAllComponentsSlowly(); 
+
+  void startBrakingSlowly(); // non-blocking. will set a Controller that smoothly brakes
+  void startBrakingNow();     // non-blocking. will set a Controller that will instantly reduce velocity to 0, be careful!
+  void crashbrake();   // last-resort braking, may disconnect device or even break the robot
+
+  //! Returns a list of all installed measurement types.
+  std::set<ComponentDataType> getInstalledMeasurementTypes() const;
+  //! Returns a list of all installed command types.
+  std::set<ComponentDataType> getInstalledCommandTypes() const;
+
+
+  //! Returns the data that contains the current measurements.
+  cedar::aux::DataPtr getMeasurementData(const ComponentDataType &type);
+  //! Returns the data that contains the current measurements.
+  cedar::aux::ConstDataPtr getMeasurementData(const ComponentDataType &type) const;
+  //! Returns the data that contains the commands that will be sent to the device.
+  cedar::aux::DataPtr getDeviceSideCommandData(const ComponentDataType &type);
+  //! Returns the data that contains the commands that will be sent to the device.
+  cedar::aux::ConstDataPtr getDeviceSideCommandData(const ComponentDataType &type) const;
+  cedar::aux::DataPtr getUserSideCommandData(const ComponentDataType &type);
+  cedar::aux::ConstDataPtr getUserSideCommandData(const ComponentDataType &type) const;
+
+  //! Returns the name for the given command.
+  std::string getNameForCommandType(ComponentDataType type) const;
+  //! Returns the command type associated with the given name.
+  ComponentDataType getCommandTypeForName(const std::string& name) const;
+
+  //! Returns the name for the given measurement.
+  std::string getNameForMeasurementType(ComponentDataType type) const;
+
+  //! Returns the measurement type associated with the given name.
+  ComponentDataType getMeasurementTypeForName(const std::string& name) const;
+
+
+
+  void applyDeviceSideCommandsAs(ComponentDataType type);
+
+  //! Returns the dimensionality (size) of the given command type.
+  DimensionalityType getCommandDimensionality(ComponentDataType type) const;
+
+  void setUserSideCommandBuffer(ComponentDataType type, cv::Mat);
+
+  //!@brief this function resets the internally used user command and allows to subsequently use a different type
+  void clearUserSideCommand();
+  //!@brief clear all buffers and controllers
+  void clearAll();
+
+  //! Defines a new command group.
+  void defineUserSelectableCommandTypeSubset(const std::string& groupName);
+  //! set which subset was selected by the user
+  void setActiveUserSelectableCommandTypeSubset(const std::string& groupName);
+  //! Lists all available command groups.
+  std::vector<std::string> listUserSelectableCommandTypeSubsets() const;
+  //! Adds a given command to the specified group.
+  void addCommandTypeToUserSelectableCommandTypeSubset(const std::string& groupName, const ComponentDataType& commandType);
+  //! Checks whether any command groups are defined for this component.
+  bool hasUserSelectableCommandTypeSubsets() const;
+  //! Returns the command types that are in the given command group.
+  std::vector<ComponentDataType> getCommandsInUserSelectableCommandTypeSubset(const std::string& groupName) const;
+
+
+  //! Checks if a new step measurements duration is available.
+  bool hasLastStepMeasurementsDuration() const;
+  //! Removes and returns the duration of the last step measurements call.
+  cedar::unit::Time retrieveLastStepMeasurementsDuration();
+  //! Checks if a new step measurements duration is available.
+  bool hasLastStepCommandsDuration() const;
+  //! Removes and returns the duration of the last step commands call.
+  cedar::unit::Time retrieveLastStepCommandsDuration();
+
+  //! Returns the error rate (number of communications failed / number of communications sent) for commands and measurements.
+  void getCommunicationErrorRates(float& commands, float& measurements) const;
+  //! Returns the last communication errors.
+  std::vector<std::string> getLastCommandCommunicationErrors() const;
+  //! Returns the last communication errors.
+  std::vector<std::string> getLastMeasurementCommunicationErrors() const;
+
+
+
+
+
+  void clearController();
+  void setController( ComponentDataType buffer, cedar::dev::Component::ControllerCallback fun );
 
   //!@brief Returns the channel associated with the component.
   inline cedar::dev::ChannelPtr getChannel() const
@@ -222,129 +325,6 @@ public:
   {
     this->mChannel = channel;
   }
-
-  // utility Transformations
-  cv::Mat integrateDevice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type);
-  cv::Mat integrateDeviceTwice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type1, ComponentDataType type2);
-  cv::Mat differentiateDevice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type);
-  cv::Mat differentiateDeviceTwice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type1, ComponentDataType type2);
-
-  void processStart();
-
-  void startCommunication(bool suppressUserSideInteraction = false);
-  void stopCommunication();
-  void destroyCommunication();
-
-  void waitUntilCommunicated() const;
-
-  void startBrakingSlowly(); // non-blocking. will set a Controller that smoothly brakes
-  void startBrakingNow();     // non-blocking. will set a Controller that will instantly reduce velocity to 0, be careful!
-  void crashbrake();   // last-resort braking, may disconnect device or even break the robot
-
-  //! Returns a list of all installed measurement types.
-  std::set<ComponentDataType> getInstalledMeasurementTypes() const;
-
-  //! Returns a list of all installed command types.
-  std::set<ComponentDataType> getInstalledCommandTypes() const;
-
-  //! Returns the data that contains the current measurements.
-  cedar::aux::DataPtr getMeasurementData(const ComponentDataType &type);
-
-  //! Returns the data that contains the current measurements.
-  cedar::aux::ConstDataPtr getMeasurementData(const ComponentDataType &type) const;
-
-  //! Returns the data that contains the commands that will be sent to the device.
-  cedar::aux::DataPtr getDeviceCommandData(const ComponentDataType &type);
-
-  //! Returns the data that contains the commands that will be sent to the device.
-  cedar::aux::ConstDataPtr getDeviceCommandData(const ComponentDataType &type) const;
-
-  cedar::aux::DataPtr getUserCommandData(const ComponentDataType &type);
-
-  cedar::aux::ConstDataPtr getUserCommandData(const ComponentDataType &type) const;
-
-  //! Returns the name for the given command.
-  std::string getNameForCommandType(ComponentDataType type) const;
-
-  //! Returns the command type associated with the given name.
-  ComponentDataType getCommandTypeForName(const std::string& name) const;
-
-  //! Returns the name for the given measurement.
-  std::string getNameForMeasurementType(ComponentDataType type) const;
-
-  //! Returns the measurement type associated with the given name.
-  ComponentDataType getMeasurementTypeForName(const std::string& name) const;
-
-  //! Returns the icon path that might have been set in the description
-  QString getIconPath() const;
-
-  void applyDeviceCommandsAs(ComponentDataType type);
-
-  //! Returns the dimensionality (size) of the given command type.
-  DimensionalityType getCommandDimensionality(ComponentDataType type) const;
-
-  void setUserSideCommandBuffer(ComponentDataType type, cv::Mat);
-
-  //!@brief this function resets the internally used user command and allows to subsequently use a different type
-  void clearUserCommand();
-
-  //!@brief clear all buffers and controllers
-  void clearAll();
-
-  //! Defines a new command group.
-  void defineUserSelectableCommandTypeSubset(const std::string& groupName);
-  //! set which subset was selected by the user
-  void setActiveUserSelectableCommandTypeSubset(const std::string& groupName);
-  
-  //! Lists all available command groups.
-  std::vector<std::string> listUserSelectableCommandTypeSubsets() const;
-
-  //! Adds a given command to the specified group.
-  void addCommandTypeToUserSelectableCommandTypeSubset(const std::string& groupName, const ComponentDataType& commandType);
-
-  //! Checks whether any command groups are defined for this component.
-  bool hasUserSelectableCommandTypeSubsets() const;
-
-  //! Returns the command types that are in the given command group.
-  std::vector<ComponentDataType> getCommandsInUserSelectableCommandTypeSubset(const std::string& groupName) const;
-
-  void clearController();
-  void setController( ComponentDataType buffer, cedar::dev::Component::ControllerCallback fun );
-
-  //! Checks if a new step measurements duration is available.
-  bool hasLastStepMeasurementsDuration() const;
-
-  //! Removes and returns the duration of the last step measurements call.
-  cedar::unit::Time retrieveLastStepMeasurementsDuration();
-
-  //! Checks if a new step measurements duration is available.
-  bool hasLastStepCommandsDuration() const;
-
-  //! Removes and returns the duration of the last step commands call.
-  cedar::unit::Time retrieveLastStepCommandsDuration();
-
-  //! Returns the error rate (number of communications failed / number of communications sent) for commands and measurements.
-  void getCommunicationErrorRates(float& commands, float& measurements) const;
-
-  //! Returns the last communication errors.
-  std::vector<std::string> getLastCommandCommunicationErrors() const;
-
-  //! Returns the last communication errors.
-  std::vector<std::string> getLastMeasurementCommunicationErrors() const;
-
-  //! even if the communication with the hardware is running in the background  you may suppress interaction with the user-side (if parts of your architecture is not ready, for example)
-  void setSuppressUserInteraction(bool what);
-
-  //! ist user side communication allowed? @setSuppressUserInteraction
-  bool getSuppressUserInteraction() const;
- 
-  //! a human readable (short) name that describes the component
-  std::string prettifyName() const;
-
-  //! public hooks intended for GUI communication
-  boost::signals2::connection registerConnectedHook(boost::function<void ()> slot);
-  boost::signals2::connection registerDisconnectedHook(boost::function<void ()> slot);
-
   inline cedar::dev::ComponentSlotWeakPtr getSlot()
   {
     return this->mSlot;
@@ -355,8 +335,21 @@ public:
     this->mSlot = slot;
   }
 
+  //! public hooks intended for GUI communication
+  boost::signals2::connection registerConnectedHook(boost::function<void ()> slot);
+  boost::signals2::connection registerDisconnectedHook(boost::function<void ()> slot);
+  //! Returns the icon path that might have been set in the description
+  QString getIconPath() const;
+
+  // utility Transformations
+  cv::Mat integrateComponentData(cedar::unit::Time dt, cv::Mat data, ComponentDataType type);
+  cv::Mat integrateComponentDataTwice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type1, ComponentDataType type2);
+  cv::Mat differentiateComponentData(cedar::unit::Time dt, cv::Mat data, ComponentDataType type);
+  cv::Mat differentiateComponentDataTwice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type1, ComponentDataType type2);
+
+
 signals:
-  void updatedUserMeasurementSignal();
+  void updatedUserSideMeasurementSignal();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -442,7 +435,7 @@ private:
   MeasurementDataCollectionPtr mMeasurementData;
   CommandDataCollectionPtr mCommandData;
 
-  //! the Device-thread's wrapper
+  //! the DeviceSide-thread's wrapper
   std::unique_ptr<cedar::aux::LoopFunctionInThread> mCommunicationThread;
 
   cedar::aux::LockableMember<std::map<ComponentDataType, CommandFunctionType> > mSubmitCommandHooks;
@@ -458,9 +451,9 @@ private:
 
   cedar::aux::LockableMember< CommandCheckFunctionType > mCheckCommandHook;
 
-  boost::optional<ComponentDataType> mDeviceCommandSelection;
+  boost::optional<ComponentDataType> mDeviceSideCommandSelection;
 
-  cedar::aux::LockableMember<std::set<ComponentDataType>> mUserCommandUsed;
+  cedar::aux::LockableMember<std::set<ComponentDataType>> mUserSideCommandUsed;
 
   cedar::aux::LockableMember<boost::optional<cedar::unit::Time> > mLastStepMeasurementsTime;
   cedar::aux::LockableMember<boost::optional<cedar::unit::Time> > mLastStepCommandsTime;
@@ -482,7 +475,7 @@ private:
   cedar::aux::LockableMember<unsigned int> mNotReadyForCommandsCounter;
   static cedar::aux::LockableMember<unsigned int> mWatchDogCounter; 
 
-  bool mSuppressUserInteraction;
+  bool mSuppressUserSideInteraction;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

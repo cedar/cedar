@@ -71,7 +71,7 @@ void cedar::dev::kteam::Drive::init()
   (
       cedar::dev::kteam::Drive::ENCODERS,
       cedar::dev::kteam::Drive::ENCODERS_CHANGE,
-      boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, _2, cedar::dev::kteam::Drive::ENCODERS)
+      boost::bind(&cedar::dev::Component::differentiateComponentData, this, _1, _2, cedar::dev::kteam::Drive::ENCODERS)
   );
   registerMeasurementTransformationHook
   (

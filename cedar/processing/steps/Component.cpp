@@ -330,12 +330,12 @@ void cedar::proc::steps::Component::onStart()
   {
     auto component = this->getComponent();
 
-    component->clearUserCommand();
+    component->clearUserSideCommand();
 
     // should be supressed, un-lock:
-    if (component->getSuppressUserInteraction())
+    if (component->getSuppressUserSideInteraction())
     {
-      component->setSuppressUserInteraction(false);
+      component->setSuppressUserSideInteraction(false);
     }
 
     testStates(component);
@@ -355,7 +355,7 @@ void cedar::proc::steps::Component::onStop()
   if (this->hasComponent())
   {
     auto component = this->getComponent();
-    component->clearUserCommand();
+    component->clearUserSideCommand();
 
     if (component->isCommunicating())
     {
@@ -394,9 +394,9 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
 
 //  std::cout<<"1"<<std::endl;
 //  // unlock the suppression of user commands when the architecture is running ... only once please
-  if(component->getSuppressUserInteraction())
+  if(component->getSuppressUserSideInteraction())
   {
-    component->setSuppressUserInteraction(false);
+    component->setSuppressUserSideInteraction(false);
   }
 //  std::cout<<"2"<<std::endl;
 //  // retrieve Data from the component and copy it to the output slots of the component
@@ -571,7 +571,7 @@ void cedar::proc::steps::Component::inputConnectionChanged(const std::string& /*
   if (!component)
     return;
 
-  component->clearUserCommand();
+  component->clearUserSideCommand();
 }
 
 void cedar::proc::steps::Component::brakeSlowly()

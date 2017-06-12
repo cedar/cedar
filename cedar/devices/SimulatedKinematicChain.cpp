@@ -64,7 +64,7 @@ cedar::dev::SimulatedKinematicChain::SimulatedKinematicChain()
   registerCommandHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedAngles, this, _1));
   registerMeasurementHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedAngles, this));
 
-  this->applyDeviceCommandsAs(cedar::dev::KinematicChain::JOINT_ANGLES);
+  this->applyDeviceSideCommandsAs(cedar::dev::KinematicChain::JOINT_ANGLES);
 }
 
 cedar::dev::SimulatedKinematicChain::~SimulatedKinematicChain()
