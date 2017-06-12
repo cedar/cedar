@@ -216,9 +216,6 @@ public:
   void setCommunicationStepSize(const cedar::unit::Time& time);
   cedar::unit::Time getCommunicationStepSize();
 
-  CEDAR_DECLARE_DEPRECATED(void startTimer(float d));
-  CEDAR_DECLARE_DEPRECATED(void stopTimer());
-
   //! will we move?
   virtual bool isReadyForCommands() const;
   virtual bool isReadyForMeasurements() const;
