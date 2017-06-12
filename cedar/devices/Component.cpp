@@ -1857,15 +1857,6 @@ bool cedar::dev::Component::isRunningNolocking() const
   return isCommunicatingNolocking();
 }
 
-void cedar::dev::Component::startTimer(float)
-{
-  // this does nothing. think
-}
-
-void cedar::dev::Component::stopTimer()
-{
-}
-
 cv::Mat cedar::dev::Component::integrateComponentData(cedar::unit::Time dt, cv::Mat data, ComponentDataType type)
 {
 //  std::cout << "Integrate once!" << std::endl;
