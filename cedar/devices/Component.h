@@ -202,16 +202,18 @@ public:
   CEDAR_DECLARE_DEPRECATED(void stop());
   CEDAR_DECLARE_DEPRECATED(bool isRunning());
   bool isCommunicating() const;
-  bool isRunningNolocking(); //@todo: rename to isCommunicatingNolocking() ?
+  bool isCommunicatingNolocking() const;
+  CEDAR_DECLARE_DEPRECATED(bool isRunningNolocking() const);
   static bool anyComponentsRunning();
 
   static std::string describeAllRunningComponents();
 
 
   //!@ check if these functions have to be exposed at all (may at least be changed to protected visibility)
-  void setStepSize(const cedar::unit::Time& time);
-  void setIdleTime(const cedar::unit::Time& time);
-  void setSimulatedTime(const cedar::unit::Time& time);
+  CEDAR_DECLARE_DEPRECATED(void setStepSize(const cedar::unit::Time& time));
+  CEDAR_DECLARE_DEPRECATED(void setIdleTime(const cedar::unit::Time& time));
+  CEDAR_DECLARE_DEPRECATED(void setSimulatedTime(const cedar::unit::Time& time));
+  void setCommunicationStepSize(const cedar::unit::Time& time);
   cedar::unit::Time getCommunicationStepSize();
 
   CEDAR_DECLARE_DEPRECATED(void startTimer(float d));
@@ -275,6 +277,7 @@ public:
 
   //!@brief this function resets the internally used user command and allows to subsequently use a different type
   void clearUserSideCommand();
+  void clearAllCommands();
   //!@brief clear all buffers and controllers
   void clearAll();
 

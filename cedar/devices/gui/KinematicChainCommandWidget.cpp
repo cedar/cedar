@@ -102,13 +102,13 @@ void cedar::dev::gui::KinematicChainCommandWidget::changeWorkingMode(int mode)
 {
   // we have to reset the used command in here
   mpModeBox->setCurrentIndex(mode);
-  mpKinematicChain->clearUserSideCommand();
+  mpKinematicChain->clearAllCommands();
   update();
 }
 
 void cedar::dev::gui::KinematicChainCommandWidget::commandJoints()
 {  
-  mpKinematicChain->clearUserSideCommand();
+  mpKinematicChain->clearAllCommands();
 
   // should be supressed, un-lock:
   if (mpKinematicChain->getSuppressUserSideInteraction())
