@@ -1796,9 +1796,14 @@ cedar::unit::Time cedar::dev::Component::getCommunicationStepSize()
   return mCommunicationThread->getStepSize();
 }
 
-void cedar::dev::Component::setStepSize(const cedar::unit::Time& time)
+void cedar::dev::Component::setCommunicationStepSize(const cedar::unit::Time& time)
 {
   mCommunicationThread->setStepSize(time);
+}
+
+void cedar::dev::Component::setStepSize(const cedar::unit::Time& time)
+{
+  setCommunicationStepSize(time);
 }
 
 void cedar::dev::Component::setIdleTime(const cedar::unit::Time& time)
@@ -1842,9 +1847,14 @@ bool cedar::dev::Component::isReadyForEverything() const
          && this->isReadyForCommands();
 }
 
-bool cedar::dev::Component::isRunningNolocking()
+bool cedar::dev::Component::isCommunicatingNolocking() const
 {
   return mCommunicationThread->isRunningNolocking();
+}
+
+bool cedar::dev::Component::isRunningNolocking() const
+{
+  return isCommunicatingNolocking();
 }
 
 void cedar::dev::Component::startTimer(float)
@@ -1986,6 +1996,15 @@ void cedar::dev::Component::clearUserSideCommand()
   this->mUserSideCommandUsed.member().clear();
 }
 
+void cedar::dev::Component::clearAllCommands()
+{
+  QWriteLocker user_command_locker(this->mUserSideCommandUsed.getLockPtr());
+  this->mUserSideCommandUsed.member().clear();
+  // TODO TODO
+//  QWriteLocker dev_command_locker(this->mDeviceSideCommandUsed.getLockPtr());
+//  this->mDeviceSideCommandUsed.member().clear();
+}
+
 void cedar::dev::Component::checkExclusivenessOfCommand(ComponentDataType type)
 {
   QReadLocker user_command_locker(this->mUserSideCommandUsed.getLockPtr());
@@ -2013,7 +2032,7 @@ bool cedar::dev::Component::getSuppressUserSideInteraction() const
 
 void cedar::dev::Component::startBrakingSlowly()
 {
-  clearUserSideCommand();
+  clearAllCommands();
   clearController();
 
   // todo: test that brake is not already running ...
@@ -2038,7 +2057,7 @@ void cedar::dev::Component::startBrakingSlowly()
 
 void cedar::dev::Component::startBrakingNow()
 {
-  clearUserSideCommand();
+  clearAllCommands();
   clearController();
 
   // todo: test that brake is not already running ...
@@ -2062,7 +2081,7 @@ void cedar::dev::Component::startBrakingNow()
 bool cedar::dev::Component::applyCrashbrake()
 {
   // dummy behaviour
-  clearUserSideCommand();
+  clearAllCommands();
   clearController();
 
   if (!applyBrakeNowController()) // dummy default
@@ -2103,7 +2122,7 @@ void cedar::dev::Component::setController(ComponentDataType type, cedar::dev::Co
 void cedar::dev::Component::clearAll()
 {
   this->clearController();
-  this->clearUserSideCommand();
+  this->clearAllCommands();
 }
 
 void cedar::dev::Component::waitUntilCommunicated() const
