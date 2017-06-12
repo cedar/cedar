@@ -80,7 +80,7 @@ cedar::dev::YarpKinematicChain::YarpKinematicChain()
 
   registerStartCommunicationHook(boost::bind(&cedar::dev::YarpKinematicChain::postStart, this));
 
-  this->applyDeviceCommandsAs(cedar::dev::KinematicChain::JOINT_ANGLES);
+  this->applyDeviceSideCommandsAs(cedar::dev::KinematicChain::JOINT_ANGLES);
 }
 
 cedar::dev::YarpKinematicChain::~YarpKinematicChain()

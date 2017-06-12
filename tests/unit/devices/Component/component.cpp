@@ -136,7 +136,7 @@ public:
       this->registerCommandHook(0, boost::bind<void>(dummy_command_hook, _1));
 
       CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION()
-      this->getDeviceCommandData(0);
+      this->getDeviceSideCommandData(0);
       CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "getting device command data that doesn't have a dimensionality set.");
 
       CEDAR_UNIT_TEST_BEGIN_EXCEPTION_FREE_CODE();
@@ -149,7 +149,7 @@ public:
 
       cedar::aux::DataPtr data;
       CEDAR_UNIT_TEST_BEGIN_EXCEPTION_FREE_CODE();
-      data = this->getDeviceCommandData(0);
+      data = this->getDeviceSideCommandData(0);
       CEDAR_UNIT_TEST_END_EXCEPTION_FREE_CODE(errors, "getting measurement data.");
 
       CEDAR_UNIT_TEST_CONDITION(errors, data.get() != nullptr);

@@ -180,9 +180,9 @@ cedar::aux::math::VelocityLimitsParameterPtr cedar::dev::DifferentialDrive::getH
 std::vector<cedar::unit::Velocity> cedar::dev::DifferentialDrive::getWheelSpeed() const
 {
   std::vector<cedar::unit::Velocity> ret;
-  auto mat_data = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(getUserCommandData(cedar::dev::DifferentialDrive::WHEEL_SPEED));
+  auto mat_data = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(getUserSideCommandData(cedar::dev::DifferentialDrive::WHEEL_SPEED));
   QReadLocker data_locker(&(mat_data->getLock()));
-  cv::Mat mat = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(getUserCommandData(cedar::dev::DifferentialDrive::WHEEL_SPEED))->getData();
+  cv::Mat mat = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(getUserSideCommandData(cedar::dev::DifferentialDrive::WHEEL_SPEED))->getData();
 
   CEDAR_DEBUG_ASSERT(mat.type() == CV_32F);
   CEDAR_DEBUG_ASSERT(mat.rows >= 2);

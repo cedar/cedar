@@ -70,7 +70,7 @@ cedar::dev::YarpVehicle::YarpVehicle()
 
   registerStartCommunicationHook(boost::bind(&cedar::dev::YarpVehicle::postStart, this));
 
-  this->applyDeviceCommandsAs(cedar::dev::YarpVehicle::WHEEL_VELOCITIES);
+  this->applyDeviceSideCommandsAs(cedar::dev::YarpVehicle::WHEEL_VELOCITIES);
 //  std::cout<<"YarpVehicle Constructor! Meine WheelListe hat folgende Größe: "<< getNumberOfWheels()<<std::endl;
 }
 

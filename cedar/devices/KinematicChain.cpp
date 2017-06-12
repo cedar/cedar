@@ -514,15 +514,15 @@ void cedar::dev::KinematicChain::init()
   defineUserSelectableCommandTypeSubset(groupName2);
   addCommandTypeToUserSelectableCommandTypeSubset( groupName2, cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES);
 
-  applyDeviceCommandsAs( cedar::dev::KinematicChain::JOINT_ANGLES ); // this is a good default
-  //applyDeviceCommandsAs( cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES ); 
+  applyDeviceSideCommandsAs( cedar::dev::KinematicChain::JOINT_ANGLES ); // this is a good default
+  //applyDeviceSideCommandsAs( cedar::dev::KinematicChain::ADDITIONAL_JOINT_TORQUES ); 
 
 
   registerCommandTransformationHook
   (
     cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
     cedar::dev::KinematicChain::JOINT_VELOCITIES,
-    boost::bind(&cedar::dev::Component::integrateDevice, this, _1, _2, cedar::dev::KinematicChain::JOINT_VELOCITIES)
+    boost::bind(&cedar::dev::Component::integrateComponentData, this, _1, _2, cedar::dev::KinematicChain::JOINT_VELOCITIES)
   );
   registerCommandTransformationHook
   (
@@ -530,7 +530,7 @@ void cedar::dev::KinematicChain::init()
     cedar::dev::KinematicChain::JOINT_ANGLES,
     boost::bind
     (
-      &cedar::dev::Component::integrateDeviceTwice,
+      &cedar::dev::Component::integrateComponentDataTwice,
       this,
       _1,
       _2,
@@ -542,14 +542,14 @@ void cedar::dev::KinematicChain::init()
   (
     cedar::dev::KinematicChain::JOINT_VELOCITIES,
     cedar::dev::KinematicChain::JOINT_ANGLES,
-    boost::bind(&cedar::dev::Component::integrateDevice, this, _1, _2, cedar::dev::KinematicChain::JOINT_ANGLES)
+    boost::bind(&cedar::dev::Component::integrateComponentData, this, _1, _2, cedar::dev::KinematicChain::JOINT_ANGLES)
   );
 
   registerMeasurementTransformationHook
   (
     cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
     cedar::dev::KinematicChain::JOINT_VELOCITIES,
-    boost::bind(&cedar::dev::Component::integrateDevice, this, _1, _2, cedar::dev::KinematicChain::JOINT_VELOCITIES)
+    boost::bind(&cedar::dev::Component::integrateComponentData, this, _1, _2, cedar::dev::KinematicChain::JOINT_VELOCITIES)
   );
   registerMeasurementTransformationHook
   (
@@ -557,7 +557,7 @@ void cedar::dev::KinematicChain::init()
     cedar::dev::KinematicChain::JOINT_ANGLES,
     boost::bind
     (
-      &cedar::dev::Component::integrateDeviceTwice,
+      &cedar::dev::Component::integrateComponentDataTwice,
       this,
       _1,
       _2,
@@ -569,13 +569,13 @@ void cedar::dev::KinematicChain::init()
   (
     cedar::dev::KinematicChain::JOINT_VELOCITIES,
     cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
-    boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, _2, cedar::dev::KinematicChain::JOINT_VELOCITIES)
+    boost::bind(&cedar::dev::Component::differentiateComponentData, this, _1, _2, cedar::dev::KinematicChain::JOINT_VELOCITIES)
   );
   registerMeasurementTransformationHook
   (
     cedar::dev::KinematicChain::JOINT_ANGLES,
     cedar::dev::KinematicChain::JOINT_VELOCITIES,
-    boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, _2, cedar::dev::KinematicChain::JOINT_ANGLES)
+    boost::bind(&cedar::dev::Component::differentiateComponentData, this, _1, _2, cedar::dev::KinematicChain::JOINT_ANGLES)
   );
   registerMeasurementTransformationHook
   (
@@ -583,7 +583,7 @@ void cedar::dev::KinematicChain::init()
       cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
       boost::bind
       (
-        &cedar::dev::Component::differentiateDeviceTwice,
+        &cedar::dev::Component::differentiateComponentDataTwice,
         this,
         _1,
         _2,
@@ -1071,7 +1071,7 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
     rlock.unlock();
 
     setCurrentInitialConfiguration(name);
-    setSuppressUserInteraction(false);
+    setSuppressUserSideInteraction(false);
 
     mControllerFinished = false;
 
