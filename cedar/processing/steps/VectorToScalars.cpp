@@ -87,12 +87,19 @@ namespace
 cedar::proc::steps::VectorToScalars::VectorToScalars()
 :
 Step(true), //is looped, since a large number of independent inputs leads to spam of "compute canceled" messaged
-mInput(new cedar::aux::MatData(cv::Mat::zeros(1,1, CV_32F))),
-mOutputs(1, cedar::aux::MatDataPtr()),
-_mInputDimension (new cedar::aux::UIntParameter(this, "number of vector entries", 1,1,255))
-{
-  //declareOutput(makeSlotName(0), cedar::aux::MatDataPtr());
+mInput(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_32F))),
+_mInputDimension(new cedar::aux::UIntParameter(this, "number of vector entries", 3, 1, 255))
+{  
   declareInput("input vector", false);
+
+  for(int i = 0; i<3; ++i)
+  {
+    mOutputs.push_back(cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))));
+  }
+
+  declareOutput(makeSlotName(0), mOutputs[0]);
+  declareOutput(makeSlotName(1), mOutputs[1]);
+  declareOutput(makeSlotName(2), mOutputs[2]);
 
   QObject::connect(_mInputDimension.get(), SIGNAL(valueChanged()), this, SLOT(vectorDimensionChanged()));
 }
@@ -105,7 +112,8 @@ void cedar::proc::steps::VectorToScalars::compute(const cedar::proc::Arguments&)
 {
   for (unsigned i=0; i<mOutputs.size(); i++)
   {
-    //mInput->getData().row(i).copyTo(mOutputs[i]);
+    cedar::aux::MatDataPtr &output = mOutputs[i];
+    mInput->getData().row(i).copyTo(output.get()->getData());
   }
 }
 
@@ -136,11 +144,9 @@ void cedar::proc::steps::VectorToScalars::vectorDimensionChanged()
     //declare new output slots
     for (unsigned i=mOutputs.size(); i<newsize; i++)
     {
-      declareOutput(makeSlotName(i), false);
+      declareOutput(makeSlotName(i), mOutputs[i]);
     }
   }
-  //resize inputs vector
-  mOutputs.resize(newsize);
 
   emitOutputPropertiesChangedSignal("vector");
   onTrigger();

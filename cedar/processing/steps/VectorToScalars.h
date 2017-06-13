@@ -112,7 +112,7 @@ class cedar::proc::steps::VectorToScalars  : public cedar::proc::Step
     //output vector
     cedar::aux::MatDataPtr mInput;
     //input scalars
-    std::vector< cedar::aux::ConstMatDataPtr > mOutputs;
+    std::vector< cedar::aux::MatDataPtr > mOutputs;
   
     // returns i-th slots name
     std::string makeSlotName(const int i);
