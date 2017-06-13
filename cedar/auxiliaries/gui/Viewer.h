@@ -115,7 +115,7 @@ public:
    *
    * @return The image in a cv::Mat structure
    */
-  const cv::Mat& grabImage();
+  cv::Mat& grabImage();
 
 
   /*!@brief initialize the grabber specific parts in this method.

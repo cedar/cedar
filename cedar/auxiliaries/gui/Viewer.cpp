@@ -147,7 +147,7 @@ QImage cedar::aux::gui::Viewer::grabFrameBuffer()
   return this->QGLWidget::grabFrameBuffer(false);
 }
 
-const cv::Mat& cedar::aux::gui::Viewer::grabImage()
+cv::Mat& cedar::aux::gui::Viewer::grabImage()
 {
   return mGrabberBuffer;
 }
