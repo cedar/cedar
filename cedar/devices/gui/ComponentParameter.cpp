@@ -232,9 +232,12 @@ void cedar::dev::gui::ComponentParameter::fillRobots(QTreeWidgetItem* pItem)
     auto p_robot_item = new QTreeWidgetItem();
     p_robot_item->setText(0, QString::fromStdString(robot_name));
     p_robot_item->setFlags(p_robot_item->flags() & (~Qt::ItemIsSelectable));
-    this->fillComponents(p_robot_item, robot);
 
-    pItem->addChild(p_robot_item);
+    if(!robot->listComponentSlots().empty())
+    {
+      this->fillComponents(p_robot_item, robot);
+      pItem->addChild(p_robot_item);
+    }
   }
 }
 
