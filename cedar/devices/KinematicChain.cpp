@@ -479,9 +479,9 @@ void cedar::dev::KinematicChain::init()
   connect
   (
     this,
-    SIGNAL(updatedUserMeasurementSignal()),
+    SIGNAL(updatedUserSideMeasurementSignal()),
     this,
-    SLOT(updatedUserMeasurementSlot()), Qt::DirectConnection
+    SLOT(updatedUserSideMeasurementSlot()), Qt::DirectConnection
   );
 
   const std::string groupName1 = "all kinematic joint controls";
@@ -1243,7 +1243,7 @@ cv::Mat cedar::dev::KinematicChain::getCurrentInitialConfiguration()
   return mInitialConfigurations[mCurrentInitialConfiguration];
 }
 
-void cedar::dev::KinematicChain::updatedUserMeasurementSlot()
+void cedar::dev::KinematicChain::updatedUserSideMeasurementSlot()
 {
   mForwardKinematics->calculateTransformations();
 }

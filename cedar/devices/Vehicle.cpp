@@ -98,7 +98,7 @@ void cedar::dev::Vehicle::init()
 //  connect
 //  (
 //    this,
-//    SIGNAL(updatedUserMeasurementSignal()),
+//    SIGNAL(updatedUserSideMeasurementSignal()),
 //    this,
 //    SLOT(updatedUserMeasurementSlot()), Qt::DirectConnection
 //  );
