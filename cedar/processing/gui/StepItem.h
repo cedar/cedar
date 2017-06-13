@@ -198,6 +198,8 @@ protected:
 private:
 
   void openKinematicChainWidget();
+
+  void openViewer();
 }; // class StepItem
 
 #endif // CEDAR_PROC_STEP_ITEM_H
