@@ -46,6 +46,7 @@
 #include <QApplication>
 #include <QGridLayout>
 #include <QGroupBox>
+#include <QPushButton>
 
 //----------------------------------------------------------------------------
 // constructors and destructor
@@ -86,6 +87,12 @@ void cedar::dev::gui::KinematicChainWidget::init(cedar::dev::KinematicChainPtr k
   p_layout->addWidget(p_command_group, 0, 1);
   mpCommandWidget = new cedar::dev::gui::KinematicChainCommandWidget(kinematicChain);
   p_layout->addWidget(mpCommandWidget, 0, 1);
+
+  QPushButton* close_button = new QPushButton(QApplication::translate("KinematicChainWindow", "close"));
+  close_button->setMaximumWidth(75);
+  QObject::connect(close_button, SIGNAL(pressed()), this, SLOT(close()));
+  p_layout->addWidget(close_button, 1, 1);
+
   this->setLayout(p_layout);
 
   //this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
