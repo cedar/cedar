@@ -695,6 +695,7 @@ protected:
 
 void cedar::dev::Component::init()
 {
+  this->mControllerFinished= true;
   this->mDestroying= false;
 
   this->mMeasurementData = boost::make_shared<cedar::dev::Component::MeasurementDataCollection>();
@@ -2104,7 +2105,7 @@ void cedar::dev::Component::clearController()
   mControllerFinished = true;
 }
 
-void cedar::dev::Component::setController(ComponentDataType type, cedar::dev::Component::ControllerCallback fun)
+void cedar::dev::Component::setController(ComponentDataType type, cedar::dev::Component::ControllerCallbackFunctionType fun)
 {
   QWriteLocker locker(mController.getLockPtr());
   mController.member() = ControllerCollectionPtr( new cedar::dev::Component::ControllerCollection{ type, fun} );
