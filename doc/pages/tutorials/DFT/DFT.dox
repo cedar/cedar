@@ -1,0 +1,121 @@
+/*!
+
+@page DFTTutorial DFT Tutorials for the Processing Framework
+
+This tutorial is a step-by-step instruction that teaches you the first steps in @em cedar's GUI, with special emphasis on
+DFT. If you are not familiar with DFT at all, it is a good idea to take a look at 
+http://robotics-school.org . Note that some steps are marked with a \[*\]. 
+These steps are optional and can be skipped if you are in a hurry. If you are lost, you can always have a look at the sample solutions, which can be found in @em cedar's resource folder, at architecture/DFTTutorial.
+
+This page contains the following sections:
+
+<ol>
+  <li>@ref DFTTutorialFirstArchFirstStep</li>
+  <li>@ref DFTTutorialFirstArchSecondStep</li>
+  <li>@ref DFTTutorialSecondArchFirstStep</li>
+</ol>
+
+@section BeforeYouStart Before you start
+Before you start, keep in mind that this software is still under development and save often. You will surely encounter
+ exceptions and crashes along the way. We are continuously improving @em cedar and feedback of any kind is welcome.
+ 
+@section StartingUpCedar Starting up cedar
+Please start your cedar gui right now. If you do not know how to do this, take a look at 
+@link ProcessingGuiTutorial this @endlink tutorial.  
+
+@section DFTTutorialFirstArchFirstStep A sample architecture - linking peaks in cedar
+
+In this section, you will assemble a small DFT architecture that links two one-dimensional estimates along arbitrary 
+metrics, represented by peaks in one-dimensional neural fields, in a two-dimensional neural field by projecting ridges 
+into it.
+
+<ul>
+<li> start off by adding a Gaussian input (called @em GaussInput) from the @em Sources tab</li>
+<li> set the dimensionality of this input to one by first selecting the element and changing the dimensionality in the property pane</li>
+<li> set the size of the element to 100 in the property pane</li>
+<li> right-click the element and choose <em> plot all</em></li>
+<li> select the element, change the parameters @em centers, @em sigmas, and @em amplitude, watch what happens</li>
+</ul>
+
+This is a good point to start saving your architecture. Go to @em file \> <em> Save as ...</em> and select an appropriate folder and filename. @em Hint: (again) save often!
+The next step is putting this artificial input into a field and creating a peak at the given center.
+
+<ul>
+<li> add a neural field (called @em NeuralField) from the @em DFT tab</li>
+<li> set the dimensionality and size of the field to match the Gaussian input</li>
+<li> drag a connection from the output circle on the right of the Gaussian input to the field's input diamond (to the left)</li>
+<li> right-click the field and choose @em field plot, then right-click the opened plot and pick @em legend</li>
+<li> start the simulation by clicking the \b play button in the tool bar</li>
+<li> watch what happens in the plot after starting the simulation, then start increasing the field's resting level (found in the property pane when the field is selected) until a peak forms</li>
+</ul>
+
+You should now have a peak representing a detection decision on the Gaussian input. Let us now project this peak into a two-dimensional field in form of a ridge.
+
+<ul>
+<li> add a @em Convolution from the <em> Math Utilities </em> tab and connect the output of the field to the "matrix" input of this element</li>
+<li> select the convolution element, look for the @em kernels entry in the property pane, pick @em Gauss from the upper drop-down list and press the @em + on the right --- this adds a Gaussian convolution kernel</li>
+<li> open up the plot of this convolution and inspect how the convolution kernel smoothes the sigmoided activity of the field</li>
+<li> now add a @em Resize element from the @em Utilities tab; we will use this to downsample the field activity</li>
+<li> connect the output of the convolution to the resize step</li>
+<li> select the resize element and set the output size in the property pane to 50 (half the resolution)</li>
+<li> \[*\] you can also try out different interpolation methods</li>
+<li> add the last element to this chain, a @em Projection from the @em Utilities tab</li>
+<li> connect the ouput of the resize element to the input of the projection</li>
+<li> to alter the configuration of the projection, you have to first pause the simulation in the tool bar</li>
+<li> select the projection, set @em output dimensionality to two, and the @em dimension mapping to zero in the property pane</li>
+<li> you'll notice that a part of the @em sizes section turns gray --- this indicates that you cannot change this parameter since the preceeding step determines the projection size in this dimension</li>
+<li> set the second size to 40 (we will later come back to this)</li>
+<li> open the plot of the projection element and inspect the output</li>
+<li> add a new field to your architecture, leave it's dimensionality at two, but change its sizes to 50 and 40</li>
+<li> connect the projection step to this field's input</li>
+</ul>
+
+For now, there is only one input coming into the two-dimensional field. We will change this now by repeating the steps above, with the following differences:
+
+<ul>
+<li> pick a different size for the Gaussian input and the one-dimensional field---we propose a size of 80---and downsample to half the size (e.g., 40 for the proposed size)</li>
+<li> in the projection step, the @em dimension mapping should map to one now --- this entails setting the first size to 50</li>
+</ul>
+
+Now two ridges cross in the two-dimensional field. But wait, there's still no peak in this field!
+
+<ul>
+<li> add a @em Boost from the @em Sources tab to your architecture and connect it up to the 2D field</li>
+<li> select the boost input and activate it --- then increase the strength until you see a peak forming in the 2D field</li>
+</ul>
+
+@section DFTTutorialFirstArchSecondStep A sample architecture continued - reading out peaks in cedar
+For now, we have created an architecture that links two one-dimensional estimates in a two-dimensional neural field. We now address reading out this linked peak in different ways: peak detection, space-code readout, rate-code readout
+<ul>
+<li> add another @em Projection element and connect the output of the 2D field to the new element, set its @em output dimensionality to zero</li>
+<li> add a @em StaticGain from the @em Utilities tab to the output of the projection, and connect the gain's output to a new neural field that is also zero-dimensional and has no interaction kernel (press @em - on its @em lateral kernels) --- we will call this field a @em node}; remember to connect this field to the looped trigger</li>
+<li> choose a normalization factor (e.g., 0.1) and adjust the static gain appropriately</li>
+<li> now tune the resting level of the zero-dimensional node so that it is above threshold once you activate the boost, and below threshold if the boost is inactive (@em hint: press ctrl+b or go to @em tools \> <em> boost control </em> in the menu to get a tool that allows you to quickly control all boosts in your architecture)</li>
+</ul>
+You now have a peak detector in your architecture. We will now read out one-dimensional space-code.
+<ul>
+<li> add another @em Projection to your architecture and connect the 2D field output to it, then set the @em output dimensionality to one and decide, which dimension should be dropped with the @em dimension map parameter</li>
+<li> look at the resulting projection --- notice the similarity between the readout and the input that produced the 2D peak</li>
+<li> \[*\] you can also look at the various compression types and how they affect the projection</li>
+</ul>
+We will close this tutorial with the last read-out method --- a rate code readout of the peak position
+<ul>
+<li> add a @em SpaceToRateCode element from the @em DFT tab, connect the space-code readout to this element and also make sure to hook it up to your trigger (@em hint: elements that need to be connected to a looped trigger always have a little loop icon in their lower right corner)</li>
+<li> set @em lowerLimit and @em upperLimit of this element to match the ressolution interval of its input: \[0,49\]</li>
+<li> make sure that the 2D field is boosted and look at how the rate code readout matches the peak position along its input --- up to a certain degree, which depends on sampling errors introduced in interpolation methods</li>
+<li> watch what happens if you deboost the 2D field</li>
+<li> \[*\] think about how a peak detector can assure that the rate code readout is not used while there is no peak in the 2D field</li>
+</ul>
+
+@section DFTTutorialSecondArchFirstStep A second architecture - real input in cedar
+For the second architecture, make sure that you start off with a fresh and clean architecture canvas by pressing @em New in the @em File menu of the GUI. You should also save this architecture in a different file. Start with the following steps:
+<ul>
+<li> go to the @em Sources tab and drag a @em Picture source into the new architecture, pick an image using the @em filename parameter --- you can use the image blocks.jpg below
+<li> build a chain starting at the picture source by adding a @em ColorConversion, a @em ChannelSplit (both in <em>Image Processing</em>), and connecting the output <em>channel 2</em> of the split element with a @em MatrixTypeConverter (in @em Utilities) --- you do not have to change any parameters, the default parameters are ok!
+<li> before connecting this to a 2D field, make sure to smooth the converted output with a convolution and a Gaussian kernel of amplitude 1/255, or roughly 0.004
+<li> depending on the size of your chosen image, you might also want to resize the output -- you already know how to do that
+<li> add a 2D field of this size, connect it to a looped trigger, add a second mode to the lateral kernel (pick Gauss from the drop-down list and press @em +), set the second mode's amplitude to minus the amplitude of the first mode, double the sigmas, decrease the global inhibition by a factor of 10, increase the resting level to get a peak at every saturated location in your input image
+<li> \[*\] exchange the image input with a camera input after connecting a USB camera to your PC --- do not forget to connect the camera input to a trigger
+</ul>
+@image html doc/pages/tutorials/DFT/images/blocks.jpg
+*/
