@@ -28,14 +28,14 @@
     Email:       Nico.Kuerschner@ini.rub.de
     Date:        2017 05 12
 
-    Description: Header file for the class cedar::proc::steps::VirtualCamera.
+    Description: Header file for the class cedar::proc::sources::VirtualCamera.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_VIRTUAL_CAMERA_H
-#define CEDAR_PROC_STEPS_VIRTUAL_CAMERA_H
+#ifndef CEDAR_PROC_SOURCES_VIRTUAL_CAMERA_H
+#define CEDAR_PROC_SOURCES_VIRTUAL_CAMERA_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -47,17 +47,11 @@
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/VirtualCamera.fwd.h"
+#include "cedar/processing/sources/VirtualCamera.fwd.h"
 
-// SYSTEM INCLUDES
-
-
-/*!@todo describe.
- *
- * @todo describe more.
- */
-class cedar::proc::steps::VirtualCamera : public cedar::proc::Step
+class cedar::proc::sources::VirtualCamera : public cedar::proc::Step
 {
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -72,6 +66,9 @@ public:
   //!@brief Destructor
   virtual ~VirtualCamera();
 
+public slots:
+  void resolutionChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -82,20 +79,12 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // private methods
-  //--------------------------------------------------------------------------------------------------------------------
-private:
   void compute(const cedar::proc::Arguments&);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-private:
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -113,7 +102,7 @@ private:
 
   QReadWriteLock* mLock;
 
-}; // class cedar::proc::steps::VirtualCamera
+}; // class cedar::proc::sources::VirtualCamera
 
-#endif // CEDAR_PROC_STEPS_VIRTUAL_CAMERA_H
+#endif // CEDAR_PROC_SOURCES_VIRTUAL_CAMERA_H
 
