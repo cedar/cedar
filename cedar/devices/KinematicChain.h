@@ -529,6 +529,8 @@ public:
    */
   std::vector<std::string> getInitialConfigurationNames();
 
+  std::string getCurrentInitialConfigurationName();
+
   /*!@brief get index number of the current initial configuration
    *
    * @return   the index position in the vector of names 
@@ -540,6 +542,9 @@ public:
    * @return    joint values of the initial configuration
    */
   cv::Mat getCurrentInitialConfiguration();
+
+  // See also @applyInitialConfiguration
+  bool setCurrentInitialConfiguration(const std::string& s);
 
   //!@brief add one initial configuration
   void addInitialConfiguration(const std::string& name, const cv::Mat& config);
@@ -576,10 +581,6 @@ private:
   void applyAccelerationLimits(cv::Mat &accelerations);
 
   //!@brief set the currently valid initial configuration, do not move the manipulator
-  // 
-  // See also @applyInitialConfiguration
-  bool setCurrentInitialConfiguration(const std::string& s);
-
   //!@brief: test validity of initial configurations
   void checkInitialConfigurations();
 
