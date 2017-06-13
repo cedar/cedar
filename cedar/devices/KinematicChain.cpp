@@ -1039,8 +1039,7 @@ void cedar::dev::KinematicChain::checkInitialConfigurations()
   }
 
   // non-empty initial configuration map:
-  if (mCurrentInitialConfiguration.empty()
-      || mCurrentInitialConfiguration == "")
+  if (mCurrentInitialConfiguration.empty())
   {
     rlock.unlock();
     // does not apply, only sets the currently active initial config:
@@ -1224,6 +1223,11 @@ std::vector<std::string> cedar::dev::KinematicChain::getInitialConfigurationName
     result.push_back( (*it).first );
   }
   return result;
+}
+
+std::string cedar::dev::KinematicChain::getCurrentInitialConfigurationName()
+{
+  return mCurrentInitialConfiguration;
 }
 
 cv::Mat cedar::dev::KinematicChain::getCurrentInitialConfiguration()
