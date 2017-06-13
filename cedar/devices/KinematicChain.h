@@ -139,7 +139,7 @@ public:
   // Qt slots
   //--------------------------------------------------------------------------------------------------------------------
 public slots:
-  void updatedUserMeasurementSlot();
+  void updatedUserSideMeasurementSlot();
 
 public:
   //!@brief updates the geometry to the current configuration of the kinematic chain DONT CALL IT YOURSELF

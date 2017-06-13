@@ -122,8 +122,8 @@ void cedar::dev::gl::Caren::initializeGl()
   mArm = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(mRobot->getComponent("arm"));
 
   // initialize with legitimate values
-  mTrunk->updatedUserMeasurementSlot();
-  mArm->updatedUserMeasurementSlot();
+  mTrunk->updatedUserSideMeasurementSlot();
+  mArm->updatedUserSideMeasurementSlot();
 
   //mHead = head;
   //mPalm = palm;
