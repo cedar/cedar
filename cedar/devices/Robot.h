@@ -202,6 +202,9 @@ private:
   //! Reads and stacks the component connections.
   void readComponentConnections(const cedar::aux::ConfigurationNode& node);
 
+  //! Reads and stacks the component connections.
+  void readSaveZone(const cedar::aux::ConfigurationNode& node);
+
   //! Reads the channels and their configurations and instantiates the selected channels.
   void readChannels(const cedar::aux::ConfigurationNode& node);
 
@@ -235,6 +238,10 @@ private:
 
   //! a pointer to the actual visualisation of the robot
   cedar::dev::gl::RobotVisualisationPtr mpRobotVisualisation;
+
+  //! safe zone coordinates
+  std::vector<float> mLowerSafeZone;
+  std::vector<float> mUpperSafeZone;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
