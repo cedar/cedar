@@ -44,7 +44,7 @@ set (CEDAR_BUILD_STATIC_LIBS              0           CACHE BOOL "Build all libr
 set (CEDAR_BUILD_DEBUG_VERSION            0           CACHE BOOL "Build with debug information?")
 set (CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS    0           CACHE BOOL "Use opencv debug libraries when building in debug mode?")
 set (CEDAR_USE_QT5                        0           CACHE BOOL "Use Qt5 and the associated plot libraries.")
-set (CEDAR_USE_QCUSTOMPLOT                0           CACHE BOOL "Use QCUSTOMPLOT for line plots.")
+set (CEDAR_USE_QCUSTOMPLOT                0           CACHE BOOL "Use QCUSTOMPLOT as default lib for line plots.")
 set (QCUSTOMPLOT_USE_OPENGL               0           CACHE BOOL "Enable opengl support for QCUSTOMPLOT.")
 #set (CEDAR_STOP_ON_MISSING_LIBRARIES      0           CACHE BOOL "Stop when libraries cannot be found by cmake?")
 
