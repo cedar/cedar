@@ -1,0 +1,354 @@
+#=======================================================================================================================
+#
+#   Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+# 
+#   This file is part of cedar.
+#
+#   cedar is free software: you can redistribute it and/or modify it under
+#   the terms of the GNU Lesser General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+#   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+#   License for more details.
+#
+#   You should have received a copy of the GNU Lesser General Public License
+#   along with cedar. If not, see <http://www.gnu.org/licenses/>.
+#
+#=======================================================================================================================
+#
+#   Institute:   Ruhr-Universitaet Bochum
+#                Institut fuer Neuroinformatik
+#
+#   File:        libraries.txt
+#
+#   Maintainer:  Mathis Richter
+#   Email:       mathis.richter@ini.rub.de
+#   Date:        2010 11 29
+#
+#   Description: Setup of cedar and third party libraries.
+#
+#   Credits:
+#
+#=======================================================================================================================
+
+########################################################################################################################
+# third party libraries
+
+string(TOLOWER "${CMAKE_BUILD_TYPE}" buildTypeLower)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CEDAR_CMAKE_DIR}/findScripts)
+
+if (CEDAR_STOP_ON_MISSING_LIBRARIES)
+  set(CEDAR_LIB_ERROR_TYPE FATAL_ERROR)
+  message("-- Will stop when missing libraries.")
+else()
+  set(CEDAR_LIB_ERROR_TYPE WARNING)
+  message("-- Will compile despite missing libraries.")
+endif()
+
+# Qt
+message("-- Searching for Qt...")
+
+# TODO: We need compiler flags to tell what libraries to include.. for now CEDAR_USE_QT5 will be set in the cedar.conf file
+if(NOT CEDAR_USE_QT5)
+  # Try to find Qt4
+  message("-- looking for Qt4...")
+
+  find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml QtSvg)
+  if(QT4_FOUND)
+    message("--QT4 was found")
+    set(QT_VERSION 4)
+    include(${QT_USE_FILE})
+    set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${QT_LIBRARIES})
+    include_directories(${QT_INCLUDE_DIRS})
+    if (CEDAR_VERBOSE_BUILD_SYSTEM)
+      message("   Qt was found in ${QT_INCLUDE_DIRS}")
+    endif(CEDAR_VERBOSE_BUILD_SYSTEM)
+  else (QT4_FOUND)
+    message("    Qt4 was not found.")
+  endif(QT4_FOUND)
+  SET(QT_FOUND ${QT4_FOUND})
+endif(NOT CEDAR_USE_QT5)
+
+if(CEDAR_USE_QT5 OR NOT QT4_FOUND)
+  # Try to find Qt57 Libraries
+  find_package(QT57)
+endif(CEDAR_USE_QT5 OR NOT QT4_FOUND)
+
+if(NOT QT_FOUND)
+  message(${CEDAR_LIB_ERROR_TYPE} "   Required library qt was not found on your system! 
+  You can try to alter the default search paths in cedar.conf.")
+endif(NOT QT_FOUND)
+
+# Boost
+if (WIN32)
+  add_definitions("-D_WIN32_WINNT=0x0601")
+endif(WIN32)
+if (${CMAKE_BUILD_STATIC_LIBS})
+  set(Boost_USE_STATIC_LIBS ON)
+else (${CMAKE_BUILD_STATIC_LIBS})
+  set(Boost_USE_STATIC_LIBS OFF)
+endif (${CMAKE_BUILD_STATIC_LIBS})
+
+message("-- Searching for boost...")
+set(Boost_USE_MULTITHREADED ON)
+find_package(Boost 1.40.0 COMPONENTS system date_time filesystem regex)
+
+if(Boost_FOUND)
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Boost_LIBRARIES})
+  include_directories(${Boost_INCLUDE_DIRS})
+  if (CEDAR_VERBOSE_BUILD_SYSTEM)
+    message("-- boost was found in ${Boost_INCLUDE_DIRS}")
+    message("Found the following boost libraries:")
+    foreach (boost_library ${Boost_LIBRARIES})
+      message("     ${boost_library}")
+    endforeach()
+    message("Found boost includes at ${Boost_INCLUDE_DIRS}")
+  endif(CEDAR_VERBOSE_BUILD_SYSTEM)
+  if(Boost_LIB_VERSION STREQUAL "1_49")
+    list(APPEND CEDAR_ISSUES "Your boost version (${Boost_LIB_VERSION}) may lead to compilation problems.")
+  endif()
+else(Boost_FOUND)
+  message(${CEDAR_LIB_ERROR_TYPE} "   Required library boost was not found on your system!
+  You can try to alter the default search paths in cedar.conf.")
+endif()
+
+# OpenCV
+message("-- Searching for OpenCV...")
+set (OpenCV_DIR ${CEDAR_OPENCV_CMAKE_DIR})
+find_package(OpenCV REQUIRED)
+if(OpenCV_FOUND)
+  message("   OpenCV was found in ${OpenCV_INCLUDE_DIRS}")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OpenCV_LIBS})
+  include_directories(${OpenCV_INCLUDE_DIRS})
+elseif(OpenCV_FOUND)
+  message(${CEDAR_LIB_ERROR_TYPE} "   Required library OpenCV was not found on your system!
+  You can try to alter the default search paths in cedar.conf.")
+endif(OpenCV_FOUND)
+
+
+# libQGLViewer
+option(CEDAR_USE_QGLVIEWER "Use QGLViewer." ON)
+message("-- Searching for QGLViewer...")
+find_package(QGLViewer REQUIRED)
+if(QGLViewer_FOUND)
+  if (CEDAR_VERBOSE_BUILD_SYSTEM)
+    message("   QGLViewer was found in ${QGLViewer_INCLUDE_DIRS}")
+  else()
+    message("-- QGLViewer was found")
+  endif()
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${QGLViewer_LIBS})
+  include_directories(${QGLViewer_INCLUDE_DIRS})
+else(QGLViewer_FOUND)
+  message("-- QGLViewer not found.")
+  set(CEDAR_USE_QGLVIEWER OFF)
+endif(QGLViewer_FOUND)
+
+# libQwt
+option(CEDAR_USE_QWT "Include Qwt based plots if possible." ON)
+message("-- Searching for qwt...")
+find_package(Qwt)
+if(qwt_FOUND)
+  if (CEDAR_VERBOSE_BUILD_SYSTEM)
+    message("-- qwt was found in ${qwt_INCLUDE_DIRS}")
+  else()
+    message("-- qwt was found")
+  endif()
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${qwt_LIBS})
+  include_directories(${qwt_INCLUDE_DIRS})
+else(qwt_FOUND)
+  message("-- Qwt not found")
+  set(CEDAR_USE_QWT OFF)
+endif(qwt_FOUND)
+
+# qwtplot3d
+option(CEDAR_USE_QWTPLOT3D "Include QwtPlot3d surface plots if possible." ON)
+message("-- Searching for qwtplot3d...")
+find_package(QwtPlot3D)
+if(qwtplot3d_FOUND)
+  if (CEDAR_VERBOSE_BUILD_SYSTEM)
+    message("-- qwtplot3d was found in ${qwtplot3d_INCLUDE_DIRS}")
+  else()
+    message("-- qwtplot3d was found.")
+  endif()
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${qwtplot3d_LIBS})
+  include_directories(${qwtplot3d_INCLUDE_DIRS})
+else(qwtplot3d_FOUND)
+  message("-- QwtPlot3d not found")
+  set(CEDAR_USE_QWTPLOT3D OFF)
+endif(qwtplot3d_FOUND)
+
+# VTK
+option(CEDAR_USE_VTK "Include VTK plots if possible." ON)
+message("-- Searching for VTK...")
+find_package(VTK)
+
+# We only support vtk 5.6 and upwards.
+# If Qt5 is used we have to disable Vtk unless it is Vtk 6.1 which probably will have Qt5 Support (not released yet)
+if(VTK_FOUND AND (QT4_FOUND OR (VTK_MAJOR_VERSION GREATER 5 AND VTK_MINOR_VERSION GREATER 0)) AND (VTK_MAJOR_VERSION GREATER 5 OR (VTK_MAJOR_VERSION EQUAL 5 AND VTK_MINOR_VERSION GREATER 5)))
+  if (CEDAR_VERBOSE_BUILD_SYSTEM)
+    message("-- VTK ${VTK_VERSION} was found in ${VTK_INCLUDE_DIRS}")
+  else()
+    message("-- VTK ${VTK_VERSION} was found")
+  endif()
+  
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${VTK_LIBRARIES})
+
+  # Vtk 5 must explicitly link qvtk
+  if(NOT VTK_MAJOR_VERSION GREATER 5)
+    set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} QVTK)
+  endif()
+  
+  include(${VTK_USE_FILE})
+else()
+  message("-- VTK 5.6 or higher not found")
+  set(CEDAR_USE_VTK OFF)
+endif()
+
+# OpenGL
+find_package(OpenGL)
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
+
+# FFTW
+option(CEDAR_USE_FFTW "Include fast Fourier transform convolution using FFTW." ON)
+if(CEDAR_USE_FFTW)
+  find_package(FFTW)
+  if(FFTW_FOUND)
+    message("-- FFTW was found.")
+    if (WIN32)
+      add_definitions(-D_WIN32 -DFFTW_DLL)
+    endif (WIN32)
+    set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${FFTW_LIBS})
+    include_directories(${FFTW_INCLUDE_DIRS})
+    if(FFTW_THREADED)
+      #set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${FFTW_LIBS_THREADED} pthread m)
+      set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${FFTW_LIBS_THREADED} m)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+      set(CEDAR_USE_FFTW_THREADED ON)
+    else(FFTW_THREADED)
+      set(CEDAR_USE_FFTW_THREADED OFF)  
+    endif(FFTW_THREADED)
+  else(FFTW_FOUND)
+    message("-- FFTW was not found.")
+    set(CEDAR_USE_FFTW OFF)
+    set(FFTW_INCLUDE_DIRS "")
+  endif(FFTW_FOUND)
+endif(CEDAR_USE_FFTW)
+
+# libFRI
+option(CEDAR_USE_KUKA_LWR "Include Kuka Fast Research Interface for LWR if possible." ON)
+
+find_library(KUKA_FRI FRI)
+if(KUKA_FRI)
+  message("-- Kuka Fast Research Interface found")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} FRI)
+else(KUKA_FRI)
+  message("-- Kuka Fast Research Interface not found")
+  set(CEDAR_USE_KUKA_LWR OFF)
+endif(KUKA_FRI)
+
+# DC1394 firewire
+find_library(LIB_DC1394 dc1394)
+if(LIB_DC1394)
+  if (CEDAR_VERBOSE_BUILD_SYSTEM)
+    message("-- libdc1394 firewire Interface found in ${LIB_DC1394}")
+  else()
+    message("-- libdc1394 firewire Interface found")
+  endif()
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${LIB_DC1394})
+  set(CEDAR_USE_LIB_DC1394 ON)
+else(LIB_DC1394)
+  message("-- libdc1394 firewire Interface not found")
+  set(CEDAR_USE_LIB_DC1394 OFF)
+endif(LIB_DC1394)
+
+# YARP
+find_package(YARP QUIET)
+if(YARP_FOUND)
+  link_libraries(${YARP_LIBRARIES})
+  include_directories(${YARP_INCLUDE_DIRS})
+  message("-- Looking for YARP packages - found")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${YARP_LIBRARIES})
+  set(CEDAR_USE_YARP ON)
+else(YARP_FOUND)
+  message("-- Looking for YARP packages - not found")
+endif(YARP_FOUND)
+
+
+##
+# Amtec device driver
+##
+
+option(CEDAR_USE_AMTEC "Include Amtec related classes and examples if possible." OFF)
+
+find_library(AMTEC_LIBRARY_DEVICE amtecdevice)
+if (CEDAR_VERBOSE_BUILD_SYSTEM)
+  message("-- Looking for Amtec drivers")
+  if(NOT AMTEC_LIBRARY_DEVICE)
+    message("   amtecdevice - not found")
+  endif()
+endif(CEDAR_VERBOSE_BUILD_SYSTEM)
+  
+find_library(AMTEC_LIBRARY_UTIL amtecutil)
+if (CEDAR_VERBOSE_BUILD_SYSTEM)
+  if(NOT AMTEC_LIBRARY_UTIL)
+    message("   amtecutil - not found")
+  endif()
+endif(CEDAR_VERBOSE_BUILD_SYSTEM)
+
+find_library(AMTEC_LIBRARY_NTCAN ntcan)
+if (CEDAR_VERBOSE_BUILD_SYSTEM)
+  if(NOT AMTEC_LIBRARY_NTCAN)
+    message("   ntcan - not found")
+  endif()
+endif(CEDAR_VERBOSE_BUILD_SYSTEM)
+
+if (AMTEC_LIBRARY_DEVICE AND AMTEC_LIBRARY_UTIL AND AMTEC_LIBRARY_NTCAN)
+  message("-- Building with amtec support.")
+else()
+  message("-- Building without amtec support.")
+endif()
+
+if(AMTEC_LIBRARY_DEVICE AND AMTEC_LIBRARY_UTIL AND AMTEC_LIBRARY_NTCAN)
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${AMTEC_LIBRARY_DEVICE} ${AMTEC_LIBRARY_UTIL} ${AMTEC_LIBRARY_NTCAN})
+  set(CEDAR_USE_AMTEC ON)
+else(AMTEC_LIBRARY_DEVICE AND AMTEC_LIBRARY_UTIL AND AMTEC_LIBRARY_NTCAN)
+  set(CEDAR_USE_AMTEC OFF)
+endif(AMTEC_LIBRARY_DEVICE AND AMTEC_LIBRARY_UTIL AND AMTEC_LIBRARY_NTCAN)
+
+
+########################################################################################################################
+# cedar libraries
+file(GLOB cedarLibPaths "${CEDAR_SOURCE_DIR}/*/")
+
+# set up the global variable CEDAR_LIBS, which holds the names of all cedar libraries
+set(CEDAR_LIBS CACHE INTERNAL "")
+
+foreach (libPath ${cedarLibPaths})
+  if (IS_DIRECTORY ${libPath} AND EXISTS "${libPath}/CMakeLists.txt")
+
+    # get the name of the libary
+    string(REPLACE ${CEDAR_SOURCE_DIR}/ "" libDirName "${libPath}")
+
+    # add out-of-source directory tree
+    set(subDir "${CEDAR_BUILD_DIR}/cedar/${libDirName}")
+
+    # add the subdirectory
+    add_subdirectory(${libPath} ${subDir})
+
+  endif(IS_DIRECTORY ${libPath} AND EXISTS "${libPath}/CMakeLists.txt")
+endforeach(libPath)
+
+
+########################################################################################################################
+# write the current configuration values to the file
+set(CEDAR_CONFIGURATION_HEADER_OUTPUT "${CEDAR_BUILD_DIR}/cedar/configuration.h")
+configure_file("${CEDAR_HOME}/cmake/resources/configuration.h.in" "${CEDAR_CONFIGURATION_HEADER_OUTPUT}")
+if (CEDAR_VERBOSE_BUILD_SYSTEM)
+  message("-- Current configuration was written to ${CEDAR_BUILD_DIR}/cedar/configuration.h")
+endif(CEDAR_VERBOSE_BUILD_SYSTEM)
+
+set(CEDAR_VERSION_HEADER_OUTPUT "${CEDAR_BUILD_DIR}/cedar/version.h")
+configure_file("${CEDAR_HOME}/cmake/resources/version.h.in" "${CEDAR_VERSION_HEADER_OUTPUT}")
