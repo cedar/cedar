@@ -80,10 +80,13 @@ class cedar::proc::steps::VectorToScalars  : public cedar::proc::Step
   public slots:
     //@called when the vector dimension changes
     void vectorDimensionChanged();
+    void inputConnectionChanged(const std::string &inputName);
+
     //--------------------------------------------------------------------------------------------------------------------
     // public methods
     //--------------------------------------------------------------------------------------------------------------------
-  public:
+
+public:
     //!@brief input verification
     cedar::proc::DataSlot::VALIDITY determineInputValidity
     (
@@ -109,10 +112,12 @@ class cedar::proc::steps::VectorToScalars  : public cedar::proc::Step
   protected:
     // none yet
   private:
-    //output vector
-    cedar::aux::MatDataPtr mInput;
-    //input scalars
-    std::vector< cedar::aux::ConstMatDataPtr > mOutputs;
+
+    //input vector
+    cedar::aux::ConstMatDataPtr mInput;
+
+    //output scalars
+    std::vector< cedar::aux::MatDataPtr > mOutputs;
   
     // returns i-th slots name
     std::string makeSlotName(const int i);

@@ -230,7 +230,7 @@ void cedar::proc::gui::Connectable::Decoration::updateIcon(const bool isConnecte
   if (!isDestructed)
   {
 
-    qreal h = this->mpIcon->boundingRect().height();
+    qreal h = (this->mpIcon->boundingRect().height()) * 1.25;
 
     if (this->mpIcon != nullptr)
     {
@@ -244,13 +244,11 @@ void cedar::proc::gui::Connectable::Decoration::updateIcon(const bool isConnecte
     {
       icon_path = ":/cedar/dev/gui/icons/connected.svg";
       brush = QBrush(QColor(222, 10, 244, 255));
-      h = 25;
     }
     else
     {
       icon_path = ":/cedar/dev/gui/icons/not_connected.svg";
       brush = QBrush(QColor(Qt::white));
-      h = 120;
     }
 
     if (this->mpRectangle != nullptr)

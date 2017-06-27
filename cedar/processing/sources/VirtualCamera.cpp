@@ -28,7 +28,7 @@
     Email:       Nico.Kuerschner@ini.rub.de
     Date:        2017 05 12
 
-    Description: Source file for the class cedar::proc::steps::VirtualCamera.
+    Description: Source file for the class cedar::proc::sources::VirtualCamera.
 
     Credits:
 
@@ -38,12 +38,13 @@
 #include "cedar/configuration.h"
 
 // CLASS HEADER
-#include "cedar/processing/steps/VirtualCamera.h"
+#include "cedar/processing/sources/VirtualCamera.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/gl/GlobalScene.h"
 #include "cedar/auxiliaries/gl/Scene.h"
+#include "cedar/processing/gui/Group.h"
 
 // SYSTEM INCLUDES
 
@@ -54,7 +55,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::steps::VirtualCamera>("Sources", "cedar.processing.steps.VirtualCamera"));
+    ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::sources::VirtualCamera>("Sources", "cedar.processing.sources.VirtualCamera"));
     declaration->setIconPath(":/steps/virtual_camera.svg");
     declaration->declare();
 
@@ -68,36 +69,52 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::steps::VirtualCamera::VirtualCamera()
+cedar::proc::sources::VirtualCamera::VirtualCamera()
   :
-  Step(false),
+  cedar::proc::Step(true),
   mpOutput(new cedar::aux::MatData(cv::Mat(256, 256, CV_8UC3))),
   mOutputSizes(new cedar::aux::UIntVectorParameter(this, "output sizes", 2, 256))
 {
   cedar::aux::gl::ScenePtr scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
-  mpViewer = new cedar::aux::gui::Viewer(scene);
+  mpViewer = new cedar::aux::gui::Viewer(scene, this);
   mpViewer->startTimer(25);
   mpViewer->setSceneRadius(scene->getSceneLimit());
-  mpViewer->resize(mOutputSizes->at(0), mOutputSizes->at(1));
+  mpViewer->setFixedSize(mOutputSizes->at(0), mOutputSizes->at(1));
+  mpViewer->setWindowFlags(Qt::WindowStaysOnTopHint);
   mpViewer->show();
+  //mpViewer->hide();
 
-  //mpViewer->setVisible(false);
+  QObject::connect(mOutputSizes.get(), SIGNAL(valueChanged()), this, SLOT(resolutionChanged()));
 
-  declareOutput("Image Matrix (RGB)", mpOutput);
+  this->declareOutput("Image Matrix (RGB)", mpOutput);
+
   mLock = mpViewer->registerGrabber();
 }
 
-cedar::proc::steps::VirtualCamera::~VirtualCamera()
+cedar::proc::sources::VirtualCamera::~VirtualCamera()
 {
   mpViewer->deregisterGrabber(mLock);
+  mpViewer->close();
 }
 
-void cedar::proc::steps::VirtualCamera::compute(const cedar::proc::Arguments &)
+void cedar::proc::sources::VirtualCamera::compute(const cedar::proc::Arguments &)
 {
-  cv::Mat& output = this->mpOutput->getData();
-  output = mpViewer->grabImage().clone();
+  mLock->lockForRead();
+
+  auto image = mpViewer->grabImage();
+
+  if(!image.empty())
+  {
+    image.resize(mOutputSizes->at(0), mOutputSizes->at(1));
+    this->mpOutput->getData() = image.clone();
+  }
+
+  mLock->unlock();
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
+void cedar::proc::sources::VirtualCamera::resolutionChanged()
+{
+  cv::Mat new_output_mat = cv::Mat(mOutputSizes->at(0), mOutputSizes->at(1), CV_8UC3);
+  mpOutput->setData(new_output_mat);
+  mpViewer->setFixedSize(mOutputSizes->at(0), mOutputSizes->at(1));
+}

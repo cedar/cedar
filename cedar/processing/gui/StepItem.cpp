@@ -50,6 +50,7 @@
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/steps/Component.h"
+#include "cedar/processing/steps/ShapeVisualisation.h"
 #include "cedar/devices/KinematicChain.h"
 #include "cedar/devices/gui/KinematicChainWidget.h"
 #include "cedar/devices/ComponentSlot.h"
@@ -57,6 +58,9 @@
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
+#include "cedar/auxiliaries/gui/Viewer.h"
+#include "cedar/auxiliaries/gl/Scene.h"
+#include "cedar/auxiliaries/gl/GlobalScene.h"
 #include "cedar/auxiliaries/TypeHierarchyMap.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/Path.h"
@@ -422,10 +426,17 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     p_actions_menu->addSeparator();
     p_actions_menu->addAction("open actions dock");
 
+    if(boost::dynamic_pointer_cast<cedar::proc::steps::ShapeVisualisation>(this->getStep()))
+    {
+      p_actions_menu->addAction("open camera view on simulator");
+    }
+
     // If we have a Kinematic Chain, add specific actions
     if(const auto component_step = boost::dynamic_pointer_cast<cedar::proc::steps::Component>(this->getStep()))
     {
       cedar::dev::ComponentPtr lComponent = component_step->getComponent();
+
+      p_actions_menu->addAction("open camera view on simulator");
 
       if(const auto kinChain = boost::dynamic_pointer_cast<cedar::dev::KinematicChain>(lComponent))
       {
@@ -465,6 +476,10 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     else if(action == "open Kinematic Chain Widget")
     {
       this->openKinematicChainWidget();
+    }
+    else if(action == "open camera view on simulator")
+    {
+      this->openViewer();
     }
     else if(action.startsWith("apply "))
     {
@@ -599,4 +614,15 @@ void cedar::proc::gui::StepItem::openKinematicChainWidget()
   cedar::dev::gui::KinematicChainWidget *pWidget = new cedar::dev::gui::KinematicChainWidget(pKinematicChain);
   this->createDockWidget(component_path, pWidget)->show();
 
+}
+
+void cedar::proc::gui::StepItem::openViewer()
+{
+  cedar::aux::gl::ScenePtr scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
+
+  auto viewer = new cedar::aux::gui::Viewer(scene, this);
+  viewer->startTimer(25);
+  viewer->setSceneRadius(scene->getSceneLimit());
+
+  this->createDockWidget("GLViewer", viewer)->show();
 }

@@ -530,10 +530,27 @@
       }
     }
   },
+
   "component connections": 
   {
     "trunk": "arm",
     "arm" : "head"
+  },
+
+  "save zone": 
+  {
+    "lower":  
+	[
+	  "0.0", 
+	  "0.0",
+	  "0.0"
+	],
+    "upper":  
+	[
+	  "0.1", 
+	  "0.1",
+	  "1.0"
+	]
   }
 }
 

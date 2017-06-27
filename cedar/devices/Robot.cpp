@@ -429,6 +429,7 @@ void cedar::dev::Robot::readConfiguration(const cedar::aux::ConfigurationNode& n
 
   this->readVisualisation(description);
   this->readComponentConnections(description);
+  this->readSaveZone(description);
 }
 
 void cedar::dev::Robot::readComponentConnections(const cedar::aux::ConfigurationNode& node)
@@ -454,6 +455,46 @@ void cedar::dev::Robot::readComponentConnections(const cedar::aux::Configuration
         std::string message = "Could not stack \""+name2+"\" on \""+name1+"\" for robot \"" + this->getName() + "\" ... ignoring that and continue.";
         std::cout << message << std::endl;
         cedar::aux::LogSingleton::getInstance()->error(message, CEDAR_CURRENT_FUNCTION_NAME);
+      }
+    }
+  }
+}
+
+void cedar::dev::Robot::readSaveZone(const cedar::aux::ConfigurationNode& node)
+{
+  auto component_connections_iter = node.find("save zone");
+
+  if(component_connections_iter != node.not_found())
+  {
+    for (auto iter = component_connections_iter->second.begin(); iter != component_connections_iter->second.end(); ++iter)
+    {
+      const std::string name = iter->first;
+
+      if(name == "lower")
+      {
+        unsigned i = 0;
+        mLowerSafeZone.clear();
+
+        for(auto subiter = iter->second.begin(); subiter != iter->second.end(); ++subiter)
+        {
+          const std::string& value = subiter->second.get_value<std::string>();
+          const float f_value = boost::lexical_cast<float>(value);
+          mLowerSafeZone.push_back(f_value);
+          ++i;
+        }
+      }
+      else if(name == "upper")
+      {
+        unsigned i = 0;
+        mUpperSafeZone.clear();
+
+        for(auto subiter = iter->second.begin(); subiter != iter->second.end(); ++subiter)
+        {
+          const std::string& value = subiter->second.get_value<std::string>();
+          const float f_value = boost::lexical_cast<float>(value);
+          mUpperSafeZone.push_back(f_value);
+          ++i;
+        }
       }
     }
   }

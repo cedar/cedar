@@ -332,8 +332,6 @@ void cedar::dev::gui::KinematicChainCommandWidget::initWindow()
 
   mpIniconfBox = new QComboBox();
   loadInitialConfigurations();
-
-  mpIniconfBox->setCurrentIndex(0);
   changeInitialConfig();
 
   mpGridLayout->addWidget(mpIniconfBox, 10, 0);
@@ -359,18 +357,18 @@ void cedar::dev::gui::KinematicChainCommandWidget::loadInitialConfigurations()
   mpIniconfBox->clear();
 
   std::vector<std::string> lConfNames = mpKinematicChain->getInitialConfigurationNames();
+  std::string lCurConf = mpKinematicChain->getCurrentInitialConfigurationName();
 
   for (const std::string &confName : lConfNames)
   {
     mpIniconfBox->addItem(QString::fromStdString(confName));
   }
 
-  mpIniconfBox->setCurrentIndex(0);
+  mpIniconfBox->setCurrentIndex(mpIniconfBox->findText(QString::fromStdString(lCurConf)));
 }
 
 void cedar::dev::gui::KinematicChainCommandWidget::changeInitialConfig()
 {
-
   const std::string filename = "initial_configurations_"+ mpKinematicChain->getName() + ".json";
   cedar::aux::Path file_path = cedar::aux::Path::globalCofigurationBaseDirectory() + filename;
 
@@ -389,6 +387,8 @@ void cedar::dev::gui::KinematicChainCommandWidget::changeInitialConfig()
 
   if( found != root.end())
   {
+    mpKinematicChain->setCurrentInitialConfiguration(conf_name);
+
     for (uint i=0; i<mpKinematicChain->getNumberOfJoints(); ++i)
     {
       float angle = found->second.get<float>(std::to_string(i));

@@ -87,12 +87,19 @@ namespace
 cedar::proc::steps::VectorToScalars::VectorToScalars()
 :
 Step(true), //is looped, since a large number of independent inputs leads to spam of "compute canceled" messaged
-mInput(new cedar::aux::MatData(cv::Mat::zeros(1,1, CV_32F))),
-mOutputs(1, cedar::aux::MatDataPtr()),
-_mInputDimension (new cedar::aux::UIntParameter(this, "number of vector entries", 1,1,255))
-{
-  //declareOutput(makeSlotName(0), cedar::aux::MatDataPtr());
+mInput(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_32F))),
+_mInputDimension(new cedar::aux::UIntParameter(this, "number of vector entries", 3, 1, 255))
+{  
   declareInput("input vector", false);
+
+  for(int i = 0; i<3; ++i)
+  {
+    mOutputs.push_back(cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))));
+  }
+
+  declareOutput(makeSlotName(0), mOutputs[0]);
+  declareOutput(makeSlotName(1), mOutputs[1]);
+  declareOutput(makeSlotName(2), mOutputs[2]);
 
   QObject::connect(_mInputDimension.get(), SIGNAL(valueChanged()), this, SLOT(vectorDimensionChanged()));
 }
@@ -103,9 +110,15 @@ _mInputDimension (new cedar::aux::UIntParameter(this, "number of vector entries"
 
 void cedar::proc::steps::VectorToScalars::compute(const cedar::proc::Arguments&)
 {
-  for (unsigned i=0; i<mOutputs.size(); i++)
+  if(mInput == nullptr)
   {
-    //mInput->getData().row(i).copyTo(mOutputs[i]);
+    return;
+  }
+
+  for (unsigned i=0; i<mOutputs.size(); ++i)
+  {      
+    const float value = mInput->getData().at<float>(i, 0);
+    mOutputs[i].get()->getData().at<float>(0, 0) = value;
   }
 }
 
@@ -128,6 +141,8 @@ void cedar::proc::steps::VectorToScalars::vectorDimensionChanged()
     //delete unused slots
     for (unsigned i=newsize; i<mOutputs.size(); i++)
     {
+      mOutputs.pop_back();
+      emitOutputPropertiesChangedSignal(makeSlotName(i));
       removeOutputSlot(makeSlotName(i));
     }
   }
@@ -136,14 +151,14 @@ void cedar::proc::steps::VectorToScalars::vectorDimensionChanged()
     //declare new output slots
     for (unsigned i=mOutputs.size(); i<newsize; i++)
     {
-      declareOutput(makeSlotName(i), false);
+      mOutputs.push_back(cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))));
+      declareOutput(makeSlotName(i), mOutputs[i]);
+      emitOutputPropertiesChangedSignal(makeSlotName(i));
     }
   }
-  //resize inputs vector
-  mOutputs.resize(newsize);
 
-  emitOutputPropertiesChangedSignal("vector");
-  onTrigger();
+  //mInput = cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(newsize, 1, CV_32));
+  inputConnectionChanged("input vector");
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::VectorToScalars::determineInputValidity
@@ -154,14 +169,30 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::VectorToScalars::determineIn
 const
 {
   cedar::aux::ConstMatDataPtr input = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data);
-  if (input)
+  if (input && !input->getData().empty())
   {
+    const unsigned cols = input->getData().cols;
+    const unsigned current_rows = static_cast<unsigned int>(input->getData().rows);
+    const unsigned num_rows = _mInputDimension->getValue();
+
     //input must be a one dimensional vector
-    if (input->getData().cols == 1 && static_cast<unsigned int>(input->getData().rows) == _mInputDimension->getValue())
+    if (cols == 1 && current_rows == num_rows)
     {
       return cedar::proc::DataSlot::VALIDITY_VALID;
     }
   }
 
   return cedar::proc::DataSlot::VALIDITY_ERROR;
+}
+
+void cedar::proc::steps::VectorToScalars::inputConnectionChanged(const std::string& inputName)
+{
+  //revalidate slot
+  auto slot = getInputSlot(inputName);
+  slot->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
+
+  mInput = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->getInput(inputName));
+
+  determineInputValidity(slot, mInput);
+  onTrigger();
 }

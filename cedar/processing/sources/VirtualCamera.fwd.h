@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_VIRTUAL_CAMERA_FWD_H
-#define CEDAR_PROC_STEPS_VIRTUAL_CAMERA_FWD_H
+#ifndef CEDAR_PROC_SOURCES_VIRTUAL_CAMERA_FWD_H
+#define CEDAR_PROC_SOURCES_VIRTUAL_CAMERA_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -53,7 +53,7 @@ namespace cedar
 {
   namespace proc
   {
-    namespace steps
+    namespace sources
     {
       //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_PROC_CLASS(VirtualCamera);
@@ -63,5 +63,5 @@ namespace cedar
 }
 
 
-#endif // CEDAR_PROC_STEPS_VIRTUAL_CAMERA_FWD_H
+#endif // CEDAR_PROC_SOURCES_VIRTUAL_CAMERA_FWD_H
 
