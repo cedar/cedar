@@ -2183,7 +2183,7 @@ void cedar::proc::gui::Group::togglePlotGroupVisibility(bool visible, cedar::aux
   }
 
   node.put("visible",!visible);
-  
+
   if (removed_elements.size() > 0)
   {
     std::string message;
