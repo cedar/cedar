@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/View.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 #include <QResizeEvent>
@@ -239,7 +240,7 @@ void cedar::proc::gui::View::resetZoomLevel()
 
 void cedar::proc::gui::View::zoomLevelSet(double zoomLevel)
 {
-  int zoom_level = static_cast<int>( round( zoomLevel * 100.0 ) );
+  int zoom_level = static_cast<int>( cedar::aux::math::round( zoomLevel * 100.0 ) );
                                      // js: round required here because numerics
   this->mpZoomLevelDisplay->setText(QString("%1%").arg(zoom_level));
 
