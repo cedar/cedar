@@ -55,9 +55,7 @@ namespace cedar
   {
     namespace gui
     {
-#ifdef CEDAR_USE_QCUSTOMPLOT
       CEDAR_DECLARE_AUX_CLASS(QCLinePlot);
-#endif
     }
   }
 }

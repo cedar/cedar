@@ -39,8 +39,6 @@
 ======================================================================================================================*/
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_QCUSTOMPLOT
-
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/QCLinePlot.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
@@ -257,6 +255,4 @@ void cedar::aux::gui::QCLinePlot::setAccepts0DData(bool accept)
 {
   this->mPlot0D = accept;
 }
-
-#endif
 
