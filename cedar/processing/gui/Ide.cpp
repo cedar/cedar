@@ -1458,13 +1458,13 @@ bool cedar::proc::gui::Ide::backupSave()
   {
     cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
     baseName= ( last_dir->getValue().absolutePath()
-                  + QDir::separator() ).toStdString()
-                + "unnamed.json.bak";
+                + QDir::separator() ).toStdString()
+              + "unnamed.json.bak";
     save = QDir(last_dir->getValue().absolutePath()).exists();
   }
   else
   {
-     baseName = this->mGroup->getFileName() + ".bak";
+    baseName = this->mGroup->getFileName() + ".bak";
   }
 
   if(save)
@@ -1502,7 +1502,7 @@ bool cedar::proc::gui::Ide::backupSave()
       counter++;
       current_fname= QString::fromStdString( baseName + "."
                                              + std::to_string( (
-                                                                       counter % MAX_COUNTER ) + 1 ) ); // from bak.1 to bak.MAX_COUNTER
+                                                                   counter % MAX_COUNTER ) + 1 ) ); // from bak.1 to bak.MAX_COUNTER
       current_info= QFileInfo( current_fname );
 
       if (counter >= MAX_COUNTER)
