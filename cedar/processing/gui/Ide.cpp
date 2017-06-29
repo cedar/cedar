@@ -1453,77 +1453,82 @@ bool cedar::proc::gui::Ide::save()
 bool cedar::proc::gui::Ide::backupSave()
 {
   std::string backupName, baseName;
-
+  bool save = true;
   if (this->mGroup->getFileName().empty())
   {
     cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
     baseName= ( last_dir->getValue().absolutePath()
                   + QDir::separator() ).toStdString()
                 + "unnamed.json.bak";
+    save = QDir(last_dir->getValue().absolutePath()).exists();
   }
   else
   {
      baseName = this->mGroup->getFileName() + ".bak";
   }
 
-  ////////////////// we iterate through .bak.X files:
-  const unsigned int MAX_COUNTER = 9;
-  unsigned int counter= 0;
-
-  // get the next non existing file or the oldest
-  bool use_oldest= false;
-  QDateTime oldest_time;   // oldest backup I found
-  QString   oldest_fname;
-
-  QFileInfo current_info;
-  QString   current_fname;
-  // filename schema is: baseName.bak.X
-  current_fname= QString::fromStdString( baseName + "." + std::to_string(counter
-  + 1) ); // count from 1 to MAX_COUNTER
-  current_info= QFileInfo( current_fname );
-
-  oldest_fname= current_fname;
-  oldest_time= current_info.lastModified();
-
-  backupName= current_fname.toStdString();
-
-  while( current_info.exists() ) // find the first available bak.X
+  if(save)
   {
-    if (current_info.lastModified() < oldest_time)
-    {
-      // ... or keep track of the oldest file bak.X (to overwrite it)
-      oldest_time= current_info.lastModified();
-      oldest_fname= current_info.absoluteFilePath();
-    }
+    ////////////////// we iterate through .bak.X files:
+    const unsigned int MAX_COUNTER = 9;
+    unsigned int counter= 0;
 
-    counter++;
-    current_fname= QString::fromStdString( baseName + "." 
-                                           + std::to_string( (
-                                               counter % MAX_COUNTER ) + 1 ) ); // from bak.1 to bak.MAX_COUNTER
+    // get the next non existing file or the oldest
+    bool use_oldest= false;
+    QDateTime oldest_time;   // oldest backup I found
+    QString   oldest_fname;
+
+    QFileInfo current_info;
+    QString   current_fname;
+    // filename schema is: baseName.bak.X
+    current_fname= QString::fromStdString( baseName + "." + std::to_string(counter
+                                                                           + 1) ); // count from 1 to MAX_COUNTER
     current_info= QFileInfo( current_fname );
 
-    if (counter >= MAX_COUNTER)
+    oldest_fname= current_fname;
+    oldest_time= current_info.lastModified();
+
+    backupName= current_fname.toStdString();
+
+    while( current_info.exists() ) // find the first available bak.X
     {
-      // no free bak.X file? Then we want to overwrite the oldest one.
-      // note: the oldest file is not necessarily the bak.1
-      backupName= oldest_fname.toStdString();
-      use_oldest= true;
-      break; 
+      if (current_info.lastModified() < oldest_time)
+      {
+        // ... or keep track of the oldest file bak.X (to overwrite it)
+        oldest_time= current_info.lastModified();
+        oldest_fname= current_info.absoluteFilePath();
+      }
+
+      counter++;
+      current_fname= QString::fromStdString( baseName + "."
+                                             + std::to_string( (
+                                                                       counter % MAX_COUNTER ) + 1 ) ); // from bak.1 to bak.MAX_COUNTER
+      current_info= QFileInfo( current_fname );
+
+      if (counter >= MAX_COUNTER)
+      {
+        // no free bak.X file? Then we want to overwrite the oldest one.
+        // note: the oldest file is not necessarily the bak.1
+        backupName= oldest_fname.toStdString();
+        use_oldest= true;
+        break;
+      }
+      else
+      {
+        backupName= current_fname.toStdString(); // for the next iteration
+      }
     }
-    else
+
+    if (use_oldest)
     {
-      backupName= current_fname.toStdString(); // for the next iteration
+      // remove the oldest file
+      QFile oldest_fob( QString::fromStdString( backupName ) );
+      oldest_fob.remove();
     }
+
+    this->mGroup->writeTo( backupName );
   }
 
-  if (use_oldest)
-  {
-    // remove the oldest file
-    QFile oldest_fob( QString::fromStdString( backupName ) );
-    oldest_fob.remove();
-  }
-
-  this->mGroup->writeTo( backupName );
   return true;
 }
 
