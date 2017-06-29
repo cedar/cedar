@@ -2278,15 +2278,15 @@ void cedar::proc::gui::Ide::backupSaveCallback()
   while (!mBackupSaveThreadWrapper->stopRequested()) 
   {
     countSmallSteps++;
-    // auto-save every X seconds
-    if (countSmallSteps >=  60 * cedar::proc::gui::SettingsSingleton::getInstance()->getAutoSaveInterval() )
+    // auto-save every getAutoSaveInterval seconds
+    if (countSmallSteps >= 10 * cedar::proc::gui::SettingsSingleton::getInstance()->getAutoSaveInterval() )
     {
       backupSave();
       countSmallSteps= 0;
     }
 
-    // check every few ms if we should terminat the thread
-    cedar::aux::sleep( cedar::unit::second * 0.1 );
+    // check every few ms if we should terminate the thread
+    cedar::aux::sleep( 0.1 * cedar::unit::second);
   }
 }
 
