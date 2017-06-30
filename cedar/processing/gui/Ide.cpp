@@ -1990,6 +1990,9 @@ void cedar::proc::gui::Ide::toggleVisibilityOfPlots(bool hidden)
   }
 
   this->mGroup->toggleVisibilityOfOpenArchitectureWidgets(!hidden);
+
+  this->mGroup->toggleVisibilityOfOpenKinematicChainWidgets(!hidden);
+  this->mGroup->toggleVisibilityOfOpenSceneViewers(!hidden);
 }
 
 void cedar::proc::gui::Ide::toggleRecorder(bool status)

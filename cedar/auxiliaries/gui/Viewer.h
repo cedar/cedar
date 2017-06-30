@@ -145,6 +145,10 @@ public:
    */
   void deregisterGrabber(QReadWriteLock* lock);
 
+  std::string getViewerLabel() const;
+
+  void setViewerLabel(std::string label);
+
 #ifndef CEDAR_USE_QGLVIEWER
   //@cond SKIPPED_DOCUMENTATION
   // The following functions mimic part of the interface of QGLViewer to reduce compilation issues when the library is
@@ -183,6 +187,9 @@ private:
   bool mReadFromFile;
 
   std::string mRegisteredGrabber;
+
+  ///!@brief flag in order to be stored in Plotgroups
+  std::string mViewerLabel;
 };
 
 #endif  // CEDAR_AUX_GUI_VIEWER_H

@@ -136,9 +136,9 @@ void cedar::dev::Vehicle::initializefromWheelList()
   mCenterToWheelDistance = calculateCenterToWheelDistance();
   mWheelRotationDirections = calculateWheelRotationDirections();
 
-  std::cout<<"The wheel rotationdirections are!"<< mWheelRotationDirections<< std::endl;
+//  std::cout<<"The wheel rotationdirections are!"<< mWheelRotationDirections<< std::endl;
 
-  std::cout<<"The wheel radius is: "<< mWheelRadius->getValue()<<std::endl;
+//  std::cout<<"The wheel radius is: "<< mWheelRadius->getValue()<<std::endl;
 }
 
 float cedar::dev::Vehicle::calculateCenterToWheelDistance()
@@ -172,7 +172,7 @@ float cedar::dev::Vehicle::calculateCenterToWheelDistance()
     float centerY = sumY / float(num);
     float centerZ = sumZ / float(num);
 
-    std::cout << "center of the loaded vehicle is at: " << centerX << "," << centerY << "," << centerZ << std::endl;
+//    std::cout << "center of the loaded vehicle is at: " << centerX << "," << centerY << "," << centerZ << std::endl;
     //We assume all wheels have the same distance to the center, but check anyway.
     float oldDistance = 0;
     for (unsigned int i = 0; i < num; i++)
@@ -199,7 +199,7 @@ float cedar::dev::Vehicle::calculateCenterToWheelDistance()
     }
   }
 
-  std::cout<<"Init: CenterToWheelDistance is:"<< distance<<std::endl;
+//  std::cout<<"Init: CenterToWheelDistance is:"<< distance<<std::endl;
   return distance;
 }
 
