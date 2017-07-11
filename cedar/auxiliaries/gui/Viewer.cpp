@@ -51,7 +51,8 @@ mpGrabberLock(NULL),
 mGrabberBuffer(cv::Mat()),
 mGrabberConnected(false),
 mReadFromFile(readFromFile),
-mRegisteredGrabber("")
+mRegisteredGrabber(""),
+mViewerLabel("")
 {
     mpScene->addViewer(this);
 }
@@ -63,7 +64,8 @@ mpGrabberLock(NULL),
 mGrabberBuffer(cv::Mat()),
 mGrabberConnected(false),
 mReadFromFile(readFromFile),
-mRegisteredGrabber("")
+mRegisteredGrabber(""),
+mViewerLabel("")
 {
 
 }
@@ -177,5 +179,15 @@ void cedar::aux::gui::Viewer::deregisterGrabber(QReadWriteLock* lock)
   {
     CEDAR_THROW(cedar::aux::NotFoundException, "Lock address does not match the stored address.");
   }
+}
+
+std::string cedar::aux::gui::Viewer::getViewerLabel() const
+{
+  return this->mViewerLabel;
+}
+
+void cedar::aux::gui::Viewer::setViewerLabel(std::string label)
+{
+  this->mViewerLabel = label;
 }
 
