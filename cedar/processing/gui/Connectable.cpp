@@ -64,7 +64,7 @@
 #include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/ColorGradient.h"
-
+#include "cedar/auxiliaries/gui/Viewer.h"
 // SYSTEM INCLUDES
 #include <map>
 #include <vector>
@@ -77,6 +77,11 @@
 
 //! declares a metatype for slot pointers; used by the serialization menu
 Q_DECLARE_METATYPE(boost::shared_ptr<cedar::proc::DataSlot>);
+
+#ifdef CEDAR_USE_QGLVIEWER
+  #include <qglviewer.h>
+  #include <QGLViewer/manipulatedFrame.h>
+#endif //CEDAR_USE_QGLVIEWER
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members
@@ -2102,6 +2107,8 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
     return; // note, this disables saving of widgets via auto-backups
 
   unsigned int plotWidgetCounter = 0;
+  unsigned int viewerLabelCounter = 0;
+
   for (auto childWidget : mChildWidgets)
   {
     // all widgets in the mChildWidgets Vector should be QDockWidgets that contain a QWidget
@@ -2132,6 +2139,53 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
       value_node.add("width", dock_widget_child->parentWidget()->width());
 
       node.push_back(cedar::aux::ConfigurationNode::value_type("KinematicChainWidget", value_node));
+
+      //In order to ensure that the Widget is correctly managed by the Gui::Group it needs to be added to the List of KinematicCHainWidgets
+      this->getGuiGroup()->insertKinematicChainWidget(static_cast<cedar::dev::gui::KinematicChainWidget*>(dock_widget_child));
+    }
+
+    if (cedar::aux::objectTypeToString(dock_widget_child) == "cedar::aux::gui::Viewer")
+    {
+      cedar::aux::ConfigurationNode value_node;
+
+      //This Code is duplicated again in Group. Maybe it should be Part of the Viewer to Serialize!
+      auto viewer_item = static_cast<cedar::aux::gui::Viewer*>(dock_widget_child);
+      value_node.add("position_x", viewer_item->parentWidget()->x());
+      value_node.add("position_y", viewer_item->parentWidget()->y());
+      value_node.add("width", viewer_item->parentWidget()->width());
+      value_node.add("height", viewer_item->parentWidget()->height());
+
+
+      if(viewer_item->getViewerLabel() != "")
+        value_node.add("viewerLabel",viewer_item->getViewerLabel());
+      else
+      {
+        //Generate some unique Label here! This is not good as there might be duplicates!!!
+        std::string labelString =  boost::lexical_cast<std::string>(viewer_item->parentWidget()->x())+boost::lexical_cast<std::string>(viewer_item->parentWidget()->y())+boost::lexical_cast<std::string>(viewer_item->parentWidget()->width())+boost::lexical_cast<std::string>(viewer_item->parentWidget()->height())+boost::lexical_cast<std::string>(viewerLabelCounter);
+        value_node.add("viewerLabel", labelString);
+        viewer_item->setViewerLabel(labelString);
+      }
+      viewerLabelCounter = viewerLabelCounter +1;
+
+
+#ifdef CEDAR_USE_QGLVIEWER
+//      QWidget* viewerAsWidget = dynamic_cast<QWidget *>(dock_widget_child);
+
+      QGLViewer *qgl = dynamic_cast<QGLViewer *>(viewer_item);
+      value_node.add("camera position x", qgl->camera()->position().x);
+      value_node.add("camera position y", qgl->camera()->position().y);
+      value_node.add("camera position z", qgl->camera()->position().z);
+      value_node.add("camera orientation 0", qgl->camera()->orientation()[0]);
+      value_node.add("camera orientation 1", qgl->camera()->orientation()[1]);
+      value_node.add("camera orientation 2", qgl->camera()->orientation()[2]);
+      value_node.add("camera orientation 3", qgl->camera()->orientation()[3]);
+
+#endif // CEDAR_USE_QGLVIEWER
+
+      node.push_back(cedar::aux::ConfigurationNode::value_type("Viewer", value_node));
+
+      //In order to ensure that the Widget is correctly managed by the Gui::Group it needs to be added to the List of KinematicCHainWidgets
+      this->getGuiGroup()->insertViewer(viewer_item);
     }
 
   }

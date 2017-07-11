@@ -64,6 +64,7 @@
 #include <vector>
 #include <string>
 #include <list>
+#include <unordered_set>
 
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/devices/gui/KinematicChainWidget.h"
@@ -186,6 +187,10 @@ public:
   //! Opens the kinematic chain control widget from saved configuration file
   void openKinematicChainWidget(const aux::ConfigurationNode &node);
 
+  void insertKinematicChainWidget(cedar::dev::gui::KinematicChainWidget* kinematicChainWidget) const;
+
+  void insertViewer(cedar::aux::gui::Viewer* viewer) const;
+
   //! Opens a view on the simulated scene
   void openSceneViewer();
   void openSceneViewer(const cedar::aux::ConfigurationNode& node);
@@ -259,6 +264,10 @@ public:
 
   //! Changes the visibility of all open architecture widgets
   void toggleVisibilityOfOpenArchitectureWidgets(bool visible);
+
+  void toggleVisibilityOfOpenKinematicChainWidgets(bool visible);
+
+  void toggleVisibilityOfOpenSceneViewers(bool visible);
 
   //! Closes all open architecture widgets
   void closeOpenArchitectureWidgets();
@@ -495,10 +504,10 @@ private:
   mutable std::string mFileName;
 
   //!@brief a vector containing all the viewers
-  std::vector<cedar::aux::gui::Viewer*> mViewers;
+  mutable std::vector<cedar::aux::gui::Viewer*> mViewers;
 
   //!@brief a vector containing all the KinematicChainWidget for savin purposes...
-  std::vector<cedar::dev::gui::KinematicChainWidget*> mKinematicChainWidgets;
+  mutable std::vector<cedar::dev::gui::KinematicChainWidget*> mKinematicChainWidgets;
 
   //!@brief a vector of all source connectors
   std::vector<cedar::proc::gui::DataSlotItem*> mConnectorSources;
