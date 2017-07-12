@@ -1,0 +1,8 @@
+{
+  "name": "hardware CORA robot",
+  "description file": "configs/cora/description.json",
+  "component instantiations":
+  {
+      "arm": "hardware"
+  }
+}

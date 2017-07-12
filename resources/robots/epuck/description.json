@@ -1,0 +1,149 @@
+{
+  "component slots":
+  {
+    "drive":
+    {
+      "available components":
+      {
+        "serial":
+        {
+          "cedar.dev.kteam.DriveSerial":
+          {
+            "requires channel": "serial",
+            "command set speed": "D",
+            "command set encoder": "P",
+            "command get encoder": "Q"
+          }
+        },
+        "yarp":
+        {
+          "cedar.dev.kteam.epuck.YarpDrive":
+          {
+            "requires channel": "yarp",
+            "motor commands port": "motorCommands",
+            "encoder values port": "encoderValues"
+          }
+        }
+      },
+      "shared component parameters":
+      {
+        "number of pulses per revolution": "1000",
+        "encoder limits":
+        {
+          "lower limit": "-32768",
+          "upper limit": "32767"
+        },
+        "wheel distance": "0.053 m",
+        "wheel radius": "0.0205 m",
+        "hardware speed limits":
+        {
+          "lower limit": "-1.0 m s^-1",
+          "upper limit": "1.0 m s^-1"
+        },
+        "forward velocity limits":
+        {
+          "lower limit": "-1.0 m s^-1",
+          "upper limit": "1.0 m s^-1"
+        },
+        "turning rate limits":
+        {
+          "lower limit": "-3.141 rad s^-1",
+          "upper limit": "3.141 rad s^-1"
+        }
+      }
+    },
+    "ambient light sensor":
+    {
+      "available components":
+      {
+        "serial":
+        {
+          "cedar.dev.kteam.InfraredSensorSerial":
+          {
+            "requires channel": "serial",
+            "command get infrared": "O"
+          }
+        },
+        "yarp":
+        {
+          "cedar.dev.kteam.InfraredSensorYarp":
+          {
+            "requires channel": "yarp",
+            "sensor port": "ambientSensors"
+          }
+        }
+      }
+    },
+    "proximity sensor":
+    {
+      "available components":
+      {
+        "serial":
+        {
+          "cedar.dev.kteam.InfraredSensorSerial":
+          {
+            "requires channel": "serial",
+            "command get infrared": "N"
+          }
+        },
+        "yarp":
+        {
+          "cedar.dev.kteam.InfraredSensorYarp":
+          {
+            "requires channel": "yarp",
+            "sensor port": "proximitySensors"
+          }
+        }
+      }
+    },
+    "acceleration sensor":
+    {
+      "available components":
+      {
+        "serial":
+        {
+          "cedar.dev.kteam.epuck.AccelerationSensorSerial":
+          {
+            "requires channel": "serial",
+            "command get acceleration": "A"
+          }
+        }
+      }
+    },
+    "led":
+    {
+      "available components":
+      {
+        "serial":
+        {
+          "cedar.dev.kteam.LedSerial":
+          {
+            "requires channel": "serial",
+            "command set state": "L"
+          }
+        }
+      }
+    }
+  },
+  "available channels":
+  {
+    "serial":
+    {
+      "cedar.dev.kteam.SerialChannel":
+      {
+        "name": "serial channel",
+        "device path": "/dev/rfcomm0",
+        "baud rate": "115200",
+        "escaped command delimiter": "\\r\\n",
+        "time out": "5.25 s"
+      }
+    },
+    "yarp":
+    {
+      "cedar.dev.YarpChannel<cv.Mat>":
+      {
+        "name": "yarp channel"
+      }
+    }
+  }
+}
