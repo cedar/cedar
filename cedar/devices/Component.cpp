@@ -1752,14 +1752,14 @@ void cedar::dev::Component::destroyCommunication()
 
 void cedar::dev::Component::stopCommunication()
 {
-  cedar::aux::LogSingleton::getInstance()->systemInfo(
-    "Stopping communication with " + prettifyName() + ".",
-    CEDAR_CURRENT_FUNCTION_NAME
-  );
-
-  // do not re-enter, do not stop/start at the same time
   QMutexLocker locker_general(&mGeneralAccessLock);
 
+  //  cedar::aux::LogSingleton::getInstance()->systemInfo(
+  //    "Stopping communication with " + prettifyName() + ".",
+  //    CEDAR_CURRENT_FUNCTION_NAME
+  //  );
+
+  // do not re-enter, do not stop/start at the same time
   // first, stop the thread
   mCommunicationThread->requestStop();
 

@@ -44,6 +44,7 @@
 #include "cedar/devices/gl/PowerCubeWrist90.h"
 #include "cedar/auxiliaries/gl/gl.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
+#include "cedar/devices/exceptions.h"
 
 // SYSTEM INCLUDES
 
@@ -110,7 +111,10 @@ void cedar::dev::gl::Caren::initializeGl()
   // Therefore commenting out all components that are not declared in Carens description.json.
   // Todo: find a clever way to perform checks. maybe try/catch on every component?
 
-  mpLocalCoordinateFrame->setName(mRobot->getVisualisationPtr()->objectName().toStdString());
+  if (auto robot = mRobot.lock())
+  {
+
+  mpLocalCoordinateFrame->setName(robot->getVisualisationPtr()->objectName().toStdString());
 
   //cedar::dev::KinematicChainPtr head = boost::dynamic_pointer_cast <cedar::dev::KinematicChain> ( mRobot->getComponent("head"));
   //cedar::dev::KinematicChainPtr palm = boost::dynamic_pointer_cast <cedar::dev::KinematicChain> ( mRobot->getComponent("palm"));
@@ -118,12 +122,22 @@ void cedar::dev::gl::Caren::initializeGl()
   //cedar::dev::KinematicChainPtr fingerTwo = boost::dynamic_pointer_cast <cedar::dev::KinematicChain> (mRobot->getComponent("fingerTwo"));
   //cedar::dev::KinematicChainPtr fingerThree = boost::dynamic_pointer_cast <cedar::dev::KinematicChain> (mRobot->getComponent("fingerThree"));
 
-  mTrunk = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(mRobot->getComponent("trunk"));
-  mArm = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(mRobot->getComponent("arm"));
+  mTrunk = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(robot->getComponent("trunk"));
+  mArm = boost::dynamic_pointer_cast <cedar::dev::KinematicChain>(robot->getComponent("arm"));
 
   // initialize with legitimate values
-  mTrunk->updatedUserSideMeasurementSlot();
-  mArm->updatedUserSideMeasurementSlot();
+    if(auto trunk = mTrunk.lock())
+    {
+      trunk->updatedUserSideMeasurementSlot();
+      mTrunkVisualization = cedar::dev::gl::KinematicChainPtr( new cedar::dev::gl::PowerCube110(trunk));
+    }
+
+    if(auto arm = mArm.lock())
+    {
+      arm->updatedUserSideMeasurementSlot();
+      mArmVisualization = cedar::dev::gl::KukaArmPtr( new cedar::dev::gl::KukaArm(arm));
+    }
+
 
   //mHead = head;
   //mPalm = palm;
@@ -131,8 +145,8 @@ void cedar::dev::gl::Caren::initializeGl()
   //mFingerTwo = fingerTwo;
   //mFingerThree = fingerThree;
 
-  mTrunkVisualization = cedar::dev::gl::KinematicChainPtr( new cedar::dev::gl::PowerCube110(mTrunk));
-  mArmVisualization = cedar::dev::gl::KukaArmPtr( new cedar::dev::gl::KukaArm(mArm));
+
+
 
   //mHandVisualization = cedar::dev::gl::SdhPtr( new cedar::dev::gl::Sdh(fingerOne, fingerTwo, fingerThree, palm) );
   //mHeadVisualization = cedar::dev::gl::KinematicChainPtr( new cedar::dev::gl::PowerCubeWrist90(head) );
@@ -141,6 +155,11 @@ void cedar::dev::gl::Caren::initializeGl()
   mArmVisualization->initializeGl();
   //mHandVisualization->initializeGl();
   //mHeadVisualization->initializeGl();
+  }
+  else
+  {
+    CEDAR_THROW(cedar::dev::ResourceNotAvailableException, "The Caren VisualisationObject has no Robot assigned to it");
+  }
 }
 
 void cedar::dev::gl::Caren::draw()
@@ -155,60 +174,65 @@ void cedar::dev::gl::Caren::draw()
 
 void cedar::dev::gl::Caren::drawBase()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
+  if(auto trunk = mTrunk.lock())
+  {
+    // move to origin
+    glPopMatrix();
+    glPushMatrix();
 
-  // go to trunk frame
-  cv::Mat transformation;
-  transformation = mTrunk->getRootTransformation().t();
-  glMultMatrixf((GLfloat*)transformation.data);
 
-  // go to table frame
-  glTranslated(0, 0, -0.36);
-  glRotated(180, 0, 0, 1);
+    // go to trunk frame
+    cv::Mat transformation;
+    transformation = trunk->getRootTransformation().t();
+    glMultMatrixf((GLfloat*)transformation.data);
 
-  // table plate
-  setMaterial(WHITE);
-  cedar::aux::gl::drawBlock(.728, .12, 1.4985, .3745, .0, 0.06, getIsDrawnAsWireFrame());
+    // go to table frame
+    glTranslated(0, 0, -0.36);
+    glRotated(180, 0, 0, 1);
 
-  setMaterial(CHROME);
-  // table connector plate
-  cedar::aux::gl::drawBlock(.1, .1, 1.4575, .3425, .012, 0, getIsDrawnAsWireFrame());
-  // base plate
-  glTranslated(0, 0, 0.012);
-  cedar::aux::gl::drawBlock(.1, .1, 0.075, .165, .012, 0, getIsDrawnAsWireFrame());
-  // trunk block
-  glTranslated(0, 0, 0.012);
-  cedar::aux::gl::drawBlock(.07, .07, 0.075, .165, .225, 0, getIsDrawnAsWireFrame());
+    // table plate
+    setMaterial(WHITE);
+    cedar::aux::gl::drawBlock(.728, .12, 1.4985, .3745, .0, 0.06, getIsDrawnAsWireFrame());
 
-  // vertical neck bar
-  glTranslated(0, -0.1875, -0.012);
-  cedar::aux::gl::drawBlock(.0225, .0225, 0.0225, .0225, .823, 0, getIsDrawnAsWireFrame());
-  // horizontal neck bar
-  glTranslated(0, 0, 0.8005);
-  cedar::aux::gl::drawBlock(.0225, .0225, .2475, 0.0225, .0225, 0.0225, getIsDrawnAsWireFrame());
-  // neck plate
-  glTranslated(0, 0.1875, 0.0225);
-  cedar::aux::gl::drawBlock(.045, .045, .07, 0.07, .01, 0.0, getIsDrawnAsWireFrame());
+    setMaterial(CHROME);
+    // table connector plate
+    cedar::aux::gl::drawBlock(.1, .1, 1.4575, .3425, .012, 0, getIsDrawnAsWireFrame());
+    // base plate
+    glTranslated(0, 0, 0.012);
+    cedar::aux::gl::drawBlock(.1, .1, 0.075, .165, .012, 0, getIsDrawnAsWireFrame());
+    // trunk block
+    glTranslated(0, 0, 0.012);
+    cedar::aux::gl::drawBlock(.07, .07, 0.075, .165, .225, 0, getIsDrawnAsWireFrame());
 
-  setMaterial(NO_MATERIAL);
+    // vertical neck bar
+    glTranslated(0, -0.1875, -0.012);
+    cedar::aux::gl::drawBlock(.0225, .0225, 0.0225, .0225, .823, 0, getIsDrawnAsWireFrame());
+    // horizontal neck bar
+    glTranslated(0, 0, 0.8005);
+    cedar::aux::gl::drawBlock(.0225, .0225, .2475, 0.0225, .0225, 0.0225, getIsDrawnAsWireFrame());
+    // neck plate
+    glTranslated(0, 0.1875, 0.0225);
+    cedar::aux::gl::drawBlock(.045, .045, .07, 0.07, .01, 0.0, getIsDrawnAsWireFrame());
 
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
+    setMaterial(NO_MATERIAL);
+
+    // move to origin
+    glPopMatrix();
+    glPushMatrix();
+  }
 }
 
 void cedar::dev::gl::Caren::drawHead()
 {
-  // move to origin
+  if(auto head = mHead.lock())
+  {  // move to origin
   glPopMatrix();
   glPushMatrix();
 
   // go to head end-effector frame
   cv::Mat transformation;
 
-  transformation = mHead->getEndEffectorTransformation().t();
+  transformation = head->getEndEffectorTransformation().t();
   glMultMatrixd((GLdouble*)transformation.data);
   // draw camera base plate
   setMaterial(CHROME);
@@ -228,6 +252,8 @@ void cedar::dev::gl::Caren::drawHead()
 
 
   setMaterial(NO_MATERIAL);
+  }
+
 }
 
 void cedar::dev::gl::Caren::drawCamera()

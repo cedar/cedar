@@ -51,3 +51,4 @@ cedar::dev::gl::RobotVisualisation::~RobotVisualisation()
 {
 
 }
+

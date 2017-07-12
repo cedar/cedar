@@ -104,13 +104,13 @@ private:
 protected:
   // none yet
 private:
-  cedar::dev::KinematicChainPtr mTrunk;
-  cedar::dev::KinematicChainPtr mArm;
-  cedar::dev::KinematicChainPtr mHead;
-  cedar::dev::KinematicChainPtr mPalm;
-  cedar::dev::KinematicChainPtr mFingerOne;
-  cedar::dev::KinematicChainPtr mFingerTwo;
-  cedar::dev::KinematicChainPtr mFingerThree;
+  cedar::dev::KinematicChainWeakPtr mTrunk;
+  cedar::dev::KinematicChainWeakPtr mArm;
+  cedar::dev::KinematicChainWeakPtr mHead;
+  cedar::dev::KinematicChainWeakPtr mPalm;
+  cedar::dev::KinematicChainWeakPtr mFingerOne;
+  cedar::dev::KinematicChainWeakPtr mFingerTwo;
+  cedar::dev::KinematicChainWeakPtr mFingerThree;
   cedar::dev::gl::KinematicChainPtr mTrunkVisualization;
   cedar::dev::gl::KinematicChainPtr mArmVisualization;
   cedar::dev::gl::SdhPtr mHandVisualization;

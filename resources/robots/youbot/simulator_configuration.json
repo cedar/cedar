@@ -1,5 +1,5 @@
 {
-  "name": "Yarp Youbot robot",
+  "name": "Simulated Youbot robot with Yarp Camera",
   "description file": "robots/youbot/description.json",
   "component instantiations":
   {
