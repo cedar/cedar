@@ -226,7 +226,7 @@ cedar::dev::ComponentPtr cedar::proc::details::ComponentStepUserSelectableComman
 
 cedar::proc::steps::Component::Component()
 :
-cedar::proc::Step(true),
+cedar::proc::Step(false),
 _mComponent(new cedar::dev::ComponentParameter(this, "component")),
 _mUserSelectableCommandTypeSubset(new cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameter(this,
 "Command Subset")),
