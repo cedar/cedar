@@ -44,6 +44,8 @@
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/TriggerItem.h"
+#include "cedar/processing/gui/Scene.h"
+#include "cedar/processing/gui/View.h"
 #include "cedar/processing/Group.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/auxiliaries/Log.h"
@@ -518,13 +520,21 @@ void cedar::proc::gui::Connection::update()
   this->setPath(path);
 }
 
-QColor cedar::proc::gui::Connection::highlightColor(const QColor& source) const
+QColor cedar::proc::gui::Connection::highlightColor(const QColor& source, bool input, bool output) const
 {
+  if(input)
+  {
+    return source.darker(300);
+  }
+  else if(output)
+  {
+    return source.darker(150);
+  }
   return QColor::fromHsvF
       (
-        std::fmod(source.hsvHueF() + 1.01, 1.0),
-        std::max(0.0, source.hsvSaturationF()),
-        std::max(0.0, source.valueF() - 0.2)
+          std::fmod(source.hsvHueF() + 1.01, 1.0),
+          std::max(0.0, source.hsvSaturationF()),
+          std::max(0.0, source.valueF() - 0.2)
       );
 }
 
@@ -548,8 +558,7 @@ void cedar::proc::gui::Connection::paint(QPainter *pPainter, const QStyleOptionG
     && cedar::proc::gui::SettingsSingleton::getInstance()->getHighlightConnections()
   )
   {
-    QColor new_color = this->highlightColor(pen.color());
-
+    QColor new_color = this->highlightColor(pen.color(), this->mpSource->parentItem()->isSelected(), this->mpTarget->parentItem()->isSelected());
     pen.setColor(new_color);
     pen.setWidthF(width_factor* static_cast<qreal>(2) * pen.widthF());
   }
@@ -632,4 +641,28 @@ void cedar::proc::gui::Connection::setSmartMode(bool smart)
     }
   }
   this->update();
+}
+
+void cedar::proc::gui::Connection::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+  this->setSelected(true);
+  QMenu menu;
+  QAction *sourceAction = menu.addAction("jump to source");
+  QAction *targetAction = menu.addAction("jump to target");
+  QAction *selectedAction = menu.exec(event->screenPos());
+
+  if (this->mpTarget && selectedAction == targetAction)
+  {
+    auto scene = dynamic_cast<cedar::proc::gui::Scene*>(this->mpTarget->scene());
+    scene->selectNone();
+    this->mpTarget->parentItem()->setSelected(true);
+    scene->getParentView()->centerOn(this->mpTarget);
+  }
+  else if (this->mpSource && selectedAction == sourceAction)
+  {
+    auto scene = dynamic_cast<cedar::proc::gui::Scene*>(this->mpSource->scene());
+    scene->selectNone();
+    this->mpSource->parentItem()->setSelected(true);
+    scene->getParentView()->centerOn(this->mpSource);
+  }
 }
