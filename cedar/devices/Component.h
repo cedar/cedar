@@ -342,11 +342,11 @@ protected:
   void setMeasurementDimensionality(ComponentDataType type, DimensionalityType dim);
   void setCommandAndMeasurementDimensionality(ComponentDataType type, DimensionalityType dim);
   //! legacy
-  CEDAR_DECLARE_DEPRECATED(void setCommandDimensionality(ComponentDataType type, unsigned int dim));
+  void setCommandDimensionality(ComponentDataType type, unsigned int dim);
   //! legacy
-  CEDAR_DECLARE_DEPRECATED(void setMeasurementDimensionality(ComponentDataType type, unsigned int dim));
+  void setMeasurementDimensionality(ComponentDataType type, unsigned int dim);
   //! legacy
-  CEDAR_DECLARE_DEPRECATED(void setCommandAndMeasurementDimensionality(ComponentDataType type, unsigned int dim));
+  void setCommandAndMeasurementDimensionality(ComponentDataType type, unsigned int dim);
 
   void registerCommandHook(ComponentDataType type, CommandFunctionType fun);
   void registerMeasurementHook(ComponentDataType type, MeasurementFunctionType fun);
