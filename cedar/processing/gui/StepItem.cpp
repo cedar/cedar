@@ -136,6 +136,14 @@ void cedar::proc::gui::StepItem::construct()
     p_effect->setOffset(3.0, 3.0);
     this->setGraphicsEffect(p_effect);
   }
+
+  // Components sind wichtig und sollten ausgeklappt sein, auch wenn 
+  // sie nicht (mehr) looped sind
+  if(const auto component_step = boost::dynamic_pointer_cast<cedar::proc::steps::Component>(this->getStep()))
+  {
+    setDisplayMode( cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT );
+  }
+
 }
 
 cedar::proc::gui::StepItem::~StepItem()
