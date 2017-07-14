@@ -218,6 +218,8 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   default_favs.push_back("cedar.processing.steps.Sum");
   default_favs.push_back("cedar.processing.sources.Boost");
   default_favs.push_back("cedar.processing.sources.GaussInput");
+  default_favs.push_back("cedar.processing.steps.Component");
+
   this->_mFavoriteElements = new cedar::aux::StringVectorParameter(this, "favorite elements", default_favs);
   QObject::connect(this->_mFavoriteElements.get(), SIGNAL(valueChanged()), this, SIGNAL(elementFavoritesChanged()));
 
@@ -254,6 +256,20 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
     "<p>Cedar now automatically saves your work in progress in separate backup "
     "files. Restore your auto-saved architectures from the Open File dialog by "
     "selecting the file type 'backup'.</p>"
+  );
+
+  this->addOneTimeMessage
+  (
+    CEDAR_MAKE_VERSION(6, 0, 0), // introduces in this version
+    "robotics framework",
+    "Connect your architectures to robots!",
+    "<p>You can now set-up communication with robotic hardware from within "
+    "your architectures. Open the robot manager, setup and connect "
+    "the robot of your choice (OpenGL simulation, hardware interface "
+    "or via network). Cedar will "
+    "communicate with your robot in a separate thread. "
+    "Finally, drag the robotic 'component' step onto your canvas and use "
+    "it like any other step.</p>"
   );
 }
 

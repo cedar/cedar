@@ -45,6 +45,6 @@
 
 int main()
 {
-  std::cout << "Finding resource test: " << cedar::aux::locateResource("configs/cora_arm.json") << std::endl;
+  std::cout << "Finding resource test: " << cedar::aux::locateResource("robots/caren/simulator_configuration.json") << std::endl;
   return 0;
 }
