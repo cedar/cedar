@@ -52,6 +52,8 @@ else(CEDAR_USE_QT5)
   set(qt5_moc_files "")
 endif(CEDAR_USE_QT5)
 
+set(qcp_moc_files gui/QCLinePlot.h gui/QCMatrixPlot.h gui/qcustomplot.h)
+
 if (CEDAR_USE_QWTPLOT3D)
   set(qwtplot3d_moc_files gui/QwtSurfacePlot.h)
 else(CEDAR_USE_QWTPLOT3D)
@@ -124,6 +126,7 @@ cedar_add_library(cedaraux
   ${qwtplot3d_moc_files}
   ${fftw_moc_files}
   ${qt5_moc_files}
+  ${qcp_moc_files}
   convolution/Convolution.h
   convolution/KernelList.h
   convolution/Engine.h

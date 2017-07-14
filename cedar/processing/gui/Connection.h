@@ -129,6 +129,9 @@ public:
   //! define a custom shape of this object, which doesn't add a filled region between line parts
   QPainterPath shape() const;
 
+  //!@brief handles events in the context menu
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+
 public slots:
   //!@brief update the position of this connection, depending on anchor points of source and target
   void update();
@@ -143,7 +146,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  QColor highlightColor(const QColor& source) const;
+  QColor highlightColor(const QColor& source, bool input = false, bool output = false) const;
 
   void updateGraphics();
 
