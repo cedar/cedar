@@ -695,6 +695,7 @@ protected:
 
 void cedar::dev::Component::init()
 {
+  this->mControllerFinished= true;
   this->mDestroying= false;
 
   this->mMeasurementData = boost::make_shared<cedar::dev::Component::MeasurementDataCollection>();
@@ -1270,7 +1271,8 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   } // end: channel is open
 
   // utitlity: warn if consistently much too slow
-  if (time > this->getCommunicationStepSize() * 2.0)
+  if (time > this->getCommunicationStepSize() * 2.0
+      && !mControllerFinished) // annoying if we are braking ...
   {
     QWriteLocker lock(&mTooSlowCounter.getLock());
 
@@ -2104,7 +2106,7 @@ void cedar::dev::Component::clearController()
   mControllerFinished = true;
 }
 
-void cedar::dev::Component::setController(ComponentDataType type, cedar::dev::Component::ControllerCallback fun)
+void cedar::dev::Component::setController(ComponentDataType type, cedar::dev::Component::ControllerCallbackFunctionType fun)
 {
   QWriteLocker locker(mController.getLockPtr());
   mController.member() = ControllerCollectionPtr( new cedar::dev::Component::ControllerCollection{ type, fun} );
