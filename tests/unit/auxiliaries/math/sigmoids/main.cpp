@@ -87,7 +87,7 @@ int main()
   // test sigmoid classes
   std::cout << "test no " << test_number++ << std::endl;
   cv::Mat my_values = cv::Mat::ones(1, 1, CV_32F);
-  cv::Mat my_values_double = cv::Mat::ones(1, 1, CV_32F);
+  cv::Mat my_values_double = cv::Mat::ones(1, 1, CV_64F);
   cedar::aux::math::SigmoidPtr abs_sigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0));
   cv::Mat sigmoid_my_values = abs_sigmoid->compute<float>(my_values);
   cv::Mat sigmoid_my_values_double = abs_sigmoid->compute<double>(my_values_double);
@@ -95,7 +95,7 @@ int main()
   cedar::aux::write(sigmoid_my_values_double);
 
   my_values = cv::Mat::ones(1, 1, CV_32F);
-  my_values_double = cv::Mat::ones(1, 1, CV_32F);
+  my_values_double = cv::Mat::ones(1, 1, CV_64F);
   cedar::aux::math::SigmoidPtr exp_sigmoid(new cedar::aux::math::ExpSigmoid(0.0, 10.0));
   sigmoid_my_values = exp_sigmoid->compute<float>(my_values);
   sigmoid_my_values_double = exp_sigmoid->compute<double>(my_values_double);
@@ -103,7 +103,7 @@ int main()
   cedar::aux::write(sigmoid_my_values_double);
 
   my_values = cv::Mat::ones(1, 1, CV_32F);
-  my_values_double = cv::Mat::ones(1, 1, CV_32F);
+  my_values_double = cv::Mat::ones(1, 1, CV_64F);
   cedar::aux::math::SigmoidPtr heaviside_sigmoid(new cedar::aux::math::HeavisideSigmoid(0.0));
   sigmoid_my_values = heaviside_sigmoid->compute<float>(my_values);
   sigmoid_my_values_double = heaviside_sigmoid->compute<double>(my_values_double);

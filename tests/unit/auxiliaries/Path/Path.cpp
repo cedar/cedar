@@ -148,7 +148,7 @@ int main()
   errors += test_path("/absolute/path/without/protocol", "absolute", "/absolute/path/without/protocol", false);
   errors += test_path("relative/path/without/protocol", "", "relative/path/without/protocol", false);
   errors += test_path("relative\\path", "", "relative/path", false);
-  errors += test_path("resource://configs/epuck/description.json", "resource", "configs/epuck/description.json", true);
+  errors += test_path("resource://robots/epuck/description.json", "resource", "robots/epuck/description.json", true);
 
   std::cout << "Test finished with " << errors << " error(s)." << std::endl;
   return errors;
