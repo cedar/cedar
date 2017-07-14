@@ -52,12 +52,12 @@ int main()
   
   // matrices of varying size being used throughout the testing
   double theta;
-  cv::Mat vec3_double(3, 1, CV_32FC1);
-  cv::Mat mat33_double(3, 3, CV_32FC1);
-  cv::Mat vec6_double(6, 1, CV_32FC1);
-  cv::Mat mat44_double(4, 4, CV_32FC1);
-  cv::Mat mat66_double(6, 6, CV_32FC1);
-  cv::Mat inverse66_double(6, 6, CV_32FC1);
+  cv::Mat vec3_double(3, 1, CV_64FC1);
+  cv::Mat mat33_double(3, 3, CV_64FC1);
+  cv::Mat vec6_double(6, 1, CV_64FC1);
+  cv::Mat mat44_double(4, 4, CV_64FC1);
+  cv::Mat mat66_double(6, 6, CV_64FC1);
+  cv::Mat inverse66_double(6, 6, CV_64FC1);
   cv::Mat vec3_float(3, 1, CV_32FC1);
   cv::Mat mat33_float(3, 3, CV_32FC1);
   cv::Mat vec6_float(6, 1, CV_32FC1);
@@ -762,9 +762,9 @@ int main()
   // twistCoordinates
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: twistCoordinates" << std::endl;
-  cv::Mat p_double = cv::Mat::zeros(3, 1, CV_32FC1);
+  cv::Mat p_double = cv::Mat::zeros(3, 1, CV_64FC1);
   p_double.at<double>(2, 0) = 1;
-  cv::Mat omega_double = cv::Mat::zeros(3, 1, CV_32FC1);
+  cv::Mat omega_double = cv::Mat::zeros(3, 1, CV_64FC1);
   omega_double.at<double>(0, 0) = 1;
   vec6_double = cedar::aux::math::twistCoordinates(p_double, omega_double);
   if (!
