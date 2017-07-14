@@ -404,7 +404,11 @@ void cedar::dev::gui::RobotManager::robotNameSelected(int nameIndex)
 void cedar::dev::gui::RobotManager::updateRobotConfiguration(QString addedRobotName)
 {
   this->selectRobot(addedRobotName.toStdString());
-  configurationChanged();
+
+  //Lets try to send the signal via the non-gui class
+  cedar::dev::RobotManagerSingleton::getInstance()->emitConfigurationChanged();
+
+//  emit configurationChanged();
 }
 
 void cedar::dev::gui::RobotManager::deselectRobot()

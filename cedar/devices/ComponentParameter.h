@@ -117,15 +117,18 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  void doReselect();
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-protected:
   // none yet
+protected:
 private:
   boost::weak_ptr<cedar::dev::ComponentSlot> mWeakComponent;
+
+  boost::signals2::connection mRobotConfigurationChangedConnection;
 
   std::string mRobotName;
   std::string mSlotName;
