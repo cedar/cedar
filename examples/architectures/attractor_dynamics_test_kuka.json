@@ -1,0 +1,1410 @@
+{
+    "meta":
+    {
+        "format": "1"
+    },
+    "steps":
+    {
+        "cedar.processing.ComponentMultiply":
+        {
+            "name": "Component Multiply 3"
+        },
+        "cedar.processing.steps.ShapeVisualisation":
+        {
+            "name": "Shape Visualisation",
+            "colour": "green",
+            "shape": "Sphere",
+            "scale": "0.02499999999999991"
+        },
+        "cedar.processing.steps.Sum":
+        {
+            "name": "Sum 5"
+        }
+    },
+    "triggers":
+    {
+        "cedar.processing.LoopedTrigger":
+        {
+            "name": "default trigger",
+            "step size": "0.001 s",
+            "idle time": "1e-05 s",
+            "simulated time": "0.001 s",
+            "loop mode": "Fixed",
+            "start with all": "true",
+            "listeners":
+            [
+                "Rectify ForwardKinematics",
+                "Amari Clock",
+                "Dynamics To Component",
+                "Target Acquisition Dynamics",
+                "Shape Visualisation"
+            ]
+        }
+    },
+    "groups":
+    {
+        "Amari Clock":
+        {
+            "meta":
+            {
+                "format": "1"
+            },
+            "steps":
+            {
+                "cedar.processing.sources.BoxInput":
+                {
+                    "name": "Box Input",
+                    "amplitude": "-1",
+                    "reference level": "0",
+                    "dimensionality": "1",
+                    "widths":
+                    [
+                        "1"
+                    ],
+                    "left bounds":
+                    [
+                        "0"
+                    ],
+                    "sizes":
+                    [
+                        "1"
+                    ]
+                },
+                "cedar.processing.sources.BoxInput":
+                {
+                    "name": "Box Input 3",
+                    "amplitude": "0.35",
+                    "reference level": "0",
+                    "dimensionality": "1",
+                    "widths":
+                    [
+                        "1"
+                    ],
+                    "left bounds":
+                    [
+                        "0"
+                    ],
+                    "sizes":
+                    [
+                        "1"
+                    ]
+                },
+                "cedar.processing.sources.BoxInput":
+                {
+                    "name": "Box Input 4",
+                    "amplitude": "4",
+                    "reference level": "0",
+                    "dimensionality": "1",
+                    "widths":
+                    [
+                        "1"
+                    ],
+                    "left bounds":
+                    [
+                        "0"
+                    ],
+                    "sizes":
+                    [
+                        "1"
+                    ]
+                },
+                "cedar.processing.sources.BoxInput":
+                {
+                    "name": "Box Input 5",
+                    "amplitude": "0.6",
+                    "reference level": "0",
+                    "dimensionality": "1",
+                    "widths":
+                    [
+                        "1"
+                    ],
+                    "left bounds":
+                    [
+                        "0"
+                    ],
+                    "sizes":
+                    [
+                        "1"
+                    ]
+                },
+                "cedar.processing.sources.BoxInput":
+                {
+                    "name": "Box Input 6",
+                    "amplitude": "0.65",
+                    "reference level": "0",
+                    "dimensionality": "1",
+                    "widths":
+                    [
+                        "1"
+                    ],
+                    "left bounds":
+                    [
+                        "0"
+                    ],
+                    "sizes":
+                    [
+                        "1"
+                    ]
+                },
+                "cedar.processing.ComponentMultiply":
+                {
+                    "name": "Component Multiply 4"
+                },
+                "cedar.processing.ScalarDivision":
+                {
+                    "name": "Scalar Division",
+                    "treat division by zero": "true",
+                    "zero divisor replacement": "1e-06"
+                },
+                "cedar.processing.ScalarDivision":
+                {
+                    "name": "Scalar Division 2",
+                    "treat division by zero": "true",
+                    "zero divisor replacement": "1e-06"
+                },
+                "cedar.processing.ScalarsToVector":
+                {
+                    "name": "Scalars To Vector",
+                    "number of vector entries": "3"
+                },
+                "cedar.processing.steps.Sum":
+                {
+                    "name": "Sum 3"
+                },
+                "cedar.processing.steps.Sum":
+                {
+                    "name": "Sum 4"
+                },
+                "cedar.dynamics.NeuralField":
+                {
+                    "name": "node",
+                    "resting level": "0",
+                    "time scale": "7500",
+                    "global inhibition": "-0",
+                    "activation as output": "false",
+                    "discrete metric (workaround)": "false",
+                    "dimensionality": "0",
+                    "sizes": "",
+                    "input noise gain": "0",
+                    "sigmoid":
+                    {
+                        "type": "cedar.aux.math.AbsSigmoid",
+                        "threshold": "0",
+                        "beta": "100"
+                    },
+                    "lateral kernels":
+                    {
+                        "cedar.aux.kernel.Box":
+                        {
+                            "dimensionality": "1",
+                            "anchor":
+                            [
+                                "0"
+                            ],
+                            "amplitude": "1",
+                            "widths":
+                            [
+                                "1"
+                            ]
+                        }
+                    },
+                    "lateral kernel convolution":
+                    {
+                        "borderType": "Zero",
+                        "mode": "Same",
+                        "engine":
+                        {
+                            "type": "cedar.aux.conv.OpenCV"
+                        },
+                        "alternate even kernel center": "false"
+                    },
+                    "noise correlation kernel":
+                    {
+                        "dimensionality": "1",
+                        "anchor":
+                        [
+                            "0"
+                        ],
+                        "amplitude": "0",
+                        "sigmas":
+                        [
+                            "3"
+                        ],
+                        "normalize": "true",
+                        "shifts":
+                        [
+                            "0"
+                        ],
+                        "limit": "5"
+                    }
+                },
+                "cedar.dynamics.NeuralField":
+                {
+                    "name": "node 2",
+                    "resting level": "-1",
+                    "time scale": "7500",
+                    "global inhibition": "0",
+                    "activation as output": "false",
+                    "discrete metric (workaround)": "false",
+                    "dimensionality": "0",
+                    "sizes": "",
+                    "input noise gain": "0",
+                    "sigmoid":
+                    {
+                        "type": "cedar.aux.math.AbsSigmoid",
+                        "threshold": "0",
+                        "beta": "100"
+                    },
+                    "lateral kernels":
+                    {
+                        "cedar.aux.kernel.Box":
+                        {
+                            "dimensionality": "1",
+                            "anchor":
+                            [
+                                "0"
+                            ],
+                            "amplitude": "1",
+                            "widths":
+                            [
+                                "1"
+                            ]
+                        }
+                    },
+                    "lateral kernel convolution":
+                    {
+                        "borderType": "Zero",
+                        "mode": "Same",
+                        "engine":
+                        {
+                            "type": "cedar.aux.conv.OpenCV"
+                        },
+                        "alternate even kernel center": "false"
+                    },
+                    "noise correlation kernel":
+                    {
+                        "dimensionality": "1",
+                        "anchor":
+                        [
+                            "0"
+                        ],
+                        "amplitude": "0",
+                        "sigmas":
+                        [
+                            "3"
+                        ],
+                        "normalize": "true",
+                        "shifts":
+                        [
+                            "0"
+                        ],
+                        "limit": "5"
+                    }
+                }
+            },
+            "connections":
+            [
+                {
+                    "source": "node.sigmoided activation",
+                    "target": "node 2.input"
+                },
+                {
+                    "source": "node.sigmoided activation",
+                    "target": "Scalar Division.matrix"
+                },
+                {
+                    "source": "node 2.sigmoided activation",
+                    "target": "Component Multiply 4.operands"
+                },
+                {
+                    "source": "node 2.sigmoided activation",
+                    "target": "Scalar Division 2.matrix"
+                },
+                {
+                    "source": "Component Multiply 4.product",
+                    "target": "node.input"
+                },
+                {
+                    "source": "Box Input.box input",
+                    "target": "Component Multiply 4.operands"
+                },
+                {
+                    "source": "Scalars To Vector.vector",
+                    "target": "external output.input"
+                },
+                {
+                    "source": "Box Input 4.box input",
+                    "target": "Scalar Division.divisor"
+                },
+                {
+                    "source": "Box Input 4.box input",
+                    "target": "Scalar Division 2.divisor"
+                },
+                {
+                    "source": "Scalar Division.result",
+                    "target": "Sum 3.terms"
+                },
+                {
+                    "source": "Sum 3.sum",
+                    "target": "Scalars To Vector.scalar 0"
+                },
+                {
+                    "source": "Scalar Division 2.result",
+                    "target": "Sum 4.terms"
+                },
+                {
+                    "source": "Sum 4.sum",
+                    "target": "Scalars To Vector.scalar 1"
+                },
+                {
+                    "source": "Box Input 5.box input",
+                    "target": "Scalars To Vector.scalar 2"
+                },
+                {
+                    "source": "Box Input 3.box input",
+                    "target": "Sum 3.terms"
+                },
+                {
+                    "source": "Box Input 6.box input",
+                    "target": "Sum 4.terms"
+                }
+            ],
+            "name": "Amari Clock",
+            "connectors":
+            {
+                "external output": "false"
+            },
+            "is looped": "true",
+            "time factor": "1",
+            "ui":
+            [
+                {
+                    "type": "step",
+                    "step": "Box Input",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "4",
+                    "positionY": "113"
+                },
+                {
+                    "type": "step",
+                    "step": "Box Input 3",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "338",
+                    "positionY": "59"
+                },
+                {
+                    "type": "step",
+                    "step": "Box Input 4",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "251",
+                    "positionY": "116"
+                },
+                {
+                    "type": "step",
+                    "step": "Box Input 5",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "338",
+                    "positionY": "147"
+                },
+                {
+                    "type": "step",
+                    "step": "Box Input 6",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "338",
+                    "positionY": "103"
+                },
+                {
+                    "type": "step",
+                    "step": "Component Multiply 4",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "47",
+                    "positionY": "112"
+                },
+                {
+                    "type": "step",
+                    "step": "Scalar Division",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "303",
+                    "positionY": "16"
+                },
+                {
+                    "type": "step",
+                    "step": "Scalar Division 2",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "305",
+                    "positionY": "211"
+                },
+                {
+                    "type": "step",
+                    "step": "Scalars To Vector",
+                    "display style": "ICON_AND_TEXT",
+                    "width": "160",
+                    "height": "50",
+                    "positionX": "450",
+                    "positionY": "115"
+                },
+                {
+                    "type": "step",
+                    "step": "Sum 3",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "393",
+                    "positionY": "15"
+                },
+                {
+                    "type": "step",
+                    "step": "Sum 4",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "393",
+                    "positionY": "212"
+                },
+                {
+                    "type": "step",
+                    "step": "node",
+                    "display style": "ICON_AND_TEXT",
+                    "width": "160",
+                    "height": "50",
+                    "positionX": "106",
+                    "positionY": "18"
+                },
+                {
+                    "type": "step",
+                    "step": "node 2",
+                    "display style": "ICON_AND_TEXT",
+                    "width": "160",
+                    "height": "50",
+                    "positionX": "100",
+                    "positionY": "209"
+                }
+            ],
+            "ui generic":
+            {
+                "group": "Amari Clock",
+                "architecture widgets": "",
+                "background color": "255,110,255",
+                "width": "632",
+                "height": "276",
+                "smart mode": "false",
+                "collapsed": "false",
+                "lock geometry": "false",
+                "uncollapsed width": "632",
+                "uncollapsed height": "276",
+                "positionX": "-1482",
+                "positionY": "83"
+            }
+        },
+        "Dynamics To Component":
+        {
+            "meta":
+            {
+                "format": "1"
+            },
+            "steps":
+            {
+                "cedar.processing.steps.Component":
+                {
+                    "name": "Component",
+                    "component": "new robot.arm",
+                    "command group": ""
+                },
+                "cedar.processing.steps.PseudoInverseKinematics":
+                {
+                    "name": "Pseudo Inverse Kinematics",
+                    "component": "new robot.arm"
+                },
+                "cedar.processing.StaticGain":
+                {
+                    "name": "Static Gain",
+                    "gain factor": "1"
+                }
+            },
+            "connections":
+            [
+                {
+                    "source": "external input 2.output",
+                    "target": "Pseudo Inverse Kinematics.Cartesian velocity"
+                },
+                {
+                    "source": "Static Gain.output",
+                    "target": "Component.Joint Velocities"
+                },
+                {
+                    "source": "Pseudo Inverse Kinematics.joint velocity",
+                    "target": "Static Gain.input"
+                }
+            ],
+            "name": "Dynamics To Component",
+            "connectors":
+            {
+                "external input 2": "true"
+            },
+            "is looped": "true",
+            "time factor": "1",
+            "ui":
+            [
+                {
+                    "type": "step",
+                    "step": "Component",
+                    "display style": "ICON_AND_TEXT",
+                    "width": "160",
+                    "height": "50",
+                    "positionX": "361.4691358024688",
+                    "positionY": "25.27160493827159"
+                },
+                {
+                    "type": "step",
+                    "step": "Pseudo Inverse Kinematics",
+                    "display style": "ICON_AND_TEXT",
+                    "width": "160",
+                    "height": "50",
+                    "positionX": "67",
+                    "positionY": "20"
+                },
+                {
+                    "type": "step",
+                    "step": "Static Gain",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "284",
+                    "positionY": "22"
+                }
+            ],
+            "ui generic":
+            {
+                "group": "Dynamics To Component",
+                "architecture widgets": "",
+                "background color": "255,255,110",
+                "width": "585",
+                "height": "99",
+                "smart mode": "false",
+                "collapsed": "false",
+                "lock geometry": "false",
+                "uncollapsed width": "585",
+                "uncollapsed height": "99",
+                "positionX": "114",
+                "positionY": "-118"
+            }
+        },
+        "Rectify ForwardKinematics":
+        {
+            "meta":
+            {
+                "format": "1"
+            },
+            "steps":
+            {
+                "cedar.processing.steps.ForwardKinematics":
+                {
+                    "name": "Forward Kinematics",
+                    "component": "new robot.arm"
+                },
+                "cedar.processing.MatrixSlice":
+                {
+                    "name": "Matrix Slice",
+                    "anchor type": "Absolute",
+                    "range lower":
+                    [
+                        "0"
+                    ],
+                    "range upper":
+                    [
+                        "3"
+                    ]
+                },
+                "cedar.processing.MatrixSlice":
+                {
+                    "name": "Matrix Slice 2",
+                    "anchor type": "Absolute",
+                    "range lower":
+                    [
+                        "0"
+                    ],
+                    "range upper":
+                    [
+                        "3"
+                    ]
+                }
+            },
+            "connections":
+            [
+                {
+                    "source": "Matrix Slice.slice",
+                    "target": "external output 6.input"
+                },
+                {
+                    "source": "Matrix Slice 2.slice",
+                    "target": "external output 2.input"
+                },
+                {
+                    "source": "Forward Kinematics.Cartesian position",
+                    "target": "Matrix Slice 2.matrix"
+                },
+                {
+                    "source": "Forward Kinematics.Cartesian velocity",
+                    "target": "Matrix Slice.matrix"
+                }
+            ],
+            "name": "Rectify ForwardKinematics",
+            "connectors":
+            {
+                "external output 2": "false",
+                "external output 6": "false"
+            },
+            "is looped": "true",
+            "time factor": "1",
+            "ui":
+            [
+                {
+                    "type": "step",
+                    "step": "Forward Kinematics",
+                    "display style": "ICON_AND_TEXT",
+                    "width": "160",
+                    "height": "50",
+                    "positionX": "16",
+                    "positionY": "54"
+                },
+                {
+                    "type": "step",
+                    "step": "Matrix Slice",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "238.4691358024693",
+                    "positionY": "82.27160493827159"
+                },
+                {
+                    "type": "step",
+                    "step": "Matrix Slice 2",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "242.4691358024693",
+                    "positionY": "29.27160493827159"
+                }
+            ],
+            "ui generic":
+            {
+                "group": "Rectify ForwardKinematics",
+                "architecture widgets": "",
+                "background color": "255,255,110",
+                "width": "404",
+                "height": "174",
+                "smart mode": "false",
+                "collapsed": "false",
+                "lock geometry": "false",
+                "uncollapsed width": "404",
+                "uncollapsed height": "174",
+                "positionX": "-1252",
+                "positionY": "-103"
+            }
+        },
+        "Target Acquisition Dynamics":
+        {
+            "meta":
+            {
+                "format": "1"
+            },
+            "steps":
+            {
+                "cedar.processing.ComponentMultiply":
+                {
+                    "name": "Component Multiply"
+                },
+                "cedar.processing.ComponentMultiply":
+                {
+                    "name": "Component Multiply 2"
+                },
+                "cedar.processing.steps.LinearDynamics":
+                {
+                    "name": "Linear Dynamics",
+                    "lambda": "-0.1",
+                    "fixed point": "1"
+                },
+                "cedar.processing.Norm":
+                {
+                    "name": "Norm"
+                },
+                "cedar.processing.Normalization":
+                {
+                    "name": "Normalization",
+                    "normalization type": "L2Norm",
+                    "normalized dimensions":
+                    [
+                        "true"
+                    ]
+                },
+                "cedar.processing.steps.RotationOnPlane":
+                {
+                    "name": "Rotation On Plane"
+                },
+                "cedar.processing.steps.SinusDynamics":
+                {
+                    "name": "Sinus Dynamics",
+                    "lambda": "-1",
+                    "fixed point": "0"
+                }
+            },
+            "connections":
+            [
+                {
+                    "source": "Sinus Dynamics.angle change",
+                    "target": "Component Multiply 2.operands"
+                },
+                {
+                    "source": "Linear Dynamics.acceleration",
+                    "target": "Component Multiply.operands"
+                },
+                {
+                    "source": "Norm.output",
+                    "target": "Linear Dynamics.speed"
+                },
+                {
+                    "source": "Normalization.normalized input",
+                    "target": "Component Multiply.operands"
+                },
+                {
+                    "source": "Rotation On Plane.angle",
+                    "target": "Sinus Dynamics.angle"
+                },
+                {
+                    "source": "Rotation On Plane.orthogonal acceleration",
+                    "target": "Component Multiply 2.operands"
+                },
+                {
+                    "source": "external input 10.output",
+                    "target": "Normalization.input"
+                },
+                {
+                    "source": "external input 10.output",
+                    "target": "Norm.input"
+                },
+                {
+                    "source": "external input 11.output",
+                    "target": "Rotation On Plane.target position"
+                },
+                {
+                    "source": "external input.output",
+                    "target": "Rotation On Plane.endeffector position"
+                },
+                {
+                    "source": "external input 10.output",
+                    "target": "Rotation On Plane.endeffector velocity"
+                },
+                {
+                    "source": "Component Multiply.product",
+                    "target": "external output 3.input"
+                },
+                {
+                    "source": "Component Multiply 2.product",
+                    "target": "external output 7.input"
+                }
+            ],
+            "name": "Target Acquisition Dynamics",
+            "connectors":
+            {
+                "external input": "true",
+                "external input 10": "true",
+                "external input 11": "true",
+                "external output 3": "false",
+                "external output 7": "false"
+            },
+            "is looped": "true",
+            "time factor": "1",
+            "ui":
+            [
+                {
+                    "type": "step",
+                    "step": "Component Multiply",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "389.4074074074073",
+                    "positionY": "26.03703703703701"
+                },
+                {
+                    "type": "step",
+                    "step": "Component Multiply 2",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "387.7654320987654",
+                    "positionY": "181.2469135802469"
+                },
+                {
+                    "type": "step",
+                    "step": "Linear Dynamics",
+                    "display style": "ICON_AND_TEXT",
+                    "width": "160",
+                    "height": "50",
+                    "positionX": "212.4691358024691",
+                    "positionY": "71.27160493827159"
+                },
+                {
+                    "type": "step",
+                    "step": "Norm",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "134.4691358024691",
+                    "positionY": "71.27160493827159"
+                },
+                {
+                    "type": "step",
+                    "step": "Normalization",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "209.4691358024691",
+                    "positionY": "26.27160493827159"
+                },
+                {
+                    "type": "step",
+                    "step": "Rotation On Plane",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "147",
+                    "positionY": "169"
+                },
+                {
+                    "type": "step",
+                    "step": "Sinus Dynamics",
+                    "display style": "ICON_AND_TEXT",
+                    "width": "160",
+                    "height": "50",
+                    "positionX": "212.5308641975307",
+                    "positionY": "124.8024691358025"
+                }
+            ],
+            "ui generic":
+            {
+                "group": "Target Acquisition Dynamics",
+                "architecture widgets": "",
+                "background color": "110,255,110",
+                "width": "516",
+                "height": "238",
+                "smart mode": "false",
+                "collapsed": "false",
+                "lock geometry": "false",
+                "uncollapsed width": "516",
+                "uncollapsed height": "238",
+                "positionX": "-748",
+                "positionY": "-99"
+            }
+        },
+        "bouncing fix":
+        {
+            "meta":
+            {
+                "format": "1"
+            },
+            "steps":
+            {
+                "cedar.processing.Norm":
+                {
+                    "name": "Norm 3"
+                },
+                "cedar.processing.StaticGain":
+                {
+                    "name": "Static Gain 2",
+                    "gain factor": "-1"
+                },
+                "cedar.processing.steps.Sum":
+                {
+                    "name": "Sum"
+                },
+                "cedar.processing.TransferFunction":
+                {
+                    "name": "Transfer Function 2",
+                    "function":
+                    {
+                        "type": "cedar.aux.math.ExpSigmoid",
+                        "threshold": "0.08",
+                        "beta": "100"
+                    }
+                }
+            },
+            "connections":
+            [
+                {
+                    "source": "external input 8.output",
+                    "target": "Static Gain 2.input"
+                },
+                {
+                    "source": "Static Gain 2.output",
+                    "target": "Sum.terms"
+                },
+                {
+                    "source": "external input 9.output",
+                    "target": "Sum.terms"
+                },
+                {
+                    "source": "Sum.sum",
+                    "target": "Norm 3.input"
+                },
+                {
+                    "source": "Norm 3.output",
+                    "target": "Transfer Function 2.input"
+                },
+                {
+                    "source": "Transfer Function 2.sigmoided output",
+                    "target": "external output 5.input"
+                }
+            ],
+            "name": "bouncing fix",
+            "connectors":
+            {
+                "external input 8": "true",
+                "external input 9": "true",
+                "external output 5": "false"
+            },
+            "is looped": "false",
+            "time factor": "1",
+            "ui":
+            [
+                {
+                    "type": "step",
+                    "step": "Norm 3",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "179",
+                    "positionY": "77"
+                },
+                {
+                    "type": "step",
+                    "step": "Static Gain 2",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "52",
+                    "positionY": "14"
+                },
+                {
+                    "type": "step",
+                    "step": "Sum",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "107",
+                    "positionY": "77"
+                },
+                {
+                    "type": "step",
+                    "step": "Transfer Function 2",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "263",
+                    "positionY": "78"
+                }
+            ],
+            "ui generic":
+            {
+                "group": "bouncing fix",
+                "architecture widgets": "",
+                "background color": "110,255,255",
+                "width": "413",
+                "height": "173",
+                "smart mode": "false",
+                "collapsed": "false",
+                "lock geometry": "false",
+                "uncollapsed width": "413",
+                "uncollapsed height": "173",
+                "positionX": "-738",
+                "positionY": "-290"
+            }
+        },
+        "zero speed fix":
+        {
+            "meta":
+            {
+                "format": "1"
+            },
+            "steps":
+            {
+                "cedar.processing.sources.BoxInput":
+                {
+                    "name": "Box Input 2",
+                    "amplitude": "0",
+                    "reference level": "0",
+                    "dimensionality": "1",
+                    "widths":
+                    [
+                        "3"
+                    ],
+                    "left bounds":
+                    [
+                        "0"
+                    ],
+                    "sizes":
+                    [
+                        "3"
+                    ]
+                },
+                "cedar.processing.Norm":
+                {
+                    "name": "Norm 2"
+                },
+                "cedar.processing.Normalization":
+                {
+                    "name": "Normalization 2",
+                    "normalization type": "L2Norm",
+                    "normalized dimensions":
+                    [
+                        "true"
+                    ]
+                },
+                "cedar.processing.StaticGain":
+                {
+                    "name": "Static Gain 3",
+                    "gain factor": "-1"
+                },
+                "cedar.processing.StaticGain":
+                {
+                    "name": "Static Gain 4",
+                    "gain factor": "-1"
+                },
+                "cedar.processing.StaticGain":
+                {
+                    "name": "Static Gain 5",
+                    "gain factor": "0.0001"
+                },
+                "cedar.processing.steps.Sum":
+                {
+                    "name": "Sum 2"
+                },
+                "cedar.processing.steps.Switch":
+                {
+                    "name": "Switch"
+                },
+                "cedar.processing.TransferFunction":
+                {
+                    "name": "Transfer Function",
+                    "function":
+                    {
+                        "type": "cedar.aux.math.HeavisideSigmoid",
+                        "threshold": "0"
+                    }
+                }
+            },
+            "connections":
+            [
+                {
+                    "source": "external input 6.output",
+                    "target": "Norm 2.input"
+                },
+                {
+                    "source": "Norm 2.output",
+                    "target": "Static Gain 3.input"
+                },
+                {
+                    "source": "Static Gain 3.output",
+                    "target": "Transfer Function.input"
+                },
+                {
+                    "source": "Transfer Function.sigmoided output",
+                    "target": "Switch.factor"
+                },
+                {
+                    "source": "Box Input 2.box input",
+                    "target": "Switch.input 2"
+                },
+                {
+                    "source": "Switch.mixture",
+                    "target": "external output 4.input"
+                },
+                {
+                    "source": "external input 7.output",
+                    "target": "Static Gain 4.input"
+                },
+                {
+                    "source": "Static Gain 4.output",
+                    "target": "Sum 2.terms"
+                },
+                {
+                    "source": "external input 13.output",
+                    "target": "Sum 2.terms"
+                },
+                {
+                    "source": "Sum 2.sum",
+                    "target": "Normalization 2.input"
+                },
+                {
+                    "source": "Normalization 2.normalized input",
+                    "target": "Static Gain 5.input"
+                },
+                {
+                    "source": "Static Gain 5.output",
+                    "target": "Switch.input 1"
+                }
+            ],
+            "name": "zero speed fix",
+            "connectors":
+            {
+                "external input 13": "true",
+                "external input 6": "true",
+                "external input 7": "true",
+                "external output 4": "false"
+            },
+            "is looped": "false",
+            "time factor": "1",
+            "ui":
+            [
+                {
+                    "type": "step",
+                    "step": "Box Input 2",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "238",
+                    "positionY": "133"
+                },
+                {
+                    "type": "step",
+                    "step": "Norm 2",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "59",
+                    "positionY": "203"
+                },
+                {
+                    "type": "step",
+                    "step": "Normalization 2",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "219",
+                    "positionY": "60"
+                },
+                {
+                    "type": "step",
+                    "step": "Static Gain 3",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "145",
+                    "positionY": "201"
+                },
+                {
+                    "type": "step",
+                    "step": "Static Gain 4",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "89",
+                    "positionY": "56"
+                },
+                {
+                    "type": "step",
+                    "step": "Static Gain 5",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "296",
+                    "positionY": "60"
+                },
+                {
+                    "type": "step",
+                    "step": "Sum 2",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "144",
+                    "positionY": "27"
+                },
+                {
+                    "type": "step",
+                    "step": "Switch",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "352",
+                    "positionY": "120"
+                },
+                {
+                    "type": "step",
+                    "step": "Transfer Function",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "238",
+                    "positionY": "200"
+                }
+            ],
+            "ui generic":
+            {
+                "group": "zero speed fix",
+                "architecture widgets": "",
+                "background color": "110,255,255",
+                "width": "466",
+                "height": "279",
+                "smart mode": "false",
+                "collapsed": "false",
+                "lock geometry": "false",
+                "uncollapsed width": "466",
+                "uncollapsed height": "279",
+                "positionX": "-718",
+                "positionY": "190"
+            }
+        }
+    },
+    "connections":
+    [
+        {
+            "source": "Amari Clock.external output",
+            "target": "Target Acquisition Dynamics.external input 11"
+        },
+        {
+            "source": "Rectify ForwardKinematics.external output 6",
+            "target": "Target Acquisition Dynamics.external input 10"
+        },
+        {
+            "source": "Rectify ForwardKinematics.external output 2",
+            "target": "Target Acquisition Dynamics.external input"
+        },
+        {
+            "source": "Rectify ForwardKinematics.external output 6",
+            "target": "zero speed fix.external input 6"
+        },
+        {
+            "source": "Amari Clock.external output",
+            "target": "zero speed fix.external input 7"
+        },
+        {
+            "source": "Component Multiply 3.product",
+            "target": "Dynamics To Component.external input 2"
+        },
+        {
+            "source": "Amari Clock.external output",
+            "target": "bouncing fix.external input 8"
+        },
+        {
+            "source": "Rectify ForwardKinematics.external output 2",
+            "target": "bouncing fix.external input 9"
+        },
+        {
+            "source": "bouncing fix.external output 5",
+            "target": "Component Multiply 3.operands"
+        },
+        {
+            "source": "Rectify ForwardKinematics.external output 2",
+            "target": "zero speed fix.external input 13"
+        },
+        {
+            "source": "Target Acquisition Dynamics.external output 3",
+            "target": "Sum 5.terms"
+        },
+        {
+            "source": "Target Acquisition Dynamics.external output 7",
+            "target": "Sum 5.terms"
+        },
+        {
+            "source": "Sum 5.sum",
+            "target": "Component Multiply 3.operands"
+        },
+        {
+            "source": "zero speed fix.external output 4",
+            "target": "Sum 5.terms"
+        },
+        {
+            "source": "Amari Clock.external output",
+            "target": "Shape Visualisation.target position"
+        }
+    ],
+    "name": "",
+    "connectors": "",
+    "is looped": "true",
+    "time factor": "1",
+    "ui":
+    [
+        {
+            "type": "step",
+            "step": "Component Multiply 3",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "6",
+            "positionY": "-73"
+        },
+        {
+            "type": "step",
+            "step": "Shape Visualisation",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "-957",
+            "positionY": "405"
+        },
+        {
+            "type": "step",
+            "step": "Sum 5",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-89",
+            "positionY": "-74"
+        },
+        {
+            "type": "trigger",
+            "trigger": "default trigger",
+            "width": "30",
+            "height": "30",
+            "positionX": "0",
+            "positionY": "0"
+        }
+    ],
+    "ui generic":
+    {
+        "group": "",
+        "open plots":
+        {
+            "Viewer":
+            {
+                "position_x": "911",
+                "position_y": "404",
+                "width": "774",
+                "height": "364",
+                "camera position x": "0.4048690404844439",
+                "camera position y": "1.893405637467202",
+                "camera position z": "1.284675518674269",
+                "camera orientation 0": "-0.0855034728112874",
+                "camera orientation 1": "-0.4664618323893668",
+                "camera orientation 2": "-0.8696999018745718",
+                "camera orientation 3": "-0.1368378446940902"
+            }
+        },
+        "plot groups": "",
+        "architecture widgets": "",
+        "width": "250",
+        "height": "250",
+        "smart mode": "false",
+        "collapsed": "false",
+        "lock geometry": "false",
+        "uncollapsed width": "250",
+        "uncollapsed height": "250",
+        "positionX": "0",
+        "positionY": "0"
+    }
+}
