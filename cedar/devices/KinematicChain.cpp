@@ -1249,6 +1249,8 @@ cv::Mat cedar::dev::KinematicChain::getCurrentInitialConfiguration()
 
 void cedar::dev::KinematicChain::updatedUserSideMeasurementSlot()
 {
+  if (!mForwardKinematics)
+    return;
   mForwardKinematics->calculateTransformations();
 }
 
