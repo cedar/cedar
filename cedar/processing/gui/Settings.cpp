@@ -218,6 +218,8 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   default_favs.push_back("cedar.processing.steps.Sum");
   default_favs.push_back("cedar.processing.sources.Boost");
   default_favs.push_back("cedar.processing.sources.GaussInput");
+  default_favs.push_back("cedar.processing.steps.Component");
+
   this->_mFavoriteElements = new cedar::aux::StringVectorParameter(this, "favorite elements", default_favs);
   QObject::connect(this->_mFavoriteElements.get(), SIGNAL(valueChanged()), this, SIGNAL(elementFavoritesChanged()));
 
