@@ -64,7 +64,7 @@ void run_test()
 
   //Creating Mats
   int sz[] = {10, 10, 10};
-  cv::Mat mat1(3, sz, CV_32F, cv::Scalar::all(0));
+  cv::Mat mat1(3, sz, CV_64F, cv::Scalar::all(0));
   cv::Mat mat2(3, sz, CV_8S, cv::Scalar::all(-42));
   cv::Mat mat3(100,100,CV_8UC3);
 

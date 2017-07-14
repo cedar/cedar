@@ -101,11 +101,11 @@ int main()
 
 #if 1
   // preparing ...
-  cv::Mat mat = cv::Mat::eye(SIZE, 2, CV_32F);
-  cv::Mat mat2 = cv::Mat::zeros(SIZE, 2, CV_32F);
-  cv::Mat mat3 = cv::Mat::zeros(16, 2, CV_32F);
-  cv::Mat mat6 = cv::Mat::zeros(SIZE, 2, CV_32F);
-  cv::Mat mat7 = cv::Mat::zeros(SIZE, 2, CV_32F);
+  cv::Mat mat = cv::Mat::eye(SIZE, 2, CV_64F);
+  cv::Mat mat2 = cv::Mat::zeros(SIZE, 2, CV_64F);
+  cv::Mat mat3 = cv::Mat::zeros(16, 2, CV_64F);
+  cv::Mat mat6 = cv::Mat::zeros(SIZE, 2, CV_64F);
+  cv::Mat mat7 = cv::Mat::zeros(SIZE, 2, CV_64F);
   cv::Mat mat8 = cv::Mat::zeros(20, 2, CV_32FC3); // multichannel
   cv::Mat mat9 = cv::Mat::zeros(20, 2, CV_32FC3); // multichannel
 

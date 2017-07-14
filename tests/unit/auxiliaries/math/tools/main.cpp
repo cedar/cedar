@@ -185,7 +185,7 @@ int main()
   // test stuff
   errors += testMinMax(CV_8U);
   errors += testMinMax(CV_32F);
-  errors += testMinMax(CV_32F);
+  errors += testMinMax(CV_64F);
 
   errors += testMatrixAccess1D<uint8_t, uint8_t, CV_8U>();
   errors += testMatrixAccess1D<uint16_t, uint16_t, CV_16U>();
