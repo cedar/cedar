@@ -207,6 +207,7 @@ CEDAR_THROW(cedar::dev::ResourceNotAvailableException,"This Slot is not implemen
 void cedar::dev::gui::ComponentParameter::updatePathText()
 {
   std::string text;
+
   try
   {
     text = this->mParameter->getStringRepresentation();
@@ -214,7 +215,9 @@ void cedar::dev::gui::ComponentParameter::updatePathText()
   catch (const cedar::dev::NoComponentSelectedException&)
   {
     // nothing to do -- text remains empty.
+    text= "";
   }
+
   this->mpComponentPathDisplay->setText(QString::fromStdString(text));
 
   if(!text.empty())
@@ -222,7 +225,6 @@ void cedar::dev::gui::ComponentParameter::updatePathText()
     this->mParameter->setRobotName(text.substr(0, text.find(".")));
     this->mParameter->setSlotName(text.substr(text.find(".")+1));
   }
-
 }
 
 void cedar::dev::gui::ComponentParameter::fillRobots(QTreeWidgetItem* pItem)

@@ -159,7 +159,18 @@ void cedar::dev::ComponentParameter::readFromNode(const cedar::aux::Configuratio
 
 void cedar::dev::ComponentParameter::writeToNode(cedar::aux::ConfigurationNode& root) const
 {
-  root.put(this->getName(), this->getStringRepresentation());
+  std::string text;
+
+  try
+  {
+    text = this->getStringRepresentation();
+  }
+  catch (const cedar::dev::NoComponentSelectedException&)
+  {
+    text= "";
+  }
+
+  root.put(this->getName(), text);
 }
 
 void cedar::dev::ComponentParameter::makeDefault()
