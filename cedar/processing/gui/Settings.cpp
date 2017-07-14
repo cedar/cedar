@@ -257,6 +257,20 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
     "files. Restore your auto-saved architectures from the Open File dialog by "
     "selecting the file type 'backup'.</p>"
   );
+
+  this->addOneTimeMessage
+  (
+    CEDAR_MAKE_VERSION(6, 0, 0), // introduces in this version
+    "robotics framework",
+    "Connect your architectures to robots!",
+    "<p>You can now set-up communication with robotic hardware from within "
+    "your architectures. Open the robot manager, setup and connect "
+    "the robot of your choice (OpenGL simulation, hardware interface "
+    "or via network). Cedar will "
+    "communicate with your robot in a separate thread. "
+    "Finally, drag the robotic 'component' step onto your canvas and use "
+    "it like any other step.</p>"
+  );
 }
 
 cedar::proc::gui::Settings::UserDefinedColor::UserDefinedColor(const std::string& stringToParse)
