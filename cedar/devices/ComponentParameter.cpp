@@ -42,6 +42,7 @@
 #include "cedar/devices/ComponentSlot.h"
 #include "cedar/devices/RobotManager.h"
 #include "cedar/devices/exceptions.h"
+#include "cedar/devices/gui/RobotManager.h"
 
 // SYSTEM INCLUDES
 
@@ -53,6 +54,14 @@ cedar::dev::ComponentParameter::ComponentParameter(cedar::aux::Configurable* pOw
 :
 cedar::dev::ComponentParameter::Super(pOwner, name)
 {
+  this->mRobotConfigurationChangedConnection = cedar::dev::RobotManagerSingleton::getInstance()->connectToConfigurationChangedSignal
+          (
+                  boost::bind
+                          (
+                                  &cedar::dev::ComponentParameter::doReselect,
+                                  this
+                          )
+          );
 }
 
 cedar::dev::ComponentParameter::~ComponentParameter()
@@ -77,7 +86,20 @@ bool cedar::dev::ComponentParameter::hasComponentSlot() const
 
 void cedar::dev::ComponentParameter::emitReselect()
 {
+  //I leave this here just because it is a signal, but it does not seem to be used by anyone.
   reselect(mRobotName, mSlotName);
+}
+
+void cedar::dev::ComponentParameter::doReselect()
+{
+//  This is just the final result of emitting reselect!
+  if(mRobotName != "")
+  {
+    cedar::dev::RobotPtr robot = cedar::dev::RobotManagerSingleton::getInstance()->getRobot(mRobotName);
+    CEDAR_ASSERT(robot);
+    cedar::dev::ComponentSlotPtr slot = robot->getComponentSlot(mSlotName);
+    this->setValue(slot);
+  }
 }
 
 void cedar::dev::ComponentParameter::setSlotName(const std::string &slot_name)

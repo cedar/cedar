@@ -164,17 +164,6 @@ private:
 
 }; // class cedar::dev::gui::RobotManager
 
-namespace cedar
-{
-  namespace dev
-  {
-    namespace gui
-    {
-      //!@brief The singleton instance of the robot manager GUI (used to directly communicate configuration selection changes).
-      typedef cedar::aux::Singleton<cedar::dev::gui::RobotManager> RobotManagerGUISingleton;
-    }
-  }
-}
 
 #endif // CEDAR_DEV_GUI_ROBOT_MANAGER_H
 

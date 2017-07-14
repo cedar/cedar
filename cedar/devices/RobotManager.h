@@ -184,13 +184,16 @@ public:
    */
   cedar::dev::ComponentSlotPtr findComponentSlot(const std::string& componentPath) const;
 
+  void emitConfigurationChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
   // signals a change in a robot's name; first parameter: old name, second: new name.
 public:
   CEDAR_DECLARE_SIGNAL(RobotNameChanged, void (const std::string&, const std::string&));
-
+public:
+  CEDAR_DECLARE_SIGNAL(ConfigurationChanged, void ());
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

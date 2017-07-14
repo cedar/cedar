@@ -54,6 +54,7 @@
 
 cedar::dev::RobotManager::RobotManager()
 {
+
   //!@todo Find a better place for this list of robots
   // epuck -----------------------------------------------------------------------------------------------------------
   cedar::dev::RobotManager::Template epuck_template;
@@ -543,5 +544,11 @@ void cedar::dev::RobotManager::restore()
       }
     }
   }
+}
+
+
+void cedar::dev::RobotManager::emitConfigurationChanged()
+{
+  this->signalConfigurationChanged();
 }
 

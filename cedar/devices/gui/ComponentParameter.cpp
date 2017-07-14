@@ -191,12 +191,17 @@ void cedar::dev::gui::ComponentParameter::selectComponent(cedar::dev::ComponentS
   cedar::aux::asserted_pointer_cast<cedar::dev::ComponentParameter>(this->getParameter())->setValue(slot);
 }
 
-void cedar::dev::gui::ComponentParameter::reselect(const std::string& robot_name, const std::string& slot_name)
+void cedar::dev::gui::ComponentParameter::reselect(const std::string& , const std::string& )
 {
-  cedar::dev::RobotPtr robot = cedar::dev::RobotManagerSingleton::getInstance()->getRobot(robot_name);
-  CEDAR_ASSERT(robot);
-  cedar::dev::ComponentSlotPtr slot = robot->getComponentSlot(slot_name);
-  this->selectComponent(slot);
+//As far as I can see is this code only picking up a signal from ComponentParameter and to perform a function on ComponentParameter. No reason to be here at all!
+  //Just to be sure that I did not overlook anything I will keep this function and throw an exception!
+CEDAR_THROW(cedar::dev::ResourceNotAvailableException,"This Slot is not implemented. Something is connected to cedar::dev::gui::ComponentParameter::reselect! This is a bug and needs to be fixed!")
+
+
+//  cedar::dev::RobotPtr robot = cedar::dev::RobotManagerSingleton::getInstance()->getRobot(robot_name);
+//  CEDAR_ASSERT(robot);
+//  cedar::dev::ComponentSlotPtr slot = robot->getComponentSlot(slot_name);
+//  this->selectComponent(slot);
 }
 
 void cedar::dev::gui::ComponentParameter::updatePathText()
