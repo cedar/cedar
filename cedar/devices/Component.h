@@ -80,24 +80,22 @@ class cedar::dev::Component : public QObject,
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  typedef unsigned int                      ComponentDataType;
+  typedef unsigned int                                                  ComponentDataType;
 
-  typedef boost::function< void (cv::Mat) > CommandFunctionType;
-  typedef boost::function< cv::Mat () >     MeasurementFunctionType;
-  typedef boost::function< void (const ComponentDataType&) > NoCommandFunctionType;
+  typedef boost::function< void (cv::Mat) >                             CommandFunctionType;
+  typedef boost::function< cv::Mat () >                                 MeasurementFunctionType;
+  typedef boost::function< void (const ComponentDataType&) >            NoCommandFunctionType;
   typedef boost::function< void () > AfterCommandFunctionType;
-  typedef boost::function< cv::Mat (cedar::unit::Time, cv::Mat) > TransformationFunctionType;
+  typedef boost::function< cv::Mat (cedar::unit::Time, cv::Mat) >       TransformationFunctionType;
+  typedef boost::function< bool(const ComponentDataType&, cv::Mat& ) >  CommandCheckFunctionType;
+  typedef boost::function< cv::Mat() >                                  ControllerCallbackFunctionType;
 
-  typedef boost::function< bool(const ComponentDataType&, cv::Mat& ) > CommandCheckFunctionType;
-
-  typedef boost::function< cv::Mat() >      ControllerCallback;
-
-  typedef std::map< ComponentDataType, cedar::aux::MatDataPtr > BufferDataType;
-  typedef std::vector< unsigned long>      DimensionalityType;
+  typedef std::map< ComponentDataType, cedar::aux::MatDataPtr >         BufferDataType;
+  typedef std::vector< unsigned long>                                   DimensionalityType;
 
 private:
-  typedef std::map< ComponentDataType, TransformationFunctionType > InnerTransformationHookContainerType;
-  typedef std::map< ComponentDataType, InnerTransformationHookContainerType > TransformationHookContainerType;
+  typedef std::map< ComponentDataType, TransformationFunctionType >             InnerTransformationHookContainerType;
+  typedef std::map< ComponentDataType, InnerTransformationHookContainerType >   TransformationHookContainerType;
 
   //--------------------------------------------------------------------------------------------------------------------
   // friends
@@ -110,40 +108,28 @@ private:
 public:
   //! Exception that is thrown when a buffer is initialized more than once.
   class AlreadyInitializedException : public cedar::aux::ExceptionBase {};
-
   //! Exception that is thrown when a function that requires the component to be stopped is called during running.
   class AlreadyCommunicatingException : public cedar::aux::ExceptionBase {};
-
   //! Exception that is thrown when a type that is not installed is requested.
   class TypeNotFoundException : public cedar::aux::NotFoundException {};
-
   //! Exception that is thrown when a hook is set that already exists.
   class DuplicateTypeException : public cedar::aux::DuplicateIdException {};
-
   //! Exception that is thrown when a hook is set that already exists.
   class DuplicateHookException : public cedar::aux::DuplicateIdException {};
-
   //! Exception that is thrown when a transformation hook is set that already exists.
   class DuplicateTransformationHookException : public DuplicateHookException {};
-
   //! Exception that is thrown when a dimensionality is not provided.
   class DimensionalityNotSetException : public cedar::aux::ExceptionBase {};
-
   //! Exception that is thrown when a hook is not found.
   class HookNotFoundException : public cedar::aux::NotFoundException {};
-
   //! Exception that is thrown when the device type could not be guessed.
   class CouldNotGuessDeviceSideTypeException : public cedar::aux::ExceptionBase {};
-
   //! Exception that is thrown when the command type could not be guessed.
   class CouldNotGuessCommandTypeException : public cedar::aux::ExceptionBase {};
-
   //! Thrown when a group name already exists.
   class DuplicateUserSelectableCommandTypeSubsetNameException : public cedar::aux::DuplicateNameException {};
-
   //! Thrown when a group name cannot be found.
   class UserSelectableCommandTypeSubsetNameNotFoundException : public cedar::aux::NotFoundException {};
-
   //! Exception that is thrown when there are no submit hooks even though they are needed.
   class NoSubmitHooksException : public cedar::aux::ExceptionBase {};
 
@@ -161,8 +147,8 @@ private:
   CEDAR_GENERATE_POINTER_TYPES(MeasurementDataCollection);
 
   struct ControllerCollection {
-    cedar::dev::Component::ComponentDataType  mBufferType;
-    cedar::dev::Component::ControllerCallback mCallback;
+    cedar::dev::Component::ComponentDataType              mBufferType;
+    cedar::dev::Component::ControllerCallbackFunctionType mCallback;
   };
   CEDAR_GENERATE_POINTER_TYPES(ControllerCollection);
 
@@ -239,6 +225,14 @@ public:
   std::set<ComponentDataType> getInstalledMeasurementTypes() const;
   //! Returns a list of all installed command types.
   std::set<ComponentDataType> getInstalledCommandTypes() const;
+  //! Returns the name for the given command.
+  std::string getNameForCommandType(ComponentDataType type) const;
+  //! Returns the command type associated with the given name.
+  ComponentDataType getCommandTypeForName(const std::string& name) const;
+  //! Returns the name for the given measurement.
+  std::string getNameForMeasurementType(ComponentDataType type) const;
+  //! Returns the measurement type associated with the given name.
+  ComponentDataType getMeasurementTypeForName(const std::string& name) const;
 
 
   //! Returns the data that contains the current measurements.
@@ -251,32 +245,43 @@ public:
   cedar::aux::ConstDataPtr getDeviceSideCommandData(const ComponentDataType &type) const;
   cedar::aux::DataPtr getUserSideCommandData(const ComponentDataType &type);
   cedar::aux::ConstDataPtr getUserSideCommandData(const ComponentDataType &type) const;
-
-  //! Returns the name for the given command.
-  std::string getNameForCommandType(ComponentDataType type) const;
-  //! Returns the command type associated with the given name.
-  ComponentDataType getCommandTypeForName(const std::string& name) const;
-
-  //! Returns the name for the given measurement.
-  std::string getNameForMeasurementType(ComponentDataType type) const;
-
-  //! Returns the measurement type associated with the given name.
-  ComponentDataType getMeasurementTypeForName(const std::string& name) const;
-
-
+  void setUserSideCommandBuffer(ComponentDataType type, cv::Mat);
 
   void applyDeviceSideCommandsAs(ComponentDataType type);
 
   //! Returns the dimensionality (size) of the given command type.
   DimensionalityType getCommandDimensionality(ComponentDataType type) const;
 
-  void setUserSideCommandBuffer(ComponentDataType type, cv::Mat);
+
 
   //!@brief this function resets the internally used user command and allows to subsequently use a different type
   void clearUserSideCommand();
   void clearAllCommands();
   //!@brief clear all buffers and controllers
   void clearAll();
+
+  void clearController();
+  void setController( ComponentDataType buffer, cedar::dev::Component::ControllerCallbackFunctionType fun );
+
+  //!@brief Returns the channel associated with the component.
+  inline cedar::dev::ChannelPtr getChannel() const
+  {
+    return mChannel;
+  }
+
+  inline void setChannel(cedar::dev::ChannelPtr channel)
+  {
+    this->mChannel = channel;
+  }
+  inline cedar::dev::ComponentSlotWeakPtr getSlot()
+  {
+    return this->mSlot;
+  }
+
+  inline void setSlot(cedar::dev::ComponentSlotWeakPtr slot)
+  {
+    this->mSlot = slot;
+  }
 
   //! Defines a new command group.
   void defineUserSelectableCommandTypeSubset(const std::string& groupName);
@@ -307,33 +312,6 @@ public:
   std::vector<std::string> getLastCommandCommunicationErrors() const;
   //! Returns the last communication errors.
   std::vector<std::string> getLastMeasurementCommunicationErrors() const;
-
-
-
-
-
-  void clearController();
-  void setController( ComponentDataType buffer, cedar::dev::Component::ControllerCallback fun );
-
-  //!@brief Returns the channel associated with the component.
-  inline cedar::dev::ChannelPtr getChannel() const
-  {
-    return mChannel;
-  }
-
-  inline void setChannel(cedar::dev::ChannelPtr channel)
-  {
-    this->mChannel = channel;
-  }
-  inline cedar::dev::ComponentSlotWeakPtr getSlot()
-  {
-    return this->mSlot;
-  }
-
-  inline void setSlot(cedar::dev::ComponentSlotWeakPtr slot)
-  {
-    this->mSlot = slot;
-  }
 
   //! public hooks intended for GUI communication
   boost::signals2::connection registerConnectedHook(boost::function<void ()> slot);
@@ -380,7 +358,6 @@ protected:
   void registerMeasurementTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
 
   boost::signals2::connection registerStartCommunicationHook(boost::function<void ()> slot);
-
   void registerCheckCommandHook(CommandCheckFunctionType fun);
 
   void setUserSideCommandBufferIndex(ComponentDataType type, int index, float value);
@@ -392,9 +369,9 @@ protected:
   cv::Mat getPreviousDeviceSideMeasurementBuffer(ComponentDataType type) const;
   float  getPreviousDeviceSideMeasurementBufferIndex(ComponentDataType type, int index) const;
 
-  void prepareComponentDestructAbsolutelyRequired();
-
   int getMeasurementMatrixType();
+
+  void prepareComponentDestructAbsolutelyRequired();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -411,8 +388,7 @@ private:
 
   void updateUserSideMeasurements();
 
-  //!@brief checks whether a given command type conflicts with already set commands and throws an exception if this happens
-  void checkExclusivenessOfCommand(ComponentDataType type);
+  void handleStopCommunicationNonBlocking();
 
   virtual bool applyBrakeSlowlyController() = 0; // returning FALSE will allow re-try
   virtual bool applyBrakeNowController() = 0;
@@ -420,30 +396,40 @@ private:
 
   static void stepStaticWatchDog(cedar::unit::Time);
 
-  void handleStopCommunicationNonBlocking();
+  //!@brief checks whether a given command type conflicts with already set commands and throws an exception if this happens
+  void checkExclusivenessOfCommand(ComponentDataType type);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  bool mControllerFinished = true;
+  bool mControllerFinished;
 
 private:
+  mutable QMutex mGeneralAccessLock;
+
+  bool mDestroying;
+  bool mDestructWasPrepared; // helper bool
+
+  bool mSuppressUserSideInteraction;
+
   cedar::dev::ChannelPtr mChannel;
   cedar::dev::ComponentSlotWeakPtr mSlot;
 
   MeasurementDataCollectionPtr mMeasurementData;
   CommandDataCollectionPtr mCommandData;
 
-  //! the DeviceSide-thread's wrapper
+  //! the Device-thread's wrapper
   std::unique_ptr<cedar::aux::LoopFunctionInThread> mCommunicationThread;
 
   cedar::aux::LockableMember<std::map<ComponentDataType, CommandFunctionType> > mSubmitCommandHooks;
   cedar::aux::LockableMember<std::map<ComponentDataType, MeasurementFunctionType> > mRetrieveMeasurementHooks;
-  cedar::aux::LockableMember<ControllerCollectionPtr> mController;
+
   cedar::aux::LockableMember< NoCommandFunctionType > mNoCommandHook;
   cedar::aux::LockableMember< NoCommandFunctionType > mNotReadyForCommandHook;
   cedar::aux::LockableMember< AfterCommandFunctionType > mAfterCommandBeforeMeasurementHook;
+
+  cedar::aux::LockableMember<ControllerCollectionPtr> mController;
 
   boost::signals2::signal<void ()> mStartCommunicationHook;
   boost::signals2::signal<void ()> mConnectedHook;
@@ -458,11 +444,6 @@ private:
   cedar::aux::LockableMember<boost::optional<cedar::unit::Time> > mLastStepMeasurementsTime;
   cedar::aux::LockableMember<boost::optional<cedar::unit::Time> > mLastStepCommandsTime;
 
-  mutable QMutex mGeneralAccessLock;
-
-  bool mDestroying;
-  bool mDestructWasPrepared; // helper bool
-
   //! Integration time that is lost due to skipping stepCommunication calls.
   cedar::unit::Time mLostTime;
 
@@ -474,8 +455,6 @@ private:
   cedar::aux::LockableMember<unsigned int> mTooSlowCounter;
   cedar::aux::LockableMember<unsigned int> mNotReadyForCommandsCounter;
   static cedar::aux::LockableMember<unsigned int> mWatchDogCounter; 
-
-  bool mSuppressUserSideInteraction;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
