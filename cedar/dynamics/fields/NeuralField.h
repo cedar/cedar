@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/dynamics/Dynamics.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
@@ -269,8 +270,7 @@ protected:
   //!@brief the relaxation rate of the field
   cedar::aux::DoubleParameterPtr mTau;
 
-  //!@brief the global inhibition of the field, which is not contained in the kernel
-  cedar::aux::DoubleParameterPtr mGlobalInhibition;
+
 
   //!@brief the noise correlation kernel
   cedar::aux::kernel::GaussPtr mNoiseCorrelationKernel;
@@ -287,6 +287,7 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+
   //!@brief Parameter that lets the user decide whether the activation is an output.
   cedar::aux::BoolParameterPtr _mOutputActivation;
 
@@ -313,6 +314,9 @@ protected:
 
   //!@brief any sigmoid function
   SigmoidParameterPtr _mSigmoid;
+
+  //!@brief the global inhibition of the field, which is not contained in the kernel
+  cedar::aux::DoubleParameterPtr mGlobalInhibition;
 
   //!@brief Parameter that determines the convolution engine used by the field.
   cedar::aux::conv::ConvolutionPtr _mLateralKernelConvolution;
