@@ -82,11 +82,13 @@ public:
     const std::string& name,
     const T& defaultValue,
     const T& minimum,
-    const T& maximum
+    const T& maximum,
+    const double& singlestep = 0.1
   )
   :
   cedar::aux::ParameterTemplate<T>(pOwner, name, defaultValue),
-  mLimits(minimum, maximum)
+  mLimits(minimum, maximum),
+  mSingleStep(singlestep)
   {
   }
 
@@ -97,11 +99,13 @@ public:
     cedar::aux::Configurable *pOwner = nullptr,
     const std::string& name = "",
     const T& defaultValue = static_cast<T>(0),
-    const LimitType& limits = LimitType::full()
+    const LimitType& limits = LimitType::full(),
+    const double& singlestep = 0.1
   )
   :
   cedar::aux::ParameterTemplate<T>(pOwner, name, defaultValue),
-  mLimits(limits)
+  mLimits(limits),
+  mSingleStep(singlestep)
   {
   }
 
@@ -158,6 +162,16 @@ public:
     this->Super::setValue(this->mLimits.limit(value), lock);
   }
 
+  void setSingleStep(const double& value)
+  {
+    mSingleStep= value;
+  }
+
+  double getSingleStep()
+  {
+    return mSingleStep;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -178,6 +192,7 @@ protected:
 private:
   //!@brief The limits for this parameter.
   LimitType mLimits;
+  double mSingleStep;
 
 }; // class cedar::aux::NumericParameter
 
