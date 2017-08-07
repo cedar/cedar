@@ -113,8 +113,8 @@ QWidget* cedar::aux::gui::Configurable::DataDelegate::createEditor(QWidget *pPar
   connect(p_ret, SIGNAL(destroyed(QObject*)), this, SLOT(widgetDestroyed(QObject*)));
   mOpenedEditors.insert(p_ret);
 
-  //Choose 7 as a fixed value, to disambiguate between Parameters and VectorParameters. Other values might be nicer, we will have to do a field study.
-  p_ret->setContentsMargins(0,7,0,7);
+  //Choose 5 as a fixed value, to disambiguate between Parameters and VectorParameters. Other values might be nicer, we will have to do a field study.
+  p_ret->setContentsMargins(0,5,0,5);
   return p_ret;
 }
 

@@ -725,6 +725,9 @@
    <property name="toolTip">
     <string>Hide/show all open plots</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+H</string>
+   </property>
   </action>
   <action name="mpActionNewPlotGroup">
    <property name="icon">
