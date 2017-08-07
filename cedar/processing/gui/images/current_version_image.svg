@@ -14,13 +14,24 @@
    height="191.9375"
    id="svg2"
    version="1.1"
-   inkscape:version="0.91 r"
+   inkscape:version="0.48.4 r9939"
    sodipodi:docname="current_version_image.svg"
    inkscape:export-filename="/home/lompolbx/Pictures/moonchild_desktop_alt.png"
    inkscape:export-xdpi="142.5284"
    inkscape:export-ydpi="142.5284">
   <defs
      id="defs4">
+    <linearGradient
+       id="linearGradient3813">
+      <stop
+         style="stop-color:#90460a;stop-opacity:1;"
+         offset="0"
+         id="stop3815" />
+      <stop
+         style="stop-color:#f4d566;stop-opacity:1;"
+         offset="1"
+         id="stop3817" />
+    </linearGradient>
     <linearGradient
        id="linearGradient3802">
       <stop
@@ -267,15 +278,6 @@
        x2="1052.5834"
        y2="372.21948" />
     <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient4211"
-       id="linearGradient3808"
-       x1="0.5363853"
-       y1="65.072937"
-       x2="-0.5363853"
-       y2="256.5625"
-       gradientUnits="userSpaceOnUse" />
-    <linearGradient
        id="linearGradient4211">
       <stop
          id="stop4213"
@@ -294,6 +296,15 @@
          offset="1"
          style="stop-color:#d3ff04;stop-opacity:1" />
     </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3813"
+       id="linearGradient3819"
+       x1="239.22786"
+       y1="65.117165"
+       x2="239.22786"
+       y2="270.94043"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -302,16 +313,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.9321657"
-     inkscape:cx="42.641951"
-     inkscape:cy="47.264653"
+     inkscape:zoom="0.94316065"
+     inkscape:cx="265.00641"
+     inkscape:cy="112.84833"
      inkscape:document-units="px"
-     inkscape:current-layer="g3688"
+     inkscape:current-layer="layer4"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1005"
+     inkscape:window-height="1030"
      inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-y="0"
      inkscape:window-maximized="1">
     <inkscape:grid
        type="xygrid"
@@ -358,7 +369,7 @@
      style="display:inline"
      transform="translate(-172.93067,-400.70852)">
     <path
-       style="fill:url(#linearGradient3808);fill-opacity:1.0;fill-rule:evenodd;stroke:none;display:inline"
+       style="fill:url(#linearGradient3819);fill-opacity:1;fill-rule:evenodd;stroke:none;display:inline"
        d="m 0,64.625 0,191.9375 488.28125,0 0,-191.9375 L 0,64.625 z"
        transform="translate(172.93067,336.08352)"
        id="rect3194" />
@@ -423,13 +434,13 @@
          id="text3684"
          y="481.02283"
          x="-72.445229"
-         style="font-style:normal;font-weight:normal;font-size:72px;line-height:125%;font-family:'Bitstream Vera Sans';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+         style="font-size:72px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
          xml:space="preserve"><tspan
-           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:95px;font-family:'URW Gothic L';-inkscape-font-specification:'URW Gothic L Semi-Bold';fill:#000000;fill-opacity:1"
+           style="font-size:95px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#000000;fill-opacity:1;font-family:URW Gothic L;-inkscape-font-specification:URW Gothic L Semi-Bold"
            y="481.02283"
            x="-72.445229"
            id="tspan3686"
-           sodipodi:role="line">cedar 5.0</tspan></text>
+           sodipodi:role="line">cedar 6.0</tspan></text>
     </g>
   </g>
 </svg>
