@@ -1,0 +1,122 @@
+#=======================================================================================================================
+#
+#   Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+# 
+#   This file is part of cedar.
+#
+#   cedar is free software: you can redistribute it and/or modify it under
+#   the terms of the GNU Lesser General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+#   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+#   License for more details.
+#
+#   You should have received a copy of the GNU Lesser General Public License
+#   along with cedar. If not, see <http://www.gnu.org/licenses/>.
+#
+#=======================================================================================================================
+#
+#   Institute:   Ruhr-Universitaet Bochum
+#                Institut fuer Neuroinformatik
+#
+#   File:        testing.txt
+#
+#   Maintainer:  Mathis Richter
+#   Email:       mathis.richter@ini.rub.de
+#   Date:        2010 11 29
+#
+#   Description: Setup of unit and interactive tests.
+#
+#   Credits:
+#
+#=======================================================================================================================
+
+########################################################################################################################
+# testing settings
+
+# enable unit tests via ctest
+if(CEDAR_BUILD_TESTS)
+  message("-- configuring tests")
+  enable_testing()
+
+  # append memcheck options
+  set(CEDAR_VALGRIND_SUPP_BASEDIR ${CEDAR_HOME}/tools/valgrindSuppressions)
+  set(MEMORYCHECK_SUPPRESSIONS_FILE ${CEDAR_VALGRIND_SUPP_BASEDIR}/memcheck.supp)
+  #set(MEMORYCHECK_COMMAND "${MEMORYCHECK_COMMAND} --gen-suppressions=all")
+  #set(MEMORYCHECK_COMMAND_OPTIONS --suppressions=${CEDAR_VALGRIND_SUPP_BASEDIR}/memcheck.supp)
+  #set(MEMORYCHECK_COMMAND_OPTIONS --gen-suppressions=all)
+
+
+########################################################################################################################
+# cedar unit and interactive tests
+  list(APPEND subdirectories ${CEDAR_UNIT_TEST_DIR} ${CEDAR_INTERACTIVE_TEST_DIR} ${CEDAR_PERFORMANCE_TEST_DIR})
+  list(LENGTH subdirectories numberOfSubdirectories)
+  
+  while (${numberOfSubdirectories} STRGREATER 0)
+    list(GET subdirectories 0 subdirectory)
+    list(REMOVE_AT subdirectories 0)
+  
+    cedar_get_subdirectories(${subdirectory})
+  
+    foreach(newSubdirectory ${returnedSubdirectories})
+  
+      if (EXISTS "${newSubdirectory}/CMakeLists.txt")
+        add_subdirectory(${newSubdirectory})
+      endif (EXISTS "${newSubdirectory}/CMakeLists.txt")
+  
+      list(APPEND subdirectories ${newSubdirectory})
+    endforeach(newSubdirectory)
+  
+    list(LENGTH subdirectories ${numberOfSubdirectories})
+  endwhile (${numberOfSubdirectories} STRGREATER 0)
+  
+########################################################################################################################
+# cedar coverage tests
+  if (CEDAR_COVERAGE_TEST AND CMAKE_COMPILER_IS_GNUCC)
+    include(CTest)
+    find_program(CEDAR_COVERAGE_TEST_GCOV gcov)
+    
+    if (NOT CEDAR_BUILD_DEBUG_VERSION)
+      message(FATAL_ERROR "\nYou specified a release build and coverage testing."
+      "Coverage testing only works with debug builds."
+      "Please change the build type to debug or turn off coverage." )
+    endif(NOT CEDAR_BUILD_DEBUG_VERSION)
+
+    if (CEDAR_COVERAGE_TEST_GCOV)
+      message (STATUS "GCov available for static code analysis. Configuring for code check." )
+      
+      set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -Wall -W --coverage -fprofile-arcs -ftest-coverage")
+      set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0 -Wall -W --coverage -fprofile-arcs -ftest-coverage")
+      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -Wall -W --coverage -fprofile-arcs -ftest-coverage")
+      set (CFLAGS "${CFLAGS} -g -O0 -Wall -W -fprofile-arcs -ftest-coverage")
+      set (LDFLAGS "${LDFLAGS} -fprofile-arcs -ftest-coverage")
+      set (LINK_FLAGS "${LINK_FLAGS} -fprofile-arcs -ftest-coverage")
+      add_definitions(-fprofile-arcs -ftest-coverage)
+      link_libraries(gcov)
+      
+    else(CEDAR_COVERAGE_TEST_GCOV)
+    
+      message ("GCov not found, skipping coverage testing.")
+      
+    endif(CEDAR_COVERAGE_TEST_GCOV)
+    
+  endif ()
+
+  
+########################################################################################################################
+# valgrind check
+
+if (CEDAR_BUILD_VALGRIND_CHECK )
+  include(CTest)
+  find_program(CEDAR_BUILD_VALGRIND_CHECK_PROGRAM valgrind)
+  if (CEDAR_BUILD_VALGRIND_CHECK_PROGRAM)
+    message(STATUS "Valgrind available for memory check.")
+  endif()
+endif(CEDAR_BUILD_VALGRIND_CHECK)
+
+else(CEDAR_BUILD_TESTS)
+  message("-- excluding tests from build")
+endif(CEDAR_BUILD_TESTS)
