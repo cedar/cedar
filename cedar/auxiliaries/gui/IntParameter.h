@@ -57,6 +57,16 @@ namespace cedar
     {
       //!@cond SKIPPED_DOCUMENTATION
       template<>
+      inline void NumericWidgetPolicy<int, QSpinBox>::setSingleStep(QSpinBox* widget, double step)
+      {
+        if (step < 1.0)
+          step= 1.0;
+
+        widget->setSingleStep( step );
+      }
+
+      //!@cond SKIPPED_DOCUMENTATION
+      template<>
       inline void NumericWidgetPolicy<int, QSpinBox>::setPrecision(QSpinBox*, int)
       {
         // integal precision is ignored
