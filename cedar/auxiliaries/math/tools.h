@@ -118,7 +118,7 @@ namespace cedar
       }
 
       //!@brief checks the zero-ness of a floating point value with a given tolerance
-      template <typename T>  inline bool isZero(const T& value, const T& precision = static_cast<T>(1e-9))
+      template <typename T>  inline bool isZero(const T& value, const T& precision = static_cast<T>(1e-8))
       {
         if (std::is_floating_point<T>::value)
         {

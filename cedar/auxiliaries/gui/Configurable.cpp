@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -112,6 +112,9 @@ QWidget* cedar::aux::gui::Configurable::DataDelegate::createEditor(QWidget *pPar
   p_ret->setParent(pParent);
   connect(p_ret, SIGNAL(destroyed(QObject*)), this, SLOT(widgetDestroyed(QObject*)));
   mOpenedEditors.insert(p_ret);
+
+  //Choose 8 as a fixed value, to disambiguate between Parameters and VectorParameters
+  p_ret->setContentsMargins(0,8,0,8);
   return p_ret;
 }
 
@@ -362,6 +365,10 @@ void cedar::aux::gui::Configurable::appendRootConfigurable(cedar::aux::Configura
   type_name = cedar::aux::replace(type_name, "::", ".");
   auto p_item = this->appendHeading(this->mpPropertyTree->invisibleRootItem(), QString::fromStdString(type_name), 1);
   p_item->setExpanded(true);
+  //Debug Change Layout:
+
+
+
   this->mpPropertyTree->setRootIsDecorated(false);
 
   this->append(index, configurable, p_item, std::string());
