@@ -150,7 +150,8 @@ mRestingLevel
     this,
     "resting level",
     -5.0,
-    cedar::aux::DoubleParameter::LimitType::negativeZero()
+    cedar::aux::DoubleParameter::LimitType::negativeZero(),
+    0.1 // step size
   )
 ),
 mTau
@@ -160,7 +161,8 @@ mTau
     this,
     "time scale",
     100.0,
-    cedar::aux::DoubleParameter::LimitType::positive()
+    cedar::aux::DoubleParameter::LimitType::positive(),
+    1.0 // step size
   )
 ),
 mMaximumLocation(new cedar::aux::MatData(cv::Mat::zeros(2, 1, CV_32F))),
@@ -220,15 +222,16 @@ _mSigmoid
   )
 ),
 mGlobalInhibition
-        (
-                new cedar::aux::DoubleParameter
-                        (
-                                this,
-                                "global inhibition",
-                                -0.01,
-                                cedar::aux::DoubleParameter::LimitType::negativeZero()
-                        )
-        ),
+(
+  new cedar::aux::DoubleParameter
+  (
+    this,
+    "global inhibition",
+    -0.01,
+    cedar::aux::DoubleParameter::LimitType::negativeZero(),
+    0.01 // Step size
+  )
+),
 _mLateralKernelConvolution(new cedar::aux::conv::Convolution()),
 _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 {
