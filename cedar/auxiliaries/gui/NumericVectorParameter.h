@@ -80,6 +80,7 @@ public cedar::aux::gui::VectorParameterAbstraction<ValueT, WidgetT>
       setMaximum(pWidget, numeric_parameter->getMaximum());
       pWidget->setAlignment(Qt::AlignRight);
       pWidget->blockSignals(signals_blocked);
+      pWidget->setSingleStep( numeric_parameter->getSingleStep() );
     }
 
     /*!@brief Sets the minimum allowed value in the widget.

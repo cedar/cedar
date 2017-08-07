@@ -111,6 +111,11 @@ class cedar::aux::gui::NumericWidgetPolicy
     {
     }
 
+    static void setSingleStep(WidgetT* pWidget, double singleStep)
+    {
+      pWidget->setSingleStep(singleStep);
+    }
+
     /*!@brief Creates a new widget of the given type.
      *
      * @param pParent The parent of the widget.
@@ -220,6 +225,7 @@ private:
     this->mpWidget->setDisabled(parameter->isConstant());
     WidgetPolicy::setMinimum(this->mpWidget, parameter->getMinimum());
     WidgetPolicy::setMaximum(this->mpWidget, parameter->getMaximum());
+    WidgetPolicy::setSingleStep(this->mpWidget, parameter->getSingleStep());
     parameter->unlock();
 
     this->mpWidget->blockSignals(blocked);

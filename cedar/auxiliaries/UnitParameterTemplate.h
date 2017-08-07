@@ -373,10 +373,11 @@ public:
     const std::string& name,
     const boost::units::quantity<T>& defaultValue,
     const typename cedar::aux::NumericParameter<boost::units::quantity<T> >::LimitType& limits
-      = cedar::aux::NumericParameter<boost::units::quantity<T> >::LimitType::full()
+      = cedar::aux::NumericParameter<boost::units::quantity<T> >::LimitType::full(),
+    const double& singleStep = double(1.0) // quickfix
   )
   :
-  Super(pOwner, name, defaultValue, limits)
+  Super(pOwner, name, defaultValue, limits, singleStep)
   {
   }
 
@@ -387,10 +388,11 @@ public:
     const std::string& name,
     const boost::units::quantity<T>& defaultValue,
     const boost::units::quantity<T>& minimum,
-    const boost::units::quantity<T>& maximum
+    const boost::units::quantity<T>& maximum,
+    const double& singleStep = double(1.0) // quickfix
   )
   :
-  Super(pOwner, name, defaultValue, minimum, maximum)
+  Super(pOwner, name, defaultValue, minimum, maximum, singleStep)
   {
   }
 
