@@ -88,7 +88,7 @@ cedar::proc::sources::BoxInput::BoxInput()
 :
 cedar::proc::Step(),
 mOutput(new cedar::aux::MatData(cv::Mat())),
-_mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0)),
+_mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0, cedar::aux::DoubleParameter::LimitType::full(), 0.5)),
 _mReferenceLevel(new cedar::aux::DoubleParameter(this, "reference level", 0.0)),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 2, 1, 4)),
 _mWidths(new cedar::aux::UIntVectorParameter(this, "widths", 2, 1, 1, 10000)),

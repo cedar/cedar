@@ -83,11 +83,13 @@ public:
                           const std::string& name,
                           const std::vector<T>& defaultValues,
                           const T& minimum,
-                          const T& maximum
+                          const T& maximum,
+                          const double& singlestep = 0.1
                         )
   :
   cedar::aux::VectorParameter<T>(pOwner, name, defaultValues),
-  mLimits(minimum, maximum)
+  mLimits(minimum, maximum),
+  mSingleStep(singlestep)
   {
   }
 
@@ -96,11 +98,13 @@ public:
                           cedar::aux::Configurable *pOwner = nullptr,
                           const std::string& name = "",
                           const std::vector<T>& defaultValues = std::vector<T>(),
-                          const LimitType& limits = LimitType::full()
+                          const LimitType& limits = LimitType::full(),
+                          const double& singleStep = double(1)
                         )
   :
   cedar::aux::VectorParameter<T>(pOwner, name, defaultValues),
-  mLimits(limits)
+  mLimits(limits),
+  mSingleStep(singleStep)
   {
   }
 
@@ -111,11 +115,13 @@ public:
                           size_t defaultSize,
                           T defaultValue,
                           const T& minimum,
-                          const T& maximum
+                          const T& maximum,
+                          const double& singleStep = double(1)
                         )
   :
   cedar::aux::VectorParameter<T>(pOwner, name, defaultSize, defaultValue),
-  mLimits(minimum, maximum)
+  mLimits(minimum, maximum),
+  mSingleStep(singleStep)
   {
   }
 
@@ -209,6 +215,16 @@ public:
     return this->mLimits;
   }
 
+  void setSingleStep(const double& value)
+  {
+    mSingleStep= value;
+  }
+
+  double getSingleStep() const
+  {
+    return mSingleStep;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -229,6 +245,7 @@ protected:
 private:
   //!@brief The range of allowed values for the vector's entries.
   LimitType mLimits;
+  double mSingleStep;
 
 }; // class cedar::aux::NumericVectorParameter
 
