@@ -138,6 +138,8 @@ public slots:
   //!@brief handles name-change of the underlying step
   void handleStepNameChanged();
 
+  //! Calls reset on the underlying step
+  void reset();
 signals:
   /*!@brief Emitted whenever the state of the step displayed by this step item changes.
    *

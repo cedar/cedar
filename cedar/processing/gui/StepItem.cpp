@@ -397,6 +397,11 @@ void cedar::proc::gui::StepItem::openActionsDock()
   p_dock_widget->show();
 }
 
+void cedar::proc::gui::StepItem::reset()
+{
+  this->getStep()->callReset();
+}
+
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 {
   CEDAR_DEBUG_ONLY(cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());)
@@ -412,6 +417,9 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 
   this->fillConnectableMenu(menu, event);
 
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+  QAction *p_reset = menu.addAction("reset");
+  this->connect(p_reset, SIGNAL(triggered()), SLOT(reset()));
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
   QMenu *p_actions_menu = menu.addMenu("actions");

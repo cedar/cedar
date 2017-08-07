@@ -94,7 +94,7 @@ mAutoLockInputsAndOutputs(true)
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 
-  this->registerFunction("reset", boost::bind(&cedar::proc::Step::callReset, this), false);
+  //this->registerFunction("reset", boost::bind(&cedar::proc::Step::callReset, this), false);
 }
 
 cedar::proc::Step::~Step()
