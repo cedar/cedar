@@ -163,16 +163,6 @@ mTau
     cedar::aux::DoubleParameter::LimitType::positive()
   )
 ),
-mGlobalInhibition
-(
-  new cedar::aux::DoubleParameter
-  (
-    this,
-    "global inhibition",
-    -0.01,
-    cedar::aux::DoubleParameter::LimitType::negativeZero()
-  )
-),
 mMaximumLocation(new cedar::aux::MatData(cv::Mat::zeros(2, 1, CV_32F))),
 mIsActive(false),
 // parameters
@@ -229,6 +219,16 @@ _mSigmoid
     cedar::aux::math::SigmoidPtr(new cedar::aux::math::AbsSigmoid(0.0, 100.0))
   )
 ),
+mGlobalInhibition
+        (
+                new cedar::aux::DoubleParameter
+                        (
+                                this,
+                                "global inhibition",
+                                -0.01,
+                                cedar::aux::DoubleParameter::LimitType::negativeZero()
+                        )
+        ),
 _mLateralKernelConvolution(new cedar::aux::conv::Convolution()),
 _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 {
