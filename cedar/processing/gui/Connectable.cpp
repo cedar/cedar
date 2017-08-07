@@ -1974,6 +1974,11 @@ void cedar::proc::gui::Connectable::toggleVisibilityOfPlots(bool visible)
   for (auto childWidget : mChildWidgets)
   {
     childWidget->setVisible(visible);
+    if(visible)
+    {
+      childWidget->activateWindow();
+      childWidget->setFocus();
+    }
   }
 }
 

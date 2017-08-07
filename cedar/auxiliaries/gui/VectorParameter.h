@@ -160,6 +160,7 @@ public:
   {
     QVBoxLayout* p_layout = new QVBoxLayout();
     p_layout->setContentsMargins(0, 0, 0, 0);
+    p_layout->setSpacing(0);
     this->setLayout(p_layout);
   }
 
@@ -268,6 +269,8 @@ private:
       WidgetAbstraction::applyProperties(this->mWidgets[i], parameter, i);
       WidgetAbstraction::setValue(this->mWidgets[i], parameter->at(i));
       WidgetAbstraction::connectValueChange(this, this->mWidgets[i]);
+
+
     }
     parameter->unlock();
 
