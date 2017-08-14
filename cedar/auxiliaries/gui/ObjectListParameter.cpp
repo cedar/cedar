@@ -82,26 +82,12 @@ cedar::aux::gui::ObjectListParameter::ObjectListParameter()
   mpAddButton->setMaximumWidth(button_size);
   p_layout->addWidget(mpAddButton, 0, 1);
 
-  mpInstanceSelector = new QComboBox();
-  mpInstanceSelector->setToolTip("Select an instance in the object list here.");
-  p_layout->addWidget(mpInstanceSelector, 1, 0);
-
-  mpRemoveButton = new QPushButton("-");
-  mpRemoveButton->setMaximumWidth(button_size);
-  mpRemoveButton->setEnabled(false);
-  mpRemoveButton->setToolTip("Remove the instance currently selected.");
-  p_layout->addWidget(mpRemoveButton, 1, 1);
-
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
   QObject::connect(this->mpAddButton, SIGNAL(clicked()), this, SLOT(addClicked()));
-  QObject::connect(this->mpRemoveButton, SIGNAL(clicked()), this, SLOT(removeClicked()));
-  QObject::connect(this->mpInstanceSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(currentInstanceIndexChanged(int)));
 }
 
 cedar::aux::gui::ObjectListParameter::~ObjectListParameter()
 {
-  mObjectAddedConnection.disconnect();
-  mObjectRemovedConnection.disconnect();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -111,32 +97,6 @@ cedar::aux::gui::ObjectListParameter::~ObjectListParameter()
 void cedar::aux::gui::ObjectListParameter::parameterPointerChanged()
 {
   cedar::aux::ObjectListParameterPtr parameter = this->getObjectList();
-
-  // Disconnect old connections (if any) ------------------------------------------------------
-  this->mObjectAddedConnection.disconnect();
-  this->mObjectRemovedConnection.disconnect();
-
-  // Connect to the new parameter's signals ---------------------------------------------------
-  this->mObjectAddedConnection = parameter->connectToObjectAddedSignal
-                                 (
-                                   boost::bind
-                                   (
-                                     &cedar::aux::gui::ObjectListParameter::slotObjectAdded,
-                                     this,
-                                     _1
-                                   )
-                                 );
-
-  this->mObjectRemovedConnection = parameter->connectToObjectRemovedSignal
-                                   (
-                                     boost::bind
-                                     (
-                                       &cedar::aux::gui::ObjectListParameter::slotObjectRemoved,
-                                       this,
-                                       _1
-                                     )
-                                   );
-
   // Fill types -------------------------------------------------------------------------------
   this->mpTypeSelector->clear();
 
@@ -148,13 +108,6 @@ void cedar::aux::gui::ObjectListParameter::parameterPointerChanged()
     QString type_id = QString::fromStdString(types.at(i));
     this->mpTypeSelector->addItem(this->prettyTypeId(type_id));
     this->mpTypeSelector->setItemData(i, type_id);
-  }
-
-  // Fill existing instances ------------------------------------------------------------------
-  this->mpInstanceSelector->clear();
-  for (size_t i = 0; i < parameter->size(); ++i)
-  {
-    this->appendObjectToInstanceList(i);
   }
 }
 
@@ -172,41 +125,6 @@ void cedar::aux::gui::ObjectListParameter::addClicked()
   this->getObjectList()->pushBack(this->getSelectedType());
 }
 
-void cedar::aux::gui::ObjectListParameter::slotObjectAdded(int index)
-{
-  this->appendObjectToInstanceList(index);
-}
-
-void cedar::aux::gui::ObjectListParameter::appendObjectToInstanceList(int index)
-{
-  cedar::aux::ConfigurablePtr object = this->getObjectList()->getConfigurableChild(index);
-  const std::string& instance_type = this->getObjectList()->getTypeOfObject(object);
-  int num = this->mpInstanceSelector->count();
-  QString label = QString("[%1] ").arg(num) + this->prettyTypeId(QString::fromStdString(instance_type));
-  this->mpInstanceSelector->addItem(label);
-
-  // The object's index should always correspond to the index in the combo box.
-  CEDAR_DEBUG_NON_CRITICAL_ASSERT(index == this->mpInstanceSelector->count() - 1);
-}
-
-void cedar::aux::gui::ObjectListParameter::removeClicked()
-{
-  int index = this->mpInstanceSelector->currentIndex();
-  if (index != -1)
-  {
-    this->getObjectList()->removeObject(index);
-  }
-  else
-  {
-    CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "No instance selected.");
-  }
-}
-
-void cedar::aux::gui::ObjectListParameter::slotObjectRemoved(int index)
-{
-  this->mpInstanceSelector->removeItem(index);
-}
-
 std::string cedar::aux::gui::ObjectListParameter::getSelectedType() const
 {
   int index = this->mpTypeSelector->currentIndex();
@@ -218,24 +136,4 @@ std::string cedar::aux::gui::ObjectListParameter::getSelectedType() const
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "No type selected.");
   }
-}
-
-cedar::aux::ConfigurablePtr cedar::aux::gui::ObjectListParameter::getSelectedInstance()
-{
-  int index = this->mpInstanceSelector->currentIndex();
-  if (index != -1)
-  {
-    cedar::aux::ObjectListParameterPtr parameter = this->getObjectList();
-    return parameter->getConfigurableChild(static_cast<size_t>(index));
-  }
-  else
-  {
-    CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "No instance selected.");
-  }
-}
-
-void cedar::aux::gui::ObjectListParameter::currentInstanceIndexChanged(int index)
-{
-  bool enabled = (index != -1);
-  mpRemoveButton->setEnabled(enabled);
 }

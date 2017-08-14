@@ -56,6 +56,7 @@
 #include <QWidget>
 #include <QTreeWidget>
 #include <QStyledItemDelegate>
+#include <QSignalMapper>
 #include <map>
 #include <string>
 #include <set>
@@ -125,6 +126,7 @@ public slots:
   //! Resizes the rows to fit their contents.
   void fitRowsToContents();
 
+
 signals:
   //! Emitted, whenever a parameter in the widget changes.
   void settingsChanged();
@@ -188,6 +190,8 @@ signals:
   //! Emitted, whenever a parameter in the displayed configurable is renamed.
   void parameterRenamed(int configurableIndex, QString oldName, QString newName);
 
+  void delButtonClickedSignal(const QString &fullPath);
+
 private slots:
   void parameterChangeFlagChanged();
 
@@ -200,6 +204,8 @@ private slots:
   void parameterRemovedSlot(int configurableIndex, QVariant parameter);
 
   void parameterRenamedSlot(int configurableIndex, QString oldName, QString newName);
+
+  void handleDeleteButtonClicked(QString fullPath);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -216,6 +222,8 @@ private:
   boost::signals2::scoped_connection mParameterRemovedConnection;
 
   std::map<cedar::aux::Parameter*, boost::signals2::connection> mParameterRenamedConnections;
+
+  QSignalMapper* delButtonSignalMapper;
 
 }; // class cedar::aux::gui::Configurable
 

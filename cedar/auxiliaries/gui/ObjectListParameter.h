@@ -90,7 +90,6 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  cedar::aux::ConfigurablePtr getSelectedInstance();
 
   std::string getSelectedType() const;
 
@@ -99,22 +98,12 @@ private:
     return cedar::aux::asserted_pointer_cast<cedar::aux::ObjectListParameter>(this->getParameter());
   }
 
-  void slotObjectAdded(int index);
-
-  void slotObjectRemoved(int index);
-
-  void appendObjectToInstanceList(int index);
-
   QString prettyTypeId(const QString& typeId) const;
 
 private slots:
   void parameterPointerChanged();
 
   void addClicked();
-
-  void removeClicked();
-
-  void currentInstanceIndexChanged(int index);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -125,21 +114,8 @@ private:
   //! Combo box for selecting the type to add.
   QComboBox *mpTypeSelector;
 
-  //! Combo box for selecting the instance.
-  QComboBox *mpInstanceSelector;
-
   //! Button for adding a new child
   QPushButton *mpAddButton;
-
-  //! Button for removing a child
-  QPushButton *mpRemoveButton;
-
-  //! Connection to the parameters instance added signal.
-  boost::signals2::connection mObjectAddedConnection;
-
-  //! Connection to the parameters instance added signal.
-  boost::signals2::connection mObjectRemovedConnection;
-
 }; // class cedar::aux::gui::ObjectListParameter
 
 #endif // CEDAR_AUX_GUI_OBJECT_LIST_PARAMETER_H
