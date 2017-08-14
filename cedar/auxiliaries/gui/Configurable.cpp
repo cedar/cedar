@@ -43,7 +43,9 @@
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/ObjectListParameter.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
@@ -54,6 +56,8 @@
 #include <QApplication>
 #include <QList>
 #include <QLabel>
+#include <QtGui/QPushButton>
+#include <boost/tokenizer.hpp>
 
 #define PARAMETER_NAME_COLUMN 0
 #define PARAMETER_EDITOR_COLUMN 1
@@ -177,6 +181,8 @@ cedar::aux::gui::Configurable::Configurable(QWidget* pParent)
 :
 QWidget(pParent)
 {
+
+  delButtonSignalMapper = new QSignalMapper();
   // create layout
   QVBoxLayout* p_layout = new QVBoxLayout();
   this->setLayout(p_layout);
@@ -206,11 +212,16 @@ QWidget(pParent)
   QObject::connect(this, SIGNAL(parameterAdded(int, QString)), this, SLOT(parameterAddedSlot(int, QString)));
   QObject::connect(this, SIGNAL(parameterRemoved(int, QVariant)), this, SLOT(parameterRemovedSlot(int, QVariant)));
   QObject::connect(this, SIGNAL(parameterRenamed(int, QString, QString)), this, SLOT(parameterRenamedSlot(int, QString, QString)));
+
+
+  QObject::connect(delButtonSignalMapper, SIGNAL(mapped(QString)),this, SIGNAL(delButtonClickedSignal(QString)));
+  QObject::connect(this, SIGNAL(delButtonClickedSignal(QString)),this, SLOT(handleDeleteButtonClicked(QString)));
 }
 
 cedar::aux::gui::Configurable::~Configurable()
 {
   this->clear();
+  std::cout<< "When is this Configurable Destructor called?"<<std::endl;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -490,6 +501,12 @@ void cedar::aux::gui::Configurable::append(size_t configurableIndex, cedar::aux:
   {
     QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(objectListParameterValueChanged()));
 
+//    This should not be necessary because in a gui class we can directly access the non-gui Element
+//    if(cedar::aux::ObjectListParameterPtr objectListParameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
+//    {
+//      QObject::connect(this, SIGNAL(delButtonClickedSignal(int)), objectListParameter.get() , SLOT(removeListItemClicked(int)));
+//    }
+
     this->appendObjectListParameter(configurableIndex, parameter, parameter_item, path);
     parameter_item->setExpanded(true);
   }
@@ -509,10 +526,78 @@ void cedar::aux::gui::Configurable::appendObjectListParameter
     std::string subpath = path + "[" + objectListParameter->childIndexToString(i) + "]";
     QString label = QString(QString::fromStdString(objectListParameter->getName()) + " [%1]").arg(i);
     auto sub_item = this->appendHeading(pParent, label, 2);
+
+    //Build a widget that contains a placeholder and the deletebutton!
+    int margins = 0;
+    int spacing = 2;
+    int button_size = 20;
+    QWidget* objectListHeadingWidget = new QWidget();
+    QGridLayout *p_layout = new QGridLayout();
+    p_layout->setContentsMargins(margins, margins, margins, margins);
+    p_layout->setSpacing(spacing);
+    objectListHeadingWidget->setLayout(p_layout);
+    //This is just the placeholder. Other Solutions are probably better practice, but this works.
+    QLabel* placeHolderLabel = new QLabel();
+    p_layout->addWidget(placeHolderLabel, 0, 0);
+
+    //The deletebutton
+    auto delButton = new QPushButton("x");
+    delButton->setToolTip("Remove this kernel");
+    delButton->setMaximumWidth(button_size);
+    p_layout->addWidget(delButton, 0, 1);
+
+    // Set up the correct Signal Linking using a signalMapper
+    QObject::connect(delButton, SIGNAL(clicked()), delButtonSignalMapper, SLOT(map()));
+    QString pathLabel = QString::fromStdString(path)+"#"+QString::number(i);
+    delButtonSignalMapper->setMapping(delButton, pathLabel);
+
+    //Add the buttons widget at the sub_item_position
+    this->mpPropertyTree->setItemWidget(sub_item,1,objectListHeadingWidget);
+    //End of Adding the KerneldeleteButton
+
     this->append(configurableIndex, configurable, sub_item, subpath);
     sub_item->setExpanded(true);
   }
 }
+
+void cedar::aux::gui::Configurable::handleDeleteButtonClicked(QString fullPath)
+{
+  for (unsigned int i = 0; i < this->mDisplayedConfigurables.size(); i++)
+  {
+    std::string path = fullPath.toStdString();
+    //String Splitting at #
+    std::vector<std::string> splitOutput;
+    std::string::size_type prev_pos = 0, pos = 0;
+    while((pos = path.find('#', pos)) != std::string::npos)
+    {
+      std::string substring( path.substr(prev_pos, pos-prev_pos) );
+      splitOutput.push_back(substring);
+      prev_pos = ++pos;
+    }
+    splitOutput.push_back(path.substr(prev_pos, pos-prev_pos));
+
+    if(splitOutput.size() == 2)
+    {
+      int index = boost::lexical_cast<int>(splitOutput[1]);
+      std::string parameterPath = splitOutput[0];
+      auto parameter = this->mDisplayedConfigurables[i]->getParameter(parameterPath);
+      if(auto objectListParameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
+      {
+        objectListParameter->removeObject(index);
+      }
+      else
+      {
+        std::cout<<"We did not get the right objectlistParameter :("<<std::endl;
+      }
+    }
+    else
+    {
+      std::cout<<"The name seems to contain a #, this caused the splitting of the path in " << splitOutput.size() << " parts" << std::endl;
+    }
+  }
+}
+
+
 
 void cedar::aux::gui::Configurable::objectListParameterValueChanged()
 {
