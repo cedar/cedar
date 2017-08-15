@@ -221,7 +221,6 @@ QWidget(pParent)
 cedar::aux::gui::Configurable::~Configurable()
 {
   this->clear();
-  std::cout<< "When is this Configurable Destructor called?"<<std::endl;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -500,13 +499,6 @@ void cedar::aux::gui::Configurable::append(size_t configurableIndex, cedar::aux:
   else if (parameter->canHaveConfigurableChildren())
   {
     QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(objectListParameterValueChanged()));
-
-//    This should not be necessary because in a gui class we can directly access the non-gui Element
-//    if(cedar::aux::ObjectListParameterPtr objectListParameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
-//    {
-//      QObject::connect(this, SIGNAL(delButtonClickedSignal(int)), objectListParameter.get() , SLOT(removeListItemClicked(int)));
-//    }
-
     this->appendObjectListParameter(configurableIndex, parameter, parameter_item, path);
     parameter_item->setExpanded(true);
   }
@@ -541,9 +533,12 @@ void cedar::aux::gui::Configurable::appendObjectListParameter
     p_layout->addWidget(placeHolderLabel, 0, 0);
 
     //The deletebutton
-    auto delButton = new QPushButton("x");
+    auto delButton = new QPushButton();
     delButton->setToolTip("Remove this kernel");
     delButton->setMaximumWidth(button_size);
+    delButton->setFlat(true);
+    delButton->setStyleSheet("QPushButton{ qproperty-icon: url(:/cedar/auxiliaries/gui/clear.svg); } QPushButton:hover{qproperty-icon: url(:/cedar/auxiliaries/gui/clear_white.svg); }"); // The hover part has no effect unfortunately
+//    delButton->setStyleSheet("QPushButton{ border-image: url(:/cedar/auxiliaries/gui/delete.svg); } QPushButton:hover{border-image:url(:/cedar/auxiliaries/gui/delete_white.svg); }"); //Hover works here, but the button is stretched...
     p_layout->addWidget(delButton, 0, 1);
 
     // Set up the correct Signal Linking using a signalMapper
