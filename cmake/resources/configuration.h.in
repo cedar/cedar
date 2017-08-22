@@ -54,6 +54,7 @@
 #cmakedefine CEDAR_USE_QT5
 #cmakedefine QCUSTOMPLOT_USE_OPENGL
 #cmakedefine CEDAR_USE_QCUSTOMPLOT
+#cmakedefine CEDAR_PORTABLE
 
 // Specific robot libraries ============================================================================================
 #cmakedefine CEDAR_USE_AMTEC

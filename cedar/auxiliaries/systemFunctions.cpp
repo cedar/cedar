@@ -230,7 +230,10 @@ void cedar::aux::openCrashFile(std::ofstream& stream, std::string& crash_file)
 
 std::string cedar::aux::getUserHomeDirectory()
 {
-#ifdef CEDAR_OS_UNIX
+#ifdef CEDAR_PORTABLE
+  std::string homedirportable = "..";
+  return homedirportable;
+#elif defined CEDAR_OS_UNIX
   std::string homedir = getenv("HOME");
   return homedir;
 #elif defined CEDAR_OS_WINDOWS
@@ -254,7 +257,7 @@ std::string cedar::aux::getUserHomeDirectory()
 #endif // CEDAR_COMPILER_GCC
 #else
 #error Implement me for this OS!
-#endif // CEDAR_OS_UNIX
+#endif // CEDAR_PORTABLE
 }
 
 std::string cedar::aux::getUserApplicationDataDirectory()

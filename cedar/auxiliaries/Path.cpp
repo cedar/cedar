@@ -313,7 +313,11 @@ cedar::aux::Path cedar::aux::Path::absolute(bool showInLog) const
 {
   if (this->isResource())
   {
+#ifdef CEDAR_PORTABLE
+    return cedar::aux::Path(boost::filesystem::current_path().string() + separator() + ".." + separator() + "resources" + separator() + this->toString(false));
+#else
     return cedar::aux::Path(cedar::aux::locateResource(this->toString(), showInLog));
+#endif // CEDAR_PORTABLE
   }
 
   else if (this->isAbsolute())
@@ -323,12 +327,20 @@ cedar::aux::Path cedar::aux::Path::absolute(bool showInLog) const
 
   else if (this->isTestFile())
   {
+#ifdef CEDAR_PORTABLE
+    return cedar::aux::Path(boost::filesystem::current_path().string() + separator() + ".." + separator() + "tests" + separator() + this->toString(false));
+#else
     return cedar::aux::Path(CEDAR_HOME_DIRECTORY "/tests/" + this->toString(false));
+#endif // CEDAR_PORTABLE
   }
 
   else if (this->isPluginRelative())
   {
+#ifdef CEDAR_PORTABLE
+    return cedar::aux::Path(boost::filesystem::current_path().string() + separator() + ".." + separator() + "plugins" + separator() + this->toString(false));
+#else
     return cedar::aux::PluginProxy::findPluginFile(this->toString(false));
+#endif // CEDAR_PORTABLE
   }
 
   // if the path is neither a resource, nor absolute, it should be relative

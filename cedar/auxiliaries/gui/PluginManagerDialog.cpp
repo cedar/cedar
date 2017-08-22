@@ -70,6 +70,15 @@ QDialog(pParent)
 
   QObject::connect(this->mpDeleteButton, SIGNAL(clicked()), this, SLOT(removeSelectedPlugins()));
   this->mpDeleteButton->setEnabled(false);
+#ifdef CEDAR_PORTABLE
+  this->mpHelpBtn->setVisible(false);
+  this->mpAddPluginBtn->setVisible(false);
+  this->mpDeleteButton->setVisible(false);
+  this->mpAddPathBtn->setVisible(false);
+  this->mpRemoveSearchPathBtn->setVisible(false);
+  this->mpUpButton->setVisible(false);
+  this->mpDownBtn->setVisible(false);
+#endif // CEDAR_PORTABLE
 
   QObject::connect(this->mpLoadSelectedPluginsBtn, SIGNAL(clicked()), this, SLOT(loadSelectedPlugins()));
   this->mpLoadSelectedPluginsBtn->setEnabled(false);
