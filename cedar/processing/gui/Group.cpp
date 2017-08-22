@@ -2922,11 +2922,18 @@ void cedar::proc::gui::Group::removeElementFromPlotGroup(const std::string &plot
 
   for (auto plot_iter = plot_group->second.begin(); plot_iter != plot_group->second.end();)
   {
-    auto name = plot_iter->second.get<std::string>("step");
-    if (name == elementName)
+    if(plot_iter->first != "visible") //Check for a PlotWidget
     {
-      plot_iter = plot_group->second.erase(plot_iter);
-    } else
+      auto name = plot_iter->second.get<std::string>("step");
+      if (name == elementName) //Does the Plotwidget contain the deleted step
+      {
+        plot_iter = plot_group->second.erase(plot_iter);
+      } else
+      {
+        ++plot_iter;
+      }
+    }
+    else
     {
       ++plot_iter;
     }
