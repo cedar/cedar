@@ -427,7 +427,7 @@ macro(cedar_add_library)
     # TODO: this may work on linux, but needs to be tested
     install(TARGETS ${libraryName} DESTINATION ${CEDAR_LIB_INSTALL_DIR})
   else(WIN32)
-    install(TARGETS ${libraryName} LIBRARY DESTINATION ${CEDAR_LIB_INSTALL_DIR})
+    install(TARGETS ${libraryName} LIBRARY DESTINATION ${CEDAR_LIB_INSTALL_DIR} ARCHIVE DESTINATION ${CEDAR_LIB_INSTALL_DIR})
   endif(WIN32)
 endmacro(cedar_add_library)
 

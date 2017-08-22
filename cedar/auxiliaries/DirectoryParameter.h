@@ -91,7 +91,11 @@ public:
   //!@brief stores a directory as string in a configuration node
   void writeToNode(cedar::aux::ConfigurationNode& root) const
   {
+#ifdef CEDAR_PORTABLE
+    root.put(this->getName(), this->mValue.path().toStdString());
+#else
     root.put(this->getName(), this->mValue.absolutePath().toStdString());
+#endif // CEDAR_PORTABLE
   }
 
   //!@brief sets a new directory from string

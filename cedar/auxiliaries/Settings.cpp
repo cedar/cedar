@@ -47,6 +47,7 @@
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/json_parser.hpp>
 #endif
+#include <boost/filesystem.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -119,6 +120,38 @@ _mRecorderSerializationFormat(new cedar::aux::EnumParameter(this, "recorder data
       "cedar::aux::Settings::Settings()"
     );
   }
+
+#ifdef CEDAR_PORTABLE
+  boost::filesystem::create_directories(boost::filesystem::current_path().string() + "/../plugins/");
+  boost::filesystem::directory_iterator end_iter;
+  std::vector<cedar::aux::Path> folders;
+  for (boost::filesystem::directory_iterator dir_iter(boost::filesystem::current_path().string() + "/../plugins/"); dir_iter != end_iter ; ++dir_iter)
+  {
+    if (boost::filesystem::is_directory(dir_iter->status()))
+    {
+      std::string folder = cedar::aux::toString(*dir_iter);
+      if (folder.size() > 0 && folder.at(0) == '"')
+      {
+        folder = folder.substr(1);
+      }
+      if (folder.size() > 0 && folder.at(folder.size() - 1) == '"')
+      {
+        folder = folder.substr(0, folder.size() - 1);
+      }
+      QString fpath = QString::fromStdString(folder).remove(QString::fromStdString(boost::filesystem::current_path().string()));
+      std::string name = QString::fromStdString(fpath.toStdString()).remove("/../plugins/").toStdString();
+      std::string search_path = "." + fpath.toStdString();
+      if (!this->_mPluginSearchPaths->contains(search_path))
+      {
+        this->_mPluginSearchPaths->pushBack(search_path);
+      }
+      if (this->_mKnownPlugins->get().find(name) == this->_mKnownPlugins->get().end())
+      {
+        this->_mKnownPlugins->insert(name);
+      }
+    }
+  }
+#endif // CEDAR_PORTABLE
 }
 
 cedar::aux::Settings::~Settings()
