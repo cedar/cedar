@@ -56,7 +56,6 @@
   #include <boost/numeric/conversion/bounds.hpp>
 #endif
 
-#include <QContextMenuEvent>
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QPalette>
@@ -199,14 +198,9 @@ void cedar::aux::gui::QCLinePlot::init()
 
   this->mpChart = new QCustomPlot();
 
-  //this->mpChart->setInteraction(QCP::iRangeDrag, true);
-  //this->mpChart->setInteraction(QCP::iRangeZoom, true);
-  //this->mpChart->setInteraction(QCP::iSelectLegend, true);
-  //this->mpChart->setInteraction(QCP::iSelectPlottables, true);
+  this->mpChart->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(this->mpChart, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenuRequest(QPoint)));
 
-  //this->mpChart->xAxis->setRange(0,50);
-  //this->mpChart->yAxis->setRange(-5,5);
-  //this->mpChart->legend->setVisible(true);
 
 #ifdef QCUSTOMPLOT_USE_OPENGL
   //this->mpChart->setOpenGl(true); //todo QT4
@@ -226,6 +220,7 @@ void cedar::aux::gui::QCLinePlot::timerEvent(QTimerEvent * /* pEvent */)
   double x_max = -std::numeric_limits<double>::max();
   double y_min = std::numeric_limits<double>::max();
   double y_max = -std::numeric_limits<double>::max();
+
   QWriteLocker locker(mpLock);
   for (size_t i = 0; i < PlotSeriesDataVector.size(); ++i)
   {
@@ -233,21 +228,93 @@ void cedar::aux::gui::QCLinePlot::timerEvent(QTimerEvent * /* pEvent */)
     {
       QReadLocker locker(&matData->getLock());
       const cv::Mat& plotMat = matData->getData();
-      QVector<double> xd(plotMat.rows),yd(plotMat.rows);
-      for(int i = 0; i< plotMat.rows;i++)
+
+      auto dim = cedar::aux::math::getDimensionalityOf(plotMat);
+      if (dim != 1) // plot is no longer capable of displaying the data
       {
-        xd[i] = (double)i;
-        yd[i] = (double)plotMat.at<float>(i,0);
-        x_min = std::min(x_min,xd[i]);
-        x_max = std::max(x_max,xd[i]);
-        y_min = std::min(y_min,yd[i]);
-        y_max = std::max(y_max,yd[i]);
+        if (dim != 0 || !this->mPlot0D)
+        {
+          emit dataChanged();
+          return;
+        }
       }
+      // Check if the size of the matrix has changed
+      unsigned int size = cedar::aux::math::get1DMatrixSize(plotMat);
+      // skip if the array is empty
+      if (size == 0)
+      {
+        continue;
+      }
+      double local_min, local_max;
+      local_min = std::numeric_limits<double>::max();
+      local_max = -std::numeric_limits<double>::max();
+      cedar::aux::annotation::ConstDimensionsPtr dimensions;
+      if (matData->hasAnnotation<cedar::aux::annotation::Dimensions>())
+      {
+        dimensions = matData->getAnnotation<cedar::aux::annotation::Dimensions>();
+      }
+      QVector<double> xd(plotMat.rows),yd(plotMat.rows);
+      for(int ia = 0; ia< plotMat.rows;ia++)
+      {
+        if (!dimensions || !dimensions->hasSamplingPositions(0))
+        {
+          xd[ia] = (double)ia;
+          local_min = std::min(local_min,xd[ia]);
+          local_max = std::max(local_max,xd[ia]);
+        }
+        else
+        {
+          const auto& sampling_positions = dimensions->getSamplingPositions(0);
+          double sampling_position;
+          if (static_cast<unsigned int>(ia) < sampling_positions.size())
+          {
+            sampling_position = sampling_positions.at(ia);
+          }
+          else
+          {
+            sampling_position = static_cast<double>(ia);
+          }
+          xd[ia] = sampling_position;
+          local_min = std::min(local_min, sampling_position);
+          local_max = std::max(local_max, sampling_position);
+        }
+        yd[ia] = (double)plotMat.at<float>(ia,0);
+        y_min = std::min(y_min,yd[ia]);
+        y_max = std::max(y_max,yd[ia]);
+      }
+      x_min = std::min(x_min, local_min);
+      x_max = std::max(x_max, local_max);
       this->mpChart->graph((int)i)->setData(xd,yd);
+
+      if (this->mPlot0D && matData->hasAnnotation<cedar::aux::annotation::Dimensions>())
+      {
+        auto annotation = matData->getAnnotation<cedar::aux::annotation::Dimensions>();
+        if (annotation->getDimensionality() >= 1)
+        {
+          //this->mpChart->graph((int)i)->setName(QString::fromStdString(annotation->getLabel(0)));
+          this->mpChart->xAxis->setLabel(QString::fromStdString(annotation->getLabel(0)));
+        }
+      }
+
     }
   }
+
+  this->YLimitMin = y_min;
+  this->YLimitMax = y_max;
+
+  if(this->SettingFixedYAxisScaling)
+  {
+    y_min = this->FixedYLimitMin;
+    y_max = this->FixedYLimitMax;
+  }else{
+    y_min -= 0.5;
+    y_max += 0.5;
+  }
+
   this->mpChart->xAxis->setRange(x_min,x_max);
+  this->mpChart->xAxis->grid()->setVisible(this->SettingShowGrid);
   this->mpChart->yAxis->setRange(y_min,y_max);
+  this->mpChart->yAxis->grid()->setVisible(this->SettingShowGrid);
   this->mpChart->replot();
 }
 
@@ -256,3 +323,83 @@ void cedar::aux::gui::QCLinePlot::setAccepts0DData(bool accept)
   this->mPlot0D = accept;
 }
 
+void cedar::aux::gui::QCLinePlot::setFixedYAxisScaling()
+{
+  if(!this->SettingFixedYAxisScaling)
+  {
+    QDialog* p_dialog = new QDialog();
+    p_dialog->setModal(true);
+    auto p_layout = new QGridLayout();
+    p_dialog->setLayout(p_layout);
+    QLabel* p_label;
+    p_label = new QLabel("lower limit:");
+    p_layout->addWidget(p_label, 0, 0);
+
+    auto p_lower = new QDoubleSpinBox();
+    p_layout->addWidget(p_lower, 0, 1);
+    p_lower->setMinimum(boost::numeric::bounds<double>::lowest());
+    p_lower->setMaximum(boost::numeric::bounds<double>::highest());
+    p_lower->setValue(this->YLimitMin);
+
+    p_label = new QLabel("upper limit:");
+    p_layout->addWidget(p_label, 1, 0);
+
+    auto p_upper = new QDoubleSpinBox();
+    p_layout->addWidget(p_upper, 1, 1);
+    p_upper->setMinimum(boost::numeric::bounds<double>::lowest());
+    p_upper->setMaximum(boost::numeric::bounds<double>::highest());
+    p_upper->setValue(this->YLimitMax);
+
+    auto p_buttons = new QDialogButtonBox();
+    p_buttons->addButton(QDialogButtonBox::Ok);
+    p_buttons->addButton(QDialogButtonBox::Cancel);
+    p_layout->addWidget(p_buttons, 2, 0, 1, 2);
+
+    QObject::connect(p_buttons->button(QDialogButtonBox::Ok), SIGNAL(clicked()), p_dialog, SLOT(accept()));
+    QObject::connect(p_buttons->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), p_dialog, SLOT(reject()));
+
+    int res = p_dialog->exec();
+
+    if (res == QDialog::Accepted)
+    {
+      this->FixedYLimitMin = p_lower->value();
+      this->FixedYLimitMax = p_upper->value();
+      this->SettingFixedYAxisScaling = true;
+    }else{
+      this->SettingFixedYAxisScaling = false;
+    }
+  }else{
+    this->SettingFixedYAxisScaling = false;
+  }
+}
+
+void cedar::aux::gui::QCLinePlot::showGrid(bool show)
+{
+  this->SettingShowGrid = show;
+}
+
+void cedar::aux::gui::QCLinePlot::showLegend(bool show)
+{
+  this->SettingShowLegend = show;
+  this->mpChart->legend->setVisible(this->SettingShowLegend);
+}
+
+void cedar::aux::gui::QCLinePlot::contextMenuRequest(QPoint pos)
+{
+  QMenu *menu = new QMenu(this);
+  menu->setAttribute(Qt::WA_DeleteOnClose);
+
+  QAction *p_legend = menu->addAction("legend", this, SLOT(showLegend(bool)));
+  p_legend->setCheckable(true);
+  p_legend->setChecked(this->SettingShowLegend);
+
+  QAction *p_grid = menu->addAction("grid", this, SLOT(showGrid(bool)));
+  p_grid->setCheckable(true);
+  p_grid->setChecked(this->SettingShowGrid);
+
+  QAction *p_fixedaxis = menu->addAction("fixed y axis scaling", this, SLOT(setFixedYAxisScaling()));
+  p_fixedaxis->setCheckable(true);
+  p_fixedaxis->setChecked(this->SettingFixedYAxisScaling);
+
+  menu->popup(this->mpChart->mapToGlobal(pos));
+}
