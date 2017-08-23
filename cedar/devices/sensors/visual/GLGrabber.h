@@ -37,6 +37,8 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H
 #define CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H
 
+#ifdef CEDAR_USE_QGLVIEWER
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
@@ -169,4 +171,5 @@ private:
 
 }; // class cedar::dev::sensors::visual::GLGrabber
 
+#endif //CEDAR_USE_QGLVIEWER
 #endif // CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H

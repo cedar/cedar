@@ -47,7 +47,7 @@ else(CEDAR_USE_QWT)
 endif(CEDAR_USE_QWT)
 
 if (CEDAR_USE_QT5)
-  set(qt5_moc_files gui/Qt5LinePlot.h gui/Qt5MatrixPlot.h gui/Qt5SurfacePlot.h gui/Qt5SurfacePlotInputHandler.h)
+  set(qt5_moc_files gui/Qt5LinePlot.h gui/Qt5MatrixPlot.h gui/Qt5SurfacePlot.h gui/Qt5SurfacePlotInputHandler.h gui/QCLinePlot.h gui/qcustomplot.h)
 else(CEDAR_USE_QT5)
   set(qt5_moc_files "")
 endif(CEDAR_USE_QT5)

@@ -81,8 +81,10 @@ namespace cedar
         CEDAR_DECLARE_DEV_CLASS(PictureGrabber);
         CEDAR_DECLARE_DEV_CLASS(PictureChannel);
 
+#ifdef CEDAR_USE_QGLVIEWER
         CEDAR_DECLARE_DEV_CLASS(GLGrabber);
         CEDAR_DECLARE_DEV_CLASS(GLChannel);
+#endif //CEDAR_USE_QGLVIEWER
 
         CEDAR_DECLARE_DEV_CLASS(GrabbableChannel);
         CEDAR_DECLARE_DEV_CLASS(GrabbableGrabber);

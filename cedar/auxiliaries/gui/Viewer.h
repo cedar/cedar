@@ -155,13 +155,14 @@ public:
   // not present. Rest assured that they do nothing.
   void setSceneRadius(double) {}
   void showEntireScene() {}
+
+  QImage grabFrameBuffer();
   //@endcond
 #endif // CEDAR_USE_QGLVIEWER
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-  QImage grabFrameBuffer();
 private:
   /*!@brief initialization */
   void init();

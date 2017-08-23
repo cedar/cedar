@@ -141,13 +141,15 @@ void cedar::aux::gui::Viewer::grabBuffer()
   mpGrabberLock->lockForWrite();
   mGrabberBuffer = mat2;
   mpGrabberLock->unlock();
-#endif // CEDAR_USE_QGLVIEWER  
+#endif // CEDAR_USE_QGLVIEWER
 }
 
+#ifdef CEDAR_USE_QGLVIEWER
 QImage cedar::aux::gui::Viewer::grabFrameBuffer()
 {
   return this->QGLWidget::grabFrameBuffer(false);
 }
+#endif // CEDAR_USE_QGLVIEWER
 
 cv::Mat& cedar::aux::gui::Viewer::grabImage()
 {
