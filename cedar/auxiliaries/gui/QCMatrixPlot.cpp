@@ -45,6 +45,7 @@
 
 #include "cedar/auxiliaries/gui/QCMatrixPlot.h"
 #include "cedar/auxiliaries/gui/QCLinePlot.h"
+#include "cedar/auxiliaries/gui/QCHistoryPlot0D.h"
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/gui/MatrixSlicePlot3D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
@@ -208,10 +209,30 @@ void cedar::aux::gui::QCMatrixPlot::plot(cedar::aux::ConstDataPtr data, const st
 
   switch (dims)
   {
+    case 0:
+      this->mpCurrentPlotWidget = new cedar::aux::gui::QCHistoryPlot0D(this->mData, title);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
+      break;
+
     case 1:
       this->mpCurrentPlotWidget = new cedar::aux::gui::QCLinePlot(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
+
+    case 2:
+    {
+      this->mpCurrentPlotWidget = new cedar::aux::gui::ImagePlot(this->mData, title);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
+      break;
+    }
+
+    case 3:
+    {
+      this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixSlicePlot3D(this->mData, title);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
+      break;
+    }
+
 
     case UINT_MAX:
     {

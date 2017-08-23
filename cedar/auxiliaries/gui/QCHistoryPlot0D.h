@@ -22,134 +22,127 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Qt5LinePlot.h
+    File:        QCHistoryPlot0D.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 14
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 09 23
 
     Description:
 
     Credits:
 
 ======================================================================================================================*/
-#ifndef CEDAR_AUX_GUI_QC_LINE_PLOT_H
-#define CEDAR_AUX_GUI_QC_LINE_PLOT_H
+
+#ifndef CEDAR_AUX_GUI_QCHISTORY_PLOT_0D_H
+#define CEDAR_AUX_GUI_QCHISTORY_PLOT_0D_H
 
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/qcustomplot.h"
-#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
-#include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
-#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/gui/QCLinePlot.h"
+#include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/annotation/ValueRangeHint.fwd.h"
 #include "cedar/auxiliaries/MatData.fwd.h"
-#include "cedar/auxiliaries/gui/QCLinePlot.fwd.h"
-#include "cedar/auxiliaries/math/Limits.fwd.h"
+#include "cedar/auxiliaries/DoubleData.fwd.h"
+#include "cedar/auxiliaries/UnitData.fwd.h"
+#include "cedar/auxiliaries/gui/QCHistoryPlot0D.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QWidget>
-#include <QReadWriteLock>
-#include <opencv2/opencv.hpp>
+//#include <qwt_plot.h>
+//#include <qwt_plot_curve.h>
+#ifndef Q_MOC_RUN
+  #include <boost/date_time.hpp>
+#endif
+#include <deque>
 #include <vector>
 
 
-/*!@brief Matrix plot that can display 1D matrices (i.e. vectors).
- *
- *        This plot is capable of displaying any matrix data with a dimensionality of one. It displays the data as a
- *        line, assuming the indices of the matrix as the x axis.
+/*!@brief A time-based plot for 0D values. Displays a history of this value from a certain point in the past up to now.
  */
-class cedar::aux::gui::QCLinePlot : public cedar::aux::gui::MultiPlotInterface
+class cedar::aux::gui::QCHistoryPlot0D : public cedar::aux::gui::MultiPlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  struct PlotData
+  {
+    //! Data used for storing the history of the activation.
+    cedar::aux::MatDataPtr mHistory;
 
+    //! Data from which the history is being recorded.
+    cedar::aux::ConstMatDataPtr mData;
 
-    //--------------------------------------------------------------------------------------------------------------------
+    //! X axis labels for the data
+    std::deque<cedar::unit::Time> mXLabels;
+
+    //QPointF* mMarkerPos;
+    //QtCharts::QScatterSeries* mMarkerSeries;
+  };
+
+  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  QCLinePlot(QWidget *pParent = nullptr);
+  QCHistoryPlot0D(QWidget *pParent = NULL);
 
-  //!@brief Constructor expecting a DataPtr.
-  QCLinePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = nullptr);
+  //!@brief Constructor that expects a DataPtr
+  QCHistoryPlot0D(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
 
   //!@brief Destructor
-  ~QCLinePlot();
+  ~QCHistoryPlot0D();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief display data
-  void plot(cedar::aux::ConstDataPtr matData, const std::string& title);
+  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
 
   //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
 
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
-  //! Checks if data can be appended, i.e., if data is the same dimensionality and size as existing data.
+  void writeConfiguration(cedar::aux::ConfigurationNode& node) const;
+
+  //!@brief Check if the given data can be appended to the plot.
   bool canAppend(cedar::aux::ConstDataPtr data) const;
-
-  //! Checks if the given data object is in this plot.
+  //!@brief Check if the given data can be detached from the plot.
   bool canDetach(cedar::aux::ConstDataPtr data) const;
-
-  //! Sets whether the plot emits dataChanged for 0d data
-  void setAccepts0DData(bool accept);
-
-
-signals:
-  //!@brief Signals the worker thread to convert the data to the plot's internal format.
-  void convert();
-
-public slots:
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! Appends the data object to this plot.
-  void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
-
-  //! Detaches the given data object from this plot.
-  void doDetach(cedar::aux::ConstDataPtr data);
-
-  //! Returns a pointer to the QwtPlot object used by this plot.
-  QCustomPlot* getPlot();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief initialize
+  //!@brief initialize the plot
   void init();
 
-private slots:
+  void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+  void doDetach(cedar::aux::ConstDataPtr data);
 
-  void showLegend(bool show = true);
-  void showGrid(bool show = true);
-  void setFixedYAxisScaling();
+  //! Takes the current data and puts it into the history
+  void advanceHistory();
 
-  void contextMenuRequest(QPoint);
+  //! Resets the history to contain only the current state.
+  void clear();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -157,32 +150,19 @@ private slots:
 protected:
   // none yet
 private:
-    QCustomPlot *mpChart;
-    std::vector<cedar::aux::ConstDataPtr> PlotSeriesDataVector;
-    std::vector<QColor> mLineColors;
+  //! Subplot used for plotting the history matrix.
+  cedar::aux::gui::QCLinePlot* mpHistoryPlot;
 
-  //! For locking the plot itself.
-  QReadWriteLock *mpLock;
+  //! Data used for storing the history of the activation.
+  std::vector<PlotData> mPlotData;
 
-  //! If true, the plot will not complain about 0d data. Otherwise, 0D data will lead it to emit a dataChanged signal.
-  bool mPlot0D;
+  //!@brief number of steps in the past, which are still plotted
+  size_t mMaxHistorySize;
 
+  int mTimerId;
 
-  bool SettingShowLegend = false;
-  bool SettingShowGrid = false;
-  bool SettingFixedYAxisScaling = false;
+  boost::optional<cedar::unit::Time> mTimeOfLastUpdate;
 
-  double YLimitMin = 0;
-  double YLimitMax = 1;
+}; // class cedar::aux::gui::QCHistoryPlot0D
 
-  double FixedYLimitMin = 0;
-  double FixedYLimitMax = 1;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-
-}; // class cedar::aux::gui::QCLinePlot
-
-#endif // CEDAR_AUX_GUI_QC_LINE_PLOT_H
+#endif // CEDAR_AUX_GUI_QCHISTORY_PLOT_0D_H
