@@ -34,16 +34,17 @@
 
 ======================================================================================================================*/
 
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-
+#ifdef CEDAR_USE_YARP
 // CLASS HEADER
 #include "cedar/devices/YarpVehicle.h"
 
 // CEDAR INCLUDES
 
 // SYSTEM INCLUDES
-#ifdef CEDAR_USE_YARP
+
 
 namespace
 {

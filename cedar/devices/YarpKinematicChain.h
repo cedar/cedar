@@ -36,7 +36,7 @@
 
 #ifndef CEDAR_DEV_YARP_KINEMATIC_CHAIN_H
 #define CEDAR_DEV_YARP_KINEMATIC_CHAIN_H
-
+#ifdef CEDAR_USE_YARP
 // CEDAR INCLUDES
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/KinematicChain.h"
@@ -48,7 +48,7 @@
 #include "cedar/devices/YarpKinematicChain.fwd.h"
 
 
-#ifdef CEDAR_USE_YARP
+
 
 /*!@todo describe.
  *

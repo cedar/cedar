@@ -37,13 +37,14 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+#ifdef CEDAR_USE_YARP
 // CLASS HEADER
 #include "cedar/devices/YarpCamera.h"
 
 // CEDAR INCLUDES
 
 // SYSTEM INCLUDES
-#ifdef CEDAR_USE_YARP
+
 
 namespace {
   bool registered() {
@@ -73,10 +74,13 @@ cedar::dev::YarpCamera::~YarpCamera() {
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::YarpCamera::postStart() {
   auto yarpChannel = boost::static_pointer_cast<cedar::dev::YarpChannel<cv::Mat> >(this->getChannel());
+
   if (!yarpChannel) {
+    std::cout<<"YarpCamera::postStart: No YarpChannel! Could not read from Port: "<< mReadPort->getValue() << std::endl;
     cedar::aux::LogSingleton::getInstance()->error("Lost yarpChannel pointer", CEDAR_CURRENT_FUNCTION_NAME);
     return;
   } else {
+    std::cout<<"YarpCamera::postStart: Added Reader for Port: "<< mReadPort->getValue() << std::endl;
     yarpChannel->addReaderPort(mReadPort->getValue());
   }
 }
@@ -84,10 +88,13 @@ void cedar::dev::YarpCamera::postStart() {
 cv::Mat cedar::dev::YarpCamera::retrievePicture() {
   auto yarpChannel = boost::static_pointer_cast<cedar::dev::YarpChannel<cv::Mat> >(this->getChannel());
   if (!yarpChannel) {
+    std::cout<<"YarpCamera::retrievePicture: No YarpChannel! Could not read from Port: "<< mReadPort->getValue() << std::endl;
     cedar::aux::LogSingleton::getInstance()->error("Lost yarpChannel pointer", CEDAR_CURRENT_FUNCTION_NAME);
     return cv::Mat();
   }
+  std::cout<<"YarpCamera::retrievePicture: We have a YarpChannel! Read from Port: "<< mReadPort->getValue() << std::endl;
   auto picture = yarpChannel->read(mReadPort->getValue());
+
   return picture;
 }
 

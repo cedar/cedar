@@ -36,6 +36,7 @@
 
 #ifndef CEDAR_DEV_YARP_CAMERA_H
 #define CEDAR_DEV_YARP_CAMERA_H
+#ifdef CEDAR_USE_YARP
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -48,7 +49,7 @@
 #include "cedar/devices/YarpCamera.fwd.h"
 
 // SYSTEM INCLUDES
-#ifdef CEDAR_USE_YARP
+
 
 /*!@todo describe.
  *
