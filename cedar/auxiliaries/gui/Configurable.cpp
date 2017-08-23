@@ -56,7 +56,12 @@
 #include <QApplication>
 #include <QList>
 #include <QLabel>
+#ifdef CEDAR_USE_QT5
+#include <QPushButton>
+#else
 #include <QtGui/QPushButton>
+#endif
+
 #include <boost/tokenizer.hpp>
 
 #define PARAMETER_NAME_COLUMN 0

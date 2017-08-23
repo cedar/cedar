@@ -131,9 +131,7 @@ endif(OpenCV_FOUND)
 # OpenGL
 find_package(OpenGL)
 set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
-
-if(NOT CEDAR_PORTABLE_MINIMAL_VERSION)
-    # libQGLViewer
+# libQGLViewer
     option(CEDAR_USE_QGLVIEWER "Use QGLViewer." ON)
     message("-- Searching for QGLViewer...")
     find_package(QGLViewer REQUIRED)
@@ -149,6 +147,10 @@ if(NOT CEDAR_PORTABLE_MINIMAL_VERSION)
       message("-- QGLViewer not found.")
       set(CEDAR_USE_QGLVIEWER OFF)
     endif(QGLViewer_FOUND)
+
+
+if(NOT CEDAR_PORTABLE_MINIMAL_VERSION)
+
 
     # libQwt
     option(CEDAR_USE_QWT "Include Qwt based plots if possible." ON)

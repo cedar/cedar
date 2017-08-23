@@ -15,10 +15,17 @@ if(NOT CEDAR_USE_QT5)
     PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
   )
 else(NOT CEDAR_USE_QT5)
-  find_library(QGLViewer_LIBS
-    NAMES qglviewer-qt5 QGLViewer-qt5 #QGLViewer qglviewer
-    PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
-  )
+  if(APPLE)
+    find_library(QGLViewer_LIBS
+            NAMES qglviewer-qt5 QGLViewer-qt5 QGLViewer qglviewer
+            PATHS ${CEDAR_DEPENDENCY_QGLVIEWER}
+            )
+  else(APPLE)
+    find_library(QGLViewer_LIBS
+            NAMES qglviewer-qt5 QGLViewer-qt5 #QGLViewer qglviewer
+            PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
+            )
+  endif(APPLE)
 endif(NOT CEDAR_USE_QT5)
 
 # now check if anything is missing
