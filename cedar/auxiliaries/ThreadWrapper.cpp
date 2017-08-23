@@ -463,7 +463,7 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time)
     if (QThread::currentThread() != mpThread)
     {
       CEDAR_DEBUG_ASSERT(this->mpThread != NULL);
-
+#ifndef CEDAR_USE_QT5
       cedar::aux::LogSingleton::getInstance()->warning
       (
 #ifdef DEBUG
@@ -475,6 +475,7 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time)
 #endif      
         "cedar::aux::ThreadWrapper::stop(unsigned int, bool)"
       );
+#endif
     }
     else
     {
