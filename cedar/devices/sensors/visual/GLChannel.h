@@ -37,6 +37,8 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_GLGRABBER_CHANNEL_H
 #define CEDAR_DEV_SENSORS_VISUAL_GLGRABBER_CHANNEL_H
 
+#ifdef CEDAR_USE_QGLVIEWER
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
@@ -113,5 +115,6 @@ private:
 
 }; // class cedar::dev::sensors::visual::GLChannel
 
+#endif // CEDAR_USE_QGLVIEWER
 #endif // CEDAR_DEV_SENSORS_VISUAL_GLGRABBER_CHANNEL_H
 

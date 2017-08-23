@@ -33,7 +33,7 @@
     Credits:
 
 ======================================================================================================================*/
-
+#ifdef CEDAR_USE_QGLVIEWER
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
@@ -46,6 +46,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
+
 namespace
 {
   bool declared
@@ -224,3 +225,4 @@ void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGL
   }
 }
 
+#endif //CEDAR_USE_QGLVIEWER
