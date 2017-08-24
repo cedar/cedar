@@ -52,6 +52,7 @@
 #include <sstream>
 #include <qglobal.h>
 #include <opencv2/core/version.hpp>
+#include <QApplication>
 
 #if defined CEDAR_COMPILER_GCC
 #include <stdlib.h>
@@ -231,7 +232,11 @@ void cedar::aux::openCrashFile(std::ofstream& stream, std::string& crash_file)
 std::string cedar::aux::getUserHomeDirectory()
 {
 #ifdef CEDAR_PORTABLE
+#ifdef CEDAR_PORTABLE_MAC_BUNDLE_PATHS
+  std::string homedirportable = QApplication::applicationDirPath().toStdString() + "..";
+#else
   std::string homedirportable = "..";
+#endif
   return homedirportable;
 #elif defined CEDAR_OS_UNIX
   std::string homedir = getenv("HOME");
