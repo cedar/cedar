@@ -48,6 +48,7 @@
   #include <boost/property_tree/json_parser.hpp>
 #endif
 #include <boost/filesystem.hpp>
+#include <QApplication>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -122,10 +123,16 @@ _mRecorderSerializationFormat(new cedar::aux::EnumParameter(this, "recorder data
   }
 
 #ifdef CEDAR_PORTABLE
+#ifndef CEDAR_PORTABLE_MAC_BUNDLE_PATHS
   boost::filesystem::create_directories(boost::filesystem::current_path().string() + "/../plugins/");
+#endif
   boost::filesystem::directory_iterator end_iter;
   std::vector<cedar::aux::Path> folders;
+#ifdef CEDAR_PORTABLE_MAC_BUNDLE_PATHS
+  for (boost::filesystem::directory_iterator dir_iter(QApplication::applicationDirPath().toStdString() + "/../plugins/"); dir_iter != end_iter ; ++dir_iter)
+#else
   for (boost::filesystem::directory_iterator dir_iter(boost::filesystem::current_path().string() + "/../plugins/"); dir_iter != end_iter ; ++dir_iter)
+#endif
   {
     if (boost::filesystem::is_directory(dir_iter->status()))
     {

@@ -42,6 +42,7 @@ set (CEDAR_EXE_DIR        "${CEDAR_HOME}/bin"         CACHE PATH "Directory all 
 set (CEDAR_LOG_DIR        "${CEDAR_HOME}/logs"        CACHE PATH "Default directory for all log files.")
 set (CEDAR_BUILD_STATIC_LIBS              0           CACHE BOOL "Build all libraries statically (*.a)?")
 set (CEDAR_PORTABLE                		  0           CACHE BOOL "Build a portable (linux only) cedar version?")
+set (CEDAR_PORTABLE_MAC_BUNDLE_PATHS      0           CACHE BOOL "Build a portable (mac bundle only) cedar version? You need to run macdeployqt afterwards manually.")
 set (CEDAR_PORTABLE_MINIMAL_VERSION       0           CACHE BOOL "The portable version requires only minimal dependencies.")
 set (CEDAR_BUILD_DEBUG_VERSION            0           CACHE BOOL "Build with debug information?")
 set (CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS    0           CACHE BOOL "Use opencv debug libraries when building in debug mode?")

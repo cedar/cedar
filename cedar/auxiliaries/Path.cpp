@@ -52,6 +52,7 @@
 #include <QDateTime>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
+#include <QApplication>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -314,7 +315,11 @@ cedar::aux::Path cedar::aux::Path::absolute(bool showInLog) const
   if (this->isResource())
   {
 #ifdef CEDAR_PORTABLE
+#ifdef CEDAR_PORTABLE_MAC_BUNDLE_PATHS
+    return cedar::aux::Path(QApplication::applicationDirPath().toStdString() + separator() + ".." + separator() + "Resources" + separator() + this->toString(false));
+#else
     return cedar::aux::Path(boost::filesystem::current_path().string() + separator() + ".." + separator() + "resources" + separator() + this->toString(false));
+#endif
 #else
     return cedar::aux::Path(cedar::aux::locateResource(this->toString(), showInLog));
 #endif // CEDAR_PORTABLE
@@ -328,7 +333,11 @@ cedar::aux::Path cedar::aux::Path::absolute(bool showInLog) const
   else if (this->isTestFile())
   {
 #ifdef CEDAR_PORTABLE
+#ifdef CEDAR_PORTABLE_MAC_BUNDLE_PATHS
+    return cedar::aux::Path(QApplication::applicationDirPath().toStdString() + separator() + ".." + separator() + "tests" + separator() + this->toString(false));
+#else
     return cedar::aux::Path(boost::filesystem::current_path().string() + separator() + ".." + separator() + "tests" + separator() + this->toString(false));
+#endif
 #else
     return cedar::aux::Path(CEDAR_HOME_DIRECTORY "/tests/" + this->toString(false));
 #endif // CEDAR_PORTABLE
@@ -337,7 +346,11 @@ cedar::aux::Path cedar::aux::Path::absolute(bool showInLog) const
   else if (this->isPluginRelative())
   {
 #ifdef CEDAR_PORTABLE
+#ifdef CEDAR_PORTABLE_MAC_BUNDLE_PATHS
+    return cedar::aux::Path(QApplication::applicationDirPath().toStdString() + separator() + ".." + separator() + "plugins" + separator() + this->toString(false));
+#else
     return cedar::aux::Path(boost::filesystem::current_path().string() + separator() + ".." + separator() + "plugins" + separator() + this->toString(false));
+#endif
 #else
     return cedar::aux::PluginProxy::findPluginFile(this->toString(false));
 #endif // CEDAR_PORTABLE
