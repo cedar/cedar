@@ -231,7 +231,7 @@ void cedar::aux::openCrashFile(std::ofstream& stream, std::string& crash_file)
 
 std::string cedar::aux::getUserHomeDirectory()
 {
-#ifdef CEDAR_PORTABLE
+#ifdef CEDAR_PORTABLE_HOME_DIR
 #ifdef CEDAR_PORTABLE_MAC_BUNDLE_PATHS
   std::string homedirportable = QApplication::applicationDirPath().toStdString() + "..";
 #else
