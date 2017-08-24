@@ -129,7 +129,7 @@ _mRecorderSerializationFormat(new cedar::aux::EnumParameter(this, "recorder data
   boost::filesystem::directory_iterator end_iter;
   std::vector<cedar::aux::Path> folders;
 #ifdef CEDAR_PORTABLE_MAC_BUNDLE_PATHS
-  for (boost::filesystem::directory_iterator dir_iter(QApplication::applicationDirPath().toStdString() + "/../plugins/"); dir_iter != end_iter ; ++dir_iter)
+  for (boost::filesystem::directory_iterator dir_iter(QCoreApplication::applicationDirPath().toStdString() + "/../Cedar_Plugins/"); dir_iter != end_iter ; ++dir_iter)
 #else
   for (boost::filesystem::directory_iterator dir_iter(boost::filesystem::current_path().string() + "/../plugins/"); dir_iter != end_iter ; ++dir_iter)
 #endif
