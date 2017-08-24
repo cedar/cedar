@@ -144,7 +144,7 @@ void cedar::aux::gui::Viewer::grabBuffer()
 #endif // CEDAR_USE_QGLVIEWER
 }
 
-#ifdef CEDAR_USE_QGLVIEWER
+#ifndef CEDAR_USE_QGLVIEWER
 QImage cedar::aux::gui::Viewer::grabFrameBuffer()
 {
   return this->QGLWidget::grabFrameBuffer(false);
