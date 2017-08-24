@@ -331,6 +331,16 @@ std::vector<std::string> cedar::aux::listResourcePaths()
 
 std::string cedar::aux::locateResource(const std::string& resourcePath, bool showInLog)
 {
+
+#ifdef CEDAR_PORTABLE
+#ifdef CEDAR_PORTABLE_MAC_BUNDLE_PATHS
+  return QCoreApplication::applicationDirPath().toStdString() + "/../Cedar_Resources/" + resourcePath;
+#else
+  return boost::filesystem::current_path().string() + "/../resources/" + resourcePath;
+#endif
+#else
+#endif // CEDAR_PORTABLE
+
   bool is_directory = false;
   std::vector<std::string> paths = cedar::aux::listResourcePaths();
   for (auto path_iter = paths.begin(); path_iter != paths.end(); ++path_iter)
