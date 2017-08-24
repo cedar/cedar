@@ -233,7 +233,7 @@ std::string cedar::aux::getUserHomeDirectory()
 {
 #ifdef CEDAR_PORTABLE_HOME_DIR
 #ifdef CEDAR_PORTABLE_MAC_BUNDLE_PATHS
-  std::string homedirportable = QApplication::applicationDirPath().toStdString() + "..";
+  std::string homedirportable = QCoreApplication::applicationDirPath().toStdString() + "/..";
 #else
   std::string homedirportable = "..";
 #endif

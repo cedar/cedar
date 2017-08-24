@@ -316,7 +316,7 @@ cedar::aux::Path cedar::aux::Path::absolute(bool showInLog) const
   {
 #ifdef CEDAR_PORTABLE
 #ifdef CEDAR_PORTABLE_MAC_BUNDLE_PATHS
-    return cedar::aux::Path(QApplication::applicationDirPath().toStdString() + separator() + ".." + separator() + "Resources" + separator() + this->toString(false));
+    return cedar::aux::Path(QCoreApplication::applicationDirPath().toStdString() + "/.." + separator() + "Cedar_Resources" + separator() + this->toString(false));
 #else
     return cedar::aux::Path(boost::filesystem::current_path().string() + separator() + ".." + separator() + "resources" + separator() + this->toString(false));
 #endif
@@ -334,7 +334,7 @@ cedar::aux::Path cedar::aux::Path::absolute(bool showInLog) const
   {
 #ifdef CEDAR_PORTABLE
 #ifdef CEDAR_PORTABLE_MAC_BUNDLE_PATHS
-    return cedar::aux::Path(QApplication::applicationDirPath().toStdString() + separator() + ".." + separator() + "tests" + separator() + this->toString(false));
+    return cedar::aux::Path(QCoreApplication::applicationDirPath().toStdString() + "/.." + separator() + "Cedar_Tests" + separator() + this->toString(false));
 #else
     return cedar::aux::Path(boost::filesystem::current_path().string() + separator() + ".." + separator() + "tests" + separator() + this->toString(false));
 #endif
@@ -347,7 +347,7 @@ cedar::aux::Path cedar::aux::Path::absolute(bool showInLog) const
   {
 #ifdef CEDAR_PORTABLE
 #ifdef CEDAR_PORTABLE_MAC_BUNDLE_PATHS
-    return cedar::aux::Path(QApplication::applicationDirPath().toStdString() + separator() + ".." + separator() + "plugins" + separator() + this->toString(false));
+    return cedar::aux::Path(QCoreApplication::applicationDirPath().toStdString() + "/.." + separator() + "Cedar_Plugins" + separator() + this->toString(false));
 #else
     return cedar::aux::Path(boost::filesystem::current_path().string() + separator() + ".." + separator() + "plugins" + separator() + this->toString(false));
 #endif
