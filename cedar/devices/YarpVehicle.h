@@ -36,7 +36,7 @@
 
 #ifndef CEDAR_DEV_YARP_VEHICLE_H
 #define CEDAR_DEV_YARP_VEHICLE_H
-#ifdef CEDAR_USE_YARP
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 #include "cedar/devices/Vehicle.h"
@@ -44,6 +44,7 @@
 
 // CEDAR INCLUDES
 
+#ifdef CEDAR_USE_YARP
 // FORWARD DECLARATIONS
 #include "cedar/devices/YarpVehicle.fwd.h"
 

@@ -33,10 +33,11 @@
  Credits:
 
  ======================================================================================================================*/
-#ifdef CEDAR_USE_YARP
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+#ifdef CEDAR_USE_YARP
 #include "cedar/devices/YarpKinematicChain.h"
 #include "cedar/devices/KinematicChain.h"
 #include "cedar/auxiliaries/math/tools.h"
