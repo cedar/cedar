@@ -33,9 +33,11 @@
     Credits:
 
 ======================================================================================================================*/
-#ifdef CEDAR_USE_QGLVIEWER
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_QGLVIEWER
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/GLGrabber.h"
