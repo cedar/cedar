@@ -1772,7 +1772,7 @@ void cedar::proc::Group::outputConnectionRemoved(cedar::proc::DataSlotPtr slot)
 
 void cedar::proc::Group::connectSlots(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target)
 {
-  auto source_connectable = source->getParentPtr();
+  //auto source_connectable = source->getParentPtr();
   auto target_connectable = target->getParentPtr();
 
   CEDAR_DEBUG_ASSERT(source_connectable && target_connectable);
