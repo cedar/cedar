@@ -65,7 +65,15 @@ void cedar::proc::gui::StaticGainView::connectableChanged()
 void cedar::proc::gui::StaticGainView::updateIconWeight()
 {
   auto parameter = boost::dynamic_pointer_cast<cedar::aux::ConstDoubleParameter>(this->getConnectable()->getParameter("gain factor"));
-  if (parameter->getValue() > 0.0)
+  if (parameter->getValue() == 1.0)
+  {
+    this->setIconPath(":/steps/static_gain_one.svg");
+  }
+  else if (parameter->getValue() == -1.0)
+  {
+    this->setIconPath(":/steps/static_gain_minus_one.svg");
+  }
+  else if (parameter->getValue() > 0.0)
   {
     this->setIconPath(":/steps/static_gain_green.svg");
   }
