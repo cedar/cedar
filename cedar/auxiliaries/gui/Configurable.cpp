@@ -46,6 +46,8 @@
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/ObjectListParameter.h"
+#include "cedar/auxiliaries/kernel/Gauss.h"
+#include "cedar/auxiliaries/kernel/Box.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
@@ -56,6 +58,7 @@
 #include <QApplication>
 #include <QList>
 #include <QLabel>
+#include <typeinfo>
 #ifdef CEDAR_USE_QT5
 #include <QPushButton>
 #else
@@ -521,7 +524,18 @@ void cedar::aux::gui::Configurable::appendObjectListParameter
   {
     cedar::aux::ConfigurablePtr configurable = objectListParameter->getConfigurableChild(i);
     std::string subpath = path + "[" + objectListParameter->childIndexToString(i) + "]";
-    QString label = QString(QString::fromStdString(objectListParameter->getName()) + " [%1]").arg(i);
+
+    std::string configurableType = "";
+    if (boost::dynamic_pointer_cast<cedar::aux::kernel::Gauss>(configurable))
+    {
+      configurableType = " (Gauss)";
+
+    } else if(boost::dynamic_pointer_cast<cedar::aux::kernel::Box>(configurable))
+    {
+      configurableType = " (Box)";
+    }
+
+    QString label =QString::fromStdString(objectListParameter->getName()+" [")+QString::number(i)+QString::fromStdString("]"+configurableType);
     auto sub_item = this->appendHeading(pParent, label, 2);
 
     //Build a widget that contains a placeholder and the deletebutton!
