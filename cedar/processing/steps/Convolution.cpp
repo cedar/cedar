@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
+#include "cedar/auxiliaries/convolution/FFTW.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -296,6 +297,14 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
 void cedar::proc::steps::Convolution::inputDimensionalityChanged()
 {
   unsigned int new_dimensionality = this->getDimensionality();
+  #ifdef CEDAR_USE_FFTW
+  if (new_dimensionality >= 3)
+  {
+    this->mConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
+  }
+#endif // CEDAR_USE_FFTW
+
+
   for (size_t i = 0; i < this->_mKernels->size(); ++i)
   {
     this->_mKernels->at(i)->setDimensionality(new_dimensionality);
