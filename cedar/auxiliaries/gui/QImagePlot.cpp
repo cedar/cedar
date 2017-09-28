@@ -101,7 +101,7 @@ mpLegend(nullptr),
 _mSmoothScaling(new cedar::aux::BoolParameter(this, "smooth scaling", true)),
 _mKeepAspectRatio(new cedar::aux::BoolParameter(this, "keep aspect ratio", true)),
 _mAutoScaling(new cedar::aux::BoolParameter(this, "automatic value scaling", true)),
-_mShowLegend(new cedar::aux::BoolParameter(this, "show legend", false)),
+_mShowLegend(new cedar::aux::BoolParameter(this, "show legend", true)),
 _mValueLimits(new cedar::aux::math::DoubleLimitsParameter(this, "value limits", 0.0, 1.0)),
 _mColorJet(new cedar::aux::EnumParameter(this, "color jet", cedar::aux::ColorGradient::StandardGradients::typePtr(), cedar::aux::ColorGradient::StandardGradients::PlotDefault))
 {
