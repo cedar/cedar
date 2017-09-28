@@ -1,0 +1,8 @@
+{
+  "name": "lalala Simulated Robot",
+  "description file": "description.json",
+  "component instantiations": 
+  {
+    "arm": "testconfig"
+  }
+}
