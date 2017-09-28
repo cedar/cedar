@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_QT5
+#ifdef CEDAR_USE_QT5_PLOTS
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/Qt5LinePlot.h"
@@ -717,4 +717,4 @@ void cedar::aux::gui::Qt5LinePlot::handleMarkerClicked()
   showLegend(this->SettingShowLegend);
 }
 
-#endif // CEDAR_USE_QT5
+#endif // CEDAR_USE_QT5_PLOTS

@@ -39,7 +39,7 @@
 
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_QT5
+#ifdef CEDAR_USE_QT5_PLOTS
 
 
 // CEDAR INCLUDES
@@ -181,5 +181,5 @@ private:
 
 }; // class cedar::aux::gui::Qt5HistoryPlot0D
 
-#endif // CEDAR_USE_QT5
+#endif // CEDAR_USE_QT5_PLOTS
 #endif // CEDAR_AUX_GUI_QT5HISTORY_PLOT_0D_H

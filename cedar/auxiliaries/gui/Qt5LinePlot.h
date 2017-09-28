@@ -43,7 +43,7 @@
 
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_QT5
+#ifdef CEDAR_USE_QT5_PLOTS
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
@@ -287,5 +287,5 @@ private:
 
 }; // class cedar::aux::gui::Qt5LinePlot
 
-#endif // CEDAR_USE_QT5
+#endif // CEDAR_USE_QT5_PLOTS
 #endif // CEDAR_AUX_GUI_QT5_LINE_PLOT_H

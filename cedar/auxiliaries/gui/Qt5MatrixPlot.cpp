@@ -43,7 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_QT5
+#ifdef CEDAR_USE_QT5_PLOTS
 
 #include "cedar/auxiliaries/gui/Qt5MatrixPlot.h"
 #include "cedar/auxiliaries/gui/Qt5LinePlot.h"
@@ -292,4 +292,4 @@ void cedar::aux::gui::Qt5MatrixPlot::processChangedData()
   }
 }
 
-#endif // CEDAR_USE_QT5
+#endif // CEDAR_USE_QT5_PLOTS

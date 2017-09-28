@@ -43,7 +43,7 @@
 
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_QT5
+#ifdef CEDAR_USE_QT5_PLOTS
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/PlotInterface.h"
 #include "cedar/auxiliaries/gui/Qt5SurfacePlotInputHandler.h"
@@ -267,5 +267,5 @@ private:
   cedar::aux::gui::detail::Qt5SurfacePlotWorkerPtr mWorker;
 }; // class cedar::aux::gui::Qt5SurfacePlot
 
-#endif // CEDAR_USE_QT5
+#endif // CEDAR_USE_QT5_PLOTS
 #endif // CEDAR_AUX_GUI_QT5_SURFACE_PLOT_H

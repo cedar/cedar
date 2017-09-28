@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_QT5
+#ifdef CEDAR_USE_QT5_PLOTS
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/Qt5HistoryPlot0D.h"
@@ -393,5 +393,5 @@ void cedar::aux::gui::Qt5HistoryPlot0D::timerEvent(QTimerEvent* /* pEvent */)
   this->advanceHistory();
 }
 
-#endif // CEDAR_USE_QT5
+#endif // CEDAR_USE_QT5_PLOTS
 

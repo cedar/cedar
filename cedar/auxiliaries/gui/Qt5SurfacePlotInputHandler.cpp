@@ -40,7 +40,7 @@
 
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_QT5
+#ifdef CEDAR_USE_QT5_PLOTS
 #define NOMINMAX // prevents MSVC conflicts
 
 // CEDAR INCLUDES
@@ -168,6 +168,6 @@ void cedar::aux::gui::Qt5SurfacePlotInputHandler::callContextMenu(QPoint menuPos
     }
   }
 }
-#endif // CEDAR_USE_QT5
+#endif // CEDAR_USE_QT5_PLOTS
 
 

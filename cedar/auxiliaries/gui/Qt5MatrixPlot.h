@@ -42,7 +42,7 @@
 #define CEDAR_AUX_GUI_QT5_MATRIX_PLOT_H
 
 #include "cedar/configuration.h"
-#ifdef CEDAR_USE_QT5
+#ifdef CEDAR_USE_QT5_PLOTS
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
@@ -128,5 +128,5 @@ private:
 
 }; // class cedar::aux::gui::Qt5MatrixPlot
 
-#endif // CEDAR_USE_QT5
+#endif // CEDAR_USE_QT5_PLOTS
 #endif // CEDAR_AUX_GUI_QT5_MATRIX_PLOT_H
