@@ -169,7 +169,7 @@ void cedar::aux::gui::QCHistoryPlot0D::advanceHistory()
     }
     cv::Mat now = plot_data.mData->getData().clone();
     data_locker.unlock();
-    double value = cedar::aux::math::getMatrixEntry<double>(now, 0);
+    //double value = cedar::aux::math::getMatrixEntry<double>(now, 0);
     //plot_data.mMarkerSeries->replace(0,-0.03,value);
   }
   // if the clock hasn't changed, abort!
