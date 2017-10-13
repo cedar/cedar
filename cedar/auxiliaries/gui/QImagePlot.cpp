@@ -116,6 +116,8 @@ _mColorJet(new cedar::aux::EnumParameter(this, "color jet", cedar::aux::ColorGra
   this->mpImageDisplay->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
   this->mpImageDisplay->setMinimumSize(QSize(5, 5));
 
+  this->showLegendChanged(); //Initialize the Legend with this, as _mShowLegend is true by default now.
+
   QObject::connect
   (
     this,
