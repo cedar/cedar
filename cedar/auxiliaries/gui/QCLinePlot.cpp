@@ -225,7 +225,7 @@ void cedar::aux::gui::QCLinePlot::timerEvent(QTimerEvent * /* pEvent */)
   double x_max = -std::numeric_limits<double>::max();
   double y_min = std::numeric_limits<double>::max();
   double y_max = -std::numeric_limits<double>::max();
-  //QWriteLocker locker(mpLock);
+  QWriteLocker locker(mpLock);
   for (size_t i = 0; i < PlotSeriesDataVector.size(); ++i)
   {
     if(auto matData = boost::dynamic_pointer_cast<const cedar::aux::MatData>(PlotSeriesDataVector.at(i)))
@@ -238,6 +238,8 @@ void cedar::aux::gui::QCLinePlot::timerEvent(QTimerEvent * /* pEvent */)
       {
         if (dim != 0 || !this->mPlot0D)
         {
+          locker.unlock();
+          locker2.unlock();
           emit dataChanged();
           return;
         }
@@ -302,7 +304,7 @@ void cedar::aux::gui::QCLinePlot::timerEvent(QTimerEvent * /* pEvent */)
       locker2.unlock();
     }
   }
-  //locker.unlock();
+  locker.unlock();
   this->YLimitMin = y_min;
   this->YLimitMax = y_max;
 
