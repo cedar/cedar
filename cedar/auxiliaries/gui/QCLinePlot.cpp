@@ -98,6 +98,10 @@ mpLock(new QReadWriteLock())
 cedar::aux::gui::QCLinePlot::~QCLinePlot()
 {
   this->PlotSeriesDataVector.clear();
+  if(this->mpChart != nullptr)
+  {
+    delete this->mpChart;
+  }
   if (mpLock)
   {
     delete mpLock;
@@ -136,6 +140,7 @@ void cedar::aux::gui::QCLinePlot::doAppend(cedar::aux::ConstDataPtr data, const 
   this->mpChart->graph(c)->setPen(mLineColors.at(c % m));
   this->mpChart->graph(c)->setName(QString::fromStdString(title));
   this->PlotSeriesDataVector.push_back(data);
+  locker.unlock();
   this->startTimer(30);
 }
 
@@ -220,13 +225,12 @@ void cedar::aux::gui::QCLinePlot::timerEvent(QTimerEvent * /* pEvent */)
   double x_max = -std::numeric_limits<double>::max();
   double y_min = std::numeric_limits<double>::max();
   double y_max = -std::numeric_limits<double>::max();
-
-  QWriteLocker locker(mpLock);
+  //QWriteLocker locker(mpLock);
   for (size_t i = 0; i < PlotSeriesDataVector.size(); ++i)
   {
     if(auto matData = boost::dynamic_pointer_cast<const cedar::aux::MatData>(PlotSeriesDataVector.at(i)))
     {
-      QReadLocker locker(&matData->getLock());
+      QReadLocker locker2(&matData->getLock());
       const cv::Mat& plotMat = matData->getData();
 
       auto dim = cedar::aux::math::getDimensionalityOf(plotMat);
@@ -295,10 +299,10 @@ void cedar::aux::gui::QCLinePlot::timerEvent(QTimerEvent * /* pEvent */)
           this->mpChart->xAxis->setLabel(QString::fromStdString(annotation->getLabel(0)));
         }
       }
-
+      locker2.unlock();
     }
   }
-
+  //locker.unlock();
   this->YLimitMin = y_min;
   this->YLimitMax = y_max;
 
