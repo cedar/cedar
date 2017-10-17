@@ -163,10 +163,15 @@ bool cedar::aux::gui::QCLinePlot::canDetach(cedar::aux::ConstDataPtr data) const
 void cedar::aux::gui::QCLinePlot::doDetach(cedar::aux::ConstDataPtr data)
 {
   mpLock->lockForWrite();
-  auto new_end = std::remove_if(this->PlotSeriesDataVector.begin(), this->PlotSeriesDataVector.end(), [&](cedar::aux::ConstDataPtr dataPtr){
-    return (boost::dynamic_pointer_cast<cedar::aux::ConstData>(dataPtr) == data);
-  });
-  this->PlotSeriesDataVector.erase(new_end, this->PlotSeriesDataVector.end());
+  for (int i = 0; i < this->PlotSeriesDataVector.size(); ++i)
+  {
+    if(boost::dynamic_pointer_cast<cedar::aux::ConstData>(this->PlotSeriesDataVector[i]) == data)
+    {
+      this->mpChart->removeGraph(i);
+      this->PlotSeriesDataVector.erase(this->PlotSeriesDataVector.begin() + i);
+      break;
+    }
+  }
   mpLock->unlock();
 }
 
