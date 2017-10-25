@@ -108,6 +108,11 @@ public:
     return this->mpIde;
   }
 
+  inline bool getThrowOnDebugMessage() const
+  {
+    return this->mThrowOnDebugMessage;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -159,6 +164,9 @@ private:
 
   //! Whether the ide catches exceptions.
   bool mCatchExceptions;
+
+  //! Whether to throw on debug messages
+  bool mThrowOnDebugMessage;
 
 }; // class cedar::proc::gui::IdeApplication
 

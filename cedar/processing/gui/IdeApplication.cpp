@@ -71,7 +71,8 @@ cedar::proc::gui::IdeApplication::IdeApplication(int& argc, char** argv)
 QApplication(argc, argv),
 mpIde (NULL),
 mLastExceptionType(NONE),
-mCatchExceptions(true)
+mCatchExceptions(true),
+mThrowOnDebugMessage(true)
 {
   QStringList args = QCoreApplication::arguments();
 
@@ -85,11 +86,20 @@ mCatchExceptions(true)
     'e'
   );
   cedar::proc::gui::Ide::addCommandLineOptionsTo(parser);
+  parser.defineFlag
+  (
+    "throw-on-debug-message",
+    "When specified, any debug message will throw an exception instead of "
+    "logging the debug message. This might be helpful for debugging. That "
+    "exception is still caught by the IDE if you do not use the '-e' flag."
+  );
 
   parser.parse(argc, argv);
   parser.writeSummary();
 
   this->mCatchExceptions = !parser.hasParsedFlag("dont-catch-exceptions");
+
+  this->mThrowOnDebugMessage = !parser.hasParsedFlag("throw-on-debug-message");
 
   this->mpIde = new cedar::proc::gui::Ide(parser);
 
