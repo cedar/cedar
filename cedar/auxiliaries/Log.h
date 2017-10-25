@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/logFilter/All.h"
 #include "cedar/auxiliaries/utilities.h"
+#include "cedar/processing/gui/IdeApplication.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Log.fwd.h"
@@ -51,6 +52,8 @@
 // SYSTEM INCLUDES
 #include <vector>
 #include <string>
+#include <stdexcept>
+#include <QApplication>
 
 //!@brief A class for logging messages in a file.
 class cedar::aux::Log
@@ -111,6 +114,24 @@ public:
   {
 #ifdef DEBUG
     this->log(level, message, source, title);
+
+    auto app = QCoreApplication::instance();
+    if (app)
+    {
+      auto pointer = dynamic_cast< cedar::proc::gui::IdeApplication* >(app);
+      if (pointer)
+      {
+        if (pointer->getThrowOnDebugMessage())
+        {
+          throw std::runtime_error("THROW ON DEBUG MESSAGE: "
+                                   + message
+                                   + " SOURCE: "
+                                   + source
+                                   + " TITLE: "
+                                   + title);
+        }
+      }
+    }
 #endif // DEBUG
   }
   
