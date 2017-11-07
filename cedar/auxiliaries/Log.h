@@ -37,6 +37,10 @@
 #ifndef CEDAR_AUX_LOG_H
 #define CEDAR_AUX_LOG_H
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Log.fwd.h"
+#include "cedar/auxiliaries/LogInterface.fwd.h"
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/Singleton.h"
@@ -45,9 +49,7 @@
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/processing/gui/IdeApplication.h"
 
-// FORWARD DECLARATIONS
-#include "cedar/auxiliaries/Log.fwd.h"
-#include "cedar/auxiliaries/LogInterface.fwd.h"
+
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -118,18 +120,14 @@ public:
     auto app = QCoreApplication::instance();
     if (app)
     {
-      auto pointer = dynamic_cast< cedar::proc::gui::IdeApplication* >(app);
-      if (pointer)
+      if (this->getThrowOnDebugMessage())
       {
-        if (pointer->getThrowOnDebugMessage())
-        {
-          throw std::runtime_error("THROW ON DEBUG MESSAGE: "
-                                   + message
-                                   + " SOURCE: "
-                                   + source
-                                   + " TITLE: "
-                                   + title);
-        }
+        throw std::runtime_error("THROW ON DEBUG MESSAGE: "
+                                 + message
+                                 + " SOURCE: "
+                                 + source
+                                 + " TITLE: "
+                                 + title);
       }
     }
 #endif // DEBUG
@@ -224,6 +222,16 @@ public:
     this->debugLog(cedar::aux::LOG_LEVEL_MEM_DEBUG, message, "memdbg", "memory");
   }
 
+  inline bool getThrowOnDebugMessage() const
+  {
+    return this->mThrowOnDebugMessage;
+  }
+
+  inline void setThrowOnDebugMessage(bool b) 
+  {
+    this->mThrowOnDebugMessage= b;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -248,6 +256,9 @@ private:
   std::vector<LogHandler> mHandlers;
   
   cedar::aux::LogInterfacePtr mDefaultLogger;
+
+  //! Whether to throw on debug messages
+  bool mThrowOnDebugMessage;
 };
 
 //!@cond SKIPPED_DOCUMENTATION

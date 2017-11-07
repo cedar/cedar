@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/IdeApplication.h"
 #include "cedar/processing/gui/Ide.h"
+#include "cedar/auxiliaries/Log.h"
 #include "cedar/devices/sensors/visual/Grabber.h"
 #include "cedar/devices/Component.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
@@ -71,8 +72,7 @@ cedar::proc::gui::IdeApplication::IdeApplication(int& argc, char** argv)
 QApplication(argc, argv),
 mpIde (NULL),
 mLastExceptionType(NONE),
-mCatchExceptions(true),
-mThrowOnDebugMessage(true)
+mCatchExceptions(true)
 {
   QStringList args = QCoreApplication::arguments();
 
@@ -99,7 +99,8 @@ mThrowOnDebugMessage(true)
 
   this->mCatchExceptions = !parser.hasParsedFlag("dont-catch-exceptions");
 
-  this->mThrowOnDebugMessage = !parser.hasParsedFlag("throw-on-debug-message");
+  cedar::aux::LogSingleton::getInstance()->setThrowOnDebugMessage( 
+                          parser.hasParsedFlag("throw-on-debug-message") );
 
   this->mpIde = new cedar::proc::gui::Ide(parser);
 
