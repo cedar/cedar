@@ -84,6 +84,13 @@ cedar::dev::RobotManager::RobotManager()
   youbot_template.addNamedConfiguration("simulator",cedar::aux::Path("resource://robots/youbot/simulator_configuration.json"));
   this->addRobotTemplate("youbot",youbot_template);
 
+  // twoDArm
+  cedar::dev::RobotManager::Template twoDArm_template;
+  twoDArm_template.setIconPath(":/cedar/dev/gui/icons/twoDArm_icon_256.png");
+  twoDArm_template.addNamedConfiguration("yarp",cedar::aux::Path("resource://robots/twoDArm/yarp_configuration.json"));
+  twoDArm_template.addNamedConfiguration("simulator",cedar::aux::Path("resource://robots/twoDArm/simulator_configuration.json"));
+  this->addRobotTemplate("twoDArm",twoDArm_template);
+
   this->restore();
 }
 

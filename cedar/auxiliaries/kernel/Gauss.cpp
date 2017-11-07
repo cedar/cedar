@@ -74,7 +74,7 @@ cedar::aux::kernel::Gauss::Gauss
 cedar::aux::kernel::Separable(),
 _mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", amplitude, -10000.0, 10000.0)),
 _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigmas", dimensionality, sigmas, 0.01, 10000)),
-_mNormalize(new cedar::aux::BoolParameter(this, "normalize", false)),
+_mNormalize(new cedar::aux::BoolParameter(this, "normalize", true)),
 _mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", dimensionality, shifts, -10000.0, 10000)),
 _mLimit(new cedar::aux::DoubleParameter(this, "limit", limit, 0.01, 1000.0))
 {
@@ -97,7 +97,7 @@ cedar::aux::kernel::Gauss::Gauss(
 cedar::aux::kernel::Separable(dimensionality),
 _mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", amplitude, -10000.0, 10000.0)),
 _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigmas", sigmas, 0.01, 10000)),
-_mNormalize(new cedar::aux::BoolParameter(this, "normalize", false)),
+_mNormalize(new cedar::aux::BoolParameter(this, "normalize", true)),
 _mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", shifts, -10000.0, 10000)),
 _mLimit(new cedar::aux::DoubleParameter(this, "limit", limit, 0.01, 1000.0))
 {
@@ -129,6 +129,7 @@ void cedar::aux::kernel::Gauss::onInit()
   QObject::connect(_mLimit.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()), Qt::DirectConnection);
   QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()), Qt::DirectConnection);
   QObject::connect(_mShifts.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()), Qt::DirectConnection);
+  QObject::connect(_mNormalize.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()), Qt::DirectConnection);
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()), Qt::DirectConnection);
 }
 

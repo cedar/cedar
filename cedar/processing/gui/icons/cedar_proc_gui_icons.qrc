@@ -110,5 +110,6 @@
         <file>steps/virtual_camera.svg</file>
         <file>steps/vector_to_scalars.svg</file>
         <file>steps/const_vector.svg</file>
+        <file>steps/stack.svg</file>
     </qresource>
 </RCC>
