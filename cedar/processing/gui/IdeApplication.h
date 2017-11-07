@@ -41,12 +41,12 @@
 #ifndef CEDAR_PROC_GUI_IDE_APPLICATION_H
 #define CEDAR_PROC_GUI_IDE_APPLICATION_H
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/IdeApplication.fwd.h"
+#include "cedar/processing/gui/Ide.fwd.h"
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/ExceptionBase.h"
-
-// FORWARD DECLARATIONS
-#include "cedar/processing/gui/Ide.fwd.h"
-#include "cedar/processing/gui/IdeApplication.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -108,11 +108,6 @@ public:
     return this->mpIde;
   }
 
-  inline bool getThrowOnDebugMessage() const
-  {
-    return this->mThrowOnDebugMessage;
-  }
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -164,9 +159,6 @@ private:
 
   //! Whether the ide catches exceptions.
   bool mCatchExceptions;
-
-  //! Whether to throw on debug messages
-  bool mThrowOnDebugMessage;
 
 }; // class cedar::proc::gui::IdeApplication
 
