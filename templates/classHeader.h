@@ -43,7 +43,7 @@
 // CEDAR INCLUDES
 
 // FORWARD DECLARATIONS
-#include "<namespace path>/<class name>.fwd.h"
+#include "<class fwd header path>"
 
 // SYSTEM INCLUDES
 
