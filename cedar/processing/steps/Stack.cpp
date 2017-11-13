@@ -192,8 +192,7 @@ void cedar::proc::steps::Stack::compute(const cedar::proc::Arguments&)
         sizes[2] = i;
         if(auto data = this->getInput(QString::number(i).toStdString()))
         {
-          auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
-          if(mat_data)
+          if(auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
           {
             const cv::Mat& input = mat_data->getData();
             output.at<float>(sizes) = input.at<float>(row,col);
@@ -208,33 +207,36 @@ void cedar::proc::steps::Stack::inputConnectionChanged(const std::string& inputN
 {
   if (auto data = this->getInput(inputName))
   {
-    auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
-    unsigned int i = static_cast<unsigned int>(QString::fromStdString(inputName).toInt());
-    //mInputs.at(i) = mat_data;
-    this->rows = mat_data->getData().rows;
-    this->cols = mat_data->getData().cols;
-    //if (mOutput->getData().size[0] != mat_data->getData().rows || mOutput->getData().size[1] != mat_data->getData().cols)
+    if(auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
     {
-      int sizes[3];
-      sizes[0] = mat_data->getData().rows;
-      sizes[1] = mat_data->getData().cols;
-      sizes[2] = static_cast<int>(this->mInputs.size());
-      QWriteLocker l(&this->mOutput->getLock());
-      this->mOutput->setData(cv::Mat(3, sizes, CV_32F, 0.));
-      l.unlock();
-    }
-    for (unsigned int j = 0; j < this->mInputs.size(); ++j)
-    {
-      if (j != i)
+      unsigned int i = static_cast<unsigned int>(QString::fromStdString(inputName).toInt());
+      //mInputs.at(i) = mat_data;
+      this->rows = mat_data->getData().rows;
+      this->cols = mat_data->getData().cols;
+      if (mOutput->getData().size[0] != mat_data->getData().rows || mOutput->getData().size[1] != mat_data->getData().cols)
       {
-        this->redetermineInputValidity(QString::number(j).toStdString());
+        int sizes[3];
+        sizes[0] = mat_data->getData().rows;
+        sizes[1] = mat_data->getData().cols;
+        sizes[2] = static_cast<int>(this->mInputs.size());
+        QWriteLocker l(&this->mOutput->getLock());
+        this->mOutput->setData(cv::Mat(3, sizes, CV_32F, 0.));
+        l.unlock();
       }
+      for (unsigned int j = 0; j < this->mInputs.size(); ++j)
+      {
+        if (j != i)
+        {
+          this->redetermineInputValidity(QString::number(j).toStdString());
+        }
+      }
+      if (!this->allInputsValid())
+      {
+        return;
+      }
+      this->callComputeWithoutTriggering();
+      this->emitOutputPropertiesChangedSignal("stack");
+
     }
-    if (!this->allInputsValid())
-    {
-      return;
-    }
-    this->callComputeWithoutTriggering();
-    this->emitOutputPropertiesChangedSignal("stack");
   }
 }
