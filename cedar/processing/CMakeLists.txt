@@ -138,6 +138,7 @@ cedar_add_library(cedarproc
   sources/Video.h
   sources/GrabberBase.h
   sources/Camera.h
+  sources/SpatialTemplate.h
   steps/Projection.h
   steps/Resize.h
   CppScript.h
