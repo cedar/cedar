@@ -122,7 +122,7 @@ private:
   cedar::aux::UIntParameterPtr _mSizeX;
   cedar::aux::UIntParameterPtr _mSizeY;
   cedar::aux::DoubleParameterPtr _mSigmaTh;
-  cedar::aux::UIntParameterPtr _mMuR;
+  cedar::aux::DoubleParameterPtr _mMuR;
   cedar::aux::DoubleParameterPtr _mSigmaR;
   cedar::aux::DoubleParameterPtr _mScaleSigmoid;
   SigmoidParameterPtr _mSigmoid;
