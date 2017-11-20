@@ -1059,39 +1059,25 @@ bool cedar::dev::KinematicChain::setCurrentInitialConfiguration(const std::strin
   return true; //TODO: should this use a return value to communicate potential errors?
 }
 
-void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& name)
+void cedar::dev::KinematicChain::applyInitialConfigurationController(cv::Mat targetConfig)
 {
-  QReadLocker rlock(&mCurrentInitialConfigurationLock);
+  setController(cedar::dev::KinematicChain::JOINT_VELOCITIES,
+                boost::bind< cv::Mat >
+                (
+                  // lambda:   
+                  //   note: its important that targetConfig is copied by
+                  //         the capture
+                  [this,targetConfig]()
+                  {
+                    cv::Mat xdot;
 
-  auto f = mInitialConfigurations.find(name);
-
-  if (f != mInitialConfigurations.end())
-  {
-    rlock.unlock();
-
-    setCurrentInitialConfiguration(name);
-    setSuppressUserSideInteraction(false);
-
-    mControllerFinished = false;
-
-    setController(cedar::dev::KinematicChain::JOINT_VELOCITIES,
-                  boost::bind< cv::Mat >
-                  (
-                    [&]()
+                    try
                     {
-                      cv::Mat xdot;
-                      auto findCurrent = mInitialConfigurations.find(mCurrentInitialConfiguration);
-
-                      if (findCurrent == mInitialConfigurations.end())
-                      {
-                        xdot = 0 * getJointAngles();
-                        return xdot;
-                      }
-
-                      xdot = -1 * (getJointAngles() - findCurrent->second);
+                      xdot = -1 * (getJointAngles() - targetConfig);
 
                       mControllerFinished = true;
-                      const float l_max_vel = 0.1;
+                      const float l_max_vel = 0.1; 
+                        // TODO: find better generic speeds
 
                       for(int i = 0; i<xdot.rows; ++i)
                       {
@@ -1110,29 +1096,39 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
                           mControllerFinished = false;
                         }
                       }
-
+                    }
+                    catch( cedar::aux::InvalidNameException &e )
+                    {
+                      mControllerFinished= true;
+                      xdot = 0 * getJointAngles();
                       return xdot;
                     }
-                  )
-                 );
 
-    if(!isCommunicating())
-    {
-        cedar::aux::LogSingleton::getInstance()->warning
-        (
-          "Applied an initial configuration \"" + name + "\" for \"" + this->getName() +
-             + "\", but the component is not communicating.",
-          "cedar::dev::KinematicChain::applyInitialConfiguration"
-        );
-    }
-  }
-  else
+                    return xdot;
+                  } // end lambda
+                )
+               ); // end setController
+}
+
+void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& name)
+{
+  auto f = getInitialConfiguration(name); // throws if not found
+
+  setCurrentInitialConfiguration(name);
+  setSuppressUserSideInteraction(false);
+
+  mControllerFinished = false;
+
+  applyInitialConfigurationController( f ); // this is virtual
+
+  if(!isCommunicating())
   {
-    CEDAR_THROW
-    (
-      InitialConfigurationNotFoundException,
-      "You tried to apply an initial configuration that was not registered."
-    );
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Applied an initial configuration \"" + name + "\" for \"" + this->getName() +
+           + "\", but the component is not communicating.",
+        "cedar::dev::KinematicChain::applyInitialConfiguration"
+      );
   }
 }
 

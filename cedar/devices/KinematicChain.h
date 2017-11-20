@@ -587,6 +587,8 @@ private:
   virtual bool applyBrakeSlowlyController();
   virtual bool applyBrakeNowController();
 
+  virtual void applyInitialConfigurationController(cv::Mat targetConfig);
+
   //----------------------------------------------------------------------------
   // parameters
   //----------------------------------------------------------------------------
