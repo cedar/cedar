@@ -40,7 +40,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/Arguments.h"
-#include "cedar/processing/typecheck/SameSizedCollection.h"
+#include "cedar/processing/typecheck/SameSize.h"
 #include "cedar/processing/typecheck/SameTypeCollection.h"
 #include "cedar/processing/typecheck/Matrix.h"
 #include "cedar/processing/typecheck/And.h"
@@ -49,6 +49,7 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/casts.h"
+
 
 // SYSTEM INCLUDES
 
@@ -89,88 +90,153 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::steps::Stack::Stack()
 :
-// outputs
-mOutput(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_32F)))
+_mOutputDimension (new cedar::aux::UIntParameter(this, "Dimension", 1,1,255))
 {
-  // declare all data
-  auto input_slot = this->declareInputCollection("input matrices");
-
+  QObject::connect(_mOutputDimension.get(), SIGNAL(valueChanged()), this, SLOT(dimensionChanged()));
+  auto slot_0 = this->declareInput("0",false);
   cedar::proc::typecheck::And input_check;
-  cedar::proc::typecheck::SameSizedCollection same_check(false,false);
+  cedar::proc::typecheck::SameSize same_check;
   cedar::proc::typecheck::Matrix matrix_check;
   matrix_check.addAcceptedDimensionality(2);
   matrix_check.addAcceptedType(CV_32F);
+  matrix_check.acceptsEmptyMatrix(true);
+  same_check.addSlot(slot_0);
   input_check.addCheck(same_check);
   input_check.addCheck(matrix_check);
-  input_slot->setCheck(input_check);
-
+  slot_0->setCheck(input_check);
+  this->mInputs.resize(1);
+  int sizes[3];
+  sizes[0] = 1;
+  sizes[1] = 1;
+  sizes[2] = 1;
+  mOutput = cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat(3, sizes, CV_32F, 0.)));
   this->declareOutput("stack", this->mOutput);
-
-  this->mInputs = this->getInputSlot("input matrices");
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::steps::Stack::dimensionChanged()
+{
+  unsigned long oldsize = this->mInputs.size();
+  unsigned long newsize = static_cast<unsigned long>(_mOutputDimension->getValue());
+  this->mInputs.resize(newsize);
+  int sizes[3];
+  sizes[0] = this->rows;
+  sizes[1] = this->cols;
+  sizes[2] = static_cast<int>(this->mInputs.size());
+  QWriteLocker l(&this->mOutput->getLock());
+  this->mOutput->setData(cv::Mat(3, sizes, CV_32F, 0.));
+  l.unlock();
+  if(oldsize > newsize)
+  {
+    for(int i = static_cast<int>(newsize); i < static_cast<int>(oldsize); ++i)
+    {
+      this->removeInputSlot(QString::number(i).toStdString());
+    }
+  }
+  else
+  {
+    for(int i = static_cast<int>(oldsize); i < static_cast<int>(newsize); ++i)
+    {
+      this->declareInput(QString::number(i).toStdString(),false);
+    }
+  }
+  cedar::proc::typecheck::And input_check;
+  cedar::proc::typecheck::SameSize same_check;
+  cedar::proc::typecheck::Matrix matrix_check;
+  matrix_check.addAcceptedDimensionality(2);
+  matrix_check.addAcceptedType(CV_32F);
+  matrix_check.acceptsEmptyMatrix(true);
+  for(int i = 0; i < static_cast<int>(newsize); ++i)
+  {
+    auto slot = this->getInputSlot(QString::number(i).toStdString());
+    same_check.addSlot(slot);
+  }
+  input_check.addCheck(same_check);
+  input_check.addCheck(matrix_check);
+  for(int i = 0; i < static_cast<int>(newsize); ++i)
+  {
+    auto slot = this->getInputSlot(QString::number(i).toStdString());
+    slot->setCheck(input_check);
+    this->redetermineInputValidity(QString::number(i).toStdString());
+  }
+  if (!this->allInputsValid())
+  {
+    return;
+  }
+  this->callComputeWithoutTriggering();
+  this->emitOutputPropertiesChangedSignal("stack");
+}
 
 void cedar::proc::steps::Stack::compute(const cedar::proc::Arguments&)
 {
+  if (!this->allInputsValid())
+  {
+    return;
+  }
+
   cv::Mat& output = this->mOutput->getData();
   int sizes[3];
   sizes[0] = 0;
   sizes[1] = 0;
-  sizes[2] = static_cast<int>(this->mInputs->getDataCount());
+  sizes[2] = static_cast<int>(this->mInputs.size());
   for(int row = 0; row < output.size[0]; ++row)
   {
-     sizes[0] = row;
-     for(int col = 0; col < output.size[1]; ++col)
-     {
-       sizes[1] = col;
-	for(size_t i = 0; i < this->mInputs->getDataCount(); ++i)
-     	{
-       	  sizes[2] = i;
-auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->mInputs->getData(i));
-
-	  output.at<float>(sizes) = mat_data->getData().at<float>(row,col);
-     	}	
-     }
+    sizes[0] = row;
+    for(int col = 0; col < output.size[1]; ++col)
+    {
+      sizes[1] = col;
+      for(int i = 0; i < static_cast<int>(this->mInputs.size()); ++i)
+      {
+        sizes[2] = i;
+        if(auto data = this->getInput(QString::number(i).toStdString()))
+        {
+          if(auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
+          {
+            const cv::Mat& input = mat_data->getData();
+            output.at<float>(sizes) = input.at<float>(row,col);
+          }
+        }
+      }
+    }
   }
 }
 
-void cedar::proc::steps::Stack::inputConnectionChanged(const std::string& /*inputName*/)
+void cedar::proc::steps::Stack::inputConnectionChanged(const std::string& inputName)
 {
-  if (this->mInputs->getDataCount() > 0)
+  if (auto data = this->getInput(inputName))
   {
-    if (!this->allInputsValid())
+    if(auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
     {
-      return;
-    }
-    QWriteLocker r_l(&this->mOutput->getLock());
-    cv::Mat old_output = this->mOutput->getData().clone();
-    r_l.unlock();
-    if (this->mInputs->getDataCount() > 0)
-    {
-      auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->mInputs->getData(0));
-      if (mat_data)
+      unsigned int i = static_cast<unsigned int>(QString::fromStdString(inputName).toInt());
+      //mInputs.at(i) = mat_data;
+      this->rows = mat_data->getData().rows;
+      this->cols = mat_data->getData().cols;
+      if (mOutput->getData().size[0] != mat_data->getData().rows || mOutput->getData().size[1] != mat_data->getData().cols)
       {
-	int sizes[3];
-	sizes[0] = mat_data->getData().rows;
-	sizes[1] = mat_data->getData().cols;
-	sizes[2] = static_cast<int>(this->mInputs->getDataCount());
-
+        int sizes[3];
+        sizes[0] = mat_data->getData().rows;
+        sizes[1] = mat_data->getData().cols;
+        sizes[2] = static_cast<int>(this->mInputs.size());
         QWriteLocker l(&this->mOutput->getLock());
-	this->mOutput->setData(cv::Mat(3,sizes,CV_32F));        
+        this->mOutput->setData(cv::Mat(3, sizes, CV_32F, 0.));
         l.unlock();
       }
-    }
-    this->callComputeWithoutTriggering();
-    cedar::proc::Step::ReadLocker locker(this);
-    const cv::Mat& output = this->mOutput->getData();
-    bool changed = old_output.type() != output.type() || old_output.size != output.size;
-    locker.unlock();
-    if (changed)
-    {
+      for (unsigned int j = 0; j < this->mInputs.size(); ++j)
+      {
+        if (j != i)
+        {
+          this->redetermineInputValidity(QString::number(j).toStdString());
+        }
+      }
+      if (!this->allInputsValid())
+      {
+        return;
+      }
+      this->callComputeWithoutTriggering();
       this->emitOutputPropertiesChangedSignal("stack");
+
     }
   }
 }

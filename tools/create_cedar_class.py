@@ -200,8 +200,10 @@ today = datetime.date.today()
 replacements["<creation date YYYY MM DD>"] = str(today.year) + " " + ("%02i") % (today.month) + " " + ("%02i") % (today.day)
 if options.no_subdirectories:
   replacements["<class header path>"] = class_name + ".h"
+  replacements["<class fwd header path>"] = class_name +".fwd.h"
 else:
   replacements["<class header path>"] = class_path + ".h"
+  replacements["<class fwd header path>"] = class_path+".fwd.h"
 replacements["class cedar::xxx::xxx"] = "class " + class_name_full
 replacements["CEDAR_XXX_XXX_H"] = class_id_all_cap + "_H"
 replacements["CEDAR_XXX_XXX_FWD_H"] = class_id_all_cap + "_FWD_H"
@@ -237,10 +239,15 @@ for namespace in namespaces:
 # remove final (superfluous) newline
 namespace_begin = namespace_begin[:-1]
 
-replacements["<begin namespaces>"] = namespace_begin
-replacements["<end namespaces>"] = namespace_end
-replacements["<namespaces indent>"] = indent
-
+if has_namespace:
+  replacements["<begin namespaces>"] = namespace_begin
+  replacements["<end namespaces>"] = namespace_end
+  replacements["<namespaces indent>"] = indent
+else:
+  replacements["<begin namespaces>"] = ""
+  replacements["<end namespaces>"] = ""
+  replacements["<namespaces indent>"] = ""
+  
 # determine where to put the new files
 base_directory = cedar_home
 
