@@ -145,9 +145,15 @@ _mRecorderSerializationFormat(new cedar::aux::EnumParameter(this, "recorder data
       {
         folder = folder.substr(0, folder.size() - 1);
       }
+#ifdef CEDAR_PORTABLE_MAC_BUNDLE_PATHS
+      QString fpath = QString::fromStdString(folder).remove(QCoreApplication::applicationDirPath());
+      std::string name = QString::fromStdString(fpath.toStdString()).remove("/../Cedar_Plugins/").toStdString();
+      std::string search_path = "." + fpath.toStdString();
+#else
       QString fpath = QString::fromStdString(folder).remove(QString::fromStdString(boost::filesystem::current_path().string()));
       std::string name = QString::fromStdString(fpath.toStdString()).remove("/../plugins/").toStdString();
       std::string search_path = "." + fpath.toStdString();
+#endif
       if (!this->_mPluginSearchPaths->contains(search_path))
       {
         this->_mPluginSearchPaths->pushBack(search_path);

@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
+#include <cedar/auxiliaries/UIntParameter.h>
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
@@ -51,6 +52,7 @@
  */
 class cedar::proc::steps::Stack : public cedar::proc::Step
 {
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -61,6 +63,9 @@ class cedar::proc::steps::Stack : public cedar::proc::Step
 public:
   //!@brief The standard constructor.
   Stack();
+
+public slots:
+  void dimensionChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -86,13 +91,15 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief The input slot containing all the terms.
-  cedar::proc::ExternalDataPtr mInputs;
+  std::vector<cedar::aux::ConstMatDataPtr> mInputs;
 
   //!@brief The data containing the output.
   cedar::aux::MatDataPtr mOutput;
 
 private:
-  // none yet
+  cedar::aux::UIntParameterPtr _mOutputDimension;
+  int rows = 0;
+  int cols = 0;
 }; // class cedar::proc::steps::Stack
 
 #endif // CEDAR_PROC_STEPS_STACK_H

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,57 +22,72 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        <filename>
+    File:        SpatialTemplate.h
 
-    Maintainer:  <first name> <last name>
-    Email:       <email address>
-    Date:        <creation date YYYY MM DD>
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2013 10 30
 
-    Description: Header file for the class <full class name>.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_XXX_XXX_H
-#define CEDAR_XXX_XXX_H
-
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
+#ifndef CEDAR_PROC_SOURCES_SPATIAL_TEMPLATE_H
+#define CEDAR_PROC_SOURCES_SPATIAL_TEMPLATE_H
 
 // CEDAR INCLUDES
+#include <cedar/processing/sources/SpatialTemplate.fwd.h>
+#include <cedar/processing/Step.h>
+#include <cedar/auxiliaries/ObjectParameterTemplate.fwd.h>
+#include <cedar/auxiliaries/math/TransferFunction.h>
+#include <cedar/auxiliaries/BoolParameter.fwd.h>
+#include <cedar/auxiliaries/UIntParameter.fwd.h>
+#include <cedar/auxiliaries/DoubleParameter.fwd.h>
+#include <cedar/auxiliaries/MatData.fwd.h>
 
-// FORWARD DECLARATIONS
-#include "<class fwd header path>"
+// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A processing step that generates spatial patterns for "left", "right", "above", and "below".
  */
-class cedar::xxx::xxx
+class cedar::proc::sources::SpatialTemplate : public cedar::proc::Step
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+  typedef cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction> SigmoidParameter;
+
+  //!@cond SKIPPED_DOCUMENTATION
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(SigmoidParameter);
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  <class name>();
+  SpatialTemplate();
 
   //!@brief Destructor
-  virtual ~<class name>();
+  ~SpatialTemplate();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void compute(const cedar::proc::Arguments&);
+
+public slots:
+  void recompute();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -84,26 +99,33 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
-  // none yet
+  // inputs
+  // none
+
+  // outputs
+  cedar::aux::MatDataPtr mPattern;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
 private:
-  // none yet
+  cedar::aux::BoolParameterPtr _mInvertSides;
+  cedar::aux::BoolParameterPtr _mHorizontalPattern;
+  cedar::aux::UIntParameterPtr _mSizeX;
+  cedar::aux::UIntParameterPtr _mSizeY;
+  cedar::aux::DoubleParameterPtr _mSigmaTh;
+  cedar::aux::DoubleParameterPtr _mMuR;
+  cedar::aux::DoubleParameterPtr _mSigmaR;
+  cedar::aux::DoubleParameterPtr _mScaleSigmoid;
+  SigmoidParameterPtr _mSigmoid;
+}; // class cedar::proc::sources::SpatialTemplate
 
-}; // class cedar::xxx::xxx
-
-#endif // CEDAR_XXX_XXX_H
-
+#endif // CEDAR_PROC_SOURCES_SPATIAL_TEMPLATE_H

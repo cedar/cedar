@@ -122,6 +122,7 @@ cedar_add_library(cedarproc
   steps/StaticGain.h
   steps/ScalarsToVector.h
   steps/ConstVector.h
+  steps/Stack.h
   steps/ShapeVisualisation.h
   steps/UnitConverter.h
   steps/Histogram.h
@@ -137,6 +138,7 @@ cedar_add_library(cedarproc
   sources/Video.h
   sources/GrabberBase.h
   sources/Camera.h
+  sources/SpatialTemplate.h
   steps/Projection.h
   steps/Resize.h
   CppScript.h
