@@ -103,3 +103,16 @@ bool cedar::dev::SimulatedKinematicChain::applyCrashbrake()
   return true;
 }
 
+void cedar::dev::SimulatedKinematicChain::applyInitialConfigurationController(cv::Mat targetConfig)
+{
+    setController(cedar::dev::KinematicChain::JOINT_ANGLES,
+                  boost::bind< cv::Mat >
+                  (
+                    [this,targetConfig]()
+                    {
+                      // directly jump to target
+                      return targetConfig.clone();
+                    }
+                  )
+                 );
+}

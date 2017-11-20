@@ -66,6 +66,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   bool applyCrashbrake() override;
+  void applyInitialConfigurationController(cv::Mat targetConfig) override;
 
 public slots:
   // none yet
