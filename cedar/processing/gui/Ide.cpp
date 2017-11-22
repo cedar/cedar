@@ -1706,8 +1706,10 @@ void cedar::proc::gui::Ide::load()
                         | QDir::NoDot
                         | QDir::Hidden );
                    // see hidden files to see the backup files
+#ifdef CEDAR_USE_QT5                   
   filedialog.setOptions( QFileDialog::DontUseNativeDialog );
                    // js: Workaround for freezing file dialogs in QT5 (?)
+#endif                   
 
   QString file;
 
