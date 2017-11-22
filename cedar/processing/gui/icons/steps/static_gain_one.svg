@@ -34,8 +34,8 @@
      showgrid="false"
      inkscape:window-width="659"
      inkscape:window-height="872"
-     inkscape:window-x="442"
-     inkscape:window-y="0"
+     inkscape:window-x="31"
+     inkscape:window-y="208"
      inkscape:window-maximized="0"
      showguides="true"
      inkscape:guide-bbox="true" />
@@ -374,7 +374,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -451,8 +451,8 @@
          id="path3793"
          sodipodi:nodetypes="cc" />
       <path
-         style="opacity:0.96428576;fill:#7ea212;fill-opacity:1;stroke:#000000;stroke-width:1.71725941;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-         d="m 159.60411,914.78172 0,-8.0812 16.66752,0 16.66752,0 0,-59.6182 0,-59.6183 -2.27285,0.5375 c -4.33108,1.0241 -32.39148,6.5721 -33.24009,6.5721 -0.46891,0 -0.85256,-3.9923 -0.85256,-8.8717 l 0,-8.8717 19.44544,-3.7944 c 13.69448,-2.6721 22.05951,-3.7827 28.28427,-3.7552 l 8.83884,0.039 0,68.6904 0,68.6904 17.17259,0 17.17259,0 0,8.0812 0,8.0812 -43.94163,0 -43.94164,0 0,-8.0812 z"
+         style="opacity:0.96428576;fill:#7ea212;fill-opacity:1;stroke:#000000;stroke-width:1.58484006;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         d="m 164.84514,909.77414 0,-7.45805 15.38227,0 15.38227,0 0,-55.02099 0,-55.02108 -2.09759,0.49606 c -3.9971,0.94513 -29.89374,6.06532 -30.67691,6.06532 -0.43276,0 -0.78682,-3.68445 -0.78682,-8.1876 l 0,-8.18759 17.94598,-3.50181 c 12.63849,-2.46606 20.35848,-3.49102 26.10325,-3.46564 l 8.15727,0.036 0,63.39363 0,63.39362 15.84839,0 15.8484,0 0,7.45805 0,7.45805 -40.55325,0 -40.55326,0 0,-7.45805 z"
          id="path14055-5"
          inkscape:connector-curvature="0" />
       <path
@@ -463,7 +463,7 @@
          sodipodi:cy="281.81216"
          sodipodi:rx="23.233509"
          sodipodi:ry="23.233509"
-         d="m 191.92899,281.81216 a 23.233509,23.233509 0 1 1 -46.46702,0 23.233509,23.233509 0 1 1 46.46702,0 z"
+         d="m 191.92899,281.81216 c 0,12.83152 -10.402,23.23351 -23.23351,23.23351 -12.83151,0 -23.23351,-10.40199 -23.23351,-23.23351 0,-12.83151 10.402,-23.2335 23.23351,-23.2335 12.83151,0 23.23351,10.40199 23.23351,23.2335 z"
          transform="matrix(0.44124202,0,0,0.44124202,60.92491,810.61759)" />
       <path
          style="opacity:0.96428576;fill:#8e8e8e;fill-opacity:1;stroke:#000000;stroke-width:1.21428573;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"

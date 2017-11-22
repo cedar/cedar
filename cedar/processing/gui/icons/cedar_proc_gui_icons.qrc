@@ -51,7 +51,11 @@
         <file>steps/static_gain_red.svg</file>
         <file>steps/static_gain_zero.svg</file>
         <file>steps/static_gain_one.svg</file>
+        <file>steps/static_gain_larger_one.svg</file>
+        <file>steps/static_gain_smaller_one.svg</file>
         <file>steps/static_gain_minus_one.svg</file>
+        <file>steps/static_gain_larger_minus_one.svg</file>
+        <file>steps/static_gain_smaller_minus_one.svg</file>
         <file>steps/switch.svg</file>
         <file>steps/threshold.svg</file>
         <file>steps/matrix_multiply.svg</file>
