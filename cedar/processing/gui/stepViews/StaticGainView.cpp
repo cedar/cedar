@@ -41,6 +41,7 @@
 #include "cedar/processing/gui/stepViews/StaticGainView.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 
@@ -65,24 +66,42 @@ void cedar::proc::gui::StaticGainView::connectableChanged()
 void cedar::proc::gui::StaticGainView::updateIconWeight()
 {
   auto parameter = boost::dynamic_pointer_cast<cedar::aux::ConstDoubleParameter>(this->getConnectable()->getParameter("gain factor"));
-  if (parameter->getValue() == 1.0)
+
+  auto value = parameter->getValue();
+
+  if (cedar::aux::math::isZero(value)) // think of numeric precision
+  {
+    this->setIconPath(":/steps/static_gain_zero.svg");
+  }
+  else if (cedar::aux::math::isZero(value - 1.0)) // think of numeric precision
   {
     this->setIconPath(":/steps/static_gain_one.svg");
   }
-  else if (parameter->getValue() == -1.0)
+  else if (cedar::aux::math::isZero(value - -1.0))
   {
     this->setIconPath(":/steps/static_gain_minus_one.svg");
   }
-  else if (parameter->getValue() > 0.0)
+  else if (value > 1.0)
   {
-    this->setIconPath(":/steps/static_gain_green.svg");
+    this->setIconPath(":/steps/static_gain_larger_one.svg");
   }
-  else if (parameter->getValue() < 0.0)
+  else if (value > 0.0
+           && value < 1.0)
   {
-    this->setIconPath(":/steps/static_gain_red.svg");
+    this->setIconPath(":/steps/static_gain_smaller_one.svg");
+  }
+  else if (value < 0.0
+           && value > -1.0)
+  {
+    this->setIconPath(":/steps/static_gain_larger_minus_one.svg");
+  }
+  else if (value < -1.0)
+  {
+    this->setIconPath(":/steps/static_gain_smaller_minus_one.svg");
   }
   else
   {
-    this->setIconPath(":/steps/static_gain_zero.svg");
+    // fallback
+    this->setIconPath(":/steps/static_gain_green.svg");
   }
 }
