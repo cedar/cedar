@@ -1516,12 +1516,21 @@ bool cedar::proc::gui::Ide::backupSave()
     cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
     baseName= ( last_dir->getValue().absolutePath()
                 + QDir::separator() ).toStdString()
-              + "unnamed.json.bak";
+                + ".unnamed.json.bak";
     save = QDir(last_dir->getValue().absolutePath()).exists();
   }
   else
   {
-    baseName = this->mGroup->getFileName() + ".bak";
+    auto path = cedar::aux::Path( this->mGroup->getFileName() );
+    std::string dirnameonly = path.getDirectory();
+    std::string filenameonly = path.getFileNameOnly();
+
+    baseName = dirnameonly // has a terminating separator 
+               + path.separator()
+               + "."
+               + filenameonly
+                 // cut terminating seperators
+               + ".bak";
   }
 
   if(save)
@@ -1690,14 +1699,24 @@ void cedar::proc::gui::Ide::load()
 
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
 
-  QString file = QFileDialog::getOpenFileName(this, // parent
-                                              "Select which file to load", // caption
-                                              last_dir->getValue().absolutePath(), // initial directory
-                                              "architecture (*.json);;backup (*.json.bak*)", // filter(s), separated by ';;'
-                                              0,
-                                              // js: Workaround for freezing file dialogs in QT5 (?)
-                                              QFileDialog::DontUseNativeDialog
-                                              );
+  QFileDialog filedialog(this, "Select which file to load");
+  filedialog.setNameFilter( tr("architecture (*.json);;backup (*.json.bak*)") );
+  filedialog.setDirectory( last_dir->getValue().absolutePath() ); // initial directory
+  filedialog.setFilter( QDir::AllDirs | QDir::Files 
+                        | QDir::NoDot
+                        | QDir::Hidden );
+                   // see hidden files to see the backup files
+  filedialog.setOptions( QFileDialog::DontUseNativeDialog );
+                   // js: Workaround for freezing file dialogs in QT5 (?)
+
+  QString file;
+
+  if (filedialog.exec())
+  {
+    QStringList filelist;
+    filelist = filedialog.selectedFiles();
+    file= filelist.first();
+  }
 
   if (!file.isEmpty())
   {
