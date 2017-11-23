@@ -154,7 +154,7 @@ private:
 
   void makeHeading(QTreeWidgetItem* item, const QString& text, int hLevel = 2);
 
-  void updateChangeState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter);
+  void updateChangeState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter, bool firstUpdate);
 
   void updateLinkState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter);
 
@@ -224,7 +224,6 @@ private:
   std::map<cedar::aux::Parameter*, boost::signals2::connection> mParameterRenamedConnections;
 
   QSignalMapper* delButtonSignalMapper;
-
 }; // class cedar::aux::gui::Configurable
 
 /*!@brief Internal class for putting the correct widget types into the QTreeWidget used by
