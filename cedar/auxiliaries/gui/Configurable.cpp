@@ -150,7 +150,9 @@ public:
   :
   mParameter(parameter)
   {
-    this->setText(PARAMETER_NAME_COLUMN, QString::fromStdString(parameter->getName()));
+    auto name= parameter->getName();
+    this->setText(PARAMETER_NAME_COLUMN, QString::fromStdString(name));
+
     this->setData(PARAMETER_NAME_COLUMN, Qt::UserRole, QVariant::fromValue(static_cast<void*>(parameter.get())));
     this->setData(PARAMETER_EDITOR_COLUMN, Qt::UserRole, QString::fromStdString(path));
   }
@@ -777,4 +779,32 @@ void cedar::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* item, ced
   QFont font = item->font(PARAMETER_NAME_COLUMN);
   font.setBold(pParameter->isChanged());
   item->setFont(PARAMETER_NAME_COLUMN, font);
+
+  if (!pParameter->isLinked())
+  {
+    auto name= pParameter->getName();
+
+    // lets try this for ergonomy for the user:
+    if (name == "dimensionality"
+        || name == "sizes"
+        || name == "size"
+        || name == "size x"
+        || name == "size y"
+        || name == "size z"
+        || name == "dimension"
+        || name == "order"
+        || name == "output dimensionality"
+        || name == "output dimension sizes"
+        || name == "output sizes"
+        || name == "number of bins"
+        || name == "bins")
+    {
+      QFont pParameter = item->font(0);
+//      font.setItalic(true);
+      item->setTextColor(PARAMETER_NAME_COLUMN, QColor::fromRgb(0, 0, 128));
+      item->setFont(PARAMETER_NAME_COLUMN, font);
+    }
+  }
+
 }
+
