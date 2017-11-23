@@ -264,13 +264,17 @@ protected:
   //!@brief this MatData contains the neural noise
   cedar::aux::MatDataPtr mNeuralNoise;
 
-  //!@brief the resting level of a field
-  cedar::aux::DoubleParameterPtr mRestingLevel;
+  //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
+  cedar::aux::UIntParameterPtr _mDimensionality;
 
+  //!@brief the field sizes in each dimension
+  cedar::aux::UIntVectorParameterPtr _mSizes;
+  
   //!@brief the relaxation rate of the field
   cedar::aux::DoubleParameterPtr mTau;
 
-
+  //!@brief the resting level of a field
+  cedar::aux::DoubleParameterPtr mRestingLevel;
 
   //!@brief the noise correlation kernel
   cedar::aux::kernel::GaussPtr mNoiseCorrelationKernel;
@@ -300,11 +304,7 @@ protected:
   //!@brief The threshold for updating the GUI if _mUpdateStepGui is active
   cedar::aux::DoubleParameterPtr _mUpdateStepGuiThreshold;
 
-  //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
-  cedar::aux::UIntParameterPtr _mDimensionality;
 
-  //!@brief the field sizes in each dimension
-  cedar::aux::UIntVectorParameterPtr _mSizes;
 
   //!@brief input noise gain
   cedar::aux::DoubleParameterPtr _mInputNoiseGain;

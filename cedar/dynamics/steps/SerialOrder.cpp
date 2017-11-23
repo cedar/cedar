@@ -99,6 +99,16 @@ mMemoryNodeActivationBuffer(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)
 mMemoryNodeOutputBuffer(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
 // parameters
 _mNumberOfOrdinalPositions(new cedar::aux::UIntParameter(this, "number of ordinal positions", 3, 1, 10)),
+_mTau
+(
+  new cedar::aux::DoubleParameter
+  (
+    this,
+    "tau",
+    100.0,
+    cedar::aux::DoubleParameter::LimitType::positive()
+  )
+),
 _mOrdinalNodeRestingLevel
 (
   new cedar::aux::DoubleParameter
@@ -186,16 +196,6 @@ _mOrdinalNodeToSameMemoryNodeWeight
     this,
     "ordinal to same memory",
     7,
-    cedar::aux::DoubleParameter::LimitType::positive()
-  )
-),
-_mTau
-(
-  new cedar::aux::DoubleParameter
-  (
-    this,
-    "tau",
-    100.0,
     cedar::aux::DoubleParameter::LimitType::positive()
   )
 ),

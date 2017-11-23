@@ -92,8 +92,6 @@ cedar::dyn::SpaceToRateCode::SpaceToRateCode()
 mOutput(new cedar::aux::MatData(cv::Mat(1,1, CV_32F))),
 mFixPoint(new cedar::aux::MatData(cv::Mat(1,1, CV_32F))),
 // parameters
-_mLowerLimit(new cedar::aux::DoubleParameter(this, "lowerLimit", 0.0, -10000.0, 10000.0)),
-_mUpperLimit(new cedar::aux::DoubleParameter(this, "upperLimit", 1.0, -10000.0, 10000.0)),
 _mTau(new cedar::aux::TimeParameter
           (
             this,
@@ -101,7 +99,9 @@ _mTau(new cedar::aux::TimeParameter
             cedar::unit::Time(100.0 * cedar::unit::milli * cedar::unit::seconds),
             cedar::aux::TimeParameter::LimitType::positive()
           )
-     )
+     ),
+_mLowerLimit(new cedar::aux::DoubleParameter(this, "lowerLimit", 0.0, -10000.0, 10000.0)),
+_mUpperLimit(new cedar::aux::DoubleParameter(this, "upperLimit", 1.0, -10000.0, 10000.0))
 {
   // declare all data
   this->declareInput("input");

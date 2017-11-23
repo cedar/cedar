@@ -89,10 +89,10 @@ namespace
 cedar::proc::sources::SpatialTemplate::SpatialTemplate()
 :
 mPattern(new cedar::aux::MatData(cv::Mat::zeros(10, 10, CV_32F))),
-_mInvertSides(new cedar::aux::BoolParameter(this, "invert sides", false)),
-_mHorizontalPattern(new cedar::aux::BoolParameter(this, "horizontal pattern", false)),
 _mSizeX(new cedar::aux::UIntParameter(this, "size x", 10, cedar::aux::UIntParameter::LimitType::positive(1000))),
 _mSizeY(new cedar::aux::UIntParameter(this, "size y", 10, cedar::aux::UIntParameter::LimitType::positive(1000))),
+_mInvertSides(new cedar::aux::BoolParameter(this, "invert sides", false)),
+_mHorizontalPattern(new cedar::aux::BoolParameter(this, "horizontal pattern", false)),
 _mSigmaTh(new cedar::aux::DoubleParameter(this, "sigma th hor", 0.25, cedar::aux::DoubleParameter::LimitType::positiveZero(1.0))),
 _mMuR(new cedar::aux::DoubleParameter(this, "mu r", 15.0, cedar::aux::DoubleParameter::LimitType::positiveZero(1000.0))),
 _mSigmaR(new cedar::aux::DoubleParameter(this, "sigma r", 100.0, cedar::aux::DoubleParameter::LimitType::positiveZero(1000.0))),

@@ -148,6 +148,9 @@ protected:
   //!@brief the number of ordinal positions this step manages
   cedar::aux::UIntParameterPtr _mNumberOfOrdinalPositions;
 
+  //!@brief time constant of all ordinal and memory nodes
+  cedar::aux::DoubleParameterPtr _mTau;
+
   // parameters for the ordinal nodes (the variable names from Yulia's paper are stated in comments)
   //!@brief resting level of all ordinal nodes
   cedar::aux::DoubleParameterPtr _mOrdinalNodeRestingLevel; // h_d
@@ -170,8 +173,6 @@ protected:
   //!@brief weight between an ordinal node and the corresponding memory node
   cedar::aux::DoubleParameterPtr _mOrdinalNodeToSameMemoryNodeWeight; // c_6
 
-  //!@brief time constant of all ordinal and memory nodes
-  cedar::aux::DoubleParameterPtr _mTau;
 
   //!@brief sigmoid function used to determine the output of all nodes
   SigmoidParameterPtr _mSigmoid;

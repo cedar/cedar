@@ -123,18 +123,19 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief the amplitude of the box function
-  cedar::aux::DoubleParameterPtr _mAmplitude;
-  //!@brief the reference level of the box function
-  cedar::aux::DoubleParameterPtr _mReferenceLevel;
   //!@brief the dimensionality of the box function
   cedar::aux::UIntParameterPtr _mDimensionality;
+  //!@brief the vector of sizes of matrix containing the box function for each dimension
+  cedar::aux::UIntVectorParameterPtr _mSizes;
+  //!@brief the amplitude of the box function
+  cedar::aux::DoubleParameterPtr _mAmplitude;
   //!@brief the vector of widths of the box function (one for each dimension)
   cedar::aux::UIntVectorParameterPtr _mWidths;
   //!@brief the vector of left bounds of the box function
   cedar::aux::UIntVectorParameterPtr _mLeftBounds;
-  //!@brief the vector of sizes of matrix containing the box function for each dimension
-  cedar::aux::UIntVectorParameterPtr _mSizes;
+  //!@brief the reference level of the box function
+  cedar::aux::DoubleParameterPtr _mReferenceLevel;
+
 
 private:
 
