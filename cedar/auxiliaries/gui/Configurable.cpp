@@ -767,7 +767,8 @@ void cedar::aux::gui::Configurable::updateLinkState(QTreeWidgetItem* item, cedar
 
   if (pParameter->isLinked())
   {
-    item->setTextColor(PARAMETER_NAME_COLUMN, QColor::fromRgb(0, 0, 128));
+    item->setTextColor(PARAMETER_NAME_COLUMN, QColor::fromRgb(204, 163, 0));
+    //item->setTextColor(PARAMETER_NAME_COLUMN, QColor::fromRgb(0, 0, 128));
   }
 }
 
