@@ -43,12 +43,14 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/NumericParameter.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/DoubleParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QDoubleSpinBox>
+#include <cmath>
 
 //----------------------------------------------------------------------------------------------------------------------
 // template specialization for QSpinBox
@@ -66,6 +68,48 @@ namespace cedar
         pWidget->setDecimals(precision);
       }
       //!@endcond
+
+      //!@cond SKIPPED_DOCUMENTATION
+      template<>
+      inline void NumericWidgetPolicy<double, QDoubleSpinBox>::manuallyChangedValue(QDoubleSpinBox* pWidget, const double& newvalue, const double& oldvalue)
+      {
+        if( newvalue != oldvalue )
+        {
+          // lets try this: set the last manual diff as the step size
+          auto diff = std::fabs( newvalue - oldvalue );
+
+          // find the magnitude of the last change. set that to be the step
+          double newstep;
+        
+          double magnitude_newval = std::floor( std::log10( newvalue ) );
+          double magnitude_oldval = std::floor( std::log10( oldvalue ) );
+          double magnitude_diff =  std::floor( std::log10( diff ) );
+                                            // TODO: some numerical issues
+                                            //       with smaller increases than intended ...
+
+          double magnitude;
+          if (magnitude_newval > magnitude_oldval)
+          {
+            magnitude= magnitude_newval;
+              // (because the magnitude of the diff will be one smaller
+              //  because of the floor())
+          }
+          else
+          {
+            magnitude= magnitude_diff;
+          }
+
+          newstep= std::pow( 10, magnitude );
+
+          if (newstep != pWidget->singleStep()
+              && !cedar::aux::math::isZero( newstep ))
+          {
+            pWidget->setSingleStep( newstep );
+          }
+        }
+      }
+      //!@endcond
+
     }
   }
 }
