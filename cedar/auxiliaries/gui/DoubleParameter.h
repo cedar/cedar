@@ -83,9 +83,9 @@ namespace cedar
         
           double magnitude_newval = std::floor( std::log10( newvalue ) );
           double magnitude_oldval = std::floor( std::log10( oldvalue ) );
-          double magnitude_diff =  std::floor( std::log10( diff ) );
-                                            // TODO: some numerical issues
-                                            //       with smaller increases than intended ...
+          double magnitude_diff =  std::floor( std::log10( diff ) + 1e-8 );
+                                            // avoid numerical issues
+                                            // with smaller increases than intended ...
 
           double magnitude;
           if (magnitude_newval > magnitude_oldval)
