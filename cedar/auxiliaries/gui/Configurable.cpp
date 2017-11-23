@@ -493,7 +493,7 @@ void cedar::aux::gui::Configurable::append(size_t configurableIndex, cedar::aux:
   ParameterItem* parameter_item = new ParameterItem(parameter, path);
   pNode->addChild(parameter_item);
   this->mpPropertyTree->openPersistentEditor(parameter_item, PARAMETER_EDITOR_COLUMN);
-  this->updateChangeState(parameter_item, parameter.get());
+  this->updateChangeState(parameter_item, parameter.get(), true);
   this->updateLinkState(parameter_item, parameter.get());
 
   QObject::connect(parameter.get(), SIGNAL(changedFlagChanged()), this, SLOT(parameterChangeFlagChanged()));
@@ -733,7 +733,7 @@ void cedar::aux::gui::Configurable::parameterChangeFlagChanged()
 
   if (item != nullptr)
   {
-    this->updateChangeState(item, p_parameter);
+    this->updateChangeState(item, p_parameter, false);
   }
   else
   {
@@ -774,11 +774,16 @@ void cedar::aux::gui::Configurable::updateLinkState(QTreeWidgetItem* item, cedar
   }
 }
 
-void cedar::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter)
+void cedar::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter, bool firstUpdate)
 {
   QFont font = item->font(PARAMETER_NAME_COLUMN);
-  font.setBold(pParameter->isChanged());
-  item->setFont(PARAMETER_NAME_COLUMN, font);
+
+  // do not do this when first dragging the items into the viewer scene
+  if (!firstUpdate)
+  {
+    font.setBold(pParameter->isChanged());
+    item->setFont(PARAMETER_NAME_COLUMN, font);
+  }
 
   if (!pParameter->isLinked())
   {
@@ -800,7 +805,6 @@ void cedar::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* item, ced
         || name == "bins")
     {
       QFont pParameter = item->font(0);
-//      font.setItalic(true);
       item->setTextColor(PARAMETER_NAME_COLUMN, QColor::fromRgb(0, 0, 128));
       item->setFont(PARAMETER_NAME_COLUMN, font);
     }
