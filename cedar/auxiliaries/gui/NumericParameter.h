@@ -116,6 +116,10 @@ class cedar::aux::gui::NumericWidgetPolicy
       pWidget->setSingleStep(singleStep);
     }
 
+    static void manuallyChangedValue(WidgetT*, const ValueT&, const ValueT&)
+    {
+    }
+
     /*!@brief Creates a new widget of the given type.
      *
      * @param pParent The parent of the widget.
@@ -204,10 +208,13 @@ protected:
   void widgetValueChanged()
   {
     ValueType value = WidgetPolicy::getValue(this->mpWidget);
-
     ValueParameterPtr parameter = cedar::aux::asserted_pointer_cast<ValueParameter>(this->getParameter());
 
+    ValueType oldvalue = parameter->getValue();
+
     parameter->setValue(value, true);
+
+    WidgetPolicy::manuallyChangedValue(this->mpWidget, value, oldvalue);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
