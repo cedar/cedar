@@ -93,6 +93,16 @@ cedar::dyn::RateMatrixToSpaceCode::RateMatrixToSpaceCode()
 mOutput(new cedar::aux::MatData(cv::Mat())),
 mDimensionality(2),
 // parameters
+_mNumberOfBins
+(
+  new cedar::aux::UIntParameter
+      (
+        this,
+        "number of bins",
+        10,
+        cedar::aux::UIntParameter::LimitType::positive()
+      )
+),
 _mLowerLimit
 (
   new cedar::aux::DoubleParameter
@@ -111,16 +121,6 @@ _mUpperLimit
         "upper limit",
         1.0,
         cedar::aux::DoubleParameter::LimitType::full()
-      )
-),
-_mNumberOfBins
-(
-  new cedar::aux::UIntParameter
-      (
-        this,
-        "number of bins",
-        10,
-        cedar::aux::UIntParameter::LimitType::positive()
       )
 )
 {

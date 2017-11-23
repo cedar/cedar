@@ -117,10 +117,10 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  cedar::aux::BoolParameterPtr _mInvertSides;
-  cedar::aux::BoolParameterPtr _mHorizontalPattern;
   cedar::aux::UIntParameterPtr _mSizeX;
   cedar::aux::UIntParameterPtr _mSizeY;
+  cedar::aux::BoolParameterPtr _mInvertSides;
+  cedar::aux::BoolParameterPtr _mHorizontalPattern;
   cedar::aux::DoubleParameterPtr _mSigmaTh;
   cedar::aux::DoubleParameterPtr _mMuR;
   cedar::aux::DoubleParameterPtr _mSigmaR;

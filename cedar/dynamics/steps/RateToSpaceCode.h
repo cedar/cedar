@@ -116,17 +116,17 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief the output sizes for each dimension representing the rate-coded values
+  cedar::aux::UIntVectorParameterPtr _mOutputSizes;
+
+  //!@brief the amplitude of the Gaussian function
+  cedar::aux::DoubleParameterPtr _mAmplitude;
+
   //!@brief the lower limits of the mapped interval for each rate-coded value
   cedar::aux::DoubleVectorParameterPtr _mLowerLimits;
   
   //!@brief the upper limits of the mapped interval for each rate-coded value
   cedar::aux::DoubleVectorParameterPtr _mUpperLimits;
-  
-  //!@brief the output sizes for each dimension representing the rate-coded values
-  cedar::aux::UIntVectorParameterPtr _mOutputSizes;
-  
-  //!@brief the amplitude of the Gaussian function
-  cedar::aux::DoubleParameterPtr _mAmplitude;
   
   //!@brief the sigmas of the Gaussian function
   cedar::aux::DoubleVectorParameterPtr _mSigmas;

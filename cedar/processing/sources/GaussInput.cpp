@@ -91,11 +91,11 @@ cedar::proc::sources::GaussInput::GaussInput()
 :
 cedar::proc::Step(),
 mOutput(new cedar::aux::MatData(cv::Mat())),
-_mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0, cedar::aux::DoubleParameter::LimitType::full(), 0.5)),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 2, 1, 4)),
-_mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigma", 2, 3.0, 0.01, 1000.0, 0.5)),
-_mCenters(new cedar::aux::DoubleVectorParameter(this, "centers", 2, 3.0, -10000.0, 10000.0)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 50, 1, 1000.0)),
+_mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0, cedar::aux::DoubleParameter::LimitType::full(), 0.5)),
+_mCenters(new cedar::aux::DoubleVectorParameter(this, "centers", 2, 3.0, -10000.0, 10000.0)),
+_mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigma", 2, 3.0, 0.01, 1000.0, 0.5)),
 _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
 {
   this->declareOutput("Gauss input", mOutput);

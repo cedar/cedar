@@ -143,44 +143,6 @@ mLateralInteraction(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mInputSum(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mInputNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mNeuralNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
-mRestingLevel
-(
-  new cedar::aux::DoubleParameter
-  (
-    this,
-    "resting level",
-    -5.0,
-    cedar::aux::DoubleParameter::LimitType::negativeZero(),
-    0.1 // step size
-  )
-),
-mTau
-(
-  new cedar::aux::DoubleParameter
-  (
-    this,
-    "time scale",
-    100.0,
-    cedar::aux::DoubleParameter::LimitType::positive(),
-    1.0 // step size
-  )
-),
-mMaximumLocation(new cedar::aux::MatData(cv::Mat::zeros(2, 1, CV_32F))),
-mIsActive(false),
-// parameters
-_mOutputActivation(new cedar::aux::BoolParameter(this, "activation as output", false)),
-_mDiscreteMetric(new cedar::aux::BoolParameter(this, "discrete metric (workaround)", false)),
-_mUpdateStepGui(new cedar::aux::BoolParameter(this, "update stepIcon according to output", true)),
-_mUpdateStepGuiThreshold
-        (
-                new cedar::aux::DoubleParameter
-                        (
-                                this,
-                                "threshold for updating the stepIcon",
-                                0.8,
-                                cedar::aux::DoubleParameter::LimitType::positiveZero()
-                        )
-        ),
 _mDimensionality
 (
   new cedar::aux::UIntParameter
@@ -202,6 +164,44 @@ _mSizes
     cedar::aux::UIntParameter::LimitType::positive(5000)
   )
 ),
+mTau
+(
+  new cedar::aux::DoubleParameter
+  (
+    this,
+    "time scale",
+    100.0,
+    cedar::aux::DoubleParameter::LimitType::positive(),
+    1.0 // step size
+  )
+),
+mRestingLevel
+(
+  new cedar::aux::DoubleParameter
+  (
+    this,
+    "resting level",
+    -5.0,
+    cedar::aux::DoubleParameter::LimitType::negativeZero(),
+    0.1 // step size
+  )
+),
+mMaximumLocation(new cedar::aux::MatData(cv::Mat::zeros(2, 1, CV_32F))),
+mIsActive(false),
+// parameters
+_mOutputActivation(new cedar::aux::BoolParameter(this, "activation as output", false)),
+_mDiscreteMetric(new cedar::aux::BoolParameter(this, "discrete metric (workaround)", false)),
+_mUpdateStepGui(new cedar::aux::BoolParameter(this, "update stepIcon according to output", true)),
+_mUpdateStepGuiThreshold
+        (
+                new cedar::aux::DoubleParameter
+                        (
+                                this,
+                                "threshold for updating the stepIcon",
+                                0.8,
+                                cedar::aux::DoubleParameter::LimitType::positiveZero()
+                        )
+        ),
 _mInputNoiseGain
 (
   new cedar::aux::DoubleParameter

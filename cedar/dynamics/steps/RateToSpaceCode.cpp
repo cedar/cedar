@@ -90,6 +90,18 @@ cedar::dyn::RateToSpaceCode::RateToSpaceCode()
 mOutput(new cedar::aux::MatData(cv::Mat(1,1, CV_32F))),
 mDimensionality(2),
 // parameters
+_mOutputSizes
+(
+  new cedar::aux::UIntVectorParameter
+      (
+        this,
+        "output sizes",
+        2,
+        50,
+        cedar::aux::UIntVectorParameter::LimitType::full()
+      )
+),
+_mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0)),
 _mLowerLimits
 (
   new cedar::aux::DoubleVectorParameter
@@ -112,18 +124,6 @@ _mUpperLimits
         cedar::aux::DoubleVectorParameter::LimitType::full()
       )
 ),
-_mOutputSizes
-(
-  new cedar::aux::UIntVectorParameter
-      (
-        this,
-        "output sizes",
-        2,
-        50,
-        cedar::aux::UIntVectorParameter::LimitType::full()
-      )
-),
-_mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0)),
 _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigma", 2, 3.0, 0.01, 1000.0)),
 _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
 {
