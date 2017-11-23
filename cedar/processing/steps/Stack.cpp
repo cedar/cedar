@@ -67,7 +67,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::Stack>
       (
-        "Algebra",
+        "Arrays",
         "cedar.processing.steps.Stack"
       )
     );
@@ -90,7 +90,7 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::steps::Stack::Stack()
 :
-_mOutputDimension (new cedar::aux::UIntParameter(this, "Dimension", 1,1,255))
+_mOutputDimension (new cedar::aux::UIntParameter(this, "dimensionality", 1,1,255))
 {
   QObject::connect(_mOutputDimension.get(), SIGNAL(valueChanged()), this, SLOT(dimensionChanged()));
   auto slot_0 = this->declareInput("0",false);
