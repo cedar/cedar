@@ -801,8 +801,11 @@ void cedar::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* item, ced
         || name == "output dimensionality"
         || name == "output dimension sizes"
         || name == "output sizes"
+        || name == "output size"
         || name == "number of bins"
-        || name == "bins")
+        || name == "bins"
+        || name == "VectorDimension"
+        || name == "number of vector entries")
     {
       QFont pParameter = item->font(0);
       item->setTextColor(PARAMETER_NAME_COLUMN, QColor::fromRgb(0, 0, 128));
