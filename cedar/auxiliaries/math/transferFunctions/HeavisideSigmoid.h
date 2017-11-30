@@ -77,6 +77,8 @@ public:
   :
   cedar::aux::math::Sigmoid(threshold)
   {
+    mThreshold->markAdvanced(false); // make users aware that the threshold is important 
+                                     // since a common mistake is to forget that Heaviside(0) = 1 in this model
   }
 
   //--------------------------------------------------------------------------------------------------------------------
