@@ -90,6 +90,7 @@ protected:
 private:
   //!@brief Updates the output matrix.
   void compute(const cedar::proc::Arguments& arguments);
+  void recompute();
 
   //!@brief Reacts to a change in the input connection.
   void inputConnectionChanged(const std::string& inputName);
