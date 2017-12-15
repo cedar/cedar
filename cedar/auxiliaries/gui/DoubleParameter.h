@@ -88,18 +88,28 @@ namespace cedar
                                             // with smaller increases than intended ...
 
           double magnitude;
-          if (magnitude_newval > magnitude_oldval)
+
+          if (std::isnan(magnitude_newval)
+              || std::isinf(magnitude_newval)) // when manually editing to 0
           {
-            magnitude= magnitude_newval;
-              // (because the magnitude of the diff will be one smaller
-              //  because of the floor())
+            newstep= pWidget->singleStep(); // keep
           }
           else
           {
-            magnitude= magnitude_diff;
-          }
+            if (magnitude_newval > magnitude_oldval
+                && std::fabs( magnitude_newval - magnitude_diff ) <= 1.0)
+            {
+              magnitude= magnitude_newval;
+                // (because the magnitude of the diff will be one smaller
+                //  because of the floor())
+            }
+            else
+            {
+              magnitude= magnitude_diff;
+            }
 
-          newstep= std::pow( 10, magnitude );
+            newstep= std::pow( 10, magnitude );
+          }
 
           if (newstep != pWidget->singleStep()
               && !cedar::aux::math::isZero( newstep ))
