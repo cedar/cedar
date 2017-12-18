@@ -116,5 +116,6 @@
         <file>steps/vector_to_scalars.svg</file>
         <file>steps/const_vector.svg</file>
         <file>steps/stack.svg</file>
+        <file>steps/noop.svg</file>
     </qresource>
 </RCC>

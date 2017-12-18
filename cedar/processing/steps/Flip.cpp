@@ -144,6 +144,11 @@ void cedar::proc::steps::Flip::readConfiguration(const cedar::aux::Configuration
 
 void cedar::proc::steps::Flip::compute(const cedar::proc::Arguments&)
 {
+  this->recompute();
+}
+
+void cedar::proc::steps::Flip::recompute()
+{
   cedar::aux::math::flip(this->mInput->getData(), this->mOutput->getData(), this->_mFlipDimensions->getValue());
 }
 
@@ -184,6 +189,8 @@ void cedar::proc::steps::Flip::inputConnectionChanged(const std::string& inputNa
 
     this->_mFlipDimensions->resize(cedar::aux::math::getDimensionalityOf(input));
   }
+  
+  this->recompute();
 
   this->emitOutputPropertiesChangedSignal("output");
 }
