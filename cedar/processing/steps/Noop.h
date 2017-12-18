@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,61 +22,57 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Flip.h
+    File:        Noop.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2012 07 11
+    Maintainer:  jokeit
+    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Date:        2017 12 04
 
-    Description:
+    Description: Header file for the class cedar::proc::steps::Noop.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_FLIP_H
-#define CEDAR_PROC_STEPS_FLIP_H
+#ifndef CEDAR_PROC_STEPS_NOOP_H
+#define CEDAR_PROC_STEPS_NOOP_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/MatData.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/auxiliaries/BoolVectorParameter.h"
+#include <cedar/processing/Step.h>
+#include <cedar/processing/InputSlotHelper.h>
+#include <cedar/auxiliaries/MatData.h>
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/Flip.fwd.h"
+#include "cedar/processing/steps/Noop.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief   This is a flip step
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::proc::steps::Flip : public cedar::proc::Step
+class cedar::proc::steps::Noop : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Flip();
+  Noop();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public slots:
-  //!@brief this slot triggers the step and is called every time a parameter changes
-  void flipDirectionsChanged();
-
-  /*! Returns whether the given dimension is set to be flipped.
-   *
-   * @throws cedar::aux::IndexOutOfRangeException if the dimension exceeds the dimension of the input.
-   */
-  bool isDimensionFlipped(unsigned int dimension) const
-       throw (cedar::aux::IndexOutOfRangeException, cedar::aux::FailedAssertionException);
+public:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -88,34 +84,33 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief Updates the output matrix.
+  void inputConnectionChanged(const std::string& inputName);
+
   void compute(const cedar::proc::Arguments& arguments);
   void recompute();
-
-  //!@brief Reacts to a change in the input connection.
-  void inputConnectionChanged(const std::string& inputName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief MatrixData representing the input.
+  // none yet
+private:
+  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
   cedar::aux::ConstMatDataPtr mInput;
 
-  //!@brief The data containing the output.
+  //!@brief The output data.
   cedar::aux::MatDataPtr mOutput;
-private:
-  void readConfiguration(const cedar::aux::ConfigurationNode& configuration);
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! Vector of bools allowing the user to select which dimensions are to be flipped.
-  cedar::aux::BoolVectorParameterPtr _mFlipDimensions;
+  // none yet
 
 private:
+  // none yet
 
-}; // class cedar::proc::steps::Flip
+}; // class cedar::proc::steps::Noop
 
-#endif // CEDAR_PROC_STEPS_FLIP_H
+#endif // CEDAR_PROC_STEPS_NOOP_H
+
