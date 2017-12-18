@@ -69,6 +69,7 @@
 #include "cedar/processing/steps/RemoveMean.fwd.h"
 #include "cedar/processing/steps/Resize.fwd.h"
 #include "cedar/processing/steps/StaticGain.fwd.h"
+#include "cedar/processing/steps/ShiftedMultiplication.fwd.h"
 #include "cedar/processing/steps/Sum.fwd.h"
 #include "cedar/processing/steps/Switch.fwd.h"
 #include "cedar/processing/steps/Threshold.fwd.h"

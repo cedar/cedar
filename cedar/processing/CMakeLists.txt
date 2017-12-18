@@ -124,6 +124,7 @@ cedar_add_library(cedarproc
   steps/ConstVector.h
   steps/Stack.h
   steps/ShapeVisualisation.h
+  steps/ShiftedMultiplication.h
   steps/UnitConverter.h
   steps/Histogram.h
   steps/ScalarDivision.h
