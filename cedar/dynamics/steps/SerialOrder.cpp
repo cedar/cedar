@@ -69,7 +69,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::dyn::SerialOrder>
       (
-        "DFT",
+        "DFT Templates",
         "cedar.dynamics.SerialOrder"
       )
     );

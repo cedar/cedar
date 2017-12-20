@@ -14,5 +14,7 @@
     <file>steps/field_nd.svg</file>
     <file>steps/field_nd_active.svg</file>
     <file>steps/field_generic.svg</file>
+    <file>steps/field_1d_selective.svg</file>
+	<file>steps/elementary_behavior.svg</file>
   </qresource>
 </RCC>

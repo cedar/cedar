@@ -140,6 +140,167 @@
         },
         "cedar.dynamics.NeuralField":
         {
+            "name": "1D selective field",
+            "resting level": "-0.75",
+            "time scale": "100",
+            "global inhibition": "-0.1",
+            "activation as output": "false",
+            "discrete metric (workaround)": "false",
+            "dimensionality": "1",
+            "sizes":
+            [
+                "50"
+            ],
+            "input noise gain": "0.1",
+            "sigmoid":
+            {
+                "type": "cedar.aux.math.AbsSigmoid",
+                "threshold": "0",
+                "beta": "100"
+            },
+            "lateral kernels":
+            {
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "1",
+                    "anchor":
+                    [
+                        "0"
+                    ],
+                    "amplitude": "1",
+                    "sigmas":
+                    [
+                        "3"
+                    ],
+                    "normalize": "true",
+                    "shifts":
+                    [
+                        "0"
+                    ],
+                    "limit": "5"
+                }
+            },
+            "lateral kernel convolution":
+            {
+                "borderType": "Zero",
+                "mode": "Same",
+                "engine":
+                {
+                    "type": "cedar.aux.conv.OpenCV"
+                }
+            },
+            "noise correlation kernel":
+            {
+                "dimensionality": "1",
+                "anchor":
+                [
+                    "0"
+                ],
+                "amplitude": "0",
+                "sigmas":
+                [
+                    "3"
+                ],
+                "normalize": "true",
+                "shifts":
+                [
+                    "0"
+                ],
+                "limit": "5"
+            }
+        },
+        "cedar.dynamics.NeuralField":
+        {
+            "name": "1D sustained field",
+            "resting level": "-1",
+            "time scale": "100",
+            "global inhibition": "-0.01",
+            "activation as output": "false",
+            "discrete metric (workaround)": "false",
+            "dimensionality": "1",
+            "sizes":
+            [
+                "50"
+            ],
+            "input noise gain": "0.1",
+            "sigmoid":
+            {
+                "type": "cedar.aux.math.AbsSigmoid",
+                "threshold": "0",
+                "beta": "100"
+            },
+            "lateral kernels":
+            {
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "1",
+                    "anchor":
+                    [
+                        "0"
+                    ],
+                    "amplitude": "6",
+                    "sigmas":
+                    [
+                        "3"
+                    ],
+                    "normalize": "true",
+                    "shifts":
+                    [
+                        "0"
+                    ],
+                    "limit": "5"
+                },
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "1",
+                    "anchor":
+                    [
+                        "0"
+                    ],
+                    "amplitude": "-5",
+                    "sigmas":
+                    [
+                        "3"
+                    ],
+                    "normalize": "true",
+                    "shifts":
+                    [
+                        "0"
+                    ],
+                    "limit": "5"
+                }
+            },
+            "lateral kernel convolution":
+            {
+                "borderType": "Zero",
+                "mode": "Same",
+                "engine":
+                {
+                    "type": "cedar.aux.conv.OpenCV"
+                }
+            },
+            "noise correlation kernel":
+            {
+                "dimensionality": "1",
+                "anchor":
+                [
+                    "0"
+                ],
+                "amplitude": "0",
+                "sigmas":
+                [
+                    "3"
+                ],
+                "normalize": "true",
+                "shifts":
+                [
+                    "0"
+                ],
+                "limit": "5"
+            }
+        },
+        "cedar.dynamics.NeuralField":
+        {
             "name": "three-dimensional field",
             "resting level": "-5",
             "time scale": "100",
