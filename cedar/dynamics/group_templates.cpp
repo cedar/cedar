@@ -56,7 +56,7 @@ namespace
                                        "two-layer field",
                                        "resource://groupTemplates/fieldTemplates.json",
                                        "two-layer",
-                                       "DFT"
+                                       "DFT Templates"
                                      )
                                    );
     group_declaration->setIconPath(":/cedar/dynamics/gui/steps/field_generic.svg");
@@ -69,10 +69,10 @@ namespace
                                        "elementary behavior",
                                        "resource://groupTemplates/elementaryBehavior.json",
                                        "Elementary behavior",
-                                       "DFT"
+                                       "DFT Templates"
                                      )
                                    );
-    elementary_behavior_declaration->setIconPath(":/cedar/dynamics/gui/steps/field_generic.svg");
+    elementary_behavior_declaration->setIconPath(":/cedar/dynamics/gui/steps/elementary_behavior.svg");
     elementary_behavior_declaration->declare();
 
     cedar::proc::GroupDeclarationPtr field_declaration
@@ -100,6 +100,32 @@ namespace
                                    );
     node_declaration->setIconPath(":/cedar/dynamics/gui/steps/field_0d.svg");
     node_declaration->declare();
+
+    cedar::proc::GroupDeclarationPtr sustained_field_declaration
+            (
+                    new cedar::proc::GroupDeclaration
+                            (
+                                    "self-sustained field (1D)",
+                                    "resource://groupTemplates/fieldTemplates.json",
+                                    "1D sustained field",
+                                    "DFT Templates"
+                            )
+            );
+    sustained_field_declaration->setIconPath(":/cedar/dynamics/gui/steps/field_1d_active.svg");
+    sustained_field_declaration->declare();
+
+    cedar::proc::GroupDeclarationPtr selective_field_declaration
+            (
+                    new cedar::proc::GroupDeclaration
+                            (
+                                    "selective field (1D)",
+                                    "resource://groupTemplates/fieldTemplates.json",
+                                    "1D selective field",
+                                    "DFT Templates"
+                            )
+            );
+    selective_field_declaration->setIconPath(":/cedar/dynamics/gui/steps/field_1d_selective.svg");
+    selective_field_declaration->declare();
 
     return true;
   }
