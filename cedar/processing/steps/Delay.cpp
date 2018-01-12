@@ -91,7 +91,8 @@ cedar::proc::steps::Delay::Delay()
 // outputs
 mOutput(new cedar::aux::MatData(cv::Mat())),
 mOutputTimeStep(new cedar::aux::MatData(cv::Mat::zeros(1,1,CV_32F))),
-mOldInput(new cedar::aux::MatData(cv::Mat()))
+mOldInput(new cedar::aux::MatData(cv::Mat())),
+mFirstIteration(true)
 {
   // declare all data
   cedar::proc::DataSlotPtr input = this->declareInput("input");
@@ -147,17 +148,35 @@ void cedar::proc::steps::Delay::inputConnectionChanged(const std::string& inputN
   {
     this->emitOutputPropertiesChangedSignal("output");
   }
+
+  mFirstIteration= true;
 }
 
 void cedar::proc::steps::Delay::compute(const cedar::proc::Arguments& )//arguments)
 {
-  this->mOutput->setData( this->mOldInput->getData().clone() );
-  this->mOldInput->setData( this->mInput->getData().clone() );
-
   cedar::unit::Time newtime = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
-  this->mOutputTimeStep->getData().at<float>(0,0)= (newtime - mLastTime) / boost::units::si::second;
+
+  if (mFirstIteration)
+  {
+    // no changes, dont generate big jumps
+    this->mOutput->setData( this->mInput->getData().clone() );
+    this->mOutputTimeStep->getData().at<float>(0,0)= 0;
+    mFirstIteration= false;
+  }
+  else
+  {
+    this->mOutput->setData( this->mOldInput->getData().clone() );
+    this->mOldInput->setData( this->mInput->getData().clone() );
+
+
+    this->mOutputTimeStep->getData().at<float>(0,0)= (newtime - mLastTime) / boost::units::si::second;
+  }
 
   mLastTime= newtime;
 }
 
+void cedar::proc::steps::Delay::reset()
+{
+  mFirstIteration= true;
+}
 

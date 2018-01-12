@@ -79,7 +79,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -112,6 +112,7 @@ protected:
 
 private:
   cedar::unit::Time mLastTime;
+  bool              mFirstIteration;
 
 }; // class cedar::proc::steps::Delay
 
