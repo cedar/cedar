@@ -144,6 +144,16 @@ void cedar::proc::steps::Noop::compute(const cedar::proc::Arguments&)
 
 void cedar::proc::steps::Noop::recompute()
 {
+  auto input = getInput("input");
+
+  if (!input)
+    return;
+
+  auto data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(input);
+
+  if (!data)
+    return;
+
   this->mOutput->setData(getInput("input")->getData<cv::Mat>()); //input.clone());
   //this->mOutput->copyAnnotationsFrom(this->mInput);
 }
