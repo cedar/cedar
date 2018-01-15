@@ -125,6 +125,12 @@ cedar::proc::steps::ShapeVisualisation::ShapeVisualisation()
 
 cedar::proc::steps::ShapeVisualisation::~ShapeVisualisation()
 {
+  if (mVisualisationPtr)
+  {
+    auto scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
+
+    scene->deleteObjectVisualizationPtr(mVisualisationPtr);
+  }
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ShapeVisualisation::determineInputValidity
