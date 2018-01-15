@@ -1150,11 +1150,13 @@ void cedar::dev::KinematicChain::readInitialConfigurations()
   }
   catch (const boost::property_tree::json_parser::json_parser_error& e)
   {
-    cedar::aux::LogSingleton::getInstance()->systemInfo
+#ifdef DEBUG
+    cedar::aux::LogSingleton::getInstance()->debugMessage
     (
       "Could not read initial configurations. Maybe there is no such file yet. Boost says: \"" + std::string(e.what()) + "\".",
       "cedar::dev::gui::KinematicChainInitialConfigWidget::KinematicChainInitialConfigWidget()"
     );
+#endif    
 
     return;
   }

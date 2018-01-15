@@ -1657,6 +1657,7 @@ void cedar::dev::Component::updateUserSideMeasurements()
 
 void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
 {
+#ifdef DEBUG
   std::string s= "";
 
   if (suppressUserSideInteraction)
@@ -1668,6 +1669,7 @@ void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
     "Starting communication with " + prettifyName() + " in the background." + s,
     CEDAR_CURRENT_FUNCTION_NAME
   );
+#endif  
 
   setSuppressUserSideInteraction(suppressUserSideInteraction);
 

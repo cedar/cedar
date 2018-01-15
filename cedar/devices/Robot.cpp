@@ -305,6 +305,7 @@ void cedar::dev::Robot::performConsistencyCheck() const
     slot_channels.insert(slot_channel_list.begin(), slot_channel_list.end());
   }
 
+#ifdef DEBUG
   // check if every slot specifies relationships for every channel
   for (auto slot_iter = this->mComponentSlots.begin(); slot_iter != this->mComponentSlots.end(); ++slot_iter)
   {
@@ -315,7 +316,8 @@ void cedar::dev::Robot::performConsistencyCheck() const
       const std::string& name = *channel_it;
       if (!slot->hasConfiguration(name))
       {
-        cedar::aux::LogSingleton::getInstance()->systemInfo
+
+        cedar::aux::LogSingleton::getInstance()->debugMessage
         (
           "Check the configuration file: The slot \"" + slot_name + "\" has no mapping for channel \"" + name + "\".",
           "void cedar::dev::Robot::performConsistencyCheck() const"
@@ -323,6 +325,7 @@ void cedar::dev::Robot::performConsistencyCheck() const
       }
     }
   }
+#endif        
 }
 
 void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& node)
