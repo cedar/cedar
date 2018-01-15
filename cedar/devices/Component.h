@@ -179,6 +179,7 @@ public:
  
   //! a human readable (short) name that describes the component
   std::string prettifyName() const;
+  std::string prettifyConfiguration() const;
 
   void startCommunication(bool suppressUserSideInteraction = false);
   void stopCommunication();
@@ -196,6 +197,7 @@ public:
   static bool anyComponentsRunning();
 
   static std::string describeAllRunningComponents();
+  static std::string describeAllRunningConfigurations();
 
 
   //!@ check if these functions have to be exposed at all (may at least be changed to protected visibility)

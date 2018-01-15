@@ -857,11 +857,12 @@ void cedar::proc::gui::Ide::timerEvent(QTimerEvent*)
   std::string formatted_time = cedar::aux::formatDuration(time);
   this->mpGlobalTimeLabel->setText(QString("simulation time: ") + QString::fromStdString(formatted_time));
 
-  std::string components_desc = cedar::dev::Component::describeAllRunningComponents();
+  //std::string components_desc = cedar::dev::Component::describeAllRunningComponents();
+  std::string components_desc = cedar::dev::Component::describeAllRunningConfigurations();
   if (!components_desc.empty())
   {
     this->mpRunningComponentsLabel->setText(
-          QString("independently running: ") 
+          QString("Robots: ") 
           + QString("<span style='color:rgb(233, 10, 255, 255)'>%1</span>").arg(QString::fromStdString(components_desc) ) );
   }
   else
