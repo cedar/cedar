@@ -2345,6 +2345,57 @@ std::string cedar::dev::Component::prettifyName() const
   return ret;
 }
 
+// static:
+std::string cedar::dev::Component::describeAllRunningConfigurations()
+{
+  std::set<std::string> myset;
+
+  for( auto component_it : mRunningComponentInstancesAliveTime )
+  {
+    auto componentpointer = component_it.first;
+
+    if (componentpointer != NULL)
+    {
+      myset.insert( componentpointer->prettifyConfiguration() );
+    }
+  }
+
+  std::string ret= "";
+  for( std::string s : myset )
+  {
+    ret+= s + ", ";
+  }
+  ret= ret.substr(0, ret.size() -2 );
+  ret[0]= std::toupper( ret[0] );
+  return ret;
+}
+
+std::string cedar::dev::Component::prettifyConfiguration() const
+{
+  std::string ret; 
+  auto slot = mSlot.lock();
+ 
+  ret = this->getName();
+
+  if (ret.length() <= 0)
+  {
+    if (!slot)
+      return "uninitialized robotic component";
+
+    ret = slot->getName();
+  }
+
+  if (slot)
+  {
+    auto config = slot->getConfigurationName();
+
+    if (config.length() > 0)
+      return config;
+  }
+
+  return ret;
+}
+
 int cedar::dev::Component::getMeasurementMatrixType()
 {
   std::string typeString = mMatrixType->getValue();
