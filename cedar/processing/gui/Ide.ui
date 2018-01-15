@@ -750,7 +750,7 @@
     <string>Rename Current Plot Group</string>
    </property>
    <property name="toolTip">
-    <string>rename selected plot group</string>
+    <string>Rename selected plot group</string>
    </property>
   </action>
   <action name="mpActionDisplayPlotGroup">
@@ -926,7 +926,7 @@
      <normaloff>:/toolbaricons/robot_manager.svg</normaloff>:/toolbaricons/robot_manager.svg</iconset>
    </property>
    <property name="text">
-    <string>open Robot Manager</string>
+    <string>Open the Robot Manager</string>
    </property>
    <property name="toolTip">
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;open Robot Manager&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
