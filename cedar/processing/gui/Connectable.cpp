@@ -234,12 +234,17 @@ void cedar::proc::gui::Connectable::Decoration::updateIcon(const bool isConnecte
 {
   if (!isDestructed)
   {
+    qreal h= 25; // default?
 
-    qreal h = (this->mpIcon->boundingRect().height()) * 1.25;
-
-    if (this->mpIcon != nullptr)
+    if (this->mpIcon
+        && this->mpIcon != nullptr ) 
     {
-      delete this->mpIcon;
+      if (isConnected)
+      {
+        auto rect = this->mpIcon->boundingRect();
+        h = (rect.height()) * 1.25;
+        delete this->mpIcon;
+      }
     }
 
     QString icon_path;
