@@ -173,6 +173,9 @@ public:
   void setSuppressUserSideInteraction(bool what);
   //! ist user side communication allowed? @setSuppressUserSideInteraction
   bool getSuppressUserSideInteraction() const;
+
+  //! Component connects automatically? -> overwrite to change behaviour, be careful!
+  virtual bool getConnectAutomatically();
  
   //! a human readable (short) name that describes the component
   std::string prettifyName() const;

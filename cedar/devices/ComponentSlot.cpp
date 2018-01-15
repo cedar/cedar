@@ -153,7 +153,15 @@ void cedar::dev::ComponentSlot::instantiateConfiguration(const std::string& conf
     this->getComponent()->setChannel(this->getRobot()->getChannel(channel_name));
   }
 
-  this->getComponent()->readConfiguration(configuration);
+  auto component= this->getComponent();
+
+  component->readConfiguration(configuration);
+
+  if (component
+      && component->getConnectAutomatically())
+  {
+    component->startCommunication(true);
+  }
 }
 
 
