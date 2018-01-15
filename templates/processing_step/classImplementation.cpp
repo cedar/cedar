@@ -42,8 +42,40 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/typecheck/IsMatrix.h"
+#include "cedar/processing/ElementDeclaration.h"
 
 // SYSTEM INCLUDES
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+bool declare()
+{
+  using cedar::proc::ElementDeclarationPtr;
+  using cedar::proc::ElementDeclarationTemplate;
+
+  ElementDeclarationPtr declaration
+  (
+    new ElementDeclarationTemplate< <full class name> >
+    (
+      "Programming",
+      "cedar.processing.steps.<class name>"
+    )
+  );
+
+  //declaration->setIconPath(":/steps/threshold.svg");
+  declaration->setDescription
+  (
+    "A description of the class."
+  );
+
+  declaration->declare();
+
+  return true;
+}
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
