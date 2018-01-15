@@ -149,7 +149,9 @@ void cedar::proc::steps::VehicleRotation::onStop()
     auto component = this->getComponent();
     if (component->isCommunicating())
     {
+#if 0      
       cedar::aux::LogSingleton::getInstance()->warning(component->prettifyName() + " is still connected and running.", CEDAR_CURRENT_FUNCTION_NAME);
+#endif      
     }
     else
     {
