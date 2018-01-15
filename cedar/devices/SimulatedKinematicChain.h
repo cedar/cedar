@@ -68,6 +68,8 @@ public:
   bool applyCrashbrake() override;
   void applyInitialConfigurationController(cv::Mat targetConfig) override;
 
+  bool getConnectAutomatically() override;
+
 public slots:
   // none yet
 

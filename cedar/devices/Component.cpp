@@ -2376,3 +2376,8 @@ int cedar::dev::Component::getMeasurementMatrixType()
   }
 }
 
+bool cedar::dev::Component::getConnectAutomatically()
+{
+  return false; // sane default
+}
+
