@@ -586,7 +586,16 @@ void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGrap
 
   if (this->getDisplayMode() == cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT)
   {
-    painter->drawText(QPointF(2 * padding + M_ICON_SIZE, 15), this->mClassId->getClassNameWithoutNamespace().c_str());
+    QFont font = painter->font();
+
+    font.setWeight( QFont::Light );
+    font.setKerning(true);
+    painter->setFont(font);
+    painter->drawText(QPointF(2 * padding + M_ICON_SIZE, 13), this->mClassId->getClassNameWithoutNamespace().c_str());
+
+    font.setWeight( QFont::DemiBold );
+    font.setKerning(true);
+    painter->setFont(font);
     painter->drawText(QPointF(2 * padding + M_ICON_SIZE, 25), this->getStep()->getName().c_str());
   }
 
