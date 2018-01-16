@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/ObjectListParameter.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/kernel/Box.h"
+#include "cedar/processing/Step.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
@@ -382,7 +383,17 @@ void cedar::aux::gui::Configurable::appendRootConfigurable(cedar::aux::Configura
   this->mDisplayedConfigurables.push_back(configurable);
 
   std::string type_name = cedar::aux::objectTypeToString(configurable);
-  type_name = cedar::aux::replace(type_name, "::", ".");
+
+  auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(configurable);
+  if (step)
+  {
+    type_name= type_name.substr( type_name.rfind(":") + 1 );
+  }
+  else
+  {
+    type_name = cedar::aux::replace(type_name, "::", ".");
+  }
+
   auto p_item = this->appendHeading(this->mpPropertyTree->invisibleRootItem(), QString::fromStdString(type_name), 1);
   p_item->setExpanded(true);
   //Debug Change Layout:
