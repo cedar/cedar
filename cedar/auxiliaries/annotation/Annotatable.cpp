@@ -88,7 +88,7 @@ std::string cedar::aux::annotation::Annotatable::getDescription() const
   std::string clean_type = cedar::aux::objectTypeToString(this);
   clean_type = cedar::aux::replace(clean_type, "<", "&lt;");
   clean_type = cedar::aux::replace(clean_type, ">", "&gt;");
-  description += "Type: <b>" + clean_type + "</b>";
+  description += "Implementation: <tt>" + clean_type + "</tt>";
 
   for (size_t i = 0; i < this->mAnnotations.size(); ++i)
   {
