@@ -99,8 +99,9 @@ std::string cedar::aux::MatData::getDescription() const
       }
     }
     //description += "<br />";
-    detailed_description += "numeric type: " + cedar::aux::math::matrixTypeToString(mat) + "<br />";
-    detailed_description += "channels: " + cedar::aux::toString(mat.channels()) + "<br />";
+    detailed_description += "<table>";
+    detailed_description += "<tr><td>numeric type: </td><td>" + cedar::aux::math::matrixTypeToString(mat) + "</td></tr>";
+    detailed_description += "<tr><td>channels: </td><td>" + cedar::aux::toString(mat.channels()) + "</td></table><br />";
   }
 
   this->unlock();
