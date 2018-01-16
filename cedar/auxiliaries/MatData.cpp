@@ -60,22 +60,24 @@
 std::string cedar::aux::MatData::getDescription() const
 {
   std::string description;
-  description += Super::getDescription();
-  description += "<hr />";
+  std::string detailed_description;
 
   this->lockForRead();
   const cv::Mat& mat = this->getData();
   if (mat.empty())
   {
-    description += "Empty matrix.";
+    description += "Empty data.";
   }
   else
   {
     unsigned int dim = cedar::aux::math::getDimensionalityOf(mat);
-    description += cedar::aux::toString(dim) + "-dimensional matrix";
+    //description += cedar::aux::toString(dim) + "-dimensional matrix";
+
+    // use the same color for sizes and dimensionalities as everywhere else:
+    description += "<font color=\"#000080\">Tensor of order</font>: " + cedar::aux::toString(dim);
     if (dim != 0)
     {
-      description += "<br />size: ";
+      description += "<br /><font color=\"#000080\">size</font>: ";
       if (dim == 1)
       {
         description += cedar::aux::toString(cedar::aux::math::get1DMatrixSize(mat));
@@ -96,12 +98,16 @@ std::string cedar::aux::MatData::getDescription() const
         description += ")";
       }
     }
-    description += "<br />";
-    description += "type: " + cedar::aux::math::matrixTypeToString(mat) + "<br />";
-    description += "channels: " + cedar::aux::toString(mat.channels());
+    //description += "<br />";
+    detailed_description += "numeric type: " + cedar::aux::math::matrixTypeToString(mat) + "<br />";
+    detailed_description += "channels: " + cedar::aux::toString(mat.channels()) + "<br />";
   }
 
   this->unlock();
+
+  description += "<hr />";
+  description += detailed_description;
+  description += Super::getDescription();
 
   return description;
 }
