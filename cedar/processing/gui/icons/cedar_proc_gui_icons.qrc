@@ -117,5 +117,6 @@
         <file>steps/const_vector.svg</file>
         <file>steps/stack.svg</file>
         <file>steps/noop.svg</file>
+        <file>steps/delay.svg</file>
     </qresource>
 </RCC>
