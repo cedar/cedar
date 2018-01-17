@@ -146,17 +146,33 @@ void cedar::proc::gui::RecorderWidget::createHeader(const std::string& name)
   //Create step name.
   QLabel* step_name = new QLabel(QString(name.c_str()));
   QFont step_name_font= step_name->font();
+
+  // imitate the format of aux::gui::Configurable
+  step_name_layout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
   step_name_font.setPointSize(step_name_font.pointSize() + 2);
-  step_name_font.setBold(true);
+  step_name_font.setKerning(true);
+  step_name_font.setWeight( QFont::Light );
+    // TODO: the classname should be in light
+    //       and the step name (which the user can change) should be in bold
+
   step_name->setFont(step_name_font);
+
   step_name_layout->addWidget(step_name);
 
   mMainLayout->addLayout(step_name_layout);
-  
+
 
   QHBoxLayout* row_headers = new QHBoxLayout();
+
   // Create header for the slot names.
-  QLabel* label = new QLabel("Slot name");
+  QLabel* label = new QLabel(""); //"Slot name");
+
+  QFont label_font = label->font();
+  label_font.setKerning(true);
+  label_font.setPointSize( label_font.pointSize() - 1 );
+  label->setFont( label_font );
+
   row_headers->addWidget(label);
   
   // Create spacer.
@@ -166,6 +182,10 @@ void cedar::proc::gui::RecorderWidget::createHeader(const std::string& name)
 
   // Create row header for record time.
   QLabel* label2 = new QLabel("Record interval");
+  QFont label2_font = label2->font();
+  label2_font.setKerning(true);
+  label2_font.setPointSize( label2_font.pointSize() - 1 );
+  label2->setFont( label2_font );
   row_headers->addWidget(label2);
   mMainLayout->addLayout(row_headers);
 
