@@ -608,7 +608,7 @@ QStandardItem* cedar::proc::gui::ElementList::TabBase::makeItem
   class_description += "<nobr>class <big><b>" + QString::fromStdString(className) + "</b></big></nobr>";
 
   class_description += "<hr />";
-  class_description += "<div align=\"right\"><nobr><small><i>" + QString::fromStdString(fullClassName) + "</i></small></nobr></div>";
+  class_description += "<div align=\"right\"><nobr><tt>" + QString::fromStdString(fullClassName) + "</tt></nobr></div>";
   if (!description.empty())
   {
     QString description_qt = "<p>" + QString::fromStdString(description).replace("\n", "<br />") + "</p>";
