@@ -26,17 +26,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="149.67213"
-     inkscape:cy="184.32541"
+     inkscape:zoom="0.7"
+     inkscape:cx="96.395946"
+     inkscape:cy="167.9725"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1005"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
-     inkscape:window-maximized="1"
+     inkscape:window-width="911"
+     inkscape:window-height="597"
+     inkscape:window-x="958"
+     inkscape:window-y="161"
+     inkscape:window-maximized="0"
      showguides="true"
      inkscape:guide-bbox="true" />
   <defs
@@ -431,16 +431,16 @@
      inkscape:groupmode="layer"
      inkscape:label="Layer 1">
     <rect
-       style="fill:none;stroke:#000000;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:none;stroke:#000000;stroke-width:15.17681122;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect2880"
-       width="170.69926"
-       height="106.19431"
-       x="-952.64612"
-       y="25.776594"
+       width="172.71138"
+       height="107.44608"
+       x="-964.74664"
+       y="25.007856"
        transform="matrix(0,-1,1,0,0,0)" />
     <g
        id="g4326"
-       transform="matrix(0,-1,1,0,-685.48626,1067.2965)">
+       transform="matrix(0,-1,1.2470227,0,-879.47226,1077.2965)">
       <path
          style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#838383;fill-opacity:1;stroke:none;stroke-width:15;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
          d="m 201.90625,831.5625 c -3.91647,0.0654 -7.42411,3.67705 -7.375,7.59375 l 0,21.25 c -0.056,3.96234 3.53726,7.60682 7.5,7.60682 3.96274,0 7.55604,-3.64448 7.5,-7.60682 l 0,-21.25 c 0.0502,-4.00003 -3.62521,-7.66033 -7.625,-7.59375 z"
@@ -454,16 +454,16 @@
          inkscape:connector-curvature="0" />
     </g>
     <rect
-       y="814.19934"
-       x="203.52414"
-       height="106.19431"
-       width="170.69926"
+       y="833.99542"
+       x="233.16965"
+       height="89.03846"
+       width="143.12254"
        id="rect3070"
-       style="color:#000000;fill:none;stroke:#ff0000;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+       style="color:#000000;fill:none;stroke:#ff0000;stroke-width:12.57672691;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
     <g
        style="font-size:64px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Ubuntu Mono;-inkscape-font-specification:Ubuntu Mono Bold"
        id="text3959"
-       transform="translate(-16.521849,13.974949)">
+       transform="matrix(2.5506,0,0,2.5506,-281.94321,-1155.4701)">
       <path
          inkscape:connector-curvature="0"
          d="m 192.97143,730.60336 0,6.528 -10.432,0 0,33.088 -7.936,0 0,-33.088 -10.432,0 0,-6.528 28.8,0"
