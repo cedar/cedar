@@ -171,15 +171,39 @@ void cedar::proc::gui::StepItem::updateToolTip()
 {
   QString tool_tip;
 
-  std::string name = this->getStep()->getName();
-  tool_tip += "<nobr>Step <big><b>" + QString::fromStdString(name) + "</b></big></nobr>";
+  auto step= this->getStep();
 
-  tool_tip += "<hr />";
+  //std::string name = step->getName();
+  std::string name = step->getFullPath();
+  std::string classname = this->mClassId->getClassNameWithoutNamespace().c_str();
+  std::string fullclassname = this->mClassId->getClassName().c_str();
 
-/*
-  std::string fullClassName = this->getStep()->getFullPath();
-  tool_tip += "<div align=\"right\"><nobr><small><i>" + QString::fromStdString(fullClassName) + "</i></small></nobr></div>";
-*/
+  tool_tip += "<nobr>"
+              "<table>";
+
+
+  tool_tip+= "<tr>"
+                "<td>Step: </td>"
+                "<td>" 
+                  + QString::fromStdString(classname)
+                  + "</td>"
+               "</tr>";
+
+  tool_tip += "<tr>"
+                "<td>Class: </td>"
+                "<td><b>"
+                + QString::fromStdString( name )
+                + "</b></td>"
+              "</tr>";
+
+  tool_tip+= "<tr>"
+                "<td>Implementation: </td>"
+                "<td><div align=\"right\"><tt>" 
+                  + QString::fromStdString(fullclassname)
+                  + "</tt></div></td>"
+               "</tr></nobr>";
+
+  tool_tip += "</table>";
 
 /*
   if (!source.empty())
@@ -189,26 +213,31 @@ void cedar::proc::gui::StepItem::updateToolTip()
   }
 */
 
+  tool_tip += "<hr />";
+  tool_tip += "<b>Measurements:</b>";
   tool_tip += "<table>";
   tool_tip += "<tr>"
-                "<th>Measurement:</th>"
-                "<th>Last</th>"
-                "<th>Average</th>"
+                "<td></td>"
+                "<td></td>"
+                "<td>last</td>"
+                "<td>average</td>"
               "</tr>";
 
   for (unsigned int m = 0; m < this->getStep()->getNumberOfTimeMeasurements(); ++m)
   {
     const std::string& measurement = this->getStep()->getTimeMeasurementName(m);
     tool_tip += "<tr>";
-    QString measurement_str = "<td>%1</td><td align=\"right\">%2</td><td align=\"right\">%3</td>";
+    QString measurement_str = "<td></td><td>%1></td><td align=\"right\">%2</td><td align=\"right\">%3</td>";
     measurement_str = measurement_str.arg(QString::fromStdString(measurement));
 
-    if (this->getStep()->hasTimeMeasurement(m))
+    if (step->hasTimeMeasurement(m))
     {
-      cedar::unit::Time last_ms = this->getStep()->getLastTimeMeasurement(m);
-      cedar::unit::Time average_ms = this->getStep()->getTimeMeasurementAverage(m);
+      cedar::unit::Time last_ms = step->getLastTimeMeasurement(m);
+      cedar::unit::Time average_ms = step->getTimeMeasurementAverage(m);
+
       double last_d = last_ms / (0.001 * cedar::unit::seconds);
       double avg_d = average_ms / (0.001 * cedar::unit::seconds);
+
       measurement_str = measurement_str.arg(QString("%1 ms").arg(last_d, 0, 'f', 1));
       measurement_str = measurement_str.arg(QString("%1 ms").arg(avg_d, 0, 'f', 1));
     }
