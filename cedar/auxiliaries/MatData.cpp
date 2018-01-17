@@ -105,8 +105,31 @@ std::string cedar::aux::MatData::getDescription() const
 
     //description += "<br />";
     detailed_description += "<table>";
-    detailed_description += "<tr><td>numeric type: </td><td>" + cedar::aux::math::matrixTypeToString(mat) + "</td></tr>";
-    detailed_description += "<tr><td>channels: </td><td>" + cedar::aux::toString(mat.channels()) + "</td></table><br />";
+    detailed_description += "<tr><td>Numeric type: </td><td>" + cedar::aux::math::matrixTypeToString(mat) + "</td></tr>";
+    detailed_description += "<tr><td>Channels: </td><td>" + cedar::aux::toString(mat.channels()) + "</td>";
+
+    unsigned int memsize;
+    std::string memsize_extra= "";
+    if (mat.isContinuous())
+    {
+      memsize= mat.total() * mat.elemSize();
+      memsize_extra= " (continuous)";
+    }
+    else
+    {
+      for( int i= 0; i < mat.rows; i++ )
+      {
+        memsize += mat.step[i] * mat.rows;
+      }
+      memsize_extra= " (non continuous)";
+    }
+
+    detailed_description += "<tr><td>Bytes: </td><td>" 
+                            + boost::lexical_cast<std::string>( memsize )
+                            + memsize_extra
+                            + "</td>";
+
+    detailed_description += "</table><br />";                           
   }
 
   this->unlock();
