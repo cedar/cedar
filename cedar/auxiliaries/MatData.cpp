@@ -81,7 +81,7 @@ std::string cedar::aux::MatData::getDescription() const
       if (dim == 1)
       {
         description += cedar::aux::toString(cedar::aux::math::get1DMatrixSize(mat));
-        description += " (";
+        description += " (as ";
       }
 
       for (int i = 0; i < mat.dims; ++i)
@@ -95,9 +95,14 @@ std::string cedar::aux::MatData::getDescription() const
 
       if (dim == 1)
       {
-        description += ")";
+        description += " matrix)";
       }
     }
+    else
+    {
+      description += " (as 1 x 1 matrix)";
+    }
+
     //description += "<br />";
     detailed_description += "<table>";
     detailed_description += "<tr><td>numeric type: </td><td>" + cedar::aux::math::matrixTypeToString(mat) + "</td></tr>";
