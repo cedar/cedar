@@ -227,7 +227,7 @@ void cedar::proc::gui::StepItem::updateToolTip()
   {
     const std::string& measurement = this->getStep()->getTimeMeasurementName(m);
     tool_tip += "<tr>";
-    QString measurement_str = "<td></td><td>%1></td><td align=\"right\">%2</td><td align=\"right\">%3</td>";
+    QString measurement_str = "<td></td><td>%1</td><td align=\"right\">%2</td><td align=\"right\">%3</td>";
     measurement_str = measurement_str.arg(QString::fromStdString(measurement));
 
     if (step->hasTimeMeasurement(m))
