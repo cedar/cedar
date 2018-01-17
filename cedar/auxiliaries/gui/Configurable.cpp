@@ -338,21 +338,33 @@ void cedar::aux::gui::Configurable::makeHeading(QTreeWidgetItem* pItem, const QS
 {
   pItem->setFirstColumnSpanned(true);
   QFont font = pItem->font(0);
+
+  font.setKerning(true);
+  pItem->setTextAlignment(0, Qt::AlignHCenter | Qt::AlignVCenter);
+
   switch (hLevel)
   {
     case 1:
+      font.setWeight( QFont::Light );
+      font.setPointSize(font.pointSize() + 3 - hLevel);
+      break;
     case 2:
       font.setBold(true);
       font.setPointSize(font.pointSize() + 3 - hLevel);
       pItem->setBackground(0, this->palette().brush(QPalette::Dark));
       pItem->setForeground(0, this->palette().brush(QPalette::Light));
       break;
+    case 3:
+      font.setPointSize(font.pointSize() - 1 );
+      pItem->setTextAlignment(0, Qt::AlignLeft | Qt::AlignVCenter);
+      break;
     default:
       font.setItalic(true);
+
   }
   pItem->setFont(0, font);
 
-  pItem->setTextAlignment(0, Qt::AlignHCenter | Qt::AlignVCenter);
+
   pItem->setText(0, text);
 }
 
@@ -788,18 +800,16 @@ void cedar::aux::gui::Configurable::updateLinkState(QTreeWidgetItem* item, cedar
 void cedar::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter, bool firstUpdate)
 {
   QFont font = item->font(PARAMETER_NAME_COLUMN);
+  auto name = pParameter->getName();
 
   // do not do this when first dragging the items into the viewer scene
   if (!firstUpdate)
   {
     font.setBold(pParameter->isChanged());
-    item->setFont(PARAMETER_NAME_COLUMN, font);
   }
 
   if (!pParameter->isLinked())
   {
-    auto name= pParameter->getName();
-
     // lets try this for ergonomy for the user:
     if (name == "dimensionality"
         || name == "sizes"
@@ -818,11 +828,11 @@ void cedar::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* item, ced
         || name == "VectorDimension"
         || name == "number of vector entries")
     {
-      QFont pParameter = item->font(0);
       item->setTextColor(PARAMETER_NAME_COLUMN, QColor::fromRgb(0, 0, 128));
-      item->setFont(PARAMETER_NAME_COLUMN, font);
     }
   }
 
+  font.setKerning(true);
+  item->setFont(PARAMETER_NAME_COLUMN, font);
 }
 
