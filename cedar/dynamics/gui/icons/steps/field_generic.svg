@@ -14,8 +14,8 @@
    height="400"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.3.1 r9886"
-   sodipodi:docname="field_temp.svg"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="field_generic.svg"
    inkscape:export-filename="/home/lompolbx/workspace/src/cedar.fieldFramework/cedar/processing/gui/icons/steps/no_icon.png"
    inkscape:export-xdpi="9"
    inkscape:export-ydpi="9">
@@ -26,17 +26,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="2.8503516"
-     inkscape:cy="294.87103"
+     inkscape:zoom="0.70000001"
+     inkscape:cx="117.51568"
+     inkscape:cy="252.89176"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1005"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
-     inkscape:window-maximized="1"
+     inkscape:window-width="883"
+     inkscape:window-height="822"
+     inkscape:window-x="101"
+     inkscape:window-y="78"
+     inkscape:window-maximized="0"
      showguides="true"
      inkscape:guide-bbox="true" />
   <defs
@@ -283,22 +283,16 @@
        id="g4987"
        style="stroke-width:18.75;stroke-miterlimit:4;stroke-dasharray:none" />
     <path
-       sodipodi:nodetypes="czc"
-       transform="translate(0,652.3622)"
-       id="path4556"
-       d="M 22.223356,227.26391 C 172.62107,226.76228 142.61231,131.9963 196.9731,132.17368 c 54.36079,0.17739 7.92299,94.71832 154.55998,95.09023"
-       style="fill:none;stroke:#9d6262;stroke-width:15;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" />
-    <path
-       style="fill:none;stroke:#ff0000;stroke-width:15;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-       d="M 24.243661,336.36039 C 174.64138,397.47806 141.60216,91.590194 195.96295,91.767579 c 54.36079,0.177386 9.94329,304.830051 157.59044,244.592811"
-       id="path4552"
-       transform="translate(0,652.3622)"
-       sodipodi:nodetypes="czc" />
-    <path
        sodipodi:nodetypes="czs"
-       transform="translate(0,652.3622)"
        id="path4554"
-       d="m 24.243661,225.24361 c 190.803819,-0.50163 78.972699,-40.71938 171.719289,-40.542 92.74659,0.17738 -27.43235,42.19039 157.59044,40.542"
-       style="fill:none;stroke:#9b9b9b;stroke-width:15;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" />
+       d="M 57.679556,959.02645 C 183.91433,939.67218 114.24952,911.21646 188.7183,911.35671 c 74.46876,0.14027 -3.42236,27.78523 142.54206,47.66974"
+       style="fill:none;stroke:#9b9b9b;stroke-width:12.15750694;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#ff0000;stroke-width:15;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="M 24.243661,988.72259 C 174.64138,1049.8403 141.60216,743.95239 195.96295,744.12978 c 54.36079,0.17739 9.94329,304.83002 157.59044,244.59281"
+       id="path4552"
+       sodipodi:nodetypes="czc"
+       inkscape:connector-curvature="0" />
   </g>
 </svg>
