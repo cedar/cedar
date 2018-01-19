@@ -73,7 +73,7 @@ namespace
     multiply_decl->setIconPath(":/steps/component_multiply.svg");
     multiply_decl->setDescription
     (
-      "Multiplies two matrices component-wise."
+      "Multiplies two matrices element-wise."
     );
 
     multiply_decl->declare();
