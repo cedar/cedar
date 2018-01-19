@@ -305,7 +305,7 @@ void cedar::proc::gui::DataSlotItem::generateTooltip()
     dynamic_cast<cedar::proc::sinks::GroupSink*>(this->getSlot()->getParentPtr())
   )
   {
-    tool_tip += "group connector: ";
+    tool_tip += "Group connector: ";
     tool_tip += "<b>" + QString::fromStdString(this->getSlot()->getParentPtr()->getName()) + "</b>";
   }
   else
