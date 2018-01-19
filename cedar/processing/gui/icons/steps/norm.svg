@@ -116,8 +116,8 @@
      showgrid="false"
      inkscape:window-width="1095"
      inkscape:window-height="636"
-     inkscape:window-x="1340"
-     inkscape:window-y="148"
+     inkscape:window-x="558"
+     inkscape:window-y="88"
      inkscape:window-maximized="0"
      width="480px"
      showguides="true"
@@ -215,33 +215,33 @@
            inkscape:connector-curvature="0" />
         <path
            sodipodi:type="arc"
-           style="fill:#000000;fill-opacity:1;stroke:none"
+           style="fill:#666666;fill-opacity:1;stroke:none"
            id="path4313"
            sodipodi:cx="288.90363"
            sodipodi:cy="-170.7515"
            sodipodi:rx="16.162441"
            sodipodi:ry="16.162441"
-           d="m 305.06607,-170.7515 a 16.162441,16.162441 0 1 1 -32.32489,0 16.162441,16.162441 0 1 1 32.32489,0 z"
+           d="m 305.06607,-170.7515 c 0,8.92627 -7.23617,16.16245 -16.16244,16.16245 -8.92627,0 -16.16245,-7.23618 -16.16245,-16.16245 0,-8.92627 7.23618,-16.16244 16.16245,-16.16244 8.92627,0 16.16244,7.23617 16.16244,16.16244 z"
            transform="translate(-152.73335,751.65961)" />
         <path
            sodipodi:type="arc"
-           style="fill:#000000;fill-opacity:1;stroke:none"
+           style="fill:#666666;fill-opacity:1;stroke:none"
            id="path4313-7"
            sodipodi:cx="288.90363"
            sodipodi:cy="-170.7515"
            sodipodi:rx="16.162441"
            sodipodi:ry="16.162441"
-           d="m 305.06607,-170.7515 a 16.162441,16.162441 0 1 1 -32.32489,0 16.162441,16.162441 0 1 1 32.32489,0 z"
+           d="m 305.06607,-170.7515 c 0,8.92627 -7.23617,16.16245 -16.16244,16.16245 -8.92627,0 -16.16245,-7.23618 -16.16245,-16.16245 0,-8.92627 7.23618,-16.16244 16.16245,-16.16244 8.92627,0 16.16244,7.23617 16.16244,16.16244 z"
            transform="translate(-152.73335,881.9693)" />
         <path
            sodipodi:type="arc"
-           style="fill:#000000;fill-opacity:1;stroke:none"
+           style="fill:#666666;fill-opacity:1;stroke:none"
            id="path4313-7-5"
            sodipodi:cx="288.90363"
            sodipodi:cy="-170.7515"
            sodipodi:rx="16.162441"
            sodipodi:ry="16.162441"
-           d="m 305.06607,-170.7515 a 16.162441,16.162441 0 1 1 -32.32489,0 16.162441,16.162441 0 1 1 32.32489,0 z"
+           d="m 305.06607,-170.7515 c 0,8.92627 -7.23617,16.16245 -16.16244,16.16245 -8.92627,0 -16.16245,-7.23618 -16.16245,-16.16245 0,-8.92627 7.23618,-16.16244 16.16245,-16.16244 8.92627,0 16.16244,7.23617 16.16244,16.16244 z"
            transform="translate(-152.73335,1012.279)" />
       </g>
     </g>

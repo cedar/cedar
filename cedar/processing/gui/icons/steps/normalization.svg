@@ -14,7 +14,7 @@
    height="400"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.3.1 r9886"
+   inkscape:version="0.48.4 r9939"
    sodipodi:docname="normalization.svg"
    inkscape:export-filename="/home/lompolbx/workspace/src/ObjectRecognitionPlugins/icons/channel_split.png"
    inkscape:export-xdpi="9"
@@ -30,12 +30,12 @@
      inkscape:cx="-66.418737"
      inkscape:cy="149.8951"
      inkscape:document-units="px"
-     inkscape:current-layer="g2879"
+     inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1005"
+     inkscape:window-height="1032"
      inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      showguides="true"
      inkscape:guide-bbox="true" />
@@ -431,15 +431,15 @@
     </g>
     <text
        xml:space="preserve"
-       style="font-size:195.89050293px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
-       x="120.99736"
-       y="992.32843"
+       style="font-size:177.62191771999999901px;font-style:normal;font-weight:normal;fill:#666666;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="127.63027"
+       y="985.37994"
        id="text2881"
        transform="scale(1.0808777,0.92517405)"><tspan
          sodipodi:role="line"
          id="tspan2883"
-         x="120.99736"
-         y="992.32843">1</tspan></text>
+         x="127.63027"
+         y="985.37994">1</tspan></text>
     <g
        id="g2879"
        style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-opacity:1">

@@ -14,7 +14,7 @@
    height="400"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47 r22583"
+   inkscape:version="0.48.4 r9939"
    sodipodi:docname="flip.svg"
    inkscape:export-filename="/home/lompolbx/workspace/src/cedar.fieldFramework/cedar/processing/gui/icons/steps/no_icon.png"
    inkscape:export-xdpi="9"
@@ -33,9 +33,9 @@
      inkscape:current-layer="g2865"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1007"
+     inkscape:window-height="1032"
      inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      showguides="true"
      inkscape:guide-bbox="true" />
@@ -360,7 +360,7 @@
       </g>
       <text
          xml:space="preserve"
-         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
          x="568.88153"
          y="353.31549"
          id="text3731"
@@ -370,7 +370,7 @@
            id="tspan3733"
            x="568.88153"
            y="353.31549"
-           style="font-size:48px;font-weight:bold;-inkscape-font-specification:Bitstream Charter Bold">1</tspan></text>
+           style="font-size:48px;font-weight:bold;-inkscape-font-specification:Bitstream Charter Bold;fill:#ff0000">1</tspan></text>
       <text
          xml:space="preserve"
          style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
@@ -451,7 +451,7 @@
            style="font-size:48px;font-weight:bold;-inkscape-font-specification:Bitstream Charter Bold">3</tspan></text>
       <text
          xml:space="preserve"
-         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
          x="853.10101"
          y="644.33606"
          id="text3731-8-5"
@@ -461,7 +461,7 @@
            id="tspan3733-96-1"
            x="853.10101"
            y="644.33606"
-           style="font-size:48px;font-weight:bold;-inkscape-font-specification:Bitstream Charter Bold">1</tspan></text>
+           style="font-size:48px;font-weight:bold;-inkscape-font-specification:Bitstream Charter Bold;fill:#ff0000">1</tspan></text>
     </g>
     <rect
        y="238.11078"
