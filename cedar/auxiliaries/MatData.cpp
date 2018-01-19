@@ -77,7 +77,7 @@ std::string cedar::aux::MatData::getDescription() const
     description += "<font color=\"#000080\">Tensor of order</font>: " + cedar::aux::toString(dim);
     if (dim != 0)
     {
-      description += "<br /><font color=\"#000080\">size</font>: ";
+      description += "<br /><font color=\"#000080\">Size</font>: ";
       if (dim == 1)
       {
         description += cedar::aux::toString(cedar::aux::math::get1DMatrixSize(mat));
