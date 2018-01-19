@@ -65,10 +65,10 @@ bool declare()
     )
   );
 
-  //declaration->setIconPath(":/steps/threshold.svg");
+  declaration->setIconPath(":/steps/positionofmaximum.svg");
   declaration->setDescription
   (
-    "A step that applies a threshold to an image."
+    "Returns the indices of the maximum value of the tensor."
   );
 
   declaration->declare();
