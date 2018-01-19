@@ -26,17 +26,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4142136"
-     inkscape:cx="45.692951"
-     inkscape:cy="162.31364"
+     inkscape:zoom="0.50000001"
+     inkscape:cx="-7.5613884"
+     inkscape:cy="263.23465"
      inkscape:document-units="px"
      inkscape:current-layer="g14242"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1030"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
+     inkscape:window-width="1055"
+     inkscape:window-height="782"
+     inkscape:window-x="732"
+     inkscape:window-y="119"
+     inkscape:window-maximized="0"
      showguides="false"
      inkscape:guide-bbox="true">
     <inkscape:grid
@@ -374,22 +374,29 @@
          id="path15019"
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="cssc" />
-      <path
-         style="fill:none;stroke:#ff0000;stroke-width:25.06773949;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-         d="m 68.557323,764.90977 c 0,0 -0.0583,82.37431 0,125.02535 0.0134,9.80249 -9.51555,20.48954 -23.170929,24.69041 -3.730109,1.14751 -29.471316,0.37733 -29.471316,0.37733"
-         id="path3887"
-         inkscape:connector-curvature="0"
-         sodipodi:nodetypes="cssc" />
-      <path
-         style="fill:none;stroke:#ff0000;stroke-width:17.9890976;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-         d="m 87.832223,753.81936 52.152877,0"
-         id="path3889"
-         inkscape:connector-curvature="0" />
-      <path
-         style="fill:none;stroke:#ff0000;stroke-width:17.9890976;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-         d="m 114.01778,779.07351 0,-52.15289"
-         id="path3889-4"
-         inkscape:connector-curvature="0" />
+      <text
+         xml:space="preserve"
+         style="font-size:176.86227417px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#666666;fill-opacity:1;stroke:none;font-family:Courier New;-inkscape-font-specification:Courier New Bold"
+         x="-5.9026527"
+         y="894.48822"
+         id="text3917"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan3919"
+           x="-5.9026527"
+           y="894.48822"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#666666;font-family:Latin Modern Roman Caps;-inkscape-font-specification:Latin Modern Roman Caps">J</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:82.02940369px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#666666;fill-opacity:1;stroke:none;font-family:TlwgMono;-inkscape-font-specification:TlwgMono Medium"
+         x="84.047867"
+         y="789.87842"
+         id="text3055"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan3057"
+           x="84.047867"
+           y="789.87842">#</tspan></text>
     </g>
     <path
        style="fill:none;stroke:#ff0000;stroke-width:20;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"

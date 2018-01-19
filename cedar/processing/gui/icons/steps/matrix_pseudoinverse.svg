@@ -15,7 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="matrix_transpose.svg"
+   sodipodi:docname="matrix_pseudoinverse.svg"
    inkscape:export-filename="/home/lompolbx/workspace/src/ObjectRecognitionPlugins/icons/channel_split.png"
    inkscape:export-xdpi="9"
    inkscape:export-ydpi="9">
@@ -421,7 +421,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -438,28 +438,6 @@
        x="-964.74664"
        y="25.007856"
        transform="matrix(0,-1,1,0,0,0)" />
-    <g
-       id="g4326"
-       transform="matrix(0,-1,1.2470227,0,-879.47226,1077.2965)">
-      <path
-         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#838383;fill-opacity:1;stroke:none;stroke-width:15;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
-         d="m 201.90625,831.5625 c -3.91647,0.0654 -7.42411,3.67705 -7.375,7.59375 l 0,21.25 c -0.056,3.96234 3.53726,7.60682 7.5,7.60682 3.96274,0 7.55604,-3.64448 7.5,-7.60682 l 0,-21.25 c 0.0502,-4.00003 -3.62521,-7.66033 -7.625,-7.59375 z"
-         id="path3967"
-         inkscape:connector-curvature="0"
-         sodipodi:nodetypes="cccsccc" />
-      <path
-         style="fill:#838383;fill-rule:evenodd;stroke:#838383;stroke-width:0.2pt;marker-start:none"
-         d="m 202.03051,877.70188 -15,-25.95 30,0 -15,25.95 z"
-         id="path4332"
-         inkscape:connector-curvature="0" />
-    </g>
-    <rect
-       y="833.99542"
-       x="233.16965"
-       height="89.03846"
-       width="143.12254"
-       id="rect3070"
-       style="color:#000000;fill:none;stroke:#ff0000;stroke-width:12.57672691;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
     <flowRoot
        xml:space="preserve"
        id="flowRoot3047"

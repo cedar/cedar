@@ -242,7 +242,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -260,15 +260,14 @@
        width="628.32904" />
     <text
        xml:space="preserve"
-       style="font-size:56.46557617px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:TlwgMono;-inkscape-font-specification:TlwgMono Medium"
-       x="114.54678"
-       y="1012.8516"
-       id="text3595"
+       style="font-size:206.0269165px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#4d4d4d;fill-opacity:1;stroke:none;font-family:TeX Gyre Termes;-inkscape-font-specification:TeX Gyre Termes"
+       x="135.18321"
+       y="1033.4802"
+       id="text3017"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
-         id="tspan3597"
-         x="114.54678"
-         y="1012.8516"
-         style="font-size:254.09509277px">?</tspan></text>
+         id="tspan3019"
+         x="135.18321"
+         y="1033.4802">?</tspan></text>
   </g>
 </svg>
