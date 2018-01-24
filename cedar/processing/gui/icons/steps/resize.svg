@@ -26,17 +26,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98994949"
-     inkscape:cx="71.851269"
-     inkscape:cy="162.33544"
+     inkscape:zoom="1.4"
+     inkscape:cx="224.91678"
+     inkscape:cy="215.08343"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1032"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
+     inkscape:window-width="1027"
+     inkscape:window-height="727"
+     inkscape:window-x="738"
+     inkscape:window-y="123"
+     inkscape:window-maximized="0"
      showguides="true"
      inkscape:guide-bbox="true" />
   <defs
@@ -280,45 +280,33 @@
        width="126.26906"
        id="rect2844"
        style="fill:none;stroke:#979797;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
-    <path
-       inkscape:connector-curvature="0"
-       id="path3678"
-       d="m 116.4375,915.53125 -50.21875,29 7.5,12.96875 50.21875,-28.96875 -7.5,-13 z"
-       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:15;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter" />
-    <path
-       inkscape:connector-curvature="0"
-       style="fill:#ff0000;fill-rule:evenodd;stroke:none;stroke-width:3pt;marker-start:none"
-       d="m 54.987924,959.66958 14.971378,-25.96652 15.001982,25.97962 -29.97336,-0.0131 z"
-       id="path4780" />
-    <path
-       inkscape:connector-curvature="0"
-       id="path4768"
-       d="m 324,748.25 -46.15625,26.96875 7.5625,12.9375 L 331.5625,761.1875 324,748.25 z"
-       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:15;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter" />
-    <path
-       inkscape:connector-curvature="0"
-       style="fill:#ff0000;fill-rule:evenodd;stroke:none;stroke-width:3pt;marker-start:none"
-       d="m 342.73455,745.98899 -14.83956,26.04208 -15.13348,-25.90324 29.97304,-0.13884 z"
-       id="path4802" />
-    <path
-       inkscape:connector-curvature="0"
-       id="path4770"
-       d="m 73.53125,747.59375 -7.09375,13.21875 50.1875,26.96875 7.09375,-13.21875 -50.1875,-26.96875 z"
-       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:15;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter" />
-    <path
-       inkscape:connector-curvature="0"
-       style="fill:#ff0000;fill-rule:evenodd;stroke:none;stroke-width:3pt;marker-start:none"
-       d="M 54.729244,746.02078 84.688074,745.0875 70.490743,771.51544 54.729244,746.02078 z"
-       id="path4790" />
-    <path
-       inkscape:connector-curvature="0"
-       id="path4772"
-       d="M 285.40625,917.03125 277.84375,930 324,956.96875 331.5625,944 285.40625,917.03125 z"
-       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:15;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter" />
-    <path
-       inkscape:connector-curvature="0"
-       style="fill:#ff0000;fill-rule:evenodd;stroke:none;stroke-width:3pt;marker-start:none"
-       d="m 342.73455,959.21678 -29.97304,-0.13884 15.13348,-25.90324 14.83956,26.04208 z"
-       id="path4812" />
+    <g
+       id="g3031"
+       transform="matrix(0.48557496,-0.87419503,0.87419503,0.48557496,-432.22543,409.09376)">
+      <path
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:15;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter"
+         d="m -91.601895,901.6242 1.219286,-33.87363 -9.743891,0.01 -1.21929,33.87362 9.743894,-0.01 z"
+         id="path4768"
+         inkscape:connector-curvature="0" />
+      <path
+         id="path4812"
+         d="m -95.804489,936.87687 -21.459911,-36.98783 42.800401,-0.069 -21.34049,37.05686 z"
+         style="fill:#ff0000;fill-rule:evenodd;stroke:none;stroke-width:3pt;marker-start:none"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       id="g3031-3"
+       transform="matrix(-0.48557496,0.87419503,-0.87419503,-0.48557496,831.09011,1289.4278)">
+      <path
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:15;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter"
+         d="m -91.601895,901.6242 1.219286,-33.87363 -9.743891,0.01 -1.21929,33.87362 9.743894,-0.01 z"
+         id="path4768-6"
+         inkscape:connector-curvature="0" />
+      <path
+         id="path4812-7"
+         d="m -95.804489,936.87687 -21.459911,-36.98783 42.800401,-0.069 -21.34049,37.05686 z"
+         style="fill:#ff0000;fill-rule:evenodd;stroke:none;stroke-width:3pt;marker-start:none"
+         inkscape:connector-curvature="0" />
+    </g>
   </g>
 </svg>
