@@ -102,6 +102,7 @@ cedar_add_library(cedarproc
   gui/WidgetContainerItem.h
   sources/BoxInput.h
   sources/GaussInput.h
+  steps/VariablBox.h
   steps/SinusDynamics.h
   steps/LinearDynamics.h
   steps/BufferReader.h
@@ -109,9 +110,12 @@ cedar_add_library(cedarproc
   steps/Convolution.h
   steps/ColorConversion.h
   steps/ComponentMultiply.h
+  steps/DivideElementwise.h
   steps/CoordinateTransformation.h
   steps/ForwardKinematics.h
   steps/PseudoInverseKinematics.h
+  steps/PseudoInverse.h
+  steps/Jacobian.h
   steps/MatrixMultiply.h
   steps/MatrixPadding.h
   steps/MatrixSlice.h
@@ -129,9 +133,11 @@ cedar_add_library(cedarproc
   steps/Histogram.h
   steps/ScalarDivision.h
   steps/Threshold.h
+  steps/Clamp.h
   steps/TransferFunction.h
   steps/VectorToScalars.h
   steps/VehicleRotation.h    
+  steps/Delay.h
   sources/VirtualCamera.h
   sources/Boost.h
   sources/Noise.h
@@ -141,8 +147,11 @@ cedar_add_library(cedarproc
   sources/Camera.h
   sources/SpatialTemplate.h
   sources/LinearSpatialTemplate.h
+  sources/ConstDiagonalMatrix.h
+  sources/ConstMatrix.h
   steps/Projection.h
   steps/Resize.h
+  steps/ImageTransform.h
   CppScript.h
   Group.h
   Step.h

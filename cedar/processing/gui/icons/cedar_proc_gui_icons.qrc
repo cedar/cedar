@@ -21,6 +21,7 @@
         <file>steps/boost.svg</file>
         <file>steps/boost_off.svg</file>
         <file>steps/box_input.svg</file>
+        <file>steps/variable_box.svg</file>
         <file>steps/buffer_reader.svg</file>
         <file>steps/no_icon.svg</file>
         <file>steps/broken_icon.svg</file>
@@ -30,6 +31,7 @@
         <file>steps/channel_split.svg</file>
         <file>steps/color_conversion.svg</file>
         <file>steps/component_multiply.svg</file>
+        <file>steps/divide_elementwise.svg</file>
         <file>steps/convolution.svg</file>
         <file>steps/coordinate_transformation.svg</file>
         <file>steps/flip.svg</file>
@@ -39,6 +41,7 @@
         <file>steps/mask.svg</file>
         <file>steps/matrix_transpose.svg</file>
         <file>steps/matrix_pseudoinverse.svg</file>
+        <file>steps/diagonal_matrix.svg</file>
         <file>steps/normalization.svg</file>
         <file>steps/rate_matrix_to_space_code.svg</file>
         <file>steps/rate_to_space_code.svg</file>
@@ -103,6 +106,7 @@
         <file>toolbaricons/store_plotgroup.svg</file>
         <file>processing_ide_app_icon.svg</file>
         <file>processing_ide_app_icon_48.png</file>
+        <file>steps/jacobian.svg</file>
         <file>steps/forward_kinematic.svg</file>
         <file>steps/inverse_kinematic.svg</file>
         <file>steps/vehicle_rotation.svg</file>
@@ -117,8 +121,12 @@
         <file>steps/virtual_camera.svg</file>
         <file>steps/vector_to_scalars.svg</file>
         <file>steps/const_vector.svg</file>
+        <file>steps/const_matrix.svg</file>
         <file>steps/stack.svg</file>
         <file>steps/noop.svg</file>
         <file>steps/delay.svg</file>
+        <file>steps/positionofmaximum.svg</file>
+        <file>steps/clamp.svg</file>
+        <file>steps/image_transform.svg</file>
     </qresource>
 </RCC>
