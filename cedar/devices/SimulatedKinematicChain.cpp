@@ -110,6 +110,7 @@ void cedar::dev::SimulatedKinematicChain::applyInitialConfigurationController(cv
                   (
                     [this,targetConfig]()
                     {
+                      mControllerFinished = true;
                       // directly jump to target
                       return targetConfig.clone();
                     }
