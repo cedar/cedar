@@ -1294,3 +1294,81 @@ bool cedar::dev::KinematicChain::applyBrakeNowController()
   return true;
 }
 
+cv::Mat cedar::dev::KinematicChain::getUpperJointLimits()
+{
+  int num = getNumberOfJoints();
+  cv::Mat ret= cv::Mat::zeros( num, 1, CV_32F );
+
+  for( int i=1; i <= num; i++)
+  {
+    ret.at<float>(num,1)= getJoint(i)->_mpAngleLimits->getUpperLimit();
+  }
+  
+  return ret;
+}
+
+cv::Mat cedar::dev::KinematicChain::getLowerJointLimits()
+{
+  int num = getNumberOfJoints();
+  cv::Mat ret= cv::Mat::zeros( num, 1, CV_32F );
+
+  for( int i=1; i <= num; i++)
+  {
+    ret.at<float>(num,1)= getJoint(i)->_mpAngleLimits->getLowerLimit();
+  }
+  
+  return ret;
+}
+
+cv::Mat cedar::dev::KinematicChain::getUpperVelocityLimits()
+{
+  int num = getNumberOfJoints();
+  cv::Mat ret= cv::Mat::zeros( num, 1, CV_32F );
+
+  for( int i=1; i <= num; i++)
+  {
+    ret.at<float>(num,1)= getJoint(i)->_mpVelocityLimits->getUpperLimit();
+  }
+  
+  return ret;
+}
+
+cv::Mat cedar::dev::KinematicChain::getLowerVelocityLimits()
+{
+  int num = getNumberOfJoints();
+  cv::Mat ret= cv::Mat::zeros( num, 1, CV_32F );
+
+  for( int i=1; i <= num; i++)
+  {
+    ret.at<float>(num,1)= getJoint(i)->_mpVelocityLimits->getLowerLimit();
+  }
+  
+  return ret;
+}
+
+cv::Mat cedar::dev::KinematicChain::getUpperAccelerationLimits()
+{
+  int num = getNumberOfJoints();
+  cv::Mat ret= cv::Mat::zeros( num, 1, CV_32F );
+
+  for( int i=1; i <= num; i++)
+  {
+    ret.at<float>(num,1)= getJoint(i)->_mpAccelerationLimits->getUpperLimit();
+  }
+  
+  return ret;
+}
+
+cv::Mat cedar::dev::KinematicChain::getLowerAccelerationLimits()
+{
+  int num = getNumberOfJoints();
+  cv::Mat ret= cv::Mat::zeros( num, 1, CV_32F );
+
+  for( int i=1; i <= num; i++)
+  {
+    ret.at<float>(num,1)= getJoint(i)->_mpAccelerationLimits->getLowerLimit();
+  }
+  
+  return ret;
+}
+

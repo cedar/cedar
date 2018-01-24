@@ -562,6 +562,13 @@ public:
   //!@brief read initial configurations out of chain specific file
   void readInitialConfigurations();
 
+  cv::Mat getUpperJointLimits();
+  cv::Mat getLowerJointLimits();
+  cv::Mat getUpperVelocityLimits();
+  cv::Mat getLowerVelocityLimits();
+  cv::Mat getUpperAccelerationLimits();
+  cv::Mat getLowerAccelerationLimits();
+
   //----------------------------------------------------------------------------
   // protected methods
   //----------------------------------------------------------------------------
