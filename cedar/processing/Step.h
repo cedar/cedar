@@ -193,7 +193,7 @@ public:
   //!@brief The standard constructor.
   Step(bool isLooped = false);
 
-  ~Step();
+  virtual ~Step();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
