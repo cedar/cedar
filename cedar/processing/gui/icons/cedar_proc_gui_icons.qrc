@@ -128,5 +128,6 @@
         <file>steps/positionofmaximum.svg</file>
         <file>steps/clamp.svg</file>
         <file>steps/image_transform.svg</file>
+        <file>steps/add_constant.svg</file>
     </qresource>
 </RCC>

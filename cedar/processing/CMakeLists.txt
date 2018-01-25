@@ -102,7 +102,7 @@ cedar_add_library(cedarproc
   gui/WidgetContainerItem.h
   sources/BoxInput.h
   sources/GaussInput.h
-  steps/VariablBox.h
+  steps/VariableBox.h
   steps/SinusDynamics.h
   steps/LinearDynamics.h
   steps/BufferReader.h
@@ -114,6 +114,7 @@ cedar_add_library(cedarproc
   steps/CoordinateTransformation.h
   steps/ForwardKinematics.h
   steps/PseudoInverseKinematics.h
+  steps/ConfigurationLimits.h
   steps/PseudoInverse.h
   steps/Jacobian.h
   steps/MatrixMultiply.h
@@ -152,6 +153,7 @@ cedar_add_library(cedarproc
   steps/Projection.h
   steps/Resize.h
   steps/ImageTransform.h
+  steps/AddConstant.h
   CppScript.h
   Group.h
   Step.h
