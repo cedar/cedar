@@ -60,7 +60,7 @@ bool declare()
   (
     new ElementDeclarationTemplate<cedar::proc::steps::AddConstant>
     (
-      "Programming",
+      "Algebra",
       "cedar.processing.steps.AddConstant"
     )
   );
