@@ -89,18 +89,17 @@ namespace
 
 cedar::proc::steps::DivideElementwise::DivideElementwise()
 :
-mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
-mInput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
-mInput2(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))
+mOutput(new cedar::aux::MatData()),
+mInput(new cedar::aux::MatData()),
+mInput2(new cedar::aux::MatData())
 {
-  auto matrix_slot = this->declareInput("matrix");
+  auto matrix_slot = this->declareInput("dividend");
   cedar::proc::typecheck::Matrix matrix_check;
   matrix_check.addAcceptedType(CV_32F);
   matrix_slot->setCheck(matrix_check);
 
   auto divisor_slot = this->declareInput("divisor");
   cedar::proc::typecheck::Matrix divisor_check;
-  divisor_check.addAcceptedDimensionality(0);
   divisor_check.addAcceptedType(CV_32F);
   divisor_slot->setCheck(divisor_check);
 
@@ -124,7 +123,7 @@ void cedar::proc::steps::DivideElementwise::inputConnectionChanged(const std::st
   auto mat_data = input;
 */
 
-  if (inputName == "matrix")
+  if (inputName == "dividend")
   {
     this->mInput = mat_data;
 
@@ -138,12 +137,18 @@ void cedar::proc::steps::DivideElementwise::inputConnectionChanged(const std::st
       this->mOutput->setData(cv::Mat());
     }
 
+    recompute();
     // tell successive steps that the output changed
     this->emitOutputPropertiesChangedSignal("result");
   }
   else if (inputName == "divisor")
   {
     this->mInput2 = mat_data;
+
+    recompute();
+    // tell successive steps that the output changed
+    this->emitOutputPropertiesChangedSignal("result");
+
   }
   else
   {
@@ -153,8 +158,19 @@ void cedar::proc::steps::DivideElementwise::inputConnectionChanged(const std::st
 
 void cedar::proc::steps::DivideElementwise::compute(const cedar::proc::Arguments&)
 {
+  recompute();
+}
+
+void cedar::proc::steps::DivideElementwise::recompute()
+{
+  if (!mInput
+      || !mInput2)
+  {
+    return;
+  }
+
   const cv::Mat &matrix = mInput->getData();
-  const cv::Mat &divisor = mInput->getData();
+  const cv::Mat &divisor = mInput2->getData();
 
   cv::Mat &result = mOutput->getData();
 
