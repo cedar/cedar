@@ -32,10 +32,10 @@
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1486"
-     inkscape:window-height="823"
-     inkscape:window-x="30"
-     inkscape:window-y="63"
+     inkscape:window-width="1034"
+     inkscape:window-height="815"
+     inkscape:window-x="77"
+     inkscape:window-y="47"
      inkscape:window-maximized="0"
      showguides="true"
      inkscape:guide-bbox="true" />
@@ -395,7 +395,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -413,29 +413,29 @@
        sodipodi:rx="75.761444"
        sodipodi:ry="75.761444"
        d="m 220.21326,168.67506 a 75.761444,75.761444 0 1 1 -151.522891,0 75.761444,75.761444 0 1 1 151.522891,0 z"
-       transform="translate(55.548187,643.68714)" />
+       transform="translate(55.548187,665.68714)" />
     <text
        xml:space="preserve"
        style="font-size:142.83825684px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:TeX Gyre Termes;-inkscape-font-specification:TeX Gyre Termes"
        x="159.7196"
-       y="848.07178"
+       y="870.07178"
        id="text3059"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3061"
          x="159.7196"
-         y="848.07178">+</tspan></text>
+         y="870.07178">+</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:114.89498138px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:TeX Gyre Termes;-inkscape-font-specification:TeX Gyre Termes"
        x="80.701126"
-       y="989.5105"
+       y="1015.5105"
        id="text3063"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3065"
          x="80.701126"
-         y="989.5105"
+         y="1015.5105"
          style="font-style:italic;-inkscape-font-specification:TeX Gyre Termes Italic">const</tspan></text>
   </g>
 </svg>
