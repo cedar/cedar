@@ -32,6 +32,7 @@
         <file>steps/color_conversion.svg</file>
         <file>steps/component_multiply.svg</file>
         <file>steps/divide_elementwise.svg</file>
+        <file>steps/a_minus_b.svg</file>
         <file>steps/convolution.svg</file>
         <file>steps/coordinate_transformation.svg</file>
         <file>steps/flip.svg</file>
