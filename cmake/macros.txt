@@ -233,6 +233,8 @@ macro(cedar_add_test)
       set(test_linked_cedarlibs ${CEDAR_LIBS})
     endif()
     target_link_libraries(${testExecutableName} ${test_linked_cedarlibs})
+    # hotfix for gui elements in aux that require proc:
+    target_link_libraries(${testExecutableName} "cedarproc")
   else ()
     # Could not determine library: link everything
     target_link_libraries(${testExecutableName} ${CEDAR_LIBS})
