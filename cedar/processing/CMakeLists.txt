@@ -155,6 +155,7 @@ cedar_add_library(cedarproc
   steps/Resize.h
   steps/ImageTransform.h
   steps/AddConstant.h
+  steps/CountLarger.h
   CppScript.h
   Group.h
   Step.h
