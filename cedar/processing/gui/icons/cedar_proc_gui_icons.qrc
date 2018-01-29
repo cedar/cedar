@@ -22,6 +22,7 @@
         <file>steps/boost_off.svg</file>
         <file>steps/box_input.svg</file>
         <file>steps/variable_box.svg</file>
+        <file>steps/variable_gauss.svg</file>
         <file>steps/buffer_reader.svg</file>
         <file>steps/no_icon.svg</file>
         <file>steps/broken_icon.svg</file>
