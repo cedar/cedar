@@ -34,4 +34,4 @@
 #
 #=======================================================================================================================
 
-cedar_add_executable(pluginManager CEDAR_DEPENDENCIES cedaraux)
+cedar_add_executable(pluginManager CEDAR_DEPENDENCIES cedaraux cedarproc)
