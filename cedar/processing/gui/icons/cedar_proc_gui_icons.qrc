@@ -131,5 +131,6 @@
         <file>steps/image_transform.svg</file>
         <file>steps/add_constant.svg</file>
         <file>steps/configuration_limits.svg</file>
+        <file>steps/nullspace.svg</file>
     </qresource>
 </RCC>
