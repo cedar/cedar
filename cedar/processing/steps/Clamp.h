@@ -127,6 +127,12 @@ private:
   //! Upper threshold.
   cedar::aux::DoubleParameterPtr _mUpperClampValue;
 
+  cedar::aux::BoolParameterPtr mReplaceLower;
+  cedar::aux::BoolParameterPtr mReplaceUpper;
+
+  cedar::aux::DoubleParameterPtr mLowerReplacement;
+  cedar::aux::DoubleParameterPtr mUpperReplacement;
+
 }; // class cedar::proc::steps::Clamp
 
 #endif // CEDAR_PROC_STEPS_CLAMP_H

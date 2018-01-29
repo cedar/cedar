@@ -90,13 +90,22 @@ mClampedImage(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
 mApplyLowerClamp(new cedar::aux::BoolParameter(this, "apply lower limit", true)),
 mApplyUpperClamp(new cedar::aux::BoolParameter(this, "apply upper limit", true)),
 _mLowerClampValue(new cedar::aux::DoubleParameter(this, "lower limit", 0, cedar::aux::DoubleParameter::LimitType::positiveZero())),
-_mUpperClampValue(new cedar::aux::DoubleParameter(this, "upper limit", 1.0, cedar::aux::DoubleParameter::LimitType::positiveZero()))
+_mUpperClampValue(new cedar::aux::DoubleParameter(this, "upper limit", 1.0, cedar::aux::DoubleParameter::LimitType::positiveZero())),
+mReplaceLower(new cedar::aux::BoolParameter(this, "replace lower limit", false)),
+mReplaceUpper(new cedar::aux::BoolParameter(this, "replace upper limit", false)),
+mLowerReplacement(new cedar::aux::DoubleParameter(this, "lower replacement", 0)),
+mUpperReplacement(new cedar::aux::DoubleParameter(this, "upper replacement", 1.0))
 {
   QObject::connect(this->mApplyLowerClamp.get(), SIGNAL(valueChanged()), this, SLOT(applyLowerThesholdChanged()));
   QObject::connect(this->mApplyUpperClamp.get(), SIGNAL(valueChanged()), this, SLOT(applyUpperThesholdChanged()));
 
   QObject::connect(this->_mLowerClampValue.get(), SIGNAL(valueChanged()), this, SLOT(recalculate()));
   QObject::connect(this->_mUpperClampValue.get(), SIGNAL(valueChanged()), this, SLOT(recalculate()));
+
+  QObject::connect(this->mReplaceLower.get(), SIGNAL(valueChanged()), this, SLOT(recalculate()));
+  QObject::connect(this->mReplaceUpper.get(), SIGNAL(valueChanged()), this, SLOT(recalculate()));
+  QObject::connect(this->mLowerReplacement.get(), SIGNAL(valueChanged()), this, SLOT(recalculate()));
+  QObject::connect(this->mUpperReplacement.get(), SIGNAL(valueChanged()), this, SLOT(recalculate()));
 
   cedar::proc::typecheck::Matrix input_check;
   input_check.addAcceptedDimensionalityRange(0, 3);
@@ -110,6 +119,9 @@ _mUpperClampValue(new cedar::aux::DoubleParameter(this, "upper limit", 1.0, ceda
 
   this->applyLowerThesholdChanged();
   this->applyUpperThesholdChanged();
+
+  mLowerReplacement->setConstant(true);
+  mUpperReplacement->setConstant(true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -130,6 +142,24 @@ void cedar::proc::steps::Clamp::applyUpperThesholdChanged()
 
 void cedar::proc::steps::Clamp::recalculate()
 {
+  if (mReplaceLower->getValue())
+  {
+    mLowerReplacement->setConstant(false);
+  }
+  else
+  {
+    mLowerReplacement->setConstant(true);
+  }
+
+  if (mReplaceUpper->getValue())
+  {
+    mUpperReplacement->setConstant(false);
+  }
+  else
+  {
+    mUpperReplacement->setConstant(true);
+  }
+
   this->onTrigger();
 }
 
@@ -170,10 +200,22 @@ void cedar::proc::steps::Clamp::compute(const cedar::proc::Arguments&)
   const double lower_threshold = this->_mLowerClampValue->getValue();
   const double upper_threshold = this->_mUpperClampValue->getValue();
 
+  double lower_replacement = this->mLowerReplacement->getValue();
+  double upper_replacement = this->mUpperReplacement->getValue();
+
   cv::Mat tmpin, tmpout;
 
   tmpin= input_image;
   tmpout= input_image.clone();
+
+  if (!mReplaceLower->getValue())
+  {
+    lower_replacement= lower_threshold;
+  }
+  if (!mReplaceUpper->getValue())
+  {
+    upper_replacement= upper_threshold;
+  }
 
   if (this->mApplyLowerClamp->getValue())
   {
@@ -193,7 +235,7 @@ void cedar::proc::steps::Clamp::compute(const cedar::proc::Arguments&)
 
         if (val < lower_threshold)
         {
-          tmpout.at<float>(i,j)= lower_threshold;
+          tmpout.at<float>(i,j)= lower_replacement;
         }
       }
     }
@@ -204,9 +246,29 @@ void cedar::proc::steps::Clamp::compute(const cedar::proc::Arguments&)
 
   if (this->mApplyUpperClamp->getValue())
   {
-    tmpout.release();
-    cv::threshold(tmpin, tmpout, upper_threshold, upper_threshold,
+
+    if (mReplaceUpper->getValue())
+    {
+      for (int i=0; i< input_image.rows; i++)
+      { 
+        for (int j=0; j< input_image.cols; j++)
+        {
+          float val = input_image.at<float>(i,j);
+
+          if (val > upper_threshold)
+          {
+            tmpout.at<float>(i,j)= upper_replacement;
+          }
+        }
+      }
+
+    }
+    else
+    {
+      tmpout.release();
+      cv::threshold(tmpin, tmpout, upper_threshold, upper_replacement,
                   cv::THRESH_TRUNC );
+    }
   }
 
   thresholded_image= tmpout;
