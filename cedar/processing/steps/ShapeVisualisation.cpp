@@ -113,14 +113,17 @@ cedar::proc::steps::ShapeVisualisation::ShapeVisualisation()
       cedar::proc::steps::ShapeVisualisation::Shape::sphere
     )
   ),
-  _mScale(new cedar::aux::DoubleParameter(this, "scale", 0.025))
-{
-  this->declareInput("target position");
+  _mScale(new cedar::aux::DoubleParameter(this, "scale", 0.025)),
+  mInputName("target position")
+{  
+  this->declareInput(mInputName);
+
   visualisationChanged();
 
   QObject::connect(this->_mColour.get(), SIGNAL(valueChanged()), this, SLOT(visualisationChanged()));
   QObject::connect(this->_mShape.get(), SIGNAL(valueChanged()), this, SLOT(visualisationChanged()));
   QObject::connect(this->_mScale.get(), SIGNAL(valueChanged()), this, SLOT(visualisationChanged()));
+
 }
 
 cedar::proc::steps::ShapeVisualisation::~ShapeVisualisation()
@@ -141,7 +144,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ShapeVisualisation::determin
 {
 
   cedar::aux::ConstMatDataPtr _input = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
-  if(slot->getName() == "target position")
+  if(slot->getName() == mInputName)
   {
     if (_input && _input->getDimensionality() == 1 && cedar::aux::math::get1DMatrixSize(_input->getData()) == 3 && _input->getData().type() == CV_32F)
     {
@@ -170,7 +173,11 @@ void cedar::proc::steps::ShapeVisualisation::compute(const cedar::proc::Argument
 
 void cedar::proc::steps::ShapeVisualisation::inputConnectionChanged(const std::string &inputName)
 {
-  mpTargetPosition = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
+  if (inputName == mInputName)
+  {
+    mpTargetPosition = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
+  }
+
   visualisationChanged();
 }
 
@@ -186,6 +193,8 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
     {
       return;
     }
+
+    mVisualisationPtr.reset();
   }
 
   float r = 0;
@@ -343,6 +352,9 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
     }
   }
 
-  scene->addObjectVisualization(mVisualisationPtr);
+  if (mVisualisationPtr)
+  {
+    scene->addObjectVisualization(mVisualisationPtr);
+  }
 
 }

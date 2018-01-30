@@ -180,6 +180,7 @@ private:
   void inputConnectionChanged(const std::string& inputName);
 
 protected:
+private:
   cedar::aux::ConstMatDataPtr mpTargetPosition;
 
   cedar::aux::gl::ObjectVisualizationPtr mVisualisationPtr;
@@ -193,6 +194,7 @@ protected:
   //! Visualisation shape scale
   cedar::aux::DoubleParameterPtr _mScale;
 
+  const std::string mInputName;
 }; // class cedar::proc::steps::ShapeVisualisation
 
 #endif // CEDAR_PROC_STEPS_SHAPE_VISUALISATION_H
