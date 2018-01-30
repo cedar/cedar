@@ -145,6 +145,16 @@ void cedar::proc::steps::OverTime::compute(const cedar::proc::Arguments&)
   this->recompute();
 }
 
+void cedar::proc::steps::OverTime::reset()
+{
+  if (mInput
+      && !mInput->getData().empty())
+  {
+    auto input_mat = mInput->getData();
+    this->mOutput->setData( cv::Mat::zeros( input_mat.rows, input_mat.cols, CV_32F ) );
+  }
+}
+
 void cedar::proc::steps::OverTime::recompute()
 {
   auto input = getInput("input");
