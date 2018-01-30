@@ -68,7 +68,8 @@ bool declare()
   declaration->setIconPath(":/steps/count_larger.svg");
   declaration->setDescription
   (
-    "CountLarger the number of entries larger than threshold."
+    "Count the number of entries int the input that are larger than the given "
+    "threshold."
   );
 
   declaration->declare();
