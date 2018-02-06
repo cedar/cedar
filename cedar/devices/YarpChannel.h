@@ -168,6 +168,7 @@ public:
 
   void addReaderPort(const std::string& port)
   {
+	//TODO: IF ELSE IS UNNECESSARY RIGHT NOW!!!
 //    std::cout << "Add Reader Port: " << port << std::endl;
     if (mReaderMap.find(port) == mReaderMap.end())
     {
@@ -175,14 +176,15 @@ public:
     }
     else
     { //TODO: exception
-      std::cout << "readerport existed already: " << port <<" .was not added!"<< std::endl;
-//      this->mReaderMap[port] = TypeReaderPtr();
+      std::cout << "readerport existed already: " << port <<" .was added again!"<< std::endl;
+      this->mReaderMap[port] = TypeReaderPtr();
 //      CEDAR_ASSERT(false);
     }
   }
 
   void addWriterPort(const std::string& port)
   {
+	//TODO: IF ELSE IS UNNECESSARY RIGHT NOW!!!
 //    std::cout << "Add Writer Port: " << port << std::endl;
     if (mWriterMap.find(port) == mWriterMap.end())
     {
@@ -190,7 +192,8 @@ public:
     }
     else
     { //TODO: exception
-      std::cout << "writerport existed already: " << port <<" . port was not added."<< std::endl;
+      std::cout << "writerport existed already: " << port <<" . port was added again."<< std::endl;
+      this->mWriterMap[port] = TypeWriterPtr(new TypeWriter(port));
 //      CEDAR_ASSERT(false);
     }
   }
