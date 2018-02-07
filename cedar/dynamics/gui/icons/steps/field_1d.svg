@@ -15,7 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="field_1d_active.svg"
+   sodipodi:docname="field_1d.svg"
    inkscape:export-filename="/home/lompolbx/workspace/src/cedar.fieldFramework/cedar/processing/gui/icons/steps/no_icon.png"
    inkscape:export-xdpi="9"
    inkscape:export-ydpi="9">
@@ -27,16 +27,16 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.7"
-     inkscape:cx="-31.179403"
-     inkscape:cy="42.989056"
+     inkscape:cx="235.96345"
+     inkscape:cy="147.27477"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1030"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
+     inkscape:window-width="693"
+     inkscape:window-height="591"
+     inkscape:window-x="25"
+     inkscape:window-y="347"
+     inkscape:window-maximized="0"
      showguides="true"
      inkscape:guide-bbox="true" />
   <defs
@@ -244,7 +244,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -270,7 +270,7 @@
     </g>
     <path
        style="fill:none;stroke:#ff7b7b;stroke-width:15;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="m 37.426522,1019.8053 c 86.614628,34.8553 67.587208,-139.59237 98.893808,-139.49121 31.30659,0.10116 5.72638,173.84441 90.75695,139.49121"
+       d="m 37.426522,1027.8053 c 86.614628,34.8553 67.587208,-139.59237 98.893808,-139.49121 31.30659,0.10116 5.72638,173.84441 90.75695,139.49121"
        id="path4552"
        sodipodi:nodetypes="czc"
        inkscape:connector-curvature="0" />
