@@ -1,0 +1,103 @@
+{
+    "meta":
+    {
+        "format": "1"
+    },
+    "groups":
+    {
+        "template":
+        {
+            "meta":
+            {
+                "format": "1"
+            },
+            "steps":
+            {
+                "cedar.processing.StaticGain":
+                {
+                    "name": "new StaticGain",
+                    "gain factor": "1"
+                },
+                "cedar.processing.StaticGain":
+                {
+                    "name": "new StaticGain 2",
+                    "gain factor": "-1"
+                }
+            },
+            "connections":
+            [
+                {
+                    "source": "input.output",
+                    "target": "new StaticGain.input"
+                },
+                {
+                    "source": "new StaticGain.output",
+                    "target": "new StaticGain 2.input"
+                },
+                {
+                    "source": "new StaticGain 2.output",
+                    "target": "output.input"
+                }
+            ],
+            "name": "template",
+            "connectors":
+            {
+                "input": "true",
+                "output": "false"
+            },
+            "is looped": "false",
+            "ui":
+            [
+                {
+                    "type": "step",
+                    "step": "new StaticGain",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "69",
+                    "positionY": "60"
+                },
+                {
+                    "type": "step",
+                    "step": "new StaticGain 2",
+                    "display style": "ICON_ONLY",
+                    "width": "40",
+                    "height": "40",
+                    "positionX": "249",
+                    "positionY": "62"
+                }
+            ],
+            "ui generic":
+            {
+                "group": "template",
+                "architecture widgets": "",
+                "width": "400",
+                "height": "150",
+                "smart mode": "false",
+                "collapsed": "false",
+                "uncollapsed width": "400",
+                "uncollapsed height": "150",
+                "positionX": "-117",
+                "positionY": "-31"
+            }
+        }
+    },
+    "name": "",
+    "connectors": "",
+    "is looped": "false",
+    "ui generic":
+    {
+        "group": "",
+        "open plots": "",
+        "plot groups": "",
+        "architecture widgets": "",
+        "width": "250",
+        "height": "250",
+        "smart mode": "false",
+        "collapsed": "false",
+        "uncollapsed width": "250",
+        "uncollapsed height": "250",
+        "positionX": "0",
+        "positionY": "0"
+    }
+}

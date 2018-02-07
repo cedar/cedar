@@ -1,0 +1,152 @@
+/*!
+
+@page RunTimeTypeSystem cedar's Run-Time Type System
+
+Much of cedar's power comes from its ability to allocate object at run-time, based on user-defined type strings. cedar's
+ runtime type system (RTTS) comprises a few central concepts. These are explained over the following sections.
+
+
+@section RTTS_Factories Factory Pattern Implementation
+
+Central to the factory pattern is the Factory class. It is responsible for allocating new objects at runtime. In cedar,
+this is implemented with the two template classes cedar::aux::Factory and cedar::aux::FactoryDerived.
+
+The superclass, cedar::aux::Factory (with template argument BasePtr) provides an abstract interface. It's only functions
+return new objects as a Base* or BasePtr.
+
+The template class cedar::aux::FactoryDerived has two template arguments. The first argument (let's call it BasePtr)
+determines which cedar::aux::Factory is the base for the derived factory. The second argument determines the type of the
+objects actually being allocated by the derived factory.
+
+This may all seem somewhat abstract, but its usefulness should become clearer once we move on to factory managers.
+
+Here's an example of how to use factories that hints at why factories are useful: 
+@code
+class Number
+{
+  virtual void print() const = 0;
+};
+
+class Double : public Number
+{
+  void print() const
+  {
+    std::cout << "I'm a double!" << std::endl;
+  }
+};
+
+class Int : public Number
+{
+  void print() const
+  {
+    std::cout << "I'm an int!" << std::endl;
+  }
+};
+
+int main(int argc, char** argv)
+{
+  // this is where factories shine: you can have a map like this that allows you to allocate new objects of different
+  // types, based on information that is determined at run time; essentially, this is the core of cedar's RTTS, the rest
+  // is just fluff that makes it more comfortable for users
+  typedef cedar::aux::Factory<NumberPtr>* NumberFactoryPtr;
+  std::map<std::string, NumberFactoryPtr> factories;
+  // one of the fluffy things is that it is not necessary to supply the strings, but here we still do it by hand
+  factories["Double"] = new cedar::aux::FactoryDerived<NumberPtr, DoublePtr>(); 
+  factories["Int"] = new cedar::aux::FactoryDerived<NumberPtr, IntPtr>();
+  
+  // with this in place, we can now get a string from the user and use it to allocate an object
+  // (note: for simplicity, we don't check any inputs from the user) 
+  std::string arg = argv[1];
+  NumberPtr number = factories[arg]->allocate();
+
+  // this now prints double or int, depending on what the user chose
+  number->print();
+
+  // for simplicity, we've used raw pointers for the factories, 
+  // so imagine there's the appropriate code for deleting them here.
+}
+@endcode
+
+
+@section RTTS_Unmangling Getting Typenames at Run-Time 
+
+One of the annoying things in the code above is that we had to manually supply the name of the class in the code
+@code
+  factories["Double"] = // ... 
+@endcode
+(same for Int and any other class we want to declare). We can change this by using one of cedar's auxiliary functions,
+cedar::aux::typeToString():
+@code
+  factories[cedar::aux::typeToString<Double>()] = new cedar::aux::FactoryDerived<NumberPtr, DoublePtr>();
+@endcode
+At first, this may seem more like we now have to type more, but we could now write a function for this:
+@code
+template <class C>
+void declareType()
+{
+  factories[cedar::aux::typeToString<C>()] = new cedar::aux::FactoryDerived<NumberPtr, C>();
+}
+@endcode
+(this of course assumes that factories is a global variable; a better solution would be to use a singleton!) Now, to
+declare a new class, we simply call
+@code
+  declareType<Double>();
+@endcode
+which is a lot shorter.
+
+
+@section RTTS_ManagersAndSingletons Factory Managers and Singletons
+
+Code like the one shown in the example above is highly useful in many situations. For example, cedar's processing
+framework makes heavy use of this: creating new elements is, in the end, nothing but an allocate call at a derived
+factory for the given element type.
+
+Because this code would often look identical for different superclasses, we've written some template classes for it.
+
+First, the map we used before is now maintained in a cedar::aux::FactoryManager. At the core, it is little more that a
+map from a string to a factory, whose base type is determined by the template argument of the manager.
+
+This also means that there are different factory managers for each base class. For example, processing elements are
+allocated by a different factory manager than plots. However, for each of these base classes, we only want one manager.
+This is achieved by using cedar::aux::Singleton.  
+
+
+@section RTTS_Declarations Declarations and Their Managers
+
+The declaration code (declareType in the example above) is wrapped in a declaration class called
+cedar::aux::PluginDeclaration. This offers some advantages. First, declaration doesn't happen immediately. This is
+useful for plugins, where we want to first generate a list of all the declarations a plugin would add before actually
+loading it. Second, we can put additional information on the declaration, such as a description, an icon etc.
+
+Such declarations themselves are also managed by a cedar::aux::DeclarationManager. This works analogously to the factory
+manager, except that instead of factories, it manages declarations.
+
+
+@section RTTS_AutoRegisteringTypes Automatically Registering Types
+
+One problem with such declarations is that, at least for the ones that come with cedar, we need to find a way to
+automatically declare them.
+
+One solution would be to place a call at the start of every main method. However, this would put the burden onto users
+and require them to remember to do this every time.
+
+Instead, there is a nicer solution using global/static variables. It works like this:
+@code
+namespace // anonymous namespace -- this prevents linker errors if method or declared are also present in other places
+{
+  bool method()
+  {
+    // add declarations here
+    return true;
+  }
+
+  // this is the global/static variable
+  bool declared = method();
+}
+@endcode
+The trick here is simple: the value of @em declared is set to the result of a method. Since it is a static/global
+variable, it needs to be initialized when the programme starts up. In order to initialize the value, @em method is then 
+called, giving us a chance to execute any kind of code we want whenever our library is loaded (commonly this will, of
+course, be code declaring something to the RTTS)
+
+*/
