@@ -135,5 +135,6 @@
         <file>steps/nullspace.svg</file>
         <file>steps/count_larger.svg</file>
         <file>steps/over_time.svg</file>
+        <file>steps/maximum.svg</file>
     </qresource>
 </RCC>
