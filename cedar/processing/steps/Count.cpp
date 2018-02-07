@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CountLarger.cpp
+    File:        Count.cpp
 
     Maintainer:  jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        2017 12 04
 
-    Description: Source file for the class cedar::proc::steps::CountLarger.
+    Description: Source file for the class cedar::proc::steps::Count.
 
     Credits:
 
@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CLASS HEADER
-#include "cedar/processing/steps/CountLarger.h"
+#include "cedar/processing/steps/Count.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/typecheck/IsMatrix.h"
@@ -58,14 +58,15 @@ bool declare()
 
   ElementDeclarationPtr declaration
   (
-    new ElementDeclarationTemplate<cedar::proc::steps::CountLarger>
+    new ElementDeclarationTemplate<cedar::proc::steps::Count>
     (
       "Programming",
-      "cedar.processing.steps.CountLarger"
+      "cedar.processing.steps.Count"
     )
   );
 
   declaration->setIconPath(":/steps/count_larger.svg");
+  declaration->deprecatedName("cedar.processing.steps.CountLarger");
   declaration->setDescription
   (
     "Count the number of entries int the input that are larger than the given "
@@ -84,7 +85,7 @@ bool declared = declare();
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::steps::CountLarger::CountLarger()
+cedar::proc::steps::Count::Count()
 :
 // outputs
 mOutput(new cedar::aux::MatData(cv::Mat::zeros(1,1,CV_32F))),
@@ -102,12 +103,12 @@ mThreshold(new cedar::aux::DoubleParameter(this, "threshold", 0.0))
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::steps::CountLarger::updateThreshold()
+void cedar::proc::steps::Count::updateThreshold()
 {
   recompute();
 }
 
-void cedar::proc::steps::CountLarger::inputConnectionChanged(const std::string& inputName)
+void cedar::proc::steps::Count::inputConnectionChanged(const std::string& inputName)
 {
   // TODO: you may want to replace this code by using a cedar::proc::InputSlotHelper
 
@@ -145,12 +146,12 @@ void cedar::proc::steps::CountLarger::inputConnectionChanged(const std::string& 
   }
 }
 
-void cedar::proc::steps::CountLarger::compute(const cedar::proc::Arguments&)
+void cedar::proc::steps::Count::compute(const cedar::proc::Arguments&)
 {
   this->recompute();
 }
 
-void cedar::proc::steps::CountLarger::recompute()
+void cedar::proc::steps::Count::recompute()
 {
   auto input = getInput("input");
 
