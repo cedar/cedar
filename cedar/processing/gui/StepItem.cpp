@@ -69,6 +69,7 @@
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/units/Time.h"
+#include "cedar/processing/gui/PlotDockWidget.h"
 
 // SYSTEM INCLUDES
 #include <QPen>
@@ -325,7 +326,15 @@ void cedar::proc::gui::StepItem::handleStepNameChanged()
   QString step_name = QString::fromStdString(this->getConnectable()->getName());
   for(auto childWidget : mChildWidgets)
   {
+    if(auto plotDockW = dynamic_cast<cedar::proc::gui::PlotDockWidget *>(childWidget))
+    {
+      plotDockW->setTitleLabelText(step_name);
+    }
+    else
+    {
+      std::cout<<"This child is not a PlotDockWidget!"<<std::endl;
     childWidget->setWindowTitle(step_name);
+    }
   }
 }
 
