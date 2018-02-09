@@ -91,7 +91,7 @@ _mDimensionality
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 50, 1, 5000)),
 _mTimeScaleBuildUp
 (
-  new cedar::aux::DoubleParameter(this, "time scale build up", 10.0, cedar::aux::DoubleParameter::LimitType::positive())
+  new cedar::aux::DoubleParameter(this, "time scale build up", 100.0, cedar::aux::DoubleParameter::LimitType::positive())
 ),
 _mTimeScaleDecay
 (

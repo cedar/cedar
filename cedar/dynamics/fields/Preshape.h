@@ -90,6 +90,8 @@ public:
                                     cedar::aux::ConstDataPtr
                                   ) const;
 
+  void resetMemory();
+
 public slots:
   //!@brief handle a change in dimensionality, which leads to creating new matrices
   void dimensionalityChanged();
@@ -119,7 +121,7 @@ private:
   //!@brief check if input fits to field in dimension and size
   bool isMatrixCompatibleInput(const cv::Mat& matrix) const;
 
-  void resetMemory();
+  
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

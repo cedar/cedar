@@ -529,6 +529,8 @@ private slots:
 
   void loadDataClicked();
 
+  void jumpToSource();
+
 signals:
   //! translates a slot removed signal to Qt
   void reactToSlotRemovedSignal(cedar::proc::DataRole::Id role, QString name);
