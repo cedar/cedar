@@ -65,6 +65,8 @@
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/ColorGradient.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
+#include "cedar/processing/gui/PlotDockWidget.h"
+#include "cedar/processing/gui/View.h"
 // SYSTEM INCLUDES
 #include <map>
 #include <vector>
@@ -1931,13 +1933,19 @@ QWidget* cedar::proc::gui::Connectable::createDockWidget(const std::string& titl
   //!@todo There's duplicated code here -- unify
   if (this->mpMainWindow)
   {
-    QDockWidget *p_dock = new QDockWidget(QString::fromStdString(title), this->mpMainWindow);
+    PlotDockWidget *p_dock = new PlotDockWidget(QString::fromStdString(title), this->mpMainWindow);
+
+
+
     p_dock->setAttribute(Qt::WA_DeleteOnClose, true);
     p_dock->setFloating(true);
     p_dock->setContentsMargins(0, 0, 0, 0);
     p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
     QRect g = pWidget->geometry();
     p_dock->setWidget(pWidget);
+
+    QObject::connect(p_dock->getDeleteButton(),SIGNAL(clicked()),p_dock,SLOT(close()));
+    QObject::connect(p_dock->getJumpButton(),SIGNAL(clicked()),this,SLOT(jumpToSource()));
 
     mChildWidgets.push_back(p_dock);
     QObject::connect(p_dock, SIGNAL(destroyed()), this, SLOT(removeChildWidget()));
@@ -1966,6 +1974,19 @@ QWidget* cedar::proc::gui::Connectable::createDockWidget(const std::string& titl
     QObject::connect(p_widget, SIGNAL(destroyed()), this, SLOT(removeChildWidget()));
 
     return p_widget;
+  }
+}
+
+void cedar::proc::gui::Connectable::jumpToSource()
+{
+  if (auto scene = dynamic_cast<cedar::proc::gui::Scene *>(this->scene()))
+  {
+    scene->selectNone();
+    this->setSelected(true);
+    if(auto graphicsView = dynamic_cast<QGraphicsView *>(scene->getParentView()))
+    {
+      graphicsView->centerOn(this);
+    }
   }
 }
 
