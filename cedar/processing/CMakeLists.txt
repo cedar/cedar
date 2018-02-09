@@ -86,6 +86,7 @@ cedar_add_library(cedarproc
   gui/IdeApplication.h
   gui/OneTimeMessageDialog.h
   gui/PlotWidget.h
+  gui/PlotDockWidget.h
   gui/ProjectionMappingParameter.h
   gui/PerformanceOverview.h
   gui/RecorderWidget.h
