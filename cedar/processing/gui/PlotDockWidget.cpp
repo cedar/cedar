@@ -71,16 +71,16 @@ cedar::proc::gui::PlotDockWidget::PlotDockWidget(const QString & title, QWidget 
   auto layout = new QHBoxLayout();
   layout->setContentsMargins(0, 0, 0, 0);
 
-  int buttonSize =14;
+  int buttonSize =15;
   mJumpButton = new QPushButton(QIcon(":/cedar/auxiliaries/gui/jump.svg"),"");
   mJumpButton->setFixedSize(buttonSize, buttonSize);
-  mJumpButton->setIconSize(QSize(buttonSize-1,buttonSize-1));
+  mJumpButton->setIconSize(QSize(buttonSize,buttonSize));
   mJumpButton->setToolTip("jump to the connected step");
 
   mDeleteButton = new QPushButton();
   mDeleteButton->setFixedSize(buttonSize, buttonSize);
   mDeleteButton->setIcon(QIcon(":/cedar/auxiliaries/gui/clear.svg"));
-  mDeleteButton->setIconSize(QSize(buttonSize-1,buttonSize-1));
+  mDeleteButton->setIconSize(QSize(buttonSize,buttonSize));
   mDeleteButton->setToolTip("close this plot");
 
 

@@ -44,6 +44,7 @@
         <file>steps/matrix_transpose.svg</file>
         <file>steps/matrix_pseudoinverse.svg</file>
         <file>steps/diagonal_matrix.svg</file>
+	<file>steps/harmonic_oscillator.svg</file>
         <file>steps/normalization.svg</file>
         <file>steps/rate_matrix_to_space_code.svg</file>
         <file>steps/rate_to_space_code.svg</file>
@@ -82,6 +83,7 @@
         <file>steps/transferFunction.svg</file>
         <file>steps/video_grabber.svg</file>
 	<file>steps/video_sink.svg</file>
+	<file>steps/weighted_sum.svg</file>
         <file>menus/properties.svg</file>
         <file>menus/plot.svg</file>
         <file>menus/plot_advanced.svg</file>

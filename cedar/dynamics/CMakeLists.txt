@@ -45,6 +45,7 @@ cedar_add_library(cedardyn
                   gui/NeuralFieldView.h
                   fields/NeuralField.h
                   fields/Preshape.h
+                  steps/HarmonicOscillator.h
                   steps/RateMatrixToSpaceCode.h
                   steps/SpaceCodeToRateMatrix.h
                   steps/RateToSpaceCode.h

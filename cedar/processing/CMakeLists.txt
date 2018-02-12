@@ -142,6 +142,7 @@ cedar_add_library(cedarproc
   steps/VectorToScalars.h
   steps/VehicleRotation.h    
   steps/Delay.h
+  steps/WeightedSum.h
   sources/VirtualCamera.h
   sources/Boost.h
   sources/Noise.h
