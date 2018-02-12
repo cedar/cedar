@@ -74,7 +74,7 @@ namespace
     declaration->setIconPath(":/steps/unit_converter.svg");
     declaration->setDescription
     (
-      "Converts a scalar value to a unit type."
+      "Converts a scalar value to a unit type. NOTE: unit types are seldom used."
     );
 
     declaration->declare();
