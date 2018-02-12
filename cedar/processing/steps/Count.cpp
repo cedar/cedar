@@ -70,7 +70,7 @@ bool declare()
   declaration->setDescription
   (
     "Count the number of entries int the input that are larger than the given "
-    "threshold."
+    "threshold. TODO: add options for smaller-than, equal, etc."
   );
 
   declaration->declare();
