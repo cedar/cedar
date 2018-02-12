@@ -1,0 +1,117 @@
+#=======================================================================================================================
+#
+#   Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+# 
+#   This file is part of cedar.
+#
+#   cedar is free software: you can redistribute it and/or modify it under
+#   the terms of the GNU Lesser General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+#   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+#   License for more details.
+#
+#   You should have received a copy of the GNU Lesser General Public License
+#   along with cedar. If not, see <http://www.gnu.org/licenses/>.
+#
+#=======================================================================================================================
+#
+#   Institute:   Ruhr-Universitaet Bochum
+#                Institut fuer Neuroinformatik
+#
+#   File:        install.txt
+#
+#   Maintainer:  Mathis Richter
+#   Email:       mathis.richter@ini.rub.de
+#   Date:        2010 11 29
+#
+#   Description: Setup for all files that are to be installed (apart from files that are part of a cedar library).
+#
+#   Credits:
+#
+#=======================================================================================================================
+
+########################################################################################################################
+# install setup
+
+#------------------------
+# cedar configuration
+#------------------------
+# configure the file exposing cmake variables to projects
+
+# build a list of include directories
+set(CEDAR_EXPORTED_INCLUDE_DIRS "")
+
+# mandatory libraries
+list(APPEND CEDAR_EXPORTED_INCLUDE_DIRS ${QT_INCLUDE_DIRS})
+list(APPEND CEDAR_EXPORTED_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
+list(APPEND CEDAR_EXPORTED_INCLUDE_DIRS ${OpenCV_INCLUDE_DIRS})
+
+# optional libraries
+if (QGLViewer_INCLUDE_DIRS)
+  list(APPEND CEDAR_EXPORTED_INCLUDE_DIRS ${QGLViewer_INCLUDE_DIRS})
+endif()
+
+if (qwt_INCLUDE_DIRS)
+  list(APPEND CEDAR_EXPORTED_INCLUDE_DIRS ${qwt_INCLUDE_DIRS})
+endif()
+
+if (qwtplot3d_INCLUDE_DIRS)
+  list(APPEND CEDAR_EXPORTED_INCLUDE_DIRS ${qwtplot3d_INCLUDE_DIRS})
+endif()
+
+if (FFTW_INCLUDE_DIRS)
+  list(APPEND CEDAR_EXPORTED_INCLUDE_DIRS ${FFTW_INCLUDE_DIRS})
+endif()
+
+if (YARP_INCLUDE_DIRS)
+  list(APPEND CEDAR_EXPORTED_INCLUDE_DIRS ${YARP_INCLUDE_DIRS})
+endif()
+
+configure_file("${CEDAR_HOME}/cmake/resources/cedar_configuration.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cedar_configuration.cmake")
+install(FILES "${CEDAR_BUILD_DIR}/cedar_configuration.cmake" DESTINATION "${CEDAR_DOC_INSTALL_DIR}" OPTIONAL)
+
+#------------------------
+# Header files
+#------------------------
+
+file(GLOB cedarHeaders "${CEDAR_SOURCE_DIR}/*.h")
+# delete old header installation
+if(EXISTS "${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}/")
+  install(CODE "execute_process(COMMAND rm -r ${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION})")
+endif(EXISTS "${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}/")
+install(FILES ${cedarHeaders} DESTINATION "${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}")
+install(FILES ${CEDAR_CONFIGURATION_HEADER_OUTPUT} DESTINATION "${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}")
+# create links for the header directory
+install(CODE "execute_process(COMMAND ln -fsT ${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION} ${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR})")
+
+#------------------------
+# Documentation
+#------------------------
+
+if(DOXYGEN_FOUND) # only execute this part if Doxygen was found
+install(CODE "execute_process(COMMAND make doc)")
+install(DIRECTORY "${CEDAR_BUILD_DIR}/doc/html" DESTINATION "${CEDAR_DOC_INSTALL_DIR}-${CEDAR_VERSION}")
+install(FILES "${CEDAR_BUILD_DIR}/doc/latex/refman.pdf" DESTINATION "${CEDAR_DOC_INSTALL_DIR}-${CEDAR_VERSION}" OPTIONAL)
+endif(DOXYGEN_FOUND)
+
+#------------------------
+# Resources (e.g., icons)
+#------------------------
+
+install(DIRECTORY "${CEDAR_HOME}/resources" DESTINATION "${CEDAR_RESOURCE_INSTALL_DIR}-${CEDAR_VERSION}")
+# create links for the installed directories
+install(CODE "execute_process(COMMAND ln -fsT ${CEDAR_RESOURCE_INSTALL_DIR}-${CEDAR_VERSION} ${CEDAR_RESOURCE_INSTALL_DIR})")
+
+#------------------------
+# Executables
+#------------------------
+
+#todo install all executable files here automatically
+file(GLOB cedarExecutables "${CEDAR_EXE_DIR}/cedar")
+install(FILES ${cedarExecutables} DESTINATION ${CEDAR_EXE_INSTALL_DIR})
+install(CODE "execute_process(COMMAND chmod 755 ${CMAKE_INSTALL_PREFIX}/${CEDAR_EXE_INSTALL_DIR}/cedar)")
+
