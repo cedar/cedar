@@ -135,12 +135,24 @@ void cedar::proc::steps::PositionOfMaximum::inputConnectionChanged(const std::st
 
   if (output_changed)
   {
+    recompute();
     this->emitOutputPropertiesChangedSignal("output");
   }
 }
 
 void cedar::proc::steps::PositionOfMaximum::compute(const cedar::proc::Arguments&)
 {
+  recompute();
+}
+
+void cedar::proc::steps::PositionOfMaximum::recompute()
+{
+  if (!mInput)
+    return;
+
+  if (mInput->getData().empty())
+    return;
+
   double minimum, maximum;
   int minLoc[2]= {-1, -1};
   int maxLoc[2]= {-1, -1};
