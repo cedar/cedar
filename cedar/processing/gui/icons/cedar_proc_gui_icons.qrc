@@ -137,5 +137,6 @@
         <file>steps/over_time.svg</file>
         <file>steps/maximum.svg</file>
         <file>steps/minimum.svg</file>
+        <file>steps/exponential_smoothing.svg</file>
     </qresource>
 </RCC>
