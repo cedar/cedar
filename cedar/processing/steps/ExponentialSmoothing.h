@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PositionOfMaximum.h
+    File:        ExponentialSmoothing.h
 
-    Maintainer:  Jean-Stephane Jokeit
-    Email:       
-    Date:        2017 05 14
+    Maintainer:  jokeit
+    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Date:        
 
-    Description: Header file for the class cedar::proc::steps::PositionOfMaximum.
+    Description: Header file for the class cedar::proc::steps::ExponentialSmoothing.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_POSITION_OF_MAXIMUM_H
-#define CEDAR_PROC_STEPS_POSITION_OF_MAXIMUM_H
+#ifndef CEDAR_PROC_STEPS__EXPONENTIAL_SMOOTHING_H
+#define CEDAR_PROC_STEPS__EXPONENTIAL_SMOOTHING_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -44,9 +44,11 @@
 #include <cedar/processing/Step.h>
 #include <cedar/processing/InputSlotHelper.h>
 #include <cedar/auxiliaries/MatData.h>
+#include <cedar/auxiliaries/DoubleParameter.h>
+#include <cv.h>
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/PositionOfMaximum.fwd.h"
+#include "cedar/processing/steps/ExponentialSmoothing.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -55,7 +57,7 @@
  *
  * @todo describe more.
  */
-class cedar::proc::steps::PositionOfMaximum : public cedar::proc::Step
+class cedar::proc::steps::ExponentialSmoothing : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -66,7 +68,7 @@ class cedar::proc::steps::PositionOfMaximum : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  PositionOfMaximum();
+  ExponentialSmoothing();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -88,6 +90,7 @@ private:
 
   void compute(const cedar::proc::Arguments& arguments);
   void recompute();
+  void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -101,16 +104,19 @@ private:
   //!@brief The output data.
   cedar::aux::MatDataPtr mOutput;
 
+  cv::Mat mDataEstimate;
+  cv::Mat mTrendEstimate;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  cedar::aux::DoubleParameterPtr mDataSmoothingFactor;
+  cedar::aux::DoubleParameterPtr mTrendSmoothingFactor;
 
 private:
   // none yet
 
-}; // class cedar::proc::steps::PositionOfMaximum
+}; // class cedar::proc::steps::ExponentialSmoothing
 
-#endif // CEDAR_PROC_STEPS_POSITION_OF_MAXIMUM_H
+#endif // CEDAR_PROC_STEPS__EXPONENTIAL_SMOOTHING_H
 

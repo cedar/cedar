@@ -15,7 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="field_1d.svg"
+   sodipodi:docname="maximum.svg"
    inkscape:export-filename="/home/lompolbx/workspace/src/cedar.fieldFramework/cedar/processing/gui/icons/steps/no_icon.png"
    inkscape:export-xdpi="9"
    inkscape:export-ydpi="9">
@@ -26,16 +26,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
-     inkscape:cx="235.96345"
-     inkscape:cy="147.27477"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="92.559398"
+     inkscape:cy="165.3659"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="693"
-     inkscape:window-height="591"
-     inkscape:window-x="25"
-     inkscape:window-y="347"
+     inkscape:window-width="806"
+     inkscape:window-height="791"
+     inkscape:window-x="17"
+     inkscape:window-y="25"
      inkscape:window-maximized="0"
      showguides="true"
      inkscape:guide-bbox="true" />
@@ -49,10 +49,23 @@
        id="TriangleOutM"
        style="overflow:visible">
       <path
-         id="path4233"
+         id="path3829"
          d="M 5.77,0.0 L -2.88,5.0 L -2.88,-5.0 L 5.77,0.0 z "
          style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;marker-start:none"
          transform="scale(0.4)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleInM"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="TriangleInM"
+       style="overflow:visible">
+      <path
+         id="path3820"
+         d="M 5.77,0.0 L -2.88,5.0 L -2.88,-5.0 L 5.77,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;marker-start:none"
+         transform="scale(-0.4)" />
     </marker>
     <marker
        style="overflow:visible"
@@ -244,7 +257,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -253,49 +266,16 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-652.3622)">
-    <g
-       id="g3906"
-       transform="translate(3.3533763,-18.101366)">
-      <path
-         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:18.75;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter"
-         d="m 11.125,868.2372 c -2.4764654,-0.035 -4.9516922,0.95963 -6.7153309,2.6985 -1.7636388,1.73887 -2.7931879,4.19979 -2.7931879,6.6765 0,2.47671 1.0295491,4.93763 2.7931879,6.6765 1.7636387,1.73887 4.2388655,2.73352 6.7153309,2.6985 l 332.5,0 0,-18.75 z"
-         id="path3690"
-         inkscape:connector-curvature="0"
-         sodipodi:nodetypes="cssscccc" />
-      <path
-         id="path3912"
-         d="m 388.31266,877.60581 -46.55922,26.91285 0,-53.8257 46.55922,26.91285 z"
-         style="fill-rule:evenodd;stroke:#000000;stroke-width:5.38256989pt;marker-start:none"
-         inkscape:connector-curvature="0" />
-    </g>
-    <path
-       style="fill:none;stroke:#ff7b7b;stroke-width:15;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="m 37.426522,1027.8053 c 86.614628,34.8553 67.587208,-139.59237 98.893808,-139.49121 31.30659,0.10116 5.72638,173.84441 90.75695,139.49121"
-       id="path4552"
-       sodipodi:nodetypes="czc"
-       inkscape:connector-curvature="0" />
-    <g
-       id="g4987"
-       style="stroke-width:18.75;stroke-miterlimit:4;stroke-dasharray:none" />
-    <rect
-       style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="rect3257"
-       width="165.72092"
-       height="106.42857"
-       x="201.69119"
-       y="915.59875" />
     <text
        xml:space="preserve"
-       style="font-size:10.8100729px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
-       x="287.69223"
-       y="994.58923"
-       id="text3253"
-       sodipodi:linespacing="100%"
-       transform="scale(0.9911293,1.0089501)"><tspan
+       style="font-size:166.45483398px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:TeX Gyre Termes;-inkscape-font-specification:TeX Gyre Termes Italic"
+       x="60.526451"
+       y="878.5871"
+       id="text5334"
+       sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
-         id="tspan3255"
-         x="287.69223"
-         y="994.58923"
-         style="font-size:97.29065704px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial Bold">1D</tspan></text>
+         id="tspan5336"
+         x="60.526451"
+         y="878.5871">max</tspan></text>
   </g>
 </svg>
