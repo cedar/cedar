@@ -68,7 +68,7 @@ namespace
     stv_decl->setIconPath(":/steps/vector_to_scalars.svg");
     stv_decl->setDescription
     (
-      "Extracts a certain number of output scalars from a single input vector."
+      "Extracts a specified number of output scalars from the single input vector."
     );
 
     stv_decl->declare();

@@ -208,6 +208,10 @@ void cedar::proc::steps::VariableGauss::recompute()
     return;
 
   cv::Mat mat = input->getData<cv::Mat>();
+
+  if (mat.empty())
+    return;
+
   const std::vector<double> tmpvec{ static_cast<double>(mat.at<float>(0,0)), 
                                     static_cast<double>(mat.at<float>(1,0) ) };
 

@@ -208,6 +208,10 @@ void cedar::proc::steps::VariableBox::recompute()
     return;
 
   cv::Mat mat = input->getData<cv::Mat>();
+
+  if (mat.empty())
+    return;
+
   std::vector<unsigned int> tmpvec{ static_cast<unsigned int>(mat.at<float>(0,0)), 
                                     static_cast<unsigned int>(mat.at<float>(1,0) ) };
 

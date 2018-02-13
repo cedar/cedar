@@ -74,6 +74,7 @@ namespace
         "cedar.processing.steps.Component"
       )
     );
+    declaration->setDescription("Start here! The interface to your robot.");;
     declaration->setIconPath(":/cedar/dev/gui/icons/generic_hardware_icon.svg");
     declaration->declare();
 

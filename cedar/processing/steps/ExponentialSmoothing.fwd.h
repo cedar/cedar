@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CountLarger.fwd.h
+    File:        ExponentialSmoothing.fwd.h
 
     Maintainer:  jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        2017 12 04
+    Date:        
 
-    Description: Forward declaration file for the class cedar::proc::steps::CountLarger.
+    Description: Forward declaration file for the class cedar::proc::steps::ExponentialSmoothing.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_COUNT_LARGER_FWD_H
-#define CEDAR_PROC_STEPS_COUNT_LARGER_FWD_H
+#ifndef CEDAR_PROC_STEPS__EXPONENTIAL_SMOOTHING_FWD_H
+#define CEDAR_PROC_STEPS__EXPONENTIAL_SMOOTHING_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -56,12 +56,12 @@ namespace cedar
     namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(CountLarger);
+      CEDAR_DECLARE_PROC_CLASS(ExponentialSmoothing);
       //!@endcond
     }
   }
 }
 
 
-#endif // CEDAR_PROC_STEPS_COUNT_LARGER_FWD_H
+#endif // CEDAR_PROC_STEPS__EXPONENTIAL_SMOOTHING_FWD_H
 
