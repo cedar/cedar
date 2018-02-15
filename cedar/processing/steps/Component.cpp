@@ -48,6 +48,8 @@
 #include "cedar/devices/exceptions.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/devices/Sensor.h"
+#include "cedar/devices/SimulatedKinematicChain.h"
+
 
 
 // SYSTEM INCLUDES
@@ -230,7 +232,8 @@ cedar::proc::Step(true),
 _mComponent(new cedar::dev::ComponentParameter(this, "component")),
 _mUserSelectableCommandTypeSubset(new cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameter(this,
 "Command Subset")),
-_mCommunicationStepSize(new cedar::aux::DoubleParameter(this, "communication step size [ms]", 10.0, 0.01, 100))
+_mCommunicationStepSize(new cedar::aux::DoubleParameter(this, "communication step size [ms]", 10.0, 0.01, 100)),
+_mUseKinChainConfigurationOnReset( new cedar::aux::BoolParameter(this, "use current config on reset?", false))
 {
   this->_mUserSelectableCommandTypeSubset->setConstant(true);
 
@@ -247,6 +250,16 @@ _mCommunicationStepSize(new cedar::aux::DoubleParameter(this, "communication ste
   this->registerFunction( "disconnect", boost::bind(&cedar::proc::steps::Component::disconnectManually, this ) );
   this->registerFunction( "connect", boost::bind(&cedar::proc::steps::Component::connectManually, this ) );
   this->registerFunction( "open Robot Manager", boost::bind(&cedar::proc::steps::Component::openRobotManager, this ) );
+
+
+  if(auto kinChain = boost::dynamic_pointer_cast<cedar::dev::SimulatedKinematicChain>(this->getComponent()))
+  {
+      _mUseKinChainConfigurationOnReset->setConstant(false);
+  } else
+  {
+    _mUseKinChainConfigurationOnReset->setValue(false);
+    _mUseKinChainConfigurationOnReset->setConstant(true);
+  }
 
 }
 
@@ -551,12 +564,49 @@ void cedar::proc::steps::Component::componentChangedSlot()
   auto component = this->getComponent();
   this->_mUserSelectableCommandTypeSubset->setConstant(!component->hasUserSelectableCommandTypeSubsets());
   this->_mUserSelectableCommandTypeSubset->setComponent(component);
+
+  if(auto kinChain = boost::dynamic_pointer_cast<cedar::dev::SimulatedKinematicChain>(this->getComponent()))
+  {
+    _mUseKinChainConfigurationOnReset->setConstant(false);
+  } else
+  {
+    _mUseKinChainConfigurationOnReset->setValue(false);
+    _mUseKinChainConfigurationOnReset->setConstant(true);
+  }
+
+
 }
 
 void cedar::proc::steps::Component::reset()
 {
   auto component = this->getComponent();
   component->clearAll();
+
+  auto kinChain = boost::dynamic_pointer_cast<cedar::dev::SimulatedKinematicChain>(component);
+  if( kinChain && _mUseKinChainConfigurationOnReset->getValue())
+  {
+    std::vector<std::string> configList = kinChain->getInitialConfigurationNames();
+
+    if(configList.size()>0)
+    {
+//      std::cout << "Reset the position of the simulated arm. The current selected initial configuration is: " << kinChain->getCurrentInitialConfigurationName() << std::endl;
+      if (!kinChain->hasInitialConfiguration(kinChain->getCurrentInitialConfigurationName()))
+      {
+        std::cout << "Reset " << this->getName() <<" : Choose the first initial configuration, because no current configuration was selected!" << std::endl;
+        kinChain->setCurrentInitialConfiguration(configList[0]);
+      }
+      if (kinChain->isCommunicating())
+      {
+        kinChain->applyInitialConfiguration(kinChain->getCurrentInitialConfigurationName());
+      } else
+      {
+        std::cout<<"Reset: Tried to reset "<< this->getName() <<" to " << kinChain->getCurrentInitialConfigurationName() <<" but it was not connected"<<std::endl;
+      }
+    } else
+      {
+        std::cout<<"Reset: Tried to reset "<< this->getName() <<" but no initial configurations were registered"<<std::endl;
+      }
+  }
 }
 
 void cedar::proc::steps::Component::inputConnectionChanged(const std::string& /*inputName*/)

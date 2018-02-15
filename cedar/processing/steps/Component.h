@@ -217,6 +217,8 @@ private:
   //! Type of the channel stored in this component.
   cedar::aux::DoubleParameterPtr _mCommunicationStepSize;
 
+  cedar::aux::BoolParameterPtr _mUseKinChainConfigurationOnReset;
+
 }; // class cedar::proc::steps::Component
 
 #endif // CEDAR_PROC_STEPS_COMPONENT_H
