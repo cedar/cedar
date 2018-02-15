@@ -81,6 +81,7 @@
 cedar::aux::gui::QCLinePlot::QCLinePlot(QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
+textTicker(new QCPAxisTickerText),
 mpLock(new QReadWriteLock())
 {
   this->init();
@@ -89,6 +90,7 @@ mpLock(new QReadWriteLock())
 cedar::aux::gui::QCLinePlot::QCLinePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
+textTicker(new QCPAxisTickerText),
 mpLock(new QReadWriteLock())
 {
   this->init();
@@ -139,6 +141,17 @@ void cedar::aux::gui::QCLinePlot::doAppend(cedar::aux::ConstDataPtr data, const 
   unsigned long m = mLineColors.size() - 1;
   this->mpChart->graph(c)->setPen(mLineColors.at(c % m));
   this->mpChart->graph(c)->setName(QString::fromStdString(title));
+  if (data->hasAnnotation<cedar::aux::annotation::DiscreteMetric>())
+  {
+    this->mpChart->graph()->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc,10));
+    this->mpChart->graph()->setLineStyle(QCPGraph::lsNone);
+    this->DiscreteMetric = true;
+  }
+  if(this->DiscreteMetricLabels)
+  {
+    this->mpChart->xAxis->setTickLabelRotation(90);
+    this->mpChart->xAxis->setTicker(textTicker);
+  }
   this->PlotSeriesDataVector.push_back(data);
   locker.unlock();
   this->startTimer(30);
@@ -183,6 +196,17 @@ void cedar::aux::gui::QCLinePlot::plot(cedar::aux::ConstDataPtr data, const std:
 
 void cedar::aux::gui::QCLinePlot::init()
 {
+
+  this->_mAutoScalingEnabled = new cedar::aux::BoolParameter(this, "autoscaling", true);
+  this->_mMajorGridVisible = new cedar::aux::BoolParameter(this, "major grid visible", false);
+  this->_mMinorGridVisible = new cedar::aux::BoolParameter(this, "minor grid visible", false);
+  this->_mYAxisLimits = new cedar::aux::math::DoubleLimitsParameter(this, "y axis limits", 0.0, 1.0);
+  QObject::connect(this->_mAutoScalingEnabled.get(), SIGNAL(valueChanged()), this, SLOT(autoScalingChanged()));
+  QObject::connect(this->_mYAxisLimits.get(), SIGNAL(valueChanged()), this, SLOT(axisLimitsChanged()));
+  QObject::connect(this->_mMajorGridVisible.get(), SIGNAL(valueChanged()), this, SLOT(gridVisibilityChanged()));
+  QObject::connect(this->_mMinorGridVisible.get(), SIGNAL(valueChanged()), this, SLOT(gridVisibilityChanged()));
+
+
   this->mPlot0D = false;
 
 // initialize vectors, if this has not happened, yet
@@ -218,6 +242,39 @@ void cedar::aux::gui::QCLinePlot::init()
   this->mpChart->noAntialiasingOnDrag();
   this->mpChart->replot();
   this->layout()->addWidget(this->mpChart);
+}
+
+void cedar::aux::gui::QCLinePlot::gridVisibilityChanged()
+{
+  bool major_visible = this->_mMajorGridVisible->getValue();
+  bool minor_visible = this->_mMinorGridVisible->getValue();
+  bool any_visible = minor_visible || major_visible;
+  this->mpChart->xAxis->grid()->setVisible(any_visible);
+  this->mpChart->yAxis->grid()->setVisible(any_visible);
+}
+
+void cedar::aux::gui::QCLinePlot::autoScalingChanged()
+{
+  if (!this->SettingFixedYAxisScaling)
+  {
+    this->SettingFixedYAxisScaling = true;
+  }
+  else
+  {
+    this->axisLimitsChanged();
+  }
+}
+
+void cedar::aux::gui::QCLinePlot::axisLimitsChanged()
+{
+  if (this->SettingFixedYAxisScaling)
+  {
+    double lower = this->_mYAxisLimits->getLowerLimit();
+    double upper = this->_mYAxisLimits->getUpperLimit();
+    this->FixedYLimitMin = lower;
+    this->FixedYLimitMax = upper;
+
+  }
 }
 
 void cedar::aux::gui::QCLinePlot::timerEvent(QTimerEvent * /* pEvent */)
@@ -322,6 +379,14 @@ void cedar::aux::gui::QCLinePlot::timerEvent(QTimerEvent * /* pEvent */)
     y_max += 0.5;
   }
 
+  if(this->DiscreteMetric)
+  {
+    x_min -= 0.5;
+    x_max += 0.5;
+    y_min -= 0.5;
+    y_max += 0.5;
+  }
+
   this->mpChart->xAxis->setRange(x_min,x_max);
   this->mpChart->xAxis->grid()->setVisible(this->SettingShowGrid);
   this->mpChart->yAxis->setRange(y_min,y_max);
@@ -332,6 +397,23 @@ void cedar::aux::gui::QCLinePlot::timerEvent(QTimerEvent * /* pEvent */)
 void cedar::aux::gui::QCLinePlot::setAccepts0DData(bool accept)
 {
   this->mPlot0D = accept;
+}
+
+void cedar::aux::gui::QCLinePlot::setAutomaticYAxisScaling()
+{
+  this->SettingFixedYAxisScaling = false;
+}
+
+void cedar::aux::gui::QCLinePlot::setFixedYAxisScaling(double lower, double upper)
+{
+  this->FixedYLimitMin = lower;
+  this->FixedYLimitMax = upper;
+  this->SettingFixedYAxisScaling = true;
+}
+
+void cedar::aux::gui::QCLinePlot::setFixedXAxisScaling(double lower, double upper)
+{
+  //todo
 }
 
 void cedar::aux::gui::QCLinePlot::setFixedYAxisScaling()
