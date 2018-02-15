@@ -121,6 +121,22 @@ signals:
   void convert();
 
 public slots:
+  //! When called, the y axis scaling is determined automatically every time the plot updates.
+  void setAutomaticYAxisScaling();
+
+  /*! @brief Slot that is called when the menu entry in the plot is called.
+   *
+   *  This function opens a dialog that lets the user enter the desired interval for the Y axis.
+   */
+  void setFixedYAxisScaling();
+
+  /*! @brief Sets the minimum and maximum for the y axis.
+   */
+  void setFixedYAxisScaling(double lower, double upper);
+
+  /*! @brief Sets the minimum and maximum for the x axis.
+   */
+  void setFixedXAxisScaling(double lower, double upper);
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -147,15 +163,22 @@ private slots:
 
   void showLegend(bool show = true);
   void showGrid(bool show = true);
-  void setFixedYAxisScaling();
 
   void contextMenuRequest(QPoint);
+
+  void autoScalingChanged();
+
+  void axisLimitsChanged();
+
+  void gridVisibilityChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  bool DiscreteMetricLabels = false;
+  int DiscreteMetricLabelCounter = 0;
+  QSharedPointer<QCPAxisTickerText> textTicker;
 private:
     QCustomPlot *mpChart;
     std::vector<cedar::aux::ConstDataPtr> PlotSeriesDataVector;
@@ -167,8 +190,11 @@ private:
   //! If true, the plot will not complain about 0d data. Otherwise, 0D data will lead it to emit a dataChanged signal.
   bool mPlot0D;
 
-
   bool SettingShowLegend = false;
+
+  bool DiscreteMetric = false;
+
+
   bool SettingShowGrid = false;
   bool SettingFixedYAxisScaling = false;
 
@@ -182,6 +208,18 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 private:
+
+  //! Whether the y axis limits are applied.
+  cedar::aux::BoolParameterPtr _mAutoScalingEnabled;
+
+  //! Whether the major grid is displayed.
+  cedar::aux::BoolParameterPtr _mMajorGridVisible;
+
+  //! Whether the minor grid is displayed.
+  cedar::aux::BoolParameterPtr _mMinorGridVisible;
+
+  //! Limits for the y axis.
+  cedar::aux::math::DoubleLimitsParameterPtr _mYAxisLimits;
 
 }; // class cedar::aux::gui::QCLinePlot
 
