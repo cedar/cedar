@@ -1,0 +1,241 @@
+{
+   QGtkStyle::QGtkStyle
+   Memcheck:Addr4
+   ...
+   fun:_ZN9QGtkStyleC1Ev
+   ...
+}
+{
+   QGtkStyle::drawPrimitive
+   Memcheck:Addr8
+   ...
+   fun:_ZNK9QGtkStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
+   ...
+}
+{
+   QGtkStyle::drawPrimitive
+   Memcheck:Addr8
+   ...
+   fun:_ZNK6QStyle14drawItemPixmapEP8QPainterRK5QRectiRK7QPixmap
+   ...
+}
+{
+   QGtkStyle::drawControl
+   Memcheck:Addr8
+   ...
+   fun:_ZNK9QGtkStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   ...
+}
+{
+   wcscmp (1)
+   Memcheck:Addr8
+   fun:wcscmp
+   fun:_ZNSt10moneypunctIwLb0EED1Ev
+   fun:_ZNSt10moneypunctIwLb0EED0Ev
+   fun:_ZNSt6locale5_ImplD1Ev
+   fun:_ZNSt6localeD1Ev
+   ...
+}
+{
+   wcscmp (2)
+   Memcheck:Addr8
+   fun:wcscmp
+   fun:_ZNSt10moneypunctIwLb1EED1Ev
+   fun:_ZNSt10moneypunctIwLb1EED0Ev
+   fun:_ZNSt6locale5_ImplD1Ev
+   fun:_ZNSt6localeD1Ev
+   ...
+}
+{
+   _GLOBAL__sub_I_cap_ffmpeg
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:_GLOBAL__sub_I_cap_ffmpeg.cpp
+   ...
+}
+{
+   dl_init -> malloc
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:_dl_init
+   ...
+}
+{
+   g_malloc0
+   Memcheck:Leak
+   ...
+   fun:g_malloc0
+   ...
+}
+{
+   g_realloc
+   Memcheck:Leak
+   ...
+   fun:g_realloc
+   ...
+}
+{
+   ACE Object Manager
+   Memcheck:Leak
+   fun:_ZnwmRKSt9nothrow_t
+   fun:_ZN11ACE_Log_MsgD1Ev
+   fun:_ZN11ACE_Log_Msg5closeEv
+   fun:_ZN18ACE_Object_Manager4finiEv
+   fun:_ZN21ACE_OS_Object_Manager4finiEv
+   fun:_ZN21ACE_OS_Object_ManagerD1Ev
+   fun:_ZN21ACE_OS_Object_ManagerD0Ev
+   obj:/usr/lib/libACE-6.0.3.so
+   fun:__cxa_finalize
+   obj:/usr/lib/libACE-6.0.3.so
+   ...
+}
+{
+   calloc
+   Memcheck:Leak
+   fun:calloc
+   ...
+}
+{
+   ACE Object Manager (2)
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:_ZnwmRKSt9nothrow_t
+   fun:_ZN11ACE_Log_MsgD1Ev
+   fun:_ZN11ACE_Log_Msg5closeEv
+   fun:_ZN18ACE_Object_Manager4finiEv
+   fun:_ZN21ACE_OS_Object_Manager4finiEv
+   fun:_ZN21ACE_OS_Object_ManagerD1Ev
+   fun:_ZN21ACE_OS_Object_ManagerD0Ev
+   obj:/usr/lib/libACE-6.0.3.so
+   fun:__cxa_finalize
+   obj:/usr/lib/libACE-6.0.3.so
+   fun:_dl_fini
+   fun:__run_exit_handlers
+   fun:exit
+   fun:(below main)
+}
+{
+   strdup->malloc
+   Memcheck:Leak
+   fun:malloc
+   fun:strdup
+   ...
+}
+{
+   g_private_get -> malloc
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:g_private_get
+   ...
+}
+{
+   ucol_open_internal_52 -> malloc
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:ures_open_52
+   fun:ucol_open_internal_52
+   ...
+}
+{
+   QLocalePrivate::updateSystemPrivate()
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:uprv_strdup_52
+   fun:ucol_open_internal_52
+   ...
+   fun:_ZN14QLocalePrivate19updateSystemPrivateEv
+   ...
+}
+{
+   boost::signals2
+   Memcheck:Leak
+   fun:_Znwm
+   fun:_ZN5boost8signals26detail11signal_implIFvRKSsENS0_19optional_last_valueIvEEiSt4lessIiENS_8functionIS5_EENSA_IFvRKNS0_10connectionES4_EEENS0_5mutexEE16invocation_stateC1ERKNS1_12grouped_listIiS9_NS_10shared_ptrINS1_15connection_bodyISt4pairINS1_15slot_meta_groupENS_8optionalIiEEENS0_4slotIS5_SB_EESH_EEEEEERKS7_
+   fun:_ZN5boost8signals26detail11signal_implIFvRKSsENS0_19optional_last_valueIvEEiSt4lessIiENS_8functionIS5_EENSA_IFvRKNS0_10connectionES4_EEENS0_5mutexEEC1ERKS7_RKS9_
+   fun:_ZN5boost8signals26signalIFvRKSsENS0_19optional_last_valueIvEEiSt4lessIiENS_8functionIS4_EENS9_IFvRKNS0_10connectionES3_EEENS0_5mutexEEC1ERKS6_RKS8_
+   ...
+}
+{
+   boost::signals2
+   Memcheck:Leak
+   fun:_Znwm
+   fun:_ZN5boost8signals26detail11signal_implIFvNS_13intrusive_ptrIN5cedar3aux9ParameterEEEENS0_19optional_last_valueIvEEiSt4lessIiENS_8functionIS8_EENSD_IFvRKNS0_10connectionES7_EEENS0_5mutexEE16invocation_stateC1ERKNS1_12grouped_listIiSC_NS_10shared_ptrINS1_15connection_bodyISt4pairINS1_15slot_meta_groupENS_8optionalIiEEENS0_4slotIS8_SE_EESK_EEEEEERKSA_
+   fun:_ZN5boost8signals26detail11signal_implIFvNS_13intrusive_ptrIN5cedar3aux9ParameterEEEENS0_19optional_last_valueIvEEiSt4lessIiENS_8functionIS8_EENSD_IFvRKNS0_10connectionES7_EEENS0_5mutexEEC1ERKSA_RKSC_
+   fun:_ZN5boost8signals26signalIFvNS_13intrusive_ptrIN5cedar3aux9ParameterEEEENS0_19optional_last_valueIvEEiSt4lessIiENS_8functionIS7_EENSC_IFvRKNS0_10connectionES6_EEENS0_5mutexEEC1ERKS9_RKSB_
+   ...
+}
+{
+   boost::signals2
+   Memcheck:Leak
+   fun:_Znwm
+   fun:_ZN5boost8signals26detail11signal_implIFvvENS0_19optional_last_valueIvEEiSt4lessIiENS_8functionIS3_EENS8_IFvRKNS0_10connectionEEEENS0_5mutexEE16invocation_stateC1ERKNS1_12grouped_listIiS7_NS_10shared_ptrINS1_15connection_bodyISt4pairINS1_15slot_meta_groupENS_8optionalIiEEENS0_4slotIS3_S9_EESF_EEEEEERKS5_
+   fun:_ZN5boost8signals26detail11signal_implIFvvENS0_19optional_last_valueIvEEiSt4lessIiENS_8functionIS3_EENS8_IFvRKNS0_10connectionEEEENS0_5mutexEEC1ERKS5_RKS7_
+   fun:_ZN5boost8signals26signalIFvvENS0_19optional_last_valueIvEEiSt4lessIiENS_8functionIS2_EENS7_IFvRKNS0_10connectionEEEENS0_5mutexEEC1ERKS4_RKS6_
+   ...
+}
+{
+   vtkGeovisInstantiator::ClassInitialize
+   Memcheck:Leak
+   fun:_Znam
+   ...
+   fun:_ZN15vtkInstantiator20RegisterInstantiatorEPKcPFP9vtkObjectvE
+   fun:_ZN21vtkGeovisInstantiator15ClassInitializeEv
+   ...
+}
+{
+   ACE_Hash_Map_Entry::ACE_String
+   Memcheck:Leak
+   fun:_Znwm
+   fun:_ZN4yarp2os6BottleC1Ev
+   fun:_ZN12PropertyItemC1Ev
+   fun:_ZN18ACE_Hash_Map_EntryI15ACE_String_BaseIcE12PropertyItemEC1EPS3_S4_
+   ...
+}
+{
+   yarp::os::ConstString
+   Memcheck:Leak
+   fun:_Znwm
+   fun:_ZN4yarp2os11ConstStringC1Ev
+   ...
+}
+{
+   QObject
+   Memcheck:Leak
+   fun:_Znwm
+   obj:/usr/lib/x86_64-linux-gnu/libQtCore.so.4.8.6
+   fun:_ZN7QObjectC1EPS_
+   ...
+}
+{
+   QMutex
+   Memcheck:Leak
+   fun:_Znwm
+   fun:_ZN6QMutexC1ENS_13RecursionModeE
+   ...
+}
+{
+   QObject
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:_Znwm
+   fun:_ZN14QWaitConditionC1Ev
+   ...
+   fun:_ZN7QObjectC1EPS_
+   ...
+}
+{
+   QObject
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:_Znwm
+   obj:/usr/lib/x86_64-linux-gnu/libQtCore.so.4.8.6
+   obj:/usr/lib/x86_64-linux-gnu/libQtCore.so.4.8.6
+   fun:_ZN7QObjectC1EPS_
+   ...
+}
