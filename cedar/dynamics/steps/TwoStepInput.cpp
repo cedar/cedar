@@ -39,7 +39,7 @@
  ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/TwoStepInput.h"
+#include "cedar/dynamics/steps/TwoStepInput.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
@@ -64,15 +64,15 @@ namespace
 
     ElementDeclarationPtr declaration
             (
-                    new ElementDeclarationTemplate<cedar::proc::sources::TwoStepInput>
+                    new ElementDeclarationTemplate<cedar::dyn::steps::TwoStepInput>
                             (
                                     "Sources",
-                                    "cedar.processing.sources.TwoStepInput"
+                                    "cedar.dynamics.steps.TwoStepInput"
                             )
             );
     declaration->setIconPath(":/steps/two_step_input.svg");
     declaration->setDescription("A special GaussInput that allows to switch the center of the Gaussian after a specific amount of time. This might represent a stimulus in the two-step paradigm");
-    declaration->deprecatedName("cedar.processing.source.TwoStepInput");
+    declaration->deprecatedName("cedar.dynamics.steps.TwoStepInput");
 
     declaration->declare();
 
@@ -85,7 +85,7 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::sources::TwoStepInput::TwoStepInput()
+cedar::dyn::steps::TwoStepInput::TwoStepInput()
     :
       mOutput(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
       _mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0)),
@@ -116,43 +116,43 @@ cedar::proc::sources::TwoStepInput::TwoStepInput()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::sources::TwoStepInput::setDimensionality(unsigned int dimensionality)
+void cedar::dyn::steps::TwoStepInput::setDimensionality(unsigned int dimensionality)
 {
   this->_mDimensionality->setValue(dimensionality);
 }
 
-void cedar::proc::sources::TwoStepInput::setSize(unsigned int dimension, unsigned int size)
+void cedar::dyn::steps::TwoStepInput::setSize(unsigned int dimension, unsigned int size)
 {
   this->_mSizes->setValue(dimension, size);
 }
 
-void cedar::proc::sources::TwoStepInput::setCenter(unsigned int dimension, double center)
+void cedar::dyn::steps::TwoStepInput::setCenter(unsigned int dimension, double center)
 {
   CEDAR_ASSERT(dimension < this->_mCenters->size());
   this->_mCenters->setValue(dimension, center);
 }
 
-void cedar::proc::sources::TwoStepInput::setSecondCenter(unsigned int dimension, double center)
+void cedar::dyn::steps::TwoStepInput::setSecondCenter(unsigned int dimension, double center)
 {
   CEDAR_ASSERT(dimension < this->_mSecondCenters->size());
   this->_mSecondCenters->setValue(dimension, center);
 }
 
-double cedar::proc::sources::TwoStepInput::getCenter(unsigned int dimension)
+double cedar::dyn::steps::TwoStepInput::getCenter(unsigned int dimension)
 {
   CEDAR_ASSERT(dimension < this->_mCenters->size());
   return _mCenters->getValue().at(dimension);
 
 }
 
-double cedar::proc::sources::TwoStepInput::getSecondCenter(unsigned int dimension)
+double cedar::dyn::steps::TwoStepInput::getSecondCenter(unsigned int dimension)
 {
   CEDAR_ASSERT(dimension < this->_mSecondCenters->size());
   return _mSecondCenters->getValue().at(dimension);
 
 }
 
-cv::Mat cedar::proc::sources::TwoStepInput::getCurrentTarget()
+cv::Mat cedar::dyn::steps::TwoStepInput::getCurrentTarget()
 {
   cv::Mat targetMat = cv::Mat::zeros(2, 1, CV_32F);
   targetMat.at<float>(0, 0) = curCenter.at(0);
@@ -162,17 +162,17 @@ cv::Mat cedar::proc::sources::TwoStepInput::getCurrentTarget()
 
 }
 
-double cedar::proc::sources::TwoStepInput::getAmplitude() const
+double cedar::dyn::steps::TwoStepInput::getAmplitude() const
 {
   return this->_mAmplitude->getValue();
 }
 
-void cedar::proc::sources::TwoStepInput::setAmplitude(double amplitude)
+void cedar::dyn::steps::TwoStepInput::setAmplitude(double amplitude)
 {
   this->_mAmplitude->setValue(amplitude);
 }
 
-void cedar::proc::sources::TwoStepInput::eulerStep(const cedar::unit::Time& time)
+void cedar::dyn::steps::TwoStepInput::eulerStep(const cedar::unit::Time& time)
 {
   //	std::cout<<"euler Step "<<std::endl;
 
@@ -312,39 +312,39 @@ void cedar::proc::sources::TwoStepInput::eulerStep(const cedar::unit::Time& time
 
 }
 
-void cedar::proc::sources::TwoStepInput::setISI(double isi)
+void cedar::dyn::steps::TwoStepInput::setISI(double isi)
 {
   this->_mTimetilChange->setValue(isi);
 }
 
-void cedar::proc::sources::TwoStepInput::setMovementTime(double time)
+void cedar::dyn::steps::TwoStepInput::setMovementTime(double time)
 {
   this->_mMovementTime->setValue(time);
 }
 
-void cedar::proc::sources::TwoStepInput::setContinuous(bool isContinous)
+void cedar::dyn::steps::TwoStepInput::setContinuous(bool isContinous)
 {
   this->_mIsContinuous->setValue(isContinous);
 }
 
-void cedar::proc::sources::TwoStepInput::setStopMoving(bool doesStop)
+void cedar::dyn::steps::TwoStepInput::setStopMoving(bool doesStop)
 {
   this->_mStopMoving->setValue(doesStop);
 }
 
-void cedar::proc::sources::TwoStepInput::setStartBlank(bool startBlank)
+void cedar::dyn::steps::TwoStepInput::setStartBlank(bool startBlank)
 {
   this->_mStopMoving->setValue(startBlank);
 }
 
-void cedar::proc::sources::TwoStepInput::updateMatrix()
+void cedar::dyn::steps::TwoStepInput::updateMatrix()
 {
   //	this->onTrigger();
 }
 
 
 
-void cedar::proc::sources::TwoStepInput::updateDimensionality()
+void cedar::dyn::steps::TwoStepInput::updateDimensionality()
 {
   //	std::cout<<"update Dimensionality "<<std::endl;
 
@@ -366,7 +366,7 @@ void cedar::proc::sources::TwoStepInput::updateDimensionality()
 
 }
 
-void cedar::proc::sources::TwoStepInput::updateMatrixSize()
+void cedar::dyn::steps::TwoStepInput::updateMatrixSize()
 {
   //	std::cout<<"update MatrixSize "<<std::endl;
 
@@ -383,7 +383,7 @@ void cedar::proc::sources::TwoStepInput::updateMatrixSize()
 
 }
 
-void cedar::proc::sources::TwoStepInput::reset()
+void cedar::dyn::steps::TwoStepInput::reset()
 {
   elapsedTime = 0;
   curMovementTime = 0;
@@ -391,7 +391,7 @@ void cedar::proc::sources::TwoStepInput::reset()
   curCenter = _mCenters->getValue();
 }
 
-cedar::proc::DataSlot::VALIDITY cedar::proc::sources::TwoStepInput::determineInputValidity(
+cedar::proc::DataSlot::VALIDITY cedar::dyn::steps::TwoStepInput::determineInputValidity(
     cedar::proc::ConstDataSlotPtr slot,
     cedar::aux::ConstDataPtr data) const
 {
@@ -421,7 +421,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::sources::TwoStepInput::determineInp
   return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
-void cedar::proc::sources::TwoStepInput::inputConnectionChanged(const std::string& inputName)
+void cedar::dyn::steps::TwoStepInput::inputConnectionChanged(const std::string& inputName)
 {
   if (inputName == "start_countdown")
   {
