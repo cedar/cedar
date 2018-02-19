@@ -65,7 +65,7 @@ namespace
     stv_decl->setIconPath(":/steps/scalars_to_vector.svg");
     stv_decl->setDescription
     (
-      "Gathers a certain number of input scalars in a single output vector."
+      "Gathers a specified number of input scalars into a single output vector."
     );
 
     stv_decl->declare();

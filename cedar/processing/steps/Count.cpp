@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PositionOfMaximum.cpp
+    File:        Count.cpp
 
-    Maintainer:  Jean-Stephane Jokeit
-    Email:       
-    Date:        2017 05 14
+    Maintainer:  jokeit
+    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Date:        2017 12 04
 
-    Description: Source file for the class cedar::proc::steps::PositionOfMaximum.
+    Description: Source file for the class cedar::proc::steps::Count.
 
     Credits:
 
@@ -38,13 +38,13 @@
 #include "cedar/configuration.h"
 
 // CLASS HEADER
-#include "cedar/processing/steps/PositionOfMaximum.h"
+#include "cedar/processing/steps/Count.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/typecheck/IsMatrix.h"
+#include <cedar/processing/ElementDeclaration.h>
 
 // SYSTEM INCLUDES
-#include "cedar/processing/ElementDeclaration.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -58,17 +58,19 @@ bool declare()
 
   ElementDeclarationPtr declaration
   (
-    new ElementDeclarationTemplate<cedar::proc::steps::PositionOfMaximum>
+    new ElementDeclarationTemplate<cedar::proc::steps::Count>
     (
       "Programming",
-      "cedar.processing.steps.PositionOfMaximum"
+      "cedar.processing.steps.Count"
     )
   );
 
-  declaration->setIconPath(":/steps/positionofmaximum.svg");
+  declaration->setIconPath(":/steps/count_larger.svg");
+  declaration->deprecatedName("cedar.processing.steps.CountLarger");
   declaration->setDescription
   (
-    "Returns the indices of the maximum value of the tensor."
+    "Count the number of entries int the input that are larger than the given "
+    "threshold. TODO: add options for smaller-than, equal, etc."
   );
 
   declaration->declare();
@@ -83,23 +85,30 @@ bool declared = declare();
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::steps::PositionOfMaximum::PositionOfMaximum()
+cedar::proc::steps::Count::Count()
 :
 // outputs
-mOutput(new cedar::aux::MatData(cv::Mat()))
+mOutput(new cedar::aux::MatData(cv::Mat::zeros(1,1,CV_32F))),
+mThreshold(new cedar::aux::DoubleParameter(this, "threshold", 0.0))
 {
   // declare all data
   cedar::proc::DataSlotPtr input = this->declareInput("input");
   this->declareOutput("output", mOutput);
 
   input->setCheck(cedar::proc::typecheck::IsMatrix());
+
+  QObject::connect(mThreshold.get(), SIGNAL(valueChanged()), this, SLOT(updateThreshold()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+void cedar::proc::steps::Count::updateThreshold()
+{
+  recompute();
+}
 
-void cedar::proc::steps::PositionOfMaximum::inputConnectionChanged(const std::string& inputName)
+void cedar::proc::steps::Count::inputConnectionChanged(const std::string& inputName)
 {
   // TODO: you may want to replace this code by using a cedar::proc::InputSlotHelper
 
@@ -113,7 +122,7 @@ void cedar::proc::steps::PositionOfMaximum::inputConnectionChanged(const std::st
   if (!this->mInput)
   {
     // no input -> no output
-    this->mOutput->setData(cv::Mat());
+    this->mOutput->setData(cv::Mat::zeros(1,1,CV_32F));
     output_changed = true;
   }
   else
@@ -128,36 +137,64 @@ void cedar::proc::steps::PositionOfMaximum::inputConnectionChanged(const std::st
     }
 
     // Make a copy to create a matrix of the same type, dimensions, ...
-    this->mOutput->setData( cv::Mat::zeros(2, 1, CV_32F) );
-
-    this->mOutput->copyAnnotationsFrom(this->mInput);
+    this->recompute();
   }
 
   if (output_changed)
   {
-    recompute();
     this->emitOutputPropertiesChangedSignal("output");
   }
 }
 
-void cedar::proc::steps::PositionOfMaximum::compute(const cedar::proc::Arguments&)
+void cedar::proc::steps::Count::compute(const cedar::proc::Arguments&)
 {
-  recompute();
+  this->recompute();
 }
 
-void cedar::proc::steps::PositionOfMaximum::recompute()
+void cedar::proc::steps::Count::recompute()
 {
-  if (!mInput)
+  auto input = getInput("input");
+
+  if (!input)
     return;
 
-  if (mInput->getData().empty())
+  auto data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(input);
+
+  if (!data)
     return;
+ 
+  cv::Mat mat = data->getData();
 
-  double minimum, maximum;
-  int minLoc[2]= {-1, -1};
-  int maxLoc[2]= {-1, -1};
+  float threshold = mThreshold->getValue();
+  int ret= 0;
 
-  cv::minMaxIdx(mInput->getData(), &minimum, &maximum, minLoc, maxLoc);
-  mOutput->getData().at<float>(0,0) = maxLoc[0];
-  mOutput->getData().at<float>(1,0) = maxLoc[1];
+#if 0
+  if (cedar::aux::math::isZero(threshold)) // think of numeric precision
+  {
+    ret= cv::countNonZero( mat );
+  }
+  else
+#endif    
+  if (mat.empty())
+  {
+    ret= 0;
+  }
+  else
+  {
+    // row needs to be outer loop for better caching
+    for(int j= 0; j < mat.rows; j++)
+    {
+      for(int i=0; i < mat.cols; i++)
+      {
+        if (mat.at<float>(j, i) > threshold + 1e-8)
+        {
+          ret++;
+        }
+      }
+    }
+    // TODO multi-dim arrays
+  }
+ 
+  this->mOutput->getData().at<float>(0,0)= static_cast<float>(ret);
 }
+

@@ -14,7 +14,7 @@
     FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
     License for more details.
 
-    You should have received a copy of the GNU Lesser General Public License
+    You should have received a clone of the GNU Lesser General Public License
     along with cedar. If not, see <http://www.gnu.org/licenses/>.
 
 ========================================================================================================================
@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CountLarger.cpp
+    File:        ExponentialSmoothing.cpp
 
     Maintainer:  jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        2017 12 04
+    Date:        
 
-    Description: Source file for the class cedar::proc::steps::CountLarger.
+    Description: Source file for the class cedar::proc::steps::ExponentialSmoothing.
 
     Credits:
 
@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CLASS HEADER
-#include "cedar/processing/steps/CountLarger.h"
+#include "cedar/processing/steps/ExponentialSmoothing.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/typecheck/IsMatrix.h"
@@ -58,18 +58,18 @@ bool declare()
 
   ElementDeclarationPtr declaration
   (
-    new ElementDeclarationTemplate<cedar::proc::steps::CountLarger>
+    new ElementDeclarationTemplate<cedar::proc::steps::ExponentialSmoothing>
     (
       "Programming",
-      "cedar.processing.steps.CountLarger"
+      "cedar.processing.steps.ExponentialSmoothing"
     )
   );
 
-  declaration->setIconPath(":/steps/count_larger.svg");
+  declaration->setIconPath(":/steps/exponential_smoothing.svg");
   declaration->setDescription
   (
-    "Count the number of entries int the input that are larger than the given "
-    "threshold."
+    "Implements element-wise exponential smoothing (over time) and "
+    "thus smoothes your incoming inputs. Holt (i.e. double exponential) method. TODO: implement optional triple or single exponential methods."
   );
 
   declaration->declare();
@@ -84,30 +84,27 @@ bool declared = declare();
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::steps::CountLarger::CountLarger()
+cedar::proc::steps::ExponentialSmoothing::ExponentialSmoothing()
 :
 // outputs
-mOutput(new cedar::aux::MatData(cv::Mat::zeros(1,1,CV_32F))),
-mThreshold(new cedar::aux::DoubleParameter(this, "threshold", 0.0))
+mOutput(new cedar::aux::MatData(cv::Mat())),
+mDataEstimate(),
+mTrendEstimate(),
+mDataSmoothingFactor(new cedar::aux::DoubleParameter(this, "data smoothing factor", 0.1, 0.0, 1.0)),
+mTrendSmoothingFactor(new cedar::aux::DoubleParameter(this, "trend smoothing factor", 0.1, 0.0, 1.0))
 {
   // declare all data
   cedar::proc::DataSlotPtr input = this->declareInput("input");
-  this->declareOutput("output", mOutput);
+  this->declareOutput("forecast", mOutput);
 
   input->setCheck(cedar::proc::typecheck::IsMatrix());
-
-  QObject::connect(mThreshold.get(), SIGNAL(valueChanged()), this, SLOT(updateThreshold()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::steps::CountLarger::updateThreshold()
-{
-  recompute();
-}
 
-void cedar::proc::steps::CountLarger::inputConnectionChanged(const std::string& inputName)
+void cedar::proc::steps::ExponentialSmoothing::inputConnectionChanged(const std::string& inputName)
 {
   // TODO: you may want to replace this code by using a cedar::proc::InputSlotHelper
 
@@ -121,7 +118,7 @@ void cedar::proc::steps::CountLarger::inputConnectionChanged(const std::string& 
   if (!this->mInput)
   {
     // no input -> no output
-    this->mOutput->setData(cv::Mat::zeros(1,1,CV_32F));
+    this->mOutput->setData(cv::Mat());
     output_changed = true;
   }
   else
@@ -135,22 +132,30 @@ void cedar::proc::steps::CountLarger::inputConnectionChanged(const std::string& 
       output_changed = true;
     }
 
-    // Make a copy to create a matrix of the same type, dimensions, ...
+    // Make a clone to create a matrix of the same type, dimensions, ...
     this->recompute();
   }
 
   if (output_changed)
   {
-    this->emitOutputPropertiesChangedSignal("output");
+    mDataEstimate= cv::Mat();
+    mTrendEstimate= cv::Mat();
+    this->emitOutputPropertiesChangedSignal("forecast");
   }
 }
 
-void cedar::proc::steps::CountLarger::compute(const cedar::proc::Arguments&)
+void cedar::proc::steps::ExponentialSmoothing::compute(const cedar::proc::Arguments&)
 {
   this->recompute();
 }
 
-void cedar::proc::steps::CountLarger::recompute()
+void cedar::proc::steps::ExponentialSmoothing::reset()
+{
+  mDataEstimate= cv::Mat();
+  mTrendEstimate= cv::Mat();
+}
+
+void cedar::proc::steps::ExponentialSmoothing::recompute()
 {
   auto input = getInput("input");
 
@@ -161,39 +166,59 @@ void cedar::proc::steps::CountLarger::recompute()
 
   if (!data)
     return;
- 
-  cv::Mat mat = data->getData();
 
-  float threshold = mThreshold->getValue();
-  int ret= 0;
+  cv::Mat input_mat = data->getData();
 
-#if 0
-  if (cedar::aux::math::isZero(threshold)) // think of numeric precision
+  cv::Mat out_mat;
+
+  // first time step:
+  if (mDataEstimate.empty())
   {
-    ret= cv::countNonZero( mat );
+    mDataEstimate= input_mat.clone(); // prepare
+
+    out_mat= input_mat.clone(); // no filtering yet
+  }
+  else if (mTrendEstimate.empty())
+  {
+    // prepare:
+    mTrendEstimate= input_mat - mDataEstimate;
+    mDataEstimate= input_mat.clone();
+
+    out_mat= input_mat.clone(); // no filtering yet
   }
   else
-#endif    
-  if (mat.empty())
   {
-    ret= 0;
+    auto alpha = mDataSmoothingFactor->getValue();
+    auto gamma = mTrendSmoothingFactor->getValue();
+
+    // smoothed data:
+    cv::Mat last_data_estimate = mDataEstimate.clone();
+    cv::Mat new_data_estimate;
+
+    // best trend estimate (i.e. where the data is going ...)
+    cv::Mat last_trend_estimate = mTrendEstimate.clone();
+    cv::Mat new_trend_estimate;
+
+    // mix of new data and last forecast:
+    new_data_estimate= alpha * input_mat
+                        + ( 1 - alpha ) 
+                          // and the last forecast:
+                          * ( last_data_estimate
+                             + last_trend_estimate ); 
+
+    // mix of new and last trend estimates:
+    new_trend_estimate= gamma * ( new_data_estimate - last_data_estimate )
+                        + ( 1 - gamma ) * last_trend_estimate;
+
+    // the new forecast:
+    out_mat = new_data_estimate + new_trend_estimate;
+
+    mDataEstimate= new_data_estimate;
+    mTrendEstimate= new_trend_estimate;
   }
-  else
-  {
-    // row needs to be outer loop for better caching
-    for(int j= 0; j < mat.rows; j++)
-    {
-      for(int i=0; i < mat.cols; i++)
-      {
-        if (mat.at<float>(j, i) > threshold + 1e-8)
-        {
-          ret++;
-        }
-      }
-    }
-    // TODO multi-dim arrays
-  }
- 
-  this->mOutput->getData().at<float>(0,0)= static_cast<float>(ret);
+
+
+  this->mOutput->setData(out_mat);
+  //this->mOutput->cloneAnnotationsFrom(this->mInput);
 }
 

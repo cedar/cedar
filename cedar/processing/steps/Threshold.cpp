@@ -69,7 +69,9 @@ bool declare()
   declaration->setIconPath(":/steps/threshold.svg");
   declaration->setDescription
   (
-    "A step that applies a threshold to an image."
+    "A step that applies a threshold to an image. NOTE: Will apply "
+    "Opencv binary thresholding, i.e. setting either the boundary value "
+    "or 0 in the result. Use the Clamp-step for clamping values in matrices."
   );
 
   declaration->declare();

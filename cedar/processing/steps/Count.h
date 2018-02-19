@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CountLarger.h
+    File:        Count.h
 
     Maintainer:  jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        2017 12 04
 
-    Description: Header file for the class cedar::proc::steps::CountLarger.
+    Description: Header file for the class cedar::proc::steps::Count.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_COUNT_LARGER_H
-#define CEDAR_PROC_STEPS_COUNT_LARGER_H
+#ifndef CEDAR_PROC_STEPS_COUNT_H
+#define CEDAR_PROC_STEPS_COUNT_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -47,7 +47,7 @@
 #include <cedar/auxiliaries/DoubleParameter.h>
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/CountLarger.fwd.h"
+#include "cedar/processing/steps/Count.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -56,7 +56,7 @@
  *
  * @todo describe more.
  */
-class cedar::proc::steps::CountLarger : public cedar::proc::Step
+class cedar::proc::steps::Count : public cedar::proc::Step
 {
   Q_OBJECT
 
@@ -69,7 +69,7 @@ class cedar::proc::steps::CountLarger : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CountLarger();
+  Count();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -118,7 +118,7 @@ private:
 public slots:
   void updateThreshold();
 
-}; // class cedar::proc::steps::CountLarger
+}; // class cedar::proc::steps::Count
 
-#endif // CEDAR_PROC_STEPS_COUNT_LARGER_H
+#endif // CEDAR_PROC_STEPS_COUNT_H
 
