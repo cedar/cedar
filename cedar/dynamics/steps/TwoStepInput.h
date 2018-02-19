@@ -11,7 +11,7 @@
 
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/TwoStepInput.fwd.h"
+#include "cedar/dynamics/steps/TwoStepInput.fwd.h"
 #include "cedar/dynamics/Dynamics.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
@@ -30,7 +30,7 @@
  *        The output matrix will contain values of a Gauss function, sampled based on the indices of the matrix taken as
  *        x,y,... coordinates.
  */
-class cedar::proc::sources::TwoStepInput : public cedar::dyn::Dynamics
+class cedar::dyn::steps::TwoStepInput : public cedar::dyn::Dynamics
 {
 	//--------------------------------------------------------------------------------------------------------------------
 	// macros

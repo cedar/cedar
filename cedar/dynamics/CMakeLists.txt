@@ -51,6 +51,7 @@ cedar_add_library(cedardyn
                   steps/RateToSpaceCode.h
                   steps/SerialOrder.h
                   steps/SpaceToRateCode.h
+                  steps/TwoStepInput.h
                   RESOURCES
                   gui/icons/cedar_dynamics_gui_icons.qrc
                   )

@@ -28,20 +28,20 @@
     Email:       jan.tekuelve@ini.ruhr-uni-bochum.de
     Date:        2018 02 19
 
-    Description: Forward declaration file for the class cedar::proc::sources::TwoStepInput.
+    Description: Forward declaration file for the class cedar::dyn::steps::TwoStepInput.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_TWOSTEP_INPUT_FWD_H
-#define CEDAR_PROC_SOURCES_TWOSTEP_INPUT_FWD_H
+#ifndef CEDAR_DYN_STEPS_TWOSTEP_INPUT_FWD_H
+#define CEDAR_DYN_STEPS_TWOSTEP_INPUT_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/lib.h"
+#include "cedar/dynamics/lib.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -51,16 +51,16 @@
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
-  namespace proc
+  namespace dyn
   {
-    namespace sources
+    namespace steps
     {
-      CEDAR_DECLARE_PROC_CLASS(TwoStepInput);
+      CEDAR_DECLARE_DYN_CLASS(TwoStepInput);
     }
   }
 }
 
 //!@endcond
 
-#endif // CEDAR_PROC_SOURCES_TWOSTEP_INPUT_FWD_H
+#endif // CEDAR_DYN_STEPS_TWOSTEP_INPUT_FWD_H
 
