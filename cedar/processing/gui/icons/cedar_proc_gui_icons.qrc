@@ -66,6 +66,7 @@
         <file>steps/static_gain_smaller_minus_one.svg</file>
         <file>steps/switch.svg</file>
         <file>steps/threshold.svg</file>
+	<file>steps/two_step_input.svg</file>
         <file>steps/matrix_multiply.svg</file>
         <file>steps/matrix_padding.svg</file>
         <file>steps/matrix_slice.svg</file>
