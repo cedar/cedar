@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,40 +22,34 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PositionOfMaximum.h
+    File:        
 
-    Maintainer:  Jean-Stephane Jokeit
+    Maintainer:  
     Email:       
-    Date:        2017 05 14
+    Date:        
 
-    Description: Header file for the class cedar::proc::steps::PositionOfMaximum.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_POSITION_OF_MAXIMUM_H
-#define CEDAR_PROC_STEPS_POSITION_OF_MAXIMUM_H
-
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
+#ifndef CEDAR_PROC_STEPS_MAXIMUM_H
+#define CEDAR_PROC_STEPS_MAXIMUM_H
 
 // CEDAR INCLUDES
-#include <cedar/processing/Step.h>
-#include <cedar/processing/InputSlotHelper.h>
-#include <cedar/auxiliaries/MatData.h>
+#include "cedar/processing/Step.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/PositionOfMaximum.fwd.h"
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/processing/steps/Maximum.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief   This is a step that sums up a number of inputs.
  */
-class cedar::proc::steps::PositionOfMaximum : public cedar::proc::Step
+class cedar::proc::steps::Maximum : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -66,13 +60,21 @@ class cedar::proc::steps::PositionOfMaximum : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  PositionOfMaximum();
+  Maximum();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
+
+  /*! A helper function that calculates the sum of all matrices in the given slot.
+   *
+   * @remarks This function assumes that the output matrix, sum, is initialized to the appropriate size, and that all
+   *          matrices in the slot are the same size (0D matrices are treated as scalar additions).
+   */
+  static void sumSlot(cedar::proc::ExternalDataPtr slot, cv::Mat& sum, bool lock = false);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -84,33 +86,20 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void inputConnectionChanged(const std::string& inputName);
-
-  void compute(const cedar::proc::Arguments& arguments);
-  void recompute();
-
+  //!@brief Method that is called whenever an input is connected to the Connectable.
+  virtual void inputConnectionChanged(const std::string& inputName);
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-private:
-  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
-  cedar::aux::ConstMatDataPtr mInput;
+  //!@brief The input slot containing all the terms.
+  cedar::proc::ExternalDataPtr mInputs;
 
-  //!@brief The output data.
+  //!@brief The data containing the output.
   cedar::aux::MatDataPtr mOutput;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
 private:
   // none yet
+}; // class cedar::proc::steps::Maximum
 
-}; // class cedar::proc::steps::PositionOfMaximum
-
-#endif // CEDAR_PROC_STEPS_POSITION_OF_MAXIMUM_H
-
+#endif // CEDAR_PROC_STEPS_MAXIMUM_H
