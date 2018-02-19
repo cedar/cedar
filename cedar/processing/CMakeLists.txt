@@ -103,6 +103,7 @@ cedar_add_library(cedarproc
   gui/WidgetContainerItem.h
   sources/BoxInput.h
   sources/GaussInput.h
+  sources/TwoStepInput.h
   steps/VariableBox.h
   steps/VariableGauss.h
   steps/SinusDynamics.h

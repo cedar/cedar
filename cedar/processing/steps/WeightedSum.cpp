@@ -94,7 +94,7 @@ cedar::proc::steps::WeightedSum::~WeightedSum()
   // TODO Auto-generated destructor stub
 }
 
-void cedar::proc::steps::WeightedSum::compute(const cedar::proc::Arguments& arguments)
+void cedar::proc::steps::WeightedSum::compute(const cedar::proc::Arguments& /*arguments*/)
 {
   cv::Mat& output = mOutput->getData();
   cv::Mat& tangOutput = mOutputTangential->getData();
