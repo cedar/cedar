@@ -414,14 +414,17 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
   for (const auto& measurement : measurements)
   {
     std::string name = component->getNameForMeasurementType(measurement);
-    auto measurementData = component->getMeasurementData(measurement)->clone();
-    if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(measurementData))
+    if(auto measurementDataOriginal = component->getMeasurementData(measurement))
     {
-      cv::Mat measurementMat = measurementData->getData<cv::Mat>().clone();
-      std::string name = component->getNameForMeasurementType(measurement);
-      if(auto outPutPtr = mOutputs.at(name))
+      auto measurementData = measurementDataOriginal->clone();
+      if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(measurementData))
       {
-        outPutPtr->setData(measurementMat);
+        cv::Mat measurementMat = measurementData->getData<cv::Mat>().clone();
+        std::string name = component->getNameForMeasurementType(measurement);
+        if(auto outPutPtr = mOutputs.at(name))
+        {
+          outPutPtr->setData(measurementMat);
+        }
       }
     }
   }
