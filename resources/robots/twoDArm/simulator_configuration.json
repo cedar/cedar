@@ -1,0 +1,8 @@
+{
+  "name": "Simulated TwoDArm",
+  "description file": "robots/twoDArm/description.json",
+  "component instantiations":
+  {
+    "arm": "simulator"
+  }
+}
