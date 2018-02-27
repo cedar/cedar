@@ -92,109 +92,82 @@ public:
 public:
   T read(const std::string& port)
   {
-//    std::cout << "Read from the YarpChannel. Port: "<< port << std::endl;
-    try
-    {
-//      std::cout<< "Find Reader"<<std::endl;
       auto iter = mReaderMap.find(port);
-      if (iter != mReaderMap.end() && iter->second)
+      if (iter != mReaderMap.end())
       {
-//        std::cout<<"Try Reading Value with instatiated reader"<< std::endl;
-        T readValue = iter->second->read();
-//        std::cout<<" Read Value with instatiated reader: "<< readValue << std::endl;
-        return readValue;
+        try
+        {
+          if(iter->second)
+          {
+            T readValue = iter->second->read();
+            return readValue;
+          }
+          else
+          {
+            //a previous NetWaitingForWriterException makes us do this
+            //std::cout<< "Try to read from port: "<< port <<" , but there was no reader yet. Created one!"<<std::endl;
+            iter->second = TypeReaderPtr(new TypeReader(port));
+            T readValue = iter->second->read();
+            return readValue;
+          }
+        }
+        catch (cedar::aux::net::NetUnexpectedDataException& exc)
+        {
+          // this is ok, happens when reader is faster than writer
+          CEDAR_THROW(cedar::dev::IgnoreCommunicationException, "no data");
+        }
+        catch (cedar::aux::net::NetWaitingForWriterException &e)
+        {
+          // that's ok,we'll establish that one once a reader is available, but reset the pointer for now.
+          iter->second = nullptr;
+          CEDAR_THROW(cedar::dev::IgnoreCommunicationException, "writer is missing");
+        }
+        catch (cedar::aux::net::NetMissingRessourceException &e)
+        {
+          CEDAR_THROW(cedar::dev::CommunicationException, "yarp is down");
+        }
       }
-      else
-      {
-        // try to open it once more!
-//        std::cout<< "Read Else"<<std::endl;
-        iter->second = TypeReaderPtr(new TypeReader(port));
-//        std::cout<<"Initialized Reader"<< std::endl;
-        T readValue = iter->second->read();
-        return readValue;
-//      CEDAR_THROW(cedar::dev::CommunicationException, "port \"" + port + "\" is unknown");
-      }
-    }
-    catch (cedar::aux::net::NetUnexpectedDataException& exc)
-    {
-//      std::cout<< "Throw NetUnexpectedDataException"<<std::endl;
-      CEDAR_THROW(cedar::dev::IgnoreCommunicationException, "no data");
-      // this is ok, happens when reader is faster than writer
-    }
-    catch (cedar::aux::net::NetWaitingForWriterException &e)
-    {
-      //TODO: This should not be ignored!
-//      std::cout<< "Throw NetWaitingForWriterException"<<std::endl;
-      CEDAR_THROW(cedar::dev::IgnoreCommunicationException, "writer is missing");
-    }
-    catch (cedar::aux::net::NetMissingRessourceException &e)
-    {
-//      std::cout<< "Throw NetMissingRessourceException"<<std::endl;
-      CEDAR_THROW(cedar::dev::CommunicationException, "yarp is down");
-    }
     CEDAR_THROW(cedar::aux::ExceptionBase, "read failed because of an undefined error");
-//    std::cout<< "Throw ExceptionBase"<<std::endl;
-
   }
 
   void write(T value, const std::string& port)
   {
-//    std::cout << "Write to the YarpChannel. Port: "<< port << " Value: "<< value <<std::endl;
-    if (mWriterMap.find(port) != mWriterMap.end())
+    auto iter = mWriterMap.find(port);
+    if (iter != mWriterMap.end())
     {
-//      std::cout << "1"<< std::endl;
-      try
+      if(iter->second)
       {
-//        std::cout << "2: mWriterMap Size: "<< mWriterMap.size() << " Count: "<< mWriterMap.count(port)<< std::endl;
-        TypeWriterPtr myWriter = mWriterMap.at(port);
-//        std::cout<< " 2B: myWriter exists " <<std::endl;
-        myWriter->write(value);
-//        std::cout << "3"<< std::endl;
+        try
+        {
+          iter->second->write(value);
+        }
+        catch (cedar::aux::net::NetMissingRessourceException &e)
+        {
+          CEDAR_THROW(cedar::dev::CommunicationException, "yarp is down");
+        }
       }
-      catch (cedar::aux::net::NetMissingRessourceException &e)
+      else
       {
-//        std::cout << "4"<< std::endl;
-        CEDAR_THROW(cedar::dev::CommunicationException, "yarp is down");
+        CEDAR_THROW(cedar::dev::CommunicationException, "port is not open");
       }
-//      std::cout << "5"<< std::endl;
     }
-    else
-    {
-//      std::cout << "6"<< std::endl;
-      CEDAR_THROW(cedar::dev::CommunicationException, "port is not open");
-    }
-//    std::cout << "7"<< std::endl;
   }
 
   void addReaderPort(const std::string& port)
   {
-	//TODO: IF ELSE IS UNNECESSARY RIGHT NOW!!!
-//    std::cout << "Add Reader Port: " << port << std::endl;
+    //One could check here, if the channel is open and instantiate an open port in that case
     if (mReaderMap.find(port) == mReaderMap.end())
     {
-      this->mReaderMap[port] = TypeReaderPtr();
-    }
-    else
-    { //TODO: exception
-      std::cout << "readerport existed already: " << port <<" .was added again!"<< std::endl;
-      this->mReaderMap[port] = TypeReaderPtr();
-//      CEDAR_ASSERT(false);
+      this->mReaderMap[port] = nullptr;
     }
   }
 
   void addWriterPort(const std::string& port)
   {
-	//TODO: IF ELSE IS UNNECESSARY RIGHT NOW!!!
-//    std::cout << "Add Writer Port: " << port << std::endl;
+    //One could check here, if the channel is open and instantiate an open port in that case
     if (mWriterMap.find(port) == mWriterMap.end())
     {
-      this->mWriterMap[port] = TypeWriterPtr(new TypeWriter(port));
-    }
-    else
-    { //TODO: exception
-      std::cout << "writerport existed already: " << port <<" . port was added again."<< std::endl;
-      this->mWriterMap[port] = TypeWriterPtr(new TypeWriter(port));
-//      CEDAR_ASSERT(false);
+      this->mWriterMap[port] = nullptr;
     }
   }
 
@@ -204,13 +177,9 @@ public:
 protected:
   void openHook()
   {
-    std::cout << "Started the OpenHook" << std::endl;
-//    if (!mIsOpen)
-//    {
       for (auto it = mReaderMap.begin(); it != mReaderMap.end(); ++it)
       {
         const std::string& port = it->first;
-        std::cout << "Instantiate the reader for Port:" << port << std::endl;
         if (!it->second) // no object instance allocated before
         {
           try
@@ -219,32 +188,32 @@ protected:
           }
           catch (cedar::aux::net::NetWaitingForWriterException& exc)
           {
-            // that's ok, but reset pointer
-            it->second = TypeReaderPtr();
+            // that's ok,we'll establish that one once a reader is available, but reset the pointer for now.
+            it->second = nullptr;
           }
         }
       }
       for (auto it = mWriterMap.begin(); it != mWriterMap.end(); ++it)
       {
         const std::string& port = it->first;
-        std::cout << "Instantiate the Writer for Port:" << port << std::endl;
         if (!it->second) // no object instance allocated before
         {
           it->second = TypeWriterPtr(new TypeWriter(port));
         }
       }
-//    }
-    std::cout << "Finished with the OpenHook!" << std::endl;
   }
 
   void closeHook()
   {
-//    std::cout << "Started the CloseHook" << std::endl;
-    if (isOpen())
+    //Remove all Ports, but keep portname info
+    for (auto it = mWriterMap.begin(); it != mWriterMap.end(); ++it)
     {
-//      std::cout << "CloseHook closes!" << std::endl;
-      mReaderMap.clear();
-      mWriterMap.clear();
+      it->second = nullptr;
+    }
+
+    for (auto it = mReaderMap.begin(); it != mReaderMap.end(); ++it)
+    {
+      it->second = nullptr;
     }
   }
 

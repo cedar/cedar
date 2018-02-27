@@ -78,13 +78,14 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   bool applyCrashbrake() override;
+  void readConfiguration(const cedar::aux::ConfigurationNode& node) override;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
 
-  void postStart();
+  void registerPortNames();
   void sendAngles(cv::Mat mat);
   cv::Mat retrieveAngles();
 

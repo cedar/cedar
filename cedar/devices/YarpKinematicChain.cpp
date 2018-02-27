@@ -78,9 +78,6 @@ cedar::dev::YarpKinematicChain::YarpKinematicChain()
 {
   registerCommandHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::YarpKinematicChain::sendAngles, this, _1));
   registerMeasurementHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::YarpKinematicChain::retrieveAngles, this));
-
-  registerStartCommunicationHook(boost::bind(&cedar::dev::YarpKinematicChain::postStart, this));
-
   this->applyDeviceSideCommandsAs(cedar::dev::KinematicChain::JOINT_ANGLES);
 }
 
@@ -93,8 +90,16 @@ cedar::dev::YarpKinematicChain::~YarpKinematicChain()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::YarpKinematicChain::postStart()
+void cedar::dev::YarpKinematicChain::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
+  cedar::dev::KinematicChain::readConfiguration(node);
+
+  this->registerPortNames();
+}
+
+void cedar::dev::YarpKinematicChain::registerPortNames()
+{
+//  std::cout<<"Yarp Kinematic Chain adding the Reader and Writer Ports: "<< mReadPort->getValue() << ", "<< mWritePort->getValue() <<std::endl;
   auto yarpChannel = boost::static_pointer_cast< cedar::dev::YarpChannel<cv::Mat> >(this->getChannel());
   if (!yarpChannel)
   {
@@ -103,15 +108,6 @@ void cedar::dev::YarpKinematicChain::postStart()
   }
   else
   {
-//    auto readPortparameter = boost::dynamic_pointer_cast < cedar::aux::StringParameter > (yarpChannel->getParameter("readPortName"));
-//    readPort = readPortparameter->getValue();
-//
-//    auto writePortparameter = boost::dynamic_pointer_cast < cedar::aux::StringParameter > (yarpChannel->getParameter("writePortName"));
-//    writePort = writePortparameter->getValue();
-//
-//    std::cout << "ReadPort: " << readPort << std::endl;
-//    std::cout << "WritePort: " << writePort << std::endl;
-
     yarpChannel->addReaderPort(mReadPort->getValue());
     yarpChannel->addWriterPort(mWritePort->getValue());
   }
@@ -137,14 +133,12 @@ cv::Mat cedar::dev::YarpKinematicChain::retrieveAngles()
     return cv::Mat();
   }
   auto ret = yarpChannel->read(mReadPort->getValue());
-//  std::cout << "  yarp kin chain: " << ret << std::endl;
+
   return ret;
 }
 
 bool cedar::dev::YarpKinematicChain::applyCrashbrake()
 {
-//    cv::Mat::zeros( getNumberOfJoints(), 1, CV_32F );
-
   return false;
 }
 
