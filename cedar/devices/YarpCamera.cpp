@@ -60,10 +60,9 @@ namespace {
 
 cedar::dev::YarpCamera::YarpCamera()
         :
-        mReadPort(new cedar::aux::StringParameter(this, "readPortName", "readPortYarpCamera")) {
-  registerMeasurementHook(cedar::dev::Camera::CAMERA_PICTURE,
-                          boost::bind(&cedar::dev::YarpCamera::retrievePicture, this));
-  registerStartCommunicationHook(boost::bind(&cedar::dev::YarpCamera::postStart, this));
+        mReadPort(new cedar::aux::StringParameter(this, "readPortName", "readPortYarpCamera"))
+{
+  registerMeasurementHook(cedar::dev::Camera::CAMERA_PICTURE,boost::bind(&cedar::dev::YarpCamera::retrievePicture, this));
 }
 
 cedar::dev::YarpCamera::~YarpCamera() {
@@ -72,7 +71,15 @@ cedar::dev::YarpCamera::~YarpCamera() {
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::YarpCamera::postStart() {
+
+void cedar::dev::YarpCamera::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  cedar::dev::Camera::readConfiguration(node);
+
+  this->registerPortNames();
+}
+
+void cedar::dev::YarpCamera::registerPortNames() {
   auto yarpChannel = boost::static_pointer_cast<cedar::dev::YarpChannel<cv::Mat> >(this->getChannel());
 
   if (!yarpChannel) {
@@ -80,7 +87,6 @@ void cedar::dev::YarpCamera::postStart() {
     cedar::aux::LogSingleton::getInstance()->error("Lost yarpChannel pointer", CEDAR_CURRENT_FUNCTION_NAME);
     return;
   } else {
-    std::cout<<"YarpCamera::postStart: Added Reader for Port: "<< mReadPort->getValue() << std::endl;
     yarpChannel->addReaderPort(mReadPort->getValue());
   }
 }
@@ -92,10 +98,8 @@ cv::Mat cedar::dev::YarpCamera::retrievePicture() {
     cedar::aux::LogSingleton::getInstance()->error("Lost yarpChannel pointer", CEDAR_CURRENT_FUNCTION_NAME);
     return cv::Mat();
   }
-  std::cout<<"YarpCamera::retrievePicture: We have a YarpChannel! Read from Port: "<< mReadPort->getValue() << std::endl;
-  auto picture = yarpChannel->read(mReadPort->getValue());
-
-  return picture;
+    auto picture = yarpChannel->read(mReadPort->getValue());
+    return picture;
 }
 
 #endif //CEDAR_USE_YARP
