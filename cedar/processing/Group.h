@@ -205,6 +205,7 @@ public:
    */
   void readConfiguration(const cedar::aux::ConfigurationNode& root);
 
+
   void readData(const cedar::aux::ConfigurationNode& root);
 
   /*!@brief Writes the group to a configuration node.

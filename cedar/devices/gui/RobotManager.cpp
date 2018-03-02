@@ -176,18 +176,37 @@ void cedar::dev::gui::RobotManager::fillExistingRobots()
 {
   std::vector<std::string> robot_names = cedar::dev::RobotManagerSingleton::getInstance()->getRobotNames();
 
-  if(robot_names.size() == 0)
-  {
+//  if(robot_names.size() == 0)
+//  {
     // if there is no robot yet, add an empty placeholder
-    simpleModeAdd();
-    return;
-  }
+    // Always add this robot?
+
+//    return;
+//  }
+
+  bool doesDummyExist = false;
 
   for (auto robot_name_iter = robot_names.begin(); robot_name_iter != robot_names.end(); ++robot_name_iter)
   {
     const std::string& robot_name = *robot_name_iter;
     this->addRobotName(QString::fromStdString(robot_name));
+
+    try
+    {
+      std::string nameTest = cedar::dev::RobotManagerSingleton::getInstance()->getRobotTemplateName(robot_name);
+    }
+    catch(cedar::dev::TemplateNotFoundException e)
+    {
+      //We have a dummy Robot!
+      doesDummyExist = true;
+    }
   }
+
+  if(!doesDummyExist)
+  {
+    simpleModeAdd();
+  }
+
 }
 
 void cedar::dev::gui::RobotManager::removeClicked()

@@ -42,6 +42,7 @@
 #include "cedar/devices/Robot.h"
 #include "cedar/devices/exceptions.h"
 #include "cedar/auxiliaries/systemFunctions.h"
+#include "cedar/devices/KinematicChain.h"
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/ptree.hpp>
@@ -221,7 +222,7 @@ std::string cedar::dev::RobotManager::getNewRobotName() const
 
 void cedar::dev::RobotManager::addRobotName(const std::string& robotName)
 {
-  if (mRobotInstances.find(robotName) != mRobotInstances.end())
+  if (this->doesRobotExist(robotName))
   {
     CEDAR_THROW(cedar::aux::DuplicateNameException, "A robot with the name \"" + robotName + "\" already exists.");
   }
@@ -434,25 +435,63 @@ void cedar::dev::RobotManager::loadRobotTemplateConfiguration
 
 void cedar::dev::RobotManager::store() const
 {
-  cedar::aux::Path config_path = cedar::aux::Path::globalCofigurationBaseDirectory() + "robots.json";
+  //Lets try without writing down robots to that external file!
+  //Todo:: Remove this function eventually!
 
-  cedar::aux::ConfigurationNode root, robots;
+//  cedar::aux::Path config_path = cedar::aux::Path::globalCofigurationBaseDirectory() + "robots.json";
+//
+//  cedar::aux::ConfigurationNode root;
+//  this->writeRobotConfigurations(root);
+//  boost::property_tree::write_json(config_path.toString(), root);
+}
+
+void cedar::dev::RobotManager::writeRobotConfigurations(cedar::aux::ConfigurationNode& root) const
+{
+
+  cedar::aux::ConfigurationNode robots;
 
   // serialized templated robots
   for (const auto& name_robot_pair : this->mRobotInstances)
   {
-    const auto& robot_name = name_robot_pair.first;
+
+    const auto &robot_name = name_robot_pair.first;
+    auto info_iter = this->mRobotInfos.find(robot_name);
+    if (info_iter->second.mTemplateName == "")
+    {
+      //This should be the generic default robot only!
+      continue;
+    }
 
     cedar::aux::ConfigurationNode robot;
     robot.put("name", robot_name);
 
-    auto info_iter = this->mRobotInfos.find(robot_name);
     if (info_iter != this->mRobotInfos.end())
     {
       auto robot_info = info_iter->second;
       robot.put("template name", robot_info.mTemplateName);
       robot.put("loaded template configuration", robot_info.mLoadedTemplateConfiguration);
       robot.put("loaded template configuration name", robot_info.mLoadedTemplateConfigurationName);
+
+      //For KinematicChains also save their initialConfigurations
+      auto robotPtr = name_robot_pair.second;
+      auto robotSlotNames = robotPtr->getComponentSlotNames();
+      for(unsigned int i=0;i<robotSlotNames.size();i++)
+      {
+        ComponentPtr component = robotPtr->getComponent(robotSlotNames[i]);
+        if(KinematicChainPtr kinChain = boost::dynamic_pointer_cast<cedar::dev::KinematicChain>(component))
+        {
+          cedar::aux::ConfigurationNode kinChainNode;
+          cedar::aux::ConfigurationNode initialConfigurations;
+          kinChain->writeInitialConfigurations(initialConfigurations);
+          kinChainNode.push_back(cedar::aux::ConfigurationNode::value_type("initial configurations", initialConfigurations));
+          if (!kinChain->getCurrentInitialConfiguration().empty())
+          {
+            kinChainNode.put("current initial configuration",kinChain->getCurrentInitialConfigurationName());
+          }
+          robot.push_back(cedar::aux::ConfigurationNode::value_type(kinChain->getName(), kinChainNode));
+        }
+      }
+
 
     }
     else
@@ -468,8 +507,121 @@ void cedar::dev::RobotManager::store() const
   }
 
   root.push_back(cedar::aux::ConfigurationNode::value_type("robots", robots));
-  boost::property_tree::write_json(config_path.toString(), root);
+
 }
+
+void cedar::dev::RobotManager::readRobotConfigurations(cedar::aux::ConfigurationNode& robots)
+{
+  //!@todo Needs error handling.
+  for (auto child_iter = robots.begin(); child_iter != robots.end(); ++child_iter)
+  {
+    if (child_iter->first != "robot")
+    {
+      cedar::aux::LogSingleton::getInstance()->warning
+              (
+                      "Unexpected node type \"" + child_iter->first + "\". Assuming this was meant to be \"robot\".",
+                      "void cedar::dev::RobotManager::readRobotConfigurations()"
+              );
+    }
+    const cedar::aux::ConfigurationNode& robot = child_iter->second;
+
+    std::string name = robot.get<std::string>("name");
+    if (name.empty() || this->doesRobotExist(name))
+    {
+      if(this->doesRobotExist(name))
+      {
+        this->readKinematicChainConfigurations(name,robot);
+      }
+      continue;
+    }
+
+
+
+
+    this->addRobotName(name);
+
+    if (robot.find("template name") != robot.not_found())
+    {
+      std::string template_name = robot.get<std::string>("template name");
+      std::string loaded_template_configuration = robot.get<std::string>("loaded template configuration");
+      std::string loaded_template_configuration_name = robot.get<std::string>("loaded template configuration name");
+      if (!template_name.empty())
+      {
+        this->setRobotTemplateName(name, template_name);
+      }
+
+      if (!loaded_template_configuration.empty())
+      {
+        try
+        {
+          this->loadRobotTemplateConfiguration(name, loaded_template_configuration);
+        }
+        catch( cedar::dev::TemplateNotFoundException )
+        {
+          cedar::aux::LogSingleton::getInstance()->warning(
+                  "could not restore loaded configuration " + loaded_template_configuration_name + " for robot: \"" + name , CEDAR_CURRENT_FUNCTION_NAME); //+ "\" (from: " + config_path.absolute().toString() + ")"
+
+        }
+      }
+
+      if (!loaded_template_configuration_name.empty())
+      {
+        this->setRobotTemplateConfigurationName(name, loaded_template_configuration_name);
+      }
+    }
+    else
+    {
+      auto config_iter = robot.find("configuration");
+      if (config_iter != robot.not_found())
+      {
+        auto config = config_iter->second.get_value<std::string>();
+        this->loadRobotConfiguration(name, config);
+      }
+    }
+
+    this->readKinematicChainConfigurations(name,robot);
+
+  }
+}
+
+
+void cedar::dev::RobotManager::readKinematicChainConfigurations(std::string robotName,const cedar::aux::ConfigurationNode& robot)
+{
+  // Add Configurations to KinematicChains
+  RobotPtr robotPtr = this->getRobot(robotName);
+  auto robotSlotNames = robotPtr->getComponentSlotNames();
+  for(unsigned int i=0;i<robotSlotNames.size();i++)
+  {
+    ComponentPtr component = robotPtr->getComponent(robotSlotNames[i]);
+    if(KinematicChainPtr kinChain = boost::dynamic_pointer_cast<cedar::dev::KinematicChain>(component))
+    {
+      auto chainName = kinChain->getName();
+      auto chain_iter = robot.find(chainName);
+      if (chain_iter != robot.not_found())
+      {
+        auto chainNode = robot.get_child(chainName);
+        auto configurations_iter = chainNode.find("initial configurations");
+        if(configurations_iter != chainNode.not_found())
+        {
+          auto config_node = chainNode.get_child("initial configurations");
+          kinChain->readInitialConfigurations(config_node);
+        }
+
+        auto cur_config_iter = chainNode.find("current initial configuration");
+        if (cur_config_iter != chainNode.not_found())
+        {
+          std::string configName = chainNode.get<std::string>("current initial configuration");
+          kinChain->setCurrentInitialConfiguration(configName);
+//          std::cout<<"Set the current Inital Config to: " << configName << std::endl;
+        }
+      }
+    }
+
+  }
+
+}
+
+
 
 void cedar::dev::RobotManager::restore()
 {
@@ -492,66 +644,16 @@ void cedar::dev::RobotManager::restore()
 
   robots = root.get_child("robots");
 
-  //!@todo Needs error handling.
-  for (auto child_iter = robots.begin(); child_iter != robots.end(); ++child_iter)
-  {
-    if (child_iter->first != "robot")
-    {
-      cedar::aux::LogSingleton::getInstance()->warning
-      (
-        "Unexpected node type \"" + child_iter->first + "\". Assuming this was meant to be \"robot\".",
-        "void cedar::dev::RobotManager::restore()"
-      );
-    }
-    const cedar::aux::ConfigurationNode& robot = child_iter->second;
+  this->readRobotConfigurations(robots);
 
-    std::string name = robot.get<std::string>("name");
-    if (name.empty())
-    {
-      continue;
-    }
-    this->addRobotName(name);
-
-    if (robot.find("template name") != robot.not_found())
-    {
-      std::string template_name = robot.get<std::string>("template name");
-      std::string loaded_template_configuration = robot.get<std::string>("loaded template configuration");
-      std::string loaded_template_configuration_name = robot.get<std::string>("loaded template configuration name");
-      if (!template_name.empty())
-      {
-        this->setRobotTemplateName(name, template_name);
-      }
-
-      if (!loaded_template_configuration.empty())
-      {
-        try
-        {
-          this->loadRobotTemplateConfiguration(name, loaded_template_configuration);
-        }
-        catch( cedar::dev::TemplateNotFoundException )
-        {
-          cedar::aux::LogSingleton::getInstance()->warning(
-            "could not restore loaded configuration " + loaded_template_configuration_name + " for robot: \"" + name + "\" (from: " + config_path.absolute().toString() + ")",
-            CEDAR_CURRENT_FUNCTION_NAME);
-        }
-      }
-
-      if (!loaded_template_configuration_name.empty())
-      {
-        this->setRobotTemplateConfigurationName(name, loaded_template_configuration_name);
-      }
-    }
-    else
-    {
-      auto config_iter = robot.find("configuration");
-      if (config_iter != robot.not_found())
-      {
-        auto config = config_iter->second.get_value<std::string>();
-        this->loadRobotConfiguration(name, config);
-      }
-    }
-  }
 }
+
+bool cedar::dev::RobotManager::doesRobotExist(std::string robotName)
+{
+  return mRobotInstances.find(robotName) != mRobotInstances.end();
+}
+
+
 
 
 void cedar::dev::RobotManager::emitConfigurationChanged()

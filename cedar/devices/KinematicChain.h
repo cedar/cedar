@@ -562,6 +562,12 @@ public:
   //!@brief read initial configurations out of chain specific file
   void readInitialConfigurations();
 
+  //!@brief read initial configurations out of a specific node
+  void readInitialConfigurations(cedar::aux::ConfigurationNode& initConfigurations);
+
+  //!@brief write initial configurations to a specific node
+  void writeInitialConfigurations(cedar::aux::ConfigurationNode& initConfigurations);
+
   cv::Mat getUpperJointLimits();
   cv::Mat getLowerJointLimits();
   cv::Mat getUpperVelocityLimits();

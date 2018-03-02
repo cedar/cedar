@@ -182,6 +182,10 @@ private:
   void disconnectManually();
   void openRobotManager();
 
+  void applyCurrentInitialConfiguration();
+
+  void readConfiguration(const cedar::aux::ConfigurationNode& node) override;
+
 private slots:
   void componentChangedSlot();
 

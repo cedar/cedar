@@ -1146,12 +1146,31 @@ void cedar::proc::gui::Group::readJson(const cedar::aux::Path &source)
   cedar::aux::ConfigurationNode root;
   read_json(source.toString(), root);
 
+
+  this->readRobots(root);
   this->mGroup->readConfiguration(root);
   this->readConfiguration(root);
 
   if (boost::filesystem::exists(source.toString() + ".data"))
   {
     this->mGroup->readDataFile(source.toString() + ".data");
+  }
+}
+
+void cedar::proc::gui::Group::readRobots(const cedar::aux::ConfigurationNode &root)
+{
+  if (root.find("ui generic") != root.not_found())
+  {
+    auto node = root.get_child("ui generic");
+    // read robots
+    auto robots_node = node.find("robots");
+    {
+      if (robots_node != node.not_found())
+      {
+        auto robots = node.get_child("robots");
+        cedar::dev::RobotManagerSingleton::getInstance()->readRobotConfigurations(robots);
+      }
+    }
   }
 }
 
@@ -1188,7 +1207,8 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
         this->_mArchitectureWidgets[key] = value.get_value<std::string>();
       }
     }
-    // read background color
+
+
 
     // read background color
     auto color_node = node.find("background color");
@@ -1444,6 +1464,13 @@ void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode &
       architecture_plots.put(pair.first, pair.second.toString(true));
     }
     generic.put_child("architecture widgets", architecture_plots);
+  }
+
+  // write down robots
+  {
+    //Todo: Write only robots down that are actually used in the architecture
+    cedar::dev::RobotManagerSingleton::getInstance()->writeRobotConfigurations(generic);
+
   }
 
   // write background color

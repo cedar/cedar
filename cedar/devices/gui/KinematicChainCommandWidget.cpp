@@ -369,31 +369,39 @@ void cedar::dev::gui::KinematicChainCommandWidget::loadInitialConfigurations()
 
 void cedar::dev::gui::KinematicChainCommandWidget::changeInitialConfig()
 {
-  const std::string filename = "initial_configurations_"+ mpKinematicChain->getName() + ".json";
-  cedar::aux::Path file_path = cedar::aux::Path::globalCofigurationBaseDirectory() + filename;
+  //Does this in any case need the info from the jsonFile?
 
-  cedar::aux::ConfigurationNode root;
-
-  try
-  {
-    boost::property_tree::read_json(file_path.toString(), root);
-  }catch(...)
-  {
-    return;
-  }
+//  const std::string filename = "initial_configurations_"+ mpKinematicChain->getName() + ".json";
+//  cedar::aux::Path file_path = cedar::aux::Path::globalCofigurationBaseDirectory() + filename;
+//
+//  cedar::aux::ConfigurationNode root;
+//
+//  try
+//  {
+//    boost::property_tree::read_json(file_path.toString(), root);
+//  }catch(...)
+//  {
+//    return;
+//  }
 
   const std::string& conf_name = mpIniconfBox->currentText().toStdString();
-  const boost::property_tree::ptree::iterator found = root.to_iterator(root.find(conf_name));
+//  const boost::property_tree::ptree::iterator found = root.to_iterator(root.find(conf_name));
 
-  if( found != root.end())
+  if( mpKinematicChain->hasInitialConfiguration(conf_name))
   {
     mpKinematicChain->setCurrentInitialConfiguration(conf_name);
 
     for (uint i=0; i<mpKinematicChain->getNumberOfJoints(); ++i)
     {
-      float angle = found->second.get<float>(std::to_string(i));
+      float angle = mpKinematicChain->getInitialConfiguration(conf_name).at<float>(i,0);
       mCommandBoxes[i]->setValue(angle);
     }
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->error(
+            "The configuration: " +conf_name+" is not defined for: " +mpKinematicChain->prettifyName() + ". This is not supposed to happen!",
+            CEDAR_CURRENT_FUNCTION_NAME);
   }
 }
 
