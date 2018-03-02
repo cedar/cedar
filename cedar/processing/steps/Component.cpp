@@ -234,7 +234,7 @@ _mComponent(new cedar::dev::ComponentParameter(this, "component")),
 _mUserSelectableCommandTypeSubset(new cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameter(this,
 "Command Subset")),
 _mCommunicationStepSize(new cedar::aux::DoubleParameter(this, "communication step size [ms]", 10.0, 0.01, 100)),
-_mUseKinChainConfigurationOnReset( new cedar::aux::BoolParameter(this, "use current config on reset?", false))
+_mUseKinChainConfigurationOnReset( new cedar::aux::BoolParameter(this, "reset to current config?", false))
 {
   this->_mUserSelectableCommandTypeSubset->setConstant(true);
 
@@ -586,6 +586,13 @@ void cedar::proc::steps::Component::reset()
   auto component = this->getComponent();
   component->clearAll();
 
+  this->applyCurrentInitialConfiguration();
+}
+
+
+void cedar::proc::steps::Component::applyCurrentInitialConfiguration()
+{
+  auto component = this->getComponent();
   auto kinChain = boost::dynamic_pointer_cast<cedar::dev::SimulatedKinematicChain>(component);
   if( kinChain && _mUseKinChainConfigurationOnReset->getValue())
   {
@@ -607,10 +614,17 @@ void cedar::proc::steps::Component::reset()
         std::cout<<"Reset: Tried to reset "<< this->getName() <<" to " << kinChain->getCurrentInitialConfigurationName() <<" but it was not connected"<<std::endl;
       }
     } else
-      {
-        std::cout<<"Reset: Tried to reset "<< this->getName() <<" but no initial configurations were registered"<<std::endl;
-      }
+    {
+      std::cout<<"Reset: Tried to reset "<< this->getName() <<" but no initial configurations were registered"<<std::endl;
+    }
   }
+}
+
+void cedar::proc::steps::Component::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  cedar::proc::Step::readConfiguration(node);
+
+  this->applyCurrentInitialConfiguration();
 }
 
 void cedar::proc::steps::Component::inputConnectionChanged(const std::string& /*inputName*/)

@@ -160,6 +160,10 @@ public:
   //!@brief reads a configuration from a node
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
+  /*!@brief Reads the defined robots from a configuration node and initializes them in the RobotManager
+   */
+  void readRobots(const cedar::aux::ConfigurationNode &root);
+
   //!@brief saves a configuration to a node
   void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 

@@ -1033,7 +1033,7 @@ void cedar::dev::KinematicChain::checkInitialConfigurations()
   {
     rlock.unlock();
     // ... set a default initial configuration:
-    addInitialConfiguration("zeros", cv::Mat::zeros(getNumberOfJoints(), 1, CV_32FC1) );
+    addInitialConfiguration("zeros", cv::Mat::zeros(this->getNumberOfJoints(), 1, CV_32F) );
     // note, this recurses back to checkInitialConfigurations() but not into this if-branch
     return;
   }
@@ -1114,6 +1114,17 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
 {
   auto f = getInitialConfiguration(name); // throws if not found
 
+  if(f.rows != (int) this->getNumberOfJoints())
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+            (
+                    "Tried to apply an initial configuration \"" + name + "\" for \"" + this->getName() +
+                    + "\", but the specified number of angles was not correct.",
+                    "cedar::dev::KinematicChain::applyInitialConfiguration"
+            );
+    return;
+  }
+
   setCurrentInitialConfiguration(name);
   setSuppressUserSideInteraction(false);
 
@@ -1130,6 +1141,7 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
         "cedar::dev::KinematicChain::applyInitialConfiguration"
       );
   }
+
 }
 
 void cedar::dev::KinematicChain::readInitialConfigurations()
@@ -1139,8 +1151,16 @@ void cedar::dev::KinematicChain::readInitialConfigurations()
   const std::string filename = "initial_configurations_"+ this->getName() + ".json";
   cedar::aux::Path file_path = cedar::aux::Path::globalCofigurationBaseDirectory() + filename;
 
-  mInitialConfigurations.clear(); // remove meaningless defaults
+  // Maybe not using this leads to other problems, but still this does not seem right
+  // mInitialConfigurations.clear(); // remove meaningless defaults
+
+
   wlock.unlock();
+
+  // Instead change the zeros configuration to a meaningful zeros configuration
+  this->addInitialConfiguration("zeros", cv::Mat::zeros(this->getNumberOfJoints(), 1, CV_32F));
+
+
 
   cedar::aux::ConfigurationNode configs;
 
@@ -1161,18 +1181,44 @@ void cedar::dev::KinematicChain::readInitialConfigurations()
     return;
   }
 
-  for (auto child_iter = configs.begin(); child_iter != configs.end(); ++child_iter)
+  this->readInitialConfigurations(configs);
+}
+
+
+void cedar::dev::KinematicChain::readInitialConfigurations(cedar::aux::ConfigurationNode& initConfigurations)
+{
+
+  for (auto child_iter = initConfigurations.begin(); child_iter != initConfigurations.end(); ++child_iter)
   {
     cv::Mat joints = cv::Mat::zeros(this->getNumberOfJoints(), 1, CV_32F);
 
     for (uint i=0; i < this->getNumberOfJoints(); ++i)
     {
-      float angle = configs.get<float>(child_iter->first+"."+std::to_string(i));
+      float angle = initConfigurations.get(child_iter->first+"."+std::to_string(i),0.0f);
       joints.at<float>(i, 0) = angle;
     }
 
     this->addInitialConfiguration(child_iter->first, joints);
   }
+
+}
+
+
+void cedar::dev::KinematicChain::writeInitialConfigurations(cedar::aux::ConfigurationNode& initConfigurations)
+{
+
+  for (auto it = mInitialConfigurations.begin(); it != mInitialConfigurations.end(); it++)
+  {
+    cedar::aux::ConfigurationNode  joints;
+    // serialized joint angles
+    for (unsigned int i = 0; i < this->getNumberOfJoints(); ++i)
+    {
+      joints.put(std::to_string(i), float(it->second.at<float>(i,0)));
+    }
+    const std::string& conf_name = it->first;
+    initConfigurations.push_back(cedar::aux::ConfigurationNode::value_type(conf_name, joints));
+  }
+
 }
 
 unsigned int cedar::dev::KinematicChain::getCurrentInitialConfigurationIndex()

@@ -154,6 +154,12 @@ public:
 
   const std::string& getRobotTemplateName(const std::string& robotName) const;
 
+
+  void writeRobotConfigurations(cedar::aux::ConfigurationNode& root) const;
+
+  void readRobotConfigurations(cedar::aux::ConfigurationNode& robots);
+
+
   inline boost::signals2::connection connectToRobotNameAddedSignal(boost::function<void (const std::string&)> slot)
   {
     return this->mRobotNameAddedSignal.connect(slot);
@@ -226,6 +232,10 @@ private:
 
   //! Restores the state of the robot manager.
   void restore();
+
+  bool doesRobotExist(std::string robotName);
+
+  void readKinematicChainConfigurations(std::string robotName,const cedar::aux::ConfigurationNode& robot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
