@@ -1501,8 +1501,8 @@ bool cedar::proc::gui::Ide::save()
   }
   else
   {
-    this->mGroup->write();
     cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(this->mGroup->getFileName());
+    this->mGroup->write();
     this->setArchitectureChanged(false);
     return true;
   }
@@ -1679,11 +1679,12 @@ bool cedar::proc::gui::Ide::saveAs()
     file += ".json";
   }
 
+  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
+
   this->mGroup->writeJson(file.toStdString());
   this->displayFilename(file.toStdString());
   this->setArchitectureChanged(false);
   
-  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
 
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
   last_dir->setValue(path);
@@ -1832,6 +1833,10 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   group->getGroup()->setName("root");
   group->toggleTriggerColors(this->mpActionToggleTriggerColor->isChecked());
   this->mpProcessingDrawer->getScene()->setGroup(group);
+
+  //This is needed for relative paths, but should probably be done after loading. Maybe we should add an additional settings parameter
+  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(QDir(file).absolutePath().toStdString());
+
   // read network
   try
   {
@@ -1895,7 +1900,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   this->updateTriggerStartStopThreadCallers();
   this->loadPlotGroupsIntoComboBox();
 
-  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(QDir(file).absolutePath().toStdString());
+
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
   last_dir->setValue(path);

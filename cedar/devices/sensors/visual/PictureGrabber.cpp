@@ -169,7 +169,7 @@ void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
   // if found, read new image for that channel
   if (p_sender == getPictureChannel(channel)->_mSourceFileName)
   {
-    const std::string filename = getPictureChannel(channel)->_mSourceFileName->getPath();
+    const std::string filename = getPictureChannel(channel)->_mSourceFileName->getPath(true);
 
     // lock image-matrix for writing
     mpReadWriteLock->lockForWrite();
@@ -178,7 +178,7 @@ void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
 
     if (getImageMat(channel).empty())
     {
-      std::string message = this->getName() + ": Grabbing failed on Channel "
+      std::string message = this->getName() + ": FileNameChanged: Grabbing failed on Channel "
                             + cedar::aux::toString(channel) + " from \"" + filename + "\"" ;
       cedar::aux::LogSingleton::getInstance()->error
                                                (
@@ -213,13 +213,13 @@ void cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()
   for (unsigned int channel = 0; channel < num_channels; ++channel)
   {
     // read from file
-    cv::Mat frame = cv::imread(getPictureChannel(channel)->_mSourceFileName->getPath());
+    cv::Mat frame = cv::imread(getPictureChannel(channel)->_mSourceFileName->getPath(true));
 
     // test if successful
     if (frame.empty())
     {
       std::string msg = name + " Channel " + cedar::aux::toString(channel)
-                        + ": Could not read from \""+ getPictureChannel(channel)->_mSourceFileName->getPath() + "\"";
+                        + ": Could not read from \""+ getPictureChannel(channel)->_mSourceFileName->getPath(true) + "\"";
       CEDAR_THROW(cedar::dev::sensors::visual::CreateGrabberException,msg);
     }
 
@@ -266,11 +266,11 @@ const std::string cedar::dev::sensors::visual::PictureGrabber::getSourceFile(uns
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"PictureGrabber::setSourceFile");
   }
-  return getPictureChannel(channel)->_mSourceFileName->getPath();
+  return getPictureChannel(channel)->_mSourceFileName->getPath(true);
 }
 
 
 std::string cedar::dev::sensors::visual::PictureGrabber::onGetSourceInfo(unsigned int channel)
 {
-  return getPictureChannel(channel)->_mSourceFileName->getPath();
+  return getPictureChannel(channel)->_mSourceFileName->getPath(true);
 }

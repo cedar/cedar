@@ -204,7 +204,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
   // check if filenames are there (no filename could happen on startup in the processingGui)
   for (unsigned int channel = 0; channel < num_channels; ++channel)
   {
-    if (getVideoChannel(channel)->_mSourceFileName->getPath() == ".")
+    if (getVideoChannel(channel)->_mSourceFileName->getPath(true) == ".")
     {
       std::string msg = this->getName() + " channel " + cedar::aux::toString(channel)
                           + ": No video-file specified";
@@ -215,12 +215,12 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
   // open capture one by one
   for (unsigned int channel = 0; channel < num_channels; ++channel)
   {
-    cv::VideoCapture capture(getVideoChannel(channel)->_mSourceFileName->getPath());
+    cv::VideoCapture capture(getVideoChannel(channel)->_mSourceFileName->getPath(true));
 
     if (!capture.isOpened())
     {
       std::string msg = this->getName() + ": Grabbing failed on Channel " + cedar::aux::toString(channel)
-                        + " from \"" + getVideoChannel(channel)->_mSourceFileName->getPath() + "\"";
+                        + " from \"" + getVideoChannel(channel)->_mSourceFileName->getPath(true) + "\"";
       CEDAR_THROW(cedar::dev::sensors::visual::CreateGrabberException,msg)
     }
 
@@ -317,7 +317,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onGrab(unsigned int channel)
 std::string cedar::dev::sensors::visual::VideoGrabber::onGetSourceInfo(unsigned int channel)
 {
   return this->getName() + " - channel " + cedar::aux::toString(channel)
-                         + ": " + getVideoChannel(channel)->_mSourceFileName->getPath();
+                         + ": " + getVideoChannel(channel)->_mSourceFileName->getPath(true);
 }
 
 
@@ -483,5 +483,5 @@ const std::string cedar::dev::sensors::visual::VideoGrabber::getSourceFile(unsig
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "VideoGrabber::setSourceFile");
   }
 
-  return getVideoChannel(channel)->_mSourceFileName->getPath();
+  return getVideoChannel(channel)->_mSourceFileName->getPath(true);
 }

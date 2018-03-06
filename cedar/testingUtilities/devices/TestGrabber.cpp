@@ -167,7 +167,7 @@ void cedar::test::dev::TestGrabber::onCreateGrabber()
   for(unsigned int channel = 0; channel < num_channels; ++channel)
   {
     init_message << "Channel " << channel << ": capture from Source: "
-                 << getTestChannel(channel)->_mSourceFileName->getPath() << std::endl;
+                 << getTestChannel(channel)->_mSourceFileName->getPath(true) << std::endl;
   }
   cedar::aux::LogSingleton::getInstance()->message
                                            (
@@ -233,7 +233,7 @@ std::string cedar::test::dev::TestGrabber::onGetSourceInfo(unsigned int channel)
   // give some information about the used source like channelname, filename, devicename
   // or something like that
   return this->getName() + " Channel " + cedar::aux::toString(channel)
-                               + " : "+ getTestChannel(channel)->_mSourceFileName->getPath();
+                               + " : "+ getTestChannel(channel)->_mSourceFileName->getPath(true);
 }
 
 
@@ -285,6 +285,6 @@ void cedar::test::dev::TestGrabber::setTestParam(int testParameter)
 
 std::string cedar::test::dev::TestGrabber:: getSourceFileName(unsigned int channel) const
 {
-  return getTestChannel(channel)->_mSourceFileName->getPath();
+  return getTestChannel(channel)->_mSourceFileName->getPath(true);
 }
 

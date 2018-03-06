@@ -676,7 +676,7 @@ std::string cedar::dev::sensors::visual::Grabber::getSnapshotName(unsigned int c
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,buildChannelErrorMessage(channel));
   }
-  return getGrabberChannel(channel)->_mSnapshotName->getPath();
+  return getGrabberChannel(channel)->_mSnapshotName->getPath(true);
 }
 
 void cedar::dev::sensors::visual::Grabber::saveSnapshot(unsigned int channel) const
@@ -697,7 +697,7 @@ void cedar::dev::sensors::visual::Grabber::saveSnapshot(unsigned int channel) co
 
     try
     {
-      cv::imwrite(getGrabberChannel(channel)->_mSnapshotName->getPath(), imgBuffer);
+      cv::imwrite(getGrabberChannel(channel)->_mSnapshotName->getPath(true), imgBuffer);
     }
     catch (std::exception &e)
     {
@@ -803,7 +803,7 @@ const std::string cedar::dev::sensors::visual::Grabber::getRecordName(unsigned i
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,buildChannelErrorMessage(channel));
   }
-  return getGrabberChannel(channel)->_mRecordName->getPath();
+  return getGrabberChannel(channel)->_mRecordName->getPath(true);
 }
 
 void cedar::dev::sensors::visual::Grabber::startRecording
@@ -835,7 +835,7 @@ void cedar::dev::sensors::visual::Grabber::startRecording
   for(unsigned int channel = 0; channel < num_channels; ++channel)
   {
     // create writer
-    std::string record_name = getGrabberChannel(channel)->_mRecordName->getPath();
+    std::string record_name = getGrabberChannel(channel)->_mRecordName->getPath(true);
     cv::VideoWriter writer
                     (
                       record_name,

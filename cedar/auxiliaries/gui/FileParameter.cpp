@@ -39,6 +39,7 @@
 #include "cedar/auxiliaries/FileParameter.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
+#include "cedar/processing/gui/Settings.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
@@ -67,9 +68,23 @@ cedar::aux::gui::Parameter(pParent)
 {
   QHBoxLayout *p_layout = new QHBoxLayout();
   this->setLayout(p_layout);
+
+
+  QWidget *fileStringWidget = new QWidget();
+  QVBoxLayout *v_layout = new QVBoxLayout();
+  fileStringWidget->setLayout(v_layout);
+
+
+
   this->mpEdit = new QLineEdit();
   this->mpEdit->setReadOnly(true);
-  p_layout->addWidget(this->mpEdit);
+  v_layout->addWidget(this->mpEdit);
+
+
+  this->mpCheckRelative = new QCheckBox("use relative path?");
+  v_layout->addWidget(this->mpCheckRelative);
+
+  p_layout->addWidget(fileStringWidget);
 
   this->mpButton = new QPushButton(">");
   this->mpButton->setMinimumWidth(20);
@@ -81,7 +96,9 @@ cedar::aux::gui::Parameter(pParent)
   p_layout->setStretch(1, 0);
 
   QObject::connect(this->mpButton, SIGNAL(clicked()), this, SLOT(onBrowseClicked()));
+  QObject::connect(this->mpCheckRelative, SIGNAL(clicked()), this, SLOT(onUseRelativeClicked()));
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
+  QObject::connect(cedar::proc::gui::SettingsSingleton::getInstance().get(),SIGNAL(architectureFileHistoryChanged()),this,SLOT(parameterValueChanged()));
 }
 
 //!@brief Destructor
@@ -101,6 +118,8 @@ void cedar::aux::gui::FileParameter::parameterPointerChanged()
   this->mpEdit->setText(QString::fromStdString(parameter->getPath()));
   this->mpEdit->setReadOnly(true);
 
+
+
   QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(parameterValueChanged()));
 
   this->propertiesChanged();
@@ -112,6 +131,8 @@ void cedar::aux::gui::FileParameter::propertiesChanged()
   cedar::aux::Parameter::ReadLocker locker(parameter.get());
   this->mpEdit->setDisabled(parameter->isConstant());
   this->mpButton->setDisabled(parameter->isConstant());
+  this->mpCheckRelative->setChecked(parameter->getPathMode() == cedar::aux::FileParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
+
 }
 
 void cedar::aux::gui::FileParameter::parameterValueChanged()
@@ -121,12 +142,14 @@ void cedar::aux::gui::FileParameter::parameterValueChanged()
   this->mpEdit->setReadOnly(false);
   this->mpEdit->setText(QString::fromStdString(parameter->getPath()));
   this->mpEdit->setReadOnly(true);
+
 }
 
 void cedar::aux::gui::FileParameter::onBrowseClicked()
 {
   cedar::aux::FileParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::FileParameter>(this->getParameter());
+
 
   QString value;
   switch (parameter->getMode())
@@ -147,4 +170,20 @@ void cedar::aux::gui::FileParameter::onBrowseClicked()
   {
     parameter->setValue(value.toStdString());
   }
+}
+
+void cedar::aux::gui::FileParameter::onUseRelativeClicked()
+{
+  if(auto parameter = boost::dynamic_pointer_cast<cedar::aux::FileParameter>(this->getParameter()))
+  {
+    if(this->mpCheckRelative->isChecked())
+    {
+      parameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
+    }
+    else
+    {
+      parameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_ABSOLUTE);
+    }
+  }
+
 }

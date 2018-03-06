@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Parameter.h"
+#include "cedar/processing/gui/Settings.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/FileParameter.fwd.h"
@@ -76,7 +77,9 @@ public:
     PATH_MODE_ABSOLUTE,
 
     //! Paths are specified relative to the application's current working directory.
-    PATH_MODE_RELATIVE_TO_WORKING_DIR
+    PATH_MODE_RELATIVE_TO_WORKING_DIR,
+
+    PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR
   };
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -121,7 +124,7 @@ public:
    *
    * @remarks This is an alias for calling getValue().path().toStdString(). See the documentation for QDir for details.
    */
-  std::string getPath() const;
+  std::string getPath(bool forceAbsolutePath = false) const;
 
   /*!@brief Returns the mode of the file parameter.
    */
@@ -130,6 +133,8 @@ public:
   /*!@brief Sets the path mode.
    */
   void setPathMode(cedar::aux::FileParameter::PathMode mode);
+
+  cedar::aux::FileParameter::PathMode getPathMode();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -142,6 +147,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   // none yet
+  QDir getCurrentArchitectureFileDirectory() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

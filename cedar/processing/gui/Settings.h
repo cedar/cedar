@@ -362,6 +362,7 @@ public:
 
 signals:
   void elementFavoritesChanged();
+  void architectureFileHistoryChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
