@@ -61,7 +61,7 @@ int main()
     new cedar::aux::FileParameter(a.get(), "with_default", cedar::aux::FileParameter::WRITE, "default_value")
   );
 
-  std::string value = with_default->getPath();
+  std::string value = with_default->getPath(true);
   if (value != "default_value")
   {
     std::cout << "with_default doesn't have the default value set!" << std::endl;

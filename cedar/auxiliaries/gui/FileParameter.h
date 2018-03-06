@@ -46,6 +46,7 @@
 // SYSTEM INCLUDES
 #include <QLineEdit>
 #include <QPushButton>
+#include <QCheckBox>
 
 
 /*!@brief A widget for a cedar::aux::DirectoryParameter.
@@ -76,6 +77,10 @@ public slots:
   /*!@brief Handles a click on the browse button.
    */
   void onBrowseClicked();
+
+  /*!@brief Handles a click on the relative path checkbox.
+   */
+  void onUseRelativeClicked();
 
   /*!@brief Handles a changed parameter pointer.
    */
@@ -108,6 +113,9 @@ private:
 
   //! Button used for opening the dialog for selecting a file.
   QPushButton* mpButton;
+
+  //!Checkbox to switch between absolute and relative paths
+  QCheckBox* mpCheckRelative;
 
 }; // class cedar::aux::gui::FileParameter
 

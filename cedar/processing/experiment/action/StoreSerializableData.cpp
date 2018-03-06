@@ -79,7 +79,7 @@ void cedar::proc::experiment::action::StoreSerializableData::run()
     boost::bind(&cedar::aux::Configurable::unlockParameters, this, cedar::aux::LOCK_TYPE_READ)
   );
 
-  cedar::aux::Path path = this->_mOutputFile->getPath();
+  cedar::aux::Path path = this->_mOutputFile->getPath(true);
 
   if (this->_mAppendTime->getValue())
   {

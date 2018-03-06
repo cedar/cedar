@@ -89,7 +89,7 @@ cedar::dyn::steps::TwoStepInput::TwoStepInput()
     :
       mOutput(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
       _mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0)),
-      _mTimetilChange(new cedar::aux::DoubleParameter(this, "TimetilChange", 500)),
+      _mTimetilChange(new cedar::aux::DoubleParameter(this, "ISI", 500)),
       _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 2, 1, 4)),
       _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigma", 2, 3.0, 0.01, 1000.0)),
       _mCenters(new cedar::aux::DoubleVectorParameter(this, "centers", 2, 10.0, -10000.0, 10000.0)),

@@ -102,12 +102,46 @@ mPathMode(cedar::aux::FileParameter::PATH_MODE_ABSOLUTE)
 
 void cedar::aux::FileParameter::readFromNode(const cedar::aux::ConfigurationNode& node)
 {
-  this->mValue.setPath(QString::fromStdString(node.get_value<std::string>()));
+  bool oldFileFormat = true;
+
+  auto mode_iter = node.find("isRelative");
+  if (mode_iter != node.not_found())
+  {
+    auto pathMode = node.get<bool>("isRelative") ? FileParameter::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR : FileParameter::PATH_MODE_ABSOLUTE;
+    this->mPathMode = pathMode;
+    oldFileFormat = false;
+  }
+
+  auto path_iter = node.find("path");
+  if (path_iter != node.not_found())
+  {
+    if(this->mPathMode == FileParameter::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR )
+    {
+      this->mValue.setCurrent(this->getCurrentArchitectureFileDirectory().absolutePath());
+    }
+    this->mValue.setPath(QString::fromStdString(node.get<std::string>("path")));
+    oldFileFormat = false;
+  }
+
+  //Old version for legacy architecture files
+  if(oldFileFormat)
+  {
+    this->mValue.setPath(QString::fromStdString(node.get_value<std::string>()));
+    this->setPathMode(FileParameter::PATH_MODE_ABSOLUTE);
+  }
+
 }
 
 void cedar::aux::FileParameter::writeToNode(cedar::aux::ConfigurationNode& root) const
 {
-  root.put(this->getName(), this->getPath());
+  cedar::aux::ConfigurationNode fileParaNode;
+
+  fileParaNode.put("path",this->getPath());
+  fileParaNode.put("isRelative",this->mPathMode == FileParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
+
+  root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), fileParaNode));
+
+  // root.put(this->getName(), this->getPath());
 }
 
 void cedar::aux::FileParameter::copyValueFrom(cedar::aux::ConstParameterPtr other)
@@ -149,16 +183,26 @@ const QDir& cedar::aux::FileParameter::getValue() const
   return this->mValue;
 }
 
-std::string cedar::aux::FileParameter::getPath() const
+std::string cedar::aux::FileParameter::getPath(bool forceAbsolutePath) const
 {
+
+  //All the Grabberclasses expect this filePath, but maybe this could me removed in the long term. The other return values seem to work, but only during initialisation errors are thrown.
+  if(forceAbsolutePath)
+  {
+    return this->mValue.path().toStdString();
+  }
+
   switch (this->mPathMode)
   {
     default:
     case PATH_MODE_ABSOLUTE:
-      return this->mValue.path().toStdString();
+      return this->mValue.absolutePath().toStdString();
 
     case PATH_MODE_RELATIVE_TO_WORKING_DIR:
       return QDir::current().relativeFilePath(this->mValue.absolutePath()).toStdString();
+
+    case PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR:
+      return this->getCurrentArchitectureFileDirectory().relativeFilePath(this->mValue.absolutePath()).toStdString();
   }
 }
 
@@ -170,4 +214,25 @@ cedar::aux::FileParameter::Mode cedar::aux::FileParameter::getMode() const
 void cedar::aux::FileParameter::setPathMode(cedar::aux::FileParameter::PathMode mode)
 {
   this->mPathMode = mode;
+  this->emitChangedSignal();
+}
+
+
+cedar::aux::FileParameter::PathMode cedar::aux::FileParameter::getPathMode()
+{
+  return this->mPathMode;
+}
+
+
+QDir cedar::aux::FileParameter::getCurrentArchitectureFileDirectory() const
+{
+  auto lastArchitectureFiles = cedar::proc::gui::SettingsSingleton::getInstance()->getArchitectureFileHistory()->getValue();
+  auto lastArchitectureFile = lastArchitectureFiles.at(lastArchitectureFiles.size()-1);
+  QDir curArchitectureDir(QString::fromStdString(lastArchitectureFile));
+  curArchitectureDir.cdUp(); // Get the folder not the file!
+  //      std::cout<<"Currently the absolutePath to the last architecturefile is: " << curArchitectureDir.absolutePath().toStdString() <<std::endl;
+//      std::cout<<"The absolute path to the value is: " << this->mValue.absolutePath().toStdString() <<std::endl;
+//      std::cout<<"\tThe relative path is then: " << curArchitectureDir.relativeFilePath(this->mValue.absolutePath()).toStdString() <<std::endl;
+
+  return curArchitectureDir;
 }

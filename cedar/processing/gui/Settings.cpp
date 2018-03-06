@@ -554,6 +554,8 @@ void cedar::proc::gui::Settings::appendArchitectureFileToHistory(const std::stri
     new_order.erase(new_order.begin());
   }
   this->mRecentArchitectureFiles->setValue(new_order);
+
+  emit architectureFileHistoryChanged();
 }
 
 cedar::aux::StringVectorParameterPtr cedar::proc::gui::Settings::getArchitectureFileHistory()
