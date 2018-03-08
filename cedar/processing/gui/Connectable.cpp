@@ -82,7 +82,11 @@ Q_DECLARE_METATYPE(boost::shared_ptr<cedar::proc::DataSlot>);
 
 #ifdef CEDAR_USE_QGLVIEWER
   #include <qglviewer.h>
-  #include <QGLViewer/manipulatedFrame.h>
+#ifdef CEDAR_OS_WINDOWS
+#include <manipulatedFrame.h>
+#else
+#include <QGLViewer/manipulatedFrame.h>
+#endif // CEDAR_OS_WINDOWS
 #endif //CEDAR_USE_QGLVIEWER
 
 //----------------------------------------------------------------------------------------------------------------------

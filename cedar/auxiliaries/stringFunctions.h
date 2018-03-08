@@ -476,7 +476,7 @@ namespace cedar
     }
 
     //! Converts camel-case instances to spaces.
-    std::string camelCaseToSpaces(const std::string& camelCasedString);
+	CEDAR_AUX_LIB_EXPORT std::string camelCaseToSpaces(const std::string& camelCasedString);
   }
 }
 

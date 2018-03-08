@@ -82,6 +82,13 @@ if(NOT QT_FOUND)
   You can try to alter the default search paths in cedar.conf.")
 endif(NOT QT_FOUND)
 
+if (WIN32)
+link_directories(${CEDAR_DEPENDENCY_LIBRARIES})
+link_directories(${CEDAR_DEPENDENCY_QT5})
+link_directories(${CEDAR_OPENCV_CMAKE_DIR})
+link_directories(${CEDAR_DEPENDENCY_QGLVIEWER})
+endif(WIN32)
+
 # Boost
 if (WIN32)
   add_definitions("-D_WIN32_WINNT=0x0601")
