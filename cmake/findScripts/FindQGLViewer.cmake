@@ -21,17 +21,17 @@ else(NOT CEDAR_USE_QT5)
             PATHS ${CEDAR_DEPENDENCY_QGLVIEWER}
             )
   else(APPLE)
-    if(WIN32)
+    if(NOT WIN32)
     find_library(QGLViewer_LIBS
                 NAMES qglviewer-qt5 QGLViewer-qt5 #QGLViewer qglviewer
            	PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
             )
-    else(WIN32)
+    else(NOT WIN32)
     find_library(QGLViewer_LIBS
                 NAMES qglviewer-qt5 QGLViewer-qt5 QGLViewer qglviewer QGLViewer2 QGLViewer2.dll
                 PATHS ${CEDAR_DEPENDENCY_QGLVIEWER}
             )
-    endif(WIN32)
+    endif(NOT WIN32)
   endif(APPLE)
 endif(NOT CEDAR_USE_QT5)
 
