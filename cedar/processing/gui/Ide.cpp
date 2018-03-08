@@ -105,6 +105,8 @@
 
 #ifdef CEDAR_USE_YARP
 #include <yarp/conf/version.h>
+#include <cedar/auxiliaries/gui/Settings.h>
+
 #endif // CEDAR_USE_YARP
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1502,6 +1504,8 @@ bool cedar::proc::gui::Ide::save()
   else
   {
     cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(this->mGroup->getFileName());
+    cedar::aux::SettingsSingleton::getInstance()->setCurrentArchitectureFileName(this->mGroup->getFileName());
+
     this->mGroup->write();
     this->setArchitectureChanged(false);
     return true;
@@ -1681,6 +1685,8 @@ bool cedar::proc::gui::Ide::saveAs()
 
   cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
 
+  cedar::aux::SettingsSingleton::getInstance()->setCurrentArchitectureFileName(file.toStdString());
+
   this->mGroup->writeJson(file.toStdString());
   this->displayFilename(file.toStdString());
   this->setArchitectureChanged(false);
@@ -1834,8 +1840,9 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   group->toggleTriggerColors(this->mpActionToggleTriggerColor->isChecked());
   this->mpProcessingDrawer->getScene()->setGroup(group);
 
-  //This is needed for relative paths, but should probably be done after loading. Maybe we should add an additional settings parameter
-  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(QDir(file).absolutePath().toStdString());
+  //This is needed for relative paths
+  cedar::aux::SettingsSingleton::getInstance()->setCurrentArchitectureFileName(file.toStdString());
+
 
   // read network
   try
@@ -1891,6 +1898,8 @@ void cedar::proc::gui::Ide::loadFile(QString file)
     p_dialog->displayStdException(e);
     p_dialog->exec();
   }
+
+  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(QDir(file).absolutePath().toStdString());
 
   //!@todo Why doesn't this call resetTo?
   this->setGroup(group);

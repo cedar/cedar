@@ -114,6 +114,10 @@ public:
   //! Sets the default plot to be opened for 2d mat data.
   void setDefault2dMatDataPlot(const std::string& plotClass);
 
+
+
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -134,6 +138,8 @@ protected:
 private:
   //! Disables writing of the properties; this is useful for unit tests that shouldn't alter the configuration.
   bool mWritingDisabled;
+
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

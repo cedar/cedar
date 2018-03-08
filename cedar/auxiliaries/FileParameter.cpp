@@ -226,8 +226,7 @@ cedar::aux::FileParameter::PathMode cedar::aux::FileParameter::getPathMode()
 
 QDir cedar::aux::FileParameter::getCurrentArchitectureFileDirectory() const
 {
-  auto lastArchitectureFiles = cedar::proc::gui::SettingsSingleton::getInstance()->getArchitectureFileHistory()->getValue();
-  auto lastArchitectureFile = lastArchitectureFiles.at(lastArchitectureFiles.size()-1);
+  auto lastArchitectureFile = cedar::aux::SettingsSingleton::getInstance()->getCurrentArchitectureFileName();
   QDir curArchitectureDir(QString::fromStdString(lastArchitectureFile));
   curArchitectureDir.cdUp(); // Get the folder not the file!
   //      std::cout<<"Currently the absolutePath to the last architecturefile is: " << curArchitectureDir.absolutePath().toStdString() <<std::endl;
