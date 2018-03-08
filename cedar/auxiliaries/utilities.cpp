@@ -222,11 +222,14 @@ void cedar::aux::StackTrace::init(CONTEXT* context)
   }
   STACKFRAME64 stack_frame;
   memset(&stack_frame, 0, sizeof(STACKFRAME64));
+#ifndef CEDAR_OS_WINDOWS
   stack_frame.AddrPC.Offset = context_record.Eip;
-  stack_frame.AddrPC.Mode = AddrModeFlat;
   stack_frame.AddrFrame.Offset = context_record.Ebp;
-  stack_frame.AddrFrame.Mode = AddrModeFlat;
   stack_frame.AddrStack.Offset = context_record.Esp;
+#endif
+
+  stack_frame.AddrPC.Mode = AddrModeFlat;
+  stack_frame.AddrFrame.Mode = AddrModeFlat;
   stack_frame.AddrStack.Mode = AddrModeFlat;
 
   // initialize  the stack_frame variable

@@ -36,6 +36,17 @@
 
 # Configuration file for CMake
 
+#windows only
+if (WIN32)
+set(BOOST_INCLUDEDIR "C:/boost_1_65_0/")
+set(BOOST_LIBRARYDIR "C:/boost_1_65_0/lib64-msvc-14.0")
+link_directories(${BOOST_LIBRARYDIR})
+set(BOOST_ROOT "C:/boost_1_65_0/boost")
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_DEBUG ON)
+endif(WIN32)
+
 # general options
 set (CEDAR_LIB_DIR        "${CEDAR_HOME}/lib"         CACHE PATH "Directory all cedar libraries will be stored in.")
 set (CEDAR_EXE_DIR        "${CEDAR_HOME}/bin"         CACHE PATH "Directory all cedar executables will be stored in.")

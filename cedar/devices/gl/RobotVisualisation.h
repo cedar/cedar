@@ -115,7 +115,7 @@ namespace cedar
   }
 }
 
-CEDAR_AUX_EXPORT_SINGLETON(cedar::dev::gl::RobotVisualisationManager);
+CEDAR_DEV_EXPORT_SINGLETON(cedar::dev::gl::RobotVisualisationManager);
 
 
 #endif // CEDAR_DEV_ROBOTVIS_H

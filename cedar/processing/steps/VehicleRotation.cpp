@@ -37,6 +37,11 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+#ifdef CEDAR_OS_WINDOWS
+#define _USE_MATH_DEFINES
+#include <cmath>
+#endif // CEDAR_OS_WINDOWS
+
 // CLASS HEADER
 #include "cedar/processing/steps/VehicleRotation.h"
 

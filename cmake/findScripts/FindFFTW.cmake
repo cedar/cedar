@@ -10,7 +10,7 @@ find_path(FFTW_INCLUDE_DIRS
 )
 # find library in set of paths
 find_library(FFTW_LIBS
-  NAMES fftw3 libfftw3
+  NAMES fftw3 libfftw3 libfftw3-3
   PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
 )
 find_library(FFTW_LIBS_THREADED

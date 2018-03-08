@@ -180,10 +180,10 @@ namespace cedar
     {
       public:
         //! Constructor.
-        LockSetLocker(const cedar::aux::LockSet& lockSet);
+		  CEDAR_AUX_LIB_EXPORT LockSetLocker(const cedar::aux::LockSet& lockSet);
 
         //! Destructor.
-        ~LockSetLocker();
+		  CEDAR_AUX_LIB_EXPORT ~LockSetLocker();
 
       private:
         void applyLock();

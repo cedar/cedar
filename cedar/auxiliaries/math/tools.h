@@ -170,7 +170,7 @@ namespace cedar
       }
 
       //!@brief Returns a string corresponding to the given matrix's type
-      std::string matrixTypeToString(const cv::Mat& matrix);
+	  CEDAR_AUX_LIB_EXPORT std::string matrixTypeToString(const cv::Mat& matrix);
 
       //! Converts a string representation, e.g., "CV_32F" to the corresponding type value, e.g., CV_32F
       int matrixTypeFromString(const std::string& typeStr);
