@@ -39,7 +39,7 @@
 #include "cedar/auxiliaries/FileParameter.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
-#include "cedar/processing/gui/Settings.h"
+#include "cedar/auxiliaries/Settings.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
@@ -98,7 +98,7 @@ cedar::aux::gui::Parameter(pParent)
   QObject::connect(this->mpButton, SIGNAL(clicked()), this, SLOT(onBrowseClicked()));
   QObject::connect(this->mpCheckRelative, SIGNAL(clicked()), this, SLOT(onUseRelativeClicked()));
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
-  QObject::connect(cedar::proc::gui::SettingsSingleton::getInstance().get(),SIGNAL(architectureFileHistoryChanged()),this,SLOT(parameterValueChanged()));
+  QObject::connect(cedar::aux::SettingsSingleton::getInstance().get(),SIGNAL(currentArchitectureFileChanged()),this,SLOT(parameterValueChanged()));
 }
 
 //!@brief Destructor

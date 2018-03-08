@@ -212,6 +212,13 @@ public:
 
   cedar::aux::EnumParameterPtr getRecorderSerializationFormatParameter() const;
 
+  void setCurrentArchitectureFileName(std::string newFileName);
+
+  std::string getCurrentArchitectureFileName();
+
+signals:
+  void currentArchitectureFileChanged();
+
 public:
   CEDAR_DECLARE_SIGNAL(GlobalTimeFactorChanged, void(double));
 
@@ -247,6 +254,8 @@ private:
   boost::signals2::signal<void (const std::string&)> mPluginRemovedSignal;
 
   boost::signals2::signal<void (unsigned int, unsigned int)> mSearchPathsSwappedSignal;
+
+  std::string mCurrentArchitectureFileName;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

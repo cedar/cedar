@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Parameter.h"
-#include "cedar/processing/gui/Settings.h"
+#include "cedar/auxiliaries/Settings.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/FileParameter.fwd.h"

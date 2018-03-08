@@ -144,3 +144,5 @@ cedar::aux::UIntParameterPtr cedar::aux::gui::Settings::getMaximalNumberOfLogEnt
 {
   return this->_mMaximumNumberOfLogEntries;
 }
+
+

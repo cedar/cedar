@@ -441,6 +441,18 @@ void cedar::aux::Settings::removePluginToLoad(const std::string& path)
   }
 }
 
+std::string cedar::aux::Settings::getCurrentArchitectureFileName()
+{
+  return mCurrentArchitectureFileName;
+}
+
+void cedar::aux::Settings::setCurrentArchitectureFileName(std::string newFileName)
+{
+  mCurrentArchitectureFileName = newFileName;
+
+  emit currentArchitectureFileChanged();
+}
+
 #ifdef CEDAR_USE_FFTW
 unsigned int cedar::aux::Settings::getFFTWNumberOfThreads() const
 {
