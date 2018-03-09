@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/NumericParameter.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/gui/IgnoreLocaleDoubleSpinBox.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/DoubleParameter.fwd.h"
@@ -63,61 +64,61 @@ namespace cedar
     {
       //!@cond SKIPPED_DOCUMENTATION
       template<>
-      inline void NumericWidgetPolicy<double, QDoubleSpinBox>::setPrecision(QDoubleSpinBox* pWidget, int precision)
+      inline void NumericWidgetPolicy<double, cedar::aux::gui::IgnoreLocaleDoubleSpinBox>::setPrecision(cedar::aux::gui::IgnoreLocaleDoubleSpinBox* pWidget, int precision)
       {
         pWidget->setDecimals(precision);
       }
       //!@endcond
 
-      //!@cond SKIPPED_DOCUMENTATION
-      template<>
-      inline void NumericWidgetPolicy<double, QDoubleSpinBox>::manuallyChangedValue(QDoubleSpinBox* pWidget, const double& newvalue, const double& oldvalue)
-      {
-        if( newvalue != oldvalue )
-        {
-          // lets try this: set the last manual diff as the step size
-          auto diff = std::fabs( newvalue - oldvalue );
-
-          // find the magnitude of the last change. set that to be the step
-          double newstep;
-        
-          double magnitude_newval = std::floor( std::log10( newvalue ) );
-          double magnitude_oldval = std::floor( std::log10( oldvalue ) );
-          double magnitude_diff =  std::floor( std::log10( diff ) + 1e-8 );
-                                            // avoid numerical issues
-                                            // with smaller increases than intended ...
-
-          double magnitude;
-
-          if (std::isnan(magnitude_newval)
-              || std::isinf(magnitude_newval)) // when manually editing to 0
-          {
-            newstep= pWidget->singleStep(); // keep
-          }
-          else
-          {
-            if (magnitude_newval > magnitude_oldval
-                && std::fabs( magnitude_newval - magnitude_diff ) <= 1.0)
-            {
-              magnitude= magnitude_newval;
-                // (because the magnitude of the diff will be one smaller
-                //  because of the floor())
-            }
-            else
-            {
-              magnitude= magnitude_diff;
-            }
-
-            newstep= std::pow( 10, magnitude );
-          }
-
-          if (newstep != pWidget->singleStep()
-              && !cedar::aux::math::isZero( newstep ))
-          {
-            pWidget->setSingleStep( newstep );
-          }
-        }
-      }
+//      //!@cond SKIPPED_DOCUMENTATION
+//      template<>
+//      inline void NumericWidgetPolicy<double, cedar::aux::gui::IgnoreLocaleDoubleSpinBox>::manuallyChangedValue(cedar::aux::gui::IgnoreLocaleDoubleSpinBox* pWidget, const double& newvalue, const double& oldvalue)
+//      {
+//        if( newvalue != oldvalue )
+//        {
+//          // lets try this: set the last manual diff as the step size
+//          auto diff = std::fabs( newvalue - oldvalue );
+//
+//          // find the magnitude of the last change. set that to be the step
+//          double newstep;
+//
+//          double magnitude_newval = std::floor( std::log10( newvalue ) );
+//          double magnitude_oldval = std::floor( std::log10( oldvalue ) );
+//          double magnitude_diff =  std::floor( std::log10( diff ) + 1e-8 );
+//                                            // avoid numerical issues
+//                                            // with smaller increases than intended ...
+//
+//          double magnitude;
+//
+//          if (std::isnan(magnitude_newval)
+//              || std::isinf(magnitude_newval)) // when manually editing to 0
+//          {
+//            newstep= pWidget->singleStep(); // keep
+//          }
+//          else
+//          {
+//            if (magnitude_newval > magnitude_oldval
+//                && std::fabs( magnitude_newval - magnitude_diff ) <= 1.0)
+//            {
+//              magnitude= magnitude_newval;
+//                // (because the magnitude of the diff will be one smaller
+//                //  because of the floor())
+//            }
+//            else
+//            {
+//              magnitude= magnitude_diff;
+//            }
+//
+//            newstep= std::pow( 10, magnitude );
+//          }
+//
+//          if (newstep != pWidget->singleStep()
+//              && !cedar::aux::math::isZero( newstep ))
+//          {
+//            pWidget->setSingleStep( newstep );
+//          }
+//        }
+//      }
       //!@endcond
 
     }
@@ -126,7 +127,7 @@ namespace cedar
 
 /*!@brief Widget for manipulating cedar::aux::DoubleParameters.
  */
-class cedar::aux::gui::DoubleParameter : public cedar::aux::gui::NumericParameter<double, QDoubleSpinBox>
+class cedar::aux::gui::DoubleParameter : public cedar::aux::gui::NumericParameter<double, cedar::aux::gui::IgnoreLocaleDoubleSpinBox>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -137,7 +138,7 @@ class cedar::aux::gui::DoubleParameter : public cedar::aux::gui::NumericParamete
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  typedef cedar::aux::gui::NumericParameter<double, QDoubleSpinBox> Base;
+  typedef cedar::aux::gui::NumericParameter<double, cedar::aux::gui::IgnoreLocaleDoubleSpinBox> Base;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

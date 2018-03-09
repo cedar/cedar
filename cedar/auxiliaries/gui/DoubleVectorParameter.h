@@ -43,12 +43,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/NumericVectorParameter.h"
-
+#include <cedar/auxiliaries/gui/IgnoreLocaleDoubleSpinBox.h>
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/DoubleVectorParameter.fwd.h"
-
 // SYSTEM INCLUDES
-#include <QDoubleSpinBox>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -62,10 +60,10 @@ namespace cedar
     {
       //!@cond SKIPPED_DOCUMENTATION
       template <>
-      inline bool cedar::aux::gui::VectorParameterAbstraction<double, QDoubleSpinBox>::connectValueChange
+      inline bool cedar::aux::gui::VectorParameterAbstraction<double, cedar::aux::gui::IgnoreLocaleDoubleSpinBox>::connectValueChange
                   (
                     cedar::aux::gui::Parameter* pParameter,
-                    QDoubleSpinBox* pWidget
+                    cedar::aux::gui::IgnoreLocaleDoubleSpinBox* pWidget
                   )
       {
         return QObject::connect(pWidget, SIGNAL(valueChanged(double)), pParameter, SLOT(widgetValueChanged(double)));
@@ -74,7 +72,7 @@ namespace cedar
 
       //!@cond SKIPPED_DOCUMENTATION
       template<>
-      inline double cedar::aux::gui::VectorParameterAbstraction<double, QDoubleSpinBox>::getValue(QDoubleSpinBox* pWidget)
+      inline double cedar::aux::gui::VectorParameterAbstraction<double, cedar::aux::gui::IgnoreLocaleDoubleSpinBox>::getValue(cedar::aux::gui::IgnoreLocaleDoubleSpinBox* pWidget)
       {
         return pWidget->value();
       }
@@ -82,9 +80,9 @@ namespace cedar
 
       //!@cond SKIPPED_DOCUMENTATION
       template<>
-      inline void cedar::aux::gui::VectorParameterAbstraction<double, QDoubleSpinBox>::setValue
+      inline void cedar::aux::gui::VectorParameterAbstraction<double, cedar::aux::gui::IgnoreLocaleDoubleSpinBox>::setValue
                   (
-                    QDoubleSpinBox* pWidget,
+                    cedar::aux::gui::IgnoreLocaleDoubleSpinBox* pWidget,
                     const double& value
                   )
       {
@@ -94,9 +92,9 @@ namespace cedar
 
       //!@cond SKIPPED_DOCUMENTATION
       template<>
-      inline QDoubleSpinBox* cedar::aux::gui::VectorParameterAbstraction<double, QDoubleSpinBox>::create(unsigned int index)
+      inline cedar::aux::gui::IgnoreLocaleDoubleSpinBox* cedar::aux::gui::VectorParameterAbstraction<double, cedar::aux::gui::IgnoreLocaleDoubleSpinBox>::create(unsigned int index)
       {
-        auto p_widget = new QDoubleSpinBox();
+        auto p_widget = new cedar::aux::gui::IgnoreLocaleDoubleSpinBox();
         p_widget->setToolTip(QString("Set value for entry number %1.").arg(index));
         p_widget->setDecimals(4);
         return p_widget;
@@ -111,7 +109,7 @@ namespace cedar
 class cedar::aux::gui::DoubleVectorParameter : public cedar::aux::gui::NumericVectorParameter
                                                       <
                                                         double,
-                                                        QDoubleSpinBox
+                                                        cedar::aux::gui::IgnoreLocaleDoubleSpinBox
                                                       >
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -123,7 +121,7 @@ class cedar::aux::gui::DoubleVectorParameter : public cedar::aux::gui::NumericVe
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  typedef cedar::aux::gui::NumericVectorParameter<double, QDoubleSpinBox> Base;
+  typedef cedar::aux::gui::NumericVectorParameter<double, cedar::aux::gui::IgnoreLocaleDoubleSpinBox> Base;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
