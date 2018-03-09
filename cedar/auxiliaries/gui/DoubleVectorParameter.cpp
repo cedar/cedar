@@ -75,6 +75,6 @@ cedar::aux::gui::DoubleVectorParameter::Base(pParent)
 
 void cedar::aux::gui::DoubleVectorParameter::widgetValueChanged(double)
 {
-  this->Base::widgetValueChanged(cedar::aux::asserted_cast<QDoubleSpinBox*>(QObject::sender()));
+  this->Base::widgetValueChanged(cedar::aux::asserted_cast<cedar::aux::gui::IgnoreLocaleDoubleSpinBox*>(QObject::sender()));
 }
 

@@ -90,6 +90,7 @@ cedar_add_library(cedaraux
   gui/FileParameter.h
   gui/FrequencyParameter.h
   gui/HistoryPlot.h
+  gui/IgnoreLocaleDoubleSpinBox.h
   gui/ImagePlot.h
   gui/IntParameter.h
   gui/IntVectorParameter.h
