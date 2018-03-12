@@ -38,8 +38,7 @@
 
 
 #if defined CEDAR_USE_GLEW
-
-#include <Glew.h>
+#include <glew.h>
 #if defined CEDAR_OS_WINDOWS
 #ifndef NOMINMAX
 #define NOMINMAX
