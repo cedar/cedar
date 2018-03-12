@@ -80,7 +80,7 @@ double cedar::aux::gui::IgnoreLocaleDoubleSpinBox::valueFromText(const QString& 
   catch(const boost::bad_lexical_cast &)
   {
     returnValue = this->value();
-    std::cout<<"Got this text:" << text.toStdString() <<", but could not lexical cast therefore kept the value at: " << returnValue<<std::endl;
+//    std::cout<<"Got this text:" << text.toStdString() <<", but could not lexical cast therefore kept the value at: " << returnValue<<std::endl;
   }
 
   //set a "intelligentStepSize" depending on the last typed input. Maximum Stepsize however should be 1.
