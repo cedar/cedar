@@ -69,7 +69,7 @@ unsigned int DoubleVectorParameter::size() const
   return this->mWidgets.size();
 }
 
-QDoubleSpinBox* DoubleVectorParameter::widgetAt(int i)
+cedar::aux::gui::IgnoreLocaleDoubleSpinBox* DoubleVectorParameter::widgetAt(int i)
 {
   return this->mWidgets.at(i);
 }

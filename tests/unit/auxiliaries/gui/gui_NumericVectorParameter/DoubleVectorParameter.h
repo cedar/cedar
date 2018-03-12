@@ -67,7 +67,7 @@ public:
 public:
   bool empty() const;
   unsigned int size() const;
-  QDoubleSpinBox* widgetAt(int i);
+  cedar::aux::gui::IgnoreLocaleDoubleSpinBox* widgetAt(int i);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

@@ -36,11 +36,11 @@
 
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/devices/sensors/visual/GrabbableGrabber.h"
 #include "cedar/auxiliaries/Grabbable.h"
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/MatData.h"
-#include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gl/Block.h"
