@@ -82,7 +82,7 @@ private:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // no constructors -- this is a singleton class. Use cedar::aux::LogSingleton.
+  // no public constructors -- this is a singleton class. Use cedar::aux::LogSingleton.
 
   //!@brief Destructor
   ~Log();

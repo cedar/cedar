@@ -49,7 +49,8 @@
 
 cedar::aux::Log::Log()
 :
-mDefaultLogger(new cedar::aux::ConsoleLog())
+mDefaultLogger(new cedar::aux::ConsoleLog()),
+mThrowOnDebugMessage(false)
 {
 }
 
