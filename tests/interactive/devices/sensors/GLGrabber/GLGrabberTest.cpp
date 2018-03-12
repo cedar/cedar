@@ -35,11 +35,11 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/devices/sensors/visual/GLGrabber.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/MatData.h"
-#include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gl/Block.h"
