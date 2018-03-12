@@ -73,7 +73,7 @@ cedar::dev::gl::PowerCubeWrist90::~PowerCubeWrist90()
 
 void cedar::dev::gl::PowerCubeWrist90::initializeGl()
 {
-#ifndef CEDAR_OS_WINDOWS
+#ifndef CEDAR_OS_WINDOWS_NOGL
   // proximal link
   glGenBuffers(1, &mProximalLinkVertexVboId);
   glBindBuffer(GL_ARRAY_BUFFER, mProximalLinkVertexVboId);

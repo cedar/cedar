@@ -290,7 +290,7 @@ void cedar::aux::gl::ObjectVisualization::drawElement
 )
 {
   // bind the buffers
-#ifndef CEDAR_OS_WINDOWS
+#ifndef CEDAR_OS_WINDOWS_NOGL
   glBindBuffer(GL_ARRAY_BUFFER, vertexVboId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVboId);
 #endif // CEDAR_OS_WINDOWS

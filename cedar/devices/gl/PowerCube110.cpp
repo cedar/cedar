@@ -80,7 +80,7 @@ cedar::dev::gl::PowerCube110::~PowerCube110()
 
 void cedar::dev::gl::PowerCube110::initializeGl()
 {
-#ifndef CEDAR_OS_WINDOWS
+#ifndef CEDAR_OS_WINDOWS_NOGL
   // proximal link
   glGenBuffers(1, &mProximalLinkVertexVboId);
   glBindBuffer(GL_ARRAY_BUFFER, mProximalLinkVertexVboId);
