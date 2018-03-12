@@ -82,7 +82,7 @@ Q_DECLARE_METATYPE(boost::shared_ptr<cedar::proc::DataSlot>);
 
 #ifdef CEDAR_USE_QGLVIEWER
 #if defined CEDAR_USE_GLEW
-#include <Glew.h>
+#include <glew.h>
 #endif
 #include <qglviewer.h>
 #ifdef CEDAR_OS_WINDOWS
