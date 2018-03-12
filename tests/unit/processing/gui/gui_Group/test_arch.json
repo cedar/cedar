@@ -1,0 +1,327 @@
+{
+    "meta":
+    {
+        "format": "1"
+    },
+    "steps":
+    {
+        "cedar.dynamics.NeuralField":
+        {
+            "name": "new NeuralField",
+            "threaded": "false",
+            "resting level": "-5",
+            "time scale": "100",
+            "global inhibition": "-0.01",
+            "dimensionality": "2",
+            "sizes":
+            [
+                "10",
+                "10"
+            ],
+            "activation as output": "false",
+            "input noise gain": "0.1",
+            "sigmoid":
+            {
+                "type": "cedar.aux.math.AbsSigmoid",
+                "threshold": "0",
+                "beta": "100"
+            },
+            "lateral kernels":
+            {
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "2",
+                    "anchor":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "amplitude": "1",
+                    "sigmas":
+                    [
+                        "3",
+                        "3"
+                    ],
+                    "shifts":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "limit": "5"
+                }
+            },
+            "lateral kernel convolution":
+            {
+                "borderType": "Zero",
+                "mode": "Same",
+                "engine":
+                {
+                    "type": "cedar.aux.conv.OpenCV"
+                }
+            },
+            "noise correlation kernel":
+            {
+                "dimensionality": "2",
+                "anchor":
+                [
+                    "0",
+                    "0"
+                ],
+                "amplitude": "0",
+                "sigmas":
+                [
+                    "3",
+                    "3"
+                ],
+                "shifts":
+                [
+                    "0",
+                    "0"
+                ],
+                "limit": "5"
+            }
+        },
+        "cedar.dynamics.NeuralField":
+        {
+            "name": "new NeuralField 1",
+            "threaded": "false",
+            "resting level": "-5",
+            "time scale": "100",
+            "global inhibition": "-0.01",
+            "dimensionality": "2",
+            "sizes":
+            [
+                "10",
+                "10"
+            ],
+            "activation as output": "false",
+            "input noise gain": "0.1",
+            "sigmoid":
+            {
+                "type": "cedar.aux.math.AbsSigmoid",
+                "threshold": "0",
+                "beta": "100"
+            },
+            "lateral kernels":
+            {
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "2",
+                    "anchor":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "amplitude": "1",
+                    "sigmas":
+                    [
+                        "3",
+                        "3"
+                    ],
+                    "shifts":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "limit": "5"
+                }
+            },
+            "lateral kernel convolution":
+            {
+                "borderType": "Zero",
+                "mode": "Same",
+                "engine":
+                {
+                    "type": "cedar.aux.conv.OpenCV"
+                }
+            },
+            "noise correlation kernel":
+            {
+                "dimensionality": "2",
+                "anchor":
+                [
+                    "0",
+                    "0"
+                ],
+                "amplitude": "0",
+                "sigmas":
+                [
+                    "3",
+                    "3"
+                ],
+                "shifts":
+                [
+                    "0",
+                    "0"
+                ],
+                "limit": "5"
+            }
+        }
+    },
+    "triggers":
+    {
+        "cedar.processing.LoopedTrigger":
+        {
+            "name": "new LoopedTrigger",
+            "step size": "1",
+            "idle time": "0.01",
+            "simulated time": "1",
+            "loop mode": "Fixed",
+            "wait": "true",
+            "listeners":
+            [
+                "new NeuralField 1",
+                "new NeuralField"
+            ]
+        }
+    },
+    "networks":
+    {
+        "new Network":
+        {
+            "meta":
+            {
+                "format": "1"
+            },
+            "steps":
+            {
+                "cedar.dynamics.NeuralField":
+                {
+                    "name": "new NeuralField 2",
+                    "threaded": "false",
+                    "resting level": "-5",
+                    "time scale": "100",
+                    "global inhibition": "-0.01",
+                    "dimensionality": "2",
+                    "sizes":
+                    [
+                        "10",
+                        "10"
+                    ],
+                    "activation as output": "false",
+                    "input noise gain": "0.1",
+                    "sigmoid":
+                    {
+                        "type": "cedar.aux.math.AbsSigmoid",
+                        "threshold": "0",
+                        "beta": "100"
+                    },
+                    "lateral kernels":
+                    {
+                        "cedar.aux.kernel.Gauss":
+                        {
+                            "dimensionality": "2",
+                            "anchor":
+                            [
+                                "0",
+                                "0"
+                            ],
+                            "amplitude": "1",
+                            "sigmas":
+                            [
+                                "3",
+                                "3"
+                            ],
+                            "shifts":
+                            [
+                                "0",
+                                "0"
+                            ],
+                            "limit": "5"
+                        }
+                    },
+                    "lateral kernel convolution":
+                    {
+                        "borderType": "Zero",
+                        "mode": "Same",
+                        "engine":
+                        {
+                            "type": "cedar.aux.conv.OpenCV"
+                        }
+                    },
+                    "noise correlation kernel":
+                    {
+                        "dimensionality": "2",
+                        "anchor":
+                        [
+                            "0",
+                            "0"
+                        ],
+                        "amplitude": "0",
+                        "sigmas":
+                        [
+                            "3",
+                            "3"
+                        ],
+                        "shifts":
+                        [
+                            "0",
+                            "0"
+                        ],
+                        "limit": "5"
+                    }
+                }
+            },
+            "name": "new Network",
+            "promotedSlots": "",
+            "ui":
+            [
+                {
+                    "type": "step",
+                    "step": "new NeuralField 2",
+                    "display style": "ICON_AND_TEXT",
+                    "width": "160",
+                    "height": "50",
+                    "positionX": "24",
+                    "positionY": "40"
+                }
+            ]
+        }
+    },
+    "connections":
+    [
+        {
+            "source": "new NeuralField 1.sigmoided activation",
+            "target": "new NeuralField.input"
+        }
+    ],
+    "name": "root",
+    "promotedSlots": "",
+    "ui":
+    [
+        {
+            "type": "trigger",
+            "trigger": "new LoopedTrigger",
+            "width": "30",
+            "height": "30",
+            "positionX": "280",
+            "positionY": "16"
+        },
+        {
+            "type": "network",
+            "network": "new Network",
+            "width": "201",
+            "height": "93",
+            "positionX": "496",
+            "positionY": "136"
+        },
+        {
+            "type": "step",
+            "step": "new NeuralField",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "304",
+            "positionY": "176"
+        },
+        {
+            "type": "step",
+            "step": "new NeuralField 1",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "88",
+            "positionY": "176"
+        }
+    ]
+}

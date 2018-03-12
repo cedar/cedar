@@ -1,0 +1,29 @@
+<RCC>
+  <qresource prefix="/cedar/auxiliaries/gui">
+    <file>create.svg</file>
+    <file>error.svg</file>
+    <file>warning.svg</file>
+    <file>memory.svg</file>
+    <file>message.svg</file>
+    <file>clear.svg</file>
+    <file>clear_white.svg</file>
+    <file>debug.svg</file>
+    <file>delete.svg</file>
+    <file>delete_white.svg</file>
+    <file>favorite.svg</file>
+    <file>jump.svg</file>
+    <file>trashcan.svg</file>
+    <file>link.svg</file>
+    <file>lock_locked.svg</file>
+    <file>lock_unlocked.svg</file>
+    <file>menu_save.svg</file>
+    <file>pause.svg</file>
+    <file>singleStep.svg</file>
+    <file>start.svg</file>
+    <file>stop.svg</file>
+    <file>search.svg</file>
+    <file>reset.svg</file>
+    <file>record.svg</file>
+    <file>recordStop.svg</file>
+  </qresource>
+</RCC>
