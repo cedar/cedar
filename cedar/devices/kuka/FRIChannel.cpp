@@ -66,10 +66,12 @@ cedar::dev::kuka::FRIChannel::FRIChannel()
 mpFriRemote(nullptr),
 mFriState(FRI_STATE_OFF),
 mFriQuality(FRI_QUALITY_UNACCEPTABLE),
+mControlScheme(FRI_CTRL_OTHER),
 mSampleTime(0.0),
 mDrivesPowerOn(false),
 mLastFriState(FRI_STATE_OFF),
 mLastFriQuality(FRI_QUALITY_UNACCEPTABLE),
+mLastControlScheme(FRI_CTRL_OTHER),
 mLastDrivesPowerOn(false)
 {
   // change the default for the FRI channel
@@ -152,6 +154,11 @@ FRI_STATE cedar::dev::kuka::FRIChannel::getFriState() const
 FRI_QUALITY cedar::dev::kuka::FRIChannel::getFriQuality() const
 {
   return mFriQuality;
+}
+
+FRI_CTRL cedar::dev::kuka::FRIChannel::getControlScheme() const
+{
+  return mControlScheme;
 }
 
 bool cedar::dev::kuka::FRIChannel::isReadyForCommands() const
@@ -323,11 +330,13 @@ void cedar::dev::kuka::FRIChannel::exchangeData()
   mLastFriState = mFriState;
   mLastFriQuality = mFriQuality;
   mLastDrivesPowerOn = mDrivesPowerOn;
+  mLastControlScheme = mControlScheme;
 
   mFriState = mpFriRemote->getState();
   mFriQuality = mpFriRemote->getQuality();
   mSampleTime = mpFriRemote->getSampleTime();
   mDrivesPowerOn = mpFriRemote->isPowerOn();
+  mControlScheme = mpFriRemote->getCurrentControlScheme();
 
   if (!mDrivesPowerOn && mLastDrivesPowerOn)
   {
@@ -378,7 +387,7 @@ void cedar::dev::kuka::FRIChannel::exchangeData()
     {
       case FRI_STATE_CMD:
         cedar::aux::LogSingleton::getInstance()->message(
-          "FRI now accepting commands (entered CMD mode)",
+          "FRI now accepting commands (entered COMMAND mode)",
           CEDAR_CURRENT_FUNCTION_NAME);
 
         if (!mDrivesPowerOn)
@@ -420,6 +429,41 @@ void cedar::dev::kuka::FRIChannel::exchangeData()
     }
   }
 
+  if (mControlScheme != mLastControlScheme)
+  {
+    switch( mControlScheme )
+    {
+      case FRI_CTRL_OTHER:
+        cedar::aux::LogSingleton::getInstance()->message(
+          "Changed Remote FRI Control Scheme to OTHER",
+          CEDAR_CURRENT_FUNCTION_NAME);
+      break;
+
+      default:
+        cedar::aux::LogSingleton::getInstance()->message(
+          "Changed Remote FRI Control Scheme to UNKNOWN",
+          CEDAR_CURRENT_FUNCTION_NAME);
+      break;
+
+      case FRI_CTRL_POSITION:
+        cedar::aux::LogSingleton::getInstance()->message(
+          "Changed Remote FRI Control Scheme to POSITION",
+          CEDAR_CURRENT_FUNCTION_NAME);
+      break;
+
+      case FRI_CTRL_CART_IMP:
+        cedar::aux::LogSingleton::getInstance()->message(
+          "Changed Remote FRI Control Scheme to CARTESIAN IMPEDANCE CONTROL",
+          CEDAR_CURRENT_FUNCTION_NAME);
+      break;
+
+      case FRI_CTRL_JNT_IMP:
+        cedar::aux::LogSingleton::getInstance()->message(
+          "Changed Remote FRI Control Scheme to JOINT IMPEDANCE CONTROL",
+          CEDAR_CURRENT_FUNCTION_NAME);
+      break;
+    }
+  }
 }
 
 #endif // CEDAR_USE_KUKA_LWR
