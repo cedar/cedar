@@ -36,10 +36,27 @@
 
 #include "cedar/configuration.h"
 
+
+#if defined CEDAR_USE_GLEW
+
+#include <Glew.h>
 #if defined CEDAR_OS_WINDOWS
-  #ifndef NOMINMAX
-    #define NOMINMAX
-  #endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <Windows.h>
+#endif
+
+#else
+#if defined CEDAR_OS_WINDOWS
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+#ifndef CEDAR_OS_WINDOWS_NOGL
+#define CEDAR_OS_WINDOWS_NOGL
+#endif
+
   #include <Windows.h>
   #include <gl/GL.h>
 #elif defined CEDAR_OS_APPLE
@@ -47,3 +64,4 @@
 #else
   #include <GL/gl.h>
 #endif
+#endif // CEDAR_USE_GLEW

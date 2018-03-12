@@ -70,7 +70,7 @@ cedar::dev::gl::KukaArm::~KukaArm()
 
 void cedar::dev::gl::KukaArm::initializeGl()
 {
-#ifndef CEDAR_OS_WINDOWS
+#ifndef CEDAR_OS_WINDOWS_NOGL
   // base segment
   glGenBuffers(1, &mBaseSegmentVertexVboId);
   glBindBuffer(GL_ARRAY_BUFFER, mBaseSegmentVertexVboId);

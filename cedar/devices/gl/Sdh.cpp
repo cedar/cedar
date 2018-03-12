@@ -83,7 +83,7 @@ cedar::dev::gl::Sdh::~Sdh()
 
 void cedar::dev::gl::Sdh::initializeGl()
 {
-#ifndef CEDAR_OS_WINDOWS
+#ifndef CEDAR_OS_WINDOWS_NOGL
   // palm
   glGenBuffers(1, &mPalmVertexVboId);
   glBindBuffer(GL_ARRAY_BUFFER, mPalmVertexVboId);
