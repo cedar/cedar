@@ -48,6 +48,8 @@
 #include <iostream>
 #endif
 #include <string>
+#include <fri/friremote.h>
+#include <boost/lexical_cast.hpp>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -85,6 +87,7 @@ void cedar::dev::kuka::gui::FriStatusWidget::updateInformation()
   std::string quality_names[]
     = {"BAD (0)", "UNACCEPTABLE (1)", "GOOD (2)", "PERFECT (3)"};
   std::string state_names[] = {"OFF (0)", "Monitor Mode", "Command Mode"};
+
   // set Text for Fri state and Fri quality
   mpLabelStateData->setText(state_names[mpKukaIn->getFriState()].c_str());
   mpLabelQualData->setText(quality_names[mpKukaIn->getFriQuality()].c_str());
@@ -101,6 +104,30 @@ void cedar::dev::kuka::gui::FriStatusWidget::updateInformation()
   std::stringstream s;
   s << mpKukaIn->getSampleTime() << "s";
   mpLabelSampleTimeData->setText(s.str().c_str());
+
+  std::string control_desc= "?";
+  switch( mpKukaIn->getControlScheme() )
+  {
+    case FRI_CTRL_POSITION:
+      control_desc= "POSITION (1)";
+      break;
+    case FRI_CTRL_CART_IMP:
+      control_desc= "CARTESIAN IMPEDANCE (2)";
+      break;
+    case FRI_CTRL_JNT_IMP:
+      control_desc= "JOINT IMPEDANCE (3)";
+      break;
+    case FRI_CTRL_OTHER:
+      control_desc= "OTHER (3)";
+      break;
+    default: 
+      control_desc= "UKNOWN (" + 
+        boost::lexical_cast<std::string>(mpKukaIn->getControlScheme()) 
+          + ")";
+      break;
+  }
+
+  mpLabelControlSchemeData->setText( control_desc.c_str() );
 }
 
 void cedar::dev::kuka::gui::FriStatusWidget::timerEvent(QTimerEvent* /* pEvent */)

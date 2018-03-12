@@ -89,6 +89,8 @@ public:
    */
   FRI_QUALITY getFriQuality() const;
 
+  FRI_CTRL getControlScheme() const;
+
   /*! @brief returns sample time of the FRI
 
    * The sample time is set on the FRI server. Each interval with the length of the sample time, data will be exchanged
@@ -140,13 +142,17 @@ private:
   FRI_STATE mFriState;
   //!@brief Copy of the current FRI quality
   FRI_QUALITY mFriQuality;
+  //!@brief Copy of the current control scheme of the robot
+  FRI_CTRL mControlScheme;
   //!@brief Sample Time of the FRI connection
   float mSampleTime;
   //!@brief copy of last known status if power is on on the KUKA RC
   bool mDrivesPowerOn;
 
+
   FRI_STATE mLastFriState;
   FRI_QUALITY mLastFriQuality;
+  FRI_CTRL mLastControlScheme;
   bool mLastDrivesPowerOn;
 
 
