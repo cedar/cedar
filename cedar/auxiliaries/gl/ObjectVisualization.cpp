@@ -106,12 +106,14 @@ _mIsDrawnAsWireFrame( new cedar::aux::BoolParameter( this, "draw as wire frame",
 _mIsDrawingLocalCoordinateFrame( new cedar::aux::BoolParameter( this, "draw local coordinate frame", false) ),
 _mIsVisible( new cedar::aux::BoolParameter( this, "visible", true) )
 {
+#ifdef CEDAR_USE_GLEW  
 	GLenum err = glewInit();
 	if (GLEW_OK != err)
 	{
 		/* Problem: glewInit failed, something is seriously wrong. */
 		fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 	}
+#endif  
   _mIsDrawingLocalCoordinateFrame->markAdvanced();
   _mResolution->markAdvanced();
   _mAxisLength->markAdvanced();
