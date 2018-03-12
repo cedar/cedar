@@ -10,7 +10,8 @@ find_path(GLEW_INCLUDE_DIRS
 )
 # find library in set of paths
 find_library(GLEW_LIBS
-  NAMES glew32 libglew32
+  NAMES GLEW glew32 glew glew32s 
+  PATH_SUFFIXES lib64
   PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
 )
 
