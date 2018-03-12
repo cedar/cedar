@@ -80,6 +80,24 @@
      </property>
     </widget>
    </item>
+   <item row="6" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout1">
+     <item>
+      <widget class="QLabel" name="mpLabelControlScheme">
+       <property name="text">
+        <string>Control Scheme</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="6" column="1">
+    <widget class="QLabel" name="mpLabelControlSchemeData">
+     <property name="text">
+      <string>uninitialized</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>
