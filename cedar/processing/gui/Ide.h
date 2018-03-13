@@ -319,6 +319,8 @@ protected:
   //! Periodically updates certain information
   void timerEvent(QTimerEvent*);
 
+  void resizeEvent(QResizeEvent *event) override;
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------

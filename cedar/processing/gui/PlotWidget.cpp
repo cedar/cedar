@@ -41,10 +41,12 @@
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Group.h"
+#include "cedar/processing/gui/Settings.h"
+
 
 // SYSTEM INCLUDES
 #include <boost/make_shared.hpp>
-
+#include <QtGui/QGraphicsWidget>
 //----------------------------------------------------------------------------------------------------------------------
 // private nested structs and classes
 //----------------------------------------------------------------------------------------------------------------------
@@ -697,6 +699,22 @@ void cedar::proc::gui::PlotWidget::writeConfiguration(cedar::aux::ConfigurationN
   root.put("position_y", this->parentWidget()->y());
   root.put("width", this->parentWidget()->width());
   root.put("height", this->parentWidget()->height());
+  auto widthHeight = cedar::proc::gui::SettingsSingleton::getInstance()->getIdeSize();
+  if(widthHeight.x()!= 0 && widthHeight.y()!=0)
+  {
+    double xSizeFull = widthHeight.x();
+    double ySizeFull = widthHeight.y();
+    double relativeX = (double) this->parentWidget()->x() /  xSizeFull;
+    double relativeY = (double) this->parentWidget()->y() /  ySizeFull;
+    double relativeWidth = (double) this->parentWidget()->width() / xSizeFull;
+    double relativeHeight = (double) this->parentWidget()->height() / ySizeFull;
+//    std::cout<<"Writing a Widget configuration: x position is: " << this->parentWidget()->x() << " , the width is: " << xSizeFull << " netting a relative position of: " << relativeX << std::endl;
+    root.put("position_relative_x",relativeX);
+    root.put("position_relative_y",relativeY);
+    root.put("width_relative",relativeWidth);
+    root.put("height_relative",relativeHeight);
+  }
+
   root.put_child("data_list", serialize(this->mDataList));
 
   cedar::aux::ConfigurationNode plot_settings;
@@ -778,6 +796,47 @@ void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::a
   int height = node.get<int>("height");
   int x = node.get<int>("position_x");
   int y = node.get<int>("position_y");
+
+
+  auto relX_iter = node.find("position_relative_x");
+  auto relY_iter = node.find("position_relative_y");
+  auto relW_iter = node.find("width_relative");
+  auto relH_iter = node.find("height_relative");
+
+  if (relX_iter != node.not_found() && relY_iter != node.not_found()  && relW_iter != node.not_found()  && relH_iter != node.not_found() )
+  {
+//    std::cout<<"We loaded an architecture with relative Plot positions!" <<std::endl;
+    auto widthHeight = cedar::proc::gui::SettingsSingleton::getInstance()->getIdeSize();
+    if(widthHeight.x()!= 0 && widthHeight.y()!=0)
+    {
+//      std::cout<<"Old!!! values are: x,y,width, height: "<< x <<", "<< y << ", " << width << ", "<< height <<std::endl;
+      x = (int) (node.get<double>("position_relative_x") * widthHeight.x());
+      y = (int) (node.get<double>("position_relative_y") * widthHeight.y());
+      // Scaled Width and Heigth only might look pretty dump
+      int newWidth = (int) (node.get<double>("width_relative") * widthHeight.x());
+      int newHeight = (int) (node.get<double>("height_relative") * widthHeight.y());
+
+      //What about some heuristics that keep the aspect ratio! Todo: Defining very small Plotwidgets results in bad scaling, this needs to be fixed!
+      double oldAspectRatio = (double) width / (double) height;
+      // Keep the big side and alter the smaller one to keep aspect ratio
+      if(newWidth<newHeight)
+      { // Width smaller than Height
+        height = newHeight;
+        width = oldAspectRatio * height;
+      }
+      else
+      { // Height smaller than Width or same
+        width = newWidth;
+        height = (int)( (double)width / oldAspectRatio);
+      }
+//      std::cout<<"New values are: x, y, width, height: "<< x <<", "<< y << ", " << width << ", "<< height <<std::endl;
+    }
+    else
+    {
+      std::cout<<" The Ide dimensions were somehow 0 in one direction" << std::endl;
+    }
+  }
+
   
   auto serialized_data_list = node.get_child("data_list");
   cedar::proc::ElementDeclaration::DataList data_list;

@@ -225,6 +225,8 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
 
   this->_mReadOneTimeMessages = new cedar::aux::StringSetParameter(this, "read one-time messages", std::set<std::string>());
 
+  this->_mIdeSize = QPoint(); // Dont know how to initialize this for now! Todo: Think about that!
+
   this->load();
 
 
@@ -688,4 +690,15 @@ void cedar::proc::gui::Settings::save()
       );
     }
   }
+}
+
+QPoint cedar::proc::gui::Settings::getIdeSize()
+{
+  return _mIdeSize;
+}
+
+
+void cedar::proc::gui::Settings::setIdeSize(QPoint widthHeight)
+{
+  _mIdeSize = widthHeight;
 }

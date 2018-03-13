@@ -360,6 +360,10 @@ public:
   //! Favorites or unfavorites an element class.
   void setFavorite(const std::string& className, bool favorite);
 
+  QPoint getIdeSize();
+
+  void setIdeSize(QPoint widthHeight);
+
 signals:
   void elementFavoritesChanged();
 
@@ -495,6 +499,8 @@ private:
 
   //!@brief A list of one-time messages already read by the user
   cedar::aux::StringSetParameterPtr _mReadOneTimeMessages;
+
+  QPoint _mIdeSize;
 
 }; // class cedar::proc::gui::Settings
 

@@ -2209,6 +2209,15 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
 #ifdef CEDAR_USE_QGLVIEWER
 //      QWidget* viewerAsWidget = dynamic_cast<QWidget *>(dock_widget_child);
 
+      #ifdef CEDAR_USE_GLEW
+      GLenum err = glewInit();
+      if (GLEW_OK != err)
+      {
+        /* Problem: glewInit failed, something is seriously wrong. */
+        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+      }
+      #endif //CEDAR_USE_GLEW
+
       QGLViewer *qgl = dynamic_cast<QGLViewer *>(viewer_item);
       value_node.add("camera position x", qgl->camera()->position().x);
       value_node.add("camera position y", qgl->camera()->position().y);

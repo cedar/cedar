@@ -2338,3 +2338,11 @@ void cedar::proc::gui::Ide::backupSaveCallback()
 }
 
 
+void cedar::proc::gui::Ide::resizeEvent(QResizeEvent* event)
+{
+  QMainWindow::resizeEvent(event);
+  cedar::proc::gui::SettingsSingleton::getInstance()->setIdeSize(QPoint(this->width(),this->height()));
+//  std::cout<<"This is the IDE resize event! My new size is: " << this->width() << ", " << this->height() << std::endl;
+}
+
+
