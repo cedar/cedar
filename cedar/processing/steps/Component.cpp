@@ -416,7 +416,7 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
     std::string name = component->getNameForMeasurementType(measurement);
     if(auto measurementDataOriginal = component->getMeasurementData(measurement))
     {
-      auto measurementData = measurementDataOriginal->clone();
+      auto measurementData = measurementDataOriginal; // There was a clone here that seemed unneccesary and only caused a crash on windows.
       if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(measurementData))
       {
         cv::Mat measurementMat = measurementData->getData<cv::Mat>().clone();
