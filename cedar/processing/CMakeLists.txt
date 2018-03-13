@@ -159,6 +159,7 @@ cedar_add_library(cedarproc
   steps/ImageTransform.h
   steps/AddConstant.h
   steps/Count.h
+  steps/LinearLateralShift.h
   CppScript.h
   Group.h
   Step.h
