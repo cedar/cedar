@@ -26,7 +26,7 @@
        </property>
       </widget>
      </item>
-	 <item>
+     <item>
       <widget class="QLineEdit" name="mpLineEdit">
        <property name="placeholderText ">
         <string>myNewWidgetName</string>
@@ -67,7 +67,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QSplitter" name="splitter">
+    <widget class="QSplitter" name="mpSplitter">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>

@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/gl/Scene.fwd.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.fwd.h"
 #include "cedar/auxiliaries/Grabbable.h"
+#include "cedar/auxiliaries/Configurable.fwd.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/Viewer.fwd.h"
@@ -66,6 +67,7 @@
 #include <QList>
 #include <QReadWriteLock>
 #include <string>
+#include <QPoint>
 
 /*!@brief A simple viewer for OpenGL drawing routines, based on QGLViewer
  *
@@ -156,6 +158,11 @@ public:
   std::string getViewerLabel() const;
 
   void setViewerLabel(std::string label);
+
+  //Todo: Implement this!
+//  void readFromConfiguration(cedar::aux::ConfigurationNode& node);
+
+  void writeToConfiguration(cedar::aux::ConfigurationNode& root, QPoint mainWindowSize = QPoint());
 
 #ifndef CEDAR_USE_QGLVIEWER
   //@cond SKIPPED_DOCUMENTATION

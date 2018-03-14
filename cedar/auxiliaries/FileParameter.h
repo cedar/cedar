@@ -136,6 +136,10 @@ public:
 
   cedar::aux::FileParameter::PathMode getPathMode();
 
+  void setPathModeConstant(bool isConstant);
+
+  bool isPathModeConstant();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -166,6 +170,8 @@ private:
 
   //!@brief The path mode.
   PathMode mPathMode;
+
+  bool mConstantPathMode;
 
 }; // class cedar::aux::DirectoryParameter
 

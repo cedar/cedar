@@ -86,7 +86,7 @@ cedar::aux::gui::Parameter(pParent)
 
   p_layout->addWidget(fileStringWidget);
 
-  this->mpButton = new QPushButton(">");
+  this->mpButton = new QPushButton("...");
   this->mpButton->setMinimumWidth(20);
   this->mpButton->setMaximumWidth(30);
   p_layout->addWidget(this->mpButton);
@@ -132,7 +132,7 @@ void cedar::aux::gui::FileParameter::propertiesChanged()
   this->mpEdit->setDisabled(parameter->isConstant());
   this->mpButton->setDisabled(parameter->isConstant());
   this->mpCheckRelative->setChecked(parameter->getPathMode() == cedar::aux::FileParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
-
+  this->mpCheckRelative->setEnabled(!parameter->isPathModeConstant());
 }
 
 void cedar::aux::gui::FileParameter::parameterValueChanged()
@@ -142,6 +142,8 @@ void cedar::aux::gui::FileParameter::parameterValueChanged()
   this->mpEdit->setReadOnly(false);
   this->mpEdit->setText(QString::fromStdString(parameter->getPath()));
   this->mpEdit->setReadOnly(true);
+
+  this->mpCheckRelative->setEnabled(!parameter->isPathModeConstant());
 
 }
 

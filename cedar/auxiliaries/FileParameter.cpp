@@ -75,8 +75,11 @@ cedar::aux::FileParameter::FileParameter
 )
 :
 cedar::aux::Parameter(pOwner, name, false),
+mValue(this->getCurrentArchitectureFileDirectory()),
+mDefault(this->getCurrentArchitectureFileDirectory()),
 mMode(mode),
-mPathMode(cedar::aux::FileParameter::PATH_MODE_ABSOLUTE)
+mPathMode(cedar::aux::FileParameter::PATH_MODE_ABSOLUTE),
+mConstantPathMode(false)
 {
 }
 
@@ -92,8 +95,10 @@ cedar::aux::Parameter(pOwner, name, true),
 mValue(QString::fromStdString(defaultValue)),
 mDefault(QString::fromStdString(defaultValue)),
 mMode(mode),
-mPathMode(cedar::aux::FileParameter::PATH_MODE_ABSOLUTE)
+mPathMode(cedar::aux::FileParameter::PATH_MODE_ABSOLUTE),
+mConstantPathMode(false)
 {
+//  std::cout<<"FileParameter Constructor! Current Architecture Path " << this->getCurrentArchitectureFileDirectory().absolutePath().toStdString() <<std::endl;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -161,7 +166,20 @@ bool cedar::aux::FileParameter::canCopyFrom(cedar::aux::ConstParameterPtr other)
 
 void cedar::aux::FileParameter::setValue(const std::string& value)
 {
-  this->mValue = QString::fromStdString(value);
+  if(this->getPathMode()==PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR)
+  {
+//    QDir combinedPath1 = this->getCurrentArchitectureFileDirectory().relativeFilePath(QString::fromStdString(value));
+    QDir combinedPath = this->getCurrentArchitectureFileDirectory().filePath(QString::fromStdString(value));
+//    std::cout<<"c1 : " << combinedPath1.absolutePath().toStdString() << " c2: " << combinedPath2.absolutePath().toStdString() << std::endl;
+    this->mValue = combinedPath;
+  }
+  else
+  {
+    this->mValue = QString::fromStdString(value);
+  }
+
+//  std::cout<<"FileParameter::setValue(string). value:  " << value << " mValue: "<< this->mValue.absolutePath().toStdString() << std::endl;
+
 
   this->emitChangedSignal();
 }
@@ -234,4 +252,16 @@ QDir cedar::aux::FileParameter::getCurrentArchitectureFileDirectory() const
 //      std::cout<<"\tThe relative path is then: " << curArchitectureDir.relativeFilePath(this->mValue.absolutePath()).toStdString() <<std::endl;
 
   return curArchitectureDir;
+}
+
+
+void cedar::aux::FileParameter::setPathModeConstant(bool isConstant)
+{
+  mConstantPathMode = isConstant;
+  this->emitChangedSignal();
+}
+
+bool cedar::aux::FileParameter::isPathModeConstant()
+{
+  return mConstantPathMode;
 }

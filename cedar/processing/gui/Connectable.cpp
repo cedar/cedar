@@ -2145,7 +2145,6 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
     return; // note, this disables saving of widgets via auto-backups
 
   unsigned int plotWidgetCounter = 0;
-  unsigned int viewerLabelCounter = 0;
 
   for (auto childWidget : mChildWidgets)
   {
@@ -2186,50 +2185,11 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
     {
       cedar::aux::ConfigurationNode value_node;
 
-      //This Code is duplicated again in Group. Maybe it should be Part of the Viewer to Serialize!
+      std::cout<<"Connectable: Save a Viewer!"<<std::endl;
+
       auto viewer_item = static_cast<cedar::aux::gui::Viewer*>(dock_widget_child);
-      value_node.add("position_x", viewer_item->parentWidget()->x());
-      value_node.add("position_y", viewer_item->parentWidget()->y());
-      value_node.add("width", viewer_item->parentWidget()->width());
-      value_node.add("height", viewer_item->parentWidget()->height());
-
-
-      if(viewer_item->getViewerLabel() != "")
-        value_node.add("viewerLabel",viewer_item->getViewerLabel());
-      else
-      {
-        //Generate some unique Label here! This is not good as there might be duplicates!!!
-        std::string labelString =  boost::lexical_cast<std::string>(viewer_item->parentWidget()->x())+boost::lexical_cast<std::string>(viewer_item->parentWidget()->y())+boost::lexical_cast<std::string>(viewer_item->parentWidget()->width())+boost::lexical_cast<std::string>(viewer_item->parentWidget()->height())+boost::lexical_cast<std::string>(viewerLabelCounter);
-        value_node.add("viewerLabel", labelString);
-        viewer_item->setViewerLabel(labelString);
-      }
-      viewerLabelCounter = viewerLabelCounter +1;
-
-
-#ifdef CEDAR_USE_QGLVIEWER
-//      QWidget* viewerAsWidget = dynamic_cast<QWidget *>(dock_widget_child);
-
-      #ifdef CEDAR_USE_GLEW
-      GLenum err = glewInit();
-      if (GLEW_OK != err)
-      {
-        /* Problem: glewInit failed, something is seriously wrong. */
-        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-      }
-      #endif //CEDAR_USE_GLEW
-
-      QGLViewer *qgl = dynamic_cast<QGLViewer *>(viewer_item);
-      value_node.add("camera position x", qgl->camera()->position().x);
-      value_node.add("camera position y", qgl->camera()->position().y);
-      value_node.add("camera position z", qgl->camera()->position().z);
-      value_node.add("camera orientation 0", qgl->camera()->orientation()[0]);
-      value_node.add("camera orientation 1", qgl->camera()->orientation()[1]);
-      value_node.add("camera orientation 2", qgl->camera()->orientation()[2]);
-      value_node.add("camera orientation 3", qgl->camera()->orientation()[3]);
-
-#endif // CEDAR_USE_QGLVIEWER
-
-      node.push_back(cedar::aux::ConfigurationNode::value_type("Viewer", value_node));
+      viewer_item->writeToConfiguration(value_node, cedar::proc::gui::SettingsSingleton::getInstance()->getIdeSize());
+      node.put_child("Viewer"+viewer_item->getViewerLabel(), value_node);
 
       //In order to ensure that the Widget is correctly managed by the Gui::Group it needs to be added to the List of KinematicCHainWidgets
       this->getGuiGroup()->insertViewer(viewer_item);

@@ -37,6 +37,9 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gl/Scene.h"
+#include <chrono>
+#include <sstream>
+
 
 // SYSTEM INCLUDES
 
@@ -191,5 +194,79 @@ std::string cedar::aux::gui::Viewer::getViewerLabel() const
 void cedar::aux::gui::Viewer::setViewerLabel(std::string label)
 {
   this->mViewerLabel = label;
+}
+
+void cedar::aux::gui::Viewer::writeToConfiguration(cedar::aux::ConfigurationNode &value_node,QPoint mainWindowSize)
+{
+  //This Code is duplicated again in Group. Maybe it should be Part of the Viewer to Serialize!
+  value_node.add("position_x", this->parentWidget()->x());
+  value_node.add("position_y", this->parentWidget()->y());
+  value_node.add("width", this->parentWidget()->width());
+  value_node.add("height", this->parentWidget()->height());
+
+  //Todo: This is duplicate code from Plotwidget
+  auto widthHeight = mainWindowSize;
+  if(widthHeight.x()!= 0 && widthHeight.y()!=0)
+  {
+//    std::cout<<"Adding relative Viewer Positions" << std::endl;
+    double xSizeFull = widthHeight.x();
+    double ySizeFull = widthHeight.y();
+    double relativeX = (double) this->parentWidget()->x() /  xSizeFull;
+    double relativeY = (double) this->parentWidget()->y() /  ySizeFull;
+    double relativeWidth = (double) this->parentWidget()->width() / xSizeFull;
+    double relativeHeight = (double) this->parentWidget()->height() / ySizeFull;
+//    std::cout<<"Writing a Widget configuration: x position is: " << this->parentWidget()->x() << " , the width is: " << xSizeFull << " netting a relative position of: " << relativeX << std::endl;
+    value_node.add("position_relative_x",relativeX);
+    value_node.add("position_relative_y",relativeY);
+    value_node.add("width_relative",relativeWidth);
+    value_node.add("height_relative",relativeHeight);
+  }
+  else
+  {
+    std::cout<<"Not adding because the Ide Size is Zeros? Adding relative Viewer Positions" << std::endl;
+  }
+
+
+  if(this->getViewerLabel() != "")
+    value_node.add("viewerLabel",this->getViewerLabel());
+  else
+  {
+    //Generate some unique Label here! This is not good as there might be duplicates!!!
+    time_t someTimeVar = time(0);
+    std::string curTime = boost::lexical_cast<std::string>(someTimeVar);
+
+
+    std::string labelString =  boost::lexical_cast<std::string>(this->parentWidget()->x())+boost::lexical_cast<std::string>(this->parentWidget()->y())
+                               +boost::lexical_cast<std::string>(this->parentWidget()->width())+boost::lexical_cast<std::string>(this->parentWidget()->height())
+                               +curTime;
+
+    value_node.add("viewerLabel", labelString);
+    this->setViewerLabel(labelString);
+  }
+
+
+#ifdef CEDAR_USE_QGLVIEWER
+//      QWidget* viewerAsWidget = dynamic_cast<QWidget *>(dock_widget_child);
+
+#ifdef CEDAR_USE_GLEW
+  GLenum err = glewInit();
+      if (GLEW_OK != err)
+      {
+        /* Problem: glewInit failed, something is seriously wrong. */
+        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+      }
+#endif //CEDAR_USE_GLEW
+
+  QGLViewer *qgl = dynamic_cast<QGLViewer *>(this);
+  value_node.add("camera position x", qgl->camera()->position().x);
+  value_node.add("camera position y", qgl->camera()->position().y);
+  value_node.add("camera position z", qgl->camera()->position().z);
+  value_node.add("camera orientation 0", qgl->camera()->orientation()[0]);
+  value_node.add("camera orientation 1", qgl->camera()->orientation()[1]);
+  value_node.add("camera orientation 2", qgl->camera()->orientation()[2]);
+  value_node.add("camera orientation 3", qgl->camera()->orientation()[3]);
+
+#endif // CEDAR_USE_QGLVIEWER
+
 }
 
