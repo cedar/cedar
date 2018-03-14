@@ -48,8 +48,10 @@
 
 cedar::proc::gui::detail::ArchitectureWidgetInfo::ArchitectureWidgetInfo(std::string name)
 	:
-	mpFileParameter(new cedar::aux::FileParameter(this, "widget path", cedar::aux::FileParameter::READ, "/myWidget.json"))
+	mpFileParameter(new cedar::aux::FileParameter(this, "widget path", cedar::aux::FileParameter::READ))
 {
+  mpFileParameter->setPathMode(cedar::aux::FileParameter::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
+  mpFileParameter->setPathModeConstant(true);
 	this->setName(name);
 }
 
@@ -75,9 +77,17 @@ mGroup(group)
 {
   this->setupUi(this);
 
+//  mpSplitter->setStretchFactor(0, 0);
+//  mpSplitter->setStretchFactor(1,1);
+//  mpTable->setSizePolicy(QSizePolicy(QSizePolicy::Minimum,QSizePolicy::Preferred));
+    QList<int> sizeList({150, 410});
+    mpSplitter->setSizes(sizeList);
+
+
   QObject::connect(this->mpAddButton, SIGNAL(clicked()), this, SLOT(addRowClicked()));
   QObject::connect(this->mpRemoveButton, SIGNAL(clicked()), this, SLOT(removeRowClicked()));
   QObject::connect(this->mpOkButton, SIGNAL(clicked()), this, SLOT(dialogAccepted()));
+  QObject::connect(this->mpLineEdit, SIGNAL(textChanged(const QString & )), this, SLOT(checkCurrentName(const QString& )));
   
 
   const auto& plots = this->mGroup->getArchitectureWidgets();
@@ -111,7 +121,9 @@ mGroup(group)
 void cedar::proc::gui::ArchitectureWidgetList::addArchitectureWidgetInfo(const std::string& name, const cedar::aux::Path& path)
 {
 	auto architectureWidgetInfo = boost::shared_ptr<cedar::proc::gui::detail::ArchitectureWidgetInfo>(new cedar::proc::gui::detail::ArchitectureWidgetInfo(name));
+//  std::cout<<"addArchitectureWidgetInfo! Set Path: " << path << std::endl;
 	architectureWidgetInfo->setArchitectureWidgetPath(path);
+//  std::cout<<"addArchitectureWidgetInfo! Get Path afterwards: " << architectureWidgetInfo->getArchitectureWidgetPath() << std::endl;
 
 	mArchitectureInfos[name] = architectureWidgetInfo;
 
@@ -128,8 +140,6 @@ void cedar::proc::gui::ArchitectureWidgetList::addArchitectureWidgetInfo(const s
 
 void cedar::proc::gui::ArchitectureWidgetList::architectureWidgetNameChanged()
 {
-
-	//Todo: Make Sure this works!
 	auto name_parameter = dynamic_cast<cedar::aux::StringParameter*>(QObject::sender());
 	CEDAR_DEBUG_ASSERT(name_parameter);
 	auto iter = this->mUsedParameterNames.find(name_parameter);
@@ -145,6 +155,15 @@ void cedar::proc::gui::ArchitectureWidgetList::architectureWidgetNameChanged()
 			item->setText(QString::fromStdString(new_name));
 		}
 	}
+
+  //Update the ArchitectureInfoMap
+  auto searchIter = this->mArchitectureInfos.find(old_name);
+  if(searchIter!=this->mArchitectureInfos.end())
+  {
+    auto widgetInfo = searchIter->second;
+    this->mArchitectureInfos[new_name] =widgetInfo;
+    this->mArchitectureInfos.erase(old_name);
+  }
 
 	this->mUsedParameterNames[name_parameter] = new_name;
 }
@@ -178,12 +197,16 @@ boost::shared_ptr<cedar::proc::gui::detail::ArchitectureWidgetInfo> cedar::proc:
 
 void cedar::proc::gui::ArchitectureWidgetList::addRowClicked()
 {
-  //this->appendRow("", "");
-	std::string name = this->mpLineEdit->text().toStdString();
+  std::string name = this->mpLineEdit->text().toStdString();
 
-	//Todo: Check whether the Group exists
-
-	this->addArchitectureWidgetInfo(name);
+  auto iter = this->mArchitectureInfos.find(name);
+  if (iter == this->mArchitectureInfos.end() && name != "")
+  {
+	  this->addArchitectureWidgetInfo(name);
+    this->mpLineEdit->setText("");
+    this->mpLineEdit->clearFocus();
+    this->mpAddButton->clearFocus();
+  }
 }
 
 void cedar::proc::gui::ArchitectureWidgetList::removeRowClicked()
@@ -208,8 +231,6 @@ void cedar::proc::gui::ArchitectureWidgetList::removeRowClicked()
 
 void cedar::proc::gui::ArchitectureWidgetList::dialogAccepted()
 {
-	//Todo:This should work!
-	std::cout << "This is dialogAccepted!" << std::endl;
 
   std::map<std::string, cedar::aux::Path> new_widgets;
 
@@ -218,8 +239,6 @@ void cedar::proc::gui::ArchitectureWidgetList::dialogAccepted()
 	  auto widgetInfo = widget_iter->second;
     std::string name = widgetInfo->getName();
     cedar::aux::Path path = widgetInfo->getArchitectureWidgetPath();
-
-	std::cout << "I want to add: "<< name << " with path: " << path << std::endl;
     if (!name.empty())
     {
       new_widgets[name] = path;
@@ -227,4 +246,19 @@ void cedar::proc::gui::ArchitectureWidgetList::dialogAccepted()
   }
 
   this->mGroup->setArchitectureWidgets(new_widgets);
+}
+
+void cedar::proc::gui::ArchitectureWidgetList::checkCurrentName(const QString& text)
+{
+
+  auto iter = this->mArchitectureInfos.find(text.toStdString());
+  if (iter != this->mArchitectureInfos.end())
+  {
+    this->mpLineEdit->setStyleSheet("QLineEdit { background: rgb(255, 0, 0); }");
+  }
+  else
+  {
+    this->mpLineEdit->setStyleSheet("QLineEdit { background: rgb(255, 255, 255); }");
+  }
+
 }

@@ -118,7 +118,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void appendRow(const std::string& name, const cedar::aux::Path& path);
+//  void appendRow(const std::string& name, const cedar::aux::Path& path);
 
   void addArchitectureWidgetInfo(const std::string& name,const cedar::aux::Path& path = "/default.json");
 
@@ -136,6 +136,8 @@ private slots:
   void architectureWidgetNameChanged();
 
   void itemSelected();
+
+	void checkCurrentName(const QString& text);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

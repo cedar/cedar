@@ -1258,10 +1258,50 @@ void cedar::proc::gui::Group::openSceneViewer(const cedar::aux::ConfigurationNod
 {
   try
   {
-    const int posx = node.get<int>("position_x");
-    const int posy = node.get<int>("position_y");
-    const int width = node.get<int>("width");
-    const int height = node.get<int>("height");
+     int posx = node.get<int>("position_x");
+     int posy = node.get<int>("position_y");
+     int width = node.get<int>("width");
+     int height = node.get<int>("height");
+
+
+    //Todo:This is copy paste from plotWidget. Viewer read and write from configuration are not in a unified place. Should be both in the Viewer Class!
+    auto relX_iter = node.find("position_relative_x");
+    auto relY_iter = node.find("position_relative_y");
+    auto relW_iter = node.find("width_relative");
+    auto relH_iter = node.find("height_relative");
+
+    if (relX_iter != node.not_found() && relY_iter != node.not_found()  && relW_iter != node.not_found()  && relH_iter != node.not_found() )
+    {
+      auto widthHeight = cedar::proc::gui::SettingsSingleton::getInstance()->getIdeSize();
+      if(widthHeight.x()!= 0 && widthHeight.y()!=0)
+      {
+        posx = (int) (node.get<double>("position_relative_x") * widthHeight.x());
+        posy = (int) (node.get<double>("position_relative_y") * widthHeight.y());
+        // Scaled Width and Heigth only might look pretty dump
+        int newWidth = (int) (node.get<double>("width_relative") * widthHeight.x());
+        int newHeight = (int) (node.get<double>("height_relative") * widthHeight.y());
+
+        //What about some heuristics that keep the aspect ratio! Todo: Defining very small widgets results in bad scaling, this needs to be fixed!
+        double oldAspectRatio = (double) width / (double) height;
+        // Keep the big side and alter the smaller one to keep aspect ratio
+        if(newWidth<newHeight)
+        { // Width smaller than Height
+          height = newHeight;
+          width = oldAspectRatio * height;
+        }
+        else
+        { // Height smaller than Width or same
+          width = newWidth;
+          height = (int)( (double)width / oldAspectRatio);
+        }
+      }
+      else
+      {
+        std::cout<<" The IDE dimensions were somehow 0 in one direction" << std::endl;
+      }
+    }
+
+
 
     cedar::aux::gl::ScenePtr scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
 
@@ -1501,56 +1541,18 @@ void cedar::proc::gui::Group::writeOpenPlotsTo(cedar::aux::ConfigurationNode &no
     return;
   }
 
-  int labelCounter = 0;
   for (QWidget *viewer_item : mViewers)
   {
-
     if (viewer_item->parentWidget()->isVisible())
     {
-      cedar::aux::ConfigurationNode value_node;
-
-      //This Code is duplicated again in Connectable. Maybe it should be Part of the Viewer to Serialize!
-
-      value_node.add("position_x", viewer_item->parentWidget()->x());
-      value_node.add("position_y", viewer_item->parentWidget()->y());
-      value_node.add("width", viewer_item->parentWidget()->width());
-      value_node.add("height", viewer_item->parentWidget()->height());
-
-      if (auto viewer = boost::dynamic_pointer_cast<cedar::aux::gui::Viewer>(viewer_item))
+      if(auto viewer = boost::dynamic_pointer_cast<cedar::aux::gui::Viewer>(viewer_item))
       {
-        if (viewer->getViewerLabel() != "")
-          value_node.add("viewerLabel", viewer->getViewerLabel());
-        else
-        {
-          //Generate some unique Label here! This is not good as there might be duplicates!!!
-          std::string labelString = boost::lexical_cast<std::string>(viewer_item->parentWidget()->x()) +
-                                    boost::lexical_cast<std::string>(viewer_item->parentWidget()->y()) +
-                                    boost::lexical_cast<std::string>(viewer_item->parentWidget()->width()) +
-                                    boost::lexical_cast<std::string>(viewer_item->parentWidget()->height()) +
-                                    boost::lexical_cast<std::string>(labelCounter);
-          value_node.add("viewerLabel", labelString);
-          viewer->setViewerLabel(labelString);
-        }
+        std::cout<<"Group: Save a Viewer!"<<std::endl;
+        cedar::aux::ConfigurationNode value_node;
+        viewer->writeToConfiguration(value_node,cedar::proc::gui::SettingsSingleton::getInstance()->getIdeSize());
+        node.put_child("Viewer"+viewer->getViewerLabel(), value_node);
       }
-
-
-#ifdef CEDAR_USE_QGLVIEWER
-
-      QGLViewer *qgl = boost::dynamic_pointer_cast<QGLViewer>(viewer_item);
-      value_node.add("camera position x", qgl->camera()->position().x);
-      value_node.add("camera position y", qgl->camera()->position().y);
-      value_node.add("camera position z", qgl->camera()->position().z);
-      value_node.add("camera orientation 0", qgl->camera()->orientation()[0]);
-      value_node.add("camera orientation 1", qgl->camera()->orientation()[1]);
-      value_node.add("camera orientation 2", qgl->camera()->orientation()[2]);
-      value_node.add("camera orientation 3", qgl->camera()->orientation()[3]);
-
-#endif // CEDAR_USE_QGLVIEWER
-
-      node.push_back(cedar::aux::ConfigurationNode::value_type("Viewer", value_node));
     }
-    labelCounter = labelCounter + 1;
-
   }
 
   for (cedar::dev::gui::KinematicChainWidget *kcw_item : mKinematicChainWidgets)
@@ -2426,7 +2428,8 @@ void cedar::proc::gui::Group::togglePlotGroupVisibility(bool visible, cedar::aux
       continue;
     }
 
-    if (it.first == "Viewer")
+    std::string nodeName = it.first;
+    if ( nodeName.find("Viewer") != std::string::npos)
     {
       auto viewerLabel = it.second.find("viewerLabel");
       bool found = false;
@@ -2839,7 +2842,8 @@ void cedar::proc::gui::Group::changeStepName(const std::string &from, const std:
   {
     for (auto &plot : plot_group.second)
     {
-      if (!(plot.first == "visible" || plot.first == "KinematicChainWidget" || plot.first == "Viewer"))
+      std::string nodeName = plot.first;
+      if (!(nodeName == "visible" ||nodeName == "KinematicChainWidget" || nodeName.find("Viewer") != std::string::npos ))
       {
         auto name = plot.second.get<std::string>("step");
         if (name == from)
