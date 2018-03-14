@@ -41,20 +41,53 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/ui_ArchitectureWidgetList.h"
+#include "cedar/processing/gui/ui_ArchitectureWidgetEditor.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/ArchitectureWidgetList.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"
 #include "cedar/auxiliaries/Path.fwd.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
+#include "cedar/auxiliaries/FileParameter.h"
 
 // SYSTEM INCLUDES
 #include <QDialog>
 
+namespace cedar
+{
+	namespace proc
+	{
+		namespace gui
+		{
+			namespace detail
+			{
+				/*!@brief A widget for script control.
+				*/
+				class ArchitectureWidgetInfo : public cedar::aux::NamedConfigurable
+				{
+					//Q_OBJECT
+
+				public:
+					//!@brief constructor
+					ArchitectureWidgetInfo(std::string name);
+
+					cedar::aux::Path getArchitectureWidgetPath();
+					void setArchitectureWidgetPath(cedar::aux::Path);
+
+				private:
+					cedar::aux::FileParameterPtr mpFileParameter;
+				};
+			}
+		}
+	}
+}
+
+
+
 
 /*!@brief A dialog for editing the architecture widgets in a group.
  */
-class cedar::proc::gui::ArchitectureWidgetList : public QDialog, public Ui_ArchitectureWidgetList
+class cedar::proc::gui::ArchitectureWidgetList : public QDialog, public Ui_ArchitectureWidgetEditor
 {
   Q_OBJECT
 
@@ -87,12 +120,22 @@ protected:
 private:
   void appendRow(const std::string& name, const cedar::aux::Path& path);
 
+  void addArchitectureWidgetInfo(const std::string& name,const cedar::aux::Path& path = "/default.json");
+
+  void showItemProperties(QTableWidgetItem* pItem);
+
+  boost::shared_ptr<cedar::proc::gui::detail::ArchitectureWidgetInfo> getWidgetInfoFromItem(QTableWidgetItem* pItem) const;
+
 private slots:
   void dialogAccepted();
 
   void addRowClicked();
 
   void removeRowClicked();
+
+  void architectureWidgetNameChanged();
+
+  void itemSelected();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -101,6 +144,10 @@ protected:
   // none yet
 private:
   cedar::proc::gui::GroupPtr mGroup;
+
+  std::map<cedar::aux::Parameter*, std::string> mUsedParameterNames;
+
+  std::map<std::string, boost::shared_ptr<cedar::proc::gui::detail::ArchitectureWidgetInfo>> mArchitectureInfos;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
