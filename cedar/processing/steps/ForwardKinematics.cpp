@@ -101,9 +101,19 @@ void cedar::proc::steps::ForwardKinematics::compute(const cedar::proc::Arguments
     cedar::dev::KinematicChainPtr kinChain = boost::dynamic_pointer_cast < cedar::dev::KinematicChain > (component);
     if (kinChain)
     {
+      auto old_size = mOutputPos->getData().rows;
+
       mOutputPos->setData(kinChain->calculateEndEffectorPosition().rowRange( cv::Range(0,3)) );
       mOutputVelocity->setData(kinChain->calculateEndEffectorVelocity().rowRange( cv::Range(0,3)) );
       mOutputAcceleration->setData(kinChain->calculateEndEffectorAcceleration().rowRange( cv::Range(0,3)) );
+
+      // workaround: the Component is sometimes initialized with wrong sizes, quickfix here
+      if (mOutputPos->getData().rows != old_size)
+      {
+        this->emitOutputPropertiesChangedSignal("Cartesian position");
+        this->emitOutputPropertiesChangedSignal("Cartesian velocity");
+        this->emitOutputPropertiesChangedSignal("Cartesian acceleration");
+      }
     }
   }
 }
