@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/View.h"
+#include "cedar/processing/gui/Ide.h"
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
@@ -83,6 +84,7 @@ cedar::proc::gui::View::View(QWidget *pParent)
   setResizeAnchor(AnchorViewCenter);
   setTransformationAnchor(AnchorUnderMouse);
   setDragMode(QGraphicsView::RubberBandDrag);
+  setAcceptDrops(true);
 }
 
 cedar::proc::gui::View::~View()
@@ -93,6 +95,64 @@ cedar::proc::gui::View::~View()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::View::dragEnterEvent(QDragEnterEvent *event)
+{
+  if(event->mimeData()->hasFormat("text/plain"))
+  {
+    event->acceptProposedAction();
+  }
+  else
+  {
+    QGraphicsView::dragEnterEvent(event);
+  }
+}
+
+void cedar::proc::gui::View::dragMoveEvent(QDragMoveEvent *event)
+{
+  if(event->mimeData()->hasFormat("text/plain"))
+  {
+    event->acceptProposedAction();
+  }
+  else
+  {
+    QGraphicsView::dragMoveEvent(event);
+  }
+}
+
+void cedar::proc::gui::View::dragLeaveEvent(QDragLeaveEvent *event)
+{
+  QGraphicsView::dragLeaveEvent(event);
+}
+
+void cedar::proc::gui::View::dropEvent(QDropEvent *event)
+{
+  if(event->mimeData()->hasFormat("text/plain"))
+  {
+    const QMimeData* mimeData = event->mimeData();
+    for (const QString &format : mimeData->formats()) {
+      QString text;
+      if (format == QLatin1String("text/plain")) {
+        text = mimeData->text().simplified().replace("file://","");
+        auto app = QCoreApplication::instance();
+        if (app)
+        {
+          auto pointer = dynamic_cast< cedar::proc::gui::IdeApplication* >(app);
+          if (pointer)
+          {
+            auto ide = pointer->getIde();
+            ide->loadFile(text);
+          }
+        }
+      }
+    }
+    event->acceptProposedAction();
+  }
+  else
+  {
+    QGraphicsView::dropEvent(event);
+  }
+}
 
 void cedar::proc::gui::View::setWidgets
         (

@@ -165,6 +165,11 @@ protected:
    */
   void mouseReleaseEvent(QMouseEvent* pEvent);
 
+  void dragEnterEvent(QDragEnterEvent *event);
+  void dragMoveEvent(QDragMoveEvent *event);
+  void dragLeaveEvent(QDragLeaveEvent *event);
+  void dropEvent(QDropEvent *event);
+
 signals:
   //!@brief reacts to a change in zoom level
   void zoomLevelChanged(double newZoomLevel);
