@@ -117,6 +117,7 @@ cedar_add_library(cedarproc
   steps/CoordinateTransformation.h
   steps/ForwardKinematics.h
   steps/PseudoInverseKinematics.h
+  steps/DampedPseudoInverseKinematics.h
   steps/ConfigurationLimits.h
   steps/PseudoInverse.h
   steps/Jacobian.h
