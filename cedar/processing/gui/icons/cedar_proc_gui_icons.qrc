@@ -143,5 +143,6 @@
         <file>steps/minimum.svg</file>
         <file>steps/exponential_smoothing.svg</file>
         <file>steps/linear_lateralshift.svg</file>
+        <file>steps/concat_vertically.svg</file>
     </qresource>
 </RCC>
