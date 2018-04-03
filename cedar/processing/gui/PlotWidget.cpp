@@ -46,6 +46,7 @@
 
 // SYSTEM INCLUDES
 #include <boost/make_shared.hpp>
+#include <QtGui/QSizeGrip>
 //----------------------------------------------------------------------------------------------------------------------
 // private nested structs and classes
 //----------------------------------------------------------------------------------------------------------------------
@@ -66,7 +67,9 @@ mIsMultiPlot(false),
 mpData(pData),
 mpPlotData(pPlotData),
 mTitle(pLabel.toStdString()),
-mpLabel(new QLabel(pLabel))
+mpLabel(new QLabel(pLabel)),
+mGridMinimumHeight(150),
+mGridMinimumWidth(200)
 {
   this->mpTitleLayout = new QHBoxLayout();
   this->mpTitleLayout->setContentsMargins(0, 0, 0, 0);
@@ -81,6 +84,11 @@ mpLabel(new QLabel(pLabel))
   auto layout = new QVBoxLayout();
   layout->setContentsMargins(0, 0, 0, 0);
   this->mpPlotContainer->setLayout(layout);
+
+//  this->mpPlotContainer->setMinimumHeight(100);
+  this->mpPlotContainer->setMinimumWidth(mGridMinimumWidth);
+  this->mpPlotContainer->setMinimumHeight(mGridMinimumHeight);
+
   this->mpTitleLayout->addWidget(this->mpPlotSelector);
   this->mpTitleLayout->addWidget(this->mpLabel);
 
@@ -260,9 +268,16 @@ mWidgetLabel("")
   this->setContentsMargins(0, 0, 0, 0);
   this->mpLayout->setContentsMargins(mGridSpacing, mGridSpacing, mGridSpacing, mGridSpacing);
   this->mpLayout->setSpacing(mGridSpacing);
+
+
+
   this->setLayout(mpLayout);
 
   fillGridWithPlots();
+
+//  std::cout<<"Constructor: Number of Rows: " << this->mpLayout->rowCount() << "! Number of Columns: " << this->mpLayout->columnCount() << std::endl;
+
+  this->mpLayout->addWidget(new QSizeGrip(this),this->mpLayout->rowCount()-1,this->mpLayout->columnCount()-1, Qt::AlignBottom | Qt::AlignRight);
 
   // make all columns have the same stretch factor
   //!@todo Shouldn't this happen every time the plot is filled, i.e., within fillGridWithPlots?
@@ -270,6 +285,9 @@ mWidgetLabel("")
   {
     this->mpLayout->setColumnStretch(static_cast<size_t>(column), 1);
   }
+
+
+
 }
 
 cedar::proc::gui::PlotWidget::~PlotWidget()
@@ -456,6 +474,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
     delete p_current_labeled_plot->mpLabel;
     p_current_labeled_plot->mpLabel = nullptr;
   }
+//  std::cout<<"FillGridWithPlots!: Number of Rows: " << this->getRowCount() << "! Number of Columns: " << this->getColumnCount() << std::endl;
 }
 
 // returns the next free slot in the grid layout and marks it as taken IF it was previously freed

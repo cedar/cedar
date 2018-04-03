@@ -112,6 +112,10 @@ namespace cedar
 
           std::map<cedar::aux::ConstDataPtr, const std::string> mMultiPlotData;
           QLabel* mpLabel;
+
+        private:
+          int mGridMinimumHeight;
+          int mGridMinimumWidth;
         };
         CEDAR_GENERATE_POINTER_TYPES(LabeledPlot);
       }
