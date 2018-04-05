@@ -196,11 +196,12 @@ private:
 
 
   bool SettingShowGrid = false;
-  bool SettingFixedYAxisScaling = false;
+//  bool SettingFixedYAxisScaling = false;
 
   double YLimitMin = 0;
   double YLimitMax = 1;
 
+  //Todo: Remove these
   double FixedYLimitMin = 0;
   double FixedYLimitMax = 1;
 
