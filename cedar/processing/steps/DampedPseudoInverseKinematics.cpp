@@ -122,13 +122,24 @@ void cedar::proc::steps::DampedPseudoInverseKinematics::compute(const cedar::pro
       cv::Mat S2;
       cv::divide(S_diag, S_diag*S_diag + lambda_squared, S2 );
       cv::Mat S3;
-      cv::vconcat(S2, cv::Mat::zeros( V.rows - S2.rows,
+      if (V.cols > S2.rows) 
+      {
+            cv::vconcat(S2, cv::Mat::zeros( V.cols - S2.rows,
                                       S2.cols,
                                       CV_32F ),
                   S3);
+      }
+      else 
+      {
+        S3 = S2;
+      }
+      if (U_transposed.rows > S3.cols) 
+      {
+            cv::hconcat(S3.clone(), cv::Mat::zeros(S3.rows, U_transposed.rows - S3.cols, CV_32F), S3);
+      }
 
       damped_inverse= V * S3 * U_transposed;
-
+      
       cv::Mat joint_velocities = damped_inverse * cartesianVelocityMat;
       mOutputVelocity->setData(joint_velocities);
     }
