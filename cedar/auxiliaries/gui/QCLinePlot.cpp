@@ -255,19 +255,22 @@ void cedar::aux::gui::QCLinePlot::gridVisibilityChanged()
 
 void cedar::aux::gui::QCLinePlot::autoScalingChanged()
 {
-  if (!this->SettingFixedYAxisScaling)
-  {
-    this->SettingFixedYAxisScaling = true;
-  }
-  else
-  {
-    this->axisLimitsChanged();
-  }
+//  if (!this->SettingFixedYAxisScaling)
+//  {
+//    this->SettingFixedYAxisScaling = true;
+//  }
+//  else
+//  {
+//    this->axisLimitsChanged();
+//  }
+
+  this->axisLimitsChanged();
+
 }
 
 void cedar::aux::gui::QCLinePlot::axisLimitsChanged()
 {
-  if (this->SettingFixedYAxisScaling)
+  if (!this->_mAutoScalingEnabled->getValue())
   {
     double lower = this->_mYAxisLimits->getLowerLimit();
     double upper = this->_mYAxisLimits->getUpperLimit();
@@ -370,7 +373,7 @@ void cedar::aux::gui::QCLinePlot::timerEvent(QTimerEvent * /* pEvent */)
   this->YLimitMin = y_min;
   this->YLimitMax = y_max;
 
-  if(this->SettingFixedYAxisScaling)
+  if(!this->_mAutoScalingEnabled->getValue())
   {
     y_min = this->FixedYLimitMin;
     y_max = this->FixedYLimitMax;
@@ -401,14 +404,17 @@ void cedar::aux::gui::QCLinePlot::setAccepts0DData(bool accept)
 
 void cedar::aux::gui::QCLinePlot::setAutomaticYAxisScaling()
 {
-  this->SettingFixedYAxisScaling = false;
+  this->_mAutoScalingEnabled->setValue(true,true);
 }
 
 void cedar::aux::gui::QCLinePlot::setFixedYAxisScaling(double lower, double upper)
 {
   this->FixedYLimitMin = lower;
   this->FixedYLimitMax = upper;
-  this->SettingFixedYAxisScaling = true;
+//  this->SettingFixedYAxisScaling = true;
+
+  this->_mAutoScalingEnabled->setValue(false,true);
+  this->_mYAxisLimits->setValue(cedar::aux::math::Limits<double>(lower, upper), true);
 }
 
 void cedar::aux::gui::QCLinePlot::setFixedXAxisScaling(double lower, double upper)
@@ -418,7 +424,7 @@ void cedar::aux::gui::QCLinePlot::setFixedXAxisScaling(double lower, double uppe
 
 void cedar::aux::gui::QCLinePlot::setFixedYAxisScaling()
 {
-  if(!this->SettingFixedYAxisScaling)
+  if(this->_mAutoScalingEnabled->getValue())
   {
     QDialog* p_dialog = new QDialog();
     p_dialog->setModal(true);
@@ -457,12 +463,15 @@ void cedar::aux::gui::QCLinePlot::setFixedYAxisScaling()
     {
       this->FixedYLimitMin = p_lower->value();
       this->FixedYLimitMax = p_upper->value();
-      this->SettingFixedYAxisScaling = true;
+      this->_mYAxisLimits->setValue(cedar::aux::math::Limits<double>(this->FixedYLimitMin,this->FixedYLimitMax),true);
+      this->_mAutoScalingEnabled->setValue(false,true);
     }else{
-      this->SettingFixedYAxisScaling = false;
+      this->_mAutoScalingEnabled->setValue(true,true);
     }
-  }else{
-    this->SettingFixedYAxisScaling = false;
+  }
+  else
+  {
+    this->_mAutoScalingEnabled->setValue(true,true);
   }
 }
 
@@ -492,7 +501,7 @@ void cedar::aux::gui::QCLinePlot::contextMenuRequest(QPoint pos)
 
   QAction *p_fixedaxis = menu->addAction("fixed y axis scaling", this, SLOT(setFixedYAxisScaling()));
   p_fixedaxis->setCheckable(true);
-  p_fixedaxis->setChecked(this->SettingFixedYAxisScaling);
+  p_fixedaxis->setChecked(!this->_mAutoScalingEnabled->getValue());
 
   menu->popup(this->mpChart->mapToGlobal(pos));
 }
