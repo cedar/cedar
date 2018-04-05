@@ -85,9 +85,18 @@ mGridMinimumWidth(200)
   layout->setContentsMargins(0, 0, 0, 0);
   this->mpPlotContainer->setLayout(layout);
 
-//  this->mpPlotContainer->setMinimumHeight(100);
-  this->mpPlotContainer->setMinimumWidth(mGridMinimumWidth);
-  this->mpPlotContainer->setMinimumHeight(mGridMinimumHeight);
+  auto widthHeight = cedar::proc::gui::SettingsSingleton::getInstance()->getIdeSize();
+
+//  std::cout<<"Created a PlotWidget and received the current width: "<< widthHeight.x() << " and height: " << widthHeight.y() << std::endl;
+  //This is the sample resolution of a screen in the roboticslab
+  //Todo: Minimum Width and Height should be updated once the screen size changes, but this problem is not urgent enough!
+  float heuristicX = 1920;
+  float heuristicY = 1030;
+  float widthFactor = (float) widthHeight.x() / heuristicX;
+  float heightFactor = (float) widthHeight.y() / heuristicY;
+
+  this->mpPlotContainer->setMinimumWidth((int)mGridMinimumWidth*widthFactor);
+  this->mpPlotContainer->setMinimumHeight((int)mGridMinimumHeight*heightFactor);
 
   this->mpTitleLayout->addWidget(this->mpPlotSelector);
   this->mpTitleLayout->addWidget(this->mpLabel);
