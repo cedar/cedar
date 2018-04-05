@@ -1,0 +1,10 @@
+{
+  "name": "Simulated Youbot robot with Yarp Camera",
+  "description file": "robots/youbot/description.json",
+  "component instantiations":
+  {
+    "arm": "simulator",
+    "chassis": "simulator",
+    "camera" : "yarp"
+  }
+}

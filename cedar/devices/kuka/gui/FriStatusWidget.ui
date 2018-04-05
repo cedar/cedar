@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FriStatusWidget</class>
+ <widget class="QWidget" name="FriStatusWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>331</width>
+    <height>154</height>
+   </rect>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::StrongFocus</enum>
+  </property>
+  <property name="windowTitle">
+   <string>FRI Status information</string>
+  </property>
+  <layout class="QGridLayout">
+   <item row="3" column="0">
+    <widget class="QLabel" name="mpLabelQuality">
+     <property name="text">
+      <string>FRI_QUALITY</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="mpLabelSampleTime">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Sample time</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLabel" name="mpLabelStateData">
+     <property name="text">
+      <string>OFF (0)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLabel" name="mpLabelQualData">
+     <property name="text">
+      <string>BAD (0)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLabel" name="mpLabelSampleTimeData">
+     <property name="text">
+      <string>0.02s</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="mpLabelState">
+     <property name="text">
+      <string>FRI_STATE</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="mpLabelPower">
+       <property name="text">
+        <string>Drives</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="5" column="1">
+    <widget class="QLabel" name="mpLabelPowerData">
+     <property name="text">
+      <string>off</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout1">
+     <item>
+      <widget class="QLabel" name="mpLabelControlScheme">
+       <property name="text">
+        <string>Control Scheme</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="6" column="1">
+    <widget class="QLabel" name="mpLabelControlSchemeData">
+     <property name="text">
+      <string>uninitialized</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
