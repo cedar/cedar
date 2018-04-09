@@ -225,6 +225,12 @@ public:
   //!@brief Checks if the connectable has a slot with the given role and name.
   bool hasSlot(DataRole::Id role, const std::string& name, bool lock = true) const;
 
+
+  std::string getCommentString() const;
+
+  void setCommentString(std::string comment);
+
+  virtual void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -546,6 +552,8 @@ private:
 
   //!@brief Association between data roles and the corresponding lock set.
   std::map<DataRole::Id, LockSetHandle> mRoleLockSetHandles;
+
+  std::string mpCommentString;
 
 }; // class cedar::proc::Connectable
 

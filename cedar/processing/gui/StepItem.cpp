@@ -204,6 +204,16 @@ void cedar::proc::gui::StepItem::updateToolTip()
                   + "</tt></div></td>"
                "</tr></nobr>";
 
+  if(step->getCommentString()!= "")
+  {
+    tool_tip+= "<tr>"
+                     "<td>Comments: </td>"
+                     "<td><div align=\"right\"><tt>"
+             + QString::fromStdString(step->getCommentString())
+             + "</tt></div></td>"
+                     "</tr></nobr>";
+  }
+
   tool_tip += "</table>";
 
 /*

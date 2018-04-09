@@ -66,7 +66,8 @@
 cedar::proc::Connectable::Connectable()
 :
 mpConnectionLock(new QReadWriteLock()),
-mMandatoryConnectionsAreSet(true)
+mMandatoryConnectionsAreSet(true),
+mpCommentString("")
 {
   for (size_t i = 0; i < cedar::proc::DataRole::type().list().size(); ++i)
   {
@@ -88,6 +89,13 @@ cedar::proc::Connectable::~Connectable()
 void cedar::proc::Connectable::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   cedar::proc::Element::readConfiguration(node);
+
+
+  auto commentStringNode = node.find("comments");
+  if (commentStringNode != node.not_found())
+  {
+    this->setCommentString(boost::lexical_cast<std::string>(commentStringNode->second.data()));
+  }
 
   auto stored_data_iter = node.find("stored data");
   if (stored_data_iter == node.not_found())
@@ -1305,3 +1313,26 @@ bool cedar::proc::Connectable::isRecorded() const
   }
   return false;
 }
+
+
+void cedar::proc::Connectable::setCommentString(std::string comment)
+{
+// std::cout<< "This is connectable: " << this->getName() << " which got a new CommentString: " << comment <<std::endl;
+ this->mpCommentString = comment;
+}
+
+std::string cedar::proc::Connectable::getCommentString() const
+{
+//  std::cout<< "This is connectable: " << this->getName() << " which has the following current CommentString: " << this->mpCommentString <<std::endl;
+  return this->mpCommentString;
+}
+
+
+void cedar::proc::Connectable::writeConfiguration(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::proc::Element::writeConfiguration(root);
+
+  root.put("comments",this->getCommentString());
+
+}
+

@@ -88,7 +88,8 @@ public:
   (
     QMainWindow* pMainWindow,
     cedar::aux::gui::Configurable* pConigurableWidget,
-    cedar::proc::gui::RecorderWidget* pRecorderWidget
+    cedar::proc::gui::RecorderWidget* pRecorderWidget,
+    cedar::proc::gui::CommentWidget* pCommentWidget
   );
 
   //!@brief return the displayed scene
@@ -235,6 +236,8 @@ private:
   cedar::aux::gui::Configurable* mpConigurableWidget;
 
   cedar::proc::gui::RecorderWidget* mpRecorderWidget;
+
+  cedar::proc::gui::CommentWidget* mpCommentWidget;
 
 }; // class ProcessingView
 

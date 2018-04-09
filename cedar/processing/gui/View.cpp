@@ -64,7 +64,8 @@ cedar::proc::gui::View::View(QWidget *pParent)
         mpScrollTimer(new QTimer(this)),
         mpMainWindow(nullptr),
         mpConigurableWidget(nullptr),
-        mpRecorderWidget(nullptr)
+        mpRecorderWidget(nullptr),
+        mpCommentWidget(nullptr)
 {
   this->resetViewport();
   this->setInteractive(true);
@@ -158,12 +159,14 @@ void cedar::proc::gui::View::setWidgets
         (
                 QMainWindow *pMainWindow,
                 cedar::aux::gui::Configurable *pConigurableWidget,
-                cedar::proc::gui::RecorderWidget *pRecorderWidget
+                cedar::proc::gui::RecorderWidget *pRecorderWidget,
+                cedar::proc::gui::CommentWidget *pCommentWidget
         )
 {
   this->mpMainWindow = pMainWindow;
   this->mpConigurableWidget = pConigurableWidget;
   this->mpRecorderWidget = pRecorderWidget;
+  this->mpCommentWidget = pCommentWidget;
 }
 
 void cedar::proc::gui::View::resetViewport()
@@ -195,6 +198,13 @@ void cedar::proc::gui::View::resetViewport()
   {
     this->mpScene->setRecorderWidget(this->mpRecorderWidget);
   }
+
+  if (this->mpCommentWidget)
+  {
+    this->mpScene->setCommentWidget(this->mpCommentWidget);
+  }
+
+
 }
 
 void cedar::proc::gui::View::createZoomWidget()

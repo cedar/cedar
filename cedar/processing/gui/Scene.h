@@ -56,6 +56,7 @@
 #include "cedar/processing/gui/GraphicsBase.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"
 #include "cedar/processing/gui/RecorderWidget.fwd.h"
+#include "cedar/processing/gui/CommentWidget.fwd.h"
 #include "cedar/processing/gui/StickyNote.fwd.h"
 #include "cedar/processing/gui/TriggerItem.fwd.h"
 #include "cedar/auxiliaries/gui/Configurable.fwd.h"
@@ -274,6 +275,8 @@ public:
    */
   void setRecorderWidget(cedar::proc::gui::RecorderWidget* pRecorderWidget);
 
+  void setCommentWidget(cedar::proc::gui::CommentWidget* pCommentWidget);
+
   /*!@brief Exports the scene to an svg file
    */
   void exportSvg(const QString& file);
@@ -320,6 +323,8 @@ public:
 
   //! Returns the configurable widget of the scene.
   cedar::proc::gui::RecorderWidget* getRecorderWidget() const;
+
+  cedar::proc::gui::CommentWidget* getCommentWidget() const;
 
   /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
    */
@@ -496,6 +501,8 @@ private:
 
   //! The widget used to display record settings of steps when they are selected in the scene. May be null.
   cedar::proc::gui::RecorderWidget* mpRecorderWidget;
+
+  cedar::proc::gui::CommentWidget* mpCommentWidget;
 
   //! Saves the mouse x position in the scene
   int mMousePosX;
