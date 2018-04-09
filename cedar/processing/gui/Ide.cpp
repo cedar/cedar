@@ -441,7 +441,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
     this->loadDefaultPlugins();
   }
 
-  this->mpProcessingDrawer->setWidgets(this, this->mpPropertyTable, this->mpRecorderWidget);
+  this->mpProcessingDrawer->setWidgets(this, this->mpPropertyTable, this->mpRecorderWidget,this->mpCommentWidget);
 
   mpMenuWindows->addAction(this->mpItemsWidget->toggleViewAction());
   mpMenuWindows->addAction(this->mpPropertiesWidget->toggleViewAction());
@@ -2203,6 +2203,7 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   this->mpProcessingDrawer->getScene()->setGroup(group);
   this->mpPropertyTable->clear();
   this->mpRecorderWidget->clear();
+  this->mpCommentWidget->clear();
   this->mpActionShowHideGrid->setChecked(this->mpProcessingDrawer->getScene()->getSnapToGrid());
 
   this->updateTriggerStartStopThreadCallers();

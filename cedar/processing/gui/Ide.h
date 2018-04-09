@@ -42,6 +42,7 @@
 #define CEDAR_PROC_GUI_MAIN_WINDOW_H
 
 // CEDAR INCLUDES
+#include "cedar/processing/gui/CommentWidget.h"
 #include "cedar/processing/gui/ui_Ide.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/auxiliaries/LogInterface.h"

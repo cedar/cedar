@@ -50,6 +50,7 @@
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/processing/gui/CommentWidget.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/GroupDeclarationManager.h"
@@ -104,6 +105,7 @@ mpMainWindow(pMainWindow),
 mSnapToGrid(false),
 mpConfigurableWidget(nullptr),
 mpRecorderWidget(nullptr),
+mpCommentWidget(nullptr),
 mDraggingItems(false)
 {
   mMousePosX = 0;
@@ -133,6 +135,11 @@ cedar::aux::gui::Configurable* cedar::proc::gui::Scene::getConfigurableWidget() 
 cedar::proc::gui::RecorderWidget* cedar::proc::gui::Scene::getRecorderWidget() const
 {
   return this->mpRecorderWidget;
+}
+
+cedar::proc::gui::CommentWidget* cedar::proc::gui::Scene::getCommentWidget() const
+{
+  return this->mpCommentWidget;
 }
 
 void cedar::proc::gui::Scene::dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent)
@@ -381,6 +388,11 @@ void cedar::proc::gui::Scene::setRecorderWidget(cedar::proc::gui::RecorderWidget
   this->mpRecorderWidget = pRecorderWidget;
 }
 
+void cedar::proc::gui::Scene::setCommentWidget(cedar::proc::gui::CommentWidget* pCommentWidget)
+{
+  this->mpCommentWidget = pCommentWidget;
+}
+
 void cedar::proc::gui::Scene::itemSelected()
 {
   // either show the resize handles if only one item is selected, or hide them if more than one is selected
@@ -415,6 +427,19 @@ void cedar::proc::gui::Scene::itemSelected()
           this->mpRecorderWidget->clear();
         }
       }
+
+      if (this->mpCommentWidget != nullptr)
+      {
+        if (auto connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(p_element->getElement()))
+        {
+          this->mpCommentWidget->setConnectable(connectable);
+        }
+        else
+        {
+          this->mpCommentWidget->clear();
+        }
+      }
+
     }
     else if (auto coupling = dynamic_cast<cedar::proc::gui::CouplingCollection*>(p_item))
     {
@@ -434,6 +459,11 @@ void cedar::proc::gui::Scene::itemSelected()
     if (this->mpRecorderWidget != nullptr)
     {
       this->mpRecorderWidget->clear();
+    }
+
+    if (this->mpCommentWidget != nullptr)
+    {
+      this->mpCommentWidget->clear();
     }
   }
 }
