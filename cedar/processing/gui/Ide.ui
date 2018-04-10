@@ -307,7 +307,7 @@
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
-          <widget class="QScrollArea" name="scrollArea">
+          <widget class="QScrollArea" name="scrollArea1">
            <property name="widgetResizable">
             <bool>true</bool>
            </property>
@@ -423,9 +423,9 @@
         <attribute name="title">
          <string>Recorder</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
+        <layout class="QVBoxLayout" name="verticalLayout_31">
          <item>
-          <widget class="QScrollArea" name="scrollArea">
+          <widget class="QScrollArea" name="scrollArea2">
            <property name="widgetResizable">
             <bool>true</bool>
            </property>
