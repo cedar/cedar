@@ -347,6 +347,8 @@ public slots:
   //!@brief removes the reference of a child widget from the mChildWidgets vector (called when child got destroyed)
   void removeChildWidget();
 
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -597,6 +599,8 @@ private:
 
   DecorationPtr mpLoopedDecoration;
 
+  DecorationPtr mpCommentAvailableDecoration;
+
   //! An offset to be added to in- and output slot positions.
   qreal mInputOutputSlotOffset;
 
@@ -609,6 +613,7 @@ private:
   boost::signals2::connection mSlotAddedConnection;
   boost::signals2::connection mSlotRenamedConnection;
   boost::signals2::connection mSlotRemovedConnection;
+  boost::signals2::connection mCommentChangedConnection;
 
   boost::signals2::scoped_connection mStartedConnection;
   boost::signals2::scoped_connection mStoppedConnection;

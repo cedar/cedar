@@ -204,7 +204,7 @@ void cedar::proc::gui::StepItem::updateToolTip()
                   + "</tt></div></td>"
                "</tr></nobr>";
 
-  if(step->getCommentString()!= "")
+  if(step->hasComment())
   {
     tool_tip+= "<tr></tr><tr>"
                      "<td>Comments: </td>"
