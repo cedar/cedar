@@ -179,8 +179,8 @@ void cedar::proc::gui::StepItem::updateToolTip()
   std::string classname = this->mClassId->getClassNameWithoutNamespace().c_str();
   std::string fullclassname = this->mClassId->getClassName().c_str();
 
-  tool_tip += "<nobr>"
-              "<table>";
+  tool_tip += "<table>"
+              "<nobr>";
 
 
   tool_tip+= "<tr>"
@@ -199,19 +199,19 @@ void cedar::proc::gui::StepItem::updateToolTip()
 
   tool_tip+= "<tr>"
                 "<td>Implementation: </td>"
-                "<td><div align=\"right\"><tt>" 
+                "<td><div><tt>"
                   + QString::fromStdString(fullclassname)
                   + "</tt></div></td>"
                "</tr></nobr>";
 
-  if(step->getCommentString()!= "")
+  if(step->hasComment())
   {
-    tool_tip+= "<tr>"
+    tool_tip+= "<tr></tr><tr>"
                      "<td>Comments: </td>"
-                     "<td><div align=\"left\"><i>"
+                     "<td><div><i>"
              + QString::fromStdString(step->getCommentString())
              + "</i></div></td>"
-                     "</tr></nobr>";
+                     "</tr>";
   }
 
   tool_tip += "</table>";

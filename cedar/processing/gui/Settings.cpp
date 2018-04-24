@@ -273,6 +273,19 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
     "Finally, drag the robotic 'component' step onto your canvas and use "
     "it like any other step.</p>"
   );
+
+
+  this->addOneTimeMessage
+          (
+                  CEDAR_MAKE_VERSION(6, 1, 0), // introduces in this version
+                  "comment tab",
+                  "Comment on your steps",
+                  "<p>You can now comment directly on a selected step by clicking "
+                  "on the comments tab in the property panel on the right side of the screen. "
+                  "The comments also show up in the tool-tip that appears while hovering over the "
+                  "steps graphical representation. Feel free to jot down notes or explain "
+                  "your architecture with the help of the new comments tab.</p>"
+          );
 }
 
 cedar::proc::gui::Settings::UserDefinedColor::UserDefinedColor(const std::string& stringToParse)

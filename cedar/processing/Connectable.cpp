@@ -1319,6 +1319,7 @@ void cedar::proc::Connectable::setCommentString(std::string comment)
 {
 // std::cout<< "This is connectable: " << this->getName() << " which got a new CommentString: " << comment <<std::endl;
  this->mpCommentString = comment;
+ this->signalCommentChanged();
 }
 
 std::string cedar::proc::Connectable::getCommentString() const
@@ -1333,6 +1334,10 @@ void cedar::proc::Connectable::writeConfiguration(cedar::aux::ConfigurationNode&
   cedar::proc::Element::writeConfiguration(root);
 
   root.put("comments",this->getCommentString());
+}
 
+bool cedar::proc::Connectable::hasComment() const
+{
+  return this->getCommentString() != "";
 }
 

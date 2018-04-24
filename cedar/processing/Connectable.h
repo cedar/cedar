@@ -230,6 +230,8 @@ public:
 
   void setCommentString(std::string comment);
 
+  bool hasComment() const;
+
   virtual void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -522,6 +524,8 @@ public:
   CEDAR_DECLARE_SIGNAL(OutputPropertiesChanged, void (const std::string&));
 public:
   CEDAR_DECLARE_SIGNAL(InputConnectionChanged, void (const std::string&));
+public:
+  CEDAR_DECLARE_SIGNAL(CommentChanged, void ());
 
 private:
   //!@brief a connection to a signal emitted by an external data slot
