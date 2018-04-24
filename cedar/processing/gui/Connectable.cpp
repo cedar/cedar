@@ -160,6 +160,7 @@ cedar::proc::gui::Connectable::~Connectable()
   mSlotAddedConnection.disconnect();
   mSlotRenamedConnection.disconnect();
   mSlotRemovedConnection.disconnect();
+  mCommentChangedConnection.disconnect();
 }
 
 cedar::proc::gui::Connectable::Decoration::Decoration(QGraphicsItem* pParent, const QString& icon, const QString& description, const QColor& bgColour)
@@ -1153,6 +1154,7 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
   mSlotAddedConnection.disconnect();
   mSlotRenamedConnection.disconnect();
   mSlotRemovedConnection.disconnect();
+  mCommentChangedConnection.disconnect();
 
   this->mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->getConnectable());
   CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast < cedar::proc::ConstElementDeclaration > (this->mClassId))
@@ -1171,6 +1173,7 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
   mSlotAddedConnection = connectable->connectToSlotAddedSignal(boost::bind(&cedar::proc::gui::Connectable::slotAdded, this, _1, _2));
   mSlotRenamedConnection = connectable->connectToSlotRenamedSignal(boost::bind(&cedar::proc::gui::Connectable::slotRenamed, this, _1, _2, _3));
   mSlotRemovedConnection = connectable->connectToSlotRemovedSignal(boost::bind(&cedar::proc::gui::Connectable::slotRemoved, this, _1, _2));
+  mCommentChangedConnection = connectable->connectToCommentChangedSignal(boost::bind(&cedar::proc::gui::Connectable::updateDecorations,this));
 
   this->mStartedConnection.disconnect();
   this->mStoppedConnection.disconnect();
@@ -1427,17 +1430,35 @@ void cedar::proc::gui::Connectable::updateDecorations()
     if (!this->mDeviceQuality)
     {
       this->mDeviceQuality = DeviceQualityDecorationPtr(new DeviceQualityDecoration(this, component));
+      this->addDecoration(mDeviceQuality);
     }
-
-    this->addDecoration(mDeviceQuality);
   }
   else
   {
     if (this->mDeviceQuality)
     {
       this->removeDecoration(this->mDeviceQuality);
+      this->mDeviceQuality.reset();
     }
   }
+
+  if (this->getConnectable()->hasComment())
+  {
+    if (!this->mpCommentAvailableDecoration)
+    {
+      this->mpCommentAvailableDecoration =  DecorationPtr(new Decoration(this, ":/decorations/commented.svg", QString::fromStdString(this->getConnectable()->getCommentString())));
+      this->addDecoration(mpCommentAvailableDecoration);
+    } else
+    {
+      this->mpCommentAvailableDecoration->setToolTip(QString::fromStdString(this->getConnectable()->getCommentString()));
+    }
+
+  }
+  else if (this->mpCommentAvailableDecoration)
+    {
+      this->removeDecoration(this->mpCommentAvailableDecoration);
+      this->mpCommentAvailableDecoration.reset();
+    }
 
   this->updateDecorationPositions();
 }
