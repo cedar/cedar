@@ -347,7 +347,14 @@ void cedar::dev::RobotManager::loadRobotConfiguration
   }
 
   cedar::aux::gl::ObjectVisualizationPtr p_object_visualisation = boost::dynamic_pointer_cast<cedar::aux::gl::ObjectVisualization>(robot->getVisualisationPtr());
-  if(p_object_visualisation)
+
+  // BUG: loading files should not directly start the GL vis:
+  // WORKAROUND: access to QT Qidgets only allowed from the GUI thread
+  //            since most calls are not thread-safe!
+  const bool isGuiThread =
+            QThread::currentThread() == QCoreApplication::instance()->thread();
+
+  if(p_object_visualisation && isGuiThread)
   {
     p_object_visualisation->setObjectName(QString::fromStdString(robotName));
     cedar::aux::gl::GlobalSceneSingleton::getInstance()->addObjectVisualization(p_object_visualisation);

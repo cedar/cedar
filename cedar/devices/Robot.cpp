@@ -393,7 +393,17 @@ void cedar::dev::Robot::readVisualisation(const cedar::aux::ConfigurationNode &n
     // The robots visual representation in the internal simulator    
     mpRobotVisualisation = cedar::dev::gl::RobotVisualisationManagerSingleton::getInstance()->allocate(vis_class_node->second.data());
     mpRobotVisualisation->setRobotPtr(this->shared_from_this());
-    mpRobotVisualisation->initializeGl();
+
+    // BUG: purely reading a file shouldnt start the visualisation. this doesnt belong here!
+    // WORKAROUND: access to QT Qidgets only allowed from the GUI thread
+    //            since most calls are not thread-safe!
+    const bool isGuiThread =
+                 QThread::currentThread() == QCoreApplication::instance()->thread();
+
+    if (isGuiThread)
+    {
+      mpRobotVisualisation->initializeGl();
+    }
   }
 }
 
