@@ -1,0 +1,1118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Ide</class>
+ <widget class="QMainWindow" name="Ide">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>983</width>
+    <height>762</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>cedar</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="icons/cedar_proc_gui_icons.qrc">
+    <normaloff>:/processing_ide_app_icon_48.png</normaloff>:/processing_ide_app_icon_48.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="tabShape">
+       <enum>QTabWidget::Triangular</enum>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="documentMode">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>architecture</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2" rowstretch="1">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="cedar::proc::gui::View" name="mpProcessingDrawer"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabVisualisation">
+       <attribute name="title">
+        <string>visualisation</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <widget class="cedar::aux::gui::SceneControl" name="mpSceneControl" native="true"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>983</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="mpActionNew"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionSave"/>
+    <addaction name="mpActionSaveAs"/>
+    <addaction name="mpActionLoad"/>
+    <addaction name="mpRecentFiles"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionSaveSerializableData"/>
+    <addaction name="mpActionLoadSerializableData"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionExportSVG"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuSimulation">
+    <property name="title">
+     <string>Simulation</string>
+    </property>
+    <addaction name="mpActionStartPauseSimulation"/>
+    <addaction name="mpActionResetSimulation"/>
+    <addaction name="mpThreadsSingleStep"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionRecord"/>
+    <addaction name="mpActionSnapshot"/>
+   </widget>
+   <widget class="QMenu" name="menuRobots">
+    <property name="title">
+     <string>Robots</string>
+    </property>
+    <addaction name="mpActionShowRobotManager"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionBrakeAllRobots"/>
+   </widget>
+   <widget class="QMenu" name="mpMenuWindows">
+    <property name="title">
+     <string>Windows</string>
+    </property>
+    <widget class="QMenu" name="mpMenuArchitecturePlots">
+     <property name="title">
+      <string>Architecture widgets</string>
+     </property>
+    </widget>
+    <addaction name="mpActionClosePlots"/>
+    <addaction name="mpActionToggleVisibilityOfPlots"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionAddGlobalSceneViewer"/>
+    <addaction name="separator"/>
+    <addaction name="mpMenuArchitecturePlots"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionLockUIPositions"/>
+    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="mpActionShowRecentNotifications"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionAbout"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="mpActionCopy"/>
+    <addaction name="mpActionPasteConfiguration"/>
+    <addaction name="mpActionDuplicate"/>
+    <addaction name="mpActionSelectAll"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionFind"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="mpActionShowHideGrid"/>
+    <addaction name="mpActionToggleSmartConnections"/>
+    <addaction name="mpActionToggleTriggerColor"/>
+   </widget>
+   <widget class="QMenu" name="mpToolsMenu">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="mpActionPerformanceOverview"/>
+    <addaction name="mpActionParameterLinker"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionManagePlugins"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionSettings"/>
+    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="mpMenuArchitectureScripts">
+    <property name="title">
+     <string>Scripting</string>
+    </property>
+    <addaction name="mpActionExperiments"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
+   <addaction name="menuSimulation"/>
+   <addaction name="menuRobots"/>
+   <addaction name="mpToolsMenu"/>
+   <addaction name="mpMenuArchitectureScripts"/>
+   <addaction name="mpMenuWindows"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="mpStatusBar"/>
+  <widget class="QDockWidget" name="mpItemsWidget">
+   <property name="features">
+    <set>QDockWidget::DockWidgetFeatureMask</set>
+   </property>
+   <property name="windowTitle">
+    <string>Steps</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>4</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="cedar::proc::gui::ElementList" name="mpCategoryList"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="mpLogWidget">
+   <property name="features">
+    <set>QDockWidget::DockWidgetFeatureMask</set>
+   </property>
+   <property name="windowTitle">
+    <string>Log</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_3">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="cedar::aux::gui::Log" name="mpLog" native="true"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="mpPropertiesWidget">
+   <property name="features">
+    <set>QDockWidget::AllDockWidgetFeatures</set>
+   </property>
+   <property name="windowTitle">
+    <string>Settings</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_5">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QTabWidget" name="tabWidget_2">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tab_2">
+        <attribute name="title">
+         <string>Properties</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <widget class="cedar::aux::gui::Configurable" name="mpPropertyTable"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_2_5">
+        <attribute name="title">
+         <string>Comments</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QScrollArea" name="scrollArea1">
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="cedar::proc::gui::CommentWidget" name="mpCommentWidget">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>254</width>
+              <height>495</height>
+             </rect>
+            </property>
+            <property name="palette">
+             <palette>
+              <active>
+               <colorrole role="Base">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Window">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Shadow">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>249</red>
+                  <green>249</green>
+                  <blue>249</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </active>
+              <inactive>
+               <colorrole role="Base">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Window">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Shadow">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>249</red>
+                  <green>249</green>
+                  <blue>249</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </inactive>
+              <disabled>
+               <colorrole role="Base">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Window">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Shadow">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>249</red>
+                  <green>249</green>
+                  <blue>249</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </disabled>
+             </palette>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_3">
+        <attribute name="title">
+         <string>Recorder</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_31">
+         <item>
+          <widget class="QScrollArea" name="scrollArea2">
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="cedar::proc::gui::RecorderWidget" name="mpRecorderWidget">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>254</width>
+              <height>495</height>
+             </rect>
+            </property>
+            <property name="palette">
+             <palette>
+              <active>
+               <colorrole role="Base">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Window">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Shadow">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>249</red>
+                  <green>249</green>
+                  <blue>249</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </active>
+              <inactive>
+               <colorrole role="Base">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Window">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Shadow">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>249</red>
+                  <green>249</green>
+                  <blue>249</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </inactive>
+              <disabled>
+               <colorrole role="Base">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Window">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Shadow">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>249</red>
+                  <green>249</green>
+                  <blue>249</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </disabled>
+             </palette>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QToolBar" name="mpToolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="mpActionSave"/>
+   <addaction name="separator"/>
+   <addaction name="mpActionStartPauseSimulation"/>
+   <addaction name="mpActionResetSimulation"/>
+   <addaction name="mpThreadsSingleStep"/>
+   <addaction name="separator"/>
+   <addaction name="mpActionRecord"/>
+   <addaction name="mpActionSnapshot"/>
+   <addaction name="separator"/>
+   <addaction name="mpActionToggleTriggerColor"/>
+   <addaction name="separator"/>
+   <addaction name="mpActionDummy"/>
+   <addaction name="separator"/>
+   <addaction name="mpActionToggleVisibilityOfPlots"/>
+   <addaction name="separator"/>
+   <addaction name="mpActionDisplayPlotGroup"/>
+   <addaction name="mpActionNewPlotGroup"/>
+   <addaction name="mpActionRenamePlotGroup"/>
+   <addaction name="mpActionEditPlotGroup"/>
+   <addaction name="mpActionDeletePlotGroup"/>
+   <addaction name="separator"/>
+   <addaction name="mpActionOpenRobotManager"/>
+   <addaction name="mpActionBrakeAllRobots"/>
+  </widget>
+  <action name="mpActionNew">
+   <property name="text">
+    <string>New</string>
+   </property>
+  </action>
+  <action name="mpActionSave">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/save.svg</normaloff>:/toolbaricons/save.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="mpActionSaveAs">
+   <property name="text">
+    <string>Save as...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="mpActionLoad">
+   <property name="text">
+    <string>Open file...</string>
+   </property>
+   <property name="toolTip">
+    <string>Load an architecture file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="mpActionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="mpActionManagePlugins">
+   <property name="text">
+    <string>Manage plugins...</string>
+   </property>
+  </action>
+  <action name="mpActionStartPauseSimulation">
+   <property name="icon">
+    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+     <normaloff>:/cedar/auxiliaries/gui/start.svg</normaloff>:/cedar/auxiliaries/gui/start.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Start/Pause simulation</string>
+   </property>
+   <property name="toolTip">
+    <string>Starts and pauses the simulation.</string>
+   </property>
+   <property name="shortcut">
+    <string>Space</string>
+   </property>
+  </action>
+  <action name="mpActionLoadPlugin">
+   <property name="text">
+    <string>Load plugin...</string>
+   </property>
+  </action>
+  <action name="mpActionShowHideGrid">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/grid.svg</normaloff>:/toolbaricons/grid.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle grid</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggles the grid in the architecture pane. Steps will align to this grid.</string>
+   </property>
+  </action>
+  <action name="mpRecentFiles">
+   <property name="text">
+    <string>Recent files</string>
+   </property>
+  </action>
+  <action name="mpActionSettings">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/menus/settings.svg</normaloff>:/menus/settings.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Settings...</string>
+   </property>
+  </action>
+  <action name="mpActionAbout">
+   <property name="text">
+    <string>About...</string>
+   </property>
+  </action>
+  <action name="mpActionBrakeAllRobots">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/brakeall.svg</normaloff>:/toolbaricons/brakeall.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Brake all robots</string>
+   </property>
+   <property name="toolTip">
+    <string>Brake all connected robotic components (slowly)</string>
+   </property>
+  </action>
+  <action name="mpActionExportSVG">
+   <property name="text">
+    <string>Save canvas...</string>
+   </property>
+  </action>
+  <action name="mpActionShowRobotManager">
+   <property name="text">
+    <string>Robot manager...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+M</string>
+   </property>
+  </action>
+  <action name="mpActionAddGlobalSceneViewer">
+   <property name="text">
+    <string>Add a camera of the scene visualisation...</string>
+   </property>
+  </action>
+  <action name="mpActionDuplicate">
+   <property name="text">
+    <string>Duplicate</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="mpActionSelectAll">
+   <property name="text">
+    <string>Select All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="mpActionToggleTriggerVisibility">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/hide_triggers.svg</normaloff>
+     <normalon>:/toolbaricons/show_triggers.svg</normalon>:/toolbaricons/hide_triggers.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle visibility</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle color of threads.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="mpActionTriggerSmartHide">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Smart hide</string>
+   </property>
+  </action>
+  <action name="mpThreadsSingleStep">
+   <property name="icon">
+    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+     <normaloff>:/cedar/auxiliaries/gui/singleStep.svg</normaloff>:/cedar/auxiliaries/gui/singleStep.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Single-step each thread</string>
+   </property>
+   <property name="toolTip">
+    <string>Execute a single step with each thread</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl++</string>
+   </property>
+  </action>
+  <action name="mpActionToggleSmartConnections">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/standard_connections.svg</normaloff>
+     <normalon>:/toolbaricons/smart_connections.svg</normalon>:/toolbaricons/standard_connections.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle smart connections</string>
+   </property>
+   <property name="toolTip">
+    <string>toggle smart connections</string>
+   </property>
+  </action>
+  <action name="mpActionClosePlots">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/close_all_plots.svg</normaloff>:/toolbaricons/close_all_plots.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Close all plots</string>
+   </property>
+   <property name="toolTip">
+    <string>Closes all plots</string>
+   </property>
+  </action>
+  <action name="mpActionRecord">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+     <normaloff>:/cedar/auxiliaries/gui/record.svg</normaloff>
+     <normalon>:/cedar/auxiliaries/gui/recordStop.svg</normalon>
+     <activeoff>:/cedar/auxiliaries/gui/record.svg</activeoff>
+     <activeon>:/cedar/auxiliaries/gui/recordStop.svg</activeon>
+     <selectedon>:/cedar/auxiliaries/gui/recordStop.svg</selectedon>:/cedar/auxiliaries/gui/record.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Record</string>
+   </property>
+   <property name="toolTip">
+    <string notr="true">Record all registered slots.</string>
+   </property>
+  </action>
+  <action name="mpActionSnapshot">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/snapshot.svg</normaloff>:/toolbaricons/snapshot.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Snapshot</string>
+   </property>
+   <property name="toolTip">
+    <string>Takes a snapshot from the registered steps</string>
+   </property>
+  </action>
+  <action name="mpActionToggleVisibilityOfPlots">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/toggle_visibility_of_plots.svg</normaloff>:/toolbaricons/toggle_visibility_of_plots.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle visibility of plots</string>
+   </property>
+   <property name="toolTip">
+    <string>Hide/show all open plots</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+H</string>
+   </property>
+  </action>
+  <action name="mpActionNewPlotGroup">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/new.svg</normaloff>:/toolbaricons/new.svg</iconset>
+   </property>
+   <property name="text">
+    <string>New Plot Group</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new plot group, containing all open plots</string>
+   </property>
+  </action>
+  <action name="mpActionRenamePlotGroup">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/edit.svg</normaloff>:/toolbaricons/edit.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Current Plot Group</string>
+   </property>
+   <property name="toolTip">
+    <string>Rename selected plot group</string>
+   </property>
+  </action>
+  <action name="mpActionDisplayPlotGroup">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/display.svg</normaloff>:/toolbaricons/display.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Display Plot Group</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle visibility of selected plot group</string>
+   </property>
+  </action>
+  <action name="mpActionDeletePlotGroup">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/trash.svg</normaloff>:/toolbaricons/trash.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Delete Plot Group</string>
+   </property>
+   <property name="toolTip">
+    <string>delete selected plot group</string>
+   </property>
+  </action>
+  <action name="mpActionPerformanceOverview">
+   <property name="text">
+    <string>Performance overview...</string>
+   </property>
+  </action>
+  <action name="mpActionExperiments">
+   <property name="text">
+    <string>Experiments...</string>
+   </property>
+   <property name="toolTip">
+    <string>Framwork for starting experiments</string>
+   </property>
+  </action>
+  <action name="mpActionCopy">
+   <property name="text">
+    <string>Copy step</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="mpActionPasteConfiguration">
+   <property name="text">
+    <string>Paste step configuration</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+V</string>
+   </property>
+  </action>
+  <action name="mpActionParameterLinker">
+   <property name="text">
+    <string>Parameter linking...</string>
+   </property>
+  </action>
+  <action name="mpActionSaveSerializableData">
+   <property name="text">
+    <string>Save serializable data...</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a location to save all data in slots that are marked as serializable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </action>
+  <action name="mpActionLoadSerializableData">
+   <property name="text">
+    <string>Load serializable data...</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a file from which to load data in slots that are marked as serializable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </action>
+  <action name="mpActionFind">
+   <property name="text">
+    <string>Find</string>
+   </property>
+   <property name="toolTip">
+    <string>Find an step</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionNone">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>none</string>
+   </property>
+  </action>
+  <action name="mpActionResetSimulation">
+   <property name="icon">
+    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+     <normaloff>:/cedar/auxiliaries/gui/reset.svg</normaloff>:/cedar/auxiliaries/gui/reset.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Reset simulation</string>
+   </property>
+   <property name="toolTip">
+    <string>Resets the simulation, i.e., calls reset on the architecture and rewinds the global timer.</string>
+   </property>
+  </action>
+  <action name="mpActionEditPlotGroup">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/store_plotgroup.svg</normaloff>:/toolbaricons/store_plotgroup.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Store Open Plots in Current Plot Group</string>
+   </property>
+   <property name="toolTip">
+    <string>Overwrite selected plot group with open plots</string>
+   </property>
+  </action>
+  <action name="mpActionToggleTriggerColor">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/show_trigger_colors.svg</normaloff>:/toolbaricons/show_trigger_colors.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Colorize steps by thread</string>
+   </property>
+   <property name="toolTip">
+    <string>Hide/show thread association via colors</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+T</string>
+   </property>
+  </action>
+  <action name="mpActionDummy">
+   <property name="text">
+    <string>dummy action</string>
+   </property>
+   <property name="toolTip">
+    <string>You should not see this. This is what tells the IDE where to (automatically) put buttons for, e.g., the boost control.</string>
+   </property>
+  </action>
+  <action name="mpActionShowRecentNotifications">
+   <property name="text">
+    <string>Recent major changes...</string>
+   </property>
+  </action>
+  <action name="mpActionLockUIPositions">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+     <normaloff>:/cedar/auxiliaries/gui/lock_unlocked.svg</normaloff>
+     <normalon>:/cedar/auxiliaries/gui/lock_locked.svg</normalon>:/cedar/auxiliaries/gui/lock_unlocked.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Lock UI positions</string>
+   </property>
+   <property name="toolTip">
+    <string>Locks/unlocks the position of UI elements such as the log, the elements tab and so on.</string>
+   </property>
+  </action>
+  <action name="mpActionOpenRobotManager">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/robot_manager.svg</normaloff>:/toolbaricons/robot_manager.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Open the Robot Manager</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;open Robot Manager&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>cedar::proc::gui::View</class>
+   <extends>QGraphicsView</extends>
+   <header location="global">cedar/processing/gui/View.h</header>
+  </customwidget>
+  <customwidget>
+   <class>cedar::aux::gui::Configurable</class>
+   <extends>QTableWidget</extends>
+   <header>cedar/auxiliaries/gui/Configurable.h</header>
+  </customwidget>
+  <customwidget>
+   <class>cedar::aux::gui::Log</class>
+   <extends>QWidget</extends>
+   <header>cedar/auxiliaries/gui/Log.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cedar::proc::gui::RecorderWidget</class>
+   <extends>QWidget</extends>
+   <header>cedar/processing/gui/RecorderWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cedar::proc::gui::CommentWidget</class>
+   <extends>QWidget</extends>
+   <header>cedar/processing/gui/CommentWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cedar::proc::gui::ElementList</class>
+   <extends>QTabWidget</extends>
+   <header>cedar/processing/gui/ElementList.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cedar::aux::gui::SceneControl</class>
+   <extends>QWidget</extends>
+   <header>cedar/auxiliaries/gui/SceneControl.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc"/>
+  <include location="icons/cedar_proc_gui_icons.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>mpActionExit</sender>
+   <signal>triggered()</signal>
+   <receiver>Ide</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>493</x>
+     <y>380</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
