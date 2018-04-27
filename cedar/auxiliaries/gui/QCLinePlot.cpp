@@ -417,7 +417,7 @@ void cedar::aux::gui::QCLinePlot::setFixedYAxisScaling(double lower, double uppe
   this->_mYAxisLimits->setValue(cedar::aux::math::Limits<double>(lower, upper), true);
 }
 
-void cedar::aux::gui::QCLinePlot::setFixedXAxisScaling(double lower, double upper)
+void cedar::aux::gui::QCLinePlot::setFixedXAxisScaling(double /*lower*/, double /*upper*/)
 {
   //todo
 }
