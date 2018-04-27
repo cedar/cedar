@@ -55,6 +55,7 @@
         <file>steps/space_to_rate_code.svg</file>
         <file>steps/spatial_template.svg</file>
         <file>steps/linear_spatial_template.svg</file>
+		<file>steps/log_time_interval.svg</file>
         <file>steps/static_gain.svg</file>
         <file>steps/static_gain_green.svg</file>
         <file>steps/static_gain_red.svg</file>

@@ -41,6 +41,7 @@
 #include "cedar/processing/experiment/ActionSequence.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/processing/experiment/condition/OnEachTrial.h"
+#include "cedar/processing/experiment/Experiment.h"
 
 // SYSTEM INCLUDES
 
@@ -79,6 +80,35 @@ _mCondition
 {
 }
 
+cedar::proc::experiment::ActionSequence::ActionSequence(cedar::proc::experiment::ExperimentPtr experiment)
+        :
+        _mActionSet
+                (
+                        new cedar::proc::experiment::action::Action::ActionListParameter
+                                (
+                                        this,
+                                        "ActionSet",
+                                        std::vector<cedar::proc::experiment::action::ActionPtr>()
+                                )
+                ),
+        _mCondition
+                (
+                        new cedar::proc::experiment::condition::Condition::ConditionParameter
+                                (
+                                        this,
+                                        "Condition",
+                                        cedar::proc::experiment::condition::ConditionPtr(new cedar::proc::experiment::condition::OnEachTrial())
+                                )
+                ),
+                _mExperiment(experiment)
+{
+  if(auto myExperiment = _mExperiment.lock())
+  {
+    std::cout<<"Constructing the Action Sequence with experiment : " << myExperiment->getName() << std::endl;
+  }
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -100,6 +130,14 @@ void cedar::proc::experiment::ActionSequence::preExperiment()
 {
   for (size_t i = 0; i < this->_mActionSet->size(); ++i)
   {
+    if(auto myExperiment = this->_mExperiment.lock())
+    {
+      this->_mActionSet->at(i)->setExperiment(myExperiment);
+    }
+    else
+    {
+      std::cout<<"ActionSequence::preExperiment ! I want to set an Experiment, but I do not have one >()" << std::endl;
+    }
     this->_mActionSet->at(i)->preExperiment();
   }
 }
@@ -118,6 +156,8 @@ void cedar::proc::experiment::ActionSequence::run()
   {
     for (auto action : this->getActions())
     {
+
+
       action->run();
     }
   }
@@ -138,6 +178,15 @@ void cedar::proc::experiment::ActionSequence::prepareTrial()
 
 void cedar::proc::experiment::ActionSequence::addAction(cedar::proc::experiment::action::ActionPtr action)
 {
+  if(auto myExperiment = this->_mExperiment.lock())
+  {
+    std::cout<<" cedar::proc::experiment::ActionSequence::addAction. An exeperiment is there" << myExperiment->getName() << std::endl;
+//    action->setExperiment(myExperiment);
+  }
+  else
+  {
+    std::cout<<" cedar::proc::experiment::ActionSequence::addAction. No Experiment set >(" << std::endl;
+  }
   this->_mActionSet->pushBack(action);
 }
 
@@ -161,3 +210,12 @@ cedar::proc::experiment::condition::ConditionPtr cedar::proc::experiment::Action
   return this->_mCondition->getValue();
 }
 
+cedar::proc::experiment::ExperimentWeakPtr cedar::proc::experiment::ActionSequence::getExperiment()
+{
+  return _mExperiment;
+}
+
+void cedar::proc::experiment::ActionSequence::setExperiment(cedar::proc::experiment::ExperimentPtr experiment)
+{
+  _mExperiment = cedar::proc::experiment::ExperimentWeakPtr(experiment);
+}

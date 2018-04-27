@@ -73,7 +73,7 @@
  *        experiment session.
  *
  */
-class cedar::proc::experiment::Experiment : public QObject, public cedar::aux::NamedConfigurable
+class cedar::proc::experiment::Experiment : public QObject, public cedar::aux::NamedConfigurable, public boost::enable_shared_from_this<cedar::proc::experiment::Experiment>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -269,6 +269,12 @@ public:
    */
   bool checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const;
 
+  void readJson(const cedar::aux::Path& filename);
+
+  void setExperimentInfo(std::string newInfo);
+
+  std::string getExperimentInfo() const;
+
 signals:
 
   //!@brief Should be emitted if the experiment has stopped
@@ -372,6 +378,9 @@ private:
 
   //! Whether or not the experiment is meant to repeat indefinitely.
   cedar::aux::BoolParameterPtr _mRepeat;
+
+  //! An Variable to Exchange information about the current experiment status between actions
+  std::string _mExperimentInfo;
 
   //--------------------------------------------------------------------------------------------------------------------
   // connections

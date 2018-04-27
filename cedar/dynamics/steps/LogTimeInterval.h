@@ -22,44 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SetParameterValueValue.h
+    File:        LogTimeInterval.h
 
-    Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 07
+    Maintainer:  Jan Tekülve
+    Email:       jan.tekuelve@ini.rub.de
+    Date:        2018 04 18
 
-    Description: Header file for the class cedar::proc::experiment::SetParameterValueValue.
+    Description: Header file for the class cedar::dyn::steps::LogTimeInterval.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_VALUE_H
-#define CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_VALUE_H
+#ifndef CEDAR_DYN_STEPS_LOG_TIME_INTERVAL_H
+#define CEDAR_DYN_STEPS_LOG_TIME_INTERVAL_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/action/Action.h"
+
+#include "cedar/dynamics/Dynamics.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/FileParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/processing/experiment/StepPropertyParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/action/SetParameterValue.fwd.h"
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/dynamics/steps/LogTimeInterval.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QObject>
-#include <vector>
-#include <string>
-#include <cedar/auxiliaries/BoolParameter.h>
 
 
-/*!@brief Sets the parameter of a step to a desired value
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::proc::experiment::action::SetParameterValue : public cedar::proc::experiment::action::Action
+class cedar::dyn::steps::LogTimeInterval : public cedar::dyn::Dynamics
 {
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -69,35 +70,34 @@ class cedar::proc::experiment::action::SetParameterValue : public cedar::proc::e
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  SetParameterValue();
+  LogTimeInterval();
 
-//  SetParameterValue(cedar::proc::experiment::ExperimentPtr experiment);
+  //!@brief Destructor
+  virtual ~LogTimeInterval();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Sets the parameter of a step to a desired value
-  void run();
-
-  void preExperiment();
-
-  void postExperiment();
-
-  bool checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const;
+  void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! Returns the step parameter chosen for this action.
-  cedar::proc::experiment::StepPropertyParameterPtr getStepParameter() const;
+  cedar::proc::DataSlot::VALIDITY determineInputValidity(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
+
+  //!@brief Updates the output matrix.
+  void eulerStep(const cedar::unit::Time& time);
+
+  void print(float loggedTime);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -105,7 +105,16 @@ private:
 protected:
   // none yet
 private:
-  cedar::aux::ConfigurationNode mOriginalParameterValue;
+  cedar::aux::ConstMatDataPtr _mInputFirst;
+  cedar::aux::ConstMatDataPtr _mInputSecond;
+
+  std::string inputFirstName = "first input";
+  std::string inputSecondName = "second input";
+
+  float _mElapsedTime;
+  bool _mIsLogging;
+  bool _mHasLogged;
+  std::ofstream _mFile;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -114,11 +123,11 @@ protected:
   // none yet
 
 private:
-  //!@brief The step parameter to set
-  cedar::proc::experiment::StepPropertyParameterPtr _mStepParameter;
-  cedar::aux::BoolParameterPtr _mAppendTrialNumber;
+  cedar::aux::FileParameterPtr _mLogPath;
+  cedar::aux::StringParameterPtr _mLogPrefix;
+  cedar::aux::DoubleParameterPtr _mLogThreshold;
 
-}; // class cedar::proc::experiment::SetParameterValue
+}; // class cedar::dyn::steps::LogTimeInterval
 
-#endif // CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_VALUE_H
+#endif // CEDAR_dyn_STEPS_LOG_TIME_INTERVAL_H
 

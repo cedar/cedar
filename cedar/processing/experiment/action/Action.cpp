@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/action/Action.h"
+#include "cedar/processing/experiment/Experiment.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 
 // SYSTEM INCLUDES
@@ -54,6 +55,11 @@ cedar::proc::experiment::action::Action::Action()
 {
 
 }
+
+cedar::proc::experiment::action::Action::Action(cedar::proc::experiment::ExperimentPtr experiment)
+        :
+_mExperiment(experiment)
+{}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -73,4 +79,9 @@ bool cedar::proc::experiment::action::Action::checkValidity(std::vector<std::str
 {
   // by default, actions are valid
   return true;
+}
+
+void cedar::proc::experiment::action::Action::setExperiment(cedar::proc::experiment::ExperimentPtr experiment)
+{
+  _mExperiment = cedar::proc::experiment::ExperimentWeakPtr(experiment);
 }

@@ -90,9 +90,9 @@ _mRepeat(new cedar::aux::BoolParameter(this, "repeat", false))
   SupervisorSingleton::getInstance()->setExperiment(this);
 
   // Create first action sequence
-  ActionSequencePtr as = ActionSequencePtr(new ActionSequence());
-  as->setName("ActionSequence1");
-  this->addActionSequence(as);
+//  ActionSequencePtr as = ActionSequencePtr(new ActionSequence());
+//  as->setName("ActionSequence1");
+//  this->addActionSequence(as);
 
   this->mLooper = cedar::aux::LoopFunctionInThreadPtr
                              (
@@ -496,4 +496,25 @@ void cedar::proc::experiment::Experiment::step(cedar::unit::Time)
       this->stopExperiment();
     }
   }
+}
+
+
+ void cedar::proc::experiment::Experiment::readJson(const cedar::aux::Path& filename)
+{
+  cedar::aux::NamedConfigurable::readJson(filename);
+  for (ActionSequencePtr action_sequence: this->getActionSequences())
+  {
+    action_sequence->setExperiment(this->shared_from_this());
+  }
+}
+
+
+void cedar::proc::experiment::Experiment::setExperimentInfo(std::string newInfo)
+{
+  this->_mExperimentInfo = newInfo;
+}
+
+std::string cedar::proc::experiment::Experiment::getExperimentInfo() const
+{
+  return _mExperimentInfo;
 }

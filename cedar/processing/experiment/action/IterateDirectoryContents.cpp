@@ -113,6 +113,11 @@ void cedar::proc::experiment::action::IterateDirectoryContents::run()
   {
     QWriteLocker param_locker(this->mChangedParameterAsFileParameter->getLock());
     this->mChangedParameterAsFileParameter->setValue(path.absolute().toString());
+    if(auto myExperiment = this->_mExperiment.lock())
+    {
+      //Hacky way to broadcast the current picture path to other actions!
+      myExperiment->setExperimentInfo(path.absolute().toString());
+    }
   }
   else
   {
