@@ -79,6 +79,8 @@ public:
   //!@brief The standard constructor.
   Action();
 
+  Action(cedar::proc::experiment::ExperimentPtr experiment);
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -91,6 +93,8 @@ public:
 
   //! Called after an experiment is stopped.
   virtual void postExperiment();
+
+  void setExperiment(cedar::proc::experiment::ExperimentPtr experiment);
 
   /*! Reimplement this to check the validity of the action. Return true if the action is valid. If false is returned, an
    *  inforative message should be added to the @em errors vector.
@@ -111,8 +115,9 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
+  cedar::proc::experiment::ExperimentWeakPtr _mExperiment;
 private:
+
 
 }; // class cedar::proc::experiment::Action
 

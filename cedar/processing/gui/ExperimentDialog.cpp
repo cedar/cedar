@@ -222,8 +222,9 @@ void cedar::proc::gui::ExperimentDialog::clearActionSequences()
 
 void cedar::proc::gui::ExperimentDialog::addActionSequence()
 {
+  //Todo: The Sequence should be constructed in the non-gui Class!
   cedar::proc::experiment::ActionSequencePtr action_seq
-    = cedar::proc::experiment::ActionSequencePtr(new cedar::proc::experiment::ActionSequence());
+    = cedar::proc::experiment::ActionSequencePtr(new cedar::proc::experiment::ActionSequence(this->getExperiment()));
   action_seq->setName("ActionSequence");
   this->mExperiment->addActionSequence(action_seq);
   this->redraw();

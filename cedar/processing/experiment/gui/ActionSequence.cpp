@@ -161,6 +161,16 @@ void cedar::proc::experiment::gui::ActionSequence::update()
   body->addWidget(actionBox);
 
   cedar::proc::experiment::gui::ActionListParameter* actions= new cedar::proc::experiment::gui::ActionListParameter();
+//  if(auto myExperiment = this->mSequence->getExperiment().lock())
+//  {
+//   std::cout<<"Gui ActionSequence : experiment is set!" <<std::endl;
+//   actions->setExperiment(myExperiment);
+//  }
+//  else
+//  {
+//     std::cout<<"Gui ActionSequence : there was no experiment to set" <<std::endl;
+//  }
+
   actions->setParameter(this->mSequence->getParameter("ActionSet"));
   actionBoxLayout->addWidget(actions);
   body->setMargin(0);

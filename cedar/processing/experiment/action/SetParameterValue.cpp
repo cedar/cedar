@@ -41,6 +41,7 @@
 #include "cedar/processing/experiment/action/SetParameterValue.h"
 #include "cedar/auxiliaries/ParameterDeclaration.h"
 #include "cedar/processing/experiment/StepPropertyParameter.h"
+#include "cedar/processing/experiment/Experiment.h"
 
 // SYSTEM INCLUDES
 
@@ -73,9 +74,11 @@ cedar::proc::experiment::action::SetParameterValue::SetParameterValue()
 _mStepParameter
 (
     new cedar::proc::experiment::StepPropertyParameter(this, "Step Parameter")
-)
+),
+_mAppendTrialNumber(new cedar::aux::BoolParameter(this,"append experiment info (string para only)",false))
 {
   _mStepParameter->setType(cedar::proc::experiment::StepPropertyParameter::PARAMETER_VALUE);
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -107,12 +110,34 @@ cedar::proc::experiment::StepPropertyParameterPtr cedar::proc::experiment::actio
 
 void cedar::proc::experiment::action::SetParameterValue::run()
 {
+
   if (!_mStepParameter->isParameterSelected())
   {
     return;
   }
+
+
   cedar::aux::ParameterPtr parameter = _mStepParameter->getParameter();
+
+
   parameter->copyValueFrom(_mStepParameter->getParameterCopy());
+
+
+  if(_mAppendTrialNumber->getValue())
+  {
+    if(auto myExperiment = this->_mExperiment.lock())
+    {
+      if(auto stringParameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(parameter))
+      {
+        stringParameter->setValue(stringParameter->getValue() + boost::lexical_cast<std::string>(myExperiment->getExperimentInfo()));
+      }
+    }
+    else
+    {
+      std::cout<<"cedar::proc::experiment::action::SetParameterValue::run. ParameterName is: "<< parameter->getName()   << " My Experiment is not set :("<<std::endl;
+    }
+  }
+
 }
 
 void cedar::proc::experiment::action::SetParameterValue::preExperiment()

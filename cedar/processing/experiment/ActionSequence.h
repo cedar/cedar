@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/processing/experiment/action/Action.h"
 #include "cedar/processing/experiment/condition/Condition.h"
+#include "cedar/processing/experiment/Experiment.fwd.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/ActionSequence.fwd.h"
@@ -68,6 +69,8 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   ActionSequence();
+
+  ActionSequence(cedar::proc::experiment::ExperimentPtr experiment);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -100,6 +103,11 @@ public:
   //! Checks the validity of the action sequence. Returns true if the action list is valid.
   bool checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const;
 
+
+  cedar::proc::experiment::ExperimentWeakPtr getExperiment();
+
+  void setExperiment(cedar::proc::experiment::ExperimentPtr experiment);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -117,11 +125,14 @@ protected:
   // none yet
 
 private:
+
   //!@brief The actions
   cedar::proc::experiment::action::Action::ActionListParameterPtr _mActionSet;
 
   //!@brief The condition
   cedar::proc::experiment::condition::Condition::ConditionParameterPtr _mCondition;
+
+  cedar::proc::experiment::ExperimentWeakPtr _mExperiment;
 
 }; // class cedar::proc::experiment::Experiment
 
