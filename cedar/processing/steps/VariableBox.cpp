@@ -212,8 +212,10 @@ void cedar::proc::steps::VariableBox::recompute()
   if (mat.empty())
     return;
 
-  std::vector<unsigned int> tmpvec{ static_cast<unsigned int>(mat.at<float>(0,0)), 
-                                    static_cast<unsigned int>(mat.at<float>(1,0) ) };
+  std::vector<unsigned int> tmpvec{ static_cast<unsigned int>(mat.at<float>(0,0)) };
+  
+  if (mat.rows > 1 )
+    tmpvec.push_back( static_cast<unsigned int>(mat.at<float>(1,0) ) );
 
   this->mOutput->setData
                  (

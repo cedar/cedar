@@ -212,8 +212,10 @@ void cedar::proc::steps::VariableGauss::recompute()
   if (mat.empty())
     return;
 
-  const std::vector<double> tmpvec{ static_cast<double>(mat.at<float>(0,0)), 
-                                    static_cast<double>(mat.at<float>(1,0) ) };
+  std::vector<double> tmpvec{ static_cast<double>(mat.at<float>(0,0)) };
+
+  if (mat.rows > 1 )
+    tmpvec.push_back( static_cast<double>(mat.at<float>(1,0) ) );
 
   this->mOutput->setData
                  (
