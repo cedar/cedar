@@ -68,7 +68,7 @@ bool declare()
   declaration->setIconPath(":/steps/linear_lateralshift.svg");
   declaration->setDescription
   (
-    "Translates a 1D feature space representation by means of a linear function."
+    "Translates a 1D feature space representation by means of a linear function: a + bx"
   );
 
   declaration->declare();
