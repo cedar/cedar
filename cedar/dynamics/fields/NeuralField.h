@@ -269,6 +269,7 @@ protected:
 
   //!@brief a vector with the location of the maximum of the activity per dimension
   cedar::aux::MatDataPtr mMaximumLocation;
+  cedar::aux::MatDataPtr mCurrentDeltaT;
 
 private:
   boost::signals2::connection mKernelAddedConnection;
