@@ -146,5 +146,6 @@
         <file>steps/exponential_smoothing.svg</file>
         <file>steps/linear_lateralshift.svg</file>
         <file>steps/concat_vertically.svg</file>
+        <file>steps/numerical_differentiation.svg</file>
     </qresource>
 </RCC>
