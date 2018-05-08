@@ -52,6 +52,10 @@ void cedar::aux::sleep(cedar::unit::Time time)
 {
   cedar::unit::Time microsecond(1.0 * cedar::unit::micro * cedar::unit::second);
   double time_in_microseconds = time / microsecond;
+
+  if (time_in_microseconds < 0) // this saves lives!
+    return;
+
   cedar::aux::usleep(static_cast<unsigned int>(time_in_microseconds));
 }
 
