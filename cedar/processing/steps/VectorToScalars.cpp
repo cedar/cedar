@@ -86,7 +86,7 @@ namespace
 
 cedar::proc::steps::VectorToScalars::VectorToScalars()
 :
-Step(true), //is looped, since a large number of independent inputs leads to spam of "compute canceled" messaged
+Step(false), // shouldnt be looped
 mInput(new cedar::aux::MatData(cv::Mat::zeros(3, 1, CV_32F))),
 _mInputDimension(new cedar::aux::UIntParameter(this, "number of vector entries", 3, 1, 255))
 {  
