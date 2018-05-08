@@ -144,6 +144,7 @@ mInputSum(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mInputNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mNeuralNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mMaximumLocation(new cedar::aux::MatData(cv::Mat::zeros(2, 1, CV_32F))),
+mCurrentDeltaT(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
 mIsActive(false),
 // parameters
 _mOutputActivation(new cedar::aux::BoolParameter(this, "activation as output", false)),
@@ -244,6 +245,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   this->declareBuffer("input sum", mInputSum);
   this->declareBuffer("noise", this->mInputNoise);
   this->declareBuffer("location of maximum", this->mMaximumLocation);
+  this->declareBuffer("current delta time", this->mCurrentDeltaT);
 
   this->declareOutput("sigmoided activation", mSigmoidalActivation);
   this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::ValueRangeHint(0, 1)));
@@ -656,6 +658,8 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   u += time / cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds) * d_u
        + (sqrt(time / (cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))) / tau)
            * _mInputNoiseGain->getValue() * input_noise;
+
+  mCurrentDeltaT->getData().at<float>(0,0)= time / cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds);
 }
 
 void cedar::dyn::NeuralField::updateInputSum()
