@@ -659,7 +659,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
        + (sqrt(time / (cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))) / tau)
            * _mInputNoiseGain->getValue() * input_noise;
 
-  mCurrentDeltaT->getData().at<float>(0,0)= time / cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds);
+  mCurrentDeltaT->getData().at<float>(0,0)= time / cedar::unit::seconds;
 }
 
 void cedar::dyn::NeuralField::updateInputSum()
