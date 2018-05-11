@@ -45,6 +45,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/Trigger.h"
+#include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/assert.h"
@@ -87,6 +88,7 @@ mAutoLockInputsAndOutputs(true)
   this->mComputeTimeId = this->registerTimeMeasurement("compute call");
   this->mLockingTimeId = this->registerTimeMeasurement("locking");
   this->mRoundTimeId = this->registerTimeMeasurement("round time");
+
 
   // create the finished trigger singleton.
   this->getFinishedTrigger();
@@ -281,6 +283,12 @@ cedar::proc::TriggerPtr cedar::proc::Step::getTrigger(size_t index)
   return this->mTriggers.at(index);
 }
 
+cedar::proc::TriggerPtr cedar::proc::Step::getTrigger(size_t index) const
+{
+  CEDAR_ASSERT(index < this->getTriggerCount());
+  return this->mTriggers.at(index);
+}
+
 void cedar::proc::Step::addTrigger(cedar::proc::TriggerPtr trigger)
 {
   this->mTriggers.push_back(trigger);
@@ -386,6 +394,13 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
         this->setState(cedar::proc::Triggerable::STATE_RUNNING, "");
       }
     }
+
+    auto looped_trigger= boost::dynamic_pointer_cast< cedar::proc::LoopedTrigger >( trigger );
+    if (looped_trigger)
+    {
+      mNumberOfStepsMissed= looped_trigger->getNumberOfStepsMissed();
+    }
+
   }
   // catch exceptions and translate them to the given state/message
   catch(const cedar::aux::ExceptionBase& e)
@@ -581,6 +596,12 @@ cedar::unit::Time cedar::proc::Step::getLastTimeMeasurement(unsigned int id) con
   {
     CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
   }
+}
+
+
+double cedar::proc::Step::getNumberOfStepsMissed() const
+{
+  return mNumberOfStepsMissed;
 }
 
 cedar::unit::Time cedar::proc::Step::getRunTimeMeasurement() const

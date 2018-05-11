@@ -142,7 +142,7 @@ public:
    */
   LoopedThread
   (
-    cedar::unit::Time stepSize = cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds),
+    cedar::unit::Time stepSize = cedar::unit::Time(20 * cedar::unit::milli * cedar::unit::seconds),
     cedar::unit::Time  idleTime = cedar::unit::Time(0.01 * cedar::unit::milli * cedar::unit::seconds),
     cedar::unit::Time  simulatedTime = cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds),
     cedar::aux::EnumId mode = cedar::aux::LoopMode::RealDT
@@ -152,8 +152,8 @@ public:
   LoopedThread
   (
     cedar::aux::EnumId mode,
-    cedar::unit::Time stepSize = cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds),
-    cedar::unit::Time fakedStepTime = cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds)
+    cedar::unit::Time stepSize = cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds),
+    cedar::unit::Time fakedStepTime = cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds)
   );
 
   //!@brief Destructor
@@ -332,6 +332,8 @@ public:
   
   //! Returns the average number of steps that were skipped during iteration.
   double getAverageStepsTaken() const;
+
+  double getNumberOfStepsMissed() const;
 
   //----------------------------------------------------------------------------
   // protected methods

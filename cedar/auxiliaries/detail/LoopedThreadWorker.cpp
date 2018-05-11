@@ -398,9 +398,6 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         }
         // note, Stepping takes time!!! esp. for large architectures
 
-
-        updateStatistics(1);
-
         if (safeStopRequested()) // abort faster
         {
           continue;
@@ -420,15 +417,17 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         scheduled_wakeup = old_scheduled_wakeup
                            + modified_sleep_time;
 
+        long steps_missed= 0;
+
         // if we already know that we will not make the next step() in time:
         // (our last step() was too long)
         if (scheduled_wakeup < current_time_after_step)
         {
           
-          long missed= ( current_time_after_step
-                         - old_scheduled_wakeup 
-                       ).total_microseconds()
-                       / modified_sleep_time.total_microseconds();
+          steps_missed= ( current_time_after_step
+                          - old_scheduled_wakeup 
+                        ).total_microseconds()
+                        / modified_sleep_time.total_microseconds();
 //std::cout << "      skipped steps: " << missed << " now: " << boost::posix_time::to_simple_string(current_time_after_step) << std::endl;                        
           // try to hit the next step size, starting from now ...
           // note, that we know that we are slower than our step size, so 
@@ -438,6 +437,8 @@ void cedar::aux::detail::LoopedThreadWorker::work()
 
           // js: there was a while loop here, that could spin a lot. removed
         }
+
+        updateStatistics(steps_missed + 1);
 
 //std::cout << " new sched wakeup: " << boost::posix_time::to_simple_string(scheduled_wakeup) << std::endl; 
 
@@ -483,6 +484,7 @@ void cedar::aux::detail::LoopedThreadWorker::updateStatistics(double stepsTaken)
 
   mNumberOfSteps += 1.0;
   mSumOfStepsTaken += stepsTaken;
+
   if (stepsTaken > mMaxStepsTaken)
   {
     mMaxStepsTaken = stepsTaken;
@@ -558,6 +560,15 @@ double cedar::aux::detail::LoopedThreadWorker::getSumOfStepsTaken()
 {
   QReadLocker locker(&this->mSumOfStepsTakenLock);
   double value = this->mSumOfStepsTaken;
+  return value;
+}
+
+double cedar::aux::detail::LoopedThreadWorker::getSumOfStepsMissed()
+{
+  QReadLocker locker(&this->mSumOfStepsTakenLock);
+  QReadLocker locker2(&this->mNumberOfStepsLock);
+
+  double value = this->mSumOfStepsTaken - this->mNumberOfSteps;
   return value;
 }
 
