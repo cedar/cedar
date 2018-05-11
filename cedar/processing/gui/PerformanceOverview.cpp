@@ -209,37 +209,48 @@ void cedar::proc::gui::PerformanceOverview::addStepRow(cedar::proc::ConstStepPtr
   auto p_name = new QTableWidgetItem(QString::fromStdString(this->mGroup->findPath(step)));
   this->mpStepTimeOverview->setItem(row, 0, p_name);
 
+
+  double steps_missed= step->getNumberOfStepsMissed();
+  auto p_number = new QTableWidgetItem(
+                        QString::number(
+                          static_cast<unsigned long>(steps_missed) ) );
+  this->mpStepTimeOverview->setItem(row,
+                                    1, 
+                                    p_number );
+
   if (!step->isStarted())
   {
     p_name->setBackgroundColor(Qt::lightGray);
+    p_number->setBackgroundColor(Qt::lightGray);
   }
+
 
   // we have to use the row of the name item below as sorting may move it around
   if (step->hasRunTimeMeasurement())
   {
-    this->addMeasurement(step->getRunTimeAverage(), p_name->row(), 1, step->isStarted());
-  }
-  else
-  {
-    this->addUnAvailableMeasurement(p_name->row(), 1);
-  }
-
-  if (step->hasRoundTimeMeasurement() && step->isStarted()) // steps that aren't started don't have proper round times
-  {
-    this->addMeasurement(step->getRoundTimeAverage(), p_name->row(), 2, step->isStarted());
+    this->addMeasurement(step->getRunTimeAverage(), p_name->row(), 2, step->isStarted());
   }
   else
   {
     this->addUnAvailableMeasurement(p_name->row(), 2);
   }
 
-  if (step->hasLockTimeMeasurement())
+  if (step->hasRoundTimeMeasurement() && step->isStarted()) // steps that aren't started don't have proper round times
   {
-    this->addMeasurement(step->getLockTimeAverage(), p_name->row(), 3, step->isStarted());
+    this->addMeasurement(step->getRoundTimeAverage(), p_name->row(), 3, step->isStarted());
   }
   else
   {
     this->addUnAvailableMeasurement(p_name->row(), 3);
+  }
+
+  if (step->hasLockTimeMeasurement())
+  {
+    this->addMeasurement(step->getLockTimeAverage(), p_name->row(), 4, step->isStarted());
+  }
+  else
+  {
+    this->addUnAvailableMeasurement(p_name->row(), 4);
   }
 }
 

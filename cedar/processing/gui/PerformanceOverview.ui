@@ -42,6 +42,11 @@
          </column>
          <column>
           <property name="text">
+           <string>steps missed</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
            <string>compute call</string>
           </property>
          </column>

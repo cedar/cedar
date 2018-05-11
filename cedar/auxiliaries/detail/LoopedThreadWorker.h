@@ -119,6 +119,9 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
     //! Return the number of steps taken (including skipped ones).
     double getSumOfStepsTaken();
 
+    //! Return the number of steps missed
+    double getSumOfStepsMissed();
+
   private:
     void globalTimeFactorChanged(double newFactor);
 

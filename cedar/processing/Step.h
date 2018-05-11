@@ -223,6 +223,7 @@ public:
 
   //!@brief Returns the trigger associated with the given index.
   cedar::proc::TriggerPtr getTrigger(size_t index);
+  cedar::proc::TriggerPtr getTrigger(size_t index) const;
 
   //!@brief Returns the map of actions defined for this step.
   const ActionMap& getActions() const;
@@ -246,6 +247,8 @@ public:
   /*!@brief Returns the average run time measured for this step.
    */
   cedar::unit::Time getRunTimeAverage() const;
+
+  double getNumberOfStepsMissed() const;
 
   //! True if the step currently has a lock time measurement.
   bool hasLockTimeMeasurement() const;
@@ -498,6 +501,8 @@ private:
 
   //! A queue of slots that have changed their properties during the compute call.
   cedar::aux::LockableMember<std::deque<std::string>> mSlotsChangedDuringComputeCall;
+
+  double mNumberOfStepsMissed;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
