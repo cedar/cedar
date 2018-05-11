@@ -116,6 +116,15 @@ public:
    */
   static const Id Simulated = 3;
 
+  /*! Sleep for (unmodifyable) step time. Pass the real elapsed time to down to step())
+   */
+  static const Id RealDT = 4;
+
+
+  /*! Sleep for (globally scaled) step time. Pass a fake time to down to step())
+   */
+  static const Id FakeDT = 6;
+
 protected:
   // none yet
 

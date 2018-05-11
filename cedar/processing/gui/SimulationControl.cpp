@@ -451,8 +451,12 @@ void cedar::proc::gui::SimulationControl::loopedTriggerAdded(QTreeWidgetItem* pI
   parameter_names.push_back("start with all");
   parameter_names.push_back("loop mode");
   parameter_names.push_back("step size");
-  parameter_names.push_back("idle time");
-  parameter_names.push_back("simulated time");
+  parameter_names.push_back("fake Euler step size");
+  parameter_names.push_back("minimum sleep time");
+
+  // js: deactivated cedar 6.1 May 2018
+  //parameter_names.push_back("idle time");
+  //parameter_names.push_back("simulated time");
 
   for (const auto& name : parameter_names)
   {

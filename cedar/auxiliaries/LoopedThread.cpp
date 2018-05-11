@@ -68,7 +68,27 @@ _mStepSize
         cedar::aux::TimeParameter::LimitType::fromLower(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))
       )
 ),
-_mIdleTime
+_mFakeStepSize
+(
+  new cedar::aux::TimeParameter
+      (
+        this,
+        "fake Euler step size",
+        stepSize,
+        cedar::aux::TimeParameter::LimitType::fromLower(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))
+      )
+),
+_mMinimumStepSize
+(
+  new cedar::aux::TimeParameter
+      (
+        this,
+        "minimum sleep time",
+        stepSize*0.01,
+        cedar::aux::TimeParameter::LimitType::fromLower(cedar::unit::Time(0.01 * cedar::unit::milli * cedar::unit::seconds))
+      )
+),
+_mIdleTime // deprecate me
 (
   new cedar::aux::TimeParameter
       (
@@ -78,7 +98,7 @@ _mIdleTime
         cedar::aux::TimeParameter::LimitType::positiveZero()
       )
 ),
-_mSimulatedTime
+_mSimulatedTime // deprecate me 
 (
   new cedar::aux::TimeParameter
       (
@@ -98,6 +118,84 @@ _mLoopMode
     mode
   )
 )
+{
+  init();
+}
+
+cedar::aux::LoopedThread::LoopedThread
+(
+  cedar::aux::EnumId mode,
+  cedar::unit::Time stepSize,
+  cedar::unit::Time fakedStepSize
+)
+:
+mpWorker(nullptr),
+_mStepSize
+(
+  new cedar::aux::TimeParameter
+      (
+        this,
+        "step size",
+        stepSize,
+        cedar::aux::TimeParameter::LimitType::fromLower(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))
+      )
+),
+_mFakeStepSize
+(
+  new cedar::aux::TimeParameter
+      (
+        this,
+        "fake Euler step size",
+        fakedStepSize,
+        cedar::aux::TimeParameter::LimitType::fromLower(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))
+      )
+),
+_mMinimumStepSize
+(
+  new cedar::aux::TimeParameter
+      (
+        this,
+        "minimum sleep time",
+        stepSize*0.01,
+        cedar::aux::TimeParameter::LimitType::fromLower(cedar::unit::Time(0.01 * cedar::unit::milli * cedar::unit::seconds))
+      )
+),
+
+_mIdleTime // deprecate me
+(
+  new cedar::aux::TimeParameter
+      (
+        this,
+        "idle time",
+        cedar::unit::Time(0.01 * cedar::unit::milli * cedar::unit::seconds),
+        cedar::aux::TimeParameter::LimitType::positiveZero()
+      )
+),
+_mSimulatedTime // deprecate me
+(
+  new cedar::aux::TimeParameter
+      (
+        this,
+        "simulated time",
+        cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds),
+        cedar::aux::TimeParameter::LimitType::positive()
+      )
+),
+_mLoopMode
+(
+  new cedar::aux::EnumParameter
+  (
+    this,
+    "loop mode",
+    cedar::aux::LoopMode::typePtr(),
+    mode
+  )
+)
+{
+  init();
+}
+
+void cedar::aux::LoopedThread::init()
 {
   // connect to mode change signal
   QObject::connect(_mLoopMode.get(), SIGNAL(valueChanged()), this, SLOT(modeChanged()));
@@ -224,6 +322,20 @@ void cedar::aux::LoopedThread::setStepSize(cedar::unit::Time stepSize)
   this->_mStepSize->setValue(stepSize);
 }
 
+void cedar::aux::LoopedThread::setFakeStepSize(cedar::unit::Time stepSize)
+{
+  QWriteLocker locker(this->_mFakeStepSize->getLock());
+
+  this->_mFakeStepSize->setValue(stepSize);
+}
+
+void cedar::aux::LoopedThread::setMinimumStepSize(cedar::unit::Time stepSize)
+{
+  QWriteLocker locker(this->_mMinimumStepSize->getLock());
+
+  this->_mMinimumStepSize->setValue(stepSize);
+}
+
 void cedar::aux::LoopedThread::setIdleTime(cedar::unit::Time idleTime)
 {
   QWriteLocker locker(_mIdleTime->getLock());
@@ -249,11 +361,15 @@ void cedar::aux::LoopedThread::modeChanged()
 {
   switch (_mLoopMode->getValue())
   {
+
+    // old and boring: DEPRECATE ME
     case cedar::aux::LoopMode::Simulated:
     {
       this->_mStepSize->setConstant(true);
       this->_mIdleTime->setConstant(false);
       this->_mSimulatedTime->setConstant(false);
+      this->_mFakeStepSize->setConstant(true);
+      this->_mMinimumStepSize->setConstant(true);
       break;
     }
     case cedar::aux::LoopMode::RealTime:
@@ -261,6 +377,8 @@ void cedar::aux::LoopedThread::modeChanged()
       this->_mStepSize->setConstant(true);
       this->_mIdleTime->setConstant(false);
       this->_mSimulatedTime->setConstant(true);
+      this->_mFakeStepSize->setConstant(true);
+      this->_mMinimumStepSize->setConstant(true);
       break;
     }
     case cedar::aux::LoopMode::Fixed:
@@ -269,8 +387,35 @@ void cedar::aux::LoopedThread::modeChanged()
       this->_mStepSize->setConstant(false);
       this->_mIdleTime->setConstant(true);
       this->_mSimulatedTime->setConstant(true);
+      this->_mFakeStepSize->setConstant(true);
+      this->_mMinimumStepSize->setConstant(true);
       break;
     }
+
+
+    case cedar::aux::LoopMode::RealDT:
+    {
+      this->_mStepSize->setConstant(false);
+      this->_mFakeStepSize->setConstant(true);
+      this->_mMinimumStepSize->setConstant(false);
+
+      //legacy:
+      this->_mIdleTime->setConstant(true);
+      this->_mSimulatedTime->setConstant(true);
+      break;
+    }
+    case cedar::aux::LoopMode::FakeDT:
+    {
+      this->_mStepSize->setConstant(false);
+      this->_mFakeStepSize->setConstant(false);
+      this->_mMinimumStepSize->setConstant(false);
+
+      //legacy:
+      this->_mIdleTime->setConstant(true);
+      this->_mSimulatedTime->setConstant(true);
+      break;
+    }
+
     default:
     {
       // all valid cases are covered above

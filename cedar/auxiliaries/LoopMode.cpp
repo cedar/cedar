@@ -49,10 +49,15 @@
 cedar::aux::EnumType<cedar::aux::LoopMode> cedar::aux::LoopMode::mType("cedar::aux::LoopMode::");
 
 #ifndef CEDAR_COMPILER_MSVC
+// old and deprecated:
 const cedar::aux::LoopMode::Id cedar::aux::LoopMode::RealTime;
 const cedar::aux::LoopMode::Id cedar::aux::LoopMode::Fixed;
 const cedar::aux::LoopMode::Id cedar::aux::LoopMode::FixedAdaptive;
 const cedar::aux::LoopMode::Id cedar::aux::LoopMode::Simulated;
+
+// new and shiny:
+const cedar::aux::LoopMode::Id cedar::aux::LoopMode::RealDT;
+const cedar::aux::LoopMode::Id cedar::aux::LoopMode::FakeDT;
 #endif
 
 
@@ -73,6 +78,8 @@ void cedar::aux::LoopMode::construct()
     cedar::aux::Enum(cedar::aux::LoopMode::FixedAdaptive, "FixedAdaptive", "fixed adaptive time steps")
   );
   mType.type()->def(cedar::aux::Enum(cedar::aux::LoopMode::Simulated, "Simulated", "simulated time"));
+  mType.type()->def(cedar::aux::Enum(cedar::aux::LoopMode::RealDT, "real deltaT", "real deltaT"));
+  mType.type()->def(cedar::aux::Enum(cedar::aux::LoopMode::FakeDT, "fake deltaT", "fake deltaT"));
 }
 
 const cedar::aux::EnumBase& cedar::aux::LoopMode::type()
