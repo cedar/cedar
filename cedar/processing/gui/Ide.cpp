@@ -404,10 +404,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   QObject::connect(this->mpGlobalTimeFactorSlider, SIGNAL(valueChanged(int)), this, SLOT(globalTimeFactorSliderChanged(int)));
 
   this->mpGlobalTimeFactor = new QDoubleSpinBox();
-  this->mpGlobalTimeFactor->setToolTip("All timesteps are multiplied with this global factor. This allows you to slow "
-                                       "down the architecture overall and thus to better see what is going on. Also, "
-                                       "on slower machines, decreasing this factor can increase the stability of an "
-                                       "architecture.");
+  this->mpGlobalTimeFactor->setToolTip("Factor for the fake DT (only for thread running with fake DT for the Euler step).");
   this->mpGlobalTimeFactor->setMinimum(global_time_factor_min);
   this->mpGlobalTimeFactor->setMaximum(global_time_factor_max);
   this->mpGlobalTimeFactor->setDecimals(2);

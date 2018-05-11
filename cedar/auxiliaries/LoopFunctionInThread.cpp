@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LoopFunctionInThread.h"
+#include "cedar/auxiliaries/LoopMode.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/units/Time.h"
 
@@ -49,6 +50,7 @@ cedar::aux::LoopFunctionInThread::LoopFunctionInThread
   FunctionType fun
 )
 :
+LoopedThread( cedar::aux::LoopMode::RealDT ),
 mFunction(fun)
 {
 }

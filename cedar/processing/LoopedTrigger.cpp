@@ -96,7 +96,7 @@ namespace
 
 cedar::proc::LoopedTrigger::LoopedTrigger(cedar::unit::Time stepSize, const std::string& name)
 :
-cedar::aux::LoopedThread(stepSize),
+cedar::aux::LoopedThread(cedar::aux::LoopMode::RealDT, stepSize), // changed: cedar 6.1
 cedar::proc::Trigger(name),
 mStarted(false),
 mStatistics(new TimeAverage(50)),

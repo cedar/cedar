@@ -145,7 +145,15 @@ public:
     cedar::unit::Time stepSize = cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds),
     cedar::unit::Time  idleTime = cedar::unit::Time(0.01 * cedar::unit::milli * cedar::unit::seconds),
     cedar::unit::Time  simulatedTime = cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds),
-    cedar::aux::EnumId mode = cedar::aux::LoopMode::Fixed
+    cedar::aux::EnumId mode = cedar::aux::LoopMode::RealDT
+                                              // changed, cedar 6.1
+  );
+
+  LoopedThread
+  (
+    cedar::aux::EnumId mode,
+    cedar::unit::Time stepSize = cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds),
+    cedar::unit::Time fakedStepTime = cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds)
   );
 
   //!@brief Destructor
@@ -172,7 +180,16 @@ public:
    */
   void setStepSize(cedar::unit::Time stepSize);
 
+  /*!@brief Sets a new fake step size, that will be passed as the Euler step time*/
+  void setFakeStepSize(cedar::unit::Time stepSize);
+
+  /*!@brief Sets a minimum sleep time*/
+  void setMinimumStepSize(cedar::unit::Time minSleep);
+
+
   /*!@brief Sets a new idle time.
+   * 
+   * WILL BE DEPRECATED SOON
    *
    * The given idle time controls how long the thread sleeps each round when
    * running in fast running mode (step size == 0). If your system becomes
@@ -184,6 +201,8 @@ public:
 
   /*!@brief Sets a simulated time to be used in step().
    *
+   * WILL BE DEPRECATED SOON
+   *
    * If simulatedTime == 0 step() is called with the measured time.
    *
    * If simulatedTime > 0 instead of the real (measured) time, the given
@@ -193,6 +212,8 @@ public:
    */
   void setSimulatedTime(cedar::unit::Time simulatedTime
                           = cedar::unit::Time(0.0 * cedar::unit::milli * cedar::unit::seconds));
+
+
 
   //! get the duration of the fixed trigger step
   inline cedar::unit::Time getStepSize() const
@@ -214,7 +235,50 @@ public:
     return step_size;
   }
 
-  //! get the idle time that is used in-between sending trigger signals
+  //! get the duration of the fake Euler step
+  inline cedar::unit::Time getFakeStepSize() const
+  {
+    QReadLocker locker(this->_mFakeStepSize->getLock());
+    // make a copy of the step time
+    // otherwise the lock would unlock before the return statement
+    cedar::unit::Time step_size = this->_mFakeStepSize->getValue();
+    return step_size;
+  }
+
+  //! get the duration of the fixed trigger step
+  inline cedar::unit::Time getFakeStepSize()
+  {
+    QReadLocker locker(this->_mFakeStepSize->getLock());
+    // make a copy of the step time
+    // otherwise the lock would unlock before the return statement
+    cedar::unit::Time step_size = this->_mFakeStepSize->getValue();
+    return step_size;
+  }
+
+  //! get the duration of the fake Euler step
+  inline cedar::unit::Time getMinimumStepSize() const
+  {
+    QReadLocker locker(this->_mMinimumStepSize->getLock());
+    // make a copy of the step time
+    // otherwise the lock would unlock before the return statement
+    cedar::unit::Time step_size = this->_mMinimumStepSize->getValue();
+    return step_size;
+  }
+
+  //! get the duration of the fixed trigger step
+  inline cedar::unit::Time getMinimumStepSize()
+  {
+    QReadLocker locker(this->_mMinimumStepSize->getLock());
+    // make a copy of the step time
+    // otherwise the lock would unlock before the return statement
+    cedar::unit::Time step_size = this->_mMinimumStepSize->getValue();
+    return step_size;
+  }
+
+
+
+
+  //! DEPRECATED get the idle time that is used in-between sending trigger signals
   inline cedar::unit::Time getIdleTimeParameter() const
   {
     QReadLocker locker(this->_mIdleTime->getLock());
@@ -224,13 +288,16 @@ public:
     return idle_time;
   }
 
-  //! get the duration of the simulated time step
+  //! DEPRECATED get the duration of the simulated time step
   inline cedar::unit::Time getSimulatedTimeParameter() const
   {
     QReadLocker locker(this->_mSimulatedTime->getLock());
     cedar::unit::Time simulated_time = this->_mSimulatedTime->getValue();
     return simulated_time;
   }
+
+
+
 
   //! get the loop mode
   inline cedar::aux::Enum getLoopModeParameter() const
@@ -276,6 +343,8 @@ protected:
   // private methods
   //----------------------------------------------------------------------------
 private:
+  void init();
+
   //! end counting the statistics. is not thread-safe
   void stopStatistics(); 
 
@@ -319,9 +388,18 @@ private:
   //!@brief desired length of a single step, in milliseconds
   cedar::aux::TimeParameterPtr _mStepSize;
 
+  //!@brief desired length of fake Euler step (since v6.1) for appropriate modes
+  cedar::aux::TimeParameterPtr _mFakeStepSize;
+
+  //!@brief ensure the thread sleeps at least (since v6.1)
+  cedar::aux::TimeParameterPtr _mMinimumStepSize;
+
+
+  // WILL BE DEPRECATED
   //! parameter version of mIdleTime
   cedar::aux::TimeParameterPtr _mIdleTime;
 
+  // WILL BE DEPRECATED
   //! parameter version of mSimulatedTime
   cedar::aux::TimeParameterPtr _mSimulatedTime;
 

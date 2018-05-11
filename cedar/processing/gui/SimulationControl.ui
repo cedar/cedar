@@ -136,12 +136,12 @@
      </column>
      <column>
       <property name="text">
-       <string>Idle Time</string>
+       <string>Fake Euler Step</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Simulated Time</string>
+       <string>Minimum Sleep Time</string>
       </property>
      </column>
     </widget>
