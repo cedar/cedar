@@ -65,7 +65,7 @@ _mStepSize
         this,
         "step size",
         stepSize,
-        cedar::aux::TimeParameter::LimitType::fromLower(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))
+        cedar::aux::TimeParameter::LimitType::fromLower(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds))
       )
 ),
 _mFakeStepSize
@@ -75,7 +75,7 @@ _mFakeStepSize
         this,
         "fake Euler step size",
         stepSize,
-        cedar::aux::TimeParameter::LimitType::fromLower(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))
+        cedar::aux::TimeParameter::LimitType::fromLower(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds))
       )
 ),
 _mMinimumStepSize
@@ -137,7 +137,7 @@ _mStepSize
         this,
         "step size",
         stepSize,
-        cedar::aux::TimeParameter::LimitType::fromLower(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))
+        cedar::aux::TimeParameter::LimitType::fromLower(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds))
       )
 ),
 _mFakeStepSize
@@ -147,7 +147,7 @@ _mFakeStepSize
         this,
         "fake Euler step size",
         fakedStepSize,
-        cedar::aux::TimeParameter::LimitType::fromLower(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))
+        cedar::aux::TimeParameter::LimitType::fromLower(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds))
       )
 ),
 _mMinimumStepSize

@@ -83,7 +83,7 @@ public:
 public:
   //!@brief The standard constructor.
   LoopedTrigger(
-                 cedar::unit::Time stepSize = cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second),
+                 cedar::unit::Time stepSize = cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::second),
                  const std::string& name = ""
                );
 
