@@ -2206,7 +2206,7 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
     {
       cedar::aux::ConfigurationNode value_node;
 
-      std::cout<<"Connectable: Save a Viewer!"<<std::endl;
+      //std::cout<<"Connectable: Save a Viewer!"<<std::endl;
 
       auto viewer_item = static_cast<cedar::aux::gui::Viewer*>(dock_widget_child);
       viewer_item->writeToConfiguration(value_node, cedar::proc::gui::SettingsSingleton::getInstance()->getIdeSize());
