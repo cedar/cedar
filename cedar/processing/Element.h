@@ -102,6 +102,10 @@ public:
   //! call the reset function of this element
   virtual void callReset();
 
+
+  //! will be called after the architecture has been loaded
+  virtual void afterArchitectureLoaded();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

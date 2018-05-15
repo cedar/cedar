@@ -188,3 +188,9 @@ void cedar::proc::steps::BufferReader::bufferPathChanged()
   );
 }
 
+void cedar::proc::steps::BufferReader::afterArchitectureLoaded()
+{
+  bufferPathChanged();
+}
+
+

@@ -1845,6 +1845,8 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   try
   {
     group->readJson(file.toStdString());
+
+    group->afterArchitectureLoaded();
   }
   catch(const cedar::proc::ArchitectureLoadingException& e)
   {

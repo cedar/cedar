@@ -178,3 +178,8 @@ void cedar::proc::Element::callReset()
 void cedar::proc::Element::reset()
 {
 }
+
+void cedar::proc::Element::afterArchitectureLoaded()
+{
+}
+

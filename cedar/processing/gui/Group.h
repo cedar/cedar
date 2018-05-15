@@ -115,6 +115,9 @@ public:
   //!@brief read configuration from path
   void readJson(const cedar::aux::Path& filename);
 
+  //!@brief called after the architecture has been loaded
+  void afterArchitectureLoaded();
+
   //! Checks if any connectables in the given list can be added to this group. Non-connectables are ignored.
   bool canAddAny(const QList<QGraphicsItem*>& items) const;
 
