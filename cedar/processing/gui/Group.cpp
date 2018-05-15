@@ -3104,3 +3104,12 @@ void cedar::proc::gui::Group::addElementsToGroup()
     this->processElementAddedSignal(element.second);
   }
 }
+
+void cedar::proc::gui::Group::afterArchitectureLoaded()
+{
+  for (auto &element : this->mGroup->getElements())
+  {
+    element.second->afterArchitectureLoaded();
+  }
+}
+

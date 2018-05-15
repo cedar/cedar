@@ -373,7 +373,7 @@ private:
 
   void setArchitectureSavingLoadingEnabled(bool enabled);
 
-  void setRecodringControlsEnabled(bool enabled);
+  void setRecordingControlsEnabled(bool enabled);
 
   void setSimulationControlsEnabled(bool enabled);
 
