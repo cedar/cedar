@@ -1547,7 +1547,7 @@ void cedar::proc::gui::Group::writeOpenPlotsTo(cedar::aux::ConfigurationNode &no
     {
       if(auto viewer = boost::dynamic_pointer_cast<cedar::aux::gui::Viewer>(viewer_item))
       {
-        std::cout<<"Group: Save a Viewer!"<<std::endl;
+        //std::cout<<"Group: Save a Viewer!"<<std::endl;
         cedar::aux::ConfigurationNode value_node;
         viewer->writeToConfiguration(value_node,cedar::proc::gui::SettingsSingleton::getInstance()->getIdeSize());
         node.put_child("Viewer"+viewer->getViewerLabel(), value_node);
