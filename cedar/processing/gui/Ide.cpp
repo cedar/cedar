@@ -751,10 +751,10 @@ void cedar::proc::gui::Ide::experimentRunningChanged(bool running)
 {
   this->setSimulationControlsEnabled(!running);
   this->setArchitectureSavingLoadingEnabled(!running);
-  this->setRecodringControlsEnabled(!running);
+  this->setRecordingControlsEnabled(!running);
 }
 
-void cedar::proc::gui::Ide::setRecodringControlsEnabled(bool enabled)
+void cedar::proc::gui::Ide::setRecordingControlsEnabled(bool enabled)
 {
   this->mpActionRecord->setEnabled(enabled);
   this->mpActionSnapshot->setEnabled(enabled);
