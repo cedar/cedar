@@ -63,6 +63,7 @@ class cedar::proc::steps::Switch : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -88,6 +89,9 @@ public:
 public:
   //!@brief Updates the output matrix.
   void compute(const cedar::proc::Arguments& arguments);
+
+private slots:
+  void recompute();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -136,7 +140,7 @@ protected:
   // none yet
 
 private:
-  // none yet
+  cedar::aux::BoolParameterPtr _mMakeBinary;
 
 }; // class cedar::proc::steps::Gate
 
