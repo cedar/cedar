@@ -60,7 +60,7 @@ bool declare()
   (
     new ElementDeclarationTemplate<cedar::proc::steps::ExponentialSmoothing>
     (
-      "Programming",
+      "Numerics",
       "cedar.processing.steps.ExponentialSmoothing"
     )
   );
