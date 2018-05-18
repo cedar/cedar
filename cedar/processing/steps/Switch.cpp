@@ -48,6 +48,7 @@
 // SYSTEM INCLUDES
 #include <iostream>
 #include <vector>
+#include <boost/math/special_functions/sign.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -70,10 +71,12 @@ namespace
     declaration->setIconPath(":/steps/switch.svg");
     declaration->setDescription
     (
-      "A step that calculates a mixture of two inputs based on a third one.<br />"
+      "Implements a 'soft' if statement. Calculates a mixture of its first two inputs based on a third one.<br />"
       "The step has the inputs \"input 1\", \"input 2\" and \"factor\". The output, \"mixture\" is calculated "
       "as (factor) * (input 1) + (1 - factor) * (input 2). Thus, input one and two must be matrices, while "
-      "factor must be either DoubleData or zero-dimensional MatData."
+      "factor must be either DoubleData or zero-dimensional MatData. "
+      "If the parameter \"make binary\" is set the factor will be interpreted "
+      "as a bool, i.e. all non-zero values will be interpreted as 1, making the switch 'binary'."
     );
 
     declaration->declare();
@@ -92,7 +95,8 @@ cedar::proc::steps::Switch::Switch()
 // outputs
 mOutput(new cedar::aux::MatData(cv::Mat())),
 // other members
-mFactorDataType(FACTOR_TYPE_UNDETERMINED)
+mFactorDataType(FACTOR_TYPE_UNDETERMINED),
+_mMakeBinary(new cedar::aux::BoolParameter(this, "make binary", false))
 {
   // declare all data
   this->declareInput("input 1");
@@ -100,12 +104,19 @@ mFactorDataType(FACTOR_TYPE_UNDETERMINED)
   this->declareInput("factor");
 
   this->declareOutput("mixture", mOutput);
+
+  QObject::connect(_mMakeBinary.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
 void cedar::proc::steps::Switch::compute(const cedar::proc::Arguments&)
+{
+  recompute();
+}
+
+void cedar::proc::steps::Switch::recompute()
 {
   CEDAR_ASSERT(this->mFactorDataType != FACTOR_TYPE_UNDETERMINED);
 
@@ -137,6 +148,12 @@ void cedar::proc::steps::Switch::compute(const cedar::proc::Arguments&)
       // should never be reached
       CEDAR_ASSERT(false);
   }
+
+  if (this->_mMakeBinary->getValue())
+  {
+    gate_factor= boost::math::sign(gate_factor);
+  }
+std::cout << " factor " << gate_factor << std::endl;
 
   output = gate_factor * input1 + (1.0 - gate_factor) * input2;
 }
