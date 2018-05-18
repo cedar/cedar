@@ -62,7 +62,7 @@ bool declare()
   (
     new ElementDeclarationTemplate<cedar::proc::steps::NumericalDifferentiation>
     (
-      "Programming",
+      "Numerics",
       "cedar.processing.steps.NumericalDifferentiation"
     )
   );
