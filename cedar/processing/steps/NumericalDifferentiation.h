@@ -91,6 +91,7 @@ private:
   void compute(const cedar::proc::Arguments& arguments);
   void recompute();
   void reset();
+  void reinitialize();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -110,13 +111,17 @@ private:
   cv::Mat mThreeBack;
   cv::Mat mFourBack;
 
+  cedar::unit::Time mLastTime;
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
 private:
-  cedar::unit::Time mLastTime;
+  cedar::aux::BoolParameterPtr mUseFivePoints;
+  cedar::aux::DoubleParameterPtr mIgnoreTimeStepsSmallerThan;
 
 }; // class cedar::proc::steps::NumericalDifferentiation
 
