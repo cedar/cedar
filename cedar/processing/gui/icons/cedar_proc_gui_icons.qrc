@@ -151,5 +151,7 @@
         <file>steps/inner_product.svg</file>
         <file>steps/cross_product.svg</file>
         <file>steps/outer_product.svg</file>
+        <file>steps/sinus_signal.svg</file>
+        <file>steps/step_signal.svg</file>
     </qresource>
 </RCC>
