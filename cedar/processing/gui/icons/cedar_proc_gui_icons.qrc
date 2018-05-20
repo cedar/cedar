@@ -148,5 +148,8 @@
         <file>steps/concat_vertically.svg</file>
         <file>steps/numerical_differentiation.svg</file>
         <file>steps/numerical_integration.svg</file>
+        <file>steps/inner_product.svg</file>
+        <file>steps/cross_product.svg</file>
+        <file>steps/outer_product.svg</file>
     </qresource>
 </RCC>
