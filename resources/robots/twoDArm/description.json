@@ -1,0 +1,120 @@
+{
+  "component slots":
+  {
+    "arm":
+    {
+      "icon path" : ":/cedar/dev/gui/icons/twoDArm_icon.svg",
+      "available components":
+      {
+        "yarp":
+        {
+          "cedar.dev.YarpKinematicChain":
+          {
+            "requires channel": "yarp",
+            "readPortName": "webots/TwoDArmStatus",
+            "writePortName": "webots/TwoDArmCommands"
+          }
+        },
+        "simulator":
+        {
+          "cedar.dev.SimulatedKinematicChain":
+          {
+          }
+        }
+      },
+      "shared component parameters":
+      {
+        "name": "TwoDArm",
+        "server port": "0",
+        "remote host": "NULL",
+        "step size": "20.0",
+        "idle time": "0.001",
+        "use fixed step size": "false",
+        "simulated time": "0.0",
+        "root coordinate frame":
+        {
+          "initial translation": [
+            "0.0",
+            "0.0",
+            "0.0"
+          ],
+          "initial rotation": [
+            "1.0","0.0","0.0",
+            "0.0","1.0","0.0",
+            "0.0","0.0","1.0"
+          ]
+        },
+        "end-effector coordinate frame":
+        {
+          "initial translation": [
+            "0.5976",
+            "0.0",
+            "0.0"
+          ],
+          "initial rotation": [
+            "1.0","0.0","0.0",
+            "0.0","1.0","0.0",
+            "0.0","0.0","1.0"
+          ]
+        },
+        "joints": {
+          "cedar.dev.KinematicChain.Joint":
+          {
+            "angle limits": {
+              "lower limit": "-3.1",
+              "upper limit": "3.1"
+            },
+            "velocity limits":
+            {
+              "lower limit": "-10",
+              "upper limit": "10"
+            },
+            "position": [
+              "0.0",
+              "0.0",
+              "0.0"
+            ],
+            "axis": [
+              "0.0",
+              "0.0",
+              "1.0"
+            ]
+          },
+          "cedar.dev.KinematicChain.Joint":
+          {
+            "angle limits":
+            {
+              "lower limit": "-3.1",
+              "upper limit": "3.1"
+            },
+            "velocity limits":
+            {
+              "lower limit": "-10",
+              "upper limit": "10"
+            },
+            "position": [
+              "0.3348",
+              "0.0",
+              "0.0"
+            ],
+            "axis": [
+              "0.0",
+              "0.0",
+              "1.0"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "available channels":
+  {
+    "yarp": {
+      "cedar.dev.YarpChannel<cv.Mat>":
+      {
+        "ip address": "134.147.176.97"
+      }
+    }
+  }
+}
+

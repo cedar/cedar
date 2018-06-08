@@ -1,0 +1,621 @@
+#=======================================================================================================================
+#
+#   Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+# 
+#   This file is part of cedar.
+#
+#   cedar is free software: you can redistribute it and/or modify it under
+#   the terms of the GNU Lesser General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+#   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+#   License for more details.
+#
+#   You should have received a copy of the GNU Lesser General Public License
+#   along with cedar. If not, see <http://www.gnu.org/licenses/>.
+#
+#=======================================================================================================================
+#
+#   Institute:   Ruhr-Universitaet Bochum
+#                Institut fuer Neuroinformatik
+#
+#   File:        macros.txt
+#
+#   Maintainer:  Mathis Richter
+#   Email:       mathis.richter@ini.rub.de
+#   Date:        2010 11 29
+#
+#   Description: CMake macros for cedar.
+#
+#   Credits:
+#
+#=======================================================================================================================
+
+#######################################################################################################################
+# CMake macros for cedar
+########################################################################################################################
+
+
+########################################################################################################################
+
+macro(cedar_add_executable)
+	cedar_add_target_executable(${ARGN})
+endmacro(cedar_add_executable)
+
+macro(cedar_add_example)
+	cedar_add_target_executable(${ARGN} NO_INSTALL)
+endmacro(cedar_add_example)
+
+#
+# Macro cedar_add_target_executable
+#
+# Arguments:
+# PREFIX [string] prefix for the application
+# MOC_HEADERS [string list] a list of headers to pass to the moc command
+# CEDAR_DEPENDENCIES [string list] List of cedar libraries on which the application depends. Defaults to all cedar libraries if
+#                         not specified.
+#
+macro(cedar_add_target_executable)
+  # find all cpp source files in the current source folder and save them in a list
+  file(GLOB sourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+
+  parse_arguments(executable "PREFIX;MOC_HEADERS;CEDAR_DEPENDENCIES" "NO_INSTALL" ${ARGN})
+  car(executableName ${executable_DEFAULT_ARGS})
+
+  qt_wrap_cpp(executableMocSources ${executable_MOC_HEADERS})
+  set(sourceFiles ${sourceFiles} ${executableMocSources})
+  
+  # remove the ${CEDAR_EXE_DIR} from the current source path and save the result in 'demoSubdirectory'
+  string(REPLACE "${CEDAR_EXE_DIR}/" "" demoSubdirectory "${CMAKE_CURRENT_SOURCE_DIR}")
+  # remove the folder name from 'executableSubdirectory'
+  string(REPLACE "/${executableName}" "" executableSubdirectory "${executableSubdirectory}")
+
+  # temporarily change the directory where executables are created, so that we can have appropriate subdirectories
+  set(originalRuntimeOutputDirectory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CEDAR_EXE_DIR}/${executable_PREFIX}${executableSubdirectory})
+  # compose the name of the executable from a 'demo_' prefix and the demo name
+  set(executableExecutableName ${executableName})
+  
+  # add the executable with the given name, specifying all source files needed for compilation
+  #
+  # add_executable(<executable name> [WIN32] [MACOSX_BUNDLE] [EXCLUDE_FROM_ALL] source1 source2 ... sourceN)
+  add_executable(${executableExecutableName} ${sourceFiles})
+  
+  if (CMAKE_COMPILER_IS_GNUCC)
+  	set_target_properties(${executableExecutableName} PROPERTIES LINK_FLAGS "-Wl,--no-as-needed")
+  endif(CMAKE_COMPILER_IS_GNUCC)
+  
+  cedar_set_common_target_properties(${executableExecutableName})
+  
+  # link all cedar and third party libraries into the demo executable
+  if (executable_CEDAR_DEPENDENCIES)
+    target_link_libraries(${executableExecutableName} ${executable_CEDAR_DEPENDENCIES})
+  else(executable_CEDAR_DEPENDENCIES)
+    target_link_libraries(${executableExecutableName} ${CEDAR_LIBS})
+  endif(executable_CEDAR_DEPENDENCIES)
+  
+  target_link_libraries(${executableExecutableName} ${CEDAR_THIRD_PARTY_LIBS})
+  
+  # change the runtime output directory back to the original value
+  set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${originalRuntimeOutputDirectory})
+  
+  # finally, add this target to the list of executables that are going to be installed to CEDAR_EXE_INSTALL_DIR
+  if (NOT executable_NO_INSTALL)
+  	install(TARGETS ${executableExecutableName} DESTINATION "${CMAKE_INSTALL_PREFIX}/${CEDAR_EXE_INSTALL_DIR}")
+  endif(NOT executable_NO_INSTALL)
+endmacro(cedar_add_target_executable)
+
+macro(cedar_add_unit_test)
+  parse_arguments(unitTest "ARGUMENTS" "" ${ARGN})
+  parse_arguments(unitTest "MOC_HEADERS" "" ${ARGN})
+  car(unitTestName ${unitTest_DEFAULT_ARGS})
+  cdr(unitTestSources ${unitTest_DEFAULT_ARGS})
+
+  qt_wrap_cpp(unitMocSources ${unitTest_MOC_HEADERS})
+  set(unitTestSources ${unitTestSources} ${unitMocSources})
+  
+  cedar_add_test(${unitTestName} ${unitTestSources} PREFIX "unitTest" DIRECTORY ${CEDAR_UNIT_TEST_DIR} ARGUMENTS ${unitTest_ARGUMENTS} AUTOMATIC)
+endmacro(cedar_add_unit_test)
+
+macro(cedar_add_performance_test)
+  parse_arguments(performanceTest "ARGUMENTS" "" ${ARGN})
+  car(performanceTestName ${performanceTest_DEFAULT_ARGS})
+  cdr(performanceTestSources ${performanceTest_DEFAULT_ARGS})
+  cedar_add_test(${performanceTestName} ${performanceTestSources} PREFIX "performanceTest" DIRECTORY ${CEDAR_PERFORMANCE_TEST_DIR} ARGUMENTS ${unitTest_ARGUMENTS} AUTOMATIC LINK_TESTUTILS)
+endmacro(cedar_add_performance_test)
+
+macro(cedar_add_interactive_test)
+  parse_arguments(interactiveTest "MOC_HEADERS" "" ${ARGN})
+  car(interactiveTestName ${interactiveTest_DEFAULT_ARGS})
+  cdr(interactiveTestSources ${interactiveTest_DEFAULT_ARGS})
+
+  qt_wrap_cpp(interactiveMocSources ${interactiveTest_MOC_HEADERS})
+  set(interactiveTestSources ${interactiveTestSources} ${interactiveMocSources})
+
+  cedar_add_test(${interactiveTestName} ${interactiveTestSources} PREFIX "interactiveTest" DIRECTORY ${CEDAR_INTERACTIVE_TEST_DIR} ARGUMENTS interactiveTest_ARGUMENTS)
+endmacro(cedar_add_interactive_test)
+
+#
+# macro: cedar_add_test
+#
+# parameters:
+# PREFIX [string] a prefix describing the kind of test being added (unitTest, interactiveTest or performanceTest)
+# DIRECTORY [string] name of the directory in which the unit test is located
+# LINK_TESTUTILS Whether or not to link the cedartesting_utilities library
+# LINK_ALL When set, all cedar libraries will be linked.
+# ADDITIONAL_DEPENDENCIES [string list] optional list of additional cedar dependencies to add.
+#
+macro(cedar_add_test)
+  parse_arguments(test "PREFIX;DIRECTORY;ARGUMENTS;ADDITIONAL_DEPENDENCIES" "AUTOMATIC;LINK_TESTUTILS;LINK_ALL" ${ARGN})
+  car(testName ${test_DEFAULT_ARGS})
+  cdr(testSources ${test_DEFAULT_ARGS})
+  
+  # remove the absolute part from the current source path and save the result in 'testSubdirectory'
+  string(REPLACE "${test_DIRECTORY}/" "" testSubdirectory "${CMAKE_CURRENT_SOURCE_DIR}")
+
+  # extract the folder name from the current source path and remove it from 'testSubdirectory'
+  string(REGEX REPLACE ".*/(.+)$" "\\1" testFolderName "${CMAKE_CURRENT_SOURCE_DIR}")
+  string(REPLACE "/${testFolderName}" "" testSubdirectory "${testSubdirectory}")
+
+  # temporarily change the directory where executables are created, so that we can have appropriate subdirectories
+  set(originalRuntimeOutputDirectory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CEDAR_EXE_DIR}/${test_PREFIX}/${testSubdirectory})
+
+  # compose the name of the executable from a given prefix and the test name
+  set(testExecutableName "${test_PREFIX}_${testName}")
+  
+  # Find out which cedar library the test refers to (i.e., auxiliaries, ...)
+  string(REGEX REPLACE "^(.*)/.*" "\\1" testCedarLib "${testSubdirectory}")
+  
+  # add the executable with the given name, specifying all source files needed for compilation
+  #
+  # add_executable(<executable name> [WIN32] [MACOSX_BUNDLE] [EXCLUDE_FROM_ALL] source1 source2 ... sourceN)
+  add_executable(${testExecutableName} ${testSources})
+  
+  if (CMAKE_COMPILER_IS_GNUCC)
+  	set_target_properties(${testExecutableName} PROPERTIES LINK_FLAGS "-Wl,--no-as-needed")
+    
+    if (CEDAR_COVERAGE_TEST)
+      set_target_properties(${testExecutableName} PROPERTIES COMPILE_FLAGS "-O0 -g --coverage -fprofile-arcs -ftest-coverage")
+    endif (CEDAR_COVERAGE_TEST)
+  endif(CMAKE_COMPILER_IS_GNUCC)
+  
+  if (MSVC)
+    # In visual studio, put all unit tests into a subfolder
+    set_target_properties(${testExecutableName} PROPERTIES FOLDER "${test_PREFIX}")
+    
+    if (CEDAR_COVERAGE_TEST)
+      message("Sorry, coverage tests are not available for non-gcc compilers.")
+    endif (CEDAR_COVERAGE_TEST)
+  endif (MSVC)
+  
+  # add the unit test to the CMake build system (will create a build target and run the test when calling 'make test')
+  # This sets up the unit test so that it is run as if the executable were lying in the source path of the unit test,
+  # so that you can put test configuration files into the source directory.
+  #
+  # add_test(<test identifier> <executable name> <arguments for the test>)
+  if (test_AUTOMATIC)
+    set(working_dir "${test_DIRECTORY}/${testSubdirectory}/${testName}")
+    # we need at least version 2.8.4
+    if (${CMAKE_VERSION} VERSION_GREATER "2.8.3")
+      add_test(NAME ${testName}
+               WORKING_DIRECTORY ${working_dir}
+               COMMAND ${testExecutableName} ${test_ARGUMENTS}
+              )
+    else()
+      # Workaround for the missing WORKING_DIRECTORY in versions below the one given above
+      if (WIN32)
+        message(WARNING "Unit tests might not work properly with this version of cmake. Please update to at least cmake version 2.8.4.")
+      endif(WIN32)
+      add_test(${testName} ${CMAKE_COMMAND} -E chdir ${test_DIRECTORY}/${testSubdirectory}/${testName} ${CEDAR_EXE_DIR}/${test_PREFIX}/${testSubdirectory}/${testExecutableName} ${test_ARGUMENTS})
+    endif()
+    
+    set_property(TEST ${testName} PROPERTY LABELS ${test_PREFIX} ${testCedarLib})
+  endif (test_AUTOMATIC)
+  
+  # link all cedar and third party libraries into the unit test executable
+  if (NOT test_LINK_ALL AND testCedarLib)
+    if (testCedarLib MATCHES "units")
+      set(test_linked_cedarlibs "cedarunits")
+    elseif (testCedarLib MATCHES "auxiliaries")
+      set(test_linked_cedarlibs "cedaraux")
+    elseif (testCedarLib MATCHES "devices")
+      set(test_linked_cedarlibs "cedardev")
+    elseif (testCedarLib MATCHES "processing")
+      set(test_linked_cedarlibs "cedarproc")
+    elseif (testCedarLib MATCHES "dynamics")
+      set(test_linked_cedarlibs "cedardyn")
+    else ()
+      message("Could not match cedar library ${testCedarLib}. Please fix the script.")
+      set(test_linked_cedarlibs ${CEDAR_LIBS})
+    endif()
+    target_link_libraries(${testExecutableName} ${test_linked_cedarlibs})
+    # hotfix for gui elements in aux that require proc:
+    target_link_libraries(${testExecutableName} "cedarproc")
+  else ()
+    # Could not determine library: link everything
+    target_link_libraries(${testExecutableName} ${CEDAR_LIBS})
+  endif ()
+  
+  # link third party libraries
+  target_link_libraries(${testExecutableName} ${CEDAR_THIRD_PARTY_LIBS})
+
+  # link testing_utlilities if set to do so
+  if (test_LINK_TESTUTILS)
+    target_link_libraries(${testExecutableName} cedartesting_utilities)
+  endif (test_LINK_TESTUTILS)
+  
+  if (test_ADDITIONAL_DEPENDENCIES)
+    target_link_libraries(${testExecutableName} ${test_ADDITIONAL_DEPENDENCIES})
+  endif (test_ADDITIONAL_DEPENDENCIES)
+  
+  # link gcov for coverage testing
+  if (CMAKE_COMPILER_IS_GNUCC AND CEDAR_COVERAGE_TEST)
+    target_link_libraries(${testExecutableName} gcov)
+  endif ()  
+  
+  # change the runtime output directory back to the original value
+  set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${originalRuntimeOutputDirectory})
+endmacro(cedar_add_test)
+
+########################################################################################################################
+
+macro(cedar_add_demo arguments)
+  # extract the folder name from the current source path and use it as a name for the demo
+  string(REGEX REPLACE ".*/(.+)$" "\\1" demoName "${CMAKE_CURRENT_SOURCE_DIR}")
+
+  # find all cpp source files in the current source folder and save them in a list
+  file(GLOB sourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+
+  # remove the ${CEDAR_DEMO_DIR} from the current source path and save the result in 'demoSubdirectory'
+  string(REPLACE "${CEDAR_DEMO_DIR}/" "" demoSubdirectory "${CMAKE_CURRENT_SOURCE_DIR}")
+  # remove the folder name from 'demoSubdirectory'
+  string(REPLACE "/${demoName}" "" demoSubdirectory "${demoSubdirectory}")
+
+  # temporarily change the directory where executables are created, so that we can have appropriate subdirectories
+  set(originalRuntimeOutputDirectory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CEDAR_EXE_DIR}/${demoSubdirectory})
+
+  # compose the name of the executable from a 'demo_' prefix and the demo name
+  set(demoExecutableName demo_${demoName})
+  
+  # add the executable with the given name, specifying all source files needed for compilation
+  #
+  # add_executable(<executable name> [WIN32] [MACOSX_BUNDLE] [EXCLUDE_FROM_ALL] source1 source2 ... sourceN)
+  add_executable(${demoExecutableName} ${sourceFiles})
+
+  # extract the name of the library from the demo source path
+#  string(REGEX REPLACE "([^/]+)(/[^/]*)*$" "\\1" libraryName "${demoSubdirectory}")
+  
+  # link all cedar and third party libraries into the demo executable
+  target_link_libraries(${demoExecutableName} ${CEDAR_LIBS} ${CEDAR_THIRD_PARTY_LIBS})
+  
+  # change the runtime output directory back to the original value
+  set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${originalRuntimeOutputDirectory})
+endmacro(cedar_add_demo)
+
+
+########################################################################################################################
+
+macro(cedar_get_subdirectories path)
+  file(GLOB returnedSubdirectories ${path}/*/)
+  list(LENGTH returnedSubdirectories localNumberOfSubdirectories)
+
+  if (localNumberOfSubdirectories GREATER 0)
+    foreach (subdirectory ${returnedSubdirectories})
+      if (NOT IS_DIRECTORY ${subdirectory})
+        list(REMOVE_ITEM returnedSubdirectories "${subdirectory}")
+      endif(NOT IS_DIRECTORY ${subdirectory})
+    endforeach(subdirectory)
+  endif (localNumberOfSubdirectories GREATER 0)
+endmacro(cedar_get_subdirectories)
+
+########################################################################################################################
+
+# This macro adds a new library to cedar.
+# Syntax:
+# cedar_add_library(
+#                     library_name
+#                     [MOC_HEADERS header1 header2 ...]
+#                     [RESOURCES resource1 resource2 ...]
+#                     [LINK_LIBRARIES lib1 lib2 ...]
+#                     [NO_AUTOLINK]
+#                   )
+# library_name   name of the new library
+# MOC_HEADERS    header files that generate (Qt) moc-files
+# LINK_LIBRARIES libraries that need to link to from the new library (important for MacOS linking process)
+# NO_AUTOLINK    if provided, executables within cedar will not be linked to this library automatically.
+#
+# see http://www.cmake.org/Wiki/CMakeMacroParseArguments for a description of the parsing
+macro(cedar_add_library)
+  parse_arguments(library "MOC_HEADERS;RESOURCES;LINK_LIBRARIES" "NO_AUTOLINK" ${ARGN})
+  car(libraryName ${library_DEFAULT_ARGS})
+
+  # find files
+  findfiles(${CMAKE_CURRENT_SOURCE_DIR})
+
+  # create moc files from those headers that contain the Q_OBJECT macro
+  qt_wrap_cpp(generatedMocSourceFiles ${library_MOC_HEADERS})
+  set(sourceFiles ${sourceFiles} ${generatedMocSourceFiles})
+
+  # generate rules for building source files from the resources
+  qt_add_resources(recourceCompilerSrcs ${library_RESOURCES})
+
+  # create ui headers from ui files
+  cedar_qt_wrap_ui(generatedUiHeaders ${uiFiles})
+  set(headerFiles ${headerFiles} ${generatedUiHeaders})
+
+  # generate lib.h files
+  string(TOUPPER "${libraryName}" CAP_LIB_NAME)
+  string(REGEX REPLACE "CEDAR" "" CAP_LIB_NAME "${CAP_LIB_NAME}")
+  string(REGEX REPLACE "cedar" "" LIB_NAMESPACE_NAME "${libraryName}")
+  
+  set(libHOutputFile "${CMAKE_CURRENT_BINARY_DIR}/lib.h")
+  configure_file("${CEDAR_HOME}/cmake/resources/lib.h.in" ${libHOutputFile})
+  set(headerFiles ${headerFiles} ${libHOutputFile})
+
+  # make sure the paths for all ui files exist
+  foreach(uiFile ${generatedUiHeaders})
+    get_filename_component(uiFilePath ${uiFile} PATH)
+    file(MAKE_DIRECTORY ${uiFilePath})
+  endforeach(uiFile ${generatedUiHeaders})
+  
+  foreach(headerFile ${headerFiles})
+    # get the path of the file
+    get_filename_component(headerFilePath ${headerFile} PATH)
+    # extract the path to the header file, relative to the cedar source directory
+    string(REGEX REPLACE "${CEDAR_SOURCE_DIR}" "" relativeHeaderFilePath "${headerFilePath}")
+    # extract the path to the header file, relative to the cedar build directory
+    string(REGEX REPLACE "${CEDAR_BUILD_DIR}/cedar" "" relativeHeaderFilePath "${relativeHeaderFilePath}")
+
+    # Create file groups (this mirrors the actual file structure in visual studio)
+    string(REGEX MATCH "${CEDAR_BUILD_DIR}" isGenerated "${headerFilePath}")
+    string(REGEX REPLACE "/" "\\\\" groupName "${relativeHeaderFilePath}")
+    if (NOT isGenerated)
+      source_group(${groupName} FILES ${headerFile})
+    else(NOT isGenerated)
+      source_group("generated\\\\${groupName}" FILES ${headerFile})
+    endif (NOT isGenerated)
+    
+    # add the header file to the 'make install' target
+    install(FILES ${headerFile} DESTINATION "${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}/${relativeHeaderFilePath}")
+  endforeach(headerFile ${headerFiles})
+  
+  # place source files into groups
+  foreach(sourceFile ${sourceFiles})
+    # get the path of the file
+    get_filename_component(sourceFilePath ${sourceFile} PATH)
+    # extract the path to the source file, relative to the cedar source directory
+    string(REGEX REPLACE "${CEDAR_SOURCE_DIR}" "" relativeSourceFilePath "${sourceFilePath}")
+    # extract the path to the source file, relative to the cedar build directory
+    string(REGEX REPLACE "${CEDAR_BUILD_DIR}/cedar" "" relativeSourceFilePath "${relativeSourceFilePath}")
+    
+    # Create file groups (this mirrors the actual file structure in visual studio)
+    string(REGEX MATCH "${CEDAR_BUILD_DIR}" isGenerated "${sourceFilePath}")
+    string(REGEX REPLACE "/" "\\\\" groupName "${relativeSourceFilePath}")
+    if (NOT isGenerated)
+      source_group(${groupName} FILES ${sourceFile})
+    else(NOT isGenerated)
+      source_group("generated\\\\${groupName}" FILES ${sourceFile})
+    endif (NOT isGenerated)
+  endforeach(sourceFile ${sourceFiles})
+
+  # add the library and link it to all relevant cedar and third party libraries
+  if (NOT library_NO_AUTOLINK)
+    set(CEDAR_LIBS ${CEDAR_LIBS} ${libraryName} CACHE INTERNAL "")
+  endif()
+  
+  add_library(${libraryName} ${CEDAR_LIB_TYPE} ${sourceFiles} ${headerFiles} ${recourceCompilerSrcs})
+  cedar_set_common_target_properties(${libraryName})
+  
+  if (MSVC)
+    # In visual studio, put all libraries into a (virtual) subfolder
+    set_target_properties(${libraryName} PROPERTIES FOLDER "cedar libraries")
+  endif (MSVC)
+  
+  if (WIN32)
+    set(LIB_EXPORTS "CEDAR_LIB_EXPORTS_${CAP_LIB_NAME}")
+    set_target_properties(${libraryName} PROPERTIES COMPILE_FLAGS -D${LIB_EXPORTS})
+  endif (WIN32)
+
+  # link library to all relevant cedar and third party libraries
+  target_link_libraries(${libraryName} ${CEDAR_THIRD_PARTY_LIBS} ${library_LINK_LIBRARIES})
+
+  # add the library to the 'make install' target
+  if(WIN32)
+    # TODO: this may work on linux, but needs to be tested
+    install(TARGETS ${libraryName} DESTINATION ${CEDAR_LIB_INSTALL_DIR})
+  else(WIN32)
+    install(TARGETS ${libraryName} LIBRARY DESTINATION ${CEDAR_LIB_INSTALL_DIR} ARCHIVE DESTINATION ${CEDAR_LIB_INSTALL_DIR})
+  endif(WIN32)
+endmacro(cedar_add_library)
+
+macro(cedar_set_common_target_properties target)
+  set_target_properties(${target}
+                        PROPERTIES
+                        VERSION ${CEDAR_VERSION}
+                        )
+                        
+  if (MSVC)
+    get_target_property(library_out_dir ${target} LIBRARY_OUTPUT_DIRECTORY)
+    get_target_property(runtime_out_dir ${target} RUNTIME_OUTPUT_DIRECTORY)
+    get_target_property(archive_out_dir ${target} ARCHIVE_OUTPUT_DIRECTORY)
+    
+    foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
+      string(TOUPPER ${CONFIG} CONFIG)
+      set_target_properties(${target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY_${CONFIG} ${library_out_dir})
+      set_target_properties(${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_${CONFIG} ${runtime_out_dir})
+      set_target_properties(${target} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY_${CONFIG} ${archive_out_dir})
+    endforeach()
+  endif (MSVC)
+endmacro(cedar_set_common_target_properties)
+
+################################################################################################################
+# macro for finding all source, header and other dependent files
+macro(findfiles directory)
+  # collect files from given directory
+  file(GLOB_RECURSE sourceFiles ${directory}/*.cpp)
+  file(GLOB_RECURSE headerFiles ${directory}/*.h)
+  file(GLOB_RECURSE uiFiles ${directory}/*.ui)
+endmacro(findfiles)
+
+
+################################################################################################################
+# Wrapper around QT4/5 macros
+#
+
+macro(qt_wrap_cpp)
+  if(QT_VERSION GREATER 4)
+    qt5_wrap_cpp(${ARGV})
+  else(QT_VERSION GREATER 4)
+    qt4_wrap_cpp(${ARGV})
+  endif(QT_VERSION GREATER 4)
+endmacro(qt_wrap_cpp)
+
+macro(qt_add_resources)
+  if(QT_VERSION GREATER 4)
+    qt5_add_resources(${ARGV})
+  else(QT_VERSION GREATER 4)
+    qt4_add_resources(${ARGV})
+  endif(QT_VERSION GREATER 4)
+endmacro(qt_add_resources)
+
+macro(qt_wrap_ui ${ARGV})
+  if(QT_VERSION GREATER 4)
+    qt5_wrap_ui(${ARGV})
+  else(QT_VERSION GREATER 4)
+    qt4_wrap_ui(${ARGV})
+  endif(QT_VERSION GREATER 4)
+endmacro(qt_wrap_ui)
+
+macro(cedar_qt_wrap_ui ${ARGV})
+  if(QT_VERSION GREATER 4)
+    cedar_qt5_wrap_ui(${ARGV})
+  else(QT_VERSION GREATER 4)
+    cedar_qt4_wrap_ui(${ARGV})
+  endif(QT_VERSION GREATER 4)
+endmacro(cedar_qt_wrap_ui)
+
+################################################################################################################
+# Custom implementation of QT4_WRAP_UI.
+#
+# The builtin QT4_WRAP_UI puts all generated files in the current binary dir, ignoring
+# the relative path of the ui file in the project directory structure.
+# The custom implementation copies the directory structure to the build
+# directory and generates the header files in the same relative path. When the
+# binary dir is included in the include path, these files can then be accessed.
+macro(cedar_qt4_wrap_ui outfiles)
+
+  foreach (it ${ARGN})
+    get_filename_component(outfile ${it} NAME_WE)
+    get_filename_component(infile ${it} ABSOLUTE)
+    get_filename_component(generated_path ${it} PATH)
+    string(REGEX REPLACE "${CMAKE_CURRENT_SOURCE_DIR}" "" generated_path "${generated_path}")
+    set(generated_path ${CMAKE_CURRENT_BINARY_DIR}${generated_path})
+    set(outfile ${generated_path}/ui_${outfile}.h)
+    add_custom_command(OUTPUT ${outfile}
+      COMMAND ${QT_UIC_EXECUTABLE}
+      ARGS ${ui_options} -o ${outfile} ${infile}
+      MAIN_DEPENDENCY ${infile})
+    set(${outfiles} ${${outfiles}} ${outfile})
+  endforeach (it)
+
+endmacro(cedar_qt4_wrap_ui)
+
+################################################################################################################
+# Custom implementation of QT5_WRAP_UI.
+#
+# The builtin QT5_WRAP_UI puts all generated files in the current binary dir, ignoring
+# the relative path of the ui file in the project directory structure.
+# The custom implementation copies the directory structure to the build
+# directory and generates the header files in the same relative path. When the
+# binary dir is included in the include path, these files can then be accessed.
+macro(cedar_qt5_wrap_ui outfiles)
+  qt5_extract_options(ui_files ui_options ${ARGN})
+
+  # TODO is this an exact copy from cedar_qt4_wrap_ui? If so, why is this not wrapped in its own macro?
+  foreach (it ${ui_files})
+    get_filename_component(outfile ${it} NAME_WE)
+    get_filename_component(infile ${it} ABSOLUTE)
+    get_filename_component(generated_path ${it} PATH)
+    string(REGEX REPLACE "${CMAKE_CURRENT_SOURCE_DIR}" "" generated_path "${generated_path}")
+    set(generated_path ${CMAKE_CURRENT_BINARY_DIR}${generated_path})
+    set(outfile ${generated_path}/ui_${outfile}.h)
+    add_custom_command(OUTPUT ${outfile}
+      COMMAND ${QT_UIC_EXECUTABLE}
+      ARGS ${ui_options} -o ${outfile} ${infile}
+      MAIN_DEPENDENCY ${infile})
+    set(${outfiles} ${${outfiles}} ${outfile})
+	#message("   DEBUG UIC_EXECUTABLE ${QT_UIC_EXECUTABLE}")
+  endforeach (it)
+
+endmacro(cedar_qt5_wrap_ui)
+
+################################################################################################################
+# Qt5 does not come with an extract_options macro anymore. So we define it ourself.
+#
+
+MACRO (QT5_EXTRACT_OPTIONS _qt5_files _qt5_options)
+  SET(${_qt5_files})
+  SET(${_qt5_options})
+  SET(_QT5_DOING_OPTIONS FALSE)
+  FOREACH(_currentArg ${ARGN})
+    IF ("${_currentArg}" STREQUAL "OPTIONS")
+      SET(_QT5_DOING_OPTIONS TRUE)
+    ELSE ("${_currentArg}" STREQUAL "OPTIONS")
+      IF(_QT5_DOING_OPTIONS) 
+        LIST(APPEND ${_qt5_options} "${_currentArg}")
+      ELSE(_QT5_DOING_OPTIONS)
+        LIST(APPEND ${_qt5_files} "${_currentArg}")
+      ENDIF(_QT5_DOING_OPTIONS)
+    ENDIF ("${_currentArg}" STREQUAL "OPTIONS")
+  ENDFOREACH(_currentArg) 
+ENDMACRO (QT5_EXTRACT_OPTIONS)
+
+########################################################################################################################
+
+MACRO(CAR var)
+  SET(${var} ${ARGV1})
+ENDMACRO(CAR)
+
+########################################################################################################################
+
+MACRO(CDR var junk)
+  SET(${var} ${ARGN})
+ENDMACRO(CDR)
+
+########################################################################################################################
+
+MACRO(PARSE_ARGUMENTS prefix arg_names option_names)
+  SET(DEFAULT_ARGS)
+  FOREACH(arg_name ${arg_names})    
+    SET(${prefix}_${arg_name})
+  ENDFOREACH(arg_name)
+  FOREACH(option ${option_names})
+    SET(${prefix}_${option} FALSE)
+  ENDFOREACH(option)
+
+  SET(current_arg_name DEFAULT_ARGS)
+  SET(current_arg_list)
+  FOREACH(arg ${ARGN})            
+    SET(larg_names ${arg_names})    
+    LIST(FIND larg_names "${arg}" is_arg_name)                   
+    IF (is_arg_name GREATER -1)
+      SET(${prefix}_${current_arg_name} ${current_arg_list})
+      SET(current_arg_name ${arg})
+      SET(current_arg_list)
+    ELSE (is_arg_name GREATER -1)
+      SET(loption_names ${option_names})    
+      LIST(FIND loption_names "${arg}" is_option)            
+      IF (is_option GREATER -1)
+        SET(${prefix}_${arg} TRUE)
+      ELSE (is_option GREATER -1)
+        SET(current_arg_list ${current_arg_list} ${arg})
+      ENDIF (is_option GREATER -1)
+    ENDIF (is_arg_name GREATER -1)
+  ENDFOREACH(arg)
+  SET(${prefix}_${current_arg_name} ${current_arg_list})
+ENDMACRO(PARSE_ARGUMENTS)
