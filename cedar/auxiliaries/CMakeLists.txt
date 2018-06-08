@@ -140,6 +140,7 @@ cedar_add_library(cedaraux
   kernel/Kernel.h
   kernel/Gauss.h
   kernel/Box.h
+  kernel/RotatedGauss.h
   RESOURCES
   gui/icons/cedar_aux_gui_icons.qrc
   LINK_LIBRARIES
