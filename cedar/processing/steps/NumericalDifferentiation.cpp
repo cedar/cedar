@@ -245,7 +245,7 @@ void cedar::proc::steps::NumericalDifferentiation::recompute()
     mTwoBack= cv::Mat();
     mThreeBack= cv::Mat();
     mFourBack= cv::Mat();
-std::cout << " ignoring" << std::endl;    
+//std::cout << " ignoring" << std::endl;    
     return;
   }
 
