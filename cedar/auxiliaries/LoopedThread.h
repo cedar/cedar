@@ -335,6 +335,13 @@ public:
 
   double getNumberOfStepsMissed() const;
 
+  inline void setDebugMe(bool b)
+  {
+    CEDAR_ASSERT(mpWorker != NULL);
+    mpWorker->setDebugMe(b);
+  }
+
+
   //----------------------------------------------------------------------------
   // protected methods
   //----------------------------------------------------------------------------

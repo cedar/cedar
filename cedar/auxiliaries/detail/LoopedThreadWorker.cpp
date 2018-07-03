@@ -53,7 +53,8 @@
 cedar::aux::detail::LoopedThreadWorker::LoopedThreadWorker(cedar::aux::LoopedThread *wrapper) 
 :
 mpWrapper(wrapper),
-mTimeFactor(cedar::aux::SettingsSingleton::getInstance()->getGlobalTimeFactor())
+mTimeFactor(cedar::aux::SettingsSingleton::getInstance()->getGlobalTimeFactor()),
+mDebugMe(false)
 {
   this->mGlobalTimeFactorConnection = cedar::aux::SettingsSingleton::getInstance()->connectToGlobalTimeFactorChangedSignal
   (
@@ -349,14 +350,23 @@ void cedar::aux::detail::LoopedThreadWorker::work()
                            / cedar::unit::Time(1.0 * cedar::unit::micro * cedar::unit::second) ) + 0.5) );
 #endif        
 
-//std::cout << "  min sleep: " <<
-//(   minimum_step_size / cedar::unit::Time(1.0 * cedar::unit::micro * cedar::unit::second)   ) 
-//<< " in mus: " <<
-//effective_sleep_duration_safe_mus <<
-//std::endl;
-//std::cout << "   will sleep for " << effective_sleep_duration_safe_mus << std::endl;
+#if 0
+        if (mDebugMe)
+        {
+          std::cout << "       will sleep for " << effective_sleep_duration_safe_mus << std::endl;
+          std::cout << "                   a: " << effective_sleep_duration << std::endl;
+          if (check_locked_vars)
+          std::cout << "                   check locked vars " << std::endl;
+        }
+#endif        
+
         //////////// SLEEP
         usleep( static_cast<unsigned long>(effective_sleep_duration_safe_mus) );
+
+        if (safeStopRequested()) // abort faster
+        {
+          continue;
+        }
 
         auto current_time_after_sleep= boost::posix_time::microsec_clock::universal_time();
 
@@ -366,13 +376,8 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         measured_iteration_time_unitless = mLastTimeStepEnd
                                           - mLastTimeStepStart;
 
-//std::cout << "  measured step time: " << measured_iteration_time_unitless.total_microseconds() << std::endl;
+//std::cout << "       measured step time: " << measured_iteration_time_unitless.total_microseconds() << std::endl;
         cedar::unit::Time measured_iteration_time( measured_iteration_time_unitless.total_microseconds() * cedar::unit::micro * cedar::unit::seconds);
-
-        if (safeStopRequested()) // abort faster
-        {
-          continue;
-        }
 
         ///////// STEP
         if (loop_mode == cedar::aux::LoopMode::FakeDT)
@@ -395,6 +400,17 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         else
         {
           mpWrapper->step( measured_iteration_time );
+
+#if 0
+          if (mDebugMe)
+          {
+            std::cout << "             after step" << std::endl;
+
+            std::cout << "       measured step time: " << measured_iteration_time_unitless.total_microseconds() << " (intended: " << orig_step_size  << ")" << std::endl;
+            std::cout << std::endl;
+          }
+#endif          
+
         }
         // note, Stepping takes time!!! esp. for large architectures
 
@@ -428,11 +444,15 @@ void cedar::aux::detail::LoopedThreadWorker::work()
                           - old_scheduled_wakeup 
                         ).total_microseconds()
                         / modified_sleep_time.total_microseconds();
-//std::cout << "      skipped steps: " << missed << " now: " << boost::posix_time::to_simple_string(current_time_after_step) << std::endl;                        
-          // try to hit the next step size, starting from now ...
-          // note, that we know that we are slower than our step size, so 
-          // making a smaller step will probably not work, anyway
-          scheduled_wakeup = current_time_after_step
+
+//if (mDebugMe)                        
+//{
+//std::cout << "      skipped steps: " << steps_missed << " now: " << boost::posix_time::to_simple_string(current_time_after_step) << std::endl;                        
+//}
+
+          // try to hit the next step size, starting from before we
+          // dived into step() (important!)
+          scheduled_wakeup = old_scheduled_wakeup
                              + modified_sleep_time;
 
           // js: there was a while loop here, that could spin a lot. removed
