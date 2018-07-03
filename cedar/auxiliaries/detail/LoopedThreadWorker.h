@@ -71,6 +71,11 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
     //! destructor
     ~LoopedThreadWorker();
 
+    inline void setDebugMe(bool b)
+    {
+      mDebugMe= b;
+    }
+
   private:
     //! initialize statistics at construction time
     void initStatistics();
@@ -156,6 +161,8 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
     mutable QReadWriteLock mLastTimeStepEndLock;
 
     boost::signals2::scoped_connection mGlobalTimeFactorConnection;
+
+    bool mDebugMe;
 };
 
 
