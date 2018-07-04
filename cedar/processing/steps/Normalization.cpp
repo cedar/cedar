@@ -258,12 +258,12 @@ void cedar::proc::steps::Normalization::normalizeAlongOneDimension(int normalize
 
 double cedar::proc::steps::Normalization::safeNormInverse(double norm) const
 {
-  if (isinf(norm))
+  if (std::isinf(norm))
   {
     return 0.0;
   }
 
-  if (isnan(norm))
+  if (std::isnan(norm))
   {
     return 1.0;
   }
