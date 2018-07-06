@@ -153,7 +153,6 @@ void cedar::proc::steps::Switch::recompute()
   {
     gate_factor= boost::math::sign(gate_factor);
   }
-std::cout << " factor " << gate_factor << std::endl;
 
   output = gate_factor * input1 + (1.0 - gate_factor) * input2;
 }
