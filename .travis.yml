@@ -8,12 +8,16 @@ env:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -y libboost-all-dev libcv-dev libopencv-dev libopencv-contrib-dev libopencv-gpu-dev libqt4-dev libqwt5-qt4-dev libqglviewer-dev cmake build-essential libfftw3-dev
 
 install:
+  - sudo apt-get install -y libboost-all-dev libcv-dev libopencv-dev libopencv-contrib-dev libopencv-gpu-dev libqt4-dev libqwt5-qt4-dev libqglviewer-dev cmake build-essential libfftw3-dev
+
+before_script:
   - cp cedar.conf.example cedar.conf
   - mkdir build
   - cd build
+
+script:
   - cmake ..
   - make -j 4
   - make test
