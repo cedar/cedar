@@ -4,7 +4,7 @@ compiler:
   - gcc
 env:
   global:
-    - MAKEFLAGS="-j 4"
+    - MAKEFLAGS="-j 2"
 
 before_install:
   - sudo apt-get update -qq
@@ -19,6 +19,6 @@ before_script:
 
 script:
   - cmake ..
-  - make -j 4
+  - make -j 2
   - make test
   - sudo make install
