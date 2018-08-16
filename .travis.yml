@@ -2,8 +2,6 @@ sudo: enabled
 language: cpp
 compiler:
   - gcc
-cache:
-  - ccache
 env:
   - global:
     - MAKEFLAGS="-j 2"
@@ -12,7 +10,7 @@ before_install:
   - sudo apt-get update -qq
 
 install:
-  - sudo apt-get install -y libboost-all-dev libcv-dev libopencv-dev libopencv-contrib-dev libopencv-gpu-dev libqt4-dev libqwt5-qt4-dev libqglviewer-dev cmake build-essential libfftw3-dev ccache
+  - sudo apt-get install -y libboost-all-dev libcv-dev libopencv-dev libopencv-contrib-dev libopencv-gpu-dev libqt4-dev libqwt5-qt4-dev libqglviewer-dev cmake build-essential libfftw3-dev
 
 before_script:
   - cp cedar.conf.example cedar.conf
