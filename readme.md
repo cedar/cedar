@@ -23,6 +23,8 @@ with cedar. If not, see <http://www.gnu.org/licenses/>.
 
 # cedar
 
+Build status master branch: [![Build Status](https://travis-ci.org/cedar/cedar.svg?branch=master)](https://travis-ci.org/cedar/cedar)
+
 You will find the documentation and installation instructions for CEDAR on our
 [official website](https://cedar.ini.rub.de).
 
