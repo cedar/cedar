@@ -2,6 +2,8 @@ sudo: enabled
 language: cpp
 compiler:
   - gcc
+cache:
+  - ccache
 env:
   - global:
     - MAKEFLAGS="-j 2"
@@ -20,5 +22,4 @@ before_script:
 script:
   - cmake ..
   - make -j 2
-  - make test
   - sudo make install
