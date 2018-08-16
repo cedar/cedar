@@ -1,7 +1,6 @@
-syntax: glob
-.hgrc
-.qglviewer*
-.project
+*.hgrc
+*.qglviewer*
+*.project
 build
 bin
 lib
@@ -19,9 +18,9 @@ obj*
 ui*
 core
 *.new
-.cproject
-.project
-.cdtproject
+*.cproject
+*.project
+*.cdtproject
 Contents
 MacOS
 nsClassTemplate
@@ -35,9 +34,9 @@ nsClassTemplate
 *.app
 *.xcodeproj
 dist
-.externalToolBuilders
-.settings
-.Settings
+*.externalToolBuilders
+*.settings
+*.Settings
 *.svn
 *.tmproj
 *.lo
@@ -51,9 +50,9 @@ dist
 *.rej
 *~
 .*.swp
-.DS_Store
-.cvsignore
-.wrproject
+*.DS_Store
+*.cvsignore
+*.wrproject
 CMakeCache.txt
 cmake_install.cmake
 CMakeFiles
@@ -68,20 +67,13 @@ CTestTestfile.cmake
 */lib.h
 cedar/processing/Testing/Temporary/*
 
-syntax: regexp
-^tests/unit/processing/ArchitectureIO/architecture1\.json$
-syntax: regexp
-^cedar\.conf$
+tests/unit/processing/ArchitectureIO/architecture1\.json
+tests/unit/processing/Network/Nested\.json
+cedar.conf
 
-syntax: regexp
-^tests/unit/processing/Network/Nested\.json$
 
-syntax: regexp
-^resources/meshes/PowerCube110$
-syntax: regexp
-^resources/meshes/PowerCubeWrist90$
-syntax: regexp
-^tools/issues\.txt$
+resources/meshes/PowerCube110
+resources/meshes/PowerCubeWrist90
+tools/issues\.txt
 
-syntax: glob
-.pydevproject
+*.pydevproject
