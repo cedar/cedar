@@ -45,7 +45,8 @@
         <file>steps/matrix_transpose.svg</file>
         <file>steps/matrix_pseudoinverse.svg</file>
         <file>steps/diagonal_matrix.svg</file>
-	<file>steps/harmonic_oscillator.svg</file>
+	    <file>steps/harmonic_oscillator.svg</file>
+        <file>steps/hebbian_connection.svg</file>
         <file>steps/normalization.svg</file>
         <file>steps/rate_matrix_to_space_code.svg</file>
         <file>steps/rate_to_space_code.svg</file>
