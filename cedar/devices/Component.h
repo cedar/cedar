@@ -485,7 +485,7 @@ namespace cedar
     typedef cedar::aux::FactoryManager<cedar::dev::ComponentPtr> ComponentManager;
 
     //!@brief The singleton object of the ComponentManager.
-    //    typedef cedar::aux::Singleton<cedar::dev::ComponentManager> ComponentManagerSingleton;
+    typedef cedar::aux::Singleton<cedar::dev::ComponentManager> ComponentManagerSingleton;
 
     // this will be used for managing declarations; we still have to define a declaration class (see below)
     typedef cedar::aux::DeclarationManagerTemplate<cedar::dev::ComponentPtr> ComponentDeclarationManager;
