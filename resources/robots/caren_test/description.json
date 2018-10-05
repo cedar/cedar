@@ -361,7 +361,8 @@
             "requires channel": "CAN bus",
             "module mapping":
             [
-              "11"
+              "13",
+              "14"
             ]
           }
         }

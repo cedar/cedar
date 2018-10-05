@@ -1477,7 +1477,6 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
 
     QReadLocker lock(this->mCommandData->mUserSideBuffer.getLockPtr());
     userData = this->mCommandData->getUserSideBufferUnlocked(type_from_user).clone();
-
   }
 
   locker.unlock();
