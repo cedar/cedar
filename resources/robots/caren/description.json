@@ -7,14 +7,14 @@
       "icon path" : ":/cedar/dev/gui/icons/caren_arm.svg",
       "available components":
       {
-        "fri":
+        "hardware":
         {
           "cedar.dev.kuka.KinematicChain":
           {
             "requires channel": "fri"
           }
         },
-        "yarp":
+        "webots":
         {
           "cedar.dev.YarpKinematicChain":
           {
@@ -32,7 +32,7 @@
       },
       "shared component parameters":
       {
-  		  "name": "CarenArm",
+  		  "name": "CAREN arm",
   		  "server port": "0",
   		  "remote host": "NULL",
   		  "step size": "20.0",
@@ -254,7 +254,7 @@
       "icon path" : ":/cedar/dev/gui/icons/caren_trunk.svg",
       "available components":
       {
-        "yarp":
+        "webots":
         {
           "cedar.dev.YarpKinematicChain":
           {
@@ -268,11 +268,22 @@
           "cedar.dev.SimulatedKinematicChain":
           {
           }
+        },
+        "hardware":
+        {
+          "cedar.dev.schunk.PowerCubeChain":
+          {
+            "requires channel": "canbus",
+            "module mapping":
+            [
+              "11"
+            ]
+          }
         }
       },
       "shared component parameters":
       {
-			"name": "CarenTrunk",
+			"name": "CAREN trunk",
 			"root coordinate frame":
 			{
 				"initial translation":
@@ -339,14 +350,7 @@
       "icon path" : ":/cedar/dev/gui/icons/caren_head.svg",
       "available components":
       {
-        "fri":
-        {
-          "cedar.dev.kuka.KinematicChain":
-          {
-            "requires channel": "fri"
-          }
-        },
-        "yarp":
+        "webots":
         {
           "cedar.dev.YarpKinematicChain":
           {
@@ -360,11 +364,23 @@
           "cedar.dev.SimulatedKinematicChain":
           {
           }
+        },
+        "hardware":
+        {
+          "cedar.dev.schunk.PowerCubeChain":
+          {
+            "requires channel": "canbus",
+            "module mapping":
+            [
+              "13",
+              "14"
+            ]
+          }
         }
       },
       "shared component parameters":
       {
-		"name": "CarenHead",
+		"name": "CAREN head",
 		"root coordinate frame":
 		{
 			"initial translation":
@@ -454,7 +470,7 @@
     {
       "available components":
       {
-        "yarp":
+        "webots":
         {
           "cedar.dev.YarpCamera":
           {
@@ -471,7 +487,7 @@
       },
       "shared component parameters":
       {
-  		  "name": "CarenCamera0",
+  		  "name": "CAREN camera0",
   		  "pictureSizeX" : "150",
   		  "pictureSizeY" : "150",
   		  "cvMatType" : "CV_8UC3"
@@ -481,7 +497,7 @@
     {
       "available components":
       {
-        "yarp":
+        "webots":
         {
           "cedar.dev.YarpCamera":
           {
@@ -498,7 +514,7 @@
       },
       "shared component parameters":
       {
-  		  "name": "CarenCamera1",
+  		  "name": "CAREN camera1",
   		  "pictureSizeX" : "150",
   		  "pictureSizeY" : "150",
   		  "cvMatType" : "CV_8UC3"
@@ -508,7 +524,7 @@
     {
       "available components":
       {
-        "yarp":
+        "webots":
         {
           "cedar.dev.YarpCamera":
           {
@@ -525,7 +541,7 @@
       },
       "shared component parameters":
       {
-  		  "name": "CarenCamera2",
+  		  "name": "CAREN camera2",
   		  "pictureSizeX" : "150",
   		  "pictureSizeY" : "150",
   		  "cvMatType" : "CV_8UC3"
@@ -551,6 +567,12 @@
     "yarp":
     {
       "cedar.dev.YarpChannel<cv.Mat>":
+      {
+      }
+    },
+    "canbus":
+    {
+      "cedar.dev.schunk.SMPCanBusChannel":
       {
       }
     }

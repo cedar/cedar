@@ -1,5 +1,5 @@
 {
-  "name": "simulated CAREN robot",
+  "name": "Simulated CAREN robot",
   "description file": "robots/caren/description.json",
   "component instantiations":
   {

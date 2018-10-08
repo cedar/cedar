@@ -1,0 +1,13 @@
+{
+  "name": "Webots CAREN robot",
+  "description file": "robots/caren/description.json",
+  "component instantiations":
+  {
+    "arm": "webots",
+    "trunk":"webots",
+    "camera0" : "webots",
+    "camera1" : "webots",
+    "camera2" : "webots",
+    "head" : "simulator"
+  }
+}

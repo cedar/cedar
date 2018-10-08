@@ -1,13 +1,13 @@
 {
-  "name": "FRI CAREN robot",
+  "name": "CAREN robot",
   "description file": "robots/caren/description.json",
   "component instantiations":
   {
-    "arm": "fri",
-    "trunk" : "simulator",
+    "arm": "hardware",
+    "trunk" : "hardware",
     "camera0" : "simulator",
     "camera1" : "simulator",
     "camera2" : "simulator",
-    "head" : "simulator"
+    "head" : "hardware"
   }
 }
