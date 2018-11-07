@@ -25,6 +25,8 @@ with cedar. If not, see <http://www.gnu.org/licenses/>.
 
 Build status master branch: [![Build Status](https://travis-ci.org/cedar/cedar.svg?branch=master)](https://travis-ci.org/cedar/cedar)
 
+Build status Ubuntu 16.04: [![Build Status](https://dev.azure.com/ini-cedar/cedar/_apis/build/status/cedar-Ubuntu1604-CI)](https://dev.azure.com/ini-cedar/cedar/_build/latest?definitionId=2)
+
 You will find the documentation and installation instructions for CEDAR on our
 [official website](https://cedar.ini.rub.de).
 
