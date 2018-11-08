@@ -46,7 +46,11 @@
 
 // SYSTEM INCLUDES
 #include <boost/make_shared.hpp>
+#if defined CEDAR_USE_QT5
+#include <QSizeGrip>
+#else
 #include <QtGui/QSizeGrip>
+#endif
 //----------------------------------------------------------------------------------------------------------------------
 // private nested structs and classes
 //----------------------------------------------------------------------------------------------------------------------
