@@ -52,7 +52,7 @@ set (CEDAR_LIB_DIR        "${CEDAR_HOME}/lib"         CACHE PATH "Directory all 
 set (CEDAR_EXE_DIR        "${CEDAR_HOME}/bin"         CACHE PATH "Directory all cedar executables will be stored in.")
 set (CEDAR_LOG_DIR        "${CEDAR_HOME}/logs"        CACHE PATH "Default directory for all log files.")
 set (CEDAR_BUILD_STATIC_LIBS              0           CACHE BOOL "Build all libraries statically (*.a)?")
-set (CEDAR_PORTABLE                		    0           CACHE BOOL "Build a portable cedar version? You may need to run (your OS)deployqt afterwards.")
+set (CEDAR_PORTABLE                       0           CACHE BOOL "Build a portable cedar version? You may need to run (your OS)deployqt afterwards.")
 set (CEDAR_PORTABLE_HOME_DIR              0           CACHE BOOL "Save the userdata (.cedar) relative to the executable for portability.")
 set (CEDAR_PORTABLE_MAC_BUNDLE_PATHS      0           CACHE BOOL "Rename directories to resolve mac bundle conflicts? You need to run macdeployqt afterwards manually if you want to build a bundle.")
 set (CEDAR_PORTABLE_MINIMAL_VERSION       0           CACHE BOOL "The portable version requires only minimal dependencies.")
