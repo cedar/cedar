@@ -403,8 +403,8 @@ void cedar::aux::gui::Configurable::appendRootConfigurable(cedar::aux::Configura
   {
     type_name= type_name.substr( type_name.rfind(":") + 1 );
   }
-#endif
   else
+#endif      
   {
     type_name = cedar::aux::replace(type_name, "::", ".");
   }
