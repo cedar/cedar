@@ -49,6 +49,7 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <iostream>
+#include <QMimeData>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
