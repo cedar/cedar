@@ -69,7 +69,7 @@ set(BOOST_INCLUDEDIR "${CEDAR_HOME}/lib/installed/x64-windows/include/boost")
 set(BOOST_LIBRARYDIR "${CEDAR_HOME}/lib/installed/x64-windows/lib")
 link_directories(${BOOST_LIBRARYDIR})
 set(BOOST_ROOT "${CEDAR_HOME}/lib/installed/x64-windows")
-set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_DEBUG OFF)
 
