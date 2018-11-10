@@ -75,6 +75,10 @@ set (CEDAR_DEPENDENCY_QT5 "${CEDAR_LIB_DIR}" CACHE PATH "This is the default pat
 set (CEDAR_DEPENDENCY_GLEW "${CEDAR_LIB_DIR}" CACHE PATH "This is the default path in which cedar tries to find the GLEW library.")
 set (CEDAR_DEPENDENCY_LIBRARIES "${CEDAR_LIB_DIR}"    CACHE PATH "This is the default path in which cedar tries to find external libraries.")
 
+if(CEDAR_USE_QT5)
+  set(QT_UIC_EXECUTABLE ${CEDAR_DEPENDENCY_QT5}/uic.exe)
+endif(CEDAR_USE_QT5)
+
 # optional dependencies
 set (CEDAR_DEPENDENCY_FFTW "${CEDAR_HOME}/libs"                CACHE PATH "This is the default path in which cedar tries to find FFTW.")
 
