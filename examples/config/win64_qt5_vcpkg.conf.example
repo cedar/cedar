@@ -67,13 +67,13 @@ set (CEDAR_COVERAGE_TEST                  0           CACHE BOOL "Execute covera
 set (CEDAR_BUILD_VALGRIND_CHECK           0           CACHE BOOL "Execute valgrind memory check? (Disabling this will save testing time, especially on Debug build.)")
 
 # mandatory dependencies
-set (CEDAR_OPENCV_CMAKE_DIR "${CEDAR_HOME}/libs"     CACHE PATH "Directory where CMake will find the OpenCVConfig.cmake file.")
-set (CEDAR_DEPENDENCY_QWT "${CEDAR_HOME}/libs"             CACHE PATH "This is the default path in which cedar tries to find qwt.")
-set (CEDAR_DEPENDENCY_QWTPLOT3D "${CEDAR_HOME}/libs" CACHE PATH "This is the default path in which cedar tries to find qwtplot3d.")
-set (CEDAR_DEPENDENCY_QGLVIEWER "${CEDAR_HOME}/libs" CACHE PATH "This is the default path in which cedar tries to find QGLViewer.")
-set (CEDAR_DEPENDENCY_QT5 "${CEDAR_HOME}/libs" CACHE PATH "This is the default path in which cedar tries to find the QT5Library.")
-set (CEDAR_DEPENDENCY_GLEW "${CEDAR_HOME}/libs" CACHE PATH "This is the default path in which cedar tries to find the GLEW library.")
-set (CEDAR_DEPENDENCY_LIBRARIES "${CEDAR_HOME}/libs"    CACHE PATH "This is the default path in which cedar tries to find external libraries.")
+set (CEDAR_OPENCV_CMAKE_DIR "${CEDAR_LIB_DIR}"     CACHE PATH "Directory where CMake will find the OpenCVConfig.cmake file.")
+set (CEDAR_DEPENDENCY_QWT "${CEDAR_LIB_DIR}"             CACHE PATH "This is the default path in which cedar tries to find qwt.")
+set (CEDAR_DEPENDENCY_QWTPLOT3D "${CEDAR_LIB_DIR}" CACHE PATH "This is the default path in which cedar tries to find qwtplot3d.")
+set (CEDAR_DEPENDENCY_QGLVIEWER "${CEDAR_LIB_DIR}" CACHE PATH "This is the default path in which cedar tries to find QGLViewer.")
+set (CEDAR_DEPENDENCY_QT5 "${CEDAR_LIB_DIR}" CACHE PATH "This is the default path in which cedar tries to find the QT5Library.")
+set (CEDAR_DEPENDENCY_GLEW "${CEDAR_LIB_DIR}" CACHE PATH "This is the default path in which cedar tries to find the GLEW library.")
+set (CEDAR_DEPENDENCY_LIBRARIES "${CEDAR_LIB_DIR}"    CACHE PATH "This is the default path in which cedar tries to find external libraries.")
 
 # optional dependencies
 set (CEDAR_DEPENDENCY_FFTW "${CEDAR_HOME}/libs"                CACHE PATH "This is the default path in which cedar tries to find FFTW.")
