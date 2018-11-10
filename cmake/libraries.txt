@@ -91,6 +91,8 @@ link_directories(${CEDAR_DEPENDENCY_LIBRARIES})
 link_directories(${CEDAR_DEPENDENCY_QT5})
 link_directories(${CEDAR_OPENCV_CMAKE_DIR})
 link_directories(${CEDAR_DEPENDENCY_QGLVIEWER})
+link_directories(${BOOST_INCLUDEDIR})
+link_directories(${CEDAR_DEPENDENCY_GLEW})
 endif(WIN32)
 
 # Boost
