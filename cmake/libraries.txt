@@ -48,6 +48,10 @@ else()
   message("-- Will compile despite missing libraries.")
 endif()
 
+if(WIN32)
+  add_definitions(/MP)
+endif()
+
 # Qt
 message("-- Searching for Qt...")
 
