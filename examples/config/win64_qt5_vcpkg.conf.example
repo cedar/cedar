@@ -36,17 +36,6 @@
 
 # Configuration file for CMake
 
-#windows only
-if (WIN32)
-#set(BOOST_INCLUDEDIR "C:/boost_1_65_0/")
-#set(BOOST_LIBRARYDIR "C:/boost_1_65_0/lib64-msvc-14.0")
-#link_directories(${BOOST_LIBRARYDIR})
-#set(BOOST_ROOT "C:/boost_1_65_0/boost")
-set(Boost_USE_STATIC_LIBS ON)
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_DEBUG ON)
-endif(WIN32)
-
 # general options
 set (CEDAR_LIB_DIR        "${CEDAR_HOME}/lib"         CACHE PATH "Directory all cedar libraries will be stored in.")
 set (CEDAR_EXE_DIR        "${CEDAR_HOME}/bin"         CACHE PATH "Directory all cedar executables will be stored in.")
@@ -66,21 +55,39 @@ set (CEDAR_BUILD_TESTS                    0           CACHE BOOL "Build unit and
 set (CEDAR_COVERAGE_TEST                  0           CACHE BOOL "Execute coverage testing? (Enabling this will force Debug build.)")
 set (CEDAR_BUILD_VALGRIND_CHECK           0           CACHE BOOL "Execute valgrind memory check? (Disabling this will save testing time, especially on Debug build.)")
 
+set(Qt5Widgets_DIR "${CEDAR_HOME}/lib/installed/x64-windows/share/cmake/Qt5Widgets")
+set(Qt5PrintSupport_DIR "${CEDAR_HOME}/lib/installed/x64-windows/share/cmake/Qt5PrintSupport")
+set(Qt5OpenGL_DIR "${CEDAR_HOME}/lib/installed/x64-windows/share/cmake/Qt5OpenGL")
+set(Qt5Charts_DIR "${CEDAR_HOME}/lib/installed/x64-windows/share/cmake/Qt5Charts")
+set(Qt5DataVisualization_DIR "${CEDAR_HOME}/lib/installed/x64-windows/share/cmake/Qt5DataVisualization")
+set(Qt53DCore_DIR "${CEDAR_HOME}/lib/installed/x64-windows/share/cmake/Qt53DCore")
+set(Qt53DExtras_DIR "${CEDAR_HOME}/lib/installed/x64-windows/share/cmake/Qt53DExtras")
+set(Qt5Xml_DIR "${CEDAR_HOME}/lib/installed/x64-windows/share/cmake/Qt5Xml")
+set(Qt5Svg_DIR "${CEDAR_HOME}/lib/installed/x64-windows/share/cmake/Qt5Svg")
+
+set(BOOST_INCLUDEDIR "${CEDAR_HOME}/lib/installed/x64-windows/include/boost")
+set(BOOST_LIBRARYDIR "${CEDAR_HOME}/lib/installed/x64-windows/lib")
+link_directories(${BOOST_LIBRARYDIR})
+set(BOOST_ROOT "${CEDAR_HOME}/lib/installed/x64-windows")
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_DEBUG OFF)
+
 # mandatory dependencies
-set (CEDAR_OPENCV_CMAKE_DIR "${CEDAR_LIB_DIR}"     CACHE PATH "Directory where CMake will find the OpenCVConfig.cmake file.")
-set (CEDAR_DEPENDENCY_QWT "${CEDAR_LIB_DIR}"             CACHE PATH "This is the default path in which cedar tries to find qwt.")
+set (CEDAR_OPENCV_CMAKE_DIR "${CEDAR_LIB_DIR}/installed/x64-windows/share/opencv"     CACHE PATH "Directory where CMake will find the OpenCVConfig.cmake file.")
+set (CEDAR_DEPENDENCY_QWT "${CEDAR_LIB_DIR}/installed/x64-windows/share/qwt"             CACHE PATH "This is the default path in which cedar tries to find qwt.")
 set (CEDAR_DEPENDENCY_QWTPLOT3D "${CEDAR_LIB_DIR}" CACHE PATH "This is the default path in which cedar tries to find qwtplot3d.")
-set (CEDAR_DEPENDENCY_QGLVIEWER "${CEDAR_LIB_DIR}" CACHE PATH "This is the default path in which cedar tries to find QGLViewer.")
-set (CEDAR_DEPENDENCY_QT5 "${CEDAR_LIB_DIR}" CACHE PATH "This is the default path in which cedar tries to find the QT5Library.")
-set (CEDAR_DEPENDENCY_GLEW "${CEDAR_LIB_DIR}" CACHE PATH "This is the default path in which cedar tries to find the GLEW library.")
-set (CEDAR_DEPENDENCY_LIBRARIES "${CEDAR_LIB_DIR}"    CACHE PATH "This is the default path in which cedar tries to find external libraries.")
+set (CEDAR_DEPENDENCY_QGLVIEWER "${CEDAR_LIB_DIR}/installed/x64-windows/include/libqglviewer" CACHE PATH "This is the default path in which cedar tries to find QGLViewer.")
+set (CEDAR_DEPENDENCY_QT5 "${CEDAR_LIB_DIR}/installed/x64-windows/tools/qt5" CACHE PATH "This is the default path in which cedar tries to find the QT5Library.")
+set (CEDAR_DEPENDENCY_GLEW "${CEDAR_LIB_DIR}/installed/x64-windows/include/gl" CACHE PATH "This is the default path in which cedar tries to find the GLEW library.")
+set (CEDAR_DEPENDENCY_LIBRARIES "${CEDAR_LIB_DIR}/installed/x64-windows/lib"    CACHE PATH "This is the default path in which cedar tries to find external libraries.")
 
 if(CEDAR_USE_QT5)
   set(QT_UIC_EXECUTABLE ${CEDAR_DEPENDENCY_QT5}/uic.exe)
 endif(CEDAR_USE_QT5)
 
 # optional dependencies
-set (CEDAR_DEPENDENCY_FFTW "${CEDAR_HOME}/libs"                CACHE PATH "This is the default path in which cedar tries to find FFTW.")
+set (CEDAR_DEPENDENCY_FFTW "${CEDAR_LIB_DIR}/installed/x64-windows/include"                CACHE PATH "This is the default path in which cedar tries to find FFTW.")
 
 # installation
 set (CMAKE_INSTALL_PREFIX  "/usr/local")
