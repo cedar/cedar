@@ -23,7 +23,6 @@ with cedar. If not, see <http://www.gnu.org/licenses/>.
 
 # cedar
 
-
 Build status Ubuntu 16.04: [![Build Status](https://dev.azure.com/ini-cedar/cedar/_apis/build/status/ubuntu1604)](https://dev.azure.com/ini-cedar/cedar/_build/latest?definitionId=2)
 
 Build status MacOS 10.13: [![Build Status](https://dev.azure.com/ini-cedar/cedar/_apis/build/status/macos1013)](https://dev.azure.com/ini-cedar/cedar/_build/latest?definitionId=5)
