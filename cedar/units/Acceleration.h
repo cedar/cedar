@@ -57,12 +57,4 @@ namespace cedar
     using boost::units::si::metre_per_second_squared;
     using boost::units::si::metres_per_second_squared;
 
-    //!@brief template concretion for acceleration
-    typedef UnitMatrix<boost::units::si::acceleration> AccelerationMatrix;
-
-    //!@brief default unit for acceleration
-    extern CEDAR_UNITS_LIB_EXPORT const cedar::unit::Acceleration DEFAULT_ACCELERATION_UNIT;
-  }
-}
-
-#endif // CEDAR_UNITS_ACCELERATION_H
+  
