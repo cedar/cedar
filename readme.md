@@ -23,9 +23,8 @@ with cedar. If not, see <http://www.gnu.org/licenses/>.
 
 # cedar
 
-Build status master branch: [![Build Status](https://travis-ci.org/cedar/cedar.svg?branch=master)](https://travis-ci.org/cedar/cedar)
 
-Build status Ubuntu 16.04: [![Build Status](https://dev.azure.com/ini-cedar/cedar/_apis/build/status/cedar-Ubuntu1604-CI)](https://dev.azure.com/ini-cedar/cedar/_build/latest?definitionId=2)
+Build status Ubuntu 16.04: [![Build status](https://dev.azure.com/ini-cedar/cedar/_apis/build/status/cedar-Ubuntu1604)](https://dev.azure.com/ini-cedar/cedar/_build/latest?definitionId=2)
 
 Build status MacOS 10.13: [![Build Status](https://dev.azure.com/ini-cedar/cedar/_apis/build/status/cedar-macos)](https://dev.azure.com/ini-cedar/cedar/_build/latest?definitionId=5)
 
