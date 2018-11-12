@@ -68,10 +68,7 @@ namespace cedar
         pWidget->setDecimals(precision);
       }
 
-      template<>
-      inline void NumericWidgetPolicy<cedar::unit::Acceleration, QDoubleSpinBox>::setValue(QDoubleSpinBox* pWidget, const cedar::unit::Acceleration& newValue)
-      {
-        pWidget->setValue(newValue/(cedar::unit::meters/(cedar::unit::seconds * cedar::unit::seconds)));
+   idget->setValue(newValue/(cedar::unit::meters/(cedar::unit::seconds * cedar::unit::seconds)));
         pWidget->setSuffix(" m s^-2");
       }
 
