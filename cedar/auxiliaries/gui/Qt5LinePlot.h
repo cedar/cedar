@@ -278,7 +278,7 @@ private:
   static std::vector<Qt::PenStyle> mLineStyles;
 
   //! If true, the plot will not complain about 0d data. Otherwise, 0D data will lead it to emit a dataChanged signal.
-  bool mPlot0D;
+  bool mPlot0Dfail;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
