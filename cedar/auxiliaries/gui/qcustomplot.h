@@ -6645,6 +6645,7 @@ protected:
   QPen mPen, mSelectedPen;
   double mLength;
   double mTest;
+  double mTest2;
   BracketStyle mStyle;
   
   // reimplemented virtual methods:
