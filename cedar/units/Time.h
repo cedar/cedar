@@ -53,16 +53,7 @@ namespace cedar
   namespace unit
   {
     typedef boost::units::quantity<boost::units::si::time> Time;
-    using boost::units::si::second;
-    using boost::units::si::seconds;
 
-    //!@brief template concretion for time
-    typedef UnitMatrix<boost::units::si::time> TimeMatrix;
-
-    //!@brief default unit for time
-    extern CEDAR_UNITS_LIB_EXPORT const cedar::unit::Time DEFAULT_TIME_UNIT;
-  }
-}
 
 
 #endif // CEDAR_UNITS_TIME_H
