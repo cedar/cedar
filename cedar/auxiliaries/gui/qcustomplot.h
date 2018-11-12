@@ -6644,6 +6644,7 @@ protected:
   enum AnchorIndex {aiCenter};
   QPen mPen, mSelectedPen;
   double mLength;
+  double mTest;
   BracketStyle mStyle;
   
   // reimplemented virtual methods:
