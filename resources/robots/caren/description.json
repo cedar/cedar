@@ -273,7 +273,7 @@
         {
           "cedar.dev.schunk.PowerCubeChain":
           {
-            "requires channel": "canbus",
+            "requires channel": "canbus1",
             "module mapping":
             [
               "11"
@@ -321,8 +321,8 @@
 			    {
 			        "angle limits":
 			        {
-						"lower limit": "-3.1415927",
-						"upper limit": "3.1415927"
+						"lower limit": "-1.57079635",
+						"upper limit": "1.57079635"
 					},
 			        "velocity limits":
 			        {
@@ -369,7 +369,7 @@
         {
           "cedar.dev.schunk.PowerCubeChain":
           {
-            "requires channel": "canbus",
+            "requires channel": "canbus0",
             "module mapping":
             [
               "13",
@@ -417,8 +417,8 @@
 			  {
 				  "angle limits":
 				  {
-					  "lower limit": "-3.1415927",
-					  "upper limit": "3.1415927"
+					  "lower limit": "-1.8",
+					  "upper limit": "1.8"
 				  },
 				  "velocity limits":
 				  {
@@ -570,12 +570,21 @@
       {
       }
     },
-    "canbus":
+    "canbus0":
     {
       "cedar.dev.schunk.SMPCanBusChannel":
       {
+        "can port": "0"
+      }
+    },
+    "canbus1":
+    {
+      "cedar.dev.schunk.SMPCanBusChannel":
+      {
+        "can port": "1"
       }
     }
+
   },
 
   "component connections": 
