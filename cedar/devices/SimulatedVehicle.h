@@ -79,7 +79,6 @@ public:
     //--------------------------------------------------------------------------------------------------------------------
   public:
     bool applyCrashbrake() override;
-    bool getConnectAutomatically() override;
 
   public slots:
 //    @brief reacts to a change in the number of joints and sets an almost-zero initial configuration

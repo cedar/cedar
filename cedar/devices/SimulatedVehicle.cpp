@@ -127,9 +127,3 @@ bool cedar::dev::SimulatedVehicle::applyCrashbrake()
 
   return true;
 }
-
-bool cedar::dev::SimulatedVehicle::getConnectAutomatically()
-{
-  return true;
-}
-

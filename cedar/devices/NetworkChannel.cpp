@@ -52,7 +52,6 @@ _mPort(new cedar::aux::UIntParameter(this, "port", 10000, 0, 65535))
 
 cedar::dev::NetworkChannel::~NetworkChannel()
 {
-  cedar::dev::Channel::prepareChannelDestructAbsolutelyRequired();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

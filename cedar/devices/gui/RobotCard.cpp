@@ -209,10 +209,10 @@ void cedar::dev::gui::RobotCard::updateConnectionIcon()
 
     this->mpConfigurationSelector->setEnabled(false);
   }
-  else if (robot->areAllComponentsCommunicating())
+  else if (robot->areSomeComponentsCommunicating())
   {
     this->mpConnectButton->setIcon(QIcon(":/cedar/dev/gui/icons/partially_connected.svg"));
-    this->mpConnectButton->setToolTip("Patially connected");
+    this->mpConnectButton->setToolTip("Partially connected");
     this->mpConnectButton->setStyleSheet(
        "QPushButton { \
                 background: qlineargradient(x1:0, y1:0, x2:1, y2:1,\
@@ -249,7 +249,7 @@ void cedar::dev::gui::RobotCard::connectClicked()
     cedar::dev::RobotPtr robot = cedar::dev::RobotManagerSingleton::getInstance()->getRobot(this->getRobotName());
     if (!robot->areSomeComponentsCommunicating())
     {
-      robot->startCommunicationOfComponents(true); // suppres user interaction!... why?
+      robot->startCommunicationOfComponents(true); // suppress user interaction!... why?
     }
     else
     {

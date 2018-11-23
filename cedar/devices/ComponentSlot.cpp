@@ -156,12 +156,6 @@ void cedar::dev::ComponentSlot::instantiateConfiguration(const std::string& conf
   auto component= this->getComponent();
 
   component->readConfiguration(configuration);
-
-  if (component
-      && component->getConnectAutomatically())
-  {
-    component->startCommunication(true);
-  }
 }
 
 

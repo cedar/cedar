@@ -161,7 +161,10 @@ void cedar::dev::Robot::startCommunicationOfComponents(bool suppressUserInteract
 
     auto component = slot->getComponent();
 
-    component->startCommunication(suppressUserInteractionOfComponents);
+    if (!component->isCommunicating())
+    {
+      component->startCommunication(suppressUserInteractionOfComponents);
+    }
   }
 }
 

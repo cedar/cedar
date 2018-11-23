@@ -12,10 +12,11 @@
         <file>icons/drop_robot.png</file>
         <file>icons/caren_icon_256.png</file>
         <file>icons/youbot_icon_256.png</file>
-	<file>icons/twoDArm_icon_256.png</file>
-	<file>icons/twoDArm_icon.svg</file>
+	    <file>icons/twoDArm_icon_256.png</file>
+	    <file>icons/twoDArm_icon.svg</file>
         <file>icons/caren_arm.svg</file>
         <file>icons/caren_trunk.svg</file>
         <file>icons/caren_hand.svg</file>
+        <file>icons/caren_head.svg</file>
     </qresource>
 </RCC>

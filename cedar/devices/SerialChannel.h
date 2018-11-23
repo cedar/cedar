@@ -54,6 +54,7 @@
   #include <boost/asio.hpp>
 #endif // Q_MOC_RUN
 #include <string>
+#include <QReadWriteLock>
 
 
 //!@brief Channel to serial devies, based on Boost ASIO.
@@ -89,8 +90,7 @@ public:
   //!@brief  Closes the channel.
   virtual void closeHook();
 
-  //!@brief Checks whether the port is open.
-  bool isOpen() const;
+  virtual bool isOpen() const;
 
   //!@brief Returns the device path and name of the serial port.
   const std::string& getDevicePath() const;
@@ -178,6 +178,8 @@ private:
 
   //! current status of the read operation
   enum ReadResult mReadResult;
+
+  QReadWriteLock mLock;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

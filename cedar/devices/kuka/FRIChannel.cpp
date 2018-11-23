@@ -132,6 +132,13 @@ void cedar::dev::kuka::FRIChannel::closeHook()
   }
 }
 
+bool cedar::dev::kuka::FRIChannel::isOpen() const
+{
+  std::cout << "cedar::dev::kuka::FRIChannel::isOpen() needs to be implemented!" << std::endl;
+
+  return true;
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // wrapped fri-functions

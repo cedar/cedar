@@ -47,9 +47,6 @@
 // FORWARD DECLARATIONS
 #include "cedar/devices/Channel.fwd.h"
 
-// SYSTEM INCLUDES
-#include <QReadWriteLock>
-
 
 /*!@brief Communication channel for a component or device (e.g., serial communication).
  *
@@ -91,7 +88,7 @@ public:
   void close();
 
   //!@brief Returns whether the channel is open.
-  virtual bool isOpen();
+  virtual bool isOpen() const = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -115,34 +112,18 @@ protected:
   //!@brief Executed after the code in @em closeHook.
   virtual void postCloseHook(){};
 
-  //! Call this in the inheriting classes destructor
-  void prepareChannelDestructAbsolutelyRequired();
-
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //! Increases the use count of the channel. If the use cound was zero before, the channel is opened.
-  //!@todo This is more of a quick fix, may want to rewrite things so this is solved via shared ptrs.
-  void increaseUseCount();
-
-  //! Decreases the use count of the channel. If the resulting use count is zero, the channel is closed.
-  void decreaseUseCount();
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! read/write lock for the channel
-  QReadWriteLock mLock;
-
-
+  // none yet
 private:
-  //! Use count
-  unsigned int mUseCount;
-
-  bool mDestructWasPrepared; // helper bool
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

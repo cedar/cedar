@@ -76,14 +76,18 @@ public:
   YarpChannel()
 :
   mReadPortName(new cedar::aux::StringParameter(this, "readPortName", "defaultRead")),
-  mWritePortName(new cedar::aux::StringParameter(this, "writePortName", "defaultWrite"))
-{
+  mWritePortName(new cedar::aux::StringParameter(this, "writePortName", "defaultWrite")),
+  mIsOpen(false)
+  {
 
-}
+  }
 
   ~YarpChannel()
   {
-    prepareChannelDestructAbsolutelyRequired();
+    if (isOpen())
+    {
+      close();
+    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -217,6 +221,11 @@ protected:
     }
   }
 
+  bool isOpen() const
+  {
+    return mIsOpen;
+  }
+
 //--------------------------------------------------------------------------------------------------------------------
 // private methods
 //--------------------------------------------------------------------------------------------------------------------
@@ -231,6 +240,7 @@ protected:
 private:
   std::map<std::string, TypeReaderPtr> mReaderMap;
   std::map<std::string, TypeWriterPtr> mWriterMap;
+  bool mIsOpen;
 
 //--------------------------------------------------------------------------------------------------------------------
 // parameters

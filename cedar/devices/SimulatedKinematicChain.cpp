@@ -117,9 +117,3 @@ void cedar::dev::SimulatedKinematicChain::applyInitialConfigurationController(cv
                   )
                  );
 }
-
-bool cedar::dev::SimulatedKinematicChain::getConnectAutomatically()
-{
-  return true;
-}
-

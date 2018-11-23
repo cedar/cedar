@@ -1699,13 +1699,6 @@ void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
   mRunningComponentInstancesAliveTime[ this ]= now; 
   mRunningComponentInstancesStartTime[ this ]= now;
 
-
-// todo: the following needs to be done from the new thread - it may block the GUI ...
-  if (this->mChannel)
-  {
-    this->mChannel->open();
-  }
-
   if (this->mCommandData->getInstalledTypes().empty() && this->mMeasurementData->getInstalledTypes().empty())
   {
     cedar::aux::LogSingleton::getInstance()->warning
@@ -2427,9 +2420,3 @@ int cedar::dev::Component::getMeasurementMatrixType()
     return CV_32F;
   }
 }
-
-bool cedar::dev::Component::getConnectAutomatically()
-{
-  return false; // sane default
-}
-

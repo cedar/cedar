@@ -122,6 +122,7 @@ public:
 protected:
   void openHook();
   void closeHook();
+  bool isOpen() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

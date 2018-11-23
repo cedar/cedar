@@ -62,7 +62,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  bool getConnectAutomatically() override;
+  // none yet
 
 
 public slots:
