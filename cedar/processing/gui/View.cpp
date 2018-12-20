@@ -48,6 +48,7 @@
 #include <QScrollBar>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QMimeData>
 #include <iostream>
 #include <QMimeData>
 
