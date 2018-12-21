@@ -635,25 +635,44 @@ void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGrap
   if (this->getDisplayMode() == cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT)
   {
     QFont font = painter->font();
-      //font.setFamily("Helvetica");
-    QFontMetrics fm(font);
-
-
-
     font.setWeight( QFont::DemiBold );
     font.setKerning(true);
     font.setPointSize(9);
     painter->setFont(font);
+    QFontMetrics fm(font);
+    int ww = this->width()-M_ICON_SIZE-2.5*padding;
+    int wh = 2*fm.lineSpacing()+2;
+    int wx = 2*padding + M_ICON_SIZE;
+    int wy = 2;
+    QString wn = this->getStep()->getName().c_str();
 //    painter->drawText(QPointF(2 * padding + M_ICON_SIZE, 25), this->getStep()->getName().c_str());
-    painter->drawText(2*padding + M_ICON_SIZE,2,this->width()-M_ICON_SIZE-2.5*padding,2*fm.lineSpacing()+2,Qt::TextWrapAnywhere,this->getStep()->getName().c_str()); //|Qt::TextDontClip for showing full name
+    if(fm.width(wn) > (ww - 1))
+    {
+        painter->drawText(wx,wy,ww,wh,Qt::TextWrapAnywhere,wn); //|Qt::TextDontClip for showing full name
+    }
+    else
+    {
+        painter->drawText(wx,wy + 1 + (fm.lineSpacing()/2),ww,wh,Qt::TextWrapAnywhere,wn);
+    }
 
 
       font.setWeight( QFont::Light );
       font.setKerning(true);
       font.setPointSize(8);
       painter->setFont(font);
-      painter->drawText(QPointF(2 * padding + M_ICON_SIZE, 45), this->mClassId->getClassNameWithoutNamespace().c_str());
+      QFontMetrics fm2(font);
+     // painter->drawText(QPointF(2 * padding + M_ICON_SIZE, 43), this->mClassId->getClassNameWithoutNamespace().c_str());
 
+      QString wn2 = this->mClassId->getClassNameWithoutNamespace().c_str();
+      if(fm2.width(wn2) > (ww - 1))
+      {
+          painter->drawText(wx,34,ww-10,fm2.lineSpacing()+2,Qt::TextWrapAnywhere,wn2);
+          painter->drawText(wx+96,34,15,fm2.lineSpacing()+2,Qt::TextWrapAnywhere,"...");
+      }
+      else
+      {
+          painter->drawText(wx,34,ww,fm2.lineSpacing()+2,Qt::TextWrapAnywhere,wn2);
+      }
 
 
   }
