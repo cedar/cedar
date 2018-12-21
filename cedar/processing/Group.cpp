@@ -880,6 +880,8 @@ std::string cedar::proc::Group::findNewIdentifier(const std::string& basis, boos
     return basis;
   }
 
+
+
   std::string base_str = basis;
 
   size_t last_number = basis.find_last_not_of("0123456789");
@@ -1702,7 +1704,9 @@ std::string cedar::proc::Group::duplicate(const std::string& elementName, const 
   }
   else // default name
   {
-    modified_name = this->getUniqueIdentifier(elementName);
+    //omitted the camel case, just append numbers!
+    modified_name = findNewIdentifier(elementName, boost::bind(&cedar::proc::Group::nameExists, this, _1));
+    //modified_name = this->getUniqueIdentifier(elementName); // old way with camel case split
   }
   // set unique name
   new_elem->setName(modified_name);
