@@ -380,6 +380,29 @@ void cedar::proc::gui::StepManager::fillPresetLists()
           "cedar.processing.sources.Noise"
   };
 
+
+  std::vector<std::string> jokeitSpecial{
+          "cedar.processing.WeightedSum",
+          "cedar.dynamics.HebbianConnection",
+          "cedar.processing.sources.SpatialTemplate",
+          "cedar.processing.steps.Convolution",
+          "cedar.processing.steps.CoordinateTransformation",
+          "cedar.dynamics.Preshape",
+          "cedar.dynamics.NeuralField",
+          "cedar.dynamics.SpaceToRateCode",
+          "cedar.dynamics.SpaceCodeToRateMatrix",
+          "cedar.dynamics.RateMatrixToSpaceCode",
+          "cedar.dynamics.SerialOrder",
+          "cedar.processing.steps.ColorConversion",
+          "cedar.processing.steps.Histogram",
+          "cedar.processing.steps.Threshold",
+          "cedar.proc.steps.ImageGradient",
+          "cedar.processing.steps.ChannelMerge",
+          "cedar.processing.steps.ChannelSplit",
+          "cedar.processing.steps.ImageTransform",
+          "cedar.processing.steps.pairsGame"
+  };
+
   std::vector<std::string> allSteps;
 
   mPreSets.insert(std::make_pair("legacy",legacySteps));
@@ -387,6 +410,8 @@ void cedar::proc::gui::StepManager::fillPresetLists()
   mPreSets.insert(std::make_pair("minimal",minimalSteps));
 
   mPreSets.insert(std::make_pair("all",allSteps));
+
+  mPreSets.insert(std::make_pair("jokeit special",jokeitSpecial));
 
 //  std::vector<std::string> customSteps; //This probably empty on initialization
 //  mPreSets.insert(std::make_pair(mCustomSetName,customSteps));
