@@ -147,6 +147,7 @@ void cedar::aux::gui::Viewer::grabBuffer()
 #endif // CEDAR_USE_QGLVIEWER
 }
 
+//TODO: Why is this function necessary if we do not use the QGLViewer?
 #ifndef CEDAR_USE_QGLVIEWER
 QImage cedar::aux::gui::Viewer::grabFrameBuffer()
 {

@@ -354,11 +354,25 @@ public:
   //! Returns favorite elements of the user
   std::vector<std::string> getFavedElements() const;
 
+  std::vector<std::string> getHiddenElements() const;
+
   //! Checks if the given element class is a favorite
   bool isFavoriteElement(const std::string& className) const;
 
+  bool isHiddenElement(const std::string& className) const;
+
   //! Favorites or unfavorites an element class.
   void setFavorite(const std::string& className, bool favorite);
+
+  void setHidden(const std::string& className, bool isHidden,bool emitSignal=true);
+
+  void toggleHidden(const std::string& className);
+
+  void emitHiddenElementsChangedSignal();
+
+  void setHiddenPreset(const std::string presetName);
+
+  std::string getHiddenPreset() const;
 
   QPoint getIdeSize();
 
@@ -366,6 +380,7 @@ public:
 
 signals:
   void elementFavoritesChanged();
+  void hiddenElementsChanged();
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -493,6 +508,11 @@ private:
 
   //!@brief A set of user-faved elements
   cedar::aux::StringVectorParameterPtr _mFavoriteElements;
+
+  //!@brief A set of elements hidden by the user
+  cedar::aux::StringVectorParameterPtr _mHiddenElements;
+
+  cedar::aux::StringParameterPtr _mHiddenPreset;
 
   //! Vector that holds all the user-defined colors parsed from the strings.
   std::vector<UserDefinedColorPtr> mUserDefinedColors;

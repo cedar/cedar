@@ -140,6 +140,17 @@ public:
     return this->mDescription;
   }
 
+  std::string getShortDescription() const
+  {
+    //This is just a heuristic that assumes that descriptions contain a simple sentence as their first line
+    //TODO: Should be replaced with a proper field for a short description
+    std::size_t pos = this->mDescription.find(".");// position of "." in str
+    if(pos!=std::string::npos)
+      return this->mDescription.substr(0,pos);
+    else
+      return this->mDescription;
+  }
+
   /*!@brief Defines a new plot for this type of element
    *
    * @param plotDefinition Definition of the plot.

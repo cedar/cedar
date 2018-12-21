@@ -97,6 +97,7 @@ cedar_add_library(cedarproc
   gui/SettingsDialog.h
   gui/SimulationControl.h
   gui/StepItem.h
+  gui/StepManager.h
   gui/TriggerItem.h
   gui/Group.h
   gui/ToolBox.h

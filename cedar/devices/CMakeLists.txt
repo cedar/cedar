@@ -45,6 +45,12 @@ if (CEDAR_USE_LIB_DC1394)
 	set (linked_libs dc1394)
 endif(CEDAR_USE_LIB_DC1394)
 
+if(CEDAR_USE_YARP)
+  set(yarp_moc_files YarpKinematicChain.h YarpVehicle.h)
+else (CEDAR_USE_YARP)
+  set(yarp_moc_files "")
+endif(CEDAR_USE_YARP)
+
 cedar_add_library(cedardev
                   MOC_HEADERS
                   Component.h
@@ -53,11 +59,10 @@ cedar_add_library(cedardev
                   SimulatedKinematicChain.h
                   SimulatedVehicle.h
                   SimulatedCamera.h
-                  YarpKinematicChain.h
                   SerialChannel.h
                   Odometry.h
                   Vehicle.h
-                  YarpVehicle.h
+                  ${yarp_moc_files}
                   gui/KinematicChainWidget.h
                   gui/KinematicChainMonitorWidget.h
                   gui/KinematicChainCommandWidget.h

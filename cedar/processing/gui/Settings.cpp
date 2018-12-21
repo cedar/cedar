@@ -220,8 +220,17 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   default_favs.push_back("cedar.processing.sources.GaussInput");
   default_favs.push_back("cedar.processing.steps.Component");
 
+
+
   this->_mFavoriteElements = new cedar::aux::StringVectorParameter(this, "favorite elements", default_favs);
   QObject::connect(this->_mFavoriteElements.get(), SIGNAL(valueChanged()), this, SIGNAL(elementFavoritesChanged()));
+
+
+  std::vector<std::string> default_hiddens;
+  this->_mHiddenElements = new cedar::aux::StringVectorParameter(this, "hidden elements", default_hiddens);
+//  QObject::connect(this->_mHiddenElements.get(), SIGNAL(valueChanged()), this, SIGNAL(hiddenElementsChanged()));
+
+  this->_mHiddenPreset = new cedar::aux::StringParameter(this,"preset hidden","all");
 
   this->_mReadOneTimeMessages = new cedar::aux::StringSetParameter(this, "read one-time messages", std::set<std::string>());
 
@@ -329,6 +338,11 @@ std::vector<std::string> cedar::proc::gui::Settings::getFavedElements() const
   return this->_mFavoriteElements->getValue();
 }
 
+std::vector<std::string> cedar::proc::gui::Settings::getHiddenElements() const
+{
+  return this->_mHiddenElements->getValue();
+}
+
 void cedar::proc::gui::Settings::setFavorite(const std::string& className, bool favorite)
 {
   if (favorite)
@@ -344,11 +358,69 @@ void cedar::proc::gui::Settings::setFavorite(const std::string& className, bool 
   }
 }
 
+void cedar::proc::gui::Settings::setHidden(const std::string& className, bool isHidden,bool emitSignal)
+{
+  if (isHidden)
+  {
+    if (!this->isHiddenElement(className))
+    {
+      this->_mHiddenElements->pushBack(className);
+      if(emitSignal)
+      {
+        emit hiddenElementsChanged();
+      }
+    }
+  }
+  else
+  {
+    this->_mHiddenElements->eraseAll(className);
+    if(emitSignal)
+    {
+      emit hiddenElementsChanged();
+    }
+  }
+}
+
+void cedar::proc::gui::Settings::toggleHidden(const std::string& className)
+{
+  bool isHidden = this->isHiddenElement(className);
+  this->setHidden(className,!isHidden);
+}
+
+void cedar::proc::gui::Settings::emitHiddenElementsChangedSignal()
+{
+  emit hiddenElementsChanged();
+}
+
+void cedar::proc::gui::Settings::setHiddenPreset(const std::string presetName)
+{
+  this->_mHiddenPreset->setValue(presetName);
+}
+
+std::string cedar::proc::gui::Settings::getHiddenPreset() const
+{
+  return this->_mHiddenPreset->getValue();
+}
+
 bool cedar::proc::gui::Settings::isFavoriteElement(const std::string& className) const
 {
   for (const auto& favorite : this->getFavedElements())
   {
     if (favorite == className)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+bool cedar::proc::gui::Settings::isHiddenElement(const std::string& className) const
+{
+  for (const auto& hiddenElement : this->getHiddenElements())
+  {
+    if (hiddenElement == className)
     {
       return true;
     }

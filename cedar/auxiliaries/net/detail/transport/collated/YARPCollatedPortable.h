@@ -56,6 +56,7 @@
 #include <yarp/os/Portable.h>
 #include <yarp/os/ConnectionReader.h>
 #include <yarp/os/ConnectionWriter.h>
+#include <yarp/conf/version.h>
 #include <vector>
 
 //!@cond SKIPPED_DOCUMENTATION
@@ -68,8 +69,7 @@
  * 
  */
 template<class T>
-class cedar::aux::net::detail::YARPCollatedPortable : public yarp::os::Portable,
-                                                      boost::noncopyable
+class cedar::aux::net::detail::YARPCollatedPortable : public yarp::os::Portable,boost::noncopyable
 {
     // TODO: seperate into Reader and Writer parts
 
@@ -77,8 +77,13 @@ class cedar::aux::net::detail::YARPCollatedPortable : public yarp::os::Portable,
   // members
   //---------------------------------------------------------------------------
 private:
-  MatrixTypeWrapper<T> mNetType;
-  char                 *mpVals;  // size 1 byte
+#if (YARP_VERSION_MAJOR > 2)
+  mutable MatrixTypeWrapper<T> mNetType;
+  mutable char                 *mpVals;  // size 1 byte
+#else
+   MatrixTypeWrapper<T> mNetType;
+   char                 *mpVals;  // size 1 byte
+#endif //  YARP_VERSION_MAJOR > 2
   size_t               mSizeVals;
 
   typedef CollatedTraits<T>               TraitsType;
@@ -190,7 +195,8 @@ public:
   //
   // the values of the (prepared) header where already checked in 
   // CollatedNetWriter::write()
-  bool write(yarp::os::ConnectionWriter& connection) 
+#if (YARP_VERSION_MAJOR > 2)
+  bool write(yarp::os::ConnectionWriter& connection) const
   {
     int fixed_header_size, variable_header_size, data_size, blocks_array[3];
 
@@ -232,7 +238,51 @@ public:
 
     return true;
   }
+#else
+  bool write(yarp::os::ConnectionWriter& connection)
+  {
+    int fixed_header_size, variable_header_size, data_size, blocks_array[3];
 
+    fixed_header_size = mNetType.mHeader.getFixedSerializationSize();
+    variable_header_size = mNetType.mHeader.getVariableSerializationSize();
+    data_size= mNetType.getDataSize();
+
+    blocks_array[0]= fixed_header_size;
+    blocks_array[1]= variable_header_size;
+    blocks_array[2]= data_size;
+
+    connection.declareSizes( 3, blocks_array );
+    // yarp: This may improve efficiency in some situations.
+
+    //////////////////////////////////////
+    //!@todo Make this a member so it only has to be (de)allocated once
+    std::vector<char> bytes_fixed, bytes_variable;
+    bytes_fixed.resize(fixed_header_size);
+    bytes_variable.resize(variable_header_size);
+    mNetType.mHeader.serializeFixed(&bytes_fixed.front());
+    mNetType.mHeader.serializeVariable(&bytes_variable.front());
+    // write the generated matrix header to network ...
+    connection.appendBlock(&bytes_fixed.front(), fixed_header_size);
+    connection.appendBlock(&bytes_variable.front(), variable_header_size);
+
+    //////////////////////////////////////
+    // write matrix content to network ...
+    if (mpVals == nullptr)
+    {
+      mpVals= static_cast<char*>(malloc(data_size));
+    }
+
+    mNetType.writeToMemory(mpVals); // specialized depending on T
+
+    connection.appendBlock(static_cast<char*>(mpVals), data_size );
+    // YARP will copy this block internally TODO: ist that necessary?
+
+    connection.convertTextMode(); // if connection is text-mode, convert!
+
+    return true;
+  }
+
+#endif  //YARP_VERSION_MAJOR > 2
 };
 
 //!@endcond
