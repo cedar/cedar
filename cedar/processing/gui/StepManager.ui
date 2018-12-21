@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>StepManager</class>
+ <widget class="QWidget" name="StepManager">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>571</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Step Manager</string>
+  </property>
+  <layout class="QVBoxLayout" name="vBoxLayout">
+   <item>
+    <widget class="QComboBox" name="mpComboBox">
+
+    </widget>
+   </item>
+   <item>
+   <widget class="QTableWidget" name="mpTable">
+    <property name="selectionBehavior">
+     <enum>QAbstractItemView::SelectRows</enum>
+    </property>
+    <attribute name="verticalHeaderVisible">
+     <bool>false</bool>
+    </attribute>
+    <column>
+     <property name="text">
+      <string>Name</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Description</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Visible</string>
+     </property>
+    </column>
+   </widget>
+   </item>
+  </layout>
+ </widget>
+</ui>
