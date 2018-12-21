@@ -635,19 +635,27 @@ void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGrap
   if (this->getDisplayMode() == cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT)
   {
     QFont font = painter->font();
+      //font.setFamily("Helvetica");
+    QFontMetrics fm(font);
 
-    font.setWeight( QFont::Light );
-    font.setKerning(true);
-    font.setPointSize(6.5);
-    painter->setFont(font);
-    painter->drawText(QPointF(2 * padding + M_ICON_SIZE, 12), this->mClassId->getClassNameWithoutNamespace().c_str());
+
 
     font.setWeight( QFont::DemiBold );
     font.setKerning(true);
-    font.setPointSize(8);
+    font.setPointSize(9);
     painter->setFont(font);
 //    painter->drawText(QPointF(2 * padding + M_ICON_SIZE, 25), this->getStep()->getName().c_str());
-    painter->drawText(2*padding + M_ICON_SIZE,13,this->width()-M_ICON_SIZE-2.5*padding,this->height()-20,Qt::TextWrapAnywhere,this->getStep()->getName().c_str()); //|Qt::TextDontClip for showing full name
+    painter->drawText(2*padding + M_ICON_SIZE,2,this->width()-M_ICON_SIZE-2.5*padding,2*fm.lineSpacing()+2,Qt::TextWrapAnywhere,this->getStep()->getName().c_str()); //|Qt::TextDontClip for showing full name
+
+
+      font.setWeight( QFont::Light );
+      font.setKerning(true);
+      font.setPointSize(8);
+      painter->setFont(font);
+      painter->drawText(QPointF(2 * padding + M_ICON_SIZE, 45), this->mClassId->getClassNameWithoutNamespace().c_str());
+
+
+
   }
 
   painter->restore(); // restore saved painter settings
