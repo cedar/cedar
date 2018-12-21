@@ -195,7 +195,7 @@ std::string cedar::dev::SerialChannel::read()
     setupRead();
 
     // start the timer for the timeout
-    boost::posix_time::seconds timeout_boost_seconds(getTimeout() / cedar::unit::Time(1.0 * cedar::unit::second));
+    boost::posix_time::seconds timeout_boost_seconds(static_cast<long>(getTimeout() / cedar::unit::Time(1.0 * cedar::unit::second)));
     mTimer.expires_from_now(boost::posix_time::time_duration(timeout_boost_seconds));
     // wait for the timeout to expire and call cedar::dev::SerialChannel::timeoutExpired when it does
     mTimer.async_wait(boost::bind(&cedar::dev::SerialChannel::timeoutExpired, this, boost::asio::placeholders::error));

@@ -2,7 +2,6 @@
 # QT_FOUND - whether QT57 was found or not
 # Qt5_!PACKAGENAME!_INCLUDE_DIRS - the include directories for the different Qt5 Packages
 # QT_VERSION - will be set to 5
-# QT_UIC_EXECUTABLE - will be set to the 5.7 executable
 
 message("-- looking for Qt5...")
 # Set the Qt5 Path to the CMakePrefix Path according to http://doc.qt.io/qt-5/cmake-manual.html
@@ -194,7 +193,7 @@ else()
   SET(QT_FOUND 0)
 endif()
 SET(QT5_FOUND ${QT_FOUND})
-set(QT_UIC_EXECUTABLE ${CEDAR_DEPENDENCY_QT5}/bin/uic)
+#set(QT_UIC_EXECUTABLE ${CEDAR_DEPENDENCY_QT5}/bin/uic)
 
 
 

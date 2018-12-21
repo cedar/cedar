@@ -76,6 +76,8 @@
         <file>steps/matrix_type_conversion.svg</file>
         <file>steps/net_reader.svg</file>
         <file>steps/net_writer.svg</file>
+        <file>steps/local_reader.svg</file>
+        <file>steps/local_writer.svg</file>
         <file>steps/noise.svg</file>
         <file>steps/picture_grabber.svg</file>
         <file>steps/preshape.svg</file>
@@ -132,6 +134,7 @@
         <file>steps/const_vector.svg</file>
         <file>steps/const_matrix.svg</file>
         <file>steps/stack.svg</file>
+        <file>steps/pairsGame.svg</file>
         <file>steps/noop.svg</file>
         <file>steps/delay.svg</file>
         <file>steps/positionofmaximum.svg</file>
