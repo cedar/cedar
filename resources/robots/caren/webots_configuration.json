@@ -8,6 +8,6 @@
     "camera0" : "webots",
     "camera1" : "webots",
     "camera2" : "webots",
-    "head" : "simulator"
+    "head" : "webots"
   }
 }
