@@ -82,7 +82,7 @@ if(CEDAR_USE_QT5)
 endif(CEDAR_USE_QT5)
 
 # optional dependencies
-set (CEDAR_DEPENDENCY_FFTW "/usr/include"                CACHE PATH "This is the default path in which cedar tries to find FFTW.")
+set (CEDAR_DEPENDENCY_FFTW "/usr/include"                 CACHE PATH "This is the default path in which cedar tries to find FFTW.")
 
 # installation
 set (CMAKE_INSTALL_PREFIX  "/usr/local")
