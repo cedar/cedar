@@ -62,8 +62,11 @@ public:
 
   cedar::aux::gl::ScenePtr getScene() const;
 
+  void showTab();
+
 private:
   cedar::aux::gl::ScenePtr mpScene;
+  bool started = false;
 
 }; // class cedar::aux:gui::SceneControl
 

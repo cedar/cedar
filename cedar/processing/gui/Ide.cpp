@@ -444,6 +444,8 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   mpMenuWindows->addAction(this->mpPropertiesWidget->toggleViewAction());
   mpMenuWindows->addAction(this->mpLogWidget->toggleViewAction());
 
+  QObject::connect(this->tabWidget,SIGNAL(currentChanged(int)),this, SLOT(updateTabs(int))); //Fixes a Bug under Mac OS
+
   // set the property pane as the scene's property displayer
 
   QObject::connect(this->mpActionStartPauseSimulation, SIGNAL(triggered()), this, SLOT(startPauseSimulationClicked()));
@@ -1446,6 +1448,14 @@ void cedar::proc::gui::Ide::startPauseSimulationClicked()
     // start global timer
     //!@todo Should this happen automatically as soon as one of the triggers is started? Or should this remain the responsibility of the GUI?
     cedar::aux::GlobalClockSingleton::getInstance()->start();
+  }
+}
+
+void cedar::proc::gui::Ide::updateTabs(int tabid)
+{
+  if(tabWidget->widget(tabid)->objectName().toStdString() == "tabVisualisation") //Fixes a Bug under Mac OS
+  {
+    mpSceneControl->showTab();
   }
 }
 

@@ -180,7 +180,11 @@ macro(cedar_project_add_target)
   if (CMAKE_COMPILER_IS_GNUCC)
   	set_target_properties(${target_name} PROPERTIES LINK_FLAGS "-Wl,--no-as-needed")
   endif(CMAKE_COMPILER_IS_GNUCC)
-  
+
+  if(APPLE)
+    set_target_properties(${target_name} PROPERTIES XCODE_ATTRIBUTE_LD_RUNPATH_SEARCH_PATHS "@loader_path;@loader_path/../lib;@loader_path/../Frameworks")
+  endif(APPLE)
+
   if (MSVC)
     target_link_libraries(${target_name}
                           optimized cedarunits debug cedarunitsd
