@@ -45,7 +45,7 @@
 #include <cedar/processing/InputSlotHelper.h>
 #include <cedar/auxiliaries/MatData.h>
 #include <cedar/auxiliaries/DoubleParameter.h>
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/steps/NumericalIntegration.fwd.h"

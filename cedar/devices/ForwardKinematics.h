@@ -48,7 +48,7 @@
 #include "cedar/devices/KinematicChain.h"
 
 // SYSTEM INCLUDES
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 
 
 /*!@todo describe.

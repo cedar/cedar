@@ -202,38 +202,38 @@ public:
    *
    *  @remarks Not all of this properties are supported on the different camera models
    */
-  static const Id PROP_BRIGHTNESS = CV_CAP_PROP_BRIGHTNESS; // = 10
+  static const Id PROP_BRIGHTNESS = cv::CAP_PROP_BRIGHTNESS; // = 10
   /// @see PROP_BRIGHTNESS
-  static const Id PROP_SATURATION = CV_CAP_PROP_SATURATION; // = 12;
+  static const Id PROP_SATURATION = cv::CAP_PROP_SATURATION; // = 12;
   /// @see PROP_BRIGHTNESS
-  static const Id PROP_HUE = CV_CAP_PROP_HUE; //13;
+  static const Id PROP_HUE = cv::CAP_PROP_HUE; //13;
   /// @see PROP_BRIGHTNESS
-  static const Id PROP_GAIN = CV_CAP_PROP_GAIN; //14;
+  static const Id PROP_GAIN = cv::CAP_PROP_GAIN; //14;
   /// @see PROP_BRIGHTNESS
-  static const Id PROP_EXPOSURE = CV_CAP_PROP_EXPOSURE; //15;
+  static const Id PROP_EXPOSURE = cv::CAP_PROP_EXPOSURE; //15;
   /// @see PROP_BRIGHTNESS
-  static const Id PROP_WHITE_BALANCE_BLUE_U = CV_CAP_PROP_WHITE_BALANCE_BLUE_U; //17;
+  static const Id PROP_WHITE_BALANCE_BLUE_U = cv::CAP_PROP_WHITE_BALANCE_BLUE_U; //17;
   /// @see PROP_BRIGHTNESS
-  static const Id PROP_SHARPNESS = CV_CAP_PROP_SHARPNESS; //20;
+  static const Id PROP_SHARPNESS = cv::CAP_PROP_SHARPNESS; //20;
   /// @see PROP_BRIGHTNESS
-  static const Id PROP_AUTO_EXPOSURE = CV_CAP_PROP_AUTO_EXPOSURE; //21
+  static const Id PROP_AUTO_EXPOSURE = cv::CAP_PROP_AUTO_EXPOSURE; //21
   /// @see PROP_BRIGHTNESS
-  static const Id PROP_GAMMA = CV_CAP_PROP_GAMMA; //22;
+  static const Id PROP_GAMMA = cv::CAP_PROP_GAMMA; //22;
   /// @see PROP_BRIGHTNESS
-  static const Id PROP_TEMPERATURE = CV_CAP_PROP_TEMPERATURE; // 23;
+  static const Id PROP_TEMPERATURE = cv::CAP_PROP_TEMPERATURE; // 23;
 
   /* until now: not supported by cedar
   /// @see PROP_BRIGHTNESS
-  static const Id PROP_TRIGGER = CV_CAP_PROP_TRIGGER; // 24;
+  static const Id PROP_TRIGGER = cv::CAP_PROP_TRIGGER; // 24;
   /// @see PROP_BRIGHTNESS
-  static const Id PROP_TRIGGER_DELAY = CV_CAP_PROP_TRIGGER_DELAY; // 25;
+  static const Id PROP_TRIGGER_DELAY = cv::CAP_PROP_TRIGGER_DELAY; // 25;
   */
   /// @see PROP_BRIGHTNESS
-  static const Id PROP_WHITE_BALANCE_RED_V = CV_CAP_PROP_WHITE_BALANCE_RED_V; // 26;
+  static const Id PROP_WHITE_BALANCE_RED_V = cv::CAP_PROP_WHITE_BALANCE_RED_V; // 26;
   /// @see PROP_BRIGHTNESS
-  static const Id PROP_ZOOM = CV_CAP_PROP_ZOOM; // 27;
+  static const Id PROP_ZOOM = cv::CAP_PROP_ZOOM; // 27;
   /// @see PROP_BRIGHTNESS
-  static const Id PROP_FOCUS = CV_CAP_PROP_FOCUS; // 28;
+  static const Id PROP_FOCUS = cv::CAP_PROP_FOCUS; // 28;
 
 protected:
   // none yet

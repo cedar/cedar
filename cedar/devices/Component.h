@@ -53,7 +53,7 @@
 #include "cedar/auxiliaries/Data.fwd.h"
 
 // SYSTEM INCLUDES
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 #ifndef Q_MOC_RUN
   #include <boost/function.hpp>
   #include <boost/optional.hpp>

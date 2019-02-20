@@ -264,7 +264,7 @@ void cedar::proc::steps::pairsGame::paintPairs()
     bool isStarted = false;
     auto siz = _mSizes->getValue();
     auto tilesize = static_cast<int>(_mTileSize->getValue());
-    cv::rectangle(output, cv::Rect(0,0,siz[1],siz[0]), cv::Scalar(0,0,0),CV_FILLED);
+    cv::rectangle(output, cv::Rect(0,0,siz[1],siz[0]), cv::Scalar(0,0,0),cv::FILLED);
     int g1_x = 0;
     int g2_x = 0;
     int g1_y = 0;
@@ -358,17 +358,17 @@ void cedar::proc::steps::pairsGame::paintPairs()
                 pos2.x = xnew2 + cx;
                 pos2.y = ynew2 + cy;
 
-                cv::rectangle(output, pos1, cv::Scalar(255,255,255),CV_FILLED);
-                cv::rectangle(output, pos2, cv::Scalar(255,255,255),CV_FILLED);
+                cv::rectangle(output, pos1, cv::Scalar(255,255,255),cv::FILLED);
+                cv::rectangle(output, pos2, cv::Scalar(255,255,255),cv::FILLED);
 
-                cv::rectangle(output, cv::Rect(g1_x,g1_y,2,2), cv::Scalar(99,99,99),CV_FILLED);
-                cv::rectangle(output, cv::Rect(g2_x,g2_y,2,2), cv::Scalar(99,99,99),CV_FILLED);
+                cv::rectangle(output, cv::Rect(g1_x,g1_y,2,2), cv::Scalar(99,99,99),cv::FILLED);
+                cv::rectangle(output, cv::Rect(g2_x,g2_y,2,2), cv::Scalar(99,99,99),cv::FILLED);
 
                 int ht = tilesize/2;
 
                 if( ((pos1.x <= g1_x && (pos1.x+tilesize) >= g1_x ) && (pos1.y <= g1_y && (pos1.y+tilesize) >= g1_y )) || ((pos1.x <= g2_x && (pos1.x+tilesize) >= g2_x ) && (pos1.y <= g2_y && (pos1.y+tilesize) >= g2_y )) )
                 {
-                    cv::rectangle(output, pos1, cv::Scalar(255,255,255),CV_FILLED);
+                    cv::rectangle(output, pos1, cv::Scalar(255,255,255),cv::FILLED);
                     cv::Scalar color = colors[j];
                     float rotationDegrees = orientations[j];
                     if(singleFeature)
@@ -393,7 +393,7 @@ void cedar::proc::steps::pairsGame::paintPairs()
 
                 if( ( (pos2.x <= g1_x && (pos2.x+tilesize) >= g1_x ) && (pos2.y <= g1_y && (pos2.y+tilesize) >= g1_y ) ) || ( (pos2.x <= g2_x && (pos2.x+tilesize) >= g2_x ) && (pos2.y <= g2_y && (pos2.y+tilesize) >= g2_y ) ))
                 {
-                    cv::rectangle(output, pos2, cv::Scalar(255,255,255),CV_FILLED);
+                    cv::rectangle(output, pos2, cv::Scalar(255,255,255),cv::FILLED);
                     cv::Scalar color = colors[j];
                     float rotationDegrees = orientations[j];
                     if(singleFeature)
@@ -429,8 +429,8 @@ void cedar::proc::steps::pairsGame::paintPairs()
         }
         else
         {
-            cv::rectangle(output, positions[j], cv::Scalar(255,255,255),CV_FILLED);
-            cv::rectangle(output, positions[j+8], cv::Scalar(255,255,255),CV_FILLED);
+            cv::rectangle(output, positions[j], cv::Scalar(255,255,255),cv::FILLED);
+            cv::rectangle(output, positions[j+8], cv::Scalar(255,255,255),cv::FILLED);
             cv::Scalar color = colors[j];
             float rotationDegrees = orientations[j];
             if(singleFeature)
@@ -467,11 +467,11 @@ void cedar::proc::steps::pairsGame::paintDebug1()
     bool singleFeature = static_cast<bool>(_mSingleFeature->getValue());
     auto siz = _mSizes->getValue();
     auto tilesize = static_cast<int>(_mTileSize->getValue());
-    cv::rectangle(output, cv::Rect(0,0,siz[1],siz[0]), cv::Scalar(0,0,0),CV_FILLED);
+    cv::rectangle(output, cv::Rect(0,0,siz[1],siz[0]), cv::Scalar(0,0,0),cv::FILLED);
     for (unsigned int j = 0; j < nr; ++j)
     {
-        cv::rectangle(output, positions[j], cv::Scalar(255,255,255),CV_FILLED);
-        cv::rectangle(output, positions[j+8], cv::Scalar(255,255,255),CV_FILLED);
+        cv::rectangle(output, positions[j], cv::Scalar(255,255,255),cv::FILLED);
+        cv::rectangle(output, positions[j+8], cv::Scalar(255,255,255),cv::FILLED);
         cv::Scalar color = colors[j];
         float rotationDegrees = orientations[j];
         if(singleFeature)
@@ -504,7 +504,7 @@ void cedar::proc::steps::pairsGame::paintDebug2()
     bool singleFeature = static_cast<bool>(_mSingleFeature->getValue());
     auto siz = _mSizes->getValue();
     auto tilesize = static_cast<int>(_mTileSize->getValue());
-    cv::rectangle(output, cv::Rect(0,0,siz[1],siz[0]), cv::Scalar(0,0,0),CV_FILLED);
+    cv::rectangle(output, cv::Rect(0,0,siz[1],siz[0]), cv::Scalar(0,0,0),cv::FILLED);
 
     for (unsigned int j = 0; j < nr; ++j)
     {
@@ -548,8 +548,8 @@ void cedar::proc::steps::pairsGame::paintDebug2()
         pos2.x = xnew2 + cx;
         pos2.y = ynew2 + cy;
 
-        cv::rectangle(output, pos1, cv::Scalar(255,255,255),CV_FILLED);
-        cv::rectangle(output, pos2, cv::Scalar(255,255,255),CV_FILLED);
+        cv::rectangle(output, pos1, cv::Scalar(255,255,255),cv::FILLED);
+        cv::rectangle(output, pos2, cv::Scalar(255,255,255),cv::FILLED);
 
         cv::Scalar color = colors[j];
         float rotationDegrees = orientations[j];
@@ -583,7 +583,7 @@ void cedar::proc::steps::pairsGame::paintDebug3()
     auto nr = static_cast<unsigned int>(_mNumberOfPairs->getValue());
     auto siz = _mSizes->getValue();
     auto tilesize = static_cast<int>(_mTileSize->getValue());
-    cv::rectangle(output, cv::Rect(0,0,siz[1],siz[0]), cv::Scalar(0,0,0),CV_FILLED);
+    cv::rectangle(output, cv::Rect(0,0,siz[1],siz[0]), cv::Scalar(0,0,0),cv::FILLED);
 
     for (unsigned int j = 0; j < nr; ++j)
     {
@@ -627,8 +627,8 @@ void cedar::proc::steps::pairsGame::paintDebug3()
         pos2.x = xnew2 + cx;
         pos2.y = ynew2 + cy;
 
-        cv::rectangle(output, pos1, cv::Scalar(255,255,255),CV_FILLED);
-        cv::rectangle(output, pos2, cv::Scalar(255,255,255),CV_FILLED);
+        cv::rectangle(output, pos1, cv::Scalar(255,255,255),cv::FILLED);
+        cv::rectangle(output, pos2, cv::Scalar(255,255,255),cv::FILLED);
     }
 }
 
