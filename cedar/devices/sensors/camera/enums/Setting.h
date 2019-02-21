@@ -117,7 +117,8 @@ public:
    *  If you use a firewire camera, this settings can only be applied on startup, i.e. before the first picture
    *  is grabbed with the CameraGrabber::grab() method.
    */
-  static const Id FPS = cv::CAP_PROP_FPS; // 5;
+#if (OpenCV_VERSION_MAJOR > 3)
+    static const Id FPS = cv::CAP_PROP_FPS; // 5;
   /// @see SETTING_FPS
   static const Id FRAME_WIDTH = cv::CAP_PROP_FRAME_WIDTH; // 3;
   /// @see SETTING_FPS
@@ -127,8 +128,23 @@ public:
 
 #ifdef CEDAR_USE_LIB_DC1394
   /// @see SETTING_FPS
-  static const Id ISO_SPEED = CV_CAP_PROP_ISO_SPEED; // 30
+  static const Id ISO_SPEED = cv::CAP_PROP_ISO_SPEED; // 30
 #endif
+#else
+    static const Id FPS = CV_CAP_PROP_FPS; // 5;
+    /// @see SETTING_FPS
+    static const Id FRAME_WIDTH = CV_CAP_PROP_FRAME_WIDTH; // 3;
+    /// @see SETTING_FPS
+    static const Id FRAME_HEIGHT = CV_CAP_PROP_FRAME_HEIGHT; // 4;
+    /// @see SETTING_FPS
+    static const Id MODE = CV_CAP_PROP_MODE; // 9;
+
+#ifdef CEDAR_USE_LIB_DC1394
+    /// @see SETTING_FPS
+    static const Id ISO_SPEED = CV_CAP_PROP_ISO_SPEED; // 30
+#endif
+#endif //  OpenCV_VERSION_MAJOR > 3
+
 
 protected:
   // none yet
