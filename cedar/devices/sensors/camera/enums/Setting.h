@@ -46,6 +46,7 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/highgui/highgui_c.h>
+#include <opencv2/core/version.hpp>
 
 //--------------------------------------------------------------------------------------------------------------------
 //(re)defines of our new introduced properties in OpenCV:
@@ -117,7 +118,7 @@ public:
    *  If you use a firewire camera, this settings can only be applied on startup, i.e. before the first picture
    *  is grabbed with the CameraGrabber::grab() method.
    */
-#if (OpenCV_VERSION_MAJOR > 3)
+#if (CV_MAJOR_VERSION > 3)
     static const Id FPS = cv::CAP_PROP_FPS; // 5;
   /// @see SETTING_FPS
   static const Id FRAME_WIDTH = cv::CAP_PROP_FRAME_WIDTH; // 3;
@@ -143,7 +144,7 @@ public:
     /// @see SETTING_FPS
     static const Id ISO_SPEED = CV_CAP_PROP_ISO_SPEED; // 30
 #endif
-#endif //  OpenCV_VERSION_MAJOR > 3
+#endif //  CV_MAJOR_VERSION > 3
 
 
 protected:

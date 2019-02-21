@@ -45,7 +45,7 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/highgui/highgui_c.h>
-
+#include <opencv2/core/version.hpp>
 
 
 // (re)defines of our new introduced properties in OpenCV:
@@ -202,7 +202,7 @@ public:
    *
    *  @remarks Not all of this properties are supported on the different camera models
    */
-#if (OpenCV_VERSION_MAJOR > 3)
+#if (CV_MAJOR_VERSION > 3)
     static const Id PROP_BRIGHTNESS = cv::CAP_PROP_BRIGHTNESS; // = 10
   /// @see PROP_BRIGHTNESS
   static const Id PROP_SATURATION = cv::CAP_PROP_SATURATION; // = 12;
@@ -268,7 +268,7 @@ public:
     static const Id PROP_ZOOM = CV_CAP_PROP_ZOOM; // 27;
     /// @see PROP_BRIGHTNESS
     static const Id PROP_FOCUS = CV_CAP_PROP_FOCUS; // 28;
-#endif //  OpenCV_VERSION_MAJOR > 3
+#endif //  CV_MAJOR_VERSION > 3
 
 protected:
   // none yet

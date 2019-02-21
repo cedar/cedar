@@ -55,9 +55,10 @@
 
 
 // SYSTEM INCLUDES
+#include <opencv2/core/version.hpp>
 
-#if (OpenCV_VERSION_MAJOR > 3)
-#define CV_FILLED = cv::FILLED;
+#if (CV_MAJOR_VERSION > 3)
+#define CV_FILLED cv::FILLED
 #endif
 
 //----------------------------------------------------------------------------------------------------------------------
