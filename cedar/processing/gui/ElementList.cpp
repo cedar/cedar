@@ -116,6 +116,14 @@ mPreSearchIndex(-1)
     SLOT(reset())
   );
 
+  QObject::connect
+  (
+          cedar::proc::gui::SettingsSingleton::getInstance().get(),
+          SIGNAL(hiddenElementsChanged()),
+          this,
+          SLOT(reset())
+  );
+
   cedar::aux::PluginProxy::connectToPluginDeclaredSignal
   (
     boost::bind(&cedar::proc::gui::ElementList::reset, this)
@@ -454,24 +462,27 @@ void cedar::proc::gui::ElementList::TabBase::addEntries(const std::vector<cedar:
   bool blocked = this->model()->blockSignals(true);
   for (const auto& declaration : entries)
   {
-    QStandardItem* p_item = nullptr;
-    if (auto element_declaration = boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(declaration))
+    if (!SettingsSingleton::getInstance()->isHiddenElement(declaration->getClassName()))
     {
-      p_item = this->makeItemFromElementDeclaration(element_declaration);
-    }
-    else if (auto group_declaration = boost::dynamic_pointer_cast<cedar::proc::ConstGroupDeclaration>(declaration))
-    {
-      p_item = this->makeItemFromGroupDeclaration(group_declaration);
-    }
-    else
-    {
-      CEDAR_NON_CRITICAL_ASSERT(false || "Unhandled declaration type. This should not happen...");
-    }
+      QStandardItem* p_item = nullptr;
+      if (auto element_declaration = boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(declaration))
+      {
+        p_item = this->makeItemFromElementDeclaration(element_declaration);
+      }
+      else if (auto group_declaration = boost::dynamic_pointer_cast<cedar::proc::ConstGroupDeclaration>(declaration))
+      {
+        p_item = this->makeItemFromGroupDeclaration(group_declaration);
+      }
+      else
+      {
+        CEDAR_NON_CRITICAL_ASSERT(false || "Unhandled declaration type. This should not happen...");
+      }
 
-    // p_item can be a nullptr if the declaration is not supposed to be shown (e.g., if it is deprecated)
-    if (p_item != nullptr)
-    {
-      cedar::aux::asserted_cast<QStandardItemModel*>(this->model())->appendRow(p_item);
+      // p_item can be a nullptr if the declaration is not supposed to be shown (e.g., if it is deprecated)
+      if (p_item != nullptr)
+      {
+        cedar::aux::asserted_cast<QStandardItemModel*>(this->model())->appendRow(p_item);
+      }
     }
   }
   this->model()->blockSignals(blocked);

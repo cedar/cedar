@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,43 +22,39 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NumericalIntegration.h
+    File:        pairsGame.h
 
-    Maintainer:  jokeit
-    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Maintainer:  
+    Email:       
     Date:        
 
-    Description: Header file for the class cedar::proc::steps::NumericalIntegration.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS__NUMERICAL_INTEGRATION_H
-#define CEDAR_PROC_STEPS__NUMERICAL_INTEGRATION_H
-
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
+#ifndef CEDAR_PROC_STEPS_PAIRSGAME_H
+#define CEDAR_PROC_STEPS_PAIRSGAME_H
 
 // CEDAR INCLUDES
-#include <cedar/processing/Step.h>
-#include <cedar/processing/InputSlotHelper.h>
-#include <cedar/auxiliaries/MatData.h>
-#include <cedar/auxiliaries/DoubleParameter.h>
-#include <opencv2/opencv.hpp>
+#include "cedar/processing/Step.h"
+#include <cedar/auxiliaries/UIntParameter.h>
+#include <cedar/auxiliaries/BoolParameter.h>
+#include <cedar/auxiliaries/UIntVectorParameter.h>
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/NumericalIntegration.fwd.h"
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/processing/steps/pairsGame.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief
  */
-class cedar::proc::steps::NumericalIntegration : public cedar::proc::Step
+class cedar::proc::steps::pairsGame : public cedar::proc::Step
 {
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -68,13 +64,18 @@ class cedar::proc::steps::NumericalIntegration : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  NumericalIntegration();
+  pairsGame();
+
+public slots:
+    void pairsChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
+  void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -86,46 +87,35 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void inputConnectionChanged(const std::string& inputName);
-
-  void compute(const cedar::proc::Arguments& arguments);
-  void recompute();
-  void reset();
-  void reinitialize();
-
+  //!@brief Method that is called whenever an input is connected to the Connectable.
+  virtual void inputConnectionChanged(const std::string& inputName);
+    void paintPairs();
+    void paintDebug1();
+    void paintDebug2();
+    void paintDebug3();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-private:
-  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
-  cedar::aux::ConstMatDataPtr mInput;
-  cedar::aux::ConstMatDataPtr mDelayOptional;
-  cedar::aux::ConstMatDataPtr mInitialOptional;
-
-  //!@brief The output data.
+  //!@brief The data containing the output.
   cedar::aux::MatDataPtr mOutput;
-
-  cv::Mat mOneBack;
-  cv::Mat mTwoBack;
-  cv::Mat mThreeBack;
-  cv::Mat mFourBack;
-
-  cv::Mat mLastState;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
+  cedar::aux::MatDataPtr mOutputD1;
+  cedar::aux::MatDataPtr mOutputD2;
+  cedar::aux::MatDataPtr mOutputD3;
 
 private:
-  cedar::unit::Time mLastTime;
+    cedar::aux::UIntVectorParameterPtr _mSizes;
+    cedar::aux::UIntParameterPtr _mTileSize;
+    cedar::aux::UIntParameterPtr _mPadding;
+    cedar::aux::UIntParameterPtr _mNumberOfPairs;
+    cedar::aux::BoolParameterPtr _mSingleFeature;
 
-  cedar::aux::BoolParameterPtr mInitializeOnReset;
-  cedar::aux::BoolParameterPtr mUseBDF5;
+    std::vector<cv::Rect> positions;
+    std::vector<cv::Scalar> colors;
+    std::vector<cv::Scalar> colorsSF;
+    std::vector<float> orientations;
+    std::vector<int> solved;
+    int rot;
+}; // class cedar::proc::steps::pairsGame
 
-}; // class cedar::proc::steps::NumericalIntegration
-
-#endif // CEDAR_PROC_STEPS__NUMERICAL_INTEGRATION_H
-
+#endif // CEDAR_PROC_STEPS_PAIRSGAME_H

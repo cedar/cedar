@@ -1,4 +1,4 @@
-/*======================================================================================================================
+/*=============================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
@@ -17,48 +17,47 @@
     You should have received a copy of the GNU Lesser General Public License
     along with cedar. If not, see <http://www.gnu.org/licenses/>.
 
-========================================================================================================================
+===============================================================================
 
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NumericalIntegration.h
+    File:        LocalWriter.h
 
-    Maintainer:  jokeit
-    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        
+    Maintainer:  Raul Grieben
+    Email:       raul.grienen@ini.ruhr-uni-bochum.de
+    Date:        Thu 20 Dez 2018
 
-    Description: Header file for the class cedar::proc::steps::NumericalIntegration.
+    Description:
 
     Credits:
 
-======================================================================================================================*/
+=============================================================================*/
 
-#ifndef CEDAR_PROC_STEPS__NUMERICAL_INTEGRATION_H
-#define CEDAR_PROC_STEPS__NUMERICAL_INTEGRATION_H
+#ifndef CEDAR_LOCAL_WRITER_SINK_H
+#define CEDAR_LOCAL_WRITER_SINK_H
 
-// CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include <cedar/processing/Step.h>
-#include <cedar/processing/InputSlotHelper.h>
-#include <cedar/auxiliaries/MatData.h>
-#include <cedar/auxiliaries/DoubleParameter.h>
-#include <opencv2/opencv.hpp>
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/MatData.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/NumericalIntegration.fwd.h"
+#include "cedar/processing/sinks/LocalWriter.fwd.h"
 
 // SYSTEM INCLUDES
 
-
-/*!@todo describe.
- *
- * @todo describe more.
- */
-class cedar::proc::steps::NumericalIntegration : public cedar::proc::Step
+/*!@brief A step which sends matrices locally  */
+class cedar::proc::sinks::LocalWriter : public cedar::proc::Step
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -68,64 +67,77 @@ class cedar::proc::steps::NumericalIntegration : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  NumericalIntegration();
+  LocalWriter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
+  void onStart();
+  void onStop();
+
+
+  /*! Returns the name of the port.
+   */
+  inline const std::string& getPort() const
+  {
+    return this->_mPort->getValue();
+  }
+
+  /*! Sets the name of the port.
+   */
+  inline void setPort(const std::string& port)
+  {
+    this->_mPort->setValue(port);
+  }
+
+public slots:
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief Determines whether the data item can be connected to the slot.
+  cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                  (
+                                    cedar::proc::ConstDataSlotPtr slot,
+                                    cedar::aux::ConstDataPtr data
+                                  ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Reacts to a change in the input connection.
   void inputConnectionChanged(const std::string& inputName);
-
-  void compute(const cedar::proc::Arguments& arguments);
-  void recompute();
+  //!@brief Resets the step and recreates the yarp connection.
   void reset();
-  void reinitialize();
+  void connect();
+  void validatePortName(const std::string& portName) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-private:
   //!@brief MatrixData representing the input. Storing it like this saves time during computation.
   cedar::aux::ConstMatDataPtr mInput;
-  cedar::aux::ConstMatDataPtr mDelayOptional;
-  cedar::aux::ConstMatDataPtr mInitialOptional;
+  std::string oldName = "";
 
-  //!@brief The output data.
-  cedar::aux::MatDataPtr mOutput;
-
-  cv::Mat mOneBack;
-  cv::Mat mTwoBack;
-  cv::Mat mThreeBack;
-  cv::Mat mFourBack;
-
-  cv::Mat mLastState;
+public:
+    static std::map<std::string,cedar::aux::ConstMatDataPtr>& mData()
+    {
+      static std::map<std::string,cedar::aux::ConstMatDataPtr> mData;
+      return mData;
+    }
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-
 private:
-  cedar::unit::Time mLastTime;
+  cedar::aux::StringParameterPtr _mPort;
 
-  cedar::aux::BoolParameterPtr mInitializeOnReset;
-  cedar::aux::BoolParameterPtr mUseBDF5;
+}; // class cedar::proc::sinks::LocalWriter
 
-}; // class cedar::proc::steps::NumericalIntegration
-
-#endif // CEDAR_PROC_STEPS__NUMERICAL_INTEGRATION_H
-
+#endif // CEDAR_LOCAL_WRITER_SINK_H

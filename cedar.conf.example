@@ -60,6 +60,8 @@ set (CEDAR_BUILD_DEBUG_VERSION            0           CACHE BOOL "Build with deb
 set (CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS    0           CACHE BOOL "Use opencv debug libraries when building in debug mode?")
 set (CEDAR_USE_QT5                        0           CACHE BOOL "Use Qt5 and the associated plot libraries.")
 #set (CEDAR_STOP_ON_MISSING_LIBRARIES      0           CACHE BOOL "Stop when libraries cannot be found by cmake?")
+set (CEDAR_INCLUDE_YARP                   1          CACHE BOOL "Compile cedar with YARP to communicate over Network")
+
 
 # extra tests
 set (CEDAR_BUILD_TESTS                    1           CACHE BOOL "Build unit and interactive tests? (Disabling this can save compile time.)")
@@ -80,7 +82,7 @@ if(CEDAR_USE_QT5)
 endif(CEDAR_USE_QT5)
 
 # optional dependencies
-set (CEDAR_DEPENDENCY_FFTW "/usr/include"                CACHE PATH "This is the default path in which cedar tries to find FFTW.")
+set (CEDAR_DEPENDENCY_FFTW "/usr/include"                 CACHE PATH "This is the default path in which cedar tries to find FFTW.")
 
 # installation
 set (CMAKE_INSTALL_PREFIX  "/usr/local")

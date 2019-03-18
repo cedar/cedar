@@ -42,7 +42,6 @@
 #include <cedar/processing/Step.h>
 #include <cedar/auxiliaries/ObjectParameterTemplate.fwd.h>
 #include <cedar/auxiliaries/math/TransferFunction.h>
-#include <cedar/auxiliaries/BoolParameter.fwd.h>
 #include <cedar/auxiliaries/UIntParameter.fwd.h>
 #include <cedar/auxiliaries/DoubleParameter.fwd.h>
 #include <cedar/auxiliaries/MatData.fwd.h>
@@ -65,10 +64,6 @@ class cedar::proc::sources::SpatialTemplate : public cedar::proc::Step
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
   typedef cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction> SigmoidParameter;
-
-  //!@cond SKIPPED_DOCUMENTATION
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(SigmoidParameter);
-  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -119,13 +114,10 @@ private:
 private:
   cedar::aux::UIntParameterPtr _mSizeX;
   cedar::aux::UIntParameterPtr _mSizeY;
-  cedar::aux::BoolParameterPtr _mInvertSides;
-  cedar::aux::BoolParameterPtr _mHorizontalPattern;
+  cedar::aux::DoubleParameterPtr _mMuTh;
   cedar::aux::DoubleParameterPtr _mSigmaTh;
   cedar::aux::DoubleParameterPtr _mMuR;
   cedar::aux::DoubleParameterPtr _mSigmaR;
-  cedar::aux::DoubleParameterPtr _mScaleSigmoid;
-  SigmoidParameterPtr _mSigmoid;
 }; // class cedar::proc::sources::SpatialTemplate
 
 #endif // CEDAR_PROC_SOURCES_SPATIAL_TEMPLATE_H

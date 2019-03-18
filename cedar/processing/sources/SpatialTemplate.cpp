@@ -49,6 +49,7 @@
 #include <cedar/auxiliaries/math/TransferFunction.h>
 #include <cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h>
 #include <cedar/auxiliaries/math/tools.h>
+#include <cedar/auxiliaries/math/constants.h>
 
 // SYSTEM INCLUDES
 #include <cmath>
@@ -88,37 +89,23 @@ namespace
 
 cedar::proc::sources::SpatialTemplate::SpatialTemplate()
 :
-mPattern(new cedar::aux::MatData(cv::Mat::zeros(10, 10, CV_32F))),
-_mSizeX(new cedar::aux::UIntParameter(this, "size x", 10, cedar::aux::UIntParameter::LimitType::positive(1000))),
-_mSizeY(new cedar::aux::UIntParameter(this, "size y", 10, cedar::aux::UIntParameter::LimitType::positive(1000))),
-_mInvertSides(new cedar::aux::BoolParameter(this, "invert sides", false)),
-_mHorizontalPattern(new cedar::aux::BoolParameter(this, "horizontal pattern", false)),
-_mSigmaTh(new cedar::aux::DoubleParameter(this, "sigma th hor", 0.25, cedar::aux::DoubleParameter::LimitType::positiveZero(1.0))),
+mPattern(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
+_mSizeX(new cedar::aux::UIntParameter(this, "size x", 50, cedar::aux::UIntParameter::LimitType::positive(1000))),
+_mSizeY(new cedar::aux::UIntParameter(this, "size y", 50, cedar::aux::UIntParameter::LimitType::positive(1000))),
+_mMuTh(new cedar::aux::DoubleParameter(this, "mu th", 0.0, -cedar::aux::math::pi, cedar::aux::math::pi)),
+_mSigmaTh(new cedar::aux::DoubleParameter(this, "sigma th hor", 0.25, cedar::aux::DoubleParameter::LimitType::positiveZero(2.0))),
 _mMuR(new cedar::aux::DoubleParameter(this, "mu r", 15.0, cedar::aux::DoubleParameter::LimitType::positiveZero(1000.0))),
-_mSigmaR(new cedar::aux::DoubleParameter(this, "sigma r", 100.0, cedar::aux::DoubleParameter::LimitType::positiveZero(1000.0))),
-_mScaleSigmoid(new cedar::aux::DoubleParameter(this, "sigma sigmoid fw", 0.475, cedar::aux::DoubleParameter::LimitType::positiveZero(1.0))),
-_mSigmoid
-(
-  new cedar::proc::sources::SpatialTemplate::SigmoidParameter
-  (
-    this,
-    "sigmoid",
-    cedar::aux::math::SigmoidPtr(new cedar::aux::math::AbsSigmoid(0.0, 100.0))
-  )
-)
+_mSigmaR(new cedar::aux::DoubleParameter(this, "sigma r", 100.0, cedar::aux::DoubleParameter::LimitType::positiveZero(1000.0)))
 {
   // output
   this->declareOutput("spatial pattern", mPattern);
 
-  QObject::connect(_mInvertSides.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
-  QObject::connect(_mHorizontalPattern.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
   QObject::connect(_mSizeX.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
   QObject::connect(_mSizeY.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
+  QObject::connect(_mMuTh.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
   QObject::connect(_mSigmaTh.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
   QObject::connect(_mMuR.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
   QObject::connect(_mSigmaR.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
-  QObject::connect(_mScaleSigmoid.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
-  QObject::connect(_mSigmoid.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
 
   this->recompute();
 }
@@ -135,19 +122,10 @@ void cedar::proc::sources::SpatialTemplate::recompute()
 {
   unsigned int size_x = _mSizeX->getValue();
   unsigned int size_y = _mSizeY->getValue();
+  double mu_th = _mMuTh->getValue();
   double sigma_th = _mSigmaTh->getValue();
   double mu_r = _mMuR->getValue();
   double sigma_r = _mSigmaR->getValue();
-  double scale_sigmoid = _mScaleSigmoid->getValue();
-
-  double invert_sides = 1.0;
-
-  // this will switch the sides on which the pattern strengthens and attenuates
-  // to be able to generate patterns for left/right (or top/bottom)
-  if (_mInvertSides->getValue())
-  {
-    invert_sides = -1.0;
-  }
 
   mPattern->getData() = cv::Mat(size_x, size_y, CV_32F);
 
@@ -157,27 +135,24 @@ void cedar::proc::sources::SpatialTemplate::recompute()
     for (unsigned int j = 0; j < size_y; ++j)
     {
       // shift the indices so that the pattern is centered in the output matrix
-      double x_shifted = i - ((size_x - 1) / 2.0);
-      double y_shifted = j - ((size_y - 1) / 2.0);
-
-      double x = x_shifted;
-      double y = y_shifted;
-
-      // this will rotate the pattern by 90 degrees
-      if (_mHorizontalPattern->getValue())
-      {
-        x = y_shifted;
-        y = x_shifted;
-      }
+      double x = i - ((size_x - 1) / 2.0);
+      double y = j - ((size_y - 1) / 2.0);
 
       // log polar transformation
       // http://docs.opencv.org/modules/imgproc/doc/geometric_transformations.html#logpolar
-      double th = atan2(y, invert_sides * x);
+      double th = atan2(y, x);
+
+      // modulo(th - (mu_th + pi), 2*pi)
+      double a = th - mu_th - cedar::aux::math::pi;
+      double b = 2 * cedar::aux::math::pi;
+      double modulo = a-b*floor(a/b);
+
+      th = mu_th - cedar::aux::math::pi + modulo;
 
       double r = log(sqrt(pow(x, 2.0) + pow(y, 2.0)));
 
       double gaussian = exp(
-                           -0.5 * pow(th, 2.0)       / pow(sigma_th, 2.0)
+                           -0.5 * pow(th - mu_th, 2.0) / pow(sigma_th, 2.0)
                            -0.5 * pow(r - mu_r, 2.0) / pow(sigma_r, 2.0)
                            );
 
@@ -186,12 +161,9 @@ void cedar::proc::sources::SpatialTemplate::recompute()
         gaussian = 0.0;
       }
 
-      // generate a sigmoid to strengthen the relevant side of the pattern and attenuate the other one
-      double sigmoid = invert_sides * _mSigmoid->getValue()->compute(x);
-
       // generate the pattern as a weighted sum of the gaussian and the sigmoid
       mPattern->getData().at<float>(i, j)
-        = static_cast<float>((1 - scale_sigmoid) * gaussian + scale_sigmoid * sigmoid);
+        = static_cast<float>(gaussian);
     }
   }
 

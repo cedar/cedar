@@ -46,6 +46,7 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/highgui/highgui_c.h>
+#include <opencv2/core/version.hpp>
 
 //--------------------------------------------------------------------------------------------------------------------
 //(re)defines of our new introduced properties in OpenCV:
@@ -117,18 +118,34 @@ public:
    *  If you use a firewire camera, this settings can only be applied on startup, i.e. before the first picture
    *  is grabbed with the CameraGrabber::grab() method.
    */
-  static const Id FPS = CV_CAP_PROP_FPS; // 5;
+#if (CV_MAJOR_VERSION > 3)
+    static const Id FPS = cv::CAP_PROP_FPS; // 5;
   /// @see SETTING_FPS
-  static const Id FRAME_WIDTH = CV_CAP_PROP_FRAME_WIDTH; // 3;
+  static const Id FRAME_WIDTH = cv::CAP_PROP_FRAME_WIDTH; // 3;
   /// @see SETTING_FPS
-  static const Id FRAME_HEIGHT = CV_CAP_PROP_FRAME_HEIGHT; // 4;
+  static const Id FRAME_HEIGHT = cv::CAP_PROP_FRAME_HEIGHT; // 4;
   /// @see SETTING_FPS
-  static const Id MODE = CV_CAP_PROP_MODE; // 9;
+  static const Id MODE = cv::CAP_PROP_MODE; // 9;
 
 #ifdef CEDAR_USE_LIB_DC1394
   /// @see SETTING_FPS
-  static const Id ISO_SPEED = CV_CAP_PROP_ISO_SPEED; // 30
+  static const Id ISO_SPEED = cv::CAP_PROP_ISO_SPEED; // 30
 #endif
+#else
+    static const Id FPS = CV_CAP_PROP_FPS; // 5;
+    /// @see SETTING_FPS
+    static const Id FRAME_WIDTH = CV_CAP_PROP_FRAME_WIDTH; // 3;
+    /// @see SETTING_FPS
+    static const Id FRAME_HEIGHT = CV_CAP_PROP_FRAME_HEIGHT; // 4;
+    /// @see SETTING_FPS
+    static const Id MODE = CV_CAP_PROP_MODE; // 9;
+
+#ifdef CEDAR_USE_LIB_DC1394
+    /// @see SETTING_FPS
+    static const Id ISO_SPEED = CV_CAP_PROP_ISO_SPEED; // 30
+#endif
+#endif //  CV_MAJOR_VERSION > 3
+
 
 protected:
   // none yet

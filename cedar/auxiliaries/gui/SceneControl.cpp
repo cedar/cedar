@@ -51,28 +51,33 @@ mpScene(new cedar::aux::gl::Scene)
   {
     this->setObjectName(QString::fromUtf8("SceneControl"));
   }
-
   this->setFocusPolicy(Qt::StrongFocus);
-
-  // initialize scene
-  mpScene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
-  mpScene->setSceneLimit(5);
-  mpScene->drawFloor(true);
-
-  horizontalLayout = new QHBoxLayout(this);
-  horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-
-  // create a viewer widget
-  mpView = new cedar::aux::gui::Viewer(mpScene);
-  mpView->show();
-  mpView->setSceneRadius(mpScene->getSceneLimit());
-  mpView->startTimer(25);
-  mpView->setObjectName(QString::fromUtf8("mpView"));
-  horizontalLayout->addWidget(mpView);
-
   retranslateUi(this);
-
   QMetaObject::connectSlotsByName(this);
+  started = false;
+}
+
+void cedar::aux::gui::SceneControl::showTab() //Fixes a Bug under Mac OS
+{
+  if(!started)
+  {
+    // initialize scene
+    mpScene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
+    mpScene->setSceneLimit(5);
+    mpScene->drawFloor(true);
+
+    horizontalLayout = new QHBoxLayout(this);
+    horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+
+    // create a viewer widget
+    mpView = new cedar::aux::gui::Viewer(mpScene);
+    mpView->show();
+    mpView->setSceneRadius(mpScene->getSceneLimit());
+    mpView->startTimer(25);
+    mpView->setObjectName(QString::fromUtf8("mpView"));
+    horizontalLayout->addWidget(mpView);
+    started = true;
+  }
 }
 
 cedar::aux::gl::ScenePtr cedar::aux::gui::SceneControl::getScene() const

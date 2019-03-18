@@ -55,7 +55,7 @@
 #include <glew.h>
 #endif
 #include <qglviewer.h>
-#ifdef CEDAR_OS_WINDOWS
+#ifdef CEDAR_OS_WINDOWS //This looks like it should be QT5 vs QT4 ?
 #include <manipulatedFrame.h>
 #else
 #include <QGLViewer/manipulatedFrame.h>
@@ -68,6 +68,7 @@
 #include <QReadWriteLock>
 #include <string>
 #include <QPoint>
+#include <QGLWidget>
 
 /*!@brief A simple viewer for OpenGL drawing routines, based on QGLViewer
  *
@@ -83,7 +84,7 @@ class cedar::aux::gui::Viewer
 #ifdef CEDAR_USE_QGLVIEWER
 public QGLViewer,
 #else
-public QWidget,
+public QGLWidget,
 #endif // CEDAR_USE_QGLVIEWER
 public cedar::aux::Grabbable
 {

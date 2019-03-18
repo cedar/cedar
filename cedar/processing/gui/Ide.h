@@ -146,6 +146,8 @@ public slots:
    */
   void startPauseSimulationClicked();
 
+  void updateTabs(int tabid);
+
   /*!@brief Stops all looped triggers (and other derivatives of looped thread).
    */
   void resetSimulationClicked();

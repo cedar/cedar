@@ -6,30 +6,30 @@
 # find include dir in set of paths
 find_path(QGLViewer_INCLUDE_DIRS
   NAMES qglviewer.h
-  PATHS ${CEDAR_DEPENDENCY_QGLVIEWER}
+  PATHS ${CEDAR_DEPENDENCY_LIBRARIES} ${CEDAR_DEPENDENCY_QGLVIEWER}
 )
 # find library in set of paths
 if(NOT CEDAR_USE_QT5)
   find_library(QGLViewer_LIBS
     NAMES qglviewer-qt4 QGLViewer-qt4 QGLViewer qglviewer
-    PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
+    PATHS ${CEDAR_DEPENDENCY_LIBRARIES} ${CEDAR_DEPENDENCY_QGLVIEWER}
   )
 else(NOT CEDAR_USE_QT5)
   if(APPLE)
     find_library(QGLViewer_LIBS
             NAMES qglviewer-qt5 QGLViewer-qt5 QGLViewer qglviewer
-            PATHS ${CEDAR_DEPENDENCY_QGLVIEWER}
+            PATHS ${CEDAR_DEPENDENCY_LIBRARIES} ${CEDAR_DEPENDENCY_QGLVIEWER}
             )
   else(APPLE)
     if(NOT WIN32)
     find_library(QGLViewer_LIBS
-                NAMES qglviewer-qt5 QGLViewer-qt5 #QGLViewer qglviewer
-           	PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
+            NAMES qglviewer-qt5 QGLViewer-qt5 #QGLViewer qglviewer
+           	PATHS ${CEDAR_DEPENDENCY_LIBRARIES} ${CEDAR_DEPENDENCY_QGLVIEWER}
             )
     else(NOT WIN32)
     find_library(QGLViewer_LIBS
-                NAMES qglviewer-qt5 QGLViewer-qt5 QGLViewer qglviewer QGLViewer2 QGLViewer2.dll
-                PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
+            NAMES qglviewer-qt5 QGLViewer-qt5 QGLViewer qglviewer QGLViewer2 QGLViewer2.dll
+            PATHS ${CEDAR_DEPENDENCY_LIBRARIES} ${CEDAR_DEPENDENCY_QGLVIEWER}
             )
     endif(NOT WIN32)
   endif(APPLE)

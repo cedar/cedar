@@ -48,8 +48,13 @@
 #include <QScrollBar>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QMimeData>
 #include <iostream>
 #include <QMimeData>
+
+#ifdef CEDAR_USE_QT5
+    #include <QMimeData>
+#endif //CEDAR_USE_QT5
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

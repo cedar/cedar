@@ -22,43 +22,41 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NumericalIntegration.h
+    File:        UiSettings.h
 
-    Maintainer:  jokeit
-    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 01 31
 
-    Description: Header file for the class cedar::proc::steps::NumericalIntegration.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS__NUMERICAL_INTEGRATION_H
-#define CEDAR_PROC_STEPS__NUMERICAL_INTEGRATION_H
+#ifndef CEDAR_PROC_GUI_STEP_MANAGER_H
+#define CEDAR_PROC_GUI_STEP_MANAGER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include <cedar/processing/Step.h>
-#include <cedar/processing/InputSlotHelper.h>
-#include <cedar/auxiliaries/MatData.h>
-#include <cedar/auxiliaries/DoubleParameter.h>
-#include <opencv2/opencv.hpp>
+#include "cedar/processing/gui/ui_StepManager.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/NumericalIntegration.fwd.h"
+#include "cedar/processing/gui/StepManager.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QWidget>
+#include <QSignalMapper>
+#include <QCheckBox>
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A widget for displaying the settings stored in cedar::proc::gui::Settings.
  */
-class cedar::proc::steps::NumericalIntegration : public cedar::proc::Step
+class cedar::proc::gui::StepManager : public QWidget, public Ui_StepManager
 {
+Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -68,13 +66,16 @@ class cedar::proc::steps::NumericalIntegration : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  NumericalIntegration();
+  StepManager(QWidget* pParent = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  //! reject settings and load settings
+  //void reject();
+  //! accept settings and save them
+  //void accept();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -86,46 +87,30 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void inputConnectionChanged(const std::string& inputName);
+  // none yet
+  void fillTable();
+  void fillPresetLists();
 
-  void compute(const cedar::proc::Arguments& arguments);
-  void recompute();
-  void reset();
-  void reinitialize();
+signals:
+  void checkBoxToggled(const QString &fullClassName);
 
+private slots:
+  void handleCheckBoxToggle(QString fullClassName);
+
+  void handleComboBoxSelection(const QString presetName);
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
 private:
-  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
-  cedar::aux::ConstMatDataPtr mInput;
-  cedar::aux::ConstMatDataPtr mDelayOptional;
-  cedar::aux::ConstMatDataPtr mInitialOptional;
+  QSignalMapper* checkBoxMapper;
+  std::map<std::string,std::vector<std::string>> mPreSets;
+  std::map<std::string,QCheckBox*> mCheckBoxes;
+  const std::string mCustomSetName;
+  // none yet
 
-  //!@brief The output data.
-  cedar::aux::MatDataPtr mOutput;
+}; // class cedar::proc::gui::UiSettings
 
-  cv::Mat mOneBack;
-  cv::Mat mTwoBack;
-  cv::Mat mThreeBack;
-  cv::Mat mFourBack;
-
-  cv::Mat mLastState;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-
-private:
-  cedar::unit::Time mLastTime;
-
-  cedar::aux::BoolParameterPtr mInitializeOnReset;
-  cedar::aux::BoolParameterPtr mUseBDF5;
-
-}; // class cedar::proc::steps::NumericalIntegration
-
-#endif // CEDAR_PROC_STEPS__NUMERICAL_INTEGRATION_H
+#endif //CEDAR_PROC_GUI_STEP_MANAGER_H
 

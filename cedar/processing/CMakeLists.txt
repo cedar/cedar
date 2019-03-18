@@ -97,11 +97,14 @@ cedar_add_library(cedarproc
   gui/SettingsDialog.h
   gui/SimulationControl.h
   gui/StepItem.h
+  gui/StepManager.h
   gui/TriggerItem.h
   gui/Group.h
   gui/ToolBox.h
   gui/View.h
   gui/WidgetContainerItem.h
+  sources/LocalReader.h
+  sinks/LocalWriter.h
   sources/BoxInput.h
   sources/GaussInput.h
   steps/VariableBox.h
@@ -133,6 +136,7 @@ cedar_add_library(cedarproc
   steps/ScalarsToVector.h
   steps/ConstVector.h
   steps/Stack.h
+  steps/pairsGame.h
   steps/ShapeVisualisation.h
   steps/ShiftedMultiplication.h
   steps/UnitConverter.h
