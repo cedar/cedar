@@ -1483,7 +1483,15 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
 
   //  this->mUserSideCommandUsed.clear();
 
-
+    if (type_for_DeviceSide != type_from_user && type_from_user > 0) //if hardware support command type use it ;)
+    {
+        auto it = mSubmitCommandHooks.member().find(type_from_user);
+        if (it != mSubmitCommandHooks.member().end())
+        {
+            type_for_DeviceSide = type_from_user;
+            //std::cout << type_for_DeviceSide << " / " << type_from_user << std::endl;
+        }
+    }
 
   // do we need to transform the input?
   if (type_for_DeviceSide != type_from_user)
