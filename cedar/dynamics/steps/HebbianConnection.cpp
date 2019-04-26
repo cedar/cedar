@@ -50,6 +50,7 @@
 #include "cedar/units/prefixes.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
 #include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/HeavisideSigmoid.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -216,15 +217,16 @@ void cedar::dyn::steps::HebbianConnection::eulerStep(const cedar::unit::Time& ti
         double learnRate = mLearnRatePositive->getValue();
         cv::Mat currentWeights = mConnectionWeights->getData();
         cv::Mat currentAssoMat = mAssoInput->getData();
+//        auto mySigmoid = cedar::aux::math::SigmoidPtr(new cedar::aux::math::HeavisideSigmoid(0.5));
+//        float sigmoidedNodeInput =  mySigmoid->compute(mReadOutTrigger->getData().at<float>(0, 0));
+
         for (unsigned int x = 0; x < mWeightSizeX; x++)
         {
           for (unsigned int y = 0; y < mWeightSizeY; y++)
           {
-            auto mySigmoid = cedar::aux::math::SigmoidPtr(new cedar::aux::math::AbsSigmoid(0.5, 100.0));
-            float sigmoidedNodeInput =  mySigmoid->compute(mReadOutTrigger->getData().at<float>(0, 0));
 
 
-            float weightChange = learnRate * sigmoidedNodeInput   * (currentAssoMat.at<float>(x, y) - currentWeights.at<float>(x, y));
+            float weightChange = learnRate * mReadOutTrigger->getData().at<float>(0, 0)   * (currentAssoMat.at<float>(x, y) - currentWeights.at<float>(x, y));
             currentWeights.at<float>(x, y) = currentWeights.at<float>(x, y) + weightChange;
           }
         }

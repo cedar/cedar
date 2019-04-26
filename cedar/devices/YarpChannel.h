@@ -205,6 +205,8 @@ protected:
           it->second = TypeWriterPtr(new TypeWriter(port));
         }
       }
+
+      mIsOpen = true;
   }
 
   void closeHook()
@@ -219,6 +221,8 @@ protected:
     {
       it->second = nullptr;
     }
+
+    mIsOpen = false;
   }
 
   bool isOpen() const
