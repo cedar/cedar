@@ -60,7 +60,7 @@ namespace
     declaration->setIconPath(":/steps/sinus_dynamics.svg");
     declaration->setDescription
     (
-      "Implements the sinus function. The Phase shift can either be set via the GUI parameter 'phase shift' or optionally via the according input (which then overrides the GUI parameter). TODO: sin is only for one skalar, make element-wise for whole tensor"
+      "Implements the sinus function f(x)= amplitude * sin( x + shift ). The Phase shift can either be set via the GUI parameter 'phase shift' or optionally via the according input (which then overrides the GUI parameter). TODO: sin is only for one scalar, make element-wise for whole tensor"
     );
 
     declaration->declare();
@@ -130,9 +130,13 @@ void cedar::proc::steps::Sinus::recompute()
     shift= mShift->getValue();
   }
 
-  const float out = mAmplitude->getValue() * sin(x - shift); 
+  const float out = mAmplitude->getValue() * sin(x + shift); 
 
   mResult->getData().at<float>(0, 0) = out;
+
+  checkOptionalInputs();
+    // need to call this here, because determineinputValidity does not
+    // get called for optional inputs that get removed by the user.
 }
 
 void cedar::proc::steps::Sinus::compute(const cedar::proc::Arguments&)
@@ -140,6 +144,32 @@ void cedar::proc::steps::Sinus::compute(const cedar::proc::Arguments&)
   recompute();
 }
 
+void cedar::proc::steps::Sinus::checkOptionalInputs()
+{
+  auto shiftinput = getInput("phase shift (optional)");
+  bool has_shift_input= false;
+
+  if (shiftinput)
+  {
+    auto shiftdata = boost::dynamic_pointer_cast<const cedar::aux::MatData>(shiftinput);
+    if (shiftdata
+        && !shiftdata->getData().empty())
+    {
+      has_shift_input= true;
+    }
+  }
+
+  if (has_shift_input)
+  {
+    // ausgrauen des Parameters:
+    mShift->setConstant(true);
+  }
+  else
+  {
+    // Parameter aktivieren:
+    mShift->setConstant(false);
+  }
+}
 //// validity check
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sinus::determineInputValidity
   (
@@ -156,30 +186,9 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sinus::determineInputValidit
       return cedar::proc::DataSlot::VALIDITY_VALID;
     }
   }  
-
-
-  if ( slot->getName() == "phase shift (optional)")
+  else if ( slot->getName() == "phase shift (optional)")
   {
-    bool am_valid= false;
-
     if (_input && _input->getDimensionality() == 0 && _input->getData().type() == CV_32F)
-    {
-      am_valid= true;
-    }
-
-    if ( _input 
-        && !_input->getData().empty())
-    {
-      // ausgrauen des Parameters:
-      mShift->setConstant(true);
-    }
-    else
-    {
-      // Parameter aktivieren:
-      mShift->setConstant(false);
-    }
-
-    if (am_valid)
     {
       return cedar::proc::DataSlot::VALIDITY_VALID;
     }
@@ -189,13 +198,8 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sinus::determineInputValidit
   return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
-void cedar::proc::steps::Sinus::inputConnectionChanged(const std::string& inputName)
+void cedar::proc::steps::Sinus::inputConnectionChanged(const std::string&)
 {
-  if (inputName == "input")
-  {
-    mInput = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
-  }
-  
   recompute();
 }
 

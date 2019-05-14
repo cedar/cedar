@@ -61,10 +61,7 @@ public slots:
     void recompute();
     void compute(const cedar::proc::Arguments&);
     void inputConnectionChanged(const std::string& inputName);
-
-    // input
-    cedar::aux::ConstMatDataPtr mInput;
-    cedar::aux::ConstMatDataPtr mShiftInputOptional;
+    void checkOptionalInputs();
 
   protected:
     // output
