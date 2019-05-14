@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SinusDynamics.fwd.h
+    File:        Sinus.fwd.h
 
     Maintainer:  Nico Kuerschner
     Email:       nico.kuerschner@ini.rub.de
     Date:        2016 08 12
 
-    Description: Forward declaration file for the class cedar::proc::steps::SinusDynamics
+    Description: Forward declaration file for the class cedar::proc::steps::Sinus
 
     Credits:
 
@@ -56,7 +56,7 @@ namespace cedar
     namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(SinusDynamics);
+      CEDAR_DECLARE_PROC_CLASS(Sinus);
       //!@endcond
     }
   }

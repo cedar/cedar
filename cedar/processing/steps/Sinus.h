@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SinusDynamics.h
+    File:        Sinus.h
 
     Maintainer:  Nico Kuerschner
     Email:       nico.kuerschner@ini.rub.de
     Date:        2016 08 12
 
-    Description: Step for the implementation of an attractor dynamics approach by Hendrik Reimann, ISR 2010 
+    Description: 
 
     Credits:
 
@@ -40,13 +40,17 @@
 #include <cedar/processing/Step.h> // if we are going to inherit from cedar::proc::Step, we have to include the header
 #include <cedar/auxiliaries/MatData.h>
 #include <cedar/auxiliaries/DoubleParameter.h>
-#include "cedar/processing/steps/SinusDynamics.fwd.h"
+#include "cedar/processing/steps/Sinus.fwd.h"
 
-class cedar::proc::steps::SinusDynamics : public cedar::proc::Step
+class cedar::proc::steps::Sinus : public cedar::proc::Step
 {
     Q_OBJECT
+
+public slots:
+  void constantChanged();
+
   public:
-    SinusDynamics();
+    Sinus();
     cedar::proc::DataSlot::VALIDITY determineInputValidity
                                     (
                                       cedar::proc::ConstDataSlotPtr slot,
@@ -54,19 +58,20 @@ class cedar::proc::steps::SinusDynamics : public cedar::proc::Step
                                     ) const;
 
   private:
+    void recompute();
     void compute(const cedar::proc::Arguments&);
     void inputConnectionChanged(const std::string& inputName);
 
     // input
-    cedar::aux::ConstMatDataPtr mpAngle;
+    cedar::aux::ConstMatDataPtr mpInput;
 
   protected:
     // output
-    cedar::aux::MatDataPtr mpAngleChange;
+    cedar::aux::MatDataPtr mResult;
 
     // params
-    cedar::aux::DoubleParameterPtr mpLambda;
-    cedar::aux::DoubleParameterPtr mpPsi;
+    cedar::aux::DoubleParameterPtr mAmplitude;
+    cedar::aux::DoubleParameterPtr mShift;
 };
 
 #endif /* SINUS_DYNAMICS_H_ */

@@ -110,7 +110,7 @@ cedar_add_library(cedarproc
   sources/GaussInput.h
   steps/VariableBox.h
   steps/VariableGauss.h
-  steps/SinusDynamics.h
+  steps/Sinus.h
   steps/LinearDynamics.h
   steps/BufferReader.h
   steps/Component.h
