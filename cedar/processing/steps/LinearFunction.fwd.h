@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LinearDynamics.fwd.h
+    File:        LinearFunction.fwd.h
 
     Maintainer:  Nico Kuerschner
     Email:       nico.kuerschner@ini.rub.de
     Date:        2016 08 12
 
-    Description: Forward declaration file for the class cedar::proc::steps::LinearDynamics
+    Description: Forward declaration file for the class cedar::proc::steps::LinearFunction
 
     Credits:
 
@@ -56,7 +56,7 @@ namespace cedar
     namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(LinearDynamics);
+      CEDAR_DECLARE_PROC_CLASS(LinearFunction);
       //!@endcond
     }
   }

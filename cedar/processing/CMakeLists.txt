@@ -111,7 +111,7 @@ cedar_add_library(cedarproc
   steps/VariableBox.h
   steps/VariableGauss.h
   steps/Sinus.h
-  steps/LinearDynamics.h
+  steps/LinearFunction.h
   steps/BufferReader.h
   steps/Component.h
   steps/Convolution.h
