@@ -60,7 +60,7 @@ namespace
     declaration->setIconPath(":/steps/sinus_dynamics.svg");
     declaration->setDescription
     (
-      "Implements the sinus function. TODO: only for one skalar, make element-wise for whole tensor"
+      "Implements the sinus function. The Phase shift can either be set via the GUI parameter 'phase shift' or optionally via the according input (which then overrides the GUI parameter). TODO: sin is only for one skalar, make element-wise for whole tensor"
     );
 
     declaration->declare();
@@ -84,6 +84,8 @@ cedar::proc::steps::Sinus::Sinus()
   mShift(new cedar::aux::DoubleParameter(this, "phase shift", 0.0))
 {
   this->declareInput("input");
+  this->declareInput("phase shift (optional)", false); // optional
+
   this->declareOutput("result", mResult);
 
   QObject::connect(mShift.get(), SIGNAL(valueChanged()), this, SLOT(constantChanged()));
@@ -108,7 +110,27 @@ void cedar::proc::steps::Sinus::recompute()
 
   const float &x= data->getData().at<float>(0, 0);
 
-  const float out = mAmplitude->getValue() * sin(x - mShift->getValue()); 
+  float shift;
+  bool  has_shift_input;
+
+  auto shiftinput = getInput("phase shift (optional)");
+  if (shiftinput)
+  {
+    auto shiftdata = boost::dynamic_pointer_cast<const cedar::aux::MatData>(shiftinput);
+    if (shiftdata
+        && !shiftdata->getData().empty())
+    {
+      has_shift_input= true;
+      shift= shiftdata->getData().at<float>(0, 0);
+    }
+  }
+
+  if (!has_shift_input)
+  {
+    shift= mShift->getValue();
+  }
+
+  const float out = mAmplitude->getValue() * sin(x - shift); 
 
   mResult->getData().at<float>(0, 0) = out;
 }
@@ -134,6 +156,35 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sinus::determineInputValidit
       return cedar::proc::DataSlot::VALIDITY_VALID;
     }
   }  
+
+
+  if ( slot->getName() == "phase shift (optional)")
+  {
+    bool am_valid= false;
+
+    if (_input && _input->getDimensionality() == 0 && _input->getData().type() == CV_32F)
+    {
+      am_valid= true;
+    }
+
+    if ( _input 
+        && !_input->getData().empty())
+    {
+      // ausgrauen des Parameters:
+      mShift->setConstant(true);
+    }
+    else
+    {
+      // Parameter aktivieren:
+      mShift->setConstant(false);
+    }
+
+    if (am_valid)
+    {
+      return cedar::proc::DataSlot::VALIDITY_VALID;
+    }
+  }
+
   // else
   return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
@@ -142,7 +193,7 @@ void cedar::proc::steps::Sinus::inputConnectionChanged(const std::string& inputN
 {
   if (inputName == "input")
   {
-    mpInput = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
+    mInput = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>( this->getInput(inputName) );
   }
   
   recompute();

@@ -63,7 +63,8 @@ public slots:
     void inputConnectionChanged(const std::string& inputName);
 
     // input
-    cedar::aux::ConstMatDataPtr mpInput;
+    cedar::aux::ConstMatDataPtr mInput;
+    cedar::aux::ConstMatDataPtr mShiftInputOptional;
 
   protected:
     // output
