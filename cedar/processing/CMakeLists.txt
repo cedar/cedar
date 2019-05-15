@@ -132,7 +132,7 @@ cedar_add_library(cedarproc
   steps/MatrixTypeConverter.h
   steps/Normalization.h
   steps/Flip.h
-  steps/RotationOnPlane.h
+  steps/AnglesOnPlane.h
   steps/StaticGain.h
   steps/ScalarsToVector.h
   steps/ConstVector.h

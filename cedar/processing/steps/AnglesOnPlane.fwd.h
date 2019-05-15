@@ -56,7 +56,7 @@ namespace cedar
     namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(RotationOnPlane);
+      CEDAR_DECLARE_PROC_CLASS(AnglesOnPlane);
       //!@endcond
     }
   }
