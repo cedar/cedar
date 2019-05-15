@@ -54,6 +54,7 @@
 #ifdef CEDAR_USE_YARP
 #include <yarp/os/Network.h>
 #include <yarp/os/Contact.h>
+#include <yarp/conf/version.h>
 #endif
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -131,7 +132,9 @@ _mYarpConfigInfo(new cedar::aux::StringParameter(this,"yarp config info","134.14
 
   this->_mYarpConfigInfo->setConstant(true);
 #ifdef CEDAR_USE_YARP
+#if (YARP_VERSION_MAJOR > 2)
   this->_mYarpConfigInfo->setConstant(false);
+#endif
 #endif
 
 #ifdef CEDAR_PORTABLE
@@ -440,6 +443,9 @@ void cedar::aux::Settings::save()
 void cedar::aux::Settings::updateYarpNameServerContact()
 {
 #ifdef CEDAR_USE_YARP
+
+#if (YARP_VERSION_MAJOR > 2)
+
   //Extract IP And Portnumber from Config String
   std::string configInfoString = this->getYarpConfigInfoParameter()->getValue();
   std::vector<std::string> splitStrings;
@@ -459,6 +465,7 @@ void cedar::aux::Settings::updateYarpNameServerContact()
 //  std::cout<<"Changed Contact: "<< yarp::os::Network::getNameServerContact().getHost()<< std::endl;
 
   //Somehow reset Network Connections ? For now architecture Reset is neccessary
+#endif
 #endif
 }
 
