@@ -68,7 +68,8 @@ bool declare()
   declaration->setIconPath(":/steps/over_time.svg");
   declaration->setDescription
   (
-    "Find the maximum of the input over time. TODO: min, mean, etc."
+    "Find the maximum of the input over time. Useful for debugging "
+    "purposes. TODO: min, mean, etc."
   );
 
   declaration->declare();

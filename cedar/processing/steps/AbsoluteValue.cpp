@@ -68,7 +68,7 @@ namespace
     declaration->setIconPath(":/steps/absolute_value.svg");
     declaration->setDescription
     (
-      "Calculates the absolute value of its input."
+      "Calculates the absolute value of its input, element-wise."
     );
 
     declaration->declare();

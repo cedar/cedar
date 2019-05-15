@@ -71,8 +71,8 @@ bool declare()
   declaration->setDescription
   (
     "Integrates the input numerically over time, element-wise. "
-    "Uses Euler Step. "
-    "The delay input is optional and can be used to override the internal estimate of 'dt' which comes from the global clock. "
+    "Uses Euler Step as a default. "
+    "The delay input is optional and can be used to override the internal estimate of 'dt', the time step, which comes from the global clock. "
     "The initial state input is also optional and will be used when initialzing the state if available. If not, a zero valued tensor of appropriate size will be the initial state. "
     "You can choose to re-initialize the values on an architecture reset via the corresponding parameter. "
     "Optionally, you can use a BDF5 (backwards differentiation formula fifth order) method which will yield better results than the Euler step, especially for stiff systems."

@@ -71,7 +71,7 @@ bool declare()
   declaration->setDescription
   (
     "Differentiates the input numerically over time, element-wise. "
-    "Uses Euler step OR five point finite backwards difference (using the four past entries and the current one), selectable via parameter. The delay input is optional and can be used to override the internal estimate of 'dt' which comes from the global clock. To avoid big jumps in the output when resetting an architecture, adjust the respective parameter. TODO: five point method has jumpts on resets."
+    "Uses Euler step OR five point finite backwards difference (using the four past entries and the current one), selectable via parameter. The delay input is optional and can be used to override the internal estimate of 'dt', the time-step, which comes from the global clock. To avoid big jumps in the output when resetting an architecture, adjust the parameter 'ignore time steps smaller than'. TODO: five point method has jumpts on resets."
   );
 
   declaration->declare();

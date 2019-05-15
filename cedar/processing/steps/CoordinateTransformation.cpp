@@ -73,11 +73,11 @@ namespace
                           (
                             "This processing step provides a coordinate transformation using a matrix-remapping "\
                             "function.\n"\
-                            "You can select either transformation between Cartesian and polar coordinates or"\
+                            "You can select either transformation between Cartesian and polar coordinates or "\
                             "Cartesian and log-polar coordinates.\n"
-                            "For three-dimensional inputs, this step transforms each slice of the matrix individually, "
-                            "where slices are two-dimensional subregions over the last dimension of the matrix."
-                            "\n\n<b>This class is still under development.</b>"
+                            "For three-dimensional inputs, this step transforms each slice of the input tensor individually, "
+                            "where slices are two-dimensional subregions over the last dimension of the tensor."
+//                            "\n\n<b>This class is still under development.</b>"
                           );
     coord_transform_decl->setIconPath(":/steps/coordinate_transformation.svg");
     coord_transform_decl->declare();

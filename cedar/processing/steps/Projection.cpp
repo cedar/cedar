@@ -86,7 +86,14 @@ namespace
     declaration->setIconPath(":/steps/projection.svg");
     declaration->setDescription
     (
-      "Projects N-Dimensional matrices onto M-Dimensions."
+      "Converts a Nth order tensor into a Mth order tenor. "
+      "For a projection, i.e. when the output order M < N: "
+        "you can choose how the reduction "
+        "is applied (compression) by either taking the sum, average, min "
+        "or max along that dimension.\n"
+      "For an immersion, i.e. when the output order M is larger: "
+        "the emtpy entries are expanded by filling them with copies of "
+        "the input."
     );
 
     declaration->declare();

@@ -68,7 +68,8 @@ bool declare()
   declaration->setIconPath(":/steps/positionofmaximum.svg");
   declaration->setDescription
   (
-    "Returns the indices of the maximum value of the tensor."
+    "Returns the indices (positions in the array) "
+    "of the maximum value of the input tensor."
   );
 
   declaration->declare();

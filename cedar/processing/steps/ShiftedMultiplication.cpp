@@ -77,7 +77,7 @@ bool declare()
   declaration->setIconPath("");
   declaration->setDescription
   (
-    "A step that multiplies two arrays by shifting them by a fixed distance against each other and rotating them around each other by increments. Yields a three-dimensional output."
+    "A step that multiplies two arrays by shifting them by a fixed distance against each other and rotating them around each other by increments. Yields a three-dimensional output. TODO: a formula would sure be nice, here"
   );
 
   declaration->declare();

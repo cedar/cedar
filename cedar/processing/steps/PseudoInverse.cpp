@@ -65,7 +65,7 @@ namespace
     declaration->setIconPath(":/steps/matrix_pseudoinverse.svg");
     declaration->setDescription
     (
-      "Inverts matrices via the Moore-Penrose pseudoinverse."
+      "Inverts matrices via the Moore-Penrose pseudoinverse. TODO: add damping term."
     );
 
     declaration->declare();

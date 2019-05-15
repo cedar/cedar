@@ -70,7 +70,8 @@ bool declare()
   declaration->setDescription
   (
     "Count the number of entries int the input that are larger than the given "
-    "threshold. TODO: add options for smaller-than, equal, etc."
+    "threshold. Useful for debugging, for example to find the number of active "
+    "elements in a field. TODO: add options for smaller-than, equal, etc."
   );
 
   declaration->declare();

@@ -60,7 +60,7 @@ namespace
     declaration->setIconPath(":/steps/sinus_dynamics.svg");
     declaration->setDescription
     (
-      "Implements the sinus function f(x)= amplitude * sin( x + shift ). The Phase shift can either be set via the GUI parameter 'phase shift' or optionally via the according input (which then overrides the GUI parameter). TODO: sin is only for one scalar, make element-wise for whole tensor"
+      "Implements the sine function f(x)= amplitude * sin( x + shift ). The Phase shift can either be set via the GUI parameter 'phase shift' or optionally via the according input (which then overrides the GUI parameter). Note, if you shift by PI/2 you get a cosine! TODO: sin is only for one scalar, make element-wise for whole tensor."
     );
 
     declaration->declare();
