@@ -48,7 +48,14 @@
   #include <boost/property_tree/json_parser.hpp>
 #endif
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 #include <QApplication>
+
+#ifdef CEDAR_USE_YARP
+#include <yarp/os/Network.h>
+#include <yarp/os/Contact.h>
+#include <yarp/conf/version.h>
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -59,7 +66,8 @@ cedar::aux::Settings::Settings()
 cedar::aux::Configurable(),
 mGlobalTimeFactor(1.0),
 _mMemoryDebugOutput(new cedar::aux::BoolParameter(this, "memory debug output", false)),
-_mRecorderSerializationFormat(new cedar::aux::EnumParameter(this, "recorder data format", cedar::aux::SerializationFormat::typePtr(), cedar::aux::SerializationFormat::CSV))
+_mRecorderSerializationFormat(new cedar::aux::EnumParameter(this, "recorder data format", cedar::aux::SerializationFormat::typePtr(), cedar::aux::SerializationFormat::CSV)),
+_mYarpConfigInfo(new cedar::aux::StringParameter(this,"yarp config info","134.147.176.97 10000"))
 {
   _mRecorderWorkspace = new cedar::aux::DirectoryParameter
                         (
@@ -121,6 +129,13 @@ _mRecorderSerializationFormat(new cedar::aux::EnumParameter(this, "recorder data
       "cedar::aux::Settings::Settings()"
     );
   }
+
+  this->_mYarpConfigInfo->setConstant(true);
+#ifdef CEDAR_USE_YARP
+#if (YARP_VERSION_MAJOR > 2)
+  this->_mYarpConfigInfo->setConstant(false);
+#endif
+#endif
 
 #ifdef CEDAR_PORTABLE
 #ifndef CEDAR_PORTABLE_MAC_BUNDLE_PATHS
@@ -227,6 +242,11 @@ double cedar::aux::Settings::getGlobalTimeFactor() const
 cedar::aux::DirectoryParameterPtr cedar::aux::Settings::getRecorderWorkspaceParameter() const
 {
   return this->_mRecorderWorkspace;
+}
+
+cedar::aux::StringParameterPtr cedar::aux::Settings::getYarpConfigInfoParameter() const
+{
+  return this->_mYarpConfigInfo;
 }
 
 std::string cedar::aux::Settings::getRecorderOutputDirectory() const
@@ -415,6 +435,38 @@ void cedar::aux::Settings::save()
   {
     CEDAR_THROW(cedar::aux::ParseException, "Error saving settings: " + std::string(e.what()));
   }
+
+
+}
+
+
+void cedar::aux::Settings::updateYarpNameServerContact()
+{
+#ifdef CEDAR_USE_YARP
+
+#if (YARP_VERSION_MAJOR > 2)
+
+  //Extract IP And Portnumber from Config String
+  std::string configInfoString = this->getYarpConfigInfoParameter()->getValue();
+  std::vector<std::string> splitStrings;
+  boost::split(splitStrings, configInfoString, boost::is_any_of(" "));
+  std::string hostName = splitStrings.at(0);
+  int portNumber = boost::lexical_cast<int>(splitStrings.at(1));
+
+  yarp::os::Contact contact = yarp::os::Network::getNameServerContact();
+//  std::cout<<"Old Contact.Host: " << contact.getHost()  <<" Name: " << contact.getName()<<" RegName: "<< contact.getRegName() << " Carrier: " << contact.getCarrier()  <<std::endl;
+
+  yarp::os::Contact contactNew(contact); //Copy Constructor
+  contactNew.setHost(hostName);
+  contactNew.setPort(portNumber);
+//  contactNew.setName("/root"); //Default should be root already
+
+   yarp::os::Network::setNameServerContact(contactNew);
+//  std::cout<<"Changed Contact: "<< yarp::os::Network::getNameServerContact().getHost()<< std::endl;
+
+  //Somehow reset Network Connections ? For now architecture Reset is neccessary
+#endif
+#endif
 }
 
 bool cedar::aux::Settings::getMemoryDebugOutput() const
