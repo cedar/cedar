@@ -43,7 +43,7 @@
 // CEDAR INCLUDES
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/scripts/ExecuteFunctionOnSteps.fwd.h"
+#include "cedar/dynamics/scripts/ExecuteFunctionOnSteps.fwd.h"
 #include "cedar/processing/CppScript.h"
 #include "cedar/processing/Element.h"
 #include "cedar/processing/Group.h"
@@ -59,7 +59,7 @@
  * To extend the Script add a new entry to the enum and implement the desired function in the cpp.
  * Make sure the function is called upon the selection of the new enum.
  */
-class cedar::proc::scripts::ExecuteFunctionOnSteps : public cedar::proc::CppScript
+class cedar::dyn::scripts::ExecuteFunctionOnSteps : public cedar::proc::CppScript
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

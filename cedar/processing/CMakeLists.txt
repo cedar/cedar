@@ -103,7 +103,6 @@ cedar_add_library(cedarproc
   gui/ToolBox.h
   gui/View.h
   gui/WidgetContainerItem.h
-  scripts/ExecuteFunctionOnSteps.h
   sources/LocalReader.h
   sinks/LocalWriter.h
   sources/BoxInput.h

@@ -37,7 +37,7 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 // CLASS HEADER
-#include "cedar/processing/scripts/ExecuteFunctionOnSteps.h"
+#include "cedar/dynamics/scripts/ExecuteFunctionOnSteps.h"
 // CEDAR INCLUDES
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/CppScriptDeclaration.h"
@@ -63,7 +63,7 @@ namespace
 
     cedar::proc::CppScriptDeclarationPtr declaration
             (
-                    new cedar::proc::CppScriptDeclarationTemplate<cedar::proc::scripts::ExecuteFunctionOnSteps>("")
+                    new cedar::proc::CppScriptDeclarationTemplate<cedar::dyn::scripts::ExecuteFunctionOnSteps>("")
             );
 
 
@@ -81,21 +81,21 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::EnumType<cedar::proc::scripts::ExecuteFunctionOnSteps::FunctionName> cedar::proc::scripts::ExecuteFunctionOnSteps::FunctionName::mType(
+cedar::aux::EnumType<cedar::dyn::scripts::ExecuteFunctionOnSteps::FunctionName> cedar::dyn::scripts::ExecuteFunctionOnSteps::FunctionName::mType(
         "FunctionName::"
                                                                                                                                                   );
 
-cedar::proc::scripts::ExecuteFunctionOnSteps::ExecuteFunctionOnSteps()
+cedar::dyn::scripts::ExecuteFunctionOnSteps::ExecuteFunctionOnSteps()
         :
         _mFunctionName(
                 new cedar::aux::EnumParameter(this, "FunctionName",
-                                              cedar::proc::scripts::ExecuteFunctionOnSteps::FunctionName::typePtr(),
+                                              cedar::dyn::scripts::ExecuteFunctionOnSteps::FunctionName::typePtr(),
                                               FunctionName::ResetMemory
                                              ))
 {
 }
 
-cedar::proc::scripts::ExecuteFunctionOnSteps::~ExecuteFunctionOnSteps()
+cedar::dyn::scripts::ExecuteFunctionOnSteps::~ExecuteFunctionOnSteps()
 {
   this->requestStop();
 }
@@ -104,7 +104,7 @@ cedar::proc::scripts::ExecuteFunctionOnSteps::~ExecuteFunctionOnSteps()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::scripts::ExecuteFunctionOnSteps::run()
+void cedar::dyn::scripts::ExecuteFunctionOnSteps::run()
 {
 
   switch (_mFunctionName->getValue())
@@ -121,7 +121,7 @@ void cedar::proc::scripts::ExecuteFunctionOnSteps::run()
 }
 
 
-void cedar::proc::scripts::ExecuteFunctionOnSteps::hebbianConnectionResetWeights()
+void cedar::dyn::scripts::ExecuteFunctionOnSteps::hebbianConnectionResetWeights()
 {
   std::set<cedar::dyn::steps::HebbianConnectionPtr> hebbianConnections = this->getGroup()->findAll<cedar::dyn::steps::HebbianConnection>(
           true);
@@ -133,7 +133,7 @@ void cedar::proc::scripts::ExecuteFunctionOnSteps::hebbianConnectionResetWeights
   }
 }
 
-void cedar::proc::scripts::ExecuteFunctionOnSteps::preshapeResetMemory()
+void cedar::dyn::scripts::ExecuteFunctionOnSteps::preshapeResetMemory()
 {
   std::set<cedar::dyn::PreshapePtr> preShapes = this->getGroup()->findAll<cedar::dyn::Preshape>(
           true);

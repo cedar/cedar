@@ -50,7 +50,7 @@
 
 namespace cedar
 {
-  namespace proc
+  namespace dyn
   {
     namespace scripts
     {
