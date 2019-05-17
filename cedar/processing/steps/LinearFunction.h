@@ -69,7 +69,7 @@ protected:
 
     // params
     cedar::aux::DoubleParameterPtr mSlope;
-    cedar::aux::DoubleParameterPtr mIntercept;
+    cedar::aux::DoubleParameterPtr mHorizontalShift;
 };
 
 #endif /* LINEAR_DYNAMICS_H_ */
