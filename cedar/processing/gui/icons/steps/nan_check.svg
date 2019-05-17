@@ -27,14 +27,14 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="153.32014"
-     inkscape:cy="124.9598"
+     inkscape:cx="-57.111151"
+     inkscape:cy="208.80246"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="806"
+     inkscape:window-width="1360"
      inkscape:window-height="791"
-     inkscape:window-x="17"
+     inkscape:window-x="184"
      inkscape:window-y="29"
      inkscape:window-maximized="0"
      showguides="true"
@@ -257,7 +257,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -268,15 +268,25 @@
      transform="translate(0,-652.3622)">
     <text
        xml:space="preserve"
-       style="font-size:116.66147614px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:TeX Gyre Termes;-inkscape-font-specification:TeX Gyre Termes Italic"
-       x="65.701256"
-       y="888.77979"
+       style="font-size:127.55425262px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:TeX Gyre Termes;-inkscape-font-specification:TeX Gyre Termes Italic"
+       x="102.71201"
+       y="879.92804"
        id="text5334"
-       sodipodi:linespacing="125%"
-       transform="scale(1.014209,0.98599006)"><tspan
+       sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan5336"
-         x="65.701256"
-         y="888.77979">NaN?</tspan></text>
+         x="102.71201"
+         y="879.92804"
+         style="font-size:90px">NaN?</tspan></text>
+    <path
+       sodipodi:type="arc"
+       style="fill:none;stroke:#060000;stroke-width:3.21261357;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path2867"
+       sodipodi:cx="144.45181"
+       sodipodi:cy="168.67506"
+       sodipodi:rx="75.761444"
+       sodipodi:ry="75.761444"
+       d="m 220.21326,168.67506 c 0,41.84189 -33.91956,75.76145 -75.76145,75.76145 -41.84189,0 -75.761441,-33.91956 -75.761441,-75.76145 0,-41.84189 33.919551,-75.76144 75.761441,-75.76144 41.84189,0 75.76145,33.91955 75.76145,75.76144 z"
+       transform="matrix(1.6696686,0,0,1.6696686,-43.701834,567.185)" />
   </g>
 </svg>

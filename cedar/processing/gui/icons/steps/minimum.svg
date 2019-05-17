@@ -34,7 +34,7 @@
      showgrid="false"
      inkscape:window-width="1360"
      inkscape:window-height="791"
-     inkscape:window-x="17"
+     inkscape:window-x="76"
      inkscape:window-y="29"
      inkscape:window-maximized="0"
      showguides="true"
@@ -279,13 +279,13 @@
          y="879.92804">min</tspan></text>
     <path
        sodipodi:type="arc"
-       style="fill:none;stroke:#060000;stroke-width:3.21267128;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:none;stroke:#060000;stroke-width:3.21261357;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="path2867"
        sodipodi:cx="144.45181"
        sodipodi:cy="168.67506"
        sodipodi:rx="75.761444"
        sodipodi:ry="75.761444"
-       d="m 220.21326,168.67506 a 75.761444,75.761444 0 1 1 -151.522891,0 75.761444,75.761444 0 1 1 151.522891,0 z"
+       d="m 220.21326,168.67506 c 0,41.84189 -33.91956,75.76145 -75.76145,75.76145 -41.84189,0 -75.761441,-33.91956 -75.761441,-75.76145 0,-41.84189 33.919551,-75.76144 75.761441,-75.76144 41.84189,0 75.76145,33.91955 75.76145,75.76144 z"
        transform="matrix(1.6696686,0,0,1.6696686,-43.701834,567.185)" />
   </g>
 </svg>
