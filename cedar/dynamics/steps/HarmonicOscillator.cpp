@@ -25,7 +25,7 @@ namespace
             (
                     new ElementDeclarationTemplate<cedar::dyn::steps::HarmonicOscillator>
                             (
-                                    "Algebra",
+                                    "Numerics",
                                     "cedar.dynamics.HarmonicOscillator"
                             )
             );
