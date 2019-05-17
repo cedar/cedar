@@ -60,7 +60,12 @@ namespace
     declaration->setIconPath(":/steps/sinus_dynamics.svg");
     declaration->setDescription
     (
-      "Implements the sine function f(x)= amplitude * sin( x + shift ). The Phase shift can either be set via the GUI parameter 'phase shift' or optionally via the according input (which then overrides the GUI parameter). Note, if you shift by PI/2 you get a cosine! TODO: sin is only for one scalar, make element-wise for whole tensor."
+      "Implements the sine function f(x)= amplitude * sin( x + shift ). The Phase shift can either be set via the GUI parameter 'phase shift' or optionally via the according input (which then overrides the GUI parameter).\n"
+      "You can switch the sine to a cosine by a GUI parameter.\n"
+      "Note that if you want to use the Sinus step to set an attractor you "
+      "will need to give the negative of your desired attractor value "
+      "as the 'phase shift'. "
+      "TODO: sin is only for one scalar, make element-wise for whole tensor."
     );
 
     declaration->declare();
@@ -81,7 +86,8 @@ cedar::proc::steps::Sinus::Sinus()
   cedar::proc::Step(false),
   mResult(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
   mAmplitude(new cedar::aux::DoubleParameter(this,"amplitude", 1.0)),
-  mShift(new cedar::aux::DoubleParameter(this, "phase shift", 0.0))
+  mShift(new cedar::aux::DoubleParameter(this, "phase shift", 0.0)),
+  mMakeCos(new cedar::aux::BoolParameter(this, "make cos", false))
 {
   this->declareInput("input");
   this->declareInput("phase shift (optional)", false); // optional
@@ -90,6 +96,7 @@ cedar::proc::steps::Sinus::Sinus()
 
   QObject::connect(mShift.get(), SIGNAL(valueChanged()), this, SLOT(constantChanged()));
   QObject::connect(mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(constantChanged()));
+  QObject::connect(mMakeCos.get(), SIGNAL(valueChanged()), this, SLOT(constantChanged()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -130,7 +137,16 @@ void cedar::proc::steps::Sinus::recompute()
     shift= mShift->getValue();
   }
 
-  const float out = mAmplitude->getValue() * sin(x + shift); 
+  float out;
+
+  if (mMakeCos->getValue())
+  {
+    out = mAmplitude->getValue() * cos(x + shift); 
+  }
+  else
+  {
+    out = mAmplitude->getValue() * sin(x + shift); 
+  }
 
   mResult->getData().at<float>(0, 0) = out;
 

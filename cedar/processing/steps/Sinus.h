@@ -40,6 +40,7 @@
 #include <cedar/processing/Step.h> // if we are going to inherit from cedar::proc::Step, we have to include the header
 #include <cedar/auxiliaries/MatData.h>
 #include <cedar/auxiliaries/DoubleParameter.h>
+#include <cedar/auxiliaries/BoolParameter.h>
 #include "cedar/processing/steps/Sinus.fwd.h"
 
 class cedar::proc::steps::Sinus : public cedar::proc::Step
@@ -70,6 +71,8 @@ public slots:
     // params
     cedar::aux::DoubleParameterPtr mAmplitude;
     cedar::aux::DoubleParameterPtr mShift;
+    cedar::aux::BoolParameterPtr mMakeCos;
+
 };
 
 #endif /* SINUS_DYNAMICS_H_ */
