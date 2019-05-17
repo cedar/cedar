@@ -66,7 +66,7 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/boost.svg");
-    declaration->setDescription("Generates a 1x1 boost matrix. This can be input to, e.g., a field.");
+    declaration->setDescription("Generates a scalar that can be activated or deactivated. This can be input to, e.g., a field to 'boost' all entries to the field. You can control all your Boosts from a special dialog. You can also choose to deactivate the Boost when hitting the reset button of your architecture.");
 
     declaration->declare();
 

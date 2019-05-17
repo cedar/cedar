@@ -62,6 +62,11 @@ namespace
     declaration->setIconPath(":/steps/vehicle_rotation.svg");
     declaration->deprecatedName("cedar.processing.steps.VehicleRotationStep");
     declaration->declare();
+    declaration->setDescription
+    (
+      "Control an appropritate vehicle by rotation commands. "
+      "Needs to connect to a Component (Robot)."
+    );
 
     return true;
   }

@@ -69,7 +69,7 @@ namespace
     flip_decl->setIconPath(":/steps/flip.svg");
     flip_decl->setDescription
     (
-      "Flips a matrix. You can select which dimensions to flip. "
+      "Flips a tensor. You can select which dimensions to flip. "
       "Think of this as a more versatile Transpose."
     );
 

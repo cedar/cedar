@@ -69,7 +69,7 @@ namespace
     declaration->setIconPath(":/steps/video_grabber.svg");
     declaration->setDescription
     (
-      "Reads a video file and outputs the images. Supported formats depend on which ones are available via opencv."
+      "Reads a video file and outputs the frames. Note: Supported formats depend on your version of OpenCV."
     );
 
     declaration->declare();

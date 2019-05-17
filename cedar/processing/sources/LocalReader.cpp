@@ -72,7 +72,8 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/local_reader.svg");
-    declaration->setDescription("Reads a matrix locally.");
+    declaration->setDescription("Reads a matrix locally. See also the "
+                    "LocalWriter step.");
 
     declaration->declare();
 

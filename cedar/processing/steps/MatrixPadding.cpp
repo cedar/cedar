@@ -70,7 +70,7 @@ namespace
     declaration->setIconPath(":/steps/matrix_padding.svg");
     declaration->setDescription
     (
-      "Adds borders to a matrix."
+      "Adds borders to a tensor."
     );
 
     declaration->declare();

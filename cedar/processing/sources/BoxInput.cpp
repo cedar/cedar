@@ -70,7 +70,7 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/box_input.svg");
-    declaration->setDescription("Generates a matrix that contains a box input of your specifications. Note: If you require that the parameters be set via inputs, please consider the VariableBox step.");
+    declaration->setDescription("Generates a tensor that contains a 'box' (i.e. square or cubic region) of values to your specifications. Note: If you require that the parameters be set via inputs, please consider the VariableBox step.");
     declaration->deprecatedName("cedar.processing.source.BoxInput");
 
     declaration->declare();

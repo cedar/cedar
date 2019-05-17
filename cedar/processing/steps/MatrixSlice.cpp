@@ -69,7 +69,7 @@ namespace
     declaration->setIconPath(":/steps/matrix_slice.svg");
     declaration->setDescription
     (
-      "Extracts a subregion of a matrix."
+      "Extracts a subregion of a tensor."
     );
 
     declaration->declare();

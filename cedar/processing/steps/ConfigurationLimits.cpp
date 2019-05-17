@@ -61,7 +61,7 @@ namespace
 
     ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::steps::ConfigurationLimits>("Robotics", "cedar.processing.steps.ConfigurationLimits"));
     declaration->setIconPath(":/steps/configuration_limits.svg");
-    declaration->setDescription( "Return the upper/lower limits of joints, joint velocities and accelerations.");
+    declaration->setDescription( "Return the upper/lower limits of joints, joint velocities and accelerations. Needs to be connected to a Component (Robot).");
     declaration->declare();
 
     return true;

@@ -70,7 +70,7 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/variable_gauss.svg");
-    declaration->setDescription("Similar to the GaussInput step: Generates a matrix that contains a Gauss shape with center(!) defined via an input. TODO: make other parameters optionally adjustable via input.");
+    declaration->setDescription("Similar to the GaussInput step: Generates a tensor that contains a Gauss shape with center(!) defined via an input. TODO: make other parameters optionally adjustable via input.");
     declaration->deprecatedName("cedar.processing.steps.VariableGauss");
 
     declaration->declare();

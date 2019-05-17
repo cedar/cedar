@@ -71,7 +71,7 @@ namespace
       )
     );
     input_declaration->setIconPath(":/steps/net_writer.svg");
-    input_declaration->setDescription("Writes incoming matrices to the local network.");
+    input_declaration->setDescription("Writes incoming matrices to the local network to transfer data between machines. See also the NetReader step.");
 
     input_declaration->declare();
 

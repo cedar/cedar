@@ -68,7 +68,7 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/const_matrix.svg");
-    declaration->setDescription("Create a matrix with the same constant value everywhere.");
+    declaration->setDescription("Create a matrix with one common constant value  of your specification for all entries.");
     declaration->deprecatedName("cedar.processing.source.ConstMatrix");
 
     declaration->declare();

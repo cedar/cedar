@@ -71,7 +71,8 @@ bool declare()
   declaration->setIconPath(":/steps/step_signal.svg");
   declaration->setDescription
   (
-      "Generates a step signal in time."
+      "Generates a step signal in time. The Global clock serves as timing "
+      "signal."
   );
 
   declaration->declare();

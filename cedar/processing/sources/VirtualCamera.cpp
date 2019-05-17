@@ -58,6 +58,12 @@ namespace
     ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::sources::VirtualCamera>("Sources", "cedar.processing.sources.VirtualCamera"));
     declaration->setIconPath(":/steps/virtual_camera.svg");
     declaration->declare();
+    declaration->setDescription
+    (
+      "Outputs a matrix with a camera view (picture) of the virtual scene. "
+      "IMPORTANT: At the moment, this requires that a viewer window be "
+      "separately opened."
+    );
 
     return true;
   }

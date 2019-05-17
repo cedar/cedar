@@ -58,7 +58,7 @@ namespace
 
     ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::steps::DampedPseudoInverseKinematics>("Robotics", "cedar.processing.steps.DampedPseudoInverseKinematics"));
     declaration->setIconPath(":/steps/damped_inverse_kinematic.svg");
-    declaration->setDescription("Connects to a robot and calculates the damped least squares inverse of the end-effector Jacobian. Lambda is the damping parameter.");
+    declaration->setDescription("Connects to a robot and calculates the damped least squares inverse of the end-effector Jacobian. Then applies the input to it.  'Lambda' is the damping parameter. Set it to zero for no damping. Needs to be connected to an appropriate Component (Robot). TODO: output the Jacobian TODO: optional input as a point on the robot to calculate J for that position.");
     declaration->declare();
 
     return true;

@@ -76,7 +76,7 @@ namespace
     declaration->setIconPath(":/steps/serial_order.svg");
     declaration->setDescription
     (
-      "Generates a sequences of transitions between nodes that"
+      "Generates a sequences of transitions between nodes that "
       "represent the ordinal position of an action in a sequence."
     );
 

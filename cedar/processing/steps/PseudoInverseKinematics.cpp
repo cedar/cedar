@@ -59,6 +59,11 @@ namespace
     ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::steps::PseudoInverseKinematics>("Robotics", "cedar.processing.steps.PseudoInverseKinematics"));
     declaration->setIconPath(":/steps/inverse_kinematic.svg");
     declaration->declare();
+    declaration->setDescription
+    (
+      "Obtain the Jacobi matrix of the end-effector and apply the input to "
+      "it. Needs to be connected to an appropriate Component (Robot)."
+    );
 
     return true;
   }

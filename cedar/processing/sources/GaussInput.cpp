@@ -72,7 +72,7 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/gauss_input.svg");
-    declaration->setDescription("Generates a matrix that contains a sampled Gauss function of your specification. Note: If you require that the parameters be set via inputs, please consider the VariableGauss step.");
+    declaration->setDescription("Generates a tensor that contains a sampled Gauss function of your specification. Note: If you require that the parameters be set via inputs, please consider the VariableGauss step.");
     declaration->deprecatedName("cedar.processing.source.GaussInput");
 
     declaration->declare();

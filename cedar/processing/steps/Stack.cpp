@@ -74,7 +74,7 @@ namespace
     declaration->setIconPath(":/steps/stack.svg");
     declaration->setDescription
     (
-      "Stacks an arbitrary set of 2D input matrices. All matrices must have the same size."
+      "Stacks an arbitrary set of matrices (tensors of second order). All matrices must have the same size."
     );
 
     declaration->declare();

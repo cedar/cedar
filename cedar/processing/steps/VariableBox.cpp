@@ -70,7 +70,7 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/variable_box.svg");
-    declaration->setDescription("Similar to the BoxInput step: Generates a matrix that contains a box but with the left bound defined via an input. TODO: make other parameters optionally adjustable via input.");
+    declaration->setDescription("Similar to the BoxInput step: Generates a tensor that contains a 'box' (i.e. square or cubic) region but with the 'left' bound defined via an input. TODO: make other parameters optionally adjustable via input.");
     declaration->deprecatedName("cedar.processing.steps.VariableBox");
 
     declaration->declare();

@@ -71,8 +71,8 @@ namespace
     declaration->setIconPath(":/steps/picture_grabber.svg");
     declaration->setDescription
     (
-      "Reads an image from a file. What filetypes are supported depends on what your opencv "
-      "version supports."
+      "Reads an image from a file and outputs it as matrix. Note: Exactly what file types are supported depends on your OpenCV "
+      "version."
     );
 
     declaration->declare();
