@@ -75,9 +75,9 @@ public:
 
   YarpChannel()
 :
+  mIsOpen(false),
   mReadPortName(new cedar::aux::StringParameter(this, "readPortName", "defaultRead")),
-  mWritePortName(new cedar::aux::StringParameter(this, "writePortName", "defaultWrite")),
-  mIsOpen(false)
+  mWritePortName(new cedar::aux::StringParameter(this, "writePortName", "defaultWrite"))
   {
 
   }
