@@ -15,7 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="HarmonicOscillator.svg"
+   sodipodi:docname="harmonic_oscillator.svg"
    inkscape:export-filename="/home/lompolbx/workspace/src/cedar.fieldFramework/cedar/processing/gui/icons/steps/gauss_input.png"
    inkscape:export-xdpi="9"
    inkscape:export-ydpi="9">
@@ -33,9 +33,9 @@
      inkscape:current-layer="content"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1030"
+     inkscape:window-height="999"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="29"
      inkscape:window-maximized="1"
      showguides="true"
      inkscape:guide-bbox="true" />
@@ -449,7 +449,7 @@
              id="path3051"
              inkscape:connector-curvature="0"
              sodipodi:nodetypes="cccc" /><path
-             style="fill:none;stroke:#00fa37;stroke-width:5.8237255;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10.43299961;stroke-opacity:1;stroke-dasharray:none"
+             style="fill:none;stroke:#ff0000;stroke-width:5.82372550000000011;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10.43299960999999954;stroke-opacity:1;stroke-dasharray:none"
              d="m 418.1466,328.34534 41.77312,0 c 2.86522,30.67689 2.90361,73.11995 21.59834,96.36512 11.15319,13.86796 31.7305,11.41559 44.49037,12.32648 l 39.72497,0"
              id="path3947"
              inkscape:connector-curvature="0"
