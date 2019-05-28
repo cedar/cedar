@@ -1664,6 +1664,7 @@ void cedar::dev::Component::updateUserSideMeasurements()
 
 void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
 {
+  std::cout<<"cedar::dev::Component::startCommunication!"<<std::endl;
 #ifdef DEBUG
   std::string s= "";
 
@@ -1716,7 +1717,9 @@ void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
     );
   }
 
+
   mCommunicationThread->start();
+
 
   // workaround to get at least several measurements to be able to differentiate
   mCommunicationThread->waitUntilStepped();
@@ -1770,6 +1773,7 @@ void cedar::dev::Component::stopCommunication()
   // make sure it is actually stopped
   mCommunicationThread->stop();
 
+
   handleStopCommunicationNonBlocking();
 
   locker_general.unlock();
@@ -1779,6 +1783,7 @@ void cedar::dev::Component::stopCommunication()
     this->mChannel->close();
   }
 
+  mCommunicationThread->wait();
   mDisconnectedHook();
 }
 

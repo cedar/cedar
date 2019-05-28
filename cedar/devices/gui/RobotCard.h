@@ -55,6 +55,7 @@
   #include <boost/signals2.hpp>
 #endif // Q_MOC_RUN
 #include <string>
+#include <QtWidgets/QCheckBox>
 
 
 /*!@brief A class that displays an icon in the RobotCard widget.
@@ -153,6 +154,8 @@ private slots:
 
   void connectClicked();
 
+  void automaticConnectClicked(int state);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -160,6 +163,8 @@ protected:
   // none yet
 private:
   QComboBox* mpConfigurationSelector;
+
+  QCheckBox* mpAutomaticConnectBox;
 
   QLineEdit* mpRobotNameEdit;
 
@@ -173,6 +178,9 @@ private:
   cedar::dev::RobotPtr mrRobot;
 
   boost::signals2::connection mRobotRemovedConnection;
+
+  //This somehow does only work for the DisconnectHook
+  std::vector<boost::signals2::connection> mRobotDisconnectConnections;
 
   std::string mCurrentName;
 }; // class cedar::dev::gui::RobotCard
