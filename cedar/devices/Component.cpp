@@ -1664,7 +1664,6 @@ void cedar::dev::Component::updateUserSideMeasurements()
 
 void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
 {
-  std::cout<<"cedar::dev::Component::startCommunication!"<<std::endl;
 #ifdef DEBUG
   std::string s= "";
 

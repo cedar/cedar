@@ -55,7 +55,14 @@
   #include <boost/signals2.hpp>
 #endif // Q_MOC_RUN
 #include <string>
-#include <QtWidgets/QCheckBox>
+
+// SYSTEM INCLUDES
+#ifdef CEDAR_USE_QT5
+    #include <QtWidgets/QCheckBox>
+#else
+    #include <QCheckBox>
+#endif //CEDAR_USE_QT5
+    
 
 
 /*!@brief A class that displays an icon in the RobotCard widget.
