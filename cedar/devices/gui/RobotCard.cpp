@@ -122,6 +122,7 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
   p_connect_config_layout->setContentsMargins(contents_margins, contents_margins, contents_margins, contents_margins);
   this->mpAutomaticConnectBox = new QCheckBox();
   this->mpAutomaticConnectBox->setText(QString::fromStdString("connect on play?"));
+  this->mpAutomaticConnectBox->setToolTip(QString::fromStdString("Disconnection has to be handled manually"));
   p_connect_config_layout->addWidget(mpAutomaticConnectBox, 1);
 
   mpConfigurationSelector = new QComboBox();

@@ -386,7 +386,7 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
 
   auto component = this->getComponent();
 
-  if(!mInitConfigHasBeenApplied && boost::dynamic_pointer_cast<cedar::dev::SimulatedKinematicChain>(component))
+  if(!mInitConfigHasBeenApplied &&  _mUseKinChainConfigurationOnReset->getValue() && boost::dynamic_pointer_cast<cedar::dev::SimulatedKinematicChain>(component))
   {
     //This ensures that the Initial Configuration is applied after the first start of the architecture
     //Onstart does not work, because the communication might not yet be established at that point
@@ -617,6 +617,7 @@ void cedar::proc::steps::Component::applyCurrentInitialConfiguration()
       }
       if (kinChain->isCommunicating())
       {
+//        std::cout<<"Reset to: " << kinChain->getCurrentInitialConfigurationName() << std::endl;
         kinChain->applyInitialConfiguration(kinChain->getCurrentInitialConfigurationName());
         mInitConfigHasBeenApplied = true;
       } else
