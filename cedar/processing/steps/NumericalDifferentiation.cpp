@@ -88,6 +88,7 @@ bool declared = declare();
 
 cedar::proc::steps::NumericalDifferentiation::NumericalDifferentiation()
 :
+cedar::proc::Step(true),
 // outputs
 mOutput(new cedar::aux::MatData(cv::Mat())),
 mOneBack(),

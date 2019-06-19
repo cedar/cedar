@@ -86,6 +86,7 @@ bool declared = declare();
 
 cedar::proc::steps::ExponentialSmoothing::ExponentialSmoothing()
 :
+cedar::proc::Step(true),
 // outputs
 mOutput(new cedar::aux::MatData(cv::Mat())),
 mDataEstimate(),
