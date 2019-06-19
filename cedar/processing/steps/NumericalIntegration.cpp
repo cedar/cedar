@@ -186,7 +186,7 @@ void cedar::proc::steps::NumericalIntegration::inputConnectionChanged(const std:
   if (!this->mInput)
   {
     // no input -> no output
-    this->mOutput->setData(cv::Mat());
+    // quickfix: this crashes plots: this->mOutput->setData(cv::Mat());
     output_changed = true;
   }
   else
