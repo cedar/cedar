@@ -71,7 +71,11 @@ cedar::proc::gui::View::View(QWidget *pParent)
         mpMainWindow(nullptr),
         mpConigurableWidget(nullptr),
         mpRecorderWidget(nullptr),
-        mpCommentWidget(nullptr)
+        mpCommentWidget(nullptr),
+        mpCodeWidget(nullptr),
+        mpCodeTabWidget(nullptr),
+        mpTabWidget(nullptr),
+        mpCodeTabIndex(1)
 {
   this->resetViewport();
   this->setInteractive(true);
@@ -161,18 +165,94 @@ void cedar::proc::gui::View::dropEvent(QDropEvent *event)
   }
 }
 
+void cedar::proc::gui::View::hideCodeWidget()
+{
+  //mpTabWidget is the overall widget that contains all tabs
+  //mpCodeTabWidget is the code tab and contains the mpCodeWidget
+  //mpCodeWidget contains text
+  if(mpCodeWidget != nullptr)
+  {
+    //Initialize the parent QTabWidget
+    if(mpTabWidget == nullptr)
+    {
+      mpTabWidget = (QTabWidget*) mpCodeWidget->parentWidget()->parentWidget()->parentWidget()->parentWidget()->parentWidget();
+    }
+    //Initialize child widget of mpTabWidget
+    if(mpCodeTabWidget == nullptr)
+    {
+      mpCodeTabWidget = mpCodeWidget->parentWidget()->parentWidget()->parentWidget();
+      //Get the actual index of the code tab (specified by the order of tabs in Ide.ui)
+      mpCodeTabIndex = mpTabWidget->indexOf(mpCodeTabWidget);
+    }
+    if(mpTabWidget != nullptr && mpCodeTabWidget != nullptr)
+    {
+      //Remove tab if not already removed
+      if(mpTabWidget->indexOf(mpCodeTabWidget) >= 0)
+      {
+        //Save index label and widget
+        mpCodeTabIndex = mpTabWidget->indexOf(mpCodeTabWidget);
+        mpCodeTabWidget = mpTabWidget->widget(mpCodeTabIndex);
+        mpCodeTabLabel = mpTabWidget->tabText(mpCodeTabIndex);
+        bool codeWidgetIsActiveWidget = false;
+        if(mpCodeTabIndex == mpTabWidget->currentIndex()) codeWidgetIsActiveWidget = true;
+        
+        //Remove tab
+        mpTabWidget->removeTab(mpCodeTabIndex);
+        if(codeWidgetIsActiveWidget) mpTabWidget->setCurrentIndex(0);
+      }
+    }
+  }
+}
+
+void cedar::proc::gui::View::showCodeWidget()
+{
+  //mpTabWidget is the overall widget that contains all tabs
+  //mpCodeTabWidget is the code tab and contains the mpCodeWidget
+  //mpCodeWidget contains text
+  if(mpCodeWidget != nullptr)
+  {
+    //Initialize the parent QTabWidget
+    if(mpTabWidget == nullptr)
+    {
+      mpTabWidget = (QTabWidget*) mpCodeWidget->parentWidget()->parentWidget()->parentWidget()->parentWidget()->parentWidget();
+    }
+    //Initialize child widget of mpTabWidget
+    if(mpCodeTabWidget == nullptr)
+    {
+      mpCodeTabWidget = mpCodeWidget->parentWidget()->parentWidget()->parentWidget()/*->parentWidget()*/;
+      //Get the actual index of the code tab (specified by the order of tabs in Ide.ui)
+      mpCodeTabIndex = mpTabWidget->indexOf(mpCodeTabWidget);
+    }
+    
+    if(mpTabWidget != nullptr && mpCodeTabWidget != nullptr)
+    {
+      if(mpCodeTabLabel != nullptr && mpCodeTabIndex >= 0)
+      {
+        //Insert tab if not already inserted
+        if(mpTabWidget->indexOf(mpCodeTabWidget) < 0)
+        {
+          mpTabWidget->insertTab(mpCodeTabIndex, mpCodeTabWidget, mpCodeTabLabel);
+          mpTabWidget->setCurrentIndex(mpCodeTabIndex);
+        }
+      }
+    }
+  }else std::cout << "There is no CodeWidget to show" << std::endl;
+}
+
 void cedar::proc::gui::View::setWidgets
         (
                 QMainWindow *pMainWindow,
                 cedar::aux::gui::Configurable *pConigurableWidget,
                 cedar::proc::gui::RecorderWidget *pRecorderWidget,
-                cedar::proc::gui::CommentWidget *pCommentWidget
+                cedar::proc::gui::CommentWidget *pCommentWidget,
+                cedar::proc::gui::CodeWidget *pCodeWidget
         )
 {
   this->mpMainWindow = pMainWindow;
   this->mpConigurableWidget = pConigurableWidget;
   this->mpRecorderWidget = pRecorderWidget;
   this->mpCommentWidget = pCommentWidget;
+  this->mpCodeWidget = pCodeWidget;
 }
 
 void cedar::proc::gui::View::resetViewport()
@@ -208,6 +288,10 @@ void cedar::proc::gui::View::resetViewport()
   if (this->mpCommentWidget)
   {
     this->mpScene->setCommentWidget(this->mpCommentWidget);
+  }
+  if (this->mpCodeWidget)
+  {
+    this->mpScene->setCodeWidget(this->mpCodeWidget);
   }
 
 

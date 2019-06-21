@@ -231,6 +231,11 @@ bool cedar::aux::gui::ImagePlot::doConversion()
 
   switch(type)
   {
+    case CV_32F:
+    case CV_64F:
+    case CV_32S:
+    case CV_16S:
+    case CV_8S:
     case CV_16UC1:
     case CV_8UC1:
     {
@@ -277,7 +282,7 @@ bool cedar::aux::gui::ImagePlot::doConversion()
       break;
     }
 
-    case CV_32FC1:
+    /*case CV_32FC1:
     case CV_64FC1:
     {
       // convert grayscale to three-channel matrix
@@ -287,7 +292,7 @@ bool cedar::aux::gui::ImagePlot::doConversion()
       CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
       this->displayMatrix(converted);
       break;
-    }
+    }*/
 
     case CV_32FC3:
     {
@@ -334,7 +339,6 @@ bool cedar::aux::gui::ImagePlot::doConversion()
 cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in)
 {
   CEDAR_DEBUG_ASSERT(in.channels() == 1);
-
   // find min and max for scaling
   switch (this->mDataType)
   {
@@ -382,9 +386,12 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in)
           std::vector<cv::Mat> merge_vec;
           cv::Mat zeros = 0.0 * in;
 
-          cv::Mat in_scaled;
+          cv::Mat in_scaled, in_temp;
+          if(in.type() != CV_8U) in.copyTo(in_temp);
           switch (in.type())
           {
+            case CV_8U:
+              in.convertTo(in_temp, CV_32F);
             case CV_32F:
             case CV_64F:
             {
@@ -392,16 +399,16 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in)
               double max_val = this->getValueLimits().getUpper();
               if (this->isAutoScaling())
               {
-                cv::minMaxLoc(in, &min_val, &max_val);
+                cv::minMaxLoc(in_temp, &min_val, &max_val);
                 emit minMaxChanged(min_val, max_val);
               }
               if (min_val != max_val)
               {
-                in_scaled = 255.0 * (in - min_val) / (max_val - min_val);
+                in_scaled = 255.0 * (in_temp - min_val) / (max_val - min_val);
               }
               else
               {
-                in_scaled = in;
+                in_scaled = in_temp;
               }
               break;
             }

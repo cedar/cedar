@@ -51,6 +51,8 @@
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/CommentWidget.h"
+#include "cedar/processing/gui/CodeWidget.h"
+#include "cedar/processing/steps/PythonScript.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/GroupDeclarationManager.h"
@@ -106,6 +108,7 @@ mSnapToGrid(false),
 mpConfigurableWidget(nullptr),
 mpRecorderWidget(nullptr),
 mpCommentWidget(nullptr),
+mpCodeWidget(nullptr),
 mDraggingItems(false)
 {
   mMousePosX = 0;
@@ -114,6 +117,7 @@ mDraggingItems(false)
   QObject::connect(this, SIGNAL(selectionChanged()), this, SLOT(itemSelected()));
 
   this->setSnapToGrid(cedar::proc::gui::SettingsSingleton::getInstance()->snapToGrid());
+  
 }
 
 cedar::proc::gui::Scene::~Scene()
@@ -140,6 +144,11 @@ cedar::proc::gui::RecorderWidget* cedar::proc::gui::Scene::getRecorderWidget() c
 cedar::proc::gui::CommentWidget* cedar::proc::gui::Scene::getCommentWidget() const
 {
   return this->mpCommentWidget;
+}
+
+cedar::proc::gui::CodeWidget* cedar::proc::gui::Scene::getCodeWidget() const
+{
+  return this->mpCodeWidget;
 }
 
 void cedar::proc::gui::Scene::dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent)
@@ -393,6 +402,12 @@ void cedar::proc::gui::Scene::setCommentWidget(cedar::proc::gui::CommentWidget* 
   this->mpCommentWidget = pCommentWidget;
 }
 
+void cedar::proc::gui::Scene::setCodeWidget(cedar::proc::gui::CodeWidget* pCodeWidget)
+{
+  this->mpCodeWidget = pCodeWidget;
+  mpeParentView->hideCodeWidget();
+}
+
 void cedar::proc::gui::Scene::itemSelected()
 {
   // either show the resize handles if only one item is selected, or hide them if more than one is selected
@@ -439,7 +454,28 @@ void cedar::proc::gui::Scene::itemSelected()
           this->mpCommentWidget->clear();
         }
       }
-
+      
+      auto connectable_pythonScript = boost::dynamic_pointer_cast<cedar::proc::steps::PythonScript>(p_element->getElement());
+      if (this->mpCodeWidget != nullptr)
+      {
+        if (connectable_pythonScript)
+        {
+          this->mpCodeWidget->setConnectable(connectable_pythonScript);
+          mpeParentView->showCodeWidget();
+        }
+        else
+        {
+          this->mpCodeWidget->clear();
+          mpeParentView->hideCodeWidget();
+        }
+      }
+      else
+      {
+        if (connectable_pythonScript)
+        {
+          mpeParentView->showCodeWidget();
+        }
+      }
     }
     else if (auto coupling = dynamic_cast<cedar::proc::gui::CouplingCollection*>(p_item))
     {
@@ -465,6 +501,13 @@ void cedar::proc::gui::Scene::itemSelected()
     {
       this->mpCommentWidget->clear();
     }
+    
+    if (this->mpCodeWidget != nullptr)
+    {
+      this->mpCodeWidget->clear();
+    }
+    
+    mpeParentView->hideCodeWidget();
   }
 }
 

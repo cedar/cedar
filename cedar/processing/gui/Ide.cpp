@@ -438,8 +438,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
     this->loadDefaultPlugins();
   }
 
-  this->mpProcessingDrawer->setWidgets(this, this->mpPropertyTable, this->mpRecorderWidget,this->mpCommentWidget);
-
+  this->mpProcessingDrawer->setWidgets(this, this->mpPropertyTable, this->mpRecorderWidget,this->mpCommentWidget, this->mpCodeWidget);
   mpMenuWindows->addAction(this->mpItemsWidget->toggleViewAction());
   mpMenuWindows->addAction(this->mpPropertiesWidget->toggleViewAction());
   mpMenuWindows->addAction(this->mpLogWidget->toggleViewAction());
@@ -1929,6 +1928,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   this->mpActionToggleSmartConnections->blockSignals(false);
 
   this->setArchitectureChanged(false);
+  this->mpProcessingDrawer->setWidgets(this, this->mpPropertyTable, this->mpRecorderWidget,this->mpCommentWidget, this->mpCodeWidget);
 }
 
 void cedar::proc::gui::Ide::recentFileItemTriggered()
@@ -2213,6 +2213,7 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   this->mpPropertyTable->clear();
   this->mpRecorderWidget->clear();
   this->mpCommentWidget->clear();
+  this->mpCodeWidget->clear();
   this->mpActionShowHideGrid->setChecked(this->mpProcessingDrawer->getScene()->getSnapToGrid());
 
   this->updateTriggerStartStopThreadCallers();

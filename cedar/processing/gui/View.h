@@ -89,7 +89,8 @@ public:
     QMainWindow* pMainWindow,
     cedar::aux::gui::Configurable* pConigurableWidget,
     cedar::proc::gui::RecorderWidget* pRecorderWidget,
-    cedar::proc::gui::CommentWidget* pCommentWidget
+    cedar::proc::gui::CommentWidget* pCommentWidget,
+    cedar::proc::gui::CodeWidget* pCodeWidget
   );
 
   //!@brief return the displayed scene
@@ -134,6 +135,11 @@ public:
 
   //! Stops the ScrollTimer which is responsible for extending the scene during dragging
   void stopScrollTimer();
+  
+  
+  //!Hide or show the Code Tab (is only shown if "PythonScript" Step is selected)
+  void hideCodeWidget();
+  void showCodeWidget();
 
 public slots:
   /*!@brief Changes the current zoom level of the architecture.
@@ -238,6 +244,12 @@ private:
   cedar::proc::gui::RecorderWidget* mpRecorderWidget;
 
   cedar::proc::gui::CommentWidget* mpCommentWidget;
+  
+  cedar::proc::gui::CodeWidget* mpCodeWidget;
+  QWidget* mpCodeTabWidget;
+  QString mpCodeTabLabel;
+  QTabWidget* mpTabWidget;
+  int mpCodeTabIndex;
 
 }; // class ProcessingView
 

@@ -95,6 +95,21 @@ link_directories(${BOOST_INCLUDEDIR})
 link_directories(${CEDAR_DEPENDENCY_GLEW})
 endif(WIN32)
 
+# Python
+message("-- Searching for Python...")
+find_package(PythonLibs 2.7 REQUIRED)
+if(PYTHONLIBS_FOUND)
+  message("-- Python ${PYTHONLIBS_VERSION_STRING} was found in ${PYTHON_INCLUDE_DIRS}")
+  message("Found the following Python libraries:")
+  foreach (python_library ${PYTHON_LIBRARIES})
+    message("     ${python_library}")
+  endforeach()
+ 
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} python2.7)#${PYTHON_LIBRARIES})
+  include_directories(${PYTHON_INCLUDE_DIRS})
+endif(PYTHONLIBS_FOUND)
+
+
 # Boost
 if (WIN32)
   add_definitions("-D_WIN32_WINNT=0x0601")
@@ -107,7 +122,7 @@ endif (${CMAKE_BUILD_STATIC_LIBS})
 
 message("-- Searching for boost...")
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.40.0 COMPONENTS system date_time filesystem regex)
+find_package(Boost 1.40.0 COMPONENTS system date_time filesystem regex python-py27)
 
 if(Boost_FOUND)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Boost_LIBRARIES})
@@ -196,7 +211,7 @@ set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
           set(CEDAR_USE_FFTW_THREADED ON)
         else(FFTW_THREADED AND NOT APPLE)
           set(CEDAR_USE_FFTW_THREADED OFF)
-        endif(FFTW_THREADED)
+        endif(FFTW_THREADED AND NOT APPLE)
       else(FFTW_FOUND)
         message("-- FFTW was not found.")
         set(CEDAR_USE_FFTW OFF)
@@ -373,7 +388,7 @@ if(NOT CEDAR_PORTABLE_MINIMAL_VERSION)
 
     endif(CEDAR_USE_PCL)
 
-    option(CEDAR_USE_EIGEN3 "Include Eigen3 (for Kinect) if possible." ON)
+    option(CEDAR_USE_EIGEN3 "Include Eigen3 (for Kinect) if possible." OFF)
     if (CEDAR_USE_EIGEN3)
 
       if (PCL_FOUND)

@@ -414,6 +414,26 @@ void cedar::aux::gui::MatrixSlicePlot3D::plotClicked(QMouseEvent* pEvent, double
 
   switch (mat.type())
   {
+    case CV_8S:
+      info_text = info_text.arg(mat.at<int8_t>(idx));
+      break;
+
+    case CV_8U:
+      info_text = info_text.arg(mat.at<uint8_t>(idx));
+      break;
+
+    case CV_16S:
+      info_text = info_text.arg(mat.at<int16_t>(idx));
+      break;
+
+    case CV_16U:
+      info_text = info_text.arg(mat.at<uint16_t>(idx));
+      break;
+
+    case CV_32S:
+      info_text = info_text.arg(mat.at<int32_t>(idx));
+      break;
+
     case CV_32F:
       info_text = info_text.arg(mat.at<float>(idx));
       break;

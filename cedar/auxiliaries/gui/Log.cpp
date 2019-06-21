@@ -64,7 +64,7 @@ QTabWidget(pParent)
 
   this->addPane(cedar::aux::LOG_LEVEL_ERROR, "error", ":/cedar/auxiliaries/gui/error.svg");
   this->addPane(cedar::aux::LOG_LEVEL_WARNING, "warning", ":/cedar/auxiliaries/gui/warning.svg");
-  this->addPane(cedar::aux::LOG_LEVEL_MESSAGE, "message", ":/cedar/auxiliaries/gui/message.svg");
+  this->addPane(cedar::aux::LOG_LEVEL_MESSAGE, "message", ":/cedar/auxiliaries/gui/message.svg");;
 
 #ifdef DEBUG
   this->addPane(cedar::aux::LOG_LEVEL_DEBUG, "debug", ":/cedar/auxiliaries/gui/debug.svg");

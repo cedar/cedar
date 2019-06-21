@@ -285,11 +285,13 @@ namespace cedar
       {
         CEDAR_ASSERT
         (
-          matrix.type() == CV_8UC1
+             matrix.type() == CV_8UC1
+          || matrix.type() == CV_8SC1
           || matrix.type() == CV_16UC1
+          || matrix.type() == CV_16SC1
+          || matrix.type() == CV_32SC1
           || matrix.type() == CV_32F
           || matrix.type() == CV_64F
-          || matrix.type() == CV_32S
         );
         CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) <= 1);
 
@@ -299,12 +301,20 @@ namespace cedar
             return static_cast<T>(matrix.at<uint8_t>(index));
             break;
 
+          case CV_8SC1:
+            return static_cast<T>(matrix.at<int8_t>(index));
+            break;
+
           case CV_16UC1:
             return static_cast<T>(matrix.at<uint16_t>(index));
             break;
 
-          case CV_32S:
-            return static_cast<T>(matrix.at<int>(index));
+          case CV_16SC1:
+            return static_cast<T>(matrix.at<int16_t>(index));
+            break;
+
+          case CV_32SC1:
+            return static_cast<T>(matrix.at<int32_t>(index));
             break;
 
           case CV_32F:
@@ -338,8 +348,16 @@ namespace cedar
             return static_cast<T>(matrix.at<uint8_t>(row, col));
             break;
 
-          case CV_16UC1:
+          case CV_16S:
+            return static_cast<T>(matrix.at<int16_t>(row, col));
+            break;
+
+          case CV_16U:
             return static_cast<T>(matrix.at<uint16_t>(row, col));
+            break;
+
+          case CV_32S:
+            return static_cast<T>(matrix.at<int32_t>(row, col));
             break;
 
           case CV_32F:

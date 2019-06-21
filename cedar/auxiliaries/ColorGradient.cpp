@@ -293,28 +293,33 @@ cv::Mat cedar::aux::ColorGradient::applyTo(const cv::Mat& matrix, bool limits, d
 
   cv::Mat in_converted;
 
-  if (matrix.type() != CV_8UC1)
+  switch (matrix.type())
   {
-    switch (matrix.type())
+    case CV_8SC1:
     {
-      case CV_16UC1:
-      case CV_32F:
-      case CV_64F:
-      {
-        cv::Mat scaled = (matrix - min) / (max - min) * 255.0;
-        scaled.convertTo(in_converted, CV_8UC1);
-        break;
-      }
-      default:
-        matrix.convertTo(in_converted, CV_8UC1);
-        break;
+      cv::Mat temp;
+      // Increase the value range of the input matrix so that the applied
+      // range of 0-255.0 does not exceed the value range of CV_8S
+      matrix.convertTo(temp, CV_16SC1);
+      cv::Mat scaled = (temp - min) / ((max - min)) * 255.0;
+      scaled.convertTo(in_converted, CV_8UC1);
+      break;
     }
+    case CV_8UC1:
+    case CV_16UC1:
+    case CV_16SC1:
+    case CV_32SC1:
+    case CV_32F:
+    case CV_64F:
+    {
+      cv::Mat scaled = (matrix - min) / ((max - min)) * 255.0;
+      scaled.convertTo(in_converted, CV_8UC1);
+      break;
+    }
+    default:
+      matrix.convertTo(in_converted, CV_8UC1);
+      break;
   }
-  else
-  {
-    in_converted = matrix;
-  }
-
   cv::Mat converted = cv::Mat(matrix.rows, matrix.cols, CV_8UC3);
 
   const unsigned char* p_in;

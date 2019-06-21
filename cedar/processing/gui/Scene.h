@@ -57,6 +57,7 @@
 #include "cedar/processing/gui/Group.fwd.h"
 #include "cedar/processing/gui/RecorderWidget.fwd.h"
 #include "cedar/processing/gui/CommentWidget.fwd.h"
+#include "cedar/processing/gui/CodeWidget.fwd.h"
 #include "cedar/processing/gui/StickyNote.fwd.h"
 #include "cedar/processing/gui/TriggerItem.fwd.h"
 #include "cedar/auxiliaries/gui/Configurable.fwd.h"
@@ -276,6 +277,8 @@ public:
   void setRecorderWidget(cedar::proc::gui::RecorderWidget* pRecorderWidget);
 
   void setCommentWidget(cedar::proc::gui::CommentWidget* pCommentWidget);
+  
+  void setCodeWidget(cedar::proc::gui::CodeWidget* pCodeWidget);
 
   /*!@brief Exports the scene to an svg file
    */
@@ -325,6 +328,9 @@ public:
   cedar::proc::gui::RecorderWidget* getRecorderWidget() const;
 
   cedar::proc::gui::CommentWidget* getCommentWidget() const;
+  
+  cedar::proc::gui::CodeWidget* getCodeWidget() const;
+  
 
   /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
    */
@@ -503,6 +509,8 @@ private:
   cedar::proc::gui::RecorderWidget* mpRecorderWidget;
 
   cedar::proc::gui::CommentWidget* mpCommentWidget;
+  
+  cedar::proc::gui::CodeWidget* mpCodeWidget;
 
   //! Saves the mouse x position in the scene
   int mMousePosX;

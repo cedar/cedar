@@ -73,6 +73,7 @@ cedar_add_library(cedarproc
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureWidget.h
   gui/BoostControl.h
+  gui/CodeWidget.h
   gui/CommentWidget.h
   gui/Connectable.h
   gui/CouplingCollection.h
@@ -149,6 +150,8 @@ cedar_add_library(cedarproc
   steps/VehicleRotation.h    
   steps/Delay.h
   steps/WeightedSum.h
+  steps/PythonScript.h
+  steps/PythonScriptLooped.h
   sources/VirtualCamera.h
   sources/Boost.h
   sources/Noise.h
