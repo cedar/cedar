@@ -40,6 +40,8 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+#ifdef PYTHONLIBS_FOUND
+
 // CEDAR INCLUDES
 #include <cedar/processing/Step.h>
 #include <cedar/auxiliaries/MatData.h>
@@ -63,7 +65,6 @@
 // SYSTEM INCLUDES
 #include <QGraphicsSceneContextMenuEvent>
 #include <QContextMenuEvent>
-
 
 
 
@@ -245,6 +246,7 @@ class NumpyAllocator;
 
 //enum { ARG_NONE = 0, ARG_MAT = 1, ARG_SCALAR = 2 };
 
+#endif
 
 #endif // CEDAR_PROC_STEPS_PYTHON_SCRIPT_H
 

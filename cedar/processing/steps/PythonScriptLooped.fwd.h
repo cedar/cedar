@@ -49,7 +49,7 @@
 #endif // Q_MOC_RUN
 
 
-
+#ifdef PYTHONLIBS_FOUND
 
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar
@@ -64,7 +64,7 @@ namespace cedar
 }
 //!@endcond
 
-
+#endif
 
 #endif // CEDAR_PROC_STEPS_PYTHON_SCRIPT_LOOPED_FWD_H
 

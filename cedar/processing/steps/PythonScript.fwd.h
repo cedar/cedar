@@ -50,7 +50,7 @@
 
 
 
-
+#ifdef PYTHONLIBS_FOUND
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
@@ -63,7 +63,7 @@ namespace cedar
   }
 }
 //!@endcond
-
+#endif
 
 
 #endif // CEDAR_PROC_STEPS_PYTHON_SCRIPT_FWD_H

@@ -54,6 +54,7 @@
 #cmakedefine CEDAR_USE_QWTPLOT3D
 #cmakedefine CEDAR_USE_QT5
 #cmakedefine CEDAR_USE_QT5_PLOTS
+#cmakedefine PYTHONLIBS_FOUND
 #cmakedefine CEDAR_PORTABLE
 #cmakedefine CEDAR_PORTABLE_HOME_DIR
 #cmakedefine CEDAR_PORTABLE_MAC_BUNDLE_PATHS
