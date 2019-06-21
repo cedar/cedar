@@ -72,7 +72,7 @@ namespace
     );
     declaration->setDescription
                       (
-                        "This processing step convolves a matrix with a kernel or kernel list.\n"
+                        "Implements the convolution operation, where the convolution can act via a specified kernel (see parameters) or optionally via a second input.\n"
                         "Convolution can be done with to different engines: OpenCV and FFTW. "
                         "The OpenCV engine provides Convolution with three modes: Full, same, and valid. "
                         "Also the border handling can be set as: Cyclic, zero-filled, mirrowed, and replicate. "

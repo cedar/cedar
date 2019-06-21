@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 #include "cedar/auxiliaries/LockableMember.h"
 #include "cedar/auxiliaries/SerializationFormat.h"
@@ -107,6 +108,9 @@ public:
 
   //! Returns the parameter that contains the recorder's output directory.
   cedar::aux::DirectoryParameterPtr getRecorderWorkspaceParameter() const;
+
+  //! Returns the parameter that contains the recorder's output directory.
+  cedar::aux::StringParameterPtr getYarpConfigInfoParameter() const;
 
   //!@brief returns a list of all plugins that should be loaded on start-up
   const std::set<std::string>& pluginsToLoad();
@@ -216,6 +220,8 @@ public:
 
   std::string getCurrentArchitectureFileName();
 
+  void updateYarpNameServerContact();
+
 signals:
   void currentArchitectureFileChanged();
 
@@ -257,6 +263,8 @@ private:
 
   std::string mCurrentArchitectureFileName;
 
+  std::string mCurrentYarpConfigInfo;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -284,6 +292,8 @@ protected:
 
   //! Format of data written out by the recorder
   cedar::aux::EnumParameterPtr _mRecorderSerializationFormat;
+
+  cedar::aux::StringParameterPtr _mYarpConfigInfo;
 
 private:
   // none yet

@@ -71,6 +71,13 @@ QWidget(pParent)
   QObject::connect(this->mpDefault2dMatDataPlot, SIGNAL(currentIndexChanged(int)), this, SLOT(default2dMatDataPlotChanged()));
 
   this->mpRecordingFormatSelector->setParameter(cedar::aux::SettingsSingleton::getInstance()->getRecorderSerializationFormatParameter());
+
+//  QObject::connect(this->mpYarpConfigString,SIGNAL(cedar::aux::gui::Parameter::valueChanged()),this,SLOT(yarpConfigInfoChanged()));
+  this->mpYarpConfigString->setParameter(cedar::aux::SettingsSingleton::getInstance()->getYarpConfigInfoParameter());
+
+  this->mpYarpConfigString->setPlaceHolderText("XXX.XXX.XXX.XX YYYY");
+
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -126,3 +133,18 @@ void cedar::aux::gui::SettingsWidget::default2dMatDataPlotChanged()
   std::string selection = this->mpDefault2dMatDataPlot->currentText().toStdString();
   cedar::aux::gui::SettingsSingleton::getInstance()->setDefault2dMatDataPlot(selection);
 }
+
+
+void cedar::aux::gui::SettingsWidget::reject()
+{
+  // just (re-)load the settings that are currently stored on the disk
+  cedar::aux::SettingsSingleton::getInstance()->load();
+}
+
+void cedar::aux::gui::SettingsWidget::accept()
+{
+  // write the settings to the disk
+  cedar::aux::SettingsSingleton::getInstance()->save();
+  cedar::aux::SettingsSingleton::getInstance()->updateYarpNameServerContact();
+}
+

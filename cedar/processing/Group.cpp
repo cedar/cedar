@@ -880,14 +880,14 @@ std::string cedar::proc::Group::findNewIdentifier(const std::string& basis, boos
     return basis;
   }
 
-
-
   std::string base_str = basis;
-
   size_t last_number = basis.find_last_not_of("0123456789");
   if (last_number != std::string::npos && last_number != base_str.size() - 1)
   {
-    base_str = basis.substr(0, last_number);
+    if(basis.substr(last_number,1) == " ")
+      base_str = basis.substr(0, last_number);
+    else
+      base_str = basis.substr(0, last_number+1);
   }
 
   unsigned int count = 2;

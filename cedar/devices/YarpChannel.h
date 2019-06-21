@@ -75,9 +75,9 @@ public:
 
   YarpChannel()
 :
+  mIsOpen(false),
   mReadPortName(new cedar::aux::StringParameter(this, "readPortName", "defaultRead")),
-  mWritePortName(new cedar::aux::StringParameter(this, "writePortName", "defaultWrite")),
-  mIsOpen(false)
+  mWritePortName(new cedar::aux::StringParameter(this, "writePortName", "defaultWrite"))
   {
 
   }
@@ -205,6 +205,8 @@ protected:
           it->second = TypeWriterPtr(new TypeWriter(port));
         }
       }
+
+      mIsOpen = true;
   }
 
   void closeHook()
@@ -219,6 +221,8 @@ protected:
     {
       it->second = nullptr;
     }
+
+    mIsOpen = false;
   }
 
   bool isOpen() const

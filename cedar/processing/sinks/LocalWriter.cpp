@@ -69,7 +69,8 @@ namespace
       )
     );
     input_declaration->setIconPath(":/steps/local_writer.svg");
-    input_declaration->setDescription("Forwards incoming matrices locally.");
+    input_declaration->setDescription("Forwards incoming matrices locally. "
+                          "See also the LocalReader step.");
 
     input_declaration->declare();
 

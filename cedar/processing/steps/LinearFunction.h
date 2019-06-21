@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LinearDynamics.cpp
+    File:        LinearFunction.cpp
 
     Maintainer:  Nico Kuerschner
     Email:       nico.kuerschner@ini.rub.de
     Date:        2016 08 12
 
-    Description: Step for the implementation of an attractor dynamics approach by Hendrik Reimann, ISR 2010
+    Description: 
 
     Credits:
 
@@ -40,13 +40,17 @@
 #include <cedar/processing/Step.h> // if we are going to inherit from cedar::proc::Step, we have to include the header
 #include <cedar/auxiliaries/MatData.h>
 #include <cedar/auxiliaries/DoubleParameter.h>
-#include "cedar/processing/steps/LinearDynamics.fwd.h"
+#include "cedar/processing/steps/LinearFunction.fwd.h"
 
-class cedar::proc::steps::LinearDynamics : public cedar::proc::Step
+class cedar::proc::steps::LinearFunction : public cedar::proc::Step
 {
     Q_OBJECT
+
+public slots:
+  void constantChanged();
+
   public:
-    LinearDynamics();
+    LinearFunction();
     cedar::proc::DataSlot::VALIDITY determineInputValidity
                                     (
                                       cedar::proc::ConstDataSlotPtr slot,
@@ -54,19 +58,18 @@ class cedar::proc::steps::LinearDynamics : public cedar::proc::Step
                                     ) const;
 
   private:
+    void recompute();
     void compute(const cedar::proc::Arguments&);
     void inputConnectionChanged(const std::string& inputName);
-
-    // input
-    cedar::aux::ConstMatDataPtr mpSpeed;
+    void checkOptionalInputs();
 
 protected:
     // output
-    cedar::aux::MatDataPtr mpAcceleration;
+    cedar::aux::MatDataPtr mResult;
 
     // params
-    cedar::aux::DoubleParameterPtr mpLambda;
-    cedar::aux::DoubleParameterPtr mpSDes;
+    cedar::aux::DoubleParameterPtr mSlope;
+    cedar::aux::DoubleParameterPtr mHorizontalShift;
 };
 
 #endif /* LINEAR_DYNAMICS_H_ */

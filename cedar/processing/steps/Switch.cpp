@@ -72,10 +72,10 @@ namespace
     declaration->setDescription
     (
       "Implements a 'soft' if statement. Calculates a mixture of its first two inputs based on a third one.<br />"
-      "The step has the inputs \"input 1\", \"input 2\" and \"factor\". The output, \"mixture\" is calculated "
-      "as (factor) * (input 1) + (1 - factor) * (input 2). Thus, input one and two must be matrices, while "
-      "factor must be either DoubleData or zero-dimensional MatData. "
-      "If the parameter \"make binary\" is set the factor will be interpreted "
+      "This step has the inputs \'input 1\', \'input 2\' and \'factor\'. The output, \'mixture\' is calculated "
+      "as (factor) * (input 1) + (1 - factor) * (input 2). Thus, 'input one' and'input two' must be matrices, while "
+      "factor must be a scalar.\n"
+      "If the parameter \'make binary\' is set 'factor' will be interpreted "
       "as a bool, i.e. all non-zero values will be interpreted as 1, making the switch 'binary'."
     );
 

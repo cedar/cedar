@@ -76,6 +76,8 @@ public:
 public:
   void setReadOnly(bool readOnly);
 
+  void setPlaceHolderText(std::string);
+
 public slots:
   //!@brief handles a change of the associated parameter
   void parameterPointerChanged();
@@ -105,6 +107,7 @@ protected:
 private:
   //!@brief a text edit for the represented parameter
   QLineEdit *mpEdit;
+  std::string mpPlaceHolderText;
 }; // class cedar::aux::gui::StringParameter
 
 #endif // CEDAR_AUX_GUI_STRING_PARAMETER_H

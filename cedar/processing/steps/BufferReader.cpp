@@ -73,7 +73,7 @@ bool declare()
   declaration->setIconPath(":/steps/buffer_reader.svg");
   declaration->setDescription
   (
-    "A step that reads a buffer from a neural field and outputs it. NOTE: the syntax to adress buffers is to separate elements via dots."
+    "A step that reads a buffer from a neural field and outputs it. NOTE: the syntax to adress buffers is to separate elements via dots, example: 'Neural Field 2.activation'."
   );
 
   declaration->declare();

@@ -369,6 +369,11 @@ void cedar::dev::RobotManager::setRobotTemplateName(const std::string& robotName
   this->retrieveRobotInfo(robotName).mTemplateName = templateName;
 }
 
+void cedar::dev::RobotManager::setAutomaticallyConnect(const std::string& robotName, const bool doesConnectAutomatically)
+{
+  this->retrieveRobotInfo(robotName).mDoesAutomaticallyConnect = doesConnectAutomatically;
+}
+
 const std::string& cedar::dev::RobotManager::getRobotTemplateName(const std::string& robotName) const
 {
   auto iter = this->mRobotInfos.find(robotName);
@@ -479,6 +484,7 @@ void cedar::dev::RobotManager::writeRobotConfigurations(cedar::aux::Configuratio
       robot.put("template name", robot_info.mTemplateName);
       robot.put("loaded template configuration", robot_info.mLoadedTemplateConfiguration);
       robot.put("loaded template configuration name", robot_info.mLoadedTemplateConfigurationName);
+      robot.put("automatic connect",robot_info.mDoesAutomaticallyConnect);
 
       //For KinematicChains also save their initialConfigurations
       auto robotPtr = name_robot_pair.second;
@@ -543,9 +549,6 @@ void cedar::dev::RobotManager::readRobotConfigurations(cedar::aux::Configuration
       continue;
     }
 
-
-
-
     this->addRobotName(name);
 
     if (robot.find("template name") != robot.not_found())
@@ -553,6 +556,7 @@ void cedar::dev::RobotManager::readRobotConfigurations(cedar::aux::Configuration
       std::string template_name = robot.get<std::string>("template name");
       std::string loaded_template_configuration = robot.get<std::string>("loaded template configuration");
       std::string loaded_template_configuration_name = robot.get<std::string>("loaded template configuration name");
+      bool loaded_automatic_connect = robot.get<bool>("automatic connect",false);
       if (!template_name.empty())
       {
         this->setRobotTemplateName(name, template_name);
@@ -576,6 +580,10 @@ void cedar::dev::RobotManager::readRobotConfigurations(cedar::aux::Configuration
       {
         this->setRobotTemplateConfigurationName(name, loaded_template_configuration_name);
       }
+
+
+      this->setAutomaticallyConnect(name,loaded_automatic_connect);
+
     }
     else
     {
@@ -667,5 +675,27 @@ bool cedar::dev::RobotManager::doesRobotExist(std::string robotName)
 void cedar::dev::RobotManager::emitConfigurationChanged()
 {
   this->signalConfigurationChanged();
+}
+
+bool cedar::dev::RobotManager::isAutomaticallyConnecting(const std::string &robotName)
+{
+  return this->retrieveRobotInfo(robotName).mDoesAutomaticallyConnect;
+}
+
+void cedar::dev::RobotManager::connectRobotsAutomatically()
+{
+  for (auto const& roboInfoPair : mRobotInfos)
+  {
+    if(roboInfoPair.second.mDoesAutomaticallyConnect)
+    {
+      auto robot = this->getRobot(roboInfoPair.first);
+//      std::cout<<"Connect all Components of: " << roboInfoPair.first <<std::endl;
+      if (!robot->areSomeComponentsCommunicating())
+      {
+        robot->startCommunicationOfComponents(true);
+      }
+    }
+
+  }
 }
 

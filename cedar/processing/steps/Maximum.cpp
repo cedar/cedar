@@ -72,7 +72,9 @@ namespace
     declaration->setIconPath(":/steps/maximum.svg");
     declaration->setDescription
     (
-      "Calculates the element-wise maximum over all inputs."
+      "Calculates the maximum element-wise over all inputs. All tensors "
+      "inputs must have the same size. Note: This "
+      "does NOT give you the maximum entry of a tensor."
     );
 
     declaration->declare();

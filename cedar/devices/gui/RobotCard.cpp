@@ -42,6 +42,7 @@
 #include "cedar/devices/RobotManager.h"
 #include "cedar/devices/Robot.h"
 #include "cedar/devices/exceptions.h"
+#include "cedar/devices/Component.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -73,6 +74,8 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
           _1
         )
       );
+
+
 
   // build user interface
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
@@ -115,8 +118,13 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
   p_outer_layout->addLayout(p_connect_layout, 0);
 
   // connection configure box
-  auto p_connect_config_layout = new QHBoxLayout();
+  auto p_connect_config_layout = new QVBoxLayout();
   p_connect_config_layout->setContentsMargins(contents_margins, contents_margins, contents_margins, contents_margins);
+  this->mpAutomaticConnectBox = new QCheckBox();
+  this->mpAutomaticConnectBox->setText(QString::fromStdString("connect on play?"));
+  this->mpAutomaticConnectBox->setToolTip(QString::fromStdString("Disconnection has to be handled manually"));
+  p_connect_config_layout->addWidget(mpAutomaticConnectBox, 1);
+
   mpConfigurationSelector = new QComboBox();
   p_connect_config_layout->addWidget(mpConfigurationSelector, 1);
   p_outer_layout->addLayout(p_connect_config_layout, 0);
@@ -145,6 +153,7 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
   QObject::connect(mpConfigurationSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedConfigurationChanged(int)));
   QObject::connect(mpDeleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
   QObject::connect(this->mpRobotNameEdit, SIGNAL(editingFinished(void)), this, SLOT(robotNameEditValueChanged(void)));
+  QObject::connect(this->mpAutomaticConnectBox, SIGNAL(stateChanged(int)), this, SLOT(automaticConnectClicked(int)));
 
   try
   {
@@ -185,7 +194,12 @@ mpCard(pCard)
 
 cedar::dev::gui::RobotCard::~RobotCard()
 {
-  this->mRobotRemovedConnection.disconnect();    
+  this->mRobotRemovedConnection.disconnect();
+
+  for(auto connection: mRobotDisconnectConnections)
+  {
+    connection.disconnect();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -196,6 +210,7 @@ void cedar::dev::gui::RobotCard::updateConnectionIcon()
 {
   this->mpConnectButton->setEnabled(true);
   cedar::dev::RobotPtr robot = cedar::dev::RobotManagerSingleton::getInstance()->getRobot(this->getRobotName());
+
 
   if (robot->areAllComponentsCommunicating())
   {
@@ -256,7 +271,7 @@ void cedar::dev::gui::RobotCard::connectClicked()
       robot->stopCommunicationOfComponents();
     }
 
-    this->updateConnectionIcon();
+    this->updateConnectionIcon(); // Somehow a connection to the ConnectHook blocks everything. Could be the result of the boost signals. So update of the Icon will still be updated here as well.
   }
   catch (const cedar::aux::ExceptionBase& e)
   {
@@ -282,10 +297,13 @@ void cedar::dev::gui::RobotCard::connectClicked()
   this->mpConnectButton->setEnabled(true);
 }
 
+//TODO: Function Naming seems off here. This robot Dropped should call setRobotTemplate and not the other way round!
 void cedar::dev::gui::RobotCard::setRobotTemplate(const std::string& templateName)
 {
   this->robotDropped(QString::fromStdString(templateName));
   this->mpIcon->setIconFromTemplate(templateName);
+  this->mpAutomaticConnectBox->setChecked(cedar::dev::RobotManagerSingleton::getInstance()->isAutomaticallyConnecting(this->getRobotName()));
+
 }
 
 void cedar::dev::gui::RobotCard::deleteClicked()
@@ -334,6 +352,31 @@ void cedar::dev::gui::RobotCard::selectedConfigurationChanged(int index)
 
   mpConnectButton->setDisabled(false);
   cedar::dev::RobotManagerSingleton::getInstance()->loadRobotTemplateConfiguration(this->getRobotName(), combo_text.toStdString());
+
+
+
+
+  for(auto connection: mRobotDisconnectConnections)
+  {
+    connection.disconnect();
+  }
+
+  auto componentSlotNames = this->mrRobot->getComponentSlotNames();
+  for(auto slotName:componentSlotNames)
+  {
+    auto component = this->mrRobot->getComponent(slotName);
+    auto connectionToDisconnect = component->registerDisconnectedHook
+            (
+                    boost::bind
+                            (
+                                    &cedar::dev::gui::RobotCard::updateConnectionIcon,
+                                    this
+                            )
+            );
+    this->mRobotDisconnectConnections.push_back(connectionToDisconnect);
+  }
+
+
 }
 
 void cedar::dev::gui::RobotCard::robotDropped(const QString& robotTypeName)
@@ -472,4 +515,10 @@ void cedar::dev::gui::RobotCard::robotNameEditValueChanged()
 
   cedar::dev::RobotManagerSingleton::getInstance()->renameRobot(mCurrentName, robot_name);
   mCurrentName = robot_name;
+}
+
+void cedar::dev::gui::RobotCard::automaticConnectClicked(int state)
+{
+  //Checkboxes can either be 0,1 or 2, where 1 is a partial check
+  cedar::dev::RobotManagerSingleton::getInstance()->setAutomaticallyConnect(this->getRobotName(),state > 0);
 }

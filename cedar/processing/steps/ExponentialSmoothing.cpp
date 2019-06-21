@@ -86,6 +86,7 @@ bool declared = declare();
 
 cedar::proc::steps::ExponentialSmoothing::ExponentialSmoothing()
 :
+cedar::proc::Step(true),
 // outputs
 mOutput(new cedar::aux::MatData(cv::Mat())),
 mDataEstimate(),
@@ -118,7 +119,8 @@ void cedar::proc::steps::ExponentialSmoothing::inputConnectionChanged(const std:
   if (!this->mInput)
   {
     // no input -> no output
-    this->mOutput->setData(cv::Mat());
+    // quickfix: this crashes plots: this->mOutput->setData(cv::Mat());
+    //this->mOutput->setData(cv::Mat());
     output_changed = true;
   }
   else

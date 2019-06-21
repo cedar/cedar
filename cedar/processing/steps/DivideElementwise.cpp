@@ -72,7 +72,7 @@ namespace
     multiply_decl->setIconPath(":/steps/divide_elementwise.svg");
     multiply_decl->setDescription
     (
-      "Divide two matrices elementwise."
+      "Divide two matrices element-wise."
     );
 
     multiply_decl->declare();

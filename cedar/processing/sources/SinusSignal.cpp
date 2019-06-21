@@ -72,7 +72,8 @@ bool declare()
   declaration->setIconPath(":/steps/sinus_signal.svg");
   declaration->setDescription
   (
-    "Generates a sinus signal in time."
+    "Generates a sine signal in time. The Global clock serves as timing "
+    "signal. You can switch the sine to a cosine by a GUI parameter."
   );
 
   declaration->declare();

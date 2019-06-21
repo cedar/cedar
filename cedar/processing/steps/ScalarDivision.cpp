@@ -67,7 +67,9 @@ namespace
     multiply_decl->setIconPath(":/steps/scalar_division.svg");
     multiply_decl->setDescription
     (
-      "Divides an input matrix by a scalar that can also be input into the step."
+      "Divides an input tensor by a scalar input. "
+      "To avoid (numerically) dividing by zero you can also provide a "
+      "small value by which to divide instead of zero. "
     );
 
     multiply_decl->declare();

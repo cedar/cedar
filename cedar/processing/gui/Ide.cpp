@@ -81,6 +81,7 @@
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/version.h"
 #include "cedar/configuration.h"
+#include "cedar/devices/RobotManager.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -1447,6 +1448,9 @@ void cedar::proc::gui::Ide::startPauseSimulationClicked()
     // start global timer
     //!@todo Should this happen automatically as soon as one of the triggers is started? Or should this remain the responsibility of the GUI?
     cedar::aux::GlobalClockSingleton::getInstance()->start();
+
+
+    cedar::dev::RobotManagerSingleton::getInstance()->connectRobotsAutomatically();
   }
 }
 

@@ -230,11 +230,12 @@ cedar::dev::ComponentPtr cedar::proc::details::ComponentStepUserSelectableComman
 cedar::proc::steps::Component::Component()
 :
 cedar::proc::Step(true),
+mInitConfigHasBeenApplied(false),
 _mComponent(new cedar::dev::ComponentParameter(this, "component")),
 _mUserSelectableCommandTypeSubset(new cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameter(this,
 "Command Subset")),
 _mCommunicationStepSize(new cedar::aux::DoubleParameter(this, "communication step size [ms]", 10.0, 0.01, 100)),
-_mUseKinChainConfigurationOnReset( new cedar::aux::BoolParameter(this, "reset to current config?", false))
+_mUseKinChainConfigurationOnReset( new cedar::aux::BoolParameter(this, "init/reset to current config", false))
 {
   this->_mUserSelectableCommandTypeSubset->setConstant(true);
 
@@ -255,7 +256,7 @@ _mUseKinChainConfigurationOnReset( new cedar::aux::BoolParameter(this, "reset to
 
   if(auto kinChain = boost::dynamic_pointer_cast<cedar::dev::SimulatedKinematicChain>(this->getComponent()))
   {
-      _mUseKinChainConfigurationOnReset->setConstant(false);
+    _mUseKinChainConfigurationOnReset->setConstant(false);
   } else
   {
     _mUseKinChainConfigurationOnReset->setValue(false);
@@ -266,7 +267,6 @@ _mUseKinChainConfigurationOnReset( new cedar::aux::BoolParameter(this, "reset to
 
 cedar::proc::steps::Component::~Component()
 {
-  std::cout<<"Destructor!! ComponentStep"<<std::endl;
 }
 
 
@@ -385,6 +385,14 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
     return;
 
   auto component = this->getComponent();
+
+  if(!mInitConfigHasBeenApplied &&  _mUseKinChainConfigurationOnReset->getValue() && boost::dynamic_pointer_cast<cedar::dev::SimulatedKinematicChain>(component))
+  {
+    //This ensures that the Initial Configuration is applied after the first start of the architecture
+    //Onstart does not work, because the communication might not yet be established at that point
+    //Connection to the onconnect signal somehow produced a deadlock
+    this->applyCurrentInitialConfiguration();
+  }
 
   this->testStates(component);
 
@@ -605,13 +613,16 @@ void cedar::proc::steps::Component::applyCurrentInitialConfiguration()
       {
         std::cout << "Reset " << this->getName() <<" : Choose the first initial configuration, because no current configuration was selected!" << std::endl;
         kinChain->setCurrentInitialConfiguration(configList[0]);
+        mInitConfigHasBeenApplied = true;
       }
       if (kinChain->isCommunicating())
       {
+//        std::cout<<"Reset to: " << kinChain->getCurrentInitialConfigurationName() << std::endl;
         kinChain->applyInitialConfiguration(kinChain->getCurrentInitialConfigurationName());
+        mInitConfigHasBeenApplied = true;
       } else
       {
-        std::cout<<"Reset: Tried to reset "<< this->getName() <<" to " << kinChain->getCurrentInitialConfigurationName() <<" but it was not connected"<<std::endl;
+//        std::cout<<"Reset: Tried to reset "<< this->getName() <<" to " << kinChain->getCurrentInitialConfigurationName() <<" but it was not connected"<<std::endl;
       }
     } else
     {

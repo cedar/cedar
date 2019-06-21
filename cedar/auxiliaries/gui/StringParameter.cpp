@@ -67,12 +67,15 @@ namespace
 
 cedar::aux::gui::StringParameter::StringParameter(QWidget *pParent)
 :
-cedar::aux::gui::Parameter(pParent)
+cedar::aux::gui::Parameter(pParent),
+mpPlaceHolderText("")
 {
   this->setLayout(new QHBoxLayout());
   this->mpEdit = new QLineEdit();
   this->layout()->setContentsMargins(0, 0, 0, 0);
   this->layout()->addWidget(this->mpEdit);
+
+  this->mpEdit->setPlaceholderText(QString::fromStdString(mpPlaceHolderText));
 
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
 }
@@ -135,5 +138,11 @@ void cedar::aux::gui::StringParameter::textEdited(const QString& text)
     this->setStyleSheet("QLineEdit {background-color: red; }");
     QToolTip::showText(pos, QString::fromStdString(exc.getMessage()), this);
   }
+}
+
+void cedar::aux::gui::StringParameter::setPlaceHolderText(std::string placeHolder)
+{
+  this->mpPlaceHolderText = placeHolder;
+  this->mpEdit->setPlaceholderText(QString::fromStdString(mpPlaceHolderText));
 }
 

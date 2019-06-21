@@ -72,7 +72,7 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/linear_spatial_template.svg");
-    declaration->setDescription("Generates a matrix with a linear gradient. Defaults to diagonal in the 2D case; use the projection step from a 1D gradient to generate other gradients.");
+    declaration->setDescription("Generates a matrix with a linear gradient. Note: Defaults to diagonal orientation in the 2D case; use the Projection step from a 1D gradient to generate a linear gradient along one dimension, only.");
 
     declaration->declare();
 

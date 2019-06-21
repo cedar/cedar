@@ -59,6 +59,11 @@ namespace
     ElementDeclarationPtr declaration(new ElementDeclarationTemplate<cedar::proc::steps::Jacobian>("Robotics", "cedar.processing.steps.Jacobian"));
     declaration->setIconPath(":/steps/jacobian.svg");
     declaration->declare();
+    declaration->setDescription
+    (
+      "Calculates the (kinematic) Jacobian for the current configuration "
+      "of a robot. Needs to be connected to a Component (Robot)."
+    );
 
     return true;
   }

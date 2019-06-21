@@ -395,7 +395,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -406,13 +406,13 @@
      inkscape:label="Layer 1">
     <path
        sodipodi:type="arc"
-       style="fill:none;stroke:#060000;stroke-width:7;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:none;stroke:#060000;stroke-width:9.16204694;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="path2867"
        sodipodi:cx="144.45181"
        sodipodi:cy="168.67506"
        sodipodi:rx="75.761444"
        sodipodi:ry="75.761444"
-       d="m 220.21326,168.67506 a 75.761444,75.761444 0 1 1 -151.522891,0 75.761444,75.761444 0 1 1 151.522891,0 z"
+       d="m 220.21326,168.67506 c 0,41.84189 -33.91956,75.76145 -75.76145,75.76145 -41.84189,0 -75.761441,-33.91956 -75.761441,-75.76145 0,-41.84189 33.919551,-75.76144 75.761441,-75.76144 41.84189,0 75.76145,33.91955 75.76145,75.76144 z"
        transform="matrix(0.58545869,0,0,0.58545869,116.00086,738.75279)" />
     <text
        xml:space="preserve"

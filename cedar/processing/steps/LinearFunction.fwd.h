@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        VectorsPlaneAngle.fwd.h
+    File:        LinearFunction.fwd.h
 
     Maintainer:  Nico Kuerschner
     Email:       nico.kuerschner@ini.rub.de
-    Date:        2016 03 11
+    Date:        2016 08 12
 
-    Description: Forward declaration file for the class cedar::proc::steps::VectorsPlaneAngle
+    Description: Forward declaration file for the class cedar::proc::steps::LinearFunction
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_ROTATION_ON_PLANE_FWD_H
-#define CEDAR_PROC_STEPS_ROTATION_ON_PLANE_FWD_H
+#ifndef CEDAR_PROC_STEPS_LINEAR_DYNAMICS_FWD_H
+#define CEDAR_PROC_STEPS_LINEAR_DYNAMICS_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -56,12 +56,12 @@ namespace cedar
     namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(RotationOnPlane);
+      CEDAR_DECLARE_PROC_CLASS(LinearFunction);
       //!@endcond
     }
   }
 }
 
 
-#endif // CEDAR_PROC_STEPS_ROTATION_ON_PLANE_FWD_H
+#endif // CEDAR_PROC_STEPS_LINEAR_DYNAMICS_FWD_H
 

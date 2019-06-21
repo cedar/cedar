@@ -33,9 +33,9 @@
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1030"
+     inkscape:window-height="999"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="29"
      inkscape:window-maximized="1"
      showguides="true"
      inkscape:guide-bbox="true" />
@@ -252,7 +252,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -292,10 +292,10 @@
        style="stroke-width:18.75;stroke-miterlimit:4;stroke-dasharray:none" />
     <path
        style="fill:#ff0000;stroke:#ff0000;stroke-width:20;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="M 49.829236,718.21092 375.35089,1043.7326"
+       d="M 383.3509,718.21093 57.829223,1043.7326"
        id="path8713"
        inkscape:path-effect="#path-effect8715"
-       inkscape:original-d="M 49.829236,718.21092 375.35089,1043.7326"
+       inkscape:original-d="M 383.3509,718.21093 57.829223,1043.7326"
        inkscape:connector-curvature="0" />
   </g>
 </svg>

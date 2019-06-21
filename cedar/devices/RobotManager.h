@@ -107,6 +107,7 @@ private:
     std::string mTemplateName;
     std::string mLoadedTemplateConfigurationName;
     std::string mLoadedTemplateConfiguration;
+    bool mDoesAutomaticallyConnect;
   };
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -131,6 +132,10 @@ public:
   void loadRobotTemplateConfiguration(const std::string& robotName, const std::string& configurationName);
 
   void setRobotTemplateConfigurationName(const std::string& robotName, const std::string& templateName);
+
+  void setAutomaticallyConnect(const std::string &robotName, const bool doesConnectAutomatically);
+
+  bool isAutomaticallyConnecting(const std::string &robotName);
 
   cedar::dev::RobotPtr getRobot(const std::string& robotName) const;
 
@@ -158,6 +163,8 @@ public:
   void writeRobotConfigurations(cedar::aux::ConfigurationNode& root) const;
 
   void readRobotConfigurations(cedar::aux::ConfigurationNode& robots);
+
+  void connectRobotsAutomatically();
 
 
   inline boost::signals2::connection connectToRobotNameAddedSignal(boost::function<void (const std::string&)> slot)
@@ -210,7 +217,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief The standard constructor. Private beacuse this is a singleton object.
+  //!@brief The standard constructor. Private because this is a singleton object.
   RobotManager();
 
   RobotInfo& retrieveRobotInfo(const std::string& robotName)
@@ -266,6 +273,7 @@ protected:
 
 private:
   // none yet
+
 
 }; // class cedar::dev::RobotManager
 

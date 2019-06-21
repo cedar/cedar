@@ -68,7 +68,7 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/diagonal_matrix.svg");
-    declaration->setDescription("Create a diagonal matrix with the constant value.");
+    declaration->setDescription("Create a diagonal matrix with the specified constant value on the diagonal. If the matrix is not square, it will be padded appropirately with zeros.");
     declaration->deprecatedName("cedar.processing.source.ConstDiagonalMatrix");
 
     declaration->declare();

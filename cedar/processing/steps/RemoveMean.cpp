@@ -67,7 +67,7 @@ namespace
     declaration->setIconPath(":/steps/remove_mean.svg");
     declaration->setDescription
     (
-      "Returns a mean-free version of its input matrix."
+      "Returns a mean-free version of its input tensor. TODO: add option to also remove variance."
     );
 
     declaration->declare();

@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SinusDynamics.fwd.h
+    File:        VectorsPlaneAngle.fwd.h
 
     Maintainer:  Nico Kuerschner
     Email:       nico.kuerschner@ini.rub.de
-    Date:        2016 08 12
+    Date:        2016 03 11
 
-    Description: Forward declaration file for the class cedar::proc::steps::SinusDynamics
+    Description: Forward declaration file for the class cedar::proc::steps::VectorsPlaneAngle
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_SINUS_DYNAMICS_FWD_H
-#define CEDAR_PROC_STEPS_SINUS_DYNAMICS_FWD_H
+#ifndef CEDAR_PROC_STEPS_ROTATION_ON_PLANE_FWD_H
+#define CEDAR_PROC_STEPS_ROTATION_ON_PLANE_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -56,12 +56,12 @@ namespace cedar
     namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(SinusDynamics);
+      CEDAR_DECLARE_PROC_CLASS(AnglesOnPlane);
       //!@endcond
     }
   }
 }
 
 
-#endif // CEDAR_PROC_STEPS_SINUS_DYNAMICS_FWD_H
+#endif // CEDAR_PROC_STEPS_ROTATION_ON_PLANE_FWD_H
 

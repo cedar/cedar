@@ -66,7 +66,7 @@ namespace
     declaration->setIconPath(":/steps/image_gradient.svg");
     declaration->setDescription
     (
-      "Calculates gradient of an image."
+      "Calculates gradient of an image via a Sobel filter."
     );
 
     declaration->declare();

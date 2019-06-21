@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        RotationOnPlane.cpp
+    File:        AnglesOnPlane.cpp
 
     Maintainer:  Nico Kuerschner
     Email:       Nico.Kuerschner@ini.ruhr-uni-bochum.de
@@ -39,13 +39,15 @@
 
 #include <cedar/processing/Step.h>
 #include <cedar/auxiliaries/MatData.h>
-#include "cedar/processing/steps/RotationOnPlane.fwd.h"
+#include <cedar/auxiliaries/DoubleParameter.h>
+#include <cedar/auxiliaries/DoubleVectorParameter.h>
+#include "cedar/processing/steps/AnglesOnPlane.fwd.h"
 
-class cedar::proc::steps::RotationOnPlane : public cedar::proc::Step
+class cedar::proc::steps::AnglesOnPlane : public cedar::proc::Step
 {
   Q_OBJECT
   public:
-    RotationOnPlane();
+    AnglesOnPlane();
     cedar::proc::DataSlot::VALIDITY determineInputValidity
                                     (
                                       cedar::proc::ConstDataSlotPtr slot,
@@ -57,13 +59,16 @@ class cedar::proc::steps::RotationOnPlane : public cedar::proc::Step
     void inputConnectionChanged(const std::string& inputName);
 
     // input
-    cedar::aux::ConstMatDataPtr mpEndeffectorVelocity;
-    cedar::aux::ConstMatDataPtr mpEndeffectorPosition;
-    cedar::aux::ConstMatDataPtr mpTargetPosition;
+    cedar::aux::ConstMatDataPtr mVector1;
+    cedar::aux::ConstMatDataPtr mVector2;
 
     // output
-    cedar::aux::MatDataPtr mpAngle;
-    cedar::aux::MatDataPtr mpOrthogonalAcceleration;
+    cedar::aux::MatDataPtr mAngle;
+    cedar::aux::MatDataPtr mOrthogonalVector1;
+
+    // parameters
+    //cedar::aux::DoubleParameterPtr mUndefindeAngleReplacement;
+    cedar::aux::DoubleVectorParameterPtr mUndefinedOrthogonalVector1Replacement;
 };
 
 #endif /* ROTATION_ON_PLANE_H_ */

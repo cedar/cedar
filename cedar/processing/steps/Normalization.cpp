@@ -67,7 +67,9 @@ namespace
     declaration->setIconPath(":/steps/normalization.svg");
     declaration->setDescription
     (
-      "Normalizes its input according to a user-determined method."
+      "Normalizes its input in "
+      "the sense that it scales the input tensor by the inverse norm. "
+      "The user supplies which norm to choose from: L1, L2, Infinity-Norm."
     );
 
     declaration->declare();

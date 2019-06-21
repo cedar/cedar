@@ -69,7 +69,8 @@ namespace
     declaration->setIconPath(":/steps/static_gain.svg");
     declaration->setDescription
     (
-      "Multiplies a matrix with a scalar value that can be set as a parameter."
+      "Multiplies a matrix with a scalar value. "
+      "That scalar ist set as a GUI parameter."
     );
 
     declaration->declare();

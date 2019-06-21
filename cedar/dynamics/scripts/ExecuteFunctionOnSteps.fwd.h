@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014, 2015, 2016 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,46 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LinearDynamics.fwd.h
+    File:        RecruitGroup.fwd.h
 
-    Maintainer:  Nico Kuerschner
-    Email:       nico.kuerschner@ini.rub.de
-    Date:        2016 08 12
+    Maintainer:  Jan Tekülve
+    Email:       jan.tekuelve@ini.rub.de
+    Date:        2016 11 03
 
-    Description: Forward declaration file for the class cedar::proc::steps::LinearDynamics
+    Description: Forward declaration file for the class ExecuteFunctionOnSteps
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_LINEAR_DYNAMICS_FWD_H
-#define CEDAR_PROC_STEPS_LINEAR_DYNAMICS_FWD_H
+#ifndef EXECUTE_FUNCTION_ON_STEPS_FWD_H
+#define EXECUTE_FUNCTION_ON_STEPS_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
-  #include <boost/smart_ptr.hpp>
+#include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
 
 namespace cedar
 {
-  namespace proc
+  namespace dyn
   {
-    namespace steps
+    namespace scripts
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(LinearDynamics);
+      class ExecuteFunctionOnSteps;
       //!@endcond
     }
   }
 }
-
-
-#endif // CEDAR_PROC_STEPS_LINEAR_DYNAMICS_FWD_H
-
+#endif // EXECUTE_FUNCTION_ON_STEPS_FWD_H

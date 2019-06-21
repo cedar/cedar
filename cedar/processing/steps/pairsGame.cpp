@@ -82,7 +82,7 @@ namespace
     declaration->setIconPath(":/steps/pairsGame.svg");
     declaration->setDescription
     (
-      "Pairs Game."
+      "Pairs Game. TODO: This needs more description, here."
     );
 
     declaration->declare();

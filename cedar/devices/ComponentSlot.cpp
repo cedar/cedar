@@ -156,6 +156,16 @@ void cedar::dev::ComponentSlot::instantiateConfiguration(const std::string& conf
   auto component= this->getComponent();
 
   component->readConfiguration(configuration);
+
+//  bool doesConnect = cedar::dev::RobotManagerSingleton::getInstance()->isAutomaticallyConnecting(this->getRobot()->getName());
+//
+//  std::cout<<"Instantiate Configuration: " << this->getRobot()->getName() << " connect = " << doesConnect << std::endl;
+//
+//  if(doesConnect)
+//  {
+//    component->startCommunication(true);
+//  }
+
 }
 
 

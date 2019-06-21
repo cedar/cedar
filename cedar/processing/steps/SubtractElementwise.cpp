@@ -72,7 +72,8 @@ namespace
     multiply_decl->setIconPath(":/steps/a_minus_b.svg");
     multiply_decl->setDescription
     (
-      "Subtract two matrices elementwise. Can also handle scalar inputs."
+      "Subtract two matrices element-wise. Can also handle scalar inputs, "
+      "i.e. that any input is a scalar."
     );
 
     multiply_decl->declare();

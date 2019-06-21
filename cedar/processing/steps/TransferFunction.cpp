@@ -80,7 +80,9 @@ namespace
     declaration->setIconPath(":/steps/transferFunction.svg");
     declaration->setDescription
     (
-      "Applies a sigmoid function to its input."
+      "Applies a transfer function, or sigmoid, to its input. "
+      "You may choose from the range of transfer functions implemented "
+      "in cedar. TODO: explain the sigmoids"
     );
 
     declaration->declare();

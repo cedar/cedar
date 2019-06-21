@@ -57,7 +57,8 @@ public:
 
   ~TestChannel()
   {
-    prepareChannelDestructAbsolutelyRequired();
+//    prepareChannelDestructAbsolutelyRequired();
+//It seems like that function does not exist anymore
   }
 
   bool isOpen() const

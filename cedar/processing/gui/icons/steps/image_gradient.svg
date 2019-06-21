@@ -28,15 +28,15 @@
      inkscape:pageshadow="2"
      inkscape:zoom="0.7"
      inkscape:cx="346.64636"
-     inkscape:cy="174.31686"
+     inkscape:cy="288.60257"
      inkscape:document-units="px"
      inkscape:current-layer="g3051"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1005"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
-     inkscape:window-maximized="1"
+     inkscape:window-width="896"
+     inkscape:window-height="822"
+     inkscape:window-x="60"
+     inkscape:window-y="64"
+     inkscape:window-maximized="0"
      showguides="true"
      inkscape:guide-bbox="true" />
   <defs
@@ -425,35 +425,112 @@
        id="g4252">
       <g
          id="g3051"
-         transform="matrix(1.0371068,0,0,1.0371068,-10.912475,-82.147237)">
-        <path
-           style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter"
-           d="m 187.14955,817.57271 0,192.43749 10,0 0,-192.43749 z"
-           id="path2880"
-           inkscape:connector-curvature="0"
-           sodipodi:nodetypes="ccccc" />
-        <path
-           style="fill-rule:evenodd;stroke:#000000;stroke-width:3.85688324pt;marker-start:none"
-           d="m 192.14062,794.54731 15.4084,26.51878 -30.8168,0 z"
-           id="path4266"
-           inkscape:connector-curvature="0"
-           sodipodi:nodetypes="cccc" />
-        <path
-           inkscape:connector-curvature="0"
-           id="path2882"
-           d="m 12.843749,896.07348 0,10 358.593751,0 0,-10 -358.593751,0 z"
-           style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter" />
-        <path
-           inkscape:connector-curvature="0"
-           id="path4258"
-           d="m 391.47811,901.06068 -28.53908,16.5563 0,-33.11259 28.53908,16.55629 z"
-           style="fill-rule:evenodd;stroke:#000000;stroke-width:3.85688324pt;marker-start:none" />
-        <path
-           style="color:#000000;fill:none;stroke:#ff0000;stroke-width:9.6422081;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-           d="m 20.188841,902.40237 c 0,0 49.657332,83.82594 90.582949,82.92299 79.41411,-1.75214 89.07557,-167.58995 168.50375,-168.50376 38.15763,-0.439 82.79087,79.06611 82.79087,79.06611"
-           id="path3063"
-           inkscape:connector-curvature="0"
-           sodipodi:nodetypes="cssc" />
+         transform="matrix(1.0371068,0,0,1.0371068,-10.912475,-79.290094)">
+        <g
+           id="g3917"
+           transform="matrix(0.30583482,0,0,0.46307093,68.146392,399.10511)">
+          <path
+             sodipodi:nodetypes="ccccc"
+             inkscape:connector-curvature="0"
+             id="path2880"
+             d="m 187.14955,817.57271 0,192.43749 10,0 0,-192.43749 z"
+             style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter" />
+          <path
+             sodipodi:nodetypes="cccc"
+             inkscape:connector-curvature="0"
+             id="path4266"
+             d="m 192.14062,794.54731 15.4084,26.51878 -30.8168,0 z"
+             style="fill-rule:evenodd;stroke:#000000;stroke-width:3.85688324pt;marker-start:none" />
+          <path
+             style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter"
+             d="m 12.843749,896.07348 0,10 358.593751,0 0,-10 -358.593751,0 z"
+             id="path2882"
+             inkscape:connector-curvature="0" />
+          <path
+             style="fill-rule:evenodd;stroke:#000000;stroke-width:3.85688324pt;marker-start:none"
+             d="m 391.47811,901.06068 -28.53908,16.5563 0,-33.11259 28.53908,16.55629 z"
+             id="path4258"
+             inkscape:connector-curvature="0" />
+          <path
+             sodipodi:nodetypes="cssc"
+             inkscape:connector-curvature="0"
+             id="path3063"
+             d="m 20.188841,902.40237 c 0,0 49.657332,83.82594 90.582949,82.92299 79.41411,-1.75214 89.07557,-167.58995 168.50375,-168.50376 38.15763,-0.439 82.79087,79.06611 82.79087,79.06611"
+             style="color:#000000;fill:none;stroke:#ff0000;stroke-width:9.6422081;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+        </g>
+        <rect
+           style="color:#000000;fill:none;stroke:#000000;stroke-width:12.09828091;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:36.29484087, 12.09828028;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+           id="rect4164"
+           width="292.66083"
+           height="292.6662"
+           x="57.17247"
+           y="755.70459" />
+        <g
+           id="g3917-0"
+           transform="matrix(0.30583482,0,0,0.46307093,145.21715,478.19816)"
+           style="opacity:0.7">
+          <path
+             sodipodi:nodetypes="ccccc"
+             inkscape:connector-curvature="0"
+             id="path2880-9"
+             d="m 187.14955,817.57271 0,192.43749 10,0 0,-192.43749 z"
+             style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter" />
+          <path
+             sodipodi:nodetypes="cccc"
+             inkscape:connector-curvature="0"
+             id="path4266-3"
+             d="m 192.14062,794.54731 15.4084,26.51878 -30.8168,0 z"
+             style="fill-rule:evenodd;stroke:#000000;stroke-width:3.85688324000000016pt;marker-start:none" />
+          <path
+             style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter"
+             d="m 12.843749,896.07348 0,10 358.593751,0 0,-10 -358.593751,0 z"
+             id="path2882-6"
+             inkscape:connector-curvature="0" />
+          <path
+             style="fill-rule:evenodd;stroke:#000000;stroke-width:3.85688324000000016pt;marker-start:none"
+             d="m 391.47811,901.06068 -28.53908,16.5563 0,-33.11259 28.53908,16.55629 z"
+             id="path4258-0"
+             inkscape:connector-curvature="0" />
+          <path
+             sodipodi:nodetypes="cssc"
+             inkscape:connector-curvature="0"
+             id="path3063-6"
+             d="m 20.188841,902.40237 c 0,0 49.657332,83.82594 90.582949,82.92299 79.41411,-1.75214 89.07557,-167.58995 168.50375,-168.50376 38.15763,-0.439 82.79087,79.06611 82.79087,79.06611"
+             style="color:#000000;fill:none;stroke:#ff0000;stroke-width:9.64220809999999950;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+        </g>
+        <g
+           id="g3917-2"
+           transform="matrix(0.30583482,0,0,0.46307093,216.84499,563.60059)"
+           style="opacity:0.5">
+          <path
+             sodipodi:nodetypes="ccccc"
+             inkscape:connector-curvature="0"
+             id="path2880-6"
+             d="m 187.14955,817.57271 0,192.43749 10,0 0,-192.43749 z"
+             style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter" />
+          <path
+             sodipodi:nodetypes="cccc"
+             inkscape:connector-curvature="0"
+             id="path4266-1"
+             d="m 192.14062,794.54731 15.4084,26.51878 -30.8168,0 z"
+             style="fill-rule:evenodd;stroke:#000000;stroke-width:3.85688324000000016pt;marker-start:none" />
+          <path
+             style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter"
+             d="m 12.843749,896.07348 0,10 358.593751,0 0,-10 -358.593751,0 z"
+             id="path2882-8"
+             inkscape:connector-curvature="0" />
+          <path
+             style="fill-rule:evenodd;stroke:#000000;stroke-width:3.85688324000000016pt;marker-start:none"
+             d="m 391.47811,901.06068 -28.53908,16.5563 0,-33.11259 28.53908,16.55629 z"
+             id="path4258-7"
+             inkscape:connector-curvature="0" />
+          <path
+             sodipodi:nodetypes="cssc"
+             inkscape:connector-curvature="0"
+             id="path3063-9"
+             d="m 20.188841,902.40237 c 0,0 49.657332,83.82594 90.582949,82.92299 79.41411,-1.75214 89.07557,-167.58995 168.50375,-168.50376 38.15763,-0.439 82.79087,79.06611 82.79087,79.06611"
+             style="color:#000000;fill:none;stroke:#ff0000;stroke-width:9.64220809999999950;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+        </g>
       </g>
     </g>
   </g>

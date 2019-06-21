@@ -72,7 +72,9 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/net_reader.svg");
-    declaration->setDescription("Reads a matrix from the local network.");
+    declaration->setDescription("Reads a matrix from the local network. "
+                   "For transfering data between machines. "
+                   "See also the NetWriter step.");
 
     declaration->declare();
 

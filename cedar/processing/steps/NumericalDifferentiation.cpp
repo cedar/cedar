@@ -71,7 +71,7 @@ bool declare()
   declaration->setDescription
   (
     "Differentiates the input numerically over time, element-wise. "
-    "Uses Euler step OR five point finite backwards difference (using the four past entries and the current one), selectable via parameter. The delay input is optional and can be used to override the internal estimate of 'dt' which comes from the global clock. To avoid big jumps in the output when resetting an architecture, adjust the respective parameter. TODO: five point method has jumpts on resets."
+    "Uses Euler step OR five point finite backwards difference (using the four past entries and the current one), selectable via parameter. The delay input is optional and can be used to override the internal estimate of 'dt', the time-step, which comes from the global clock. To avoid big jumps in the output when resetting an architecture, adjust the parameter 'ignore time steps smaller than'. TODO: five point method has jumps on resets."
   );
 
   declaration->declare();
@@ -88,6 +88,7 @@ bool declared = declare();
 
 cedar::proc::steps::NumericalDifferentiation::NumericalDifferentiation()
 :
+cedar::proc::Step(true),
 // outputs
 mOutput(new cedar::aux::MatData(cv::Mat())),
 mOneBack(),
@@ -129,7 +130,8 @@ void cedar::proc::steps::NumericalDifferentiation::inputConnectionChanged(const 
   if (!this->mInput)
   {
     // no input -> no output
-    this->mOutput->setData(cv::Mat());
+    // quickfix: this crashes plots: this->mOutput->setData(cv::Mat());
+    //this->mOutput->setData(cv::Mat());
     output_changed = true;
   }
   else

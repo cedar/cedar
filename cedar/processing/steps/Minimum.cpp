@@ -72,7 +72,9 @@ namespace
     declaration->setIconPath(":/steps/minimum.svg");
     declaration->setDescription
     (
-      "Calculates the element-wise minimum over all inputs."
+      "Calculates the minimum element-wise over all inputs. "
+      "All tensors inputs must have the same size. Note: This does "
+      "not give you the minimum entry of a tensor."
     );
 
     declaration->declare();
