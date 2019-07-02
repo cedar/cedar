@@ -78,6 +78,8 @@ SOFTWARE.
 
 #include <QReadWriteLock>
 
+#if CV_MAJOR_VERSION < 3
+
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
@@ -441,6 +443,7 @@ BOOST_PYTHON_MODULE(pycedar)
   boost::python::def("messagePrint", &printFromPython);
 }
 
+#endif
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -451,9 +454,12 @@ PythonScript(false)
 {  
 }
 
+
 cedar::proc::steps::PythonScript::PythonScript(bool isLooped)
 :
-cedar::proc::Step(isLooped),
+cedar::proc::Step(isLooped)
+#if CV_MAJOR_VERSION < 3
+,
 mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
 
 mInputs(1, cedar::aux::MatDataPtr()),
@@ -466,7 +472,10 @@ _mNumberOfOutputs (new cedar::aux::UIntParameter(this, "Number of Outputs", 1,1,
 _hasScriptFile (new cedar::aux::BoolParameter(this, "Use script file", false)),
 _autoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "Auto-convert Double output matrices to Float", true)),
 _scriptFile (new cedar::aux::FileParameter(this, "Script file path", cedar::aux::FileParameter::READ))
+#endif
+
 {
+#if CV_MAJOR_VERSION < 3
   this->declareInput(makeInputSlotName(0), false);
   
   this->declareOutput(makeOutputSlotName(0), mOutputs[0]);
@@ -496,8 +505,10 @@ _scriptFile (new cedar::aux::FileParameter(this, "Script file path", cedar::aux:
   {
     threadStates.push_back(Py_NewInterpreter());
   }
-
+#endif
 }
+
+
 
 cedar::proc::steps::PythonScript::~PythonScript() { }
 
@@ -610,6 +621,7 @@ std::string cedar::proc::steps::PythonScript::makeOutputSlotName(const int i)
 
 void cedar::proc::steps::PythonScript::executePythonScript()
 {
+#if CV_MAJOR_VERSION < 3
   mutex.lock();
 
   isExecuting = 1;
@@ -867,6 +879,7 @@ void cedar::proc::steps::PythonScript::executePythonScript()
   
   isExecuting = 0;
   mutex.unlock();
+  #endif
 }
 
 void cedar::proc::steps::PythonScript::inputConnectionChanged(const std::string& inputName)
@@ -898,4 +911,3 @@ void cedar::proc::steps::PythonScript::executeButtonClicked(){
     executePythonScript();
   }
 }
-
