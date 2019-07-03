@@ -111,6 +111,14 @@ mPreSearchIndex(-1)
   QObject::connect
   (
     cedar::proc::gui::SettingsSingleton::getInstance().get(),
+    SIGNAL(elementListViewReset()),
+    this,
+    SLOT(reset())
+  );
+
+  QObject::connect
+  (
+    cedar::proc::gui::SettingsSingleton::getInstance().get(),
     SIGNAL(elementFavoritesChanged()),
     this,
     SLOT(reset())

@@ -392,6 +392,11 @@ void cedar::proc::gui::Settings::emitHiddenElementsChangedSignal()
   emit hiddenElementsChanged();
 }
 
+void cedar::proc::gui::Settings::emitElementListViewResetSignal()
+{
+  emit elementListViewReset();
+}
+
 void cedar::proc::gui::Settings::setHiddenPreset(const std::string presetName)
 {
   this->_mHiddenPreset->setValue(presetName);

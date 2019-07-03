@@ -67,6 +67,8 @@ SOFTWARE.
 // CEDAR INCLUDES
 //#include "cedar/processing/typecheck/Matrix.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/GroupDeclaration.h"
+#include "cedar/processing/gui/Settings.h"
 
 
 // SYSTEM INCLUDES
@@ -296,7 +298,7 @@ cv::Mat NDArrayConverter::toMat(const PyObject *o)
     PyArrayObject* oCasted = reinterpret_cast<PyArrayObject*>((PyObject*)o);
     const npy_intp* _sizes = PyArray_DIMS(oCasted); // added oCasted
     const npy_intp* _strides = PyArray_STRIDES(oCasted); // added oCasted
-    bool transposed = false;
+    //bool transposed = false;
 
     for(int i = 0; i < ndims; i++)
     {
@@ -460,12 +462,12 @@ mInputs(1, cedar::aux::MatDataPtr()),
 mOutputs(1, cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))),
 
 // Declare Properties
-_codeStringForSavingArchitecture (new cedar::aux::StringParameter(this, "Code", "import numpy as np\nimport pycedar as pc\n\n#Print to messages tab:\n# pc.messagePrint('text')\n# pc.messagePrint(str(...))\n\n#Inputs:\n# pc.inputs[0]\n# pc.inputs[1]\n# ...\n\n#Outputs:\n# pc.outputs[0]\n# pc.outputs[1]\n# ...\n\n\ninput = pc.inputs[0]\n\npc.outputs[0] = input * 2\n")),
-_mNumberOfInputs (new cedar::aux::UIntParameter(this, "Number of Inputs", 1,1,255)),
-_mNumberOfOutputs (new cedar::aux::UIntParameter(this, "Number of Outputs", 1,1,255)),
-_hasScriptFile (new cedar::aux::BoolParameter(this, "Use script file", false)),
-_autoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "Auto-convert Double output matrices to Float", true)),
-_scriptFile (new cedar::aux::FileParameter(this, "Script file path", cedar::aux::FileParameter::READ))
+_codeStringForSavingArchitecture (new cedar::aux::StringParameter(this, "code", "import numpy as np\nimport pycedar as pc\n\n#Print to messages tab:\n# pc.messagePrint('text')\n# pc.messagePrint(str(...))\n\n#Inputs:\n# pc.inputs[0]\n# pc.inputs[1]\n# ...\n\n#Outputs:\n# pc.outputs[0]\n# pc.outputs[1]\n# ...\n\n\ninput = pc.inputs[0]\n\npc.outputs[0] = input * 2\n")),
+_mNumberOfInputs (new cedar::aux::UIntParameter(this, "number of inputs", 1,1,255)),
+_mNumberOfOutputs (new cedar::aux::UIntParameter(this, "number of outputs", 1,1,255)),
+_hasScriptFile (new cedar::aux::BoolParameter(this, "use script file", false)),
+_autoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "auto-convert double output matrices to float", true)),
+_scriptFile (new cedar::aux::FileParameter(this, "script file path", cedar::aux::FileParameter::READ))
 {
   this->declareInput(makeInputSlotName(0), false);
   
@@ -557,6 +559,31 @@ void cedar::proc::steps::PythonScript::numberOfInputsChanged()
   }
   // resize inputs vector
   mInputs.resize(newsize);
+
+  if(_mNumberOfInputs->getValue() > 4)
+  {
+    //exportStepAsTemplate();
+  }
+}
+
+void cedar::proc::steps::PythonScript::exportStepAsTemplate()
+{
+  cedar::proc::GroupDeclarationPtr python_declaration
+          (
+                  new cedar::proc::GroupDeclaration
+                          (
+                                  "PScript",
+                                  "resource://groupTemplates/fieldTemplates.json",
+                                  "python script template1",
+                                  "DFT Templates"
+                          )
+          );
+  python_declaration->setIconPath(":/cedar/dynamics/gui/steps/field_1d_active.svg");
+  python_declaration->declare();
+
+  // calls the reset() function of ElementList, so the template is visible
+  cedar::proc::gui::SettingsSingleton::getInstance()->emitElementListViewResetSignal();
+
 }
 
 void cedar::proc::steps::PythonScript::numberOfOutputsChanged()

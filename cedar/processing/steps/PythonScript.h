@@ -109,12 +109,13 @@ public:
   
   std::string makeInputSlotName(const int);
   std::string makeOutputSlotName(const int);
-  
+
 public slots:
   
   void hasScriptFileChanged();
   void numberOfOutputsChanged();
   void numberOfInputsChanged();
+  void exportStepAsTemplate();
   
 signals:
 

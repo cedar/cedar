@@ -370,6 +370,8 @@ public:
 
   void emitHiddenElementsChangedSignal();
 
+  void emitElementListViewResetSignal();
+
   void setHiddenPreset(const std::string presetName);
 
   std::string getHiddenPreset() const;
@@ -381,6 +383,7 @@ public:
 signals:
   void elementFavoritesChanged();
   void hiddenElementsChanged();
+  void elementListViewReset();
 
 
   //--------------------------------------------------------------------------------------------------------------------
