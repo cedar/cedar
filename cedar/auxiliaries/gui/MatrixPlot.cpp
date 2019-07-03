@@ -229,14 +229,19 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
       this->mpCurrentPlotWidget = new cedar::aux::gui::QCHistoryPlot0D(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
-#elif defined CEDAR_USE_QWT
+#elif defined CEDAR_USE_QWT && !defined(CEDAR_USE_QT5)
     case 0:
       this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
-#elif defined CEDAR_USE_QT5
+#elif defined CEDAR_USE_QT5_PLOTS
     case 0:
       this->mpCurrentPlotWidget = new cedar::aux::gui::Qt5HistoryPlot0D(this->mData, title);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
+      break;
+#else
+      case 0:
+      this->mpCurrentPlotWidget = new cedar::aux::gui::QCHistoryPlot0D(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
 #endif
@@ -246,7 +251,7 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
       this->mpCurrentPlotWidget = new cedar::aux::gui::QCLinePlot(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
-#elif defined CEDAR_USE_QWT
+#elif defined CEDAR_USE_QWT && !defined(CEDAR_USE_QT5)
     case 1:
       this->mpCurrentPlotWidget = new cedar::aux::gui::QwtLinePlot(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
@@ -256,7 +261,7 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
       this->mpCurrentPlotWidget = new cedar::aux::gui::VtkLinePlot(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
-#elif defined CEDAR_USE_QT5
+#elif defined CEDAR_USE_QT5_PLOTS
     case 1:
       this->mpCurrentPlotWidget = new cedar::aux::gui::Qt5LinePlot(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
@@ -284,7 +289,7 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
         this->mpCurrentPlotWidget = new cedar::aux::gui::VtkSurfacePlot(this->mData, title);
       }
 #endif // CEDAR_USE_VTK
-#ifdef CEDAR_USE_QT5
+#ifdef CEDAR_USE_QT5_PLOTS
 #ifndef CEDAR_PORTABLE
 #ifndef CEDAR_PORTABLE_MINIMAL_VERSION
       if  (plot_class == "cedar::aux::gui::Qt5SurfacePlot")
