@@ -38,6 +38,7 @@
 #define CEDAR_PROC_SOURCES_VIRTUAL_CAMERA_H
 
 // CEDAR CONFIGURATION
+#include <cedar/auxiliaries/DoubleVectorParameter.h>
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
@@ -66,8 +67,18 @@ public:
   //!@brief Destructor
   virtual ~VirtualCamera();
 
+
 public slots:
   void resolutionChanged();
+  void cameraPositionChanged();
+  void cameraOrientationChanged();
+  void cameraPositionChangedFromViewport();
+  void cameraOrientationChangedFromViewport();
+  //!@brief temporary fix for updating outputs, please replace
+  void updateOutput();
+
+
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -79,6 +90,9 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  /*!@note This method isn't called !
+   *       A temporary fix is in place which updates the output via a signal emmited from mpViewer
+   */
   void compute(const cedar::proc::Arguments&);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -95,10 +109,15 @@ protected:
   cedar::aux::MatDataPtr mpOutput;
 
 private:
-  cedar::aux::gui::Viewer* mpViewer;
-
+  //cedar::aux::gui::ViewerWeakPtr mpViewer;
+  boost::shared_ptr<cedar::aux::gui::Viewer> mpViewer;
   //!@brief sizes of all dimensions of the output of the projection
   cedar::aux::UIntVectorParameterPtr mOutputSizes;
+  //!@brief position of the virtual camera (x,y,z)
+  cedar::aux::DoubleVectorParameterPtr mCameraPosition;
+  //!@brief orientation of the virtual camera
+  cedar::aux::DoubleVectorParameterPtr mHorizontalOrientation;
+  cedar::aux::DoubleVectorParameterPtr mVerticalOrientation;
 
   QReadWriteLock* mLock;
 
