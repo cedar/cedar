@@ -60,9 +60,11 @@ mRegisteredGrabber(""),
 mViewerLabel("")
 {
     mpScene->addViewer(this);
+#ifdef CEDAR_USE_QGLVIEWER
     this->camera()->setUpVector(qglviewer::Vec(0,0,1));
     mOldPos = camera()->position();
     mOldDir = camera()->viewDirection();
+#endif
 }
 
 cedar::aux::gui::Viewer::Viewer(bool readFromFile)
@@ -75,9 +77,11 @@ mReadFromFile(readFromFile),
 mRegisteredGrabber(""),
 mViewerLabel("")
 {
+#ifdef CEDAR_USE_QGLVIEWER
     this->camera()->setUpVector(qglviewer::Vec(0,0,1));
     mOldPos = camera()->position();
     mOldDir = camera()->viewDirection();
+#endif
 }
 
 cedar::aux::gui::Viewer::~Viewer()
@@ -124,13 +128,14 @@ void cedar::aux::gui::Viewer::draw()
 
 void cedar::aux::gui::Viewer::timerEvent(QTimerEvent*)
 {
+    bool move =false;
+#ifdef CEDAR_USE_QGLVIEWER
     if(!this->isVisible()){
         hiddenUpdate();
     }
     else{
         update();
     }
-    bool move =false;
     if(mOldPos != camera()->position()){
         mOldPos = camera()->position();
         move = true;
@@ -139,16 +144,18 @@ void cedar::aux::gui::Viewer::timerEvent(QTimerEvent*)
         mOldDir = camera()->viewDirection();
         move = true;
     }
+#endif
     if (move)
         emit cameraMoved();
     emit updated();
 }
 
-
+#ifdef CEDAR_USE_QGLVIEWER
 void cedar::aux::gui::Viewer::hiddenUpdate(){
     // regular draw doesn't work while the Widget is hidden
     //!@note DO NOT CALL makeCurrent() as it will lead to a segfault when instancing a new Robot while the Viewer is hidden
     //makeCurrent();
+
     paintGL();
 
     if (!m_fbo || m_fbo->width() != width() || m_fbo->height() != height())
@@ -188,8 +195,8 @@ void cedar::aux::gui::Viewer::hiddenUpdate(){
    //and isn't supposed to use defaultFramebuffer()...
    m_fbo->bindDefault();
    //doneCurrent();
-
 }
+#endif
 
 void cedar::aux::gui::Viewer::grabBuffer()
 {
@@ -345,15 +352,16 @@ void cedar::aux::gui::Viewer::writeToConfiguration(cedar::aux::ConfigurationNode
 
 void cedar::aux::gui::Viewer::changeCameraPosition(const double x , const double y, const double z)
 {
+#ifdef CEDAR_USE_QGLVIEWER
     qglviewer::Vec position = qglviewer::Vec(x,y,z);
 
     this->camera()->setPosition(position);
-
+#endif
 }
 
 void cedar::aux::gui::Viewer::changeCameraOrientation(const double alpha , const double beta)
 {
-
+#ifdef CEDAR_USE_QGLVIEWER
     this->camera()->setUpVector(qglviewer::Vec(0,0,1));  // set up axis
 
     // based on the description this "should" do the same thing
@@ -368,7 +376,7 @@ void cedar::aux::gui::Viewer::changeCameraOrientation(const double alpha , const
 
 
     this->camera()->setViewDirection(direction);
-
+#endif
 }
 
 void cedar::aux::gui::Viewer::closeEvent(QCloseEvent *event)
