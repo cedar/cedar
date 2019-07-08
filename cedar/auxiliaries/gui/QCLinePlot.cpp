@@ -66,6 +66,7 @@
 #include <QDoubleSpinBox>
 #include <QPushButton>
 #include <QLabel>
+#include <QPen>
 #include <iostream>
 #include <limits.h>
 
@@ -139,7 +140,9 @@ void cedar::aux::gui::QCLinePlot::doAppend(cedar::aux::ConstDataPtr data, const 
   this->mpChart->addGraph();
   int c = this->mpChart->graphCount() - 1;
   unsigned long m = mLineColors.size() - 1;
-  this->mpChart->graph(c)->setPen(mLineColors.at(c % m));
+  auto linePen = QPen(mLineColors.at(c % m));
+  linePen.setWidth(3);
+  this->mpChart->graph(c)->setPen(linePen);
   this->mpChart->graph(c)->setName(QString::fromStdString(title));
   if (data->hasAnnotation<cedar::aux::annotation::DiscreteMetric>())
   {
