@@ -146,10 +146,15 @@ void cedar::aux::gui::QCLinePlot::doAppend(cedar::aux::ConstDataPtr data, const 
   this->mpChart->graph(c)->setName(QString::fromStdString(title));
   if (data->hasAnnotation<cedar::aux::annotation::DiscreteMetric>())
   {
-    this->mpChart->graph()->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc,10));
-    this->mpChart->graph()->setLineStyle(QCPGraph::lsNone);
     this->DiscreteMetric = true;
   }
+
+  if(this->DiscreteMetric)
+  {
+    this->mpChart->graph()->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc,10));
+    this->mpChart->graph()->setLineStyle(QCPGraph::lsNone);
+  }
+
   if(this->DiscreteMetricLabels)
   {
     this->mpChart->xAxis->setTickLabelRotation(90);
@@ -489,6 +494,27 @@ void cedar::aux::gui::QCLinePlot::showLegend(bool show)
   this->mpChart->legend->setVisible(this->SettingShowLegend);
 }
 
+void cedar::aux::gui::QCLinePlot::toggleDiscreteMetric(bool show)
+{
+  this->DiscreteMetric = show;
+  if(this->DiscreteMetric)
+  {
+    for (int i = 0 ;i < this->mpChart->graphCount();i++)
+    {
+      this->mpChart->graph(i)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 10));
+      this->mpChart->graph(i)->setLineStyle(QCPGraph::lsNone);
+    }
+  }
+  else
+  {
+    for (int i = 0 ;i < this->mpChart->graphCount();i++)
+    {
+    this->mpChart->graph(i)->setScatterStyle(QCPScatterStyle::ssNone);
+    this->mpChart->graph(i)->setLineStyle(QCPGraph::lsLine);
+    }
+  }
+}
+
 void cedar::aux::gui::QCLinePlot::contextMenuRequest(QPoint pos)
 {
   QMenu *menu = new QMenu(this);
@@ -505,6 +531,10 @@ void cedar::aux::gui::QCLinePlot::contextMenuRequest(QPoint pos)
   QAction *p_fixedaxis = menu->addAction("fixed y axis scaling", this, SLOT(setFixedYAxisScaling()));
   p_fixedaxis->setCheckable(true);
   p_fixedaxis->setChecked(!this->_mAutoScalingEnabled->getValue());
+
+  QAction *p_discrete = menu->addAction("discrete metric", this, SLOT(toggleDiscreteMetric(bool)));
+  p_discrete->setCheckable(true);
+  p_discrete->setChecked(this->DiscreteMetric);
 
   menu->popup(this->mpChart->mapToGlobal(pos));
 }

@@ -164,6 +164,8 @@ private slots:
   void showLegend(bool show = true);
   void showGrid(bool show = true);
 
+  void toggleDiscreteMetric(bool show);
+
   void contextMenuRequest(QPoint);
 
   void autoScalingChanged();
