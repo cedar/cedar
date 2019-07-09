@@ -174,6 +174,8 @@ private slots:
 
   void gridVisibilityChanged();
 
+  void discreteMetricChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -194,7 +196,7 @@ private:
 
   bool SettingShowLegend = false;
 
-  bool DiscreteMetric = false;
+//  bool DiscreteMetric = false;
 
 
   bool SettingShowGrid = false;
@@ -220,6 +222,8 @@ private:
 
   //! Whether the minor grid is displayed.
   cedar::aux::BoolParameterPtr _mMinorGridVisible;
+
+  cedar::aux::BoolParameterPtr _mDiscretePlot;
 
   //! Limits for the y axis.
   cedar::aux::math::DoubleLimitsParameterPtr _mYAxisLimits;
