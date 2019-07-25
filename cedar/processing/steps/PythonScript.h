@@ -104,7 +104,7 @@ public:
   void printFromPython(char const*);
 
   template<typename T>
-  cv::Mat convert3DMatToFloat(cv::Mat);
+  cv::Mat convert3DMatToFloat(cv::Mat&);
 
   
   std::string makeInputSlotName(const int);
@@ -198,7 +198,8 @@ public:
     //--------------------------------------------------------------------------------------------------------------------
 public:
 
-    cv::Mat toMat(const PyObject* o);
+    cv::Mat toMat(PyObject*, int);
+
     PyObject* toNDArray(const cv::Mat& mat);
     //void copyTo(cv::Mat src, cv::OutputArray _dst);
     int failmsg(const char*, ...);
@@ -208,6 +209,7 @@ public:
     //--------------------------------------------------------------------------------------------------------------------
 private:
 
+    const char * typenumToString(int);
     void init();
 
     //--------------------------------------------------------------------------------------------------------------------
