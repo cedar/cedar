@@ -731,8 +731,8 @@ _scriptFile (new cedar::aux::FileParameter(this, "script file path", cedar::aux:
   this->_codeStringForSavingArchitecture->setHidden(true);
   this->_autoConvertDoubleToFloat->markAdvanced(true);
 
-  this->registerFunction("export step  as  template", boost::bind(&cedar::proc::steps::PythonScript::exportStepAsTemplate  , this), false);
-  this->registerFunction("import step from template", boost::bind(&cedar::proc::steps::PythonScript::importStepFromTemplate, this), false);
+  //this->registerFunction("export step  as  template", boost::bind(&cedar::proc::steps::PythonScript::exportStepAsTemplate  , this), false);
+  //this->registerFunction("import step from template", boost::bind(&cedar::proc::steps::PythonScript::importStepFromTemplate, this), false);
   
   cedar::proc::steps::PythonScript::executionFailed = 0;
   
