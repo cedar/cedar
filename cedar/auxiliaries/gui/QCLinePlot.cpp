@@ -66,6 +66,7 @@
 #include <QDoubleSpinBox>
 #include <QPushButton>
 #include <QLabel>
+#include <QPen>
 #include <iostream>
 #include <limits.h>
 
@@ -139,14 +140,22 @@ void cedar::aux::gui::QCLinePlot::doAppend(cedar::aux::ConstDataPtr data, const 
   this->mpChart->addGraph();
   int c = this->mpChart->graphCount() - 1;
   unsigned long m = mLineColors.size() - 1;
-  this->mpChart->graph(c)->setPen(mLineColors.at(c % m));
+  auto linePen = QPen(mLineColors.at(c % m));
+  linePen.setWidth(3);
+  this->mpChart->graph(c)->setPen(linePen);
   this->mpChart->graph(c)->setName(QString::fromStdString(title));
   if (data->hasAnnotation<cedar::aux::annotation::DiscreteMetric>())
   {
-    this->mpChart->graph()->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc,10));
-    this->mpChart->graph()->setLineStyle(QCPGraph::lsNone);
-    this->DiscreteMetric = true;
+    this->_mDiscretePlot->setValue(true);
+    discreteMetricChanged(); // Enforce this to react to each annotation!
   }
+
+//  if(this->_mDiscretePlot->getValue())
+//  {
+//    this->mpChart->graph()->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc,10));
+//    this->mpChart->graph()->setLineStyle(QCPGraph::lsNone);
+//  }
+
   if(this->DiscreteMetricLabels)
   {
     this->mpChart->xAxis->setTickLabelRotation(90);
@@ -201,10 +210,13 @@ void cedar::aux::gui::QCLinePlot::init()
   this->_mMajorGridVisible = new cedar::aux::BoolParameter(this, "major grid visible", false);
   this->_mMinorGridVisible = new cedar::aux::BoolParameter(this, "minor grid visible", false);
   this->_mYAxisLimits = new cedar::aux::math::DoubleLimitsParameter(this, "y axis limits", 0.0, 1.0);
+  this->_mDiscretePlot =  new cedar::aux::BoolParameter(this, "discrete plot", false);
   QObject::connect(this->_mAutoScalingEnabled.get(), SIGNAL(valueChanged()), this, SLOT(autoScalingChanged()));
   QObject::connect(this->_mYAxisLimits.get(), SIGNAL(valueChanged()), this, SLOT(axisLimitsChanged()));
   QObject::connect(this->_mMajorGridVisible.get(), SIGNAL(valueChanged()), this, SLOT(gridVisibilityChanged()));
   QObject::connect(this->_mMinorGridVisible.get(), SIGNAL(valueChanged()), this, SLOT(gridVisibilityChanged()));
+  QObject::connect(this->_mDiscretePlot.get(), SIGNAL(valueChanged()), this, SLOT(discreteMetricChanged()));
+
 
 
   this->mPlot0D = false;
@@ -382,7 +394,7 @@ void cedar::aux::gui::QCLinePlot::timerEvent(QTimerEvent * /* pEvent */)
     y_max += 0.5;
   }
 
-  if(this->DiscreteMetric)
+  if(this->_mDiscretePlot->getValue())
   {
     x_min -= 0.5;
     x_max += 0.5;
@@ -486,6 +498,33 @@ void cedar::aux::gui::QCLinePlot::showLegend(bool show)
   this->mpChart->legend->setVisible(this->SettingShowLegend);
 }
 
+void cedar::aux::gui::QCLinePlot::toggleDiscreteMetric(bool show)
+{
+  this->_mDiscretePlot->setValue(show);
+}
+
+
+void cedar::aux::gui::QCLinePlot::discreteMetricChanged()
+{
+  if(this->_mDiscretePlot->getValue())
+  {
+    for (int i = 0 ;i < this->mpChart->graphCount();i++)
+    {
+      this->mpChart->graph(i)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 10));
+      this->mpChart->graph(i)->setLineStyle(QCPGraph::lsNone);
+    }
+  }
+  else
+  {
+    for (int i = 0 ;i < this->mpChart->graphCount();i++)
+    {
+      this->mpChart->graph(i)->setScatterStyle(QCPScatterStyle::ssNone);
+      this->mpChart->graph(i)->setLineStyle(QCPGraph::lsLine);
+    }
+  }
+}
+
+
 void cedar::aux::gui::QCLinePlot::contextMenuRequest(QPoint pos)
 {
   QMenu *menu = new QMenu(this);
@@ -502,6 +541,10 @@ void cedar::aux::gui::QCLinePlot::contextMenuRequest(QPoint pos)
   QAction *p_fixedaxis = menu->addAction("fixed y axis scaling", this, SLOT(setFixedYAxisScaling()));
   p_fixedaxis->setCheckable(true);
   p_fixedaxis->setChecked(!this->_mAutoScalingEnabled->getValue());
+
+  QAction *p_discrete = menu->addAction("discrete metric", this, SLOT(toggleDiscreteMetric(bool)));
+  p_discrete->setCheckable(true);
+  p_discrete->setChecked(this->_mDiscretePlot->getValue());
 
   menu->popup(this->mpChart->mapToGlobal(pos));
 }
