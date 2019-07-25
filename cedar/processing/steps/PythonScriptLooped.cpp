@@ -76,7 +76,6 @@ SOFTWARE.
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
 
-#if CV_MAJOR_VERSION < 3
 namespace
 {
   bool declare()
@@ -105,8 +104,6 @@ namespace
 
   bool declared = declare();
 }
-
-#endif
 
 cedar::proc::steps::PythonScriptLooped::PythonScriptLooped()
 :

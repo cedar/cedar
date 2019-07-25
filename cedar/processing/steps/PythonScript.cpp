@@ -165,13 +165,12 @@ public:
 private:
     PyGILState_STATE _state;
 };
-
+#if CV_MAJOR_VERSION < 3
 class NumpyAllocator : public cv::MatAllocator
 {
 public:
 
-    const MatAllocator* stdAllocator;
-    NumpyAllocator() { stdAllocator = cv::Mat::getStdAllocator(); }
+    NumpyAllocator() {  }
     ~NumpyAllocator() {}
 
     void allocate(int dims, const int* sizes, int type, int*& refcount,
@@ -208,6 +207,27 @@ public:
         step[i] = (size_t)_strides[i];
       datastart = data = (uchar*)PyArray_DATA(oCasted); // added oCasted
     }
+
+    void deallocate(int* refcount, uchar*, uchar*)
+    {
+      //PyEnsureGIL gil;
+      if( !refcount )
+        return;
+
+      PyObject* o = pyObjectFromRefcount(refcount);
+      Py_INCREF(o);
+      Py_DECREF(o);
+    }
+
+};
+#else // CV_MAJOR_VERSION
+class NumpyAllocator : public cv::MatAllocator
+{
+public:
+
+    const MatAllocator* stdAllocator;
+    NumpyAllocator() { stdAllocator = cv::Mat::getStdAllocator(); }
+    ~NumpyAllocator() {}
 
     cv::UMatData* allocate(PyObject* o, int dims, const int* sizes, int type, size_t* step) const
     {
@@ -256,17 +276,6 @@ public:
       return stdAllocator->allocate(u, accessFlags, usageFlags);
     }
 
-    void deallocate(int* refcount, uchar*, uchar*)
-    {
-      //PyEnsureGIL gil;
-      if( !refcount )
-        return;
-
-      PyObject* o = pyObjectFromRefcount(refcount);
-      Py_INCREF(o);
-      Py_DECREF(o);
-    }
-
     void deallocate(cv::UMatData* u) const //CV_OVERRIDE
     {
       if(!u)
@@ -283,6 +292,7 @@ public:
     }
 
 };
+#endif // CV_MAJOR_VERSION
 
 NumpyAllocator g_numpyAllocator;
 
@@ -550,24 +560,21 @@ cv::Mat NDArrayConverter::toMat(PyObject* o, int index)
 
   m = cv::Mat(ndims, size, type, PyArray_DATA(oarr), step);
 
-  //CV2
-  //if( m.data )
-  //{
-  //  m.refcount = refcountFromPyObject(o);
-  //  m.addref(); // protect the original numpy array from deallocation
-  //  // (since Mat destructor will decrement the reference counter)
-  //}
-
-  //CV3
+#if CV_MAJOR_VERSION < 3
+  if( m.data )
+  {
+    m.refcount = refcountFromPyObject(o);
+    m.addref(); // protect the original numpy array from deallocation
+    // (since Mat destructor will decrement the reference counter)
+  }
+#else // CV_MAJOR_VERSION
   m.u = g_numpyAllocator.allocate(o, ndims, size, type, step);
   m.addref();
   if( !needcopy )
   {
     Py_INCREF(o);
   }
-
-
-
+#endif // CV_MAJOR_VERSION
 
   m.allocator = &g_numpyAllocator;
   return m;
@@ -581,12 +588,11 @@ PyObject* NDArrayConverter::toNDArray(const cv::Mat& m)
   }
   cv::Mat temp, *p = (cv::Mat*)&m;
 
-  //CV2
-  //if(!p->refcount || p->allocator != &g_numpyAllocator)
-
-  //CV3
+#if CV_MAJOR_VERSION < 3
+  if(!p->refcount || p->allocator != &g_numpyAllocator)
+#else
   if(!p->u || p->allocator != &g_numpyAllocator)
-
+#endif
   {
     temp.allocator = &g_numpyAllocator;
     try
@@ -603,14 +609,14 @@ PyObject* NDArrayConverter::toNDArray(const cv::Mat& m)
 
     p = &temp;
   }
-  //CV2
-  //p->addref();
-  //return pyObjectFromRefcount(&p->u->refcount);
-
-  //CV3
+#if CV_MAJOR_VERSION < 3
+  p->addref();
+  return pyObjectFromRefcount(p->refcount);
+#else
   PyObject* o = (PyObject*)p->u->userdata;
   Py_INCREF(o);
   return o;
+#endif
 }
 
 
@@ -724,6 +730,9 @@ _scriptFile (new cedar::aux::FileParameter(this, "script file path", cedar::aux:
   this->_scriptFile->setConstant(true);
   this->_codeStringForSavingArchitecture->setHidden(true);
   this->_autoConvertDoubleToFloat->markAdvanced(true);
+
+  this->registerFunction("export step  as  template", boost::bind(&cedar::proc::steps::PythonScript::exportStepAsTemplate  , this), false);
+  this->registerFunction("import step from template", boost::bind(&cedar::proc::steps::PythonScript::importStepFromTemplate, this), false);
   
   cedar::proc::steps::PythonScript::executionFailed = 0;
   
@@ -806,8 +815,7 @@ void cedar::proc::steps::PythonScript::numberOfInputsChanged()
   mInputs.resize(newsize);
 }
 
-void cedar::proc::steps::PythonScript::exportStepAsTemplate()
-{
+void cedar::proc::steps::PythonScript::importStepFromTemplate(){
   cedar::proc::GroupDeclarationPtr python_declaration
           (
                   new cedar::proc::GroupDeclaration
@@ -818,12 +826,16 @@ void cedar::proc::steps::PythonScript::exportStepAsTemplate()
                                   "DFT Templates"
                           )
           );
-  python_declaration->setIconPath(":/cedar/dynamics/gui/steps/field_1d_active.svg");
+  python_declaration->setIconPath(":/steps/python_script.svg");
   python_declaration->declare();
 
   // calls the reset() function of ElementList, so the template is visible
   cedar::proc::gui::SettingsSingleton::getInstance()->emitElementListViewResetSignal();
+}
 
+void cedar::proc::steps::PythonScript::exportStepAsTemplate()
+{
+  this->writeJson(cedar::aux::Path("resource://pythonTemplates/python.json"));
 }
 
 void cedar::proc::steps::PythonScript::numberOfOutputsChanged()
@@ -1003,8 +1015,11 @@ void cedar::proc::steps::PythonScript::executePythonScript()
     {
       std::string inputString = this->_codeStringForSavingArchitecture->getValue();
       boost::python::str inputString_py(inputString);
-      
+#if CV_MAJOR_VERSION < 3
+      boost::python::exec(inputString_py, main_namespace);
+#else
       boost::python::exec(boost::python::extract<char const*>(inputString_py), main_namespace);
+#endif
     }
 
     // Old way: Setting the Output to pc.output1, pc.output2 etc.

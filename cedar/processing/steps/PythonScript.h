@@ -116,6 +116,7 @@ public slots:
   void numberOfOutputsChanged();
   void numberOfInputsChanged();
   void exportStepAsTemplate();
+  void importStepFromTemplate();
   
 signals:
 
