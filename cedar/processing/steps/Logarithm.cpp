@@ -66,7 +66,6 @@ cedar::proc::steps::Logarithm::Logarithm()
 
 void cedar::proc::steps::Logarithm::recompute()
 {
-    cedar::aux::LogSingleton::getInstance()->message("recompute", CEDAR_CURRENT_FUNCTION_NAME);
     auto input = getInput("input");
 
     if (!input)
