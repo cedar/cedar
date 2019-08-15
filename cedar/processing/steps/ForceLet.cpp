@@ -1,0 +1,279 @@
+/*======================================================================================================================
+
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        ForceLet.cpp
+
+    Maintainer:  Daniel Sabinasz
+    Email:       daniel.sabinasz@ini.rub.de
+    Date:        2019 08 15
+
+    Description: Implements a force-let function
+
+    Credits:
+
+======================================================================================================================*/
+// LOCAL INCLUDES
+#include "ForceLet.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include <math.h>
+#include <iostream>
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace {
+    bool declare() {
+        using cedar::proc::ElementDeclarationPtr;
+        using cedar::proc::ElementDeclarationTemplate;
+
+        ElementDeclarationPtr declaration
+                (
+                        new ElementDeclarationTemplate<cedar::proc::steps::ForceLet>
+                                (
+                                        "Robotics",
+                                        "cedar.processing.steps.ForceLet"
+                                )
+                );
+        declaration->setIconPath(":/steps/forcelet.svg");
+        declaration->setDescription
+                (
+                        "Implements a force-let as defined in 'Bicho, E., Mallet, P.,  and Schöner, G. (2000). Target representation on an autonomous vehicle with low-level sensors. International Journal of Robotics Research, 19(5):424–447'.\n"
+                );
+
+        declaration->declare();
+
+        return true;
+    }
+
+    bool declared = declare();
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::steps::ForceLet::ForceLet()
+        :
+        cedar::proc::Step(false),
+        mResult(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
+        mSigma(new cedar::aux::DoubleParameter(this, "range (sigma)", 0.2)),
+        mBeta1(new cedar::aux::DoubleParameter(this, "maximal strength (beta 1)", 1.0)),
+        mBeta2(new cedar::aux::DoubleParameter(this, "distance scale (beta 2)", 1.0)) {
+    this->declareInput("input");
+    this->declareInput("obstacle angle (psi)");
+    this->declareInput("obstacle distance (d)");
+    this->declareInput("range (sigma; optional)", false); // optional
+    this->declareInput("maximal strength (beta 1; optional)", false); // optional
+    this->declareInput("distance scale (beta 2; optional)", false); // optional
+
+    this->declareOutput("result", mResult);
+
+    QObject::connect(mSigma.get(), SIGNAL(valueChanged()), this, SLOT(constantChanged()));
+    QObject::connect(mBeta1.get(), SIGNAL(valueChanged()), this, SLOT(constantChanged()));
+    QObject::connect(mBeta2.get(), SIGNAL(valueChanged()), this, SLOT(constantChanged()));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::steps::ForceLet::recompute() {
+    auto phiInput = getInput("input");
+    if (!phiInput)
+        return;
+    auto phiInputData = boost::dynamic_pointer_cast<const cedar::aux::MatData>(phiInput);
+    if (!phiInputData)
+        return;
+    const float &phi = phiInputData->getData().at<float>(0, 0);
+
+    auto psiInput = getInput("obstacle angle (psi)");
+    if (!psiInput)
+        return;
+    auto psiInputData = boost::dynamic_pointer_cast<const cedar::aux::MatData>(psiInput);
+    if (!psiInputData)
+        return;
+    const float &psi = psiInputData->getData().at<float>(0, 0);
+
+    auto dInput = getInput("obstacle distance (d)");
+    if (!dInput)
+        return;
+    auto dInputData = boost::dynamic_pointer_cast<const cedar::aux::MatData>(dInput);
+    if (!dInputData)
+        return;
+    const float &d = dInputData->getData().at<float>(0, 0);
+
+    float sigma;
+    bool has_sigma_input = false;
+    auto sigmainput = getInput("range (sigma; optional)");
+    if (sigmainput) {
+        auto sigmadata = boost::dynamic_pointer_cast<const cedar::aux::MatData>(sigmainput);
+        if (sigmadata
+            && !sigmadata->getData().empty()) {
+            has_sigma_input = true;
+            sigma = sigmadata->getData().at<float>(0, 0);
+        }
+    }
+    if (!has_sigma_input) {
+        sigma = mSigma->getValue();
+    }
+
+    float beta1;
+    bool has_beta1_input = false;
+    auto beta1input = getInput("maximal strength (beta 1; optional)");
+    if (beta1input) {
+        auto beta1data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(sigmainput);
+        if (beta1data
+            && !beta1data->getData().empty()) {
+            has_beta1_input = true;
+            beta1 = beta1data->getData().at<float>(0, 0);
+        }
+    }
+    if (!has_beta1_input) {
+        beta1 = mBeta1->getValue();
+    }
+
+    float beta2;
+    bool has_beta2_input = false;
+    auto beta2input = getInput("distance scale (beta 2; optional)");
+    if (beta2input) {
+        auto beta2data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(sigmainput);
+        if (beta2data
+            && !beta2data->getData().empty()) {
+            has_beta2_input = true;
+            beta2 = beta2data->getData().at<float>(0, 0);
+        }
+    }
+    if (!has_beta2_input) {
+        beta2 = mBeta2->getValue();
+    }
+
+    float lambda = beta1 * exp(-d/beta2);
+    float out = lambda * (phi - psi) * exp(-pow(phi-psi, 2) / 2*pow(sigma, 2));
+
+    mResult->getData().at<float>(0, 0) = out;
+
+    checkOptionalInputs();
+    // need to call this here, because determineinputValidity does not
+    // get called for optional inputs that get removed by the user.
+}
+
+void cedar::proc::steps::ForceLet::compute(const cedar::proc::Arguments &) {
+    recompute();
+}
+
+void cedar::proc::steps::ForceLet::checkOptionalInputs() {
+
+    auto sigmaInput = getInput("range (sigma; optional)");
+    bool has_sigma_input = false;
+    if (sigmaInput) {
+        auto sigmaData = boost::dynamic_pointer_cast<const cedar::aux::MatData>(sigmaInput);
+        if (sigmaData
+            && !sigmaData->getData().empty()) {
+            has_sigma_input = true;
+        }
+    }
+    if (has_sigma_input) {
+        // ausgrauen des Parameters:
+        mSigma->setConstant(true);
+    } else {
+        // Parameter aktivieren:
+        mSigma->setConstant(false);
+    }
+
+    auto beta1Input = getInput("maximal strength (beta 1; optional)");
+    bool has_beta1_input = false;
+    if (beta1Input) {
+        auto beta1Data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(beta1Input);
+        if (beta1Data
+            && !beta1Data->getData().empty()) {
+            has_beta1_input = true;
+        }
+    }
+    if (has_beta1_input) {
+        // ausgrauen des Parameters:
+        mBeta1->setConstant(true);
+    } else {
+        // Parameter aktivieren:
+        mBeta1->setConstant(false);
+    }
+
+
+    auto beta2Input = getInput("distance scale (beta 2; optional)");
+    bool has_beta2_input = false;
+    if (beta2Input) {
+        auto beta2Data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(beta2Input);
+        if (beta2Data
+            && !beta2Data->getData().empty()) {
+            has_beta2_input = true;
+        }
+    }
+    if (has_beta2_input) {
+        // ausgrauen des Parameters:
+        mBeta2->setConstant(true);
+    } else {
+        // Parameter aktivieren:
+        mBeta2->setConstant(false);
+    }
+
+}
+
+//// validity check
+/*cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ForceLet::determineInputValidity
+        (
+                cedar::proc::ConstDataSlotPtr slot,
+                cedar::aux::ConstDataPtr data
+        ) const {
+    //all inputs have same type
+    cedar::aux::ConstMatDataPtr _input = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
+    if (slot->getName() == "input") {
+        if (_input && _input->getDimensionality() == 0 && _input->getData().type() == CV_32F) {
+            return cedar::proc::DataSlot::VALIDITY_VALID;
+        }
+    } else if (slot->getName() == "range (sigma; optional)") {
+        if (_input && _input->getDimensionality() == 0 && _input->getData().type() == CV_32F) {
+            return cedar::proc::DataSlot::VALIDITY_VALID;
+        }
+    } else if (slot->getName() == "maximal strength (beta 1; optional)") {
+        if (_input && _input->getDimensionality() == 0 && _input->getData().type() == CV_32F) {
+            return cedar::proc::DataSlot::VALIDITY_VALID;
+        }
+    } else if (slot->getName() == "distance scale (beta 2; optional)") {
+        if (_input && _input->getDimensionality() == 0 && _input->getData().type() == CV_32F) {
+            return cedar::proc::DataSlot::VALIDITY_VALID;
+        }
+    }
+
+    // else
+    return cedar::proc::DataSlot::VALIDITY_ERROR;
+}*/
+
+void cedar::proc::steps::ForceLet::inputConnectionChanged(const std::string &) {
+    recompute();
+}
+
+void cedar::proc::steps::ForceLet::constantChanged() {
+    recompute();
+}
+

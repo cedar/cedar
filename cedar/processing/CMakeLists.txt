@@ -126,6 +126,7 @@ cedar_add_library(cedarproc
   steps/DampedPseudoInverseKinematics.h
   steps/ConfigurationLimits.h
   steps/PseudoInverse.h
+  steps/ForceLet.h
   steps/Jacobian.h
   steps/MatrixMultiply.h
   steps/MatrixPadding.h
