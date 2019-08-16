@@ -423,7 +423,7 @@ void cedar::proc::gui::ElementList::TabBase::contextMenuEvent(QContextMenuEvent*
     fav_action->setChecked(cedar::proc::gui::SettingsSingleton::getInstance()->isFavoriteElement(class_name));
 
     // Add the context menu entry "Remove template" if right clicked on a python template
-    if(p_declaration->getIconPath().find("python_script_template") != std::string::npos)
+    if(p_declaration->getCategory().find("Python Templates") != std::string::npos)
     {
       remove_template_action = context_menu.addAction("Remove template");
     }
