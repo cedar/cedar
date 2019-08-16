@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/Supervisor.h"
+#include "cedar/processing/steps/PythonScript.h"
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/ArchitectureWidgetList.h"
 #include "cedar/processing/gui/ArchitectureScriptEditor.h"
@@ -628,6 +629,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   mBackupSaveThreadWrapper= cedar::aux::CallFunctionInThreadPtr( new cedar::aux::CallFunctionInThread( boost::bind( &cedar::proc::gui::Ide::backupSaveCallback, this ) ) );
   mBackupSaveThreadWrapper->start();
 
+  cedar::proc::steps::PythonScript::importStepsFromTemplate();
 }
 
 cedar::proc::gui::Ide::~Ide()

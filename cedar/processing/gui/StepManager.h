@@ -42,6 +42,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ui_StepManager.h"
+#include "cedar/processing/GroupDeclaration.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/GroupDeclarationManager.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/StepManager.fwd.h"
@@ -50,6 +53,7 @@
 #include <QWidget>
 #include <QSignalMapper>
 #include <QCheckBox>
+#include <cedar/auxiliaries/DeclarationManagerTemplate.h>
 
 
 /*!@brief A widget for displaying the settings stored in cedar::proc::gui::Settings.
@@ -111,6 +115,14 @@ private:
   // none yet
 
 }; // class cedar::proc::gui::UiSettings
+
+class GroupOrElementDeclaration
+{
+public:
+    bool isGroup;
+    cedar::proc::ConstGroupDeclaration* groupDeclaration;
+    cedar::proc::ConstElementDeclaration* elementDeclaration;
+};
 
 #endif //CEDAR_PROC_GUI_STEP_MANAGER_H
 

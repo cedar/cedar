@@ -61,6 +61,9 @@
 #include <QMenu>
 #include <vector>
 #include <QMimeData>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/algorithm/string.hpp>
 
 // ---------------------------------------------------------------------------------------------------------------------
 //  the following code makes sure that a plugin declaration can be passed around within qt via drag & drop
@@ -344,6 +347,62 @@ cedar::aux::ConstPluginDeclaration* cedar::proc::gui::ElementList::TabBase::getD
   }
 }
 
+void cedar::proc::gui::ElementList::TabBase::removePythonTemplateFromJSON(std::string name)
+{
+  cedar::aux::Path filename("resource://pythonTemplates/python.json");
+
+  boost::property_tree::ptree root;
+
+  // Read existing json
+  try
+  {
+    boost::property_tree::read_json(filename.absolute(), root);
+
+    boost::optional<boost::property_tree::ptree&> steps = root.get_child_optional("steps");
+    // If the "steps" tree is already there, append our configuration
+    if(steps)
+    {
+
+      boost::property_tree::ptree::iterator stepsIterator = steps->begin(); // Node iterator
+      boost::property_tree::ptree::iterator end = steps->end(); // Stop sentinel
+      // Loop through current 'Root-Level'
+      for(stepsIterator; stepsIterator != end; stepsIterator++)
+      {
+        std::string left = stepsIterator->first;
+        boost::trim(left);
+        bool isLooped = false, isNonLooped = false;
+        if(!left.compare("cedar.processing.steps.PythonScriptLooped")) isLooped = true;
+        if(!left.compare("cedar.processing.steps.PythonScript")) isNonLooped = true;
+        if(isLooped || isNonLooped)
+        {
+          std::string foundName = stepsIterator->second.get<std::string>("name", "-");
+
+          if(!foundName.compare(name))
+          {
+            // Found declaration, we want to delete
+
+            // Remove the Declaration
+            root.erase(stepsIterator);
+          }
+        }
+      }
+    }
+    // write the tree to a file
+    boost::property_tree::write_json(filename.absolute(), root);
+  }
+  catch(boost::property_tree::ptree_bad_path e)
+  {
+    CEDAR_THROW(cedar::aux::InvalidPathException, "Error in removing declaration (ptree_bad_path)");
+  }
+  catch(boost::property_tree::json_parser::json_parser_error e)
+  {
+    CEDAR_THROW(cedar::aux::ParseException, "Error in removing declaration (json_parser_error)");
+  }
+  catch(std::exception e)
+  {
+    CEDAR_THROW(cedar::aux::FailedAssertionException, "Error in removing declaration");
+  }
+}
 
 void cedar::proc::gui::ElementList::TabBase::contextMenuEvent(QContextMenuEvent* pEvent)
 {
@@ -355,11 +414,19 @@ void cedar::proc::gui::ElementList::TabBase::contextMenuEvent(QContextMenuEvent*
   fav_action->setCheckable(true);
   cedar::aux::ConstPluginDeclaration* p_declaration = nullptr;
   std::string class_name;
+
+  QAction* remove_template_action = nullptr;
   if (index.isValid())
   {
     p_declaration = this->getDeclarationFromIndex(index);
     class_name = p_declaration->getClassName();
     fav_action->setChecked(cedar::proc::gui::SettingsSingleton::getInstance()->isFavoriteElement(class_name));
+
+    // Add the context menu entry "Remove template" if right clicked on a python template
+    if(p_declaration->getIconPath().find("python_script_template") != std::string::npos)
+    {
+      remove_template_action = context_menu.addAction("Remove template");
+    }
   }
   else
   {
@@ -381,6 +448,15 @@ void cedar::proc::gui::ElementList::TabBase::contextMenuEvent(QContextMenuEvent*
   else if (selected_action == fav_action)
   {
     cedar::proc::gui::SettingsSingleton::getInstance()->setFavorite(class_name, fav_action->isChecked());
+  }
+  else if(remove_template_action != nullptr && selected_action == remove_template_action)
+  {
+    // Remove the declaration in the JSON file
+    removePythonTemplateFromJSON(p_declaration->getClassNameWithoutNamespace());
+    // To hide the declaration in the Elements tab, remove the declaration from the declarations list of the GroupDeclarationManager
+    cedar::proc::GroupDeclarationManagerSingleton::getInstance()->removeDeclaration(p_declaration->getClassName());
+    // calls the reset() function of ElementList, so the template is no longer visible
+    cedar::proc::gui::SettingsSingleton::getInstance()->emitElementListViewResetSignal();
   }
 }
 
