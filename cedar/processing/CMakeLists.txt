@@ -112,6 +112,7 @@ cedar_add_library(cedarproc
   steps/VariableGauss.h
   steps/Sinus.h
   steps/LinearFunction.h
+  steps/Logarithm.h
   steps/BufferReader.h
   steps/Component.h
   steps/Convolution.h
@@ -125,6 +126,7 @@ cedar_add_library(cedarproc
   steps/DampedPseudoInverseKinematics.h
   steps/ConfigurationLimits.h
   steps/PseudoInverse.h
+  steps/ForceLet.h
   steps/Jacobian.h
   steps/MatrixMultiply.h
   steps/MatrixPadding.h
