@@ -78,19 +78,20 @@ cedar::proc::steps::ForceLet::ForceLet()
         :
         cedar::proc::Step(false),
         mResult(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
-        mSigma(new cedar::aux::DoubleParameter(this, "range (sigma)", 0.2)),
+        mRadius(new cedar::aux::DoubleParameter(this, "robot radius (R)", 0.0265)),
+        mSensorRange(new cedar::aux::DoubleParameter(this, "sensor range (delta theta)", 45)),
         mBeta1(new cedar::aux::DoubleParameter(this, "maximal strength (beta 1)", 1.0)),
         mBeta2(new cedar::aux::DoubleParameter(this, "distance scale (beta 2)", 1.0)) {
     this->declareInput("input");
     this->declareInput("obstacle angle (psi)");
     this->declareInput("obstacle distance (d)");
-    this->declareInput("range (sigma; optional)", false); // optional
     this->declareInput("maximal strength (beta 1; optional)", false); // optional
     this->declareInput("distance scale (beta 2; optional)", false); // optional
 
     this->declareOutput("result", mResult);
 
-    QObject::connect(mSigma.get(), SIGNAL(valueChanged()), this, SLOT(constantChanged()));
+    QObject::connect(mRadius.get(), SIGNAL(valueChanged()), this, SLOT(constantChanged()));
+    QObject::connect(mSensorRange.get(), SIGNAL(valueChanged()), this, SLOT(constantChanged()));
     QObject::connect(mBeta1.get(), SIGNAL(valueChanged()), this, SLOT(constantChanged()));
     QObject::connect(mBeta2.get(), SIGNAL(valueChanged()), this, SLOT(constantChanged()));
 }
@@ -124,26 +125,11 @@ void cedar::proc::steps::ForceLet::recompute() {
         return;
     const float &d = dInputData->getData().at<float>(0, 0);
 
-    float sigma;
-    bool has_sigma_input = false;
-    auto sigmainput = getInput("range (sigma; optional)");
-    if (sigmainput) {
-        auto sigmadata = boost::dynamic_pointer_cast<const cedar::aux::MatData>(sigmainput);
-        if (sigmadata
-            && !sigmadata->getData().empty()) {
-            has_sigma_input = true;
-            sigma = sigmadata->getData().at<float>(0, 0);
-        }
-    }
-    if (!has_sigma_input) {
-        sigma = mSigma->getValue();
-    }
-
     float beta1;
     bool has_beta1_input = false;
     auto beta1input = getInput("maximal strength (beta 1; optional)");
     if (beta1input) {
-        auto beta1data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(sigmainput);
+        auto beta1data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(beta1input);
         if (beta1data
             && !beta1data->getData().empty()) {
             has_beta1_input = true;
@@ -158,7 +144,7 @@ void cedar::proc::steps::ForceLet::recompute() {
     bool has_beta2_input = false;
     auto beta2input = getInput("distance scale (beta 2; optional)");
     if (beta2input) {
-        auto beta2data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(sigmainput);
+        auto beta2data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(beta2input);
         if (beta2data
             && !beta2data->getData().empty()) {
             has_beta2_input = true;
@@ -169,8 +155,15 @@ void cedar::proc::steps::ForceLet::recompute() {
         beta2 = mBeta2->getValue();
     }
 
+    float sensorRange = mSensorRange->getValue();
+    float radius = mRadius->getValue();
+
+    float sigma = atan(tan(sensorRange/2) + radius / (radius + d))*180/M_PI;
     float lambda = beta1 * exp(-d/beta2);
-    float out = lambda * (phi - psi) * exp(-pow(phi-psi, 2) / 2*pow(sigma, 2));
+    float out = lambda * (phi - psi) * exp(
+            -pow(phi-psi, 2)
+            / (2*pow(sigma, 2))
+            );
 
     mResult->getData().at<float>(0, 0) = out;
 
@@ -184,23 +177,6 @@ void cedar::proc::steps::ForceLet::compute(const cedar::proc::Arguments &) {
 }
 
 void cedar::proc::steps::ForceLet::checkOptionalInputs() {
-
-    auto sigmaInput = getInput("range (sigma; optional)");
-    bool has_sigma_input = false;
-    if (sigmaInput) {
-        auto sigmaData = boost::dynamic_pointer_cast<const cedar::aux::MatData>(sigmaInput);
-        if (sigmaData
-            && !sigmaData->getData().empty()) {
-            has_sigma_input = true;
-        }
-    }
-    if (has_sigma_input) {
-        // ausgrauen des Parameters:
-        mSigma->setConstant(true);
-    } else {
-        // Parameter aktivieren:
-        mSigma->setConstant(false);
-    }
 
     auto beta1Input = getInput("maximal strength (beta 1; optional)");
     bool has_beta1_input = false;

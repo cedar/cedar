@@ -69,7 +69,8 @@ public slots:
     cedar::aux::MatDataPtr mResult;
 
     // params
-    cedar::aux::DoubleParameterPtr mSigma;
+    cedar::aux::DoubleParameterPtr mRadius;
+    cedar::aux::DoubleParameterPtr mSensorRange;
     cedar::aux::DoubleParameterPtr mBeta1;
     cedar::aux::DoubleParameterPtr mBeta2;
 
