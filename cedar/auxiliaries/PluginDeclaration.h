@@ -171,6 +171,29 @@ public:
     return this->mIconPath;
   }
 
+  //!@brief set short description of this step
+  void setDescription(const std::string& description)
+  {
+    this->mDescription = description;
+  }
+
+  //!@brief get short description of this step
+  const std::string& getDescription() const
+  {
+    return this->mDescription;
+  }
+
+  std::string getShortDescription() const
+  {
+    //This is just a heuristic that assumes that descriptions contain a simple sentence as their first line
+    //TODO: Should be replaced with a proper field for a short description
+    std::size_t pos = this->mDescription.find(".");// position of "." in str
+    if(pos!=std::string::npos)
+      return this->mDescription.substr(0,pos);
+    else
+      return this->mDescription;
+  }
+
   //!@brief Returns the actual icon for the element.
   QIcon getIcon() const
   {
@@ -226,6 +249,9 @@ private:
 
   //!@brief path to icon included in the graphical representation of this step
   std::string mIconPath;
+
+  //!@brief short description of the step
+  std::string mDescription;
 
 }; // class cedar::aux::PluginDeclaration
 

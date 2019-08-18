@@ -65,20 +65,24 @@ SOFTWARE.
 #include "cedar/processing/steps/PythonScript.h"
 
 // CEDAR INCLUDES
-//#include "cedar/processing/typecheck/Matrix.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/gui/Settings.h"
+
+#include "cedar/processing/GroupDeclarationManager.h"
 
 
 // SYSTEM INCLUDES
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include <boost/algorithm/string.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 #include "numpy/ndarrayobject.h"
 
 #include <QReadWriteLock>
+#include <QRegExpValidator>
+
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -115,7 +119,6 @@ namespace
 
 // static member declaration
 int cedar::proc::steps::PythonScript::executionFailed = 0;
-std::vector<PyThreadState*> cedar::proc::steps::PythonScript::threadStates;
 QMutex cedar::proc::steps::PythonScript::mutex;
 std::string cedar::proc::steps::PythonScript::nameOfExecutingStep = "";
 
@@ -376,7 +379,7 @@ const char * NDArrayConverter::typenumToString(int typenum) {
     case NPY_USERDEF:
       return "user defined (NPY_USERDEF)";
     default:
-      "unknown";
+      return "unknown";
   }
 
 }
@@ -597,7 +600,7 @@ PyObject* NDArrayConverter::toNDArray(const cv::Mat& m)
     temp.allocator = &g_numpyAllocator;
     try
     {
-      PyAllowThreads allowThreads;
+      //PyAllowThreads allowThreads;
       m.copyTo(temp);
     }
     catch (const cv::Exception &e)
@@ -731,26 +734,16 @@ _scriptFile (new cedar::aux::FileParameter(this, "script file path", cedar::aux:
   this->_codeStringForSavingArchitecture->setHidden(true);
   this->_autoConvertDoubleToFloat->markAdvanced(true);
 
-  //this->registerFunction("export step  as  template", boost::bind(&cedar::proc::steps::PythonScript::exportStepAsTemplate  , this), false);
-  //this->registerFunction("import step from template", boost::bind(&cedar::proc::steps::PythonScript::importStepFromTemplate, this), false);
+  this->registerFunction("export step  as  template", boost::bind(&cedar::proc::steps::PythonScript::exportStepAsTemplate   , this), false);
+  //this->registerFunction("import step from template", boost::bind(&cedar::proc::steps::PythonScript::importStepsFromTemplate, this), false);
   
   cedar::proc::steps::PythonScript::executionFailed = 0;
   
   PyImport_AppendInittab("pycedar", &initpycedar);
-  
-  Py_Initialize();
+
   PyEval_InitThreads();
+  Py_Initialize();
 
-  threadID = threadStates.size();
-
-  if(threadID == 0)
-  {
-    threadStates.push_back(PyThreadState_Get());
-  }
-  else
-  {
-    threadStates.push_back(Py_NewInterpreter());
-  }
 }
 
 
@@ -815,27 +808,207 @@ void cedar::proc::steps::PythonScript::numberOfInputsChanged()
   mInputs.resize(newsize);
 }
 
-void cedar::proc::steps::PythonScript::importStepFromTemplate(){
+std::vector<cedar::proc::steps::PythonScript::TemplateName> cedar::proc::steps::PythonScript::getTemplateNames()
+{
+  std::vector<TemplateName> list;
+  try
+  {
+    boost::property_tree::ptree root;
+    boost::property_tree::read_json(cedar::aux::Path("resource://pythonTemplates/python.json").absolute(), root);
+    for (boost::property_tree::ptree::value_type &nodeOuter : root.get_child("steps"))
+    {
+      std::string left = nodeOuter.first;
+      boost::trim(left);
+      bool isLooped = false, isNonLooped = false;
+      if(!left.compare("cedar.processing.steps.PythonScriptLooped")) isLooped = true;
+      if(!left.compare("cedar.processing.steps.PythonScript")) isNonLooped = true;
+      if(isLooped || isNonLooped)
+      {
+        for (boost::property_tree::ptree::value_type &node : nodeOuter.second)
+        {
+          std::string left = node.first;
+          boost::trim(left);
+          if(!left.compare("name"))
+          {
+            list.push_back(TemplateName());
+            list[list.size() - 1].name = node.second.data();
+            list[list.size() - 1].isLooped = isLooped;
+          }
+        }
+      }
+    }
+  }
+  catch(boost::property_tree::ptree_bad_path e)
+  {
+    //std::cout << "Error[1]: " << e.what() << std::endl;
+  }
+  catch(boost::property_tree::json_parser::json_parser_error e)
+  {
+    //std::cout << "Error[2]: " << e.what() << std::endl;
+  }
+  catch(std::exception e)
+  {
+    //std::cout << "Error[3]: " << e.what() << std::endl;
+  }
+
+  return list;
+}
+
+void cedar::proc::steps::PythonScript::declareTemplate(const char* name, bool isLooped){
+  std::string category = "Python Templates";
+
+  cedar::proc::ElementDeclarationManagerSingleton::getInstance()->addCategory(category);
+
   cedar::proc::GroupDeclarationPtr python_declaration
           (
                   new cedar::proc::GroupDeclaration
                           (
-                                  "PScript",
-                                  "resource://groupTemplates/fieldTemplates.json",
-                                  "python script template1",
-                                  "DFT Templates"
+                                  name,
+                                  "resource://pythonTemplates/python.json",
+                                  name,
+                                  category
                           )
           );
-  python_declaration->setIconPath(":/steps/python_script.svg");
+  std::string icon_path;
+  if(isLooped)
+  {
+    icon_path = ":/steps/python_script.svg";
+  }
+  else
+  {
+    icon_path = ":/steps/python_script.svg";
+  }
+  python_declaration->setIconPath(icon_path);
+  python_declaration->setDescription
+          (
+                  "A template of the PythonScript Step."
+          );
   python_declaration->declare();
+}
 
-  // calls the reset() function of ElementList, so the template is visible
-  cedar::proc::gui::SettingsSingleton::getInstance()->emitElementListViewResetSignal();
+void cedar::proc::steps::PythonScript::importStepsFromTemplate()
+{
+  std::vector<TemplateName> list = getTemplateNames();
+  if(list.size() > 0)
+  {
+    for (int i = 0; i < list.size(); ++i)
+    {
+      std::string name = list.at(i).name;
+
+      // Declare template if it is not already declared
+      if(!cedar::proc::GroupDeclarationManagerSingleton::getInstance()->getDeclarationNoThrow(name)){
+        declareTemplate(name.c_str(), list.at(i).isLooped);
+      }
+    }
+
+    // calls the reset() function of ElementList, so the template is visible
+    cedar::proc::gui::SettingsSingleton::getInstance()->emitElementListViewResetSignal();
+  }
+}
+
+// Abstraction of writeJson()
+void cedar::proc::steps::PythonScript::appendJson(cedar::aux::Path filename, bool isLooped, std::string templateName){
+  // make sure the directory to which the file is supposed to be written exists
+  filename.absolute().createDirectories();
+
+  // generate the configuration tree
+  cedar::aux::ConfigurationNode configuration;
+  this->writeConfiguration(configuration);
+  boost::property_tree::ptree config = configuration;
+  config.put("name", templateName);
+
+  boost::property_tree::ptree root;
+
+  // Read existing json
+  try
+  {
+    boost::property_tree::read_json(filename.absolute(), root);
+
+    std::string name;
+    if(isLooped)
+    {
+      name = "cedar.processing.steps.PythonScriptLooped";
+    }
+    else
+    {
+      name = "cedar.processing.steps.PythonScript";
+    }
+
+    boost::optional<boost::property_tree::ptree&> steps = root.get_child_optional("steps");
+    // If the "steps" tree is already there, append our configuration
+    if(steps)
+    {
+      root.get_child("steps").add_child(boost::property_tree::ptree::path_type(name, '&'),config);
+    }
+    else
+    {
+      boost::property_tree::ptree stepsTree;
+      stepsTree.add_child(boost::property_tree::ptree::path_type(name, '&'),config);
+      root.add_child("steps",stepsTree);
+    }
+
+
+    // write the tree to a file
+    boost::property_tree::write_json(filename.absolute(), root);
+  }
+  catch(boost::property_tree::ptree_bad_path e)
+  {
+    //std::cout << "Error[1]: " << e.what() << std::endl;
+  }
+  catch(boost::property_tree::json_parser::json_parser_error e)
+  {
+    //std::cout << "Error[2]: " << e.what() << std::endl;
+  }
+  catch(std::exception e)
+  {
+    //std::cout << "Error[3]: " << e.what() << std::endl;
+  }
 }
 
 void cedar::proc::steps::PythonScript::exportStepAsTemplate()
 {
-  this->writeJson(cedar::aux::Path("resource://pythonTemplates/python.json"));
+  std::vector<TemplateName> templateNames = getTemplateNames();
+
+  bool ok;
+  // create the list of not accepted strings
+  std::vector<std::string> unaccepted;
+  unaccepted.push_back("");
+  for(int i = 0; i < templateNames.size(); i++)
+  {
+    unaccepted.push_back(templateNames.at(i).name);
+  }
+
+  // execute the dialog
+  ValidationMaskInputDialog dialog(unaccepted);
+  QString text = dialog.getText(0, "Export step as Template", "Name for the template:", QLineEdit::Normal, QString::fromStdString(this->getName()), &ok);
+
+  if(!ok)
+  {
+    return;
+  }
+
+  // Check again if no name breaks the name rules
+  std::string exportTemplateName = text.toStdString();
+  boost::trim(exportTemplateName);
+  if(!exportTemplateName.compare(""))
+  {
+    CEDAR_THROW(cedar::aux::ParseException, "The template name cannot be null");
+    return;
+  }
+  for (int i = 0; i < templateNames.size(); ++i)
+  {
+    if(!templateNames.at(i).name.compare(exportTemplateName))
+    {
+      CEDAR_THROW(cedar::aux::DuplicateNameException, "A template with name \"" + exportTemplateName + "\" already exists.");
+      return;
+    }
+  }
+
+  // export the template
+  appendJson(cedar::aux::Path("resource://pythonTemplates/python.json"), isLooped(), exportTemplateName);
+
+  // Load templates, to make the exported step visible
+  importStepsFromTemplate();
 }
 
 void cedar::proc::steps::PythonScript::numberOfOutputsChanged()
@@ -884,6 +1057,57 @@ std::string cedar::proc::steps::PythonScript::makeOutputSlotName(const int i)
     return s.str();
 }
 
+void cedar::proc::steps::PythonScript::freePythonVariables() {
+  PyObject * poMainModule = PyImport_AddModule("__main__");
+
+  PyObject * poAttrList = PyObject_Dir(poMainModule);
+
+  PyObject * poAttrIter = PyObject_GetIter(poAttrList);
+
+  PyObject * poAttrName;
+
+  while ((poAttrName = PyIter_Next(poAttrIter)) != NULL)
+  {
+    std::string oAttrName;
+    if (PyUnicode_Check(poAttrName))
+    {
+      std::cout << "is unicode" << std::endl;
+
+      PyObject* temp = PyUnicode_AsASCIIString(poAttrName);
+      if (NULL == temp) {
+        std::cout << "unicode to ASCII conversion failed" << std::endl;
+        oAttrName = "__asd__";
+      }
+      else
+      {
+        oAttrName = PyByteArray_AsString(temp);
+        std::cout << "unicode name: " << oAttrName << std::endl;
+      }
+      Py_DecRef(temp);
+    }
+    else
+    {
+      oAttrName = PyString_AsString(poAttrName);
+    }
+    // Make sure we don't delete any private objects.
+    if (!boost::starts_with(oAttrName, "__") || !boost::ends_with(oAttrName, "__"))
+    {
+      PyObject * poAttr = PyObject_GetAttr(poMainModule, poAttrName);
+
+      // Make sure we don't delete any module objects.
+      if (poAttr && poAttr->ob_type != poMainModule->ob_type)
+        PyObject_SetAttr(poMainModule, poAttrName, NULL);
+
+      Py_DecRef(poAttr);
+    }
+
+    Py_DecRef(poAttrName);
+  }
+
+  Py_DecRef(poAttrIter);
+
+  Py_DecRef(poAttrList);
+}
 
 //TODO allow 0 inputs / outputs in GUI
 
@@ -897,14 +1121,6 @@ void cedar::proc::steps::PythonScript::executePythonScript()
   nameOfExecutingStep = this->getName();
 
   // Swap to the interpreter of this specific PythonScript step
-  if(threadStates.size() > threadID)
-  {
-    PyThreadState_Swap(threadStates.at(threadID));
-  }
-  else
-  {
-    std::cout << "No thread state for thread ID " << threadID << std::endl;
-  }
   
   // Python...
   try{
@@ -1144,7 +1360,9 @@ void cedar::proc::steps::PythonScript::executePythonScript()
   
   if(cedar::proc::steps::PythonScript::executionFailed) this->setState(cedar::proc::Triggerable::STATE_EXCEPTION, "An exception occured");
   else this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
-  
+
+  freePythonVariables();
+
   isExecuting = 0;
   mutex.unlock();
 }

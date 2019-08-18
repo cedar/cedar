@@ -85,6 +85,10 @@ public:
   //!@brief add a new declaration to the manager
   void addDeclaration(cedar::proc::ConstGroupDeclarationPtr declaration);
 
+  //!@brief remove a declaration from the manager
+  //!@return true if a declaration with the specified class name was found
+  bool removeDeclaration(std::string className);
+
   /*! Adds a group template to the given group.
    *
    * @param templateName Name of the template to add.

@@ -146,7 +146,7 @@
         <file>steps/add_constant.svg</file>
         <file>steps/configuration_limits.svg</file>
         <file>steps/nullspace.svg</file>
-	<file>steps/python_script.svg</file>
+    	<file>steps/python_script.svg</file>
         <file>steps/count_larger.svg</file>
         <file>steps/over_time.svg</file>
         <file>steps/maximum.svg</file>
