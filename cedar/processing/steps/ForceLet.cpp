@@ -79,7 +79,7 @@ cedar::proc::steps::ForceLet::ForceLet()
         cedar::proc::Step(false),
         mResult(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
         mRadius(new cedar::aux::DoubleParameter(this, "robot radius (R)", 0.0265)),
-        mSensorRange(new cedar::aux::DoubleParameter(this, "sensor range (delta theta)", 45)),
+        mSensorRange(new cedar::aux::DoubleParameter(this, "sensor range (delta theta)", 0.7854)),
         mBeta1(new cedar::aux::DoubleParameter(this, "maximal strength (beta 1)", 1.0)),
         mBeta2(new cedar::aux::DoubleParameter(this, "distance scale (beta 2)", 1.0)) {
     this->declareInput("input");
@@ -158,12 +158,21 @@ void cedar::proc::steps::ForceLet::recompute() {
     float sensorRange = mSensorRange->getValue();
     float radius = mRadius->getValue();
 
-    float sigma = atan(tan(sensorRange/2) + radius / (radius + d))*180/M_PI;
+    float sigma = atan(tan(sensorRange/2) + radius / (radius + d));
     float lambda = beta1 * exp(-d/beta2);
     float out = lambda * (phi - psi) * exp(
             -pow(phi-psi, 2)
             / (2*pow(sigma, 2))
             );
+
+    out += lambda * (phi - psi - 2*M_PI) * exp(
+            -pow(phi-psi-2*M_PI, 2)
+            / (2*pow(sigma, 2))
+    );
+    out += lambda * (phi - psi + 2*M_PI) * exp(
+            -pow(phi-psi + 2*M_PI, 2)
+            / (2*pow(sigma, 2))
+    );
 
     mResult->getData().at<float>(0, 0) = out;
 
