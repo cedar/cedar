@@ -38,8 +38,6 @@
 #define CEDAR_AUX_GUI_VIEWER_H
 
 #include "cedar/configuration.h"
-#include <QCloseEvent>
-#include <QGLFramebufferObject>
 
 
 // CEDAR INCLUDES
@@ -105,17 +103,17 @@ public:
   Viewer(bool readFromFile = true);
 
   /*!@brief the destructor */
-  ~Viewer() override;
+  ~Viewer();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /*!@brief draws all objects in the scene */
-  void draw() override;
+  void draw();
 
   /*!@brief function being called automatically when a timer is up, usually in a loop */
-  void timerEvent(QTimerEvent* pEvent) override;
+  void timerEvent(QTimerEvent* pEvent);
 
   //!@brief call this function to initialize Gl resources for the passed visualization object
   void initGl(cedar::aux::gl::ObjectVisualizationPtr pVisualization);
@@ -128,7 +126,7 @@ public:
    *
    * @return The image in a cv::Mat structure
    */
-  cv::Mat& grabImage() override;
+  cv::Mat& grabImage();
 
 
   /*!@brief initialize the grabber specific parts in this method.
@@ -143,7 +141,7 @@ public:
    * @return returns the lock for the image-mat, if there isn't already a grabber connected.
    *         Otherwise it will return NULL
    */
-  QReadWriteLock* registerGrabber() override;
+  QReadWriteLock* registerGrabber();
 
   /*!@brief deinitialize the grabber specific parts in this method.
    *
@@ -156,11 +154,7 @@ public:
    * @remarks
    *    This is a member of the grabbable interface
    */
-  void deregisterGrabber(QReadWriteLock* lock) override;
-
-  void changeCameraPosition(const double x , const double y, const double z);
-
-  void changeCameraOrientation(const double alpha , const double beta);
+  void deregisterGrabber(QReadWriteLock* lock);
 
   std::string getViewerLabel() const;
 
@@ -170,10 +164,6 @@ public:
 //  void readFromConfiguration(cedar::aux::ConfigurationNode& node);
 
   void writeToConfiguration(cedar::aux::ConfigurationNode& root, QPoint mainWindowSize = QPoint());
-
-  void closeEvent(QCloseEvent *event) override;
-
-  void toggleVisible();
 
 #ifndef CEDAR_USE_QGLVIEWER
   //@cond SKIPPED_DOCUMENTATION
@@ -186,33 +176,20 @@ public:
   //@endcond
 #endif // CEDAR_USE_QGLVIEWER
 
-
-signals:
-  void cameraMoved();
-  void updated();
-
-
-
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
   /*!@brief initialization */
-  void init() override;
+  void init();
   
   ///!@brief grab the GL context
   void grabBuffer();
-
-  //!@brief updates the framebuffer when the window is hidden
-  void hiddenUpdate();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
   cedar::aux::gl::ScenePtr mpScene;
-
-  qglviewer::Vec mOldPos;
-  qglviewer::Vec mOldDir;
 
   ///!@brief Read/write lock for the internal grabber buffer used for concurrent access
   QReadWriteLock* mpGrabberLock;
@@ -230,9 +207,6 @@ private:
 
   ///!@brief flag in order to be stored in Plotgroups
   std::string mViewerLabel;
-
-
-  QGLFramebufferObject * m_fbo = nullptr;
 };
 
 #endif  // CEDAR_AUX_GUI_VIEWER_H
