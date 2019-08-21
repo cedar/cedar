@@ -34,11 +34,12 @@
 
 ======================================================================================================================*/
 
+
 #ifndef CEDAR_PROC_GUI_CODE_WIDGET_FWD_H
 #define CEDAR_PROC_GUI_CODE_WIDGET_FWD_H
 
 // CEDAR CONFIGURATION
-#include "cedar/configuration.h"
+
 
 // CEDAR INCLUDES
 #include "cedar/processing/lib.h"
@@ -61,6 +62,7 @@ namespace cedar
 }
 
 //!@endcond
+
 
 #endif // CEDAR_PROC_GUI_CODE_WIDGET_FWD_H
 

@@ -39,8 +39,7 @@
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-
-#ifdef PYTHONLIBS_FOUND
+#ifdef CEDAR_USE_PYTHON
 
 // CEDAR INCLUDES
 #include <cedar/processing/Step.h>
@@ -363,7 +362,7 @@ class NumpyAllocator;
 
 //enum { ARG_NONE = 0, ARG_MAT = 1, ARG_SCALAR = 2 };
 
-#endif
+#endif // CEDAR_USE_PYTHON
 
 #endif // CEDAR_PROC_STEPS_PYTHON_SCRIPT_H
 

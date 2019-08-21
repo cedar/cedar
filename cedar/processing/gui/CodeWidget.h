@@ -35,10 +35,12 @@
 ======================================================================================================================*/
 
 
+
 #ifndef CEDAR_PROC_GUI_CODE_WIDGET_H
 #define CEDAR_PROC_GUI_CODE_WIDGET_H
 
 // CEDAR INCLUDES
+#include "cedar/configuration.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Connectable.fwd.h"
@@ -56,6 +58,7 @@
 #include <QSyntaxHighlighter>
 
 
+#ifdef CEDAR_USE_PYTHON
 
 
 /*!@brief Syntax Highlighter for QTextEdit to highlight Python code
@@ -273,6 +276,25 @@ private:
 };
 
 
+#else // CEDAR_USE_PYTHON
 
+class cedar::proc::gui::CodeWidget
+:
+public QWidget
+{
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
+
+public:
+  inline void clear() 
+  {
+  }
+};
+
+#endif // CEDAR_USE_PYTHON
 
 #endif // CEDAR_PROC_GUI_CODE_WIDGET_H
+
+

@@ -34,7 +34,10 @@
 
 ======================================================================================================================*/
 
+
 // CEDAR INCLUDES
+#include "cedar/configuration.h"
+
 #include "cedar/processing/steps/PythonScript.h"
 #include "cedar/processing/gui/CodeWidget.h"
 #include "cedar/processing/DataSlot.h"
@@ -51,6 +54,7 @@
 #include <QPainter>
 
 
+#ifdef CEDAR_USE_PYTHON
 
 
 /*
@@ -565,4 +569,4 @@ void CodeEditor::keyPressEvent(QKeyEvent *e)
 }
 
 
-
+#endif // CEDAR_USE_PYTHON

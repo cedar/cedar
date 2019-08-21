@@ -629,7 +629,9 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   mBackupSaveThreadWrapper= cedar::aux::CallFunctionInThreadPtr( new cedar::aux::CallFunctionInThread( boost::bind( &cedar::proc::gui::Ide::backupSaveCallback, this ) ) );
   mBackupSaveThreadWrapper->start();
 
+#ifdef CEDAR_USE_PYTHON
   cedar::proc::steps::PythonScript::importStepsFromTemplate();
+#endif
 }
 
 cedar::proc::gui::Ide::~Ide()

@@ -58,8 +58,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-
 // CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+#ifdef CEDAR_USE_PYTHON
 
 // CLASS HEADER
 #include "cedar/processing/steps/PythonScript.h"
@@ -1396,3 +1397,5 @@ void cedar::proc::steps::PythonScript::executeButtonClicked(){
     executePythonScript();
   }
 }
+
+#endif // CEDAR_USE_PYTHON
