@@ -57,7 +57,7 @@
 #include <glew.h>
 #endif
 #include <qglviewer.h>
-#ifdef CEDAR_OS_WINDOWS //This looks like it should be QT5 vs QT4 ?
+#ifdef CEDAR_USE_QT5
 #include <manipulatedFrame.h>
 #else
 #include <QGLViewer/manipulatedFrame.h>

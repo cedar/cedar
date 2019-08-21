@@ -368,9 +368,9 @@ void cedar::aux::gui::Viewer::changeCameraOrientation(const double alpha , const
     // --> this->camera()->setOrientation(beta,alpha);
     // but it doesn't
 
-    double xVec = cv::cos(alpha) * cv::cos(beta);
-    double yVec = cv::sin(alpha) * cv::cos(beta);
-    double zVec = cv::sin(beta);
+    double xVec = std::cos(alpha) * std::cos(beta);
+    double yVec = std::sin(alpha) * std::cos(beta);
+    double zVec = std::sin(beta);
 
     qglviewer::Vec direction = qglviewer::Vec(xVec,yVec,zVec);
 

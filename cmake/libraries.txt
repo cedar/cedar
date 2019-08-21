@@ -95,6 +95,9 @@ link_directories(${BOOST_INCLUDEDIR})
 link_directories(${CEDAR_DEPENDENCY_GLEW})
 endif(WIN32)
 
+if (CEDAR_INCLUDE_PYTHON)
+if (NOT WIN32)
+if (NOT APPLE)
 # Python
 message("-- Searching for Python...")
 find_package(PythonLibs 2.7 REQUIRED)
@@ -108,7 +111,9 @@ if(PYTHONLIBS_FOUND)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} python2.7)#${PYTHON_LIBRARIES})
   include_directories(${PYTHON_INCLUDE_DIRS})
 endif(PYTHONLIBS_FOUND)
-
+endif(NOT APPLE)
+endif(NOT WIN32)
+endif(CEDAR_INCLUDE_PYTHON)
 
 # Boost
 if (WIN32)
