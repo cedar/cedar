@@ -178,16 +178,15 @@ void cedar::proc::sources::VirtualCamera::cameraOrientationChanged() {
 }
 
 void cedar::proc::sources::VirtualCamera::cameraPositionChangedFromViewport() {
-#ifdef CEDAR_USE_QGLVIEWER
+
     qglviewer::Vec pos = mpViewer.get()->camera()->position();
     mCameraPosition->setValue(0, pos.x, true);
     mCameraPosition->setValue(1, pos.y, true);
     mCameraPosition->setValue(2, pos.z, true);
-#endif
+
 }
 
 void cedar::proc::sources::VirtualCamera::cameraOrientationChangedFromViewport() {
-#ifdef CEDAR_USE_QGLVIEWER
 
     qglviewer::Vec dir = mpViewer.get()->camera()->viewDirection();
     if (dir.z < -1.)
@@ -199,6 +198,6 @@ void cedar::proc::sources::VirtualCamera::cameraOrientationChangedFromViewport()
     mVerticalOrientation->setValue(0, beta, true);
     if(dir.z != 1. && dir.z != -1.)
         mHorizontalOrientation->setValue(0, alpha, true);
-#endif
+
 }
 

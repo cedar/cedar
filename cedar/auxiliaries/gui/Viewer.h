@@ -112,7 +112,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /*!@brief draws all objects in the scene */
-  void draw();
+  void draw() override;
 
   /*!@brief function being called automatically when a timer is up, usually in a loop */
   void timerEvent(QTimerEvent* pEvent) override;
@@ -198,24 +198,21 @@ signals:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   /*!@brief initialization */
-  void init();
+  void init() override;
   
   ///!@brief grab the GL context
   void grabBuffer();
 
   //!@brief updates the framebuffer when the window is hidden
-#ifdef CEDAR_USE_QGLVIEWER
-
   void hiddenUpdate();
 
-  qglviewer::Vec mOldPos;
-  qglviewer::Vec mOldDir;
-
-#endif
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
   cedar::aux::gl::ScenePtr mpScene;
+
+  qglviewer::Vec mOldPos;
+  qglviewer::Vec mOldDir;
 
   ///!@brief Read/write lock for the internal grabber buffer used for concurrent access
   QReadWriteLock* mpGrabberLock;
