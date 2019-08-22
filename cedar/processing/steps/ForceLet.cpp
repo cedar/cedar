@@ -36,6 +36,7 @@
 // LOCAL INCLUDES
 #include "ForceLet.h"
 #include "cedar/processing/ElementDeclaration.h"
+#define _USE_MATH_DEFINES
 #include <math.h>
 #include <iostream>
 
