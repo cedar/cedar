@@ -1664,6 +1664,8 @@ void cedar::dev::Component::updateUserSideMeasurements()
 
 void cedar::dev::Component::startCommunication(bool suppressUserSideInteraction)
 {
+  // js: TODO: as of Aug 2019 this doesnt work if our channel is not opened, yet
+
 #ifdef DEBUG
   std::string s= "";
 

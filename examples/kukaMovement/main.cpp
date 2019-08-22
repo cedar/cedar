@@ -200,7 +200,7 @@ int main(int argc, char **argv)
   if (use_hardware)
   {
     // hardware interface
-    robot->readJson("resource://robots/caren/fri_configuration.json");
+    robot->readJson("resource://robots/caren/hardware_configuration.json");
     arm = robot->getComponent< cedar::dev::kuka::KinematicChain >("arm");
     trunk = robot->getComponent< cedar::dev::SimulatedKinematicChain >("trunk");
 
@@ -280,7 +280,8 @@ int main(int argc, char **argv)
   WorkerThread worker(arm, target);
   worker.setStepSize(arm->getCommunicationStepSize());
   // start everything
-  arm->startCommunication();
+  robot->startCommunicationOfComponents();
+  //arm->startCommunication();
   worker.start();
   a.exec();
 
