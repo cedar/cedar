@@ -175,7 +175,7 @@ else(Qt5Svg_FOUND)
     You can try to alter the default search paths in cedar.conf.")
 endif(Qt5Svg_FOUND)
 
-find_package(Qt5Concurrent 5.7.0 REQUIRED)
+find_package(Qt5Concurrent 5.7.0 QUIET)
 if(Qt5Concurrent_FOUND)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Qt5Concurrent_LIBRARIES})
   include_directories(${Qt5Concurrent_INCLUDE_DIRS})
