@@ -30,7 +30,7 @@
 
     Description: Simple viewer for visualizing a scene of objects
 
-    Credits:Listenebene
+    Credits:
 
 ======================================================================================================================*/
 
@@ -109,11 +109,6 @@ void cedar::aux::gui::Viewer::init()
     restoreStateFromFile();
 #endif // CEDAR_USE_QGLVIEWER
   }
-  else{
-#ifdef CEDAR_USE_QGLVIEWER
-      this->camera()->setPosition(qglviewer::Vec(0,-3,1));
-#endif // CEDAR_USE_QGLVIEWER
-  }
 
   mpScene->initGl();
 }
@@ -158,10 +153,10 @@ void cedar::aux::gui::Viewer::timerEvent(QTimerEvent*)
 #ifdef CEDAR_USE_QGLVIEWER
 void cedar::aux::gui::Viewer::hiddenUpdate(){
     // regular draw doesn't work while the Widget is hidden
+    //!@note DO NOT CALL makeCurrent() as it will lead to a segfault when instancing a new Robot while the Viewer is hidden
+    //makeCurrent();
 
-    makeCurrent();
-
-    //paintGL();
+    paintGL();
 
     if (!m_fbo || m_fbo->width() != width() || m_fbo->height() != height())
     {
@@ -177,7 +172,7 @@ void cedar::aux::gui::Viewer::hiddenUpdate(){
    //bind FBO and render stuff with paintGL() call
    m_fbo->bind();
    paintGL();
-
+   //You could now grab the content of the framebuffer we've rendered to
    QImage qimage = m_fbo->toImage();
 
    cv::Mat  mat( qimage.height(), qimage.width(),
@@ -190,9 +185,9 @@ void cedar::aux::gui::Viewer::hiddenUpdate(){
    cv::mixChannels(&mat, 1, &mat2, 1, from_to, 3);
 
    //apply the new content to the channel image
-   //mpGrabberLock->lockForWrite();
+   mpGrabberLock->lockForWrite();
    mGrabberBuffer = mat2;
-   //mpGrabberLock->unlock();
+   mpGrabberLock->unlock();
 
    m_fbo->release();
 
@@ -210,11 +205,8 @@ void cedar::aux::gui::Viewer::grabBuffer()
   // GL_FRONT_LEFT, GL_FRONT_RIGHT, GL_BACK_LEFT, GL_BACK_RIGHT, GL_FRONT, GL_BACK, GL_LEFT, GL_RIGHT,
   // GL_AUXi, where i is between 0 and the value of GL_AUX_BUFFERS minus 1.
   //glReadBuffer(GL_FRONT_RIGHT);
-#if QGLVIEWER_VERSION >= 0x020700
-  QImage qimage = this->grabFramebuffer();
-#else
   QImage qimage = this->QGLWidget::grabFrameBuffer(false);
-#endif // QGLVIEWER_Version
+
 
   // QImage to cv::Mat
   cv::Mat  mat( qimage.height(), qimage.width(),
@@ -376,9 +368,9 @@ void cedar::aux::gui::Viewer::changeCameraOrientation(const double alpha , const
     // --> this->camera()->setOrientation(beta,alpha);
     // but it doesn't
 
-    double xVec = std::cos(alpha) * std::cos(beta);
-    double yVec = std::sin(alpha) * std::cos(beta);
-    double zVec = std::sin(beta);
+    double xVec = cv::cos(alpha) * cv::cos(beta);
+    double yVec = cv::sin(alpha) * cv::cos(beta);
+    double zVec = cv::sin(beta);
 
     qglviewer::Vec direction = qglviewer::Vec(xVec,yVec,zVec);
 
