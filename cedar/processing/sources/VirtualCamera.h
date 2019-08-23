@@ -67,8 +67,8 @@ public:
   //!@brief Destructor
   virtual ~VirtualCamera();
 
-
 public slots:
+  //!@brief slots for changing camera parameters
   void resolutionChanged();
   void cameraPositionChanged();
   void cameraOrientationChanged();
@@ -76,9 +76,6 @@ public slots:
   void cameraOrientationChangedFromViewport();
   //!@brief temporary fix for updating outputs, please replace
   void updateOutput();
-
-
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -100,6 +97,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

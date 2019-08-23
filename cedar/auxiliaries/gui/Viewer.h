@@ -60,7 +60,11 @@
 #ifdef CEDAR_OS_WINDOWS //This looks like it should be QT5 vs QT4 ?
 #include <manipulatedFrame.h>
 #else
-#include <QGLViewer/manipulatedFrame.h>
+#if QGLVIEWER_VERSION >= 0x020700
+#include <manipulatedFrame.h>
+#else
+#include <QGLViewer/manipulatedFrame.h>F
+#endif // QGLVIEWER_VERSION
 #endif // CEDAR_OS_WINDOWS
 
 #else
@@ -71,6 +75,7 @@
 #include <string>
 #include <QPoint>
 #include <QGLWidget>
+
 
 /*!@brief A simple viewer for OpenGL drawing routines, based on QGLViewer
  *
@@ -99,12 +104,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 
   /*!@brief the constructor */
-  Viewer(cedar::aux::gl::ScenePtr pScene, bool readFromFile = true);
+  Viewer(cedar::aux::gl::ScenePtr pScene, bool readFromFile = false);
 
   /*!@brief the constructor without a scene pointer */
   Viewer(bool readFromFile = true);
 
   /*!@brief the destructor */
+// SYSTEM INCLUDES
   ~Viewer() override;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -131,7 +137,7 @@ public:
   cv::Mat& grabImage() override;
 
 
-  /*!@brief initialize the grabber specific parts in this method.
+  /*!@brief initialize the grabber specific parts irestoreStateFromFilen this method.
    *
    * The grabber invokes this method in it's constructor.
    * Have a look at the class cedar::aux::gui::Viewer for an implementation.
@@ -175,6 +181,9 @@ public:
 
   void toggleVisible();
 
+  /*!@brief initialization */
+  void init();
+
 #ifndef CEDAR_USE_QGLVIEWER
   //@cond SKIPPED_DOCUMENTATION
   // The following functions mimic part of the interface of QGLViewer to reduce compilation issues when the library is
@@ -197,8 +206,7 @@ signals:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief initialization */
-  void init();
+
   
   ///!@brief grab the GL context
   void grabBuffer();

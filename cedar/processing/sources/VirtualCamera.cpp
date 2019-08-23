@@ -124,9 +124,11 @@ cedar::proc::sources::VirtualCamera::VirtualCamera()
 cedar::proc::sources::VirtualCamera::~VirtualCamera() {
 
     //TODO this destructor seemingly never gets called ?
-    //     object parameters persist throughout different sessions
-    //     and even after logging out entirely
     //     investigate how these cameras are created and how they should be deleted
+    ///     Fixed:
+    ///     object parameters persist throughout different sessions
+    ///     and even after logging out entirely
+
     mpViewer.get()->deregisterGrabber(mLock);
     mpViewer.get()->close();
 }
