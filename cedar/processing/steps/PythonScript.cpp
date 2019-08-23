@@ -58,27 +58,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-
 // CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+#ifdef CEDAR_USE_PYTHON
 
 // CLASS HEADER
 #include "cedar/processing/steps/PythonScript.h"
 
 // CEDAR INCLUDES
-//#include "cedar/processing/typecheck/Matrix.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/GroupDeclaration.h"
+#include "cedar/processing/gui/Settings.h"
+
+#include "cedar/processing/GroupDeclarationManager.h"
 
 
 // SYSTEM INCLUDES
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include <boost/algorithm/string.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 #include "numpy/ndarrayobject.h"
 
 #include <QReadWriteLock>
+#include <QRegExpValidator>
 
-#if CV_MAJOR_VERSION < 3
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -114,28 +120,28 @@ namespace
 
 // static member declaration
 int cedar::proc::steps::PythonScript::executionFailed = 0;
-std::vector<PyThreadState*> cedar::proc::steps::PythonScript::threadStates;
 QMutex cedar::proc::steps::PythonScript::mutex;
 std::string cedar::proc::steps::PythonScript::nameOfExecutingStep = "";
 
 int NDArrayConverter::failmsg(const char *fmt, ...)
 {
-    cedar::aux::LogSingleton::getInstance()->error
-      (
-        fmt,
-        "void cedar::proc::steps::PythonScript::executePythonScript()",
-        (this->pythonScript != nullptr) ? this->pythonScript->getName():"Python Script"
-      );
-    cedar::proc::steps::PythonScript::executionFailed = 1;
+  char str[1000];
+  va_list ap;
+  va_start(ap, fmt);
+  vsnprintf(str, sizeof(str), fmt, ap);
+  va_end(ap);
 
-    char str[1000];
-    va_list ap;
-    va_start(ap, fmt);
-    vsnprintf(str, sizeof(str), fmt, ap);
-    va_end(ap);
+  PyErr_SetString(PyExc_TypeError, str);
 
-    PyErr_SetString(PyExc_TypeError, str);
-    return 0;
+  cedar::aux::LogSingleton::getInstance()->error
+          (
+                  str,
+                  "void cedar::proc::steps::PythonScript::executePythonScript()",
+                  (this->pythonScript != nullptr) ? this->pythonScript->getName():"Python Script"
+          );
+  cedar::proc::steps::PythonScript::executionFailed = 1;
+
+  return 0;
 }
 
 class PyAllowThreads
@@ -158,64 +164,139 @@ public:
     }
     ~PyEnsureGIL()
     {
-        PyGILState_Release(_state);
+      PyGILState_Release(_state);
     }
 private:
     PyGILState_STATE _state;
 };
-
+#if CV_MAJOR_VERSION < 3
 class NumpyAllocator : public cv::MatAllocator
 {
 public:
-    NumpyAllocator() {}
+
+    NumpyAllocator() {  }
     ~NumpyAllocator() {}
 
     void allocate(int dims, const int* sizes, int type, int*& refcount,
                   uchar*& datastart, uchar*& data, size_t* step)
     {
-        //PyEnsureGIL gil;
-        int depth = CV_MAT_DEPTH(type);
-        int cn = CV_MAT_CN(type);
-        const int f = (int)(sizeof(size_t)/8);
-        int typenum = depth == CV_8U ? NPY_UBYTE : depth == CV_8S ? NPY_BYTE :
-                      depth == CV_16U ? NPY_USHORT : depth == CV_16S ? NPY_SHORT :
-                      depth == CV_32S ? NPY_INT : depth == CV_32F ? NPY_FLOAT :
-                      depth == CV_64F ? NPY_DOUBLE : f*NPY_ULONGLONG + (f^1)*NPY_UINT;
-        int i;
-        npy_intp _sizes[CV_MAX_DIM+1];
-        for( i = 0; i < dims; i++ )
-        {
-            _sizes[i] = sizes[i];
-        }
+      //PyEnsureGIL gil;
+      int depth = CV_MAT_DEPTH(type);
+      int cn = CV_MAT_CN(type);
+      const int f = (int)(sizeof(size_t)/8);
+      int typenum = depth == CV_8U ? NPY_UBYTE : depth == CV_8S ? NPY_BYTE :
+                                                 depth == CV_16U ? NPY_USHORT : depth == CV_16S ? NPY_SHORT :
+                                                                                depth == CV_32S ? NPY_INT : depth == CV_32F ? NPY_FLOAT :
+                                                                                                            depth == CV_64F ? NPY_DOUBLE : f*NPY_ULONGLONG + (f^1)*NPY_UINT;
+      int i;
+      npy_intp _sizes[CV_MAX_DIM+1];
+      for( i = 0; i < dims; i++ )
+      {
+        _sizes[i] = sizes[i];
+      }
 
-        if( cn > 1 )
-        {
-            _sizes[dims++] = cn;
-        }
-        PyObject* o = PyArray_SimpleNew(dims, _sizes, typenum);
-        if(!o)
-        {
-            CV_Error_(CV_StsError, ("The numpy array of typenum=%d, ndims=%d can not be created", typenum, dims));
-        }
-        refcount = refcountFromPyObject(o);
-        PyArrayObject* oCasted = reinterpret_cast<PyArrayObject*>(o);
-        npy_intp* _strides = PyArray_STRIDES(oCasted); // added oCasted
-        for( i = 0; i < dims - (cn > 1); i++ )
-            step[i] = (size_t)_strides[i];
-        datastart = data = (uchar*)PyArray_DATA(oCasted); // added oCasted
+      if( cn > 1 )
+      {
+        _sizes[dims++] = cn;
+      }
+      PyObject* o = PyArray_SimpleNew(dims, _sizes, typenum);
+      if(!o)
+      {
+        CV_Error_(CV_StsError, ("The numpy array of typenum=%d, ndims=%d can not be created", typenum, dims));
+      }
+      refcount = refcountFromPyObject(o);
+      PyArrayObject* oCasted = reinterpret_cast<PyArrayObject*>(o);
+      npy_intp* _strides = PyArray_STRIDES(oCasted); // added oCasted
+      for( i = 0; i < dims - (cn > 1); i++ )
+        step[i] = (size_t)_strides[i];
+      datastart = data = (uchar*)PyArray_DATA(oCasted); // added oCasted
     }
 
     void deallocate(int* refcount, uchar*, uchar*)
     {
-        //PyEnsureGIL gil;
-        if( !refcount )
-            return;
+      //PyEnsureGIL gil;
+      if( !refcount )
+        return;
 
-        PyObject* o = pyObjectFromRefcount(refcount);
-        Py_INCREF(o);
-        Py_DECREF(o);
+      PyObject* o = pyObjectFromRefcount(refcount);
+      Py_INCREF(o);
+      Py_DECREF(o);
     }
+
 };
+#else // CV_MAJOR_VERSION
+class NumpyAllocator : public cv::MatAllocator
+{
+public:
+
+    const MatAllocator* stdAllocator;
+    NumpyAllocator() { stdAllocator = cv::Mat::getStdAllocator(); }
+    ~NumpyAllocator() {}
+
+    cv::UMatData* allocate(PyObject* o, int dims, const int* sizes, int type, size_t* step) const
+    {
+      cv::UMatData* u = new cv::UMatData(this);
+      u->data = u->origdata = (uchar*)PyArray_DATA((PyArrayObject*) o);
+      npy_intp* _strides = PyArray_STRIDES((PyArrayObject*) o);
+      for( int i = 0; i < dims - 1; i++ )
+        step[i] = (size_t)_strides[i];
+      step[dims-1] = CV_ELEM_SIZE(type);
+      u->size = sizes[0]*step[0];
+      u->userdata = o;
+      return u;
+    }
+
+    cv::UMatData* allocate(int dims0, const int* sizes, int type, void* data, size_t* step, int flags, cv::UMatUsageFlags usageFlags) const// CV_OVERRIDE
+    {
+      if( data != 0 )
+      {
+        // issue #6969: CV_Error(Error::StsAssert, "The data should normally be NULL!");
+        // probably this is safe to do in such extreme case
+        return stdAllocator->allocate(dims0, sizes, type, data, step, flags, usageFlags);
+      }
+      //PyEnsureGIL gil;
+
+      int depth = CV_MAT_DEPTH(type);
+      int cn = CV_MAT_CN(type);
+      const int f = (int)(sizeof(size_t)/8);
+      int typenum = depth == CV_8U ? NPY_UBYTE : depth == CV_8S ? NPY_BYTE :
+                                                 depth == CV_16U ? NPY_USHORT : depth == CV_16S ? NPY_SHORT :
+                                                                                depth == CV_32S ? NPY_INT : depth == CV_32F ? NPY_FLOAT :
+                                                                                                            depth == CV_64F ? NPY_DOUBLE : f*NPY_ULONGLONG + (f^1)*NPY_UINT;
+      int i, dims = dims0;
+      cv::AutoBuffer<npy_intp> _sizes(dims + 1);
+      for( i = 0; i < dims; i++ )
+        _sizes[i] = sizes[i];
+      if( cn > 1 )
+        _sizes[dims++] = cn;
+      PyObject* o = PyArray_SimpleNew(dims, _sizes, typenum);
+      if(!o)
+        CV_Error_(cv::Error::StsError, ("The numpy array of typenum=%d, ndims=%d can not be created", typenum, dims));
+      return allocate(o, dims0, sizes, type, step);
+    }
+
+    bool allocate(cv::UMatData* u, int accessFlags, cv::UMatUsageFlags usageFlags) const //CV_OVERRIDE
+    {
+      return stdAllocator->allocate(u, accessFlags, usageFlags);
+    }
+
+    void deallocate(cv::UMatData* u) const //CV_OVERRIDE
+    {
+      if(!u)
+        return;
+      //PyEnsureGIL gil;
+      CV_Assert(u->urefcount >= 0);
+      CV_Assert(u->refcount >= 0);
+      if(u->refcount == 0)
+      {
+        PyObject* o = (PyObject*)u->userdata;
+        Py_XDECREF(o);
+        delete u;
+      }
+    }
+
+};
+#endif // CV_MAJOR_VERSION
 
 NumpyAllocator g_numpyAllocator;
 
@@ -248,129 +329,300 @@ void NDArrayConverter::init()
   }
 }
 
-cv::Mat NDArrayConverter::toMat(const PyObject *o)
+const char * NDArrayConverter::typenumToString(int typenum) {
+  switch(typenum){
+    case NPY_BOOL:
+      return "boolean (NPY_BOOL)";
+    case NPY_UBYTE:
+      return "unsigned byte (NPY_UBYTE)";
+    case NPY_BYTE:
+      return "byte (NPY_BYTE)";
+    case NPY_USHORT:
+      return "unsigned short (NPY_USHORT)";
+    case NPY_SHORT:
+      return "short (NPY_SHORT)";
+    case NPY_UINT:
+      return "unsigned int (NPY_UINT)";
+    case NPY_INT:
+      return "int (NPY_INT)";
+    case NPY_ULONGLONG:
+      return "unsigned long long (NPY_ULONGLONG)";
+    case NPY_LONGLONG:
+      return "long long (NPY_LONGLONG)";
+    case NPY_HALF:
+      return "float16 (NPY_HALF)";
+    case NPY_FLOAT:
+      return "float32 (NPY_FLOAT)";
+    case NPY_DOUBLE:
+      return "double (NPY_DOUBLE)";
+    case NPY_LONGDOUBLE:
+      return "long double (NPY_LONGDOUBLE)";
+    case NPY_CFLOAT:
+      return "complex float32 (NPY_CFLOAT)";
+    case NPY_CDOUBLE:
+      return "complex double (NPY_CDOUBLE)";
+    case NPY_CLONGDOUBLE:
+      return "complex long double (NPY_CLONGDOUBLE)";
+    case NPY_DATETIME:
+      return "datetime (NPY_DATETIME)";
+    case NPY_TIMEDELTA:
+      return "timedelta (NPY_TIMEDELTA)";
+    case NPY_STRING:
+      return "string (NPY_STRING)";
+    case NPY_UNICODE:
+      return "unicode (NPY_UNICODE)";
+    case NPY_OBJECT:
+      return "object (NPY_OBJECT)";
+    case NPY_VOID:
+      return "void (NPY_VOID)";
+    case NPY_NOTYPE:
+      return "notype (NPY_NOTYPE)";
+    case NPY_USERDEF:
+      return "user defined (NPY_USERDEF)";
+    default:
+      return "unknown";
+  }
+
+}
+
+cv::Mat NDArrayConverter::toMat(PyObject* o, int index)
 {
-    cv::Mat m;
+  cv::Mat m;
+  bool allowND = true, doMultiChannelTypeConversion = false;
+  if(!o || o == Py_None)
+  {
+    //TODO failmsg here?
+    return cv::Mat::zeros(1,1,CV_32F);
+  }
 
-    if(!o || o == Py_None)
-    {
-      if( !m.data )
-        m.allocator = &g_numpyAllocator;
-    }
-
-    if(!o || !PyArray_Check(o) )
-    {
-      if(pythonScript != nullptr) this->failmsg("Output is not a numpy array (Did you forgot to connect the inputs?)");
-      return cv::Mat::zeros(1, 1, CV_32F);
-    }
-    const PyArrayObject* oCastedConst = reinterpret_cast<const PyArrayObject*>(o);
-    int typenum = PyArray_TYPE(oCastedConst); // changed
-    int type = typenum == NPY_UBYTE ? CV_8U : typenum == NPY_BYTE ? CV_8S :
-               typenum == NPY_USHORT ? CV_16U : typenum == NPY_SHORT ? CV_16S :
-               typenum == NPY_UINT || typenum == NPY_INT ? CV_32S :
-               typenum == NPY_ULONG || typenum == NPY_LONG ? CV_32S :
-               typenum == NPY_FLOAT ? CV_32F :
-               typenum == NPY_DOUBLE ? CV_64F : -1;
-               
-    if( type < 0 )
-    {
-      if(pythonScript != nullptr) this->failmsg("Data type is not supported", typenum);
-      return cv::Mat::zeros(1, 1, CV_32F);
-    }
-
-    int ndims = PyArray_NDIM(oCastedConst); // added oCastedConst
-    
-    if(ndims >= CV_MAX_DIM || ndims >= 4)
-    {
-      if(pythonScript != nullptr) this->failmsg("Dimensionality of matrix is too high", ndims);
-      return cv::Mat::zeros(1, 1, CV_32F);
-    }
-    if(ndims == 0)
-    {
-      if(pythonScript != nullptr) this->failmsg("Matrix has 0 dimensions");
-      return cv::Mat::zeros(1, 1, CV_32F);
-    }
-    
-    
-    int size[CV_MAX_DIM+1];
-    size_t step[CV_MAX_DIM+1], elemsize = CV_ELEM_SIZE1(type);
-
-    PyArrayObject* oCasted = reinterpret_cast<PyArrayObject*>((PyObject*)o);
-    const npy_intp* _sizes = PyArray_DIMS(oCasted); // added oCasted
-    const npy_intp* _strides = PyArray_STRIDES(oCasted); // added oCasted
-    bool transposed = false;
-
-    for(int i = 0; i < ndims; i++)
-    {
-      size[i] = (int)_sizes[i];
-      step[i] = (size_t)_strides[i];
-    }
-
-    if(step[ndims-1] > elemsize)
-    {
-      if(pythonScript != nullptr) this->failmsg("Datatype of matrix is not supported");
-      return cv::Mat::zeros(1, 1, CV_32F);
-    }
-    
-    /*
-    if( ndims == 0 || step[ndims-1] > elemsize) {
-        size[ndims] = 1;
-        step[ndims] = elemsize;
-        ndims++;
-    }
-
-    if( ndims >= 2 && step[0] < step[1] )
-    {
-        std::swap(size[0], size[1]);
-        std::swap(step[0], step[1]);
-        transposed = true;
-    }
-
-    if( ndims == 3 && size[2] <= CV_CN_MAX && step[1] == elemsize*size[2] )
-    {
-        ndims--;
-        type |= CV_MAKETYPE(0, size[2]);
-    }
-    */
-
-    m = cv::Mat(ndims, size, type, PyArray_DATA(oCasted), step); // added oCasted
-
-
-    if( m.data )
-    {
-      m.refcount = refcountFromPyObject(o);
-      m.addref(); // protect the original numpy array from deallocation
-                    // (since Mat destructor will decrement the reference counter)
-    }
-    m.allocator = &g_numpyAllocator;
-    /*
-    if(transposed)
-    {
-      cv::Mat tmp;
-      tmp.allocator = &g_numpyAllocator;
-      transpose(m, tmp);
-      m = tmp;
-    }
-    */
+  if( PyInt_Check(o) )
+  {
+    double v[] = {static_cast<double>(PyInt_AsLong((PyObject*)o))};
+    m = cv::Mat(1, 1, CV_64F, v).clone();
     return m;
+  }
+  if( PyFloat_Check(o) )
+  {
+    double v[] = {PyFloat_AsDouble((PyObject*)o)};
+    m = cv::Mat(1, 1, CV_64F, v).clone();
+    return m;
+  }
+  if( PyTuple_Check(o) )
+  {
+    int i, sz = (int)PyTuple_Size((PyObject*)o);
+    m = cv::Mat(sz, 1, CV_64F);
+    for( i = 0; i < sz; i++ )
+    {
+      PyObject* oi = PyTuple_GetItem(o, i);
+      if( PyInt_Check(oi) )
+      {
+        m.at<double>(i) = (double) PyInt_AsLong(oi);
+      }
+      else if( PyFloat_Check(oi) )
+      {
+        m.at<double>(i) = (double) PyFloat_AsDouble(oi);
+      }
+      else
+      {
+        failmsg("Object in pc.outputs[%d] is not a numerical tuple.", index);
+        return cv::Mat::zeros(1,1,CV_32F);
+      }
+    }
+    return m;
+  }
+
+  if( !PyArray_Check(o) )
+  {
+    failmsg("Object in pc.outputs[%d] is not a numpy array, neither a scalar.", index);
+    return cv::Mat::zeros(1,1,CV_32F);
+  }
+
+  PyArrayObject* oarr = (PyArrayObject*) o;
+
+  bool needcopy = false, needcast = false;
+  int typenum = PyArray_TYPE(oarr), new_typenum = typenum;
+  int type = typenum == NPY_UBYTE ? CV_8U :
+             typenum == NPY_BYTE ? CV_8S :
+             typenum == NPY_USHORT ? CV_16U :
+             typenum == NPY_SHORT ? CV_16S :
+             typenum == NPY_INT ? CV_32S :
+             typenum == NPY_INT32 ? CV_32S :
+             typenum == NPY_FLOAT ? CV_32F :
+             typenum == NPY_DOUBLE ? CV_64F : -1;
+
+  if( type < 0 )
+  {
+    if( typenum == NPY_INT64 || typenum == NPY_UINT64 || typenum == NPY_LONG )
+    {
+      needcopy = needcast = true;
+      new_typenum = NPY_INT;
+      type = CV_32S;
+    }
+    else
+    {
+      failmsg("Data type (%s) of matrix in pc.outputs[%d] is not supported.", typenumToString(typenum), index);
+      return cv::Mat::zeros(1,1,CV_32F);
+    }
+  }
+
+#ifndef CV_MAX_DIM
+  const int CV_MAX_DIM = 32;
+#endif
+
+  int ndims = PyArray_NDIM(oarr);
+  if(ndims >= CV_MAX_DIM)
+  {
+    failmsg("Dimension of matrix in pc.outputs[%d] is too high. (%d)", index, ndims);
+    return cv::Mat::zeros(1,1,CV_32F);
+  }
+
+  int size[CV_MAX_DIM+1];
+  size_t step[CV_MAX_DIM+1];
+  size_t elemsize = CV_ELEM_SIZE1(type);
+  const npy_intp* _sizes = PyArray_DIMS(oarr);
+  const npy_intp* _strides = PyArray_STRIDES(oarr);
+  bool ismultichannel = ndims == 3 && _sizes[2] <= CV_CN_MAX;
+
+  for( int i = ndims-1; i >= 0 && !needcopy; i-- )
+  {
+    // these checks handle cases of
+    //  a) multi-dimensional (ndims > 2) arrays, as well as simpler 1- and 2-dimensional cases
+    //  b) transposed arrays, where _strides[] elements go in non-descending order
+    //  c) flipped arrays, where some of _strides[] elements are negative
+    // the _sizes[i] > 1 is needed to avoid spurious copies when NPY_RELAXED_STRIDES is set
+    if( (i == ndims-1 && _sizes[i] > 1 && (size_t)_strides[i] != elemsize) ||
+        (i < ndims-1 && _sizes[i] > 1 && _strides[i] < _strides[i+1]) )
+    {
+      needcopy = true;
+    }
+  }
+
+  if( ismultichannel && _strides[1] != (npy_intp)elemsize*_sizes[2] )
+  {
+    needcopy = true;
+  }
+
+  if (needcopy)
+  {
+    if( needcast )
+    {
+      o = PyArray_Cast(oarr, new_typenum);
+      oarr = (PyArrayObject*) o;
+    }
+    else
+    {
+      oarr = PyArray_GETCONTIGUOUS(oarr);
+      o = (PyObject*) oarr;
+    }
+
+    _strides = PyArray_STRIDES(oarr);
+  }
+
+  // Normalize strides in case NPY_RELAXED_STRIDES is set
+  size_t default_step = elemsize;
+  for ( int i = ndims - 1; i >= 0; --i )
+  {
+    size[i] = (int)_sizes[i];
+    if ( size[i] > 1 )
+    {
+      step[i] = (size_t)_strides[i];
+      default_step = step[i] * size[i];
+    }
+    else
+    {
+      step[i] = default_step;
+      default_step *= size[i];
+    }
+  }
+
+  // handle degenerate case
+  if(ndims == 0)
+  {
+    failmsg("Matrix in pc.outputs[%d] has 0 dimensions.", index);
+    return cv::Mat::zeros(1,1,CV_32F);
+
+    // Could check the following:
+    //size[ndims] = 1;
+    //step[ndims] = elemsize;
+    //ndims++;
+  }
+
+  if( doMultiChannelTypeConversion && ismultichannel )
+  {
+    ndims--;
+    type |= CV_MAKETYPE(0, size[2]);
+    std::cout << "Matrix has multiple channels... Do conversion... type |=" <<
+                 " CV_MAKETYPE(0, size[2]) has computed " << type << std::endl;
+    //TODO implement a type check after oring (currently this statement is never true)
+  }
+
+  if( ndims > 2 && !allowND )
+  {
+    failmsg("Matrix in pc.outputs[%d] has more than 2 dimensions. (%d) (This is currently not supported)", index, ndims);
+    return cv::Mat::zeros(1,1,CV_32F);
+  }
+
+  m = cv::Mat(ndims, size, type, PyArray_DATA(oarr), step);
+
+#if CV_MAJOR_VERSION < 3
+  if( m.data )
+  {
+    m.refcount = refcountFromPyObject(o);
+    m.addref(); // protect the original numpy array from deallocation
+    // (since Mat destructor will decrement the reference counter)
+  }
+#else // CV_MAJOR_VERSION
+  m.u = g_numpyAllocator.allocate(o, ndims, size, type, step);
+  m.addref();
+  if( !needcopy )
+  {
+    Py_INCREF(o);
+  }
+#endif // CV_MAJOR_VERSION
+
+  m.allocator = &g_numpyAllocator;
+  return m;
 }
 
 PyObject* NDArrayConverter::toNDArray(const cv::Mat& m)
 {
-    if( !m.data ){
-      Py_RETURN_NONE;
-    }
-    cv::Mat temp, *p = (cv::Mat*)&m;
-    if(!p->refcount || p->allocator != &g_numpyAllocator)
+  if( !m.data )
+  {
+    Py_RETURN_NONE;
+  }
+  cv::Mat temp, *p = (cv::Mat*)&m;
+
+#if CV_MAJOR_VERSION < 3
+  if(!p->refcount || p->allocator != &g_numpyAllocator)
+#else
+  if(!p->u || p->allocator != &g_numpyAllocator)
+#endif
+  {
+    temp.allocator = &g_numpyAllocator;
+    try
     {
-      temp.allocator = &g_numpyAllocator;
+      //PyAllowThreads allowThreads;
       m.copyTo(temp);
-      
-      p = &temp;
     }
-    p->addref();
-    return pyObjectFromRefcount(p->refcount);
+    catch (const cv::Exception &e)
+    {
+      PyErr_SetString(0, e.what());
+      return 0;
+    }
+    //m.copyTo(temp);
+
+    p = &temp;
+  }
+#if CV_MAJOR_VERSION < 3
+  p->addref();
+  return pyObjectFromRefcount(p->refcount);
+#else
+  PyObject* o = (PyObject*)p->u->userdata;
+  Py_INCREF(o);
+  return o;
+#endif
 }
+
 
 
 void printFromPython(PyObject* obj)
@@ -443,7 +695,6 @@ BOOST_PYTHON_MODULE(pycedar)
   boost::python::def("messagePrint", &printFromPython);
 }
 
-#endif
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -458,7 +709,6 @@ PythonScript(false)
 cedar::proc::steps::PythonScript::PythonScript(bool isLooped)
 :
 cedar::proc::Step(isLooped)
-#if CV_MAJOR_VERSION < 3
 ,
 mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
 
@@ -466,16 +716,13 @@ mInputs(1, cedar::aux::MatDataPtr()),
 mOutputs(1, cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))),
 
 // Declare Properties
-_codeStringForSavingArchitecture (new cedar::aux::StringParameter(this, "Code", "import numpy as np\nimport pycedar as pc\n\n#Print to messages tab:\n# pc.messagePrint('text')\n# pc.messagePrint(str(...))\n\n#Inputs:\n# pc.inputs[0]\n# pc.inputs[1]\n# ...\n\n#Outputs:\n# pc.outputs[0]\n# pc.outputs[1]\n# ...\n\n\ninput = pc.inputs[0]\n\npc.outputs[0] = input * 2\n")),
-_mNumberOfInputs (new cedar::aux::UIntParameter(this, "Number of Inputs", 1,1,255)),
-_mNumberOfOutputs (new cedar::aux::UIntParameter(this, "Number of Outputs", 1,1,255)),
-_hasScriptFile (new cedar::aux::BoolParameter(this, "Use script file", false)),
-_autoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "Auto-convert Double output matrices to Float", true)),
-_scriptFile (new cedar::aux::FileParameter(this, "Script file path", cedar::aux::FileParameter::READ))
-#endif
-
+_codeStringForSavingArchitecture (new cedar::aux::StringParameter(this, "code", "import numpy as np\nimport pycedar as pc\n\n#Print to messages tab:\n# pc.messagePrint('text')\n# pc.messagePrint(str(...))\n\n#Inputs:\n# pc.inputs[0]\n# pc.inputs[1]\n# ...\n\n#Outputs:\n# pc.outputs[0]\n# pc.outputs[1]\n# ...\n\n\ninput = pc.inputs[0]\n\npc.outputs[0] = input * 2\n")),
+_mNumberOfInputs (new cedar::aux::UIntParameter(this, "number of inputs", 1,1,255)),
+_mNumberOfOutputs (new cedar::aux::UIntParameter(this, "number of outputs", 1,1,255)),
+_hasScriptFile (new cedar::aux::BoolParameter(this, "use script file", false)),
+_autoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "auto-convert double output matrices to float", true)),
+_scriptFile (new cedar::aux::FileParameter(this, "script file path", cedar::aux::FileParameter::READ))
 {
-#if CV_MAJOR_VERSION < 3
   this->declareInput(makeInputSlotName(0), false);
   
   this->declareOutput(makeOutputSlotName(0), mOutputs[0]);
@@ -487,25 +734,17 @@ _scriptFile (new cedar::aux::FileParameter(this, "Script file path", cedar::aux:
   this->_scriptFile->setConstant(true);
   this->_codeStringForSavingArchitecture->setHidden(true);
   this->_autoConvertDoubleToFloat->markAdvanced(true);
+
+  this->registerFunction("export step  as  template", boost::bind(&cedar::proc::steps::PythonScript::exportStepAsTemplate   , this), false);
+  //this->registerFunction("import step from template", boost::bind(&cedar::proc::steps::PythonScript::importStepsFromTemplate, this), false);
   
   cedar::proc::steps::PythonScript::executionFailed = 0;
   
   PyImport_AppendInittab("pycedar", &initpycedar);
-  
-  Py_Initialize();
+
   PyEval_InitThreads();
+  Py_Initialize();
 
-  threadID = threadStates.size();
-
-  if(threadID == 0)
-  {
-    threadStates.push_back(PyThreadState_Get());
-  }
-  else
-  {
-    threadStates.push_back(Py_NewInterpreter());
-  }
-#endif
 }
 
 
@@ -513,7 +752,7 @@ _scriptFile (new cedar::aux::FileParameter(this, "Script file path", cedar::aux:
 cedar::proc::steps::PythonScript::~PythonScript() { }
 
 template<typename T>
-cv::Mat cedar::proc::steps::PythonScript::convert3DMatToFloat(cv::Mat mat)
+cv::Mat cedar::proc::steps::PythonScript::convert3DMatToFloat(cv::Mat &mat)
 {
   if(mat.dims != 3) return cv::Mat::zeros(1,1,CV_32F);
   int size[] = {mat.size[0], mat.size[1], mat.size[2]};
@@ -570,6 +809,209 @@ void cedar::proc::steps::PythonScript::numberOfInputsChanged()
   mInputs.resize(newsize);
 }
 
+std::vector<cedar::proc::steps::PythonScript::TemplateName> cedar::proc::steps::PythonScript::getTemplateNames()
+{
+  std::vector<TemplateName> list;
+  try
+  {
+    boost::property_tree::ptree root;
+    boost::property_tree::read_json(cedar::aux::Path("resource://pythonTemplates/python.json").absolute(), root);
+    for (boost::property_tree::ptree::value_type &nodeOuter : root.get_child("steps"))
+    {
+      std::string left = nodeOuter.first;
+      boost::trim(left);
+      bool isLooped = false, isNonLooped = false;
+      if(!left.compare("cedar.processing.steps.PythonScriptLooped")) isLooped = true;
+      if(!left.compare("cedar.processing.steps.PythonScript")) isNonLooped = true;
+      if(isLooped || isNonLooped)
+      {
+        for (boost::property_tree::ptree::value_type &node : nodeOuter.second)
+        {
+          std::string left = node.first;
+          boost::trim(left);
+          if(!left.compare("name"))
+          {
+            list.push_back(TemplateName());
+            list[list.size() - 1].name = node.second.data();
+            list[list.size() - 1].isLooped = isLooped;
+          }
+        }
+      }
+    }
+  }
+  catch(boost::property_tree::ptree_bad_path e)
+  {
+    //std::cout << "Error[1]: " << e.what() << std::endl;
+  }
+  catch(boost::property_tree::json_parser::json_parser_error e)
+  {
+    //std::cout << "Error[2]: " << e.what() << std::endl;
+  }
+  catch(std::exception e)
+  {
+    //std::cout << "Error[3]: " << e.what() << std::endl;
+  }
+
+  return list;
+}
+
+void cedar::proc::steps::PythonScript::declareTemplate(const char* name, bool isLooped){
+  std::string category = "Python Templates";
+
+  cedar::proc::ElementDeclarationManagerSingleton::getInstance()->addCategory(category);
+
+  cedar::proc::GroupDeclarationPtr python_declaration
+          (
+                  new cedar::proc::GroupDeclaration
+                          (
+                                  name,
+                                  "resource://pythonTemplates/python.json",
+                                  name,
+                                  category
+                          )
+          );
+  std::string icon_path;
+  if(isLooped)
+  {
+    icon_path = ":/steps/python_script.svg";
+  }
+  else
+  {
+    icon_path = ":/steps/python_script.svg";
+  }
+  python_declaration->setIconPath(icon_path);
+  python_declaration->setDescription
+          (
+                  "A template of the PythonScript Step."
+          );
+  python_declaration->declare();
+}
+
+void cedar::proc::steps::PythonScript::importStepsFromTemplate()
+{
+  std::vector<TemplateName> list = getTemplateNames();
+  if(list.size() > 0)
+  {
+    for (int i = 0; i < list.size(); ++i)
+    {
+      std::string name = list.at(i).name;
+
+      // Declare template if it is not already declared
+      if(!cedar::proc::GroupDeclarationManagerSingleton::getInstance()->getDeclarationNoThrow(name)){
+        declareTemplate(name.c_str(), list.at(i).isLooped);
+      }
+    }
+
+    // calls the reset() function of ElementList, so the template is visible
+    cedar::proc::gui::SettingsSingleton::getInstance()->emitElementListViewResetSignal();
+  }
+}
+
+// Abstraction of writeJson()
+void cedar::proc::steps::PythonScript::appendJson(cedar::aux::Path filename, bool isLooped, std::string templateName){
+  // make sure the directory to which the file is supposed to be written exists
+  filename.absolute().createDirectories();
+
+  // generate the configuration tree
+  cedar::aux::ConfigurationNode configuration;
+  this->writeConfiguration(configuration);
+  boost::property_tree::ptree config = configuration;
+  config.put("name", templateName);
+
+  boost::property_tree::ptree root;
+
+  // Read existing json
+  try
+  {
+    boost::property_tree::read_json(filename.absolute(), root);
+
+    std::string name;
+    if(isLooped)
+    {
+      name = "cedar.processing.steps.PythonScriptLooped";
+    }
+    else
+    {
+      name = "cedar.processing.steps.PythonScript";
+    }
+
+    boost::optional<boost::property_tree::ptree&> steps = root.get_child_optional("steps");
+    // If the "steps" tree is already there, append our configuration
+    if(steps)
+    {
+      root.get_child("steps").add_child(boost::property_tree::ptree::path_type(name, '&'),config);
+    }
+    else
+    {
+      boost::property_tree::ptree stepsTree;
+      stepsTree.add_child(boost::property_tree::ptree::path_type(name, '&'),config);
+      root.add_child("steps",stepsTree);
+    }
+
+
+    // write the tree to a file
+    boost::property_tree::write_json(filename.absolute(), root);
+  }
+  catch(boost::property_tree::ptree_bad_path e)
+  {
+    //std::cout << "Error[1]: " << e.what() << std::endl;
+  }
+  catch(boost::property_tree::json_parser::json_parser_error e)
+  {
+    //std::cout << "Error[2]: " << e.what() << std::endl;
+  }
+  catch(std::exception e)
+  {
+    //std::cout << "Error[3]: " << e.what() << std::endl;
+  }
+}
+
+void cedar::proc::steps::PythonScript::exportStepAsTemplate()
+{
+  std::vector<TemplateName> templateNames = getTemplateNames();
+
+  bool ok;
+  // create the list of not accepted strings
+  std::vector<std::string> unaccepted;
+  unaccepted.push_back("");
+  for(int i = 0; i < templateNames.size(); i++)
+  {
+    unaccepted.push_back(templateNames.at(i).name);
+  }
+
+  // execute the dialog
+  ValidationMaskInputDialog dialog(unaccepted);
+  QString text = dialog.getText(0, "Export step as Template", "Name for the template:", QLineEdit::Normal, QString::fromStdString(this->getName()), &ok);
+
+  if(!ok)
+  {
+    return;
+  }
+
+  // Check again if no name breaks the name rules
+  std::string exportTemplateName = text.toStdString();
+  boost::trim(exportTemplateName);
+  if(!exportTemplateName.compare(""))
+  {
+    CEDAR_THROW(cedar::aux::ParseException, "The template name cannot be null");
+    return;
+  }
+  for (int i = 0; i < templateNames.size(); ++i)
+  {
+    if(!templateNames.at(i).name.compare(exportTemplateName))
+    {
+      CEDAR_THROW(cedar::aux::DuplicateNameException, "A template with name \"" + exportTemplateName + "\" already exists.");
+      return;
+    }
+  }
+
+  // export the template
+  appendJson(cedar::aux::Path("resource://pythonTemplates/python.json"), isLooped(), exportTemplateName);
+
+  // Load templates, to make the exported step visible
+  importStepsFromTemplate();
+}
+
 void cedar::proc::steps::PythonScript::numberOfOutputsChanged()
 {
   unsigned newsize = _mNumberOfOutputs->getValue();
@@ -616,12 +1058,62 @@ std::string cedar::proc::steps::PythonScript::makeOutputSlotName(const int i)
     return s.str();
 }
 
+void cedar::proc::steps::PythonScript::freePythonVariables() {
+  PyObject * poMainModule = PyImport_AddModule("__main__");
 
+  PyObject * poAttrList = PyObject_Dir(poMainModule);
 
+  PyObject * poAttrIter = PyObject_GetIter(poAttrList);
+
+  PyObject * poAttrName;
+
+  while ((poAttrName = PyIter_Next(poAttrIter)) != NULL)
+  {
+    std::string oAttrName;
+    if (PyUnicode_Check(poAttrName))
+    {
+      std::cout << "is unicode" << std::endl;
+
+      PyObject* temp = PyUnicode_AsASCIIString(poAttrName);
+      if (NULL == temp) {
+        std::cout << "unicode to ASCII conversion failed" << std::endl;
+        oAttrName = "__asd__";
+      }
+      else
+      {
+        oAttrName = PyByteArray_AsString(temp);
+        std::cout << "unicode name: " << oAttrName << std::endl;
+      }
+      Py_DecRef(temp);
+    }
+    else
+    {
+      oAttrName = PyString_AsString(poAttrName);
+    }
+    // Make sure we don't delete any private objects.
+    if (!boost::starts_with(oAttrName, "__") || !boost::ends_with(oAttrName, "__"))
+    {
+      PyObject * poAttr = PyObject_GetAttr(poMainModule, poAttrName);
+
+      // Make sure we don't delete any module objects.
+      if (poAttr && poAttr->ob_type != poMainModule->ob_type)
+        PyObject_SetAttr(poMainModule, poAttrName, NULL);
+
+      Py_DecRef(poAttr);
+    }
+
+    Py_DecRef(poAttrName);
+  }
+
+  Py_DecRef(poAttrIter);
+
+  Py_DecRef(poAttrList);
+}
+
+//TODO allow 0 inputs / outputs in GUI
 
 void cedar::proc::steps::PythonScript::executePythonScript()
 {
-#if CV_MAJOR_VERSION < 3
   mutex.lock();
 
   isExecuting = 1;
@@ -630,14 +1122,6 @@ void cedar::proc::steps::PythonScript::executePythonScript()
   nameOfExecutingStep = this->getName();
 
   // Swap to the interpreter of this specific PythonScript step
-  if(threadStates.size() > threadID)
-  {
-    PyThreadState_Swap(threadStates.at(threadID));
-  }
-  else
-  {
-    std::cout << "No thread state for thread ID " << threadID << std::endl;
-  }
   
   // Python...
   try{
@@ -696,7 +1180,6 @@ void cedar::proc::steps::PythonScript::executePythonScript()
       }
     }
     boost::python::scope(pycedar_module).attr("inputs") = inputsList;
-
     // Adding empty matrices to the output list so that the length of the list in python is correctly set
     std::list<boost::python::handle<>> outputsList;
     boost::python::handle<> hand(cvt.toNDArray( cv::Mat::zeros(1, 1, CV_32F) ));
@@ -705,7 +1188,6 @@ void cedar::proc::steps::PythonScript::executePythonScript()
       outputsList.push_back(hand);
 
     boost::python::scope(pycedar_module).attr("outputs") = outputsList;
-
     // Old way: Setting the Output to pc.output1, pc.output2 etc.
     /*
 
@@ -750,8 +1232,11 @@ void cedar::proc::steps::PythonScript::executePythonScript()
     {
       std::string inputString = this->_codeStringForSavingArchitecture->getValue();
       boost::python::str inputString_py(inputString);
-      
+#if CV_MAJOR_VERSION < 3
       boost::python::exec(inputString_py, main_namespace);
+#else
+      boost::python::exec(boost::python::extract<char const*>(inputString_py), main_namespace);
+#endif
     }
 
     // Old way: Setting the Output to pc.output1, pc.output2 etc.
@@ -796,7 +1281,7 @@ void cedar::proc::steps::PythonScript::executePythonScript()
       if(i >= mOutputs.size()) break;
 
       cv::Mat &outputNodeMatrix = mOutputs[i]->getData();
-      outputNodeMatrix = cvt.toMat(outputPointer);
+      outputNodeMatrix = cvt.toMat(outputPointer, i);
 
       // Convert 1D and 2D matrices of type CV_64F (double) to CV_32F (float)
       if (this->_autoConvertDoubleToFloat->getValue())
@@ -876,10 +1361,11 @@ void cedar::proc::steps::PythonScript::executePythonScript()
   
   if(cedar::proc::steps::PythonScript::executionFailed) this->setState(cedar::proc::Triggerable::STATE_EXCEPTION, "An exception occured");
   else this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
-  
+
+  freePythonVariables();
+
   isExecuting = 0;
   mutex.unlock();
-  #endif
 }
 
 void cedar::proc::steps::PythonScript::inputConnectionChanged(const std::string& inputName)
@@ -911,3 +1397,5 @@ void cedar::proc::steps::PythonScript::executeButtonClicked(){
     executePythonScript();
   }
 }
+
+#endif // CEDAR_USE_PYTHON

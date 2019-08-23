@@ -4,10 +4,10 @@
   "component instantiations":
   {
     "arm": "hardware",
-    "trunk" : "hardware",
+    "trunk" : "simulator",
     "camera0" : "simulator",
     "camera1" : "simulator",
     "camera2" : "simulator",
-    "head" : "hardware"
+    "head" : "simulator"
   }
 }

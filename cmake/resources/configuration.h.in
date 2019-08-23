@@ -60,6 +60,8 @@
 #cmakedefine CEDAR_PORTABLE_MAC_BUNDLE_PATHS
 #cmakedefine CEDAR_PORTABLE_MINIMAL_VERSION
 
+#cmakedefine CEDAR_USE_PYTHON
+
 // Specific robot libraries ============================================================================================
 #cmakedefine CEDAR_USE_AMTEC
 #cmakedefine CEDAR_USE_KUKA_LWR

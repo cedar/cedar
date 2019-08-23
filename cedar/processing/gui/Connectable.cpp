@@ -85,7 +85,7 @@ Q_DECLARE_METATYPE(boost::shared_ptr<cedar::proc::DataSlot>);
 #include <glew.h>
 #endif
 #include <qglviewer.h>
-#ifdef CEDAR_OS_WINDOWS
+#ifdef CEDAR_USE_QT5
 #include <manipulatedFrame.h>
 #else
 #if QGLVIEWER_VERSION >= 0x020700

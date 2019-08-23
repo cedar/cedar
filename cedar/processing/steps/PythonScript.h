@@ -39,8 +39,7 @@
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-
-#ifdef PYTHONLIBS_FOUND
+#ifdef CEDAR_USE_PYTHON
 
 // CEDAR INCLUDES
 #include <cedar/processing/Step.h>
@@ -59,12 +58,18 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
+#include <boost/algorithm/string.hpp>
 
 #define NUMPY_IMPORT_ARRAY_RETVAL
 
 // SYSTEM INCLUDES
 #include <QGraphicsSceneContextMenuEvent>
 #include <QContextMenuEvent>
+#include <QInputDialog>
+#include <QDialogButtonBox>
+#include <QPushButton>
+#include <QFormLayout>
+#include <QLabel>
 
 
 
@@ -94,6 +99,16 @@ public:
   ~PythonScript();
 
   //--------------------------------------------------------------------------------------------------------------------
+  // public structs
+  //--------------------------------------------------------------------------------------------------------------------
+
+public:
+  struct TemplateName{
+      std::string name;
+      bool isLooped;
+  };
+
+  //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -104,18 +119,25 @@ public:
   void printFromPython(char const*);
 
   template<typename T>
-  cv::Mat convert3DMatToFloat(cv::Mat);
+  cv::Mat convert3DMatToFloat(cv::Mat&);
 
   
   std::string makeInputSlotName(const int);
   std::string makeOutputSlotName(const int);
-  
+
+  void exportStepAsTemplate();
+  void appendJson(cedar::aux::Path, bool, std::string);
+
+  static void importStepsFromTemplate();
+  static void declareTemplate(const char*, bool);
+  static std::vector<TemplateName> getTemplateNames();
+
 public slots:
   
   void hasScriptFileChanged();
   void numberOfOutputsChanged();
   void numberOfInputsChanged();
-  
+
 signals:
 
   void errorMessageLineNumberChanged(long);
@@ -130,10 +152,11 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  
+
   void compute(const cedar::proc::Arguments&);
-  
   void executePythonScript();
+
+  void freePythonVariables();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -143,7 +166,6 @@ public:
 
   // public static members
   static int executionFailed;
-  static std::vector<PyThreadState*> threadStates;
   static QMutex mutex;
   static std::string nameOfExecutingStep;
 
@@ -152,9 +174,6 @@ protected:
 private:
 
   cedar::aux::MatDataPtr mOutput;
-
-  int threadID;
-  
   int isExecuting = 0;
 
   std::vector< cedar::aux::ConstMatDataPtr > mInputs;
@@ -180,6 +199,101 @@ private:
 
 };
 
+class ValidationMaskInputDialog : public QDialog
+{
+    //--------------------------------------------------------------------------------------------------------------------
+    // nested types
+    //--------------------------------------------------------------------------------------------------------------------
+
+
+Q_OBJECT
+
+public:
+    ValidationMaskInputDialog(std::vector<std::string> unacceptedStrings)
+    :
+    QDialog()
+    {
+      this->unacceptedStrings = unacceptedStrings;
+    };
+    QString getText(QWidget *parent, const QString &title, const QString &label,
+                           QLineEdit::EchoMode echo = QLineEdit::Normal,
+                           const QString &text = QString(), bool *ok = nullptr,
+                           Qt::WindowFlags flags = Qt::WindowFlags(),
+                           Qt::InputMethodHints inputMethodHints = Qt::ImhNone)
+    {
+      this->setWindowTitle(title);
+      this->setInputMethodHints(inputMethodHints);
+
+      QFormLayout form(this);
+
+      // Add the lineEdit with its label
+      edit = new QLineEdit(this);
+      edit->setText(text);
+      edit->setEchoMode(echo);
+      form.addRow(label, edit);
+
+      // Add some standard buttons (Cancel/Ok) at the bottom of the dialog
+      QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
+
+      btnBox = &buttonBox;
+      btnBox->button(QDialogButtonBox::Ok)->setEnabled(checkString(text.toStdString()));
+      form.addRow(btnBox);
+
+      QObject::connect(&buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+      QObject::connect(&buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+
+      QObject::connect(edit, SIGNAL(textChanged(const QString &)), this, SLOT(textChanged(const QString &)));
+
+      const int ret = this->exec();
+      if (ok)
+        *ok = !!ret;
+      if (ret) {
+        return edit->text();
+      } else {
+        return QString();
+      }
+    }
+
+public slots:
+
+    void textChanged(const QString& text)
+    {
+      if(checkString(text.toStdString()))
+      {
+        edit->setStyleSheet("QLineEdit { background: rgb(255, 255, 255); }");
+        btnBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+
+      }
+      else
+      {
+        edit->setStyleSheet("QLineEdit { background: rgb(255, 0, 0); }");
+        btnBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+      }
+
+    }
+
+private:
+
+    bool checkString(std::string text)
+    {
+      boost::trim(text);
+      for(int i = 0; i < unacceptedStrings.size(); i++)
+      {
+        if(!unacceptedStrings.at(i).compare(text))
+        {
+          return false;
+        }
+      }
+      return true;
+    }
+
+private:
+    QLineEdit* edit;
+    QDialogButtonBox* btnBox;
+    std::vector<std::string> unacceptedStrings;
+
+};
+
 
 //!@brief This class performs the matrix conversion between python and c++
 class NDArrayConverter
@@ -197,7 +311,8 @@ public:
     //--------------------------------------------------------------------------------------------------------------------
 public:
 
-    cv::Mat toMat(const PyObject* o);
+    cv::Mat toMat(PyObject*, int);
+
     PyObject* toNDArray(const cv::Mat& mat);
     //void copyTo(cv::Mat src, cv::OutputArray _dst);
     int failmsg(const char*, ...);
@@ -207,6 +322,7 @@ public:
     //--------------------------------------------------------------------------------------------------------------------
 private:
 
+    const char * typenumToString(int);
     void init();
 
     //--------------------------------------------------------------------------------------------------------------------
@@ -246,7 +362,7 @@ class NumpyAllocator;
 
 //enum { ARG_NONE = 0, ARG_MAT = 1, ARG_SCALAR = 2 };
 
-#endif
+#endif // CEDAR_USE_PYTHON
 
 #endif // CEDAR_PROC_STEPS_PYTHON_SCRIPT_H
 

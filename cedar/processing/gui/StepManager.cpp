@@ -125,21 +125,74 @@ void cedar::proc::gui::StepManager::fillTable()
 //    std::cout<<"Did not find saved HiddenPreset: "<< SettingsSingleton::getInstance()->getHiddenPreset() <<" in Box!" <<std::endl;
   }
 
+  // create a set of categories for element and group declarations
+  std::set<std::string> categories;
 
-  auto categories = ElementManagerSingleton::getInstance()->listCategories();
-  int rowCount = categories.size();
-  for(auto category:categories)
+  //create a map for the declarations
+  std::map<std::string, std::vector<GroupOrElementDeclaration>> declarationsByCategory;
+
+
+  // get all element declarations
+  for(auto category : ElementManagerSingleton::getInstance()->listCategories())
   {
+    categories.insert(category);
+
+    std::vector<GroupOrElementDeclaration> vector;
+    // get all declarations for this category
     auto entries = ElementManagerSingleton::getInstance()->getCategoryEntries(category);
-    rowCount+=entries.size();
+    for(auto entry : entries)
+    {
+      // for each declaration, add it to the vector
+      auto declaration = boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(entry);
+      GroupOrElementDeclaration dec;
+      dec.elementDeclaration = declaration.get();
+      dec.isGroup = false;
+      vector.push_back(dec);
+    }
+    // insert the vector with declarations for the current category to the map
+    declarationsByCategory.insert(std::pair<std::string, std::vector<GroupOrElementDeclaration>>(category, vector));
+
+  }
+
+  // get all group declarations
+  std::map<std::string, cedar::proc::ConstGroupDeclarationPtr> map = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->getDefinitions();
+  for(std::map<std::string, cedar::proc::ConstGroupDeclarationPtr>::const_iterator it = map.begin(); it != map.end(); ++it)
+  {
+    // extract current category
+    std::string category = it->second->getCategory();
+    categories.insert(category);
+
+    GroupOrElementDeclaration dec;
+    dec.groupDeclaration = it->second.get();
+    dec.isGroup = true;
+
+    if(declarationsByCategory.find(category) == declarationsByCategory.end())
+    {
+      // if no vector for this category exists in groupDeclarationsByCategory, add a vector with only the current declaration to the map
+      std::vector<GroupOrElementDeclaration> vec;
+      vec.push_back(dec);
+      declarationsByCategory.insert(std::pair<std::string, std::vector<GroupOrElementDeclaration>>(category, vec));
+    }
+    else
+    {
+      // if a vector for this category exists in groupDeclarationsByCategory, add the declaration to the vector
+      declarationsByCategory.at(category).push_back(dec);
+    }
+  }
+
+  // increase row count for delarations
+  int rowCount = categories.size();
+  for(auto entry : declarationsByCategory)
+  {
+    rowCount += entry.second.size();
   }
   this->mpTable->setRowCount(rowCount);
-
 
   int i=0;
   for(auto category:categories)
   {
-    auto entries = ElementManagerSingleton::getInstance()->getCategoryEntries(category);
+    //auto entries = ElementManagerSingleton::getInstance()->getCategoryEntries(category);
+    auto entries = declarationsByCategory.at(category);
 
     //Show the Category
     QTableWidgetItem *newItem = new QTableWidgetItem(QString::fromStdString("Category: "+category));
@@ -152,39 +205,68 @@ void cedar::proc::gui::StepManager::fillTable()
     this->mpTable->setSpan(i, 0, 1, 3);
 
     i = i+1;
-    for (auto entry: entries)
+    for (auto entry : entries)
     {
-      auto declaration = boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(entry);
-      CEDAR_ASSERT(declaration);
-      QTableWidgetItem *newItem = new QTableWidgetItem(QString::fromStdString(declaration->getClassNameWithoutNamespace()));
-      newItem->setIcon(declaration->getIcon());
-      this->mpTable->setItem(i, 0, newItem);
+      if(!entry.isGroup)
+      {
+        auto declaration = entry.elementDeclaration;
 
-      QTableWidgetItem *descItem = new QTableWidgetItem(QString::fromStdString(declaration->getShortDescription()));
-      QFont italicFont = descItem->font();
-      italicFont.setItalic(true);
-      descItem->setFont(italicFont);
-      this->mpTable->setItem(i, 1, descItem);
+        CEDAR_ASSERT(declaration);
+        QTableWidgetItem *newItem = new QTableWidgetItem(QString::fromStdString(declaration->getClassNameWithoutNamespace()));
+        newItem->setIcon(declaration->getIcon());
+        this->mpTable->setItem(i, 0, newItem);
 
-      auto myBox = new QCheckBox(this);
-      myBox->setStyleSheet("margin-left:50%; margin-right:50%;");
-      bool isHidden = SettingsSingleton::getInstance()->isHiddenElement(declaration->getClassName());
-      myBox->setChecked(!isHidden);
+        QTableWidgetItem *descItem = new QTableWidgetItem(QString::fromStdString(declaration->getShortDescription()));
+        QFont italicFont = descItem->font();
+        italicFont.setItalic(true);
+        descItem->setFont(italicFont);
+        this->mpTable->setItem(i, 1, descItem);
 
-      //Set up the Mapping between Button and Class
-      QObject::connect(myBox, SIGNAL(clicked()), checkBoxMapper, SLOT(map()));
-      QString fullClassName = QString::fromStdString(declaration->getClassName());
-      checkBoxMapper->setMapping(myBox, fullClassName);
-      mCheckBoxes[declaration->getClassName()] = myBox;
+        auto myBox = new QCheckBox(this);
+        myBox->setStyleSheet("margin-left:50%; margin-right:50%;");
+        bool isHidden = SettingsSingleton::getInstance()->isHiddenElement(declaration->getClassName());
+        myBox->setChecked(!isHidden);
 
-      this->mpTable->setCellWidget(i,2,myBox);
-      i = i+1;
+        //Set up the Mapping between Button and Class
+        QObject::connect(myBox, SIGNAL(clicked()), checkBoxMapper, SLOT(map()));
+        QString fullClassName = QString::fromStdString(declaration->getClassName());
+        checkBoxMapper->setMapping(myBox, fullClassName);
+        mCheckBoxes[declaration->getClassName()] = myBox;
+
+        this->mpTable->setCellWidget(i,2,myBox);
+        i = i+1;
+      }
+      else
+      {
+        auto declaration = entry.groupDeclaration;
+
+        CEDAR_ASSERT(declaration);
+        QTableWidgetItem *newItem = new QTableWidgetItem(QString::fromStdString(declaration->getClassNameWithoutNamespace()));
+        newItem->setIcon(declaration->getIcon());
+        this->mpTable->setItem(i, 0, newItem);
+
+        QTableWidgetItem *descItem = new QTableWidgetItem(QString::fromStdString(declaration->getShortDescription()));
+        QFont italicFont = descItem->font();
+        italicFont.setItalic(true);
+        descItem->setFont(italicFont);
+        this->mpTable->setItem(i, 1, descItem);
+
+        auto myBox = new QCheckBox(this);
+        myBox->setStyleSheet("margin-left:50%; margin-right:50%;");
+        bool isHidden = SettingsSingleton::getInstance()->isHiddenElement(declaration->getClassName());
+        myBox->setChecked(!isHidden);
+
+        //Set up the Mapping between Button and Class
+        QObject::connect(myBox, SIGNAL(clicked()), checkBoxMapper, SLOT(map()));
+        QString fullClassName = QString::fromStdString(declaration->getClassName());
+        checkBoxMapper->setMapping(myBox, fullClassName);
+        mCheckBoxes[declaration->getClassName()] = myBox;
+
+        this->mpTable->setCellWidget(i,2,myBox);
+        i = i+1;
+      }
     }
-
-
   }
-
-
 }
 
 

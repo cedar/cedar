@@ -112,6 +112,14 @@ public:
     mDeclarationsByCategory[category].push_back(declaration);
   }
 
+  void addCategory(std::string category)
+  {
+    if (mDeclarationsByCategory.find(category) == mDeclarationsByCategory.end())
+    {
+      mDeclarationsByCategory[category] = BasePluginList();
+    }
+  }
+
   //! Returns the factory manager for this declaration manager.
   boost::shared_ptr<BaseFactoryManager> getFactoryManager() const
   {

@@ -236,7 +236,9 @@ void cedar::proc::gui::View::showCodeWidget()
         }
       }
     }
-  }else std::cout << "There is no CodeWidget to show" << std::endl;
+  }
+  else 
+    std::cout << "There is no CodeWidget to show" << std::endl;
 }
 
 void cedar::proc::gui::View::setWidgets
@@ -251,7 +253,7 @@ void cedar::proc::gui::View::setWidgets
   this->mpMainWindow = pMainWindow;
   this->mpConigurableWidget = pConigurableWidget;
   this->mpRecorderWidget = pRecorderWidget;
-  this->mpCommentWidget = pCommentWidget;
+  this->mpCommentWidget = pCommentWidget;\
   this->mpCodeWidget = pCodeWidget;
 }
 
@@ -289,11 +291,11 @@ void cedar::proc::gui::View::resetViewport()
   {
     this->mpScene->setCommentWidget(this->mpCommentWidget);
   }
+
   if (this->mpCodeWidget)
   {
     this->mpScene->setCodeWidget(this->mpCodeWidget);
   }
-
 
 }
 
