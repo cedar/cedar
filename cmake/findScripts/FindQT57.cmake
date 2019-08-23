@@ -175,9 +175,22 @@ else(Qt5Svg_FOUND)
     You can try to alter the default search paths in cedar.conf.")
 endif(Qt5Svg_FOUND)
 
+find_package(Qt5Concurrent 5.7.0 REQUIRED)
+if(Qt5Concurrent_FOUND)
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Qt5Concurrent_LIBRARIES})
+  include_directories(${Qt5Concurrent_INCLUDE_DIRS})
+  add_definitions(${Qt5Concurrent_DEFINITIONS})
+  if (CEDAR_VERBOSE_BUILD_SYSTEM)
+    message("   Qt5Concurrent was found in ${Qt5Concurrent_INCLUDE_DIRS}")
+  endif(CEDAR_VERBOSE_BUILD_SYSTEM)
+else(Qt5Concurrent_FOUND)
+  message(${CEDAR_LIB_ERROR_TYPE} "   Required library Qt5Concurrent was not found on your system!
+    You can try to alter the default search paths in cedar.conf.")
+endif(Qt5Concurrent_FOUND)
 
 
-if(${Qt5Widgets_FOUND} AND ${Qt5Svg_FOUND} AND ${Qt5Xml_FOUND} AND ${Qt5OpenGL_FOUND} AND ${Qt53DCore_FOUND} AND ${Qt53DExtras_FOUND} AND ${Qt53DInput_FOUND} AND ${Qt53DLogic_FOUND} AND ${Qt53DRender_FOUND})
+
+if(${Qt5Widgets_FOUND} AND ${Qt5Concurrent_FOUND} AND ${Qt5Svg_FOUND} AND ${Qt5Xml_FOUND} AND ${Qt5OpenGL_FOUND} AND ${Qt53DCore_FOUND} AND ${Qt53DExtras_FOUND} AND ${Qt53DInput_FOUND} AND ${Qt53DLogic_FOUND} AND ${Qt53DRender_FOUND})
   SET(QT_FOUND 1)
   SET(QT_VERSION 5)
   message("-- QT5 was found")
