@@ -190,7 +190,7 @@ endif(Qt5Concurrent_FOUND)
 
 
 
-if(${Qt5Widgets_FOUND} AND ${Qt5Concurrent_FOUND} AND ${Qt5Svg_FOUND} AND ${Qt5Xml_FOUND} AND ${Qt5OpenGL_FOUND} AND ${Qt53DCore_FOUND} AND ${Qt53DExtras_FOUND} AND ${Qt53DInput_FOUND} AND ${Qt53DLogic_FOUND} AND ${Qt53DRender_FOUND})
+if(${Qt5Widgets_FOUND} AND ${Qt5Svg_FOUND} AND ${Qt5Xml_FOUND} AND ${Qt5OpenGL_FOUND} AND ${Qt53DCore_FOUND} AND ${Qt53DExtras_FOUND} AND ${Qt53DInput_FOUND} AND ${Qt53DLogic_FOUND} AND ${Qt53DRender_FOUND})
   SET(QT_FOUND 1)
   SET(QT_VERSION 5)
   message("-- QT5 was found")
