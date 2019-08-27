@@ -79,6 +79,7 @@ public:
         mType.type()->def(cedar::aux::Enum(AUTO, "AUTO"));
         mType.type()->def(cedar::aux::Enum(BGR, "BGR"));
         mType.type()->def(cedar::aux::Enum(HSV, "HSV"));
+        mType.type()->def(cedar::aux::Enum(HLS, "HLS"));
         mType.type()->def(cedar::aux::Enum(YUV, "YUV"));
         mType.type()->def(cedar::aux::Enum(YCrCb, "YCrCb"));
         mType.type()->def(cedar::aux::Enum(Lab, "Lab"));
@@ -109,6 +110,8 @@ public:
       static const Id YCrCb = 4;
       //! Alias for LAB
       static const Id Lab = 5;
+      //! flag for HLS color space (hue, luminance, saturation)
+      static const Id HLS = 6;
 
     private:
       static cedar::aux::EnumType<ColorSpace> mType;
