@@ -91,114 +91,112 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 //! Container to describe a highlighting rule. Based on a regular expression, a relevant match # and the format.
-class HighlightingRule
+namespace cedar::proc::gui::CodeWidgetScope
 {
-public: 
-  HighlightingRule(const QString &patternStr, int n, const QTextCharFormat &matchingFormat)
+
+  class HighlightingRule
   {
-    originalRuleStr = patternStr;
-    pattern = QRegExp(patternStr);
-    nth = n;
-    format = matchingFormat;
-  } 
-  
-  QString originalRuleStr;
-  QRegExp pattern;
-  int nth;
-  QTextCharFormat format;
-};
-
-//! Implementation of highlighting for Python code.
-class PythonSyntaxHighlighter : public QSyntaxHighlighter
-{
-  Q_OBJECT
-  
   public:
-    PythonSyntaxHighlighter(QTextDocument *parent = 0);
-    
-  protected:
-     void highlightBlock(const QString &text);
-     
-  private:
-    QStringList keywords;
-    QStringList operators;
-    QStringList braces;
+    HighlightingRule(const QString &patternStr, int n, const QTextCharFormat &matchingFormat)
+    {
+      originalRuleStr = patternStr;
+      pattern = QRegExp(patternStr);
+      nth = n;
+      format = matchingFormat;
+    }
 
-    QHash<QString, QTextCharFormat> basicStyles;
+    QString originalRuleStr;
+    QRegExp pattern;
+    int nth;
+    QTextCharFormat format;
+  };
 
-    void initializeRules();
-
-    //! Highlights multi-line strings, returns true if after processing we are still within the multi-line section.
-    bool matchMultiline(const QString &text, const QRegExp &delimiter, const int inState, const QTextCharFormat &style);
-    const QTextCharFormat getTextCharFormat(const QString &colorName, const QString &style = QString());
-
-    QList<HighlightingRule> rules;
-    QRegExp triSingleQuote;
-    QRegExp triDoubleQuote;
-};
-
-
-
-//!@brief Implementation of QPlainTextEdit with Code-Editor features (like Syntaxhighlighting, line marking, line numbers etc.)
-class CodeEditor : public QPlainTextEdit
-{
+  //! Implementation of highlighting for Python code.
+  class PythonSyntaxHighlighter : public QSyntaxHighlighter
+  {
     Q_OBJECT
 
-public:
-    CodeEditor(QWidget *parent = 0);
-    ~CodeEditor();
+    public:
+      PythonSyntaxHighlighter(QTextDocument *parent = 0);
 
-    void lineNumberAreaPaintEvent(QPaintEvent *event);
-    int lineNumberAreaWidth();
-    void markErrorLine(long);
+    protected:
+       void highlightBlock(const QString &text);
 
-protected:
-    void resizeEvent(QResizeEvent *event);
-    void keyPressEvent(QKeyEvent *event) override;
+    private:
+      QStringList keywords;
+      QStringList operators;
+      QStringList braces;
 
-private slots:
-    void updateLineNumberAreaWidth(int newBlockCount);
-    void highlightCurrentLine();
-    void updateLineNumberArea(const QRect &, int);
+      QHash<QString, QTextCharFormat> basicStyles;
 
-public:
+      void initializeRules();
 
-private:
-    QWidget *lineNumberArea;
-};
+      //! Highlights multi-line strings, returns true if after processing we are still within the multi-line section.
+      bool matchMultiline(const QString &text, const QRegExp &delimiter, const int inState, const QTextCharFormat &style);
+      const QTextCharFormat getTextCharFormat(const QString &colorName, const QString &style = QString());
 
-
-
-
-/*!@brief Widget to paint line numbers in the code section
-  */
-class LineNumberArea : public QWidget
-{
-public:
-    LineNumberArea(CodeEditor *editor) : QWidget(editor) {
-        codeEditor = editor;
-    }
-
-    QSize sizeHint() const {
-        return QSize(codeEditor->lineNumberAreaWidth(), 0);
-    }
-
-protected:
-    void paintEvent(QPaintEvent *event) {
-        codeEditor->lineNumberAreaPaintEvent(event);
-    }
-
-private:
-    CodeEditor *codeEditor;
-};
+      QList<HighlightingRule> rules;
+      QRegExp triSingleQuote;
+      QRegExp triDoubleQuote;
+  };
 
 
 
+  //!@brief Implementation of QPlainTextEdit with Code-Editor features (like Syntaxhighlighting, line marking, line numbers etc.)
+  class CodeEditor : public QPlainTextEdit
+  {
+      Q_OBJECT
+
+  public:
+      CodeEditor(QWidget *parent = 0);
+      ~CodeEditor();
+
+      void lineNumberAreaPaintEvent(QPaintEvent *event);
+      int lineNumberAreaWidth();
+      void markErrorLine(long);
+
+  protected:
+      void resizeEvent(QResizeEvent *event);
+      void keyPressEvent(QKeyEvent *event) override;
+
+  private slots:
+      void updateLineNumberAreaWidth(int newBlockCount);
+      void highlightCurrentLine();
+      void updateLineNumberArea(const QRect &, int);
+
+  public:
+
+  private:
+      QWidget *lineNumberArea;
+  };
 
 
 
 
+  /*!@brief Widget to paint line numbers in the code section
+    */
+  class LineNumberArea : public QWidget
+  {
+  public:
+      LineNumberArea(CodeEditor *editor) : QWidget(editor) {
+          codeEditor = editor;
+      }
 
+      QSize sizeHint() const {
+          return QSize(codeEditor->lineNumberAreaWidth(), 0);
+      }
+
+  protected:
+      void paintEvent(QPaintEvent *event) {
+          codeEditor->lineNumberAreaPaintEvent(event);
+      }
+
+  private:
+      CodeEditor *codeEditor;
+  };
+
+
+}
 
 
 /*!@brief GUI representation for the code section.
@@ -268,11 +266,11 @@ private:
   //!@brief The layout for this widget.
   QVBoxLayout* mMainLayout;
 
-  CodeEditor* mCodeTextField;
+  cedar::proc::gui::CodeWidgetScope::CodeEditor* mCodeTextField;
   //QLabel* mErrorMessageLabel;
   QPushButton* mExecuteButton;
-  
-  PythonSyntaxHighlighter *highlighter;
+
+  cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter *highlighter;
 };
 
 

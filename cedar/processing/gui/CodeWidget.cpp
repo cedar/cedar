@@ -83,7 +83,7 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 
-PythonSyntaxHighlighter::PythonSyntaxHighlighter(QTextDocument *parent)
+cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter::PythonSyntaxHighlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
 {
   keywords = QStringList() << "as" << "and" << "assert" << "break" << "class" << "continue" << "def" <<
@@ -129,50 +129,50 @@ PythonSyntaxHighlighter::PythonSyntaxHighlighter(QTextDocument *parent)
 }
 
 
-void PythonSyntaxHighlighter::initializeRules()
+void cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter::initializeRules()
 {
   foreach (QString currKeyword, keywords)
   {
-    rules.append(HighlightingRule(QString("\\b%1\\b").arg(currKeyword), 0, basicStyles.value("keyword")));
+    rules.append(cedar::proc::gui::CodeWidgetScope::HighlightingRule(QString("\\b%1\\b").arg(currKeyword), 0, basicStyles.value("keyword")));
   }
   foreach (QString currOperator, operators)
   {
-    rules.append(HighlightingRule(QString("%1").arg(currOperator), 0, basicStyles.value("operator")));
+    rules.append(cedar::proc::gui::CodeWidgetScope::HighlightingRule(QString("%1").arg(currOperator), 0, basicStyles.value("operator")));
   }
   foreach (QString currBrace, braces)
   {
-    rules.append(HighlightingRule(QString("%1").arg(currBrace), 0, basicStyles.value("brace")));
+    rules.append(cedar::proc::gui::CodeWidgetScope::HighlightingRule(QString("%1").arg(currBrace), 0, basicStyles.value("brace")));
   }
 
   // 'self'
-  rules.append(HighlightingRule("\\bself\\b", 0, basicStyles.value("self")));
+  rules.append(cedar::proc::gui::CodeWidgetScope::HighlightingRule("\\bself\\b", 0, basicStyles.value("self")));
 
   // Double-quoted string, possibly containing escape sequences
   // FF: originally in python : r'"[^"\\]*(\\.[^"\\]*)*"'
-  rules.append(HighlightingRule("\"[^\"\\\\]*(\\\\.[^\"\\\\]*)*\"", 0, basicStyles.value("string")));
+  rules.append(cedar::proc::gui::CodeWidgetScope::HighlightingRule("\"[^\"\\\\]*(\\\\.[^\"\\\\]*)*\"", 0, basicStyles.value("string")));
   // Single-quoted string, possibly containing escape sequences
   // FF: originally in python : r"'[^'\\]*(\\.[^'\\]*)*'"
-  rules.append(HighlightingRule("'[^'\\\\]*(\\\\.[^'\\\\]*)*'", 0, basicStyles.value("string")));
+  rules.append(cedar::proc::gui::CodeWidgetScope::HighlightingRule("'[^'\\\\]*(\\\\.[^'\\\\]*)*'", 0, basicStyles.value("string")));
 
   // 'def' followed by an identifier
   // FF: originally: r'\bdef\b\s*(\w+)'
-  rules.append(HighlightingRule("\\bdef\\b\\s*(\\w+)", 1, basicStyles.value("defclass")));
+  rules.append(cedar::proc::gui::CodeWidgetScope::HighlightingRule("\\bdef\\b\\s*(\\w+)", 1, basicStyles.value("defclass")));
   //  'class' followed by an identifier
   // FF: originally: r'\bclass\b\s*(\w+)'
-  rules.append(HighlightingRule("\\bclass\\b\\s*(\\w+)", 1, basicStyles.value("defclass")));
+  rules.append(cedar::proc::gui::CodeWidgetScope::HighlightingRule("\\bclass\\b\\s*(\\w+)", 1, basicStyles.value("defclass")));
 
   // From '#' until a newline
   // FF: originally: r'#[^\\n]*'
-  rules.append(HighlightingRule("#[^\\n]*", 0, basicStyles.value("comment")));
+  rules.append(cedar::proc::gui::CodeWidgetScope::HighlightingRule("#[^\\n]*", 0, basicStyles.value("comment")));
 
   // Numeric literals
-  rules.append(HighlightingRule("\\b[+-]?[0-9]+[lL]?\\b", 0, basicStyles.value("numbers"))); // r'\b[+-]?[0-9]+[lL]?\b'
-  rules.append(HighlightingRule("\\b[+-]?0[xX][0-9A-Fa-f]+[lL]?\\b", 0, basicStyles.value("numbers"))); // r'\b[+-]?0[xX][0-9A-Fa-f]+[lL]?\b'
-  rules.append(HighlightingRule("\\b[+-]?[0-9]+(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b", 0, basicStyles.value("numbers"))); // r'\b[+-]?[0-9]+(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\b'
+  rules.append(cedar::proc::gui::CodeWidgetScope::HighlightingRule("\\b[+-]?[0-9]+[lL]?\\b", 0, basicStyles.value("numbers"))); // r'\b[+-]?[0-9]+[lL]?\b'
+  rules.append(cedar::proc::gui::CodeWidgetScope::HighlightingRule("\\b[+-]?0[xX][0-9A-Fa-f]+[lL]?\\b", 0, basicStyles.value("numbers"))); // r'\b[+-]?0[xX][0-9A-Fa-f]+[lL]?\b'
+  rules.append(cedar::proc::gui::CodeWidgetScope::HighlightingRule("\\b[+-]?[0-9]+(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b", 0, basicStyles.value("numbers"))); // r'\b[+-]?[0-9]+(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\b'
 }
 
 
-void PythonSyntaxHighlighter::highlightBlock(const QString &text)
+void cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter::highlightBlock(const QString &text)
 { 
   foreach (HighlightingRule currRule, rules)
   {
@@ -199,7 +199,7 @@ void PythonSyntaxHighlighter::highlightBlock(const QString &text)
 
 
 
-bool PythonSyntaxHighlighter::matchMultiline(const QString &text, const QRegExp &delimiter, const int inState, const QTextCharFormat &style)
+bool cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter::matchMultiline(const QString &text, const QRegExp &delimiter, const int inState, const QTextCharFormat &style)
 {
   int start;
   int add;
@@ -243,7 +243,7 @@ bool PythonSyntaxHighlighter::matchMultiline(const QString &text, const QRegExp 
     return false;
 }
 
-const QTextCharFormat PythonSyntaxHighlighter::getTextCharFormat(const QString &colorName, const QString &style)
+const QTextCharFormat cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter::getTextCharFormat(const QString &colorName, const QString &style)
 {
   QTextCharFormat charFormat;
   QColor color(colorName);
@@ -376,13 +376,13 @@ void cedar::proc::gui::CodeWidget::fillInCodeSection(std::string& code)
   
   QVBoxLayout* code_widget_layout = new QVBoxLayout();
   
-  mCodeTextField = new CodeEditor();
+  mCodeTextField = new cedar::proc::gui::CodeWidgetScope::CodeEditor();
   mCodeTextField->setPlainText(QString::fromStdString(code));
   mCodeTextField->setFont(font);
   mCodeTextField->setLineWrapMode(mCodeTextField->NoWrap);
     
   // Syntax Highlighting
-  highlighter = new PythonSyntaxHighlighter(mCodeTextField->document());
+  highlighter = new cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter(mCodeTextField->document());
 
   QObject::connect(mCodeTextField, SIGNAL(textChanged()), this, SLOT(updateCodeString()));
   
@@ -422,7 +422,7 @@ void cedar::proc::gui::CodeWidget::updateCodeString()
 
 // CodeEditor implementation
 
-CodeEditor::CodeEditor(QWidget *parent)
+cedar::proc::gui::CodeWidgetScope::CodeEditor::CodeEditor(QWidget *parent)
 :
 QPlainTextEdit(parent)
 {
@@ -438,11 +438,11 @@ QPlainTextEdit(parent)
   highlightCurrentLine();
 }
 
-CodeEditor::~CodeEditor(){
+cedar::proc::gui::CodeWidgetScope::CodeEditor::~CodeEditor(){
   cedar::proc::gui::CodeWidget::dontMark = 1;
 }
 
-int CodeEditor::lineNumberAreaWidth()
+int cedar::proc::gui::CodeWidgetScope::CodeEditor::lineNumberAreaWidth()
 {
   int digits = 1;
   int max = qMax(1, blockCount());
@@ -456,12 +456,12 @@ int CodeEditor::lineNumberAreaWidth()
   return space;
 }
 
-void CodeEditor::updateLineNumberAreaWidth(int)
+void cedar::proc::gui::CodeWidgetScope::CodeEditor::updateLineNumberAreaWidth(int)
 {
   setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
 }
 
-void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
+void cedar::proc::gui::CodeWidgetScope::CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
 {
   if (dy)
     lineNumberArea->scroll(0, dy);
@@ -472,7 +472,7 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
     updateLineNumberAreaWidth(0);
 }
 
-void CodeEditor::resizeEvent(QResizeEvent *e)
+void cedar::proc::gui::CodeWidgetScope::CodeEditor::resizeEvent(QResizeEvent *e)
 {
   QPlainTextEdit::resizeEvent(e);
 
@@ -480,7 +480,7 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
   lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }
 
-void CodeEditor::highlightCurrentLine()
+void cedar::proc::gui::CodeWidgetScope::CodeEditor::highlightCurrentLine()
 {
   QList<QTextEdit::ExtraSelection> extraSelections;
 
@@ -499,7 +499,7 @@ void CodeEditor::highlightCurrentLine()
   setExtraSelections(extraSelections);
 }
 
-void CodeEditor::markErrorLine(long lineno)
+void cedar::proc::gui::CodeWidgetScope::CodeEditor::markErrorLine(long lineno)
 {
 
   if(!cedar::proc::gui::CodeWidget::dontMark && lineno > 0) {
@@ -526,7 +526,7 @@ void CodeEditor::markErrorLine(long lineno)
   }
 }
 
-void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
+void cedar::proc::gui::CodeWidgetScope::CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
   QPainter painter(lineNumberArea);
   painter.fillRect(event->rect(), QColor(Qt::lightGray).lighter(120));
@@ -550,7 +550,7 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
     }
 }
 
-void CodeEditor::keyPressEvent(QKeyEvent *e)
+void cedar::proc::gui::CodeWidgetScope::CodeEditor::keyPressEvent(QKeyEvent *e)
 {
   QTextCursor text_cursor = this->textCursor();
   int key = e->key();

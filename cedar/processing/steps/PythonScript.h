@@ -199,27 +199,30 @@ private:
 
 };
 
-class ValidationMaskInputDialog : public QDialog
+namespace cedar::proc::steps::PythonScriptScope
 {
+  class ValidationMaskInputDialog : public QDialog
+  {
     //--------------------------------------------------------------------------------------------------------------------
     // nested types
     //--------------------------------------------------------------------------------------------------------------------
 
 
-Q_OBJECT
+  Q_OBJECT
 
-public:
+  public:
     ValidationMaskInputDialog(std::vector<std::string> unacceptedStrings)
-    :
-    QDialog()
+            :
+            QDialog()
     {
       this->unacceptedStrings = unacceptedStrings;
     };
+
     QString getText(QWidget *parent, const QString &title, const QString &label,
-                           QLineEdit::EchoMode echo = QLineEdit::Normal,
-                           const QString &text = QString(), bool *ok = nullptr,
-                           Qt::WindowFlags flags = Qt::WindowFlags(),
-                           Qt::InputMethodHints inputMethodHints = Qt::ImhNone)
+                    QLineEdit::EchoMode echo = QLineEdit::Normal,
+                    const QString &text = QString(), bool *ok = nullptr,
+                    Qt::WindowFlags flags = Qt::WindowFlags(),
+                    Qt::InputMethodHints inputMethodHints = Qt::ImhNone)
     {
       this->setWindowTitle(title);
       this->setInputMethodHints(inputMethodHints);
@@ -242,23 +245,28 @@ public:
       QObject::connect(&buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
       QObject::connect(&buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
-      QObject::connect(edit, SIGNAL(textChanged(const QString &)), this, SLOT(textChanged(const QString &)));
+      QObject::connect(edit, SIGNAL(textChanged(
+                                            const QString &)), this, SLOT(textChanged(
+                                                                                  const QString &)));
 
       const int ret = this->exec();
       if (ok)
         *ok = !!ret;
-      if (ret) {
+      if (ret)
+      {
         return edit->text();
-      } else {
+      }
+      else
+      {
         return QString();
       }
     }
 
-public slots:
+  public slots:
 
-    void textChanged(const QString& text)
+    void textChanged(const QString &text)
     {
-      if(checkString(text.toStdString()))
+      if (checkString(text.toStdString()))
       {
         edit->setStyleSheet("QLineEdit { background: rgb(255, 255, 255); }");
         btnBox->button(QDialogButtonBox::Ok)->setEnabled(true);
@@ -272,14 +280,14 @@ public slots:
 
     }
 
-private:
+  private:
 
     bool checkString(std::string text)
     {
       boost::trim(text);
-      for(int i = 0; i < unacceptedStrings.size(); i++)
+      for (int i = 0; i < unacceptedStrings.size(); i++)
       {
-        if(!unacceptedStrings.at(i).compare(text))
+        if (!unacceptedStrings.at(i).compare(text))
         {
           return false;
         }
@@ -287,78 +295,83 @@ private:
       return true;
     }
 
-private:
-    QLineEdit* edit;
-    QDialogButtonBox* btnBox;
+  private:
+    QLineEdit *edit;
+    QDialogButtonBox *btnBox;
     std::vector<std::string> unacceptedStrings;
 
-};
+  };
 
 
-//!@brief This class performs the matrix conversion between python and c++
-class NDArrayConverter
-{
+  //!@brief This class performs the matrix conversion between python and c++
+  class NDArrayConverter
+  {
     //--------------------------------------------------------------------------------------------------------------------
     // constructors and destructor
     //--------------------------------------------------------------------------------------------------------------------
-public:
+  public:
 
     NDArrayConverter();
-    NDArrayConverter(cedar::proc::steps::PythonScript*);
+
+    NDArrayConverter(cedar::proc::steps::PythonScript *);
 
     //--------------------------------------------------------------------------------------------------------------------
     // public methods
     //--------------------------------------------------------------------------------------------------------------------
-public:
+  public:
 
-    cv::Mat toMat(PyObject*, int);
+    cv::Mat toMat(PyObject *, int);
 
-    PyObject* toNDArray(const cv::Mat& mat);
+    PyObject *toNDArray(const cv::Mat &mat);
+
     //void copyTo(cv::Mat src, cv::OutputArray _dst);
-    int failmsg(const char*, ...);
+    int failmsg(const char *, ...);
 
     //--------------------------------------------------------------------------------------------------------------------
     // private methods
     //--------------------------------------------------------------------------------------------------------------------
-private:
+  private:
 
-    const char * typenumToString(int);
+    const char *typenumToString(int);
+
     void init();
 
     //--------------------------------------------------------------------------------------------------------------------
     // members
     //--------------------------------------------------------------------------------------------------------------------
-public:
+  public:
 
     static int isInitialized;
 
-private:
-    cedar::proc::steps::PythonScript* pythonScript;
+  private:
+    cedar::proc::steps::PythonScript *pythonScript;
 
 
-};
+  };
 
 
-class PyAllowThreads;
+  class PyAllowThreads;
 
-class PyEnsureGIL;
+  class PyEnsureGIL;
 
+  static size_t REFCOUNT_OFFSET = (size_t)&(((PyObject*)0)->ob_refcnt) +
+                                  (0x12345678 != *(const size_t*)"\x78\x56\x34\x12\0\0\0\0\0")*sizeof(int);
 
-static size_t REFCOUNT_OFFSET = (size_t)&(((PyObject*)0)->ob_refcnt) +
-    (0x12345678 != *(const size_t*)"\x78\x56\x34\x12\0\0\0\0\0")*sizeof(int);
-
-static inline PyObject* pyObjectFromRefcount(const int* refcount)
-{
+  static inline PyObject* pyObjectFromRefcount(const int* refcount)
+  {
     return (PyObject*)((size_t)refcount - REFCOUNT_OFFSET);
-}
+  }
 
-static inline int* refcountFromPyObject(const PyObject* obj)
-{
+  static inline int* refcountFromPyObject(const PyObject* obj)
+  {
     return (int*)((size_t)obj + REFCOUNT_OFFSET);
+  }
+
+
+  class NumpyAllocator;
 }
 
 
-class NumpyAllocator;
 
 //enum { ARG_NONE = 0, ARG_MAT = 1, ARG_SCALAR = 2 };
 

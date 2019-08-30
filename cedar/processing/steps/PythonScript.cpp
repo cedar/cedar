@@ -123,7 +123,7 @@ int cedar::proc::steps::PythonScript::executionFailed = 0;
 QMutex cedar::proc::steps::PythonScript::mutex;
 std::string cedar::proc::steps::PythonScript::nameOfExecutingStep = "";
 
-int NDArrayConverter::failmsg(const char *fmt, ...)
+int cedar::proc::steps::PythonScriptScope::NDArrayConverter::failmsg(const char *fmt, ...)
 {
   char str[1000];
   va_list ap;
@@ -141,7 +141,7 @@ int NDArrayConverter::failmsg(const char *fmt, ...)
   return 0;
 }
 
-class PyAllowThreads
+class cedar::proc::steps::PythonScriptScope::PyAllowThreads
 {
 public:
     PyAllowThreads() : _state(PyEval_SaveThread()) {}
@@ -153,7 +153,7 @@ private:
     PyThreadState* _state;
 };
 
-class PyEnsureGIL
+class cedar::proc::steps::PythonScriptScope::PyEnsureGIL
 {
 public:
     PyEnsureGIL() : _state(PyGILState_Ensure()) 
@@ -222,7 +222,7 @@ public:
 
 };
 #else // CV_MAJOR_VERSION
-class NumpyAllocator : public cv::MatAllocator
+class cedar::proc::steps::PythonScriptScope::NumpyAllocator : public cv::MatAllocator
 {
 public:
 
@@ -295,21 +295,21 @@ public:
 };
 #endif // CV_MAJOR_VERSION
 
-NumpyAllocator g_numpyAllocator;
+cedar::proc::steps::PythonScriptScope::NumpyAllocator g_numpyAllocator;
 
 
 // static member decleration
-int NDArrayConverter::isInitialized = 0;
+int cedar::proc::steps::PythonScriptScope::NDArrayConverter::isInitialized = 0;
 
 
-NDArrayConverter::NDArrayConverter()
+cedar::proc::steps::PythonScriptScope::NDArrayConverter::NDArrayConverter()
 :
 pythonScript(nullptr)
 {
   init();
 }
 
-NDArrayConverter::NDArrayConverter(cedar::proc::steps::PythonScript* pScript)
+cedar::proc::steps::PythonScriptScope::NDArrayConverter::NDArrayConverter(cedar::proc::steps::PythonScript* pScript)
 :
 pythonScript(pScript)
 {
@@ -317,7 +317,7 @@ pythonScript(pScript)
 }
 
 
-void NDArrayConverter::init()
+void cedar::proc::steps::PythonScriptScope::NDArrayConverter::init()
 {
   if(!NDArrayConverter::isInitialized)
   {
@@ -326,7 +326,7 @@ void NDArrayConverter::init()
   }
 }
 
-const char * NDArrayConverter::typenumToString(int typenum) {
+const char * cedar::proc::steps::PythonScriptScope::NDArrayConverter::typenumToString(int typenum) {
   switch(typenum){
     case NPY_BOOL:
       return "boolean (NPY_BOOL)";
@@ -382,7 +382,7 @@ const char * NDArrayConverter::typenumToString(int typenum) {
 
 }
 
-cv::Mat NDArrayConverter::toMat(PyObject* o, int index)
+cv::Mat cedar::proc::steps::PythonScriptScope::NDArrayConverter::toMat(PyObject* o, int index)
 {
   cv::Mat m;
   bool allowND = true, doMultiChannelTypeConversion = false;
@@ -578,7 +578,7 @@ cv::Mat NDArrayConverter::toMat(PyObject* o, int index)
   return m;
 }
 
-PyObject* NDArrayConverter::toNDArray(const cv::Mat& m)
+PyObject* cedar::proc::steps::PythonScriptScope::NDArrayConverter::toNDArray(const cv::Mat& m)
 {
   if( !m.data )
   {
@@ -710,7 +710,7 @@ mInputs(1, cedar::aux::MatDataPtr()),
 mOutputs(1, cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))),
 
 // Declare Properties
-_codeStringForSavingArchitecture (new cedar::aux::StringParameter(this, "code", "import numpy as np\nimport pycedar as pc\n\n#Print to messages tab:\n# pc.messagePrint('text')\n# pc.messagePrint(str(...))\n\n#Inputs:\n# pc.inputs[0]\n# pc.inputs[1]\n# ...\n\n#Outputs:\n# pc.outputs[0]\n# pc.outputs[1]\n# ...\n\n\ninput = pc.inputs[0]\n\npc.outputs[0] = input * 2\n")),
+_codeStringForSavingArchitecture (new cedar::aux::StringParameter(this, "code", "import numpy as np\nimport pycedar as pc\n\n#Print to messages tab:\n# pc.messagePrint('text')\n# pc.messagePrint(str(...))\n\n#Inputs: (NumPy Arrays)\n# pc.inputs[0]\n# pc.inputs[1]\n# ...\n\n#Outputs:\n# pc.outputs[0]\n# pc.outputs[1]\n# ...\n\n\ninput = pc.inputs[0]\n\npc.outputs[0] = input * 2\n")),
 _mNumberOfInputs (new cedar::aux::UIntParameter(this, "number of inputs", 1,1,255)),
 _mNumberOfOutputs (new cedar::aux::UIntParameter(this, "number of outputs", 1,1,255)),
 _hasScriptFile (new cedar::aux::BoolParameter(this, "use script file", false)),
@@ -974,7 +974,7 @@ void cedar::proc::steps::PythonScript::exportStepAsTemplate()
   }
 
   // execute the dialog
-  ValidationMaskInputDialog dialog(unaccepted);
+  cedar::proc::steps::PythonScriptScope::ValidationMaskInputDialog dialog(unaccepted);
   QString text = dialog.getText(0, "Export step as Template", "Name for the template:", QLineEdit::Normal, QString::fromStdString(this->getName()), &ok);
 
   if(!ok)
@@ -1126,7 +1126,7 @@ void cedar::proc::steps::PythonScript::executePythonScript()
     boost::python::object pycedar_module( (boost::python::handle<>(PyImport_ImportModule("pycedar"))) );
 
     std::list<boost::python::handle<>> inputsList;
-    NDArrayConverter cvt(this);
+    cedar::proc::steps::PythonScriptScope::NDArrayConverter cvt(this);
     for(unsigned int i = 0; i < mInputs.size(); i++)
     {
       cedar::aux::ConstDataPtr inputMatrixPointer = this->getInputSlot(makeInputSlotName(i))->getData();
