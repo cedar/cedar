@@ -388,7 +388,6 @@ cv::Mat cedar::proc::steps::PythonScriptScope::NDArrayConverter::toMat(PyObject*
   bool allowND = true, doMultiChannelTypeConversion = false;
   if(!o || o == Py_None)
   {
-    //TODO failmsg here?
     return cv::Mat::zeros(1,1,CV_32F);
   }
   if( PyInt_Check(o) )
@@ -704,15 +703,13 @@ cedar::proc::steps::PythonScript::PythonScript(bool isLooped)
 :
 cedar::proc::Step(isLooped)
 ,
-mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
-
 mInputs(1, cedar::aux::MatDataPtr()),
 mOutputs(1, cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))),
 
 // Declare Properties
 _codeStringForSavingArchitecture (new cedar::aux::StringParameter(this, "code", "import numpy as np\nimport pycedar as pc\n\n#Print to messages tab:\n# pc.messagePrint('text')\n# pc.messagePrint(str(...))\n\n#Inputs: (NumPy Arrays)\n# pc.inputs[0]\n# pc.inputs[1]\n# ...\n\n#Outputs:\n# pc.outputs[0]\n# pc.outputs[1]\n# ...\n\n\ninput = pc.inputs[0]\n\npc.outputs[0] = input * 2\n")),
-_mNumberOfInputs (new cedar::aux::UIntParameter(this, "number of inputs", 1,1,255)),
-_mNumberOfOutputs (new cedar::aux::UIntParameter(this, "number of outputs", 1,1,255)),
+_mNumberOfInputs (new cedar::aux::UIntParameter(this, "number of inputs", 1,0,255)),
+_mNumberOfOutputs (new cedar::aux::UIntParameter(this, "number of outputs", 1,0,255)),
 _hasScriptFile (new cedar::aux::BoolParameter(this, "use script file", false)),
 _scriptFile (new cedar::aux::FileParameter(this, "script file path", cedar::aux::FileParameter::READ)),
 _autoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "auto-convert double output matrices to float", true))
@@ -729,7 +726,7 @@ _autoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "auto-convert dou
   this->_codeStringForSavingArchitecture->setHidden(true);
   this->_autoConvertDoubleToFloat->markAdvanced(true);
 
-  this->registerFunction("export step  as  template", boost::bind(&cedar::proc::steps::PythonScript::exportStepAsTemplate   , this), false);
+  this->registerFunction("export step as template", boost::bind(&cedar::proc::steps::PythonScript::exportStepAsTemplate   , this), false);
   //this->registerFunction("import step from template", boost::bind(&cedar::proc::steps::PythonScript::importStepsFromTemplate, this), false);
   
   cedar::proc::steps::PythonScript::executionFailed = 0;
@@ -1101,8 +1098,6 @@ void cedar::proc::steps::PythonScript::freePythonVariables() {
 
   Py_DecRef(poAttrList);
 }
-
-//TODO allow 0 inputs / outputs in GUI
 
 void cedar::proc::steps::PythonScript::executePythonScript()
 {
