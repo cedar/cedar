@@ -66,8 +66,12 @@ public:
   //!@brief Destructor
   virtual ~VirtualCamera();
 
+
 public slots:
   void resolutionChanged();
+
+
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

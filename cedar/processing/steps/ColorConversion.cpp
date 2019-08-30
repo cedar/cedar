@@ -90,6 +90,7 @@ cedar::aux::EnumType<cedar::proc::steps::ColorConversion::ColorSpace>
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::proc::steps::ColorConversion::ColorSpace::Id cedar::proc::steps::ColorConversion::ColorSpace::BGR;
 const cedar::proc::steps::ColorConversion::ColorSpace::Id cedar::proc::steps::ColorConversion::ColorSpace::HSV;
+const cedar::proc::steps::ColorConversion::ColorSpace::Id cedar::proc::steps::ColorConversion::ColorSpace::HLS;
 const cedar::proc::steps::ColorConversion::ColorSpace::Id cedar::proc::steps::ColorConversion::ColorSpace::YUV;
 const cedar::proc::steps::ColorConversion::ColorSpace::Id cedar::proc::steps::ColorConversion::ColorSpace::YCrCb;
 #endif // CEDAR_COMPILER_MSVC
@@ -192,18 +193,28 @@ void cedar::proc::steps::ColorConversion::updateTargetImageColorSpace()
                        )
                      );
       break;
-    case ColorSpace::HSV:
-      target_space = cedar::aux::annotation::ColorSpacePtr
-                     (
-                       new cedar::aux::annotation::ColorSpace
-                       (
-                         cedar::aux::annotation::ColorSpace::Hue,
-                         cedar::aux::annotation::ColorSpace::Saturation,
-                         cedar::aux::annotation::ColorSpace::Value
-                       )
-                     );
-      break;
-
+      case ColorSpace::HSV:
+          target_space = cedar::aux::annotation::ColorSpacePtr
+                  (
+                          new cedar::aux::annotation::ColorSpace
+                                  (
+                                          cedar::aux::annotation::ColorSpace::Hue,
+                                          cedar::aux::annotation::ColorSpace::Saturation,
+                                          cedar::aux::annotation::ColorSpace::Value
+                                  )
+                  );
+          break;
+      case ColorSpace::HLS:
+          target_space = cedar::aux::annotation::ColorSpacePtr
+                  (
+                          new cedar::aux::annotation::ColorSpace
+                                  (
+                                          cedar::aux::annotation::ColorSpace::Hue,
+                                          cedar::aux::annotation::ColorSpace::Saturation,
+                                          cedar::aux::annotation::ColorSpace::Luminance
+                                  )
+                  );
+          break;
     case ColorSpace::BGR:
       target_space = cedar::aux::annotation::ColorSpacePtr
                      (
@@ -264,13 +275,22 @@ void cedar::proc::steps::ColorConversion::updateSourceImageColorSpace()
               this->mInputColorSpace = ColorSpace::BGR;
             }
             else if
-            (
-              this->mInputColorSpaceAnnotation->getChannelType(0) == cedar::aux::annotation::ColorSpace::Hue
-              && this->mInputColorSpaceAnnotation->getChannelType(1) == cedar::aux::annotation::ColorSpace::Saturation
-              && this->mInputColorSpaceAnnotation->getChannelType(2) == cedar::aux::annotation::ColorSpace::Value
-            )
+                    (
+                    this->mInputColorSpaceAnnotation->getChannelType(0) == cedar::aux::annotation::ColorSpace::Hue
+                    && this->mInputColorSpaceAnnotation->getChannelType(1) == cedar::aux::annotation::ColorSpace::Saturation
+                    && this->mInputColorSpaceAnnotation->getChannelType(2) == cedar::aux::annotation::ColorSpace::Value
+                    )
             {
-              this->mInputColorSpace = ColorSpace::HSV;
+                this->mInputColorSpace = ColorSpace::HSV;
+            }
+            else if
+                    (
+                    this->mInputColorSpaceAnnotation->getChannelType(0) == cedar::aux::annotation::ColorSpace::Hue
+                    && this->mInputColorSpaceAnnotation->getChannelType(1) == cedar::aux::annotation::ColorSpace::Luminance
+                    && this->mInputColorSpaceAnnotation->getChannelType(2) == cedar::aux::annotation::ColorSpace::Saturation
+                    )
+            {
+                this->mInputColorSpace = ColorSpace::HLS;
             }
             else if
             (
@@ -343,18 +363,52 @@ void cedar::proc::steps::ColorConversion::updateCvConvertConstant()
       }
       break;
 
+      case ColorSpace::HLS:
+          switch (this->getTargetColorSpace())
+          {
+              case ColorSpace::BGR:
+                  this->mCvConversionConstant =
+#if CEDAR_OPENCV_MAJOR_VERSION >= 3
+                          cv::COLOR_HLS2BGR
+#else
+                      CV_HSL2BGR
+#endif
+                          ;
+                  break;
+
+              case ColorSpace::YCrCb:
+              case ColorSpace::YUV:
+              CEDAR_THROW(cedar::aux::UnhandledValueException, "HLS to YUV is not handled.");
+                  break;
+
+              default:
+              CEDAR_THROW(cedar::aux::UnhandledValueException, "Conversion not handled.");
+                  break;
+          }
+          break;
+
     case ColorSpace::BGR:
       switch (this->getTargetColorSpace())
       {
-        case ColorSpace::HSV:
-          this->mCvConversionConstant =
+          case ColorSpace::HSV:
+              this->mCvConversionConstant =
 #if CEDAR_OPENCV_MAJOR_VERSION >= 3
-           cv::COLOR_BGR2HSV
+                      cv::COLOR_BGR2HSV
 #else
-           CV_BGR2HSV
+                  CV_BGR2HSV
 #endif
-           ;
-          break;
+                      ;
+              break;
+
+          case ColorSpace::HLS:
+              this->mCvConversionConstant =
+#if CEDAR_OPENCV_MAJOR_VERSION >= 3
+                      cv::COLOR_BGR2HLS
+#else
+                  CV_BGR2HLS
+#endif
+                      ;
+              break;
 
         case ColorSpace::YCrCb:
         case ColorSpace::YUV:
