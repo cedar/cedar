@@ -193,9 +193,8 @@ private:
   cedar::aux::UIntParameterPtr _mNumberOfInputs;
   cedar::aux::UIntParameterPtr _mNumberOfOutputs;
   cedar::aux::BoolParameterPtr _hasScriptFile;
-  cedar::aux::BoolParameterPtr _autoConvertDoubleToFloat;
   cedar::aux::FileParameterPtr _scriptFile;
-
+  cedar::aux::BoolParameterPtr _autoConvertDoubleToFloat; // advanced
 
 };
 

@@ -714,8 +714,8 @@ _codeStringForSavingArchitecture (new cedar::aux::StringParameter(this, "code", 
 _mNumberOfInputs (new cedar::aux::UIntParameter(this, "number of inputs", 1,1,255)),
 _mNumberOfOutputs (new cedar::aux::UIntParameter(this, "number of outputs", 1,1,255)),
 _hasScriptFile (new cedar::aux::BoolParameter(this, "use script file", false)),
-_autoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "auto-convert double output matrices to float", true)),
-_scriptFile (new cedar::aux::FileParameter(this, "script file path", cedar::aux::FileParameter::READ))
+_scriptFile (new cedar::aux::FileParameter(this, "script file path", cedar::aux::FileParameter::READ)),
+_autoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "auto-convert double output matrices to float", true))
 {
   this->declareInput(makeInputSlotName(0), false);
   
