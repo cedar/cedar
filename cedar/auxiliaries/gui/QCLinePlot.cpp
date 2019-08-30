@@ -361,7 +361,32 @@ void cedar::aux::gui::QCLinePlot::timerEvent(QTimerEvent * /* pEvent */)
           local_min = std::min(local_min, sampling_position);
           local_max = std::max(local_max, sampling_position);
         }
-        yd[ia] = (double)plotMat.at<float>(ia,0);
+        switch(plotMat.type())
+        {
+          case CV_64F:
+            yd[ia] = (double)plotMat.at<double>(ia,0);
+            break;
+          case CV_32F:
+            yd[ia] = (double)plotMat.at<float>(ia,0);
+            break;
+          case CV_32S:
+            yd[ia] = (double)plotMat.at<int>(ia,0);
+            break;
+          case CV_16S:
+            yd[ia] = (double)plotMat.at<short>(ia,0);
+            break;
+          case CV_16U:
+            yd[ia] = (double)plotMat.at<unsigned short>(ia,0);
+            break;
+          case CV_8S:
+            yd[ia] = (double)plotMat.at<char>(ia,0);
+            break;
+          case CV_8U:
+            yd[ia] = (double)plotMat.at<unsigned char>(ia,0);
+            break;
+          default:
+            yd[ia] = (double)plotMat.at<float>(ia,0);
+        }
         y_min = std::min(y_min,yd[ia]);
         y_max = std::max(y_max,yd[ia]);
       }
