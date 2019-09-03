@@ -88,7 +88,11 @@ Q_DECLARE_METATYPE(boost::shared_ptr<cedar::proc::DataSlot>);
 #ifdef CEDAR_USE_QT5
 #include <manipulatedFrame.h>
 #else
+#if QGLVIEWER_VERSION >= 0x020700
+#include <manipulatedFrame.h>
+#else
 #include <QGLViewer/manipulatedFrame.h>
+#endif // QGLVIEWER_VERSION
 #endif // CEDAR_OS_WINDOWS
 #endif //CEDAR_USE_QGLVIEWER
 
@@ -114,38 +118,38 @@ const cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectab
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::gui::Connectable::Connectable(qreal width, qreal height, cedar::proc::gui::GraphicsBase::GraphicsGroup group, QMainWindow* pMainWindow)
-    :
-      cedar::proc::gui::Element(width, height, group, cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
-      mpIconView(nullptr),
-      mpMainWindow(pMainWindow),
-      mDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT),
-      mInputOutputSlotOffset(static_cast<qreal>(0.0)),
-      mPreviousFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
-      mShowingTriggerColor(false)
+        :
+        cedar::proc::gui::Element(width, height, group, cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
+        mpIconView(nullptr),
+        mpMainWindow(pMainWindow),
+        mDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT),
+        mInputOutputSlotOffset(static_cast<qreal>(0.0)),
+        mPreviousFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
+        mShowingTriggerColor(false)
 {
   this->connect(this,
-  SIGNAL(reactToSlotRemovedSignal(cedar::proc::DataRole::Id, QString)),
-  SLOT(reactToSlotRemoved(cedar::proc::DataRole::Id, QString)), Qt::ConnectionType::DirectConnection);
+                SIGNAL(reactToSlotRemovedSignal(cedar::proc::DataRole::Id, QString)),
+                SLOT(reactToSlotRemoved(cedar::proc::DataRole::Id, QString)), Qt::ConnectionType::DirectConnection);
 
   this->connect(this,
-  SIGNAL(reactToSlotAddedSignal(cedar::proc::DataRole::Id, QString)),
-  SLOT(reactToSlotAdded(cedar::proc::DataRole::Id, QString)), Qt::ConnectionType::DirectConnection);
+                SIGNAL(reactToSlotAddedSignal(cedar::proc::DataRole::Id, QString)),
+                SLOT(reactToSlotAdded(cedar::proc::DataRole::Id, QString)), Qt::ConnectionType::DirectConnection);
 
   this->connect(this,
-  SIGNAL(reactToSlotRenamedSignal(cedar::proc::DataRole::Id, QString, QString)),
-  SLOT(reactToSlotRenamed(cedar::proc::DataRole::Id, QString, QString)), Qt::ConnectionType::DirectConnection);
+                SIGNAL(reactToSlotRenamedSignal(cedar::proc::DataRole::Id, QString, QString)),
+                SLOT(reactToSlotRenamed(cedar::proc::DataRole::Id, QString, QString)), Qt::ConnectionType::DirectConnection);
 
   this->connect(this,
-  SIGNAL(triggerableStartedSignal()),
-  SLOT(triggerableStarted()), Qt::ConnectionType::DirectConnection);
+                SIGNAL(triggerableStartedSignal()),
+                SLOT(triggerableStarted()), Qt::ConnectionType::DirectConnection);
 
   this->connect(this,
-  SIGNAL(triggerableStoppedSignal()),
-  SLOT(triggerableStopped()), Qt::ConnectionType::DirectConnection);
+                SIGNAL(triggerableStoppedSignal()),
+                SLOT(triggerableStopped()), Qt::ConnectionType::DirectConnection);
 
   this->connect(this,
-  SIGNAL(triggerableParentTriggerChanged()),
-  SLOT(updateTriggerColorState()), Qt::ConnectionType::DirectConnection);
+                SIGNAL(triggerableParentTriggerChanged()),
+                SLOT(updateTriggerColorState()), Qt::ConnectionType::DirectConnection);
 
   mFillColorChangedConnection = this->connectToFillColorChangedSignal(boost::bind(&cedar::proc::gui::Connectable::fillColorChanged, this, _1));
 }
@@ -164,14 +168,14 @@ cedar::proc::gui::Connectable::~Connectable()
 }
 
 cedar::proc::gui::Connectable::Decoration::Decoration(QGraphicsItem* pParent, const QString& icon, const QString& description, const QColor& bgColour)
-    :
-      mpIcon(nullptr),
-      mDefaultBackground(bgColour)
+        :
+        mpIcon(nullptr),
+        mDefaultBackground(bgColour)
 {
   qreal padding = 1;
 
   this->mpRectangle = new QGraphicsRectItem(-padding, -padding, cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE + 2 * padding, cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE + 2 * padding,
-      pParent);
+                                            pParent);
 
   if (!icon.isEmpty())
   {
@@ -197,9 +201,9 @@ cedar::proc::gui::Connectable::Decoration::Decoration(QGraphicsItem* pParent, co
 
 //!@todo This should really be solved differently, steps should be able to provide decorations via their declarations, rather than putting in dynamic casts here.
 cedar::proc::gui::Connectable::DeviceQualityDecoration::DeviceQualityDecoration(QGraphicsItem* pParent, cedar::proc::steps::ComponentPtr step)
-    :
-      cedar::proc::gui::Connectable::Decoration(pParent, ":/cedar/dev/gui/icons/not_connected.svg", QString()),
-      mStep(step)
+        :
+        cedar::proc::gui::Connectable::Decoration(pParent, ":/cedar/dev/gui/icons/not_connected.svg", QString()),
+        mStep(step)
 {
   // register hooks for the initial component
   updateHooks();
@@ -247,7 +251,7 @@ void cedar::proc::gui::Connectable::Decoration::updateIcon(const bool isConnecte
     qreal h= 25; // default?
 
     if (this->mpIcon
-        && this->mpIcon != nullptr ) 
+        && this->mpIcon != nullptr )
     {
       if (isConnected)
       {
@@ -277,7 +281,7 @@ void cedar::proc::gui::Connectable::Decoration::updateIcon(const bool isConnecte
       this->mpIcon = new QGraphicsSvgItem(icon_path, this->mpRectangle);
 
       // setting this cache mode makes sure that when writing out an svg file, the icon will not be pixelized
-      this->mpIcon->setCacheMode(QGraphicsItem::NoCache);     
+      this->mpIcon->setCacheMode(QGraphicsItem::NoCache);
       this->mpIcon->setScale(cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE / h);
     }
   }
@@ -306,7 +310,7 @@ void cedar::proc::gui::Connectable::DeviceQualityDecoration::timerEvent(QTimerEv
     component->getCommunicationErrorRates(command_errors, measurement_errors);
 
     QString tool_tip = QString("<table><tr><td>command quality:</td><td>%1%</td></tr><tr><td>measurement quality:</td><td>%2%</td></tr></table>").arg(100.0 * (1.0 - command_errors), -1, 'f', 0).arg(
-        100.0 * (1.0 - measurement_errors), -1, 'f', 0);
+            100.0 * (1.0 - measurement_errors), -1, 'f', 0);
 
     auto command_error_msgs = component->getLastCommandCommunicationErrors();
     if (!command_error_msgs.empty())
@@ -701,18 +705,18 @@ void cedar::proc::gui::Connectable::showTriggerChains()
     auto text = new QGraphicsSimpleTextItem(QString("%1").arg(depth + 1), circle);
 
     // note: this order is important; if the circle got deleted before the text, this would lead to a crash
-      this->mTriggerChainVisualization.push_back(text);
-      this->mTriggerChainVisualization.push_back(circle);
+    this->mTriggerChainVisualization.push_back(text);
+    this->mTriggerChainVisualization.push_back(circle);
 
-      // center the text on the circle
-      QRectF text_bounds = text->boundingRect();
-      QRectF circle_bounds = circle->boundingRect();
-      text->setPos
-      (
-          (circle_bounds.width() - text_bounds.width()) / static_cast<qreal>(2),
-          (circle_bounds.height() - text_bounds.height()) / static_cast<qreal>(2)
-      );
-    };
+    // center the text on the circle
+    QRectF text_bounds = text->boundingRect();
+    QRectF circle_bounds = circle->boundingRect();
+    text->setPos
+            (
+                    (circle_bounds.width() - text_bounds.width()) / static_cast<qreal>(2),
+                    (circle_bounds.height() - text_bounds.height()) / static_cast<qreal>(2)
+            );
+  };
 
   qreal root_size = static_cast<qreal>(40.0);
   qreal item_size = static_cast<qreal>(30.0);
@@ -1003,7 +1007,7 @@ cedar::proc::gui::DataSlotItem const* cedar::proc::gui::Connectable::getSlotItem
   if (iter == role_map.end())
   {
     CEDAR_THROW(cedar::aux::InvalidNameException,
-        "No slot item named \"" + name + "\" found for role " + cedar::proc::DataRole::type().get(role).prettyString() + " in \"" + this->getConnectable()->getName() + "\".");
+                "No slot item named \"" + name + "\" found for role " + cedar::proc::DataRole::type().get(role).prettyString() + " in \"" + this->getConnectable()->getName() + "\".");
   }
 
   return iter->second;
@@ -1455,20 +1459,20 @@ void cedar::proc::gui::Connectable::updateDecorations()
 
   }
   else if (this->mpCommentAvailableDecoration)
-    {
-      this->removeDecoration(this->mpCommentAvailableDecoration);
-      this->mpCommentAvailableDecoration.reset();
-    }
+  {
+    this->removeDecoration(this->mpCommentAvailableDecoration);
+    this->mpCommentAvailableDecoration.reset();
+  }
 
   this->updateDecorationPositions();
 }
 
 void cedar::proc::gui::Connectable::buildConnectTriggerMenu(
-    QMenu* pMenu,
-    const cedar::proc::gui::Group* gui_group,
-    const QObject* receiver,
-    const char* slot,
-    boost::optional<cedar::proc::LoopedTriggerPtr> current)
+        QMenu* pMenu,
+        const cedar::proc::gui::Group* gui_group,
+        const QObject* receiver,
+        const char* slot,
+        boost::optional<cedar::proc::LoopedTriggerPtr> current)
 {
   auto group = gui_group->getGroup();
 
@@ -1523,7 +1527,7 @@ void cedar::proc::gui::Connectable::fillConnectableMenu(QMenu& menu, QGraphicsSc
   if (triggerable && triggerable->isLooped())
   {
     cedar::proc::gui::Connectable::buildConnectTriggerMenu(p_assign_trigger, gui_group, this,
-    SLOT(assignTriggerClicked()), triggerable->getLoopedTrigger());
+                                                           SLOT(assignTriggerClicked()), triggerable->getLoopedTrigger());
   }
   else
   {
@@ -1614,12 +1618,12 @@ void cedar::proc::gui::Connectable::loadDataClicked()
   CEDAR_DEBUG_ASSERT(slot);
 
   QString filename = QFileDialog::getOpenFileName
-                     (
-                       this->mpMainWindow,
-                       "Select a file to load",
-                       0, 0, 0, 
-                       QFileDialog::DontUseNativeDialog
-                     );
+          (
+                  this->mpMainWindow,
+                  "Select a file to load",
+                  0, 0, 0,
+                  QFileDialog::DontUseNativeDialog
+          );
 
   if (!filename.isEmpty())
   {
@@ -1702,7 +1706,7 @@ void cedar::proc::gui::Connectable::assignTriggerClicked()
   {
     group->connectTrigger(trigger, triggerable);
   }
-  // if no trigger was chosen, the user clicked the "disconnect" option, so: disconnect!
+    // if no trigger was chosen, the user clicked the "disconnect" option, so: disconnect!
   else if (triggerable->getLoopedTrigger())
   {
     group->disconnectTrigger(triggerable->getLoopedTrigger(), triggerable);
@@ -1851,8 +1855,8 @@ void cedar::proc::gui::Connectable::addPlotAllAction(QMenu& menu, const QPoint& 
 }
 
 void cedar::proc::gui::Connectable::fillPlots(QMenu* pMenu //,
-    //std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
-    )
+        //std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
+)
 {
   for (const cedar::aux::Enum& e : cedar::proc::DataRole::type().list())
   {

@@ -38,6 +38,8 @@
 #define CEDAR_AUX_GUI_VIEWER_H
 
 #include "cedar/configuration.h"
+#include <QCloseEvent>
+#include <QGLFramebufferObject>
 
 
 // CEDAR INCLUDES
@@ -58,7 +60,11 @@
 #ifdef CEDAR_USE_QT5
 #include <manipulatedFrame.h>
 #else
+#if QGLVIEWER_VERSION >= 0x020700
+#include <manipulatedFrame.h>
+#else
 #include <QGLViewer/manipulatedFrame.h>
+#endif // QGLVIEWER_VERSION
 #endif // CEDAR_OS_WINDOWS
 
 #else
@@ -70,6 +76,7 @@
 #include <QPoint>
 #include <QGLWidget>
 
+
 /*!@brief A simple viewer for OpenGL drawing routines, based on QGLViewer
  *
  * Use this class to draw instances of classes inherited from cedar::aux::gl::Object. This viewer has freely movable
@@ -80,30 +87,31 @@
  *
  */
 class cedar::aux::gui::Viewer
-:
+        :
 #ifdef CEDAR_USE_QGLVIEWER
-public QGLViewer,
+                public QGLViewer,
 #else
-public QGLWidget,
+                public QGLWidget,
 #endif // CEDAR_USE_QGLVIEWER
-public cedar::aux::Grabbable
+                public cedar::aux::Grabbable
 {
 private:
   Q_OBJECT
-  
+
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 
   /*!@brief the constructor */
-  Viewer(cedar::aux::gl::ScenePtr pScene, bool readFromFile = true);
+  Viewer(cedar::aux::gl::ScenePtr pScene, bool readFromFile = false);
 
   /*!@brief the constructor without a scene pointer */
   Viewer(bool readFromFile = true);
 
   /*!@brief the destructor */
-  ~Viewer();
+// SYSTEM INCLUDES
+  ~Viewer() override;
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -113,7 +121,7 @@ public:
   void draw();
 
   /*!@brief function being called automatically when a timer is up, usually in a loop */
-  void timerEvent(QTimerEvent* pEvent);
+  void timerEvent(QTimerEvent* pEvent) override;
 
   //!@brief call this function to initialize Gl resources for the passed visualization object
   void initGl(cedar::aux::gl::ObjectVisualizationPtr pVisualization);
@@ -126,10 +134,10 @@ public:
    *
    * @return The image in a cv::Mat structure
    */
-  cv::Mat& grabImage();
+  cv::Mat& grabImage() override;
 
 
-  /*!@brief initialize the grabber specific parts in this method.
+  /*!@brief initialize the grabber specific parts irestoreStateFromFilen this method.
    *
    * The grabber invokes this method in it's constructor.
    * Have a look at the class cedar::aux::gui::Viewer for an implementation.
@@ -141,7 +149,7 @@ public:
    * @return returns the lock for the image-mat, if there isn't already a grabber connected.
    *         Otherwise it will return NULL
    */
-  QReadWriteLock* registerGrabber();
+  QReadWriteLock* registerGrabber() override;
 
   /*!@brief deinitialize the grabber specific parts in this method.
    *
@@ -154,7 +162,11 @@ public:
    * @remarks
    *    This is a member of the grabbable interface
    */
-  void deregisterGrabber(QReadWriteLock* lock);
+  void deregisterGrabber(QReadWriteLock* lock) override;
+
+  void changeCameraPosition(const double x , const double y, const double z);
+
+  void changeCameraOrientation(const double alpha , const double beta);
 
   std::string getViewerLabel() const;
 
@@ -164,6 +176,13 @@ public:
 //  void readFromConfiguration(cedar::aux::ConfigurationNode& node);
 
   void writeToConfiguration(cedar::aux::ConfigurationNode& root, QPoint mainWindowSize = QPoint());
+
+  void closeEvent(QCloseEvent *event) override;
+
+  void toggleVisible();
+
+  /*!@brief initialization */
+  void init();
 
 #ifndef CEDAR_USE_QGLVIEWER
   //@cond SKIPPED_DOCUMENTATION
@@ -176,16 +195,31 @@ public:
   //@endcond
 #endif // CEDAR_USE_QGLVIEWER
 
+
+  signals:
+          void cameraMoved();
+  void updated();
+
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief initialization */
-  void init();
-  
+
+
   ///!@brief grab the GL context
   void grabBuffer();
 
+  //!@brief updates the framebuffer when the window is hidden
+#ifdef CEDAR_USE_QGLVIEWER
+
+  void hiddenUpdate();
+
+  qglviewer::Vec mOldPos;
+  qglviewer::Vec mOldDir;
+
+#endif
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -207,6 +241,9 @@ private:
 
   ///!@brief flag in order to be stored in Plotgroups
   std::string mViewerLabel;
+
+
+  QGLFramebufferObject * m_fbo = nullptr;
 };
 
 #endif  // CEDAR_AUX_GUI_VIEWER_H
