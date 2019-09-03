@@ -145,6 +145,7 @@ mInputNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mNeuralNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mMaximumLocation(new cedar::aux::MatData(cv::Mat::zeros(2, 1, CV_32F))),
 mCurrentDeltaT(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
+mLateralKernelEducational(new cedar::aux::MatData(cv::Mat::zeros(50,50,CV_32F))),
 mIsActive(false),
 // parameters
 _mOutputActivation(new cedar::aux::BoolParameter(this, "activation as output", false)),
@@ -246,6 +247,9 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   this->declareBuffer("noise", this->mInputNoise);
   this->declareBuffer("location of maximum", this->mMaximumLocation);
   this->declareBuffer("current delta time", this->mCurrentDeltaT);
+  this->declareBuffer("full lateral kernel", this->mLateralKernelEducational);
+
+
 
   this->declareOutput("sigmoided activation", mSigmoidalActivation);
   this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::ValueRangeHint(0, 1)));
@@ -301,6 +305,10 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
   QObject::connect(_mOutputActivation.get(), SIGNAL(valueChanged()), this, SLOT(activationAsOutputChanged()));
   QObject::connect(_mDiscreteMetric.get(), SIGNAL(valueChanged()), this, SLOT(discreteMetricChanged()));
+  QObject::connect(mGlobalInhibition.get(),SIGNAL(valueChanged()),this , SLOT(updateEducationalKernel()));
+  QObject::connect(_mLateralKernelConvolution.get(),SIGNAL(combinedKernelUpdated()),this , SLOT(updateEducationalKernel())); //,Qt::DirectConnection
+
+
 
   mKernelAddedConnection
     = this->_mKernels->connectToObjectAddedSignal(boost::bind(&cedar::dyn::NeuralField::slotKernelAdded, this, _1));
@@ -379,6 +387,7 @@ void cedar::dyn::NeuralField::activationAsOutputChanged()
 void cedar::dyn::NeuralField::slotKernelAdded(size_t kernelIndex)
 {
   cedar::aux::kernel::KernelPtr kernel = this->_mKernels->at(kernelIndex);
+
   this->addKernelToConvolution(kernel);
 }
 
@@ -759,6 +768,8 @@ void cedar::dyn::NeuralField::updateMatrices()
     this->mNoiseCorrelationKernel->setDimensionality(dimensionality);
   }
 
+  this->updateEducationalKernel();
+
   this->revalidateInputSlot("input");
 
   if (this->activationIsOutput())
@@ -778,4 +789,48 @@ void cedar::dyn::NeuralField::onStop()
 {
   this->_mDimensionality->setConstant(false);
   this->_mSizes->setConstant(false);
+}
+
+
+void cedar::dyn::NeuralField::updateEducationalKernel()
+{
+  cv::Mat curkernel =
+          this->_mLateralKernelConvolution->getKernelList()->getCombinedKernel();
+  cv::Mat paddedKernel;
+
+
+  //TODO: This needs revision! e.g. what happens if the kernel is bigger than the field?
+  int firstDimLeft = 0;
+  int firstDimRight = 0;
+  int secondDimLeft = 0;
+  int secondDimRight = 0;
+
+  //TODO: We won't use 3D Kernels for educational purposes, that is why I left that out for now
+  if (this->getDimensionality() == 1 || this->getDimensionality() == 2)
+  {
+    int dim1Size = this->_mSizes->getValue().at(0);
+    int kernelSize = curkernel.rows;
+
+    if(dim1Size>kernelSize)
+    {
+      firstDimLeft = (dim1Size-kernelSize)/2.0;
+      firstDimRight= firstDimLeft;
+    }
+
+    if (this->getDimensionality() == 2)
+    {
+      int dim2Size = this->_mSizes->getValue().at(1);
+      int kernelSize2 = curkernel.cols;
+
+      if(dim2Size>kernelSize2)
+      {
+        secondDimLeft = (dim2Size-kernelSize2)/2.0;
+        secondDimRight= firstDimLeft;
+      }
+    }
+  }
+
+  cv::copyMakeBorder(curkernel, paddedKernel, firstDimLeft, firstDimRight, secondDimLeft, secondDimRight , cv::BORDER_CONSTANT, 0.0);
+
+  this->mLateralKernelEducational->setData(paddedKernel+this->mGlobalInhibition->getValue());
 }

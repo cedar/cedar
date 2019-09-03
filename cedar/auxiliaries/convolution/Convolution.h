@@ -266,6 +266,8 @@ public:
 signals:
   //! signals that the configuration has changed
   void configurationChanged();
+  //! signals that after a single kernel updated the combination was successfully updated
+  void combinedKernelUpdated();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

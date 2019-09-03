@@ -238,9 +238,11 @@ private:
    */
   void updateInputSum();
 
+
 private slots:
   void activationAsOutputChanged();
   void discreteMetricChanged();
+  void updateEducationalKernel();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -270,6 +272,10 @@ protected:
   //!@brief a vector with the location of the maximum of the activity per dimension
   cedar::aux::MatDataPtr mMaximumLocation;
   cedar::aux::MatDataPtr mCurrentDeltaT;
+
+
+  //!@brief a Matrix displaying the complete interaction in the field analog to the cosivina example
+  cedar::aux::MatDataPtr mLateralKernelEducational;
 
 private:
   boost::signals2::connection mKernelAddedConnection;

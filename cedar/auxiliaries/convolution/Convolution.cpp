@@ -131,6 +131,8 @@ void cedar::aux::conv::Convolution::updateCombinedKernel()
     this->mCombinedKernel->lockForWrite();
     this->mCombinedKernel->setData(new_combined_kernel);
     this->mCombinedKernel->unlock();
+
+    emit combinedKernelUpdated();
   }
   catch (cedar::aux::DimensionalityMismatchException& exc)
   {

@@ -80,6 +80,7 @@ _mLimit(new cedar::aux::DoubleParameter(this, "limit", limit, 0.01, 1000.0))
 {
   this->_mLimit->markAdvanced();
   this->_mShifts->markAdvanced();
+  this->_mNormalize->markAdvanced();
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setDimensionality(dimensionality);
   
