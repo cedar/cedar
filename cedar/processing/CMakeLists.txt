@@ -161,6 +161,7 @@ cedar_add_library(cedarproc
   sources/Video.h
   sources/GrabberBase.h
   sources/Camera.h
+  sources/CameraStream.h
   sources/SpatialTemplate.h
   sources/LinearSpatialTemplate.h
   sources/ConstDiagonalMatrix.h
