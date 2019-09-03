@@ -108,7 +108,6 @@ cedar::proc::sources::CameraStream::~CameraStream()
 void cedar::proc::sources::CameraStream::compute(const cedar::proc::Arguments&)
 {
     //cap->set(cv::CAP_PROP_BUFFERSIZE, _mBufferSize->getValue());
-    cap->set(cv::CAP_PROP_BUFFERSIZE, 1);
     if(!this->cap->isOpened()){
         this->setState(cedar::proc::Step::STATE_EXCEPTION, "Error opening video stream");
         return;
