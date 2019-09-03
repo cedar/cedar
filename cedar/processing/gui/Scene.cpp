@@ -39,6 +39,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/configuration.h"
 #include "cedar/processing/gui/CouplingCollection.h"
 #include "cedar/processing/gui/ResizeHandle.h"
 #include "cedar/processing/gui/Scene.h"
@@ -454,7 +455,8 @@ void cedar::proc::gui::Scene::itemSelected()
           this->mpCommentWidget->clear();
         }
       }
-      
+
+#ifdef CEDAR_USE_PYTHON
       auto connectable_pythonScript = boost::dynamic_pointer_cast<cedar::proc::steps::PythonScript>(p_element->getElement());
       if (this->mpCodeWidget != nullptr)
       {
@@ -476,6 +478,7 @@ void cedar::proc::gui::Scene::itemSelected()
           mpeParentView->showCodeWidget();
         }
       }
+#endif      
     }
     else if (auto coupling = dynamic_cast<cedar::proc::gui::CouplingCollection*>(p_item))
     {
@@ -501,7 +504,7 @@ void cedar::proc::gui::Scene::itemSelected()
     {
       this->mpCommentWidget->clear();
     }
-    
+
     if (this->mpCodeWidget != nullptr)
     {
       this->mpCodeWidget->clear();

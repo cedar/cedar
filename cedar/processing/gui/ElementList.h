@@ -136,6 +136,9 @@ private:
       cedar::aux::ConstPluginDeclaration* getDeclarationFromIndex(const QModelIndex& index) const;
 
     private:
+
+      void removePythonTemplateFromJSON(std::string);
+
       QStandardItem* makeItemFromElementDeclaration(cedar::proc::ConstElementDeclarationPtr declaration);
 
       QStandardItem* makeItemFromGroupDeclaration(cedar::proc::ConstGroupDeclarationPtr declaration);

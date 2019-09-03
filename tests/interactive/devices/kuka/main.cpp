@@ -59,7 +59,7 @@ int main(int argc, char **argv)
   std::string mode = "0";
 
   auto robot = boost::make_shared< cedar::dev::Robot >();
-  robot->readJson("resource://robots/caren/fri_configuration.json");
+  robot->readJson("resource://robots/caren/hardware_configuration.json");
 
   QApplication a(argc, argv);
 
@@ -77,7 +77,8 @@ int main(int argc, char **argv)
   p_kinematic_chain_widget = new cedar::dev::gui::KinematicChainWidget(p_arm);
   p_kinematic_chain_widget->show();
 
-  p_arm->startCommunication();
+  //p_arm->startCommunication();
+  robot->startCommunicationOfComponents();
 
   a.exec();
 

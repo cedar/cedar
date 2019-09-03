@@ -39,6 +39,7 @@
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
+#ifdef CEDAR_USE_PYTHON
 
 // CEDAR INCLUDES
 #include "cedar/processing/lib.h"
@@ -50,7 +51,6 @@
 
 
 
-#ifdef PYTHONLIBS_FOUND
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
@@ -63,7 +63,8 @@ namespace cedar
   }
 }
 //!@endcond
-#endif
+
+#endif // CEDAR_USE_PYTHON
 
 
 #endif // CEDAR_PROC_STEPS_PYTHON_SCRIPT_FWD_H

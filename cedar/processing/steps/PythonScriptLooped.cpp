@@ -60,7 +60,8 @@ SOFTWARE.
 
 
 // CEDAR CONFIGURATION
-//#include "cedar/configuration.h"
+#include "cedar/configuration.h"
+#ifdef CEDAR_USE_PYTHON
 
 // CLASS HEADER
 #include "cedar/processing/steps/PythonScriptLooped.h"
@@ -76,7 +77,6 @@ SOFTWARE.
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
 
-#if CV_MAJOR_VERSION < 3
 namespace
 {
   bool declare()
@@ -106,8 +106,6 @@ namespace
   bool declared = declare();
 }
 
-#endif
-
 cedar::proc::steps::PythonScriptLooped::PythonScriptLooped()
 :
 cedar::proc::steps::PythonScript(true)
@@ -120,4 +118,4 @@ cedar::proc::steps::PythonScriptLooped::~PythonScriptLooped()
   
 }
 
-
+#endif // CEDAR_USE_PYTHON

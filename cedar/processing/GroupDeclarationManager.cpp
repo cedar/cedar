@@ -76,6 +76,19 @@ void cedar::proc::GroupDeclarationManager::addDeclaration(cedar::proc::ConstGrou
   }
 }
 
+bool cedar::proc::GroupDeclarationManager::removeDeclaration(std::string className)
+{
+  if (this->mDeclarations.find(className) == this->mDeclarations.end())
+  {
+    return false;
+  }
+  else
+  {
+    this->mDeclarations.erase(className);
+    return true;
+  }
+}
+
 cedar::proc::ElementPtr cedar::proc::GroupDeclarationManager::addGroupTemplateToGroup(const std::string& templateName, cedar::proc::GroupPtr base, bool makeLink) const
 {
   auto iter = this->mDeclarations.find(templateName);

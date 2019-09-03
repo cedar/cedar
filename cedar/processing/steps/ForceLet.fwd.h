@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+    Copyright 2011, 2012, 2013, 2014, 2015, 2016 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,24 +22,23 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CodeWidget.fwd.h
+    File:        ForceLet.fwd.h
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
-    Date:        2019 04 08
+    Maintainer:  Daniel Sabinasz
+    Email:       daniel.sabinasz@ini.rub.de
+    Date:        2019 08 15
 
-    Description: Implementation of the @em cedar::aux::gui::CodeWidget class.
+    Description: Forward declaration file for the class cedar::proc::steps::ForceLet
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_PROC_GUI_CODE_WIDGET_FWD_H
-#define CEDAR_PROC_GUI_CODE_WIDGET_FWD_H
+#ifndef CEDAR_PROC_STEPS_FORCELET_FWD_H
+#define CEDAR_PROC_STEPS_FORCELET_FWD_H
 
 // CEDAR CONFIGURATION
-
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/lib.h"
@@ -49,20 +48,20 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
+
 namespace cedar
 {
   namespace proc
   {
-    namespace gui
+    namespace steps
     {
-      CEDAR_DECLARE_PROC_CLASS(CodeWidget);
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_PROC_CLASS(ForceLet);
+      //!@endcond
     }
   }
 }
 
-//!@endcond
 
-
-#endif // CEDAR_PROC_GUI_CODE_WIDGET_FWD_H
+#endif // CEDAR_PROC_STEPS_FORCELET_FWD_H
 

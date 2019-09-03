@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/math/functions.h"
+#include "cedar/processing/steps/TransferFunction.h"
 //#include <boost/enable_shared_from_this.hpp>
 
 #include "HebbianConnection.fwd.h"
@@ -72,6 +73,9 @@ class cedar::dyn::steps::HebbianConnection : public cedar::dyn::Dynamics
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  typedef cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction> SigmoidParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(SigmoidParameter);
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -98,6 +102,7 @@ public:
 public slots:
   //!@brief This slot is connected to the valueChanged() event of the gain value parameter.
  void updateAssociationDimension();
+ void updateInputDimension();
  void resetWeights();
  void toggleUseReward();
  void toggleUseManualWeights();
@@ -126,21 +131,35 @@ private:
 
   void reset();
 
+  unsigned int determineWeightDimension();
+
+  unsigned int determineWeightSizes(unsigned int dimension);
+
+  cv::Mat calculateWeightChange(cv::Mat inputActivation,cv::Mat associationActivation);
+
+  cv::Mat calculateOutputMatrix( cv::Mat mat);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief The factor by which the input is multiplied.
+  cedar::aux::UIntParameterPtr mInputDimension;
+  cedar::aux::UIntVectorParameterPtr mInputSizes;
   cedar::aux::UIntParameterPtr mAssociationDimension;
   cedar::aux::UIntVectorParameterPtr mAssociationSizes;
   cedar::aux::DoubleParameterPtr mLearnRatePositive;
+  SigmoidParameterPtr mSigmoid;
   cedar::aux::BoolParameterPtr mUseRewardDuration;
   cedar::aux::DoubleParameterPtr mRewardDuration;
   cedar::aux::BoolParameterPtr mSetWeights;
   cedar::aux::DoubleVectorParameterPtr mWeightCenters;
   cedar::aux::DoubleVectorParameterPtr mWeightSigmas;
   cedar::aux::DoubleParameterPtr mWeightAmplitude;
+  cedar::aux::DoubleParameterPtr mWeightInitBase;
+  cedar::aux::DoubleParameterPtr mWeightInitNoiseRange;
+
 
 private:
 
@@ -165,6 +184,8 @@ private:
   cedar::aux::ConstMatDataPtr mReadOutTrigger;
   unsigned int mWeightSizeX;
   unsigned int mWeightSizeY;
+
+
 };// class cedar::dyn::steps::ImprintHebb
 
 

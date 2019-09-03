@@ -244,7 +244,7 @@ private:
   cedar::proc::gui::RecorderWidget* mpRecorderWidget;
 
   cedar::proc::gui::CommentWidget* mpCommentWidget;
-  
+
   cedar::proc::gui::CodeWidget* mpCodeWidget;
   QWidget* mpCodeTabWidget;
   QString mpCodeTabLabel;

@@ -39,8 +39,7 @@
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-
-#ifdef PYTHONLIBS_FOUND
+#ifdef CEDAR_USE_PYTHON
 
 // CEDAR INCLUDES
 #include "cedar/processing/steps/PythonScript.h"
@@ -113,7 +112,7 @@ private:
 
 };
 
-#endif
+#endif // CEDAR_USE_PYTHON
 
 #endif // CEDAR_PROC_STEPS_PYTHON_SCRIPT_LOOPED_H
 
