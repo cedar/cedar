@@ -39,7 +39,6 @@
 
 #include "cedar/configuration.h"
 #include <QCloseEvent>
-#include <QGLFramebufferObject>
 
 
 // CEDAR INCLUDES
@@ -56,6 +55,8 @@
 #if defined CEDAR_USE_GLEW
 #include <glew.h>
 #endif
+
+#include <QGLFramebufferObject>
 #include <qglviewer.h>
 #ifdef CEDAR_USE_QT5
 #include <manipulatedFrame.h>
