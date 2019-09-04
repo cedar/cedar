@@ -117,11 +117,23 @@ void cedar::proc::sources::CameraStream::compute(const cedar::proc::Arguments&)
     {
         this->mStream->setData(frame);
     }
+    else
+    {
+      this->setState(cedar::proc::Step::STATE_EXCEPTION, "Error reading video stream");
+    }
+}
+
+void cedar::proc::sources::CameraStream::reset()
+{
+  if(this->cap->isOpened()){
+    this->cap->release();
+  }
+  delete this->cap;
+  this->cap = new cv::VideoCapture(this->_mURL->getValue());
 }
 
 void cedar::proc::sources::CameraStream::recompute()
 {
-    this->cap->release();
-    this->cap = new cv::VideoCapture(this->_mURL->getValue());
-    this->onTrigger();
+  this->reset();
+  this->onTrigger();
 }
