@@ -828,9 +828,15 @@ void cedar::dyn::NeuralField::updateEducationalKernel()
         secondDimRight= firstDimLeft;
       }
     }
+
+
+    cv::copyMakeBorder(curkernel, paddedKernel, firstDimLeft, firstDimRight, secondDimLeft, secondDimRight , cv::BORDER_CONSTANT, 0.0);
+    this->mLateralKernelEducational->setData(paddedKernel+this->mGlobalInhibition->getValue());
   }
 
-  cv::copyMakeBorder(curkernel, paddedKernel, firstDimLeft, firstDimRight, secondDimLeft, secondDimRight , cv::BORDER_CONSTANT, 0.0);
+  if(this->getDimensionality()>2 || this->getDimensionality() < 1)
+  {
+    this->mLateralKernelEducational->setData(curkernel +this->mGlobalInhibition->getValue()); //TODO: ADD Padding for 3D
+  }
 
-  this->mLateralKernelEducational->setData(paddedKernel+this->mGlobalInhibition->getValue());
 }
