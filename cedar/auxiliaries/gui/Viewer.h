@@ -243,8 +243,9 @@ private:
   ///!@brief flag in order to be stored in Plotgroups
   std::string mViewerLabel;
 
-
+#ifdef CEDAR_USE_QGLVIEWER
   QGLFramebufferObject * m_fbo = nullptr;
+#endif // CEDAR_USE_QGLVIEWER
 };
 
 #endif  // CEDAR_AUX_GUI_VIEWER_H
