@@ -371,7 +371,7 @@ void cedar::proc::steps::ColorConversion::updateCvConvertConstant()
 #if CEDAR_OPENCV_MAJOR_VERSION >= 3
                           cv::COLOR_HLS2BGR
 #else
-                      CV_HSL2BGR
+                      CV_HLS2BGR
 #endif
                           ;
                   break;
