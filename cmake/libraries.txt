@@ -80,8 +80,8 @@ if(CEDAR_USE_QT5 OR NOT QT4_FOUND)
   # Try to find Qt57 Libraries
   find_package(QT57)
   if(QT_FOUND AND NOT CEDAR_USE_QT5)
-    SET(CEDAR_USE_QT5 1)
-  endif(QT_FOUND)
+    SET(CEDAR_USE_QT5 1 BOOL "Use Qt5 and the associated plot libraries.")
+  endif(QT_FOUND AND NOT CEDAR_USE_QT5)
 endif(CEDAR_USE_QT5 OR NOT QT4_FOUND)
 
 if(NOT QT_FOUND)
