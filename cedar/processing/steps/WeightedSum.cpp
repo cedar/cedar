@@ -115,13 +115,16 @@ void cedar::proc::steps::WeightedSum::compute(const cedar::proc::Arguments& /*ar
       {
         float inputValue = inputValueMat.at<float>(i, j);
 
-        cv::Mat weights = cv::Mat::zeros(2, 1, CV_32F);
-        weights.at<float>(0, 0) = mWeightsX->getData().at<float>(i, 0);
-        weights.at<float>(1, 0) = mWeightsY->getData().at<float>(j, 0);
+        //cv::Mat weights = cv::Mat::zeros(2, 1, CV_32F);
+        std::vector<float> weightsXY;
+        weightsXY.push_back(mWeightsX->getData().at<float>(i, 0));
+        weightsXY.push_back(mWeightsY->getData().at<float>(j, 0));
+        //weights.at<float>(0, 0) = mWeightsX->getData().at<float>(i, 0);
+        //weights.at<float>(1, 0) = mWeightsY->getData().at<float>(j, 0);
 
         for (unsigned int d = 0; d < _mDimensionality->getValue(); d++)
         {
-          weightedSum.at<float>(d, 0) = weightedSum.at<float>(d, 0) + weights.at<float>(d, 0) * inputValue;
+          weightedSum.at<float>(d, 0) = weightedSum.at<float>(d, 0) + weightsXY.at(d) * inputValue;
         }
       }
     }

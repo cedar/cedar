@@ -135,10 +135,17 @@ void cedar::aux::gui::Viewer::timerEvent(QTimerEvent*)
 {
   bool move =false;
 #ifdef CEDAR_USE_QGLVIEWER
-  if(!this->isVisible()){
+  if(!this->isVisible())
+  {
     hiddenUpdate();
   }
-  else{
+  else
+  {
+    if (m_fbo)
+    {
+      m_fbo->release();
+      //m_fbo->bindDefault();//This does not help to bring the View on the Robot Back
+    }
     update();
   }
   if(mOldPos != camera()->position()){
@@ -151,17 +158,20 @@ void cedar::aux::gui::Viewer::timerEvent(QTimerEvent*)
   }
 #endif
   if (move)
+  {
     emit cameraMoved();
+  }
   emit updated();
 }
 
 #ifdef CEDAR_USE_QGLVIEWER
-void cedar::aux::gui::Viewer::hiddenUpdate(){
+void cedar::aux::gui::Viewer::hiddenUpdate()
+{
   // regular draw doesn't work while the Widget is hidden
-
   makeCurrent();
 
   //paintGL();
+
 
   if (!m_fbo || m_fbo->width() != width() || m_fbo->height() != height())
   {
@@ -171,34 +181,41 @@ void cedar::aux::gui::Viewer::hiddenUpdate(){
     format.setAttachment(QGLFramebufferObject::CombinedDepthStencil);
     m_fbo = new QGLFramebufferObject(width(), height(), format);
     resizeGL(width(), height());
+
+
   }
 
-
   //bind FBO and render stuff with paintGL() call
+
   m_fbo->bind();
   paintGL();
 
   QImage qimage = m_fbo->toImage();
 
-  cv::Mat  mat( qimage.height(), qimage.width(),
-                CV_8UC4,
-                const_cast<uchar*>(qimage.bits()),
-                static_cast<size_t>(qimage.bytesPerLine())
-              );
+  cv::Mat mat(qimage.height(), qimage.width(),
+              CV_8UC4,
+              const_cast<uchar *>(qimage.bits()),
+              static_cast<size_t>(qimage.bytesPerLine())
+             );
   cv::Mat mat2 = cv::Mat(mat.rows, mat.cols, CV_8UC3);
-  int from_to[] = { 0,0, 1,1, 2,2 };
+  int from_to[] = {0, 0, 1, 1, 2, 2};
   cv::mixChannels(&mat, 1, &mat2, 1, from_to, 3);
 
   //apply the new content to the channel image
-  //mpGrabberLock->lockForWrite();
-  mGrabberBuffer = mat2;
-  //mpGrabberLock->unlock();
+  if (mpGrabberLock)
+  {
+    mpGrabberLock->lockForWrite();
+    mGrabberBuffer = mat2;
+    mpGrabberLock->unlock();
+  }
 
-  m_fbo->release();
+
+//  m_fbo->release(); // This allows the default framebuffer to render again..
+
 
   //bind default framebuffer again. not sure if this necessary
   //and isn't supposed to use defaultFramebuffer()...
-  m_fbo->bindDefault();
+//  m_fbo->bindDefault(); // Removed this for now
   //doneCurrent();
 }
 #endif
@@ -261,6 +278,7 @@ void cedar::aux::gui::Viewer::deregisterGrabber(QReadWriteLock* lock)
 {
   // only allow grabber with correct QReadWriteLock to disconnect
   // i.e., use the pointer-address of the QReadWriteLock as unique id
+//  std::cout<<"Deregister a Grabber!"<<std::endl;
   if (mpGrabberLock && (lock == mpGrabberLock))
   {
     delete mpGrabberLock;

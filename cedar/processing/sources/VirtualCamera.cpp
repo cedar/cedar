@@ -106,7 +106,6 @@ cedar::proc::sources::VirtualCamera::VirtualCamera()
   QObject::connect(mpViewer.get(), SIGNAL(cameraMoved()), this, SLOT(cameraPositionChangedFromViewport()));
   QObject::connect(mpViewer.get(), SIGNAL(cameraMoved()), this, SLOT(cameraOrientationChangedFromViewport()));
 
-  QObject::connect(mpViewer.get(), SIGNAL(updated()), this, SLOT(updateOutput()));
 
   QObject::connect(this , SIGNAL(destroyed()), mpViewer.get(), SLOT(deleteLater()));
 
@@ -129,6 +128,7 @@ cedar::proc::sources::VirtualCamera::~VirtualCamera() {
   ///     object parameters persist throughout different sessions
   ///     and even after logging out entirely
 
+//  std::cout<<"Virtual Camera Destroy!"<<std::endl;
   mpViewer.get()->deregisterGrabber(mLock);
   mpViewer.get()->close();
 }
@@ -137,30 +137,22 @@ cedar::proc::sources::VirtualCamera::~VirtualCamera() {
 void cedar::proc::sources::VirtualCamera::compute(const cedar::proc::Arguments &) {
   mLock->lockForRead();
 
+
+//  std::cout<<"Virtual Camera Compute"<<std::endl;
   auto image = mpViewer.get()->grabImage();
 
-  if (!image.empty()) {
+  if (!image.empty())
+  {
     image.resize(mOutputSizes->at(0), mOutputSizes->at(1));
-    this->mpOutput->setData(image);
-  }
-  mLock->unlock();
-}
-
-void cedar::proc::sources::VirtualCamera::updateOutput() {
-  mLock->lockForRead();
-
-  auto image = mpViewer.get()->grabImage();
-
-  if (!image.empty()) {
-    image.resize(mOutputSizes->at(0), mOutputSizes->at(1));
-    this->mpOutput->setData(image);
-
+    auto clonedImage = image.clone();
+    this->mpOutput->setData(clonedImage);
   }
   mLock->unlock();
 }
 
 void cedar::proc::sources::VirtualCamera::resolutionChanged() {
   cv::Mat new_output_mat = cv::Mat(mOutputSizes->at(0), mOutputSizes->at(1), CV_8UC3);
+//  std::cout<<"VC ResolutionChanged"<<std::endl;
   mpOutput->setData(new_output_mat);
 
   mpViewer.get()->setFixedSize(mOutputSizes->at(1), mOutputSizes->at(0));

@@ -74,8 +74,6 @@ public slots:
   void cameraOrientationChanged();
   void cameraPositionChangedFromViewport();
   void cameraOrientationChangedFromViewport();
-  //!@brief temporary fix for updating outputs, please replace
-  void updateOutput();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

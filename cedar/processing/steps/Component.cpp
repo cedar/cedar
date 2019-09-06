@@ -424,10 +424,12 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
     std::string name = component->getNameForMeasurementType(measurement);
     if(auto measurementDataOriginal = component->getMeasurementData(measurement))
     {
-      auto measurementData = measurementDataOriginal; // There was a clone here that seemed unneccesary and only caused a crash on windows.
-      if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(measurementData))
+//      auto measurementData = measurementDataOriginal; // There was a clone here that seemed unneccesary and only caused a crash on windows.
+      if (auto measurementData = boost::dynamic_pointer_cast<const cedar::aux::MatData>(measurementDataOriginal))
       {
-        cv::Mat measurementMat = measurementData->getData<cv::Mat>().clone();
+        QReadLocker measurementLocker(&measurementData->getLock());
+        cv::Mat measurementMat = measurementData->getData().clone();
+        measurementLocker.unlock();
         std::string name = component->getNameForMeasurementType(measurement);
         if(auto outPutPtr = mOutputs.at(name))
         {
