@@ -47,7 +47,6 @@ set (CEDAR_PORTABLE_MAC_BUNDLE_PATHS      0           CACHE BOOL "Rename directo
 set (CEDAR_PORTABLE_MINIMAL_VERSION       0           CACHE BOOL "The portable version requires only minimal dependencies.")
 set (CEDAR_BUILD_DEBUG_VERSION            0           CACHE BOOL "Build with debug information?")
 set (CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS    0           CACHE BOOL "Use opencv debug libraries when building in debug mode?")
-set (CEDAR_USE_QT5                        1           CACHE BOOL "Use Qt5 and the associated plot libraries.")
 #set (CEDAR_STOP_ON_MISSING_LIBRARIES     0           CACHE BOOL "Stop when libraries cannot be found by cmake?")
 set (CEDAR_INCLUDE_YARP                   0           CACHE BOOL "Compile cedar with YARP to communicate over Network")
 set (CEDAR_INCLUDE_PYTHON                 0           CACHE BOOL "Compile cedar with PYTHON to use the Python Step (in development, linux only currently)")
@@ -77,16 +76,12 @@ set(Boost_DEBUG OFF)
 
 # mandatory dependencies
 set (CEDAR_OPENCV_CMAKE_DIR "${CEDAR_LIB_DIR}/installed/x64-windows/share/opencv"     CACHE PATH "Directory where CMake will find the OpenCVConfig.cmake file.")
-set (CEDAR_DEPENDENCY_QWT "${CEDAR_LIB_DIR}/installed/x64-windows/share/qwt"             CACHE PATH "This is the default path in which cedar tries to find qwt.")
-set (CEDAR_DEPENDENCY_QWTPLOT3D "${CEDAR_LIB_DIR}" CACHE PATH "This is the default path in which cedar tries to find qwtplot3d.")
 set (CEDAR_DEPENDENCY_QGLVIEWER "${CEDAR_LIB_DIR}/installed/x64-windows/include/libqglviewer" CACHE PATH "This is the default path in which cedar tries to find QGLViewer.")
 set (CEDAR_DEPENDENCY_QT5 "${CEDAR_LIB_DIR}/installed/x64-windows/tools/qt5" CACHE PATH "This is the default path in which cedar tries to find the QT5Library.")
 set (CEDAR_DEPENDENCY_GLEW "${CEDAR_LIB_DIR}/installed/x64-windows/include/gl" CACHE PATH "This is the default path in which cedar tries to find the GLEW library.")
 set (CEDAR_DEPENDENCY_LIBRARIES "${CEDAR_LIB_DIR}/installed/x64-windows/lib"    CACHE PATH "This is the default path in which cedar tries to find external libraries.")
 
-if(CEDAR_USE_QT5)
-  set(QT_UIC_EXECUTABLE ${CEDAR_DEPENDENCY_QT5}/uic.exe)
-endif(CEDAR_USE_QT5)
+set(QT_UIC_EXECUTABLE ${CEDAR_DEPENDENCY_QT5}/uic.exe)
 
 # optional dependencies
 set (CEDAR_DEPENDENCY_FFTW "${CEDAR_LIB_DIR}/installed/x64-windows/include"                CACHE PATH "This is the default path in which cedar tries to find FFTW.")
