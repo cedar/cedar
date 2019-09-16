@@ -55,34 +55,11 @@ endif()
 # Qt
 message("-- Searching for Qt...")
 
-# TODO: We need compiler flags to tell what libraries to include.. for now CEDAR_USE_QT5 will be set in the cedar.conf file
-if(NOT CEDAR_USE_QT5)
-  # Try to find Qt4
-  message("-- looking for Qt4...")
-
-  find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml QtSvg)
-  if(QT4_FOUND)
-    message("--QT4 was found")
-    set(QT_VERSION 4)
-    include(${QT_USE_FILE})
-    set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${QT_LIBRARIES})
-    include_directories(${QT_INCLUDE_DIRS})
-    if (CEDAR_VERBOSE_BUILD_SYSTEM)
-      message("   Qt was found in ${QT_INCLUDE_DIRS}")
-    endif(CEDAR_VERBOSE_BUILD_SYSTEM)
-  else (QT4_FOUND)
-    message("    Qt4 was not found.")
-  endif(QT4_FOUND)
-  SET(QT_FOUND ${QT4_FOUND})
-endif(NOT CEDAR_USE_QT5)
-
-if(CEDAR_USE_QT5 OR NOT QT4_FOUND)
-  # Try to find Qt57 Libraries
-  find_package(QT57)
-  if(QT_FOUND AND NOT CEDAR_USE_QT5)
+# Try to find Qt5 Libraries
+find_package(QT57)
+if(QT_FOUND AND NOT CEDAR_USE_QT5)
     SET(CEDAR_USE_QT5 1 BOOL "Use Qt5 and the associated plot libraries.")
-  endif(QT_FOUND AND NOT CEDAR_USE_QT5)
-endif(CEDAR_USE_QT5 OR NOT QT4_FOUND)
+endif(QT_FOUND AND NOT CEDAR_USE_QT5)
 
 if(NOT QT_FOUND)
   message(${CEDAR_LIB_ERROR_TYPE} "   Required library qt was not found on your system! 
@@ -248,68 +225,6 @@ set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
     endif(CEDAR_INCLUDE_YARP)
 
 if(NOT CEDAR_PORTABLE_MINIMAL_VERSION)
-
-
-    # libQwt
-    option(CEDAR_USE_QWT "Include Qwt based plots if possible." ON)
-    message("-- Searching for qwt...")
-    find_package(Qwt)
-    if(qwt_FOUND)
-      if (CEDAR_VERBOSE_BUILD_SYSTEM)
-        message("-- qwt was found in ${qwt_INCLUDE_DIRS}")
-      else()
-        message("-- qwt was found")
-      endif()
-      set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${qwt_LIBS})
-      include_directories(${qwt_INCLUDE_DIRS})
-    else(qwt_FOUND)
-      message("-- Qwt not found")
-      set(CEDAR_USE_QWT OFF)
-    endif(qwt_FOUND)
-
-    # qwtplot3d
-    option(CEDAR_USE_QWTPLOT3D "Include QwtPlot3d surface plots if possible." ON)
-    message("-- Searching for qwtplot3d...")
-    find_package(QwtPlot3D)
-    if(qwtplot3d_FOUND)
-      if (CEDAR_VERBOSE_BUILD_SYSTEM)
-        message("-- qwtplot3d was found in ${qwtplot3d_INCLUDE_DIRS}")
-      else()
-        message("-- qwtplot3d was found.")
-      endif()
-      set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${qwtplot3d_LIBS})
-      include_directories(${qwtplot3d_INCLUDE_DIRS})
-    else(qwtplot3d_FOUND)
-      message("-- QwtPlot3d not found")
-      set(CEDAR_USE_QWTPLOT3D OFF)
-    endif(qwtplot3d_FOUND)
-
-    # VTK
-    option(CEDAR_USE_VTK "Include VTK plots if possible." ON)
-    message("-- Searching for VTK...")
-    find_package(VTK)
-
-    # We only support vtk 5.6 and upwards.
-    # If Qt5 is used we have to disable Vtk unless it is Vtk 6.1 which probably will have Qt5 Support (not released yet)
-    if(VTK_FOUND AND (QT4_FOUND OR (VTK_MAJOR_VERSION GREATER 5 AND VTK_MINOR_VERSION GREATER 0)) AND (VTK_MAJOR_VERSION GREATER 5 OR (VTK_MAJOR_VERSION EQUAL 5 AND VTK_MINOR_VERSION GREATER 5)))
-      if (CEDAR_VERBOSE_BUILD_SYSTEM)
-        message("-- VTK ${VTK_VERSION} was found in ${VTK_INCLUDE_DIRS}")
-      else()
-        message("-- VTK ${VTK_VERSION} was found")
-      endif()
-
-      set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${VTK_LIBRARIES})
-
-      # Vtk 5 must explicitly link qvtk
-      if(NOT VTK_MAJOR_VERSION GREATER 5)
-        set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} QVTK)
-      endif()
-
-      include(${VTK_USE_FILE})
-    else()
-      message("-- VTK 5.6 or higher not found")
-      set(CEDAR_USE_VTK OFF)
-    endif()
 
     # libFRI
     option(CEDAR_USE_KUKA_LWR "Include Kuka Fast Research Interface for LWR if possible." ON)

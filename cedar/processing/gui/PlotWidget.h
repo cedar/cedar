@@ -41,6 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/Step.h"
@@ -95,6 +96,11 @@ namespace cedar
 
         private slots:
           void openDefaultPlot();
+          void openHistoryPlot();
+          void openQCPlot();
+          void openQt5Plot();
+          void openImagePlot();
+          void openMatDataPlot();
 
           void openSpecificPlot();
 

@@ -58,7 +58,6 @@ set (CEDAR_PORTABLE_MAC_BUNDLE_PATHS      0           CACHE BOOL "Rename directo
 set (CEDAR_PORTABLE_MINIMAL_VERSION       0           CACHE BOOL "The portable version requires only minimal dependencies.")
 set (CEDAR_BUILD_DEBUG_VERSION            0           CACHE BOOL "Build with debug information?")
 set (CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS    0           CACHE BOOL "Use opencv debug libraries when building in debug mode?")
-set (CEDAR_USE_QT5                        0           CACHE BOOL "Use Qt5 and the associated plot libraries.")
 #set (CEDAR_STOP_ON_MISSING_LIBRARIES     0           CACHE BOOL "Stop when libraries cannot be found by cmake?")
 set (CEDAR_INCLUDE_YARP                   1          CACHE BOOL "Compile cedar with YARP to communicate over Network")
 set (CEDAR_INCLUDE_PYTHON                 0          CACHE BOOL "Compile cedar with PYTHON to use the Python Step (in development, linux only currently)")
@@ -71,16 +70,12 @@ set (CEDAR_BUILD_VALGRIND_CHECK           0           CACHE BOOL "Execute valgri
 
 # mandatory dependencies
 set (CEDAR_OPENCV_CMAKE_DIR "/usr/share/OpenCV"     CACHE PATH "Directory where CMake will find the OpenCVConfig.cmake file.")
-set (CEDAR_DEPENDENCY_QWT "/usr/include/qwt-qt4"             CACHE PATH "This is the default path in which cedar tries to find qwt.")
-set (CEDAR_DEPENDENCY_QWTPLOT3D "/usr/local/include/qwtplot3d" CACHE PATH "This is the default path in which cedar tries to find qwtplot3d.")
 set (CEDAR_DEPENDENCY_QGLVIEWER "/usr/include/QGLViewer" CACHE PATH "This is the default path in which cedar tries to find QGLViewer.")
 set (CEDAR_DEPENDENCY_QT5 "/opt/qt512/" CACHE PATH "This is the default path in which cedar tries to find the QT5Library.")
 set (CEDAR_DEPENDENCY_GLEW "/usr/local/lib" CACHE PATH "This is the default path in which cedar tries to find the GLEW library.")
 set (CEDAR_DEPENDENCY_LIBRARIES "/usr/local/lib"    CACHE PATH "This is the default path in which cedar tries to find external libraries.")
 
-if(CEDAR_USE_QT5)
-  set(QT_UIC_EXECUTABLE ${CEDAR_DEPENDENCY_QT5}/bin/uic)
-endif(CEDAR_USE_QT5)
+set(QT_UIC_EXECUTABLE ${CEDAR_DEPENDENCY_QT5}/bin/uic)
 
 # optional dependencies
 set (CEDAR_DEPENDENCY_FFTW "/usr/include"                 CACHE PATH "This is the default path in which cedar tries to find FFTW.")

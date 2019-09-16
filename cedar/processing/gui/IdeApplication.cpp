@@ -52,6 +52,7 @@
 
 // SYSTEM INCLUDES
 #include <QString>
+#include <QStyleFactory>
 #include <fstream>
 #include <cstdlib>
 #ifdef CEDAR_COMPILER_GCC
@@ -96,6 +97,8 @@ mCatchExceptions(true)
 
   parser.parse(argc, argv);
   parser.writeSummary();
+
+  this->QApplication::setStyle(QStyleFactory::create("Fusion"));//Forcing the same look and feel for all OS
 
   this->mCatchExceptions = !parser.hasParsedFlag("dont-catch-exceptions");
 

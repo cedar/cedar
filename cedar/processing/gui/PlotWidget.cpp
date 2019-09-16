@@ -213,8 +213,33 @@ void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openPlotFromDeclaration(c
 
 void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openDefaultPlot()
 {
-  // empty = default plot
-  this->openPlotFromDeclaration(std::string());
+    // empty = default plot
+    this->openPlotFromDeclaration(std::string());
+}
+
+void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openHistoryPlot()
+{
+    this->openPlotFromDeclaration(std::string("cedar::aux::gui::HistoryPlot"));
+}
+
+void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openQCPlot()
+{
+    this->openPlotFromDeclaration(std::string("cedar::aux::gui::QCMatrixPlot"));
+}
+
+void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openQt5Plot()
+{
+    this->openPlotFromDeclaration(std::string("cedar::aux::gui::Qt5MatrixPlot"));
+}
+
+void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openImagePlot()
+{
+    this->openPlotFromDeclaration(std::string("cedar::aux::gui::ImagePlot"));
+}
+
+void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openMatDataPlot()
+{
+    this->openPlotFromDeclaration(std::string("cedar::aux::gui::MatDataPlot"));
 }
 
 void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openSpecificPlot()
@@ -227,11 +252,56 @@ void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openSpecificPlot()
 void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::fillPlotOptions(QMenu* menu)
 {
   this->mpPlotSelector->setEnabled(true);
-  auto default_action = menu->addAction("default");
-  menu->addSeparator();
-  QObject::connect(default_action, SIGNAL(triggered()), this, SLOT(openDefaultPlot()));
+  //auto default_action = menu->addAction("default");
+  //menu->addSeparator();
+  //QObject::connect(default_action, SIGNAL(triggered()), this, SLOT(openDefaultPlot()));
 
-  try
+
+    if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->mpData)) {
+        switch (mat_data->getDimensionality()) {
+            case 0:
+            {
+                auto qc_action = menu->addAction("1D History Plot (default)");
+                QObject::connect(qc_action, SIGNAL(triggered()), this, SLOT(openQCPlot()));
+#ifdef CEDAR_USE_QT5_PLOTS
+                auto qt5_action = menu->addAction("1D History Plot (Qt5)");
+                QObject::connect(qt5_action, SIGNAL(triggered()), this, SLOT(openQt5Plot()));
+#endif // CEDAR_USE_QT5_PLOTS
+            }
+                break;
+            case 1:
+            {
+                auto qc_action = menu->addAction("Line Plot (default)");
+                QObject::connect(qc_action, SIGNAL(triggered()), this, SLOT(openQCPlot()));
+#ifdef CEDAR_USE_QT5_PLOTS
+                auto qt5_action = menu->addAction("Line Plot (Qt5)");
+                QObject::connect(qt5_action, SIGNAL(triggered()), this, SLOT(openQt5Plot()));
+#endif // CEDAR_USE_QT5_PLOTS
+                auto his_action = menu->addAction("2D History Plot (image)");
+                QObject::connect(his_action, SIGNAL(triggered()), this, SLOT(openHistoryPlot()));
+            }
+                break;
+            case 2:
+            {
+                auto ip_action = menu->addAction("2D image Plot (default)");
+                QObject::connect(ip_action, SIGNAL(triggered()), this, SLOT(openQCPlot()));
+#ifdef CEDAR_USE_QT5_PLOTS
+                auto qt5_action = menu->addAction("3D Plot (Qt5)");
+                QObject::connect(qt5_action, SIGNAL(triggered()), this, SLOT(openQt5Plot()));
+#endif // CEDAR_USE_QT5_PLOTS
+            }
+                break;
+            case 3:
+            {
+                auto md_action = menu->addAction("3D image Plot (default)");
+                QObject::connect(md_action, SIGNAL(triggered()), this, SLOT(openMatDataPlot()));
+            }
+                break;
+        }
+    }
+
+
+ /*try
   {
     auto declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find(mpData)->getData();
     for (auto declaration : declarations)
@@ -246,7 +316,8 @@ void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::fillPlotOptions(QMenu* me
     auto no_action = menu->addAction("no plots found");
     no_action->setEnabled(false);
     this->mpPlotSelector->setEnabled(false);
-  }
+  }*/
+
 }
 //!@endcond
 
