@@ -73,7 +73,7 @@ set (CEDAR_BUILD_VALGRIND_CHECK           0           CACHE BOOL "Execute valgri
 # mandatory dependencies
 set (CEDAR_OPENCV_CMAKE_DIR "/usr/share/OpenCV"     CACHE PATH "Directory where CMake will find the OpenCVConfig.cmake file.")
 set (CEDAR_DEPENDENCY_QGLVIEWER "/usr/include/QGLViewer" CACHE PATH "This is the default path in which cedar tries to find QGLViewer.")
-set (CEDAR_DEPENDENCY_QT5 "/opt/qt512/" CACHE PATH "This is the default path in which cedar tries to find the QT5Library.")
+set (CEDAR_DEPENDENCY_QT5 "/usr/lib/x86_64-linux-gnu/qt5" CACHE PATH "This is the default path in which cedar tries to find the QT5Library.")
 set (CEDAR_DEPENDENCY_GLEW "/usr/local/lib" CACHE PATH "This is the default path in which cedar tries to find the GLEW library.")
 set (CEDAR_DEPENDENCY_LIBRARIES "/usr/local/lib"    CACHE PATH "This is the default path in which cedar tries to find external libraries.")
 set(QT_UIC_EXECUTABLE ${CEDAR_DEPENDENCY_QT5}/bin/uic)
