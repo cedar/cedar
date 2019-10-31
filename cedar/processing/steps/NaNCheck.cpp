@@ -68,8 +68,8 @@ bool declare()
   declaration->setIconPath(":/steps/nan_check.svg");
   declaration->setDescription
   (
-    "If any entry in 'input' is NaN, replace the input 'input' by "
-    "the input 'replacement'."
+    "If any entry in 'input' is NaN or Infinite, replace the input 'input' by "
+    "the input 'replacement' of your specification."
   );
 
   declaration->declare();

@@ -67,7 +67,7 @@ namespace
     declaration->setIconPath(":/steps/log_time_interval.svg");
     declaration->setDescription
             (
-                    "Logs the time between two peak detector signals"
+                    "Logs the time between two peak detector signals."
             );
 
     declaration->declare();

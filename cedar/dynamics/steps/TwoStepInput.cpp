@@ -71,7 +71,7 @@ namespace
                             )
             );
     declaration->setIconPath(":/steps/two_step_input.svg");
-    declaration->setDescription("A special GaussInput that allows to switch the center of the Gaussian after a specific amount of time. This might represent a stimulus in the two-step paradigm");
+    declaration->setDescription("A special GaussInput that allows to switch the center of the Gaussian after a specific amount of time. This might represent a stimulus in the two-step paradigm.");
     declaration->deprecatedName("cedar.dynamics.steps.TwoStepInput");
 
     declaration->declare();

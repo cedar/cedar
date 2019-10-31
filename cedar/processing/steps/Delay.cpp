@@ -71,7 +71,7 @@ bool declare()
   declaration->setIconPath(":/steps/delay.svg");
   declaration->setDescription
   (
-    "Delays an input for exactly one time-step. Also provides the time difference between those two last time-steps."
+    "Delays an input for exactly one time-step. Also provides the measured actual time difference between those two last time-steps."
   );
 
   declaration->declare();
