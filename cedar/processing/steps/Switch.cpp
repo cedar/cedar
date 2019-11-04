@@ -76,7 +76,7 @@ namespace
       "as (factor) * (input 1) + (1 - factor) * (input 2). Thus, 'input one' and'input two' must be matrices, while "
       "factor must be a scalar.\n"
       "If the parameter \'make binary\' is set 'factor' will be interpreted "
-      "as a bool, i.e. all non-zero values will be interpreted as 1, making the switch 'binary'."
+      "as a boolean, i.e. all non-zero values will be interpreted as TRUE, making the switch effectively 'hard' or rather 'binary'."
     );
 
     declaration->declare();

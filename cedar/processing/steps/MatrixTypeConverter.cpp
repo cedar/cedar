@@ -69,7 +69,7 @@ namespace
     declaration->setIconPath(":/steps/matrix_type_conversion.svg");
     declaration->setDescription
     (
-      "Converts a matrix from one type to another, for example from "
+      "Converts a matrix from one variable type to another, for example from "
       "an Integer representation to a Float. Useful for preprocessing "
       "image data."
     );

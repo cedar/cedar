@@ -76,7 +76,7 @@ namespace
     declaration->setDescription("Generates a matrix with a "
       "Gaussian-shaped cone region. Indices closer to the center of the cone "
       "will have higher values. "
-      "The cone can be rotated and stretched by the parameters."
+      "The cone can be rotated and stretched by the parameters. "
       "Use this to generated a template for a spatial relation (e.g., to the left of). TODO: The parameters need some more explanation.");
 
     declaration->declare();
