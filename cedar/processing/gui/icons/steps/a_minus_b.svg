@@ -14,7 +14,7 @@
    height="400"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
    sodipodi:docname="a_minus_b.svg"
    inkscape:export-filename="/home/lompolbx/workspace/src/ObjectRecognitionPlugins/icons/simple_summation.png"
    inkscape:export-xdpi="9"
@@ -32,11 +32,11 @@
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1034"
-     inkscape:window-height="815"
-     inkscape:window-x="77"
-     inkscape:window-y="47"
-     inkscape:window-maximized="0"
+     inkscape:window-width="1920"
+     inkscape:window-height="995"
+     inkscape:window-x="0"
+     inkscape:window-y="28"
+     inkscape:window-maximized="1"
      showguides="true"
      inkscape:guide-bbox="true" />
   <defs
@@ -412,40 +412,40 @@
        sodipodi:cy="168.67506"
        sodipodi:rx="75.761444"
        sodipodi:ry="75.761444"
-       d="m 220.21326,168.67506 c 0,41.84189 -33.91956,75.76145 -75.76145,75.76145 -41.84189,0 -75.761441,-33.91956 -75.761441,-75.76145 0,-41.84189 33.919551,-75.76144 75.761441,-75.76144 41.84189,0 75.76145,33.91955 75.76145,75.76144 z"
+       d="m 220.21326,168.67506 a 75.761444,75.761444 0 0 1 -75.76145,75.76145 75.761444,75.761444 0 0 1 -75.761441,-75.76145 75.761444,75.761444 0 0 1 75.761441,-75.76144 75.761444,75.761444 0 0 1 75.76145,75.76144 z"
        transform="matrix(0.58545869,0,0,0.58545869,116.00086,738.75279)" />
     <text
        xml:space="preserve"
-       style="font-size:168.79953003px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:TeX Gyre Termes;-inkscape-font-specification:TeX Gyre Termes"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'TeX Gyre Termes';-inkscape-font-specification:'TeX Gyre Termes';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        x="18.485149"
        y="895.505"
-       id="text3041"
-       sodipodi:linespacing="125%"><tspan
+       id="text3041"><tspan
          sodipodi:role="line"
          id="tspan3043"
          x="18.485149"
-         y="895.505">A</tspan></text>
+         y="895.505"
+         style="font-size:168.79953003px;line-height:1.25">A</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:168.79953002999999967px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;font-family:TeX Gyre Termes;-inkscape-font-specification:TeX Gyre Termes"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'TeX Gyre Termes';-inkscape-font-specification:'TeX Gyre Termes';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;"
        x="275.8653"
        y="895.505"
-       id="text3045"
-       sodipodi:linespacing="125%"><tspan
+       id="text3045"><tspan
          sodipodi:role="line"
          id="tspan3047"
          x="275.8653"
-         y="895.505">B</tspan></text>
+         y="895.505"
+         style="font-size:168.79953003px;line-height:1.25;fill:#000000;">B</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;font-family:TeX Gyre Termes;-inkscape-font-specification:TeX Gyre Termes"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'TeX Gyre Termes';-inkscape-font-specification:'TeX Gyre Termes';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;"
        x="179.14285"
        y="869.50507"
-       id="text3049"
-       sodipodi:linespacing="125%"><tspan
+       id="text3049"><tspan
          sodipodi:role="line"
          id="tspan3051"
          x="179.14285"
-         y="869.50507">-</tspan></text>
+         y="869.50507"
+         style="font-size:144px;line-height:1.25;fill:#000000;">-</tspan></text>
   </g>
 </svg>
