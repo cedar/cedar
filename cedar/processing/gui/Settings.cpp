@@ -295,6 +295,17 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
                   "steps graphical representation. Feel free to jot down notes or explain "
                   "your architecture with the help of the new comments tab.</p>"
           );
+
+  this->addOneTimeMessage
+          (
+                  CEDAR_MAKE_VERSION(6, 1, 0), // introduces in this version
+                  "connection anchor",
+                  "Add drag nodes for connections",
+                  "<p>You can now add \"drag nodes\" to any connection by double-clicking "
+                  "on a connection, at the position where you want the node to appear. You can also do this "
+                  "by right-clicking on the connection and selecting \"add drag node\". "
+                  "This adds a small circle which can be dragged to customize the path of the connection.</p>"
+          );
 }
 
 cedar::proc::gui::Settings::UserDefinedColor::UserDefinedColor(const std::string& stringToParse)
