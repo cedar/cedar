@@ -69,18 +69,19 @@ cedar::proc::gui::Connection::Connection
 :
 mpSource(nullptr),
 mpTarget(nullptr),
-mpArrowStart(nullptr),
 mpArrowEnd(nullptr),
 mValidity(CONNECT_NOT_SET),
 mSmartMode(false),
 mHighlight(false),
 mHighlightHover(false),
-mBaseLineWidth(2.5)
+mBaseLineWidth(2.5),
+mAnchorPointRadius(4)
 {
   this->setFlags(this->flags() | QGraphicsItem::ItemStacksBehindParent | QGraphicsItem::ItemIsSelectable);
   this->setHighlightedBySelection(false);
 
   this->setSourceAndTarget(pSource, pTarget);
+
 }
 
 cedar::proc::gui::Connection::~Connection()
@@ -163,6 +164,25 @@ void cedar::proc::gui::Connection::setSourceAndTarget(cedar::proc::gui::Graphics
   this->updateGraphics();
 }
 
+QGraphicsPolygonItem* cedar::proc::gui::Connection::createArrow()
+{
+  QVector<QPointF> arrow;
+  double arrow_size_factor = std::max(4.0 - this->mBaseLineWidth, 0.9);
+
+  arrow.push_back(QPointF(arrow_size_factor * this->mBaseLineWidth, 0.0));
+  arrow.push_back(QPointF(-arrow_size_factor * this->mBaseLineWidth, 0.0));
+  arrow.push_back(QPointF(0.0, 1.6 * arrow_size_factor * this->mBaseLineWidth));
+
+  QGraphicsPolygonItem* arrowPolygon = new QGraphicsPolygonItem(this);
+  arrowPolygon->setPolygon(QPolygonF(arrow));
+  return arrowPolygon;
+}
+
+cedar::proc::gui::ConnectValidity cedar::proc::gui::Connection::getValidity()
+{
+  return mValidity;
+}
+
 void cedar::proc::gui::Connection::updateGraphics()
 {
   if (!this->mpSource || !this->mpTarget)
@@ -176,33 +196,51 @@ void cedar::proc::gui::Connection::updateGraphics()
   pen.setCapStyle(Qt::RoundCap);
   pen.setJoinStyle(Qt::RoundJoin);
 
-  QVector<QPointF> arrow;
-  double arrow_size_factor = std::max(4.0 - this->mBaseLineWidth, 0.9);
-
-  arrow.push_back(QPointF(arrow_size_factor * this->mBaseLineWidth, 0.0));
-  arrow.push_back(QPointF(-arrow_size_factor * this->mBaseLineWidth, 0.0));
-  arrow.push_back(QPointF(0.0, 1.6 * arrow_size_factor * this->mBaseLineWidth));
-
-  if (!this->mpArrowStart)
+  if(this->mpArrows.size() > this->mConnectionAnchorPoints.size() + 1)
   {
-    this->mpArrowStart = new QGraphicsPolygonItem(this);
-    this->mpArrowStart->setPolygon(QPolygonF(arrow));
+    for(int i = 0; i < this->mpArrows.size(); i++)
+    {
+      delete this->mpArrows[i];
+    }
+    this->mpArrows.clear();
+  }
+  while(this->mpArrows.size() < this->mConnectionAnchorPoints.size() + 1)
+  {
+    this->mpArrows.push_back(createArrow());
   }
 
   if (mSmartMode)
   {
     if (!this->mpArrowEnd)
     {
-      this->mpArrowEnd = new QGraphicsPolygonItem(this);
-      this->mpArrowEnd->setPolygon(QPolygonF(arrow));
+      this->mpArrowEnd = createArrow();
     }
     this->mpArrowEnd->setVisible(true);
-  }
-  else if (this->mpArrowEnd)
+    //Hide all anchor arrows and anchors
+    for(int i = 0; i < mpArrows.size(); i++)
+    {
+      this->mpArrows[i]->setVisible(false);
+    }
+    for(int i = 0; i < mConnectionAnchorPoints.size(); i++)
+    {
+      this->mConnectionAnchorPoints[i]->setVisibility(false);
+    }
+  }else
   {
-    this->mpArrowEnd->setVisible(false);
+    if (this->mpArrowEnd)
+    {
+      this->mpArrowEnd->setVisible(false);
+    }
+    //Show all anchor arrows
+    for(int i = 0; i < mpArrows.size(); i++)
+    {
+      this->mpArrows[i]->setVisible(true);
+    }
+    for(int i = 0; i < mConnectionAnchorPoints.size(); i++)
+    {
+      this->mConnectionAnchorPoints[i]->setVisibility(true);
+    }
   }
-
   QColor color;
   if (this->isTriggerConnection())
   {
@@ -216,16 +254,18 @@ void cedar::proc::gui::Connection::updateGraphics()
   QBrush brush = this->brush();
   brush.setColor(color);
   brush.setStyle(Qt::SolidPattern);
-  mpArrowStart->setBrush(brush);
   if (mpArrowEnd)
   {
     mpArrowEnd->setBrush(brush);
     this->mpArrowEnd->setPen(pen);
   }
-
   pen.setColor(color);
   this->setPen(pen);
-  mpArrowStart->setPen(pen);
+  for(int i = 0; i < this->mpArrows.size(); i++)
+  {
+    this->mpArrows.at(i)->setBrush(brush);
+    this->mpArrows.at(i)->setPen(pen);
+  }
 
   // update validity
   this->updateValidity();
@@ -293,14 +333,14 @@ void cedar::proc::gui::Connection::setHighlightedBySelection(bool highlight)
     col = this->pen().color();
   }
 
-  if (this->mpArrowStart)
+  for(int i = 0; i < this->mpArrows.size(); i++)
   {
-    QBrush brush = this->mpArrowStart->brush();
+    QBrush brush = this->mpArrows.at(i)->brush();
     brush.setColor(col);
-    QPen pen = this->mpArrowStart->pen();
+    QPen pen = this->mpArrows.at(i)->pen();
     pen.setColor(col);
-    this->mpArrowStart->setPen(pen);
-    this->mpArrowStart->setBrush(brush);
+    this->mpArrows.at(i)->setPen(pen);
+    this->mpArrows.at(i)->setBrush(brush);
   }
 
   if (this->mpArrowEnd)
@@ -392,6 +432,11 @@ void cedar::proc::gui::Connection::setValidity(cedar::proc::gui::ConnectValidity
 void cedar::proc::gui::Connection::update()
 {
   this->setZValue(-1.0);
+
+  for(int i = 0; i < mConnectionAnchorPoints.size(); i++)
+  {
+    this->mConnectionAnchorPoints.at(i)->updatePosition(this->mpSource->scenePos());
+  }
 
   QPointF source = this->mpSource->getConnectionAnchorInScene() - this->mpSource->scenePos();
   QPointF target = this->mpTarget->getConnectionAnchorInScene() - this->mpSource->scenePos();
@@ -488,13 +533,6 @@ void cedar::proc::gui::Connection::update()
       path.lineTo(fourth_point);
       path.lineTo(target);
     }
-    if (mpArrowStart != 0)
-    {
-      QTransform matrix;
-      matrix.translate(source.x() + min_length/2.0, source.y());
-      matrix.rotate(270.0);
-      mpArrowStart->setTransform(matrix);
-    }
     if (mpArrowEnd != 0)
     {
       QTransform matrix;
@@ -508,14 +546,41 @@ void cedar::proc::gui::Connection::update()
     QPointF middle_point = (target + source) / 2.0;
     QPointF vector_src_tar = target - source;
 
-    path.lineTo(target);
-    if (mpArrowStart != 0)
+    // draw the line to every anchor point
+    for(int i = 0; i <= mConnectionAnchorPoints.size(); i++)
     {
-      QTransform matrix;
-      matrix.translate(middle_point.x(), middle_point.y());
-      matrix.rotate(atan2(vector_src_tar.y(), vector_src_tar.x()) * 180 / cedar::aux::math::pi - 90);
-      mpArrowStart->setTransform(matrix);
+      if(i < mConnectionAnchorPoints.size())
+      {
+        path.lineTo(mConnectionAnchorPoints.at(i)->posMiddle());
+      }
+      //set transformation for current arrow
+      if (this->mpArrows.size() > i && this->mpArrows.at(i) != nullptr)
+      {
+        QPointF targ, sour;
+        if(i == 0)
+        {
+          sour = source;
+        }else
+        {
+          sour = mConnectionAnchorPoints.at(i-1)->posMiddle();
+        }
+        if(i == mConnectionAnchorPoints.size())
+        {
+          targ = target;
+        }else
+        {
+          targ = mConnectionAnchorPoints.at(i)->posMiddle();
+        }
+
+        QPointF middle_point = (targ + sour) / 2.0;
+        QPointF vector_src_tar = targ - sour;
+        QTransform matrix;
+        matrix.translate(middle_point.x(), middle_point.y());
+        matrix.rotate(atan2(vector_src_tar.y(), vector_src_tar.x()) * 180 / cedar::aux::math::pi - 90);
+        this->mpArrows.at(i)->setTransform(matrix);
+      }
     }
+    path.lineTo(target);
   }
   this->setPath(path);
 }
@@ -640,7 +705,104 @@ void cedar::proc::gui::Connection::setSmartMode(bool smart)
       mpArrowEnd = 0;
     }
   }
-  this->update();
+  this->updateGraphics();
+}
+
+float cedar::proc::gui::Connection::distance(QPointF source, QPointF target)
+{
+  return sqrt((source.x() - target.x()) * (source.x() - target.x()) + (source.y() - target.y()) * (source.y() - target.y()));
+}
+
+void cedar::proc::gui::Connection::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
+  QGraphicsPathItem::mouseDoubleClickEvent(event);
+  if(event->button() == Qt::LeftButton){
+    addConnectionAnchor(event->scenePos());
+  }
+}
+
+void cedar::proc::gui::Connection::addConnectionAnchor(QPointF addPosition){
+  int event = 0;
+  if(!this->mSmartMode)
+  {
+    QPointF anchorPoint = addPosition;
+    QPointF anchorPointMinusPos = anchorPoint - this->mpSource->scenePos();
+
+    float min_dis = this->distance(this->path().pointAtPercent(0), anchorPointMinusPos);
+    float min_percent = 0;
+
+    QPointF nearestPoint = anchorPointMinusPos;
+    for(float i = 0.0f; i < 1.0f; i += 0.001f)
+    {
+      QPointF point = this->path().pointAtPercent(i);
+      float distance = this->distance(point, anchorPointMinusPos);
+      if(distance < min_dis)
+      {
+        min_dis = distance;
+        min_percent = i;
+        nearestPoint = point;
+      }
+    }
+    anchorPointMinusPos = nearestPoint;
+
+    if(mConnectionAnchorPoints.size() == 0)
+    {
+      mConnectionAnchorPoints.push_back(new cedar::proc::gui::ConnectionAnchor(anchorPointMinusPos.x(), anchorPointMinusPos.y(), mAnchorPointRadius, this));
+      this->updateGraphics();
+      return;
+    }
+
+    float pathLength = 0.0f;
+    for(int i = 0; i <= mConnectionAnchorPoints.size(); i++)
+    {
+      if(i == 0)
+      {
+        pathLength += this->distance(this->path().pointAtPercent(0), mConnectionAnchorPoints.at(i)->posMiddle());
+      }
+      else if(i == mConnectionAnchorPoints.size())
+      {
+        pathLength += this->distance(mConnectionAnchorPoints.at(i - 1)->posMiddle(), this->path().pointAtPercent(1));
+      }
+      else
+      {
+        pathLength += this->distance(mConnectionAnchorPoints.at(i - 1)->posMiddle(), mConnectionAnchorPoints.at(i)->posMiddle());
+      }
+    }
+    if(pathLength == 0)
+    {
+      std::cout << "Error pathlength is 0" << std::endl;
+      pathLength = 0.1f;
+    }
+
+    float currentLength = 0;
+    int indexToInsert = 0;
+    for(int i = 0; i <= mConnectionAnchorPoints.size(); i++)
+    {
+      if(i == 0)
+      {
+        currentLength += this->distance(this->path().pointAtPercent(0), mConnectionAnchorPoints.at(i)->posMiddle());
+      }
+      else if(i == mConnectionAnchorPoints.size())
+      {
+        indexToInsert = i;
+        break;
+      }
+      else
+      {
+        currentLength += this->distance(mConnectionAnchorPoints.at(i - 1)->posMiddle(), mConnectionAnchorPoints.at(i)->posMiddle());
+      }
+      float percentage = currentLength / pathLength;
+      if(percentage > min_percent)
+      {
+        indexToInsert = i;
+        break;
+      }
+    }
+    ConnectionAnchor* anchor = new ConnectionAnchor(anchorPointMinusPos.x(), anchorPointMinusPos.y(), mAnchorPointRadius, this);
+
+    if(mConnectionAnchorPoints.size() == indexToInsert) mConnectionAnchorPoints.push_back(anchor);
+    else mConnectionAnchorPoints.insert(mConnectionAnchorPoints.begin() + indexToInsert, anchor);
+    this->updateGraphics();
+  }
 }
 
 void cedar::proc::gui::Connection::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
@@ -649,6 +811,7 @@ void cedar::proc::gui::Connection::contextMenuEvent(QGraphicsSceneContextMenuEve
   QMenu menu;
   QAction *sourceAction = menu.addAction("jump to source");
   QAction *targetAction = menu.addAction("jump to target");
+  QAction *addDragNodeAction = menu.addAction("add drag node"); // adds a ConnectionAnchor
   QAction *selectedAction = menu.exec(event->screenPos());
 
   if (this->mpTarget && selectedAction == targetAction)
@@ -665,4 +828,23 @@ void cedar::proc::gui::Connection::contextMenuEvent(QGraphicsSceneContextMenuEve
     this->mpSource->parentItem()->setSelected(true);
     scene->getParentView()->centerOn(this->mpSource);
   }
+  else if (selectedAction == addDragNodeAction)
+  {
+    addConnectionAnchor(event->scenePos());
+  }
+}
+
+void cedar::proc::gui::Connection::deleteAnchor(cedar::proc::gui::ConnectionAnchor *anchor)
+{
+  int i = 0;
+  for(std::vector<cedar::proc::gui::ConnectionAnchor*>::iterator it = this->mConnectionAnchorPoints.begin(); it != this->mConnectionAnchorPoints.end(); ++it)
+  {
+    if(*it == anchor)
+    {
+      this->mConnectionAnchorPoints.erase(it);
+      break;
+    }
+    i++;
+  }
+  this->updateGraphics();
 }

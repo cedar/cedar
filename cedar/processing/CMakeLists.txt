@@ -76,6 +76,7 @@ cedar_add_library(cedarproc
   gui/CodeWidget.h
   gui/CommentWidget.h
   gui/Connectable.h
+  gui/ConnectionAnchor.h
   gui/CouplingCollection.h
   gui/DataSlotItem.h
   gui/ElementList.h

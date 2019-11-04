@@ -44,10 +44,12 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ConnectValidity.h"
 #include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/gui/ConnectionAnchor.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/Connection.fwd.h"
 #include "cedar/processing/gui/GraphicsBase.fwd.h"
+#include "cedar/processing/gui/ConnectionAnchor.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsPathItem>
@@ -129,8 +131,23 @@ public:
   //! define a custom shape of this object, which doesn't add a filled region between line parts
   QPainterPath shape() const;
 
+  //! calculates the distance between two points
+  float distance(QPointF, QPointF);
+
+  //! gets called when the user double clicks on the connection
+  void mouseDoubleClickEvent(QGraphicsSceneMouseEvent*);
+
+  //!@brief adds a "drag node" to the connection
+  void addConnectionAnchor(QPointF);
+
   //!@brief handles events in the context menu
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+
+  //!deletes specific anchor
+  void deleteAnchor(cedar::proc::gui::ConnectionAnchor*);
+
+  //! returns validity
+  cedar::proc::gui::ConnectValidity getValidity();
 
 public slots:
   //!@brief update the position of this connection, depending on anchor points of source and target
@@ -152,6 +169,8 @@ private:
 
   void updateValidity();
 
+  QGraphicsPolygonItem* createArrow();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -162,14 +181,20 @@ private:
   cedar::proc::gui::GraphicsBase* mpSource;
   //!@brief target of connection
   cedar::proc::gui::GraphicsBase* mpTarget;
-  //!@brief arrow that points out the direction of the line at the starting point
-  QGraphicsPolygonItem* mpArrowStart;
-  //!@brief arrow that points out the direction of the line at the end point
+  //!@brief arrows that point out the direction of the line between all anchor points
+  std::vector<QGraphicsPolygonItem*> mpArrows;
+  //!@brief arrow that points out the direction of the line at the end point (only smart mode)
   QGraphicsPolygonItem* mpArrowEnd;
   //!@brief the last set validity
   cedar::proc::gui::ConnectValidity mValidity;
   //!@brief smart mode flag (i.e., automatically draw nice lines with corners)
   bool mSmartMode;
+
+  //! all anchor points of the path that the user has created by double clicking on the connection
+  std::vector<cedar::proc::gui::ConnectionAnchor*> mConnectionAnchorPoints;
+
+  //! Default radius for connection anchors
+  int mAnchorPointRadius;
 
   //! Whether or not to highlight the connection.
   bool mHighlight;
