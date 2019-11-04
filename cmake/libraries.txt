@@ -88,7 +88,7 @@ if(PYTHONLIBS_FOUND)
     message("     ${python_library}")
   endforeach()
  
-  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} python2.7)#${PYTHON_LIBRARIES})
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${PYTHON_LIBRARIES})
   include_directories(${PYTHON_INCLUDE_DIRS})
   set(CEDAR_USE_PYTHON ON)
 endif(PYTHONLIBS_FOUND)
