@@ -130,7 +130,9 @@ int cedar::proc::steps::PythonScriptScope::NDArrayConverter::failmsg(const char 
   va_start(ap, fmt);
   vsnprintf(str, sizeof(str), fmt, ap);
   va_end(ap);
+
   PyErr_SetString(PyExc_TypeError, str);
+
   cedar::aux::LogSingleton::getInstance()->error
           (
                   str,
@@ -138,6 +140,7 @@ int cedar::proc::steps::PythonScriptScope::NDArrayConverter::failmsg(const char 
                   (this->pythonScript != nullptr) ? this->pythonScript->getName():"Python Script"
           );
   cedar::proc::steps::PythonScript::executionFailed = 1;
+
   return 0;
 }
 
@@ -390,6 +393,12 @@ cv::Mat cedar::proc::steps::PythonScriptScope::NDArrayConverter::toMat(PyObject*
   {
     return cv::Mat::zeros(1,1,CV_32F);
   }
+
+#if (PY_MAJOR_VERSION >= 3)
+  if( PyLong_Check(o) )
+  {
+    double v[] = {static_cast<double>(PyLong_AsLong((PyObject*)o))};
+#else (PY_MAJOR_VERSION >= 3)
   if( PyInt_Check(o) )
   {
   double v[] = {static_cast<double>(PyInt_AsLong((PyObject*)o))};
@@ -435,6 +444,7 @@ cv::Mat cedar::proc::steps::PythonScriptScope::NDArrayConverter::toMat(PyObject*
     }
     return m;
   }
+
   if( !PyArray_Check(o) )
   {
     failmsg("Object in pc.outputs[%d] is not a numpy array, neither a scalar.", index);
@@ -468,6 +478,7 @@ cv::Mat cedar::proc::steps::PythonScriptScope::NDArrayConverter::toMat(PyObject*
       return cv::Mat::zeros(1,1,CV_32F);
     }
   }
+
 #ifndef CV_MAX_DIM
   const int CV_MAX_DIM = 32;
 #endif
@@ -1064,12 +1075,13 @@ std::string cedar::proc::steps::PythonScript::makeOutputSlotName(const int i)
 
 void cedar::proc::steps::PythonScript::freePythonVariables() {
   PyObject * poMainModule = PyImport_AddModule("__main__");
-  if(poMainModule == nullptr) return;
+
   PyObject * poAttrList = PyObject_Dir(poMainModule);
-  if(poAttrList == nullptr) return;
+
   PyObject * poAttrIter = PyObject_GetIter(poAttrList);
-  if(poAttrIter == nullptr) return;
+
   PyObject * poAttrName;
+
   while ((poAttrName = PyIter_Next(poAttrIter)) != NULL)
   {
     std::string oAttrName;
@@ -1109,6 +1121,7 @@ void cedar::proc::steps::PythonScript::freePythonVariables() {
 
       Py_DecRef(poAttr);
     }
+
     Py_DecRef(poAttrName);
   }
 
@@ -1305,8 +1318,10 @@ void cedar::proc::steps::PythonScript::executePythonScript()
 
       i++;
     }
+    
   }
   catch(const boost::python::error_already_set&){
+
     cedar::proc::steps::PythonScript::executionFailed = 1;
     
     if(PyErr_Occurred() == 0) std::cout << "No PyErr occured!" << std::endl;
@@ -1361,10 +1376,12 @@ void cedar::proc::steps::PythonScript::executePythonScript()
       );
 
   }
-
+  
   if(cedar::proc::steps::PythonScript::executionFailed) this->setState(cedar::proc::Triggerable::STATE_EXCEPTION, "An exception occured");
   else this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
+
   freePythonVariables();
+
   isExecuting = 0;
   mutex.unlock();
 }
