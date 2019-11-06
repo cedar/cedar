@@ -72,7 +72,7 @@ QGraphicsEllipseItem(x - radius, y - radius, radius*2, radius*2, parentPtr)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::ConnectionAnchor::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void cedar::proc::gui::ConnectionAnchor::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
   QPen pen = this->pen();
   pen.setCapStyle(Qt::RoundCap);
@@ -80,12 +80,7 @@ void cedar::proc::gui::ConnectionAnchor::paint(QPainter *painter, const QStyleOp
 
   QColor color = cedar::proc::gui::GraphicsBase::getValidityColor(parent->getValidity());//.darker(110);
 
-  if(this->isSelected())
-  {
-    pen.setColor(QColor(0, 0, 0));
-    painter->setPen(pen);
-    painter->drawRect(this->rect());
-  }
+
   pen.setColor(color);
 
   QBrush brush(color);
@@ -93,6 +88,14 @@ void cedar::proc::gui::ConnectionAnchor::paint(QPainter *painter, const QStyleOp
   painter->setPen(pen);
   painter->setBrush(color);
   painter->drawEllipse(this->rect());
+
+  if(this->isSelected())
+  {
+    pen.setColor(QColor(0, 0, 0));
+    pen.setStyle(Qt::DashLine);
+    painter->setPen(pen);
+    painter->drawEllipse(this->rect());
+  }
 }
 
 void cedar::proc::gui::ConnectionAnchor::updatePosition(QPointF sourcePos)

@@ -394,15 +394,15 @@ cv::Mat cedar::proc::steps::PythonScriptScope::NDArrayConverter::toMat(PyObject*
     return cv::Mat::zeros(1,1,CV_32F);
   }
 
-#if (PY_MAJOR_VERSION >= 3)
+#if PY_MAJOR_VERSION >= 3
   if( PyLong_Check(o) )
   {
     double v[] = {static_cast<double>(PyLong_AsLong((PyObject*)o))};
-#else (PY_MAJOR_VERSION >= 3)
+#else // PY_MAJOR_VERSION >= 3
   if( PyInt_Check(o) )
   {
   double v[] = {static_cast<double>(PyInt_AsLong((PyObject*)o))};
-#endif (PY_MAJOR_VERSION >= 3)
+#endif // PY_MAJOR_VERSION >= 3
 
     m = cv::Mat(1, 1, CV_64F, v).clone();
     return m;
@@ -422,15 +422,15 @@ cv::Mat cedar::proc::steps::PythonScriptScope::NDArrayConverter::toMat(PyObject*
       PyObject* oi = PyTuple_GetItem(o, i);
 
 
-#if (PY_MAJOR_VERSION >= 3)
+#if PY_MAJOR_VERSION >= 3
       if( PyLong_Check(oi) )
       {
         m.at<double>(i) = (double) PyLong_AsLong(oi);
-#else (PY_MAJOR_VERSION >= 3)
+#else // PY_MAJOR_VERSION >= 3
       if( PyInt_Check(oi) )
       {
         m.at<double>(i) = (double) PyInt_AsLong(oi);
-#endif (PY_MAJOR_VERSION >= 3)
+#endif // PY_MAJOR_VERSION >= 3
       }
       else if( PyFloat_Check(oi) )
       {
@@ -753,12 +753,12 @@ _autoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "auto-convert dou
   
   cedar::proc::steps::PythonScript::executionFailed = 0;
 
-#if (PY_MAJOR_VERSION >= 3)
+#if PY_MAJOR_VERSION >= 3
   PyImport_AppendInittab("pycedar", &PyInit_pycedar);
-#else (PY_MAJOR_VERSION >= 3)
+#else // PY_MAJOR_VERSION >= 3
   PyImport_AppendInittab("pycedar", &initpycedar);
   PyEval_InitThreads();
-#endif (PY_MAJOR_VERSION >= 3)
+#endif // PY_MAJOR_VERSION >= 3
 
   Py_Initialize();
 
@@ -907,7 +907,7 @@ void cedar::proc::steps::PythonScript::importStepsFromTemplate()
   std::vector<TemplateName> list = getTemplateNames();
   if(list.size() > 0)
   {
-    for (int i = 0; i < list.size(); ++i)
+    for (unsigned int i = 0; i < list.size(); ++i)
     {
       std::string name = list.at(i).name;
 
@@ -989,7 +989,7 @@ void cedar::proc::steps::PythonScript::exportStepAsTemplate()
   // create the list of not accepted strings
   std::vector<std::string> unaccepted;
   unaccepted.push_back("");
-  for(int i = 0; i < templateNames.size(); i++)
+  for(unsigned int i = 0; i < templateNames.size(); i++)
   {
     unaccepted.push_back(templateNames.at(i).name);
   }
@@ -1011,7 +1011,7 @@ void cedar::proc::steps::PythonScript::exportStepAsTemplate()
     CEDAR_THROW(cedar::aux::ParseException, "The template name cannot be null");
     return;
   }
-  for (int i = 0; i < templateNames.size(); ++i)
+  for (unsigned int i = 0; i < templateNames.size(); ++i)
   {
     if(!templateNames.at(i).name.compare(exportTemplateName))
     {
@@ -1094,21 +1094,21 @@ void cedar::proc::steps::PythonScript::freePythonVariables() {
       }
       else
       {
-#if (PY_MAJOR_VERSION >= 3)
+#if PY_MAJOR_VERSION >= 3
         oAttrName = PyBytes_AsString(temp);
-#else (PY_MAJOR_VERSION >= 3)
+#else // PY_MAJOR_VERSION >= 3
         oAttrName = PyByteArray_AsString(temp);
-#endif (PY_MAJOR_VERSION >= 3)
+#endif // PY_MAJOR_VERSION >= 3
       }
       Py_DecRef(temp);
     }
     else
     {
-#if (PY_MAJOR_VERSION >= 3)
+#if PY_MAJOR_VERSION >= 3
       oAttrName = PyBytes_AsString(poAttrName);
-#else (PY_MAJOR_VERSION >= 3)
+#else // PY_MAJOR_VERSION >= 3
       oAttrName = PyString_AsString(poAttrName);
-#endif (PY_MAJOR_VERSION >= 3)
+#endif // PY_MAJOR_VERSION >= 3
     }
     // Make sure we don't delete any private objects.
     if (!boost::starts_with(oAttrName, "__") || !boost::ends_with(oAttrName, "__"))
@@ -1294,7 +1294,7 @@ void cedar::proc::steps::PythonScript::executePythonScript()
     // Get the outputs from python
     std::list<PyObject*> list = boost::python::extract<std::list<PyObject*>>(boost::python::scope(pycedar_module).attr("outputs"));
 
-    int i = 0;
+    unsigned int i = 0;
     for (auto const& outputPointer : list) {
       if(i >= mOutputs.size()) break;
 

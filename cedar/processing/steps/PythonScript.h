@@ -223,10 +223,10 @@ namespace cedar::proc::steps::PythonScriptScope
       this->unacceptedStrings = unacceptedStrings;
     };
 
-    QString getText(QWidget *parent, const QString &title, const QString &label,
+    QString getText(QWidget *, const QString &title, const QString &label,
                     QLineEdit::EchoMode echo = QLineEdit::Normal,
                     const QString &text = QString(), bool *ok = nullptr,
-                    Qt::WindowFlags flags = Qt::WindowFlags(),
+                    Qt::WindowFlags = Qt::WindowFlags(),
                     Qt::InputMethodHints inputMethodHints = Qt::ImhNone)
     {
       this->setWindowTitle(title);
@@ -290,7 +290,7 @@ namespace cedar::proc::steps::PythonScriptScope
     bool checkString(std::string text)
     {
       boost::trim(text);
-      for (int i = 0; i < unacceptedStrings.size(); i++)
+      for (unsigned int i = 0; i < unacceptedStrings.size(); i++)
       {
         if (!unacceptedStrings.at(i).compare(text))
         {
