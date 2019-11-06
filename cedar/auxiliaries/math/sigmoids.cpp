@@ -52,7 +52,7 @@ double cedar::aux::math::sigmoidAbs(const double x, const double beta, const dou
 
 double cedar::aux::math::sigmoidHeaviside(const double x, const double threshold)
 {
-  if (x < threshold)
+  if (x <= threshold) // jokeit: return 0 for 0 
     return 0.0;
   return 1.0;
 }
