@@ -61,6 +61,7 @@ set (CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS    0           CACHE BOOL "Use opencv deb
 #set (CEDAR_STOP_ON_MISSING_LIBRARIES     0           CACHE BOOL "Stop when libraries cannot be found by cmake?")
 set (CEDAR_INCLUDE_YARP                   1          CACHE BOOL "Compile cedar with YARP to communicate over Network")
 set (CEDAR_INCLUDE_PYTHON                 0          CACHE BOOL "Compile cedar with PYTHON to use the Python Step (in development, linux only currently)")
+set (CEDAR_USE_PYTHON3                    1          CACHE BOOL "Use the python version 3 instead of 2 for compiling python (only has effect if CEDAR_INCLUDE_PYTHON is set to 1)")
 
 
 # extra tests

@@ -392,7 +392,9 @@ cv::Mat cedar::proc::steps::PythonScriptScope::NDArrayConverter::toMat(PyObject*
   }
   if( PyInt_Check(o) )
   {
-    double v[] = {static_cast<double>(PyInt_AsLong((PyObject*)o))};
+  double v[] = {static_cast<double>(PyInt_AsLong((PyObject*)o))};
+#endif (PY_MAJOR_VERSION >= 3)
+
     m = cv::Mat(1, 1, CV_64F, v).clone();
     return m;
   }
@@ -409,9 +411,17 @@ cv::Mat cedar::proc::steps::PythonScriptScope::NDArrayConverter::toMat(PyObject*
     for( i = 0; i < sz; i++ )
     {
       PyObject* oi = PyTuple_GetItem(o, i);
+
+
+#if (PY_MAJOR_VERSION >= 3)
+      if( PyLong_Check(oi) )
+      {
+        m.at<double>(i) = (double) PyLong_AsLong(oi);
+#else (PY_MAJOR_VERSION >= 3)
       if( PyInt_Check(oi) )
       {
         m.at<double>(i) = (double) PyInt_AsLong(oi);
+#endif (PY_MAJOR_VERSION >= 3)
       }
       else if( PyFloat_Check(oi) )
       {
@@ -695,7 +705,8 @@ BOOST_PYTHON_MODULE(pycedar)
 cedar::proc::steps::PythonScript::PythonScript()
 :
 PythonScript(false)
-{  
+{
+
 }
 
 
@@ -730,15 +741,17 @@ _autoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "auto-convert dou
   //this->registerFunction("import step from template", boost::bind(&cedar::proc::steps::PythonScript::importStepsFromTemplate, this), false);
   
   cedar::proc::steps::PythonScript::executionFailed = 0;
-  
-  PyImport_AppendInittab("pycedar", &initpycedar);
 
+#if (PY_MAJOR_VERSION >= 3)
+  PyImport_AppendInittab("pycedar", &PyInit_pycedar);
+#else (PY_MAJOR_VERSION >= 3)
+  PyImport_AppendInittab("pycedar", &initpycedar);
   PyEval_InitThreads();
+#endif (PY_MAJOR_VERSION >= 3)
+
   Py_Initialize();
 
 }
-
-
 
 cedar::proc::steps::PythonScript::~PythonScript() { }
 
@@ -1062,8 +1075,6 @@ void cedar::proc::steps::PythonScript::freePythonVariables() {
     std::string oAttrName;
     if (PyUnicode_Check(poAttrName))
     {
-      std::cout << "is unicode" << std::endl;
-
       PyObject* temp = PyUnicode_AsASCIIString(poAttrName);
       if (NULL == temp) {
         std::cout << "unicode to ASCII conversion failed" << std::endl;
@@ -1071,14 +1082,21 @@ void cedar::proc::steps::PythonScript::freePythonVariables() {
       }
       else
       {
+#if (PY_MAJOR_VERSION >= 3)
+        oAttrName = PyBytes_AsString(temp);
+#else (PY_MAJOR_VERSION >= 3)
         oAttrName = PyByteArray_AsString(temp);
-        std::cout << "unicode name: " << oAttrName << std::endl;
+#endif (PY_MAJOR_VERSION >= 3)
       }
       Py_DecRef(temp);
     }
     else
     {
+#if (PY_MAJOR_VERSION >= 3)
+      oAttrName = PyBytes_AsString(poAttrName);
+#else (PY_MAJOR_VERSION >= 3)
       oAttrName = PyString_AsString(poAttrName);
+#endif (PY_MAJOR_VERSION >= 3)
     }
     // Make sure we don't delete any private objects.
     if (!boost::starts_with(oAttrName, "__") || !boost::ends_with(oAttrName, "__"))
