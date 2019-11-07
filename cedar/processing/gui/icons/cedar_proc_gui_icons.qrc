@@ -141,6 +141,7 @@
         <file>steps/pairsGame.svg</file>
         <file>steps/noop.svg</file>
         <file>steps/nan_check.svg</file>
+        <file>steps/nan_check_caught.svg</file>
         <file>steps/delay.svg</file>
         <file>steps/positionofmaximum.svg</file>
         <file>steps/clamp.svg</file>

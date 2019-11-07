@@ -39,6 +39,7 @@
 
 // CLASS HEADER
 #include "cedar/processing/steps/NaNCheck.h"
+#include "cedar/processing/gui/stepViews/NaNCheckView.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/typecheck/IsMatrix.h"
@@ -58,7 +59,7 @@ bool declare()
 
   ElementDeclarationPtr declaration
   (
-    new ElementDeclarationTemplate<cedar::proc::steps::NaNCheck>
+    new ElementDeclarationTemplate<cedar::proc::steps::NaNCheck, cedar::proc::gui::NaNCheckView>
     (
       "Programming",
       "cedar.processing.steps.NaNCheck"
@@ -69,7 +70,9 @@ bool declare()
   declaration->setDescription
   (
     "If any entry in 'input' is NaN or Infinite, replace the input 'input' by "
-    "the input 'replacement' of your specification."
+    "the input 'replacement' of your specification.\n"
+    "Also gives an visual clue that only goes away after resetting or "
+    "restarting the architecture."
   );
 
   declaration->declare();
@@ -87,7 +90,8 @@ bool declared = declare();
 cedar::proc::steps::NaNCheck::NaNCheck()
 :
 // outputs
-mOutput(new cedar::aux::MatData(cv::Mat()))
+mOutput(new cedar::aux::MatData(cv::Mat())),
+mCaughtOne(false)
 {
   // declare all data
   cedar::proc::DataSlotPtr input = this->declareInput("input");
@@ -173,6 +177,7 @@ void cedar::proc::steps::NaNCheck::recompute()
         || std::isinf( matnorm ))
     {
       replace_me= true;
+      setCaughtOne(true);
     }
   }
 
@@ -203,5 +208,27 @@ void cedar::proc::steps::NaNCheck::recompute()
   {
     this->mOutput->setData( mat );
   }
+}
+
+
+bool cedar::proc::steps::NaNCheck::getCaughtOne() const
+{
+  return mCaughtOne;
+}
+
+void cedar::proc::steps::NaNCheck::setCaughtOne(bool b)
+{
+  mCaughtOne= b;
+  emit caughtNaNChangedSignal();
+}
+
+void cedar::proc::steps::NaNCheck::reset()
+{
+  setCaughtOne(false);
+}
+
+void cedar::proc::steps::NaNCheck::onStart()
+{
+  setCaughtOne(true);
 }
 

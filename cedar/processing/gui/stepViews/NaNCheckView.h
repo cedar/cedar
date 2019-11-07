@@ -22,46 +22,39 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NaNCheck.h
+    File:        NaNCheckView.h
 
-    Maintainer:  jokeit
-    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        2017 12 04
+    Maintainer:  
+    Email:       
+    Date:        
 
-    Description: Header file for the class cedar::proc::steps::NaNCheck.
+    Description: Header file for the class cedar::proc::gui::NaNCheckView.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_NOOP_H
-#define CEDAR_PROC_STEPS_NOOP_H
+#ifndef CEDAR_PROC_GUI_NAN_CHECK_VIEW_H
+#define CEDAR_PROC_GUI_NAN_CHECK_VIEW_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include <cedar/processing/Step.h>
-#include <cedar/processing/InputSlotHelper.h>
-#include <cedar/auxiliaries/MatData.h>
+#include "cedar/processing/gui/DefaultConnectableIconView.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/NaNCheck.fwd.h"
+#include "cedar/processing/gui/stepViews/NaNCheckView.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QObject>
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief Responsible for changing the icon of NaNChecks.
  */
-class cedar::proc::steps::NaNCheck : public cedar::proc::Step
+class cedar::proc::gui::NaNCheckView : public QObject, public cedar::proc::gui::DefaultConnectableIconView
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -70,11 +63,7 @@ class cedar::proc::steps::NaNCheck : public cedar::proc::Step
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  NaNCheck();
-
-  bool getCaughtOne() const;
-  void setCaughtOne(bool b);
+  // none yet (compiler generated)
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -86,18 +75,14 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief handle change of connectable
+  void connectableChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  void inputConnectionChanged(const std::string& inputName);
-
-  void compute(const cedar::proc::Arguments& arguments);
-  void recompute();
-  void reset();
-  void onStart();
+private slots:
+  void updateIconWeight();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -105,13 +90,8 @@ private:
 protected:
   // none yet
 private:
-  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
-  cedar::aux::ConstMatDataPtr mInput;
+  // none yet
 
-  //!@brief The output data.
-  cedar::aux::MatDataPtr mOutput;
-
-  bool mCaughtOne;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -121,12 +101,7 @@ protected:
 private:
   // none yet
 
+}; // class cedar::proc::gui::NaNCheckView
 
-public:
-signals:
-  void caughtNaNChangedSignal();
-
-}; // class cedar::proc::steps::NaNCheck
-
-#endif // CEDAR_PROC_STEPS_NOOP_H
+#endif // CEDAR_PROC_GUI_NAN_CHECK_VIEW_H
 
