@@ -51,30 +51,32 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace
 {
-bool declare()
-{
-  using cedar::proc::ElementDeclarationPtr;
-  using cedar::proc::ElementDeclarationTemplate;
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
 
-  ElementDeclarationPtr declaration
-  (
-    new ElementDeclarationTemplate< <full class name> >
+    ElementDeclarationPtr declaration
     (
-      "Programming",
-      "cedar.processing.steps.<class name>"
-    )
-  );
+      new ElementDeclarationTemplate< <full class name> >
+      (
+        "Programming",
+        "cedar.processing.steps.<class name>"
+      )
+    );
 
-  //declaration->setIconPath(":/steps/threshold.svg");
-  declaration->setDescription
-  (
-    "A description of the class."
-  );
+    //declaration->setIconPath(":/steps/threshold.svg");
+    declaration->setDescription
+    (
+      "A description of the class."
+    );
 
-  declaration->declare();
+    declaration->declare();
 
-  return true;
-}
+    return true;
+  }
+
+  bool declared = declare();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
