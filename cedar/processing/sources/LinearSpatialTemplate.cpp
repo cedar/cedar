@@ -36,6 +36,7 @@
 
 // LOCAL INCLUDES
 #include <cedar/processing/sources/LinearSpatialTemplate.h>
+#include "cedar/processing/gui/stepViews/LinearSpatialTemplateView.h"
 
 // SYSTEM INCLUDES
 #include <cedar/auxiliaries/assert.h>
@@ -65,7 +66,7 @@ namespace
 
     ElementDeclarationPtr declaration
     (
-      new ElementDeclarationTemplate<cedar::proc::sources::LinearSpatialTemplate>
+      new ElementDeclarationTemplate<cedar::proc::sources::LinearSpatialTemplate, cedar::proc::gui::LinearSpatialTemplateView>
       (
         "Sources",
         "cedar.processing.sources.LinearSpatialTemplate"
