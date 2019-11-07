@@ -71,6 +71,7 @@ cedar_add_library(cedarproc
   gui/stepViews/ComponentStepView.h
   gui/stepViews/LinearSpatialTemplateView.h
   gui/stepViews/NaNCheckView.h
+  gui/stepViews/LinearFunctionView.h
   gui/AdvancedParameterLinker.h
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureWidget.h

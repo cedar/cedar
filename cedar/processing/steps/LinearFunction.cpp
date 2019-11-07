@@ -1,5 +1,6 @@
 // LOCAL INCLUDES
 #include "LinearFunction.h"
+#include "cedar/processing/gui/stepViews/LinearFunctionView.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include <math.h>
 #include <iostream>
@@ -16,7 +17,7 @@ namespace
 
     ElementDeclarationPtr declaration
     (
-      new ElementDeclarationTemplate<cedar::proc::steps::LinearFunction>
+      new ElementDeclarationTemplate<cedar::proc::steps::LinearFunction, cedar::proc::gui::LinearFunctionView >
       (
         "Algebra",
         "cedar.processing.steps.LinearFunction"
