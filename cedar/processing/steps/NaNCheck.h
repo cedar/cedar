@@ -44,6 +44,7 @@
 #include <cedar/processing/Step.h>
 #include <cedar/processing/InputSlotHelper.h>
 #include <cedar/auxiliaries/MatData.h>
+#include <cedar/auxiliaries/BoolParameter.h>
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/steps/NaNCheck.fwd.h"
@@ -73,8 +74,12 @@ public:
   //!@brief The standard constructor.
   NaNCheck();
 
-  bool getCaughtOne() const;
-  void setCaughtOne(bool b);
+  bool getCaughtNaN() const;
+  void setCaughtNaN(bool b);
+  bool getCaughtInf() const;
+  void setCaughtInf(bool b);
+  bool getCaughtEmpty() const;
+  void setCaughtEmpty(bool b);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -99,6 +104,8 @@ private:
   void reset();
   void onStart();
 
+  void resetStates();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -111,7 +118,9 @@ private:
   //!@brief The output data.
   cedar::aux::MatDataPtr mOutput;
 
-  bool mCaughtOne;
+  bool mCaughtNaN;
+  bool mCaughtInf;
+  bool mCaughtEmpty;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -119,8 +128,9 @@ protected:
   // none yet
 
 private:
-  // none yet
-
+  cedar::aux::BoolParameterPtr mCheckForNaN;
+  cedar::aux::BoolParameterPtr mCheckForInf;
+  cedar::aux::BoolParameterPtr mCheckForEmpty;
 
 public:
 signals:

@@ -68,11 +68,17 @@ void cedar::proc::gui::NaNCheckView::updateIconWeight()
 {
   auto step= boost::dynamic_pointer_cast<const cedar::proc::steps::NaNCheck>(this->getConnectable());
 
-  bool value = step->getCaughtOne();
-
-  if (value)
+  if (step->getCaughtNaN())
   {
-    this->setIconPath(":/steps/nan_check_caught.svg");
+    this->setIconPath(":/steps/nan_check_caught_nan.svg");
+  }
+  else if (step->getCaughtInf())
+  {
+    this->setIconPath(":/steps/nan_check_caught_inf.svg");
+  }
+  else if (step->getCaughtEmpty())
+  {
+    this->setIconPath(":/steps/nan_check_caught_empty.svg");
   }
   else 
   {

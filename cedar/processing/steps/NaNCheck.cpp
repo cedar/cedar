@@ -44,6 +44,8 @@
 // CEDAR INCLUDES
 #include "cedar/processing/typecheck/IsMatrix.h"
 #include <cedar/processing/ElementDeclaration.h>
+#include <cedar/auxiliaries/BoolParameter.h>
+#include <cedar/auxiliaries/BoolParameter.h>
 
 // SYSTEM INCLUDES
 
@@ -69,10 +71,12 @@ bool declare()
   declaration->setIconPath(":/steps/nan_check.svg");
   declaration->setDescription
   (
-    "If any entry in 'input' is NaN or Infinite, replace the input 'input' by "
-    "the input 'replacement' of your specification.\n"
-    "Also gives an visual clue that only goes away after resetting or "
-    "restarting the architecture."
+    "If any entry in 'input' is NaN OR Infinite OR empty, give a visual clue. "
+    "The "
+    "visual clue will remain until you reset the step.\n"
+    "You can also determine how to replace the input 'input' by "
+    "the optional input 'replacement'.\n"
+    "You can also select a subset of the above checking conditions."
   );
 
   declaration->declare();
@@ -91,11 +95,16 @@ cedar::proc::steps::NaNCheck::NaNCheck()
 :
 // outputs
 mOutput(new cedar::aux::MatData(cv::Mat())),
-mCaughtOne(false)
+mCaughtNaN(false),
+mCaughtInf(false),
+mCaughtEmpty(false),
+mCheckForNaN(new cedar::aux::BoolParameter(this,"check for NaN?", true)),
+mCheckForInf(new cedar::aux::BoolParameter(this,"check for Inf?", true)),
+mCheckForEmpty(new cedar::aux::BoolParameter(this,"check for Empty?", true))
 {
   // declare all data
   cedar::proc::DataSlotPtr input = this->declareInput("input");
-  cedar::proc::DataSlotPtr input2 = this->declareInput("replacement");
+  cedar::proc::DataSlotPtr input2 = this->declareInput("replacement (optional)", false); // optional
   this->declareOutput("output", mOutput);
 
   input->setCheck(cedar::proc::typecheck::IsMatrix());
@@ -163,9 +172,15 @@ void cedar::proc::steps::NaNCheck::recompute()
   auto mat= data->getData();
  
   bool replace_me = false;
+  bool caught_one = false;
+
   if (mat.empty())
   {
-    replace_me= true;
+    if (mCheckForEmpty->getValue())
+    {
+      caught_one= true;
+      setCaughtEmpty(true);
+    }
   }
   else
   {
@@ -173,16 +188,24 @@ void cedar::proc::steps::NaNCheck::recompute()
     
     matnorm= cv::norm( mat );
 
-    if (std::isnan( matnorm )
-        || std::isinf( matnorm ))
+    if (mCheckForNaN->getValue()
+        && std::isnan( matnorm ))
     {
-      replace_me= true;
-      setCaughtOne(true);
+      caught_one= true;
+      setCaughtNaN(true);
+    }
+    else if (mCheckForInf->getValue()
+         && std::isinf( matnorm ))
+    {
+      caught_one= true;
+      setCaughtInf(true);
     }
   }
 
-  if (replace_me)
+  if (caught_one)
   {
+    replace_me= true;
+
     auto input2 = getInput("replacement");
 
     if (!input2)
@@ -193,7 +216,8 @@ void cedar::proc::steps::NaNCheck::recompute()
     {
       auto data2 = boost::dynamic_pointer_cast<const cedar::aux::MatData>(input2);
 
-      if (!data2)
+      if (!data2
+          || data2->isEmpty())
       {
         replace_me= false;
       }
@@ -211,24 +235,53 @@ void cedar::proc::steps::NaNCheck::recompute()
 }
 
 
-bool cedar::proc::steps::NaNCheck::getCaughtOne() const
+bool cedar::proc::steps::NaNCheck::getCaughtNaN() const
 {
-  return mCaughtOne;
+  return mCaughtNaN;
 }
 
-void cedar::proc::steps::NaNCheck::setCaughtOne(bool b)
+void cedar::proc::steps::NaNCheck::setCaughtNaN(bool b)
 {
-  mCaughtOne= b;
+  mCaughtNaN= b;
   emit caughtNaNChangedSignal();
+}
+
+bool cedar::proc::steps::NaNCheck::getCaughtInf() const
+{
+  return mCaughtInf;
+}
+
+void cedar::proc::steps::NaNCheck::setCaughtInf(bool b)
+{
+  mCaughtInf= b;
+  emit caughtNaNChangedSignal();
+}
+
+bool cedar::proc::steps::NaNCheck::getCaughtEmpty() const
+{
+  return mCaughtEmpty;
+}
+
+void cedar::proc::steps::NaNCheck::setCaughtEmpty(bool b)
+{
+  mCaughtEmpty= b;
+  emit caughtNaNChangedSignal();
+}
+
+void cedar::proc::steps::NaNCheck::resetStates()
+{
+  setCaughtNaN(false);
+  setCaughtInf(false);
+  setCaughtEmpty(false);
 }
 
 void cedar::proc::steps::NaNCheck::reset()
 {
-  setCaughtOne(false);
+  resetStates();
 }
 
 void cedar::proc::steps::NaNCheck::onStart()
 {
-  setCaughtOne(true);
+  resetStates();
 }
 
