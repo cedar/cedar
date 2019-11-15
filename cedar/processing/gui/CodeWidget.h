@@ -89,11 +89,9 @@ ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WIT
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
-//! Container to describe a highlighting rule. Based on a regular expression, a relevant match # and the format.
 namespace cedar::proc::gui::CodeWidgetScope
 {
-
+  //! Container to describe a highlighting rule. Based on a regular expression, a relevant match # and the format.
   class HighlightingRule
   {
   public:

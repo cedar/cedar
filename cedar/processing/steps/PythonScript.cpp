@@ -130,7 +130,9 @@ int cedar::proc::steps::PythonScriptScope::NDArrayConverter::failmsg(const char 
   va_start(ap, fmt);
   vsnprintf(str, sizeof(str), fmt, ap);
   va_end(ap);
+
   PyErr_SetString(PyExc_TypeError, str);
+
   cedar::aux::LogSingleton::getInstance()->error
           (
                   str,
@@ -138,6 +140,7 @@ int cedar::proc::steps::PythonScriptScope::NDArrayConverter::failmsg(const char 
                   (this->pythonScript != nullptr) ? this->pythonScript->getName():"Python Script"
           );
   cedar::proc::steps::PythonScript::executionFailed = 1;
+
   return 0;
 }
 
@@ -390,9 +393,17 @@ cv::Mat cedar::proc::steps::PythonScriptScope::NDArrayConverter::toMat(PyObject*
   {
     return cv::Mat::zeros(1,1,CV_32F);
   }
+
+#if PY_MAJOR_VERSION >= 3
+  if( PyLong_Check(o) )
+  {
+    double v[] = {static_cast<double>(PyLong_AsLong((PyObject*)o))};
+#else // PY_MAJOR_VERSION >= 3
   if( PyInt_Check(o) )
   {
-    double v[] = {static_cast<double>(PyInt_AsLong((PyObject*)o))};
+  double v[] = {static_cast<double>(PyInt_AsLong((PyObject*)o))};
+#endif // PY_MAJOR_VERSION >= 3
+
     m = cv::Mat(1, 1, CV_64F, v).clone();
     return m;
   }
@@ -409,9 +420,17 @@ cv::Mat cedar::proc::steps::PythonScriptScope::NDArrayConverter::toMat(PyObject*
     for( i = 0; i < sz; i++ )
     {
       PyObject* oi = PyTuple_GetItem(o, i);
+
+
+#if PY_MAJOR_VERSION >= 3
+      if( PyLong_Check(oi) )
+      {
+        m.at<double>(i) = (double) PyLong_AsLong(oi);
+#else // PY_MAJOR_VERSION >= 3
       if( PyInt_Check(oi) )
       {
         m.at<double>(i) = (double) PyInt_AsLong(oi);
+#endif // PY_MAJOR_VERSION >= 3
       }
       else if( PyFloat_Check(oi) )
       {
@@ -425,6 +444,7 @@ cv::Mat cedar::proc::steps::PythonScriptScope::NDArrayConverter::toMat(PyObject*
     }
     return m;
   }
+
   if( !PyArray_Check(o) )
   {
     failmsg("Object in pc.outputs[%d] is not a numpy array, neither a scalar.", index);
@@ -458,6 +478,7 @@ cv::Mat cedar::proc::steps::PythonScriptScope::NDArrayConverter::toMat(PyObject*
       return cv::Mat::zeros(1,1,CV_32F);
     }
   }
+
 #ifndef CV_MAX_DIM
   const int CV_MAX_DIM = 32;
 #endif
@@ -695,7 +716,8 @@ BOOST_PYTHON_MODULE(pycedar)
 cedar::proc::steps::PythonScript::PythonScript()
 :
 PythonScript(false)
-{  
+{
+
 }
 
 
@@ -730,15 +752,17 @@ _autoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "auto-convert dou
   //this->registerFunction("import step from template", boost::bind(&cedar::proc::steps::PythonScript::importStepsFromTemplate, this), false);
   
   cedar::proc::steps::PythonScript::executionFailed = 0;
-  
-  PyImport_AppendInittab("pycedar", &initpycedar);
 
+#if PY_MAJOR_VERSION >= 3
+  PyImport_AppendInittab("pycedar", &PyInit_pycedar);
+#else // PY_MAJOR_VERSION >= 3
+  PyImport_AppendInittab("pycedar", &initpycedar);
   PyEval_InitThreads();
+#endif // PY_MAJOR_VERSION >= 3
+
   Py_Initialize();
 
 }
-
-
 
 cedar::proc::steps::PythonScript::~PythonScript() { }
 
@@ -883,7 +907,7 @@ void cedar::proc::steps::PythonScript::importStepsFromTemplate()
   std::vector<TemplateName> list = getTemplateNames();
   if(list.size() > 0)
   {
-    for (int i = 0; i < list.size(); ++i)
+    for (unsigned int i = 0; i < list.size(); ++i)
     {
       std::string name = list.at(i).name;
 
@@ -965,7 +989,7 @@ void cedar::proc::steps::PythonScript::exportStepAsTemplate()
   // create the list of not accepted strings
   std::vector<std::string> unaccepted;
   unaccepted.push_back("");
-  for(int i = 0; i < templateNames.size(); i++)
+  for(unsigned int i = 0; i < templateNames.size(); i++)
   {
     unaccepted.push_back(templateNames.at(i).name);
   }
@@ -987,7 +1011,7 @@ void cedar::proc::steps::PythonScript::exportStepAsTemplate()
     CEDAR_THROW(cedar::aux::ParseException, "The template name cannot be null");
     return;
   }
-  for (int i = 0; i < templateNames.size(); ++i)
+  for (unsigned int i = 0; i < templateNames.size(); ++i)
   {
     if(!templateNames.at(i).name.compare(exportTemplateName))
     {
@@ -1051,19 +1075,18 @@ std::string cedar::proc::steps::PythonScript::makeOutputSlotName(const int i)
 
 void cedar::proc::steps::PythonScript::freePythonVariables() {
   PyObject * poMainModule = PyImport_AddModule("__main__");
-  if(poMainModule == nullptr) return;
+
   PyObject * poAttrList = PyObject_Dir(poMainModule);
-  if(poAttrList == nullptr) return;
+
   PyObject * poAttrIter = PyObject_GetIter(poAttrList);
-  if(poAttrIter == nullptr) return;
+
   PyObject * poAttrName;
+
   while ((poAttrName = PyIter_Next(poAttrIter)) != NULL)
   {
     std::string oAttrName;
     if (PyUnicode_Check(poAttrName))
     {
-      std::cout << "is unicode" << std::endl;
-
       PyObject* temp = PyUnicode_AsASCIIString(poAttrName);
       if (NULL == temp) {
         std::cout << "unicode to ASCII conversion failed" << std::endl;
@@ -1071,14 +1094,21 @@ void cedar::proc::steps::PythonScript::freePythonVariables() {
       }
       else
       {
+#if PY_MAJOR_VERSION >= 3
+        oAttrName = PyBytes_AsString(temp);
+#else // PY_MAJOR_VERSION >= 3
         oAttrName = PyByteArray_AsString(temp);
-        std::cout << "unicode name: " << oAttrName << std::endl;
+#endif // PY_MAJOR_VERSION >= 3
       }
       Py_DecRef(temp);
     }
     else
     {
+#if PY_MAJOR_VERSION >= 3
+      oAttrName = PyBytes_AsString(poAttrName);
+#else // PY_MAJOR_VERSION >= 3
       oAttrName = PyString_AsString(poAttrName);
+#endif // PY_MAJOR_VERSION >= 3
     }
     // Make sure we don't delete any private objects.
     if (!boost::starts_with(oAttrName, "__") || !boost::ends_with(oAttrName, "__"))
@@ -1091,6 +1121,7 @@ void cedar::proc::steps::PythonScript::freePythonVariables() {
 
       Py_DecRef(poAttr);
     }
+
     Py_DecRef(poAttrName);
   }
 
@@ -1263,7 +1294,7 @@ void cedar::proc::steps::PythonScript::executePythonScript()
     // Get the outputs from python
     std::list<PyObject*> list = boost::python::extract<std::list<PyObject*>>(boost::python::scope(pycedar_module).attr("outputs"));
 
-    int i = 0;
+    unsigned int i = 0;
     for (auto const& outputPointer : list) {
       if(i >= mOutputs.size()) break;
 
@@ -1287,8 +1318,10 @@ void cedar::proc::steps::PythonScript::executePythonScript()
 
       i++;
     }
+    
   }
   catch(const boost::python::error_already_set&){
+
     cedar::proc::steps::PythonScript::executionFailed = 1;
     
     if(PyErr_Occurred() == 0) std::cout << "No PyErr occured!" << std::endl;
@@ -1343,10 +1376,12 @@ void cedar::proc::steps::PythonScript::executePythonScript()
       );
 
   }
-
+  
   if(cedar::proc::steps::PythonScript::executionFailed) this->setState(cedar::proc::Triggerable::STATE_EXCEPTION, "An exception occured");
   else this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
+
   freePythonVariables();
+
   isExecuting = 0;
   mutex.unlock();
 }
