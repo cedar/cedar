@@ -70,8 +70,11 @@ bool declare()
   declaration->setIconPath(":/steps/numerical_differentiation.svg");
   declaration->setDescription
   (
-    "Differentiates the input numerically over time, element-wise. "
-    "Uses Euler step OR five point finite backwards difference (using the four past entries and the current one), selectable via parameter. The delay input is optional and can be used to override the internal estimate of 'dt', the time-step, which comes from the global clock. To avoid big jumps in the output when resetting an architecture, adjust the parameter 'ignore time steps smaller than'. TODO: five point method has jumps on resets."
+    "Differentiates the input numerically over time, element-wise.\n"
+    "Uses Euler Step OR five point Finite Backwards Difference (using the four past entries and the current one), selectable via parameter.\n"
+    "The delay input is optional and can be used to override the internal estimate of 'dt', the time-step, which by default comes from the global clock. This will be relevant for scenarios where architectures are large but require exact results.\n"
+    "To avoid big jumps in the output in corner cases, adjust the parameters 'ignore time steps smaller than' and 'ignore time steps larger than', which will "
+    "prompt resetting of the algorithm in such cases."
   );
 
   declaration->declare();
@@ -96,13 +99,16 @@ mTwoBack(),
 mThreeBack(),
 mFourBack(),
 mUseFivePoints(new cedar::aux::BoolParameter(this, "use five points", false)),
-mIgnoreTimeStepsSmallerThan(new cedar::aux::DoubleParameter(this, "ignore time steps smaller than", 0.002, 0.0, 10000.0))
+mIgnoreTimeStepsSmallerThan(new cedar::aux::DoubleParameter(this, "ignore time steps smaller than", 0.002, 0.0, 10000.0)),
+mIgnoreTimeStepsLargerThan(new cedar::aux::DoubleParameter(this, "ignore time steps larger than", 1.0, 0.0, 10000.0))
 {
   // declare all data
   cedar::proc::DataSlotPtr input = this->declareInput("input");
   cedar::proc::DataSlotPtr input2 = this->declareInput("delay (optional)", false); // optional
 
   this->declareOutput("differentiated result", mOutput);
+  mIgnoreTimeStepsSmallerThan->markAdvanced(true);
+  mIgnoreTimeStepsLargerThan->markAdvanced(true);
 
   input->setCheck(cedar::proc::typecheck::IsMatrix());
 
@@ -115,7 +121,7 @@ mIgnoreTimeStepsSmallerThan(new cedar::aux::DoubleParameter(this, "ignore time s
 
 void cedar::proc::steps::NumericalDifferentiation::inputConnectionChanged(const std::string& inputName)
 {
-//std::cout << "  INPUT CHANGED " << std::endl;  
+//std::cout << "  inputConnectionChanged" << std::endl;
   // TODO: you may want to replace this code by using a cedar::proc::InputSlotHelper
 
   // Again, let's first make sure that this is really the input in case anyone ever changes our interface.
@@ -146,7 +152,7 @@ void cedar::proc::steps::NumericalDifferentiation::inputConnectionChanged(const 
     }
 
     // Make a clone to create a matrix of the same type, dimensions, ...
-    this->recompute();
+    this->recompute(true);
   }
 
   if (output_changed)
@@ -159,28 +165,51 @@ void cedar::proc::steps::NumericalDifferentiation::inputConnectionChanged(const 
 
 void cedar::proc::steps::NumericalDifferentiation::reinitialize()
 {
+//std::cout << "  reinitialize" << std::endl;
   mOneBack= cv::Mat();
   mTwoBack= cv::Mat();
-  mThreeBack= cv::Mat();
-  mFourBack= cv::Mat();
+
+  if (mUseFivePoints->getValue())
+  {
+    mThreeBack= cv::Mat();
+    mFourBack= cv::Mat();
+  }
+
+  auto input = getInput("input");
+  auto delayinput= getInput("delay (optional)");
+
+  if (!input)
+    return;
+
+  auto data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(input);
+
+  if (!data)
+    return;
+
+  cv::Mat input_mat = data->getData();
+  if (input_mat.empty())
+    return;
+
+//std::cout << "  setting output to zero" << std::endl;
+  cv::Mat out_mat= cv::Mat::zeros( input_mat.rows, input_mat.cols, CV_32F );
+  this->mOutput->setData(out_mat);
 }
 
 void cedar::proc::steps::NumericalDifferentiation::compute(const cedar::proc::Arguments&)
 {
-  this->recompute();
+//std::cout << "  compute" << std::endl;
+  this->recompute(false);
 }
 
 void cedar::proc::steps::NumericalDifferentiation::reset()
 {
-//std::cout << "  RESET " << std::endl;  
-  mOneBack= cv::Mat();
-  mTwoBack= cv::Mat();
-  mThreeBack= cv::Mat();
-  mFourBack= cv::Mat();
+//std::cout << "\n\n\n  RESET: " << std::endl;
+  reinitialize();
 }
 
-void cedar::proc::steps::NumericalDifferentiation::recompute()
+void cedar::proc::steps::NumericalDifferentiation::recompute(bool force_reinit)
 {
+//std::cout << "  recompute" << std::endl;
   auto input = getInput("input");
   auto delayinput= getInput("delay (optional)");
 
@@ -209,7 +238,7 @@ void cedar::proc::steps::NumericalDifferentiation::recompute()
     if (cedar::aux::math::isZero(mLastTime / boost::units::si::second)
         || mOneBack.empty())
     {
-//std::cout << " here" << std::endl;    
+//std::cout << " setting dt to zero" << std::endl;    
       dt= 0.0;
     }
     else
@@ -225,11 +254,31 @@ void cedar::proc::steps::NumericalDifferentiation::recompute()
 //std::cout << " dt: " << dt << std::endl;  
   mLastTime= newtime;
 
-  if (dt < 0.0)
+  if (force_reinit
+      || dt < 0.0)
   {
+//std::cout << "  force reinitialize ... " << std::endl;
     // architecture reset
     reinitialize(); // reinit here so to avoid spikes when mFourBack is not cleared
     return; // ignore here, will treat in reset()
+  }
+//std::cout << "  dt since last: " << dt << std::endl;
+
+  // this avoids big numerical errors:
+  //   avoid dividing by very small numbers!
+  //   avoid making big numerial errors after pausing the architecture or
+  //     lagging
+  if (cedar::aux::math::isZero(dt)
+      || dt < mIgnoreTimeStepsSmallerThan->getValue() )
+
+  {
+    mOneBack= input_mat.clone();
+    return;
+  }
+  else if (dt > mIgnoreTimeStepsLargerThan->getValue() ) 
+  {
+    mOneBack= input_mat.clone();
+    return;
   }
 
   cv::Mat five_back;
@@ -239,17 +288,6 @@ void cedar::proc::steps::NumericalDifferentiation::recompute()
   mThreeBack= mTwoBack;
   mTwoBack= mOneBack;
   mOneBack= input_mat.clone();
-
-  // avoid dividing by very small numbers!
-  if (cedar::aux::math::isZero(dt)
-      || dt < mIgnoreTimeStepsSmallerThan->getValue() ) 
-  {
-    mTwoBack= cv::Mat();
-    mThreeBack= cv::Mat();
-    mFourBack= cv::Mat();
-//std::cout << " ignoring" << std::endl;    
-    return;
-  }
 
   if (mUseFivePoints->getValue())
   {
@@ -271,20 +309,23 @@ void cedar::proc::steps::NumericalDifferentiation::recompute()
     else if (mThreeBack.empty())
     {
 //std::cout << " C" << std::endl;    
-      // Euler
+      // fall back to Euler
       out_mat= - ( mTwoBack - mOneBack ) / dt;
-      //out_mat= cv::Mat::zeros( mOneBack.rows, mTwoBack.cols, CV_32F );
+//std::cout << "      " << mTwoBack << " " << mOneBack << " dt: " << dt << std::endl;
+      out_mat= cv::Mat::zeros( mOneBack.rows, mTwoBack.cols, CV_32F );
     }
     else if (mFourBack.empty())
     {
-//std::cout << " D" << std::endl;    
+//std::cout << " D" << std::endl;   
+//std::cout << "      " << mTwoBack << " " << mOneBack << " dt: " << dt << std::endl;
       // Euler
       out_mat= - ( mTwoBack - mOneBack ) / dt;
-      //out_mat= cv::Mat::zeros( mOneBack.rows, mTwoBack.cols, CV_32F );
+      out_mat= cv::Mat::zeros( mOneBack.rows, mTwoBack.cols, CV_32F );
     }
     else
     {
 //std::cout << " E" << std::endl;    
+//std::cout << "   " << mOneBack << " two: " << mTwoBack << " three: " << mThreeBack << "  four: " << mFourBack  << " five: " << five_back << std::endl;
       // use finite difference 5th order
   // std::cout << " " <<  ( mTwoBack.at<float>(0,0) - mOneBack.at<float>(0,0) ) << " dt: " << dt << "  div: " << ( mTwoBack.at<float>(0,0) - mOneBack.at<float>(0,0) ) / dt << std::endl;
 
@@ -299,23 +340,30 @@ void cedar::proc::steps::NumericalDifferentiation::recompute()
   }
   else
   {
+    // use Euler:
+//std::cout << "     using Euler ... " << std::endl;
     if (mOneBack.empty())
     {
+//std::cout << "         A " << std::endl;      
       // paranoid?
       if (!out_mat.empty())
       {
+//std::cout << "         a " << std::endl;      
         out_mat= cv::Mat::zeros( out_mat.rows, out_mat.cols, CV_32F );
       }
       //out_mat= cv::Mat();
     }
     else if (mTwoBack.empty())
     {
+//std::cout << "         B " << std::endl;      
       out_mat= cv::Mat::zeros( mOneBack.rows, mTwoBack.cols, CV_32F );
     }
     else
     {
+//std::cout << "         C " << std::endl;      
       // use Euler
       out_mat= - ( mTwoBack - mOneBack ) / dt;
+//std::cout << "      " << mTwoBack <<  " , " << mOneBack << " dt: " << dt;      
     }
   }
 
