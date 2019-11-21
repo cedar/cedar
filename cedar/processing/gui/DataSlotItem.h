@@ -94,7 +94,7 @@ public:
 
   /*!@brief Connects the UI item and the underlying data slot to the target.
    */
-  cedar::proc::gui::Connection* connectTo(cedar::proc::gui::DataSlotItem *pTarget);
+  cedar::proc::gui::Connection* connectTo(cedar::proc::gui::DataSlotItem *pTarget, QString sourceSlotName, QString targetSlotName);
 
   /*!@brief Returns the name of the data slot.
    */

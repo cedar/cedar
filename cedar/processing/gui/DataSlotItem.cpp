@@ -237,9 +237,9 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo
   return cedar::proc::gui::CONNECT_NO;
 }
 
-cedar::proc::gui::Connection* cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *pTarget)
+cedar::proc::gui::Connection* cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *pTarget, QString sourceSlotName, QString targetSlotName)
 {
-  return new cedar::proc::gui::Connection(this, pTarget);
+  return new cedar::proc::gui::Connection(this, pTarget, sourceSlotName, targetSlotName);
 }
 
 void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
