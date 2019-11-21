@@ -2966,7 +2966,7 @@ void cedar::proc::gui::Group::readConnections(const cedar::aux::ConfigurationNod
           }
           if(guiConnection == nullptr)
           {
-            std::cout << "No corresponding connection found" << std::endl;
+            std::cout << "[Read drag-points]: No corresponding connection found" << std::endl;
           }
           else
           {
