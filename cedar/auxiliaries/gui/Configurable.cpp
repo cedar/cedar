@@ -829,7 +829,8 @@ void cedar::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* item, ced
         || name == "number of bins"
         || name == "bins"
         || name == "VectorDimension"
-        || name == "number of vector entries")
+        || name == "number of vector entries"
+        || name == "bank size")
     {
       item->setTextColor(PARAMETER_NAME_COLUMN, QColor::fromRgb(0, 0, 128));
     }

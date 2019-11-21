@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NumericalIntegration.h
+    File:        HopfOscillatorRHS.h
 
     Maintainer:  jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        
+    Date:        2019 11 04
 
-    Description: Header file for the class cedar::proc::steps::NumericalIntegration.
+    Description: Header file for the class cedar::proc::steps::HopfOscillatorRHS.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS__NUMERICAL_INTEGRATION_H
-#define CEDAR_PROC_STEPS__NUMERICAL_INTEGRATION_H
+#ifndef CEDAR_PROC_STEPS_HOPF_OSCILLATOR_RHS_H
+#define CEDAR_PROC_STEPS_HOPF_OSCILLATOR_RHS_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -44,11 +44,12 @@
 #include <cedar/processing/Step.h>
 #include <cedar/processing/InputSlotHelper.h>
 #include <cedar/auxiliaries/MatData.h>
-#include <cedar/auxiliaries/DoubleParameter.h>
-#include <opencv2/opencv.hpp>
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/NumericalIntegration.fwd.h"
+#include "cedar/processing/steps/HopfOscillatorRHS.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -57,8 +58,13 @@
  *
  * @todo describe more.
  */
-class cedar::proc::steps::NumericalIntegration : public cedar::proc::Step
+class cedar::proc::steps::HopfOscillatorRHS : public cedar::proc::Step
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -68,13 +74,13 @@ class cedar::proc::steps::NumericalIntegration : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  NumericalIntegration();
+  HopfOscillatorRHS();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  cedar::proc::DataSlot::VALIDITY determineInputValidity(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -86,33 +92,31 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  void onStart();
+  void onStop();
+
   void inputConnectionChanged(const std::string& inputName);
 
   void compute(const cedar::proc::Arguments& arguments);
-  void recompute(bool force_reinit);
+  void recompute();
+
   void reset();
   void reinitialize();
+  void checkOptionalInputs();
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
 private:
   //!@brief MatrixData representing the input. Storing it like this saves time during computation.
   cedar::aux::ConstMatDataPtr mInput;
-  cedar::aux::ConstMatDataPtr mDelayOptional;
   cedar::aux::ConstMatDataPtr mInitialOptional;
+  cedar::aux::ConstMatDataPtr mOmegasInputOptional;
+  cedar::aux::ConstMatDataPtr mAlphasInputOptional;
+  cedar::aux::ConstMatDataPtr mGammasInputOptional;
 
   //!@brief The output data.
   cedar::aux::MatDataPtr mOutput;
-
-  cv::Mat mOneBack;
-  cv::Mat mTwoBack;
-  cv::Mat mThreeBack;
-  cv::Mat mFourBack;
-
-  cv::Mat mLastState;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -120,12 +124,19 @@ private:
 protected:
 
 private:
-  cedar::unit::Time mLastTime;
+  cedar::aux::UIntParameterPtr   mBankSize;
+  cedar::aux::DoubleParameterPtr mGlobalOmega;
+  cedar::aux::DoubleParameterPtr mGlobalAlpha;
+  cedar::aux::DoubleParameterPtr mGlobalGamma;
 
   cedar::aux::BoolParameterPtr mInitializeOnReset;
-  cedar::aux::BoolParameterPtr mUseBDF5;
+  cedar::aux::DoubleParameterPtr mShiftUByRadiusFactor;
 
-}; // class cedar::proc::steps::NumericalIntegration
+private slots:
+  void thereIsAChangedSlot();
 
-#endif // CEDAR_PROC_STEPS__NUMERICAL_INTEGRATION_H
+
+}; // class cedar::proc::steps::HopfOscillatorRHS
+
+#endif // CEDAR_PROC_STEPS_HOPF_OSCILLATOR_RHS_H
 

@@ -70,6 +70,9 @@ namespace
     declaration->setDescription
     (
       "Extracts a subregion of a tensor."
+      "\nNote: The bounds of ranges follow the OpenCV convention, i.e. "
+      "the lower boundary is inclusive and the upper boundary is "
+      "exclusive."
     );
 
     declaration->declare();

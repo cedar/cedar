@@ -89,7 +89,7 @@ private:
   void inputConnectionChanged(const std::string& inputName);
 
   void compute(const cedar::proc::Arguments& arguments);
-  void recompute();
+  void recompute(bool force_reinit);
   void reset();
   void reinitialize();
 
@@ -122,6 +122,7 @@ protected:
 private:
   cedar::aux::BoolParameterPtr mUseFivePoints;
   cedar::aux::DoubleParameterPtr mIgnoreTimeStepsSmallerThan;
+  cedar::aux::DoubleParameterPtr mIgnoreTimeStepsLargerThan;
 
 }; // class cedar::proc::steps::NumericalDifferentiation
 

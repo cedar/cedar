@@ -56,6 +56,8 @@
         <file>steps/space_to_rate_code.svg</file>
         <file>steps/spatial_template.svg</file>
         <file>steps/linear_spatial_template.svg</file>
+        <file>steps/linear_spatial_template_1xn.svg</file>
+        <file>steps/linear_spatial_template_nx1.svg</file>
 		<file>steps/log_time_interval.svg</file>
         <file>steps/static_gain.svg</file>
         <file>steps/static_gain_green.svg</file>
@@ -125,6 +127,7 @@
         <file>steps/attr_dyn_target_acquisition.svg</file>
         <file>steps/scalars_to_vector.svg</file>
         <file>steps/linear_dynamics.svg</file>
+        <file>steps/linear_negative_dynamics.svg</file>
         <file>steps/sinus_dynamics.svg</file>
         <file>steps/logarithm.svg</file>
         <file>steps/norm.svg</file>
@@ -139,6 +142,9 @@
         <file>steps/pairsGame.svg</file>
         <file>steps/noop.svg</file>
         <file>steps/nan_check.svg</file>
+        <file>steps/nan_check_caught_nan.svg</file>
+        <file>steps/nan_check_caught_inf.svg</file>
+        <file>steps/nan_check_caught_empty.svg</file>
         <file>steps/delay.svg</file>
         <file>steps/positionofmaximum.svg</file>
         <file>steps/clamp.svg</file>
@@ -161,5 +167,6 @@
         <file>steps/outer_product.svg</file>
         <file>steps/sinus_signal.svg</file>
         <file>steps/step_signal.svg</file>
+        <file>steps/hopf_osci.svg</file>
     </qresource>
 </RCC>

@@ -160,6 +160,9 @@ void cedar::proc::steps::NumericalIntegration::reinitialize()
   mTwoBack= cv::Mat();
   mThreeBack= cv::Mat();
   mFourBack= cv::Mat();
+
+  // set the output imediately to the new state:
+  this->mOutput->setData( mLastState.clone() );
 }
 
 void cedar::proc::steps::NumericalIntegration::reset()
@@ -201,7 +204,7 @@ void cedar::proc::steps::NumericalIntegration::inputConnectionChanged(const std:
     }
 
     // Make a clone to create a matrix of the same type, dimensions, ...
-    this->recompute();
+    this->recompute(true);
   }
 
   if (output_changed)
@@ -214,10 +217,10 @@ void cedar::proc::steps::NumericalIntegration::inputConnectionChanged(const std:
 
 void cedar::proc::steps::NumericalIntegration::compute(const cedar::proc::Arguments&)
 {
-  this->recompute();
+  this->recompute(false);
 }
 
-void cedar::proc::steps::NumericalIntegration::recompute()
+void cedar::proc::steps::NumericalIntegration::recompute(bool force_reinit)
 {
   auto input = getInput("input");
   auto delayinput= getInput("delay (optional)");
@@ -277,7 +280,8 @@ void cedar::proc::steps::NumericalIntegration::recompute()
 
   if (mUseBDF5->getValue())
   {
-    if (mOneBack.empty())
+    if (force_reinit 
+        || mOneBack.empty())
     {
       reinitialize();
       out_mat= mLastState.clone();
@@ -314,9 +318,12 @@ void cedar::proc::steps::NumericalIntegration::recompute()
   }
   else
   {
-    if (mOneBack.empty())
+    if (force_reinit
+        || mOneBack.empty())
     {
       reinitialize();
+      // last state hat nun einen brauchbaren startwert:
+      out_mat= mLastState.clone();
     }
     else
     {

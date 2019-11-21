@@ -69,6 +69,9 @@ cedar_add_library(cedarproc
   gui/stepViews/BoostView.h
   gui/stepViews/StaticGainView.h
   gui/stepViews/ComponentStepView.h
+  gui/stepViews/LinearSpatialTemplateView.h
+  gui/stepViews/NaNCheckView.h
+  gui/stepViews/LinearFunctionView.h
   gui/AdvancedParameterLinker.h
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureWidget.h
@@ -174,6 +177,8 @@ cedar_add_library(cedarproc
   steps/Count.h
   steps/Switch.h
   steps/LinearLateralShift.h
+  steps/HopfOscillatorRHS.h
+  steps/NaNCheck.h
   CppScript.h
   Group.h
   Step.h

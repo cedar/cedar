@@ -192,7 +192,6 @@ void cedar::proc::steps::VectorToScalars::inputConnectionChanged(const std::stri
   slot->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
 
   mInput = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->getInput(inputName));
-
-  determineInputValidity(slot, mInput);
+  slot->setValidity( determineInputValidity(slot, mInput) );
   onTrigger();
 }
