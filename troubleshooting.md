@@ -64,7 +64,7 @@ Installing cedar
 
 * **If I do *make doc*, creation of the documentation fails due to a missing refman.tex.**
 
-> This is a known bug in your Doxygen version. Use the html-doc instead or upgrade your Doxygen.
+> This is a known bug in your Doxygen version. Use the html doc instead of the latex doc or upgrade your Doxygen.
 
 
 * **Some of the unit tests fail. Help!**

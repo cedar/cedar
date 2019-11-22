@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ForceLet.h
+    File:        VehicleObstacleAvoidanceForceLet.h
 
     Maintainer:  Daniel Sabinasz
     Email:       daniel.sabinasz@ini.rub.de
@@ -34,16 +34,16 @@
 
 ======================================================================================================================*/
 
-#ifndef FORCELET_H_
-#define FORCELET_H_
+#ifndef VEHICLE_OBSTACLE_AVOIDANCE_FORCELET_H_
+#define VEHICLE_OBSTACLE_AVOIDANCE_FORCELET_H_
 
 #include <cedar/processing/Step.h> // if we are going to inherit from cedar::proc::Step, we have to include the header
 #include <cedar/auxiliaries/MatData.h>
 #include <cedar/auxiliaries/DoubleParameter.h>
 #include <cedar/auxiliaries/BoolParameter.h>
-#include "cedar/processing/steps/ForceLet.fwd.h"
+#include "cedar/processing/steps/VehicleObstacleAvoidanceForceLet.fwd.h"
 
-class cedar::proc::steps::ForceLet : public cedar::proc::Step
+class cedar::proc::steps::VehicleObstacleAvoidanceForceLet : public cedar::proc::Step
 {
     Q_OBJECT
 
@@ -51,7 +51,7 @@ public slots:
   void constantChanged();
 
   public:
-    ForceLet();
+    VehicleObstacleAvoidanceForceLet();
     /*cedar::proc::DataSlot::VALIDITY determineInputValidity
                                     (
                                       cedar::proc::ConstDataSlotPtr slot,
@@ -76,4 +76,4 @@ public slots:
 
 };
 
-#endif /* FORCELET_H_ */
+#endif /* VEHICLE_OBSTACLE_AVOIDANCE_FORCELET_H_ */
