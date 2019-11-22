@@ -425,6 +425,7 @@ private:
   cedar::proc::gui::Element* getUiElementFor(cedar::proc::ElementPtr element) const;
 
   void readStickyNotes(const cedar::aux::ConfigurationNode& node);
+  void readConnections(const cedar::aux::ConfigurationNode& node);
   void readView(const cedar::aux::ConfigurationNode& node);
 
   /*!@brief this function emits a connection added signal for all connections in the underlying network.
@@ -521,6 +522,9 @@ private:
 
   //!@brief a vector of all sink connectors
   std::vector<cedar::proc::gui::DataSlotItem*> mConnectorSinks;
+
+  //!@brief a vector of all gui connections
+  //std::vector<cedar::proc::gui::Connection*> mConnections;
 
   //!@brief a vector of steps, which contains all steps that should be added to the scene after reading a configuration
   std::vector<cedar::proc::gui::StepItem*> mpStepsToAdd;

@@ -133,6 +133,12 @@ QPointF cedar::proc::gui::ConnectionAnchor::posMiddle()
   return this->pos() + this->posOffset + QPointF(this->mRadius, this->mRadius);
 }
 
+QPointF cedar::proc::gui::ConnectionAnchor::scenePos()
+{
+  // return the position in the middle of the circle relative to the parent coordinate system ( (0|0) is at Connection->source->scenePos)
+  return QGraphicsEllipseItem::scenePos();
+}
+
 void cedar::proc::gui::ConnectionAnchor::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
   QGraphicsEllipseItem::mouseMoveEvent(event);

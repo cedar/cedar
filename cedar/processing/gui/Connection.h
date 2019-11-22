@@ -71,7 +71,7 @@ class cedar::proc::gui::Connection : public QGraphicsPathItem
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Connection(cedar::proc::gui::GraphicsBase *pSource = nullptr, cedar::proc::gui::GraphicsBase *pTarget = nullptr);
+  Connection(cedar::proc::gui::GraphicsBase *pSource = nullptr, cedar::proc::gui::GraphicsBase *pTarget = nullptr, QString sourceSlotName = "", QString targetSlotName = "");
 
   //!@brief Destructor
   ~Connection();
@@ -94,6 +94,14 @@ public:
 
   //!@brief access the target of this connection
   cedar::proc::gui::ConstGraphicsBase* getTarget() const;
+
+  //! returns the slot name of the source
+  QString getSourceSlotName();
+
+  //! returns the slot name of the target
+  QString getTargetSlotName();
+
+  bool isSourceTargetSlotNameValid();
 
   //! Sets the source of the connection
   void setSource(cedar::proc::gui::GraphicsBase* source);
@@ -138,7 +146,7 @@ public:
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent*);
 
   //!@brief adds a "drag node" to the connection
-  void addConnectionAnchor(QPointF);
+  void addConnectionAnchor(QPointF, bool);
 
   //!@brief handles events in the context menu
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
@@ -148,6 +156,9 @@ public:
 
   //! returns validity
   cedar::proc::gui::ConnectValidity getValidity();
+
+  //! returns the anchor point vector
+  std::vector<cedar::proc::gui::ConnectionAnchor*> getConnectionAnchorPoints();
 
 public slots:
   //!@brief update the position of this connection, depending on anchor points of source and target
@@ -190,12 +201,6 @@ private:
   //!@brief smart mode flag (i.e., automatically draw nice lines with corners)
   bool mSmartMode;
 
-  //! all anchor points of the path that the user has created by double clicking on the connection
-  std::vector<cedar::proc::gui::ConnectionAnchor*> mConnectionAnchorPoints;
-
-  //! Default radius for connection anchors
-  int mAnchorPointRadius;
-
   //! Whether or not to highlight the connection.
   bool mHighlight;
 
@@ -204,6 +209,21 @@ private:
 
   //! Base width of the connection's line
   double mBaseLineWidth;
+
+  //! Wether the given name (from the constructor) of source and target slot is valid
+  bool mValidSourceTargetSlotName;
+
+  //! name of source slot in the format sourceStepName.sourceSlotName
+  QString mSourceSlotName;
+
+  //! name of target slot in the format targetStepName.targetSlotName
+  QString mTargetSlotName;
+
+  //! all anchor points of the path that the user has created by double clicking on the connection
+  std::vector<cedar::proc::gui::ConnectionAnchor*> mConnectionAnchorPoints;
+
+  //! Default radius for connection anchors
+  int mAnchorPointRadius;
 }; // class cedar::proc::gui::TriggerConnection
 
 #endif // CEDAR_PROC_GUI_CONNECTION_H
