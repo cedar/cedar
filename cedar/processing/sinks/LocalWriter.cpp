@@ -69,7 +69,9 @@ namespace
       )
     );
     input_declaration->setIconPath(":/steps/local_writer.svg");
-    input_declaration->setDescription("Forwards incoming matrices locally. "
+    input_declaration->setDescription("Forwards a tensor to a "
+                          "'LocalReader' step inside the same local "
+                          "cedar instance. "
                           "See also the LocalReader step.");
 
     input_declaration->declare();

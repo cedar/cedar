@@ -72,7 +72,9 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/local_reader.svg");
-    declaration->setDescription("Reads a matrix locally. See also the "
+    declaration->setDescription("Reads a tensor that was sent from a "
+                    "'LocalWriter' inside the same local cedar instance. "
+                    "See also the "
                     "LocalWriter step.");
 
     declaration->declare();
