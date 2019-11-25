@@ -187,6 +187,9 @@ bool cedar::proc::steps::DampedPseudoInverseKinematics::hasComponent() const
 
 void cedar::proc::steps::DampedPseudoInverseKinematics::reset()
 {
+  if (!this->hasComponent())
+    return;
+
   auto component = this->getComponent();
   component->clearAll();
 }

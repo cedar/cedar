@@ -155,6 +155,9 @@ bool cedar::proc::steps::PseudoInverseKinematics::hasComponent() const
 
 void cedar::proc::steps::PseudoInverseKinematics::reset()
 {
+  if (!this->hasComponent())
+    return;
+
   auto component = this->getComponent();
   component->clearAll();
 }
