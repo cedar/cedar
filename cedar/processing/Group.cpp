@@ -2828,12 +2828,20 @@ void cedar::proc::Group::revalidateConnections(const std::string& sender)
   std::string output;
   cedar::aux::splitLast(sender, ".", child, output);
   std::vector<cedar::proc::DataConnectionPtr> connections;
-  this->getDataConnectionsFrom(this->getElement<Connectable>(child), output, connections);
-  for (auto connection : connections)
+
+  try
   {
-    cedar::proc::ConnectablePtr sender = this->getElement<Connectable>(connection->getSource()->getParent());
-    cedar::proc::ConnectablePtr receiver = this->getElement<Connectable>(connection->getTarget()->getParent());
-    receiver->callInputConnectionChanged(connection->getTarget()->getName());
+    this->getDataConnectionsFrom(this->getElement<Connectable>(child), output, connections);
+    for (auto connection : connections)
+    {
+      cedar::proc::ConnectablePtr sender = this->getElement<Connectable>(connection->getSource()->getParent());
+      cedar::proc::ConnectablePtr receiver = this->getElement<Connectable>(connection->getTarget()->getParent());
+      receiver->callInputConnectionChanged(connection->getTarget()->getName());
+    }
+  }
+  catch (cedar::aux::InvalidNameException &e)
+  {
+    // ignore
   }
 }
 
