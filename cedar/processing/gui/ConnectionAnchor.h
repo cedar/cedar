@@ -98,6 +98,9 @@ public:
   //! return the (middle) position relative to the source step position
   QPointF posMiddle();
 
+  //! return the position relative to the scene
+  QPointF scenePos();
+
   //! set the visibility
   void setVisibility(bool);
 

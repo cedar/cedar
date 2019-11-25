@@ -1146,14 +1146,51 @@ void cedar::proc::gui::Group::readJson(const cedar::aux::Path &source)
   cedar::aux::ConfigurationNode root;
   read_json(source.toString(), root);
 
+  std::vector<std::string> exceptions;
 
-  this->readRobots(root);
-  this->mGroup->readConfiguration(root);
-  this->readConfiguration(root);
+  try
+  {
+    this->readRobots(root);
+  }
+  catch(const cedar::proc::ArchitectureLoadingException& e)
+  {
+    exceptions.insert( std::end(exceptions),
+                       std::begin(e.getMessages()),
+                       std::end(e.getMessages()) );
+  }
+
+  try
+  {
+    this->mGroup->readConfiguration(root);
+  }
+  catch(const cedar::proc::ArchitectureLoadingException& e)
+  {
+    exceptions.insert( std::end(exceptions),
+                       std::begin(e.getMessages()),
+                       std::end(e.getMessages()) );
+  }
+
+  try
+  {
+    this->readConfiguration(root);
+  }
+  catch(const cedar::proc::ArchitectureLoadingException& e)
+  {
+    exceptions.insert( std::end(exceptions),
+                       std::begin(e.getMessages()),
+                       std::end(e.getMessages()) );
+  }
 
   if (boost::filesystem::exists(source.toString() + ".data"))
   {
     this->mGroup->readDataFile(source.toString() + ".data");
+  }
+
+  // rethrow after having finished as much as possible ...
+  if (!exceptions.empty())
+  {
+    cedar::proc::ArchitectureLoadingException exception(exceptions);
+    CEDAR_THROW_EXCEPTION(exception);
   }
 }
 
@@ -1235,6 +1272,7 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
   if (root.find("ui") != root.not_found())
   {
     this->readStickyNotes(root.get_child("ui"));
+    this->readConnections(root.get_child("ui"));
   }
 
   if (root.find("ui view") != root.not_found())
@@ -1642,6 +1680,45 @@ void cedar::proc::gui::Group::writeScene(cedar::aux::ConfigurationNode &root) co
     }
   }
 
+  //Save ConnectionAnchor (drag-points of Connection)
+  std::vector<cedar::proc::gui::Connection*> cs;
+
+  QList<QGraphicsItem *> items = this->mpScene->items();
+  for (int i = 0; i < items.size(); ++i)
+  {
+    if (cedar::proc::gui::Connection *conn = dynamic_cast<cedar::proc::gui::Connection *>(items[i]))
+    {
+      cs.push_back(conn);
+    }
+  }
+
+  cedar::aux::ConfigurationNode connNode;
+  connNode.put("type", "connections");
+  cedar::aux::ConfigurationNode allConnections;
+
+  for (cedar::proc::gui::Connection *conn : cs)
+  {
+    if(conn->getConnectionAnchorPoints().size() <= 0 && !conn->isSourceTargetSlotNameValid()) continue;
+    cedar::aux::ConfigurationNode connection;
+    connection.put("source slot", conn->getSourceSlotName().toStdString());
+    connection.put("target slot", conn->getTargetSlotName().toStdString());
+    cedar::aux::ConfigurationNode anchorsNode;
+    for(cedar::proc::gui::ConnectionAnchor *anchor : conn->getConnectionAnchorPoints()){
+      cedar::aux::ConfigurationNode anchorNode;
+      anchorNode.put("x", static_cast<int>(anchor->posMiddle().x()));
+      anchorNode.put("y", static_cast<int>(anchor->posMiddle().y()));
+
+
+      //cedar::proc::gui::GraphicsBase *p_base_source = this->mpScene->getGraphicsItemFor();
+
+      anchorsNode.push_back(cedar::aux::ConfigurationNode::value_type("", anchorNode));
+    }
+    connection.add_child("anchors", anchorsNode);
+    allConnections.push_back(cedar::aux::ConfigurationNode::value_type("", connection));
+  }
+  connNode.put_child("connections", allConnections);
+
+  scene.push_back(cedar::aux::ConfigurationNode::value_type("", connNode));
   auto elements = this->getGroup()->getElements();
 
   for
@@ -1819,7 +1896,7 @@ void cedar::proc::gui::Group::dataConnectionChanged
   {
     case cedar::proc::Group::CONNECTION_ADDED:
     {
-      cedar::proc::gui::Connection *p_con = source_slot->connectTo(target_slot);
+      cedar::proc::gui::Connection *p_con = source_slot->connectTo(target_slot, sourceName + "." + sourceSlot, targetName + "." + targetSlot);
       p_con->setSmartMode(this->getSmartConnection());
       break;
     }
@@ -2880,6 +2957,69 @@ void cedar::proc::gui::Group::readView(const cedar::aux::ConfigurationNode &node
   }
   catch (std::exception &e)
   {
+  }
+}
+
+void cedar::proc::gui::Group::readConnections(const cedar::aux::ConfigurationNode &node)
+{
+
+  std::vector<cedar::proc::gui::Connection*> cs;
+
+  QList<QGraphicsItem *> items = this->mpScene->items();
+  for (int i = 0; i < items.size(); ++i)
+  {
+    if (cedar::proc::gui::Connection *con = dynamic_cast<cedar::proc::gui::Connection *>(items[i]))
+    {
+      cs.push_back(con);
+    }
+  }
+
+  if(cs.size() <= 0) return;
+
+  for (auto iter = node.begin(); iter != node.end(); ++iter)
+  {
+    const auto &type_node = iter->second;
+    const std::string &type = type_node.get<std::string>("type");
+    if (type == "connections")
+    {
+      auto allConnections = type_node.get_child("connections");
+      for (auto it = allConnections.begin(); it != allConnections.end(); ++it)
+      {
+        auto connectionNode = it->second;
+
+        std::string sourceSlotName = connectionNode.get<std::string>("source slot");
+        std::string targetSlotName = connectionNode.get<std::string>("target slot");
+        if(sourceSlotName.compare("") && targetSlotName.compare(""))
+        {
+          //Find the right gui::Connection
+          cedar::proc::gui::Connection* guiConnection = nullptr;
+          for(int i = 0; i < cs.size(); i++)
+          {
+            if(sourceSlotName.compare(cs.at(i)->getSourceSlotName().toStdString()) == 0 && targetSlotName.compare(cs.at(i)->getTargetSlotName().toStdString()) == 0)
+            {
+              guiConnection = cs.at(i);
+              break;
+            }
+          }
+          if(guiConnection == nullptr)
+          {
+            std::cout << "[Read drag-points]: No corresponding connection found" << std::endl;
+          }
+          else
+          {
+            auto anchorsNode = connectionNode.get_child("anchors");
+            for (auto iter2 = anchorsNode.begin(); iter2 != anchorsNode.end(); ++iter2)
+            {
+              auto anchorNode = iter2->second;
+              int x = anchorNode.get<int>("x");
+              int y = anchorNode.get<int>("y");
+              guiConnection->addConnectionAnchor(QPointF(x, y), true);
+            }
+          }
+        }
+      }
+      break;
+    }
   }
 }
 
