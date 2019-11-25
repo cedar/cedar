@@ -64,6 +64,16 @@ namespace
       "Obtain the Jacobi matrix of the end-effector and apply the input to "
       "it. Needs to be connected to an appropriate Component (Robot)."
     );
+    declaration->setDescription("Connects to a robot and calculates the "
+      "inverse of the end-effector Jacobian. Then applies the input to it.\n"
+      "Needs to be connected to an appropriate Component (Robot).\n" 
+      "The inverse is calculated via SVD iff the parameter 'lambda' is "
+      "equals to zero OR via the damped least squares "
+      "method iff 'lambda' is unequal to zero. "
+      "'Lambda' then is the damping parameter. Note: 'lambda' is chosen "
+      "quite high per default, reduce it if the inversion is not "
+      "precise enough for your use-case.\n"
+      "TODO: output the Jacobian TODO: optional input as a point on the robot to calculate J for that position.");
 
     return true;
   }
@@ -80,7 +90,8 @@ cedar::proc::steps::PseudoInverseKinematics::PseudoInverseKinematics()
       cedar::proc::Step(true),
       mOutputVelocity(new cedar::aux::MatData(cv::Mat())),
       mInputVelocityName("Cartesian velocity"),
-      _mComponent(new cedar::dev::ComponentParameter(this, "component"))
+      _mComponent(new cedar::dev::ComponentParameter(this, "component")),
+      mLambda(new cedar::aux::DoubleParameter(this, "damping lambda", 0.04, 0.0, 100000.0 ))
 {
   this->declareInput(mInputVelocityName);
   QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SLOT(rebuildOutputs()));
@@ -106,10 +117,58 @@ void cedar::proc::steps::PseudoInverseKinematics::compute(const cedar::proc::Arg
     if (kinChain)
     {
       cv::Mat Jacobian = kinChain->calculateEndEffectorJacobian();
-      cv::Mat jacobian_pseudo_inverse = cv::Mat::zeros(kinChain->getNumberOfJoints(), 2, CV_32FC1);
-      cv::invert(Jacobian, jacobian_pseudo_inverse, cv::DECOMP_SVD);
-      cv::Mat joint_velocities = jacobian_pseudo_inverse * cartesianVelocityMat;
-      mOutputVelocity->setData(joint_velocities);
+
+      if (cedar::aux::math::isZero( mLambda->getValue() ))
+      {
+        // classic: no dampingg, use the CV SVD decomposition
+        cv::Mat jacobian_pseudo_inverse = cv::Mat::zeros(kinChain->getNumberOfJoints(), 2, CV_32FC1);
+        cv::invert(Jacobian, jacobian_pseudo_inverse, cv::DECOMP_SVD);
+        cv::Mat joint_velocities = jacobian_pseudo_inverse * cartesianVelocityMat;
+        mOutputVelocity->setData(joint_velocities);
+      }
+      else
+      {
+        // calculate SVD ourselves and apply damping
+        cv::Mat jacobian_pseudo_inverse = cv::Mat::zeros(kinChain->getNumberOfJoints(), 2, CV_32FC1);
+
+        cv::Mat U, V_transposed, S;
+
+        //cv::invert(Jacobian, jacobian_pseudo_inverse, cv::DECOMP_SVD);
+        cv::SVD::compute( Jacobian, S, U, V_transposed, cv::SVD::FULL_UV );
+
+        cv::Mat V, U_transposed;
+        V= V_transposed.t();
+        U_transposed= U.t();
+
+        cv::Mat damped_inverse;
+       
+        float lambda_squared = mLambda->getValue() * mLambda->getValue();
+
+        cv::Mat S_diag= cv::Mat::diag( S );
+        cv::Mat S2;
+        cv::divide(S_diag, S_diag*S_diag + lambda_squared, S2 );
+        cv::Mat S3;
+        if (V.cols > S2.rows) 
+        {
+              cv::vconcat(S2, cv::Mat::zeros( V.cols - S2.rows,
+                                        S2.cols,
+                                        CV_32F ),
+                    S3);
+        }
+        else 
+        {
+          S3 = S2;
+        }
+        if (U_transposed.rows > S3.cols) 
+        {
+              cv::hconcat(S3.clone(), cv::Mat::zeros(S3.rows, U_transposed.rows - S3.cols, CV_32F), S3);
+        }
+
+        damped_inverse= V * S3 * U_transposed;
+        
+        cv::Mat joint_velocities = damped_inverse * cartesianVelocityMat;
+        mOutputVelocity->setData(joint_velocities);
+      }
     }
   }
 }

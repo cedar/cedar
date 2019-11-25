@@ -43,6 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/devices/ComponentParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/MatData.h"
 
 // FORWARD DECLARATIONS
@@ -121,6 +122,7 @@ protected:
 
 private:
   cedar::dev::ComponentParameterPtr _mComponent;
+  cedar::aux::DoubleParameterPtr mLambda;
 
 };
 // class cedar::proc::steps::InverseKinematicsStep
