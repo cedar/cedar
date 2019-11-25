@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ForceLet.fwd.h
+    File:        VehicleObstacleAvoidanceForceLet.fwd.h
 
     Maintainer:  Daniel Sabinasz
     Email:       daniel.sabinasz@ini.rub.de
     Date:        2019 08 15
 
-    Description: Forward declaration file for the class cedar::proc::steps::ForceLet
+    Description: Forward declaration file for the class cedar::proc::steps::VehicleObstacleAvoidanceForceLet
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_FORCELET_FWD_H
-#define CEDAR_PROC_STEPS_FORCELET_FWD_H
+#ifndef CEDAR_PROC_STEPS_VEHICLE_OBSTACLE_AVOIDANCE_FORCELET_FWD_H
+#define CEDAR_PROC_STEPS_VEHICLE_OBSTACLE_AVOIDANCE_FORCELET_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -56,12 +56,12 @@ namespace cedar
     namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(ForceLet);
+      CEDAR_DECLARE_PROC_CLASS(VehicleObstacleAvoidanceForceLet);
       //!@endcond
     }
   }
 }
 
 
-#endif // CEDAR_PROC_STEPS_FORCELET_FWD_H
+#endif // CEDAR_PROC_STEPS_VEHICLE_OBSTACLE_AVOIDANCE_FORCELET_FWD_H
 

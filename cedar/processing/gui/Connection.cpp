@@ -64,7 +64,9 @@
 cedar::proc::gui::Connection::Connection
 (
   cedar::proc::gui::GraphicsBase* pSource,
-  cedar::proc::gui::GraphicsBase* pTarget
+  cedar::proc::gui::GraphicsBase* pTarget,
+  QString sourceSlotName,
+  QString targetSlotName
 )
 :
 mpSource(nullptr),
@@ -75,13 +77,15 @@ mSmartMode(false),
 mHighlight(false),
 mHighlightHover(false),
 mBaseLineWidth(2.5),
+mSourceSlotName(sourceSlotName),
+mTargetSlotName(targetSlotName),
 mAnchorPointRadius(4)
 {
   this->setFlags(this->flags() | QGraphicsItem::ItemStacksBehindParent | QGraphicsItem::ItemIsSelectable);
   this->setHighlightedBySelection(false);
 
   this->setSourceAndTarget(pSource, pTarget);
-
+  this->mValidSourceTargetSlotName = sourceSlotName != "" && targetSlotName != "";
 }
 
 cedar::proc::gui::Connection::~Connection()
@@ -585,6 +589,10 @@ void cedar::proc::gui::Connection::update()
   this->setPath(path);
 }
 
+std::vector<cedar::proc::gui::ConnectionAnchor*> cedar::proc::gui::Connection::getConnectionAnchorPoints(){
+  return this->mConnectionAnchorPoints;
+}
+
 QColor cedar::proc::gui::Connection::highlightColor(const QColor& source, bool input, bool output) const
 {
   if(input)
@@ -667,6 +675,21 @@ cedar::proc::gui::ConstGraphicsBase* cedar::proc::gui::Connection::getTarget() c
   return this->mpTarget;
 }
 
+QString cedar::proc::gui::Connection::getSourceSlotName()
+{
+  return this->mSourceSlotName;
+}
+
+QString cedar::proc::gui::Connection::getTargetSlotName()
+{
+  return this->mTargetSlotName;
+}
+
+bool cedar::proc::gui::Connection::isSourceTargetSlotNameValid()
+{
+  return this->mValidSourceTargetSlotName;
+}
+
 void cedar::proc::gui::Connection::setSmartMode(bool smart)
 {
   this->mSmartMode = smart;
@@ -716,14 +739,20 @@ float cedar::proc::gui::Connection::distance(QPointF source, QPointF target)
 void cedar::proc::gui::Connection::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
   QGraphicsPathItem::mouseDoubleClickEvent(event);
   if(event->button() == Qt::LeftButton){
-    addConnectionAnchor(event->scenePos());
+    addConnectionAnchor(event->scenePos(), false);
   }
 }
 
-void cedar::proc::gui::Connection::addConnectionAnchor(QPointF addPosition){
-  int event = 0;
+void cedar::proc::gui::Connection::addConnectionAnchor(QPointF addPosition, bool restoreOldPoint){
   if(!this->mSmartMode)
   {
+    if(restoreOldPoint)
+    {
+      mConnectionAnchorPoints.push_back(new cedar::proc::gui::ConnectionAnchor(addPosition.x(), addPosition.y(), mAnchorPointRadius, this));
+      this->updateGraphics();
+      return;
+    }
+
     QPointF anchorPoint = addPosition;
     QPointF anchorPointMinusPos = anchorPoint - this->mpSource->scenePos();
 
@@ -830,7 +859,7 @@ void cedar::proc::gui::Connection::contextMenuEvent(QGraphicsSceneContextMenuEve
   }
   else if (selectedAction == addDragNodeAction)
   {
-    addConnectionAnchor(event->scenePos());
+    addConnectionAnchor(event->scenePos(), false);
   }
 }
 
