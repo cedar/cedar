@@ -2831,7 +2831,12 @@ void cedar::proc::Group::revalidateConnections(const std::string& sender)
 
   try
   {
-    this->getDataConnectionsFrom(this->getElement<Connectable>(child), output, connections);
+    auto elem= this->getElement<Connectable>(child);
+
+    if (!elem)
+      return;
+
+    this->getDataConnectionsFrom(elem, output, connections);
     for (auto connection : connections)
     {
       cedar::proc::ConnectablePtr sender = this->getElement<Connectable>(connection->getSource()->getParent());
