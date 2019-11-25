@@ -1146,14 +1146,51 @@ void cedar::proc::gui::Group::readJson(const cedar::aux::Path &source)
   cedar::aux::ConfigurationNode root;
   read_json(source.toString(), root);
 
+  std::vector<std::string> exceptions;
 
-  this->readRobots(root);
-  this->mGroup->readConfiguration(root);
-  this->readConfiguration(root);
+  try
+  {
+    this->readRobots(root);
+  }
+  catch(const cedar::proc::ArchitectureLoadingException& e)
+  {
+    exceptions.insert( std::end(exceptions),
+                       std::begin(e.getMessages()),
+                       std::end(e.getMessages()) );
+  }
+
+  try
+  {
+    this->mGroup->readConfiguration(root);
+  }
+  catch(const cedar::proc::ArchitectureLoadingException& e)
+  {
+    exceptions.insert( std::end(exceptions),
+                       std::begin(e.getMessages()),
+                       std::end(e.getMessages()) );
+  }
+
+  try
+  {
+    this->readConfiguration(root);
+  }
+  catch(const cedar::proc::ArchitectureLoadingException& e)
+  {
+    exceptions.insert( std::end(exceptions),
+                       std::begin(e.getMessages()),
+                       std::end(e.getMessages()) );
+  }
 
   if (boost::filesystem::exists(source.toString() + ".data"))
   {
     this->mGroup->readDataFile(source.toString() + ".data");
+  }
+
+  // rethrow after having finished as much as possible ...
+  if (!exceptions.empty())
+  {
+    cedar::proc::ArchitectureLoadingException exception(exceptions);
+    CEDAR_THROW_EXCEPTION(exception);
   }
 }
 

@@ -2118,12 +2118,6 @@ void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& 
   std::set<cedar::proc::Trigger*> visited;
   this->updateTriggerChains(visited);
 
-  if (!exceptions.empty())
-  {
-    cedar::proc::ArchitectureLoadingException exception(exceptions);
-    CEDAR_THROW_EXCEPTION(exception);
-  }
-
   // holding trigger chain updates may have caused some steps to not be computed; thus, re-trigger all sources
   for (const auto& name_element_pair : this->getElements())
   {
@@ -2133,6 +2127,15 @@ void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& 
       triggerable->onTrigger();
     }
   }
+
+  // do this as late as possible so as to rescue as much as possible
+  // of the defunct architecture file
+  if (!exceptions.empty())
+  {
+    cedar::proc::ArchitectureLoadingException exception(exceptions);
+    CEDAR_THROW_EXCEPTION(exception);
+  }
+
 }
 
 void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions)
