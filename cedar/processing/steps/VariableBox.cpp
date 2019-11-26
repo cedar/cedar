@@ -70,7 +70,11 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/variable_box.svg");
-    declaration->setDescription("Similar to the BoxInput step: Generates a tensor that contains a 'box' (i.e. square or cubic) region but with the 'left' bound defined via an input. TODO: make other parameters optionally adjustable via input.");
+    declaration->setDescription("Similar to the BoxInput step: Generates a tensor that contains a 'box' (i.e. square or cubic) region but with the 'left' (!) bound defined via an input.\n"
+"The required input is in indices. "
+"If you want your input to correspond to the center of the box, select the parameter option 'center at input', instead.\n"
+"The 'amplitude' sets the value inside the designated box area and the 'reference level' the value outside the box.\n"
+    "TODO: make other parameters (like the width) optionally adjustable via input.");
     declaration->deprecatedName("cedar.processing.steps.VariableBox");
 
     declaration->declare();
@@ -91,8 +95,9 @@ mOutput(new cedar::aux::MatData(cv::Mat())),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 2, 1, 4)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 50, 1, 1000)),
 _mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0, cedar::aux::DoubleParameter::LimitType::full(), 0.5)),
-_mWidths(new cedar::aux::UIntVectorParameter(this, "widths", 2, 1, 1, 10000)),
-_mReferenceLevel(new cedar::aux::DoubleParameter(this, "reference level", 0.0))
+_mWidths(new cedar::aux::UIntVectorParameter(this, "widths", 2, 10, 1, 10000)),
+_mReferenceLevel(new cedar::aux::DoubleParameter(this, "reference level", 0.0)),
+_mDoCenterAtInput(new cedar::aux::BoolParameter(this, "center at input", false))
 {
   cedar::proc::DataSlotPtr input = this->declareInput("left bounds");
 
@@ -102,6 +107,7 @@ _mReferenceLevel(new cedar::aux::DoubleParameter(this, "reference level", 0.0))
   QObject::connect(_mWidths.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
+  QObject::connect(_mDoCenterAtInput.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   this->updateMatrix();
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -216,6 +222,15 @@ void cedar::proc::steps::VariableBox::recompute()
   
   if (mat.rows > 1 )
     tmpvec.push_back( static_cast<unsigned int>(mat.at<float>(1,0) ) );
+
+  if (_mDoCenterAtInput->getValue())
+  {
+    tmpvec[0]-= _mWidths->getValue()[0] / 2;
+    if (mat.rows > 1 )
+    {
+      tmpvec[1]-= _mWidths->getValue()[1] / 2;
+    }
+  }
 
   this->mOutput->setData
                  (

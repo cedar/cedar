@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
@@ -135,6 +136,8 @@ protected:
 
   //!@brief the reference level of the box function
   cedar::aux::DoubleParameterPtr _mReferenceLevel;
+
+  cedar::aux::BoolParameterPtr _mDoCenterAtInput;
 
   //!@brief the vector of left bounds of the box function
   //cedar::aux::UIntVectorParameterPtr _mLeftBounds;
