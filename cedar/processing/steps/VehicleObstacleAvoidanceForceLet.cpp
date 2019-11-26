@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ForceLet.cpp
+    File:        VehicleObstacleAvoidanceForceLet.cpp
 
     Maintainer:  Daniel Sabinasz
     Email:       daniel.sabinasz@ini.rub.de
@@ -34,7 +34,7 @@
 
 ======================================================================================================================*/
 // LOCAL INCLUDES
-#include "ForceLet.h"
+#include "VehicleObstacleAvoidanceForceLet.h"
 #include "cedar/processing/ElementDeclaration.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -50,16 +50,16 @@ namespace {
 
         ElementDeclarationPtr declaration
                 (
-                        new ElementDeclarationTemplate<cedar::proc::steps::ForceLet>
+                        new ElementDeclarationTemplate<cedar::proc::steps::VehicleObstacleAvoidanceForceLet>
                                 (
                                         "Robotics",
-                                        "cedar.processing.steps.ForceLet"
+                                        "cedar.processing.steps.VehicleObstacleAvoidanceForceLet"
                                 )
                 );
-        declaration->setIconPath(":/steps/forcelet.svg");
+        declaration->setIconPath(":/steps/vehicle_obstacle_avoidance_forcelet.svg");
         declaration->setDescription
                 (
-                        "Implements a force-let as defined in 'Bicho, E., Mallet, P.,  and Schöner, G. (2000). Target representation on an autonomous vehicle with low-level sensors. International Journal of Robotics Research, 19(5):424–447'.\n"
+                        "Implements an obstacle avoidance force-let for the heading direction of a vehicle on a 2D surface. Formula: lambda * (phi - psi_obs) * exp(-0.5 (phi - psi_obs)^2 / sigma^2). lambda = beta_1 * exp(-d_i / beta_2). sigma = arctan(tan(Delta_theta) + R / (R + d)). For details see 'Bicho, E., Mallet, P., and Schöner, G. (2000). Target representation on an autonomous vehicle with low-level sensors. International Journal of Robotics Research, 19(5):424–447'.\n"
                 );
 
         declaration->declare();
@@ -75,19 +75,19 @@ namespace {
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::steps::ForceLet::ForceLet()
+cedar::proc::steps::VehicleObstacleAvoidanceForceLet::VehicleObstacleAvoidanceForceLet()
         :
         cedar::proc::Step(false),
         mResult(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
         mRadius(new cedar::aux::DoubleParameter(this, "robot radius (R)", 0.0265)),
-        mSensorRange(new cedar::aux::DoubleParameter(this, "sensor range (delta theta)", 0.7854)),
-        mBeta1(new cedar::aux::DoubleParameter(this, "maximal strength (beta 1)", 1.0)),
-        mBeta2(new cedar::aux::DoubleParameter(this, "distance scale (beta 2)", 1.0)) {
+        mSensorRange(new cedar::aux::DoubleParameter(this, "sensor range (Delta_theta)", 0.7854)),
+        mBeta1(new cedar::aux::DoubleParameter(this, "maximal strength (beta_1)", 1.0)),
+        mBeta2(new cedar::aux::DoubleParameter(this, "distance scale (beta_2)", 1.0)) {
     this->declareInput("input");
     this->declareInput("obstacle angle (psi)");
     this->declareInput("obstacle distance (d)");
-    this->declareInput("maximal strength (beta 1; optional)", false); // optional
-    this->declareInput("distance scale (beta 2; optional)", false); // optional
+    this->declareInput("maximal strength (beta_1; optional)", false); // optional
+    this->declareInput("distance scale (beta_2; optional)", false); // optional
 
     this->declareOutput("result", mResult);
 
@@ -101,7 +101,7 @@ cedar::proc::steps::ForceLet::ForceLet()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::steps::ForceLet::recompute() {
+void cedar::proc::steps::VehicleObstacleAvoidanceForceLet::recompute() {
     auto phiInput = getInput("input");
     if (!phiInput)
         return;
@@ -182,11 +182,11 @@ void cedar::proc::steps::ForceLet::recompute() {
     // get called for optional inputs that get removed by the user.
 }
 
-void cedar::proc::steps::ForceLet::compute(const cedar::proc::Arguments &) {
+void cedar::proc::steps::VehicleObstacleAvoidanceForceLet::compute(const cedar::proc::Arguments &) {
     recompute();
 }
 
-void cedar::proc::steps::ForceLet::checkOptionalInputs() {
+void cedar::proc::steps::VehicleObstacleAvoidanceForceLet::checkOptionalInputs() {
 
     auto beta1Input = getInput("maximal strength (beta 1; optional)");
     bool has_beta1_input = false;
@@ -226,7 +226,7 @@ void cedar::proc::steps::ForceLet::checkOptionalInputs() {
 }
 
 //// validity check
-/*cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ForceLet::determineInputValidity
+/*cedar::proc::DataSlot::VALIDITY cedar::proc::steps::VehicleObstacleAvoidanceForceLet::determineInputValidity
         (
                 cedar::proc::ConstDataSlotPtr slot,
                 cedar::aux::ConstDataPtr data
@@ -255,11 +255,11 @@ void cedar::proc::steps::ForceLet::checkOptionalInputs() {
     return cedar::proc::DataSlot::VALIDITY_ERROR;
 }*/
 
-void cedar::proc::steps::ForceLet::inputConnectionChanged(const std::string &) {
+void cedar::proc::steps::VehicleObstacleAvoidanceForceLet::inputConnectionChanged(const std::string &) {
     recompute();
 }
 
-void cedar::proc::steps::ForceLet::constantChanged() {
+void cedar::proc::steps::VehicleObstacleAvoidanceForceLet::constantChanged() {
     recompute();
 }
 
