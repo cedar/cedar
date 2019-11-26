@@ -89,113 +89,121 @@ ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WIT
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-namespace cedar::proc::gui::CodeWidgetScope
+namespace cedar
 {
-  //! Container to describe a highlighting rule. Based on a regular expression, a relevant match # and the format.
-  class HighlightingRule
+  namespace proc
   {
-  public:
-    HighlightingRule(const QString &patternStr, int n, const QTextCharFormat &matchingFormat)
+    namespace gui
     {
-      originalRuleStr = patternStr;
-      pattern = QRegExp(patternStr);
-      nth = n;
-      format = matchingFormat;
+      namespace CodeWidgetScope
+      {
+        //! Container to describe a highlighting rule. Based on a regular expression, a relevant match # and the format.
+        class HighlightingRule
+        {
+        public:
+          HighlightingRule(const QString &patternStr, int n, const QTextCharFormat &matchingFormat)
+          {
+            originalRuleStr = patternStr;
+            pattern = QRegExp(patternStr);
+            nth = n;
+            format = matchingFormat;
+          }
+
+          QString originalRuleStr;
+          QRegExp pattern;
+          int nth;
+          QTextCharFormat format;
+        };
+
+        //! Implementation of highlighting for Python code.
+        class PythonSyntaxHighlighter : public QSyntaxHighlighter
+        {
+          Q_OBJECT
+
+          public:
+            PythonSyntaxHighlighter(QTextDocument *parent = 0);
+
+          protected:
+             void highlightBlock(const QString &text);
+
+          private:
+            QStringList keywords;
+            QStringList operators;
+            QStringList braces;
+
+            QHash<QString, QTextCharFormat> basicStyles;
+
+            void initializeRules();
+
+            //! Highlights multi-line strings, returns true if after processing we are still within the multi-line section.
+            bool matchMultiline(const QString &text, const QRegExp &delimiter, const int inState, const QTextCharFormat &style);
+            const QTextCharFormat getTextCharFormat(const QString &colorName, const QString &style = QString());
+
+            QList<HighlightingRule> rules;
+            QRegExp triSingleQuote;
+            QRegExp triDoubleQuote;
+        };
+
+
+
+        //!@brief Implementation of QPlainTextEdit with Code-Editor features (like Syntaxhighlighting, line marking, line numbers etc.)
+        class CodeEditor : public QPlainTextEdit
+        {
+            Q_OBJECT
+
+        public:
+            CodeEditor(QWidget *parent = 0);
+            ~CodeEditor();
+
+            void lineNumberAreaPaintEvent(QPaintEvent *event);
+            int lineNumberAreaWidth();
+            void markErrorLine(long);
+
+        protected:
+            void resizeEvent(QResizeEvent *event);
+            void keyPressEvent(QKeyEvent *event) override;
+
+        private slots:
+            void updateLineNumberAreaWidth(int newBlockCount);
+            void highlightCurrentLine();
+            void updateLineNumberArea(const QRect &, int);
+
+        public:
+
+        private:
+            QWidget *lineNumberArea;
+        };
+
+
+
+
+        /*!@brief Widget to paint line numbers in the code section
+          */
+        class LineNumberArea : public QWidget
+        {
+        public:
+            LineNumberArea(CodeEditor *editor) : QWidget(editor) {
+                codeEditor = editor;
+            }
+
+            QSize sizeHint() const {
+                return QSize(codeEditor->lineNumberAreaWidth(), 0);
+            }
+
+        protected:
+            void paintEvent(QPaintEvent *event) {
+                codeEditor->lineNumberAreaPaintEvent(event);
+            }
+
+        private:
+            CodeEditor *codeEditor;
+        };
+
+
+      }
     }
-
-    QString originalRuleStr;
-    QRegExp pattern;
-    int nth;
-    QTextCharFormat format;
-  };
-
-  //! Implementation of highlighting for Python code.
-  class PythonSyntaxHighlighter : public QSyntaxHighlighter
-  {
-    Q_OBJECT
-
-    public:
-      PythonSyntaxHighlighter(QTextDocument *parent = 0);
-
-    protected:
-       void highlightBlock(const QString &text);
-
-    private:
-      QStringList keywords;
-      QStringList operators;
-      QStringList braces;
-
-      QHash<QString, QTextCharFormat> basicStyles;
-
-      void initializeRules();
-
-      //! Highlights multi-line strings, returns true if after processing we are still within the multi-line section.
-      bool matchMultiline(const QString &text, const QRegExp &delimiter, const int inState, const QTextCharFormat &style);
-      const QTextCharFormat getTextCharFormat(const QString &colorName, const QString &style = QString());
-
-      QList<HighlightingRule> rules;
-      QRegExp triSingleQuote;
-      QRegExp triDoubleQuote;
-  };
-
-
-
-  //!@brief Implementation of QPlainTextEdit with Code-Editor features (like Syntaxhighlighting, line marking, line numbers etc.)
-  class CodeEditor : public QPlainTextEdit
-  {
-      Q_OBJECT
-
-  public:
-      CodeEditor(QWidget *parent = 0);
-      ~CodeEditor();
-
-      void lineNumberAreaPaintEvent(QPaintEvent *event);
-      int lineNumberAreaWidth();
-      void markErrorLine(long);
-
-  protected:
-      void resizeEvent(QResizeEvent *event);
-      void keyPressEvent(QKeyEvent *event) override;
-
-  private slots:
-      void updateLineNumberAreaWidth(int newBlockCount);
-      void highlightCurrentLine();
-      void updateLineNumberArea(const QRect &, int);
-
-  public:
-
-  private:
-      QWidget *lineNumberArea;
-  };
-
-
-
-
-  /*!@brief Widget to paint line numbers in the code section
-    */
-  class LineNumberArea : public QWidget
-  {
-  public:
-      LineNumberArea(CodeEditor *editor) : QWidget(editor) {
-          codeEditor = editor;
-      }
-
-      QSize sizeHint() const {
-          return QSize(codeEditor->lineNumberAreaWidth(), 0);
-      }
-
-  protected:
-      void paintEvent(QPaintEvent *event) {
-          codeEditor->lineNumberAreaPaintEvent(event);
-      }
-
-  private:
-      CodeEditor *codeEditor;
-  };
-
-
+  }
 }
-
 
 /*!@brief GUI representation for the code section.
   */
