@@ -80,12 +80,6 @@ public:
   //!@brief Returns the amplitude of the box input.
   double getAmplitude() const;
 
-  //!@brief Sets the reference level of the box input.
-  void setReferenceLevel(double referenceLevel);
-
-  //!@brief Returns the reference level of the box input.
-  double getReferenceLevel() const;
-
   //!@brief Sets the width of the box input.
   void setWidth(unsigned int dimension, unsigned int width);
 
@@ -132,9 +126,6 @@ protected:
   cedar::aux::DoubleParameterPtr _mAmplitude;
   //!@brief the vector of sigmas (i.e. width) of the Gauss function
   cedar::aux::DoubleVectorParameterPtr _mSigmas;
-
-  //!@brief the reference level of the box function
-  cedar::aux::DoubleParameterPtr _mReferenceLevel;
 
   //!@brief the vector of left bounds of the box function
   //cedar::aux::UIntVectorParameterPtr _mLeftBounds;

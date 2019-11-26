@@ -91,14 +91,12 @@ mOutput(new cedar::aux::MatData(cv::Mat())),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 2, 1, 4)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 50, 1, 1000)),
 _mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0, cedar::aux::DoubleParameter::LimitType::full(), 0.5)),
-_mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigma", 2, 3.0, 0.01, 1000.0, 0.5)),
-_mReferenceLevel(new cedar::aux::DoubleParameter(this, "reference level", 0.0))
+_mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigma", 2, 3.0, 0.01, 1000.0, 0.5))
 {
   cedar::proc::DataSlotPtr input = this->declareInput("centers");
 
   this->declareOutput("box", mOutput);
   QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
-  QObject::connect(_mReferenceLevel.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
   QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
@@ -117,16 +115,6 @@ double cedar::proc::steps::VariableGauss::getAmplitude() const
 void cedar::proc::steps::VariableGauss::setAmplitude(double amplitude)
 {
   this->_mAmplitude->setValue(amplitude);
-}
-
-void cedar::proc::steps::VariableGauss::setReferenceLevel(double referenceLevel)
-{
-  this->_mReferenceLevel->setValue(referenceLevel);
-}
-
-double cedar::proc::steps::VariableGauss::getReferenceLevel() const
-{
-  return this->_mReferenceLevel->getValue();
 }
 
 void cedar::proc::steps::VariableGauss::updateMatrix()
