@@ -204,178 +204,186 @@ private:
 
 };
 
-namespace cedar::proc::steps::PythonScriptScope
+namespace cedar
 {
-  class ValidationMaskInputDialog : public QDialog
+  namespace proc
   {
-    //--------------------------------------------------------------------------------------------------------------------
-    // nested types
-    //--------------------------------------------------------------------------------------------------------------------
-
-
-  Q_OBJECT
-
-  public:
-    ValidationMaskInputDialog(std::vector<std::string> unacceptedStrings)
-            :
-            QDialog()
+    namespace steps
     {
-      this->unacceptedStrings = unacceptedStrings;
-    };
-
-    QString getText(QWidget *, const QString &title, const QString &label,
-                    QLineEdit::EchoMode echo = QLineEdit::Normal,
-                    const QString &text = QString(), bool *ok = nullptr,
-                    Qt::WindowFlags = Qt::WindowFlags(),
-                    Qt::InputMethodHints inputMethodHints = Qt::ImhNone)
-    {
-      this->setWindowTitle(title);
-      this->setInputMethodHints(inputMethodHints);
-
-      QFormLayout form(this);
-
-      // Add the lineEdit with its label
-      edit = new QLineEdit(this);
-      edit->setText(text);
-      edit->setEchoMode(echo);
-      form.addRow(label, edit);
-
-      // Add some standard buttons (Cancel/Ok) at the bottom of the dialog
-      QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
-
-      btnBox = &buttonBox;
-      btnBox->button(QDialogButtonBox::Ok)->setEnabled(checkString(text.toStdString()));
-      form.addRow(btnBox);
-
-      QObject::connect(&buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-      QObject::connect(&buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-
-      QObject::connect(edit, SIGNAL(textChanged(
-                                            const QString &)), this, SLOT(textChanged(
-                                                                                  const QString &)));
-
-      const int ret = this->exec();
-      if (ok)
-        *ok = !!ret;
-      if (ret)
+      namespace PythonScriptScope
       {
-        return edit->text();
-      }
-      else
-      {
-        return QString();
-      }
-    }
-
-  public slots:
-
-    void textChanged(const QString &text)
-    {
-      if (checkString(text.toStdString()))
-      {
-        edit->setStyleSheet("QLineEdit { background: rgb(255, 255, 255); }");
-        btnBox->button(QDialogButtonBox::Ok)->setEnabled(true);
-
-      }
-      else
-      {
-        edit->setStyleSheet("QLineEdit { background: rgb(255, 0, 0); }");
-        btnBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-      }
-
-    }
-
-  private:
-
-    bool checkString(std::string text)
-    {
-      boost::trim(text);
-      for (unsigned int i = 0; i < unacceptedStrings.size(); i++)
-      {
-        if (!unacceptedStrings.at(i).compare(text))
+        class ValidationMaskInputDialog : public QDialog
         {
-          return false;
+          //--------------------------------------------------------------------------------------------------------------------
+          // nested types
+          //--------------------------------------------------------------------------------------------------------------------
+
+
+        Q_OBJECT
+
+        public:
+          ValidationMaskInputDialog(std::vector<std::string> unacceptedStrings)
+                  :
+                  QDialog()
+          {
+            this->unacceptedStrings = unacceptedStrings;
+          };
+
+          QString getText(QWidget *, const QString &title, const QString &label,
+                          QLineEdit::EchoMode echo = QLineEdit::Normal,
+                          const QString &text = QString(), bool *ok = nullptr,
+                          Qt::WindowFlags = Qt::WindowFlags(),
+                          Qt::InputMethodHints inputMethodHints = Qt::ImhNone)
+          {
+            this->setWindowTitle(title);
+            this->setInputMethodHints(inputMethodHints);
+
+            QFormLayout form(this);
+
+            // Add the lineEdit with its label
+            edit = new QLineEdit(this);
+            edit->setText(text);
+            edit->setEchoMode(echo);
+            form.addRow(label, edit);
+
+            // Add some standard buttons (Cancel/Ok) at the bottom of the dialog
+            QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
+
+            btnBox = &buttonBox;
+            btnBox->button(QDialogButtonBox::Ok)->setEnabled(checkString(text.toStdString()));
+            form.addRow(btnBox);
+
+            QObject::connect(&buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+            QObject::connect(&buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+
+            QObject::connect(edit, SIGNAL(textChanged(
+                                                  const QString &)), this, SLOT(textChanged(
+                                                                                        const QString &)));
+
+            const int ret = this->exec();
+            if (ok)
+              *ok = !!ret;
+            if (ret)
+            {
+              return edit->text();
+            }
+            else
+            {
+              return QString();
+            }
+          }
+
+        public slots:
+
+          void textChanged(const QString &text)
+          {
+            if (checkString(text.toStdString()))
+            {
+              edit->setStyleSheet("QLineEdit { background: rgb(255, 255, 255); }");
+              btnBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+
+            }
+            else
+            {
+              edit->setStyleSheet("QLineEdit { background: rgb(255, 0, 0); }");
+              btnBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+            }
+
+          }
+
+        private:
+
+          bool checkString(std::string text)
+          {
+            boost::trim(text);
+            for (unsigned int i = 0; i < unacceptedStrings.size(); i++)
+            {
+              if (!unacceptedStrings.at(i).compare(text))
+              {
+                return false;
+              }
+            }
+            return true;
+          }
+
+        private:
+          QLineEdit *edit;
+          QDialogButtonBox *btnBox;
+          std::vector<std::string> unacceptedStrings;
+
+        };
+
+
+        //!@brief This class performs the matrix conversion between python and c++
+        class NDArrayConverter
+        {
+          //--------------------------------------------------------------------------------------------------------------------
+          // constructors and destructor
+          //--------------------------------------------------------------------------------------------------------------------
+        public:
+
+          NDArrayConverter();
+
+          NDArrayConverter(cedar::proc::steps::PythonScript *);
+
+          //--------------------------------------------------------------------------------------------------------------------
+          // public methods
+          //--------------------------------------------------------------------------------------------------------------------
+        public:
+
+          cv::Mat toMat(PyObject *, int);
+
+          PyObject *toNDArray(const cv::Mat &mat);
+
+          //void copyTo(cv::Mat src, cv::OutputArray _dst);
+          int failmsg(const char *, ...);
+
+          //--------------------------------------------------------------------------------------------------------------------
+          // private methods
+          //--------------------------------------------------------------------------------------------------------------------
+        private:
+
+          const char *typenumToString(int);
+
+          void init();
+
+          //--------------------------------------------------------------------------------------------------------------------
+          // members
+          //--------------------------------------------------------------------------------------------------------------------
+        public:
+
+          static int isInitialized;
+
+        private:
+          cedar::proc::steps::PythonScript *pythonScript;
+
+
+        };
+
+
+        class PyAllowThreads;
+
+        class PyEnsureGIL;
+
+        static size_t REFCOUNT_OFFSET = (size_t)&(((PyObject*)0)->ob_refcnt) +
+                                        (0x12345678 != *(const size_t*)"\x78\x56\x34\x12\0\0\0\0\0")*sizeof(int);
+
+        static inline PyObject* pyObjectFromRefcount(const int* refcount)
+        {
+          return (PyObject*)((size_t)refcount - REFCOUNT_OFFSET);
         }
+
+        static inline int* refcountFromPyObject(const PyObject* obj)
+        {
+          return (int*)((size_t)obj + REFCOUNT_OFFSET);
+        }
+
+
+        class NumpyAllocator;
       }
-      return true;
     }
-
-  private:
-    QLineEdit *edit;
-    QDialogButtonBox *btnBox;
-    std::vector<std::string> unacceptedStrings;
-
-  };
-
-
-  //!@brief This class performs the matrix conversion between python and c++
-  class NDArrayConverter
-  {
-    //--------------------------------------------------------------------------------------------------------------------
-    // constructors and destructor
-    //--------------------------------------------------------------------------------------------------------------------
-  public:
-
-    NDArrayConverter();
-
-    NDArrayConverter(cedar::proc::steps::PythonScript *);
-
-    //--------------------------------------------------------------------------------------------------------------------
-    // public methods
-    //--------------------------------------------------------------------------------------------------------------------
-  public:
-
-    cv::Mat toMat(PyObject *, int);
-
-    PyObject *toNDArray(const cv::Mat &mat);
-
-    //void copyTo(cv::Mat src, cv::OutputArray _dst);
-    int failmsg(const char *, ...);
-
-    //--------------------------------------------------------------------------------------------------------------------
-    // private methods
-    //--------------------------------------------------------------------------------------------------------------------
-  private:
-
-    const char *typenumToString(int);
-
-    void init();
-
-    //--------------------------------------------------------------------------------------------------------------------
-    // members
-    //--------------------------------------------------------------------------------------------------------------------
-  public:
-
-    static int isInitialized;
-
-  private:
-    cedar::proc::steps::PythonScript *pythonScript;
-
-
-  };
-
-
-  class PyAllowThreads;
-
-  class PyEnsureGIL;
-
-  static size_t REFCOUNT_OFFSET = (size_t)&(((PyObject*)0)->ob_refcnt) +
-                                  (0x12345678 != *(const size_t*)"\x78\x56\x34\x12\0\0\0\0\0")*sizeof(int);
-
-  static inline PyObject* pyObjectFromRefcount(const int* refcount)
-  {
-    return (PyObject*)((size_t)refcount - REFCOUNT_OFFSET);
   }
-
-  static inline int* refcountFromPyObject(const PyObject* obj)
-  {
-    return (int*)((size_t)obj + REFCOUNT_OFFSET);
-  }
-
-
-  class NumpyAllocator;
 }
-
 
 
 //enum { ARG_NONE = 0, ARG_MAT = 1, ARG_SCALAR = 2 };
