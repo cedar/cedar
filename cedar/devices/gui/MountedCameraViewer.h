@@ -33,7 +33,6 @@
     Credits:
 
 ======================================================================================================================*/
-
 #ifndef CEDAR_DEV_GL_MOUNTED_CAMERA_VIEWER_H
 #define CEDAR_DEV_GL_MOUNTED_CAMERA_VIEWER_H
 
@@ -43,6 +42,8 @@
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/devices/gui/namespace.h"
 #include "cedar/devices/KinematicChain.h"
+
+#ifdef CEDAR_USE_QGLVIEWER
 
 // SYSTEM INCLUDES
 
@@ -113,3 +114,5 @@ private:
   cv::Mat mProjection;
 };
 #endif  // CEDAR_DEV_GL_MOUNTED_CAMERA_VIEWER_H
+
+#endif  // CEDAR_USE_QGLVIEWER

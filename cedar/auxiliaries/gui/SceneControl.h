@@ -36,15 +36,27 @@
 #ifndef CEDAR_AUX_GUI_SCENE_CONTROL_H
 #define CEDAR_AUX_GUI_SCENE_CONTROL_H
 
-// CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/ui_SceneControl.h"
-#include "cedar/auxiliaries/gui/Viewer.h"
-#include "cedar/auxiliaries/gl/GlobalScene.h"
-
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/SceneControl.fwd.h"
 
-class cedar::aux::gui::SceneControl : public QWidget, private Ui_SceneControl
+// CEDAR INCLUDES
+#ifdef CEDAR_USE_QGLVIEWER
+#include "cedar/auxiliaries/gui/ui_SceneControl.h"
+#else
+#include <QtCore/QVariant>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QWidget>
+#endif // CEDAR_USE_QGLVIEWER
+#include "cedar/auxiliaries/gui/Viewer.h"
+#include "cedar/auxiliaries/gl/GlobalScene.h"
+
+
+
+class cedar::aux::gui::SceneControl : public QWidget
+#ifdef CEDAR_USE_QGLVIEWER
+        , private Ui_SceneControl
+#endif // CEDAR_USE_QGLVIEWER
 {
   Q_OBJECT
 

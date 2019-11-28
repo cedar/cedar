@@ -106,12 +106,14 @@ public:
    * @param pViewer pointer to the viewer
    * @return index of the object in the scene
    */
+#ifdef CEDAR_USE_QGLVIEWER
   int addViewer(cedar::aux::gui::Viewer* pViewer);
 
   /*!@brief removes the viewer from the scene
    * @param pViewer pointer to the viewer
    */
   int removeViewer(cedar::aux::gui::Viewer* pViewer);
+#endif // CEDAR_USE_QGLVIEWER
 
   /*!@brief removes an object from the scene via its name
    * @param name name of the object in the scene
@@ -162,8 +164,9 @@ private:
   double mSceneLimit;
   QList<cedar::aux::gl::ObjectVisualizationPtr> mObjectVisualizations;
   // list of viewers currently displaying this scene
+#ifdef CEDAR_USE_QGLVIEWER
   QList<cedar::aux::gui::Viewer*> mViewers;
-  
+#endif // CEDAR_USE_QGLVIEWER
   mutable QReadWriteLock mObjectVisualizationLock;
 };
 

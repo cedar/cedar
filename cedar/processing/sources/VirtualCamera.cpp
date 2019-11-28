@@ -48,6 +48,8 @@
 #include "cedar/auxiliaries/math/constants.h"
 #include "boost/shared_ptr.hpp"
 
+#ifdef CEDAR_USE_QGLVIEWER
+
 // SYSTEM INCLUDES
 
 namespace {
@@ -91,6 +93,8 @@ cedar::proc::sources::VirtualCamera::VirtualCamera()
   mCameraPosition->setValue(2, 1.0);  // set z axis to 1
 
   cedar::aux::gl::ScenePtr scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
+
+
   mpViewer = boost::shared_ptr<cedar::aux::gui::Viewer>(new cedar::aux::gui::Viewer(scene, false));
 
   mpViewer.get()->startTimer(25);
@@ -108,6 +112,7 @@ cedar::proc::sources::VirtualCamera::VirtualCamera()
 
 
   QObject::connect(this , SIGNAL(destroyed()), mpViewer.get(), SLOT(deleteLater()));
+  QObject::connect( mpViewer.get() , SIGNAL(updated()), this , SLOT(updatedView()));
 
 
 
@@ -117,6 +122,7 @@ cedar::proc::sources::VirtualCamera::VirtualCamera()
   mLock = mpViewer.get()->registerGrabber();
   this->cameraPositionChanged();
   this->cameraOrientationChanged();
+
 
 }
 
@@ -129,16 +135,17 @@ cedar::proc::sources::VirtualCamera::~VirtualCamera() {
   ///     and even after logging out entirely
 
 //  std::cout<<"Virtual Camera Destroy!"<<std::endl;
+
   mpViewer.get()->deregisterGrabber(mLock);
   mpViewer.get()->close();
+
 }
 
-//!@note: since this code is never called it has been duplicated in the Signal below as a temporary fix
+//!@note: update the output during simulation
 void cedar::proc::sources::VirtualCamera::compute(const cedar::proc::Arguments &) {
+
   mLock->lockForRead();
 
-
-//  std::cout<<"Virtual Camera Compute"<<std::endl;
   auto image = mpViewer.get()->grabImage();
 
   if (!image.empty())
@@ -148,6 +155,26 @@ void cedar::proc::sources::VirtualCamera::compute(const cedar::proc::Arguments &
     this->mpOutput->setData(clonedImage);
   }
   mLock->unlock();
+
+}
+
+//!@note: this enables the output plot to function even while the simulation is not running
+///       the relevant signal is only emitted when the camera is moved so this code should not be called
+///       at all during simulation (unless the camera moves during simulation)
+void cedar::proc::sources::VirtualCamera::updatedView() {
+
+    mLock->lockForRead();
+
+    auto image = mpViewer.get()->grabImage();
+
+    if (!image.empty())
+    {
+        image.resize(mOutputSizes->at(0), mOutputSizes->at(1));
+        auto clonedImage = image.clone();
+        this->mpOutput->setData(clonedImage);
+    }
+    mLock->unlock();
+
 }
 
 void cedar::proc::sources::VirtualCamera::resolutionChanged() {
@@ -172,16 +199,16 @@ void cedar::proc::sources::VirtualCamera::cameraOrientationChanged() {
 }
 
 void cedar::proc::sources::VirtualCamera::cameraPositionChangedFromViewport() {
-#ifdef CEDAR_USE_QGLVIEWER
+
   qglviewer::Vec pos = mpViewer.get()->camera()->position();
   mCameraPosition->setValue(0, pos.x, true);
   mCameraPosition->setValue(1, pos.y, true);
   mCameraPosition->setValue(2, pos.z, true);
-#endif
+
 }
 
 void cedar::proc::sources::VirtualCamera::cameraOrientationChangedFromViewport() {
-#ifdef CEDAR_USE_QGLVIEWER
+
 
   qglviewer::Vec dir = mpViewer.get()->camera()->viewDirection();
   if (dir.z < -1.)
@@ -193,6 +220,8 @@ void cedar::proc::sources::VirtualCamera::cameraOrientationChangedFromViewport()
   mVerticalOrientation->setValue(0, beta, true);
   if(dir.z != 1. && dir.z != -1.)
     mHorizontalOrientation->setValue(0, alpha, true);
-#endif
+
 }
 
+
+#endif  // CEDAR_USE_QGLVIEWER

@@ -35,11 +35,14 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+
 #include "cedar/devices/gui/namespace.h"
 #include "cedar/devices/gui/MountedCameraViewer.h"
 #include "cedar/auxiliaries/math/screwCalculus.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/gl/gl.h"
+
+#ifdef CEDAR_USE_QGLVIEWER
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -253,3 +256,4 @@ void cedar::dev::gui::MountedCameraViewer::draw()
   cedar::aux::gui::Viewer::draw();
 }
 
+#endif //CEDAR_USE_QGLVIEWER

@@ -2211,13 +2211,14 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
       cedar::aux::ConfigurationNode value_node;
 
       //std::cout<<"Connectable: Save a Viewer!"<<std::endl;
-
+#ifdef CEDAR_USE_QGLVIEWER
       auto viewer_item = static_cast<cedar::aux::gui::Viewer*>(dock_widget_child);
       viewer_item->writeToConfiguration(value_node, cedar::proc::gui::SettingsSingleton::getInstance()->getIdeSize());
       node.put_child("Viewer"+viewer_item->getViewerLabel(), value_node);
 
       //In order to ensure that the Widget is correctly managed by the Gui::Group it needs to be added to the List of KinematicCHainWidgets
       this->getGuiGroup()->insertViewer(viewer_item);
+#endif //CEDAR_USE_QGLVIEWER
     }
 
   }

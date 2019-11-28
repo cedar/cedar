@@ -539,6 +539,7 @@ void cedar::proc::gui::Group::showArchitectureWidget(const std::string &name)
 
 void cedar::proc::gui::Group::removeViewer()
 {
+#ifdef CEDAR_USE_QGLVIEWER
   auto it = mViewers.begin();
   while (*it != QObject::sender() && it != mViewers.end())
   {
@@ -552,6 +553,7 @@ void cedar::proc::gui::Group::removeViewer()
     cedar::aux::LogSingleton::getInstance()->error("Could not find a reference to the destroyed Viewer.",
                                                    "cedar::proc::gui::Group::removeViewer()");
   }
+#endif //CEDAR_USE_QGLVIEWER
 }
 
 void cedar::proc::gui::Group::removeKinematicChainWidget()
@@ -614,11 +616,13 @@ void cedar::proc::gui::Group::toggleVisibilityOfOpenKinematicChainWidgets(bool v
 
 void cedar::proc::gui::Group::toggleVisibilityOfOpenSceneViewers(bool visible)
 {
+#ifdef CEDAR_USE_QGLVIEWER
   for (auto iter = this->mViewers.begin(); iter != this->mViewers.end(); iter++)
   {
     auto mViewer = *iter;
     mViewer->parentWidget()->setVisible(visible);
   }
+#endif //CEDAR_USE_QGLVIEWER
 }
 
 void cedar::proc::gui::Group::lastReadConfigurationChanged()
@@ -1340,7 +1344,7 @@ void cedar::proc::gui::Group::openSceneViewer(const cedar::aux::ConfigurationNod
     }
 
 
-
+#ifdef CEDAR_USE_QGLVIEWER
     cedar::aux::gl::ScenePtr scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
 
     cedar::aux::gui::Viewer *viewer = new cedar::aux::gui::Viewer(scene);
@@ -1366,7 +1370,6 @@ void cedar::proc::gui::Group::openSceneViewer(const cedar::aux::ConfigurationNod
     dock_widget->resize(width, height);
     dock_widget->move(posx, posy);
 
-#ifdef CEDAR_USE_QGLVIEWER
 
     const float cposx = node.get<float>("camera position x");
     const float cposy = node.get<float>("camera position y");
@@ -1438,14 +1441,17 @@ void cedar::proc::gui::Group::insertKinematicChainWidget(cedar::dev::gui::Kinema
   mKinematicChainWidgets.push_back(kinematicChainWidget);
 }
 
+#ifdef CEDAR_USE_QGLVIEWER
 void cedar::proc::gui::Group::insertViewer(cedar::aux::gui::Viewer *viewer) const
 {
   QObject::connect(viewer, SIGNAL(destroyed()), this, SLOT(removeViewer()));
   mViewers.push_back(viewer);
 }
+#endif
 
 void cedar::proc::gui::Group::openSceneViewer()
 {
+#ifdef CEDAR_USE_QGLVIEWER
   cedar::aux::gl::ScenePtr scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
   cedar::aux::gui::Viewer *viewer = new cedar::aux::gui::Viewer(scene);
 
@@ -1456,6 +1462,7 @@ void cedar::proc::gui::Group::openSceneViewer()
   this->insertViewer(viewer);
   auto dock_widget = this->createDockWidget("simulated scene", viewer);
   dock_widget->show();
+#endif
 }
 
 //void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node)
@@ -1578,7 +1585,7 @@ void cedar::proc::gui::Group::writeOpenPlotsTo(cedar::aux::ConfigurationNode &no
   {
     return;
   }
-
+#ifdef CEDAR_USE_QGLVIEWER
   for (QWidget *viewer_item : mViewers)
   {
     if (viewer_item->parentWidget()->isVisible())
@@ -1592,7 +1599,7 @@ void cedar::proc::gui::Group::writeOpenPlotsTo(cedar::aux::ConfigurationNode &no
       }
     }
   }
-
+#endif //CEDAR_USE_QGLVIEWER
   for (cedar::dev::gui::KinematicChainWidget *kcw_item : mKinematicChainWidgets)
   { //These are only the widgets managed by the gui:Group! They are not ChildWidgets of the ComponentStep!
     if (kcw_item->parentWidget()->isVisible())
@@ -2513,6 +2520,7 @@ void cedar::proc::gui::Group::togglePlotGroupVisibility(bool visible, cedar::aux
 
       if (viewerLabel != it.second.not_found())
       {
+#ifdef CEDAR_USE_QGLVIEWER
         std::string label = viewerLabel->second.get_value<std::string>();
         for (cedar::aux::gui::Viewer *v: mViewers)
         {
@@ -2522,6 +2530,7 @@ void cedar::proc::gui::Group::togglePlotGroupVisibility(bool visible, cedar::aux
             v->parentWidget()->setVisible(!visible);
           }
         }
+#endif //CEDAR_USE_QGLVIEWER
       }
 
       if (!visible && !found)
