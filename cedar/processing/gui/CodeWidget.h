@@ -270,13 +270,13 @@ private:
   cedar::proc::steps::PythonScriptPtr mPythonScript;
 
   //!@brief The layout for this widget.
-  QVBoxLayout* mMainLayout;
+  QVBoxLayout* mpMainLayout;
 
-  cedar::proc::gui::CodeWidgetScope::CodeEditor* mCodeTextField;
+  cedar::proc::gui::CodeWidgetScope::CodeEditor* mpCodeTextField;
   //QLabel* mErrorMessageLabel;
-  QPushButton* mExecuteButton;
+  QPushButton* mpExecuteButton;
 
-  cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter *highlighter;
+  cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter *mpHighlighter;
 };
 
 

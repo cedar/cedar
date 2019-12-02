@@ -259,27 +259,27 @@ int cedar::proc::gui::CodeWidget::dontMark;
 
 cedar::proc::gui::CodeWidget::CodeWidget()
 :
-highlighter(nullptr)
+mpHighlighter(nullptr)
 {
   cedar::proc::gui::CodeWidget::dontMark = 0;
-  mMainLayout = new QVBoxLayout();
-  this->setLayout(this->mMainLayout);
+  this->mpMainLayout = new QVBoxLayout();
+  this->setLayout(this->mpMainLayout);
 
 }
 
 cedar::proc::gui::CodeWidget::CodeWidget(QWidget* pParent)
 :
 QWidget(pParent),
-highlighter(nullptr)
+mpHighlighter(nullptr)
 {
   cedar::proc::gui::CodeWidget::dontMark = 0;
-  mMainLayout = new QVBoxLayout();
-  this->setLayout(this->mMainLayout);
+  mpMainLayout = new QVBoxLayout();
+  this->setLayout(this->mpMainLayout);
 }
 
 cedar::proc::gui::CodeWidget::~CodeWidget()
 {
-  delete mMainLayout;
+  delete mpMainLayout;
 }
 
 void cedar::proc::gui::CodeWidget::setConnectable(cedar::proc::steps::PythonScriptPtr pythonScript)
@@ -300,18 +300,18 @@ void cedar::proc::gui::CodeWidget::refreshWidget()
   // draw Headers
   this->createHeader(this->mPythonScript->getName());
 
-  std::string codeText = this->mPythonScript->_codeStringForSavingArchitecture->getValue();
+  std::string codeText = this->mPythonScript->_mCodeStringForSavingArchitecture->getValue();
 
   this->fillInCodeSection(codeText);
 
   QObject::connect(mPythonScript.get(), SIGNAL(errorMessageLineNumberChanged(long)), this, SLOT(errorMessageLineNumberUpdated(long)));
   
-  mMainLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+  this->mpMainLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 }
 
 void cedar::proc::gui::CodeWidget::errorMessageLineNumberUpdated(long lineno)
 {
-  mCodeTextField->markErrorLine(lineno);
+  this->mpCodeTextField->markErrorLine(lineno);
 }
 
 void cedar::proc::gui::CodeWidget::clear()
@@ -326,7 +326,7 @@ void cedar::proc::gui::CodeWidget::clearLayout()
   int counterWidget = 0;
 
   QLayoutItem *item;
-  while ((item = mMainLayout->takeAt(0)) != nullptr)
+  while ((item = this->mpMainLayout->takeAt(0)) != nullptr)
   {
     counter= counter +1;
     QLayoutItem* widget;
@@ -361,7 +361,7 @@ void cedar::proc::gui::CodeWidget::createHeader(const std::string& name)
   step_name_layout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
   step_name_layout->addWidget(step_name);
 
-  mMainLayout->addLayout(step_name_layout);
+  this->mpMainLayout->addLayout(step_name_layout);
 
 }
 
@@ -376,29 +376,29 @@ void cedar::proc::gui::CodeWidget::fillInCodeSection(std::string& code)
   
   QVBoxLayout* code_widget_layout = new QVBoxLayout();
   
-  mCodeTextField = new cedar::proc::gui::CodeWidgetScope::CodeEditor();
-  mCodeTextField->setPlainText(QString::fromStdString(code));
-  mCodeTextField->setFont(font);
-  mCodeTextField->setLineWrapMode(mCodeTextField->NoWrap);
+  this->mpCodeTextField = new cedar::proc::gui::CodeWidgetScope::CodeEditor();
+  this->mpCodeTextField->setPlainText(QString::fromStdString(code));
+  this->mpCodeTextField->setFont(font);
+  this->mpCodeTextField->setLineWrapMode(this->mpCodeTextField->NoWrap);
     
   // Syntax Highlighting
-  highlighter = new cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter(mCodeTextField->document());
+  this->mpHighlighter = new cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter(this->mpCodeTextField->document());
 
-  QObject::connect(mCodeTextField, SIGNAL(textChanged()), this, SLOT(updateCodeString()));
+  QObject::connect(this->mpCodeTextField, SIGNAL(textChanged()), this, SLOT(updateCodeString()));
   
   
-  code_widget_layout->addWidget(mCodeTextField);
+  code_widget_layout->addWidget(this->mpCodeTextField);
   
-  mExecuteButton = new QPushButton("Execute");
-  QObject::connect(mExecuteButton, SIGNAL (clicked()), this, SLOT(executeButtonClicked()));
-  code_widget_layout->addWidget(mExecuteButton);
+  this->mpExecuteButton = new QPushButton("Execute");
+  QObject::connect(this->mpExecuteButton, SIGNAL (clicked()), this, SLOT(executeButtonClicked()));
+  code_widget_layout->addWidget(this->mpExecuteButton);
 
-  mMainLayout->addLayout(code_widget_layout);
+  this->mpMainLayout->addLayout(code_widget_layout);
   
 }
 
 void cedar::proc::gui::CodeWidget::executeButtonClicked(){
-  if(mCodeTextField != nullptr)
+  if(this->mpCodeTextField != nullptr)
   {
     if(this->mPythonScript)
     {
@@ -409,11 +409,11 @@ void cedar::proc::gui::CodeWidget::executeButtonClicked(){
 
 void cedar::proc::gui::CodeWidget::updateCodeString()
 {
-  if(mCodeTextField != nullptr)
+  if(this->mpCodeTextField != nullptr)
   {
     if(this->mPythonScript)
     {
-      this->mPythonScript->_codeStringForSavingArchitecture->setValue(mCodeTextField->toPlainText().toStdString());
+      this->mPythonScript->_mCodeStringForSavingArchitecture->setValue(this->mpCodeTextField->toPlainText().toStdString());
     }
   }
 }

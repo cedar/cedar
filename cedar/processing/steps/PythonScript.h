@@ -180,7 +180,7 @@ protected:
 private:
 
   cedar::aux::MatDataPtr mOutput;
-  int isExecuting = 0;
+  int mIsExecuting = 0;
 
   std::vector< cedar::aux::ConstMatDataPtr > mInputs;
   std::vector< cedar::aux::MatDataPtr > mOutputs;
@@ -190,7 +190,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   
-  cedar::aux::StringParameterPtr _codeStringForSavingArchitecture;
+  cedar::aux::StringParameterPtr _mCodeStringForSavingArchitecture;
 protected:
   // none yet
 
@@ -198,9 +198,9 @@ private:
 
   cedar::aux::UIntParameterPtr _mNumberOfInputs;
   cedar::aux::UIntParameterPtr _mNumberOfOutputs;
-  cedar::aux::BoolParameterPtr _hasScriptFile;
-  cedar::aux::FileParameterPtr _scriptFile;
-  cedar::aux::BoolParameterPtr _autoConvertDoubleToFloat; // advanced
+  cedar::aux::BoolParameterPtr _mHasScriptFile;
+  cedar::aux::FileParameterPtr _mScriptFile;
+  cedar::aux::BoolParameterPtr _mAutoConvertDoubleToFloat; // advanced
 
 };
 

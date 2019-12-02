@@ -729,24 +729,24 @@ mInputs(1, cedar::aux::MatDataPtr()),
 mOutputs(1, cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))),
 
 // Declare Properties
-_codeStringForSavingArchitecture (new cedar::aux::StringParameter(this, "code", "import numpy as np\nimport pycedar as pc\n\n#Print to messages tab:\n# pc.messagePrint('text')\n# pc.messagePrint(str(...))\n\n#Inputs: (NumPy Arrays)\n# pc.inputs[0]\n# pc.inputs[1]\n# ...\n\n#Outputs:\n# pc.outputs[0]\n# pc.outputs[1]\n# ...\n\n\ninput = pc.inputs[0]\n\npc.outputs[0] = input * 2\n")),
+_mCodeStringForSavingArchitecture (new cedar::aux::StringParameter(this, "code", "import numpy as np\nimport pycedar as pc\n\n#Print to messages tab:\n# pc.messagePrint('text')\n# pc.messagePrint(str(...))\n\n#Inputs: (NumPy Arrays)\n# pc.inputs[0]\n# pc.inputs[1]\n# ...\n\n#Outputs:\n# pc.outputs[0]\n# pc.outputs[1]\n# ...\n\n\ninput = pc.inputs[0]\n\npc.outputs[0] = input * 2\n")),
 _mNumberOfInputs (new cedar::aux::UIntParameter(this, "number of inputs", 1,0,255)),
 _mNumberOfOutputs (new cedar::aux::UIntParameter(this, "number of outputs", 1,0,255)),
-_hasScriptFile (new cedar::aux::BoolParameter(this, "use script file", false)),
-_scriptFile (new cedar::aux::FileParameter(this, "script file path", cedar::aux::FileParameter::READ)),
-_autoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "auto-convert double output matrices to float", true))
+_mHasScriptFile (new cedar::aux::BoolParameter(this, "use script file", false)),
+_mScriptFile (new cedar::aux::FileParameter(this, "script file path", cedar::aux::FileParameter::READ)),
+_mAutoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "auto-convert double output matrices to float", true))
 {
   this->declareInput(makeInputSlotName(0), false);
   
   this->declareOutput(makeOutputSlotName(0), mOutputs[0]);
   
-  QObject::connect(this->_hasScriptFile.get(), SIGNAL(valueChanged()), this, SLOT(hasScriptFileChanged()));
+  QObject::connect(this->_mHasScriptFile.get(), SIGNAL(valueChanged()), this, SLOT(hasScriptFileChanged()));
   QObject::connect(_mNumberOfInputs.get(), SIGNAL(valueChanged()), this, SLOT(numberOfInputsChanged()));
   QObject::connect(_mNumberOfOutputs.get(), SIGNAL(valueChanged()), this, SLOT(numberOfOutputsChanged()));
 
-  this->_scriptFile->setConstant(true);
-  this->_codeStringForSavingArchitecture->setHidden(true);
-  this->_autoConvertDoubleToFloat->markAdvanced(true);
+  this->_mScriptFile->setConstant(true);
+  this->_mCodeStringForSavingArchitecture->setHidden(true);
+  this->_mAutoConvertDoubleToFloat->markAdvanced(true);
 
   this->registerFunction("export step as template", boost::bind(&cedar::proc::steps::PythonScript::exportStepAsTemplate   , this), false);
   //this->registerFunction("import step from template", boost::bind(&cedar::proc::steps::PythonScript::importStepsFromTemplate, this), false);
@@ -787,13 +787,13 @@ cv::Mat cedar::proc::steps::PythonScript::convert3DMatToFloat(cv::Mat &mat)
 
 void cedar::proc::steps::PythonScript::hasScriptFileChanged()
 {
-  if(this->_hasScriptFile->getValue())
+  if(this->_mHasScriptFile->getValue())
   {
-    this->_scriptFile->setConstant(false);
+    this->_mScriptFile->setConstant(false);
   }
   else
   {
-    this->_scriptFile->setConstant(true);
+    this->_mScriptFile->setConstant(true);
   }
 }
 
@@ -1134,7 +1134,7 @@ void cedar::proc::steps::PythonScript::executePythonScript()
 {
   mutex.lock();
 
-  isExecuting = 1;
+  this->mIsExecuting = 1;
   cedar::proc::steps::PythonScript::executionFailed = 0;
 
   nameOfExecutingStep = this->getName();
@@ -1237,9 +1237,9 @@ void cedar::proc::steps::PythonScript::executePythonScript()
 
     bool executedFromFile = false;
     // Execute script from the specified file, if the hasScriptFile Parameter is set and the file exists
-    if(this->_hasScriptFile->getValue())
+    if(this->_mHasScriptFile->getValue())
     {
-      cedar::aux::Path path = this->_scriptFile->getPath();
+      cedar::aux::Path path = this->_mScriptFile->getPath();
       if(path.exists()){
         boost::python::exec_file(path.toString().c_str(), main_namespace);
         executedFromFile = true;
@@ -1248,7 +1248,7 @@ void cedar::proc::steps::PythonScript::executePythonScript()
     
     if(!executedFromFile)
     {
-      std::string inputString = this->_codeStringForSavingArchitecture->getValue();
+      std::string inputString = this->_mCodeStringForSavingArchitecture->getValue();
       boost::python::str inputString_py(inputString);
 #if CV_MAJOR_VERSION < 3
       boost::python::exec(inputString_py, main_namespace);
@@ -1302,7 +1302,7 @@ void cedar::proc::steps::PythonScript::executePythonScript()
       outputNodeMatrix = cvt.toMat(outputPointer, i);
 
       // Convert 1D and 2D matrices of type CV_64F (double) to CV_32F (float)
-      if (this->_autoConvertDoubleToFloat->getValue())
+      if (this->_mAutoConvertDoubleToFloat->getValue())
       {
         if (outputNodeMatrix.dims <= 2 &&
             outputNodeMatrix.type() == CV_64F)
@@ -1382,7 +1382,7 @@ void cedar::proc::steps::PythonScript::executePythonScript()
 
   freePythonVariables();
 
-  isExecuting = 0;
+  this->mIsExecuting = 0;
   mutex.unlock();
 }
 
@@ -1402,7 +1402,7 @@ void cedar::proc::steps::PythonScript::inputConnectionChanged(const std::string&
 
 void cedar::proc::steps::PythonScript::compute(const cedar::proc::Arguments&)
 {
-  if(!isExecuting)
+  if(!this->mIsExecuting)
   {
     executePythonScript();
   }
@@ -1410,7 +1410,7 @@ void cedar::proc::steps::PythonScript::compute(const cedar::proc::Arguments&)
 
 // Method is called when the executeButton in the CodeWidget is clicked
 void cedar::proc::steps::PythonScript::executeButtonClicked(){
-  if(!isExecuting)
+  if(!this->mIsExecuting)
   {
     executePythonScript();
   }
