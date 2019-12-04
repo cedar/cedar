@@ -113,16 +113,32 @@ cedar::proc::steps::ShapeVisualisation::ShapeVisualisation()
       cedar::proc::steps::ShapeVisualisation::Shape::sphere
     )
   ),
-  _mScale(new cedar::aux::DoubleParameter(this, "scale", 0.025)),
+  _mRadius(new cedar::aux::DoubleParameter(this, "radius", 0.1, 0, 10000.0, 0.025)),
+  _mLength(new cedar::aux::DoubleParameter(this, "length", 0.1, 0, 10000.0, 0.025)),
+  _mWidth(new cedar::aux::DoubleParameter( this, "width",  0.1, 0, 10000.0, 0.025)),
+  _mHeight(new cedar::aux::DoubleParameter(this, "height", 0.1, 0, 10000.0, 0.025)),
+
+
   mInputName("target position")
 {  
   this->declareInput(mInputName);
-
   visualisationChanged();
+
+  /*@TODO: It would be better if these could be hidden instead of set constant.
+           setHidden exists as a Function, however changing a parameters visibility
+           this way only transfers to the UI after some change was made to this steps input.
+  */
+  _mRadius->setConstant(false);
+  _mLength->setConstant(true);
+  _mWidth->setConstant(true);
+  _mHeight->setConstant(true);
 
   QObject::connect(this->_mColour.get(), SIGNAL(valueChanged()), this, SLOT(visualisationChanged()));
   QObject::connect(this->_mShape.get(), SIGNAL(valueChanged()), this, SLOT(visualisationChanged()));
-  QObject::connect(this->_mScale.get(), SIGNAL(valueChanged()), this, SLOT(visualisationChanged()));
+  QObject::connect(this->_mRadius.get(), SIGNAL(valueChanged()), this, SLOT(visualisationChanged()));
+  QObject::connect(this->_mLength.get(), SIGNAL(valueChanged()), this, SLOT(visualisationChanged()));
+  QObject::connect(this->_mWidth.get(), SIGNAL(valueChanged()), this, SLOT(visualisationChanged()));
+  QObject::connect(this->_mHeight.get(), SIGNAL(valueChanged()), this, SLOT(visualisationChanged()));
 
 }
 
@@ -158,17 +174,39 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ShapeVisualisation::determin
 
 void cedar::proc::steps::ShapeVisualisation::compute(const cedar::proc::Arguments &)
 {
-  mVisualisationPtr->getLocalCoordinateFrame()->setTranslation
-  (
-    std::vector<float>
+    float modifier = 0.0;
+
+    //! Adjust vertical Position so all Shapes are placed ON the ground by default
+    switch (this->_mShape->getValue()) {
+        default:
+        case Shape::sphere:
+        case Shape::torus:
+            //! Shift 1 Radius upwards
+            modifier = _mRadius->getValue();
+            break;
+        case Shape::block:
+        case Shape::cylinder:
+        case Shape::pyramid:
+            //! Shift 1/2 Height upwards
+            modifier = 0.5 * _mHeight->getValue();
+            break;
+        case Shape::prism:
+        case Shape::cone:
+            //! No adjustment needed
+            modifier = 0.0;
+            break;
+    }
+    mVisualisationPtr->getLocalCoordinateFrame()->setTranslation
     (
-      {
-        mpTargetPosition->getData().at<float>(0),
-        mpTargetPosition->getData().at<float>(1),
-        mpTargetPosition->getData().at<float>(2)
-      }
-    )
-  );
+    std::vector<float>
+              (
+              {
+                 mpTargetPosition->getData().at<float>(0),
+                 mpTargetPosition->getData().at<float>(1),
+                 static_cast<float>(mpTargetPosition->getData().at<float>(2)  + modifier)
+                 }
+              )
+    );
 }
 
 void cedar::proc::steps::ShapeVisualisation::inputConnectionChanged(const std::string &inputName)
@@ -189,10 +227,6 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
   {
     scene->deleteObjectVisualizationPtr(mVisualisationPtr);
 
-    if(!mpTargetPosition)
-    {
-      return;
-    }
 
     mVisualisationPtr.reset();
   }
@@ -254,20 +288,28 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
       break;
     }
   }
+  const float radius = _mRadius->getValue();
+  const float length = _mLength->getValue();
+  const float width = _mWidth->getValue();
+  const float height = _mHeight->getValue();
 
-  const float scale = _mScale->getValue();
 
   switch (this->_mShape->getValue())
   {
     default:
     case Shape::sphere:
     {
+        _mRadius->setConstant(false);
+        _mLength->setConstant(true);
+        _mWidth->setConstant(true);
+        _mHeight->setConstant(true);
+
       mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
       (
         new cedar::aux::gl::Sphere
         (
           cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-          2*scale, r, g, b
+          radius, r, g, b
         )
       );
       break;
@@ -275,12 +317,18 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
 
     case Shape::block:
     {
-      mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
+        _mRadius->setConstant(true);
+        _mLength->setConstant(false);
+        _mWidth->setConstant(false);
+        _mHeight->setConstant(false);
+
+
+        mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
       (
         new cedar::aux::gl::Block
         (
           cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-          3*scale, 2*scale, scale, r, g, b
+          length, width, height, r, g, b
         )
       );
       break;
@@ -288,12 +336,16 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
 
     case Shape::cone:
     {
+        _mRadius->setConstant(false);
+        _mLength->setConstant(true);
+        _mWidth->setConstant(true);
+        _mHeight->setConstant(false);
       mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
       (
         new cedar::aux::gl::Cone
         (
           cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-          2*scale, 2*scale, r, g, b
+          radius, height, r, g, b
         )
       );
       break;
@@ -301,12 +353,16 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
 
     case Shape::cylinder:
     {
+        _mRadius->setConstant(false);
+        _mLength->setConstant(true);
+        _mWidth->setConstant(true);
+        _mHeight->setConstant(false);
       mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
       (
         new cedar::aux::gl::Cylinder
         (
           cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-          scale, 2*scale, r, g, b
+          radius, height, r, g, b
         )
       );
       break;
@@ -314,12 +370,16 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
 
     case Shape::prism:
     {
+        _mRadius->setConstant(true);
+        _mLength->setConstant(true);
+        _mWidth->setConstant(false);
+        _mHeight->setConstant(false);
       mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
       (
         new cedar::aux::gl::Prism
         (
           cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-          3*scale, scale, r, g, b
+          width, height, r, g, b
         )
       );
       break;
@@ -327,12 +387,16 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
 
     case Shape::pyramid:
     {
+        _mRadius->setConstant(true);
+        _mLength->setConstant(false);
+        _mWidth->setConstant(false);
+        _mHeight->setConstant(false);
       mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
       (
         new cedar::aux::gl::Pyramid
         (
           cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-          2*scale, 3*scale, 2*scale, r, g, b
+          width, length, height, r, g, b
         )
       );
       break;
@@ -340,21 +404,31 @@ void cedar::proc::steps::ShapeVisualisation::visualisationChanged()
 
     case Shape::torus:
     {
+        _mRadius->setConstant(false);
+        _mLength->setConstant(true);
+        _mWidth->setConstant( false);
+        _mHeight->setConstant(true);
       mVisualisationPtr = cedar::aux::gl::ObjectVisualizationPtr
       (
         new cedar::aux::gl::Torus
         (
           cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame),
-          3*scale, 0.5*scale, r, g, b
+          width, radius, r, g, b
         )
       );
       break;
     }
   }
 
-  if (mVisualisationPtr)
+  if(!mpTargetPosition)
   {
-    scene->addObjectVisualization(mVisualisationPtr);
+      return;
   }
+  if (mVisualisationPtr) {
+
+
+      scene->addObjectVisualization(mVisualisationPtr);
+  }
+  this->callComputeWithoutTriggering();
 
 }
