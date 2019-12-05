@@ -72,7 +72,7 @@ cedar::proc::steps::LinearFunction::LinearFunction()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::steps::LinearFunction::recompute()
+void cedar::proc::steps::LinearFunction::recompute(bool reinitialize)
 {
   auto input = getInput("input");
 
@@ -85,6 +85,11 @@ void cedar::proc::steps::LinearFunction::recompute()
     return;
 
   auto x= data->getData().clone();
+
+  if (reinitialize)
+  {
+    mResult->setData( cv::Mat::zeros( x.rows, x.cols, CV_32F ) );
+  }
 
   float shift;
   bool  has_shift_input;
@@ -117,7 +122,7 @@ void cedar::proc::steps::LinearFunction::recompute()
 
 void cedar::proc::steps::LinearFunction::compute(const cedar::proc::Arguments&)
 {
-  recompute();
+  recompute(false);
 }
 
 void cedar::proc::steps::LinearFunction::checkOptionalInputs()
@@ -179,12 +184,12 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::LinearFunction::determineInp
 
 void cedar::proc::steps::LinearFunction::inputConnectionChanged(const std::string&)
 {
-  recompute();
+  recompute(true);
 }
 
 void cedar::proc::steps::LinearFunction::constantChanged()
 {
-  recompute();
+  recompute(true);
 }
 
 
