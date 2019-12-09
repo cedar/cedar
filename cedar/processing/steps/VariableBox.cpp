@@ -218,17 +218,38 @@ void cedar::proc::steps::VariableBox::recompute()
   if (mat.empty())
     return;
 
-  std::vector<unsigned int> tmpvec{ static_cast<unsigned int>(mat.at<float>(0,0)) };
+  std::vector<unsigned int> startvec{ static_cast<unsigned int>(mat.at<float>(0,0)) };
   
   if (mat.rows > 1 )
-    tmpvec.push_back( static_cast<unsigned int>(mat.at<float>(1,0) ) );
+    startvec.push_back( static_cast<unsigned int>(mat.at<float>(1,0) ) );
+
+  auto widthsvec= _mWidths->getValue();
 
   if (_mDoCenterAtInput->getValue())
   {
-    tmpvec[0]-= _mWidths->getValue()[0] / 2;
+    unsigned int halfwidth= _mWidths->getValue()[0] / 2;
+
+    if (startvec[0] > halfwidth)
+    {
+      startvec[0]-= halfwidth;
+    }
+    else
+    {
+      widthsvec[0]-= ( halfwidth - startvec[0] );
+      startvec[0]= 0;
+    }
+
     if (mat.rows > 1 )
     {
-      tmpvec[1]-= _mWidths->getValue()[1] / 2;
+      if (startvec[1] > halfwidth)
+      {
+        startvec[1]-= halfwidth;
+      }
+      else
+      {
+        widthsvec[1]-= ( halfwidth - startvec[0] );
+        startvec[1]= 0;
+      }
     }
   }
 
@@ -240,8 +261,8 @@ void cedar::proc::steps::VariableBox::recompute()
                      _mSizes->getValue(),
                      _mAmplitude->getValue(),
                      _mReferenceLevel->getValue(),
-                     _mWidths->getValue(),
-                     tmpvec
+                     widthsvec,
+                     startvec
                    )
                  );
 }
