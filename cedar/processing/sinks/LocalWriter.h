@@ -126,17 +126,24 @@ protected:
   std::string oldName = "";
 
 public:
-    static std::map<std::string,cedar::aux::ConstMatDataPtr>& mData()
-    {
-      static std::map<std::string,cedar::aux::ConstMatDataPtr> mData;
-      return mData;
-    }
+  static cv::Mat getMatrix(const std::string &key);
+  static void setMatrix(const std::string &key, const cv::Mat &mat);
+  static unsigned int getPortCount(const std::string &key);
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 private:
   cedar::aux::StringParameterPtr _mPort;
+
+  // locking for thread safety
+  static QReadWriteLock *mpDataLock;
+
+  static std::map<std::string, cv::Mat>& accessData()
+  {
+    static std::map<std::string, cv::Mat> mData;
+    return mData; // returns a reference!
+  }
 
 }; // class cedar::proc::sinks::LocalWriter
 
