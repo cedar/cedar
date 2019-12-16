@@ -151,6 +151,9 @@ void cedar::proc::steps::Projection::onStop()
 
 void cedar::proc::steps::Projection::compute(const cedar::proc::Arguments&)
 {
+  if (!mInput) // quickfix
+    return;
+
   // call the appropriate projection method via the function pointer
   (this->*mpProjectionMethod)();
 }

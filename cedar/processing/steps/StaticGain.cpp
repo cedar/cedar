@@ -107,7 +107,14 @@ _mGainFactor(new cedar::aux::DoubleParameter(this, "gain factor", 1.0, -10000.0,
 void cedar::proc::steps::StaticGain::compute(const cedar::proc::Arguments&)
 {
   // the result is simply input * gain.
-  this->mOutput->setData(this->mInput->getData() * this->_mGainFactor->getValue());
+  if (mInput)
+  {
+    this->mOutput->setData(this->mInput->getData() * this->_mGainFactor->getValue());
+  }
+  else
+  {
+    this->mOutput->setData( cv::Mat() );
+  }
 }
 
 void cedar::proc::steps::StaticGain::gainChanged()
