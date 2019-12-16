@@ -91,7 +91,7 @@ mOutput(new cedar::aux::MatData(cv::Mat())),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 2, 1, 4)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 50, 1, 1000)),
 _mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0, cedar::aux::DoubleParameter::LimitType::full(), 0.5)),
-_mWidths(new cedar::aux::UIntVectorParameter(this, "widths", 2, 1, 1, 10000)),
+_mWidths(new cedar::aux::UIntVectorParameter(this, "widths", 2, 10, 1, 10000)),
 _mLeftBounds(new cedar::aux::UIntVectorParameter(this, "left bounds", 2, 0, 0, 10000)),
 _mReferenceLevel(new cedar::aux::DoubleParameter(this, "reference level", 0.0))
 {
