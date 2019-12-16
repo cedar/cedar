@@ -50,35 +50,44 @@
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
 namespace
-{
-bool declare()
-{
-  using cedar::proc::ElementDeclarationPtr;
-  using cedar::proc::ElementDeclarationTemplate;
+  {
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
 
-  ElementDeclarationPtr declaration
-  (
-    new ElementDeclarationTemplate<cedar::proc::steps::PositionOfMaximum>
+    ElementDeclarationPtr declaration
     (
-      "Programming",
-      "cedar.processing.steps.PositionOfMaximum"
-    )
-  );
+      new ElementDeclarationTemplate<cedar::proc::steps::PositionOfMaximum>
+      (
+        "Programming",
+        "cedar.processing.steps.PositionOfMaximum"
+      )
+    );
 
-  declaration->setIconPath(":/steps/positionofmaximum.svg");
-  declaration->setDescription
-  (
-    "Returns the indices (positions in the array) "
-    "of the maximum value of the input tensor."
-  );
+    declaration->setIconPath(":/steps/positionofmaximum.svg");
+    declaration->setDescription
+    (
+      "Returns the indices (positions in the array) "
+      "of the MAXIMUM (or other, see below) value of the input tensor.\n"
+      "Note: The position of the maximum is always the "
+      "first (i.e. leftmost, upmost) pixel!\n"
+      "You can optionally choose to find the position of the "
+      "CENTROID (center of mass). The Centroid method implemented "
+      "assumes you have an unimodal distribution and that the values of "
+      "the input are in an appropriate range, i.e. most of the pixels are of value zero. Note: If many pixels are not exactly zero, this will affect the result significantly."
+    );
 
-  declaration->declare();
+    declaration->declare();
 
-  return true;
+    return true;
+  }
+
+  bool declared = declare();
 }
 
-bool declared = declare();
-}
+cedar::aux::EnumType<cedar::proc::steps::PositionOfMaximum::UnitType>
+cedar::proc::steps::PositionOfMaximum::UnitType::mType("PositionOfMaximum::");
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -87,18 +96,35 @@ bool declared = declare();
 cedar::proc::steps::PositionOfMaximum::PositionOfMaximum()
 :
 // outputs
-mOutput(new cedar::aux::MatData(cv::Mat()))
+mOutput(new cedar::aux::MatData(cv::Mat())),
+mPositionType
+(
+  new cedar::aux::EnumParameter
+  (
+    this,
+    "position type",
+    cedar::proc::steps::PositionOfMaximum::UnitType::typePtr(),
+    cedar::proc::steps::PositionOfMaximum::UnitType::Maximum
+  )
+)
 {
   // declare all data
   cedar::proc::DataSlotPtr input = this->declareInput("input");
   this->declareOutput("output", mOutput);
 
   input->setCheck(cedar::proc::typecheck::IsMatrix());
+
+  QObject::connect(this->mPositionType.get(), SIGNAL(valueChanged()), this, SLOT(outputTypeChanged()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::steps::PositionOfMaximum::outputTypeChanged()
+{
+  recompute();
+}
 
 void cedar::proc::steps::PositionOfMaximum::inputConnectionChanged(const std::string& inputName)
 {
@@ -148,17 +174,52 @@ void cedar::proc::steps::PositionOfMaximum::compute(const cedar::proc::Arguments
 
 void cedar::proc::steps::PositionOfMaximum::recompute()
 {
-  if (!mInput)
+  if (!mInput
+     || mInput->getData().empty())
+  {
+    mOutput->setData( cv::Mat::zeros(2,2,CV_32F) );
     return;
+  }
 
-  if (mInput->getData().empty())
-    return;
+  switch (this->mPositionType->getValue())
+  {
+    case cedar::proc::steps::PositionOfMaximum::UnitType::Maximum:
+      // fall-through
+    default:
+    {
+      double minimum, maximum;
+      int minLoc[2]= {-1, -1};
+      int maxLoc[2]= {-1, -1};
 
-  double minimum, maximum;
-  int minLoc[2]= {-1, -1};
-  int maxLoc[2]= {-1, -1};
+      cv::minMaxIdx(mInput->getData(), &minimum, &maximum, minLoc, maxLoc);
 
-  cv::minMaxIdx(mInput->getData(), &minimum, &maximum, minLoc, maxLoc);
-  mOutput->getData().at<float>(0,0) = maxLoc[0];
-  mOutput->getData().at<float>(1,0) = maxLoc[1];
+      mOutput->getData().at<float>(0,0) = maxLoc[0];
+      mOutput->getData().at<float>(1,0) = maxLoc[1];
+      break;
+    }
+
+    case cedar::proc::steps::PositionOfMaximum::UnitType::Centroid:
+    {
+      // moments:
+      // this assumes the input is already went through a sigmoid
+      cv::Moments m= cv::moments( mInput->getData(), true);
+      cv::Point p( m.m10/m.m00, m.m01/m.m00);
+      
+      float p1= p.x;
+      float p2= p.y;
+
+      if ( cedar::aux::math::isZero( p1 ) )
+      {
+        p1= 0.0;
+      }
+      if ( cedar::aux::math::isZero( p2 ) )
+      {
+        p2= 0.0;
+      }
+
+      mOutput->getData().at<float>(0,0) = p1;
+      mOutput->getData().at<float>(1,0) = p2;
+      break;
+    }
+  }
 }

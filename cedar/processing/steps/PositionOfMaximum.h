@@ -44,6 +44,7 @@
 #include <cedar/processing/Step.h>
 #include <cedar/processing/InputSlotHelper.h>
 #include <cedar/auxiliaries/MatData.h>
+#include "cedar/auxiliaries/EnumParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/steps/PositionOfMaximum.fwd.h"
@@ -57,9 +58,45 @@
  */
 class cedar::proc::steps::PositionOfMaximum : public cedar::proc::Step
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  class UnitType
+  {
+    public:
+      //! the id of an enum entry
+      typedef cedar::aux::EnumId Id;
+
+      //! constructs the enum for all ids
+      static void construct()
+      {
+        mType.type()->def(cedar::aux::Enum(Maximum, "Maximum"));
+        mType.type()->def(cedar::aux::Enum(Centroid, "Centroid"));
+      }
+
+      //! @returns A const reference to the base enum object.
+      static const cedar::aux::EnumBase& type()
+      {
+        return *(mType.type());
+      }
+
+      //! @returns A pointer to the base enum object.
+      static const cedar::proc::DataRole::TypePtr& typePtr()
+      {
+        return mType.type();
+      }
+
+    public:
+      static const Id Maximum = 0;
+      static const Id Centroid = 1;
+
+    private:
+      static cedar::aux::EnumType<UnitType> mType;
+  };
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -89,6 +126,9 @@ private:
   void compute(const cedar::proc::Arguments& arguments);
   void recompute();
 
+private slots:
+  void outputTypeChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -108,6 +148,7 @@ protected:
   // none yet
 
 private:
+  cedar::aux::EnumParameterPtr mPositionType;
   // none yet
 
 }; // class cedar::proc::steps::PositionOfMaximum

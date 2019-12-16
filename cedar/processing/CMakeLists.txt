@@ -179,6 +179,7 @@ cedar_add_library(cedarproc
   steps/LinearLateralShift.h
   steps/HopfOscillatorRHS.h
   steps/NaNCheck.h
+  steps/PositionOfMaximum.h
   CppScript.h
   Group.h
   Step.h
