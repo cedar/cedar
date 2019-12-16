@@ -140,6 +140,9 @@ void cedar::proc::steps::TransferFunction::somethingChanged()
 
 void cedar::proc::steps::TransferFunction::recompute()
 {
+  if (!this->mInput)
+    return;
+
   // get all members
   const cv::Mat& input = this->mInput->getData();
   cv::Mat& sigmoid_u = this->mOutput->getData();
