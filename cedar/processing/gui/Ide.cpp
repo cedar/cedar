@@ -572,7 +572,9 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   this->mpActionSave->setEnabled(true);
 
-  this->mpActionResetSimulation->setEnabled(false);
+  // jokeit: reset now does much more and is usefull even when nothing
+  //         happened, yet (i.e. to reset the simulated robot)
+  // this->mpActionResetSimulation->setEnabled(false);
 
   auto boost_ctrl = OpenableDialogPtr(new OpenableBoostControl(this->mpProcessingDrawer));
 
@@ -777,7 +779,7 @@ void cedar::proc::gui::Ide::setArchitectureSavingLoadingEnabled(bool enabled)
 void cedar::proc::gui::Ide::setSimulationControlsEnabled(bool enabled)
 {
   this->mpActionStartPauseSimulation->setEnabled(enabled);
-  this->mpActionResetSimulation->setEnabled(enabled);
+  // jokeit: see above this->mpActionResetSimulation->setEnabled(enabled);
   this->mpThreadsSingleStep->setEnabled(enabled);
 }
 
@@ -1468,7 +1470,7 @@ void cedar::proc::gui::Ide::updateTabs(int tabid)
 
 void cedar::proc::gui::Ide::resetSimulationClicked()
 {
-  this->mpActionResetSimulation->setEnabled(false);
+  // jokeit: see above this->mpActionResetSimulation->setEnabled(false);
 
   this->resetRootGroup();
   cedar::aux::GlobalClockSingleton::getInstance()->reset();
