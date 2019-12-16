@@ -70,7 +70,7 @@
      <item>
       <widget class="QPushButton" name="mpDeleteButton">
        <property name="toolTip">
-        <string>Deletes a selected looped trigger. Note that the default trigger can never be deleted.</string>
+        <string>Deletes a selected thread. Note that the default thread can never be deleted.</string>
        </property>
        <property name="text">
         <string/>
@@ -111,7 +111,7 @@
        <string>#</string>
       </property>
       <property name="toolTip">
-       <string>The number of elements connected to this trigger.</string>
+       <string>The number of elements connected to this thread.</string>
       </property>
      </column>
      <column>

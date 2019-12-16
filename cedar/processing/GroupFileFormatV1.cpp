@@ -804,9 +804,14 @@ void cedar::proc::GroupFileFormatV1::readTriggers
     try
     {
       // if this is the default trigger and group already has one, only copy the configuration
-      if (trigger->getName() == "default trigger" && group->nameExists("default trigger"))
+      if ( ( trigger->getName() == "default trigger"  // old
+            || trigger->getName() == "default thread"  // new
+           )
+           && ( group->nameExists("default trigger")
+                ||  group->nameExists("default thread") 
+              ) )
       {
-        auto existing_trigger = group->getElement<cedar::proc::Trigger>("default trigger");
+        auto existing_trigger = group->getElement<cedar::proc::Trigger>("default thread");
         existing_trigger->copyFrom(trigger);
       }
       else
