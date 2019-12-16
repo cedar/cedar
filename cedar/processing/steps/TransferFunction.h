@@ -94,6 +94,7 @@ public:
 private:
   //!@brief compute
   void compute(const cedar::proc::Arguments&);
+  void recompute();
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -107,6 +108,9 @@ protected:
   cedar::aux::MatDataPtr mOutput;
 
 private:
+
+private slots:
+  void somethingChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
