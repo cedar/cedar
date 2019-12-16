@@ -93,7 +93,7 @@ cedar::proc::sources::LocalReader::LocalReader()
 cedar::proc::Step(true),
 mOutput(new cedar::aux::MatData(cv::Mat())),
 // parameters
-_mPort(new cedar::aux::StringParameter(this, "port", ""))
+_mPort(new cedar::aux::StringParameter(this, "port", "default local port"))
 {
   // declare all data
   this->declareOutput("output", mOutput);

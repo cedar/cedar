@@ -96,7 +96,7 @@ cedar::proc::sinks::LocalWriter::LocalWriter()
 cedar::proc::Step(true),
 // outputs
 mInput(new cedar::aux::MatData(cv::Mat())),
-_mPort(new cedar::aux::StringParameter(this, "port", ""))
+_mPort(new cedar::aux::StringParameter(this, "port", "default local port"))
 {
   cedar::proc::sinks::LocalWriter::mpDataLock= new QReadWriteLock();
 
