@@ -206,7 +206,7 @@ void cedar::proc::steps::NaNCheck::recompute()
   {
     replace_me= true;
 
-    auto input2 = getInput("replacement");
+    auto input2 = getInput("replacement (optional)");
 
     if (!input2)
     {
