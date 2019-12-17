@@ -45,6 +45,7 @@
 #include <cedar/processing/InputSlotHelper.h>
 #include <cedar/auxiliaries/MatData.h>
 #include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/steps/PositionOfMaximum.fwd.h"
@@ -150,6 +151,9 @@ protected:
 private:
   cedar::aux::EnumParameterPtr mPositionType;
   // none yet
+
+  cedar::aux::BoolParameterPtr   mNaNIfNoPeak;
+  cedar::aux::DoubleParameterPtr mPeakThreshold;
 
 }; // class cedar::proc::steps::PositionOfMaximum
 

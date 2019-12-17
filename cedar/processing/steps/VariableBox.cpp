@@ -97,7 +97,8 @@ _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 50, 1, 1000)),
 _mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0, cedar::aux::DoubleParameter::LimitType::full(), 0.5)),
 _mWidths(new cedar::aux::UIntVectorParameter(this, "widths", 2, 10, 1, 10000)),
 _mReferenceLevel(new cedar::aux::DoubleParameter(this, "reference level", 0.0)),
-_mDoCenterAtInput(new cedar::aux::BoolParameter(this, "center at input", false))
+_mDoCenterAtInput(new cedar::aux::BoolParameter(this, "center at input", false)),
+mNoPeakIfNaN(new cedar::aux::BoolParameter(this, "no peak if NaN", false))
 {
   cedar::proc::DataSlotPtr input = this->declareInput("left bounds");
 
@@ -108,6 +109,7 @@ _mDoCenterAtInput(new cedar::aux::BoolParameter(this, "center at input", false))
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
   QObject::connect(_mDoCenterAtInput.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
+  QObject::connect(mNoPeakIfNaN.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   this->updateMatrix();
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -251,6 +253,27 @@ void cedar::proc::steps::VariableBox::recompute()
         startvec[1]= 0;
       }
     }
+  }
+
+  // test for NaN
+  if (mNoPeakIfNaN->getValue()
+      && ( std::isnan( mat.at<float>(0,0) )
+           || (mat.rows > 1 && std::isnan( mat.at<float>(1,0) ) ) )
+     )
+  {
+    this->mOutput->setData
+                   (
+                     cedar::aux::math::boxMatrix
+                     (
+                       _mDimensionality->getValue(),
+                       _mSizes->getValue(),
+                       _mReferenceLevel->getValue(), // statt der Amplitude
+                       _mReferenceLevel->getValue(),
+                       widthsvec,
+                       startvec
+                     )
+                   );
+    return;
   }
 
   this->mOutput->setData

@@ -42,9 +42,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/typecheck/IsMatrix.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 
 // SYSTEM INCLUDES
 #include "cedar/processing/ElementDeclaration.h"
+#include <limits> 
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -106,7 +108,9 @@ mPositionType
     cedar::proc::steps::PositionOfMaximum::UnitType::typePtr(),
     cedar::proc::steps::PositionOfMaximum::UnitType::Maximum
   )
-)
+),
+mNaNIfNoPeak(new cedar::aux::BoolParameter(this, "NaN if no peak", false)),
+mPeakThreshold(new cedar::aux::DoubleParameter(this, "Peak detection threshold", 0.1))
 {
   // declare all data
   cedar::proc::DataSlotPtr input = this->declareInput("input");
@@ -114,7 +118,11 @@ mPositionType
 
   input->setCheck(cedar::proc::typecheck::IsMatrix());
 
+  mPeakThreshold->setConstant(true); 
+ 
   QObject::connect(this->mPositionType.get(), SIGNAL(valueChanged()), this, SLOT(outputTypeChanged()));
+  QObject::connect(this->mNaNIfNoPeak.get(), SIGNAL(valueChanged()), this, SLOT(outputTypeChanged()));
+  QObject::connect(this->mPeakThreshold.get(), SIGNAL(valueChanged()), this, SLOT(outputTypeChanged()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -123,6 +131,15 @@ mPositionType
 
 void cedar::proc::steps::PositionOfMaximum::outputTypeChanged()
 {
+  if (mNaNIfNoPeak->getValue())
+  {
+    mPeakThreshold->setConstant(false);
+  }
+  else
+  {
+    mPeakThreshold->setConstant(true);
+  }
+
   recompute();
 }
 
@@ -174,6 +191,8 @@ void cedar::proc::steps::PositionOfMaximum::compute(const cedar::proc::Arguments
 
 void cedar::proc::steps::PositionOfMaximum::recompute()
 {
+  bool isNaN;
+
   if (!mInput
      || mInput->getData().empty())
   {
@@ -208,18 +227,40 @@ void cedar::proc::steps::PositionOfMaximum::recompute()
       float p1= p.x;
       float p2= p.y;
 
-      if ( cedar::aux::math::isZero( p1 ) )
+      if ( cedar::aux::math::isZero( p1 ) 
+           || p1 < 0.0 )
       {
         p1= 0.0;
+        isNaN= true;
       }
-      if ( cedar::aux::math::isZero( p2 ) )
+      if ( cedar::aux::math::isZero( p2 ) 
+           || p2 < 0.0 )
       {
         p2= 0.0;
+        isNaN= true;
       }
 
       mOutput->getData().at<float>(0,0) = p1;
       mOutput->getData().at<float>(1,0) = p2;
       break;
+    }
+  }
+
+  if (mNaNIfNoPeak->getValue())
+  {
+    float val= mInput->getData().at<float>(
+                 mOutput->getData().at<float>(0,0),
+                 mOutput->getData().at<float>(1,0) );
+
+    if ( isNaN
+         || cedar::aux::math::isZero( val ) 
+         || val < mPeakThreshold->getValue() ) 
+    {
+      mOutput->getData().at<float>(0,0) = std::numeric_limits<float>::quiet_NaN();
+      mOutput->getData().at<float>(1,0) = std::numeric_limits<float>::quiet_NaN();
+    }
+    else
+    {
     }
   }
 }

@@ -145,6 +145,8 @@ protected:
 
 private:
 
+  cedar::aux::BoolParameterPtr mNoPeakIfNaN;
+
 }; // class cedar::proc::source::VariableBox
 
 #endif // CEDAR_PROC_SOURCES_VARIABLE_BOX_H
