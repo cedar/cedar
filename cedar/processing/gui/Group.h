@@ -56,6 +56,7 @@
 // SYSTEM INCLUDES
 #include <QObject>
 #include <QWeakPointer>
+#include <QMutex>
 #ifndef Q_MOC_RUN
   #include <boost/signals2/signal.hpp>
   #include <boost/signals2/connection.hpp>
@@ -591,6 +592,8 @@ private:
 
   //! Map containing all the architecture plots. Keys are the names of the plots, values the paths to the files defining them.
   std::map<std::string, cedar::aux::Path> _mArchitectureWidgets;
+
+  mutable QMutex mIOLock;
 
 }; // class cedar::proc::gui::GroupFile
 

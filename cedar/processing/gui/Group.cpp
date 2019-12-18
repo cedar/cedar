@@ -86,6 +86,7 @@
 #include <QStatusBar>
 #include <QListWidget>
 #include <QScrollBar>
+#include <QMutexLocker>
 
 #ifndef Q_MOC_RUN
 
@@ -1120,6 +1121,8 @@ void cedar::proc::gui::Group::writeTo(std::string file) const
 
 void cedar::proc::gui::Group::internalWriteJson(const cedar::aux::Path &filename) const
 {
+  QMutexLocker lock( &mIOLock ); 
+
   cedar::aux::ConfigurationNode root;
 
   this->mGroup->writeConfiguration(root);
@@ -1140,6 +1143,8 @@ void cedar::proc::gui::Group::writeJson(const cedar::aux::Path &filename) const
 
 void cedar::proc::gui::Group::readJson(const cedar::aux::Path &source)
 {
+  QMutexLocker lock( &mIOLock ); 
+
   this->mFileName = source.toString();
   cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
 
