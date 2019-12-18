@@ -385,7 +385,8 @@ protected:
   qreal getInputOutputSlotOffset() const;
 
   //! Updates the positions of the data slot items.
-  void updateDataSlotPositions();
+  //!@Note Added updatePos condition to prevent Data Slots from being reset to their original positions after being rearranged by the user
+  void updateDataSlotPositions(bool updatePos = true);
 
   //! Sets the size and position of the icon display. The icon will, at most, be size x size.
   void setIconBounds(const qreal& x, const qreal& y, const qreal& size);
