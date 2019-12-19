@@ -140,7 +140,9 @@ void cedar::proc::steps::PositionOfMaximum::outputTypeChanged()
     mPeakThreshold->setConstant(true);
   }
 
-  recompute();
+  this->lock(cedar::aux::LOCK_TYPE_WRITE);
+  recompute(true);
+  this->unlock();
 }
 
 void cedar::proc::steps::PositionOfMaximum::inputConnectionChanged(const std::string& inputName)
@@ -179,25 +181,29 @@ void cedar::proc::steps::PositionOfMaximum::inputConnectionChanged(const std::st
 
   if (output_changed)
   {
-    recompute();
+    recompute(true);
     this->emitOutputPropertiesChangedSignal("output");
   }
 }
 
 void cedar::proc::steps::PositionOfMaximum::compute(const cedar::proc::Arguments&)
 {
-  recompute();
+  recompute(false);
 }
 
-void cedar::proc::steps::PositionOfMaximum::recompute()
+void cedar::proc::steps::PositionOfMaximum::recompute(bool reinit)
 {
-  bool isNaN;
+  bool isNoPeak;
 
   if (!mInput
      || mInput->getData().empty())
   {
-    mOutput->setData( cv::Mat::zeros(2,2,CV_32F) );
+    mOutput->setData( cv::Mat::zeros(2,1,CV_32F) );
     return;
+  }
+  else if (reinit)
+  {
+    mOutput->setData( cv::Mat::zeros(2,1,CV_32F) );
   }
 
   switch (this->mPositionType->getValue())
@@ -224,43 +230,58 @@ void cedar::proc::steps::PositionOfMaximum::recompute()
       cv::Moments m= cv::moments( mInput->getData(), true);
       cv::Point p( m.m10/m.m00, m.m01/m.m00);
       
-      float p1= p.x;
-      float p2= p.y;
+      auto p1= p.x;
+      auto p2= p.y;
 
       if ( cedar::aux::math::isZero( p1 ) 
            || p1 < 0.0 )
       {
         p1= 0.0;
-        isNaN= true;
+        isNoPeak= true;
       }
       if ( cedar::aux::math::isZero( p2 ) 
            || p2 < 0.0 )
       {
         p2= 0.0;
-        isNaN= true;
+        isNoPeak= true;
       }
 
-      mOutput->getData().at<float>(0,0) = p1;
-      mOutput->getData().at<float>(1,0) = p2;
+      mOutput->getData().at<float>(0,0) = static_cast<float>(p1);
+      mOutput->getData().at<float>(1,0) = static_cast<float>(p2);
       break;
     }
   }
 
+  bool makeNaN;
+
   if (mNaNIfNoPeak->getValue())
   {
-    float val= mInput->getData().at<float>(
-                 mOutput->getData().at<float>(0,0),
-                 mOutput->getData().at<float>(1,0) );
-
-    if ( isNaN
-         || cedar::aux::math::isZero( val ) 
-         || val < mPeakThreshold->getValue() ) 
+    if (isNoPeak)
     {
+      makeNaN= true;
+    }
+    else if (mInput)
+    {
+      float val= mInput->getData().at<float>(
+                   mOutput->getData().at<float>(0,0),
+                   mOutput->getData().at<float>(1,0) );
+
+      if ( isNoPeak
+           || cedar::aux::math::isZero( val ) 
+           || val < mPeakThreshold->getValue() ) 
+      {
+        makeNaN= true;
+      }
+      else
+      {
+        // nothing
+      }
+    }
+  }
+
+  if (makeNaN)
+  {
       mOutput->getData().at<float>(0,0) = std::numeric_limits<float>::quiet_NaN();
       mOutput->getData().at<float>(1,0) = std::numeric_limits<float>::quiet_NaN();
-    }
-    else
-    {
-    }
   }
 }

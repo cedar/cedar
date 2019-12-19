@@ -125,7 +125,7 @@ private:
   void inputConnectionChanged(const std::string& inputName);
 
   void compute(const cedar::proc::Arguments& arguments);
-  void recompute();
+  void recompute(bool reinit);
 
 private slots:
   void outputTypeChanged();
