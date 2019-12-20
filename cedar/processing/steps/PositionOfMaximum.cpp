@@ -77,7 +77,10 @@ namespace
       "You can optionally choose to find the position of the "
       "CENTROID (center of mass). The Centroid method implemented "
       "assumes you have an unimodal distribution and that the values of "
-      "the input are in an appropriate range, i.e. most of the pixels are of value zero. Note: If many pixels are not exactly zero, this will affect the result significantly."
+      "the input are in an appropriate range, i.e. most of the pixels are of value zero. Note: If many pixels are not exactly zero, this will affect the result significantly. Use the 'Centroid threshold' parameter in that case to set all values smaller than that threshold to zero.\n"
+      "You can also output NaNs if no values are smaller than the "
+      "'Peak Detection Threshold' to be able to discern no-peak situations "
+      "from situations where a peak would be at (0,0)."
     );
 
     declaration->declare();
@@ -110,7 +113,8 @@ mPositionType
   )
 ),
 mNaNIfNoPeak(new cedar::aux::BoolParameter(this, "NaN if no peak", false)),
-mPeakThreshold(new cedar::aux::DoubleParameter(this, "Peak detection threshold", 0.1))
+mPeakThreshold(new cedar::aux::DoubleParameter(this, "Peak detection threshold", 0.1)),
+mCentroidThreshold(new cedar::aux::DoubleParameter(this, "Centroid detection threshold", 0.1))
 {
   // declare all data
   cedar::proc::DataSlotPtr input = this->declareInput("input");
@@ -119,10 +123,12 @@ mPeakThreshold(new cedar::aux::DoubleParameter(this, "Peak detection threshold",
   input->setCheck(cedar::proc::typecheck::IsMatrix());
 
   mPeakThreshold->setConstant(true); 
+  mCentroidThreshold->setConstant(true);
  
   QObject::connect(this->mPositionType.get(), SIGNAL(valueChanged()), this, SLOT(outputTypeChanged()));
   QObject::connect(this->mNaNIfNoPeak.get(), SIGNAL(valueChanged()), this, SLOT(outputTypeChanged()));
   QObject::connect(this->mPeakThreshold.get(), SIGNAL(valueChanged()), this, SLOT(outputTypeChanged()));
+  QObject::connect(this->mCentroidThreshold.get(), SIGNAL(valueChanged()), this, SLOT(outputTypeChanged()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -131,6 +137,16 @@ mPeakThreshold(new cedar::aux::DoubleParameter(this, "Peak detection threshold",
 
 void cedar::proc::steps::PositionOfMaximum::outputTypeChanged()
 {
+  switch (this->mPositionType->getValue())
+  {
+    case cedar::proc::steps::PositionOfMaximum::UnitType::Maximum:
+      mCentroidThreshold->setConstant(true);
+      break;
+    case cedar::proc::steps::PositionOfMaximum::UnitType::Centroid:
+      mCentroidThreshold->setConstant(false);
+      break;
+  }
+
   if (mNaNIfNoPeak->getValue())
   {
     mPeakThreshold->setConstant(false);
@@ -225,13 +241,19 @@ void cedar::proc::steps::PositionOfMaximum::recompute(bool reinit)
 
     case cedar::proc::steps::PositionOfMaximum::UnitType::Centroid:
     {
-      // moments:
-      // this assumes the input is already went through a sigmoid
-      cv::Moments m= cv::moments( mInput->getData(), true);
+      cv::Mat source= mInput->getData();
+      cv::Mat temp;
+
+      // start by thresholding, ignoring everyhting smaller than ...
+      cv::threshold( source, temp, mCentroidThreshold->getValue(), 
+                     42, // this is ignored:
+                     cv::THRESH_TOZERO );
+      // calculate moments:
+      cv::Moments m= cv::moments( temp, true);
       cv::Point p( m.m10/m.m00, m.m01/m.m00);
       
-      auto p1= p.x;
-      auto p2= p.y;
+      auto p1= p.y; // note the switch of x and y, here!
+      auto p2= p.x;
 
       if ( cedar::aux::math::isZero( p1 ) 
            || p1 < 0.0 )

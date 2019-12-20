@@ -154,6 +154,7 @@ private:
 
   cedar::aux::BoolParameterPtr   mNaNIfNoPeak;
   cedar::aux::DoubleParameterPtr mPeakThreshold;
+  cedar::aux::DoubleParameterPtr mCentroidThreshold;
 
 }; // class cedar::proc::steps::PositionOfMaximum
 
