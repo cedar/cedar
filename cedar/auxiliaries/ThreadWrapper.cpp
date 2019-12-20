@@ -164,6 +164,8 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
     delete mpThread;
     this->mpThread = NULL;
   }
+
+  mDestructingMutex.unlock();
 }
 
 //------------------------------------------------------------------------------
@@ -456,9 +458,11 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time)
           && old_thread->isRunning())
       {
         old_thread->wait(time);
-        //std::cout << "  resuming from wait." << std::endl;
       }
-
+      else
+      {
+        return; // already stopped
+      }
 
       thread_worker_readlock.relock();
     }
