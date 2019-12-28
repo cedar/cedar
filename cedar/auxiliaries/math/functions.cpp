@@ -69,26 +69,37 @@ cv::Mat cedar::aux::math::boxMatrix
     = cv::Mat(static_cast<int>(dimensionality), &matrix_sizes_int.front(), CV_32F, cv::Scalar(referenceLevel));
 
   std::vector<int> box_widths_int(widths.size());
+  std::vector<int> box_left_bounds_int(leftBounds.size());
+
   for (unsigned int i = 0; i < widths.size(); ++i)
   {
     unsigned int left = leftBounds.at(i);
     if (left >= matrixSizes.at(i))
     {
-      return output;
-    }
-    if (left + widths.at(i) > matrixSizes.at(i))
-    {
-      box_widths_int.at(i) = static_cast<int>(matrixSizes.at(i) - leftBounds.at(i));
+      // jokeit: this returned a box at (0,0):
+      //   return output;
+      box_left_bounds_int.at(i) = matrixSizes.at(i) - 1;
+      box_widths_int.at(i) = 1;
     }
     else
     {
-      box_widths_int.at(i) = static_cast<int>(widths.at(i));
+      box_left_bounds_int.at(i)= left;
+
+      if (left + widths.at(i) > matrixSizes.at(i))
+      {
+        box_widths_int.at(i) = static_cast<int>(matrixSizes.at(i) - leftBounds.at(i));
+      }
+      else
+      {
+        box_widths_int.at(i) = static_cast<int>(widths.at(i));
+      }
     }
   }
 
   if (dimensionality < 2)
   {
     box_widths_int.push_back(1);
+    box_left_bounds_int.push_back(0);
   }
 
   cv::Mat box = cv::Mat(static_cast<int>(dimensionality), &box_widths_int.front(), CV_32F, cv::Scalar(boxAmplitude));
@@ -96,7 +107,7 @@ cv::Mat cedar::aux::math::boxMatrix
   std::vector<cv::Range> box_ranges(dimensionality);
   for (unsigned int i = 0; i < dimensionality; ++i)
   {
-    unsigned int left = leftBounds.at(i);
+    unsigned int left = box_left_bounds_int.at(i);
     unsigned int right = left + widths.at(i);
     if (right > matrixSizes.at(i))
     {
