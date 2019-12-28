@@ -41,14 +41,20 @@
 #include <cedar/auxiliaries/DoubleVectorParameter.h>
 #include "cedar/configuration.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/sources/VirtualCamera.fwd.h"
+
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/gui/Viewer.h"
+#ifdef CEDAR_USE_QGLVIEWER
+   #include "cedar/auxiliaries/gui/Viewer.h"
+#endif CEDAR_USE_QGlVIEWER
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 
-// FORWARD DECLARATIONS
-#include "cedar/processing/sources/VirtualCamera.fwd.h"
+#ifdef CEDAR_USE_QGLVIEWER
+
+
 
 class cedar::proc::sources::VirtualCamera : public cedar::proc::Step
 {
@@ -74,6 +80,7 @@ public slots:
   void cameraOrientationChanged();
   void cameraPositionChangedFromViewport();
   void cameraOrientationChangedFromViewport();
+  void updatedView();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -106,7 +113,9 @@ protected:
 
 private:
   //cedar::aux::gui::ViewerWeakPtr mpViewer;
+#ifdef CEDAR_USE_QGLVIEWER
   boost::shared_ptr<cedar::aux::gui::Viewer> mpViewer;
+#endif CEDAR_USE_QGlVIEWER
   //!@brief sizes of all dimensions of the output of the projection
   cedar::aux::UIntVectorParameterPtr mOutputSizes;
   //!@brief position of the virtual camera (x,y,z)
@@ -119,5 +128,6 @@ private:
 
 }; // class cedar::proc::sources::VirtualCamera
 
+#endif // CEDAR_USE_QGLVIEWER
 #endif // CEDAR_PROC_SOURCES_VIRTUAL_CAMERA_H
 

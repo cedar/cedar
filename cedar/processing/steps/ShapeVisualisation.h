@@ -192,7 +192,11 @@ private:
   cedar::aux::EnumParameterPtr _mShape;
 
   //! Visualisation shape scale
-  cedar::aux::DoubleParameterPtr _mScale;
+  cedar::aux::DoubleParameterPtr _mRadius;
+  cedar::aux::DoubleParameterPtr _mLength;
+  cedar::aux::DoubleParameterPtr _mWidth;
+  cedar::aux::DoubleParameterPtr _mHeight;
+
 
   const std::string mInputName;
 }; // class cedar::proc::steps::ShapeVisualisation

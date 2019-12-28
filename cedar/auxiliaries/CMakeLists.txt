@@ -54,6 +54,12 @@ endif(CEDAR_USE_QT5)
 
 set(qcp_moc_files gui/QCLinePlot.h  gui/QCMatrixPlot.h gui/QCMatrixPlot.h gui/qcustomplot.h)
 
+if (CEDAR_USE_QGLVIEWER)
+  set(qglviewer_moc_files gui/Viewer.h)
+else(CEDAR_USE_QGLVIEWER)
+  set(qglviewer_moc_files "")
+endif(CEDAR_USE_QGLVIEWER)
+
 if (CEDAR_USE_QWTPLOT3D)
   set(qwtplot3d_moc_files gui/QwtSurfacePlot.h)
 else(CEDAR_USE_QWTPLOT3D)
@@ -121,7 +127,7 @@ cedar_add_library(cedaraux
   gui/UIntParameter.h
   gui/UIntVectorParameter.h
   gui/VelocityParameter.h
-  gui/Viewer.h
+  ${qglviewer_moc_files}
   ${qwt_moc_files}
   ${vtk_moc_files}
   ${qwtplot3d_moc_files}

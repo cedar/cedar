@@ -34,6 +34,8 @@
 
 ======================================================================================================================*/
 
+
+
 #ifndef CEDAR_AUX_GUI_VIEWER_H
 #define CEDAR_AUX_GUI_VIEWER_H
 
@@ -49,6 +51,9 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/Viewer.fwd.h"
+
+
+#ifdef CEDAR_USE_QGLVIEWER
 
 // SYSTEM INCLUDES
 #ifdef CEDAR_USE_QGLVIEWER
@@ -89,11 +94,7 @@
  */
 class cedar::aux::gui::Viewer
         :
-#ifdef CEDAR_USE_QGLVIEWER
                 public QGLViewer,
-#else
-                public QGLWidget,
-#endif // CEDAR_USE_QGLVIEWER
                 public cedar::aux::Grabbable
 {
 private:
@@ -197,8 +198,8 @@ public:
 #endif // CEDAR_USE_QGLVIEWER
 
 
-  signals:
-          void cameraMoved();
+signals:
+  void cameraMoved();
   void updated();
 
 
@@ -213,14 +214,13 @@ private:
   void grabBuffer();
 
   //!@brief updates the framebuffer when the window is hidden
-#ifdef CEDAR_USE_QGLVIEWER
+
 
   void hiddenUpdate();
 
   qglviewer::Vec mOldPos;
   qglviewer::Vec mOldDir;
 
-#endif
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -243,9 +243,10 @@ private:
   ///!@brief flag in order to be stored in Plotgroups
   std::string mViewerLabel;
 
-#ifdef CEDAR_USE_QGLVIEWER
   QGLFramebufferObject * m_fbo = nullptr;
-#endif // CEDAR_USE_QGLVIEWER
+
 };
 
 #endif  // CEDAR_AUX_GUI_VIEWER_H
+
+#endif  // CEDAR_USE_QGLVIEWER

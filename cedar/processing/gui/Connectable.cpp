@@ -1211,10 +1211,9 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
   }
 }
 
-void cedar::proc::gui::Connectable::updateDataSlotPositions()
+void cedar::proc::gui::Connectable::updateDataSlotPositions(bool updatePos)
 {
   qreal style_factor;
-
   switch (this->mDisplayMode)
   {
     case cedar::proc::gui::Connectable::DisplayMode::ICON_ONLY:
@@ -1273,8 +1272,11 @@ void cedar::proc::gui::Connectable::updateDataSlotPositions()
         p_item->setHeight(slot_size);
         qreal x = origin.x();
         qreal y = origin.y();
-        p_item->setPos(QPointF(x - size_diff, y) + current_origin);
-        current_origin += direction * (slot_size + M_DATA_SLOT_PADDING);
+        /// dont change the DataSlots positions unless neccessary
+        if(updatePos) {
+            p_item->setPos(QPointF(x - size_diff, y) + current_origin);
+            current_origin += direction * (slot_size + M_DATA_SLOT_PADDING);
+        }
       }
     }
   }
@@ -1340,7 +1342,7 @@ void cedar::proc::gui::Connectable::demagnetizeSlots()
 
   if (changes)
   {
-    this->updateDataSlotPositions();
+    this->updateDataSlotPositions(false);
   }
 }
 
@@ -1384,7 +1386,7 @@ void cedar::proc::gui::Connectable::magnetizeSlots(const QPointF& mousePositionI
 
   if (changes)
   {
-    this->updateDataSlotPositions();
+    this->updateDataSlotPositions(false);
   }
 }
 
@@ -2211,13 +2213,14 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
       cedar::aux::ConfigurationNode value_node;
 
       //std::cout<<"Connectable: Save a Viewer!"<<std::endl;
-
+#ifdef CEDAR_USE_QGLVIEWER
       auto viewer_item = static_cast<cedar::aux::gui::Viewer*>(dock_widget_child);
       viewer_item->writeToConfiguration(value_node, cedar::proc::gui::SettingsSingleton::getInstance()->getIdeSize());
       node.put_child("Viewer"+viewer_item->getViewerLabel(), value_node);
 
       //In order to ensure that the Widget is correctly managed by the Gui::Group it needs to be added to the List of KinematicCHainWidgets
       this->getGuiGroup()->insertViewer(viewer_item);
+#endif //CEDAR_USE_QGLVIEWER
     }
 
   }

@@ -44,6 +44,12 @@ else()
   SET(yarp_moc_headers "")
 endif()
 
+if (CEDAR_USE_QGLVIEWER)
+  set(qglviewer_moc_headers sources/VirtualCamera.h)
+else(CEDAR_USE_QGLVIEWER)
+  set(qglviewer_moc_headers "")
+endif(CEDAR_USE_QGLVIEWER)
+
 cedar_add_library(cedarproc
   LINK_LIBRARIES
   cedaraux
@@ -158,7 +164,7 @@ cedar_add_library(cedarproc
   steps/WeightedSum.h
   steps/PythonScript.h
   steps/PythonScriptLooped.h
-  sources/VirtualCamera.h
+  ${qglviewer_moc_headers}
   sources/Boost.h
   sources/Noise.h
   sources/Picture.h

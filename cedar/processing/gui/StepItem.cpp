@@ -722,10 +722,11 @@ void cedar::proc::gui::StepItem::openKinematicChainWidget()
 void cedar::proc::gui::StepItem::openViewer()
 {
   cedar::aux::gl::ScenePtr scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
-
+#ifdef CEDAR_USE_QGLVIEWER
   auto viewer = new cedar::aux::gui::Viewer(scene, this);
   viewer->startTimer(25);
   viewer->setSceneRadius(scene->getSceneLimit());
 
   this->createDockWidget("GLViewer", viewer)->show();
+#endif // CEDAR_USE_QGLVIEWER
 }

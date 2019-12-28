@@ -196,9 +196,9 @@ public:
   void openKinematicChainWidget(const aux::ConfigurationNode &node);
 
   void insertKinematicChainWidget(cedar::dev::gui::KinematicChainWidget* kinematicChainWidget) const;
-
+#ifdef CEDAR_USE_QGLVIEWER
   void insertViewer(cedar::aux::gui::Viewer* viewer) const;
-
+#endif //CEDAR_USE_QGLVIEWER
   //! Opens a view on the simulated scene
   void openSceneViewer();
   void openSceneViewer(const cedar::aux::ConfigurationNode& node);
@@ -513,7 +513,9 @@ private:
   mutable std::string mFileName;
 
   //!@brief a vector containing all the viewers
+#ifdef CEDAR_USE_QGLVIEWER
   mutable std::vector<cedar::aux::gui::Viewer*> mViewers;
+#endif //CEDAR_USE_QGLVIEWER
 
   //!@brief a vector containing all the KinematicChainWidget for savin purposes...
   mutable std::vector<cedar::dev::gui::KinematicChainWidget*> mKinematicChainWidgets;

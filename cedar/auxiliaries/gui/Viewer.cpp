@@ -35,6 +35,9 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+
+
+
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include <chrono>
@@ -42,7 +45,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-
+#ifdef CEDAR_USE_QGLVIEWER
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,11 +63,11 @@ cedar::aux::gui::Viewer::Viewer(cedar::aux::gl::ScenePtr pScene, bool readFromFi
         mViewerLabel("")
 {
   mpScene->addViewer(this);
-#ifdef CEDAR_USE_QGLVIEWER
+
   this->camera()->setUpVector(qglviewer::Vec(0,0,1));
   mOldPos = camera()->position();
   mOldDir = camera()->viewDirection();
-#endif
+
 }
 
 cedar::aux::gui::Viewer::Viewer(bool readFromFile)
@@ -77,11 +80,11 @@ cedar::aux::gui::Viewer::Viewer(bool readFromFile)
         mRegisteredGrabber(""),
         mViewerLabel("")
 {
-#ifdef CEDAR_USE_QGLVIEWER
+
   this->camera()->setUpVector(qglviewer::Vec(0,0,1));
   mOldPos = camera()->position();
   mOldDir = camera()->viewDirection();
-#endif
+
 }
 
 cedar::aux::gui::Viewer::~Viewer()
@@ -105,18 +108,18 @@ void cedar::aux::gui::Viewer::init()
 {
   if (mReadFromFile)
   {
-#ifdef CEDAR_USE_QGLVIEWER
+
     restoreStateFromFile();
-#endif // CEDAR_USE_QGLVIEWER
+
   }
   else{
-#ifdef CEDAR_USE_QGLVIEWER
-    this->camera()->setPosition(qglviewer::Vec(0,-3,1));
-#endif // CEDAR_USE_QGLVIEWER
-  }
 
+    this->camera()->setPosition(qglviewer::Vec(0,-3,1));
+
+  }
   mpScene->initGl();
 }
+
 
 void cedar::aux::gui::Viewer::initGl(cedar::aux::gl::ObjectVisualizationPtr pVisualization)
 {
@@ -134,7 +137,7 @@ void cedar::aux::gui::Viewer::draw()
 void cedar::aux::gui::Viewer::timerEvent(QTimerEvent*)
 {
   bool move =false;
-#ifdef CEDAR_USE_QGLVIEWER
+
   if(!this->isVisible())
   {
     hiddenUpdate();
@@ -156,15 +159,16 @@ void cedar::aux::gui::Viewer::timerEvent(QTimerEvent*)
     mOldDir = camera()->viewDirection();
     move = true;
   }
-#endif
+
   if (move)
   {
     emit cameraMoved();
+    emit updated();
   }
-  emit updated();
+
 }
 
-#ifdef CEDAR_USE_QGLVIEWER
+
 void cedar::aux::gui::Viewer::hiddenUpdate()
 {
   // regular draw doesn't work while the Widget is hidden
@@ -204,25 +208,26 @@ void cedar::aux::gui::Viewer::hiddenUpdate()
   //apply the new content to the channel image
   if (mpGrabberLock)
   {
+
     mpGrabberLock->lockForWrite();
     mGrabberBuffer = mat2;
     mpGrabberLock->unlock();
   }
 
 
-//  m_fbo->release(); // This allows the default framebuffer to render again..
+  m_fbo->release(); // This allows the default framebuffer to render again..
 
 
   //bind default framebuffer again. not sure if this necessary
   //and isn't supposed to use defaultFramebuffer()...
-//  m_fbo->bindDefault(); // Removed this for now
+  m_fbo->bindDefault(); // Removed this for now
   //doneCurrent();
 }
-#endif
+
 
 void cedar::aux::gui::Viewer::grabBuffer()
 {
-#ifdef CEDAR_USE_QGLVIEWER
+
   // grab framebuffer without alpha-channel. possible values
   // GL_FRONT_LEFT, GL_FRONT_RIGHT, GL_BACK_LEFT, GL_BACK_RIGHT, GL_FRONT, GL_BACK, GL_LEFT, GL_RIGHT,
   // GL_AUXi, where i is between 0 and the value of GL_AUX_BUFFERS minus 1.
@@ -247,16 +252,9 @@ void cedar::aux::gui::Viewer::grabBuffer()
   mpGrabberLock->lockForWrite();
   mGrabberBuffer = mat2;
   mpGrabberLock->unlock();
-#endif // CEDAR_USE_QGLVIEWER
+
 }
 
-//TODO: Why is this function necessary if we do not use the QGLViewer?
-#ifndef CEDAR_USE_QGLVIEWER
-QImage cedar::aux::gui::Viewer::grabFrameBuffer()
-{
-  return this->QGLWidget::grabFrameBuffer(false);
-}
-#endif // CEDAR_USE_QGLVIEWER
 
 cv::Mat& cedar::aux::gui::Viewer::grabImage()
 {
@@ -350,7 +348,7 @@ void cedar::aux::gui::Viewer::writeToConfiguration(cedar::aux::ConfigurationNode
   }
 
 
-#ifdef CEDAR_USE_QGLVIEWER
+
 //      QWidget* viewerAsWidget = dynamic_cast<QWidget *>(dock_widget_child);
 
 #ifdef CEDAR_USE_GLEW
@@ -371,23 +369,23 @@ void cedar::aux::gui::Viewer::writeToConfiguration(cedar::aux::ConfigurationNode
   value_node.add("camera orientation 2", qgl->camera()->orientation()[2]);
   value_node.add("camera orientation 3", qgl->camera()->orientation()[3]);
 
-#endif // CEDAR_USE_QGLVIEWER
+
 
 }
 
 
 void cedar::aux::gui::Viewer::changeCameraPosition(const double x , const double y, const double z)
 {
-#ifdef CEDAR_USE_QGLVIEWER
+
   qglviewer::Vec position = qglviewer::Vec(x,y,z);
 
   this->camera()->setPosition(position);
-#endif
+
 }
 
 void cedar::aux::gui::Viewer::changeCameraOrientation(const double alpha , const double beta)
 {
-#ifdef CEDAR_USE_QGLVIEWER
+
   this->camera()->setUpVector(qglviewer::Vec(0,0,1));  // set up axis
 
   // based on the description this "should" do the same thing
@@ -402,7 +400,7 @@ void cedar::aux::gui::Viewer::changeCameraOrientation(const double alpha , const
 
 
   this->camera()->setViewDirection(direction);
-#endif
+
 }
 
 void cedar::aux::gui::Viewer::closeEvent(QCloseEvent *event)
@@ -425,4 +423,6 @@ void cedar::aux::gui::Viewer::toggleVisible()
   else
     this->setVisible(true);
 }
+
+#endif
 

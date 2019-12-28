@@ -84,14 +84,17 @@ int cedar::aux::gl::Scene::addObjectVisualization(cedar::aux::gl::ObjectVisualiz
   QWriteLocker write_locker(&mObjectVisualizationLock);
 
   mObjectVisualizations.push_back(pObjectVisualization);
+#ifdef CEDAR_USE_QGLVIEWER
   for (int i=0; i<mViewers.size(); i++)
   {
     mViewers[i]->initGl(pObjectVisualization);
   }
+#endif // CEDAR_USE_QGLVIEWER
   mSceneChanged();
   return mObjectVisualizations.size() - 1;
 }
 
+#ifdef CEDAR_USE_QGLVIEWER
 int cedar::aux::gl::Scene::addViewer(cedar::aux::gui::Viewer* pViewer)
 {
   mViewers.push_back(pViewer);
@@ -110,6 +113,7 @@ int cedar::aux::gl::Scene::removeViewer(cedar::aux::gui::Viewer* pViewer)
   }
   return 0;
 }
+#endif // CEDAR_USE_QGLVIEWER
 
 void cedar::aux::gl::Scene::deleteObjectVisualization(const std::string &name)
 {

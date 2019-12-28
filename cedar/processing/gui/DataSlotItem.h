@@ -135,6 +135,9 @@ public:
 
   bool canDuplicate() const;
 
+  //! Changed to return true
+  bool canBeDragged() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -168,6 +171,11 @@ private slots:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
+  //! Used to restrict dragging for Data Slots
+  //! The Data slot can only be dragged along a Rectangle slightly larger than the parent item
+  void mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEvent);
+
 private:
   //! The step item that this slot belongs to.
   cedar::proc::gui::GraphicsBase* mpStep;

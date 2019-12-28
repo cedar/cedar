@@ -51,6 +51,12 @@ else (CEDAR_USE_YARP)
   set(yarp_moc_files "")
 endif(CEDAR_USE_YARP)
 
+if (CEDAR_USE_QGLVIEWER)
+    set(qglviewer_moc_files gui/MountedCameraViewer.h)
+else(CEDAR_USE_QGLVIEWER)
+    set(qglviewer_moc_files "")
+endif(CEDAR_USE_QGLVIEWER)
+
 cedar_add_library(cedardev
                   MOC_HEADERS
                   Component.h
@@ -69,7 +75,7 @@ cedar_add_library(cedardev
                   gui/ComponentParameter.h
                   gui/RobotManager.h
                   gui/RobotCard.h
-                  gui/MountedCameraViewer.h
+                  ${qglviewer_moc_files}
                   kteam/gui/DriveControlWidget.h
                   sensors/visual/VideoGrabber.h
                   sensors/visual/PictureGrabber.h
