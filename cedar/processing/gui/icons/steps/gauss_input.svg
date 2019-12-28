@@ -14,7 +14,7 @@
    height="400"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
    sodipodi:docname="gauss_input.svg"
    inkscape:export-filename="/home/lompolbx/workspace/src/cedar.fieldFramework/cedar/processing/gui/icons/steps/gauss_input.png"
    inkscape:export-xdpi="9"
@@ -33,9 +33,9 @@
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1032"
+     inkscape:window-height="995"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="28"
      inkscape:window-maximized="1"
      showguides="true"
      inkscape:guide-bbox="true" />
@@ -387,37 +387,5 @@
        style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:15;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter"
        d="m 199.9375,684.40625 c -11.46308,0.0821 -20.59317,7.85737 -26.9375,18.28125 -6.34433,10.42388 -11.00276,24.13884 -15.28125,40.3125 -8.55697,32.34732 -15.19278,74.52171 -24.78125,116.40625 -9.58847,41.88454 -22.21763,83.37539 -41.71875,113.65625 -19.501116,30.2809 -44.757329,49.2858 -82.6875,49.2813 a 7.50075,7.50075 0 1 0 0,15 c 43.134053,0.01 74.055955,-23.1497 95.3125,-56.1563 21.25654,-33.00664 33.97952,-75.89439 43.71875,-118.4375 9.73923,-42.54311 16.4389,-84.84277 24.65625,-115.90625 4.10868,-15.53174 8.6499,-28.25214 13.59375,-36.375 4.92349,-8.0894 9.12999,-11.00273 14.1875,-11.0625 5.05751,0.0598 9.26401,2.9731 14.1875,11.0625 4.94385,8.12285 9.48507,20.84327 13.59375,36.375 8.21735,31.06345 14.91702,73.36316 24.65625,115.90625 9.73923,42.54309 22.46221,85.43084 43.71875,118.4375 21.25654,33.0067 52.17845,56.1613 95.3125,56.1563 a 7.50075,7.50075 0 1 0 0,-15 c -37.93017,0 -63.18638,-19.0004 -82.6875,-49.2813 C 289.28013,942.78163 276.65097,901.29077 267.0625,859.40625 257.47403,817.52173 250.83822,775.3473 242.28125,743 238.00276,726.82635 233.34433,713.11138 227,702.6875 220.65567,692.26362 211.52558,684.48831 200.0625,684.40625 l -0.0625,0 -0.0625,0 z"
        id="path2835" />
-    <g
-       id="g2876"
-       style="fill:#666666">
-      <path
-         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#666666;fill-opacity:1;stroke:none;stroke-width:5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter"
-         d="m 155.65625,892.125 0,5 87.96875,0 0,-5 -87.96875,0 z"
-         id="path3645" />
-      <path
-         id="path2882"
-         d="m 144.11903,894.62437 17.3,-10 0,20 -17.3,-10 z"
-         style="fill:#666666;fill-rule:evenodd;stroke:#c30000;stroke-width:2pt;marker-start:none" />
-      <path
-         id="path2884"
-         d="m 255.16669,894.62437 -17.3,10 0,-20 17.3,10 z"
-         style="fill:#666666;fill-rule:evenodd;stroke:#c30000;stroke-width:2pt;marker-start:none" />
-    </g>
-    <g
-       id="g2866"
-       style="fill:#666666">
-      <path
-         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#666666;fill-opacity:1;stroke:none;stroke-width:5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter"
-         d="m 197.5,716.4375 0,314.0313 5,0 0,-314.0313 -5,0 z"
-         id="path4739" />
-      <path
-         id="path2872"
-         d="m 200,1042.0187 -10,-17.3 20,0 -10,17.3 z"
-         style="fill:#666666;fill-rule:evenodd;stroke:#c30000;stroke-width:2pt;marker-start:none" />
-      <path
-         id="path2874"
-         d="m 200,704.91011 10,17.3 -20,0 10,-17.3 z"
-         style="fill:#666666;fill-rule:evenodd;stroke:#c30000;stroke-width:2pt;marker-start:none" />
-    </g>
   </g>
 </svg>
