@@ -249,7 +249,7 @@ void cedar::proc::steps::VariableBox::recompute()
       }
       else
       {
-        widthsvec[1]-= ( halfwidth - startvec[0] );
+        widthsvec[1]-= ( halfwidth - startvec[1] );
         startvec[1]= 0;
       }
     }
