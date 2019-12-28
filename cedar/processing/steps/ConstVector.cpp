@@ -40,6 +40,7 @@
 
 // PROJECT INCLUDES
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/gui/stepViews/ConstVectorView.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -53,7 +54,7 @@ namespace
 
     ElementDeclarationPtr stv_decl
         (
-            new ElementDeclarationTemplate<cedar::proc::steps::ConstVector>
+            new ElementDeclarationTemplate<cedar::proc::steps::ConstVector, cedar::proc::gui::ConstVectorView>
                 (
                     "Sources",
                     "cedar.processing.ConstVector"

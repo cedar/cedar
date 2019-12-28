@@ -11,7 +11,7 @@
    id="svg2"
    height="700"
    width="700"
-   sodipodi:docname="const_vector.svg"
+   sodipodi:docname="const_vector_2d.svg"
    inkscape:version="0.92.3 (2405546, 2018-03-11)">
   <sodipodi:namedview
      pagecolor="#ffffff"
@@ -22,15 +22,15 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1041"
-     inkscape:window-height="751"
-     id="namedview16174"
+     inkscape:window-width="1518"
+     inkscape:window-height="843"
+     id="namedview16117"
      showgrid="false"
-     inkscape:zoom="0.33714286"
-     inkscape:cx="-57.838983"
-     inkscape:cy="350"
-     inkscape:window-x="420"
-     inkscape:window-y="174"
+     inkscape:zoom="0.953584"
+     inkscape:cx="343.64521"
+     inkscape:cy="359.9205"
+     inkscape:window-x="197"
+     inkscape:window-y="78"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg2" />
   <defs
@@ -103,7 +103,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -134,32 +134,22 @@
   </g>
   <text
      xml:space="preserve"
-     style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;-inkscape-font-specification:Sans;letter-spacing:0px;word-spacing:0px;fill:#666666;fill-opacity:1;stroke:none"
-     x="309.54691"
-     y="172.28572"
+     style="font-style:normal;font-weight:normal;font-size:13.61807728px;line-height:0%;font-family:sans-serif;-inkscape-font-specification:Sans;letter-spacing:0px;word-spacing:0px;fill:#666666;fill-opacity:1;stroke:none;stroke-width:1.13483965"
+     x="306.61484"
+     y="252.57303"
      id="text3048"><tspan
        id="tspan3050"
-       x="309.54691"
-       y="172.28572"
-       style="font-size:144px;line-height:1.25;font-family:sans-serif">a</tspan></text>
+       x="306.61484"
+       y="252.57303"
+       style="font-size:163.41691589px;line-height:1.25;font-family:sans-serif;stroke-width:1.13483965">a</tspan></text>
   <text
      xml:space="preserve"
-     style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;-inkscape-font-specification:Sans;letter-spacing:0px;word-spacing:0px;fill:#666666;fill-opacity:1;stroke:none"
-     x="305.11722"
-     y="367.22375"
+     style="font-style:normal;font-weight:normal;font-size:13.61807728px;line-height:0%;font-family:sans-serif;-inkscape-font-specification:Sans;letter-spacing:0px;word-spacing:0px;fill:#666666;fill-opacity:1;stroke:none;stroke-width:1.13483965"
+     x="299.35376"
+     y="500.32758"
      id="text3048-6"><tspan
        id="tspan3050-9"
-       x="305.11722"
-       y="367.22375"
-       style="font-size:144px;line-height:1.25;font-family:sans-serif">b</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;-inkscape-font-specification:Sans;letter-spacing:0px;word-spacing:0px;fill:#666666;fill-opacity:1;stroke:none"
-     x="310.25003"
-     y="562.1618"
-     id="text3048-0"><tspan
-       id="tspan3050-3"
-       x="310.25003"
-       y="562.1618"
-       style="font-size:144px;line-height:1.25;font-family:sans-serif">c</tspan></text>
+       x="299.35376"
+       y="500.32758"
+       style="font-size:163.41691589px;line-height:1.25;font-family:sans-serif;stroke-width:1.13483965">b</tspan></text>
 </svg>

@@ -137,6 +137,10 @@
         <file>steps/virtual_camera.svg</file>
         <file>steps/vector_to_scalars.svg</file>
         <file>steps/const_vector.svg</file>
+        <file>steps/const_vector_1d.svg</file>
+        <file>steps/const_vector_2d.svg</file>
+        <file>steps/const_vector_3d.svg</file>
+        <file>steps/const_vector_nd.svg</file>
         <file>steps/const_matrix.svg</file>
         <file>steps/stack.svg</file>
         <file>steps/pairsGame.svg</file>
