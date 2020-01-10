@@ -433,6 +433,18 @@ void cedar::proc::gui::Connection::setValidity(cedar::proc::gui::ConnectValidity
   this->updateGraphics();
 }
 
+QPointF cedar::proc::gui::Connection::gridOffset()
+{
+  //This value is only useful, when the grid is turned on, but the source step is not snapped correctly
+  QPointF offset = QPointF(this->mpSource->scenePos().x(), this->mpSource->scenePos().y());
+
+  qreal snap_grid_size = cedar::proc::gui::SettingsSingleton::getInstance()->getSnapGridSize();
+  offset.rx() = offset.x() - cedar::aux::math::round(offset.x() / snap_grid_size) * snap_grid_size;
+  offset.ry() = offset.y() - cedar::aux::math::round(offset.y() / snap_grid_size) * snap_grid_size;
+  //This should be 0|0 when the souce step is snapped to the grid
+  return offset;
+}
+
 void cedar::proc::gui::Connection::update()
 {
   this->setZValue(-1.0);
@@ -547,9 +559,6 @@ void cedar::proc::gui::Connection::update()
   }
   else
   {
-    QPointF middle_point = (target + source) / 2.0;
-    QPointF vector_src_tar = target - source;
-
     // draw the line to every anchor point
     for(int i = 0; i <= mConnectionAnchorPoints.size(); i++)
     {
@@ -748,6 +757,7 @@ void cedar::proc::gui::Connection::addConnectionAnchor(QPointF addPosition, bool
   {
     if(restoreOldPoint)
     {
+      // Used when loading an architecture
       mConnectionAnchorPoints.push_back(new cedar::proc::gui::ConnectionAnchor(addPosition.x(), addPosition.y(), mAnchorPointRadius, this));
       this->updateGraphics();
       return;

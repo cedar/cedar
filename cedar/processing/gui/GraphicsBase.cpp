@@ -184,6 +184,11 @@ void cedar::proc::gui::GraphicsBase::sizeChanged()
   // nothing to do
 }
 
+void cedar::proc::gui::GraphicsBase::snapToGrid()
+{
+  this->setPos(this->pos().x() + 1, this->pos().y() + 1);
+}
+
 void cedar::proc::gui::GraphicsBase::updateToolTip()
 {
   // empty default implementation

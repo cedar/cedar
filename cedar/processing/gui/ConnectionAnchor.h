@@ -62,7 +62,7 @@
  *        This class is responsible for displaying the anchors of a connection.
  *        Those are created by double-clicking on a connection, and are represented by small circles, which can be moved.
  */
-class cedar::proc::gui::ConnectionAnchor : QGraphicsEllipseItem
+class cedar::proc::gui::ConnectionAnchor : public QGraphicsEllipseItem
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -83,6 +83,10 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
+  //! gets called when the user releases the mouse
+  void mouseReleaseEvent(QGraphicsSceneMouseEvent*);
+
   //! gets called when the user moves the mouse
   void mouseMoveEvent(QGraphicsSceneMouseEvent*);
 
@@ -100,6 +104,9 @@ public:
 
   //! return the position relative to the scene
   QPointF scenePos();
+
+  //! move the anchor 1 pixel
+  void move(QPointF, QPointF);
 
   //! set the visibility
   void setVisibility(bool);
@@ -126,17 +133,25 @@ protected:
 private:
 
   //! offset set at in the constructor
-  QPointF posOffset;
+  QPointF mPosOffset;
   //! current position in the scene
-  QPointF absPos;
+  QPointF mAbsPos;
+  //! initial position (when mouse moved) in the parent coordinate system
+  QPointF mInitialParentPos;
+
+  //! position at mouse button press
+  QPointF mInitialPosition;
+
+  //! determines if intial position is already set
+  bool mInitialPositionSet;
 
   //! radius of the ellipse
   int mRadius;
   //! initialization flag
-  bool started;
+  bool mStarted;
 
   //! pointer to the parent (Connection)
-  cedar::proc::gui::Connection* parent;
+  cedar::proc::gui::Connection* mpParent;
 
 }; // class cedar::proc::gui::TriggerConnection
 

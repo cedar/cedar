@@ -529,8 +529,16 @@ void cedar::proc::gui::Scene::resetBackgroundColor()
 {
   if (this->mSnapToGrid)
   {
-    QBrush grid(Qt::CrossPattern);
+    QBrush grid(Qt::CrossPattern); // default width/height of the grid pattern is 8
     grid.setColor(QColor(230, 230, 230));
+    float scale_factor = SettingsSingleton::getInstance()->getSnapGridSize() / 8.0;
+
+    QTransform trans;
+
+    trans.scale(scale_factor, scale_factor);
+    trans.translate(3 , 4); // default grid pattern has an offset of (x:3|y:4)
+    grid.setTransform(trans);
+
     this->setBackgroundBrush(grid);
   }
   else
@@ -1407,6 +1415,39 @@ void cedar::proc::gui::Scene::connectSlots
       cedar::aux::asserted_pointer_cast<cedar::proc::OwnedData>(source_slot),
       cedar::aux::asserted_pointer_cast<cedar::proc::ExternalData>(target_slot)
     );
+  }
+}
+
+void cedar::proc::gui::Scene::snapAllItemsToGrid()
+{
+  if(cedar::proc::gui::SettingsSingleton::getInstance()->snapToGrid())
+  {
+    QList<QGraphicsItem*> all_items = this->items();
+    for (int i = 0; i < all_items.size(); ++i)
+    {
+      if (cedar::proc::gui::GraphicsBase *item = dynamic_cast<cedar::proc::gui::GraphicsBase *>(all_items.at(i)))
+      {
+        if (!dynamic_cast<cedar::proc::gui::DataSlotItem *>(all_items.at(i)))
+        {
+          item->snapToGrid();
+        }
+      }
+    }
+    for (int i = 0; i < all_items.size(); ++i)
+    {
+      if (cedar::proc::gui::Connection *con = dynamic_cast<cedar::proc::gui::Connection*>(all_items[i]))
+      {
+        std::vector<cedar::proc::gui::ConnectionAnchor*> anchors = con->getConnectionAnchorPoints();
+        for(int j = 0; j < anchors.size(); j++)
+        {
+          cedar::proc::gui::ConnectionAnchor* anchor = anchors.at(j);
+          anchor->setSelected(true);
+          anchor->move(QPointF(anchor->scenePos().x() + 1, anchor->scenePos().y() + 1), anchor->scenePos());
+          anchor->mouseReleaseEvent(nullptr);
+          anchor->setSelected(false);
+        }
+      }
+    }
   }
 }
 

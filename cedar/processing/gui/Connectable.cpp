@@ -101,12 +101,12 @@ Q_DECLARE_METATYPE(boost::shared_ptr<cedar::proc::DataSlot>);
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::aux::EnumType<cedar::proc::gui::Connectable::DisplayMode> cedar::proc::gui::Connectable::DisplayMode::mType;
-const qreal cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE = static_cast<qreal>(12.0);
-const qreal cedar::proc::gui::Connectable::M_DATA_SLOT_PADDING = static_cast<qreal>(3.0);
+const qreal cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE = static_cast<qreal>(12.0); // 14 (cell_size) - 2 (2 because 1 pixel padding left and right)
+const qreal cedar::proc::gui::Connectable::M_DATA_SLOT_PADDING = static_cast<qreal>(2.0);
 
 const int cedar::proc::gui::Connectable::M_ICON_SIZE = 40;
-const qreal cedar::proc::gui::Connectable::M_DEFAULT_WIDTH = static_cast<qreal>(160);
-const qreal cedar::proc::gui::Connectable::M_DEFAULT_HEIGHT = static_cast<qreal>(50);
+const qreal cedar::proc::gui::Connectable::M_DEFAULT_WIDTH = static_cast<qreal>(124); // 9 (How many cells) * 14 (cell_size) - 2 (2 because 1 pixel padding left and right)
+const qreal cedar::proc::gui::Connectable::M_DEFAULT_HEIGHT = static_cast<qreal>(40); // 3 (How many cells) * 14 (cell_size) - 2 (2 because 1 pixel padding left and right)
 
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT;
@@ -1213,24 +1213,15 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
 
 void cedar::proc::gui::Connectable::updateDataSlotPositions()
 {
-  qreal style_factor;
+  qreal style_factor = static_cast<qreal>(1); // scale factor of data slots
 
-  switch (this->mDisplayMode)
-  {
-    case cedar::proc::gui::Connectable::DisplayMode::ICON_ONLY:
-      style_factor = static_cast<qreal>(0.75);
-      break;
-
-    default:
-      style_factor = static_cast<qreal>(1);
-  }
   std::map<cedar::proc::DataRole::Id, QPointF> add_origins;
   std::map<cedar::proc::DataRole::Id, QPointF> add_directions;
   std::map<cedar::proc::DataRole::Id, qreal> data_slot_size;
 
   data_slot_size[cedar::proc::DataRole::BUFFER] = M_BASE_DATA_SLOT_SIZE * static_cast<qreal>(0.75) * style_factor;
-  add_directions[cedar::proc::DataRole::BUFFER] = QPointF(1, 0);
   add_origins[cedar::proc::DataRole::BUFFER] = QPointF(0, -M_DATA_SLOT_PADDING - data_slot_size[cedar::proc::DataRole::BUFFER]);
+  add_directions[cedar::proc::DataRole::BUFFER] = QPointF(1, 0);
 
   data_slot_size[cedar::proc::DataRole::INPUT] = M_BASE_DATA_SLOT_SIZE * style_factor;
   add_origins[cedar::proc::DataRole::INPUT] = QPointF(-M_DATA_SLOT_PADDING - data_slot_size[cedar::proc::DataRole::INPUT], this->getInputOutputSlotOffset());

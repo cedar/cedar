@@ -289,7 +289,7 @@ public:
   //! Size of the SnapGrid, when enabled
   double getSnapGridSize() const
   {
-    return this->_mSnapGridSize->getValue();
+    return this->_mSnapGridSize;
   }
 
   unsigned int getAutoSaveInterval() const
@@ -303,7 +303,7 @@ public:
     return this->_mUseDynamicFieldIcons->getValue();
   }
 
-  //! Returns wheter data slots should scalse based on the distance of the mouse.
+  //! Returns wheter data slots should scale based on the distance of the mouse.
   bool getDataSlotScalingEnabled() const
   {
     return this->_mDataSlotScalingEnabled->getValue();
@@ -492,9 +492,6 @@ private:
   cedar::aux::DoubleParameterPtr _mDataSlotScalingSensitivity;
 
   //! Size of the Snapgrid, when snapping is enabled
-  cedar::aux::DoubleParameterPtr _mSnapGridSize;
-
-  //! Size of the Snapgrid, when snapping is enabled
   cedar::aux::UIntParameterPtr _mAutoSaveInterval;
 
   //! Use Field Icons that switch depending on a present peak
@@ -524,6 +521,8 @@ private:
   cedar::aux::StringSetParameterPtr _mReadOneTimeMessages;
 
   QPoint _mIdeSize;
+
+  double _mSnapGridSize;
 
 }; // class cedar::proc::gui::Settings
 

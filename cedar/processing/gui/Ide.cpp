@@ -465,6 +465,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   QObject::connect(this->mpActionManagePlugins, SIGNAL(triggered()), this, SLOT(showManagePluginsDialog()));
   QObject::connect(this->mpActionSettings, SIGNAL(triggered()), this, SLOT(showSettingsDialog()));
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
+  QObject::connect(this->mpActionAutoSnapAll, SIGNAL(triggered()), this, SLOT(autoSnapAll()));
   QObject::connect(this->mpActionToggleSmartConnections, SIGNAL(toggled(bool)), this, SLOT(toggleSmartConnections(bool)));
   QObject::connect(this->mpActionClosePlots, SIGNAL(triggered()), this, SLOT(closePlots()));
   QObject::connect(this->mpActionToggleVisibilityOfPlots, SIGNAL(toggled(bool)), this, SLOT(toggleVisibilityOfPlots(bool)));
@@ -571,6 +572,8 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   this->togglePlotGroupActions();
 
   this->mpActionSave->setEnabled(true);
+
+  this->mpActionAutoSnapAll->setEnabled(this->mpActionShowHideGrid->isChecked());
 
   this->mpActionResetSimulation->setEnabled(false);
 
@@ -1264,6 +1267,12 @@ void cedar::proc::gui::Ide::toggleGrid(bool triggered)
   //!@todo How this should really work: ste this in the settings singleton, then scenes react to parameter changes in there.
   cedar::proc::gui::SettingsSingleton::getInstance()->snapToGrid(triggered);
   this->mpProcessingDrawer->getScene()->setSnapToGrid(triggered);
+  this->mpActionAutoSnapAll->setEnabled(triggered);
+}
+
+void cedar::proc::gui::Ide::autoSnapAll()
+{
+  this->mpProcessingDrawer->getScene()->snapAllItemsToGrid();
 }
 
 bool cedar::proc::gui::Ide::checkSave()

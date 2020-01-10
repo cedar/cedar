@@ -175,6 +175,9 @@ public:
    */
   void addStepItem(cedar::proc::gui::StepItem* pStep);
 
+    /*!@brief Snaps all items to the Snapgrid
+     */
+  void snapAllItemsToGrid();
 
   /*!@brief Adds a cedar::proc::gui::TriggerItem for the given cedar::proc::Trigger to the scene at the given position.
    */

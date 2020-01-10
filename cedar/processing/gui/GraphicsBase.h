@@ -324,6 +324,8 @@ protected:
     this->mSnapToGrid = snap;
   }
 
+  void snapToGrid();
+
   //! Sets an override fill style. If an override fill style is set, it will be used instead of the normal fill style.
   void setOverrideFillStyle(Qt::BrushStyle style, bool update = true);
 

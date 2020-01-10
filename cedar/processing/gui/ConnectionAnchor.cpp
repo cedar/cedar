@@ -59,13 +59,14 @@
 
 cedar::proc::gui::ConnectionAnchor::ConnectionAnchor(qreal x, qreal y, qreal radius, cedar::proc::gui::Connection *parentPtr = nullptr)
 :
+mInitialPositionSet(false),
 mRadius(radius),
-started(false),
-parent(parentPtr),
+mStarted(false),
+mpParent(parentPtr),
 QGraphicsEllipseItem(x - radius, y - radius, radius*2, radius*2, parentPtr)
 {
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsFocusable);
-  this->posOffset = QPointF(x - mRadius, y - mRadius);
+  this->mPosOffset = QPointF(x - mRadius, y - mRadius);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -78,7 +79,7 @@ void cedar::proc::gui::ConnectionAnchor::paint(QPainter *painter, const QStyleOp
   pen.setCapStyle(Qt::RoundCap);
   pen.setJoinStyle(Qt::RoundJoin);
 
-  QColor color = cedar::proc::gui::GraphicsBase::getValidityColor(parent->getValidity());//.darker(110);
+  QColor color = cedar::proc::gui::GraphicsBase::getValidityColor(mpParent->getValidity());//.darker(110);
 
 
   pen.setColor(color);
@@ -100,16 +101,16 @@ void cedar::proc::gui::ConnectionAnchor::paint(QPainter *painter, const QStyleOp
 
 void cedar::proc::gui::ConnectionAnchor::updatePosition(QPointF sourcePos)
 {
-  if(!started)
+  if(!this->mStarted)
   {
     // Do not set the position during initialization.
     // wait until initialization is finished
     if(sourcePos.x() != 0 || sourcePos.y() != 0)
     {
       // finished
-      this->absPos = this->scenePos();
+      this->mAbsPos = this->scenePos();
       this->setTransformOriginPoint(this->posMiddle());
-      started = true;
+      this->mStarted = true;
     }
   }
   else if(!this->isSelected())
@@ -117,20 +118,20 @@ void cedar::proc::gui::ConnectionAnchor::updatePosition(QPointF sourcePos)
     // Anchor is not moved directly, but the source step (or target) of the Connection is moved
     // Since Connection is the parent of this anchor, our (0|0) is the scenePos of the source step
     // Because we do not want to move this anchor while moving the source, we restore our old position here
-    this->setPos(this->absPos - sourcePos);
+    this->setPos(this->mAbsPos - sourcePos);
   }
   else
   {
     // Anchor is moved directly by dragging it...
     // Save new position
-    this->absPos = this->scenePos();
+    this->mAbsPos = this->scenePos();
   }
 }
 
 QPointF cedar::proc::gui::ConnectionAnchor::posMiddle()
 {
   // return the position in the middle of the circle relative to the parent coordinate system ( (0|0) is at Connection->source->scenePos)
-  return this->pos() + this->posOffset + QPointF(this->mRadius, this->mRadius);
+  return this->pos() + this->mPosOffset + QPointF(this->mRadius, this->mRadius);
 }
 
 QPointF cedar::proc::gui::ConnectionAnchor::scenePos()
@@ -139,10 +140,49 @@ QPointF cedar::proc::gui::ConnectionAnchor::scenePos()
   return QGraphicsEllipseItem::scenePos();
 }
 
+void cedar::proc::gui::ConnectionAnchor::move(QPointF scenePos, QPointF buttonDownScenePos)
+{
+  if(!this->mInitialPositionSet)
+  {
+    this->mInitialParentPos = this->pos() + this->mPosOffset; // relative to the source slot of the parent step
+    this->mInitialPosition = this->pos();
+    this->mInitialPositionSet = true;
+  }
+
+  QPointF currentParentPos = this->mapFromScene(scenePos);
+  QPointF buttonDownParentPos = this->mapFromScene(buttonDownScenePos);
+
+  QPointF temp1 = scenePos - buttonDownScenePos;
+  QPointF temp2 = currentParentPos - buttonDownParentPos;
+
+  QPointF newScenePos = this->mInitialParentPos + currentParentPos - buttonDownParentPos;
+  if(cedar::proc::gui::SettingsSingleton::getInstance()->snapToGrid())
+  {
+    qreal grid_size = cedar::proc::gui::SettingsSingleton::getInstance()->getSnapGridSize();
+
+    //As the source step is the parent of this coordinate system, all drag-nodes have an offset to the grid when
+    //the source step is not snapped to the grid
+    //Here we get the current offset of the parent to a grid cell and subtract it to compensate this
+    QPointF parentOffset = mpParent->gridOffset();
+
+    newScenePos.rx() = (cedar::aux::math::round(newScenePos.x() / grid_size) * grid_size + (grid_size / 2 - this->mRadius) - 1) - parentOffset.x();
+    newScenePos.ry() = (cedar::aux::math::round(newScenePos.y() / grid_size) * grid_size + (grid_size / 2 - this->mRadius) - 1) - parentOffset.y();
+  }
+  QPointF newPos = this->mInitialPosition + (newScenePos - this->mInitialParentPos);
+  this->setPos(newPos);
+
+  this->mpParent->update();
+}
+
+void cedar::proc::gui::ConnectionAnchor::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+  this->mInitialPositionSet = false;
+}
+
 void cedar::proc::gui::ConnectionAnchor::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-  QGraphicsEllipseItem::mouseMoveEvent(event);
-  this->parent->update();
+  // The default movement behaviour is reimplemented and is added the snap-to-grid functionality
+  this->move(event->scenePos(), event->buttonDownScenePos(Qt::LeftButton));
 }
 
 void cedar::proc::gui::ConnectionAnchor::setVisibility(bool visibility){
@@ -155,9 +195,6 @@ void cedar::proc::gui::ConnectionAnchor::keyPressEvent(QKeyEvent *event)
   if(event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace)
   {
     this->setVisible(false);
-    parent->deleteAnchor(this);
+    this->mpParent->deleteAnchor(this);
   }
 }
-
-//TODO right click "delete"
-//TODO snap to grid

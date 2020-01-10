@@ -196,6 +196,10 @@ public slots:
    */
   void toggleGrid(bool toggled);
 
+  /*!@brief automatically snap steps to grid
+   */
+  void autoSnapAll();
+
   /*!@brief Fills the recent files list.
    */
   void fillRecentFilesList();

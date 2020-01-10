@@ -154,6 +154,8 @@ public:
   //!deletes specific anchor
   void deleteAnchor(cedar::proc::gui::ConnectionAnchor*);
 
+  QPointF gridOffset();
+
   //! returns validity
   cedar::proc::gui::ConnectValidity getValidity();
 

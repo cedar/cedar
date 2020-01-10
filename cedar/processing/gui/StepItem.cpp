@@ -368,7 +368,15 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 void cedar::proc::gui::StepItem::updateIconGeometry()
 {
   qreal padding = this->getContentsPadding();
-  this->setIconBounds(padding, padding, static_cast<qreal>(cedar::proc::gui::Connectable::M_ICON_SIZE));
+  switch (this->getDisplayMode())
+  {
+    case cedar::proc::gui::StepItem::DisplayMode::ICON_ONLY:
+      this->setIconBounds(padding, padding, static_cast<qreal>(cedar::proc::gui::Connectable::M_ICON_SIZE));
+      break;
+
+    default:
+      this->setIconBounds(padding, 0, static_cast<qreal>(cedar::proc::gui::Connectable::M_ICON_SIZE));
+  }
 }
 
 void cedar::proc::gui::StepItem::emitStepStateChanged()
@@ -645,36 +653,34 @@ void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGrap
     int wx = 2*padding + M_ICON_SIZE;
     int wy = 2;
     QString wn = this->getStep()->getName().c_str();
-//    painter->drawText(QPointF(2 * padding + M_ICON_SIZE, 25), this->getStep()->getName().c_str());
+
     if(fm.width(wn) > (ww - 1))
     {
         painter->drawText(wx,wy,ww,wh,Qt::TextWrapAnywhere,wn); //|Qt::TextDontClip for showing full name
     }
     else
     {
-        painter->drawText(wx,wy + 1 + (fm.lineSpacing()/2),ww,wh,Qt::TextWrapAnywhere,wn);
+        painter->drawText(wx,wy + 3,ww,wh,Qt::TextWrapAnywhere,wn);
     }
 
 
-      font.setWeight( QFont::Light );
-      font.setKerning(true);
-      font.setPointSize(8);
-      painter->setFont(font);
-      QFontMetrics fm2(font);
-     // painter->drawText(QPointF(2 * padding + M_ICON_SIZE, 43), this->mClassId->getClassNameWithoutNamespace().c_str());
+    font.setWeight( QFont::Light );
+    font.setKerning(true);
+    font.setPointSize(7);
+    painter->setFont(font);
+    QFontMetrics fm2(font);
+    ww = this->width()-M_ICON_SIZE-2.5*padding - ((this->getStep()->isLooped()) ? 14 : 0);
 
-      QString wn2 = this->mClassId->getClassNameWithoutNamespace().c_str();
-      if(fm2.width(wn2) > (ww - 1))
-      {
-          painter->drawText(wx,34,ww-10,fm2.lineSpacing()+2,Qt::TextWrapAnywhere,wn2);
-          painter->drawText(wx+96,34,15,fm2.lineSpacing()+2,Qt::TextWrapAnywhere,"...");
-      }
-      else
-      {
-          painter->drawText(wx,34,ww,fm2.lineSpacing()+2,Qt::TextWrapAnywhere,wn2);
-      }
-
-
+    QString wn2 = this->mClassId->getClassNameWithoutNamespace().c_str();
+    if(fm2.width(wn2) > ww - 1)
+    {
+        painter->drawText(wx,28,ww - 8,fm2.lineSpacing()+2,Qt::TextWrapAnywhere,wn2);
+        painter->drawText(wx+ww - 8,28,15,fm2.lineSpacing()+2,Qt::TextWrapAnywhere,"...");
+    }
+    else
+    {
+        painter->drawText(wx,28,ww,fm2.lineSpacing()+2,Qt::TextWrapAnywhere,wn2);
+    }
   }
 
   painter->restore(); // restore saved painter settings

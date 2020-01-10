@@ -111,6 +111,7 @@
         <file>toolbaricons/hide_triggers.svg</file>
         <file>toolbaricons/standard_connections.svg</file>
         <file>toolbaricons/smart_connections.svg</file>
+        <file>toolbaricons/snap_to_grid.svg</file>
         <file>toolbaricons/close_all_plots.svg</file>
         <file>toolbaricons/simulation_control.svg</file>
         <file>toolbaricons/show_trigger_colors.svg</file>

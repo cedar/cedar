@@ -96,13 +96,12 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   this->_mDataSlotScalingEnabled = new cedar::aux::BoolParameter(slot_growth.get(), "enabled", true);
   auto growth_limits = cedar::aux::DoubleParameter::LimitType::positive();
   growth_limits.setLower(1.0);
-  this->_mDataSlotScaling = new cedar::aux::DoubleParameter(slot_growth.get(), "factor", 1.3, growth_limits);
+  this->_mDataSlotScaling = new cedar::aux::DoubleParameter(slot_growth.get(), "factor", 1.6, growth_limits);
 
   this->_mDataSlotScalingSensitivity
     = new cedar::aux::DoubleParameter(slot_growth.get(), "sensitivity", 10.0, growth_limits);
 
-  this->_mSnapGridSize
-          = new cedar::aux::DoubleParameter(ui_settings.get(), "snap grid size", 30.0, growth_limits);
+  this->_mSnapGridSize = 14.0;
 
   this->_mAutoSaveInterval
           = new cedar::aux::UIntParameter(ui_settings.get(), "autosave interval", 600,cedar::aux::UIntParameter::LimitType::positive());
