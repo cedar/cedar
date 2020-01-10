@@ -133,6 +133,8 @@ protected:
 
 private:
 
+  cedar::aux::BoolParameterPtr mNoPeakIfNaN;
+
 }; // class cedar::proc::source::VariableGauss
 
 #endif // CEDAR_PROC_SOURCES_VARIABLE_GAUSS_H

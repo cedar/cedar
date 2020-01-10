@@ -120,6 +120,8 @@ _mTransferFunction
   input_slot->setCheck(input_check);
 
   this->declareOutput("sigmoided output", mOutput);
+
+  QObject::connect(this->_mTransferFunction.get(), SIGNAL(valueChanged()), this, SLOT(somethingChanged()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -128,6 +130,19 @@ _mTransferFunction
 
 void cedar::proc::steps::TransferFunction::compute(const cedar::proc::Arguments&)
 {
+  recompute();
+}
+
+void cedar::proc::steps::TransferFunction::somethingChanged()
+{
+  recompute();
+}
+
+void cedar::proc::steps::TransferFunction::recompute()
+{
+  if (!this->mInput)
+    return;
+
   // get all members
   const cv::Mat& input = this->mInput->getData();
   cv::Mat& sigmoid_u = this->mOutput->getData();

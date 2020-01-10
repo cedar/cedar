@@ -164,6 +164,8 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
     delete mpThread;
     this->mpThread = NULL;
   }
+
+  mDestructingMutex.unlock();
 }
 
 //------------------------------------------------------------------------------
@@ -449,10 +451,18 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time)
       // make a copy of the thread pointer, it may get deleted due to being stopped
       QThread* old_thread = mpThread;
       thread_worker_readlock.unlock();
-      CEDAR_DEBUG_NON_CRITICAL_ASSERT(old_thread->isRunning());
 
-      old_thread->wait(time);
-      //std::cout << "  resuming from wait." << std::endl;
+      // the old thread can actually already have been stopped,
+      // this can happen if the GUI is lagging for example
+      if (old_thread != NULL
+          && old_thread->isRunning())
+      {
+        old_thread->wait(time);
+      }
+      else
+      {
+        return; // already stopped
+      }
 
       thread_worker_readlock.relock();
     }

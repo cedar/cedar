@@ -91,7 +91,8 @@ mOutput(new cedar::aux::MatData(cv::Mat())),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 2, 1, 4)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 50, 1, 1000)),
 _mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0, cedar::aux::DoubleParameter::LimitType::full(), 0.5)),
-_mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigma", 2, 3.0, 0.01, 1000.0, 0.5))
+_mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigma", 2, 3.0, 0.01, 1000.0, 0.5)),
+mNoPeakIfNaN(new cedar::aux::BoolParameter(this, "no peak if NaN", false))
 {
   cedar::proc::DataSlotPtr input = this->declareInput("centers");
 
@@ -100,6 +101,7 @@ _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigma", 2, 3.0, 0.01, 1000
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
   QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
+  QObject::connect(mNoPeakIfNaN.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   this->updateMatrix();
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -204,6 +206,27 @@ void cedar::proc::steps::VariableGauss::recompute()
 
   if (mat.rows > 1 )
     tmpvec.push_back( static_cast<double>(mat.at<float>(1,0) ) );
+
+  // test for NaN
+  if (mNoPeakIfNaN->getValue()
+      && ( std::isnan( mat.at<float>(0,0) )
+           || (mat.rows > 1 && std::isnan( mat.at<float>(1,0) ) ) )
+     )
+  {
+    this->mOutput->setData
+                   (
+                     cedar::aux::math::gaussMatrix
+                     (
+                       _mDimensionality->getValue(),
+                       _mSizes->getValue(),
+                       0.0,
+                       _mSigmas->getValue(),
+                       tmpvec,
+                       false // cyclic
+                     )
+                   );
+    return;
+  }
 
   this->mOutput->setData
                  (

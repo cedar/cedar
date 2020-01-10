@@ -1211,7 +1211,7 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
   }
 }
 
-void cedar::proc::gui::Connectable::updateDataSlotPositions()
+void cedar::proc::gui::Connectable::updateDataSlotPositions(bool updatePos)
 {
   qreal style_factor = static_cast<qreal>(1); // scale factor of data slots
 
@@ -1264,8 +1264,11 @@ void cedar::proc::gui::Connectable::updateDataSlotPositions()
         p_item->setHeight(slot_size);
         qreal x = origin.x();
         qreal y = origin.y();
-        p_item->setPos(QPointF(x - size_diff, y) + current_origin);
-        current_origin += direction * (slot_size + M_DATA_SLOT_PADDING);
+        /// dont change the DataSlots positions unless neccessary
+        if(updatePos) {
+            p_item->setPos(QPointF(x - size_diff, y) + current_origin);
+            current_origin += direction * (slot_size + M_DATA_SLOT_PADDING);
+        }
       }
     }
   }
@@ -1331,7 +1334,7 @@ void cedar::proc::gui::Connectable::demagnetizeSlots()
 
   if (changes)
   {
-    this->updateDataSlotPositions();
+    this->updateDataSlotPositions(false);
   }
 }
 
@@ -1375,7 +1378,7 @@ void cedar::proc::gui::Connectable::magnetizeSlots(const QPointF& mousePositionI
 
   if (changes)
   {
-    this->updateDataSlotPositions();
+    this->updateDataSlotPositions(false);
   }
 }
 

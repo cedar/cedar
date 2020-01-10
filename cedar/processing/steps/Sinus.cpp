@@ -38,6 +38,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include <math.h>
 #include <iostream>
+#include "cedar/processing/gui/stepViews/SinusFunctionView.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -51,7 +52,7 @@ namespace
 
     ElementDeclarationPtr declaration
     (
-      new ElementDeclarationTemplate<cedar::proc::steps::Sinus>
+      new ElementDeclarationTemplate<cedar::proc::steps::Sinus, cedar::proc::gui::SinusFunctionView>
       (
         "Algebra",
         "cedar.processing.steps.Sinus"

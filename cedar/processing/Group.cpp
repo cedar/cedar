@@ -1076,7 +1076,10 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element, bool destr
       }
       trigger_con = mTriggerConnections.erase(trigger_con);
       // if the deleted element is a looped trigger, connect the triggerable to the default trigger
-      if (source_trigger == element && !destructing && this->isRoot() && element->getName() != "default trigger")
+      if (source_trigger == element && !destructing && this->isRoot() 
+          && element->getName() != "default thread" 
+          && element->getName() != "default trigger" // legacy
+         )
       {
         // remember the triggerable for a later re-connection to the default trigger
         triggerables_for_default_trigger.push_back(target_triggerable);
@@ -1135,9 +1138,9 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element, bool destr
   if (triggerables_for_default_trigger.size() > 0 && !destructing)
   {
     // if there is no default trigger, create one
-    if (!this->nameExists("default trigger"))
+    if (!this->nameExists("default thread"))
     {
-      this->create("cedar.processing.LoopedTrigger", "default trigger");
+      this->create("cedar.processing.LoopedTrigger", "default thread");
     }
 
     for (auto unconnected_triggerable : triggerables_for_default_trigger)
@@ -1148,7 +1151,7 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element, bool destr
       {
         this->connectTrigger
         (
-          this->getElement<cedar::proc::LoopedTrigger>("default trigger"),
+          this->getElement<cedar::proc::LoopedTrigger>("default thread"),
           this->getElement<cedar::proc::Triggerable>(element->getName())
         );
       }
@@ -1448,11 +1451,11 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
       if (this->isRoot())
       {
         // if there is no default trigger, create one
-        if (!this->nameExists("default trigger"))
+        if (!this->nameExists("default thread"))
         {
-          this->create("cedar.processing.LoopedTrigger", "default trigger");
+          this->create("cedar.processing.LoopedTrigger", "default thread");
         }
-        this->connectTrigger(this->getElement<cedar::proc::LoopedTrigger>("default trigger"), triggerable);
+        this->connectTrigger(this->getElement<cedar::proc::LoopedTrigger>("default thread"), triggerable);
       }
     }
     if (this->numberOfStartCalls())
@@ -1716,12 +1719,23 @@ std::string cedar::proc::Group::duplicate(const std::string& elementName, const 
   return modified_name;
 }
 
-cedar::proc::ConstElementPtr cedar::proc::Group::getElement(const cedar::proc::GroupPath& name) const
+cedar::proc::ConstElementPtr cedar::proc::Group::getElement(const cedar::proc::GroupPath& old_name) const
 {
   //!@todo this should use the functionality of group path instead of splitting the string by its own
   ElementMap::const_iterator iter;
   std::string first;
   std::string rest;
+  std::string name;
+
+  if (old_name == "default trigger") // change deprecated names
+  {
+    name= "default thread";
+  }
+  else
+  {
+    name= old_name;
+  }
+
   cedar::aux::splitFirst(name, ".", first, rest);
   if (first.length() != 0 && rest.length() != 0)
   {
@@ -1733,7 +1747,7 @@ cedar::proc::ConstElementPtr cedar::proc::Group::getElement(const cedar::proc::G
       CEDAR_THROW
       (
         cedar::aux::InvalidNameException,
-        "The path \"" + name.toString() + "\" does not specify a proper path in the group \"" + this->getName() + "\"."
+        "The path \"" + old_name.toString() + "\" does not specify a proper path in the group \"" + this->getName() + "\"."
       );
     }
 
@@ -1882,6 +1896,13 @@ void cedar::proc::Group::connectTrigger(cedar::proc::TriggerPtr source, cedar::p
     this->disconnectTriggerInternal(target->getLoopedTrigger(), target);
   }
 
+  // legacy:
+  if (source->getName() == "default trigger")
+  {
+std::cout << "  changing name!" << std::endl;    
+    source->setName("default thread");
+  }
+
   // check connection
   try
   {
@@ -1889,7 +1910,7 @@ void cedar::proc::Group::connectTrigger(cedar::proc::TriggerPtr source, cedar::p
   }
   catch (const cedar::proc::DuplicateConnectionException& e)
   {
-    if (source->getName() == "default trigger")
+    if (source->getName() == "default thread")
     {
       // this is ok, might happen (connections to the default trigger are saved, but also created when the element is added)
     }
@@ -2000,9 +2021,9 @@ void cedar::proc::Group::disconnectTrigger(cedar::proc::TriggerPtr source, cedar
 {
   CEDAR_DEBUG_ASSERT(source && target);
   this->disconnectTriggerInternal(source, target);
-  if (this->nameExists("default trigger"))
+  if (this->nameExists("default thread"))
   {
-    auto default_trigger = this->getElement<cedar::proc::LoopedTrigger>("default trigger");
+    auto default_trigger = this->getElement<cedar::proc::LoopedTrigger>("default thread");
     if (default_trigger->canTrigger(target))
     {
       this->connectTrigger(default_trigger, target);
@@ -3168,11 +3189,11 @@ void cedar::proc::Group::onLoopedChanged()
     if (this->isRoot())
     {
       // if there is no default trigger, create one
-      if (!this->nameExists("default trigger"))
+      if (!this->nameExists("default thread"))
       {
-        this->create("cedar.processing.LoopedTrigger", "default trigger");
+        this->create("cedar.processing.LoopedTrigger", "default thread");
       }
-      this->connectTrigger(this->getElement<cedar::proc::LoopedTrigger>("default trigger"), group);
+      this->connectTrigger(this->getElement<cedar::proc::LoopedTrigger>("default thread"), group);
     }
   }
   else // remove
@@ -3206,9 +3227,9 @@ void cedar::proc::Group::onParentGroupChanged()
   if (!this->isRoot())
   {
     // if there is no default trigger, create one
-    if (this->nameExists("default trigger"))
+    if (this->nameExists("default thread"))
     {
-      this->remove(this->getElement("default trigger"));
+      this->remove(this->getElement("default thread"));
     }
   }
 }

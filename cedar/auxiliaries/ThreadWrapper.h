@@ -94,7 +94,7 @@ public:
   ThreadWrapper();
 
   //!@brief Destructor
-  virtual ~ThreadWrapper();
+  virtual ~ThreadWrapper() noexcept(true);
 
   //----------------------------------------------------------------------------
   // public methods

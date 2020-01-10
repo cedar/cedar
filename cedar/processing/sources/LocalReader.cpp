@@ -93,7 +93,7 @@ cedar::proc::sources::LocalReader::LocalReader()
 cedar::proc::Step(true),
 mOutput(new cedar::aux::MatData(cv::Mat())),
 // parameters
-_mPort(new cedar::aux::StringParameter(this, "port", ""))
+_mPort(new cedar::aux::StringParameter(this, "port", "default local port"))
 {
   // declare all data
   this->declareOutput("output", mOutput);
@@ -145,14 +145,14 @@ void cedar::proc::sources::LocalReader::compute(const cedar::proc::Arguments&)
         this->setState(cedar::proc::Step::STATE_EXCEPTION, "Local port name is empty!");
         //CEDAR_THROW(cedar::aux::InvalidNameException, "Local port name is empty!");
     }
-  else if(cedar::proc::sinks::LocalWriter::mData().count(_mPort->getValue()) > 0)
+  else if(cedar::proc::sinks::LocalWriter::getPortCount( _mPort->getValue() ) > 0)
   {
     cv::Mat old = this->mOutput->getData();
-    cedar::aux::ConstMatDataPtr readPtr = cedar::proc::sinks::LocalWriter::mData()[_mPort->getValue()];
-    cv::Mat read = readPtr->getData();
+
+    cv::Mat read = cedar::proc::sinks::LocalWriter::getMatrix( _mPort->getValue() );
 
     bool changed = (old.type() != read.type() || old.size != read.size);
-    this->mOutput->setData(read);
+    this->mOutput->setData(read.clone());
     if (changed)
     {
       this->emitOutputPropertiesChangedSignal("output");

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,106 +22,86 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TransferFunction.h
+    File:        SinusSignalView.h
 
-    Maintainer:  Oliver Lomp
+    Maintainer:  
+    Email:       
+    Date:        
 
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Description: Header file for the class cedar::proc::gui::SinusSignalView.
 
-    Date:        2013 07 03
-
-    Description: This class provides the processing with the configurable sigmoid function.
-
-    Credits:     Originally implemented by Michael Berger.
+    Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_TRANSFER_FUNCTION_H
-#define CEDAR_PROC_STEPS_TRANSFER_FUNCTION_H
+#ifndef CEDAR_PROC_GUI_SINUS_SIGNAL_VIEW_H
+#define CEDAR_PROC_GUI_SINUS_SIGNAL_VIEW_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/Sigmoid.h"
-#include "cedar/auxiliaries/ObjectParameterTemplate.h"
-#include "cedar/auxiliaries/ObjectListParameterTemplate.h"
-#include "cedar/processing/Step.h"
+#include "cedar/processing/gui/DefaultConnectableIconView.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/MatData.fwd.h"
-#include "cedar/processing/steps/TransferFunction.fwd.h"
+#include "cedar/processing/gui/stepViews/SinusSignalView.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QObject>
 
 
-/*!@brief Applies a transfer function to its input.
- *
- *        The transfer function can be chosen from the list of all available ones registered with cedar.
+/*!@brief Responsible for changing the icon of SinusSignals.
  */
-class cedar::proc::steps::TransferFunction : public cedar::proc::Step
+class cedar::proc::gui::SinusSignalView : public QObject, public cedar::proc::gui::DefaultConnectableIconView
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  //!@brief a parameter for sigmoid objects
-  typedef cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction> TransferFunctionParameter;
-
-  //!@cond SKIPPED_DOCUMENTATION
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(TransferFunctionParameter);
-  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  TransferFunction();
+  // none yet (compiler generated)
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief do this if the input changes
-  void inputConnectionChanged(const std::string& inputName);
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  //!@brief handle change of connectable
+  void connectableChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  //!@brief compute
-  void compute(const cedar::proc::Arguments&);
-  void recompute();
-
+private slots:
+  void updateIconWeight();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief input member
-  cedar::aux::ConstMatDataPtr mInput;
-
-  //!@brief sigmoidal output member
-  cedar::aux::MatDataPtr mOutput;
-
+  // none yet
 private:
-
-private slots:
-  void somethingChanged();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief any sigmoid function
-  TransferFunctionParameterPtr _mTransferFunction;
-
+  // none yet
 
 private:
+  // none yet
 
-}; // class cedar::proc::steps::TransferFunction
+}; // class cedar::proc::gui::SinusSignalView
 
-#endif // CEDAR_PROC_STEPS_TRANSFER_FUNCTION_H
+#endif // CEDAR_PROC_GUI_SINUS_SIGNAL_VIEW_H
+

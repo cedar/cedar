@@ -244,8 +244,8 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
     "looped-trigger-overhaul",
     "Looped Trigger Overhaul",
     "<p>In a recent overhaul, looped triggers have been redesigned.</p>"
-    "<p>You no longer have to manually connect steps to looped triggers. Rather, they are connected to a default trigger"
-    " automatically. If you want more triggers, you can add them in the new simulation control widget. Assigning them"
+    "<p>You no longer have to manually connect steps to looped triggers. Rather, they are connected to a default trigger (thread)"
+    " automatically. If you want more threads, you can add them in the new thread control widget. Assigning them"
     " can be done in the right-click menu.</p>"
     "<p>Please refer to the changelog for more details."
   );

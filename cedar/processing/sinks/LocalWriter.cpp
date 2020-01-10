@@ -44,8 +44,11 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/version.h"
+#include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
+#include <QReadLocker>
+#include <QWriteLocker>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -85,13 +88,18 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
+QReadWriteLock *cedar::proc::sinks::LocalWriter::mpDataLock= NULL;
+
 cedar::proc::sinks::LocalWriter::LocalWriter()
 :
 cedar::proc::Step(true),
 // outputs
 mInput(new cedar::aux::MatData(cv::Mat())),
-_mPort(new cedar::aux::StringParameter(this, "port", ""))
+_mPort(new cedar::aux::StringParameter(this, "port", "default local port"))
 {
+  cedar::proc::sinks::LocalWriter::mpDataLock= new QReadWriteLock();
+
   // declare all data
   this->declareInput("input");
   _mPort->setValidator(boost::bind(&cedar::proc::sinks::LocalWriter::validatePortName, this, _1));
@@ -105,15 +113,15 @@ void cedar::proc::sinks::LocalWriter::onStart()
   _mPort->setConstant(true);
     if("" != oldName && oldName != _mPort->getValue())
     {
-        if(mData().count(oldName) > 0)
+        if(getPortCount(oldName) > 0)
         {
-            mData().erase(oldName);
+            accessData().erase(oldName);
         }
         oldName = "";
     }
     if("" != _mPort->getValue())
     {
-        mData()[_mPort->getValue()] = this->mInput;
+        this->setMatrix( _mPort->getValue(), this->mInput->getData() );
         oldName = _mPort->getValue();
     }
 
@@ -144,7 +152,7 @@ void cedar::proc::sinks::LocalWriter::compute(const cedar::proc::Arguments&)
     }
     else
     {
-        mData()[_mPort->getValue()] = this->mInput;
+      this->setMatrix( _mPort->getValue(), this->mInput->getData() );
     }
 }
 
@@ -186,7 +194,7 @@ void cedar::proc::sinks::LocalWriter::inputConnectionChanged(const std::string& 
 
 void cedar::proc::sinks::LocalWriter::validatePortName(const std::string& portName) const
 {
-  if(mData().count(portName) > 0)
+  if(getPortCount( portName ) > 0)
   {
     CEDAR_THROW(cedar::aux::ValidationFailedException, "Port name already in use.");
   }
@@ -195,3 +203,25 @@ void cedar::proc::sinks::LocalWriter::validatePortName(const std::string& portNa
     CEDAR_THROW(cedar::aux::ValidationFailedException, "Port names may not contain whitespace characters.");
   }
 }
+
+void cedar::proc::sinks::LocalWriter::setMatrix(const std::string &key, const cv::Mat &mat)
+{
+  QWriteLocker lock( mpDataLock );
+  accessData()[ key ]= mat.clone();
+}
+
+cv::Mat cedar::proc::sinks::LocalWriter::getMatrix(const std::string &key)
+{
+  QReadLocker lock( mpDataLock ); // locking for multi-threaded writers/readers
+  auto res= accessData()[ key ];
+
+  return res.clone(); // cloning is important since the cv::Mats share 
+                      // their memory
+}
+
+unsigned int cedar::proc::sinks::LocalWriter::getPortCount(const std::string &key)
+{
+  QReadLocker lock( mpDataLock );
+  return accessData().count( key );
+}
+

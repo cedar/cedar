@@ -97,7 +97,8 @@ _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 50, 1, 1000)),
 _mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0, cedar::aux::DoubleParameter::LimitType::full(), 0.5)),
 _mWidths(new cedar::aux::UIntVectorParameter(this, "widths", 2, 10, 1, 10000)),
 _mReferenceLevel(new cedar::aux::DoubleParameter(this, "reference level", 0.0)),
-_mDoCenterAtInput(new cedar::aux::BoolParameter(this, "center at input", false))
+_mDoCenterAtInput(new cedar::aux::BoolParameter(this, "center at input", false)),
+mNoPeakIfNaN(new cedar::aux::BoolParameter(this, "no peak if NaN", false))
 {
   cedar::proc::DataSlotPtr input = this->declareInput("left bounds");
 
@@ -108,6 +109,7 @@ _mDoCenterAtInput(new cedar::aux::BoolParameter(this, "center at input", false))
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
   QObject::connect(_mDoCenterAtInput.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
+  QObject::connect(mNoPeakIfNaN.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   this->updateMatrix();
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -218,18 +220,60 @@ void cedar::proc::steps::VariableBox::recompute()
   if (mat.empty())
     return;
 
-  std::vector<unsigned int> tmpvec{ static_cast<unsigned int>(mat.at<float>(0,0)) };
+  std::vector<unsigned int> startvec{ static_cast<unsigned int>(mat.at<float>(0,0)) };
   
   if (mat.rows > 1 )
-    tmpvec.push_back( static_cast<unsigned int>(mat.at<float>(1,0) ) );
+    startvec.push_back( static_cast<unsigned int>(mat.at<float>(1,0) ) );
+
+  auto widthsvec= _mWidths->getValue();
 
   if (_mDoCenterAtInput->getValue())
   {
-    tmpvec[0]-= _mWidths->getValue()[0] / 2;
+    unsigned int halfwidth= _mWidths->getValue()[0] / 2;
+
+    if (startvec[0] > halfwidth)
+    {
+      startvec[0]-= halfwidth;
+    }
+    else
+    {
+      widthsvec[0]-= ( halfwidth - startvec[0] );
+      startvec[0]= 0;
+    }
+
     if (mat.rows > 1 )
     {
-      tmpvec[1]-= _mWidths->getValue()[1] / 2;
+      if (startvec[1] > halfwidth)
+      {
+        startvec[1]-= halfwidth;
+      }
+      else
+      {
+        widthsvec[1]-= ( halfwidth - startvec[1] );
+        startvec[1]= 0;
+      }
     }
+  }
+
+  // test for NaN
+  if (mNoPeakIfNaN->getValue()
+      && ( std::isnan( mat.at<float>(0,0) )
+           || (mat.rows > 1 && std::isnan( mat.at<float>(1,0) ) ) )
+     )
+  {
+    this->mOutput->setData
+                   (
+                     cedar::aux::math::boxMatrix
+                     (
+                       _mDimensionality->getValue(),
+                       _mSizes->getValue(),
+                       _mReferenceLevel->getValue(), // statt der Amplitude
+                       _mReferenceLevel->getValue(),
+                       widthsvec,
+                       startvec
+                     )
+                   );
+    return;
   }
 
   this->mOutput->setData
@@ -240,8 +284,8 @@ void cedar::proc::steps::VariableBox::recompute()
                      _mSizes->getValue(),
                      _mAmplitude->getValue(),
                      _mReferenceLevel->getValue(),
-                     _mWidths->getValue(),
-                     tmpvec
+                     widthsvec,
+                     startvec
                    )
                  );
 }

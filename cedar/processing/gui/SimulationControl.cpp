@@ -369,7 +369,7 @@ void cedar::proc::gui::SimulationControl::updateTriggerQualities()
 void cedar::proc::gui::SimulationControl::createClicked()
 {
   cedar::proc::LoopedTriggerPtr trigger(new cedar::proc::LoopedTrigger());
-  std::string name = this->mGroup->getGroup()->getUniqueIdentifier("new LoopedTrigger");
+  std::string name = this->mGroup->getGroup()->getUniqueIdentifier("new thread");
   this->mGroup->getGroup()->add(trigger, name);
 }
 
@@ -384,7 +384,8 @@ void cedar::proc::gui::SimulationControl::removeClicked()
   {
     std::string path = this->mpTree->getPathFromItem(item);
     auto element = this->mGroup->getGroup()->getElement(path);
-    if (element->getName() != "default trigger")
+    if (element->getName() != "default trigger" // legacy
+        && element->getName() != "default thread")
     {
       to_remove.push_back(element);
     }

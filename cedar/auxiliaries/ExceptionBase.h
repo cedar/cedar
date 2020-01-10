@@ -85,7 +85,7 @@ public:
    *
    * @remarks The destructor may not throw any exception.
    */
-  virtual ~ExceptionBase() throw ();
+  virtual ~ExceptionBase() noexcept(true);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

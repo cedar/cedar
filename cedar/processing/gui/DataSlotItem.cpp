@@ -108,6 +108,11 @@ mMagneticScale(1.0)
   // data slots never snap to the grid; they are attached to the parent.
   this->setSnapToGrid(false);
   this->setAcceptHoverEvents(true);
+
+  /// Set Flags that allow DataSlots to be selectable and movable
+  /// This enables dragging with the standard Qt Drag/Drop functionality
+  /// To limit dragging/dropping the mouseMoveEvent of this class was overridden
+  this->setFlags(this->flags()|QGraphicsItem::ItemIsSelectable|QGraphicsItem::ItemIsMovable);
 }
 
 cedar::proc::gui::DataSlotItem::~DataSlotItem()
@@ -360,4 +365,59 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::translateValid
       return cedar::proc::gui::CONNECT_UNKNOWN;
   }
 }
+
+bool cedar::proc::gui::DataSlotItem::canBeDragged() const {
+    return true;
+
+}
+
+void cedar::proc::gui::DataSlotItem::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEvent) {
+
+    QGraphicsItem::mouseMoveEvent(pMouseEvent);
+    /// set margin and adjust for Data slot shape
+    float margin =  3.0/*M_DATA_SLOT_PADDING*/ + this->width() / 2.;
+    /// the Data slots position is their upper left corner, adjust positioning accordingly
+    float adjustmentx = this->width() / 2. ;
+    float adjustmenty = this->height() /2. ;
+    /// get the borders on which the Data Slot should appear
+    /// each border represents a line along which the Data Slot can be dragged
+    float leftborder   = this->parentItem()->boundingRect().left()   - margin - adjustmentx;
+    float rightborder  = this->parentItem()->boundingRect().right()  + margin - adjustmentx;
+    float topborder    = this->parentItem()->boundingRect().top()    - margin - adjustmenty;
+    float bottomborder = this->parentItem()->boundingRect().bottom() + margin - adjustmenty;
+
+
+    /// get the curent position of the Data Slot
+    float xPos = this->pos().x();
+    float yPos = this->pos().y();
+
+    /// Determine the Position of the Data slot within the given constraints
+    if ((xPos <= leftborder || (xPos > leftborder && xPos < rightborder)) && yPos >= topborder && yPos <= bottomborder)
+        this->setPos(leftborder, yPos);
+    else if ((xPos >= rightborder || (xPos > leftborder && xPos < rightborder)) && yPos >= topborder && yPos <= bottomborder)
+        this->setPos(rightborder, yPos);
+    else if ((yPos <= topborder || (yPos > topborder && yPos < bottomborder)) && xPos >= leftborder && xPos <= rightborder)
+        this->setPos(xPos, topborder);
+    else if ((yPos >= bottomborder || (yPos > topborder && yPos < bottomborder)) && xPos >= leftborder && xPos <= rightborder)
+        this->setPos(xPos, bottomborder);
+    else{
+        float x,y;
+        if(xPos<leftborder)
+            x = leftborder;
+        else
+            x = rightborder;
+        if(yPos < topborder)
+            y = topborder;
+        else
+            y = bottomborder;
+        this->setPos(x,y);
+    }
+
+
+
+}
+
+
+
+
 

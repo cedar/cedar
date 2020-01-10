@@ -95,7 +95,9 @@ public:
     //! Selection mode, i.e., items can be selected, moved etc.
     MODE_SELECT,
     //! Connection mode, i.e., connections can be created.
-    MODE_CONNECT
+    MODE_CONNECT,
+    //! Mode for manipulating data slots
+    MODE_MOVE_DATASLOTS
   };
 
   //! Current trigger connection mode

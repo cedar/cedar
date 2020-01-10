@@ -184,7 +184,7 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
 
 void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
-  // not sure why, but the drop event starts out as accepted; thus, reset its accepted state
+// not sure why, but the drop event starts out as accepted; thus, reset its accepted state
   pEvent->setAccepted(false);
 
   this->QGraphicsScene::dropEvent(pEvent);
@@ -631,6 +631,31 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
   switch (this->mMode)
   {
     default:
+    /// Added mode for moving dataslots
+    case MODE_MOVE_DATASLOTS:
+    {
+        if // check if this is not a "fake" left click event that emulates middle mouse button scrolling
+                (
+                pMouseEvent->buttons().testFlag(Qt::LeftButton)
+                && this->mpeParentView->dragMode() != QGraphicsView::ScrollHandDrag
+                )
+        {
+            QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
+            /*@TODO The canvas interferes here...  > 1 is not true if the DataSlot is outside the canvas
+             *      but > 0 is always true, as long as the event is *inside* the canvas*/
+
+            /// check  if there is a valid item to drag (in this case including dataslots)
+            if (items.size() > 1)
+            {
+                QGraphicsScene::mousePressEvent(pMouseEvent);
+            }
+            else
+            {
+                this->mMode = MODE_SELECT;
+            }
+             break;
+        }
+    }
     case MODE_SELECT:
     {
       if // check if this is not a "fake" left click event that emulates middle mouse button scrolling
@@ -675,7 +700,6 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
     // (resize handles make an exception, they can be dragged without being selected)
     if (items.size() > 0)
     {
-
       if (!dynamic_cast<cedar::proc::gui::ResizeHandle*>(items.at(0)))
       {
         for (int i = 0; i < items.size(); ++i)
@@ -965,7 +989,6 @@ void cedar::proc::gui::Scene::promoteElementToExistingGroup()
 void cedar::proc::gui::Scene::multiItemContextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent)
 {
   QMenu menu;
-
   bool can_connect = false;
   for (auto item : this->selectedItems())
   {
@@ -1067,6 +1090,11 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
   QAction* p_importStep = menu.addAction("import step from file ...");
   menu.addSeparator();
   QAction *p_addSickyNode = menu.addAction("add sticky note");
+
+  /// Added this menu point as a quick method to switch mode
+  /// There are probably more elegant ways to do this
+  QAction *p_moveDataslots = menu.addAction( "move Data Slots");
+
   menu.addSeparator();
   QAction *a = menu.exec(pContextMenuEvent->screenPos());
 
@@ -1082,6 +1110,27 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
   else if (a == p_addSickyNode)
   {
     this->addStickyNote();
+  }
+  /// switch mode to MODE_MOVE_DATASLOTS (or to MODE_SELECT if already in MODE_MOVE_DATASLOTS)
+  else if(a == p_moveDataslots)
+  {
+    if (this->mMode == MODE_MOVE_DATASLOTS)
+    {
+        this->mMode = MODE_SELECT;
+    } else {
+        this->mMode = MODE_MOVE_DATASLOTS;
+        /// At this point the Dataslots should be highlighted somehow to provide a visual clue
+        /// that tey can be manipulated
+        QList<QGraphicsItem *> allItems = this->items();
+        for (auto item : allItems) {
+            QList<QGraphicsItem *> children = item->childItems();
+            for (auto childItem : children) {
+                //! highlight dataslots somehow
+
+
+            }
+        }
+    }
   }
   else if (a != nullptr)
   {

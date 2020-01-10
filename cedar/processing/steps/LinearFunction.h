@@ -58,7 +58,7 @@ public slots:
                                     ) const;
 
   private:
-    void recompute();
+    void recompute(bool reinitialize);
     void compute(const cedar::proc::Arguments&);
     void inputConnectionChanged(const std::string& inputName);
     void checkOptionalInputs();

@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SinusSignal.cpp
+    File:        SinusSignalView.cpp
 
-    Maintainer:  jokeit
-    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        2017 12 04
+    Maintainer:  
+    Email:       
+    Date:        
 
-    Description: Source file for the class cedar::proc::sources::SinusSignal.
+    Description: Source file for the class cedar::proc::gui::SinusSignalView.
 
     Credits:
 
@@ -37,78 +37,68 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-// CLASS HEADER
-#include "cedar/processing/sources/SinusSignal.h"
-
 // CEDAR INCLUDES
-#include "cedar/processing/typecheck/IsMatrix.h"
-#include <cedar/processing/ElementDeclaration.h>
-#include "cedar/auxiliaries/GlobalClock.h"
-#include "cedar/units/Time.h"
 #include "cedar/processing/gui/stepViews/SinusSignalView.h"
+#include "cedar/processing/Connectable.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-//----------------------------------------------------------------------------------------------------------------------
-// register the class
-//----------------------------------------------------------------------------------------------------------------------
-namespace
-{
-bool declare()
-{
-  using cedar::proc::ElementDeclarationPtr;
-  using cedar::proc::ElementDeclarationTemplate;
-
-  ElementDeclarationPtr declaration
-  (
-    new ElementDeclarationTemplate<cedar::proc::sources::SinusSignal, cedar::proc::gui::SinusSignalView >
-    (
-      "Sources",
-      "cedar.processing.sources.SinusSignal"
-    )
-  );
-
-  declaration->setIconPath(":/steps/sinus_signal.svg");
-  declaration->setDescription
-  (
-    "Generates a sine signal in time. The Global clock serves as timing "
-    "signal. You can switch the sine to a cosine by a GUI parameter."
-  );
-
-  declaration->declare();
-
-  return true;
-}
-
-bool declared = declare();
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::sources::SinusSignal::SinusSignal()
-:
-mMakeCos(new cedar::aux::BoolParameter(this, "make cos", false))
-{
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::proc::sources::SinusSignal::calculateSignal(double t, double period, double amplitude, double phase, double verticaloffset)
+void cedar::proc::gui::SinusSignalView::connectableChanged()
 {
-  double value;
+  this->cedar::proc::gui::DefaultConnectableIconView::connectableChanged();
 
-  // can be done via phase shift, but this is more user friendly:
-  if (mMakeCos->getValue())
-    value= cos( ( t + phase ) / period * 2.0 * M_PI );
-  else
-    value= sin( ( t + phase ) / period * 2.0 * M_PI );
+  auto parameter1 = this->getConnectable()->getParameter("amplitude");
 
-  return amplitude * value + verticaloffset;
+  QObject::connect(parameter1.get(), SIGNAL(valueChanged()), this, SLOT(updateIconWeight()));
+
+  auto parameter2 = this->getConnectable()->getParameter("make cos");
+
+  QObject::connect(parameter2.get(), SIGNAL(valueChanged()), this, SLOT(updateIconWeight()));
+
+  this->updateIconWeight();
 }
 
+void cedar::proc::gui::SinusSignalView::updateIconWeight()
+{
+  auto parameter1 = boost::dynamic_pointer_cast<cedar::aux::ConstDoubleParameter>(this->getConnectable()->getParameter("amplitude"));
+
+  auto value1 = parameter1->getValue();
+
+  auto parameter2 = boost::dynamic_pointer_cast<cedar::aux::ConstBoolParameter>(this->getConnectable()->getParameter("make cos"));
+
+  auto value2 = parameter2->getValue();
+
+  if (!value2)
+  {
+    if (value1 < 0)
+    {
+      this->setIconPath(":/steps/sinus_dynamics_neg.svg");
+    }
+    else 
+    {
+      this->setIconPath(":/steps/sinus_dynamics.svg");
+    }
+  }
+  else
+  {
+    if (value1 < 0)
+    {
+      this->setIconPath(":/steps/cosinus_dynamics_neg.svg");
+    }
+    else 
+    {
+      this->setIconPath(":/steps/cosinus_dynamics.svg");
+    }
+  }
+}

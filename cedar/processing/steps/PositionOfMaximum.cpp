@@ -42,43 +42,57 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/typecheck/IsMatrix.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 
 // SYSTEM INCLUDES
 #include "cedar/processing/ElementDeclaration.h"
+#include <limits> 
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
 namespace
-{
-bool declare()
-{
-  using cedar::proc::ElementDeclarationPtr;
-  using cedar::proc::ElementDeclarationTemplate;
+  {
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
 
-  ElementDeclarationPtr declaration
-  (
-    new ElementDeclarationTemplate<cedar::proc::steps::PositionOfMaximum>
+    ElementDeclarationPtr declaration
     (
-      "Programming",
-      "cedar.processing.steps.PositionOfMaximum"
-    )
-  );
+      new ElementDeclarationTemplate<cedar::proc::steps::PositionOfMaximum>
+      (
+        "Programming",
+        "cedar.processing.steps.PositionOfMaximum"
+      )
+    );
 
-  declaration->setIconPath(":/steps/positionofmaximum.svg");
-  declaration->setDescription
-  (
-    "Returns the indices (positions in the array) "
-    "of the maximum value of the input tensor."
-  );
+    declaration->setIconPath(":/steps/positionofmaximum.svg");
+    declaration->setDescription
+    (
+      "Returns the indices (positions in the array) "
+      "of the MAXIMUM (or other, see below) value of the input tensor.\n"
+      "Note: The position of the maximum is always the "
+      "first (i.e. leftmost, upmost) pixel!\n"
+      "You can optionally choose to find the position of the "
+      "CENTROID (center of mass). The Centroid method implemented "
+      "assumes you have an unimodal distribution and that the values of "
+      "the input are in an appropriate range, i.e. most of the pixels are of value zero. Note: If many pixels are not exactly zero, this will affect the result significantly. Use the 'Centroid threshold' parameter in that case to set all values smaller than that threshold to zero.\n"
+      "You can also output NaNs if no values are smaller than the "
+      "'Peak Detection Threshold' to be able to discern no-peak situations "
+      "from situations where a peak would be at (0,0)."
+    );
 
-  declaration->declare();
+    declaration->declare();
 
-  return true;
+    return true;
+  }
+
+  bool declared = declare();
 }
 
-bool declared = declare();
-}
+cedar::aux::EnumType<cedar::proc::steps::PositionOfMaximum::UnitType>
+cedar::proc::steps::PositionOfMaximum::UnitType::mType("PositionOfMaximum::");
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -87,18 +101,65 @@ bool declared = declare();
 cedar::proc::steps::PositionOfMaximum::PositionOfMaximum()
 :
 // outputs
-mOutput(new cedar::aux::MatData(cv::Mat()))
+mOutput(new cedar::aux::MatData(cv::Mat())),
+mPositionType
+(
+  new cedar::aux::EnumParameter
+  (
+    this,
+    "position type",
+    cedar::proc::steps::PositionOfMaximum::UnitType::typePtr(),
+    cedar::proc::steps::PositionOfMaximum::UnitType::Maximum
+  )
+),
+mNaNIfNoPeak(new cedar::aux::BoolParameter(this, "NaN if no peak", false)),
+mPeakThreshold(new cedar::aux::DoubleParameter(this, "Peak detection threshold", 0.1)),
+mCentroidThreshold(new cedar::aux::DoubleParameter(this, "Centroid detection threshold", 0.1))
 {
   // declare all data
   cedar::proc::DataSlotPtr input = this->declareInput("input");
   this->declareOutput("output", mOutput);
 
   input->setCheck(cedar::proc::typecheck::IsMatrix());
+
+  mPeakThreshold->setConstant(true); 
+  mCentroidThreshold->setConstant(true);
+ 
+  QObject::connect(this->mPositionType.get(), SIGNAL(valueChanged()), this, SLOT(outputTypeChanged()));
+  QObject::connect(this->mNaNIfNoPeak.get(), SIGNAL(valueChanged()), this, SLOT(outputTypeChanged()));
+  QObject::connect(this->mPeakThreshold.get(), SIGNAL(valueChanged()), this, SLOT(outputTypeChanged()));
+  QObject::connect(this->mCentroidThreshold.get(), SIGNAL(valueChanged()), this, SLOT(outputTypeChanged()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::steps::PositionOfMaximum::outputTypeChanged()
+{
+  switch (this->mPositionType->getValue())
+  {
+    case cedar::proc::steps::PositionOfMaximum::UnitType::Maximum:
+      mCentroidThreshold->setConstant(true);
+      break;
+    case cedar::proc::steps::PositionOfMaximum::UnitType::Centroid:
+      mCentroidThreshold->setConstant(false);
+      break;
+  }
+
+  if (mNaNIfNoPeak->getValue())
+  {
+    mPeakThreshold->setConstant(false);
+  }
+  else
+  {
+    mPeakThreshold->setConstant(true);
+  }
+
+  this->lock(cedar::aux::LOCK_TYPE_WRITE);
+  recompute(true);
+  this->unlock();
+}
 
 void cedar::proc::steps::PositionOfMaximum::inputConnectionChanged(const std::string& inputName)
 {
@@ -136,29 +197,113 @@ void cedar::proc::steps::PositionOfMaximum::inputConnectionChanged(const std::st
 
   if (output_changed)
   {
-    recompute();
+    recompute(true);
     this->emitOutputPropertiesChangedSignal("output");
   }
 }
 
 void cedar::proc::steps::PositionOfMaximum::compute(const cedar::proc::Arguments&)
 {
-  recompute();
+  recompute(false);
 }
 
-void cedar::proc::steps::PositionOfMaximum::recompute()
+void cedar::proc::steps::PositionOfMaximum::recompute(bool reinit)
 {
-  if (!mInput)
+  bool isNoPeak;
+
+  if (!mInput
+     || mInput->getData().empty())
+  {
+    mOutput->setData( cv::Mat::zeros(2,1,CV_32F) );
     return;
+  }
+  else if (reinit)
+  {
+    mOutput->setData( cv::Mat::zeros(2,1,CV_32F) );
+  }
 
-  if (mInput->getData().empty())
-    return;
+  switch (this->mPositionType->getValue())
+  {
+    case cedar::proc::steps::PositionOfMaximum::UnitType::Maximum:
+      // fall-through
+    default:
+    {
+      double minimum, maximum;
+      int minLoc[2]= {-1, -1};
+      int maxLoc[2]= {-1, -1};
 
-  double minimum, maximum;
-  int minLoc[2]= {-1, -1};
-  int maxLoc[2]= {-1, -1};
+      cv::minMaxIdx(mInput->getData(), &minimum, &maximum, minLoc, maxLoc);
 
-  cv::minMaxIdx(mInput->getData(), &minimum, &maximum, minLoc, maxLoc);
-  mOutput->getData().at<float>(0,0) = maxLoc[0];
-  mOutput->getData().at<float>(1,0) = maxLoc[1];
+      mOutput->getData().at<float>(0,0) = maxLoc[0];
+      mOutput->getData().at<float>(1,0) = maxLoc[1];
+      break;
+    }
+
+    case cedar::proc::steps::PositionOfMaximum::UnitType::Centroid:
+    {
+      cv::Mat source= mInput->getData();
+      cv::Mat temp;
+
+      // start by thresholding, ignoring everyhting smaller than ...
+      cv::threshold( source, temp, mCentroidThreshold->getValue(), 
+                     42, // this is ignored:
+                     cv::THRESH_TOZERO );
+      // calculate moments:
+      cv::Moments m= cv::moments( temp, true);
+      cv::Point p( m.m10/m.m00, m.m01/m.m00);
+      
+      auto p1= p.y; // note the switch of x and y, here!
+      auto p2= p.x;
+
+      if ( cedar::aux::math::isZero( p1 ) 
+           || p1 < 0.0 )
+      {
+        p1= 0.0;
+        isNoPeak= true;
+      }
+      if ( cedar::aux::math::isZero( p2 ) 
+           || p2 < 0.0 )
+      {
+        p2= 0.0;
+        isNoPeak= true;
+      }
+
+      mOutput->getData().at<float>(0,0) = static_cast<float>(p1);
+      mOutput->getData().at<float>(1,0) = static_cast<float>(p2);
+      break;
+    }
+  }
+
+  bool makeNaN;
+
+  if (mNaNIfNoPeak->getValue())
+  {
+    if (isNoPeak)
+    {
+      makeNaN= true;
+    }
+    else if (mInput)
+    {
+      float val= mInput->getData().at<float>(
+                   mOutput->getData().at<float>(0,0),
+                   mOutput->getData().at<float>(1,0) );
+
+      if ( isNoPeak
+           || cedar::aux::math::isZero( val ) 
+           || val < mPeakThreshold->getValue() ) 
+      {
+        makeNaN= true;
+      }
+      else
+      {
+        // nothing
+      }
+    }
+  }
+
+  if (makeNaN)
+  {
+      mOutput->getData().at<float>(0,0) = std::numeric_limits<float>::quiet_NaN();
+      mOutput->getData().at<float>(1,0) = std::numeric_limits<float>::quiet_NaN();
+  }
 }
