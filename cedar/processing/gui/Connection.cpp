@@ -85,7 +85,7 @@ mAnchorPointRadius(4)
   this->setHighlightedBySelection(false);
 
   this->setSourceAndTarget(pSource, pTarget);
-  this->mValidSourceTargetSlotName = sourceSlotName != "" && targetSlotName != "";
+  this->mValidSourceTargetSlotName = sourceSlotName.toStdString().compare("") && targetSlotName.toStdString().compare("");
 }
 
 cedar::proc::gui::Connection::~Connection()

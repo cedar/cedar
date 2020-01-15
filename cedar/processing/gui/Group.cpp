@@ -1693,7 +1693,7 @@ void cedar::proc::gui::Group::writeScene(cedar::aux::ConfigurationNode &root) co
   }
 
   //Save ConnectionAnchor (drag-points of Connection)
-  std::vector<cedar::proc::gui::Connection*> cs;
+  std::vector<cedar::proc::gui::Connection*> cs; // all gui connections in the scene
 
   QList<QGraphicsItem *> items = this->mpScene->items();
   for (int i = 0; i < items.size(); ++i)
@@ -1710,7 +1710,7 @@ void cedar::proc::gui::Group::writeScene(cedar::aux::ConfigurationNode &root) co
 
   for (cedar::proc::gui::Connection *conn : cs)
   {
-    if(conn->getConnectionAnchorPoints().size() <= 0 && !conn->isSourceTargetSlotNameValid()) continue;
+    if(conn->getConnectionAnchorPoints().size() <= 0 || !conn->isSourceTargetSlotNameValid()) continue;
     cedar::aux::ConfigurationNode connection;
     connection.put("source slot", conn->getSourceSlotName().toStdString());
     connection.put("target slot", conn->getTargetSlotName().toStdString());
@@ -2977,7 +2977,7 @@ void cedar::proc::gui::Group::readView(const cedar::aux::ConfigurationNode &node
 void cedar::proc::gui::Group::readConnections(const cedar::aux::ConfigurationNode &node)
 {
 
-  std::vector<cedar::proc::gui::Connection*> cs;
+  std::vector<cedar::proc::gui::Connection*> cs; // all gui connections in the scene
 
   QList<QGraphicsItem *> items = this->mpScene->items();
   for (int i = 0; i < items.size(); ++i)
@@ -3015,11 +3015,7 @@ void cedar::proc::gui::Group::readConnections(const cedar::aux::ConfigurationNod
               break;
             }
           }
-          if(guiConnection == nullptr)
-          {
-            std::cout << "[Read drag-points]: No corresponding connection found" << std::endl;
-          }
-          else
+          if(guiConnection != nullptr)
           {
             auto anchorsNode = connectionNode.get_child("anchors");
             for (auto iter2 = anchorsNode.begin(); iter2 != anchorsNode.end(); ++iter2)
