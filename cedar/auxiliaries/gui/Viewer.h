@@ -243,7 +243,7 @@ private:
   ///!@brief flag in order to be stored in Plotgroups
   std::string mViewerLabel;
 
-  QGLFramebufferObject * m_fbo = nullptr;
+  boost::shared_ptr<QGLFramebufferObject> m_fbo;
 
 };
 

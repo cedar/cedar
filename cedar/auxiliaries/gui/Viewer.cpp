@@ -180,13 +180,11 @@ void cedar::aux::gui::Viewer::hiddenUpdate()
   if (!m_fbo || m_fbo->width() != width() || m_fbo->height() != height())
   {
     //allocate additional? FBO for rendering or resize it if widget size changed
-    if(m_fbo) delete m_fbo;
+    if(m_fbo) m_fbo.reset();
     QGLFramebufferObjectFormat format;
     format.setAttachment(QGLFramebufferObject::CombinedDepthStencil);
-    m_fbo = new QGLFramebufferObject(width(), height(), format);
+    m_fbo = boost::shared_ptr<QGLFramebufferObject>(new QGLFramebufferObject(width(), height(), format));
     resizeGL(width(), height());
-
-
   }
 
   //bind FBO and render stuff with paintGL() call
