@@ -116,6 +116,13 @@ void cedar::proc::steps::TemplateMatching::compute(const cedar::proc::Arguments&
   {
       cv::Mat result = cv::Mat::zeros(result_rows, result_cols, CV_32F);
       cv::matchTemplate( image, patch, result, CV_TM_CCORR_NORMED );
+#if (CV_MAJOR_VERSION > 3)
+      cv::matchTemplate( image, patch, result, cv::TM_CCORR_NORMED );
+#else
+      cv::matchTemplate( image, patch, result, CV_TM_CCORR_NORMED );
+#endif
       this->mOutput->setData(result.clone());
   }
 }
+
+
