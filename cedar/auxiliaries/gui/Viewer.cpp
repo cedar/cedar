@@ -180,7 +180,7 @@ void cedar::aux::gui::Viewer::hiddenUpdate()
   if (!m_fbo || m_fbo->width() != width() || m_fbo->height() != height())
   {
     //allocate additional? FBO for rendering or resize it if widget size changed
-    delete m_fbo;
+    if(m_fbo) delete m_fbo;
     QGLFramebufferObjectFormat format;
     format.setAttachment(QGLFramebufferObject::CombinedDepthStencil);
     m_fbo = new QGLFramebufferObject(width(), height(), format);
