@@ -158,6 +158,7 @@ cedar_add_library(cedarproc
   steps/UnitConverter.h
   steps/Histogram.h
   steps/ScalarDivision.h
+  steps/TemplateMatching.h
   steps/Threshold.h
   steps/Clamp.h
   steps/TransferFunction.h
