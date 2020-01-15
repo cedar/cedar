@@ -1334,7 +1334,14 @@ void cedar::proc::gui::Connectable::demagnetizeSlots()
 
   if (changes)
   {
-    this->updateDataSlotPositions(false);
+    if (auto scene = dynamic_cast<cedar::proc::gui::Scene *>(this->scene()))
+    {
+      this->updateDataSlotPositions(!scene->getDataSlotPositioningEnabled());
+    }
+    else
+    {
+      this->updateDataSlotPositions();
+    }
   }
 }
 
@@ -1378,7 +1385,14 @@ void cedar::proc::gui::Connectable::magnetizeSlots(const QPointF& mousePositionI
 
   if (changes)
   {
-    this->updateDataSlotPositions(false);
+    if (auto scene = dynamic_cast<cedar::proc::gui::Scene *>(this->scene()))
+    {
+      this->updateDataSlotPositions(!scene->getDataSlotPositioningEnabled());
+    }
+    else
+    {
+      this->updateDataSlotPositions();
+    }
   }
 }
 

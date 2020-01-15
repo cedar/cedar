@@ -535,6 +535,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   QObject::connect(mpActionPerformanceOverview, SIGNAL(triggered()), this->mpPerformanceOverview, SLOT(show()));
   QObject::connect(mpActionParameterLinker, SIGNAL(triggered()), this, SLOT(openParameterLinker()));
+  QObject::connect(mpActionDataSlotPositioning, SIGNAL(triggered()), this, SLOT(toggleDataSlotPositioning()));
 
 
   QObject::connect(this->mpRecorderWidget,
@@ -922,6 +923,12 @@ void cedar::proc::gui::Ide::globalTimeFactorSpinboxChanged(double newValue)
   {
     this->mGroup->getGroup()->setTimeFactor(newValue);
   }
+}
+void cedar::proc::gui::Ide::toggleDataSlotPositioning()
+{
+
+  this->mpProcessingDrawer->getScene()->setDataSlotPositioningEnabled(this->mpActionDataSlotPositioning->isChecked());
+
 }
 
 void cedar::proc::gui::Ide::openParameterLinker()

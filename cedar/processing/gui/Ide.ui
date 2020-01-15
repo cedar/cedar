@@ -178,6 +178,7 @@
     </property>
     <addaction name="mpActionPerformanceOverview"/>
     <addaction name="mpActionParameterLinker"/>
+    <addaction name="mpActionDataSlotPositioning"/>
     <addaction name="separator"/>
     <addaction name="mpActionManagePlugins"/>
     <addaction name="separator"/>
@@ -1059,6 +1060,19 @@
   <action name="mpActionParameterLinker">
    <property name="text">
     <string>Parameter linking...</string>
+   </property>
+  </action>
+  <action name="mpActionDataSlotPositioning">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/data_slot_positioning.svg</normaloff>
+     <normalon>:/toolbaricons/data_slot_positioning.svg</normalon>:/toolbaricons/data_slot_positioning.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Enable data slot positioning (experimental)</string>
    </property>
   </action>
   <action name="mpActionSaveSerializableData">

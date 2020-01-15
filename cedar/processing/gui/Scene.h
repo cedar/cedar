@@ -96,7 +96,7 @@ public:
     MODE_SELECT,
     //! Connection mode, i.e., connections can be created.
     MODE_CONNECT,
-    //! Mode for manipulating data slots
+    //! Mode for manipulating *output* data slots
     MODE_MOVE_DATASLOTS
   };
 
@@ -257,6 +257,14 @@ public:
   /*!@brief Enables or disables the snap-to-grid function.
    */
   void setSnapToGrid(bool snap);
+
+  /*!@brief Returns, whether data slot positioning is enabled.
+   */
+  bool getDataSlotPositioningEnabled() const;
+
+  /*!@brief Enables or disables the data slot positioning function.
+   */
+  void setDataSlotPositioningEnabled(bool);
 
   /*!@brief Access the root group
    */
@@ -525,6 +533,9 @@ private:
 
   //! Whether or not the mouse is currently dragging items in the scene
   bool mDraggingItems;
+
+  //! Whether or not data slots should be moved by the mouse (experimental)
+  bool mDataSlotPositioningEnabled;
 
 }; // class ProcessingScene
 

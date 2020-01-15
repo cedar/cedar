@@ -257,6 +257,9 @@ public slots:
    */
   void openParameterLinker();
 
+  //!@brief toggle data slot positioning
+  void toggleDataSlotPositioning();
+
   //!@brief toggle smart connections
   void toggleSmartConnections(bool smart);
 

@@ -525,6 +525,16 @@ void cedar::proc::gui::Scene::setSnapToGrid(bool snap)
   this->resetBackgroundColor();
 }
 
+bool cedar::proc::gui::Scene::getDataSlotPositioningEnabled() const
+{
+  return this->mDataSlotPositioningEnabled;
+}
+
+void cedar::proc::gui::Scene::setDataSlotPositioningEnabled(bool enabled)
+{
+  this->mDataSlotPositioningEnabled = enabled;
+}
+
 void cedar::proc::gui::Scene::resetBackgroundColor()
 {
   if (this->mSnapToGrid)
@@ -1093,7 +1103,8 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
 
   /// Added this menu point as a quick method to switch mode
   /// There are probably more elegant ways to do this
-  QAction *p_moveDataslots = menu.addAction( "move Data Slots");
+  QAction *p_moveOutputDataslots = nullptr;
+  if(this->getDataSlotPositioningEnabled()) p_moveOutputDataslots = menu.addAction( "move output data slots");
 
   menu.addSeparator();
   QAction *a = menu.exec(pContextMenuEvent->screenPos());
@@ -1112,7 +1123,7 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
     this->addStickyNote();
   }
   /// switch mode to MODE_MOVE_DATASLOTS (or to MODE_SELECT if already in MODE_MOVE_DATASLOTS)
-  else if(a == p_moveDataslots)
+  else if(p_moveOutputDataslots != nullptr && a == p_moveOutputDataslots)
   {
     if (this->mMode == MODE_MOVE_DATASLOTS)
     {
@@ -1120,7 +1131,7 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
     } else {
         this->mMode = MODE_MOVE_DATASLOTS;
         /// At this point the Dataslots should be highlighted somehow to provide a visual clue
-        /// that tey can be manipulated
+        /// that they can be manipulated
         QList<QGraphicsItem *> allItems = this->items();
         for (auto item : allItems) {
             QList<QGraphicsItem *> children = item->childItems();

@@ -367,23 +367,27 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::translateValid
 }
 
 bool cedar::proc::gui::DataSlotItem::canBeDragged() const {
-    return true;
-
+  CEDAR_DEBUG_ONLY(cedar::proc::gui::Scene* p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());)
+  CEDAR_DEBUG_ASSERT(p_scene);
+  return p_scene->getDataSlotPositioningEnabled();
 }
 
 void cedar::proc::gui::DataSlotItem::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEvent) {
-
+  CEDAR_DEBUG_ONLY(cedar::proc::gui::Scene* p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());)
+  CEDAR_DEBUG_ASSERT(p_scene);
+  if(p_scene->getDataSlotPositioningEnabled())
+  {
     QGraphicsItem::mouseMoveEvent(pMouseEvent);
     /// set margin and adjust for Data slot shape
-    float margin =  3.0/*M_DATA_SLOT_PADDING*/ + this->width() / 2.;
+    float margin = 3.0/*M_DATA_SLOT_PADDING*/ + this->width() / 2.;
     /// the Data slots position is their upper left corner, adjust positioning accordingly
-    float adjustmentx = this->width() / 2. ;
-    float adjustmenty = this->height() /2. ;
+    float adjustmentx = this->width() / 2.;
+    float adjustmenty = this->height() / 2.;
     /// get the borders on which the Data Slot should appear
     /// each border represents a line along which the Data Slot can be dragged
-    float leftborder   = this->parentItem()->boundingRect().left()   - margin - adjustmentx;
-    float rightborder  = this->parentItem()->boundingRect().right()  + margin - adjustmentx;
-    float topborder    = this->parentItem()->boundingRect().top()    - margin - adjustmenty;
+    float leftborder = this->parentItem()->boundingRect().left() - margin - adjustmentx;
+    float rightborder = this->parentItem()->boundingRect().right() + margin - adjustmentx;
+    float topborder = this->parentItem()->boundingRect().top() - margin - adjustmenty;
     float bottomborder = this->parentItem()->boundingRect().bottom() + margin - adjustmenty;
 
 
@@ -393,25 +397,30 @@ void cedar::proc::gui::DataSlotItem::mouseMoveEvent(QGraphicsSceneMouseEvent *pM
 
     /// Determine the Position of the Data slot within the given constraints
     if ((xPos <= leftborder || (xPos > leftborder && xPos < rightborder)) && yPos >= topborder && yPos <= bottomborder)
-        this->setPos(leftborder, yPos);
-    else if ((xPos >= rightborder || (xPos > leftborder && xPos < rightborder)) && yPos >= topborder && yPos <= bottomborder)
-        this->setPos(rightborder, yPos);
-    else if ((yPos <= topborder || (yPos > topborder && yPos < bottomborder)) && xPos >= leftborder && xPos <= rightborder)
-        this->setPos(xPos, topborder);
-    else if ((yPos >= bottomborder || (yPos > topborder && yPos < bottomborder)) && xPos >= leftborder && xPos <= rightborder)
-        this->setPos(xPos, bottomborder);
-    else{
-        float x,y;
-        if(xPos<leftborder)
-            x = leftborder;
-        else
-            x = rightborder;
-        if(yPos < topborder)
-            y = topborder;
-        else
-            y = bottomborder;
-        this->setPos(x,y);
+      this->setPos(leftborder, yPos);
+    else if ((xPos >= rightborder || (xPos > leftborder && xPos < rightborder)) && yPos >= topborder &&
+             yPos <= bottomborder)
+      this->setPos(rightborder, yPos);
+    else if ((yPos <= topborder || (yPos > topborder && yPos < bottomborder)) && xPos >= leftborder &&
+             xPos <= rightborder)
+      this->setPos(xPos, topborder);
+    else if ((yPos >= bottomborder || (yPos > topborder && yPos < bottomborder)) && xPos >= leftborder &&
+             xPos <= rightborder)
+      this->setPos(xPos, bottomborder);
+    else
+    {
+      float x, y;
+      if (xPos < leftborder)
+        x = leftborder;
+      else
+        x = rightborder;
+      if (yPos < topborder)
+        y = topborder;
+      else
+        y = bottomborder;
+      this->setPos(x, y);
     }
+  }
 
 
 
