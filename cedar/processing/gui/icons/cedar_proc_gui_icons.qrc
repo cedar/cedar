@@ -147,6 +147,7 @@
         <file>steps/const_vector_nd.svg</file>
         <file>steps/const_matrix.svg</file>
         <file>steps/stack.svg</file>
+        <file>steps/template_matching.svg</file>
         <file>steps/pairsGame.svg</file>
         <file>steps/noop.svg</file>
         <file>steps/nan_check.svg</file>
