@@ -164,8 +164,9 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
     delete mpThread;
     this->mpThread = NULL;
   }
-
+#ifndef CEDAR_OS_WINDOWS
   mDestructingMutex.unlock();
+#endif	
 }
 
 //------------------------------------------------------------------------------
