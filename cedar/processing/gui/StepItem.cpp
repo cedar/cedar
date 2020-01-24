@@ -476,6 +476,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
   QAction *p_reset = menu.addAction("reset");
   this->connect(p_reset, SIGNAL(triggered()), SLOT(reset()));
+  QAction *p_delete = menu.addAction("delete");
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
   QMenu *p_actions_menu = menu.addMenu("actions");
@@ -569,6 +570,14 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     {
       //Call the manually specified action!
       this->getStep()->callAction(action.toStdString());
+    }
+  }
+  else if(a == p_delete)
+  {
+    cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+    if(p_scene)
+    {
+      p_scene->deleteElement(this);
     }
   }
   else
