@@ -184,6 +184,15 @@ void cedar::proc::gui::ConnectionAnchor::mouseMoveEvent(QGraphicsSceneMouseEvent
   // The default movement behaviour is reimplemented and is added the snap-to-grid functionality
   this->move(event->scenePos(), event->buttonDownScenePos(Qt::LeftButton));
 }
+
+void cedar::proc::gui::ConnectionAnchor::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+  QGraphicsEllipseItem::mousePressEvent(event);
+  if(event->button() == Qt::RightButton) {
+    this->setSelected(true);
+  }
+}
+
 void cedar::proc::gui::ConnectionAnchor::keyPressEvent(QKeyEvent *event)
 {
   QGraphicsEllipseItem::keyPressEvent(event);
