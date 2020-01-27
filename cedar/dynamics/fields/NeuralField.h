@@ -314,6 +314,10 @@ protected:
   //!@brief input noise gain
   cedar::aux::DoubleParameterPtr _mInputNoiseGain;
 
+    //!@brief multiplicative noise
+  cedar::aux::BoolParameterPtr _mMultiplicativeNoiseInput;
+  cedar::aux::BoolParameterPtr _mMultiplicativeNoiseActivation;
+
   //!@brief The list of kernels for this field.
   KernelListParameterPtr _mKernels;
 
