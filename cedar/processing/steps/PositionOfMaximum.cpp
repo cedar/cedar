@@ -159,6 +159,7 @@ void cedar::proc::steps::PositionOfMaximum::outputTypeChanged()
   this->lock(cedar::aux::LOCK_TYPE_WRITE);
   recompute(true);
   this->unlock();
+  this->emitOutputPropertiesChangedSignal("output");
 }
 
 void cedar::proc::steps::PositionOfMaximum::inputConnectionChanged(const std::string& inputName)
@@ -251,7 +252,7 @@ void cedar::proc::steps::PositionOfMaximum::recompute(bool reinit)
       // calculate moments:
       cv::Moments m= cv::moments( temp, true);
       cv::Point p( m.m10/m.m00, m.m01/m.m00);
-      
+//std::cout << " moments:  m00: " << m.m00 << " m10: " << m.m10 << " m01: " << m.m01 << " px: " << p.x << " py: " << p.y << std::endl;
       auto p1= p.y; // note the switch of x and y, here!
       auto p2= p.x;
 
@@ -284,9 +285,16 @@ void cedar::proc::steps::PositionOfMaximum::recompute(bool reinit)
     }
     else if (mInput)
     {
-      float val= mInput->getData().at<float>(
-                   mOutput->getData().at<float>(0,0),
-                   mOutput->getData().at<float>(1,0) );
+      float val;
+      // before: is there a "peak" at exactly that position
+      // float val= mInput->getData().at<float>(
+      //             mOutput->getData().at<float>(0,0),
+      //             mOutput->getData().at<float>(1,0) );
+      // now: is there a "peak" anywhere in the image?
+      double minimum, maximum;
+
+      cv::minMaxIdx(mInput->getData(), &minimum, &maximum);
+      val= static_cast<float>(maximum);
 
       if ( isNoPeak
            || cedar::aux::math::isZero( val ) 
