@@ -260,13 +260,19 @@ void cedar::proc::steps::PositionOfMaximum::recompute(bool reinit)
            || p1 < 0.0 )
       {
         p1= 0.0;
-        isNoPeak= true;
+        if (source.rows > 1) // not 1D: this dimension "exists"
+        {
+          isNoPeak= true;
+        }
       }
       if ( cedar::aux::math::isZero( p2 ) 
            || p2 < 0.0 )
       {
         p2= 0.0;
-        isNoPeak= true;
+        if (source.cols > 1) // not 1D: this dimension "exists"
+        {
+          isNoPeak= true;
+        }
       }
 
       mOutput->getData().at<float>(0,0) = static_cast<float>(p1);
