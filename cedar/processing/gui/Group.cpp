@@ -2663,6 +2663,7 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
   QAction *p_reset = menu.addAction("reset");
   this->connect(p_reset, SIGNAL(triggered()), SLOT(reset()));
+  QAction *p_delete = menu.addAction("delete");
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
@@ -2836,6 +2837,10 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   } else if (a == p_prune)
   {
     this->getGroup()->pruneUnusedConnectors();
+  }
+  else if (a == p_delete)
+  {
+    this->getScene()->deleteElement(this);
   }
 
     // plot data

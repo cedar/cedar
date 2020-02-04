@@ -227,7 +227,7 @@ void cedar::proc::gui::Connection::updateGraphics()
     }
     for(int i = 0; i < mConnectionAnchorPoints.size(); i++)
     {
-      this->mConnectionAnchorPoints[i]->setVisibility(false);
+      this->mConnectionAnchorPoints[i]->setVisible(false);
     }
   }else
   {
@@ -242,7 +242,7 @@ void cedar::proc::gui::Connection::updateGraphics()
     }
     for(int i = 0; i < mConnectionAnchorPoints.size(); i++)
     {
-      this->mConnectionAnchorPoints[i]->setVisibility(true);
+      this->mConnectionAnchorPoints[i]->setVisible(true);
     }
   }
   QColor color;
@@ -846,30 +846,62 @@ void cedar::proc::gui::Connection::addConnectionAnchor(QPointF addPosition, bool
 
 void cedar::proc::gui::Connection::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-  this->setSelected(true);
+  bool connectionAnchorMenu = false;
+  cedar::proc::gui::ConnectionAnchor* anchor;
+  for(std::vector<cedar::proc::gui::ConnectionAnchor*>::iterator it = this->mConnectionAnchorPoints.begin(); it != this->mConnectionAnchorPoints.end(); ++it)
+  {
+    if((*it)->isSelected())
+    {
+      // menu of the drag-point should be called
+      anchor = (*it);
+      connectionAnchorMenu = true;
+    }
+  }
   QMenu menu;
-  QAction *sourceAction = menu.addAction("jump to source");
-  QAction *targetAction = menu.addAction("jump to target");
-  QAction *addDragNodeAction = menu.addAction("add drag node"); // adds a ConnectionAnchor
-  QAction *selectedAction = menu.exec(event->screenPos());
+  // display menu of ConnectionAnchor
+  if(connectionAnchorMenu)
+  {
+    QAction *deleteAction = menu.addAction("delete");
+    QAction *selectedAction = menu.exec(event->screenPos());
+    if (selectedAction == deleteAction)
+    {
+      deleteAnchor(anchor);
+    }
+  }
+  // display Connection menu
+  else
+  {
+    this->setSelected(true);
 
-  if (this->mpTarget && selectedAction == targetAction)
-  {
-    auto scene = dynamic_cast<cedar::proc::gui::Scene*>(this->mpTarget->scene());
-    scene->selectNone();
-    this->mpTarget->parentItem()->setSelected(true);
-    scene->getParentView()->centerOn(this->mpTarget);
-  }
-  else if (this->mpSource && selectedAction == sourceAction)
-  {
-    auto scene = dynamic_cast<cedar::proc::gui::Scene*>(this->mpSource->scene());
-    scene->selectNone();
-    this->mpSource->parentItem()->setSelected(true);
-    scene->getParentView()->centerOn(this->mpSource);
-  }
-  else if (selectedAction == addDragNodeAction)
-  {
-    addConnectionAnchor(event->scenePos(), false);
+    QAction *sourceAction = menu.addAction("jump to source");
+    QAction *targetAction = menu.addAction("jump to target");
+    menu.addSeparator();
+    QAction *addDragNodeAction = menu.addAction("add drag node"); // adds a ConnectionAnchor
+    QAction *deleteAction = menu.addAction("delete");
+    QAction *selectedAction = menu.exec(event->screenPos());
+
+    if (this->mpTarget && selectedAction == targetAction)
+    {
+      auto scene = dynamic_cast<cedar::proc::gui::Scene *>(this->mpTarget->scene());
+      scene->selectNone();
+      this->mpTarget->parentItem()->setSelected(true);
+      scene->getParentView()->centerOn(this->mpTarget);
+    }
+    else if (this->mpSource && selectedAction == sourceAction)
+    {
+      auto scene = dynamic_cast<cedar::proc::gui::Scene *>(this->mpSource->scene());
+      scene->selectNone();
+      this->mpSource->parentItem()->setSelected(true);
+      scene->getParentView()->centerOn(this->mpSource);
+    }
+    else if (selectedAction == addDragNodeAction)
+    {
+      addConnectionAnchor(event->scenePos(), false);
+    }
+    else if (selectedAction == deleteAction)
+    {
+      this->disconnectUnderlying();
+    }
   }
 }
 
@@ -880,6 +912,7 @@ void cedar::proc::gui::Connection::deleteAnchor(cedar::proc::gui::ConnectionAnch
   {
     if(*it == anchor)
     {
+      anchor->setVisible(false);
       this->mConnectionAnchorPoints.erase(it);
       break;
     }

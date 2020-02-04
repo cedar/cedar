@@ -90,6 +90,9 @@ public:
   //! gets called when the user moves the mouse
   void mouseMoveEvent(QGraphicsSceneMouseEvent*);
 
+  //! gets called when the user presses a mouse button
+  void mousePressEvent(QGraphicsSceneMouseEvent*);
+
   //! gets called when the user presses a key
   void keyPressEvent(QKeyEvent*);
 

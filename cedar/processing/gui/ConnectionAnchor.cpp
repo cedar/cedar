@@ -185,8 +185,12 @@ void cedar::proc::gui::ConnectionAnchor::mouseMoveEvent(QGraphicsSceneMouseEvent
   this->move(event->scenePos(), event->buttonDownScenePos(Qt::LeftButton));
 }
 
-void cedar::proc::gui::ConnectionAnchor::setVisibility(bool visibility){
-  this->setVisible(visibility);
+void cedar::proc::gui::ConnectionAnchor::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+  QGraphicsEllipseItem::mousePressEvent(event);
+  if(event->button() == Qt::RightButton) {
+    this->setSelected(true);
+  }
 }
 
 void cedar::proc::gui::ConnectionAnchor::keyPressEvent(QKeyEvent *event)
@@ -194,7 +198,6 @@ void cedar::proc::gui::ConnectionAnchor::keyPressEvent(QKeyEvent *event)
   QGraphicsEllipseItem::keyPressEvent(event);
   if(event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace)
   {
-    this->setVisible(false);
     this->mpParent->deleteAnchor(this);
   }
 }
