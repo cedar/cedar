@@ -488,7 +488,10 @@ void cedar::proc::steps::CoordinateTransformation::createCartPolarMapForward()
   const unsigned int input_center_rows = input_rows / 2;
   const unsigned int input_center_cols = input_cols / 2;
 
-  const float distance = static_cast<float>(sqrt(pow(input_rows, 2.0) + pow(input_cols, 2.0)));
+  const float distance = static_cast<float>(
+                           sqrt(pow(input_rows, 2.0) + pow(input_cols, 2.0))
+                           / 2.0 // max distance from the center
+                         );
 
   const float angular_step = 1.0f / static_cast<float>(this->_mSamplesPerDegree->getValue());
   const float distance_step = 1.0f / static_cast<float>(this->_mSamplesPerDistance->getValue());
@@ -575,7 +578,10 @@ void cedar::proc::steps::CoordinateTransformation::createCartLogPolarMapForward(
   const unsigned int input_center_rows = input_rows / 2;
   const unsigned int input_center_cols = input_cols / 2;
 
-  const float distance = sqrt(pow(input_rows, 2.0) + pow(input_cols, 2.0));
+  const float distance = static_cast<float>(
+                           sqrt(pow(input_rows, 2.0) + pow(input_cols, 2.0))
+                           / 2.0 // max distance from the center
+                         );
 
   const float angular_step = 1.0f / static_cast<float>(this->_mSamplesPerDegree->getValue());
   const float distance_step = 1.0f / static_cast<float>(this->_mSamplesPerDistance->getValue());

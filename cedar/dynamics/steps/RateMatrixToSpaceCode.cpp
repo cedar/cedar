@@ -69,11 +69,14 @@ namespace
     declaration->setIconPath(":/steps/rate_matrix_to_space_code.svg");
     declaration->setDescription
     (
-      "Transforms a (2D) matrix of rate code to (3D) space code. This step assumes that the input contains rate code "
-      "values in a meaningful interval described by the parameters lower and upper boundary. For each entry, this step"
-      "interpolates a bin (or slice) in which to put the current value. The amount of bins can be changed. This step"
-      "fills the resulting 3D matrix with ones for each rate code bin entry. If other values are desired, a separate"
-      "input can be used to provide those."
+      "Splits a second-order tensor (a matrix) into a third-order tensor by "
+      "binning the values.\n"
+      "Which bin is assigned, depends on the parameters 'number of bins', 'lower limit' and 'upper limit'.\n"
+      "This step fills the resulting third-order tensor with ONEs in the "
+      "appropriate slice at the position where the original value was. "
+      "If other values are desired, these can be optionally given via the "
+      "'values' input.\n"
+      "Use this to transform a 2D field of rate codes into a 3D field of space codes."
     );
 
     declaration->declare();

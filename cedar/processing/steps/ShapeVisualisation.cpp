@@ -176,6 +176,9 @@ void cedar::proc::steps::ShapeVisualisation::compute(const cedar::proc::Argument
 {
     float modifier = 0.0;
 
+    if (!mVisualisationPtr)
+      return;
+
     //! Adjust vertical Position so all Shapes are placed ON the ground by default
     switch (this->_mShape->getValue()) {
         default:

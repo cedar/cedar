@@ -428,6 +428,10 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
       if (auto measurementData = boost::dynamic_pointer_cast<const cedar::aux::MatData>(measurementDataOriginal))
       {
         QReadLocker measurementLocker(&measurementData->getLock());
+
+        if (!measurementData) // test again after the lock
+          continue;
+
         cv::Mat measurementMat = measurementData->getData().clone();
         measurementLocker.unlock();
         std::string name = component->getNameForMeasurementType(measurement);

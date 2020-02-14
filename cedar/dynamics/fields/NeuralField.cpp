@@ -209,15 +209,17 @@ mRestingLevel
   )
 ),
 _mInputNoiseGain
-(
-  new cedar::aux::DoubleParameter
-  (
-    this,
-    "input noise gain",
-    0.1,
-    cedar::aux::DoubleParameter::LimitType::positiveZero()
-  )
-),
+        (
+                new cedar::aux::DoubleParameter
+                        (
+                                this,
+                                "input noise gain",
+                                0.1,
+                                cedar::aux::DoubleParameter::LimitType::positiveZero()
+                        )
+        ),
+_mMultiplicativeNoiseInput(new cedar::aux::BoolParameter(this, "multiplicative noise (input)", false)),
+_mMultiplicativeNoiseActivation(new cedar::aux::BoolParameter(this, "multiplicative noise (activation)", false)),
 _mSigmoid
 (
   new cedar::dyn::NeuralField::SigmoidParameter
@@ -253,7 +255,8 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   this->declareBuffer("current delta time", this->mCurrentDeltaT);
   this->declareBuffer("full lateral kernel", this->mLateralKernelEducational);
 
-
+    _mMultiplicativeNoiseInput->markAdvanced(true);
+    _mMultiplicativeNoiseActivation->markAdvanced(true);
 
   this->declareOutput("sigmoided activation", mSigmoidalActivation);
   this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::ValueRangeHint(0, 1)));
@@ -667,9 +670,18 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 
   cv::randn(input_noise, cv::Scalar(0), cv::Scalar(1));
 
-  // integrate one time step
-  u += time / cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds) * d_u
-       + (sqrt(time / (cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))) / tau)
+    if(_mMultiplicativeNoiseInput->getValue() != 0)
+    {
+        input_noise = input_noise.mul(this->mInputSum->getData()); //cv::sum(input_sum)[0];
+    }
+    else if(_mMultiplicativeNoiseActivation->getValue() != 0)
+    {
+        input_noise = input_noise.mul(this->mActivation->getData()); //cv::sum(input_sum)[0];
+    }
+
+    // integrate one time step
+    u += time / cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds) * d_u
+         + (sqrt(time / (cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))) / tau)
            * _mInputNoiseGain->getValue() * input_noise;
 
   mCurrentDeltaT->getData().at<float>(0,0)= time / cedar::unit::seconds;
