@@ -43,6 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/typecheck/IsMatrix.h"
 #include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/math/constants.h"
 
 // SYSTEM INCLUDES
 #include "cedar/processing/ElementDeclaration.h"
@@ -78,9 +79,12 @@ namespace
       "CENTROID (center of mass). The Centroid method implemented "
       "assumes you have an unimodal distribution and that the values of "
       "the input are in an appropriate range, i.e. most of the pixels are of value zero. Note: If many pixels are not exactly zero, this will affect the result significantly. Use the 'Centroid threshold' parameter in that case to set all values smaller than that threshold to zero.\n"
-      "You can also output NaNs if no values are smaller than the "
-      "'Peak Detection Threshold' to be able to discern no-peak situations "
-      "from situations where a peak would be at (0,0)."
+      "You can also choose to calculate the position of the CYCLIC MEAN. This "
+      "is useful if your need to find the mean for a cyclic variable.\n"
+      "Finally, you can also choose to output NaNs in cases where "
+      "all input values are smaller than the "
+      "'Peak Detection Threshold' so as to be able to catch no-peak "
+      "situations and process these NaNs afterwards."
     );
 
     declaration->declare();
@@ -139,6 +143,7 @@ void cedar::proc::steps::PositionOfMaximum::outputTypeChanged()
 {
   switch (this->mPositionType->getValue())
   {
+    default:
     case cedar::proc::steps::PositionOfMaximum::UnitType::Maximum:
       mCentroidThreshold->setConstant(true);
       break;
@@ -210,7 +215,7 @@ void cedar::proc::steps::PositionOfMaximum::compute(const cedar::proc::Arguments
 
 void cedar::proc::steps::PositionOfMaximum::recompute(bool reinit)
 {
-  bool isNoPeak;
+  bool isNoPeak= false;
 
   if (!mInput
      || mInput->getData().empty())
@@ -237,6 +242,24 @@ void cedar::proc::steps::PositionOfMaximum::recompute(bool reinit)
 
       mOutput->getData().at<float>(0,0) = maxLoc[0];
       mOutput->getData().at<float>(1,0) = maxLoc[1];
+      break;
+    }
+
+    case cedar::proc::steps::PositionOfMaximum::UnitType::Cyclic:
+    {
+      double target;
+      double rangeMax= mInput->getData().rows;
+      auto   rows= this->mInput->getData().rows;
+      cv::Mat ramp = cedar::aux::math::ramp(CV_32F, rows, 1, rows);
+
+      cv::Mat vecAngles;
+      vecAngles= 2 * cedar::aux::math::pi * ramp / rangeMax;
+
+      target= cedar::aux::math::cyclicMean( vecAngles,
+                                            this->mInput->getData() );
+      target*= rangeMax / ( 2 * cedar::aux::math::pi );
+      mOutput->getData().at<float>(0,0) = static_cast<float>(target);
+      mOutput->getData().at<float>(1,0) = 0.0f;
       break;
     }
 
@@ -281,7 +304,7 @@ void cedar::proc::steps::PositionOfMaximum::recompute(bool reinit)
     }
   }
 
-  bool makeNaN;
+  bool makeNaN= false;
 
   if (mNaNIfNoPeak->getValue())
   {

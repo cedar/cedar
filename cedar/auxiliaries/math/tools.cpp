@@ -533,3 +533,41 @@ void cedar::aux::math::findPeaks(const cv::Mat& activation, std::vector<cv::Poin
     peakCenters.push_back(center);
   }
 }
+
+double cedar::aux::math::cyclicMean(const cv::Mat& angles, const cv::Mat &lengths)
+{
+  cv::Mat vecAngles= angles
+               // (**) to improve the below approximation around 0:
+               - cedar::aux::math::pi;
+  cv::Mat vecSin, vecCos;
+
+  // use opencvs per-element functions as much as possible:
+  // approximate sin and cos by Taylor expansion:
+  cv::Mat tmpPow2;
+  cv::pow( vecAngles, 2, tmpPow2 );
+  cv::Mat tmpPow3;
+  cv::pow( vecAngles, 3, tmpPow3 );
+  cv::Mat tmpPow4;
+  cv::pow( vecAngles, 4, tmpPow4 );
+  cv::Mat tmpPow5;
+  cv::pow( vecAngles, 5, tmpPow5 );
+  cv::Mat tmpPow6;
+  cv::pow( vecAngles, 6, tmpPow6 );
+  cv::Mat tmpPow7;
+  cv::pow( vecAngles, 7, tmpPow7 );
+
+  vecSin= vecAngles - tmpPow3/6 + tmpPow5/120 - tmpPow7/5040;
+  vecCos= 1 - tmpPow2/2 + tmpPow4/24 - tmpPow6/720;
+
+  double sum1 = cv::sum( lengths.mul( vecSin )).val[0];
+  double sum2 = cv::sum( lengths.mul( vecCos )).val[0];
+
+  unsigned int N= lengths.rows;
+
+  double target= std::atan2( sum1/N,
+                             sum2/N )
+          + cedar::aux::math::pi; // see (**) recind above shift 
+                      
+  return target;
+}
+

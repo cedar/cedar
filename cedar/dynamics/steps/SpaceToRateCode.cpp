@@ -42,8 +42,10 @@
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/math/constants.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
+
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -101,7 +103,8 @@ _mTau(new cedar::aux::TimeParameter
           )
      ),
 _mLowerLimit(new cedar::aux::DoubleParameter(this, "lowerLimit", 0.0, -10000.0, 10000.0)),
-_mUpperLimit(new cedar::aux::DoubleParameter(this, "upperLimit", 1.0, -10000.0, 10000.0))
+_mUpperLimit(new cedar::aux::DoubleParameter(this, "upperLimit", 1.0, -10000.0, 10000.0)),
+mMakeCyclic(new cedar::aux::BoolParameter(this, "use cyclic mean", false))
 {
   // declare all data
   this->declareInput("input");
@@ -109,6 +112,9 @@ _mUpperLimit(new cedar::aux::DoubleParameter(this, "upperLimit", 1.0, -10000.0, 
   this->declareBuffer("fix point", mFixPoint);
   this->mOutput->getData().at<float>(0,0) = 0.0;
   this->limitsChanged();
+
+  mMakeCyclic->markAdvanced(true);
+
   // connect the parameter's change signal
   QObject::connect(_mLowerLimit.get(), SIGNAL(valueChanged()), this, SLOT(limitsChanged()));
   QObject::connect(_mUpperLimit.get(), SIGNAL(valueChanged()), this, SLOT(limitsChanged()));
@@ -214,13 +220,36 @@ _mUpperLimit(new cedar::aux::DoubleParameter(this, "upperLimit", 1.0, -10000.0, 
  */
 void cedar::dyn::SpaceToRateCode::eulerStep(const cedar::unit::Time& time)
 {
-  // the result is simply input * gain; see explanation above for variable names
-  double s = cv::sum(this->mInput->getData()).val[0];
-  double o = cv::sum(this->mInput->getData().mul(mRamp)).val[0];
+  double s;
+  double o;
+
+  if (!mMakeCyclic->getValue()) // the default case (weighted mean):
+  {
+    s = cv::sum(this->mInput->getData()).val[0];
+    o = cv::sum(this->mInput->getData().mul(mRamp)).val[0];
+  }
+  else // the variable domain is cyclic (cyclic mean):
+  {
+    double target;
+    double rangeMax= this->getUpperLimit();
+
+    cv::Mat vecAngles;
+    vecAngles= 2 * cedar::aux::math::pi * mRamp / rangeMax;
+
+    target= cedar::aux::math::cyclicMean( vecAngles,
+                                          this->mInput->getData() );
+    target*= rangeMax / ( 2 * cedar::aux::math::pi );
+
+    s = 1.0;
+    o = target;
+  }
+
+
   double dt = time / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second);
   //!@todo use the time unit throughout the computation
   double tau = this->getTau() / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second);
 
+  // the result is simply input * gain; see explanation above for variable names
   double h = dt;
   if (h / tau * s >= 2) // stability criterion
   {
