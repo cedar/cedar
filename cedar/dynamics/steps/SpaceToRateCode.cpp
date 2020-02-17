@@ -223,9 +223,10 @@ void cedar::dyn::SpaceToRateCode::eulerStep(const cedar::unit::Time& time)
   double s;
   double o;
 
+  s = cv::sum(this->mInput->getData()).val[0];
+
   if (!mMakeCyclic->getValue()) // the default case (weighted mean):
   {
-    s = cv::sum(this->mInput->getData()).val[0];
     o = cv::sum(this->mInput->getData().mul(mRamp)).val[0];
   }
   else // the variable domain is cyclic (cyclic mean):
@@ -237,11 +238,14 @@ void cedar::dyn::SpaceToRateCode::eulerStep(const cedar::unit::Time& time)
     vecAngles= 2 * cedar::aux::math::pi * mRamp / rangeMax;
 
     target= cedar::aux::math::cyclicMean( vecAngles,
-                                          this->mInput->getData() );
+                                          this->mInput->getData(),
+                                          0.0 );
     target*= rangeMax / ( 2 * cedar::aux::math::pi );
 
-    s = 1.0;
-    o = target;
+    // s stays as above
+    o = target * s; // see below: The attractor is o/s 
+                    // we do this so that the attractor becomes
+                    // marginally stable when there is no peak (s==0)
   }
 
 

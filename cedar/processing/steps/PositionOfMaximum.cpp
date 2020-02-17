@@ -254,9 +254,21 @@ void cedar::proc::steps::PositionOfMaximum::recompute(bool reinit)
 
       cv::Mat vecAngles;
       vecAngles= 2 * cedar::aux::math::pi * ramp / rangeMax;
+  
+      // what to do if all lengths are zero:
+      double noPeakResult;
+      if (mNaNIfNoPeak->getValue())
+      {
+        noPeakResult= std::numeric_limits<double>::quiet_NaN();
+      }
+      else
+      {
+        noPeakResult= 0.0;
+      }
 
       target= cedar::aux::math::cyclicMean( vecAngles,
-                                            this->mInput->getData() );
+                                            this->mInput->getData(),
+                                            noPeakResult );
       target*= rangeMax / ( 2 * cedar::aux::math::pi );
       mOutput->getData().at<float>(0,0) = static_cast<float>(target);
       mOutput->getData().at<float>(1,0) = 0.0f;
