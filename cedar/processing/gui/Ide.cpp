@@ -553,21 +553,15 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
                    this,
                    SLOT(showRecentNotifications()));
 
-  QObject::connect
-  (
-    cedar::proc::experiment::SupervisorSingleton::getInstance().get(),
-    SIGNAL(experimentRunningChanged(bool)),
-    this,
-    SLOT(experimentRunningChanged(bool))
-  );
+  QObject::connect(cedar::proc::experiment::SupervisorSingleton::getInstance().get(),
+                   SIGNAL(experimentRunningChanged(bool)),
+                   this,
+                   SLOT(experimentRunningChanged(bool)));
 
-  QObject::connect
-  (
-      this->mpPlotGroupsComboBox,
-      SIGNAL(currentIndexChanged(int)),
-      this,
-      SLOT(togglePlotGroupActions())
-  );
+  QObject::connect(this->mpPlotGroupsComboBox,
+                   SIGNAL(currentIndexChanged(int)),
+                   this,
+                   SLOT(togglePlotGroupActions()));
 
   // make sure that we start with the right setting
   this->togglePlotGroupActions();
