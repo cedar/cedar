@@ -112,7 +112,10 @@ public:
   //!@brief reads a configuration from a node
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
   //!@brief saves a configuration to a node
-  void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
+  void writeConfiguration(cedar::aux::ConfigurationNode& root) const;;
+
+  //!brief ovverrides virtual function of GraphicsBase, determines when the popup menu in the deletion process should show up
+  bool manualDeletionRequiresConfirmation() const;
 
   //!@brief helper function to remove all connections to other graphical elements
   void disconnect();
@@ -140,6 +143,7 @@ public slots:
 
   //! Calls reset on the underlying step
   void reset();
+
 signals:
   /*!@brief Emitted whenever the state of the step displayed by this step item changes.
    *

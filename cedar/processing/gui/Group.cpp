@@ -2840,10 +2840,11 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   }
   else if (a == p_delete)
   {
-    this->getScene()->deleteElement(this);
+    QList<QGraphicsItem*> items;
+    items.append(this);
+    this->getScene()->deleteElements(items, event->modifiers() & Qt::ControlModifier);
   }
-
-    // plot data
+  // plot data
   else
   {
     this->handleContextMenuAction(a, event);
