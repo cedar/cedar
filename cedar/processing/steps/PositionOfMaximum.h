@@ -76,6 +76,7 @@ private:
       {
         mType.type()->def(cedar::aux::Enum(Maximum, "Maximum"));
         mType.type()->def(cedar::aux::Enum(Centroid, "Centroid"));
+        mType.type()->def(cedar::aux::Enum(Cyclic, "Cyclic Mean"));
       }
 
       //! @returns A const reference to the base enum object.
@@ -93,6 +94,7 @@ private:
     public:
       static const Id Maximum = 0;
       static const Id Centroid = 1;
+      static const Id Cyclic = 2;
 
     private:
       static cedar::aux::EnumType<UnitType> mType;

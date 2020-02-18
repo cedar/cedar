@@ -501,6 +501,8 @@ namespace cedar
        */
       CEDAR_AUX_LIB_EXPORT void findPeaks(const cv::Mat& activation, std::vector<cv::Point>& peakCenters, double threshold = 0.1);
 
+      /*! Calculyte the cyclic mean of complex variables */
+      CEDAR_AUX_LIB_EXPORT double cyclicMean(const cv::Mat& angles, const cv::Mat& lengths, double allZeroSolution = 0.0);
     } // namespace math
   } // namespace aux
 } // namespace cedar

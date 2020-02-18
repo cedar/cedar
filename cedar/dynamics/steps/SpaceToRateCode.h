@@ -161,6 +161,7 @@ protected:
   cedar::aux::DoubleParameterPtr _mUpperLimit;
 
 
+  cedar::aux::BoolParameterPtr mMakeCyclic;
 private:
 
 }; // class cedar::dyn::SpaceToRateCode
