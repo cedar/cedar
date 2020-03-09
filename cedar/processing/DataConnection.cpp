@@ -140,6 +140,11 @@ void cedar::proc::DataConnection::disconnect()
       }
       catch (cedar::aux::ExceptionBase& exc)
       {
+        if (cedar::aux::LogSingleton::getInstance()->getDontCatchExceptions())
+        {
+          throw;
+        }
+          
         // we ignore exceptions during this destructor, but notify the user
         if (auto p_triggerable = dynamic_cast<cedar::proc::Triggerable*>(this->getTarget()->getParentPtr()))
         {
@@ -153,6 +158,11 @@ void cedar::proc::DataConnection::disconnect()
       }
       catch (std::exception& exc)
       {
+        if (cedar::aux::LogSingleton::getInstance()->getDontCatchExceptions())
+        {
+          throw;
+        }
+
         // we ignore exceptions during this destructor, but notify the user
         if (auto p_triggerable = dynamic_cast<cedar::proc::Triggerable*>(this->getTarget()->getParentPtr()))
         {

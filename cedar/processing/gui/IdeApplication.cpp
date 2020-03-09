@@ -72,8 +72,7 @@ cedar::proc::gui::IdeApplication::IdeApplication(int& argc, char** argv)
 :
 QApplication(argc, argv),
 mpIde (NULL),
-mLastExceptionType(NONE),
-mCatchExceptions(true)
+mLastExceptionType(NONE)
 {
   QStringList args = QCoreApplication::arguments();
 
@@ -100,7 +99,8 @@ mCatchExceptions(true)
 
   this->QApplication::setStyle(QStyleFactory::create("Fusion"));//Forcing the same look and feel for all OS
 
-  this->mCatchExceptions = !parser.hasParsedFlag("dont-catch-exceptions");
+  cedar::aux::LogSingleton::getInstance()->setDontCatchExceptions( 
+    parser.hasParsedFlag("dont-catch-exceptions") );
 
   cedar::aux::LogSingleton::getInstance()->setThrowOnDebugMessage( 
                           parser.hasParsedFlag("throw-on-debug-message") );
@@ -239,7 +239,7 @@ void cedar::proc::gui::IdeApplication::cleanupAfterCrash()
 bool cedar::proc::gui::IdeApplication::notify(QObject* pReceiver, QEvent* pEvent)
 {
   //!@todo Make this flag a setting?
-  if (this->mCatchExceptions)
+  if (!cedar::aux::LogSingleton::getInstance()->getDontCatchExceptions())
   {
     try
     {

@@ -232,6 +232,15 @@ public:
     this->mThrowOnDebugMessage= b;
   }
 
+  inline bool getDontCatchExceptions() const
+  {
+    return this->mCatchExceptions;
+  }
+
+  inline void setDontCatchExceptions(bool b) 
+  {
+    this->mCatchExceptions= b;
+  }
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -259,6 +268,8 @@ private:
 
   //! Whether to throw on debug messages
   bool mThrowOnDebugMessage;
+  //! Whether to catch exceptions or not
+  bool mCatchExceptions;
 };
 
 //!@cond SKIPPED_DOCUMENTATION
