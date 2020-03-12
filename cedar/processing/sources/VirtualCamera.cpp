@@ -47,6 +47,9 @@
 #include "cedar/processing/gui/Group.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "boost/shared_ptr.hpp"
+#include <QPoint>
+#include <QtGlobal>
+#include "boost/lexical_cast.hpp"
 
 #ifdef CEDAR_USE_QGLVIEWER
 
@@ -89,7 +92,10 @@ cedar::proc::sources::VirtualCamera::VirtualCamera()
                                                       (1.) * cedar::aux::math::pi, 0.01)),
         mVerticalOrientation(
                 new cedar::aux::DoubleVectorParameter(this, "camera vertical", 1, 0., -(1. / 2.) * cedar::aux::math::pi,
-                                                      (1. / 2.) * cedar::aux::math::pi, 0.01)) {
+                                                      (1. / 2.) * cedar::aux::math::pi, 0.01)),
+        mProvidePointToWorldTrafos(new cedar::aux::UIntParameter(this, "provide pixel to world transformation input/output pairs", 0, 0, 1000 )), 
+        timerID(0)
+{
   mCameraPosition->setValue(2, 1.0);  // set z axis to 1
 
   cedar::aux::gl::ScenePtr scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
@@ -123,7 +129,9 @@ cedar::proc::sources::VirtualCamera::VirtualCamera()
   this->cameraPositionChanged();
   this->cameraOrientationChanged();
 
-
+  // optional: quick n dirty: calculate world coordinates from pixel
+  mProvidePointToWorldTrafos->markAdvanced(true);
+  QObject::connect(mProvidePointToWorldTrafos.get(), SIGNAL(valueChanged()), this, SLOT(showPointToWorldChanged()));
 }
 
 cedar::proc::sources::VirtualCamera::~VirtualCamera() {
@@ -156,6 +164,7 @@ void cedar::proc::sources::VirtualCamera::compute(const cedar::proc::Arguments &
   }
   mLock->unlock();
 
+//  computePixelsToWorld();
 }
 
 //!@note: this enables the output plot to function even while the simulation is not running
@@ -223,5 +232,152 @@ void cedar::proc::sources::VirtualCamera::cameraOrientationChangedFromViewport()
 
 }
 
+void cedar::proc::sources::VirtualCamera::inputConnectionChanged(const std::string& inputName)
+{
+  if (mProvidePointToWorldTrafos->getValue() < 1)
+    return;
+
+  // Assign the input to the member. This saves us from casting in every computation step.
+  auto casted_input = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
+
+  auto inputIt = mInputTrafos.find( inputName );
+  if ( inputIt != mInputTrafos.end() )
+  {
+    inputIt->second= casted_input;
+  }
+
+  auto outputIt = mOutputTrafos.find( inputName );
+  if( outputIt != mOutputTrafos.end() )
+  {
+    auto outputPtr= outputIt->second;
+
+
+    if (!casted_input)
+    {
+      outputPtr->setData( cv::Mat() );
+    }
+    else if (outputPtr->isEmpty())
+    {
+      outputPtr->setData( cv::Mat::zeros(3, 1, CV_32F) );
+    }
+  }
+  else
+  {
+    // ignore
+//std::cout << "ouput name not found" << std::endl;
+  }
+}
+
+void cedar::proc::sources::VirtualCamera::computePixelsToWorld()
+{
+  if (mProvidePointToWorldTrafos->getValue() < 1)
+    return;
+
+  // this needs to be done from the GUI Thread, alone!
+  CEDAR_DEBUG_ASSERT(QApplication::instance()->thread() == QThread::currentThread());
+
+  //mpViewer.get()->camera()->computeModelViewMatrix();
+  //mpViewer.get()->camera()->computeProjectionMatrix();
+
+  for (const auto& [key, outputPtr] : mOutputTrafos )
+  {
+    std::string key_in= key + " in";
+
+    if(auto inputPtr = mInputTrafos.at( key_in ))
+    {
+      cv::Mat mat = inputPtr->getData();
+      if (!mat.empty())
+      {
+        const QPoint point = QPoint( mat.at<float>(0,0),
+                                     mat.at<float>(1,0) );
+//std::cout << "   in: " << mat.at<float>(0,0)
+//          << ", " << mat.at<float>(1,0) << std::endl;
+        bool found = false;
+        qglviewer::Vec pos = mpViewer.get()->camera()->pointUnderPixel( 
+                               point, found );
+
+        outputPtr->getData().at<float>(0,0) = pos.x;
+        outputPtr->getData().at<float>(1,0) = pos.y;
+//std::cout << "     found? " << found << std::endl;        
+//std::cout << "     out: " << pos.x << ", " << pos.y << std::endl;        
+
+#if 0
+        qreal near = mpViewer.get()->camera()->zNear();
+        qreal far= mpViewer.get()->camera()->zFar();
+        float myz=  far / ( far-near ) * ( 1.0 - near / 1.3 ); 
+        qglviewer::Vec pixelpoint= qglviewer::Vec( mat.at<float>(0,0),
+                                                   mat.at<float>(1,0),
+                                                   myz );
+
+        qglviewer::Vec campos = mpViewer.get()->camera()->unprojectedCoordinatesOf( pixelpoint );
+
+        qglviewer::Vec worldpos = mpViewer.get()->camera()->worldCoordinatesOf( 
+                                campos );
+std::cout << "      pixelpoint: " << pixelpoint.x << ", " << pixelpoint.y << ", " << pixelpoint.z << std::endl;
+std::cout << "      campos:     " << campos.x << ", " << campos.y << ", " << campos.z << std::endl;
+std::cout << "      worldpos:   " << worldpos.x << ", " << worldpos.y << ", " << worldpos.z << std::endl;
+#endif
+      }
+    }
+  }
+}
+
+void cedar::proc::sources::VirtualCamera::reset()
+{
+  computePixelsToWorld();
+}
+
+void cedar::proc::sources::VirtualCamera::timerEvent(QTimerEvent*)
+{
+  // to be able to call this from the GUI thread:
+  computePixelsToWorld();
+}
+
+void cedar::proc::sources::VirtualCamera::showPointToWorldChanged()
+{
+  if (timerID)
+    killTimer(timerID);
+
+  // clear all
+  for (const auto& [key, value] : mOutputTrafos )
+  {
+    this->removeOutputSlot( key );
+  }
+  for (const auto& [key, value] : mInputTrafos )
+  {
+    this->removeInputSlot( key );
+  }
+
+  mOutputTrafos.clear();
+  mInputTrafos.clear();
+  // end clear all:
+
+  unsigned int num_trafos= mProvidePointToWorldTrafos->getValue();
+  if (num_trafos > 0)
+  {
+    for (unsigned int i=0; i < num_trafos; i++)
+    {
+      std::string name= "trafo" + boost::lexical_cast<std::string>(i+1);
+      std::string name_in= name + " in";
+      std::string name_out= name; // see computePixelsToWorld()
+
+      cedar::aux::MatDataPtr dataOutPtr = cedar::aux::MatDataPtr(new cedar::aux::MatData( cv::Mat::zeros(3,1,CV_32F) ));
+      this->declareOutput(name_out, dataOutPtr);
+
+      mOutputTrafos.insert(std::pair<std::string,cedar::aux::MatDataPtr>(name_out,dataOutPtr)); 
+
+      cedar::aux::MatDataPtr dataInPtr = cedar::aux::MatDataPtr(new cedar::aux::MatData( cv::Mat::zeros(3,1,CV_32F) ));
+      this->declareInput( name_in, false ); // optional
+      mInputTrafos.insert(std::pair<std::string,cedar::aux::MatDataPtr>(name_in,dataInPtr)); 
+    }
+
+    this->startTimer(500); // this is good enough. dont want to bog down the
+                           // GUI thread
+  }
+  else
+  {
+    // do nothing
+  }
+}
 
 #endif  // CEDAR_USE_QGLVIEWER

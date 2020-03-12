@@ -48,9 +48,10 @@
 #include "cedar/processing/Step.h"
 #ifdef CEDAR_USE_QGLVIEWER
    #include "cedar/auxiliaries/gui/Viewer.h"
-#endif CEDAR_USE_QGlVIEWER
+#endif //CEDAR_USE_QGlVIEWER
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 
 #ifdef CEDAR_USE_QGLVIEWER
 
@@ -81,12 +82,14 @@ public slots:
   void cameraPositionChangedFromViewport();
   void cameraOrientationChangedFromViewport();
   void updatedView();
+  void showPointToWorldChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void reset();
+  void timerEvent(QTimerEvent* pEvent) override;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -96,6 +99,10 @@ protected:
    *       A temporary fix is in place which updates the output via a signal emmited from mpViewer
    */
   void compute(const cedar::proc::Arguments&);
+  void computePixelsToWorld();
+
+private:
+  void inputConnectionChanged(const std::string& inputName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -110,12 +117,14 @@ protected:
 protected:
   // output
   cedar::aux::MatDataPtr mpOutput;
+  std::map<std::string, cedar::aux::MatDataPtr>  mOutputTrafos;
+ 
 
 private:
   //cedar::aux::gui::ViewerWeakPtr mpViewer;
 #ifdef CEDAR_USE_QGLVIEWER
   boost::shared_ptr<cedar::aux::gui::Viewer> mpViewer;
-#endif CEDAR_USE_QGlVIEWER
+#endif //CEDAR_USE_QGlVIEWER
   //!@brief sizes of all dimensions of the output of the projection
   cedar::aux::UIntVectorParameterPtr mOutputSizes;
   //!@brief position of the virtual camera (x,y,z)
@@ -125,6 +134,10 @@ private:
   cedar::aux::DoubleVectorParameterPtr mVerticalOrientation;
 
   QReadWriteLock* mLock;
+
+  cedar::aux::UIntParameterPtr mProvidePointToWorldTrafos;
+  std::map<std::string, cedar::aux::ConstMatDataPtr>  mInputTrafos;
+  int timerID;
 
 }; // class cedar::proc::sources::VirtualCamera
 
