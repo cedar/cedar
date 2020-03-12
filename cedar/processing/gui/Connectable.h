@@ -144,10 +144,12 @@ protected:
         if (mpIcon != nullptr)
         {
           delete mpIcon;
+          mpIcon= nullptr;
         }
         if(mpRectangle != nullptr)
         {
           delete mpRectangle;
+          mpRectangle= nullptr;
         }
         isDestructed = true;
       }
