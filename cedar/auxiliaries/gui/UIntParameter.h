@@ -47,6 +47,7 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/UIntParameter.fwd.h"
+#include "boost/lexical_cast.hpp"
 
 // SYSTEM INCLUDES
 #include <QSpinBox>
@@ -107,7 +108,9 @@ namespace cedar
         {
           cedar::aux::LogSingleton::getInstance()->debugMessage
           (
-            "Maximum for unsigned int parameter exceed qt's capabilities -- limiting to max int.",
+            "Maximum for this 'unsigned int' parameter is "
+            + boost::lexical_cast< std::string >( new_limit )
+            + " and exceeds qt's capabilities -- limiting to max int.",
             "void cedar::aux::gui::NumericWidgetPolicy<unsigned int, QSpinBox>::setMinimum(WidgetT*, const ValueT&)"
           );
           new_limit = std::numeric_limits<int>::max();
