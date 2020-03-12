@@ -435,6 +435,11 @@ void cedar::proc::gui::StepItem::writeConfiguration(cedar::aux::ConfigurationNod
 //	}
 //}
 
+bool cedar::proc::gui::StepItem::manualDeletionRequiresConfirmation() const
+{
+  return true;
+}
+
 void cedar::proc::gui::StepItem::openActionsDock()
 {
   QWidget* p_actions = new QWidget();
@@ -577,7 +582,9 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
     if(p_scene)
     {
-      p_scene->deleteElement(this);
+      QList<QGraphicsItem*> items;
+      items.append(this);
+      p_scene->deleteElements(items, event->modifiers() & Qt::ControlModifier);
     }
   }
   else
