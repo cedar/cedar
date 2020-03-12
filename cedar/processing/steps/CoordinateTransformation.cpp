@@ -510,8 +510,8 @@ void cedar::proc::steps::CoordinateTransformation::createCartPolarMapForward()
   {
     for (unsigned int rho = 0; rho < distance_size; ++rho)
     {
-      float x = input_center_cols + rho * distance_step * sin(angle * angular_step * cedar::aux::math::pi / 180.0);
-      float y = input_center_rows + rho * distance_step * cos(angle * angular_step * cedar::aux::math::pi / 180.0);
+      float x = input_center_cols + rho * distance_step * cos(angle * angular_step * cedar::aux::math::pi / 180.0);
+      float y = input_center_rows - rho * distance_step * sin(angle * angular_step * cedar::aux::math::pi / 180.0);
       forward_map_x.at<float>(angle, rho) = x;
       forward_map_y.at<float>(angle, rho) = y;
     }
