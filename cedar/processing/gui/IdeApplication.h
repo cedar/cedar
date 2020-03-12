@@ -156,10 +156,6 @@ private:
 
   //! Lock for the last exception information.
   QReadWriteLock mLastExceptionInfoLock;
-
-  //! Whether the ide catches exceptions.
-  bool mCatchExceptions;
-
 }; // class cedar::proc::gui::IdeApplication
 
 #endif // CEDAR_PROC_GUI_IDE_APPLICATION_H
