@@ -536,6 +536,10 @@ void cedar::aux::math::findPeaks(const cv::Mat& activation, std::vector<cv::Poin
 
 double cedar::aux::math::cyclicMean(const cv::Mat& angles, const cv::Mat &lengths, const double allZeroSolution)
 {
+  CEDAR_ASSERT(angles.rows == lengths.rows);
+  CEDAR_ASSERT(angles.cols == 1);
+  CEDAR_ASSERT(lengths.cols == 1);
+
   // atan2 is not defined at 0,0 but the user can provide the result he
   // expects
   double sumLengths = cv::sum( lengths ).val[0];
