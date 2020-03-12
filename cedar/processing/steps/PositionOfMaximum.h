@@ -112,7 +112,11 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  cedar::proc::DataSlot::VALIDITY determineInputValidity
+  (
+    cedar::proc::ConstDataSlotPtr slot,
+    cedar::aux::ConstDataPtr data
+  ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

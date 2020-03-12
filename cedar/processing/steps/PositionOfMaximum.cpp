@@ -250,6 +250,13 @@ void cedar::proc::steps::PositionOfMaximum::recompute(bool reinit)
       double target;
       double rangeMax= mInput->getData().rows;
       auto   rows= this->mInput->getData().rows;
+
+      if (this->mInput->getData().cols != 1)
+      {
+        CEDAR_ASSERT( this->mInput->getData().cols == 1);
+        break;
+      }
+
       cv::Mat ramp = cedar::aux::math::ramp(CV_32F, rows, 1, rows);
 
       cv::Mat vecAngles;
@@ -265,9 +272,8 @@ void cedar::proc::steps::PositionOfMaximum::recompute(bool reinit)
       {
         noPeakResult= 0.0;
       }
-
       target= cedar::aux::math::cyclicMean( vecAngles,
-                                            this->mInput->getData(),
+                                            this->mInput->getData(), 
                                             noPeakResult );
       target*= rangeMax / ( 2 * cedar::aux::math::pi );
       mOutput->getData().at<float>(0,0) = static_cast<float>(target);
@@ -356,3 +362,32 @@ void cedar::proc::steps::PositionOfMaximum::recompute(bool reinit)
       mOutput->getData().at<float>(1,0) = std::numeric_limits<float>::quiet_NaN();
   }
 }
+
+
+cedar::proc::DataSlot::VALIDITY cedar::proc::steps::PositionOfMaximum::determineInputValidity
+(
+  cedar::proc::ConstDataSlotPtr,
+  cedar::aux::ConstDataPtr data
+)
+const
+{
+  cedar::aux::ConstMatDataPtr input = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data);
+  if (input)
+  {
+    switch (this->mPositionType->getValue())
+    {
+      case cedar::proc::steps::PositionOfMaximum::UnitType::Cyclic:
+        //input must be zero-dimensional
+        if (input->getData().cols != 1)
+        {
+           return cedar::proc::DataSlot::VALIDITY_ERROR;
+        }
+        break;
+      default:
+        // do nothing
+        break;
+    }
+  }
+  return cedar::proc::DataSlot::VALIDITY_VALID;
+}
+
