@@ -330,7 +330,7 @@ if(NOT CEDAR_PORTABLE_MINIMAL_VERSION)
 
     endif(CEDAR_USE_PCL)
 
-    option(CEDAR_USE_EIGEN3 "Include Eigen3 (for Kinect) if possible." OFF)
+    option(CEDAR_USE_EIGEN3 "Include Eigen3 if possible." ON)
     if (CEDAR_USE_EIGEN3)
 
       if (PCL_FOUND)
@@ -341,8 +341,11 @@ if(NOT CEDAR_PORTABLE_MINIMAL_VERSION)
 
       if(EIGEN3_FOUND)
         message("-- Eigen3 library found")
-        set(CEDAR_USE_EIGEN3)
+        set(CEDAR_USE_EIGEN3 ON)
         include_directories(${EIGEN3_INCLUDE_DIR})
+      else(EIGEN3_FOUND)
+        message("-- Eigen3 library not found")
+        set(CEDAR_USE_EIGEN3 OFF)
 
       endif(EIGEN3_FOUND)
 
