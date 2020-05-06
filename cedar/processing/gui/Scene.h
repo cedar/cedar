@@ -53,6 +53,7 @@
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/Step.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/gui/Connection.fwd.h"
 #include "cedar/processing/gui/GraphicsBase.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"
 #include "cedar/processing/gui/RecorderWidget.fwd.h"
@@ -420,6 +421,8 @@ private:
 
   void resetBackgroundColor();
 
+  cedar::proc::gui::GraphicsBase* findInputSlotItem(const QList<QGraphicsItem*>& items);
+
   cedar::proc::gui::GraphicsBase* findConnectableItem(const QList<QGraphicsItem*>& items);
 
   cedar::proc::gui::Group* findFirstGroupItem(const QList<QGraphicsItem*>& items);
@@ -493,6 +496,9 @@ private:
 
   //! The item from which a new connection is started.
   cedar::proc::gui::GraphicsBase* mpConnectionStart;
+
+  //! When reconnecting already connected input slots: The connection that should be disconnected, when the mouse is dragged.
+  cedar::proc::gui::Connection* mpConnectionToBeReconnected;
 
   //! The step map.
   StepMap mStepMap;
