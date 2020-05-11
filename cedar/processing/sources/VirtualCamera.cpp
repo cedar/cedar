@@ -279,8 +279,11 @@ void cedar::proc::sources::VirtualCamera::computePixelsToWorld()
   //mpViewer.get()->camera()->computeModelViewMatrix();
   //mpViewer.get()->camera()->computeProjectionMatrix();
 
-  for (const auto& [key, outputPtr] : mOutputTrafos )
+  for (const auto &iter : mOutputTrafos )
   {
+    auto key = iter.first;
+    auto outputPtr = iter.second;
+
     std::string key_in= key + " in";
 
     if(auto inputPtr = mInputTrafos.at( key_in ))
@@ -339,12 +342,15 @@ void cedar::proc::sources::VirtualCamera::showPointToWorldChanged()
     killTimer(timerID);
 
   // clear all
-  for (const auto& [key, value] : mOutputTrafos )
+  for (const auto &iter: mOutputTrafos )
   {
+    auto key= iter.first;
+
     this->removeOutputSlot( key );
   }
-  for (const auto& [key, value] : mInputTrafos )
+  for (const auto &iter: mInputTrafos )
   {
+    auto key= iter.first;
     this->removeInputSlot( key );
   }
 
