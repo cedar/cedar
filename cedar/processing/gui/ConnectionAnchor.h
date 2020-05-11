@@ -42,14 +42,11 @@
 #define CEDAR_PROC_GUI_CONNECTION_ANCHOR_H
 
 // CEDAR INCLUDES
-//#include "cedar/processing/gui/ConnectValidity.h"
-//#include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/processing/gui/Connection.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/ConnectionAnchor.fwd.h"
 #include "cedar/processing/gui/Connection.fwd.h"
-//#include "cedar/processing/gui/GraphicsBase.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsEllipseItem>

@@ -41,12 +41,14 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/casts.h"
+#include "cedar/auxiliaries/math/constants.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/devices/kteam/epuck/YarpDrive.h"
 #include "cedar/devices/YarpChannel.h"
 #include "cedar/devices/kteam/serialChannelHelperFunctions.h"
 #include "cedar/devices/ComponentSlot.h"
 #include "cedar/devices/Robot.h"
+#include "cedar/devices/RobotManager.h"
 
 // SYSTEM INCLUDES
 
@@ -103,7 +105,8 @@ void cedar::dev::kteam::epuck::YarpDrive::registerChannels()
 {
   CEDAR_ASSERT(this->getChannel());
   mYarpChannel = boost::dynamic_pointer_cast<YarpMatChannel>(this->getChannel());
-  std::string robot_name = this->getSlot().lock()->getRobot()->getName() + "/";
+  std::string robot_name = cedar::dev::RobotManagerSingleton::getInstance()->getRobotName(this->getSlot().lock()->getRobot()) + "/";
+  boost::replace_all(robot_name, " ", "_");
   mMotorCommandPortWithPrefix = robot_name + _mMotorCommandsPort->getValue();
   mEncoderValuesPortWithPrefix = robot_name + _mEncoderValuesPort->getValue();
   mYarpChannel->addWriterPort(mMotorCommandPortWithPrefix);
@@ -137,13 +140,20 @@ void cedar::dev::kteam::epuck::YarpDrive::setEncoders(const std::vector<int>& /*
 
 void cedar::dev::kteam::epuck::YarpDrive::sendMovementCommand()
 {
-  // the speed has be thresholded based on the maximum possible number
-  // of pulses per second (this is hardware-specific).
-  // first: convert speed from m/s into Pulses/s ...
-  std::vector<cedar::unit::Frequency> wheel_speed_pulses = convertWheelSpeedToPulses(getWheelSpeed());
+  //retrieve matrix
+  auto mat_data = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(getUserSideCommandData(cedar::dev::DifferentialDrive::WHEEL_SPEED));
+  QReadLocker data_locker(&(mat_data->getLock()));
+  cv::Mat mat = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(getUserSideCommandData(cedar::dev::DifferentialDrive::WHEEL_SPEED))->getData();
+
+  CEDAR_DEBUG_ASSERT(mat.type() == CV_32F);
+  CEDAR_DEBUG_ASSERT(mat.rows == 2);
+  CEDAR_DEBUG_ASSERT(mat.cols == 1);
+
   cv::Mat velocities(2, 1, CV_32F);
-  velocities.at<float>(0,0) = static_cast<int>(wheel_speed_pulses[0] / cedar::unit::DEFAULT_FREQUENCY_UNIT);
-  velocities.at<float>(1,0) = static_cast<int>(wheel_speed_pulses[1] / cedar::unit::DEFAULT_FREQUENCY_UNIT);
+
+  velocities.at<float>(0, 0) = (mat.at<float>(0, 0) / getNumberOfPulsesPerRevolution()) * 2.0f * cedar::aux::math::pi;
+  velocities.at<float>(1, 0) = (mat.at<float>(1, 0) / getNumberOfPulsesPerRevolution()) * 2.0f * cedar::aux::math::pi;
+
   mYarpChannel->write(velocities, mMotorCommandPortWithPrefix);
 }
 

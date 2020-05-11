@@ -104,6 +104,7 @@ mpDropTarget(nullptr),
 mpeParentView(peParentView),
 mpNewConnectionIndicator(nullptr),
 mpConnectionStart(nullptr),
+mpConnectionToBeReconnected(nullptr),
 mpMainWindow(pMainWindow),
 mSnapToGrid(false),
 mpConfigurableWidget(nullptr),
@@ -607,6 +608,28 @@ void cedar::proc::gui::Scene::setMode(MODE mode, const QString& param)
   this->mModeParam = param;
 }
 
+cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::findInputSlotItem(const QList<QGraphicsItem*>& items)
+{
+  for (int i = 0; i < items.size(); ++i)
+  {
+    if (auto graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
+    {
+      if (!graphics_item->isReadOnly())
+      {
+        if (auto data_slot_item = dynamic_cast<cedar::proc::gui::DataSlotItem*>(items[i]))
+        {
+          if(data_slot_item->getSlot()->getRole() == cedar::proc::DataRole::INPUT)
+          {
+            return graphics_item;
+          }
+        }
+      }
+    }
+  }
+
+  return nullptr;
+}
+
 cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::findConnectableItem(const QList<QGraphicsItem*>& items)
 {
   for (int i = 0; i < items.size(); ++i)
@@ -689,7 +712,32 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
           }
           else
           {
-            QGraphicsScene::mousePressEvent(pMouseEvent);
+            //When the user clicks on an input slot that has one ingoing connecion, the connection can be reconnected by dragging
+
+            cedar::proc::gui::GraphicsBase* mpConnectionEnd = findInputSlotItem(items);
+            if(mpConnectionEnd != nullptr)
+            {
+              std::vector<cedar::proc::gui::Connection*> connections = mpConnectionEnd->getConnections();
+              if(connections.size() == 1)
+              {
+                cedar::proc::gui::Connection* connection = connections.at(0);
+                if(connection != nullptr)
+                {
+                  mpConnectionStart = connection->getSource();
+                  if(mpConnectionStart != nullptr) {
+                    mpConnectionToBeReconnected = connection;
+                    CEDAR_DEBUG_ASSERT(mpConnectionStart->canConnect());
+                    this->mMode = MODE_CONNECT;
+                    mpeParentView->setMode(cedar::proc::gui::Scene::MODE_CONNECT);
+                    this->connectModeProcessMousePress(pMouseEvent);
+                  }
+                }
+              }
+            }
+            else
+            {
+              QGraphicsScene::mousePressEvent(pMouseEvent);
+            }
           }
         }
         break;
@@ -894,6 +942,7 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
       break;
   }
 
+  mpConnectionToBeReconnected = nullptr;
   this->mDraggingItems = false;
 
 
@@ -1168,7 +1217,11 @@ void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEv
 
   if (items.size() > 0)
   {
-    mpConnectionStart = this->findConnectableItem(items);
+    if(mpConnectionToBeReconnected == nullptr)
+    {
+      //This is not a reconnect
+      mpConnectionStart = this->findConnectableItem(items);
+    }
 
     if (this->mpConnectionStart != nullptr)
     {
@@ -1196,6 +1249,11 @@ void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEv
 
 void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEvent* pMouseEvent)
 {
+  if(mpConnectionToBeReconnected != nullptr)
+  {
+    mpConnectionToBeReconnected->disconnectUnderlying();
+    mpConnectionToBeReconnected = nullptr;
+  }
   if (mpNewConnectionIndicator != NULL)
   {
     QPointF p2 = pMouseEvent->scenePos() - mpConnectionStart->scenePos();

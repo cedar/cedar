@@ -77,6 +77,7 @@ mSmartMode(false),
 mHighlight(false),
 mHighlightHover(false),
 mBaseLineWidth(2.5),
+mIsActivated(true),
 mSourceSlotName(sourceSlotName),
 mTargetSlotName(targetSlotName),
 mAnchorPointRadius(4)
@@ -182,6 +183,11 @@ QGraphicsPolygonItem* cedar::proc::gui::Connection::createArrow()
   return arrowPolygon;
 }
 
+bool cedar::proc::gui::Connection::isActivated()
+{
+  return this->mIsActivated;
+}
+
 cedar::proc::gui::ConnectValidity cedar::proc::gui::Connection::getValidity()
 {
   return mValidity;
@@ -252,7 +258,14 @@ void cedar::proc::gui::Connection::updateGraphics()
   }
   else
   {
-    color = cedar::proc::gui::GraphicsBase::getValidityColor(mValidity);
+    if(this->mIsActivated)
+    {
+      color = cedar::proc::gui::GraphicsBase::getValidityColor(mValidity);
+    }
+    else
+    {
+      color = QColor(200, 200, 200);
+    }
     pen.setWidthF(static_cast<qreal>(this->mBaseLineWidth));
   }
   QBrush brush = this->brush();
@@ -612,12 +625,24 @@ QColor cedar::proc::gui::Connection::highlightColor(const QColor& source, bool i
   {
     return source.darker(150);
   }
-  return QColor::fromHsvF
-      (
-          std::fmod(source.hsvHueF() + 1.01, 1.0),
-          std::max(0.0, source.hsvSaturationF()),
-          std::max(0.0, source.valueF() - 0.2)
-      );
+  if(this->mIsActivated)
+  {
+    return QColor::fromHsvF
+            (
+                    std::fmod(source.hsvHueF() + 1.01, 1.0),
+                    std::max(0.0, source.hsvSaturationF()),
+                    std::max(0.0, source.valueF() - 0.2)
+            );
+  }
+  else
+  {
+    return QColor::fromHsvF
+            (
+                    std::fmod(source.hsvHueF() + 1.01, 1.0),
+                    0.0,
+                    std::max(0.0, source.valueF() - 0.2)
+            );
+  }
 }
 
 QPainterPath cedar::proc::gui::Connection::shape() const
@@ -875,6 +900,16 @@ void cedar::proc::gui::Connection::contextMenuEvent(QGraphicsSceneContextMenuEve
 
     QAction *sourceAction = menu.addAction("jump to source");
     QAction *targetAction = menu.addAction("jump to target");
+    QAction *de_activateAction;
+    menu.addSeparator();
+    if(this->mIsActivated)
+    {
+      de_activateAction = menu.addAction("deactivate");
+    }
+    else
+    {
+      de_activateAction = menu.addAction("activate");
+    }
     menu.addSeparator();
     QAction *addDragNodeAction = menu.addAction("add drag node"); // adds a ConnectionAnchor
     QAction *deleteAction = menu.addAction("delete");
@@ -893,6 +928,29 @@ void cedar::proc::gui::Connection::contextMenuEvent(QGraphicsSceneContextMenuEve
       scene->selectNone();
       this->mpSource->parentItem()->setSelected(true);
       scene->getParentView()->centerOn(this->mpSource);
+    }
+    else if (selectedAction == de_activateAction)
+    {
+      auto target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(this->getTarget());
+      if (target)
+      {
+        auto target_slot = boost::dynamic_pointer_cast<cedar::proc::ExternalData>(target->getSlot());
+        if(target_slot)
+        {
+          if(this->mIsActivated)
+          {
+            this->mpTargetExternalData = target_slot->getData();
+            target_slot->clearInternal();
+          }
+          else if(this->mpTargetExternalData != nullptr)
+          {
+            auto target_slot = boost::dynamic_pointer_cast<cedar::proc::ExternalData>(target->getSlot());
+            target_slot->setData(this->mpTargetExternalData);
+          }
+        }
+      }
+      this->mIsActivated = !this->mIsActivated;
+      this->updateGraphics();
     }
     else if (selectedAction == addDragNodeAction)
     {

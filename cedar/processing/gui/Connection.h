@@ -50,6 +50,7 @@
 #include "cedar/processing/gui/Connection.fwd.h"
 #include "cedar/processing/gui/GraphicsBase.fwd.h"
 #include "cedar/processing/gui/ConnectionAnchor.fwd.h"
+#include "cedar/auxiliaries/Data.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsPathItem>
@@ -154,6 +155,9 @@ public:
   //!deletes specific anchor
   void deleteAnchor(cedar::proc::gui::ConnectionAnchor*);
 
+  //! wheter the connection is activated
+  bool isActivated();
+
   QPointF gridOffset();
 
   //! returns validity
@@ -215,6 +219,11 @@ private:
   //! Wether the given name (from the constructor) of source and target slot is valid
   bool mValidSourceTargetSlotName;
 
+  //! whether this Connection is activated (can be deactivated in the right-click menu)
+  bool mIsActivated;
+
+  cedar::aux::DataPtr mpTargetExternalData;
+
   //! name of source slot in the format sourceStepName.sourceSlotName
   QString mSourceSlotName;
 
@@ -226,6 +235,7 @@ private:
 
   //! Default radius for connection anchors
   int mAnchorPointRadius;
+
 }; // class cedar::proc::gui::TriggerConnection
 
 #endif // CEDAR_PROC_GUI_CONNECTION_H

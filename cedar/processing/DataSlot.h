@@ -61,6 +61,7 @@
 #endif
 #include <string>
 #include <vector>
+#include <cedar/processing/gui/Connection.h>
 
 
 /*!@brief This class represents data slots in connectable objects.
@@ -75,6 +76,7 @@ public boost::enable_shared_from_this<cedar::proc::DataSlot>
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::gui::Connection;
   friend class cedar::proc::Connectable;
   friend class cedar::proc::DataConnection;
   friend class cedar::proc::Group;

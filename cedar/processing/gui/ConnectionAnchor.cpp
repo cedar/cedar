@@ -78,8 +78,9 @@ void cedar::proc::gui::ConnectionAnchor::paint(QPainter *painter, const QStyleOp
   QPen pen = this->pen();
   pen.setCapStyle(Qt::RoundCap);
   pen.setJoinStyle(Qt::RoundJoin);
-
-  QColor color = cedar::proc::gui::GraphicsBase::getValidityColor(mpParent->getValidity());//.darker(110);
+  QColor color;
+  if(mpParent->isActivated()) color = cedar::proc::gui::GraphicsBase::getValidityColor(mpParent->getValidity());//.darker(110);
+  else color = QColor(180, 180, 180);
 
 
   pen.setColor(color);
