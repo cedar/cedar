@@ -51,6 +51,7 @@
 #include "cedar/auxiliaries/math/Sigmoid.h"
 #include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
 #include "cedar/auxiliaries/math/transferFunctions/HeavisideSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/LinearTransferFunction.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -79,7 +80,7 @@ namespace
     declaration->setIconPath(":/steps/hebbian_connection.svg");
     declaration->setDescription
             (
-                    "A looped step that learns a projection between a node and a field according to a Hebbian rule.\nweightchange = learnrate * sigmoid(node)*sigmoid(reward)*(weights-field)"
+                    "A looped step that learns a projection between a node and a field according to a Hebbian rule.\nweightchange = learnrate * f(source)*g(reward)*(h(target)-weights)"
             );
 
     declaration->declare();
@@ -97,18 +98,36 @@ namespace
 cedar::dyn::steps::HebbianConnection::HebbianConnection()
     :
       // parameters
-      mInputDimension(new cedar::aux::UIntParameter(this, "input dimension", 0, 0, 2)),
-      mInputSizes(new cedar::aux::UIntVectorParameter(this, "input sizes", 0, 50,cedar::aux::UIntParameter::LimitType::positive(5000))),
-      mAssociationDimension(new cedar::aux::UIntParameter(this, "association dimension", 2, 0, 2)),
-      mAssociationSizes(new cedar::aux::UIntVectorParameter(this, "association sizes", 2, 50,cedar::aux::UIntParameter::LimitType::positive(5000))),
+      mInputDimension(new cedar::aux::UIntParameter(this, "source dimension", 0, 0, 2)),
+      mInputSizes(new cedar::aux::UIntVectorParameter(this, "source sizes", 0, 50,cedar::aux::UIntParameter::LimitType::positive(5000))),
+      mAssociationDimension(new cedar::aux::UIntParameter(this, "target dimension", 2, 0, 2)),
+      mAssociationSizes(new cedar::aux::UIntVectorParameter(this, "target sizes", 2, 50,cedar::aux::UIntParameter::LimitType::positive(5000))),
       mLearnRatePositive(new cedar::aux::DoubleParameter(this, "learning rate", 0.01)),
-      mSigmoid
+      mSigmoidF
               (
                       new cedar::dyn::steps::HebbianConnection::SigmoidParameter
                               (
                                       this,
-                                      "sigmoid",
+                                      "f",
                                       cedar::aux::math::SigmoidPtr(new cedar::aux::math::HeavisideSigmoid(0.5))
+                              )
+              ),
+      mSigmoidG
+              (
+                      new cedar::dyn::steps::HebbianConnection::SigmoidParameter
+                              (
+                                      this,
+                                      "g",
+                                      cedar::aux::math::SigmoidPtr(new cedar::aux::math::HeavisideSigmoid(0.5))
+                              )
+              ),
+      mSigmoidH
+              (
+                      new cedar::dyn::steps::HebbianConnection::SigmoidParameter
+                              (
+                                      this,
+                                      "h",
+                                      cedar::aux::math::LinearTransferFunctionPtr(new cedar::aux::math::LinearTransferFunction())
                               )
               ),
       mUseRewardDuration(new cedar::aux::BoolParameter(this, "fixed reward duration", false)),
@@ -129,6 +148,11 @@ cedar::dyn::steps::HebbianConnection::HebbianConnection()
       mWeightSizeY(mAssociationDimension->getValue() > 1 ? mAssociationSizes->getValue().at(1) : 1)
 
 {
+  //deal with deprecated Names
+  this->mInputDimension->addDeprecatedName("input dimension");
+  this->mInputSizes->addDeprecatedName("input sizes");
+  this->mAssociationDimension->addDeprecatedName("association dimension");
+  this->mAssociationSizes->addDeprecatedName("association sizes");
 
   // declare all data
   cedar::proc::DataSlotPtr assoInput = this->declareInput(mAssoInputName, false);
@@ -245,7 +269,7 @@ void cedar::dyn::steps::HebbianConnection::eulerStep(const cedar::unit::Time& ti
   if (mAssoInput && mRewardTrigger && mReadOutTrigger )
   {
     const cv::Mat& rewardTrigger = mRewardTrigger->getData();
-    if (rewardTrigger.at<float>(0, 0) > 0.5) // It is assumed that a change greater than 0.5 is not noise! This is for the RewardDuration Trick. Should be removed in later versions!
+    if (mSigmoidG->getValue()->compute(rewardTrigger.at<float>(0, 0)) > 0) // This is for the RewardDuration Trick. Should be removed in later versions!
     {
       if (!mIsRewarded && mUseRewardDuration->getValue())
       {
@@ -259,7 +283,7 @@ void cedar::dyn::steps::HebbianConnection::eulerStep(const cedar::unit::Time& ti
       {
 
         cv::Mat currentWeights = mConnectionWeights->getData();
-        auto weightChange = calculateWeightChange(mReadOutTrigger->getData(),mAssoInput->getData());
+        auto weightChange = calculateWeightChange(mReadOutTrigger->getData(),mAssoInput->getData(),mRewardTrigger->getData());
         currentWeights = currentWeights + weightChange;
         mConnectionWeights->setData(currentWeights);
 
@@ -522,21 +546,24 @@ unsigned int cedar::dyn::steps::HebbianConnection::determineWeightDimension()
 
 }
 
-cv::Mat cedar::dyn::steps::HebbianConnection::calculateWeightChange(cv::Mat inputActivation,cv::Mat associationActivation)
+cv::Mat cedar::dyn::steps::HebbianConnection::calculateWeightChange(cv::Mat inputActivation,cv::Mat associationActivation,cv::Mat rewardValue)
 {
   double learnRate = mLearnRatePositive->getValue();
   cv::Mat currentWeights = mConnectionWeights->getData();
 
+  auto inputSigmoid = this->mSigmoidF->getValue()->compute(inputActivation);
+  auto targetSigmoid = this->mSigmoidH->getValue()->compute(associationActivation);
+  auto rewardSigValue = this->mSigmoidG->getValue()->compute(rewardValue);
+
+  //One case is outstar the other instar
   if(mInputDimension->getValue() == 0) // The old case! && And the 0 to 0 case! Be careful!
   {
-    auto sigmoidedNodeInput =  mSigmoid->getValue()->compute(inputActivation.at<float>(0,0));
-    return learnRate * sigmoidedNodeInput   * (associationActivation- currentWeights);
+    return learnRate * inputSigmoid.at<float>(0,0) * rewardSigValue.at<float>(0,0)  * (targetSigmoid- currentWeights);
   }
 
   if(mAssociationDimension->getValue() == 0) // The reverse case
   {
-    auto sigmoidedOutput =  mSigmoid->getValue()->compute(associationActivation.at<float>(0,0));
-    return learnRate * sigmoidedOutput   * (inputActivation- currentWeights);
+    return learnRate * rewardSigValue.at<float>(0,0) * targetSigmoid.at<float>(0,0)   * (inputSigmoid- currentWeights);
   }
 
   if(mAssociationDimension->getValue() == 1 && mInputDimension->getValue() == 1)
@@ -547,7 +574,7 @@ cv::Mat cedar::dyn::steps::HebbianConnection::calculateWeightChange(cv::Mat inpu
         {
           for (unsigned int y = 0; y < mWeightSizeY; y++)
           {
-            float combinedValue = inputActivation.at<float>(x,0) * associationActivation.at<float>(y,0);
+            float combinedValue = inputSigmoid.at<float>(x,0) * targetSigmoid.at<float>(y,0);
             float weightChange = learnRate * ( combinedValue    - currentWeights.at<float>(x, y));
             weightChangeMat.at<float>(x, y) = weightChange;
           }
@@ -566,12 +593,12 @@ cv::Mat cedar::dyn::steps::HebbianConnection::calculateWeightChange(cv::Mat inpu
 {
   if(mInputDimension->getValue() == 0) // The old case! && And the 0 to 0 case! Be careful!
   {
-   return mConnectionWeights->getData() * mSigmoid->getValue()->compute(inputMatrix.at<float>(0, 0));
+   return mConnectionWeights->getData() * mSigmoidF->getValue()->compute(inputMatrix.at<float>(0, 0));
   }
 
   if(mAssociationDimension->getValue() == 0) // The reverse case
   {
-    cv::Mat overlap =  mConnectionWeights->getData().mul( mSigmoid->getValue()->compute(inputMatrix));
+    cv::Mat overlap =  mConnectionWeights->getData().mul( mSigmoidF->getValue()->compute(inputMatrix));
     cv::Mat outputMat = cv::Mat::zeros(1,1,CV_32F);
     double overlapDouble = cv::sum(overlap) [0];
     outputMat.at<float>(0,0) = (float) overlapDouble; //TODO: The output might get very large
