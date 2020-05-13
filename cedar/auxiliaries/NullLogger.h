@@ -45,7 +45,7 @@
 
 
 // SYSTEM INCLUDES
-
+#include <string>
 
 /*!@brief  Doesn't log messages.
  *
