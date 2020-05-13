@@ -50,6 +50,13 @@ endif()
 
 if(WIN32)
   add_definitions(/MP)
+  
+cmake_minimum_required(VERSION 3.3)
+include(CheckSymbolExists)
+check_symbol_exists(snprintf stdio.h HAVE_SNPRINTF)
+message("[${HAVE_SNPRINTF}]")
+message("[${CMAKE_CXX_COMPILER_VERSION}]")
+  
 endif()
 
 # Qt
