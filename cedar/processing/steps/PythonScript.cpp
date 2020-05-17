@@ -69,6 +69,7 @@ SOFTWARE.
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/auxiliaries//annotation/ColorSpace.h"
 
 #include "cedar/processing/GroupDeclarationManager.h"
 
@@ -388,7 +389,7 @@ const char * cedar::proc::steps::PythonScriptScope::NDArrayConverter::typenumToS
 cv::Mat cedar::proc::steps::PythonScriptScope::NDArrayConverter::toMat(PyObject* o, int index)
 {
   cv::Mat m;
-  bool allowND = true, doMultiChannelTypeConversion = false;
+  bool allowND = true;
   if(!o || o == Py_None)
   {
     return cv::Mat::zeros(1,1,CV_32F);
@@ -560,14 +561,19 @@ cv::Mat cedar::proc::steps::PythonScriptScope::NDArrayConverter::toMat(PyObject*
     //step[ndims] = elemsize;
     //ndims++;
   }
-
-  if( doMultiChannelTypeConversion && ismultichannel )
+  //if output is an rgb image, do multichannel conversion
+  if(ismultichannel && (type == CV_8U || type == CV_8UC3))
   {
-    ndims--;
-    type |= CV_MAKETYPE(0, size[2]);
-    std::cout << "Matrix has multiple channels... Do conversion... type |=" <<
-                 " CV_MAKETYPE(0, size[2]) has computed " << type << std::endl;
-    //TODO implement a type check after oring (currently this statement is never true)
+    int newType = type | CV_MAKETYPE(0, size[2]);
+    if(newType == CV_8UC3)
+    {
+      ndims--;
+      type = newType;
+    }
+    else
+    {
+      std::cout << "PythonScript: Multichannel conversion failed. Trying to convert from type " << type << " to " << newType << ". Add support for this type if multichannel conversion is intended." << std::endl;
+    }
   }
 
   if( ndims > 2 && !allowND )
@@ -624,7 +630,6 @@ PyObject* cedar::proc::steps::PythonScriptScope::NDArrayConverter::toNDArray(con
       return 0;
     }
     //m.copyTo(temp);
-
     p = &temp;
   }
 #if CV_MAJOR_VERSION < 3
@@ -1153,6 +1158,7 @@ void cedar::proc::steps::PythonScript::executePythonScript()
 
     std::list<boost::python::handle<>> inputsList;
     cedar::proc::steps::PythonScriptScope::NDArrayConverter cvt(this);
+    cedar::aux::annotation::ConstColorSpacePtr pColorSpaceAnnotation = nullptr;
     for(unsigned int i = 0; i < mInputs.size(); i++)
     {
       cedar::aux::ConstDataPtr inputMatrixPointer = this->getInputSlot(makeInputSlotName(i))->getData();
@@ -1161,6 +1167,17 @@ void cedar::proc::steps::PythonScript::executePythonScript()
         // Lock input matrix
         auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(inputMatrixPointer);
         QReadLocker input_l(&mat_data->getLock());
+        try
+        {
+          if(pColorSpaceAnnotation == nullptr)
+          {
+            pColorSpaceAnnotation = inputMatrixPointer->getAnnotation<cedar::aux::annotation::ColorSpace>();
+          }
+        }
+        catch(std::exception)
+        {
+          pColorSpaceAnnotation = nullptr;
+        }
         cv::Mat inputMatrix = mat_data->getData().clone();
 
         // Unlock input matrix
@@ -1315,7 +1332,14 @@ void cedar::proc::steps::PythonScript::executePythonScript()
           outputNodeMatrix = convert3DMatToFloat<double>(outputNodeMatrix);
         }
       }
-
+      if(outputNodeMatrix.type() == CV_8UC3 && pColorSpaceAnnotation != nullptr)
+      {
+        mOutputs[i]->setAnnotation(cedar::aux::annotation::ColorSpacePtr(new cedar::aux::annotation::ColorSpace(*pColorSpaceAnnotation)));
+      }
+      else
+      {
+        mOutputs[i]->removeAnnotations<cedar::aux::annotation::ColorSpace>();
+      }
       i++;
     }
     
