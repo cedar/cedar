@@ -135,7 +135,7 @@ private:
 
   unsigned int determineWeightSizes(unsigned int dimension);
 
-  cv::Mat calculateWeightChange(cv::Mat inputActivation,cv::Mat associationActivation);
+  cv::Mat calculateWeightChange(cv::Mat inputActivation,cv::Mat associationActivation, cv::Mat rewardValue);
 
   cv::Mat calculateOutputMatrix( cv::Mat mat);
 
@@ -150,7 +150,9 @@ protected:
   cedar::aux::UIntParameterPtr mAssociationDimension;
   cedar::aux::UIntVectorParameterPtr mAssociationSizes;
   cedar::aux::DoubleParameterPtr mLearnRatePositive;
-  SigmoidParameterPtr mSigmoid;
+  SigmoidParameterPtr mSigmoidF;
+  SigmoidParameterPtr mSigmoidG;
+  SigmoidParameterPtr mSigmoidH;
   cedar::aux::BoolParameterPtr mUseRewardDuration;
   cedar::aux::DoubleParameterPtr mRewardDuration;
   cedar::aux::BoolParameterPtr mSetWeights;
