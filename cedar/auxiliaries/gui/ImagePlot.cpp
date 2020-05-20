@@ -384,8 +384,7 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in)
         else
         {
           std::vector<cv::Mat> merge_vec;
-          cv::Mat zeros = 0.0 * in;
-
+          
           cv::Mat in_scaled, in_temp;
           if(in.type() != CV_8U) in.copyTo(in_temp);
           switch (in.type())
@@ -416,6 +415,8 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in)
               in_scaled = in;
               break;
           }
+
+          cv::Mat zeros = 0.0 * in_scaled;
 
           switch (type)
           {
