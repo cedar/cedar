@@ -1203,6 +1203,22 @@ void cedar::proc::gui::Group::readJson(const cedar::aux::Path &source)
   }
 }
 
+void cedar::proc::gui::Group::readJsonFromString(std::string jsonString)
+{
+  std::stringstream jsonFromClipboardStream;
+  jsonFromClipboardStream << jsonString;
+
+  cedar::aux::ConfigurationNode root;
+
+  //Debugged: Works
+  read_json(jsonFromClipboardStream, root);
+
+
+  this->readRobots(root);
+  this->mGroup->readConfiguration(root);
+  this->readConfiguration(root);
+}
+
 void cedar::proc::gui::Group::readRobots(const cedar::aux::ConfigurationNode &root)
 {
   if (root.find("ui generic") != root.not_found())
