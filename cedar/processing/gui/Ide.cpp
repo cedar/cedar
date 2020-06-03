@@ -96,7 +96,6 @@
 #include <QMimeData>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
-#include <bits/stdc++.h>
 #include <boost/algorithm/string.hpp>
 
 #ifndef Q_MOC_RUN
