@@ -298,6 +298,12 @@ public slots:
     return this->mpLog;
   }
 
+  //!@brief undo last action
+  void undo();
+
+  //!@brief redo last action
+  void redo();
+
   //!@brief copy selected elements (cross instance)
   void copy();
 

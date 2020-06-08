@@ -531,6 +531,8 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   QObject::connect(mpActionCopy, SIGNAL(triggered()), this, SLOT(copy()));
   QObject::connect(mpActionPaste, SIGNAL(triggered()), this, SLOT(paste()));
+  QObject::connect(mpActionUndo, SIGNAL(triggered()), this, SLOT(undo()));
+  QObject::connect(mpActionRedo, SIGNAL(triggered()), this, SLOT(redo()));
   QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateSelected()));
   QObject::connect(mpActionCopyConfiguration, SIGNAL(triggered()), this, SLOT(copyStepConfiguration()));
   QObject::connect(mpActionPasteConfiguration, SIGNAL(triggered()), this, SLOT(pasteStepConfiguration()));
@@ -1167,6 +1169,16 @@ void cedar::proc::gui::Ide::duplicateSelected()
   {
     cedar::proc::Group::connectAcrossGroups(outgoing_slots.at(i).second, receiving_slots.at(i).second);
   }
+}
+
+void cedar::proc::gui::Ide::undo()
+{
+  cedar::aux::LogSingleton::getInstance()->message("undo", "cedar::proc::gui::Ide");
+}
+
+void cedar::proc::gui::Ide::redo()
+{
+  cedar::aux::LogSingleton::getInstance()->message("redo", "cedar::proc::gui::Ide");
 }
 
 void cedar::proc::gui::Ide::copy()

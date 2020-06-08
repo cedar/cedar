@@ -158,6 +158,8 @@
     </property>
     <addaction name="mpActionCopy"/>
     <addaction name="mpActionPaste"/>
+    <addaction name="mpActionUndo"/>
+    <addaction name="mpActionRedo"/>
     <addaction name="mpActionCopyConfiguration"/>
     <addaction name="mpActionPasteConfiguration"/>
     <addaction name="mpActionDuplicate"/>
