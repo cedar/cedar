@@ -1051,7 +1051,22 @@
     <string>Ctrl+C</string>
    </property>
   </action>
-
+  <action name="mpActionUndo">
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="mpActionRedo">
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
+   </property>
+  </action>
   <action name="mpActionCopyConfiguration">
    <property name="text">
     <string>Copy step configuration</string>
@@ -1060,7 +1075,6 @@
     <string>Ctrl+Shift+C</string>
    </property>
   </action>
-
   <action name="mpActionPaste">
    <property name="text">
     <string>Paste</string>
