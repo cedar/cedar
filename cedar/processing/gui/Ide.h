@@ -52,6 +52,7 @@
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
 #include "cedar/auxiliaries/CommandLineParser.fwd.h"
+#include "cedar/auxiliaries/UndoStack.fwd.h"
 #include "cedar/processing/gui/PerformanceOverview.fwd.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.fwd.h"
 #include "cedar/processing/gui/BoostControl.fwd.h"
@@ -449,6 +450,9 @@ private:
   cedar::proc::gui::GroupPtr mGroup;
 
   cedar::proc::StepPtr mLastCopiedStep;
+
+  //! Undo Stack
+  cedar::aux::UndoStack* mpUndoStack;
 
   //! Performance overview.
   cedar::proc::gui::PerformanceOverview* mpPerformanceOverview;

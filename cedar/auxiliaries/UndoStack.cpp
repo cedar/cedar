@@ -48,7 +48,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::UndoStack::UndoStack()
+cedar::aux::UndoStack::UndoStack(QObject *parent)
+:
+QUndoStack(parent)
 {
 }
 

@@ -80,6 +80,7 @@ cedar_add_library(cedaraux
   detail/CallFunctionInThreadALotWorker.h
   LoopedThread.h
   LocalCoordinateFrame.h
+  UndoStack.h
   gl/ObjectVisualization.h
   gui/AccelerationParameter.h
   gui/AngularVelocityParameter.h

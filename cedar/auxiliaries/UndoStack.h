@@ -46,13 +46,12 @@
 #include "cedar/auxiliaries/UndoStack.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QUndoStack>
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief Implementation of the QUndoStack to handle all undo/redo commands
  */
-class cedar::aux::UndoStack
+class cedar::aux::UndoStack : public QUndoStack
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -63,7 +62,7 @@ class cedar::aux::UndoStack
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  UndoStack();
+  UndoStack(QObject *parent = nullptr);
 
   //!@brief Destructor
   virtual ~UndoStack();
@@ -92,7 +91,6 @@ private:
 protected:
   // none yet
 private:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
