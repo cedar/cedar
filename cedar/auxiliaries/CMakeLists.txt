@@ -81,6 +81,8 @@ cedar_add_library(cedaraux
   LoopedThread.h
   LocalCoordinateFrame.h
   UndoStack.h
+  UndoCommand.h
+  ElementMoveCommand.h
   gl/ObjectVisualization.h
   gui/AccelerationParameter.h
   gui/AngularVelocityParameter.h

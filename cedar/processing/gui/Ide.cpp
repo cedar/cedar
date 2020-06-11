@@ -1175,7 +1175,10 @@ void cedar::proc::gui::Ide::duplicateSelected()
 
 void cedar::proc::gui::Ide::undo()
 {
-  cedar::aux::LogSingleton::getInstance()->message("undo", "cedar::proc::gui::Ide");
+  if(mpUndoStack->canUndo())
+  {
+    mpUndoStack->undo();
+  }
 }
 
 void cedar::proc::gui::Ide::redo()
