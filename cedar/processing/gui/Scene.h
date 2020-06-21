@@ -479,6 +479,8 @@ private:
   //! The parameter for the current mode.
   QString mModeParam;
 
+  QPointF mStartMovingPosition;
+
   //! The group displayed by the scene.
   cedar::proc::gui::GroupPtr mGroup;
 

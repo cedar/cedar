@@ -1183,7 +1183,10 @@ void cedar::proc::gui::Ide::undo()
 
 void cedar::proc::gui::Ide::redo()
 {
-  cedar::aux::LogSingleton::getInstance()->message("redo", "cedar::proc::gui::Ide");
+  if(mpUndoStack->canRedo())
+  {
+    mpUndoStack->redo();
+  }
 }
 
 void cedar::proc::gui::Ide::copy()

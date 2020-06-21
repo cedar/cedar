@@ -443,6 +443,10 @@ signals:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+
+  //! Undo Stack
+  static cedar::aux::UndoStack* mpUndoStack;
 protected:
   // none yet
 private:
@@ -451,8 +455,6 @@ private:
 
   cedar::proc::StepPtr mLastCopiedStep;
 
-  //! Undo Stack
-  cedar::aux::UndoStack* mpUndoStack;
 
   //! Performance overview.
   cedar::proc::gui::PerformanceOverview* mpPerformanceOverview;

@@ -68,6 +68,8 @@
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/ElementMoveCommand.h"
+#include "cedar/auxiliaries/UndoStack.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -186,6 +188,7 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
 void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
 // not sure why, but the drop event starts out as accepted; thus, reset its accepted state
+
   pEvent->setAccepted(false);
 
   this->QGraphicsScene::dropEvent(pEvent);
@@ -767,6 +770,7 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
             if (graphics_base->isSelected() && graphics_base->canBeDragged())
             {
               // we cannot move with a
+              this->mStartMovingPosition = graphics_base->pos();
               this->mDraggingItems = true;
               this->mpeParentView->startScrollTimer();
             }
@@ -926,6 +930,7 @@ void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition
   }
 }
 
+cedar::aux::UndoStack* cedar::proc::gui::Ide::mpUndoStack;
 
 void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouseEvent)
 {
@@ -943,19 +948,23 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
   }
 
   mpConnectionToBeReconnected = nullptr;
-  this->mDraggingItems = false;
-
 
   // reset highlighting of the groups from which the items are being removed
   auto selected = this->selectedItems();
   for (int i = 0; i < selected.size(); ++i)
   {
     auto item = selected.at(i);
+    auto graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item);
+    if (graphics_item)
+    {
+      cedar::proc::gui::Ide::mpUndoStack->push(new cedar::aux::ElementMoveCommand(graphics_item, this->mStartMovingPosition));
+    }
     if (auto group = dynamic_cast<cedar::proc::gui::Group*>(item->parentItem()))
     {
       group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
     }
   }
+  this->mDraggingItems = false;
 
   if (mTargetGroup)
   {
