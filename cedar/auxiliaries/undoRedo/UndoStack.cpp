@@ -22,43 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ElementMoveCommand.fwd.h
+    File:        UndoStack.cpp
 
     Maintainer:  Yogeshwar Agnihotri
     Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2020 06 11
+    Date:        2020 06 21
 
-    Description: Forward declaration file for the class cedar::aux::ElementMoveCommand.
+    Description: Source file for the class cedar::aux::undoRedo::UndoStack.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_ELEMENT_MOVE_COMMAND_FWD_H
-#define CEDAR_AUX_ELEMENT_MOVE_COMMAND_FWD_H
-
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+// CLASS HEADER
+#include "cedar/auxiliaries/undoRedo/UndoStack.h"
+
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
 
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/smart_ptr.hpp>
-#endif // Q_MOC_RUN
 
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
-namespace cedar
+cedar::aux::undoRedo::UndoStack::UndoStack(QObject *parent)
+:
+QUndoStack(parent)
 {
-  namespace aux
-  {
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(ElementMoveCommand);
-    //!@endcond
-  }
 }
 
+cedar::aux::undoRedo::UndoStack::~UndoStack()
+{
+}
 
-#endif // CEDAR_AUX_ELEMENT_MOVE_COMMAND_FWD_H
-
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------

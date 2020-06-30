@@ -68,8 +68,8 @@
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
-#include "cedar/auxiliaries/ElementMoveCommand.h"
-#include "cedar/auxiliaries/UndoStack.h"
+#include "cedar/auxiliaries/undoRedo/commands/ElementMoveCommand.h"
+#include "cedar/auxiliaries/undoRedo/UndoStack.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -930,7 +930,7 @@ void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition
   }
 }
 
-cedar::aux::UndoStack* cedar::proc::gui::Ide::mpUndoStack;
+cedar::aux::undoRedo::UndoStack* cedar::proc::gui::Ide::mpUndoStack;
 
 void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouseEvent)
 {
@@ -957,7 +957,7 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
     auto graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item);
     if (graphics_item)
     {
-      cedar::proc::gui::Ide::mpUndoStack->push(new cedar::aux::ElementMoveCommand(graphics_item, this->mStartMovingPosition));
+      cedar::proc::gui::Ide::mpUndoStack->push(new cedar::aux::undoRedo::commands::ElementMoveCommand(graphics_item, this->mStartMovingPosition));
     }
     if (auto group = dynamic_cast<cedar::proc::gui::Group*>(item->parentItem()))
     {

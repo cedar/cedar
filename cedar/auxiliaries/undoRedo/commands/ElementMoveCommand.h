@@ -22,36 +22,39 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        UndoCommand.h
+    File:        ElementMoveCommand.h
 
     Maintainer:  Yogeshwar Agnihotri
     Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2020 06 11
+    Date:        2020 06 21
 
-    Description: Header file for the class cedar::aux::UndoCommand.
+    Description: Header file for the class cedar::aux::undoRedo::commands::ElementMoveCommand.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_UNDO_COMMAND_H
-#define CEDAR_AUX_UNDO_COMMAND_H
+#ifndef CEDAR_AUX_UNDO_REDO_COMMANDS_ELEMENT_MOVE_COMMAND_H
+#define CEDAR_AUX_UNDO_REDO_COMMANDS_ELEMENT_MOVE_COMMAND_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/undoRedo/UndoCommand.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/UndoCommand.fwd.h"
+#include "cedar/auxiliaries/undoRedo/commands/ElementMoveCommand.fwd.h"
+#include "cedar/processing/gui/GraphicsBase.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QUndoCommand>
+#include <QPointF>
 
-/*!@brief UndoCommand of undo redo command pattern. Every command inherits from this class, and has to implement the
- * undo and the redo method
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::aux::UndoCommand : public QUndoCommand
+class cedar::aux::undoRedo::commands::ElementMoveCommand : public UndoCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -62,16 +65,17 @@ class cedar::aux::UndoCommand : public QUndoCommand
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  UndoCommand();
+  ElementMoveCommand(cedar::proc::gui::GraphicsBase* element, const QPointF sourcePosition);
 
   //!@brief Destructor
-  virtual ~UndoCommand();
+  virtual ~ElementMoveCommand();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void undo();
+  void redo();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -91,7 +95,9 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  cedar::proc::gui::GraphicsBase* mpElement;
+  const QPointF mSourcePosition;
+  const QPointF mTargetPosition;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -102,7 +108,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::UndoCommand
+};
 
-#endif // CEDAR_AUX_UNDO_COMMAND_H
+#endif // CEDAR_AUX_UNDO_REDO_COMMANDS_ELEMENT_MOVE_COMMAND_H
 

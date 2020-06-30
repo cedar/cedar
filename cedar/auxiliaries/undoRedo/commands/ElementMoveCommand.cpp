@@ -26,9 +26,9 @@
 
     Maintainer:  Yogeshwar Agnihotri
     Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2020 06 11
+    Date:        2020 06 21
 
-    Description: Source file for the class cedar::aux::ElementMoveCommand.
+    Description: Source file for the class cedar::aux::undoRedo::commands::ElementMoveCommand.
 
     Credits:
 
@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CLASS HEADER
-#include "cedar/auxiliaries/ElementMoveCommand.h"
+#include "cedar/auxiliaries/undoRedo/commands/ElementMoveCommand.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/GraphicsBase.h"
@@ -49,7 +49,7 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::ElementMoveCommand::ElementMoveCommand(cedar::proc::gui::GraphicsBase* element, const QPointF sourcePosition)
+cedar::aux::undoRedo::commands::ElementMoveCommand::ElementMoveCommand(cedar::proc::gui::GraphicsBase* element, const QPointF sourcePosition)
 :
 mpElement(element),
 mSourcePosition(sourcePosition),
@@ -57,7 +57,7 @@ mTargetPosition(element->pos())
 {
 }
 
-cedar::aux::ElementMoveCommand::~ElementMoveCommand()
+cedar::aux::undoRedo::commands::ElementMoveCommand::~ElementMoveCommand()
 {
 }
 
@@ -65,12 +65,12 @@ cedar::aux::ElementMoveCommand::~ElementMoveCommand()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 //Set element back to its source
-void cedar::aux::ElementMoveCommand::undo()
+void cedar::aux::undoRedo::commands::ElementMoveCommand::undo()
 {
   mpElement->setPos(mSourcePosition);
 }
 
-void cedar::aux::ElementMoveCommand::redo()
+void cedar::aux::undoRedo::commands::ElementMoveCommand::redo()
 {
   mpElement->setPos(mTargetPosition);
 }

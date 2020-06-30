@@ -26,16 +26,16 @@
 
     Maintainer:  Yogeshwar Agnihotri
     Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2020 06 11
+    Date:        2020 06 21
 
-    Description: Forward declaration file for the class cedar::aux::UndoStack.
+    Description: Forward declaration file for the class cedar::aux::undoRedo::UndoStack.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_UNDO_STACK_FWD_H
-#define CEDAR_AUX_UNDO_STACK_FWD_H
+#ifndef CEDAR_AUX_UNDO_REDO_UNDO_STACK_FWD_H
+#define CEDAR_AUX_UNDO_REDO_UNDO_STACK_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -53,12 +53,15 @@ namespace cedar
 {
   namespace aux
   {
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(UndoStack);
-    //!@endcond
+    namespace undoRedo
+    {
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_AUX_CLASS(UndoStack);
+      //!@endcond
+    }
   }
 }
 
 
-#endif // CEDAR_AUX_UNDO_STACK_FWD_H
+#endif // CEDAR_AUX_UNDO_REDO_UNDO_STACK_FWD_H
 

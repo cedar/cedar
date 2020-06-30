@@ -22,40 +22,49 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        UndoCommand.cpp
+    File:        ElementMoveCommand.fwd.h
 
     Maintainer:  Yogeshwar Agnihotri
     Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2020 06 11
+    Date:        2020 06 21
 
-    Description: Source file for the class cedar::aux::UndoCommand.
+    Description: Forward declaration file for the class cedar::aux::undoRedo::commands::ElementMoveCommand.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_AUX_UNDO_REDO_COMMANDS_ELEMENT_MOVE_COMMAND_FWD_H
+#define CEDAR_AUX_UNDO_REDO_COMMANDS_ELEMENT_MOVE_COMMAND_FWD_H
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-// CLASS HEADER
-#include "cedar/auxiliaries/UndoCommand.h"
-
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::UndoCommand::UndoCommand()
+namespace cedar
 {
+  namespace aux
+  {
+    namespace undoRedo
+    {
+      namespace commands
+      {
+        //!@cond SKIPPED_DOCUMENTATION
+        CEDAR_DECLARE_AUX_CLASS(ElementMoveCommand);
+        //!@endcond
+      }
+    }
+  }
 }
 
-cedar::aux::UndoCommand::~UndoCommand()
-{
-}
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
+#endif // CEDAR_AUX_UNDO_REDO_COMMANDS_ELEMENT_MOVE_COMMAND_FWD_H
+

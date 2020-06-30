@@ -52,7 +52,7 @@
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
 #include "cedar/auxiliaries/CommandLineParser.fwd.h"
-#include "cedar/auxiliaries/UndoStack.fwd.h"
+#include "cedar/auxiliaries/undoRedo/UndoStack.fwd.h"
 #include "cedar/processing/gui/PerformanceOverview.fwd.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.fwd.h"
 #include "cedar/processing/gui/BoostControl.fwd.h"
@@ -446,7 +446,7 @@ signals:
 public:
 
   //! Undo Stack
-  static cedar::aux::UndoStack* mpUndoStack;
+  static cedar::aux::undoRedo::UndoStack* mpUndoStack;
 protected:
   // none yet
 private:

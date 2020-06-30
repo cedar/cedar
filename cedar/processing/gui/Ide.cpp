@@ -68,7 +68,7 @@
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/gui/PluginManagerDialog.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
-#include "cedar/auxiliaries/UndoStack.h"
+#include "cedar/auxiliaries/undoRedo/UndoStack.h"
 #include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/PluginProxy.h"
@@ -372,7 +372,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   mpFindDialog = new cedar::proc::gui::FindDialog(this, this->mpProcessingDrawer);
   mpPerformanceOverview = new cedar::proc::gui::PerformanceOverview(this);
-  mpUndoStack = new cedar::aux::UndoStack(this);
+  mpUndoStack = new cedar::aux::undoRedo::UndoStack(this);
 
   // manually added components
 

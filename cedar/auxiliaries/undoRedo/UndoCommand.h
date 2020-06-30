@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        UndoStack.h
+    File:        UndoCommand.h
 
     Maintainer:  Yogeshwar Agnihotri
     Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2020 06 11
+    Date:        2020 06 21
 
-    Description: Header file for the class cedar::aux::UndoStack.
+    Description: Header file for the class cedar::aux::undoRedo::UndoCommand.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_UNDO_STACK_H
-#define CEDAR_AUX_UNDO_STACK_H
+#ifndef CEDAR_AUX_UNDO_REDO_UNDO_COMMAND_H
+#define CEDAR_AUX_UNDO_REDO_UNDO_COMMAND_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -43,15 +43,16 @@
 // CEDAR INCLUDES
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/UndoStack.fwd.h"
+#include "cedar/auxiliaries/undoRedo/UndoCommand.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QUndoStack>
+#include <QUndoCommand>
 
-
-/*!@brief Implementation of the QUndoStack to handle all undo/redo commands
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::aux::UndoStack : public QUndoStack
+class cedar::aux::undoRedo::UndoCommand : public QUndoCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -62,10 +63,10 @@ class cedar::aux::UndoStack : public QUndoStack
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  UndoStack(QObject *parent = nullptr);
+  UndoCommand();
 
   //!@brief Destructor
-  virtual ~UndoStack();
+  virtual ~UndoCommand();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -91,6 +92,7 @@ private:
 protected:
   // none yet
 private:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -101,7 +103,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::UndoStack
+}; // class cedar::aux::undoRedo::UndoCommand
 
-#endif // CEDAR_AUX_UNDO_STACK_H
+#endif // CEDAR_AUX_UNDO_REDO_UNDO_COMMAND_H
 

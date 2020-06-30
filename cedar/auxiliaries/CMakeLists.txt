@@ -80,9 +80,6 @@ cedar_add_library(cedaraux
   detail/CallFunctionInThreadALotWorker.h
   LoopedThread.h
   LocalCoordinateFrame.h
-  UndoStack.h
-  UndoCommand.h
-  ElementMoveCommand.h
   gl/ObjectVisualization.h
   gui/AccelerationParameter.h
   gui/AngularVelocityParameter.h
@@ -130,6 +127,9 @@ cedar_add_library(cedaraux
   gui/UIntParameter.h
   gui/UIntVectorParameter.h
   gui/VelocityParameter.h
+  undoRedo/UndoStack.h
+  undoRedo/UndoCommand.h
+  undoRedo/commands/ElementMoveCommand.h
   ${qglviewer_moc_files}
   ${qwt_moc_files}
   ${vtk_moc_files}
