@@ -68,7 +68,7 @@
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
-#include "cedar/auxiliaries/undoRedo/commands/ElementMoveCommand.h"
+#include "cedar/auxiliaries/undoRedo/commands/ElementMove.h"
 #include "cedar/auxiliaries/undoRedo/UndoStack.h"
 
 // SYSTEM INCLUDES
@@ -957,7 +957,7 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
     auto graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item);
     if (graphics_item)
     {
-      cedar::proc::gui::Ide::mpUndoStack->push(new cedar::aux::undoRedo::commands::ElementMoveCommand(graphics_item, this->mStartMovingPosition));
+      cedar::proc::gui::Ide::mpUndoStack->push(new cedar::aux::undoRedo::commands::ElementMove(graphics_item, this->mStartMovingPosition));
     }
     if (auto group = dynamic_cast<cedar::proc::gui::Group*>(item->parentItem()))
     {

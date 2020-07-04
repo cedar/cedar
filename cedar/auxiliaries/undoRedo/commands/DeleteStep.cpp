@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ElementMoveCommand.cpp
+    File:        DeleteStep.cpp
 
     Maintainer:  Yogeshwar Agnihotri
     Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2020 06 21
+    Date:        2020 07 04
 
-    Description: Source file for the class cedar::aux::undoRedo::commands::ElementMoveCommand.
+    Description: Source file for the class cedar::aux::undoRedo::commands::DeleteStep.
 
     Credits:
 
@@ -38,39 +38,24 @@
 #include "cedar/configuration.h"
 
 // CLASS HEADER
-#include "cedar/auxiliaries/undoRedo/commands/ElementMoveCommand.h"
+#include "cedar/auxiliaries/undoRedo/commands/DeleteStep.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/GraphicsBase.h"
-// SYSTEM INCLUDES
 
+// SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::undoRedo::commands::ElementMoveCommand::ElementMoveCommand(cedar::proc::gui::GraphicsBase* element, const QPointF sourcePosition)
-:
-mpElement(element),
-mSourcePosition(sourcePosition),
-mTargetPosition(element->pos())
+cedar::aux::undoRedo::commands::DeleteStep::DeleteStep()
 {
 }
 
-cedar::aux::undoRedo::commands::ElementMoveCommand::~ElementMoveCommand()
+cedar::aux::undoRedo::commands::DeleteStep::~DeleteStep()
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-//Set element back to its source
-void cedar::aux::undoRedo::commands::ElementMoveCommand::undo()
-{
-  mpElement->setPos(mSourcePosition);
-}
-
-void cedar::aux::undoRedo::commands::ElementMoveCommand::redo()
-{
-  mpElement->setPos(mTargetPosition);
-}

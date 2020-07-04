@@ -22,49 +22,55 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ElementMoveCommand.fwd.h
+    File:        ElementMove.cpp
 
     Maintainer:  Yogeshwar Agnihotri
     Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
     Date:        2020 06 21
 
-    Description: Forward declaration file for the class cedar::aux::undoRedo::commands::ElementMoveCommand.
+    Description: Source file for the class cedar::aux::undoRedo::commands::ElementMove.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_UNDO_REDO_COMMANDS_ELEMENT_MOVE_COMMAND_FWD_H
-#define CEDAR_AUX_UNDO_REDO_COMMANDS_ELEMENT_MOVE_COMMAND_FWD_H
-
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+// CLASS HEADER
+#include "cedar/auxiliaries/undoRedo/commands/ElementMove.h"
+
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
-
+#include "cedar/processing/gui/GraphicsBase.h"
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/smart_ptr.hpp>
-#endif // Q_MOC_RUN
 
 
-namespace cedar
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::undoRedo::commands::ElementMove::ElementMove(cedar::proc::gui::GraphicsBase* element, const QPointF sourcePosition)
+:
+mpElement(element),
+mSourcePosition(sourcePosition),
+mTargetPosition(element->pos())
 {
-  namespace aux
-  {
-    namespace undoRedo
-    {
-      namespace commands
-      {
-        //!@cond SKIPPED_DOCUMENTATION
-        CEDAR_DECLARE_AUX_CLASS(ElementMoveCommand);
-        //!@endcond
-      }
-    }
-  }
 }
 
+cedar::aux::undoRedo::commands::ElementMove::~ElementMove()
+{
+}
 
-#endif // CEDAR_AUX_UNDO_REDO_COMMANDS_ELEMENT_MOVE_COMMAND_FWD_H
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+//Set element back to its source
+void cedar::aux::undoRedo::commands::ElementMove::undo()
+{
+  mpElement->setPos(mSourcePosition);
+}
 
+void cedar::aux::undoRedo::commands::ElementMove::redo()
+{
+  mpElement->setPos(mTargetPosition);
+}

@@ -375,7 +375,6 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   mpUndoStack = new cedar::aux::undoRedo::UndoStack(this);
 
   // manually added components
-
   // toolbar: custom timestep
   auto p_enable_custom_time_step = new QCheckBox();
   p_enable_custom_time_step->setToolTip("When enabled, the specified time step is used to iterate all steps connected to looped triggers once when single-step is clicked. Otherwise, the time step to be used is determined automatically.");

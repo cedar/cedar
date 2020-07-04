@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ElementMoveCommand.h
+    File:        ElementMove.h
 
     Maintainer:  Yogeshwar Agnihotri
     Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
     Date:        2020 06 21
 
-    Description: Header file for the class cedar::aux::undoRedo::commands::ElementMoveCommand.
+    Description: Header file for the class cedar::aux::undoRedo::commands::ElementMove.
 
     Credits:
 
@@ -44,17 +44,17 @@
 #include "cedar/auxiliaries/undoRedo/UndoCommand.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/undoRedo/commands/ElementMoveCommand.fwd.h"
+#include "cedar/auxiliaries/undoRedo/commands/ElementMove.fwd.h"
 #include "cedar/processing/gui/GraphicsBase.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QPointF>
 
 /*!@todo describe.
- *
+ *F
  * @todo describe more.
  */
-class cedar::aux::undoRedo::commands::ElementMoveCommand : public UndoCommand
+class cedar::aux::undoRedo::commands::ElementMove : public UndoCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -65,10 +65,10 @@ class cedar::aux::undoRedo::commands::ElementMoveCommand : public UndoCommand
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ElementMoveCommand(cedar::proc::gui::GraphicsBase* element, const QPointF sourcePosition);
+  ElementMove(cedar::proc::gui::GraphicsBase* element, const QPointF sourcePosition);
 
   //!@brief Destructor
-  virtual ~ElementMoveCommand();
+  virtual ~ElementMove();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

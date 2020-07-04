@@ -251,7 +251,7 @@ public:
   //! Returns the graphics item corresponding to the given element.
   cedar::proc::gui::Element* getGraphicsItemFor(cedar::proc::ConstElementPtr element);
 
-  /*!@brief Returns, whether snap-to-grid is true.
+  /*!@brief Returns, whether snap-to-grid is true.F
    */
   bool getSnapToGrid() const;
 
