@@ -313,6 +313,7 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
 
 void cedar::proc::gui::Scene::deleteElement(QGraphicsItem* pItem)
 {
+  std::cout << "Element deleted" << std::endl;
   if (auto element = dynamic_cast<cedar::proc::gui::Element*>(pItem))
   {
     element->deleteElement();
