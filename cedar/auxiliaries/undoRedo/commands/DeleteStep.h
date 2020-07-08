@@ -41,6 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/undoRedo/UndoCommand.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/undoRedo/commands/DeleteStep.fwd.h"
@@ -52,7 +53,7 @@
  *
  * @todo describe more.
  */
-class cedar::aux::undoRedo::commands::DeleteStep
+class cedar::aux::undoRedo::commands::DeleteStep : public UndoCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -72,7 +73,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void undo();
+  void redo();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

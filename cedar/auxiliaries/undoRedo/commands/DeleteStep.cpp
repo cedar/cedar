@@ -59,3 +59,12 @@ cedar::aux::undoRedo::commands::DeleteStep::~DeleteStep()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+void cedar::aux::undoRedo::commands::DeleteStep::undo()
+{
+
+}
+
+void cedar::aux::undoRedo::commands::DeleteStep::redo()
+{
+
+}
