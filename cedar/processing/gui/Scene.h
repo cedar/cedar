@@ -170,6 +170,10 @@ public:
     QPointF position
   );
 
+  /*!@brief Create a connection from source to target
+   */
+  void createConnection(cedar::proc::gui::GraphicsBase* source, cedar::proc::gui::GraphicsBase* target, bool create_connector_group);
+
   /*!@brief Adds a cedar::proc::gui::StepItem for the given cedar::proc::Step to the scene at the given position.
    */
   void addProcessingStep(cedar::proc::StepPtr step, QPointF position);

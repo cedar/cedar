@@ -38,21 +38,26 @@
 #define CEDAR_AUX_UNDO_REDO_COMMANDS_DELETE_CONNECTION_H
 
 // CEDAR CONFIGURATION
+#include <cedar/processing/gui/GraphicsBase.h>
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/undoRedo/UndoCommand.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/undoRedo/commands/DeleteConnection.fwd.h"
+#include "cedar/processing/gui/Connection.fwd.h"
+#include "cedar/processing/gui/GraphicsBase.fwd.h"
+#include "cedar/processing/gui/Group.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
+/*!@ Delete Connection Command
  *
- * @todo describe more.
+ * UndoCommand Implementation for deleting a Connection
  */
-class cedar::aux::undoRedo::commands::DeleteConnection
+class cedar::aux::undoRedo::commands::DeleteConnection : public cedar::aux::undoRedo::UndoCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -63,7 +68,7 @@ class cedar::aux::undoRedo::commands::DeleteConnection
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DeleteConnection();
+  DeleteConnection(cedar::proc::gui::Connection* connection, cedar::proc::gui::Group* group);
 
   //!@brief Destructor
   virtual ~DeleteConnection();
@@ -72,7 +77,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+
+  void undo();
+  void redo();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -92,7 +99,14 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+
+  cedar::proc::gui::GraphicsBase* source;
+  cedar::proc::gui::GraphicsBase* target;
+
+  QString sourceSlotName;
+  QString targetSlotName;
+
+  cedar::proc::gui::Group* group;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

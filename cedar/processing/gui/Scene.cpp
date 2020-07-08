@@ -1333,6 +1333,71 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
   }
 }
 
+void cedar::proc::gui::Scene::createConnection(cedar::proc::gui::GraphicsBase* source, cedar::proc::gui::GraphicsBase* target, bool create_connector_group)
+{
+  switch (source->getGroup())
+  {
+    // source item is a data item
+    case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM:
+    {
+      cedar::proc::gui::DataSlotItem *p_source = dynamic_cast<cedar::proc::gui::DataSlotItem*>(source);
+      CEDAR_DEBUG_ASSERT(p_source != NULL);
+
+      switch (target->getGroup())
+      {
+        // case: connecting two data slots
+        case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM:
+        {
+          cedar::proc::gui::DataSlotItem *p_data_target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(target);
+          this->connectSlots(p_source, p_data_target, create_connector_group);
+          break;
+        } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM
+      }
+
+      break;
+    } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM
+
+      // source item is a trigger
+    case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
+    {
+      cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(source);
+      CEDAR_DEBUG_ASSERT(source != NULL);
+
+      switch (target->getGroup())
+      {
+        case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
+        {
+          cedar::proc::gui::TriggerItem *p_trigger = dynamic_cast<cedar::proc::gui::TriggerItem*>(target);
+          source->getTrigger()->getGroup()->connectTrigger(source->getTrigger(), p_trigger->getTrigger());
+          break; // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
+        }
+
+        case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP:
+        {
+          cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(target);
+          source->getTrigger()->getGroup()->connectTrigger(source->getTrigger(), p_step_item->getStep());
+          break;
+        } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
+
+        case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP:
+        {
+          cedar::proc::gui::Group* p_group = dynamic_cast<cedar::proc::gui::Group*>(target);
+          source->getTrigger()->getGroup()->connectTrigger(source->getTrigger(), p_group->getGroup());
+          break;
+        } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP
+
+        default:
+          CEDAR_DEBUG_ASSERT(false); // this should not happen
+          break;
+      } // switch (target->getGroup())
+
+    } // case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
+
+    default:
+      break;
+  } // switch (mpConnectionStart->getGroup())
+}
+
 void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouseEvent * pMouseEvent)
 {
   if (mpNewConnectionIndicator != nullptr)

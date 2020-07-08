@@ -70,8 +70,11 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/Recorder.h"
+#include "cedar/auxiliaries/undoRedo/UndoStack.h"
+#include "cedar/auxiliaries/undoRedo/commands/DeleteConnection.h"
 #include "cedar/processing/gui/StickyNote.h"
 #include "cedar/processing/gui/GroupParameterDesigner.h"
+#include "Ide.h"
 
 // SYSTEM INCLUDES
 #include <QEvent>
@@ -1205,13 +1208,13 @@ void cedar::proc::gui::Group::readJson(const cedar::aux::Path &source)
 
 void cedar::proc::gui::Group::readJsonFromString(std::string jsonString)
 {
-  std::stringstream jsonFromClipboardStream;
-  jsonFromClipboardStream << jsonString;
+  std::stringstream jsonStream;
+  jsonStream << jsonString;
 
   cedar::aux::ConfigurationNode root;
 
   //Debugged: Works
-  read_json(jsonFromClipboardStream, root);
+  read_json(jsonStream, root);
 
 
   this->readRobots(root);
@@ -1937,7 +1940,9 @@ void cedar::proc::gui::Group::dataConnectionChanged
         {
           if (con->getSource() == source_slot && con->getTarget() == target_slot)
           {
+            cedar::proc::gui::Ide::mpUndoStack->push(new cedar::aux::undoRedo::commands::DeleteConnection(con, this));
             con->disconnect();
+            std::cout << "Con removed in Group::dataConnectionChanged" << std::endl;
             this->mpScene->removeItem(con);
             delete con;
             return;

@@ -39,6 +39,11 @@
 
 // CLASS HEADER
 #include "cedar/auxiliaries/undoRedo/commands/DeleteConnection.h"
+#include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/gui/Connection.h"
+#include "cedar/processing/gui/Group.h"
+#include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/Scene.h"
 
 // CEDAR INCLUDES
 
@@ -48,12 +53,39 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::undoRedo::commands::DeleteConnection::DeleteConnection()
+cedar::aux::undoRedo::commands::DeleteConnection::DeleteConnection(cedar::proc::gui::Connection* connection, cedar::proc::gui::Group* group)
+:
+source(connection->getSource()),
+target(connection->getTarget()),
+sourceSlotName(connection->getSourceSlotName()),
+targetSlotName(connection->getTargetSlotName()),
+group(group)
 {
+  //p_con->setSmartMode(group->getSmartConnection());
+
 }
 
 cedar::aux::undoRedo::commands::DeleteConnection::~DeleteConnection()
 {
+}
+
+void cedar::aux::undoRedo::commands::DeleteConnection::undo() {
+  this->group->getScene()->createConnection(source, target, false);
+  /*if(source->canConnectTo(target) != cedar::proc::gui::CONNECT_NO)
+  {
+    if(auto element = dynamic_cast<cedar::proc::gui::Element*>(source))
+    {
+      if(auto group = dynamic_cast<cedar::proc::gui::Group*>(element->getGroup()))
+      {
+
+      }
+    }
+    //cedar::proc::gui::Connection *p_con = source_slot->connectTo(target_slot, sourceName + "." + sourceSlot, targetName + "." + targetSlot);
+  }*/
+}
+
+void cedar::aux::undoRedo::commands::DeleteConnection::redo() {
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------
