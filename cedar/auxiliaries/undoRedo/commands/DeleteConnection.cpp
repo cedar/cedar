@@ -67,6 +67,7 @@ group(group)
 
 cedar::aux::undoRedo::commands::DeleteConnection::~DeleteConnection()
 {
+  //test
 }
 
 void cedar::aux::undoRedo::commands::DeleteConnection::undo() {
