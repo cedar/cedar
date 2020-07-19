@@ -126,8 +126,6 @@ void cedar::aux::undoRedo::commands::DeleteConnection::createConnection()
   if(this->mpSource != nullptr && this->mpTarget != nullptr && this->mpScene != nullptr)
   {
     this->mpScene->createConnection(this->mpSource, this->mpTarget, mCreateConnectorGroup);
-    this->mpScene->createConnection(this->mpSource, this->mpTarget, mCreateConnectorGroup);
-    this->mpScene->createConnection(this->mpSource, this->mpTarget, mCreateConnectorGroup);
   }
 }
 
