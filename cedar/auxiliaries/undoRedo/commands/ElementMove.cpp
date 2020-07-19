@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/gui/Scene.h"
 // SYSTEM INCLUDES
 
 
@@ -49,12 +50,14 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::undoRedo::commands::ElementMove::ElementMove(cedar::proc::gui::GraphicsBase* element, const QPointF sourcePosition)
+cedar::aux::undoRedo::commands::ElementMove::ElementMove(cedar::proc::gui::GraphicsBase* element, const QPointF sourcePosition, cedar::proc::gui::Scene* scene)
 :
 mpElement(element),
 mSourcePosition(sourcePosition),
-mTargetPosition(element->pos())
+mTargetPosition(element->pos()),
+pScene(scene)
 {
+  //TODO move element between groups
 }
 
 cedar::aux::undoRedo::commands::ElementMove::~ElementMove()
@@ -64,13 +67,21 @@ cedar::aux::undoRedo::commands::ElementMove::~ElementMove()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-//Set element back to its source
+
+// Move element back to the source
 void cedar::aux::undoRedo::commands::ElementMove::undo()
 {
-  mpElement->setPos(mSourcePosition);
+  if(this->mpElement != nullptr && this->pScene->items().contains(this->mpElement))
+  {
+    this->mpElement->setPos(this->mSourcePosition);
+  }
 }
 
+// Move element to the target
 void cedar::aux::undoRedo::commands::ElementMove::redo()
 {
-  mpElement->setPos(mTargetPosition);
+  if(this->mpElement != nullptr && this->pScene->items().contains(this->mpElement))
+  {
+    this->mpElement->setPos(this->mTargetPosition);
+  }
 }

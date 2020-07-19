@@ -1940,9 +1940,7 @@ void cedar::proc::gui::Group::dataConnectionChanged
         {
           if (con->getSource() == source_slot && con->getTarget() == target_slot)
           {
-            cedar::proc::gui::Ide::mpUndoStack->push(new cedar::aux::undoRedo::commands::DeleteConnection(con, this));
             con->disconnect();
-            std::cout << "Con removed in Group::dataConnectionChanged" << std::endl;
             this->mpScene->removeItem(con);
             delete con;
             return;

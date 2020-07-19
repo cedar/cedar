@@ -37,7 +37,7 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-// CLASS HEADER
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/undoRedo/commands/DeleteConnection.h"
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/processing/gui/Connection.h"
@@ -45,48 +45,90 @@
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/Scene.h"
 
-// CEDAR INCLUDES
-
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::undoRedo::commands::DeleteConnection::DeleteConnection(cedar::proc::gui::Connection* connection, cedar::proc::gui::Group* group)
+cedar::aux::undoRedo::commands::DeleteConnection::DeleteConnection(cedar::proc::gui::Connection* connection,
+        cedar::aux::undoRedo::commands::DeleteConnection::Action action,
+        bool createConnectorGroup)
 :
-source(connection->getSource()),
-target(connection->getTarget()),
-sourceSlotName(connection->getSourceSlotName()),
-targetSlotName(connection->getTargetSlotName()),
-group(group)
+mpSource(connection->getSource()),
+mpTarget(connection->getTarget()),
+mAction(action),
+mCreateConnectorGroup(createConnectorGroup)
 {
-  //p_con->setSmartMode(group->getSmartConnection());
+  this->mpScene = dynamic_cast<cedar::proc::gui::Scene *>(this->mpTarget->scene());
+  CEDAR_DEBUG_ASSERT(this->mpScene)
+}
 
+cedar::aux::undoRedo::commands::DeleteConnection::DeleteConnection(cedar::proc::gui::GraphicsBase* source,
+        cedar::proc::gui::GraphicsBase* target,
+        cedar::aux::undoRedo::commands::DeleteConnection::Action action,
+        bool createConnectorGroup)
+:
+mpSource(source),
+mpTarget(target),
+mAction(action),
+mCreateConnectorGroup(createConnectorGroup)
+{
+  this->mpScene = dynamic_cast<cedar::proc::gui::Scene *>(this->mpTarget->scene());
+  CEDAR_DEBUG_ASSERT(this->mpScene)
 }
 
 cedar::aux::undoRedo::commands::DeleteConnection::~DeleteConnection()
 {
-  //test
 }
 
-void cedar::aux::undoRedo::commands::DeleteConnection::undo() {
-  this->group->getScene()->createConnection(source, target, false);
-  /*if(source->canConnectTo(target) != cedar::proc::gui::CONNECT_NO)
+void cedar::aux::undoRedo::commands::DeleteConnection::undo()
+{
+  switch(mAction)
   {
-    if(auto element = dynamic_cast<cedar::proc::gui::Element*>(source))
-    {
-      if(auto group = dynamic_cast<cedar::proc::gui::Group*>(element->getGroup()))
-      {
-
-      }
-    }
-    //cedar::proc::gui::Connection *p_con = source_slot->connectTo(target_slot, sourceName + "." + sourceSlot, targetName + "." + targetSlot);
-  }*/
+    case Action::ADDED:
+      removeConnection();
+      break;
+    case Action::REMOVED:
+      createConnection();
+      break;
+  }
 }
 
-void cedar::aux::undoRedo::commands::DeleteConnection::redo() {
+void cedar::aux::undoRedo::commands::DeleteConnection::redo()
+{
+  switch(mAction)
+  {
+    case Action::ADDED:
+      createConnection();
+      break;
+    case Action::REMOVED:
+      removeConnection();
+      break;
+  }
+}
 
+void cedar::aux::undoRedo::commands::DeleteConnection::removeConnection()
+{
+  std::vector<cedar::proc::gui::Connection*> connectionsFromSource = this->mpSource->getConnections();
+  for(cedar::proc::gui::Connection* con : connectionsFromSource)
+  {
+    if(con->getTarget() == this->mpTarget)
+    {
+      con->disconnectUnderlying();
+      break;
+    }
+  }
+}
+
+void cedar::aux::undoRedo::commands::DeleteConnection::createConnection()
+{
+  if(this->mpSource != nullptr && this->mpTarget != nullptr && this->mpScene != nullptr)
+  {
+    this->mpScene->createConnection(this->mpSource, this->mpTarget, mCreateConnectorGroup);
+    this->mpScene->createConnection(this->mpSource, this->mpTarget, mCreateConnectorGroup);
+    this->mpScene->createConnection(this->mpSource, this->mpTarget, mCreateConnectorGroup);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

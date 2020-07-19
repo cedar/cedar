@@ -46,6 +46,7 @@
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/undoRedo/commands/ElementMove.fwd.h"
 #include "cedar/processing/gui/GraphicsBase.fwd.h"
+#include "cedar/processing/gui/Scene.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QPointF>
@@ -65,7 +66,7 @@ class cedar::aux::undoRedo::commands::ElementMove : public UndoCommand
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ElementMove(cedar::proc::gui::GraphicsBase* element, const QPointF sourcePosition);
+  ElementMove(cedar::proc::gui::GraphicsBase* element, const QPointF sourcePosition, cedar::proc::gui::Scene* pScene);
 
   //!@brief Destructor
   virtual ~ElementMove();
@@ -98,6 +99,7 @@ private:
   cedar::proc::gui::GraphicsBase* mpElement;
   const QPointF mSourcePosition;
   const QPointF mTargetPosition;
+  cedar::proc::gui::Scene* pScene;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

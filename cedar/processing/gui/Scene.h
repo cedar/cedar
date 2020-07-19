@@ -503,6 +503,9 @@ private:
   //! The item from which a new connection is started.
   cedar::proc::gui::GraphicsBase* mpConnectionStart;
 
+  //! The item which is currently dragged
+  cedar::proc::gui::GraphicsBase* mpDraggingGraphicsBase;
+
   //! When reconnecting already connected input slots: The connection that should be disconnected, when the mouse is dragged.
   cedar::proc::gui::Connection* mpConnectionToBeReconnected;
 

@@ -64,11 +64,27 @@ class cedar::aux::undoRedo::commands::DeleteConnection : public cedar::aux::undo
   //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
+  // enums
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+
+  enum Action
+  {
+    ADDED,
+    REMOVED
+  };
+
+  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  DeleteConnection(cedar::proc::gui::Connection* connection, cedar::proc::gui::Group* group);
+
+  //!@brief Constructor for removeConnection
+  DeleteConnection(cedar::proc::gui::Connection* connection, Action action, bool createConnectorGroup = false);
+
+  //!@brief Constructor for createConnection
+  DeleteConnection(cedar::proc::gui::GraphicsBase* source, cedar::proc::gui::GraphicsBase* target, Action action,
+          bool createConnectorGroup = false);
 
   //!@brief Destructor
   virtual ~DeleteConnection();
@@ -84,6 +100,10 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
+
+  void createConnection();
+  void removeConnection();
+
 protected:
   // none yet
 
@@ -100,13 +120,12 @@ protected:
   // none yet
 private:
 
-  cedar::proc::gui::GraphicsBase* source;
-  cedar::proc::gui::GraphicsBase* target;
+  cedar::proc::gui::GraphicsBase* mpSource;
+  cedar::proc::gui::GraphicsBase* mpTarget;
 
-  QString sourceSlotName;
-  QString targetSlotName;
-
-  cedar::proc::gui::Group* group;
+  cedar::proc::gui::Scene* mpScene;
+  Action mAction;
+  bool mCreateConnectorGroup;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
