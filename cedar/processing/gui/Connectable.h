@@ -349,7 +349,9 @@ public slots:
   //!@brief removes the reference of a child widget from the mChildWidgets vector (called when child got destroyed)
   void removeChildWidget();
 
+  cedar::proc::gui::ConstGroup* getGuiGroup() const;
 
+  cedar::proc::gui::Group* getGuiGroup();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -488,8 +490,6 @@ private:
 
   //! Fill plot menu
   void fillPlotMenu(QMenu& menu, QGraphicsSceneContextMenuEvent* event);
-
-  cedar::proc::gui::ConstGroup* getGuiGroup() const;
 
   void translateLoopedTriggerChangedSignal();
 

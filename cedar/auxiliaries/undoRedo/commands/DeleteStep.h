@@ -42,12 +42,17 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/undoRedo/UndoCommand.h"
+#include "cedar/processing/gui/Group.h"
+#include "cedar/processing/gui/Element.h"
+#include "cedar/processing/gui/Connectable.h"
+
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/undoRedo/commands/DeleteStep.fwd.h"
 
-// SYSTEM INCLUDES
 
+// SYSTEM INCLUDES
+#include <QPointF>
 
 /*!@todo describe.
  *
@@ -64,7 +69,7 @@ class cedar::aux::undoRedo::commands::DeleteStep : public UndoCommand
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DeleteStep();
+  DeleteStep(cedar::proc::gui::ElementPtr element);
 
   //!@brief Destructor
   virtual ~DeleteStep();
@@ -94,7 +99,10 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  cedar::proc::gui::ElementPtr element;
+  cedar::proc::gui::GroupPtr group;
+  std::string classId;
+  QPointF position;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

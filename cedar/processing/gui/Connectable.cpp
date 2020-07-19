@@ -794,6 +794,27 @@ cedar::proc::gui::ConstGroup* cedar::proc::gui::Connectable::getGuiGroup() const
   }
 }
 
+cedar::proc::gui::Group* cedar::proc::gui::Connectable::getGuiGroup()
+{
+  if (auto scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene()))
+  {
+    auto group = this->getElement()->getGroup();
+    CEDAR_DEBUG_ASSERT(group);
+    if (group != scene->getRootGroup()->getGroup())
+    {
+      return scene->getGroupFor(group.get());
+    }
+    else
+    {
+      return scene->getRootGroup().get();
+    }
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
 void cedar::proc::gui::Connectable::fillColorChanged(QColor color)
 {
   auto gui_group = this->getGuiGroup();

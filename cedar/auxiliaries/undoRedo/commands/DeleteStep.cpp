@@ -39,6 +39,7 @@
 
 // CLASS HEADER
 #include "cedar/auxiliaries/undoRedo/commands/DeleteStep.h"
+#include "cedar/processing/DeclarationRegistry.h"
 
 // CEDAR INCLUDES
 
@@ -48,12 +49,19 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::undoRedo::commands::DeleteStep::DeleteStep()
+cedar::aux::undoRedo::commands::DeleteStep::DeleteStep(cedar::proc::gui::ElementPtr element)
+:
+element(element)
 {
+  position = element->pos();
+  classId = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(element->getElement());
+  auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(element.get());
+  cedar::proc::gui::Group* guiGroup = connectable->getGuiGroup();
 }
 
 cedar::aux::undoRedo::commands::DeleteStep::~DeleteStep()
 {
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -61,7 +69,8 @@ cedar::aux::undoRedo::commands::DeleteStep::~DeleteStep()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::aux::undoRedo::commands::DeleteStep::undo()
 {
-
+  //Create Element in its group
+  group->getScene()->createElement(group->getGroup(), classId, position);
 }
 
 void cedar::aux::undoRedo::commands::DeleteStep::redo()
