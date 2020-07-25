@@ -24,24 +24,24 @@
 
     File:        UndoCommand.fwd.h
 
-    Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2020 06 21
+    Maintainer:  Lars Janssen
+    Email:       lars.janssen@ini.rub.de
+    Date:        2020 07 23
 
-    Description: Forward declaration file for the class cedar::aux::undoRedo::UndoCommand.
+    Description: Forward declaration file for the class cedar::proc::undoRedo::UndoCommand.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_UNDO_REDO_UNDO_COMMAND_FWD_H
-#define CEDAR_AUX_UNDO_REDO_UNDO_COMMAND_FWD_H
+#ifndef CEDAR_PROC_UNDO_REDO_UNDO_COMMAND_FWD_H
+#define CEDAR_PROC_UNDO_REDO_UNDO_COMMAND_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -51,17 +51,17 @@
 
 namespace cedar
 {
-  namespace aux
+  namespace proc
   {
     namespace undoRedo
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_AUX_CLASS(UndoCommand);
+      CEDAR_DECLARE_PROC_CLASS(UndoCommand);
       //!@endcond
     }
   }
 }
 
 
-#endif // CEDAR_AUX_UNDO_REDO_UNDO_COMMAND_FWD_H
+#endif // CEDAR_PROC_UNDO_REDO_UNDO_COMMAND_FWD_H
 

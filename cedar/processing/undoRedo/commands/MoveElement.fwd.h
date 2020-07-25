@@ -22,26 +22,26 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DeleteStep.fwd.h
+    File:        MoveElement.fwd.h
 
-    Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2020 07 04
+    Maintainer:  Lars Janssen
+    Email:       lars.janssen@ini.rub.de
+    Date:        2020 07 23
 
-    Description: Forward declaration file for the class cedar::aux::undoRedo::commands::DeleteStep.
+    Description: Forward declaration file for the class cedar::proc::undoRedo::commands::MoveElement.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_UNDO_REDO_COMMANDS_DELETE_STEP_FWD_H
-#define CEDAR_AUX_UNDO_REDO_COMMANDS_DELETE_STEP_FWD_H
+#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_MOVE_ELEMENT_FWD_H
+#define CEDAR_PROC_UNDO_REDO_COMMANDS_MOVE_ELEMENT_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -51,14 +51,14 @@
 
 namespace cedar
 {
-  namespace aux
+  namespace proc
   {
     namespace undoRedo
     {
       namespace commands
       {
         //!@cond SKIPPED_DOCUMENTATION
-        CEDAR_DECLARE_AUX_CLASS(DeleteStep);
+        CEDAR_DECLARE_PROC_CLASS(MoveElement);
         //!@endcond
       }
     }
@@ -66,5 +66,5 @@ namespace cedar
 }
 
 
-#endif // CEDAR_AUX_UNDO_REDO_COMMANDS_DELETE_STEP_FWD_H
+#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_MOVE_ELEMENT_FWD_H
 

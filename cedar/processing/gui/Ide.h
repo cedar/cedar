@@ -52,7 +52,6 @@
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
 #include "cedar/auxiliaries/CommandLineParser.fwd.h"
-#include "cedar/auxiliaries/undoRedo/UndoStack.fwd.h"
 #include "cedar/processing/gui/PerformanceOverview.fwd.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.fwd.h"
 #include "cedar/processing/gui/BoostControl.fwd.h"
@@ -60,6 +59,7 @@
 #include "cedar/processing/gui/Ide.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"
 #include "cedar/processing/gui/FindDialog.fwd.h"
+#include "cedar/processing/undoRedo/UndoStack.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
@@ -446,7 +446,7 @@ signals:
 public:
 
   //! Undo Stack
-  static cedar::aux::undoRedo::UndoStack* mpUndoStack;
+  static cedar::proc::undoRedo::UndoStack* mpUndoStack;
 protected:
   // none yet
 private:

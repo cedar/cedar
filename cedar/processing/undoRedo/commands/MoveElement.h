@@ -22,38 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        UndoStack.h
+    File:        MoveElement.h
 
-    Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2020 06 21
+    Maintainer:  Lars Janssen
+    Email:       lars.janssen@ini.rub.de
+    Date:        2020 07 23
 
-    Description: Header file for the class cedar::aux::undoRedo::UndoStack.
+    Description: Header file for the class cedar::proc::undoRedo::commands::MoveElement.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_UNDO_REDO_UNDO_STACK_H
-#define CEDAR_AUX_UNDO_REDO_UNDO_STACK_H
+#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_MOVE_ELEMENT_H
+#define CEDAR_PROC_UNDO_REDO_COMMANDS_MOVE_ELEMENT_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/undoRedo/UndoCommand.h"
 
 // FORWARD DECLARATIONS
-#include "UndoStack.fwd.h"
+#include "cedar/processing/undoRedo/commands/MoveElement.fwd.h"
+#include "cedar/processing/gui/GraphicsBase.fwd.h"
+#include "cedar/processing/gui/Scene.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QUndoStack>
+#include <QPointF>
 
-
-/*!@todo describe.
+/*! Move ELement Command
  *
- * @todo describe more.
+ * An UndoCommand implementation for moving an element in the scene (e.g. a step)
  */
-class cedar::aux::undoRedo::UndoStack : public QUndoStack
+class cedar::proc::undoRedo::commands::MoveElement : public UndoCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -64,16 +66,17 @@ class cedar::aux::undoRedo::UndoStack : public QUndoStack
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  UndoStack(QObject *parent = nullptr);
+  MoveElement(cedar::proc::gui::GraphicsBase* element, const QPointF sourcePosition, cedar::proc::gui::Scene* pScene);
 
   //!@brief Destructor
-  virtual ~UndoStack();
+  virtual ~MoveElement();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void undo();
+  void redo();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -93,7 +96,10 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  cedar::proc::gui::GraphicsBase* mpElement;
+  const QPointF mSourcePosition;
+  const QPointF mTargetPosition;
+  cedar::proc::gui::Scene* pScene;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -104,7 +110,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::undoRedo::UndoStack
+}; // class cedar::proc::undoRedo::commands::MoveElement
 
-#endif // CEDAR_AUX_UNDO_REDO_UNDO_STACK_H
+#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_MOVE_ELEMENT_H
 

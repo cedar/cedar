@@ -22,40 +22,49 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        UndoCommand.cpp
+    File:        CreateDeleteStep.fwd.h
 
-    Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2020 06 21
+    Maintainer:  Lars Janssen
+    Email:       lars.janssen@ini.rub.de
+    Date:        2020 07 23
 
-    Description: Source file for the class cedar::aux::undoRedo::UndoCommand.
+    Description: Forward declaration file for the class cedar::proc::undoRedo::commands::CreateDeleteStep.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_STEP_FWD_H
+#define CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_STEP_FWD_H
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-// CLASS HEADER
-#include "cedar/auxiliaries/undoRedo/UndoCommand.h"
-
 // CEDAR INCLUDES
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::undoRedo::UndoCommand::UndoCommand()
+namespace cedar
 {
+  namespace proc
+  {
+    namespace undoRedo
+    {
+      namespace commands
+      {
+        //!@cond SKIPPED_DOCUMENTATION
+        CEDAR_DECLARE_PROC_CLASS(CreateDeleteStep);
+        //!@endcond
+      }
+    }
+  }
 }
 
-cedar::aux::undoRedo::UndoCommand::~UndoCommand()
-{
-}
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
+#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_STEP_FWD_H
+

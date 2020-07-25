@@ -127,11 +127,6 @@ cedar_add_library(cedaraux
   gui/UIntParameter.h
   gui/UIntVectorParameter.h
   gui/VelocityParameter.h
-  undoRedo/UndoStack.h
-  undoRedo/UndoCommand.h
-  undoRedo/commands/ElementMove.h
-  undoRedo/commands/DeleteConnection.h
-  undoRedo/commands/DeleteStep.h
   ${qglviewer_moc_files}
   ${qwt_moc_files}
   ${vtk_moc_files}

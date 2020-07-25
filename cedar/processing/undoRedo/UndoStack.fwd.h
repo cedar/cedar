@@ -22,42 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        UndoStack.cpp
+    File:        UndoStack.fwd.h
 
-    Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2020 06 21
+    Maintainer:  Lars Janssen
+    Email:       lars.janssen@ini.rub.de
+    Date:        2020 07 23
 
-    Description: Source file for the class cedar::aux::undoRedo::UndoStack.
+    Description: Forward declaration file for the class cedar::proc::undoRedo::UndoStack.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_PROC_UNDO_REDO_UNDO_STACK_FWD_H
+#define CEDAR_PROC_UNDO_REDO_UNDO_STACK_FWD_H
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-// CLASS HEADER
-#include "cedar/auxiliaries/undoRedo/UndoStack.h"
-
 // CEDAR INCLUDES
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::undoRedo::UndoStack::UndoStack(QObject *parent)
-:
-QUndoStack(parent)
+namespace cedar
 {
+  namespace proc
+  {
+    namespace undoRedo
+    {
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_PROC_CLASS(UndoStack);
+      //!@endcond
+    }
+  }
 }
 
-cedar::aux::undoRedo::UndoStack::~UndoStack()
-{
-}
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
+#endif // CEDAR_PROC_UNDO_REDO_UNDO_STACK_FWD_H
+

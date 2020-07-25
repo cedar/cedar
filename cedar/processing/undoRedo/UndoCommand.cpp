@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ElementMove.cpp
+    File:        UndoCommand.cpp
 
-    Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2020 06 21
+    Maintainer:  Lars Janssen
+    Email:       lars.janssen@ini.rub.de
+    Date:        2020 07 23
 
-    Description: Source file for the class cedar::aux::undoRedo::commands::ElementMove.
+    Description: Source file for the class cedar::proc::undoRedo::UndoCommand.
 
     Credits:
 
@@ -38,50 +38,24 @@
 #include "cedar/configuration.h"
 
 // CLASS HEADER
-#include "cedar/auxiliaries/undoRedo/commands/ElementMove.h"
+#include "cedar/processing/undoRedo/UndoCommand.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/GraphicsBase.h"
-#include "cedar/processing/gui/Scene.h"
-// SYSTEM INCLUDES
 
+// SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::undoRedo::commands::ElementMove::ElementMove(cedar::proc::gui::GraphicsBase* element, const QPointF sourcePosition, cedar::proc::gui::Scene* scene)
-:
-mpElement(element),
-mSourcePosition(sourcePosition),
-mTargetPosition(element->pos()),
-pScene(scene)
+cedar::proc::undoRedo::UndoCommand::UndoCommand()
 {
-  //TODO move element between groups
 }
 
-cedar::aux::undoRedo::commands::ElementMove::~ElementMove()
+cedar::proc::undoRedo::UndoCommand::~UndoCommand()
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-// Move element back to the source
-void cedar::aux::undoRedo::commands::ElementMove::undo()
-{
-  if(this->mpElement != nullptr && this->pScene->items().contains(this->mpElement))
-  {
-    this->mpElement->setPos(this->mSourcePosition);
-  }
-}
-
-// Move element to the target
-void cedar::aux::undoRedo::commands::ElementMove::redo()
-{
-  if(this->mpElement != nullptr && this->pScene->items().contains(this->mpElement))
-  {
-    this->mpElement->setPos(this->mTargetPosition);
-  }
-}

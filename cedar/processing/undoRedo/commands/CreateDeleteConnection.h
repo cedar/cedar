@@ -22,30 +22,30 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DeleteConnection.h
+    File:        CreateDeleteConnection.h
 
-    Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2020 07 04
+    Maintainer:  Lars Janssen
+    Email:       lars.janssen@ini.rub.de
+    Date:        2020 07 23
 
-    Description: Header file for the class cedar::aux::undoRedo::commands::DeleteConnection.
+    Description: Header file for the class cedar::proc::undoRedo::commands::CreateDeleteConnection.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_UNDO_REDO_COMMANDS_DELETE_CONNECTION_H
-#define CEDAR_AUX_UNDO_REDO_COMMANDS_DELETE_CONNECTION_H
+#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_CONNECTION_H
+#define CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_CONNECTION_H
 
 // CEDAR CONFIGURATION
 #include <cedar/processing/gui/GraphicsBase.h>
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/undoRedo/UndoCommand.h"
+#include "cedar/processing/undoRedo/UndoCommand.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/undoRedo/commands/DeleteConnection.fwd.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteConnection.fwd.h"
 #include "cedar/processing/gui/Connection.fwd.h"
 #include "cedar/processing/gui/GraphicsBase.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"
@@ -53,11 +53,11 @@
 // SYSTEM INCLUDES
 
 
-/*!@ Delete Connection Command
+/*!@ Create/Delete Connection Command
  *
- * UndoCommand Implementation for deleting a Connection
+ * UndoCommand Implementation for creating or deleting a Connection
  */
-class cedar::aux::undoRedo::commands::DeleteConnection : public cedar::aux::undoRedo::UndoCommand
+class cedar::proc::undoRedo::commands::CreateDeleteConnection : public cedar::proc::undoRedo::UndoCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -80,14 +80,14 @@ public:
 public:
 
   //!@brief Constructor for removeConnection
-  DeleteConnection(cedar::proc::gui::Connection* connection, Action action, bool createConnectorGroup = false);
+  CreateDeleteConnection(cedar::proc::gui::Connection* connection, Action action, bool createConnectorGroup = false);
 
   //!@brief Constructor for createConnection
-  DeleteConnection(cedar::proc::gui::GraphicsBase* source, cedar::proc::gui::GraphicsBase* target, Action action,
-          bool createConnectorGroup = false);
+  CreateDeleteConnection(cedar::proc::gui::GraphicsBase* source, cedar::proc::gui::GraphicsBase* target, Action action,
+                   bool createConnectorGroup = false);
 
   //!@brief Destructor
-  virtual ~DeleteConnection();
+  virtual ~CreateDeleteConnection();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -136,7 +136,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::undoRedo::commands::DeleteConnection
+}; // class cedar::proc::undoRedo::commands::CreateDeleteConnection
 
-#endif // CEDAR_AUX_UNDO_REDO_COMMANDS_DELETE_CONNECTION_H
+#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_CONNECTION_H
 

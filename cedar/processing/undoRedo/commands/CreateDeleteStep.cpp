@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DeleteStep.cpp
+    File:        CreateDeleteStep.cpp
 
-    Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2020 07 04
+    Maintainer:  Lars Janssen
+    Email:       lars.janssen@ini.rub.de
+    Date:        2020 07 23
 
-    Description: Source file for the class cedar::aux::undoRedo::commands::DeleteStep.
+    Description: Source file for the class cedar::proc::undoRedo::commands::CreateDeleteStep.
 
     Credits:
 
@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CLASS HEADER
-#include "cedar/auxiliaries/undoRedo/commands/DeleteStep.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteStep.h"
 #include "cedar/processing/DeclarationRegistry.h"
 
 // CEDAR INCLUDES
@@ -49,7 +49,7 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::undoRedo::commands::DeleteStep::DeleteStep(cedar::proc::gui::ElementPtr element)
+cedar::proc::undoRedo::commands::CreateDeleteStep::CreateDeleteStep(cedar::proc::gui::ElementPtr element)
 :
 element(element)
 {
@@ -59,21 +59,20 @@ element(element)
   cedar::proc::gui::Group* guiGroup = connectable->getGuiGroup();
 }
 
-cedar::aux::undoRedo::commands::DeleteStep::~DeleteStep()
+cedar::proc::undoRedo::commands::CreateDeleteStep::~CreateDeleteStep()
 {
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::aux::undoRedo::commands::DeleteStep::undo()
+
+void cedar::proc::undoRedo::commands::CreateDeleteStep::undo()
 {
   //Create Element in its group
   group->getScene()->createElement(group->getGroup(), classId, position);
 }
 
-void cedar::aux::undoRedo::commands::DeleteStep::redo()
+void cedar::proc::undoRedo::commands::CreateDeleteStep::redo()
 {
-
 }

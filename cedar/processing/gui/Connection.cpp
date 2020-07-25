@@ -47,12 +47,12 @@
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/View.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteConnection.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/processing/Group.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/casts.h"
-#include "cedar/auxiliaries/undoRedo/commands/DeleteConnection.h"
-#include "cedar/auxiliaries/undoRedo/UndoStack.h"
 
 // SYSTEM INCLUDES
 #include <QPainter>
@@ -961,7 +961,7 @@ void cedar::proc::gui::Connection::contextMenuEvent(QGraphicsSceneContextMenuEve
     }
     else if (selectedAction == deleteAction)
     {
-      cedar::proc::gui::Ide::mpUndoStack->push(new cedar::aux::undoRedo::commands::DeleteConnection(this, cedar::aux::undoRedo::commands::DeleteConnection::Action::REMOVED));
+      cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(this, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::REMOVED));
     }
   }
 }

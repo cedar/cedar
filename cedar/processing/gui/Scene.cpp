@@ -54,6 +54,9 @@
 #include "cedar/processing/gui/CommentWidget.h"
 #include "cedar/processing/gui/CodeWidget.h"
 #include "cedar/processing/steps/PythonScript.h"
+#include "cedar/processing/undoRedo/commands/MoveElement.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteConnection.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/GroupDeclarationManager.h"
@@ -68,9 +71,6 @@
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
-#include "cedar/auxiliaries/undoRedo/commands/ElementMove.h"
-#include "cedar/auxiliaries/undoRedo/commands/DeleteConnection.h"
-#include "cedar/auxiliaries/undoRedo/UndoStack.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -131,6 +131,8 @@ cedar::proc::gui::Scene::~Scene()
 
   this->clear();
 }
+
+cedar::proc::undoRedo::UndoStack* cedar::proc::gui::Ide::mpUndoStack;
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -294,7 +296,7 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
   while (delete_connections_stack.size() > 0)
   {
     cedar::proc::gui::Connection* p_current_connection = delete_connections_stack.back();
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::aux::undoRedo::commands::DeleteConnection(p_current_connection, cedar::aux::undoRedo::commands::DeleteConnection::Action::REMOVED));
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(p_current_connection, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::REMOVED));
     delete_connections_stack.pop_back();
   }
 
@@ -931,8 +933,6 @@ void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition
   }
 }
 
-cedar::aux::undoRedo::UndoStack* cedar::proc::gui::Ide::mpUndoStack;
-
 void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouseEvent)
 {
   switch (this->mMode)
@@ -953,7 +953,7 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
   // Push dragged element on the undo/redo stack if position has changed
   if (this->mDraggingItems && this->mpDraggingGraphicsBase && this->mStartMovingPosition != this->mpDraggingGraphicsBase->pos())
   {
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::aux::undoRedo::commands::ElementMove(this->mpDraggingGraphicsBase, this->mStartMovingPosition, this));
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::MoveElement(this->mpDraggingGraphicsBase, this->mStartMovingPosition, this));
   }
   this->mDraggingItems = false;
 
@@ -1262,7 +1262,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
 {
   if(this->mpConnectionToBeReconnected != nullptr)
   {
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::aux::undoRedo::commands::DeleteConnection(this->mpConnectionToBeReconnected, cedar::aux::undoRedo::commands::DeleteConnection::Action::REMOVED));
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(this->mpConnectionToBeReconnected, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::REMOVED));
     //TODO ConnectionMove-Command or macro for de-/ recoupling connections
     this->mpConnectionToBeReconnected = nullptr;
   }
@@ -1433,8 +1433,8 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
       {
         connected = true;
         bool create_connector_group = pMouseEvent->modifiers().testFlag(Qt::ShiftModifier);
-        cedar::proc::gui::Ide::mpUndoStack->push(new cedar::aux::undoRedo::commands::DeleteConnection(mpConnectionStart,
-                target, cedar::aux::undoRedo::commands::DeleteConnection::Action::ADDED, create_connector_group));
+        cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(mpConnectionStart,
+                target, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::ADDED, create_connector_group));
       }
       else if 
       (

@@ -22,37 +22,43 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        UndoCommand.h
+    File:        CreateDeleteStep.h
 
-    Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2020 06 21
+    Maintainer:  Lars Janssen
+    Email:       lars.janssen@ini.rub.de
+    Date:        2020 07 23
 
-    Description: Header file for the class cedar::aux::undoRedo::UndoCommand.
+    Description: Header file for the class cedar::proc::undoRedo::commands::CreateDeleteStep.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_UNDO_REDO_UNDO_COMMAND_H
-#define CEDAR_AUX_UNDO_REDO_UNDO_COMMAND_H
+#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_STEP_H
+#define CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_STEP_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/undoRedo/UndoCommand.h"
+#include "cedar/processing/gui/Group.h"
+#include "cedar/processing/gui/Element.h"
+#include "cedar/processing/gui/Connectable.h"
+
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/undoRedo/UndoCommand.fwd.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteStep.fwd.h"
+
 
 // SYSTEM INCLUDES
-#include <QUndoCommand>
+#include <QPointF>
 
-/*!@todo describe.
+/*! Create/Delete Step
  *
- * @todo describe more.
+ * Undo/redo command for step creation/deletion
  */
-class cedar::aux::undoRedo::UndoCommand : public QUndoCommand
+class cedar::proc::undoRedo::commands::CreateDeleteStep : public UndoCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -63,16 +69,17 @@ class cedar::aux::undoRedo::UndoCommand : public QUndoCommand
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  UndoCommand();
+  CreateDeleteStep(cedar::proc::gui::ElementPtr element);
 
   //!@brief Destructor
-  virtual ~UndoCommand();
+  virtual ~CreateDeleteStep();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void undo();
+  void redo();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -92,7 +99,10 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  cedar::proc::gui::ElementPtr element;
+  cedar::proc::gui::GroupPtr group;
+  std::string classId;
+  QPointF position;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -103,7 +113,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::undoRedo::UndoCommand
+}; // class cedar::proc::undoRedo::commands::CreateDeleteStep
 
-#endif // CEDAR_AUX_UNDO_REDO_UNDO_COMMAND_H
+#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_STEP_H
 

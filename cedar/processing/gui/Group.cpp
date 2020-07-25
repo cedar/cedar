@@ -70,8 +70,6 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/Recorder.h"
-#include "cedar/auxiliaries/undoRedo/UndoStack.h"
-#include "cedar/auxiliaries/undoRedo/commands/DeleteConnection.h"
 #include "cedar/processing/gui/StickyNote.h"
 #include "cedar/processing/gui/GroupParameterDesigner.h"
 #include "Ide.h"

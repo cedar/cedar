@@ -22,43 +22,37 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DeleteStep.h
+    File:        UndoStack.h
 
-    Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2020 07 04
+    Maintainer:  Lars Janssen
+    Email:       lars.janssen@ini.rub.de
+    Date:        2020 07 23
 
-    Description: Header file for the class cedar::aux::undoRedo::commands::DeleteStep.
+    Description: Header file for the class cedar::proc::undoRedo::UndoStack.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_UNDO_REDO_COMMANDS_DELETE_STEP_H
-#define CEDAR_AUX_UNDO_REDO_COMMANDS_DELETE_STEP_H
+#ifndef CEDAR_PROC_UNDO_REDO_UNDO_STACK_H
+#define CEDAR_PROC_UNDO_REDO_UNDO_STACK_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/undoRedo/UndoCommand.h"
-#include "cedar/processing/gui/Group.h"
-#include "cedar/processing/gui/Element.h"
-#include "cedar/processing/gui/Connectable.h"
-
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/undoRedo/commands/DeleteStep.fwd.h"
-
+#include "cedar/processing/undoRedo/UndoStack.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QPointF>
+#include <QUndoStack>
 
-/*!@todo describe.
+/*! Undo/Redo stack
  *
- * @todo describe more.
+ * Implementation of QTs QUndoStack to control commands regarding the undo/redo system
  */
-class cedar::aux::undoRedo::commands::DeleteStep : public UndoCommand
+class cedar::proc::undoRedo::UndoStack : public QUndoStack
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -68,18 +62,17 @@ class cedar::aux::undoRedo::commands::DeleteStep : public UndoCommand
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  DeleteStep(cedar::proc::gui::ElementPtr element);
+  //!@brief Constructor initializing the superclass
+  UndoStack(QObject *parent = nullptr);
 
   //!@brief Destructor
-  virtual ~DeleteStep();
+  virtual ~UndoStack();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void undo();
-  void redo();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -99,10 +92,7 @@ private:
 protected:
   // none yet
 private:
-  cedar::proc::gui::ElementPtr element;
-  cedar::proc::gui::GroupPtr group;
-  std::string classId;
-  QPointF position;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -113,7 +103,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::undoRedo::commands::DeleteStep
+}; // class cedar::proc::undoRedo::UndoStack
 
-#endif // CEDAR_AUX_UNDO_REDO_COMMANDS_DELETE_STEP_H
+#endif // CEDAR_PROC_UNDO_REDO_UNDO_STACK_H
 
