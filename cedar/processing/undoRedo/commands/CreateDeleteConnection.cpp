@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DeleteConnection.cpp
+    File:        CreateDeleteConnection.cpp
 
-    Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2020 07 04
+    Maintainer:  Lars Janssen
+    Email:       lars.janssen@ini.rub.de
+    Date:        2020 07 23
 
-    Description: Source file for the class cedar::aux::undoRedo::commands::DeleteConnection.
+    Description: Source file for the class cedar::proc::undoRedo::commands::CreateDeleteConnection.
 
     Credits:
 
@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/undoRedo/commands/DeleteConnection.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteConnection.h"
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/Group.h"
@@ -51,9 +51,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::undoRedo::commands::DeleteConnection::DeleteConnection(cedar::proc::gui::Connection* connection,
-        cedar::aux::undoRedo::commands::DeleteConnection::Action action,
-        bool createConnectorGroup)
+cedar::proc::undoRedo::commands::CreateDeleteConnection::CreateDeleteConnection(cedar::proc::gui::Connection* connection,
+                                                                   cedar::proc::undoRedo::commands::CreateDeleteConnection::Action action,
+                                                                   bool createConnectorGroup)
 :
 mpSource(connection->getSource()),
 mpTarget(connection->getTarget()),
@@ -64,10 +64,10 @@ mCreateConnectorGroup(createConnectorGroup)
   CEDAR_DEBUG_ASSERT(this->mpScene)
 }
 
-cedar::aux::undoRedo::commands::DeleteConnection::DeleteConnection(cedar::proc::gui::GraphicsBase* source,
-        cedar::proc::gui::GraphicsBase* target,
-        cedar::aux::undoRedo::commands::DeleteConnection::Action action,
-        bool createConnectorGroup)
+cedar::proc::undoRedo::commands::CreateDeleteConnection::CreateDeleteConnection(cedar::proc::gui::GraphicsBase* source,
+                                                                   cedar::proc::gui::GraphicsBase* target,
+                                                                   cedar::proc::undoRedo::commands::CreateDeleteConnection::Action action,
+                                                                   bool createConnectorGroup)
 :
 mpSource(source),
 mpTarget(target),
@@ -78,11 +78,15 @@ mCreateConnectorGroup(createConnectorGroup)
   CEDAR_DEBUG_ASSERT(this->mpScene)
 }
 
-cedar::aux::undoRedo::commands::DeleteConnection::~DeleteConnection()
+cedar::proc::undoRedo::commands::CreateDeleteConnection::~CreateDeleteConnection()
 {
 }
 
-void cedar::aux::undoRedo::commands::DeleteConnection::undo()
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::undoRedo::commands::CreateDeleteConnection::undo()
 {
   switch(mAction)
   {
@@ -95,7 +99,7 @@ void cedar::aux::undoRedo::commands::DeleteConnection::undo()
   }
 }
 
-void cedar::aux::undoRedo::commands::DeleteConnection::redo()
+void cedar::proc::undoRedo::commands::CreateDeleteConnection::redo()
 {
   switch(mAction)
   {
@@ -108,7 +112,7 @@ void cedar::aux::undoRedo::commands::DeleteConnection::redo()
   }
 }
 
-void cedar::aux::undoRedo::commands::DeleteConnection::removeConnection()
+void cedar::proc::undoRedo::commands::CreateDeleteConnection::removeConnection()
 {
   std::vector<cedar::proc::gui::Connection*> connectionsFromSource = this->mpSource->getConnections();
   for(cedar::proc::gui::Connection* con : connectionsFromSource)
@@ -121,14 +125,10 @@ void cedar::aux::undoRedo::commands::DeleteConnection::removeConnection()
   }
 }
 
-void cedar::aux::undoRedo::commands::DeleteConnection::createConnection()
+void cedar::proc::undoRedo::commands::CreateDeleteConnection::createConnection()
 {
   if(this->mpSource != nullptr && this->mpTarget != nullptr && this->mpScene != nullptr)
   {
     this->mpScene->createConnection(this->mpSource, this->mpTarget, mCreateConnectorGroup);
   }
 }
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
