@@ -44,6 +44,9 @@
 #include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/casts.h"
+#include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
+#include "cedar/processing/undoRedo/commands/ChangeParameterValue.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/NumericParameter.fwd.h"
@@ -242,6 +245,8 @@ private:
   void valueChanged()
   {
     ValueParameterPtr parameter = cedar::aux::asserted_pointer_cast<ValueParameter>(this->getParameter());
+
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeParameterValue<ValueType>(parameter.get(), parameter->getValue(), parameter->getValue()));
 
     bool blocked = this->mpWidget->blockSignals(true);
     parameter->lockForRead();
