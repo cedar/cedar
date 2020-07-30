@@ -1421,51 +1421,60 @@ void cedar::proc::gui::Ide::copy()
     {
       bool foundSourceString = false;
       bool foundTargetString = false;
-      //Get source and target string of connectionPair
-      std::string sourceString = connectionPair.second.find("source")->second.get_value<std::string>();
-      std::string targetString = connectionPair.second.find("target")->second.get_value<std::string>();
-      //Split and replace the step name (before the .) with the new Name
-      std::vector<std::string> sourceStringSplitted;
-      std::vector<std::string> targetStringSplitted;
-      boost::split(sourceStringSplitted, sourceString, boost::is_any_of("."));
-      boost::split(targetStringSplitted, targetString, boost::is_any_of("."));
-      //Loop through steps
-      for (auto &pair:stepsNode)
+      if(connectionPair.second.find("source") != connectionPair.second.not_found())
       {
-        //Get name of that step
-        std::string stepName = pair.second.find("name")->second.get_value<std::string>();
-        if (sourceStringSplitted[0] == stepName)
+        //Get source and target string of connectionPair
+        std::string sourceString = connectionPair.second.find("source")->second.get_value<std::string>();
+        std::string targetString = connectionPair.second.find("target")->second.get_value<std::string>();
+        //Split and replace the step name (before the .) with the new Name
+        std::vector<std::string> sourceStringSplitted;
+        std::vector<std::string> targetStringSplitted;
+        boost::split(sourceStringSplitted, sourceString, boost::is_any_of("."));
+        boost::split(targetStringSplitted, targetString, boost::is_any_of("."));
+        //Loop through steps
+        for (auto &pair:stepsNode)
         {
-          foundSourceString = true;
-        }
-        if (targetStringSplitted[0] == stepName)
-        {
-          foundTargetString = true;
-        }
-      }
-      if (!(foundSourceString && foundTargetString))
-      {
-        //Loop through groups
-        for (auto &pair:groupNode)
-        {
-          //Get name of that group
-          std::string groupName = pair.second.find("name")->second.get_value<std::string>();
-          if (sourceStringSplitted[0] == groupName)
+          if(pair.second.find("name") != pair.second.not_found())
           {
-            foundSourceString = true;
-          }
-          if (targetStringSplitted[0] == groupName)
-          {
-            foundTargetString = true;
+            //Get name of that step
+            std::string stepName = pair.second.find("name")->second.get_value<std::string>();
+            if (sourceStringSplitted[0] == stepName)
+            {
+              foundSourceString = true;
+            }
+            if (targetStringSplitted[0] == stepName)
+            {
+              foundTargetString = true;
+            }
           }
         }
-      }
-      if (foundSourceString && foundTargetString)
-      {
-        cedar::aux::ConfigurationNode connectionNode;
-        connectionNode.put("source", sourceString);
-        connectionNode.put("target", targetString);
-        filteredConnectionsNode.push_back(cedar::aux::ConfigurationNode::value_type("", connectionNode));
+        if (!(foundSourceString && foundTargetString))
+        {
+          //Loop through groups
+          for (auto &pair:groupNode)
+          {
+            if(pair.second.find("name") != pair.second.not_found())
+            {
+              //Get name of that group
+              std::string groupName = pair.second.find("name")->second.get_value<std::string>();
+              if (sourceStringSplitted[0] == groupName)
+              {
+                foundSourceString = true;
+              }
+              if (targetStringSplitted[0] == groupName)
+              {
+                foundTargetString = true;
+              }
+            }
+          }
+        }
+        if (foundSourceString && foundTargetString)
+        {
+          cedar::aux::ConfigurationNode connectionNode;
+          connectionNode.put("source", sourceString);
+          connectionNode.put("target", targetString);
+          filteredConnectionsNode.push_back(cedar::aux::ConfigurationNode::value_type("", connectionNode));
+        }
       }
     }
     rootNode.add_child("connections", filteredConnectionsNode);
@@ -1528,8 +1537,7 @@ void cedar::proc::gui::Ide::paste()
   int counterofUis = 0;
   for (auto &uiPair:uiTree)
   {
-    boost::property_tree::ptree::const_assoc_iterator it = uiPair.second.find("positionX");
-    if(it != uiPair.second.not_found())
+    if(uiPair.second.find("positionX") != uiPair.second.not_found())
     {
       double positionX = uiPair.second.find("positionX")->second.get_value<double>();
       double positionY = uiPair.second.find("positionY")->second.get_value<double>();
@@ -1542,24 +1550,33 @@ void cedar::proc::gui::Ide::paste()
     {
       if (itType->second.get_value<std::string>() == "stickyNote")
       {
-        double positionX = uiPair.second.find("x")->second.get_value<double>();
-        double positionY = uiPair.second.find("y")->second.get_value<double>();
-        QPointF pointofStep(positionX, positionY);
-        center += pointofStep;
-        counterofUis++;
+        if(uiPair.second.find("x") != uiPair.second.not_found())
+        {
+          double positionX = uiPair.second.find("x")->second.get_value<double>();
+          double positionY = uiPair.second.find("y")->second.get_value<double>();
+          QPointF pointofStep(positionX, positionY);
+          center += pointofStep;
+          counterofUis++;
+        }
       }
     }
   }
   for(auto &groupPair:groupTree)
   {
-    auto ui_generic = groupPair.second.find("ui generic");
-    double positionX = ui_generic->second.find("positionX")->second.get_value<double>();
-    double positionY = ui_generic->second.find("positionY")->second.get_value<double>();
-    double width = ui_generic->second.find("width")->second.get_value<double>();
-    double height = ui_generic->second.find("height")->second.get_value<double>();
-    QPointF pointofGroup(positionX + width / 2,positionY + height / 2);
-    center += pointofGroup;
-    counterofUis++;
+    if(groupPair.second.find("ui generic") != groupPair.second.not_found())
+    {
+      auto ui_generic = groupPair.second.find("ui generic");
+      if(ui_generic->second.find("positionX") != ui_generic->second.not_found() && ui_generic->second.find("width") != ui_generic->second.not_found())
+      {
+        double positionX = ui_generic->second.find("positionX")->second.get_value<double>();
+        double positionY = ui_generic->second.find("positionY")->second.get_value<double>();
+        double width = ui_generic->second.find("width")->second.get_value<double>();
+        double height = ui_generic->second.find("height")->second.get_value<double>();
+        QPointF pointofGroup(positionX + width / 2, positionY + height / 2);
+        center += pointofGroup;
+        counterofUis++;
+      }
+    }
   }
 
   center /= counterofUis;
@@ -1590,14 +1607,17 @@ void cedar::proc::gui::Ide::paste()
 
     cedar::aux::ConfigurationNode singleStepValue;
 
+    if(stepsPair.second.find("name") == stepsPair.second.not_found())
+    {
+      continue;
+    }
     std::string oldName = stepsPair.second.find("name")->second.get_value<std::string>();
     std::string newName = this->mGroup->getGroup()->getUniqueIdentifier(oldName);
 
     //In UI rename every occurrence of oldName to newName and change position
     for (auto &uiPair:uiTree)
     {
-      boost::property_tree::ptree::const_assoc_iterator it = uiPair.second.find("step");
-      if(it != uiPair.second.not_found())
+      if(uiPair.second.find("step") != uiPair.second.not_found() && uiPair.second.find("positionX") != uiPair.second.not_found())
       {
         std::string uiName = uiPair.second.find("step")->second.get_value<std::string>();
 
@@ -1616,8 +1636,8 @@ void cedar::proc::gui::Ide::paste()
           QPointF newPositionOfStep = mousePositionScenePos + vectorFromCenterToStep;
 
           //Set new position
-          uiPair.second.put("positionX", std::to_string(newPositionOfStep.x()));
-          uiPair.second.put("positionY", std::to_string(newPositionOfStep.y()));
+          uiPair.second.put("positionX", newPositionOfStep.x());
+          uiPair.second.put("positionY", newPositionOfStep.y());
 
           singleUiValue.push_back(cedar::aux::ConfigurationNode::value_type("", uiPair.second));
         }
@@ -1648,8 +1668,9 @@ void cedar::proc::gui::Ide::paste()
   {
     cedar::aux::ConfigurationNode singleUiValue;
 
-    boost::property_tree::ptree::const_assoc_iterator it = uiPair.second.find("type");
-    if(it != uiPair.second.not_found() && it->second.get_value<std::string>() == "stickyNote")
+    boost::property_tree::ptree::const_assoc_iterator itType = uiPair.second.find("type");
+    if(itType != uiPair.second.not_found() && itType->second.get_value<std::string>() == "stickyNote" &&
+        uiPair.second.find("x") != uiPair.second.not_found())
     {
       ////Change position
       //Get
@@ -1662,8 +1683,8 @@ void cedar::proc::gui::Ide::paste()
       QPointF newPostionOfNote = mousePositionScenePos + vectorFromCenterToNote;
 
       //Set
-      uiPair.second.put("x", std::to_string((int)newPostionOfNote.x()));
-      uiPair.second.put("y",  std::to_string((int)newPostionOfNote.y()));
+      uiPair.second.put("x", (int)newPostionOfNote.x());
+      uiPair.second.put("y",  (int)newPostionOfNote.y());
       singleUiValue.push_back(cedar::aux::ConfigurationNode::value_type("", uiPair.second));
     }
 
@@ -1678,35 +1699,37 @@ void cedar::proc::gui::Ide::paste()
 
     ////Change position
     auto ui_generic = groupPair.second.find("ui generic");
-    double positionX = ui_generic->second.find("positionX")->second.get_value<double>();
-    double positionY = ui_generic->second.find("positionY")->second.get_value<double>();
-    QPointF pointofGroup(positionX,positionY);
-
-    //Manipulate: Get vector from center to step and add this vector to the mouse
-    QPointF vectorFromCenterToGroup = pointofGroup - center;
-    QPointF newPostionofGroup = mousePositionScenePos + vectorFromCenterToGroup;
-    //Set
-    ui_generic->second.put("positionX", std::to_string(newPostionofGroup.x()));
-    ui_generic->second.put("positionY",  std::to_string(newPostionofGroup.y()));
-
-    //Rename other occurences at "name" and ui generic/group
-    groupPair.second.put("name", newName);
-    groupPair.second.find("ui generic")->second.put("group", newName);
-    if (connectionsTree)
+    if(ui_generic != groupPair.second.not_found() && ui_generic->second.find("positionX") != ui_generic->second.not_found())
     {
-      renameElementInConnection(*connectionsTree, oldName, newName, "source", "target");
+      double positionX = ui_generic->second.find("positionX")->second.get_value<double>();
+      double positionY = ui_generic->second.find("positionY")->second.get_value<double>();
+      QPointF pointofGroup(positionX, positionY);
+
+      //Manipulate: Get vector from center to step and add this vector to the mouse
+      QPointF vectorFromCenterToGroup = pointofGroup - center;
+      QPointF newPostionofGroup = mousePositionScenePos + vectorFromCenterToGroup;
+      //Set
+      ui_generic->second.put("positionX", newPostionofGroup.x());
+      ui_generic->second.put("positionY", newPostionofGroup.y());
+
+      //Rename other occurences at "name" and ui generic/group
+      groupPair.second.put("name", newName);
+      ui_generic->second.put("group", newName);
+      if (connectionsTree)
+      {
+        renameElementInConnection(*connectionsTree, oldName, newName, "source", "target");
+      }
+      if (uiConnectionsTree)
+      {
+        renameElementInConnection(*uiConnectionsTree, oldName, newName, "source slot", "target slot");
+      }
+
+      cedar::aux::ConfigurationNode singleGroupPair;
+      singleGroupPair.push_front(cedar::aux::ConfigurationNode::value_type(newName, groupPair.second));
+
+      cedar::aux::ConfigurationNode emptyNode;
+      this->pasteConfigurationNodes(emptyNode, emptyNode, emptyNode, singleGroupPair);
     }
-    if(uiConnectionsTree)
-    {
-      renameElementInConnection(*uiConnectionsTree, oldName, newName, "source slot", "target slot");
-    }
-
-    cedar::aux::ConfigurationNode singleGroupPair;
-    singleGroupPair.push_front(cedar::aux::ConfigurationNode::value_type(newName, groupPair.second));
-
-    cedar::aux::ConfigurationNode emptyNode;
-    this->pasteConfigurationNodes(emptyNode,emptyNode,emptyNode,singleGroupPair);
-
   }
 
   ////Generate Configuration node for ui connections
@@ -1789,8 +1812,7 @@ void cedar::proc::gui::Ide::renameElementInConnection(boost::property_tree::ptre
   for (auto &connectionPair:connectionTree)
   {
     //Get source and target string of connectionPair
-    boost::property_tree::ptree::const_assoc_iterator it = connectionPair.second.find(sourceSlotName);
-    if(it != connectionPair.second.not_found()) {
+    if(connectionPair.second.find(sourceSlotName) != connectionPair.second.not_found()) {
       std::string sourceString = connectionPair.second.find(sourceSlotName)->second.get_value<std::string>();
       std::string targetString = connectionPair.second.find(targetSlotName)->second.get_value<std::string>();
       //Split and replace the first part (before the .) with the new Name
