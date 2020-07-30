@@ -43,6 +43,11 @@ import sys
 import os
 import re
 
+#Resolve Python 2/3 conflicts
+if sys.version_info.major > 2:
+    def raw_input(input_str):
+        return input(input_str)
+
 # Script configuration:
 namespace_aliases = {}
 namespace_aliases["unit"] = "units"
@@ -62,14 +67,14 @@ users_mail_cfg = "user's mail"
 
 # determine cedar home
 cedar_home = os.path.realpath(__file__ + "/../..")
-print "cedar home detected as:", cedar_home
+print("cedar home detected as:", cedar_home)
 template_base_path = cedar_home + os.sep + "templates" + os.sep
 
 # Configuration reading
 config_file_path = home + os.sep + ".cedar" + os.sep + "template_script.cfg"
 try:
     with open(config_file_path, "r") as config:
-        print "Reading user information from", config_file_path
+        print("Reading user information from", config_file_path)
         for line in config.readlines():
             line = line.rstrip()
             vals = line.split("=")
@@ -81,9 +86,9 @@ try:
                 elif arg == users_mail_cfg:
                     users_mail = val
                 else:
-                    print "unknown config entry:", arg
+                    print("unknown config entry:", arg)
             else:
-                print "Could not interpret config line:", line
+                print("Could not interpret config line:", line)
 except IOError:
   pass
 
@@ -120,15 +125,15 @@ if not options.template is None:
     if (options.template == "step"):
         options.template= "processing_step"
     if not os.path.exists(template_base_path + options.template):
-        print "Could not find template", options.template
+        print("Could not find template", options.template)
         sys.exit(-1)
     template_base_path += options.template + os.sep
 
 if len(args) > 1:
-    print "Please specify a single class name (you specified: ", args, ")."
+    print("Please specify a single class name (you specified: ", args, ").")
     sys.exit(-1)
 elif len(args) == 0:
-    print "Please specify a class name."
+    print("Please specify a class name.")
     parser.print_usage()
     sys.exit(-1)
 
@@ -265,19 +270,19 @@ else:
   
 # Get user confirmation
 
-print "Creating class:", class_name_full, "aka", class_name
+print("Creating class:", class_name_full, "aka", class_name)
 if not options.template is None:
-    print "Using template", options.template
-print "at:", destination_base + ".{" + ", ".join(extensions) + "}"
+    print("Using template", options.template)
+print("at:", destination_base + ".{" + ", ".join(extensions) + "}")
 # print "replacements:", replacements
 # print "namespaces:", namespaces
-print "top-level namespace:", top_level_namespace
+print("top-level namespace:", top_level_namespace)
 choice = None
 while not choice in ('y', 'n'):
     choice = raw_input("Do you want to proceed? (y/n): ")
 
 if choice == 'n':
-    print "Okay, bye!"
+    print("Okay, bye!")
     sys.exit()
 
 # make sure the path for the namespace exists
@@ -290,7 +295,7 @@ if_re = re.compile(r'\<if\s*:\s*(\w+)\s*\>\n(.*?)\<\s*endif\s*\>\n', re.DOTALL)
 else_re = re.compile(r'(.*?)\s*\<\s*else\s*\>\n(.*)', re.DOTALL)
 
 for extension in extensions:
-    print "Copying template", templates[extension]
+    print("Copying template", templates[extension])
     replacements["<filename>"] = class_name + "." + extension
     with open(template_base_path + templates[extension], "r") as header:
         contents = header.read()
@@ -331,18 +336,18 @@ for extension in extensions:
         
     destination = destination_base + "." + extension
       
-    print "destination:", destination
+    print("destination:", destination)
     
     if not overwrite and os.path.exists(destination):
-        print "File already exists. Skipping."
+        print("File already exists. Skipping.")
         continue
 
     try:    
         with open(destination, "w") as out:
             out.write(contents)
     except IOError as e:
-        print "Could not create file \"" + str(destination) + "\". Error:", str(e)
+        print("Could not create file \"" + str(destination) + "\". Error:", str(e))
         sys.exit(-1)
     
-print "Done. Please remember to rerun cmake!"
+print("Done. Please remember to rerun cmake!")
 
