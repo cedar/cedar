@@ -22,39 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ChangeParameterValue.h
+    File:        ChangeVectorParameterValue.h
 
     Maintainer:  Lars Janssen
     Email:       lars.janssen@ini.rub.de
-    Date:        2020 07 28
+    Date:        2020 08 15
 
-    Description: Header file for the class cedar::proc::undoRedo::commands::ChangeParameterValue.
+    Description: Header file for the class cedar::proc::undoRedo::commands::ChangeVectorParameterValue.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_PARAMETER_VALUE_H
-#define CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_PARAMETER_VALUE_H
+#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_VECTOR_PARAMETER_VALUE_H
+#define CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_VECTOR_PARAMETER_VALUE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/undoRedo/UndoCommand.h"
-#include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/VectorParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/undoRedo/commands/ChangeParameterValue.fwd.h"
+#include "cedar/processing/undoRedo/commands/ChangeVectorParameterValue.fwd.h"
 
 // SYSTEM INCLUDES
 
+
 /*!@ Parameter change command
  *
- * UndoCommand Implementation for changing multiple types of Parameters (PatameterTemplate<>)
+ * UndoCommand Implementation for changing VectorParameters (double, uint, ...)
  */
 template <typename ValueT>
-class cedar::proc::undoRedo::commands::ChangeParameterValue : public cedar::proc::undoRedo::UndoCommand
+class cedar::proc::undoRedo::commands::ChangeVectorParameterValue : public cedar::proc::undoRedo::UndoCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -68,16 +69,16 @@ class cedar::proc::undoRedo::commands::ChangeParameterValue : public cedar::proc
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ChangeParameterValue(cedar::aux::ParameterTemplate<ValueType>* parameter, ValueType oldValue, ValueType newValue, bool lock = false)
+  ChangeVectorParameterValue(cedar::aux::VectorParameter<ValueType>* parameter,
+                             std::vector<ValueType> oldValue, std::vector<ValueType> newValue)
   {
     this->mpParameter = parameter;
     this->mOldValue = oldValue;
     this->mNewValue = newValue;
-    this->mLock = lock;
   }
 
   //!@brief Destructor
-  virtual ~ChangeParameterValue()
+  ChangeVectorParameterValue()
   {
   }
 
@@ -88,13 +89,11 @@ public:
 
   void undo()
   {
-    this->mpParameter->setValue(this->mOldValue, this->mLock);
-    this->mpParameter->emitChangedSignal();
+    this->mpParameter->setValue(this->mOldValue);
   }
   void redo()
   {
-    this->mpParameter->setValue(this->mNewValue, this->mLock);
-    this->mpParameter->emitChangedSignal();
+    this->mpParameter->setValue(this->mNewValue);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -116,10 +115,9 @@ protected:
   // none yet
 private:
 
-  cedar::aux::ParameterTemplate<ValueType>* mpParameter;
-  ValueType mOldValue;
-  ValueType mNewValue;
-  bool mLock;
+  cedar::aux::VectorParameter<ValueType>* mpParameter;
+  std::vector<ValueType> mOldValue;
+  std::vector<ValueType> mNewValue;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -130,7 +128,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::undoRedo::commands::ChangeParameterValue
+}; // class cedar::proc::undoRedo::commands::ChangeVectorParameterValue
 
-#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_PARAMETER_VALUE_H
+#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_VECTOR_PARAMETER_VALUE_H
 

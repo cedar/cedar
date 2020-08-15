@@ -215,8 +215,15 @@ protected:
 
     ValueType oldvalue = parameter->getValue();
 
-    parameter->setValue(value, true);
+    // push to undo stack
+    if (oldvalue != value)
+    {
+      cedar::proc::gui::Ide::mpUndoStack->push(
+              new cedar::proc::undoRedo::commands::ChangeParameterValue<ValueType>(parameter.get(), oldvalue, value, true));
+    }
 
+    // update parameter value
+    parameter->setValue(value, true);
     WidgetPolicy::manuallyChangedValue(this->mpWidget, value, oldvalue);
   }
 
@@ -245,8 +252,6 @@ private:
   void valueChanged()
   {
     ValueParameterPtr parameter = cedar::aux::asserted_pointer_cast<ValueParameter>(this->getParameter());
-
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeParameterValue<ValueType>(parameter.get(), parameter->getValue(), parameter->getValue()));
 
     bool blocked = this->mpWidget->blockSignals(true);
     parameter->lockForRead();

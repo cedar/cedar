@@ -43,6 +43,9 @@
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
+#include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
+#include "cedar/processing/undoRedo/commands/ChangeParameterValue.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
@@ -129,7 +132,9 @@ void cedar::aux::gui::StringParameter::textEdited(const QString& text)
   auto parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(this->getParameter());
   try
   {
+    std::string oldValue = parameter->getValue();
     parameter->setValue(text.toStdString());
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeParameterValue<std::string>(parameter.get(), oldValue, text.toStdString()));
   }
   catch (cedar::aux::ValidationFailedException& exc)
   {

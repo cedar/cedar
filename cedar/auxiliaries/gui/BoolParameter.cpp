@@ -43,6 +43,9 @@
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
+#include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
+#include "cedar/processing/undoRedo/commands/ChangeParameterValue.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
@@ -113,6 +116,11 @@ void cedar::aux::gui::BoolParameter::stateChanged(int state)
   parameter = boost::dynamic_pointer_cast<cedar::aux::BoolParameter>(this->getParameter());
   if (value != parameter->getValue())
   {
+    // push to undo stack
+    cedar::proc::gui::Ide::mpUndoStack->push(
+            new cedar::proc::undoRedo::commands::ChangeParameterValue<bool>(parameter.get(), !value, value));
+
+    // update parameter value
     parameter->setValue(value, true);
   }
 }

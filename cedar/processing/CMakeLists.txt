@@ -192,6 +192,7 @@ cedar_add_library(cedarproc
   steps/PositionOfMaximum.h
   undoRedo/UndoStack.h
   undoRedo/UndoCommand.h
+  undoRedo/commands/ChangeVectorParameterValue.h
   undoRedo/commands/ChangeParameterValue.h
   undoRedo/commands/CreateDeleteConnection.h
   undoRedo/commands/CreateDeleteStep.h

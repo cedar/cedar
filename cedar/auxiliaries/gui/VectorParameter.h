@@ -45,6 +45,9 @@
 #include "cedar/auxiliaries/VectorParameter.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
 #include "cedar/auxiliaries/casts.h"
+#include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
+#include "cedar/processing/undoRedo/commands/ChangeVectorParameterValue.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/VectorParameter.fwd.h"
@@ -177,6 +180,10 @@ protected:
   //! react to value change in one of the sub widgets
   virtual void widgetValueChanged(WidgetT* pWidget)
   {
+
+    std::vector<ValueType> before;
+    std::vector<ValueType> after;
+
     size_t index = this->mWidgets.size();
 
     for (size_t i = 0; i < this->mWidgets.size(); ++i)
@@ -184,8 +191,9 @@ protected:
       if (this->mWidgets[i] == pWidget)
       {
         index = i;
-        break;
       }
+      before.push_back(WidgetAbstraction::getValue(this->mWidgets[i]));
+      after.push_back(WidgetAbstraction::getValue(this->mWidgets[i]));
     }
 
     // if this fails, the widget was not found in the list of the ones managed by this gui parameter
@@ -195,6 +203,16 @@ protected:
 
     if (WidgetAbstraction::getValue(this->mWidgets[index]) != this->parameter()->at(index))
     {
+      // push to undo stack
+      if (auto param = dynamic_cast<cedar::aux::VectorParameter<ValueType> *>(this->getParameter().get()))
+      {
+        before[index] = this->parameter()->at(index);
+        cedar::proc::gui::Ide::mpUndoStack->push(
+                new cedar::proc::undoRedo::commands::ChangeVectorParameterValue<ValueType>(param, before,
+                                                                                                     after));
+      }
+
+      // update parameter value
       this->parameter()->setValue(index, WidgetAbstraction::getValue(this->mWidgets[index]), true);
     }
   }

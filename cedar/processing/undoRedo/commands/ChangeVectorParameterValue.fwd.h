@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ChangeParameterValue.fwd.h
+    File:        ChangeVectorParameterValue.fwd.h
 
     Maintainer:  Lars Janssen
     Email:       lars.janssen@ini.rub.de
-    Date:        2020 07 28
+    Date:        2020 08 15
 
-    Description: Forward declaration file for the class cedar::proc::undoRedo::commands::ChangeParameterValue.
+    Description: Forward declaration file for the class cedar::proc::undoRedo::commands::ChangeVectorParameterValue.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_PARAMETER_VALUE_FWD_H
-#define CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_PARAMETER_VALUE_FWD_H
+#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_VECTOR_PARAMETER_VALUE_FWD_H
+#define CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_VECTOR_PARAMETER_VALUE_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -59,7 +59,7 @@ namespace cedar
       {
         //!@cond SKIPPED_DOCUMENTATION
         template<typename T>
-        class ChangeParameterValue;
+        class ChangeVectorParameterValue;
         //!@endcond
       }
     }
@@ -67,5 +67,5 @@ namespace cedar
 }
 
 
-#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_PARAMETER_VALUE_FWD_H
+#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_VECTOR_PARAMETER_VALUE_FWD_H
 
