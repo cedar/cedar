@@ -62,6 +62,7 @@
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
+#include <QShowEvent>
 #include <QKeyEvent>
 #include <QDoubleSpinBox>
 #include <QComboBox>
@@ -404,6 +405,8 @@ private:
   void resetWarningAndErrorStateIndicators();
 
   void backupSaveCallback();
+
+  void showEvent( QShowEvent *event );
 
 private slots:
   void globalTimeFactorSliderChanged(int newValue);

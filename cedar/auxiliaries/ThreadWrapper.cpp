@@ -164,9 +164,9 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
     delete mpThread;
     this->mpThread = NULL;
   }
-#ifndef CEDAR_OS_WINDOWS
-  mDestructingMutex.unlock();
-#endif	
+
+//  mDestructingMutex.unlock(); //responsible for crashes under win64 and MacOS do we need it under linux?
+
 }
 
 //------------------------------------------------------------------------------

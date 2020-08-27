@@ -175,16 +175,24 @@ void cedar::proc::steps::Jacobian::rebuildOutputs()
 
 void cedar::proc::steps::Jacobian::testStates(cedar::dev::ComponentPtr component)
 {
-  if (!component->isCommunicating())
-  {
-    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, component->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.");
-  }
-  else if (!component->isReadyForMeasurements())
-  {
-    this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, component->prettifyName() + " is not ready to receive measurements, yet.");
-  }
-  else
-  {
-    this->resetState();
-  }
+    if (this->hasComponent())
+    {
+        if (!component->isCommunicating())
+        {
+            this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, component->prettifyName() + " is not connected, yet. Open the Robot Manager to connect.");
+        }
+        else if (!component->isReadyForMeasurements())
+        {
+            this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, component->prettifyName() + " is not ready to receive measurements, yet.");
+        }
+        else
+        {
+            this->resetState();
+        }
+    }
+    else
+    {
+        this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, "No component connected."); //fix crash mac/win
+    }
+
 }
