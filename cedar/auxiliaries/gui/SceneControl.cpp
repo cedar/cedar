@@ -60,7 +60,6 @@ mpScene(new cedar::aux::gl::Scene)
 }
 
 cedar::aux::gui::SceneControl::~SceneControl(){
-    delete mpView;
 }
 
 void cedar::aux::gui::SceneControl::showTab() //Fixes a Bug under Mac OS
