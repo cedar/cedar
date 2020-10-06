@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/gui/RobotManager.h"
+#include "cedar/processing/devices/gui/RobotManager.h"
 #include "cedar/devices/gui/RobotCard.h"
 #include "cedar/devices/RobotManager.h"
 #include "cedar/devices/Robot.h"
@@ -59,7 +59,7 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::gui::RobotManager::RobotManager()
+cedar::proc::dev::gui::RobotManager::RobotManager()
 :
 mpComponentsNode(NULL),
 mpChannelsNode(NULL)
@@ -85,7 +85,7 @@ mpChannelsNode(NULL)
                                                     (
                                                       boost::bind
                                                       (
-                                                        &cedar::dev::gui::RobotManager::robotAddedSignalTranslator,
+                                                        &cedar::proc::dev::gui::RobotManager::robotAddedSignalTranslator,
                                                         this,
                                                         _1
                                                       )
@@ -98,7 +98,7 @@ mpChannelsNode(NULL)
                                            (
                                              boost::bind
                                              (
-                                               &cedar::dev::gui::RobotManager::robotConfigurationLoadedSignalTranslator,
+                                               &cedar::proc::dev::gui::RobotManager::robotConfigurationLoadedSignalTranslator,
                                                this,
                                                _1
                                              )
@@ -109,7 +109,7 @@ mpChannelsNode(NULL)
                                 (
                                   boost::bind
                                   (
-                                    &cedar::dev::gui::RobotManager::robotRemoved,
+                                    &cedar::proc::dev::gui::RobotManager::robotRemoved,
                                     this,
                                     _1
                                   )
@@ -135,7 +135,7 @@ mpChannelsNode(NULL)
   (
     boost::bind
     (
-      &cedar::dev::gui::RobotManager::robotRenamed,
+      &cedar::proc::dev::gui::RobotManager::robotRenamed,
       this,
       _1,
       _2
@@ -143,7 +143,7 @@ mpChannelsNode(NULL)
   );
 }
 
-cedar::dev::gui::RobotManager::~RobotManager()
+cedar::proc::dev::gui::RobotManager::~RobotManager()
 {
   mRobotAddedConnection.disconnect();
   mRobotRemovedConnection.disconnect();
@@ -154,7 +154,7 @@ cedar::dev::gui::RobotManager::~RobotManager()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::gui::RobotManager::robotRenamed(const std::string& oldName, const std::string& newName)
+void cedar::proc::dev::gui::RobotManager::robotRenamed(const std::string& oldName, const std::string& newName)
 {
   //!@todo This should probably be emitted using Qt signals in case it gets called outside the GUI thread
 
@@ -172,7 +172,7 @@ void cedar::dev::gui::RobotManager::robotRenamed(const std::string& oldName, con
   CEDAR_DEBUG_NON_CRITICAL_ASSERT(false && "Could not find previous robot name in selector.");
 }
 
-void cedar::dev::gui::RobotManager::fillExistingRobots()
+void cedar::proc::dev::gui::RobotManager::fillExistingRobots()
 {
   std::vector<std::string> robot_names = cedar::dev::RobotManagerSingleton::getInstance()->getRobotNames();
 
@@ -209,17 +209,17 @@ void cedar::dev::gui::RobotManager::fillExistingRobots()
 
 }
 
-void cedar::dev::gui::RobotManager::removeClicked()
+void cedar::proc::dev::gui::RobotManager::removeClicked()
 {
     cedar::dev::RobotManagerSingleton::getInstance()->removeRobot(this->getSelectedRobotName());
 }
 
-void cedar::dev::gui::RobotManager::closeWindow()
+void cedar::proc::dev::gui::RobotManager::closeWindow()
 {
     closeRobotManager();
 }
 
-void cedar::dev::gui::RobotManager::robotRemoved(const std::string& robotName)
+void cedar::proc::dev::gui::RobotManager::robotRemoved(const std::string& robotName)
 {
   int index = this->mpRobotSelector->findData(QString::fromStdString(robotName));
   CEDAR_ASSERT(index >= 0);
@@ -227,7 +227,7 @@ void cedar::dev::gui::RobotManager::robotRemoved(const std::string& robotName)
   this->mpRobotSelector->removeItem(index);
 }
 
-void cedar::dev::gui::RobotManager::fillSimpleRobotList()
+void cedar::proc::dev::gui::RobotManager::fillSimpleRobotList()
 {
   std::vector<std::string> robot_names = cedar::dev::RobotManagerSingleton::getInstance()->getRobotTemplateNames();
 
@@ -246,13 +246,13 @@ void cedar::dev::gui::RobotManager::fillSimpleRobotList()
   }
 }
 
-void cedar::dev::gui::RobotManager::simpleModeAdd()
+void cedar::proc::dev::gui::RobotManager::simpleModeAdd()
 {
   std::string new_robot_name = cedar::dev::RobotManagerSingleton::getInstance()->getNewRobotName();
   cedar::dev::RobotManagerSingleton::getInstance()->addRobotName(new_robot_name);
 }
 
-void cedar::dev::gui::RobotManager::partSelected(QTreeWidgetItem* pCurrent, QTreeWidgetItem*)
+void cedar::proc::dev::gui::RobotManager::partSelected(QTreeWidgetItem* pCurrent, QTreeWidgetItem*)
 {
   if
   (
@@ -296,7 +296,7 @@ void cedar::dev::gui::RobotManager::partSelected(QTreeWidgetItem* pCurrent, QTre
   }
 }
 
-void cedar::dev::gui::RobotManager::addRobotClicked()
+void cedar::proc::dev::gui::RobotManager::addRobotClicked()
 {
   QString name
     = QInputDialog::getText
@@ -317,7 +317,7 @@ void cedar::dev::gui::RobotManager::addRobotClicked()
       cedar::aux::LogSingleton::getInstance()->error
       (
         e.exceptionInfo(),
-        "void cedar::dev::gui::RobotManager::addRobotClicked()"
+        "void cedar::proc::dev::gui::RobotManager::addRobotClicked()"
       );
       QMessageBox::critical
       (
@@ -329,7 +329,7 @@ void cedar::dev::gui::RobotManager::addRobotClicked()
   }
 }
 
-void cedar::dev::gui::RobotManager::loadConfiguration(const cedar::aux::Path& configuration)
+void cedar::proc::dev::gui::RobotManager::loadConfiguration(const cedar::aux::Path& configuration)
 {
   std::string robot_name = this->getSelectedRobotName();
   try
@@ -341,7 +341,7 @@ void cedar::dev::gui::RobotManager::loadConfiguration(const cedar::aux::Path& co
     cedar::aux::LogSingleton::getInstance()->error
     (
       e.exceptionInfo(),
-      "void cedar::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()"
+      "void cedar::proc::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()"
     );
     QMessageBox::critical
     (
@@ -355,7 +355,7 @@ void cedar::dev::gui::RobotManager::loadConfiguration(const cedar::aux::Path& co
     cedar::aux::LogSingleton::getInstance()->error
     (
       e.exceptionInfo(),
-      "void cedar::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()"
+      "void cedar::proc::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()"
     );
     QMessageBox::critical
     (
@@ -366,7 +366,7 @@ void cedar::dev::gui::RobotManager::loadConfiguration(const cedar::aux::Path& co
   }
 }
 
-void cedar::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()
+void cedar::proc::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()
 {
   std::vector<std::string> extensions;
   extensions.push_back(".json");
@@ -378,12 +378,12 @@ void cedar::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()
   }
 }
 
-cedar::dev::RobotPtr cedar::dev::gui::RobotManager::getSelectedRobot() const
+cedar::dev::RobotPtr cedar::proc::dev::gui::RobotManager::getSelectedRobot() const
 {
   return cedar::dev::RobotManagerSingleton::getInstance()->getRobot(this->getSelectedRobotName());
 }
 
-std::string cedar::dev::gui::RobotManager::getSelectedRobotName() const
+std::string cedar::proc::dev::gui::RobotManager::getSelectedRobotName() const
 {
   //!@todo Proper exception.
   CEDAR_ASSERT (this->mpRobotSelector->currentIndex() != -1);
@@ -391,7 +391,7 @@ std::string cedar::dev::gui::RobotManager::getSelectedRobotName() const
   return this->mpRobotSelector->itemData(this->mpRobotSelector->currentIndex()).toString().toStdString();
 }
 
-void cedar::dev::gui::RobotManager::loadConfigurationTriggered()
+void cedar::proc::dev::gui::RobotManager::loadConfigurationTriggered()
 {
   QString file = QFileDialog::getOpenFileName(this, "Select a configuration file to load.", "", "*");
 
@@ -401,7 +401,7 @@ void cedar::dev::gui::RobotManager::loadConfigurationTriggered()
   }
 }
 
-void cedar::dev::gui::RobotManager::robotNameSelected(int nameIndex)
+void cedar::proc::dev::gui::RobotManager::robotNameSelected(int nameIndex)
 {
   bool something_selected = (nameIndex != -1);
   this->mpLoadButton->setEnabled(something_selected);
@@ -420,7 +420,7 @@ void cedar::dev::gui::RobotManager::robotNameSelected(int nameIndex)
   }
 }
 
-void cedar::dev::gui::RobotManager::updateRobotConfiguration(QString addedRobotName)
+void cedar::proc::dev::gui::RobotManager::updateRobotConfiguration(QString addedRobotName)
 {
   this->selectRobot(addedRobotName.toStdString());
 
@@ -430,7 +430,7 @@ void cedar::dev::gui::RobotManager::updateRobotConfiguration(QString addedRobotN
 //  emit configurationChanged();
 }
 
-void cedar::dev::gui::RobotManager::deselectRobot()
+void cedar::proc::dev::gui::RobotManager::deselectRobot()
 {
   if (this->mpComponentsNode != NULL)
   {
@@ -445,7 +445,7 @@ void cedar::dev::gui::RobotManager::deselectRobot()
   }
 }
 
-void cedar::dev::gui::RobotManager::selectRobot(const std::string& robotName)
+void cedar::proc::dev::gui::RobotManager::selectRobot(const std::string& robotName)
 {
   this->deselectRobot();
 
@@ -520,7 +520,7 @@ void cedar::dev::gui::RobotManager::selectRobot(const std::string& robotName)
   }
 }
 
-void cedar::dev::gui::RobotManager::addRobotName(QString addedRobotName)
+void cedar::proc::dev::gui::RobotManager::addRobotName(QString addedRobotName)
 {
   /* the first parameter is the displayed string, the second is the name used to internally identify the robot.
    * the first parameter can be changed without consequences (e.g., to display useful information), the second should
@@ -537,12 +537,12 @@ void cedar::dev::gui::RobotManager::addRobotName(QString addedRobotName)
 
 }
 
-void cedar::dev::gui::RobotManager::robotAddedSignalTranslator(const std::string& addedRobotName)
+void cedar::proc::dev::gui::RobotManager::robotAddedSignalTranslator(const std::string& addedRobotName)
 {
   emit robotNameAdded(QString::fromStdString(addedRobotName));
 }
 
-void cedar::dev::gui::RobotManager::robotConfigurationLoadedSignalTranslator(const std::string& robotName)
+void cedar::proc::dev::gui::RobotManager::robotConfigurationLoadedSignalTranslator(const std::string& robotName)
 {
   emit robotConfigurationLoaded(QString::fromStdString(robotName));
 }

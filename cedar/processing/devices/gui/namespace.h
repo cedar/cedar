@@ -34,11 +34,11 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_GUI_NAMESPACE_H
-#define CEDAR_DEV_GUI_NAMESPACE_H
+#ifndef CEDAR_PROC_DEV_GUI_NAMESPACE_H
+#define CEDAR_PROC_DEV_GUI_NAMESPACE_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/lib.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -47,21 +47,20 @@
 
 namespace cedar
 {
-  namespace dev
+  namespace proc
   {
-    /*! @brief Namespace for gui of robot interfaces. */
-    namespace gui
+    namespace dev
     {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_DEV_CLASS(KinematicChainWidget);
-      CEDAR_DECLARE_DEV_CLASS(KinematicChainMonitorWidget);
-      CEDAR_DECLARE_DEV_CLASS(KinematicChainCommandWidget);
-      CEDAR_DECLARE_DEV_CLASS(MountedCameraViewer);
-      CEDAR_DECLARE_DEV_CLASS(RobotCard);
-      CEDAR_DECLARE_DEV_CLASS(RobotCardIconHolder);
-      //!@endcond
+      /*! @brief Namespace for gui of robot interfaces. */
+      namespace gui
+      {
+        //!@cond SKIPPED_DOCUMENTATION
+        CEDAR_DECLARE_PROC_CLASS(ComponentParameter);
+        CEDAR_DECLARE_PROC_CLASS(RobotManager);
+        //!@endcond
+      }
     }
   }
 }
 
-#endif // CEDAR_DEV_GUI_NAMESPACE_H
+#endif // CEDAR_PROC_DEV_GUI_NAMESPACE_H

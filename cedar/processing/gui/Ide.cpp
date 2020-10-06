@@ -63,7 +63,7 @@
 #include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/exceptions.h"
-#include "cedar/devices/gui/RobotManager.h"
+#include "cedar/processing/devices/gui/RobotManager.h"
 #include "cedar/devices/Component.h"
 #include "cedar/auxiliaries/CommandLineParser.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
@@ -956,7 +956,7 @@ void cedar::proc::gui::Ide::showRobotManager()
   auto p_dialog = new QDialog(this);
   auto p_layout = new QVBoxLayout();
   p_dialog->setLayout(p_layout);
-  auto p_robot_manager = new cedar::dev::gui::RobotManager();
+  auto p_robot_manager = new cedar::proc::dev::gui::RobotManager();
   QObject::connect(p_robot_manager, SIGNAL(closeRobotManager(void)), p_dialog, SLOT(close(void)));
   p_layout->addWidget(p_robot_manager);
   p_dialog->setMinimumHeight(800);

@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/gui/namespace.h"
+#include "cedar/processing/devices/gui/namespace.h"
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/gui/ui_RobotManager.h"
 
@@ -56,7 +57,7 @@
 
 /*!@brief A gui for the manager of robot instances.
  */
-class cedar::dev::gui::RobotManager : public QWidget, public Ui_RobotManager
+class cedar::proc::dev::gui::RobotManager : public QWidget, public Ui_RobotManager
 {
   Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
@@ -162,7 +163,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dev::gui::RobotManager
+}; // class cedar::proc::dev::gui::RobotManager
 
 
 #endif // CEDAR_DEV_GUI_ROBOT_MANAGER_H

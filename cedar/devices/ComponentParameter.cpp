@@ -42,7 +42,6 @@
 #include "cedar/devices/ComponentSlot.h"
 #include "cedar/devices/RobotManager.h"
 #include "cedar/devices/exceptions.h"
-#include "cedar/devices/gui/RobotManager.h"
 
 // SYSTEM INCLUDES
 

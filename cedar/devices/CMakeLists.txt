@@ -72,8 +72,6 @@ cedar_add_library(cedardev
                   gui/KinematicChainWidget.h
                   gui/KinematicChainMonitorWidget.h
                   gui/KinematicChainCommandWidget.h
-                  gui/ComponentParameter.h
-                  gui/RobotManager.h
                   gui/RobotCard.h
                   ${qglviewer_moc_files}
                   kteam/gui/DriveControlWidget.h

@@ -41,6 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/devices/gui/namespace.h"
 #include "cedar/devices/gui/namespace.h"
 #include "cedar/devices/namespace.h"
 #include "cedar/processing/auxiliaries/gui/Parameter.h"
@@ -52,7 +53,7 @@
 
 /*!@brief GUI representation of a cedar::dev::ComponentParameter.
  */
-class cedar::dev::gui::ComponentParameter : public cedar::proc::aux::gui::Parameter
+class cedar::proc::dev::gui::ComponentParameter : public cedar::proc::aux::gui::Parameter
 {
   Q_OBJECT
 
@@ -117,7 +118,7 @@ private:
 
   QTreeWidget* mpComponentTree;
 
-}; // class cedar::dev::gui::ComponentParameter
+}; // class cedar::proc::dev::gui::ComponentParameter
 
 #endif // CEDAR_DEV_GUI_COMPONENT_PARAMETER_H
 

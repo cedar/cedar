@@ -83,6 +83,8 @@ cedar_add_library(cedarproc
   auxiliaries/gui/UIntParameter.h
   auxiliaries/gui/UIntVectorParameter.h
   auxiliaries/gui/VelocityParameter.h
+  devices/gui/ComponentParameter.h
+  devices/gui/RobotManager.h
   experiment/Experiment.h
   experiment/ActionParameter.h
   experiment/PropertyParameter.h

@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/gui/ComponentParameter.h"
+#include "cedar/processing/devices/gui/ComponentParameter.h"
 #include "cedar/devices/ComponentParameter.h"
 #include "cedar/devices/ComponentSlot.h"
 #include "cedar/devices/RobotManager.h"
@@ -67,7 +67,7 @@ namespace
   bool registered = cedar::proc::aux::gui::ParameterFactorySingleton::getInstance()->add
       <
         cedar::dev::ComponentParameter,
-        cedar::dev::gui::ComponentParameter
+        cedar::proc::dev::gui::ComponentParameter
       >();
 }
 
@@ -75,7 +75,7 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::gui::ComponentParameter::ComponentParameter()
+cedar::proc::dev::gui::ComponentParameter::ComponentParameter()
 :
 mpComponentDialog(NULL),
 mpComponentTree(NULL)
@@ -100,7 +100,7 @@ mpComponentTree(NULL)
   p_button->setMaximumWidth(30);
 }
 
-cedar::dev::gui::ComponentParameter::~ComponentParameter()
+cedar::proc::dev::gui::ComponentParameter::~ComponentParameter()
 {
 }
 
@@ -108,7 +108,7 @@ cedar::dev::gui::ComponentParameter::~ComponentParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::gui::ComponentParameter::parameterChanged()
+void cedar::proc::dev::gui::ComponentParameter::parameterChanged()
 {
   this->mParameter = boost::dynamic_pointer_cast<cedar::dev::ComponentParameter>(this->getParameter());
   QObject::connect(this->mParameter.get(), SIGNAL(valueChanged()), this, SLOT(updatePathText()));
@@ -119,7 +119,7 @@ void cedar::dev::gui::ComponentParameter::parameterChanged()
   this->mpComponentPathDisplay->blockSignals(blocked);
 }
 
-void cedar::dev::gui::ComponentParameter::componentDoubleClicked()
+void cedar::proc::dev::gui::ComponentParameter::componentDoubleClicked()
 {
   QTreeWidgetItem* p_selected = this->mpComponentTree->currentItem();
 
@@ -132,7 +132,7 @@ void cedar::dev::gui::ComponentParameter::componentDoubleClicked()
   this->mpComponentDialog->accept();
 }
 
-void cedar::dev::gui::ComponentParameter::openComponentSelector()
+void cedar::proc::dev::gui::ComponentParameter::openComponentSelector()
 {
   if (mpComponentDialog != NULL)
   {
@@ -186,16 +186,16 @@ void cedar::dev::gui::ComponentParameter::openComponentSelector()
   }
 }
 
-void cedar::dev::gui::ComponentParameter::selectComponent(cedar::dev::ComponentSlotPtr slot)
+void cedar::proc::dev::gui::ComponentParameter::selectComponent(cedar::dev::ComponentSlotPtr slot)
 {
   cedar::aux::asserted_pointer_cast<cedar::dev::ComponentParameter>(this->getParameter())->setValue(slot);
 }
 
-void cedar::dev::gui::ComponentParameter::reselect(const std::string& , const std::string& )
+void cedar::proc::dev::gui::ComponentParameter::reselect(const std::string& , const std::string& )
 {
 //As far as I can see is this code only picking up a signal from ComponentParameter and to perform a function on ComponentParameter. No reason to be here at all!
   //Just to be sure that I did not overlook anything I will keep this function and throw an exception!
-CEDAR_THROW(cedar::dev::ResourceNotAvailableException,"This Slot is not implemented. Something is connected to cedar::dev::gui::ComponentParameter::reselect! This is a bug and needs to be fixed!")
+CEDAR_THROW(cedar::dev::ResourceNotAvailableException,"This Slot is not implemented. Something is connected to cedar::proc::dev::gui::ComponentParameter::reselect! This is a bug and needs to be fixed!")
 
 
 //  cedar::dev::RobotPtr robot = cedar::dev::RobotManagerSingleton::getInstance()->getRobot(robot_name);
@@ -204,7 +204,7 @@ CEDAR_THROW(cedar::dev::ResourceNotAvailableException,"This Slot is not implemen
 //  this->selectComponent(slot);
 }
 
-void cedar::dev::gui::ComponentParameter::updatePathText()
+void cedar::proc::dev::gui::ComponentParameter::updatePathText()
 {
   std::string text;
 
@@ -227,7 +227,7 @@ void cedar::dev::gui::ComponentParameter::updatePathText()
   }
 }
 
-void cedar::dev::gui::ComponentParameter::fillRobots(QTreeWidgetItem* pItem)
+void cedar::proc::dev::gui::ComponentParameter::fillRobots(QTreeWidgetItem* pItem)
 {
   auto robot_names = cedar::dev::RobotManagerSingleton::getInstance()->getRobotNames();
 
@@ -248,7 +248,7 @@ void cedar::dev::gui::ComponentParameter::fillRobots(QTreeWidgetItem* pItem)
   }
 }
 
-void cedar::dev::gui::ComponentParameter::fillComponents(QTreeWidgetItem* pItem, cedar::dev::RobotPtr robot)
+void cedar::proc::dev::gui::ComponentParameter::fillComponents(QTreeWidgetItem* pItem, cedar::dev::RobotPtr robot)
 {
   auto components = robot->listComponentSlots();
 
