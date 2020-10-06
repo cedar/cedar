@@ -81,52 +81,25 @@ cedar_add_library(cedaraux
   LoopedThread.h
   LocalCoordinateFrame.h
   gl/ObjectVisualization.h
-  gui/AccelerationParameter.h
-  gui/AngularVelocityParameter.h
   gui/BaseWidget.h
-  gui/BoolParameter.h
-  gui/BoolVectorParameter.h
-  gui/Configurable.h
   gui/DataPlotter.h
-  gui/DirectoryParameter.h
-  gui/DoubleParameter.h
-  gui/DoubleVectorParameter.h
-  gui/EnumParameter.h
   gui/ExceptionDialog.h
-  gui/FileParameter.h
-  gui/FrequencyParameter.h
   gui/HistoryPlot.h
-  gui/IgnoreLocaleDoubleSpinBox.h
   gui/ImagePlot.h
-  gui/IntParameter.h
-  gui/IntVectorParameter.h
-  gui/LengthParameter.h
   gui/LocalCoordinateFrameWidget.h
   gui/Log.h
   gui/MatrixPlot.h
   gui/MatrixSlicePlot3D.h
-  gui/ObjectParameter.h
-  gui/ObjectListParameter.h
   gui/ObjectVisualizationWidget.h
-  gui/Parameter.h
-  gui/PlaneAngleParameter.h
   gui/PlotInterface.h
   gui/PluginInfoDialog.h
   gui/PluginManagerDialog.h
-  gui/PropertyPane.h
   gui/QImagePlot.h
   gui/QwtMatrixPlot.h
   gui/ResourceDialog.h
   gui/SceneControl.h
   gui/SceneWidget.h
-  gui/SettingsWidget.h
-  gui/StringParameter.h
-  gui/StringVectorParameter.h
   gui/ThreadedPlot.h
-  gui/TimeParameter.h
-  gui/UIntParameter.h
-  gui/UIntVectorParameter.h
-  gui/VelocityParameter.h
   ${qglviewer_moc_files}
   ${qwt_moc_files}
   ${vtk_moc_files}
@@ -137,16 +110,16 @@ cedar_add_library(cedaraux
   convolution/Convolution.h
   convolution/KernelList.h
   convolution/Engine.h
-  Parameter.h
-  ParameterLink.h
   Recorder.h
   Settings.h
-  EquationParameterLink.h
   kernel/Separable.h
   kernel/Kernel.h
   kernel/Gauss.h
   kernel/Box.h
   kernel/RotatedGauss.h
+  Parameter.h
+  ParameterLink.h
+  EquationParameterLink.h
   RESOURCES
   gui/icons/cedar_aux_gui_icons.qrc
   LINK_LIBRARIES

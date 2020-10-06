@@ -56,7 +56,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace
 {
-  bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->add
+  bool registered = cedar::proc::aux::gui::ParameterFactorySingleton::getInstance()->add
       <
         cedar::proc::ProjectionMappingParameter,
         cedar::proc::gui::ProjectionMappingParameter
@@ -69,7 +69,7 @@ namespace
 
 cedar::proc::gui::ProjectionMappingParameter::ProjectionMappingParameter(QWidget *pParent)
 :
-cedar::aux::gui::Parameter(pParent)
+cedar::proc::aux::gui::Parameter(pParent)
 {
   this->setLayout(new QVBoxLayout());
   this->layout()->setContentsMargins(0, 0, 0, 0);

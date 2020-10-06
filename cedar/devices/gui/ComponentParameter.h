@@ -43,7 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/gui/namespace.h"
 #include "cedar/devices/namespace.h"
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/processing/auxiliaries/gui/Parameter.h"
 
 // SYSTEM INCLUDES
 #include <QLineEdit>
@@ -52,7 +52,7 @@
 
 /*!@brief GUI representation of a cedar::dev::ComponentParameter.
  */
-class cedar::dev::gui::ComponentParameter : public cedar::aux::gui::Parameter
+class cedar::dev::gui::ComponentParameter : public cedar::proc::aux::gui::Parameter
 {
   Q_OBJECT
 

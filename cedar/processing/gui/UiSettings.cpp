@@ -40,8 +40,8 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/UiSettings.h"
 #include "cedar/processing/gui/Settings.h"
-#include "cedar/auxiliaries/gui/BoolParameter.h"
-#include "cedar/auxiliaries/gui/UIntParameter.h"
+#include "cedar/processing/auxiliaries/gui/BoolParameter.h"
+#include "cedar/processing/auxiliaries/gui/UIntParameter.h"
 #include "cedar/auxiliaries/gui/Settings.h"
 #include "cedar/auxiliaries/Settings.h"
 

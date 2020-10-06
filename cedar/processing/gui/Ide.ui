@@ -301,7 +301,7 @@
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_6">
          <item>
-          <widget class="cedar::aux::gui::Configurable" name="mpPropertyTable"/>
+          <widget class="cedar::proc::aux::gui::Configurable" name="mpPropertyTable"/>
          </item>
         </layout>
        </widget>
@@ -1238,9 +1238,9 @@
    <header location="global">cedar/processing/gui/View.h</header>
   </customwidget>
   <customwidget>
-   <class>cedar::aux::gui::Configurable</class>
+   <class>cedar::proc::aux::gui::Configurable</class>
    <extends>QTableWidget</extends>
-   <header>cedar/auxiliaries/gui/Configurable.h</header>
+   <header>cedar/processing/auxiliaries/gui/Configurable.h</header>
   </customwidget>
   <customwidget>
    <class>cedar::aux::gui::Log</class>

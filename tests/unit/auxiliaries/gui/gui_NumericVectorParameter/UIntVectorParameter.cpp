@@ -54,7 +54,7 @@
 
 UIntVectorParameter::UIntVectorParameter(QWidget *pParent)
 :
-cedar::aux::gui::UIntVectorParameter(pParent)
+cedar::proc::aux::gui::UIntVectorParameter(pParent)
 {
 }
 

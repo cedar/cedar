@@ -63,7 +63,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
-#include "cedar/auxiliaries/gui/PropertyPane.h"
+#include "cedar/processing/auxiliaries/gui/PropertyPane.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -138,7 +138,7 @@ cedar::proc::undoRedo::UndoStack* cedar::proc::gui::Ide::mpUndoStack;
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::Configurable* cedar::proc::gui::Scene::getConfigurableWidget() const
+cedar::proc::aux::gui::Configurable* cedar::proc::gui::Scene::getConfigurableWidget() const
 {
   return this->mpConfigurableWidget;
 }
@@ -395,7 +395,7 @@ void cedar::proc::gui::Scene::exportSvg(const QString& file)
   }
 }
 
-void cedar::proc::gui::Scene::setConfigurableWidget(cedar::aux::gui::Configurable* pConfigurableWidget)
+void cedar::proc::gui::Scene::setConfigurableWidget(cedar::proc::aux::gui::Configurable* pConfigurableWidget)
 {
   this->mpConfigurableWidget = pConfigurableWidget;
 }

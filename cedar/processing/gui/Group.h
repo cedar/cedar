@@ -195,7 +195,7 @@ public:
   }
 
   //! Opens the kinematic chain control widget from saved configuration file
-  void openKinematicChainWidget(const aux::ConfigurationNode &node);
+  void openKinematicChainWidget(const cedar::aux::ConfigurationNode &node);
 
   void insertKinematicChainWidget(cedar::dev::gui::KinematicChainWidget* kinematicChainWidget) const;
 #ifdef CEDAR_USE_QGLVIEWER

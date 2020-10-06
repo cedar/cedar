@@ -49,7 +49,7 @@
 
 IntVectorParameter::IntVectorParameter(QWidget *pParent)
 :
-cedar::aux::gui::IntVectorParameter(pParent)
+cedar::proc::aux::gui::IntVectorParameter(pParent)
 {
 }
 

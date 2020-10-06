@@ -38,7 +38,7 @@
 #define CEDAR_PROC_GUI_PROJECTION_MAPPING_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/processing/auxiliaries/gui/Parameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/ProjectionMappingParameter.fwd.h"
@@ -57,7 +57,7 @@
  * an exception state (i.e., the architecture cannot be run). The combo boxes will turn green as soon as the
  * configuration is corrected.
  */
-class cedar::proc::gui::ProjectionMappingParameter : public cedar::aux::gui::Parameter
+class cedar::proc::gui::ProjectionMappingParameter : public cedar::proc::aux::gui::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

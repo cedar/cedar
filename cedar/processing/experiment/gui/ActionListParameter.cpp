@@ -41,7 +41,7 @@
 #include "cedar/processing/experiment/gui/ActionListParameter.h"
 #include "cedar/processing/experiment/gui/ExperimentItemWidget.h"
 #include "cedar/processing/experiment/action/EndTrial.h"
-#include "cedar/auxiliaries/gui/ObjectParameter.h"
+#include "cedar/processing/auxiliaries/gui/ObjectParameter.h"
 
 // SYSTEM INCLUDES
 #include <QBoxLayout>
@@ -55,7 +55,7 @@
 
 cedar::proc::experiment::gui::ActionListParameter::ActionListParameter(QWidget* parent)
 :
-cedar::aux::gui::Parameter(parent)
+cedar::proc::aux::gui::Parameter(parent)
 ,
 mActionListParameter
 (
@@ -141,7 +141,7 @@ void cedar::proc::experiment::gui::ActionListParameter::updateList()
     (
       new cedar::proc::experiment::action::Action::ActionParameter(nullptr, std::to_string(i), action)
     );
-    cedar::aux::gui::Parameter* parameter_widget = new cedar::aux::gui::ObjectParameter();
+    cedar::proc::aux::gui::Parameter* parameter_widget = new cedar::proc::aux::gui::ObjectParameter();
     parameter_widget->setParameter(actionParameter);
     inner_layout->addWidget(parameter_widget);
     outer_layout->addLayout(inner_layout);

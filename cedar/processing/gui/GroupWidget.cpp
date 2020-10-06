@@ -101,7 +101,7 @@ cedar::proc::gui::GroupPtr cedar::proc::gui::GroupWidget::getGroup() const
   return this->mGroup;
 }
 
-void cedar::proc::gui::GroupWidget::setConfigurableWidget(cedar::aux::gui::Configurable* pConfigurableWidget)
+void cedar::proc::gui::GroupWidget::setConfigurableWidget(cedar::proc::aux::gui::Configurable* pConfigurableWidget)
 {
   this->mpView->getScene()->setConfigurableWidget(pConfigurableWidget);
 }

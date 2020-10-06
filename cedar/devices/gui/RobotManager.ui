@@ -325,7 +325,7 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_3">
           <item row="0" column="0">
-           <widget class="cedar::aux::gui::PropertyPane" name="mpPropertyPane" native="true"/>
+           <widget class="cedar::proc::aux::gui::PropertyPane" name="mpPropertyPane" native="true"/>
           </item>
          </layout>
         </widget>
@@ -358,9 +358,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>cedar::aux::gui::PropertyPane</class>
+   <class>cedar::proc::aux::gui::PropertyPane</class>
    <extends>QWidget</extends>
-   <header>cedar/auxiliaries/gui/PropertyPane.h</header>
+   <header>cedar/processing/auxiliaries/gui/PropertyPane.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

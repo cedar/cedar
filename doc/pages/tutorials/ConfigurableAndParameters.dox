@@ -139,11 +139,11 @@ valueChanged() signal in your constructor:
 
 @section DealingWithChange Beginner's Tutorial: Displaying the Configurable in a Widget
 
-If your class inherits cedar::aux::Configurable, you can use cedar::aux::gui::PropertyPane to display it. Just write:
+If your class inherits cedar::aux::Configurable, you can use cedar::proc::aux::gui::PropertyPane to display it. Just write:
 @code
-#include <cedar/auxiliaries/gui/PropertyPane.h>
+#include <cedar/processing/auxiliaries/gui/PropertyPane.h>
 // ..
-  cedar::aux::gui::PropertyPane *p_pane = new cedar::aux::gui::PropertyPane();
+  cedar::proc::aux::gui::PropertyPane *p_pane = new cedar::proc::aux::gui::PropertyPane();
   p_pane->show(); // makes qt show the widget
   p_pane->display(my_configurable_object);
 @endcode
@@ -156,7 +156,7 @@ This widget allows you to manipulate all the parameters of your object.
 @section OverviewOfParameterTypes Overview over the Different Parameter Types
 
 cedar already ships with a number of different parameter types, each with a proper widget for manipulating the data in,
-e.g., a cedar::aux::gui::PropertyPane. The most primitive parameter types can be found in cedar::aux and include
+e.g., a cedar::proc::aux::gui::PropertyPane. The most primitive parameter types can be found in cedar::aux and include
 cedar::aux::DoubleParameter, cedar::aux::UIntParameter, cedar::aux::BoolParameter and others. See the inheritance
 diagram for cedar::aux::Parameter to get a full overview.
 
