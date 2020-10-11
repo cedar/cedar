@@ -296,7 +296,7 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
   while (delete_connections_stack.size() > 0)
   {
     cedar::proc::gui::Connection* p_current_connection = delete_connections_stack.back();
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(p_current_connection, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::REMOVED));
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(p_current_connection, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::DELETE));
     delete_connections_stack.pop_back();
   }
 
@@ -1262,7 +1262,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
 {
   if(this->mpConnectionToBeReconnected != nullptr)
   {
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(this->mpConnectionToBeReconnected, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::REMOVED));
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(this->mpConnectionToBeReconnected, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::DELETE));
     //TODO ConnectionMove-Command or macro for de-/ recoupling connections
     this->mpConnectionToBeReconnected = nullptr;
   }
@@ -1434,7 +1434,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
         connected = true;
         bool create_connector_group = pMouseEvent->modifiers().testFlag(Qt::ShiftModifier);
         cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(mpConnectionStart,
-                target, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::ADDED, create_connector_group));
+                target, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::CREATE, create_connector_group));
       }
       else if 
       (

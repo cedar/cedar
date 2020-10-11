@@ -90,10 +90,10 @@ void cedar::proc::undoRedo::commands::CreateDeleteConnection::undo()
 {
   switch(mAction)
   {
-    case Action::ADDED:
-      removeConnection();
+    case Action::CREATE:
+      deleteConnection();
       break;
-    case Action::REMOVED:
+    case Action::DELETE:
       createConnection();
       break;
   }
@@ -103,16 +103,16 @@ void cedar::proc::undoRedo::commands::CreateDeleteConnection::redo()
 {
   switch(mAction)
   {
-    case Action::ADDED:
+    case Action::CREATE:
       createConnection();
       break;
-    case Action::REMOVED:
-      removeConnection();
+    case Action::DELETE:
+      deleteConnection();
       break;
   }
 }
 
-void cedar::proc::undoRedo::commands::CreateDeleteConnection::removeConnection()
+void cedar::proc::undoRedo::commands::CreateDeleteConnection::deleteConnection()
 {
   std::vector<cedar::proc::gui::Connection*> connectionsFromSource = this->mpSource->getConnections();
   for(cedar::proc::gui::Connection* con : connectionsFromSource)
