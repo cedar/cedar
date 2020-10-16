@@ -38,7 +38,7 @@
 #include "cedar/processing/auxiliaries/gui/EnumParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/defines.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES

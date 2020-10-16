@@ -43,7 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Singleton.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Parameter.h"
 
 // FORWARD DECLARATIONS

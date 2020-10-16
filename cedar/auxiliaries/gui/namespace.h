@@ -41,7 +41,7 @@
 
 #include "cedar/auxiliaries/gui/BaseWidget.fwd.h"
 #include "cedar/auxiliaries/gui/ColorValueRGBA.fwd.h"
-#include "cedar/auxiliaries/gui/DataPlotter.fwd.h"
+#include "cedar/processing/auxiliaries/gui/DataPlotter.fwd.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.fwd.h"
 #include "cedar/auxiliaries/gui/exceptions.fwd.h"
 #include "cedar/auxiliaries/gui/HistoryPlot.fwd.h"

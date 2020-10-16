@@ -45,7 +45,7 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Parameter.fwd.h"
-#include "cedar/auxiliaries/TypeBasedFactory.fwd.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.fwd.h"
 #include "cedar/auxiliaries/Singleton.fwd.h"
 
 // SYSTEM INCLUDES
@@ -60,7 +60,7 @@ namespace cedar
       namespace gui
       {
         CEDAR_DECLARE_PROC_CLASS(Parameter);
-        typedef cedar::aux::TypeBasedFactory<cedar::aux::ParameterPtr, cedar::proc::aux::gui::ParameterPtr> ParameterFactory;
+        typedef cedar::proc::aux::TypeBasedFactory<cedar::aux::ParameterPtr, cedar::proc::aux::gui::ParameterPtr> ParameterFactory;
         typedef cedar::aux::Singleton<ParameterFactory> ParameterFactorySingleton;
       }
     }

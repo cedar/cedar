@@ -48,7 +48,7 @@
 #include "cedar/processing/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/Singleton.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES

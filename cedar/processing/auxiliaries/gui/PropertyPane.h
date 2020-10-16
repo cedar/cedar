@@ -38,7 +38,7 @@
 #define CEDAR_AUX_GUI_PROPERTY_PANE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Configurable.h"
 
 // FORWARD DECLARATIONS

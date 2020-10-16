@@ -46,8 +46,8 @@
 #include "cedar/auxiliaries/Data.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/TypeBasedFactory.fwd.h"
-#include "cedar/auxiliaries/gui/DataPlotter.fwd.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.fwd.h"
+#include "cedar/processing/auxiliaries/gui/DataPlotter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QDockWidget>
@@ -57,7 +57,7 @@
  *
  * This class decides, which plot fits best the given data and instantiate a plot of the right type.
  */
-class cedar::aux::gui::DataPlotter : public cedar::aux::gui::MultiPlotInterface
+class cedar::proc::aux::gui::DataPlotter : public cedar::aux::gui::MultiPlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -66,7 +66,7 @@ class cedar::aux::gui::DataPlotter : public cedar::aux::gui::MultiPlotInterface
 
 public:
   //!@brief a factory, which is currently not used
-  typedef cedar::aux::TypeBasedFactory<cedar::aux::DataPtr, boost::shared_ptr<QWidget> > WidgetFactory;
+  typedef cedar::proc::aux::TypeBasedFactory<cedar::aux::DataPtr, boost::shared_ptr<QWidget> > WidgetFactory;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -119,6 +119,6 @@ private:
   //!@brief Pointer to the current plot.
   cedar::aux::gui::PlotInterface *mpCurrentPlot;
 
-}; // class cedar::aux::gui::DataPlotter
+}; // class cedar::proc::aux::gui::DataPlotter
 
 #endif // CEDAR_PROC_GUI_DATA_PLOTTER_H

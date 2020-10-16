@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/DataPlotter.h"
+#include "cedar/processing/auxiliaries/gui/DataPlotter.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -50,7 +50,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::aux::gui::DataPlotter::DataPlotter(QWidget *pParent)
+cedar::proc::aux::gui::DataPlotter::DataPlotter(QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
 mpCurrentPlot(NULL)
@@ -62,7 +62,7 @@ mpCurrentPlot(NULL)
   this->layout()->setContentsMargins(0, 0, 0, 0);
 }
 
-cedar::aux::gui::DataPlotter::~DataPlotter()
+cedar::proc::aux::gui::DataPlotter::~DataPlotter()
 {
 }
 
@@ -70,7 +70,7 @@ cedar::aux::gui::DataPlotter::~DataPlotter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::aux::gui::DataPlotter::canAppend(cedar::aux::ConstDataPtr data) const
+bool cedar::proc::aux::gui::DataPlotter::canAppend(cedar::aux::ConstDataPtr data) const
 {
   if (this->mpCurrentPlot != NULL)
   {
@@ -83,7 +83,7 @@ bool cedar::aux::gui::DataPlotter::canAppend(cedar::aux::ConstDataPtr data) cons
   return false;
 }
 
-void cedar::aux::gui::DataPlotter::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
+void cedar::proc::aux::gui::DataPlotter::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   if (this->mpCurrentPlot == NULL)
   {
@@ -99,7 +99,7 @@ void cedar::aux::gui::DataPlotter::doAppend(cedar::aux::ConstDataPtr data, const
   }
 }
 
-void cedar::aux::gui::DataPlotter::plot(cedar::aux::ConstDataPtr data, const std::string& title)
+void cedar::proc::aux::gui::DataPlotter::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   this->mData = data;
   this->mTitle = title;
@@ -124,7 +124,7 @@ void cedar::aux::gui::DataPlotter::plot(cedar::aux::ConstDataPtr data, const std
   this->layout()->addWidget(this->mpCurrentPlot);
 }
 
-void cedar::aux::gui::DataPlotter::dataChanged()
+void cedar::proc::aux::gui::DataPlotter::dataChanged()
 {
   this->plot(mData, this->mTitle);
 }

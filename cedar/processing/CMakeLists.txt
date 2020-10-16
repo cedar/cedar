@@ -61,6 +61,7 @@ cedar_add_library(cedarproc
   auxiliaries/gui/BoolParameter.h
   auxiliaries/gui/BoolVectorParameter.h
   auxiliaries/gui/Configurable.h
+  auxiliaries/gui/DataPlotter.h
   auxiliaries/gui/DirectoryParameter.h
   auxiliaries/gui/DoubleParameter.h
   auxiliaries/gui/DoubleVectorParameter.h
