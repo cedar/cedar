@@ -56,6 +56,7 @@
 #include "cedar/processing/steps/PythonScript.h"
 #include "cedar/processing/undoRedo/commands/MoveElement.h"
 #include "cedar/processing/undoRedo/commands/CreateDeleteConnection.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteStep.h"
 #include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/GroupDeclaration.h"
@@ -318,7 +319,8 @@ void cedar::proc::gui::Scene::deleteElement(QGraphicsItem* pItem)
 {
   if (auto element = dynamic_cast<cedar::proc::gui::Element*>(pItem))
   {
-    element->deleteElement();
+    //element->deleteElement();
+    //cedar::proc::gui::Ide::mpUndoStack->push( new cedar::proc::undoRedo::commands::CreateDeleteStep::
   }
 }
 
@@ -357,7 +359,6 @@ void cedar::proc::gui::Scene::helpEvent(QGraphicsSceneHelpEvent* pHelpEvent)
       base_item->updateToolTip();
     }
   }
-
   QGraphicsScene::helpEvent(pHelpEvent);
 }
 
@@ -989,8 +990,6 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
       this->mGroup->addElements(items_to_move);
     }
   }
-
-
   mTargetGroup.reset();
   this->resetBackgroundColor();
   mpDropTarget = NULL;

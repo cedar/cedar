@@ -73,6 +73,9 @@
 #include "cedar/processing/gui/StickyNote.h"
 #include "cedar/processing/gui/GroupParameterDesigner.h"
 #include "Ide.h"
+#include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteStep.h"
 
 // SYSTEM INCLUDES
 #include <QEvent>
@@ -350,10 +353,14 @@ void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 
   if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration *>(declaration))
   {
-    //!@todo can createElement be moved into gui::Group?
-    this->mpScene->createElement(target_group, elem_declaration->getClassName(), mapped);
+    //Push a createDeleteCommand (as a create) ontot the UndoStack
+    cedar::proc::gui::Ide::mpUndoStack->push(
+            new cedar::proc::undoRedo::commands::CreateDeleteStep(mapped,elem_declaration->getClassName(),target_group,mpScene,undoRedo::commands::CreateDeleteStep::Action::CREATE)
+    );
+
   } else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration *>(declaration))
   {
+
     auto elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup
             (
                     group_declaration->getClassName(),

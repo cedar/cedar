@@ -49,14 +49,28 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::undoRedo::commands::CreateDeleteStep::CreateDeleteStep(cedar::proc::gui::ElementPtr element)
+//Constructor for creating an element
+//@TODO: maybe put more stuff into the ":" part and find out how to ":" part is called
+cedar::proc::undoRedo::commands::CreateDeleteStep::CreateDeleteStep(QPointF position,std::string classId, cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene,cedar::proc::undoRedo::commands::CreateDeleteStep::Action action)
 :
-element(element)
+mAction(action)
 {
-  position = element->pos();
-  classId = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(element->getElement());
-  auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(element.get());
-  cedar::proc::gui::Group* guiGroup = connectable->getGuiGroup();
+  //mPosition = mpElement->pos();
+  mPosition = position;
+  //mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(mpElement->getElement());
+  mClassId = classId;
+  //auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(mpElement);
+  //mpGuiGroup = connectable->getGuiGroup();
+  mpGroup = group;
+  mpScene = scene;
+}
+
+//Constructor for deleting an element
+cedar::proc::undoRedo::commands::CreateDeleteStep::CreateDeleteStep(cedar::proc::gui::Element* element, cedar::proc::undoRedo::commands::CreateDeleteStep::Action action)
+:
+mpGuiElement(element),
+mAction(action)
+{
 }
 
 cedar::proc::undoRedo::commands::CreateDeleteStep::~CreateDeleteStep()
@@ -69,10 +83,40 @@ cedar::proc::undoRedo::commands::CreateDeleteStep::~CreateDeleteStep()
 
 void cedar::proc::undoRedo::commands::CreateDeleteStep::undo()
 {
-  //Create Element in its group
-  group->getScene()->createElement(group->getGroup(), classId, position);
+  switch(mAction)
+  {
+    case Action::CREATE:
+      //Undo of createStep = deleteStep
+      deleteStep();
+      break;
+    case Action::DELETE:
+      //Undo of deleteStep = createStep
+      createStep();
+      break;
+  }
 }
 
 void cedar::proc::undoRedo::commands::CreateDeleteStep::redo()
 {
+  switch(mAction)
+  {
+    case Action::CREATE:
+      //Redo of createStep = createStep
+      createStep();
+      break;
+    case Action::DELETE:
+      //Redo of deleteStep = deleteStep
+      deleteStep();
+      break;
+  }
+}
+
+void cedar::proc::undoRedo::commands::CreateDeleteStep::createStep()
+{
+  mpElement = mpScene->createElement(mpGroup,mClassId,mPosition);
+}
+
+void cedar::proc::undoRedo::commands::CreateDeleteStep::deleteStep()
+{
+  mpScene->getGraphicsItemFor(mpElement)->deleteElement();
 }

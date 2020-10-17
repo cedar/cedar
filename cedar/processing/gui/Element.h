@@ -43,8 +43,10 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/GraphicsBase.h"
 
+
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/Element.fwd.h"
+#include "cedar/processing/gui/Group.fwd.h"
 
 // SYSTEM INCLUDES
 
