@@ -80,7 +80,7 @@ public:
   //Constructor for creating an element
   CreateDeleteStep(QPointF position,std::string classId, cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene,cedar::proc::undoRedo::commands::CreateDeleteStep::Action action);
   //Constructor for deleting an element
-  CreateDeleteStep(cedar::proc::gui::Element* element, cedar::proc::undoRedo::commands::CreateDeleteStep::Action action);
+  CreateDeleteStep(cedar::proc::gui::Element* element, cedar::proc::gui::Scene* scene, cedar::proc::undoRedo::commands::CreateDeleteStep::Action action);
 
   //!@brief Destructor
   virtual ~CreateDeleteStep();
@@ -98,6 +98,8 @@ public:
 protected:
   void createStep();
   void deleteStep();
+  void saveStepConfiguration();
+  void loadStepConfiguration();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -111,6 +113,7 @@ private:
 protected:
   // none yet
 private:
+  cedar::aux::ConfigurationNode mElementConfiguration;
   cedar::proc::gui::Element* mpGuiElement;
   cedar::proc::ElementPtr mpElement;
   cedar::proc::GroupPtr mpGroup;
@@ -128,7 +131,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::undoRedo::commands::CreateDeleteStep
+};
 
 #endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_STEP_H
 
