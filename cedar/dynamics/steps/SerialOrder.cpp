@@ -218,7 +218,7 @@ _mSigmoid
     cedar::aux::math::SigmoidPtr(new cedar::aux::math::AbsSigmoid(0.0, 100.0))
   )
 ),
-_mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", true))
+_mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
 {
   // declare the inputs
   this->declareInput("CoS signal input", false);
