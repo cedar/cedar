@@ -24,8 +24,8 @@
 
     File:        CreateDeleteStep.cpp
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
+    Maintainer:  Yogeshwar Agnihotri
+    Email:       yogeshwar.agnihotri@ini.rub.de
     Date:        2020 07 23
 
     Description: Source file for the class cedar::proc::undoRedo::commands::CreateDeleteStep.
@@ -72,9 +72,28 @@ mAction(action)
   mPosition = element->pos();
   mpScene = scene;
   mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(element->getElement());
-  //@TODO: For now the Root
-  mpGroup = scene->getRootGroup()->getGroup();
+
   //GetParent Check and loop to first
+  QGraphicsItem* parentItem = element->parentItem();
+  while(true)
+  {
+    //Check if the parentItem is a group, if yes set the parentItem as the Group of the Element. If not go one step above and so on
+    if (cedar::proc::gui::Group* groupOfElement = dynamic_cast<cedar::proc::gui::Group *>(parentItem))
+    {
+      mpGroup = groupOfElement->getGroup();
+      break;
+    }
+    else if(parentItem == nullptr)
+    {
+      mpGroup = scene->getRootGroup()->getGroup();
+      break;
+    }
+    else
+    {
+      //Get the next parentItem of the parentItem before.
+      parentItem = parentItem->parentItem();
+    }
+  }
 }
 
 cedar::proc::undoRedo::commands::CreateDeleteStep::~CreateDeleteStep()

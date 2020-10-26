@@ -24,8 +24,8 @@
 
     File:        CreateDeleteStep.h
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
+    Maintainer:  Yogeshwar Agnihotri
+    Email:       yogeshwar.agnihotri@ini.rub.de
     Date:        2020 07 23
 
     Description: Header file for the class cedar::proc::undoRedo::commands::CreateDeleteStep.
