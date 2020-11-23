@@ -36,6 +36,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/auxiliaries/gui/EnumParameter.h"
+#include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/undoRedo/commands/ChangeParameterValue.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/defines.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
@@ -45,6 +48,7 @@
 #include <QHBoxLayout>
 #include <QStandardItemModel>
 #include <iostream>
+#include <cedar/processing/gui/Ide.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 // associate aux::gui parameter with the aux parameter
@@ -172,7 +176,7 @@ void cedar::proc::aux::gui::EnumParameter::currentIndexChanged(const QString&)
     cedar::aux::EnumParameterPtr parameter;
     parameter = boost::dynamic_pointer_cast<cedar::aux::EnumParameter>(this->getParameter());
     QString value = this->mpEdit->itemData(this->mpEdit->currentIndex(), Qt::UserRole).toString();
-    parameter->setValue(value.toStdString(), true);
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeParameterValue<std::string, cedar::aux::EnumParameter>(parameter.get(), parameter->getValue().name(), value.toStdString(), true));
   }
 }
 
