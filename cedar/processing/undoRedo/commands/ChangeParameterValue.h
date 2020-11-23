@@ -53,7 +53,7 @@
  *
  * UndoCommand Implementation for changing multiple types of Parameters (PatameterTemplate<>)
  */
-template <typename ValueT>
+template <typename ValueT, typename ParameterT = cedar::aux::ParameterTemplate<ValueT>>
 class cedar::proc::undoRedo::commands::ChangeParameterValue : public cedar::proc::undoRedo::UndoCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -62,18 +62,30 @@ class cedar::proc::undoRedo::commands::ChangeParameterValue : public cedar::proc
 
   //! Type of the values stored in this widget.
   typedef ValueT ValueType;
+  typedef ParameterT ParameterType;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ChangeParameterValue(cedar::aux::ParameterTemplate<ValueType>* parameter, ValueType oldValue, ValueType newValue, bool lock = false)
+  ChangeParameterValue(ParameterType* parameter, ValueType oldValue, ValueType newValue)
+  :
+  mpParameter(parameter),
+  mOldValue(oldValue),
+  mNewValue(newValue),
+  mLockSet(false)
   {
-    this->mpParameter = parameter;
-    this->mOldValue = oldValue;
-    this->mNewValue = newValue;
-    this->mLock = lock;
+  }
+
+  ChangeParameterValue(ParameterType* parameter, ValueType oldValue, ValueType newValue, bool lock)
+  :
+  mpParameter(parameter),
+  mOldValue(oldValue),
+  mNewValue(newValue),
+  mLockSet(true),
+  mLock(lock)
+  {
   }
 
   //!@brief Destructor
@@ -88,12 +100,29 @@ public:
 
   void undo()
   {
-    this->mpParameter->setValue(this->mOldValue, this->mLock);
+    if(this->mLockSet)
+    {
+      this->mpParameter->setValue(this->mOldValue, this->mLock);
+      //this->mpParameter->setValue(this->mOldValue);
+    }
+    else
+    {
+      this->mpParameter->setValue(this->mOldValue);
+    }
     this->mpParameter->emitChangedSignal();
   }
+
   void redo()
   {
-    this->mpParameter->setValue(this->mNewValue, this->mLock);
+    if(this->mLockSet)
+    {
+      this->mpParameter->setValue(this->mNewValue, this->mLock);
+      //this->mpParameter->setValue(this->mNewValue);
+    }
+    else
+    {
+      this->mpParameter->setValue(this->mNewValue);
+    }
     this->mpParameter->emitChangedSignal();
   }
 
@@ -116,10 +145,11 @@ protected:
   // none yet
 private:
 
-  cedar::aux::ParameterTemplate<ValueType>* mpParameter;
+  ParameterType* mpParameter;
   ValueType mOldValue;
   ValueType mNewValue;
   bool mLock;
+  bool mLockSet;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

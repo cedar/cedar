@@ -58,7 +58,7 @@ namespace cedar
       namespace commands
       {
         //!@cond SKIPPED_DOCUMENTATION
-        template<typename T>
+        template<typename T, typename PT>
         class ChangeParameterValue;
         //!@endcond
       }

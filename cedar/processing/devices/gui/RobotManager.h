@@ -44,7 +44,7 @@
 #include "cedar/devices/gui/namespace.h"
 #include "cedar/processing/devices/gui/namespace.h"
 #include "cedar/devices/namespace.h"
-#include "cedar/devices/gui/ui_RobotManager.h"
+#include "cedar/processing/devices/gui/ui_RobotManager.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Path.fwd.h"
