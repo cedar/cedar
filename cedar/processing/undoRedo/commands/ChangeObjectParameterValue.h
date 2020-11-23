@@ -22,89 +22,83 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ObjectParameter.h
+    File:        ChangeParameterValue.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 03 09
+    Maintainer:  Lars Janssen
+    Email:       lars.janssen@ini.rub.de
+    Date:        2020 07 28
 
-    Description:
+    Description: Header file for the class cedar::proc::undoRedo::commands::ChangeParameterValue.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_OBJECT_PARAMETER_H
-#define CEDAR_AUX_GUI_OBJECT_PARAMETER_H
+#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_OBJECT_PARAMETER_VALUE_H
+#define CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_OBJECT_PARAMETER_VALUE_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/auxiliaries/gui/Parameter.h"
+#include "cedar/processing/undoRedo/UndoCommand.h"
 #include "cedar/auxiliaries/ObjectParameter.h"
-#include "cedar/auxiliaries/casts.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/auxiliaries/gui/ObjectParameter.fwd.h"
+#include "cedar/processing/undoRedo/commands/ChangeObjectParameterValue.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QComboBox>
-#include <QPushButton>
-#ifndef Q_MOC_RUN
-  #include <boost/signals2.hpp>
-#endif
-#include <string>
 
-
-//!@brief User interface representation of cedar::aux::ObjectListParameter.
-class cedar::proc::aux::gui::ObjectParameter : public cedar::proc::aux::gui::Parameter
+/*!@ Parameter change command
+ *
+ * UndoCommand Implementation for ObjectParameter
+ */
+class cedar::proc::undoRedo::commands::ChangeObjectParameterValue : public cedar::proc::undoRedo::UndoCommand
 {
-  Q_OBJECT
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // nested types
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ObjectParameter();
+  ChangeObjectParameterValue(cedar::aux::ObjectParameter* parameter, std::string oldValue, std::string newValue)
+  :
+  mpParameter(parameter),
+  mOldValue(oldValue),
+  mNewValue(newValue)
+  {
+  }
 
   //!@brief Destructor
-  ~ObjectParameter();
+  virtual ~ChangeObjectParameterValue()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+
+  void undo()
+  {
+    this->mpParameter->setType(this->mOldValue);
+  }
+
+  void redo()
+  {
+    this->mpParameter->setType(this->mNewValue);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! ignores all wheel events
-  bool eventFilter(QObject* object, QEvent* event);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  std::string getSelectedType() const;
-
-  inline cedar::aux::ObjectParameterPtr getObjectParameter()
-  {
-    return cedar::aux::asserted_pointer_cast<cedar::aux::ObjectParameter>(this->getParameter());
-  }
-
-  void splitTypeId(const QString& typeId, QString& className) const;
-
-private slots:
-  void parameterPointerChanged();
-
-  void parameterValueChanged();
-
-  void currentTypeChanged(int index);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -112,10 +106,21 @@ private slots:
 protected:
   // none yet
 private:
-  //! Combo box for selecting the type to add.
-  QComboBox *mpTypeSelector;
 
-}; // class cedar::proc::aux::gui::ObjectParameter
+  cedar::aux::ObjectParameter* mpParameter;
+  std::string mOldValue;
+  std::string mNewValue;
 
-#endif // CEDAR_AUX_GUI_OBJECT_PARAMETER_H
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::proc::undoRedo::commands::ChangeObjectParameterValue
+
+#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_OBJECT_PARAMETER_VALUE_H
 

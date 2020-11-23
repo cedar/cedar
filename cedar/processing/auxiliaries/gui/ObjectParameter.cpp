@@ -37,6 +37,9 @@
 // CEDAR INCLUDES
 #include "cedar/processing/auxiliaries/gui/ObjectParameter.h"
 #include "cedar/processing/auxiliaries/gui/PropertyPane.h"
+#include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/undoRedo/commands/ChangeObjectParameterValue.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
@@ -153,6 +156,21 @@ void cedar::proc::aux::gui::ObjectParameter::parameterPointerChanged()
   this->mpTypeSelector->setCurrentIndex(current_type);
 
   // reconnect the signal
+  QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(parameterValueChanged()));
+  QObject::connect(this->mpTypeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(currentTypeChanged(int)));
+}
+
+void cedar::proc::aux::gui::ObjectParameter::parameterValueChanged()
+{
+  QObject::disconnect(this->mpTypeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(currentTypeChanged(int)));
+  cedar::aux::ObjectParameterPtr parameter = this->getObjectParameter();
+  for(int i = 0; i < this->mpTypeSelector->count(); i++){
+    if(!this->mpTypeSelector->itemData(i).toString().toStdString().compare(parameter->getTypeId()))
+    {
+      this->mpTypeSelector->setCurrentIndex(i);
+      break;
+    }
+  }
   QObject::connect(this->mpTypeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(currentTypeChanged(int)));
 }
 
@@ -174,6 +192,6 @@ void cedar::proc::aux::gui::ObjectParameter::currentTypeChanged(int index)
   if (index != -1)
   {
     std::string type = this->getSelectedType();
-    this->getObjectParameter()->setType(type);
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeObjectParameterValue(this->getObjectParameter().get(), this->getObjectParameter()->getTypeId(), type));
   }
 }
