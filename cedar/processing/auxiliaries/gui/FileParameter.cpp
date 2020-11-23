@@ -36,6 +36,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/auxiliaries/gui/FileParameter.h"
+#include "cedar/processing/undoRedo/commands/ChangeParameterValue.h"
+#include "cedar/processing/undoRedo/commands/ToggleRelativePath.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
+#include "cedar/processing/gui/Ide.h"
 #include "cedar/auxiliaries/FileParameter.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
@@ -144,7 +148,6 @@ void cedar::proc::aux::gui::FileParameter::parameterValueChanged()
   this->mpEdit->setReadOnly(true);
 
   this->mpCheckRelative->setEnabled(!parameter->isPathModeConstant());
-
 }
 
 void cedar::proc::aux::gui::FileParameter::onBrowseClicked()
@@ -170,7 +173,8 @@ void cedar::proc::aux::gui::FileParameter::onBrowseClicked()
   }
   if (!value.isEmpty())
   {
-    parameter->setValue(value.toStdString());
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeParameterValue<std::string,
+                     cedar::aux::FileParameter>(parameter.get(), parameter->getPath(), value.toStdString()));
   }
 }
 
@@ -178,14 +182,6 @@ void cedar::proc::aux::gui::FileParameter::onUseRelativeClicked()
 {
   if(auto parameter = boost::dynamic_pointer_cast<cedar::aux::FileParameter>(this->getParameter()))
   {
-    if(this->mpCheckRelative->isChecked())
-    {
-      parameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
-    }
-    else
-    {
-      parameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_ABSOLUTE);
-    }
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ToggleRelativePath(this->mpCheckRelative, this->mpCheckRelative->isChecked(), parameter.get()));
   }
-
 }

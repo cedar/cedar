@@ -22,73 +22,89 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        FileParameter.h
+    File:        ToggleRelativePath.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 01 18
+    Maintainer:  Lars Janssen
+    Email:       lars.janssen@ini.rub.de
+    Date:        2020 07 28
 
-    Description:
+    Description: Header file for the class cedar::proc::undoRedo::commands::ChangeParameterValue.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_FILE_PARAMETER_H
-#define CEDAR_AUX_GUI_FILE_PARAMETER_H
+#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_TOGGLE_RELATIVE_PATH_H
+#define CEDAR_PROC_UNDO_REDO_COMMANDS_TOGGLE_RELATIVE_PATH_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/auxiliaries/gui/Parameter.h"
+#include "cedar/processing/undoRedo/UndoCommand.h"
+#include "cedar/auxiliaries/FileParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/auxiliaries/gui/FileParameter.fwd.h"
+#include "cedar/processing/undoRedo/commands/ToggleRelativePath.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QLineEdit>
-#include <QPushButton>
 #include <QCheckBox>
 
-
-/*!@brief A widget for a cedar::aux::FileParameter.
+/*!@ Parameter change command
+ *
+ * UndoCommand Implementation for changing the relative path checkbox in the FileParameter
  */
-class cedar::proc::aux::gui::FileParameter : public cedar::proc::aux::gui::Parameter
-{
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
+class cedar::proc::undoRedo::commands::ToggleRelativePath : public cedar::proc::undoRedo::UndoCommand
+{
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  FileParameter(QWidget *pParent = NULL);
+  ToggleRelativePath(QCheckBox *checkBox, bool targetState, cedar::aux::FileParameter* parameter)
+  :
+  mpCheckBox(checkBox),
+  mTargetState(targetState),
+  mpParameter(parameter)
+  {
+  }
 
   //!@brief Destructor
-  virtual ~FileParameter();
+  virtual ~ToggleRelativePath()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-public slots:
-  /*!@brief Handles a click on the browse button.
-   */
-  void onBrowseClicked();
+  void undo()
+  {
+    this->mpCheckBox->setChecked(!this->mTargetState);
+    if(this->mTargetState)
+    {
+      this->mpParameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_ABSOLUTE);
+    }
+    else
+    {
+      this->mpParameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
+    }
+  }
 
-  /*!@brief Handles a click on the relative path checkbox.
-   */
-  void onUseRelativeClicked();
-
-  /*!@brief Handles a changed parameter pointer.
-   */
-  void parameterPointerChanged();
-
-  /*!@brief Handles a change in the value of the parameter.
-   */
-  void parameterValueChanged();
+  void redo()
+  {
+    this->mpCheckBox->setChecked(this->mTargetState);
+    if(this->mTargetState)
+    {
+      this->mpParameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
+    }
+    else
+    {
+      this->mpParameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_ABSOLUTE);
+    }
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -100,7 +116,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void propertiesChanged();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -108,16 +124,22 @@ private:
 protected:
   // none yet
 private:
-  //! QLineEdit used for displaying the parameter value.
-  QLineEdit* mpEdit;
 
-  //! Button used for opening the dialog for selecting a file.
-  QPushButton* mpButton;
+  QCheckBox* mpCheckBox;
+  bool mTargetState;
+  cedar::aux::FileParameter* mpParameter;
 
-  //!Checkbox to switch between absolute and relative paths
-  QCheckBox* mpCheckRelative;
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-}; // class cedar::proc::aux::gui::FileParameter
+private:
+  // none yet
 
-#endif // CEDAR_AUX_GUI_FILE_PARAMETER_H
+}; // class cedar::proc::undoRedo::commands::ToggleRelativePath
+
+#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_TOGGLE_RELATIVE_PATH_H
+
 
