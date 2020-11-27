@@ -37,7 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/auxiliaries/gui/TimeParameter.h"
 #include "cedar/auxiliaries/TimeParameter.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES

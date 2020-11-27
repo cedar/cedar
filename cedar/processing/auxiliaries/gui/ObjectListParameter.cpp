@@ -38,7 +38,7 @@
 #include "cedar/processing/auxiliaries/gui/ObjectListParameter.h"
 #include "cedar/processing/auxiliaries/gui/PropertyPane.h"
 #include "cedar/auxiliaries/exceptions.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES

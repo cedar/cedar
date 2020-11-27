@@ -43,7 +43,7 @@
 #include "cedar/auxiliaries/utilities.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/TypeBasedFactory.fwd.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -58,7 +58,7 @@ template
   typename KeyBasePtr,
   typename ValueBasePtr
 >
-class cedar::aux::TypeBasedFactory
+class cedar::proc::aux::TypeBasedFactory
 {
   //--------------------------------------------------------------------------------------------------------------------
   // types
@@ -203,6 +203,6 @@ private:
   //! List of associations for this factory.
   KeyTypes mKeyTypes;
 
-}; // class cedar::aux::TypeBasedFactory
+}; // class cedar::proc::aux::TypeBasedFactory
 
 #endif // CEDAR_AUX_TYPE_BASED_FACTORY_H

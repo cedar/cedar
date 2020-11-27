@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/auxiliaries/gui/Configurable.h"
 #include "cedar/processing/auxiliaries/gui/Parameter.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"

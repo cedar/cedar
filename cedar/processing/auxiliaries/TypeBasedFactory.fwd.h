@@ -28,7 +28,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
     Date:        2013 11 08
 
-    Description: Forward declaration file for the class cedar::aux::TypeBasedFactory.
+    Description: Forward declaration file for the class cedar::proc::aux::TypeBasedFactory.
 
     Credits:
 
@@ -51,9 +51,13 @@
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
-  namespace aux
+  namespace proc
   {
-    template <typename KeyBasePtr, typename ValueBasePtr> class TypeBasedFactory;
+    namespace aux
+    {
+      template<typename KeyBasePtr, typename ValueBasePtr>
+      class TypeBasedFactory;
+    }
   }
 }
 

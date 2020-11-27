@@ -82,7 +82,6 @@ cedar_add_library(cedaraux
   LocalCoordinateFrame.h
   gl/ObjectVisualization.h
   gui/BaseWidget.h
-  gui/DataPlotter.h
   gui/ExceptionDialog.h
   gui/HistoryPlot.h
   gui/ImagePlot.h

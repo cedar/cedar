@@ -41,7 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/auxiliaries/gui/StringParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/undoRedo/UndoStack.h"

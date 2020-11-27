@@ -41,7 +41,7 @@
 #include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/auxiliaries/FileParameter.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/Settings.h"
 

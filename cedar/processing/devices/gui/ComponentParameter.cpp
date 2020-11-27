@@ -45,7 +45,7 @@
 #include "cedar/devices/Robot.h"
 #include "cedar/devices/exceptions.h"
 #include "cedar/auxiliaries/Singleton.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Factory.h"
 #include "cedar/auxiliaries/casts.h"
 

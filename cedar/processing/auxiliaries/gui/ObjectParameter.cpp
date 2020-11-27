@@ -41,7 +41,7 @@
 #include "cedar/processing/undoRedo/commands/ChangeObjectParameterValue.h"
 #include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/auxiliaries/exceptions.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES

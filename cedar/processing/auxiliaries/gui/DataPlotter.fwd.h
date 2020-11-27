@@ -28,7 +28,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
     Date:        2013 11 14
 
-    Description: Forward declaration file for the class cedar::aux::gui::DataPlotter.
+    Description: Forward declaration file for the class cedar::proc::aux::gui::DataPlotter.
 
     Credits:
 
@@ -41,7 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -51,11 +51,14 @@
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
-  namespace aux
+  namespace proc
   {
-    namespace gui
+    namespace aux
     {
-      CEDAR_DECLARE_AUX_CLASS(DataPlotter);
+      namespace gui
+      {
+        CEDAR_DECLARE_PROC_CLASS(DataPlotter);
+      }
     }
   }
 }

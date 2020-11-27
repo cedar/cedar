@@ -38,7 +38,7 @@
 #include "IntVectorParameter.h"
 #include "cedar/auxiliaries/IntVectorParameter.h"
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES

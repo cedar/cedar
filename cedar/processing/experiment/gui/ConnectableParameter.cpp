@@ -41,7 +41,7 @@
 #include "cedar/processing/experiment/gui/ConnectableParameter.h"
 #include "cedar/processing/experiment/ConnectableParameter.h"
 #include "cedar/processing/experiment/Supervisor.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/processing/auxiliaries/gui/Parameter.h"
 
