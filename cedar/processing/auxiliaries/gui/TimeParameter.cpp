@@ -38,7 +38,7 @@
 #include "cedar/processing/auxiliaries/gui/TimeParameter.h"
 #include "cedar/auxiliaries/TimeParameter.h"
 #include "cedar/processing/auxiliaries/TypeBasedFactory.h"
-#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/processing/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>

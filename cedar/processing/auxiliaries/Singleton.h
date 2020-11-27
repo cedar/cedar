@@ -34,15 +34,15 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_SINGLETON_H
-#define CEDAR_AUX_SINGLETON_H
+#ifndef CEDAR_PROC_AUX_SINGLETON_H
+#define CEDAR_PROC_AUX_SINGLETON_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/auxiliaries/exceptions.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/Singleton.fwd.h"
+#include "cedar/processing/auxiliaries/Singleton.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QMutex>
@@ -57,13 +57,13 @@
  *
  * This specific implementation is thread-safe and returns a boost shared pointer to the Singleton instance.
  *
- * cedar::proc::aux::Singleton is a duplicate of this class, but it is needed to ensure Windows compilation for
- * Parameter-related classes in cedar::proc::aux. Any changes in any Singleton class should be applied to both classes.
+ * This class is a duplicate of cedar::aux::Singleton, but it is needed to ensure Windows compilation for Parameter-
+ * related classes in cedar::proc::aux. Any changes in any Singleton class should be applied to both classes.
  *
  * \todo Separate into policies according to Alexandrescu (2001) [threading model, lifetime policy].
  */
 template<class InstanceType>
-class cedar::aux::Singleton
+class cedar::proc::aux::Singleton
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -136,8 +136,8 @@ protected:
 private:
   //! Whether the singleton object has already been destroyed.
   static bool mDestroyed;
-}; // class cedar::aux::Singleton
+}; // class cedar::proc::aux::Singleton
 
-template <class InstanceType> bool cedar::aux::Singleton<InstanceType>::mDestroyed;
+template <class InstanceType> bool cedar::proc::aux::Singleton<InstanceType>::mDestroyed;
 
 #endif // CEDAR_AUX_SINGLETON_H

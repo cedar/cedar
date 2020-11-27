@@ -22,52 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        IntVectorParameter.cpp
+    File:        Singleton.fwd.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 03 12
+    Date:        2013 11 08
 
-    Description:
+    Description: Forward declaration file for the class cedar::aux::Singleton.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_PROC_AUX_SINGLETON_FWD_H
+#define CEDAR_PROC_AUX_SINGLETON_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
-#include "IntVectorParameter.h"
-#include "cedar/auxiliaries/IntVectorParameter.h"
-#include "cedar/auxiliaries/assert.h"
-#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
-#include "cedar/processing/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-IntVectorParameter::IntVectorParameter(QWidget *pParent)
-:
-cedar::proc::aux::gui::IntVectorParameter(pParent)
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
 {
+  namespace proc
+  {
+    namespace aux
+    {
+      template<class T>
+      class Singleton;
+    }
+  }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
+//!@endcond
 
-bool IntVectorParameter::empty() const
-{
-  return this->mWidgets.empty();
-}
+#endif // CEDAR_PROC_AUX_SINGLETON_FWD_H
 
-unsigned int IntVectorParameter::size() const
-{
-  return this->mWidgets.size();
-}
-
-QSpinBox* IntVectorParameter::widgetAt(int i)
-{
-  return this->mWidgets.at(i);
-}

@@ -38,7 +38,7 @@
 #include "cedar/processing/auxiliaries/gui/LengthParameter.h"
 #include "cedar/auxiliaries/LengthParameter.h"
 #include "cedar/processing/auxiliaries/TypeBasedFactory.h"
-#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/processing/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>

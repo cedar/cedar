@@ -38,7 +38,7 @@
 #include "cedar/processing/auxiliaries/gui/AngularVelocityParameter.h"
 #include "cedar/auxiliaries/AngularVelocityParameter.h"
 #include "cedar/processing/auxiliaries/TypeBasedFactory.h"
-#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/processing/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>

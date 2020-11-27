@@ -42,6 +42,7 @@
 #include "cedar/processing/auxiliaries/gui/UIntVectorParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/processing/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 

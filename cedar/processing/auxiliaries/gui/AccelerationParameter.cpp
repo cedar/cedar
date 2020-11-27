@@ -38,7 +38,7 @@
 #include "cedar/processing/auxiliaries/gui/AccelerationParameter.h"
 #include "cedar/auxiliaries/AccelerationParameter.h"
 #include "cedar/processing/auxiliaries/TypeBasedFactory.h"
-#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/processing/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>

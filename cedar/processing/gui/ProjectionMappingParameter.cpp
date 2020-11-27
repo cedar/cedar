@@ -42,7 +42,7 @@
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/processing/auxiliaries/TypeBasedFactory.h"
-#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/processing/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>

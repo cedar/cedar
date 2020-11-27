@@ -42,7 +42,7 @@
 #include "cedar/processing/auxiliaries/gui/DoubleParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/processing/auxiliaries/TypeBasedFactory.h"
-#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/processing/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>

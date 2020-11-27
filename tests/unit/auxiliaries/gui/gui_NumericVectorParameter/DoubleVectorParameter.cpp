@@ -41,7 +41,7 @@
 // CEDAR INCLUDES
 #include "DoubleVectorParameter.h"
 #include "cedar/processing/auxiliaries/TypeBasedFactory.h"
-#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/processing/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
