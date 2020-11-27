@@ -102,6 +102,8 @@ private:
 private slots:
   void parameterPointerChanged();
 
+  void parameterValueChanged();
+
   void currentTypeChanged(int index);
 
   //--------------------------------------------------------------------------------------------------------------------

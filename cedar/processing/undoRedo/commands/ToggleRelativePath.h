@@ -22,72 +22,89 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        RobotManager.h
+    File:        ToggleRelativePath.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 02 27
+    Maintainer:  Lars Janssen
+    Email:       lars.janssen@ini.rub.de
+    Date:        2020 07 28
 
-    Description:
+    Description: Header file for the class cedar::proc::undoRedo::commands::ChangeParameterValue.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_GUI_ROBOT_MANAGER_H
-#define CEDAR_DEV_GUI_ROBOT_MANAGER_H
+#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_TOGGLE_RELATIVE_PATH_H
+#define CEDAR_PROC_UNDO_REDO_COMMANDS_TOGGLE_RELATIVE_PATH_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/gui/namespace.h"
-#include "cedar/processing/devices/gui/namespace.h"
-#include "cedar/devices/namespace.h"
-#include "cedar/processing/devices/gui/ui_RobotManager.h"
+#include "cedar/processing/undoRedo/UndoCommand.h"
+#include "cedar/auxiliaries/FileParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/Path.fwd.h"
+#include "cedar/processing/undoRedo/commands/ToggleRelativePath.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QTreeWidgetItem>
-#include <QWidget>
-#include <string>
+#include <QCheckBox>
 
-
-/*!@brief A gui for the manager of robot instances.
+/*!@ Parameter change command
+ *
+ * UndoCommand Implementation for changing the relative path checkbox in the FileParameter
  */
-class cedar::proc::dev::gui::RobotManager : public QWidget, public Ui_RobotManager
-{
-  Q_OBJECT
-  //--------------------------------------------------------------------------------------------------------------------
-  // nested types
-  //--------------------------------------------------------------------------------------------------------------------
 
+class cedar::proc::undoRedo::commands::ToggleRelativePath : public cedar::proc::undoRedo::UndoCommand
+{
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  RobotManager();
+  ToggleRelativePath(QCheckBox *checkBox, bool targetState, cedar::aux::FileParameter* parameter)
+  :
+  mpCheckBox(checkBox),
+  mTargetState(targetState),
+  mpParameter(parameter)
+  {
+  }
 
-  //!@brief The destructor.
-  ~RobotManager();
+  //!@brief Destructor
+  virtual ~ToggleRelativePath()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void loadConfiguration(const cedar::aux::Path& configuration);
 
-signals:
-  void robotNameAdded(QString addedRobotName);
+  void undo()
+  {
+    this->mpCheckBox->setChecked(!this->mTargetState);
+    if(this->mTargetState)
+    {
+      this->mpParameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_ABSOLUTE);
+    }
+    else
+    {
+      this->mpParameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
+    }
+  }
 
-  void robotConfigurationLoaded(QString addedRobotName);
-
-  void closeRobotManager();
-
-  void configurationChanged();
+  void redo()
+  {
+    this->mpCheckBox->setChecked(this->mTargetState);
+    if(this->mTargetState)
+    {
+      this->mpParameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
+    }
+    else
+    {
+      this->mpParameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_ABSOLUTE);
+    }
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -99,60 +116,18 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void deselectRobot();
+  // none yet
 
-  void selectRobot(const std::string& robotName);
-
-  std::string getSelectedRobotName() const;
-
-  cedar::dev::RobotPtr getSelectedRobot() const;
-
-  // signal translators
-  void robotAddedSignalTranslator(const std::string& addedRobotName);
-
-  void robotConfigurationLoadedSignalTranslator(const std::string& robotName);
-
-  void fillSimpleRobotList();
-
-  void robotRemoved(const std::string& robotName);
-
-  void fillExistingRobots();
-
-  void robotRenamed(const std::string& oldName, const std::string& newName);
-
-private slots:
-  void loadConfigurationTriggered();
-
-  void loadConfigurationFromResourceTriggered();
-
-  void addRobotClicked();
-
-  void addRobotName(QString addedRobotName);
-
-  void updateRobotConfiguration(QString addedRobotName);
-
-  void robotNameSelected(int nameIndex);
-
-  void partSelected(QTreeWidgetItem* pCurrent, QTreeWidgetItem* pPrevious);
-
-  void simpleModeAdd();
-
-  void removeClicked();
-
-  void closeWindow();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
 private:
-  boost::signals2::connection mRobotAddedConnection;
-  boost::signals2::connection mRobotConfigurationChangedConnection;
-  boost::signals2::connection mRobotRemovedConnection;
-  boost::signals2::scoped_connection mRobotRenamedConnection;
 
-  QTreeWidgetItem* mpComponentsNode;
-  QTreeWidgetItem* mpChannelsNode;
+  QCheckBox* mpCheckBox;
+  bool mTargetState;
+  cedar::aux::FileParameter* mpParameter;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -163,8 +138,8 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::dev::gui::RobotManager
+}; // class cedar::proc::undoRedo::commands::ToggleRelativePath
 
+#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_TOGGLE_RELATIVE_PATH_H
 
-#endif // CEDAR_DEV_GUI_ROBOT_MANAGER_H
 

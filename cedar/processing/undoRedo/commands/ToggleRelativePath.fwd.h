@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ChangeParameterValue.fwd.h
+    File:        ToggleRelativePath.fwd.h
 
     Maintainer:  Lars Janssen
     Email:       lars.janssen@ini.rub.de
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_PARAMETER_VALUE_FWD_H
-#define CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_PARAMETER_VALUE_FWD_H
+#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_TOGGLE_RELATIVE_PATH_FWD_H
+#define CEDAR_PROC_UNDO_REDO_COMMANDS_TOGGLE_RELATIVE_PATH_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -58,8 +58,7 @@ namespace cedar
       namespace commands
       {
         //!@cond SKIPPED_DOCUMENTATION
-        template<typename T, typename PT>
-        class ChangeParameterValue;
+        class ToggleRelativePath;
         //!@endcond
       }
     }
@@ -67,5 +66,5 @@ namespace cedar
 }
 
 
-#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_PARAMETER_VALUE_FWD_H
+#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_TOGGLE_RELATIVE_PATH_FWD_H
 

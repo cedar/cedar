@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_PARAMETER_VALUE_FWD_H
-#define CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_PARAMETER_VALUE_FWD_H
+#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_OBJECT_PARAMETER_VALUE_FWD_H
+#define CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_OBJECT_PARAMETER_VALUE_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -58,8 +58,7 @@ namespace cedar
       namespace commands
       {
         //!@cond SKIPPED_DOCUMENTATION
-        template<typename T, typename PT>
-        class ChangeParameterValue;
+        class ChangeObjectParameterValue;
         //!@endcond
       }
     }
@@ -67,5 +66,5 @@ namespace cedar
 }
 
 
-#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_PARAMETER_VALUE_FWD_H
+#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_OBJECT_PARAMETER_VALUE_FWD_H
 

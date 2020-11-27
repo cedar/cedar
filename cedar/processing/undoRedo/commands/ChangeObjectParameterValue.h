@@ -22,72 +22,71 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        RobotManager.h
+    File:        ChangeParameterValue.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 02 27
+    Maintainer:  Lars Janssen
+    Email:       lars.janssen@ini.rub.de
+    Date:        2020 07 28
 
-    Description:
+    Description: Header file for the class cedar::proc::undoRedo::commands::ChangeParameterValue.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_GUI_ROBOT_MANAGER_H
-#define CEDAR_DEV_GUI_ROBOT_MANAGER_H
+#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_OBJECT_PARAMETER_VALUE_H
+#define CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_OBJECT_PARAMETER_VALUE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/gui/namespace.h"
-#include "cedar/processing/devices/gui/namespace.h"
-#include "cedar/devices/namespace.h"
-#include "cedar/processing/devices/gui/ui_RobotManager.h"
+#include "cedar/processing/undoRedo/UndoCommand.h"
+#include "cedar/auxiliaries/ObjectParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/Path.fwd.h"
+#include "cedar/processing/undoRedo/commands/ChangeObjectParameterValue.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QTreeWidgetItem>
-#include <QWidget>
-#include <string>
 
-
-/*!@brief A gui for the manager of robot instances.
+/*!@ Parameter change command
+ *
+ * UndoCommand Implementation for ObjectParameter
  */
-class cedar::proc::dev::gui::RobotManager : public QWidget, public Ui_RobotManager
+class cedar::proc::undoRedo::commands::ChangeObjectParameterValue : public cedar::proc::undoRedo::UndoCommand
 {
-  Q_OBJECT
-  //--------------------------------------------------------------------------------------------------------------------
-  // nested types
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  RobotManager();
+  ChangeObjectParameterValue(cedar::aux::ObjectParameter* parameter, std::string oldValue, std::string newValue)
+  :
+  mpParameter(parameter),
+  mOldValue(oldValue),
+  mNewValue(newValue)
+  {
+  }
 
-  //!@brief The destructor.
-  ~RobotManager();
+  //!@brief Destructor
+  virtual ~ChangeObjectParameterValue()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void loadConfiguration(const cedar::aux::Path& configuration);
 
-signals:
-  void robotNameAdded(QString addedRobotName);
+  void undo()
+  {
+    this->mpParameter->setType(this->mOldValue);
+  }
 
-  void robotConfigurationLoaded(QString addedRobotName);
-
-  void closeRobotManager();
-
-  void configurationChanged();
+  void redo()
+  {
+    this->mpParameter->setType(this->mNewValue);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -99,60 +98,18 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void deselectRobot();
+  // none yet
 
-  void selectRobot(const std::string& robotName);
-
-  std::string getSelectedRobotName() const;
-
-  cedar::dev::RobotPtr getSelectedRobot() const;
-
-  // signal translators
-  void robotAddedSignalTranslator(const std::string& addedRobotName);
-
-  void robotConfigurationLoadedSignalTranslator(const std::string& robotName);
-
-  void fillSimpleRobotList();
-
-  void robotRemoved(const std::string& robotName);
-
-  void fillExistingRobots();
-
-  void robotRenamed(const std::string& oldName, const std::string& newName);
-
-private slots:
-  void loadConfigurationTriggered();
-
-  void loadConfigurationFromResourceTriggered();
-
-  void addRobotClicked();
-
-  void addRobotName(QString addedRobotName);
-
-  void updateRobotConfiguration(QString addedRobotName);
-
-  void robotNameSelected(int nameIndex);
-
-  void partSelected(QTreeWidgetItem* pCurrent, QTreeWidgetItem* pPrevious);
-
-  void simpleModeAdd();
-
-  void removeClicked();
-
-  void closeWindow();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
 private:
-  boost::signals2::connection mRobotAddedConnection;
-  boost::signals2::connection mRobotConfigurationChangedConnection;
-  boost::signals2::connection mRobotRemovedConnection;
-  boost::signals2::scoped_connection mRobotRenamedConnection;
 
-  QTreeWidgetItem* mpComponentsNode;
-  QTreeWidgetItem* mpChannelsNode;
+  cedar::aux::ObjectParameter* mpParameter;
+  std::string mOldValue;
+  std::string mNewValue;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -163,8 +120,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::dev::gui::RobotManager
+}; // class cedar::proc::undoRedo::commands::ChangeObjectParameterValue
 
-
-#endif // CEDAR_DEV_GUI_ROBOT_MANAGER_H
+#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_OBJECT_PARAMETER_VALUE_H
 

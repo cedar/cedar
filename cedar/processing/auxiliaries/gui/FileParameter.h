@@ -49,7 +49,7 @@
 #include <QCheckBox>
 
 
-/*!@brief A widget for a cedar::aux::DirectoryParameter.
+/*!@brief A widget for a cedar::aux::FileParameter.
  */
 class cedar::proc::aux::gui::FileParameter : public cedar::proc::aux::gui::Parameter
 {
