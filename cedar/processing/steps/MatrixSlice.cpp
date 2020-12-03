@@ -384,6 +384,11 @@ void cedar::proc::steps::MatrixSlice::rangeChanged()
 
 void cedar::proc::steps::MatrixSlice::compute(const cedar::proc::Arguments&)
 {
+  if (!this->mInput || this->mInput->isEmpty())
+  {
+    return;
+  }
+
   const cv::Mat& input = this->mInput->getData();
   cv::Mat& output = this->mOutput->getData();
 
