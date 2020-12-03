@@ -191,6 +191,8 @@ void cedar::proc::steps::Projection::reconfigure(bool triggerSubsequent)
                   );
     return;
   }
+  if (this->mInput->isEmpty()) // often this is just a temporary state
+    return;
 
   unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
   unsigned int output_dimensionality = _mOutputDimensionality->getValue();
