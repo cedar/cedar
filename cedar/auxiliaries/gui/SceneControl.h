@@ -70,7 +70,7 @@ public:
   SceneControl(QWidget* parent=0);
   
   /*!@brief the destructor */
-  ~SceneControl(){}
+  ~SceneControl();
 
   cedar::aux::gl::ScenePtr getScene() const;
 

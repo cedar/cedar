@@ -150,8 +150,9 @@ void cedar::dev::gl::Caren::initializeGl()
 
   //mHandVisualization = cedar::dev::gl::SdhPtr( new cedar::dev::gl::Sdh(fingerOne, fingerTwo, fingerThree, palm) );
   //mHeadVisualization = cedar::dev::gl::KinematicChainPtr( new cedar::dev::gl::PowerCubeWrist90(head) );
-
+#ifndef CEDAR_PORTABLE
   mTrunkVisualization->initializeGl();
+#endif
   mArmVisualization->initializeGl();
   //mHandVisualization->initializeGl();
   //mHeadVisualization->initializeGl();
@@ -165,7 +166,9 @@ void cedar::dev::gl::Caren::initializeGl()
 void cedar::dev::gl::Caren::draw()
 {
   drawBase();
+#ifndef CEDAR_PORTABLE
   mTrunkVisualization->draw();
+#endif
   mArmVisualization->draw();
   //mHandVisualization->draw();
   //mHeadVisualization->draw();

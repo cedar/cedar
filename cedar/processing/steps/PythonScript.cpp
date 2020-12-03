@@ -69,6 +69,7 @@ SOFTWARE.
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/auxiliaries//annotation/ColorSpace.h"
 
 #include "cedar/processing/GroupDeclarationManager.h"
 
@@ -225,6 +226,7 @@ public:
 
 };
 #else // CV_MAJOR_VERSION
+#if CV_MAJOR_VERSION < 4
 class cedar::proc::steps::PythonScriptScope::NumpyAllocator : public cv::MatAllocator
 {
 public:
@@ -235,67 +237,142 @@ public:
 
     cv::UMatData* allocate(PyObject* o, int dims, const int* sizes, int type, size_t* step) const
     {
-      cv::UMatData* u = new cv::UMatData(this);
-      u->data = u->origdata = (uchar*)PyArray_DATA((PyArrayObject*) o);
-      npy_intp* _strides = PyArray_STRIDES((PyArrayObject*) o);
-      for( int i = 0; i < dims - 1; i++ )
-        step[i] = (size_t)_strides[i];
-      step[dims-1] = CV_ELEM_SIZE(type);
-      u->size = sizes[0]*step[0];
-      u->userdata = o;
-      return u;
+        cv::UMatData* u = new cv::UMatData(this);
+        u->data = u->origdata = (uchar*)PyArray_DATA((PyArrayObject*)o);
+        npy_intp* _strides = PyArray_STRIDES((PyArrayObject*)o);
+        for (int i = 0; i < dims - 1; i++)
+            step[i] = (size_t)_strides[i];
+        step[dims - 1] = CV_ELEM_SIZE(type);
+        u->size = sizes[0] * step[0];
+        u->userdata = o;
+        return u;
     }
 
     cv::UMatData* allocate(int dims0, const int* sizes, int type, void* data, size_t* step, int flags, cv::UMatUsageFlags usageFlags) const// CV_OVERRIDE
     {
-      if( data != 0 )
-      {
-        // issue #6969: CV_Error(Error::StsAssert, "The data should normally be NULL!");
-        // probably this is safe to do in such extreme case
-        return stdAllocator->allocate(dims0, sizes, type, data, step, flags, usageFlags);
-      }
-      //PyEnsureGIL gil;
+        if (data != 0)
+        {
+            // issue #6969: CV_Error(Error::StsAssert, "The data should normally be NULL!");
+            // probably this is safe to do in such extreme case
+            return stdAllocator->allocate(dims0, sizes, type, data, step, flags, usageFlags);
+        }
+        //PyEnsureGIL gil;
 
-      int depth = CV_MAT_DEPTH(type);
-      int cn = CV_MAT_CN(type);
-      const int f = (int)(sizeof(size_t)/8);
-      int typenum = depth == CV_8U ? NPY_UBYTE : depth == CV_8S ? NPY_BYTE :
-                                                 depth == CV_16U ? NPY_USHORT : depth == CV_16S ? NPY_SHORT :
-                                                                                depth == CV_32S ? NPY_INT : depth == CV_32F ? NPY_FLOAT :
-                                                                                                            depth == CV_64F ? NPY_DOUBLE : f*NPY_ULONGLONG + (f^1)*NPY_UINT;
-      int i, dims = dims0;
-      cv::AutoBuffer<npy_intp> _sizes(dims + 1);
-      for( i = 0; i < dims; i++ )
-        _sizes[i] = sizes[i];
-      if( cn > 1 )
-        _sizes[dims++] = cn;
-      PyObject* o = PyArray_SimpleNew(dims, _sizes, typenum);
-      if(!o)
-        CV_Error_(cv::Error::StsError, ("The numpy array of typenum=%d, ndims=%d can not be created", typenum, dims));
-      return allocate(o, dims0, sizes, type, step);
+        int depth = CV_MAT_DEPTH(type);
+        int cn = CV_MAT_CN(type);
+        const int f = (int)(sizeof(size_t) / 8);
+        int typenum = depth == CV_8U ? NPY_UBYTE : depth == CV_8S ? NPY_BYTE :
+            depth == CV_16U ? NPY_USHORT : depth == CV_16S ? NPY_SHORT :
+            depth == CV_32S ? NPY_INT : depth == CV_32F ? NPY_FLOAT :
+            depth == CV_64F ? NPY_DOUBLE : f * NPY_ULONGLONG + (f ^ 1) * NPY_UINT;
+        int i, dims = dims0;
+        cv::AutoBuffer<npy_intp> _sizes(dims + 1);
+        for (i = 0; i < dims; i++)
+            _sizes[i] = sizes[i];
+        if (cn > 1)
+            _sizes[dims++] = cn;
+        PyObject* o = PyArray_SimpleNew(dims, _sizes, typenum);
+        if (!o)
+            CV_Error_(cv::Error::StsError, ("The numpy array of typenum=%d, ndims=%d can not be created", typenum, dims));
+        return allocate(o, dims0, sizes, type, step);
     }
 
     bool allocate(cv::UMatData* u, int accessFlags, cv::UMatUsageFlags usageFlags) const //CV_OVERRIDE
     {
-      return stdAllocator->allocate(u, accessFlags, usageFlags);
+        return stdAllocator->allocate(u, accessFlags, usageFlags);
     }
 
     void deallocate(cv::UMatData* u) const //CV_OVERRIDE
     {
-      if(!u)
-        return;
-      //PyEnsureGIL gil;
-      CV_Assert(u->urefcount >= 0);
-      CV_Assert(u->refcount >= 0);
-      if(u->refcount == 0)
-      {
-        PyObject* o = (PyObject*)u->userdata;
-        Py_XDECREF(o);
-        delete u;
-      }
+        if (!u)
+            return;
+        //PyEnsureGIL gil;
+        CV_Assert(u->urefcount >= 0);
+        CV_Assert(u->refcount >= 0);
+        if (u->refcount == 0)
+        {
+            PyObject* o = (PyObject*)u->userdata;
+            Py_XDECREF(o);
+            delete u;
+        }
     }
 
 };
+#else 
+class cedar::proc::steps::PythonScriptScope::NumpyAllocator : public cv::MatAllocator
+{
+public:
+
+    NumpyAllocator() { stdAllocator = cv::Mat::getStdAllocator(); }
+    ~NumpyAllocator() {}
+
+    cv::UMatData* allocate(PyObject* o, int dims, const int* sizes, int type, size_t* step) const
+    {
+
+        cv::UMatData* u = new cv::UMatData(this);
+        u->data = u->origdata = (uchar*)PyArray_DATA((PyArrayObject*)o);
+        npy_intp* _strides = PyArray_STRIDES((PyArrayObject*)o);
+        for (int i = 0; i < dims - 1; i++)
+            step[i] = (size_t)_strides[i];
+        step[dims - 1] = CV_ELEM_SIZE(type);
+        u->size = sizes[0] * step[0];
+        u->userdata = o;
+        return u;
+    }
+
+    cv::UMatData* allocate(int dims0, const int* sizes, int type, void* data, size_t* step, cv::AccessFlag flags, cv::UMatUsageFlags usageFlags) const// CV_OVERRIDE
+    {
+        if (data != 0)
+        {
+            // issue #6969: CV_Error(Error::StsAssert, "The data should normally be NULL!");
+            // probably this is safe to do in such extreme case
+            return stdAllocator->allocate(dims0, sizes, type, data, step, flags, usageFlags);
+        }
+        //PyEnsureGIL gil;
+
+        int depth = CV_MAT_DEPTH(type);
+        int cn = CV_MAT_CN(type);
+        const int f = (int)(sizeof(size_t) / 8);
+        int typenum = depth == CV_8U ? NPY_UBYTE : depth == CV_8S ? NPY_BYTE :
+            depth == CV_16U ? NPY_USHORT : depth == CV_16S ? NPY_SHORT :
+            depth == CV_32S ? NPY_INT : depth == CV_32F ? NPY_FLOAT :
+            depth == CV_64F ? NPY_DOUBLE : f * NPY_ULONGLONG + (f ^ 1) * NPY_UINT;
+        int i, dims = dims0;
+        cv::AutoBuffer<npy_intp> _sizes(dims + 1);
+        for (i = 0; i < dims; i++)
+            _sizes[i] = sizes[i];
+        if (cn > 1)
+            _sizes[dims++] = cn;
+        PyObject* o = PyArray_SimpleNew(dims, _sizes, typenum);
+        if (!o)
+            CV_Error_(cv::Error::StsError, ("The numpy array of typenum=%d, ndims=%d can not be created", typenum, dims));
+        return allocate(o, dims0, sizes, type, step);
+    }
+
+    bool allocate(cv::UMatData* u, cv::AccessFlag accessFlags, cv::UMatUsageFlags usageFlags) const //CV_OVERRIDE
+    {
+        return stdAllocator->allocate(u, accessFlags, usageFlags);
+    }
+
+    void deallocate(cv::UMatData* u) const //CV_OVERRIDE
+    {
+        if (!u)
+            return;
+        //PyEnsureGIL gil;
+        CV_Assert(u->urefcount >= 0);
+        CV_Assert(u->refcount >= 0);
+        if (u->refcount == 0)
+        {
+            PyObject* o = (PyObject*)u->userdata;
+            Py_XDECREF(o);
+            delete u;
+        }
+    }
+
+    const MatAllocator* stdAllocator;
+
+};
+#endif
 #endif // CV_MAJOR_VERSION
 
 cedar::proc::steps::PythonScriptScope::NumpyAllocator g_numpyAllocator;
@@ -388,7 +465,7 @@ const char * cedar::proc::steps::PythonScriptScope::NDArrayConverter::typenumToS
 cv::Mat cedar::proc::steps::PythonScriptScope::NDArrayConverter::toMat(PyObject* o, int index)
 {
   cv::Mat m;
-  bool allowND = true, doMultiChannelTypeConversion = false;
+  bool allowND = true;
   if(!o || o == Py_None)
   {
     return cv::Mat::zeros(1,1,CV_32F);
@@ -560,14 +637,19 @@ cv::Mat cedar::proc::steps::PythonScriptScope::NDArrayConverter::toMat(PyObject*
     //step[ndims] = elemsize;
     //ndims++;
   }
-
-  if( doMultiChannelTypeConversion && ismultichannel )
+  //if output is an rgb image, do multichannel conversion
+  if(ismultichannel && (type == CV_8U || type == CV_8UC3))
   {
-    ndims--;
-    type |= CV_MAKETYPE(0, size[2]);
-    std::cout << "Matrix has multiple channels... Do conversion... type |=" <<
-                 " CV_MAKETYPE(0, size[2]) has computed " << type << std::endl;
-    //TODO implement a type check after oring (currently this statement is never true)
+    int newType = type | CV_MAKETYPE(0, size[2]);
+    if(newType == CV_8UC3)
+    {
+      ndims--;
+      type = newType;
+    }
+    else
+    {
+      std::cout << "PythonScript: Multichannel conversion failed. Trying to convert from type " << type << " to " << newType << ". Add support for this type if multichannel conversion is intended." << std::endl;
+    }
   }
 
   if( ndims > 2 && !allowND )
@@ -624,7 +706,6 @@ PyObject* cedar::proc::steps::PythonScriptScope::NDArrayConverter::toNDArray(con
       return 0;
     }
     //m.copyTo(temp);
-
     p = &temp;
   }
 #if CV_MAJOR_VERSION < 3
@@ -1153,6 +1234,7 @@ void cedar::proc::steps::PythonScript::executePythonScript()
 
     std::list<boost::python::handle<>> inputsList;
     cedar::proc::steps::PythonScriptScope::NDArrayConverter cvt(this);
+    cedar::aux::annotation::ConstColorSpacePtr pColorSpaceAnnotation = nullptr;
     for(unsigned int i = 0; i < mInputs.size(); i++)
     {
       cedar::aux::ConstDataPtr inputMatrixPointer = this->getInputSlot(makeInputSlotName(i))->getData();
@@ -1161,6 +1243,17 @@ void cedar::proc::steps::PythonScript::executePythonScript()
         // Lock input matrix
         auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(inputMatrixPointer);
         QReadLocker input_l(&mat_data->getLock());
+        try
+        {
+          if(pColorSpaceAnnotation == nullptr)
+          {
+            pColorSpaceAnnotation = inputMatrixPointer->getAnnotation<cedar::aux::annotation::ColorSpace>();
+          }
+        }
+        catch(std::exception)
+        {
+          pColorSpaceAnnotation = nullptr;
+        }
         cv::Mat inputMatrix = mat_data->getData().clone();
 
         // Unlock input matrix
@@ -1315,7 +1408,14 @@ void cedar::proc::steps::PythonScript::executePythonScript()
           outputNodeMatrix = convert3DMatToFloat<double>(outputNodeMatrix);
         }
       }
-
+      if(outputNodeMatrix.type() == CV_8UC3 && pColorSpaceAnnotation != nullptr)
+      {
+        mOutputs[i]->setAnnotation(cedar::aux::annotation::ColorSpacePtr(new cedar::aux::annotation::ColorSpace(*pColorSpaceAnnotation)));
+      }
+      else
+      {
+        mOutputs[i]->removeAnnotations<cedar::aux::annotation::ColorSpace>();
+      }
       i++;
     }
     

@@ -42,6 +42,8 @@
 #include "cedar/auxiliaries/Settings.h"
 #include "cedar/units/Time.h"
 
+#include <boost/regex.hpp>
+
 // SYSTEM INCLUDES
 
 #ifndef Q_MOC_RUN
@@ -103,8 +105,11 @@ void cedar::aux::DataSpectator::prepareStart()
       extension = "csv";
       break;
   }
+
+  boost::regex re("[[:space:]/]");
+
   mOutputPath = cedar::aux::RecorderSingleton::getInstance()->getOutputDirectory() + "/" +
-      boost::algorithm::replace_all_copy(mName," ","_") + "." + extension;
+          boost::regex_replace(mName,re,"_") + "." + extension;
   mOutputStream.open(mOutputPath, std::ios::out | std::ios::app);
   writeHeader(mode);
 }

@@ -44,7 +44,7 @@
 #include "cedar/auxiliaries/LogInterface.fwd.h"
 
 // SYSTEM INCLUDES
-
+#include <string>
 
 /*!@brief An interface for classes that redirect log outputs.
  */

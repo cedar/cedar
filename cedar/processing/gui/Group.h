@@ -116,6 +116,8 @@ public:
   //!@brief read configuration from path
   void readJson(const cedar::aux::Path& filename);
 
+  void readJsonFromString(std::string jsonString);
+
   //!@brief called after the architecture has been loaded
   void afterArchitectureLoaded();
 

@@ -62,6 +62,8 @@
 
 #cmakedefine CEDAR_USE_PYTHON
 
+#cmakedefine HAVE_SNPRINTF
+
 // Specific robot libraries ============================================================================================
 #cmakedefine CEDAR_USE_AMTEC
 #cmakedefine CEDAR_USE_KUKA_LWR

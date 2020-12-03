@@ -58,6 +58,7 @@
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/SimulationControl.h"
 #include "cedar/processing/gui/OneTimeMessageDialog.h"
+#include "cedar/processing/gui/StickyNote.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/gui/ExperimentDialog.h"
 #include "cedar/processing/exceptions.h"
@@ -83,6 +84,7 @@
 #include "cedar/version.h"
 #include "cedar/configuration.h"
 #include "cedar/devices/RobotManager.h"
+#include "cedar/processing/GroupFileFormatV1.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -91,6 +93,11 @@
 #include <QDialogButtonBox>
 #include <QInputDialog>
 #include <QTableWidget>
+#include <QMimeData>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/algorithm/string.hpp>
+
 #ifndef Q_MOC_RUN
   #if (BOOST_VERSION / 100000 < 2 && BOOST_VERSION / 100 % 1000 < 61) 
     #include <boost/property_tree/detail/json_parser_error.hpp>  
@@ -104,6 +111,7 @@
 #include <list>
 #include <string>
 #include <utility>
+#include <QtGui/QClipboard>
 
 #ifdef CEDAR_USE_YARP
 #include <yarp/conf/version.h>
@@ -447,6 +455,9 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   QObject::connect(this->tabWidget,SIGNAL(currentChanged(int)),this, SLOT(updateTabs(int))); //Fixes a Bug under Mac OS
 
+    //do not remove this line, init the qglviewer, allowing the robotic framework to work as intended. Hotfix part 1. Needs a better fix. TODO
+    this->tabWidget->setCurrentIndex(1);
+
   // set the property pane as the scene's property displayer
 
   QObject::connect(this->mpActionStartPauseSimulation, SIGNAL(triggered()), this, SLOT(startPauseSimulationClicked()));
@@ -520,8 +531,11 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
                    this,
                    SLOT(addGlobalSceneViewer()));
 
+
+  QObject::connect(mpActionCopy, SIGNAL(triggered()), this, SLOT(copy()));
+  QObject::connect(mpActionPaste, SIGNAL(triggered()), this, SLOT(paste()));
   QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateSelected()));
-  QObject::connect(mpActionCopy, SIGNAL(triggered()), this, SLOT(copyStep()));
+  QObject::connect(mpActionCopyConfiguration, SIGNAL(triggered()), this, SLOT(copyStepConfiguration()));
   QObject::connect(mpActionPasteConfiguration, SIGNAL(triggered()), this, SLOT(pasteStepConfiguration()));
   QObject::connect(mpActionFind, SIGNAL(triggered()), this, SLOT(openFindDialog()));
 
@@ -632,6 +646,12 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 #ifdef CEDAR_USE_PYTHON
   cedar::proc::steps::PythonScript::importStepsFromTemplate();
 #endif
+}
+
+void cedar::proc::gui::Ide::showEvent( QShowEvent *event ) {
+    QWidget::showEvent( event );
+    //do not remove this line, init the qglviewer, allowing the robotic framework to work as intended. Hotfix part 2. Needs a better fix. TODO
+    this->tabWidget->setCurrentIndex(0);
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -1158,8 +1178,627 @@ void cedar::proc::gui::Ide::duplicateSelected()
   }
 }
 
-void cedar::proc::gui::Ide::copyStep()
+void cedar::proc::gui::Ide::copy()
 {
+  ////Nodes
+  //Root of the copied steps, this will be converted to json and put into the clipboard later
+  cedar::aux::ConfigurationNode rootNode;
+  cedar::aux::ConfigurationNode stepsNode;
+  cedar::aux::ConfigurationNode uiNode;
+  cedar::aux::ConfigurationNode metaNode;
+  cedar::aux::ConfigurationNode groupNode;
+  cedar::aux::ConfigurationNode stickyNoteNode;
+
+  //Get selected items
+  QList<QGraphicsItem*> selected = this->mpProcessingDrawer->getScene()->selectedItems();
+
+  //If no elements are selected the clipboard will not get cleared
+  if (selected.empty())
+  {
+    return;
+  }
+
+  ////Store data of groups in groupNode
+  //Iterate over all selected elements
+  for (QGraphicsItem* singleSelected : selected)
+  {
+    if(cedar::proc::gui::StickyNote* stickyNote = dynamic_cast<cedar::proc::gui::StickyNote*>(singleSelected))
+    {
+      cedar::aux::ConfigurationNode node;
+      node.put("type", "stickyNote");
+      QRectF rect = stickyNote->boundingRect();
+      node.put("width", static_cast<int>(rect.width()));
+      node.put("height", static_cast<int>(rect.height()));
+      node.put("x", static_cast<int>(stickyNote->scenePos().x()));
+      node.put("y", static_cast<int>(stickyNote->scenePos().y()));
+      node.put("text", stickyNote->getText());
+      node.put("font size", stickyNote->getFontSize());
+      QColor color = stickyNote->getColor();
+      node.put("color red", color.red());
+      node.put("color green", color.green());
+      node.put("color blue", color.blue());
+      uiNode.push_back(cedar::aux::ConfigurationNode::value_type("", node));
+    }
+
+    bool doCopy = true;
+    cedar::aux::ConfigurationNode singleGroup;
+    if (Element* p_base = dynamic_cast<cedar::proc::gui::Element *>(singleSelected))
+    {
+      //Get Element
+      cedar::proc::ElementPtr element = p_base->getElement();
+
+      //Check if Element is a group
+      if (cedar::proc::GroupPtr sub_group = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
+      {
+        //Check if group is not already in another group
+        for (QGraphicsItem* sub_item : selected)
+        {
+          if (sub_item->isAncestorOf(singleSelected))
+          {
+            doCopy = false;
+          }
+        }
+        if(doCopy)
+        {
+          //Element info
+          sub_group->writeConfiguration(singleGroup);
+
+          ////Get UI info
+          cedar::proc::gui::GraphicsBase *p_item = dynamic_cast<cedar::proc::gui::GraphicsBase *>(singleSelected);
+
+          cedar::proc::gui::Group *p_group_item = dynamic_cast<cedar::proc::gui::Group *>(p_item);
+          //Write configuration to ConfigurationNode singleGroup
+          if(p_group_item != nullptr)
+          {
+            p_group_item->writeConfiguration(singleGroup);
+          }
+
+          //Push everything back to groupNode
+          groupNode.push_back(cedar::aux::ConfigurationNode::value_type(sub_group->getName(), singleGroup));
+        }
+      }
+    }
+  }
+
+  //Create a list of all items to be duplicated
+  QList<QGraphicsItem*> items_to_duplicate;
+
+  //Iterate through selected and check if steps can be duplicated
+  for (QGraphicsItem* singleSelected : selected)
+  {
+    singleSelected->setSelected(false);
+    bool addToDuplicateList = true;
+
+    //Check if item is a duplicatable GraphicsBase (e.g Step, Connection)
+    if (cedar::proc::gui::GraphicsBase* graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase *>(singleSelected))
+    {
+      addToDuplicateList = graphics_item->canDuplicate();
+    }
+    else
+    {
+      addToDuplicateList = false;
+    }
+
+    if (addToDuplicateList)
+    {
+      //Check if the item has a parent within the selection
+      for (QGraphicsItem* sub_item : selected)
+      {
+        if (sub_item->isAncestorOf(singleSelected))
+        {
+          // the parent should always be a group, otherwise, the item might not be duplicated correctly
+          CEDAR_DEBUG_NON_CRITICAL_ASSERT(dynamic_cast<cedar::proc::gui::Group *>(sub_item) != nullptr);
+          addToDuplicateList = false;
+          break;
+        }
+      }
+    }
+
+    // if the item has a parent in the selection, that parent will take care of duplicating it
+    // this should only be the case for groups
+    if (addToDuplicateList)
+    {
+      items_to_duplicate.append(singleSelected);
+    }
+  }
+
+
+  //Go through every item
+  for (int i = 0; i < items_to_duplicate.length(); i++)
+  {
+    QGraphicsItem *currentQGraphicsItem = items_to_duplicate.at(i);
+    if (auto p_base = dynamic_cast<cedar::proc::gui::Element *>(currentQGraphicsItem))
+    {
+      if(dynamic_cast<cedar::proc::gui::Group *>(currentQGraphicsItem) != nullptr)
+      {
+        continue;
+      }
+      //Get the element to duplicate (with its name)
+      auto elementToDuplicate = p_base->getElement();
+      //Get UI Element
+      auto elementToDuplicateUi = p_base;
+
+      //Create Configuration Node for Element and its UI
+      cedar::aux::ConfigurationNode tempElementConfigurationNode;
+      cedar::aux::ConfigurationNode tempUiConfigurationNode;
+
+      //Add Ui Type to uiNode
+      switch (elementToDuplicateUi->getGroup())
+      {
+        case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP:
+          tempUiConfigurationNode.put("type", "step");
+          break;
+
+        case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
+          tempUiConfigurationNode.put("type", "trigger");
+          break;
+
+        case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP:
+        {
+          //Move along, nothing to do here
+          tempUiConfigurationNode.put("type", "group");
+          break;
+        }
+
+        default:
+          continue;
+      }
+
+      //Write Configuration to TempNodes
+      elementToDuplicate->writeConfiguration(tempElementConfigurationNode);
+      elementToDuplicateUi->writeConfiguration(tempUiConfigurationNode);
+
+      ////Meta Node
+      metaNode.put("format","1");
+
+      if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(elementToDuplicate))
+      {
+        //Append class name of object
+        std::string class_name = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(step);
+        stepsNode.push_front(cedar::aux::ConfigurationNode::value_type(class_name, tempElementConfigurationNode));
+      }
+      //Add the tempUiConfigurationNode to the uiNode
+      uiNode.push_back(cedar::aux::ConfigurationNode::value_type("", tempUiConfigurationNode));
+    }
+  }
+
+  ////Save Connections and ConnectionAnchors (drag-points of Connections)
+  std::vector<cedar::proc::gui::Connection*> allUiConnections; // all gui connections in the scene
+
+  for (int i = 0; i < selected.size(); ++i)
+  {
+    if (cedar::proc::gui::Connection *conn = dynamic_cast<cedar::proc::gui::Connection *>(selected[i]))
+    {
+      allUiConnections.push_back(conn);
+    }
+  }
+
+  cedar::aux::ConfigurationNode uiConnectionsNode;
+  uiConnectionsNode.put("type", "connections");
+  cedar::aux::ConfigurationNode allUiConnectionsNode;
+
+  for (cedar::proc::gui::Connection *conn : allUiConnections)
+  {
+    if(conn->getConnectionAnchorPoints().size() <= 0 || !conn->isSourceTargetSlotNameValid()) continue;
+    cedar::aux::ConfigurationNode connection;
+    connection.put("source slot", conn->getSourceSlotName().toStdString());
+    connection.put("target slot", conn->getTargetSlotName().toStdString());
+    cedar::aux::ConfigurationNode anchorsNode;
+    for(cedar::proc::gui::ConnectionAnchor *anchor : conn->getConnectionAnchorPoints())
+    {
+      cedar::aux::ConfigurationNode anchorNode;
+      anchorNode.put("x", static_cast<int>(anchor->posMiddle().x()));
+      anchorNode.put("y", static_cast<int>(anchor->posMiddle().y()));
+
+      anchorsNode.push_back(cedar::aux::ConfigurationNode::value_type("", anchorNode));
+    }
+    connection.add_child("anchors", anchorsNode);
+    allUiConnectionsNode.push_back(cedar::aux::ConfigurationNode::value_type("", connection));
+  }
+  uiConnectionsNode.put_child("connections", allUiConnectionsNode);
+
+  uiNode.push_back(cedar::aux::ConfigurationNode::value_type("", uiConnectionsNode));
+
+  //Add sub nodes to rootNode
+  rootNode.add_child("meta",metaNode);
+  rootNode.add_child("steps", stepsNode);
+  rootNode.add_child("groups", groupNode);
+  rootNode.add_child("ui", uiNode);
+
+  //Get DataConnections and if not empty then write it to our rootNode. (Fiter which Steps marked are in the returend DataConnection List, since getDataConnections gives all connections not only the highlighted ones
+  auto DataConnections = this->getGroup()->getGroup()->getDataConnections();
+
+  cedar::aux::ConfigurationNode AllConnectionsNode;
+
+  //Add all connections
+  for (auto data_connection : DataConnections)
+  {
+    cedar::aux::ConfigurationNode connectionNode;
+    std::string source_str = data_connection->getSource()->getParent() + "." + data_connection->getSource()->getName();
+    std::string target_str = data_connection->getTarget()->getParent() + "." + data_connection->getTarget()->getName();
+
+    connectionNode.put("source", source_str);
+    connectionNode.put("target", target_str);
+    AllConnectionsNode.push_back(cedar::aux::ConfigurationNode::value_type("", connectionNode));
+  }
+
+  if (!AllConnectionsNode.empty())
+  {
+    cedar::aux::ConfigurationNode filteredConnectionsNode;
+    //Remove the connections that are not "selected" (if source or target step is not in the selection, do not copy connection)
+    for (auto &connectionPair:AllConnectionsNode)
+    {
+      bool foundSourceString = false;
+      bool foundTargetString = false;
+      if(connectionPair.second.find("source") != connectionPair.second.not_found())
+      {
+        //Get source and target string of connectionPair
+        std::string sourceString = connectionPair.second.find("source")->second.get_value<std::string>();
+        std::string targetString = connectionPair.second.find("target")->second.get_value<std::string>();
+        //Split and replace the step name (before the .) with the new Name
+        std::vector<std::string> sourceStringSplitted;
+        std::vector<std::string> targetStringSplitted;
+        boost::split(sourceStringSplitted, sourceString, boost::is_any_of("."));
+        boost::split(targetStringSplitted, targetString, boost::is_any_of("."));
+        //Loop through steps
+        for (auto &pair:stepsNode)
+        {
+          if(pair.second.find("name") != pair.second.not_found())
+          {
+            //Get name of that step
+            std::string stepName = pair.second.find("name")->second.get_value<std::string>();
+            if (sourceStringSplitted[0] == stepName)
+            {
+              foundSourceString = true;
+            }
+            if (targetStringSplitted[0] == stepName)
+            {
+              foundTargetString = true;
+            }
+          }
+        }
+        if (!(foundSourceString && foundTargetString))
+        {
+          //Loop through groups
+          for (auto &pair:groupNode)
+          {
+            if(pair.second.find("name") != pair.second.not_found())
+            {
+              //Get name of that group
+              std::string groupName = pair.second.find("name")->second.get_value<std::string>();
+              if (sourceStringSplitted[0] == groupName)
+              {
+                foundSourceString = true;
+              }
+              if (targetStringSplitted[0] == groupName)
+              {
+                foundTargetString = true;
+              }
+            }
+          }
+        }
+        if (foundSourceString && foundTargetString)
+        {
+          cedar::aux::ConfigurationNode connectionNode;
+          connectionNode.put("source", sourceString);
+          connectionNode.put("target", targetString);
+          filteredConnectionsNode.push_back(cedar::aux::ConfigurationNode::value_type("", connectionNode));
+        }
+      }
+    }
+    rootNode.add_child("connections", filteredConnectionsNode);
+  }
+
+  //Creating stringstream to convert rootNode to json
+  std::stringstream stringstream;
+  boost::property_tree::write_json(stringstream, rootNode);
+
+  std::string jsonString = stringstream.str();
+
+  //Debug: prints out rootNode to file
+  //boost::property_tree::write_json("Copy: Clipboard Values.json", rootNode);
+
+  //String to QByteArray
+  QByteArray jsonQByteArray(jsonString.c_str(), jsonString.length());
+
+  //Global Clipboard
+  QClipboard *clipboard = QApplication::clipboard();
+
+  QMimeData *mimeData = new QMimeData;
+  //Set created mimedate to json and fill it with jsonQByteArray
+  mimeData->setData("application/json", jsonQByteArray);
+
+  //Fill Clipboard with mimeData
+  clipboard->setMimeData(mimeData, QClipboard::Clipboard);
+}
+
+void cedar::proc::gui::Ide::paste()
+{
+  cedar::aux::ConfigurationNode emptyNode;
+
+  //Get mouse position and convert it to scene coordinates
+  QPoint mousePosition = this->getArchitectureView()->mapFromGlobal(QCursor::pos());
+  QPointF mousePositionScenePos = this->getArchitectureView()->mapToScene(mousePosition);
+
+  ////Get json from global clipboard and convert it to string
+  //Get global clipboard
+  QClipboard *clipboard = QApplication::clipboard();
+
+  //Get clipboard MimeData and convert to string
+  const QMimeData *qMimeDataFromClipboard = clipboard->mimeData(QClipboard::Clipboard);
+  std::string stringJsonFromClipboard = qMimeDataFromClipboard->data("application/json").toStdString();
+
+
+  //Convert back to ConfigurationNode
+  cedar::aux::ConfigurationNode inputNode;
+  std::stringstream jsonFromClipboardStream;
+  jsonFromClipboardStream << stringJsonFromClipboard;
+  read_json(jsonFromClipboardStream, inputNode);
+
+  //Get steps and ui tree
+  cedar::aux::ConfigurationNode &stepsTree = inputNode.get_child("steps");
+  cedar::aux::ConfigurationNode &uiTree = inputNode.get_child("ui");
+  cedar::aux::ConfigurationNode &groupTree = inputNode.get_child("groups");
+
+  //Get center of pasted elements to paste elements to the cursor position
+  //Determine the position offset of the duplicates as the average of the positions of all selected elements
+  QPointF center(0.0, 0.0);
+  int counterofUis = 0;
+  for (auto &uiPair:uiTree)
+  {
+    if(uiPair.second.find("positionX") != uiPair.second.not_found())
+    {
+      double positionX = uiPair.second.find("positionX")->second.get_value<double>();
+      double positionY = uiPair.second.find("positionY")->second.get_value<double>();
+      QPointF pointofStep(positionX, positionY);
+      center += pointofStep;
+      counterofUis++;
+    }
+    boost::property_tree::ptree::const_assoc_iterator itType = uiPair.second.find("type");
+    if(itType != uiPair.second.not_found())
+    {
+      if (itType->second.get_value<std::string>() == "stickyNote")
+      {
+        if(uiPair.second.find("x") != uiPair.second.not_found())
+        {
+          double positionX = uiPair.second.find("x")->second.get_value<double>();
+          double positionY = uiPair.second.find("y")->second.get_value<double>();
+          QPointF pointofStep(positionX, positionY);
+          center += pointofStep;
+          counterofUis++;
+        }
+      }
+    }
+  }
+  for(auto &groupPair:groupTree)
+  {
+    if(groupPair.second.find("ui generic") != groupPair.second.not_found())
+    {
+      auto ui_generic = groupPair.second.find("ui generic");
+      if(ui_generic->second.find("positionX") != ui_generic->second.not_found() && ui_generic->second.find("width") != ui_generic->second.not_found())
+      {
+        double positionX = ui_generic->second.find("positionX")->second.get_value<double>();
+        double positionY = ui_generic->second.find("positionY")->second.get_value<double>();
+        double width = ui_generic->second.find("width")->second.get_value<double>();
+        double height = ui_generic->second.find("height")->second.get_value<double>();
+        QPointF pointofGroup(positionX + width / 2, positionY + height / 2);
+        center += pointofGroup;
+        counterofUis++;
+      }
+    }
+  }
+
+  center /= counterofUis;
+  boost::optional<boost::property_tree::ptree &> connectionsTree = inputNode.get_child_optional("connections");
+  //Get gui connections tree
+  boost::optional<boost::property_tree::ptree &> uiConnectionsTree;
+  for(auto &uiPair:uiTree)
+  {
+    boost::property_tree::ptree::const_assoc_iterator it = uiPair.second.find("type");
+    if(it != uiPair.second.not_found())
+    {
+      std::string type = it->second.get_value<std::string>();
+      if (type == "connections")
+      {
+        uiConnectionsTree = uiPair.second.get_child_optional("connections");
+        if(uiConnectionsTree)
+        {
+          break;
+        }
+      }
+    }
+  }
+
+  //Rename and add steps, rename connections
+  for (auto &stepsPair:stepsTree)
+  {
+    cedar::aux::ConfigurationNode singleUiValue;
+
+    cedar::aux::ConfigurationNode singleStepValue;
+
+    if(stepsPair.second.find("name") == stepsPair.second.not_found())
+    {
+      continue;
+    }
+    std::string oldName = stepsPair.second.find("name")->second.get_value<std::string>();
+    std::string newName = this->mGroup->getGroup()->getUniqueIdentifier(oldName);
+
+    //In UI rename every occurrence of oldName to newName and change position
+    for (auto &uiPair:uiTree)
+    {
+      if(uiPair.second.find("step") != uiPair.second.not_found() && uiPair.second.find("positionX") != uiPair.second.not_found())
+      {
+        std::string uiName = uiPair.second.find("step")->second.get_value<std::string>();
+
+        if (uiName == oldName)
+        {
+          //Rename occurence
+          uiPair.second.put("step", newName);
+
+          ////Change position
+          double positionX = uiPair.second.find("positionX")->second.get_value<double>();
+          double positionY = uiPair.second.find("positionY")->second.get_value<double>();
+          QPointF pointofStep(positionX, positionY);
+
+          //Add vector from center to step to mouse position
+          QPointF vectorFromCenterToStep = pointofStep - center;
+          QPointF newPositionOfStep = mousePositionScenePos + vectorFromCenterToStep;
+
+          //Set new position
+          uiPair.second.put("positionX", newPositionOfStep.x());
+          uiPair.second.put("positionY", newPositionOfStep.y());
+
+          singleUiValue.push_back(cedar::aux::ConfigurationNode::value_type("", uiPair.second));
+        }
+      }
+    }
+
+    if(connectionsTree)
+    {
+      renameElementInConnection(*connectionsTree, oldName, newName, "source", "target");
+    }
+    if(uiConnectionsTree)
+    {
+      renameElementInConnection(*uiConnectionsTree, oldName, newName, "source slot", "target slot");
+    }
+
+    stepsPair.second.put("name", newName);
+
+    cedar::aux::ConfigurationNode rootNode;
+
+    singleStepValue.push_front(cedar::aux::ConfigurationNode::value_type(stepsPair.first, stepsPair.second));
+    cedar::aux::ConfigurationNode emptyNode;
+
+    this->pasteConfigurationNodes(singleStepValue, singleUiValue, emptyNode, emptyNode);
+  }
+
+  ////StickyNotes
+  for (auto &uiPair:uiTree)
+  {
+    cedar::aux::ConfigurationNode singleUiValue;
+
+    boost::property_tree::ptree::const_assoc_iterator itType = uiPair.second.find("type");
+    if(itType != uiPair.second.not_found() && itType->second.get_value<std::string>() == "stickyNote" &&
+        uiPair.second.find("x") != uiPair.second.not_found())
+    {
+      ////Change position
+      //Get
+      double positionX = uiPair.second.find("x")->second.get_value<double>();
+      double positionY = uiPair.second.find("y")->second.get_value<double>();
+      QPointF pointOfNote(positionX,positionY);
+
+      //Add vector from center to stickynote to mouse position
+      QPointF vectorFromCenterToNote = pointOfNote - center;
+      QPointF newPostionOfNote = mousePositionScenePos + vectorFromCenterToNote;
+
+      //Set
+      uiPair.second.put("x", (int)newPostionOfNote.x());
+      uiPair.second.put("y",  (int)newPostionOfNote.y());
+      singleUiValue.push_back(cedar::aux::ConfigurationNode::value_type("", uiPair.second));
+    }
+
+    cedar::aux::ConfigurationNode emptyNode;
+    this->pasteConfigurationNodes(emptyNode,singleUiValue,emptyNode,emptyNode);
+  }
+  //Rename and add groups
+  for(auto &groupPair:groupTree)
+  {
+    std::string oldName = groupPair.first;
+    std::string newName = this->mGroup->getGroup()->getUniqueIdentifier(oldName);
+
+    ////Change position
+    auto ui_generic = groupPair.second.find("ui generic");
+    if(ui_generic != groupPair.second.not_found() && ui_generic->second.find("positionX") != ui_generic->second.not_found())
+    {
+      double positionX = ui_generic->second.find("positionX")->second.get_value<double>();
+      double positionY = ui_generic->second.find("positionY")->second.get_value<double>();
+      QPointF pointofGroup(positionX, positionY);
+
+      //Manipulate: Get vector from center to step and add this vector to the mouse
+      QPointF vectorFromCenterToGroup = pointofGroup - center;
+      QPointF newPostionofGroup = mousePositionScenePos + vectorFromCenterToGroup;
+      //Set
+      ui_generic->second.put("positionX", newPostionofGroup.x());
+      ui_generic->second.put("positionY", newPostionofGroup.y());
+
+      //Rename other occurences at "name" and ui generic/group
+      groupPair.second.put("name", newName);
+      ui_generic->second.put("group", newName);
+      if (connectionsTree)
+      {
+        renameElementInConnection(*connectionsTree, oldName, newName, "source", "target");
+      }
+      if (uiConnectionsTree)
+      {
+        renameElementInConnection(*uiConnectionsTree, oldName, newName, "source slot", "target slot");
+      }
+
+      cedar::aux::ConfigurationNode singleGroupPair;
+      singleGroupPair.push_front(cedar::aux::ConfigurationNode::value_type(newName, groupPair.second));
+
+      cedar::aux::ConfigurationNode emptyNode;
+      this->pasteConfigurationNodes(emptyNode, emptyNode, emptyNode, singleGroupPair);
+    }
+  }
+
+  ////Generate Configuration node for ui connections
+  cedar::aux::ConfigurationNode uiConnectionsNode;
+  for (auto &uiPair:uiTree)
+  {
+    boost::property_tree::ptree::const_assoc_iterator it = uiPair.second.find("type");
+    if(it != uiPair.second.not_found())
+    {
+      std::string type = it->second.get_value<std::string>();
+      if (type == "connections")
+      {
+        uiConnectionsNode.push_front(cedar::aux::ConfigurationNode::value_type(uiPair.first, uiPair.second));
+        break;
+      }
+    }
+  }
+
+  ////Paste connections
+  if (connectionsTree)
+  {
+    cedar::aux::ConfigurationNode emptyNode;
+    this->pasteConfigurationNodes(emptyNode, uiConnectionsNode, *connectionsTree, emptyNode);
+  }
+}
+
+void cedar::proc::gui::Ide::pasteConfigurationNodes(cedar::aux::ConfigurationNode stepNode, cedar::aux::ConfigurationNode uiNode, cedar::aux::ConfigurationNode connectionNode, cedar::aux::ConfigurationNode groupNode)
+{
+  cedar::aux::ConfigurationNode rootNode;
+
+  //Add meta Infos
+  cedar::aux::ConfigurationNode metaNode;
+  metaNode.put("format", "1");
+
+  rootNode.add_child("meta", metaNode);
+  rootNode.add_child("steps", stepNode);
+  rootNode.add_child("ui", uiNode);
+  rootNode.add_child("connections", connectionNode);
+  rootNode.add_child("groups", groupNode);
+
+  std::stringstream stringstream;
+  boost::property_tree::write_json(stringstream, rootNode);
+
+  //Debug: Print modified pasted
+  //boost::property_tree::write_json("Paste: Modified Final Into read Function.json", rootNode);
+
+  //Use readJsonFromString to paste the stringJson
+  try
+  {
+    this->mGroup->readJsonFromString(stringstream.str());
+
+  }
+  catch (const boost::property_tree::json_parser_error &e)
+  {
+    std::string info(e.what());
+    std::cout << info << std::endl;
+  }
+}
+
+void cedar::proc::gui::Ide::copyStepConfiguration() {
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
   // make sure there is only one item
   if (selected_items.size() > 1)
@@ -1176,8 +1815,33 @@ void cedar::proc::gui::Ide::copyStep()
   }
 }
 
-void cedar::proc::gui::Ide::pasteStepConfiguration()
+void cedar::proc::gui::Ide::renameElementInConnection(boost::property_tree::ptree& connectionTree, std::string oldName, std::string newName,
+                                                      std::string sourceSlotName, std::string targetSlotName)
 {
+  for (auto &connectionPair:connectionTree)
+  {
+    //Get source and target string of connectionPair
+    if(connectionPair.second.find(sourceSlotName) != connectionPair.second.not_found()) {
+      std::string sourceString = connectionPair.second.find(sourceSlotName)->second.get_value<std::string>();
+      std::string targetString = connectionPair.second.find(targetSlotName)->second.get_value<std::string>();
+      //Split and replace the first part (before the .) with the new Name
+      std::vector<std::string> sourceStringSplitted;
+      std::vector<std::string> targetStringSplitted;
+      boost::split(sourceStringSplitted, sourceString, boost::is_any_of("."));
+      boost::split(targetStringSplitted, targetString, boost::is_any_of("."));
+      if (sourceStringSplitted[0] == oldName) {
+        std::string newSource = newName + "." + sourceStringSplitted[1];
+        connectionPair.second.put(sourceSlotName, newSource);
+      }
+      if (targetStringSplitted[0] == oldName) {
+        std::string newTarget = newName + "." + targetStringSplitted[1];
+        connectionPair.second.put(targetSlotName, newTarget);
+      }
+    }
+  }
+}
+
+void cedar::proc::gui::Ide::pasteStepConfiguration() {
   if (this->mLastCopiedStep) // is there a step in the buffer?
   {
     QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();

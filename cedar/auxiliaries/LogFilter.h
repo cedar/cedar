@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/LogFilter.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 /*!@brief A class for filtering log messages.
  */
