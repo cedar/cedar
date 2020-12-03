@@ -175,7 +175,14 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
 
 bool cedar::aux::ThreadWrapper::isRunning() const
 {
+  if (mDestructing)
+    return false;
+
   QMutexLocker general_access_lock(&mGeneralAccessLock);
+
+  if (mDestructing)
+    return false;
+
   QReadLocker thread_worker_readlock(&mThreadAndWorkerLock);
 
   if (mDestructing)
