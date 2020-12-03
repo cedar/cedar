@@ -308,13 +308,17 @@ void cedar::proc::steps::HopfOscillatorRHS::recompute()
 
   auto data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(input);
 
-  if (!data)
+  if (!data
+      || data->isEmpty())
     return;
 
   cv::Mat input_mat = data->getData();
   cv::Mat out_mat;
 
   auto my_cols= mBankSize->getValue(); //input_mat.cols;
+
+  if (my_cols > input_mat.cols)
+    return;
 
   out_mat= cv::Mat::zeros(2, my_cols, CV_32F);
 
