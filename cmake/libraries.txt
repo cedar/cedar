@@ -59,6 +59,15 @@ message("[${CMAKE_CXX_COMPILER_VERSION}]")
   
 endif()
 
+# realsense2
+message("-- Searching for realsense2...")
+find_package(realsense2 QUIET)
+if(realsense2_FOUND)
+    message("realsense2 found: " ${realsense2_DIR}) 
+    link_libraries(${realsense2_LIBRARY})
+endif(realsense2_FOUND)
+
+
 # Qt
 message("-- Searching for Qt...")
 

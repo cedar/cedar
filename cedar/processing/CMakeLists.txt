@@ -121,6 +121,7 @@ cedar_add_library(cedarproc
   sinks/LocalWriter.h
   sources/BoxInput.h
   sources/GaussInput.h
+  sources/RealSense.h
   steps/VariableBox.h
   steps/VariableGauss.h
   steps/Sinus.h
