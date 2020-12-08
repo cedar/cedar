@@ -48,6 +48,8 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
+#ifdef CEDAR_USE_REALSENSE
+
 namespace cedar
 {
   namespace proc
@@ -60,6 +62,8 @@ namespace cedar
     }
   }
 }
+
+#endif // CEDAR_USE_REALSENSE
 
 #endif // CEDAR_PROC_SOURCES_REALSENSE_FWD_H
 

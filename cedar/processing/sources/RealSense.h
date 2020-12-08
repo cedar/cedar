@@ -40,6 +40,8 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+#ifdef CEDAR_USE_REALSENSE
+
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
@@ -114,6 +116,8 @@ private:
     rs2::pipeline p;
 
 }; // class cedar::proc::sources::RealSense
+
+#endif // CEDAR_USE_REALSENSE
 
 #endif // CEDAR_PROC_SOURCES_REALSENSE_H
 

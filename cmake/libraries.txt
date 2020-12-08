@@ -65,6 +65,7 @@ find_package(realsense2 QUIET)
 if(realsense2_FOUND)
     message("realsense2 found: " ${realsense2_DIR}) 
     link_libraries(${realsense2_LIBRARY})
+    set(CEDAR_USE_REALSENSE ON)
 endif(realsense2_FOUND)
 
 

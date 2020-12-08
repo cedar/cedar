@@ -37,6 +37,8 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+#ifdef CEDAR_USE_REALSENSE
+
 // CEDAR INCLUDES
 #include "cedar/processing/gui/stepViews/BoostView.h"
 #include "cedar/processing/sources/RealSense.h"
@@ -119,3 +121,4 @@ void cedar::proc::sources::RealSense::compute(const cedar::proc::Arguments&)
     std::cout << "The camera is facing an object " << dist_to_center << " meters away \r";
 }
 
+#endif // CEDAR_USE_REALSENSE
