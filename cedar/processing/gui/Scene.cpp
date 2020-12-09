@@ -56,6 +56,7 @@
 #include "cedar/processing/steps/PythonScript.h"
 #include "cedar/processing/undoRedo/commands/MoveElement.h"
 #include "cedar/processing/undoRedo/commands/CreateDeleteConnection.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteStep.h"
 #include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/GroupDeclaration.h"
@@ -264,22 +265,25 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
     }
   }
 
+  //Stack for all connections that have to be deleted
   std::vector<cedar::proc::gui::Connection*> delete_connections_stack;
-  // remove connections
+
+  //Go through all items and add all found connections to the delete_connection stack
   for (int i = 0; i < items.size(); ++i)
   {
-    // delete connections first
     if (auto p_connection = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
     {
-      // store for later deletion
       delete_connections_stack.push_back(p_connection);
 
-      // take connections out of the list of graphic elements
+      //Take the connection out of the list so it dosent gets added twice
       items[i] = nullptr;
     }
   }
+
+  //Stack for everything else that has to be deleted
   std::vector<cedar::proc::gui::GraphicsBase*> delete_stack;
-  // fill stack with elements
+
+  //Go through all items and push them onto the delete_stack if they are deleteable
   for (int i = 0; i < items.size(); ++i)
   {
     auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]);
@@ -292,12 +296,53 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
     }
   }
 
-  // delete all connections
+  //Delete all connections that were on the "delete_connection_stack"
   while (delete_connections_stack.size() > 0)
   {
     cedar::proc::gui::Connection* p_current_connection = delete_connections_stack.back();
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(p_current_connection, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::REMOVED));
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(p_current_connection, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::DELETE));
     delete_connections_stack.pop_back();
+  }
+
+  //Delete all connections that are connected to any step which is on the "delete_stack" and not already deleted (happens if a element gets deleted but the connection was not selected)
+  for(cedar::proc::gui::GraphicsBase* graphics_base : delete_stack)
+  {
+    //Check if there is any connection to the current item that was NOT in the items list
+    if(auto element = dynamic_cast<cedar::proc::gui::Connectable*>(graphics_base))
+    {
+      //Get all Input DataSlots of the Element
+      cedar::proc::gui::Connectable::DataSlotNameMap &inputDataSlotMap = element->getSlotItems(
+              cedar::proc::DataRole::INPUT);
+      //Get all Output DataSlots of the Element
+      cedar::proc::gui::Connectable::DataSlotNameMap &outputDataSlotMap = element->getSlotItems(
+              cedar::proc::DataRole::OUTPUT);
+
+      std::map<std::string, cedar::proc::gui::DataSlotItem*> test;
+
+      //iterate over inputDataSlotMap
+      for(std::pair<std::string, cedar::proc::gui::DataSlotItem*> const& nameMap : inputDataSlotMap)
+      {
+        //Get all connection from this dataslor
+        std::vector<cedar::proc::gui::Connection*> connectionsFrom = nameMap.second->getConnections();
+
+        for(cedar::proc::gui::Connection* connection : connectionsFrom)
+        {
+          cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(connection, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::DELETE));
+        }
+      }
+
+      //iterate over outputDataSlotMap
+      for(std::pair<std::string, cedar::proc::gui::DataSlotItem*> const& nameMap : outputDataSlotMap)
+      {
+        //Get all connection from this dataslor
+        std::vector<cedar::proc::gui::Connection*> connectionsFrom = nameMap.second->getConnections();
+
+        for(cedar::proc::gui::Connection* connection : connectionsFrom)
+        {
+          cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(connection, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::DELETE));
+        }
+      }
+    }
   }
 
   // sort stack (make it a real stack)
@@ -316,9 +361,9 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
 
 void cedar::proc::gui::Scene::deleteElement(QGraphicsItem* pItem)
 {
-  if (auto element = dynamic_cast<cedar::proc::gui::Element*>(pItem))
+  if (cedar::proc::gui::Element* element = dynamic_cast<cedar::proc::gui::Element*>(pItem))
   {
-    element->deleteElement();
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteStep(element, this,undoRedo::commands::CreateDeleteStep::Action::DELETE));
   }
 }
 
@@ -357,7 +402,6 @@ void cedar::proc::gui::Scene::helpEvent(QGraphicsSceneHelpEvent* pHelpEvent)
       base_item->updateToolTip();
     }
   }
-
   QGraphicsScene::helpEvent(pHelpEvent);
 }
 
@@ -989,8 +1033,6 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
       this->mGroup->addElements(items_to_move);
     }
   }
-
-
   mTargetGroup.reset();
   this->resetBackgroundColor();
   mpDropTarget = NULL;
@@ -1262,7 +1304,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
 {
   if(this->mpConnectionToBeReconnected != nullptr)
   {
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(this->mpConnectionToBeReconnected, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::REMOVED));
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(this->mpConnectionToBeReconnected, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::DELETE));
     //TODO ConnectionMove-Command or macro for de-/ recoupling connections
     this->mpConnectionToBeReconnected = nullptr;
   }
@@ -1434,7 +1476,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
         connected = true;
         bool create_connector_group = pMouseEvent->modifiers().testFlag(Qt::ShiftModifier);
         cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(mpConnectionStart,
-                target, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::ADDED, create_connector_group));
+                target, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::CREATE, create_connector_group));
       }
       else if 
       (

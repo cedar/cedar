@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -24,8 +24,8 @@
 
     File:        CreateDeleteStep.cpp
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
+    Maintainer:  Yogeshwar Agnihotri
+    Email:       yogeshwar.agnihotri@ini.rub.de
     Date:        2020 07 23
 
     Description: Source file for the class cedar::proc::undoRedo::commands::CreateDeleteStep.
@@ -49,14 +49,51 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::undoRedo::commands::CreateDeleteStep::CreateDeleteStep(cedar::proc::gui::ElementPtr element)
+//Constructor for creating an element
+cedar::proc::undoRedo::commands::CreateDeleteStep::CreateDeleteStep(QPointF position,std::string classId, cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene,cedar::proc::undoRedo::commands::CreateDeleteStep::Action action)
 :
-element(element)
+mAction(action)
 {
-  position = element->pos();
-  classId = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(element->getElement());
-  auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(element.get());
-  cedar::proc::gui::Group* guiGroup = connectable->getGuiGroup();
+  //These 3 are needed for creating an element
+  mPosition = position;
+  mClassId = classId;
+  mpGroup = group;
+  //Scene is needed to create the element in the scene
+  mpScene = scene;
+}
+
+//Constructor for deleting an element
+cedar::proc::undoRedo::commands::CreateDeleteStep::CreateDeleteStep(cedar::proc::gui::Element* element, cedar::proc::gui::Scene* scene, cedar::proc::undoRedo::commands::CreateDeleteStep::Action action)
+:
+mpGuiElement(element),
+mpElement(element->getElement()),
+mAction(action)
+{
+  mPosition = element->pos();
+  mpScene = scene;
+  mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(element->getElement());
+
+  //GetParent Check and loop to first
+  QGraphicsItem* parentItem = element->parentItem();
+  while(true)
+  {
+    //Check if the parentItem is a group, if yes set the parentItem as the Group of the Element. If not go one step above and so on
+    if (cedar::proc::gui::Group* groupOfElement = dynamic_cast<cedar::proc::gui::Group *>(parentItem))
+    {
+      mpGroup = groupOfElement->getGroup();
+      break;
+    }
+    else if(parentItem == nullptr)
+    {
+      mpGroup = scene->getRootGroup()->getGroup();
+      break;
+    }
+    else
+    {
+      //Get the next parentItem of the parentItem before.
+      parentItem = parentItem->parentItem();
+    }
+  }
 }
 
 cedar::proc::undoRedo::commands::CreateDeleteStep::~CreateDeleteStep()
@@ -67,12 +104,66 @@ cedar::proc::undoRedo::commands::CreateDeleteStep::~CreateDeleteStep()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+//STRG Z
 void cedar::proc::undoRedo::commands::CreateDeleteStep::undo()
 {
-  //Create Element in its group
-  group->getScene()->createElement(group->getGroup(), classId, position);
+  switch(mAction)
+  {
+    case Action::CREATE:
+      //Before deleting a step we have to save its configuration, so when we create it again in redo we load its old parameter
+      saveStepConfiguration();
+      //Undo of createStep = deleteStep
+      deleteStep();
+      break;
+    case Action::DELETE:
+      //Undo of deleteStep = createStep
+      createStep();
+      //Loadings its old values, that we saved when it was deleted
+      loadStepConfiguration();
+      break;
+  }
 }
 
+//STRG Y
 void cedar::proc::undoRedo::commands::CreateDeleteStep::redo()
 {
+  switch(mAction)
+  {
+    case Action::CREATE:
+      //Redo of createStep = createStep
+      createStep();
+      //Loadings its old values, that we saved when it was deleted
+      loadStepConfiguration();
+      break;
+    case Action::DELETE:
+      //Before deleting a step we have to save its configuration, so when we create it again in redo we load its old parameter
+      saveStepConfiguration();
+      //Redo of deleteStep = deleteStep
+      deleteStep();
+      break;
+  }
+}
+
+void cedar::proc::undoRedo::commands::CreateDeleteStep::createStep()
+{
+  mpElement = mpScene->createElement(mpGroup,mClassId,mPosition);
+  mpGuiElement = mpScene->getGraphicsItemFor(mpElement);
+}
+
+void cedar::proc::undoRedo::commands::CreateDeleteStep::deleteStep()
+{
+  mpGuiElement->deleteElement();
+}
+
+void cedar::proc::undoRedo::commands::CreateDeleteStep::saveStepConfiguration()
+{
+  mpElement->writeConfiguration(mElementConfiguration);
+}
+
+void cedar::proc::undoRedo::commands::CreateDeleteStep::loadStepConfiguration()
+{
+  if(mElementConfiguration.empty() == false)
+  {
+    mpElement->readConfiguration(mElementConfiguration);
+  }
 }

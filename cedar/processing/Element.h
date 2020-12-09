@@ -45,6 +45,7 @@
 #include "cedar/processing/Element.fwd.h"
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/gui/Group.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -53,6 +54,7 @@
 #endif
 #include <set>
 #include <string>
+
 
 
 /*!@brief Base class for Elements in a processing architecture.

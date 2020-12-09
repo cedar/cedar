@@ -1177,6 +1177,7 @@ void cedar::proc::gui::Ide::undo()
   if(mpUndoStack->canUndo())
   {
     mpUndoStack->undo();
+    std::cout << "\n mpUndoStack Count: " << mpUndoStack->count() << std::endl;
   }
 }
 
@@ -1185,6 +1186,7 @@ void cedar::proc::gui::Ide::redo()
   if(mpUndoStack->canRedo())
   {
     mpUndoStack->redo();
+    std::cout << "\n mpUndoStack Count: " << mpUndoStack->count() << std::endl;
   }
 }
 
@@ -1318,16 +1320,16 @@ void cedar::proc::gui::Ide::copy()
   for (int i = 0; i < items_to_duplicate.length(); i++)
   {
     QGraphicsItem *currentQGraphicsItem = items_to_duplicate.at(i);
-    if (auto p_base = dynamic_cast<cedar::proc::gui::Element *>(currentQGraphicsItem))
+    if (cedar::proc::gui::Element* p_base = dynamic_cast<cedar::proc::gui::Element*>(currentQGraphicsItem))
     {
       if(dynamic_cast<cedar::proc::gui::Group *>(currentQGraphicsItem) != nullptr)
       {
         continue;
       }
       //Get the element to duplicate (with its name)
-      auto elementToDuplicate = p_base->getElement();
+      cedar::proc::ElementPtr elementToDuplicate = p_base->getElement();
       //Get UI Element
-      auto elementToDuplicateUi = p_base;
+      cedar::proc::gui::Element* elementToDuplicateUi = p_base;
 
       //Create Configuration Node for Element and its UI
       cedar::aux::ConfigurationNode tempElementConfigurationNode;

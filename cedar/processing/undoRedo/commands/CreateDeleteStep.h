@@ -24,8 +24,8 @@
 
     File:        CreateDeleteStep.h
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
+    Maintainer:  Yogeshwar Agnihotri
+    Email:       yogeshwar.agnihotri@ini.rub.de
     Date:        2020 07 23
 
     Description: Header file for the class cedar::proc::undoRedo::commands::CreateDeleteStep.
@@ -63,13 +63,24 @@ class cedar::proc::undoRedo::commands::CreateDeleteStep : public UndoCommand
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------------------------------------
+  // enums
+  //--------------------------------------------------------------------------------------------------------------------
+public:
 
+  enum Action
+  {
+    CREATE,
+    DELETE
+  };
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  CreateDeleteStep(cedar::proc::gui::ElementPtr element);
+  //Constructor for creating an element
+  CreateDeleteStep(QPointF position,std::string classId, cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene,cedar::proc::undoRedo::commands::CreateDeleteStep::Action action);
+  //Constructor for deleting an element
+  CreateDeleteStep(cedar::proc::gui::Element* element, cedar::proc::gui::Scene* scene, cedar::proc::undoRedo::commands::CreateDeleteStep::Action action);
 
   //!@brief Destructor
   virtual ~CreateDeleteStep();
@@ -85,7 +96,10 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void createStep();
+  void deleteStep();
+  void saveStepConfiguration();
+  void loadStepConfiguration();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -99,10 +113,14 @@ private:
 protected:
   // none yet
 private:
-  cedar::proc::gui::ElementPtr element;
-  cedar::proc::gui::GroupPtr group;
-  std::string classId;
-  QPointF position;
+  cedar::aux::ConfigurationNode mElementConfiguration;
+  cedar::proc::gui::Element* mpGuiElement;
+  cedar::proc::ElementPtr mpElement;
+  cedar::proc::GroupPtr mpGroup;
+  cedar::proc::gui::Scene* mpScene;
+  std::string mClassId;
+  QPointF mPosition;
+  Action mAction;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -113,7 +131,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::undoRedo::commands::CreateDeleteStep
+};
 
 #endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_STEP_H
 
