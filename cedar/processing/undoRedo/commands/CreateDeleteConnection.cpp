@@ -44,6 +44,7 @@
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/Scene.h"
+#include "cedar/processing/gui/DataSlotItem.h"
 
 // SYSTEM INCLUDES
 
@@ -52,8 +53,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::undoRedo::commands::CreateDeleteConnection::CreateDeleteConnection(cedar::proc::gui::Connection* connection,
-                                                                   cedar::proc::undoRedo::commands::CreateDeleteConnection::Action action,
-                                                                   bool createConnectorGroup)
+                                                                                cedar::proc::undoRedo::commands::CreateDeleteConnection::Action action,
+                                                                                bool createConnectorGroup)
 :
 mpSource(connection->getSource()),
 mpTarget(connection->getTarget()),
@@ -62,12 +63,13 @@ mCreateConnectorGroup(createConnectorGroup)
 {
   this->mpScene = dynamic_cast<cedar::proc::gui::Scene *>(this->mpTarget->scene());
   CEDAR_DEBUG_ASSERT(this->mpScene)
+  updateSourceTargetNameAndSlotName();
 }
 
 cedar::proc::undoRedo::commands::CreateDeleteConnection::CreateDeleteConnection(cedar::proc::gui::GraphicsBase* source,
-                                                                   cedar::proc::gui::GraphicsBase* target,
-                                                                   cedar::proc::undoRedo::commands::CreateDeleteConnection::Action action,
-                                                                   bool createConnectorGroup)
+                                                                                cedar::proc::gui::GraphicsBase* target,
+                                                                                cedar::proc::undoRedo::commands::CreateDeleteConnection::Action action,
+                                                                                bool createConnectorGroup)
 :
 mpSource(source),
 mpTarget(target),
@@ -76,6 +78,7 @@ mCreateConnectorGroup(createConnectorGroup)
 {
   this->mpScene = dynamic_cast<cedar::proc::gui::Scene *>(this->mpTarget->scene());
   CEDAR_DEBUG_ASSERT(this->mpScene)
+  updateSourceTargetNameAndSlotName();
 }
 
 cedar::proc::undoRedo::commands::CreateDeleteConnection::~CreateDeleteConnection()
@@ -114,6 +117,9 @@ void cedar::proc::undoRedo::commands::CreateDeleteConnection::redo()
 
 void cedar::proc::undoRedo::commands::CreateDeleteConnection::deleteConnection()
 {
+  //Update the SourceElementName/SourceSlotName and TargetElementName/TargetSlotName before deleting
+  updateSourceTargetNameAndSlotName();
+
   std::vector<cedar::proc::gui::Connection*> connectionsFromSource = this->mpSource->getConnections();
   for(cedar::proc::gui::Connection* con : connectionsFromSource)
   {
@@ -127,8 +133,67 @@ void cedar::proc::undoRedo::commands::CreateDeleteConnection::deleteConnection()
 
 void cedar::proc::undoRedo::commands::CreateDeleteConnection::createConnection()
 {
+  updateSourceAndTargetConnectors();
+  std::cout << "createConnection() was called" << std::endl;
   if(this->mpSource != nullptr && this->mpTarget != nullptr && this->mpScene != nullptr)
   {
     this->mpScene->createConnection(this->mpSource, this->mpTarget, mCreateConnectorGroup);
+  }
+}
+
+//This gets called when a connections is deleted or when a the constructor is called
+void cedar::proc::undoRedo::commands::CreateDeleteConnection::updateSourceTargetNameAndSlotName()
+{
+  if(auto sourceSlot = dynamic_cast<cedar::proc::gui::DataSlotItem*>(mpSource))
+  {
+    mSourceSlotName = sourceSlot->getSlot()->getName();
+    mSourceElementName = sourceSlot->getSlot()->getParent();
+  }
+
+  if(auto targetSlot = dynamic_cast<cedar::proc::gui::DataSlotItem*>(mpTarget))
+  {
+    mTargetSlotName = targetSlot->getSlot()->getName();
+    mTargetElementName = targetSlot->getSlot()->getParent();
+  }
+}
+
+void cedar::proc::undoRedo::commands::CreateDeleteConnection::updateSourceAndTargetConnectors()
+{
+  cedar::proc::gui::Element* sourceOfFoundElement = nullptr;
+  cedar::proc::gui::Element* targetOfFoundElement = nullptr;
+  cedar::proc::gui::DataSlotItem* sourceDataSlot = nullptr;
+  cedar::proc::gui::DataSlotItem* targetDataSlot = nullptr;
+
+  //Go through all items and check if both elements are still in scene, if yes get both elements and convert them to
+  QList<QGraphicsItem *> items = this->mpScene->items();
+
+  for(QGraphicsItem* item : items)
+  {
+    if(cedar::proc::gui::Element* element = dynamic_cast<cedar::proc::gui::Element*>(item))
+    {
+      std::string nameOfItem = element->getElement()->getName();
+
+      if(nameOfItem == mSourceElementName)
+      {
+        sourceOfFoundElement = element;
+      }
+      else if(nameOfItem == mTargetElementName)
+      {
+        targetOfFoundElement = element;
+      }
+      if(cedar::proc::gui::Connectable* connectable = dynamic_cast<cedar::proc::gui::Connectable*>(sourceOfFoundElement))
+      {
+        //1 for DataRole=Output
+        sourceDataSlot = connectable->getSlotItem(cedar::proc::DataRole::OUTPUT, mSourceSlotName);
+        mpSource = sourceDataSlot;
+      }
+
+      if(cedar::proc::gui::Connectable* connectable = dynamic_cast<cedar::proc::gui::Connectable*>(targetOfFoundElement))
+      {
+        //0 for DataRole=Input
+        targetDataSlot = connectable->getSlotItem(cedar::proc::DataRole::INPUT, mTargetSlotName);
+        mpTarget = targetDataSlot;
+      }
+    }
   }
 }

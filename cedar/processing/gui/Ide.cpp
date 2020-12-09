@@ -1174,10 +1174,10 @@ void cedar::proc::gui::Ide::duplicateSelected()
 
 void cedar::proc::gui::Ide::undo()
 {
-  std::cout << mpUndoStack->count() << std::endl;
   if(mpUndoStack->canUndo())
   {
     mpUndoStack->undo();
+    std::cout << "\n mpUndoStack Count: " << mpUndoStack->count() << std::endl;
   }
 }
 
@@ -1186,6 +1186,7 @@ void cedar::proc::gui::Ide::redo()
   if(mpUndoStack->canRedo())
   {
     mpUndoStack->redo();
+    std::cout << "\n mpUndoStack Count: " << mpUndoStack->count() << std::endl;
   }
 }
 

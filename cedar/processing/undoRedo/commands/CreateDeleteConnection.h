@@ -79,10 +79,8 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  //!@brief Constructor for removeConnection
   CreateDeleteConnection(cedar::proc::gui::Connection* connection, Action action, bool createConnectorGroup = false);
 
-  //!@brief Constructor for createConnection
   CreateDeleteConnection(cedar::proc::gui::GraphicsBase* source, cedar::proc::gui::GraphicsBase* target, Action action,
                    bool createConnectorGroup = false);
 
@@ -103,6 +101,8 @@ public:
 protected:
   void createConnection();
   void deleteConnection();
+  void updateSourceTargetNameAndSlotName();
+  void updateSourceAndTargetConnectors();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -119,6 +119,11 @@ private:
 
   cedar::proc::gui::GraphicsBase* mpSource;
   cedar::proc::gui::GraphicsBase* mpTarget;
+
+  std::string mSourceElementName;
+  std::string mTargetElementName;
+  std::string mSourceSlotName;
+  std::string mTargetSlotName;
 
   cedar::proc::gui::Scene* mpScene;
   Action mAction;

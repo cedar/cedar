@@ -76,6 +76,10 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteConnection.h"
+#include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/gui/DataSlotItem.h"
 
 #include "cedar/processing/consistency/LoopedElementNotConnected.h"
 #include "cedar/processing/consistency/LoopedElementInNonLoopedGroup.h"
