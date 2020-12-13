@@ -41,6 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/undoRedo/UndoCommand.fwd.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/undoRedo/UndoStack.fwd.h"
@@ -72,7 +73,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+
+  // Searches for idIndex of given string or creates it
+  int idIndex(std::string id);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -101,7 +104,8 @@ protected:
   // none yet
 
 private:
-  // none yet
+
+  std::vector<std::string> idList;
 
 }; // class cedar::proc::undoRedo::UndoStack
 

@@ -133,8 +133,9 @@ void cedar::proc::aux::gui::StringParameter::textEdited(const QString& text)
   try
   {
     std::string oldValue = parameter->getValue();
-    parameter->setValue(text.toStdString());
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeParameterValue<std::string>(parameter.get(), oldValue, text.toStdString()));
+    cedar::proc::gui::Ide::mpUndoStack->push(
+            new cedar::proc::undoRedo::commands::ChangeParameterValue<std::string>(
+                    parameter.get(), oldValue, text.toStdString()));
   }
   catch (cedar::aux::ValidationFailedException& exc)
   {

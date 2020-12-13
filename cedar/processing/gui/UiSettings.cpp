@@ -70,6 +70,9 @@ QWidget(pParent)
   this->mpHighlightConnections->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mHighlightConnections);
   this->mpHighlightHoveredConnection->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mHighlightHoveredConnections);
   this->mpMaximumNumberOfLogMessages->setParameter(cedar::aux::gui::SettingsSingleton::getInstance()->getMaximalNumberOfLogEntriesParameter());
+
+  // miscellaneous settings
+  this->mpUndoRedoAutoMacro->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mUndoRedoAutoMacro);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -66,6 +66,7 @@ public:
   mOldValue(oldValue),
   mNewValue(newValue)
   {
+    setText(QString::fromStdString(mpParameter->getName() + ":" + getOwnerName()));
   }
 
   //!@brief Destructor
@@ -86,6 +87,46 @@ public:
   void redo()
   {
     this->mpParameter->setType(this->mNewValue);
+  }
+
+  bool mergeWith(const QUndoCommand* other)
+  {
+    if(!cedar::proc::gui::SettingsSingleton::getInstance()->getUndoRedoAutoMacro())
+    {
+      return false;
+    }
+    if(auto command = dynamic_cast<const cedar::proc::undoRedo::commands::ChangeObjectParameterValue*>(other))
+    {
+      if(!getMacroIdentifier().compare(command->getMacroIdentifier()))
+      {
+        CEDAR_ASSERT(this->mpParameter == command->mpParameter)
+        this->mNewValue = command->mNewValue;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  std::string getMacroIdentifier() const override
+  {
+    std::string macroId = getOwnerName();
+    if(!macroId.compare(""))
+    {
+      return "";
+    }
+    return macroId + "." + this->mpParameter->getName();
+  }
+
+  std::string getOwnerName() const
+  {
+    if(auto namedConfig = dynamic_cast<cedar::aux::NamedConfigurable*>(this->mpParameter->getOwner()))
+    {
+      return namedConfig->getName();
+    }
+    else
+    {
+      return "";
+    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -43,11 +43,14 @@
 // CEDAR INCLUDES
 #include "cedar/processing/undoRedo/UndoCommand.h"
 #include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
+#include "cedar/processing/gui/Settings.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/undoRedo/commands/ChangeParameterValue.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 /*!@ Parameter change command
  *
@@ -76,6 +79,7 @@ public:
   mNewValue(newValue),
   mLockSet(false)
   {
+    setText(QString::fromStdString(mpParameter->getName() + ":" + getOwnerName()));
   }
 
   ChangeParameterValue(ParameterType* parameter, ValueType oldValue, ValueType newValue, bool lock)
@@ -86,6 +90,7 @@ public:
   mLockSet(true),
   mLock(lock)
   {
+    setText(QString::fromStdString(mpParameter->getName() + ":" + getOwnerName()));
   }
 
   //!@brief Destructor
@@ -124,6 +129,48 @@ public:
       this->mpParameter->setValue(this->mNewValue);
     }
     this->mpParameter->emitChangedSignal();
+  }
+
+  bool mergeWith(const QUndoCommand* other)
+  {
+    if(!cedar::proc::gui::SettingsSingleton::getInstance()->getUndoRedoAutoMacro())
+    {
+      return false;
+    }
+    if(auto command = dynamic_cast<const cedar::proc::undoRedo::commands::ChangeParameterValue<ValueType, ParameterType>*>(other))
+    {
+      if(!getMacroIdentifier().compare(command->getMacroIdentifier()))
+      {
+        CEDAR_ASSERT(this->mpParameter == command->mpParameter)
+        this->mNewValue = command->mNewValue;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  //TODO cpp file?
+
+  std::string getMacroIdentifier() const override
+  {
+    std::string macroId = getOwnerName();
+    if(!macroId.compare(""))
+    {
+      return "";
+    }
+    return macroId + "." + this->mpParameter->getName();
+  }
+
+  std::string getOwnerName() const
+  {
+    if(auto namedConfig = dynamic_cast<cedar::aux::NamedConfigurable*>(this->mpParameter->getOwner()))
+    {
+      return namedConfig->getName();
+    }
+    else
+    {
+      return "";
+    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------

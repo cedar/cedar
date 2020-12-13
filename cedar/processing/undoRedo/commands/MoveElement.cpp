@@ -58,6 +58,7 @@ mTargetPosition(element->pos()),
 pScene(scene)
 {
   //TODO move element between groups
+  setText(QString::fromStdString("Moved element"));
 }
 
 cedar::proc::undoRedo::commands::MoveElement::~MoveElement()
