@@ -71,10 +71,12 @@ public:
   //!@brief The standard constructor.
   ChangeVectorParameterValue(cedar::aux::VectorParameter<ValueType>* parameter,
                              std::vector<ValueType> oldValue, std::vector<ValueType> newValue)
+  :
+  mpParameter(parameter),
+  mOldValue(oldValue),
+  mNewValue(newValue)
   {
-    this->mpParameter = parameter;
-    this->mOldValue = oldValue;
-    this->mNewValue = newValue;
+    setText(QString::fromStdString(mpParameter->getName() + ":" + getOwnerName()));
   }
 
   //!@brief Destructor
@@ -91,9 +93,59 @@ public:
   {
     this->mpParameter->setValue(this->mOldValue);
   }
+
   void redo()
   {
     this->mpParameter->setValue(this->mNewValue);
+  }
+
+  bool mergeWith(const QUndoCommand* other)
+  {
+    if(!cedar::proc::gui::SettingsSingleton::getInstance()->getUndoRedoAutoMacro())
+    {
+      return false;
+    }
+    if(auto command = dynamic_cast<const cedar::proc::undoRedo::commands::ChangeVectorParameterValue<ValueType>*>(other))
+    {
+      if(!getMacroIdentifier().compare(command->getMacroIdentifier()))
+      {
+        CEDAR_ASSERT(this->mpParameter == command->mpParameter)
+        this->mNewValue = command->mNewValue;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  std::string getMacroIdentifier() const override
+  {
+    std::string macroId = getOwnerName();
+    if(!macroId.compare(""))
+    {
+      return "";
+    }
+    return macroId + "." + this->mpParameter->getName();
+  }
+
+  std::string getOwnerName() const
+  {
+    if(auto namedConfig = dynamic_cast<cedar::aux::NamedConfigurable*>(this->mpParameter->getOwner()))
+    {
+      if(this->mOldValue.size() == this->mNewValue.size())
+      {
+        for(int i = 0; i < this->mOldValue.size(); i++)
+        {
+          if(this->mOldValue.at(i) != this->mNewValue.at(i))
+          {
+            return namedConfig->getName() + "." + this->mpParameter->getName() + "." + std::to_string(i);
+          }
+        }
+      }
+    }
+    else
+    {
+      return "";
+    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------

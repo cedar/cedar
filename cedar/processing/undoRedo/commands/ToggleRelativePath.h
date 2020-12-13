@@ -68,6 +68,7 @@ public:
   mTargetState(targetState),
   mpParameter(parameter)
   {
+    setText(QString::fromStdString(mpParameter->getName() + ":" + getOwnerName()));
   }
 
   //!@brief Destructor
@@ -103,6 +104,28 @@ public:
     else
     {
       this->mpParameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_ABSOLUTE);
+    }
+  }
+
+  std::string getMacroIdentifier() const override
+  {
+    std::string macroId = getOwnerName();
+    if(!macroId.compare(""))
+    {
+      return "";
+    }
+    return macroId + "." + this->mpParameter->getName();
+  }
+
+  std::string getOwnerName() const
+  {
+    if(auto namedConfig = dynamic_cast<cedar::aux::NamedConfigurable*>(this->mpParameter->getOwner()))
+    {
+      return namedConfig->getName();
+    }
+    else
+    {
+      return "";
     }
   }
 

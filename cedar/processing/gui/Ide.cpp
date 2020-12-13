@@ -95,6 +95,7 @@
 #include <QInputDialog>
 #include <QTableWidget>
 #include <QMimeData>
+#include <QUndoView>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/algorithm/string.hpp>
@@ -244,6 +245,22 @@ private:
   QString mIconPath;
 
   bool mIsInToolBar;
+};
+
+// An internal class that implements the undo/redo stack as an openable dialog.
+class cedar::proc::gui::Ide::OpenableUndoRedoStack : public cedar::proc::gui::Ide::OpenableDialog
+{
+public:
+  OpenableUndoRedoStack()
+          :
+          OpenableDialog("Undo/Redo Stack", ":/menus/undo.svg", "undo redo stack")
+  {
+  }
+
+  QWidget* createOpenable() const
+  {
+    return new QUndoView(cedar::proc::gui::Ide::mpUndoStack);
+  }
 };
 
 // An internal class that implements the architecture consistency check as an openable dialog.
@@ -595,6 +612,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   openable_dialogs.push_back(OpenableDialogPtr(new OpenableSimulationControl()));
   openable_dialogs.push_back(boost_ctrl);
   openable_dialogs.push_back(OpenableDialogPtr(new OpenableArchitectureConsistencyCheck(this->mpProcessingDrawer)));
+  openable_dialogs.push_back(OpenableDialogPtr(new OpenableUndoRedoStack()));
 
   // actions are added at end of menu (jokeit: 2016, before: at front, iterated in reverse)
   for (auto iter = openable_dialogs.begin(); iter != openable_dialogs.end(); ++iter)
@@ -1174,18 +1192,12 @@ void cedar::proc::gui::Ide::duplicateSelected()
 
 void cedar::proc::gui::Ide::undo()
 {
-  if(mpUndoStack->canUndo())
-  {
-    mpUndoStack->undo();
-  }
+  mpUndoStack->undo();
 }
 
 void cedar::proc::gui::Ide::redo()
 {
-  if(mpUndoStack->canRedo())
-  {
-    mpUndoStack->redo();
-  }
+  mpUndoStack->redo();
 }
 
 void cedar::proc::gui::Ide::copy()

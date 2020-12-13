@@ -96,16 +96,6 @@
      </layout>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>* changes only take effect after a restart of the application</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="0">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
@@ -143,6 +133,35 @@
        <widget class="cedar::proc::aux::gui::BoolParameter" name="mpSlotGrowthEnabled" native="true"/>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Miscellaneous</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Undo individual changes of a parameter value at once</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="cedar::proc::aux::gui::BoolParameter" name="mpUndoRedoAutoMacro" native="true"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>* changes only take effect after a restart of the application</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+     </property>
     </widget>
    </item>
   </layout>

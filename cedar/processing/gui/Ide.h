@@ -88,6 +88,8 @@ private:
   class OpenableDialog;
   CEDAR_GENERATE_POINTER_TYPES(OpenableDialog);
 
+  class OpenableUndoRedoStack;
+
   class OpenableArchitectureConsistencyCheck;
 
   class OpenableSimulationControl;

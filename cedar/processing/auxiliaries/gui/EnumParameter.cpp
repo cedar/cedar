@@ -176,7 +176,10 @@ void cedar::proc::aux::gui::EnumParameter::currentIndexChanged(const QString&)
     cedar::aux::EnumParameterPtr parameter;
     parameter = boost::dynamic_pointer_cast<cedar::aux::EnumParameter>(this->getParameter());
     QString value = this->mpEdit->itemData(this->mpEdit->currentIndex(), Qt::UserRole).toString();
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeParameterValue<std::string, cedar::aux::EnumParameter>(parameter.get(), parameter->getValue().name(), value.toStdString(), true));
+    cedar::proc::gui::Ide::mpUndoStack->push(
+            new cedar::proc::undoRedo::commands::ChangeParameterValue<std::string, cedar::aux::EnumParameter>(
+                    parameter.get(), parameter->getValue().name(), value.toStdString(), true));
+
   }
 }
 

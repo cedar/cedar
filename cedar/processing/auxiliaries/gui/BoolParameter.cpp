@@ -116,12 +116,8 @@ void cedar::proc::aux::gui::BoolParameter::stateChanged(int state)
   parameter = boost::dynamic_pointer_cast<cedar::aux::BoolParameter>(this->getParameter());
   if (value != parameter->getValue())
   {
-    // push to undo stack
     cedar::proc::gui::Ide::mpUndoStack->push(
             new cedar::proc::undoRedo::commands::ChangeParameterValue<bool>(parameter.get(), !value, value));
-
-    // update parameter value
-    parameter->setValue(value, true);
   }
 }
 

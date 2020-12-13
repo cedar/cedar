@@ -62,6 +62,16 @@ mAction(action),
 mCreateConnectorGroup(createConnectorGroup)
 {
   this->mpScene = dynamic_cast<cedar::proc::gui::Scene *>(this->mpTarget->scene());
+  std::string text;
+  if(action == CREATE)
+  {
+    text = "Added";
+  }
+  else if(action == DELETE)
+  {
+    text = "Removed";
+  }
+  setText(QString::fromStdString(text + " connection"));
   CEDAR_DEBUG_ASSERT(this->mpScene)
   updateSourceTargetNameAndSlotName();
 }
@@ -77,6 +87,14 @@ mAction(action),
 mCreateConnectorGroup(createConnectorGroup)
 {
   this->mpScene = dynamic_cast<cedar::proc::gui::Scene *>(this->mpTarget->scene());
+  if(action == CREATE)
+  {
+    setText(QString::fromStdString("Added connection"));
+  }
+  else if(action == DELETE)
+  {
+    setText(QString::fromStdString("Removed connection"));
+  }
   CEDAR_DEBUG_ASSERT(this->mpScene)
   updateSourceTargetNameAndSlotName();
 }

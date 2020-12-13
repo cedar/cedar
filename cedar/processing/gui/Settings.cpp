@@ -89,6 +89,7 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   this->declareDockSettings("boost control", false);
   this->declareDockSettings("thread control", false);
   this->declareDockSettings("architecture consistency check", false);
+  this->declareDockSettings("undo redo stack", false);
 
   cedar::aux::ConfigurablePtr slot_growth(new cedar::aux::Configurable());
   this->addConfigurableChild("slot growth", slot_growth);
@@ -140,6 +141,13 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
         "highlight connections of data slots when hovering",
         true
       );
+
+  this->_mUndoRedoAutoMacro = new cedar::aux::BoolParameter
+          (
+                  ui_settings.get(),
+                  "simultaneous undo operations",
+                  true
+          );
 
   cedar::aux::ConfigurablePtr display_settings(new cedar::aux::Configurable());
   this->addConfigurableChild("displaySettings", display_settings);

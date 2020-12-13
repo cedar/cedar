@@ -61,6 +61,7 @@ mpScene(scene)
 {
   updateElementName();
   //TODO move element between groups
+  setText(QString::fromStdString("Moved element"));
 }
 
 cedar::proc::undoRedo::commands::MoveElement::~MoveElement()

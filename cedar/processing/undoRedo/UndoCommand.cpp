@@ -39,6 +39,8 @@
 
 // CLASS HEADER
 #include "cedar/processing/undoRedo/UndoCommand.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
+#include "cedar/processing/gui/Ide.h"
 
 // CEDAR INCLUDES
 
@@ -54,6 +56,11 @@ cedar::proc::undoRedo::UndoCommand::UndoCommand()
 
 cedar::proc::undoRedo::UndoCommand::~UndoCommand()
 {
+}
+
+int cedar::proc::undoRedo::UndoCommand::id() const
+{
+  return cedar::proc::gui::Ide::mpUndoStack->idIndex(this->getMacroIdentifier());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

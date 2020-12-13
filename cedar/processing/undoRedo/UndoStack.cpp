@@ -41,6 +41,9 @@
 #include "cedar/processing/undoRedo/UndoStack.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/undoRedo/UndoCommand.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
+#include "cedar/processing/gui/Settings.h"
 
 // SYSTEM INCLUDES
 
@@ -52,6 +55,7 @@ cedar::proc::undoRedo::UndoStack::UndoStack(QObject *parent)
 :
 QUndoStack(parent)
 {
+  this->setUndoLimit(100);
 }
 
 cedar::proc::undoRedo::UndoStack::~UndoStack()
@@ -61,3 +65,16 @@ cedar::proc::undoRedo::UndoStack::~UndoStack()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+int cedar::proc::undoRedo::UndoStack::idIndex(std::string id)
+{
+  for(int i = 0; i < this->idList.size(); i++)
+  {
+    if(!this->idList.at(i).compare(id))
+    {
+      return i;
+    }
+  }
+  this->idList.push_back(id);
+  return this->idList.size() - 1;
+}
