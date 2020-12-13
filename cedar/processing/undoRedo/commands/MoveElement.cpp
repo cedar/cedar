@@ -43,6 +43,8 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/processing/gui/Scene.h"
+#include "cedar/processing/Element.h"
+#include "cedar/processing/gui/Element.h"
 // SYSTEM INCLUDES
 
 
@@ -55,8 +57,9 @@ cedar::proc::undoRedo::commands::MoveElement::MoveElement(cedar::proc::gui::Grap
 mpElement(element),
 mSourcePosition(sourcePosition),
 mTargetPosition(element->pos()),
-pScene(scene)
+mpScene(scene)
 {
+  updateElementName();
   //TODO move element between groups
 }
 
@@ -71,7 +74,7 @@ cedar::proc::undoRedo::commands::MoveElement::~MoveElement()
 // Move element back to the source
 void cedar::proc::undoRedo::commands::MoveElement::undo()
 {
-  if(this->mpElement != nullptr && this->pScene->items().contains(this->mpElement))
+  if(this->mpElement != nullptr && this->mpScene->items().contains(this->mpElement))
   {
     this->mpElement->setPos(this->mSourcePosition);
   }
@@ -80,8 +83,33 @@ void cedar::proc::undoRedo::commands::MoveElement::undo()
 // Move element to the target
 void cedar::proc::undoRedo::commands::MoveElement::redo()
 {
-  if(this->mpElement != nullptr && this->pScene->items().contains(this->mpElement))
+  updateElementAddress();
+  if(this->mpElement != nullptr && this->mpScene->items().contains(this->mpElement))
   {
     this->mpElement->setPos(this->mTargetPosition);
+  }
+}
+
+void cedar::proc::undoRedo::commands::MoveElement::updateElementName()
+{
+  if(auto element = dynamic_cast<cedar::proc::Element*>(mpElement))
+  {
+    mElementName = element->getName();
+  }
+}
+
+void cedar::proc::undoRedo::commands::MoveElement::updateElementAddress()
+{
+  QList<QGraphicsItem *> items = this->mpScene->items();
+
+  for(QGraphicsItem* item : items)
+  {
+    if(cedar::proc::gui::Element* element = dynamic_cast<cedar::proc::gui::Element*>(item))
+    {
+      if(element->getElement()->getName() == mElementName)
+      {
+        mpElement = element;
+      }
+    }
   }
 }

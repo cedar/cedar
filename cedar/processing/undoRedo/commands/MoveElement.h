@@ -82,8 +82,11 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-
+  //!@brief When a Element gets deleted and it gets undoed (CreateDeleteElement) the adress of the element here (mpElement) is not valid anymore. The Name is kept as an identifier
+  //!@brief saves the name of the element as string
+  void updateElementName();
+  //!@brief search all items in scene, check if our element is there (via the name string), if yes set mpElement
+  void updateElementAddress();
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -97,9 +100,12 @@ protected:
   // none yet
 private:
   cedar::proc::gui::GraphicsBase* mpElement;
+
+  std::string mElementName;
+
   const QPointF mSourcePosition;
   const QPointF mTargetPosition;
-  cedar::proc::gui::Scene* pScene;
+  cedar::proc::gui::Scene* mpScene;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

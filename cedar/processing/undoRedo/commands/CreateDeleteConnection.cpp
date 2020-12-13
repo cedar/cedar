@@ -134,7 +134,7 @@ void cedar::proc::undoRedo::commands::CreateDeleteConnection::deleteConnection()
 void cedar::proc::undoRedo::commands::CreateDeleteConnection::createConnection()
 {
   updateSourceAndTargetConnectors();
-  std::cout << "createConnection() was called" << std::endl;
+
   if(this->mpSource != nullptr && this->mpTarget != nullptr && this->mpScene != nullptr)
   {
     this->mpScene->createConnection(this->mpSource, this->mpTarget, mCreateConnectorGroup);
