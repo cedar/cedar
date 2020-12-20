@@ -36,7 +36,6 @@
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/ArithmeticExpression.h"
 #include "cedar/auxiliaries/stringFunctions.h"
@@ -57,7 +56,7 @@ cedar::aux::ArithmeticExpression::ArithmeticExpression()
 
 cedar::aux::ArithmeticExpression::ArithmeticExpression(const std::string& expression)
 {
-  this->parse(expression);
+    this->parse(expression);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

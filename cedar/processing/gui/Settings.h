@@ -223,6 +223,8 @@ public:
 
   //!@brief returns the settings concerning the docking behavior for the log widget
   DockSettingsPtr logSettings();
+  //!@brief returns the settings concerning the docking behavior for the CoPy widget
+  DockSettingsPtr copySettings();
   //!@brief returns the settings concerning the docking behavior for the tools widget
   DockSettingsPtr toolsSettings();
   //!@brief returns the settings concerning the docking behavior for the property pane
@@ -439,6 +441,9 @@ private:
 
   //!@brief the settings concerning the docking behavior for the log widget
   DockSettingsPtr mLog;
+
+  //!@brief the settings concerning the docking behavior for the CoPY widget
+  DockSettingsPtr mCopy;
 
   //!@brief the settings concerning the docking behavior for the steps widget
   DockSettingsPtr mSteps;

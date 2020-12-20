@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>983</width>
+    <width>920</width>
     <height>762</height>
    </rect>
   </property>
@@ -33,7 +33,6 @@
     </property>
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
-
       <property name="currentIndex">
        <number>0</number>
       </property>
@@ -84,8 +83,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>983</width>
-     <height>20</height>
+     <width>920</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -205,6 +204,9 @@
   </widget>
   <widget class="QStatusBar" name="mpStatusBar"/>
   <widget class="QDockWidget" name="mpItemsWidget">
+   <property name="floating">
+    <bool>false</bool>
+   </property>
    <property name="features">
     <set>QDockWidget::DockWidgetFeatureMask</set>
    </property>
@@ -318,8 +320,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>254</width>
-              <height>495</height>
+              <width>98</width>
+              <height>28</height>
              </rect>
             </property>
             <property name="palette">
@@ -436,8 +438,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>254</width>
-              <height>495</height>
+              <width>98</width>
+              <height>28</height>
              </rect>
             </property>
             <property name="palette">
@@ -554,8 +556,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>254</width>
-              <height>495</height>
+              <width>98</width>
+              <height>28</height>
              </rect>
             </property>
             <property name="palette">
@@ -695,6 +697,49 @@
    <addaction name="separator"/>
    <addaction name="mpActionOpenRobotManager"/>
    <addaction name="mpActionBrakeAllRobots"/>
+  </widget>
+  <widget class="QDockWidget" name="mpCopyWidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetFeatureMask</set>
+   </property>
+   <property name="windowTitle">
+    <string>CoPY</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>4</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_10">
+    <layout class="QHBoxLayout" name="verticalLayout_10">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="cedar::proc::gui::Copy" name="mpCopy" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <action name="mpActionNew">
    <property name="text">
@@ -1051,7 +1096,6 @@
     <string>Ctrl+C</string>
    </property>
   </action>
-
   <action name="mpActionCopyConfiguration">
    <property name="text">
     <string>Copy step configuration</string>
@@ -1060,7 +1104,6 @@
     <string>Ctrl+Shift+C</string>
    </property>
   </action>
-
   <action name="mpActionPaste">
    <property name="text">
     <string>Paste</string>
@@ -1069,7 +1112,6 @@
     <string>Ctrl+V</string>
    </property>
   </action>
-
   <action name="mpActionPasteConfiguration">
    <property name="text">
     <string>Paste step configuration</string>
@@ -1225,6 +1267,7 @@
    <class>cedar::aux::gui::Configurable</class>
    <extends>QTableWidget</extends>
    <header>cedar/auxiliaries/gui/Configurable.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>cedar::aux::gui::Log</class>
@@ -1261,6 +1304,11 @@
    <extends>QWidget</extends>
    <header>cedar/auxiliaries/gui/SceneControl.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cedar::proc::gui::Copy</class>
+   <extends>QWidget</extends>
+   <header>cedar/processing/gui/Copy.h</header>
   </customwidget>
  </customwidgets>
  <resources>
