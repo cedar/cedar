@@ -353,7 +353,7 @@ void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 
   if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration *>(declaration))
   {
-    //Push a createDeleteCommand (as a create) ontot the UndoStack
+    //Push a createDeleteCommand (as a create) onto the UndoStack
     cedar::proc::gui::Ide::mpUndoStack->push(
             new cedar::proc::undoRedo::commands::CreateDeleteStep(mapped,elem_declaration->getClassName(),target_group,mpScene,undoRedo::commands::CreateDeleteStep::Action::CREATE)
     );

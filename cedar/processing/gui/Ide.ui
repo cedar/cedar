@@ -156,10 +156,11 @@
     <property name="title">
      <string>Edit</string>
     </property>
-    <addaction name="mpActionCopy"/>
-    <addaction name="mpActionPaste"/>
     <addaction name="mpActionUndo"/>
     <addaction name="mpActionRedo"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionCopy"/>
+    <addaction name="mpActionPaste"/>
     <addaction name="mpActionCopyConfiguration"/>
     <addaction name="mpActionPasteConfiguration"/>
     <addaction name="mpActionDuplicate"/>
@@ -680,6 +681,9 @@
    <addaction name="mpActionResetSimulation"/>
    <addaction name="mpThreadsSingleStep"/>
    <addaction name="separator"/>
+   <addaction name="mpActionUndo"/>
+   <addaction name="mpActionRedo"/>
+   <addaction name="separator"/>
    <addaction name="mpActionRecord"/>
    <addaction name="mpActionSnapshot"/>
    <addaction name="separator"/>
@@ -1054,6 +1058,10 @@
    </property>
   </action>
   <action name="mpActionUndo">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/menus/undo.svg</normaloff>:/menus/undo.svg</iconset>
+   </property>
    <property name="text">
     <string>Undo</string>
    </property>
@@ -1062,6 +1070,10 @@
    </property>
   </action>
   <action name="mpActionRedo">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/menus/redo.svg</normaloff>:/menus/redo.svg</iconset>
+   </property>
    <property name="text">
     <string>Redo</string>
    </property>

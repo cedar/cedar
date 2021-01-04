@@ -50,7 +50,7 @@
 
 /*! Undo command
  *
- * An implementation of QTs QUndoCommand, a command superclass for all commands regarding undo/redo operations,
+ * An implementation of QTs QUndoCommand, a base class for all commands regarding undo/redo operations,
  * followed by the command pattern
  */
 class cedar::proc::undoRedo::UndoCommand : public QUndoCommand
