@@ -75,6 +75,7 @@ cedar::proc::undoRedo::commands::MoveElement::~MoveElement()
 // Move element back to the source
 void cedar::proc::undoRedo::commands::MoveElement::undo()
 {
+  updateElementAddress();
   if(this->mpElement != nullptr && this->mpScene->items().contains(this->mpElement))
   {
     this->mpElement->setPos(this->mSourcePosition);
@@ -93,9 +94,9 @@ void cedar::proc::undoRedo::commands::MoveElement::redo()
 
 void cedar::proc::undoRedo::commands::MoveElement::updateElementName()
 {
-  if(auto element = dynamic_cast<cedar::proc::Element*>(mpElement))
+  if(auto element = dynamic_cast<cedar::proc::gui::Element*>(this->mpElement))
   {
-    mElementName = element->getName();
+    this->mElementName = element->getElement()->getName();
   }
 }
 
@@ -105,9 +106,10 @@ void cedar::proc::undoRedo::commands::MoveElement::updateElementAddress()
 
   for(QGraphicsItem* item : items)
   {
+
     if(cedar::proc::gui::Element* element = dynamic_cast<cedar::proc::gui::Element*>(item))
     {
-      if(element->getElement()->getName() == mElementName)
+      if(!element->getElement()->getName().compare(mElementName))
       {
         mpElement = element;
       }
