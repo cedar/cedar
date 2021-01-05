@@ -60,13 +60,13 @@ mAction(action)
   mpGroup = group;
   //Scene is needed to create the element in the scene
   mpScene = scene;
+  setText(QString::fromStdString("Created element"));
 }
 
 //Constructor for deleting an element
 cedar::proc::undoRedo::commands::CreateDeleteStep::CreateDeleteStep(cedar::proc::gui::Element* element, cedar::proc::gui::Scene* scene, cedar::proc::undoRedo::commands::CreateDeleteStep::Action action)
 :
 mpGuiElement(element),
-mpElement(element->getElement()),
 mAction(action)
 {
   mPosition = element->pos();
@@ -94,6 +94,8 @@ mAction(action)
       parentItem = parentItem->parentItem();
     }
   }
+  updateElementName();
+  setText(QString::fromStdString("Deleted element"));
 }
 
 cedar::proc::undoRedo::commands::CreateDeleteStep::~CreateDeleteStep()
@@ -110,6 +112,7 @@ void cedar::proc::undoRedo::commands::CreateDeleteStep::undo()
   switch(mAction)
   {
     case Action::CREATE:
+      updateElementAddress();
       //Before deleting a step we have to save its configuration, so when we create it again in redo we load its old parameter
       saveStepConfiguration();
       //Undo of createStep = deleteStep
@@ -136,6 +139,7 @@ void cedar::proc::undoRedo::commands::CreateDeleteStep::redo()
       loadStepConfiguration();
       break;
     case Action::DELETE:
+      updateElementAddress();
       //Before deleting a step we have to save its configuration, so when we create it again in redo we load its old parameter
       saveStepConfiguration();
       //Redo of deleteStep = deleteStep
@@ -146,24 +150,50 @@ void cedar::proc::undoRedo::commands::CreateDeleteStep::redo()
 
 void cedar::proc::undoRedo::commands::CreateDeleteStep::createStep()
 {
-  mpElement = mpScene->createElement(mpGroup,mClassId,mPosition);
-  mpGuiElement = mpScene->getGraphicsItemFor(mpElement);
+  cedar::proc::Element* Element = mpScene->createElement(mpGroup,mClassId,mPosition).get();
+  mpGuiElement = mpScene->getGraphicsItemFor(Element);
+  updateElementName();
 }
 
 void cedar::proc::undoRedo::commands::CreateDeleteStep::deleteStep()
 {
-  mpGuiElement->deleteElement();
+  if(this->mpGuiElement != nullptr && this->mpScene->items().contains(this->mpGuiElement))
+  {
+    mpGuiElement->deleteElement();
+  }
 }
 
 void cedar::proc::undoRedo::commands::CreateDeleteStep::saveStepConfiguration()
 {
-  mpElement->writeConfiguration(mElementConfiguration);
+  mpGuiElement->getElement()->writeConfiguration(mElementConfiguration);
 }
 
 void cedar::proc::undoRedo::commands::CreateDeleteStep::loadStepConfiguration()
 {
   if(mElementConfiguration.empty() == false)
   {
-    mpElement->readConfiguration(mElementConfiguration);
+    mpGuiElement->getElement()->readConfiguration(mElementConfiguration);
+  }
+}
+
+void cedar::proc::undoRedo::commands::CreateDeleteStep::updateElementName()
+{
+  mElementName = mpGuiElement->getElement()->getName();
+}
+
+void cedar::proc::undoRedo::commands::CreateDeleteStep::updateElementAddress()
+{
+  QList<QGraphicsItem *> items = this->mpScene->items();
+
+  for(QGraphicsItem* item : items)
+  {
+
+    if(cedar::proc::gui::Element* element = dynamic_cast<cedar::proc::gui::Element*>(item))
+    {
+      if(!element->getElement()->getName().compare(mElementName))
+      {
+        mpGuiElement = element;
+      }
+    }
   }
 }

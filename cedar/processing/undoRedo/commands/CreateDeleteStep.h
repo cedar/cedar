@@ -100,6 +100,8 @@ protected:
   void deleteStep();
   void saveStepConfiguration();
   void loadStepConfiguration();
+  void updateElementName();
+  void updateElementAddress();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -115,7 +117,7 @@ protected:
 private:
   cedar::aux::ConfigurationNode mElementConfiguration;
   cedar::proc::gui::Element* mpGuiElement;
-  cedar::proc::ElementPtr mpElement;
+  std::string mElementName;
   cedar::proc::GroupPtr mpGroup;
   cedar::proc::gui::Scene* mpScene;
   std::string mClassId;
