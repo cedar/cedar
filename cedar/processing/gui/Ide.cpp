@@ -452,7 +452,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   mpMenuWindows->addAction(this->mpItemsWidget->toggleViewAction());
   mpMenuWindows->addAction(this->mpPropertiesWidget->toggleViewAction());
   mpMenuWindows->addAction(this->mpLogWidget->toggleViewAction());
-  //mpMenuWindows->addAction(this->mpCopyWidget->toggleViewAction());
+  mpMenuWindows->addAction(this->mpCopyWidget->toggleViewAction());
 
   QObject::connect(this->tabWidget,SIGNAL(currentChanged(int)),this, SLOT(updateTabs(int))); //Fixes a Bug under Mac OS
 
@@ -644,6 +644,8 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   mBackupSaveThreadWrapper= cedar::aux::CallFunctionInThreadPtr( new cedar::aux::CallFunctionInThread( boost::bind( &cedar::proc::gui::Ide::backupSaveCallback, this ) ) );
   mBackupSaveThreadWrapper->start();
 
+  //send Scene to CoPYWidget
+  mpCopy->setScene(mpProcessingDrawer->getScene());
 #ifdef CEDAR_USE_PYTHON
   cedar::proc::steps::PythonScript::importStepsFromTemplate();
 #endif
@@ -686,7 +688,7 @@ void cedar::proc::gui::Ide::lockUI(bool lock)
   widgets.push_back(this->mpItemsWidget);
   widgets.push_back(this->mpPropertiesWidget);
   widgets.push_back(this->mpLogWidget);
-  //widgets.push_back(this->mpCopyWidget);
+  widgets.push_back(this->mpCopyWidget);
 
   for (auto widget : widgets)
   {
@@ -2002,7 +2004,7 @@ void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
 void cedar::proc::gui::Ide::storeSettings()
 {
   cedar::proc::gui::SettingsSingleton::getInstance()->logSettings()->getFrom(this->mpLogWidget);
-  //cedar::proc::gui::SettingsSingleton::getInstance()->copySettings()->getFrom(this->mpCopyWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->coPYSettings()->getFrom(this->mpCopyWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->getFrom(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->getFrom(this->mpItemsWidget);
 
@@ -2020,7 +2022,7 @@ void cedar::proc::gui::Ide::storeSettings()
 void cedar::proc::gui::Ide::restoreSettings()
 {
   cedar::proc::gui::SettingsSingleton::getInstance()->logSettings()->setTo(this->mpLogWidget);
-  //cedar::proc::gui::SettingsSingleton::getInstance()->copySettings()->setTo(this->mpCopyWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->coPYSettings()->setTo(this->mpCopyWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->setTo(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->setTo(this->mpItemsWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->restoreMainWindow(this);

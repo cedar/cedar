@@ -73,7 +73,7 @@ cedar::proc::gui::Settings::Settings()
 cedar::aux::Configurable(),
 mWritingDisabled(false),
 mLog(new cedar::proc::gui::Settings::DockSettings()),
-mCopy(new cedar::proc::gui::Settings::DockSettings()),
+mCoPY(new cedar::proc::gui::Settings::DockSettings()),
 mSteps(new cedar::proc::gui::Settings::DockSettings()),
 mTools(new cedar::proc::gui::Settings::DockSettings()),
 mProperties(new cedar::proc::gui::Settings::DockSettings()),
@@ -84,7 +84,7 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   this->addConfigurableChild("ui", ui_settings);
   
   ui_settings->addConfigurableChild("log", mLog);
-  ui_settings->addConfigurableChild("copy", mCopy);
+  ui_settings->addConfigurableChild("copywidget", mCoPY);
   ui_settings->addConfigurableChild("steps", mSteps);
   ui_settings->addConfigurableChild("tools", mTools);
   ui_settings->addConfigurableChild("properties", mProperties);
@@ -739,9 +739,9 @@ cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::logSetti
   return this->mLog;
 }
 
-cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::copySettings()
+cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::coPYSettings()
 {
-  return this->mCopy;
+  return this->mCoPY;
 }
 
 cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::toolsSettings()

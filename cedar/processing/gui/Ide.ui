@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>920</width>
-    <height>762</height>
+    <width>1017</width>
+    <height>811</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -83,7 +83,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>920</width>
+     <width>1017</width>
      <height>22</height>
     </rect>
    </property>
@@ -320,8 +320,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>28</height>
+              <width>254</width>
+              <height>421</height>
              </rect>
             </property>
             <property name="palette">
@@ -438,8 +438,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>28</height>
+              <width>254</width>
+              <height>421</height>
              </rect>
             </property>
             <property name="palette">
@@ -556,8 +556,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>28</height>
+              <width>254</width>
+              <height>421</height>
              </rect>
             </property>
             <property name="palette">
@@ -729,7 +729,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="cedar::proc::gui::Copy" name="mpCopy" native="true">
+      <widget class="cedar::proc::gui::CoPYWidget" name="mpCopy" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -1306,9 +1306,10 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>cedar::proc::gui::Copy</class>
+   <class>cedar::proc::gui::CoPYWidget</class>
    <extends>QWidget</extends>
-   <header>cedar/processing/gui/Copy.h</header>
+   <header>cedar/processing/gui/CoPYWidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

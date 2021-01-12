@@ -22,53 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Copy.cpp
+    File:        CoPYWidget.fwd.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 02 14
+    Maintainer:  Frederik Bendel
+    Email:       frederik.bendel@ruhr-uni-bochum.de
+    Date:        2020 12 22
 
-    Description:
+    Description: Forward declaration file for the class cedar::aux::gui::CoPYWidget.
 
     Credits:
 
 ======================================================================================================================*/
+
+#ifndef CEDAR_PROC_GUI_COPY_WIDGET_FWD_H
+#define CEDAR_PROC_GUI_COPY_WIDGET_FWD_H
+
+// CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/Copy.h"
+#include "cedar/processing/lib.h"
 
-#include "cedar/processing/gui/Settings.h"
-#include "cedar/auxiliaries/casts.h"
 // SYSTEM INCLUDES
-#include <QHBoxLayout>
-#include <QTextEdit>
-#include <QWidget>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-cedar::proc::gui::Copy::Copy()
+namespace cedar
 {
-}
-
-cedar::proc::gui::Copy::Copy(QWidget* pParent)
-:
-QWidget(pParent)
-{
-
-}
-
-cedar::proc::gui::Copy::~Copy()
-{
-
+  namespace proc
+  {
+    namespace gui
+    {
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_PROC_CLASS(CoPYWidget);
+      //!@endcond
+    }
+  }
 }
 
 
-
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
+#endif // CEDAR_PROC_GUI_COPY_WIDGET_FWD_H
 

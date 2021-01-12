@@ -41,7 +41,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/configuration.h"
-
+#include "gui/PythonQtScriptingConsole.h"
 // FORWARD DECLARATIONS
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/gui/CodeWidget.fwd.h"
@@ -147,7 +147,7 @@ namespace cedar
 
 
         //!@brief Implementation of QPlainTextEdit with Code-Editor features (like Syntaxhighlighting, line marking, line numbers etc.)
-        class CodeEditor : public QPlainTextEdit
+      class CodeEditor : public QPlainTextEdit
         {
             Q_OBJECT
 
@@ -173,8 +173,6 @@ namespace cedar
         private:
             QWidget *lineNumberArea;
         };
-
-
 
 
         /*!@brief Widget to paint line numbers in the code section

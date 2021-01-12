@@ -22,86 +22,83 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Log.h
+    File:        CoPYWidget.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 02 14
+    Maintainer:  Frederik Bendel
+    Email:       frederik.bendel@ruhr-uni-bochum.de
+    Date:        2020 12 22
 
     Description: Header for the \em cedar::aux::Log class.
 
     Credits:
 
 ======================================================================================================================*/
-
-#ifndef CEDAR_PROC_GUI_COPY_H
-#define CEDAR_PROC_GUI_COPY_H
-
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+#ifndef CEDAR_PROC_GUI_COPY_WIDGET_H
+#define CEDAR_PROC_GUI_COPY_WIDGET_H
+
 // FORWARD DECLARATIONS
-#include "cedar/processing/gui/Copy.fwd.h"
+#include "cedar/processing/gui/CoPYWidget.fwd.h"
+#include "cedar/processing/gui/CodeWidget.h"
 
 // CEDAR INCLUDES
-
+#include <PythonQt.h>
+#include <pythonrun.h>
+#include <cedar/processing/gui/PythonQtConsole.h>
+#include <cedar/processing/gui/Scene.h>
+#include <cedar/processing/gui/Group.h>
+#include <cedar/processing/sources/CoPYObject.h>
 // SYSTEM INCLUDES
 
 #ifndef Q_MOC_RUN
 #include <boost/signals2/connection.hpp>
 #endif // Q_MOC_RUN
+
 #include <QWidget>
+#include <QVariant>
 #include <vector>
 #include <string>
 #include <stdexcept>
 #include <QApplication>
-#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QTextEdit>
 #include <map>
+#include <QGraphicsSceneDragDropEvent>
+#include <QGraphicsObject>
+#include <QGraphicsItem>
 
 
 //!@brief A class for Scripting with Python to copy/create things.
-class cedar::proc::gui::Copy : public QWidget
+class cedar::proc::gui::CoPYWidget : public QWidget
 {
   Q_OBJECT;
-
-  void setObjectName(QString qString)
-  {
-  }
-
 public:
-
-  Copy();
   //!@brief The standard constructor.
-  Copy(QWidget *pParent = NULL);
-
-
+  CoPYWidget(QWidget *pParent = NULL);
   //! Destructor.
-  ~Copy();
-
-
-public slots:
+  ~CoPYWidget();
+  void setScene(cedar::proc::gui::Scene* pScene);
+  void lineNumberAreaPaintEvent(QPaintEvent *event);
+private slots:
+  void executeButtonClicked();
+  void updateCodeString();
+private:
+  cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter *mpHighlighter;
+  QPushButton* mpExecuteButton;
+  PythonQtConsole* console;
+  PythonQtObjectPtr context;
+  cedar::proc::gui::Scene* mpScene;
+  CoPYObjectWrapper* pyWrap;
+  CoPYObject* mPy;
+  void executeCode();
+  void dropEvent(QDropEvent *pEvent);
+  void dragEnterEvent(QDragEnterEvent *pEvent);
+  void dragMoveEvent(QDragMoveEvent *pEvent);
   void reset();
-  //--------------------------------------------------------------------------------------------------------------------
-  // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
-
-protected:
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // private methods
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // members
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-
-
-protected:
 
 };
 
-#endif // CEDAR_PROC_GUI_COPY_H
+#endif // CEDAR_PROC_GUI_COPY_WIDGET_H
 

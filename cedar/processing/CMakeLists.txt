@@ -85,7 +85,7 @@ cedar_add_library(cedarproc
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureWidget.h
   gui/BoostControl.h
-  gui/Copy.h
+        gui/CoPYWidget.h
   gui/CodeWidget.h
   gui/CommentWidget.h
   gui/Connectable.h
@@ -105,6 +105,7 @@ cedar_add_library(cedarproc
   gui/PlotDockWidget.h
   gui/ProjectionMappingParameter.h
   gui/PerformanceOverview.h
+  gui/PythonQtConsole.h
   gui/RecorderWidget.h
   gui/RecorderProperty.h
   gui/Scene.h
@@ -121,6 +122,7 @@ cedar_add_library(cedarproc
   sources/LocalReader.h
   sinks/LocalWriter.h
   sources/BoxInput.h
+  sources/CoPYObject.h
   sources/GaussInput.h
   sources/RealSense.h
   steps/VariableBox.h

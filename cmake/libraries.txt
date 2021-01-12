@@ -92,6 +92,21 @@ link_directories(${BOOST_INCLUDEDIR})
 link_directories(${CEDAR_DEPENDENCY_GLEW})
 endif(WIN32)
 
+#PythonQT
+
+if (CEDAR_USE_PYTHONQT)
+  find_package(PythonQT REQUIRED)
+
+  message("Found PythonQt in ${PYTHONQT_INCLUDE_DIRS}")
+  message("Found the following libs:")
+  foreach(lib ${PYTHONQT_LIBS})
+    message(${lib})
+  endforeach()
+
+  include_directories(${PYTHONQT_INCLUDE_DIRS})
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${PYTHONQT_LIBS})
+endif(CEDAR_USE_PYTHONQT)
+
 if (CEDAR_INCLUDE_PYTHON)
 #if (NOT WIN32)
 #if (NOT APPLE)
@@ -116,6 +131,7 @@ if(PYTHONLIBS_FOUND)
   endforeach()
  
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${PYTHON_LIBRARIES})
+  set(PYTHON_INCLUDE_DIRS ${PYTHON_INCLUDE_DIRS} /home/fred/.local/lib/python3.6/site-packages/numpy/core/include)
   include_directories(${PYTHON_INCLUDE_DIRS})
   link_directories(${PYTHON_INCLUDE_DIRS})
   set(CEDAR_USE_PYTHON ON)
