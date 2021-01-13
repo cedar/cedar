@@ -121,15 +121,10 @@ void PythonQtConsole::flushStdOut()
 PythonQtConsole::~PythonQtConsole() {
 }
 
-
-
-
-
 //-----------------------------------------------------------------------------
 
 void PythonQtConsole::executeLine()
 {
-
   QString code = this->toPlainText();
 
   // i don't know where this trailing space is coming from, blast it!
@@ -334,12 +329,12 @@ void PythonQtConsole::keyPressEvent(QKeyEvent* event) {
   } else {
 
     cedar::proc::gui::CodeWidgetScope::CodeEditor::keyPressEvent(event);
-    QString text = event->text();
-    if (!text.isEmpty()) {
+    //QString text = event->text();
+    /*if (!text.isEmpty()) {
       handleTabCompletion();
     } else {
       _completer->popup()->hide();
-    }
+    }*/
     eventHandled = true;
   }
 }

@@ -68,6 +68,7 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/processing/gui/CoPYWidget.h"
 #include "cedar/units/Time.h"
 #include "cedar/processing/gui/PlotDockWidget.h"
 
@@ -484,6 +485,10 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   QAction *p_delete = menu.addAction("delete");
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
+  QAction *p_use_in_copy = menu.addAction("use In CoPY");
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+
   QMenu *p_actions_menu = menu.addMenu("actions");
   p_actions_menu->setIcon(QIcon(":/menus/actions.svg"));
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
@@ -586,6 +591,11 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
       items.append(this);
       p_scene->deleteElements(items, event->modifiers() & Qt::ControlModifier);
     }
+  }
+  else if(a == p_use_in_copy)
+  {
+    cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+    p_scene->getCoPYWidget()->importStepInformation(this);
   }
   else
   {

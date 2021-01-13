@@ -99,7 +99,7 @@ public Q_SLOTS:
 
   void connect(CoPYObject* o, const QString& first, const int& firstSlot, const QString& second, const int& secondSlot) { o->connectSlots(first, firstSlot, second, secondSlot);}
 
-  void connect(CoPYObject* o, const QString& first, const QString& second) { o->connectSlots(first, 1, second, 1);}
+  void connect(CoPYObject* o, const QString& first, const QString& second) { o->connectSlots(first, 0, second, 0);}
 
   void create(CoPYObject* o, const QString& classId, const int& x, const int& y, const int& amount) { o->createElem(classId, x, y, amount);}
 

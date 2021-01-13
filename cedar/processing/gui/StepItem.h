@@ -48,6 +48,7 @@
 #include "cedar/processing/gui/PlotWidget.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/EnumType.h"
+#include "cedar/processing/gui/CoPYWidget.h"
 
 // FORWARD DECLARATION
 #include "cedar/auxiliaries/gui/PlotDeclaration.fwd.h"
@@ -143,6 +144,7 @@ public slots:
 
   //! Calls reset on the underlying step
   void reset();
+
 
 signals:
   /*!@brief Emitted whenever the state of the step displayed by this step item changes.

@@ -646,6 +646,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   //send Scene to CoPYWidget
   mpCopy->setScene(mpProcessingDrawer->getScene());
+  mpProcessingDrawer->getScene()->setCoPYWidget(mpCopy);
 #ifdef CEDAR_USE_PYTHON
   cedar::proc::steps::PythonScript::importStepsFromTemplate();
 #endif

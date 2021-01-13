@@ -36,11 +36,13 @@ void CoPYObject::connectSlots(const QString& first, const int& firstSlot, const 
   std::string target_slot_name;
   cedar::aux::splitFirst(first.toStdString(), ".", source_group, source_slot_name);
   cedar::aux::splitFirst(second.toStdString(), ".", target_group, target_slot_name);
+  std::cout << "Group 1: " + source_group << std::endl;
+  std::cout << "Slot 1: " + source_slot_name << std::endl;
 
-  cedar::proc::DataSlotPtr sourceSlot = this->getGroupByName(source_group)
+  auto sourceSlot = this->getGroupByName(source_group)
           ->getElement<cedar::proc::Connectable>(source_slot_name)
                   ->getOrderedDataSlots(1)[firstSlot];
-  cedar::proc::DataSlotPtr targetSlot = this->getGroupByName(target_group)
+  auto targetSlot = this->getGroupByName(target_group)
           ->getElement<cedar::proc::Connectable>(target_slot_name)
                   ->getOrderedDataSlots(0)[secondSlot];
   cedar::proc::Group::connectAcrossGroups
@@ -58,10 +60,15 @@ void CoPYObject::setGroup(const QString& groupId){
 }
 
 void CoPYObject::setGroup(){
-  _mpGroup = _mpScene->getRootGroup()->getGroup();
+  _mpGroup = _mpRootGroup;
+  std::cout << _mpRootGroup->getName() << std::endl;
 }
 
 cedar::proc::GroupPtr CoPYObject::getGroupByName(const std::string groupId){
+  if(groupId == "root")
+  {
+    return _mpRootGroup;
+  }
   auto list = _mpScene->items();
   for(QGraphicsItem* item : list){
     if(auto group = dynamic_cast<cedar::proc::gui::Group*>(item)){

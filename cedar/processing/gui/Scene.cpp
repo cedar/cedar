@@ -153,6 +153,11 @@ cedar::proc::gui::CodeWidget* cedar::proc::gui::Scene::getCodeWidget() const
   return this->mpCodeWidget;
 }
 
+cedar::proc::gui::CoPYWidget* cedar::proc::gui::Scene::getCoPYWidget() const
+{
+  return this->mpCoPYWidget;
+}
+
 void cedar::proc::gui::Scene::dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
   this->QGraphicsScene::dragEnterEvent(pEvent);
@@ -408,6 +413,11 @@ void cedar::proc::gui::Scene::setCodeWidget(cedar::proc::gui::CodeWidget* pCodeW
 {
   this->mpCodeWidget = pCodeWidget;
   mpeParentView->hideCodeWidget();
+}
+
+void cedar::proc::gui::Scene::setCoPYWidget(cedar::proc::gui::CoPYWidget* pCoPYWidget)
+{
+  this->mpCoPYWidget = pCoPYWidget;
 }
 
 void cedar::proc::gui::Scene::itemSelected()
@@ -1049,6 +1059,7 @@ void cedar::proc::gui::Scene::multiItemContextMenuEvent(QGraphicsSceneContextMen
 {
   QMenu menu;
   bool can_connect = false;
+
   for (auto item : this->selectedItems())
   {
     //!@todo Cast to element instead
@@ -1065,7 +1076,27 @@ void cedar::proc::gui::Scene::multiItemContextMenuEvent(QGraphicsSceneContextMen
     }
   }
 
+  bool can_be_used_in_py = false;
+  for (auto item : this->selectedItems())
+  {
+    if (auto step = dynamic_cast<cedar::proc::gui::StepItem*>(item))
+    {
+      can_be_used_in_py = true;
+      break;
+    }
+  }
+
+  auto p_use_in_py = menu.addAction("use in CoPY");
   auto p_assign_to_trigger = menu.addMenu("assign to trigger");
+
+
+  if(can_be_used_in_py)
+  {
+  }
+  else{
+    p_use_in_py->setEnabled(false);
+  }
+
   if (can_connect)
   {
     cedar::proc::gui::Connectable::buildConnectTriggerMenu
@@ -1081,7 +1112,10 @@ void cedar::proc::gui::Scene::multiItemContextMenuEvent(QGraphicsSceneContextMen
     p_assign_to_trigger->setEnabled(false);
   }
 
-  menu.exec(pContextMenuEvent->screenPos());
+  QAction* a = menu.exec(pContextMenuEvent->screenPos());
+  if(a == p_use_in_py){
+    mpCoPYWidget->importStepInformation(this->selectedItems());
+  }
 
   pContextMenuEvent->accept();
 }
@@ -1186,8 +1220,6 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
             QList<QGraphicsItem *> children = item->childItems();
             for (auto childItem : children) {
                 //! highlight dataslots somehow
-
-
             }
         }
     }

@@ -48,6 +48,8 @@
 #include <pythonrun.h>
 #include <cedar/processing/gui/PythonQtConsole.h>
 #include <cedar/processing/gui/Scene.h>
+#include <cedar/processing/Step.h>
+#include <cedar/processing/gui/StepItem.h>
 #include <cedar/processing/gui/Group.h>
 #include <cedar/processing/sources/CoPYObject.h>
 // SYSTEM INCLUDES
@@ -81,6 +83,8 @@ public:
   ~CoPYWidget();
   void setScene(cedar::proc::gui::Scene* pScene);
   void lineNumberAreaPaintEvent(QPaintEvent *event);
+  void importStepInformation(cedar::proc::gui::StepItem* pStep);
+  void importStepInformation(QList<QGraphicsItem*> pSteps);
 private slots:
   void executeButtonClicked();
   void updateCodeString();
@@ -92,6 +96,7 @@ private:
   cedar::proc::gui::Scene* mpScene;
   CoPYObjectWrapper* pyWrap;
   CoPYObject* mPy;
+  std::string getStepInfo(cedar::proc::gui::StepItem* pStep);
   void executeCode();
   void dropEvent(QDropEvent *pEvent);
   void dragEnterEvent(QDragEnterEvent *pEvent);
