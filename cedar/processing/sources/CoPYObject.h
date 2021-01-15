@@ -53,12 +53,16 @@ public:
   /*!@brief connect two Steps at indexed DataSlots*/
   void connectSlots(const QString& first, const int& firstSlot, const QString& second, const int& secondSlot);
 
+  void copyTo(const QString &fromStep, const QString &targetStep);
+
+
   cedar::proc::GroupPtr _mpGroup;
 
   cedar::proc::GroupPtr _mpRootGroup;
 
   cedar::proc::gui::Scene* _mpScene;
 private:
+  cedar::proc::StepPtr getStepByName(const std::string& stepId);
   cedar::proc::GroupPtr getGroupByName(const std::string name);
 };
 
@@ -104,6 +108,8 @@ public Q_SLOTS:
   void create(CoPYObject* o, const QString& classId, const int& x, const int& y, const int& amount) { o->createElem(classId, x, y, amount);}
 
   void createGroup(CoPYObject* o, const QString& groupId, const int& x, const int& y) { o->createGroup(groupId, x, y);}
+
+  void copy(CoPYObject* o, const QString& source, const QString& target) {o->copyTo(source, target);}
 };
 
 #endif //CEDAR_COPYOBJECT_H

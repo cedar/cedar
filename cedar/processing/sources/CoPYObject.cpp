@@ -7,6 +7,7 @@
 #include <cedar/processing/GroupDeclarationManager.h>
 #include <cedar/processing/gui/Element.h>
 #include <cedar/auxiliaries/casts.h>
+#include <cedar/processing/gui/StepItem.h>
 
 void CoPYObject::createElem(const QString& classId, const int& x, const int& y, const int& amount)
 {
@@ -26,6 +27,20 @@ void CoPYObject::createGroup(const QString& groupId, const int& x, const int& y)
                   false
           );
   this->_mpScene->getGraphicsItemFor(elem)->setPos(QPointF(x,y));
+}
+
+void CoPYObject::copyTo(const QString &fromStep, const QString &targetStep)
+{
+  std::string source_group, source_slot_name, target_group, target_slot_name;
+  cedar::aux::splitFirst(fromStep.toStdString(), ".", source_group, source_slot_name);
+  cedar::aux::splitFirst(targetStep.toStdString(), ".", target_group, target_slot_name);
+
+  this->getStepByName(target_slot_name)->copyFrom(this->getStepByName(source_slot_name));
+
+  /*cedar::proc::StepPtr pSource = this->getGroupByName(source_group)->getElement<cedar::proc::Step>(source_slot_name);
+  cedar::proc::gui::StepItem* source = dynamic_cast<cedar::proc::gui::StepItem*>(_mpScene->getStepItemFor(pSource))
+  cedar::proc::Step *source = this->getGroupByName(source_group)->getElement<cedar::proc::StepPtr>(source_slot_name);
+  this->getGroupByName(target_group)->getElement<cedar::proc::Element>(target_slot_name)->copyFrom(_mpScene->getStepItemFor(source));*/
 }
 
 void CoPYObject::connectSlots(const QString& first, const int& firstSlot, const QString& second, const int& secondSlot)
@@ -75,6 +90,18 @@ cedar::proc::GroupPtr CoPYObject::getGroupByName(const std::string groupId){
       if(group->getGroup()->getName() == groupId)
       {
         return group->getGroup();
+      }
+    }
+  }
+}
+
+cedar::proc::StepPtr CoPYObject::getStepByName(const std::string& stepId){
+  auto list = _mpScene->items();
+  for(QGraphicsItem* item : list){
+    if(auto step = dynamic_cast<cedar::proc::gui::StepItem*>(item)){
+      if(step->getStep()->getName() == stepId)
+      {
+        return step->getStep();
       }
     }
   }

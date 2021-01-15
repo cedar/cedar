@@ -93,6 +93,7 @@ private:
   QPushButton* mpExecuteButton;
   PythonQtConsole* console;
   PythonQtObjectPtr context;
+  int selCounter;
   cedar::proc::gui::Scene* mpScene;
   CoPYObjectWrapper* pyWrap;
   CoPYObject* mPy;

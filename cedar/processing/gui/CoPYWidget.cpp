@@ -63,7 +63,7 @@ QWidget(pParent)
   PythonQt::init(PythonQt::RedirectStdOut);
   context = PythonQt::self()->getMainModule();
   console = new PythonQtConsole(NULL, context);
-
+  selCounter = 0;
   //finalize widget and button
   layout->addWidget(console);
   layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
@@ -123,13 +123,13 @@ void cedar::proc::gui::CoPYWidget::importStepInformation(QList<QGraphicsItem*> p
       steps.push_back(step);
     }
   }
-  std::string pylist = "[";
-  for(cedar::proc::gui::StepItem* step : steps) pylist += this->getStepInfo(step) + ",";
-  pylist = pylist.replace(pylist.size()-1, pylist.size()-1, "]");
+  QStringList list;
+  std::string sel = "selection" + std::to_string(++selCounter);
+  for(cedar::proc::gui::StepItem* step : steps) list.append(QString::fromUtf8(this->getStepInfo(step).c_str()));
 
-  context.evalScript("selection = " + QString::fromUtf8(pylist.c_str()));
-  console->consoleMessage("Selected Items where imported to CoPY as 'selection'", false);
-  std::cout << pylist << std::endl;
+  context.addVariable(QString(sel.c_str()), list);
+  console->consoleMessage(QString::fromUtf8(("Selected Items where imported to CoPY as '" + sel + "'").c_str()), false);
+  console->appendPlainText(QString::fromUtf8(sel.c_str()));
 }
 
 void cedar::proc::gui::CoPYWidget::reset()
