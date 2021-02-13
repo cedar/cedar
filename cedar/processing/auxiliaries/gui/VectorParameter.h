@@ -206,10 +206,32 @@ protected:
       // push to undo stack
       if (auto param = dynamic_cast<cedar::aux::VectorParameter<ValueType> *>(this->getParameter().get()))
       {
-        before[index] = this->parameter()->at(index);
-        cedar::proc::gui::Ide::mpUndoStack->push(
-                new cedar::proc::undoRedo::commands::ChangeVectorParameterValue<ValueType>(param, before,
-                                                                                                     after));
+        // If parameter belongs to a step, push to undo stack (e.g. settings parameter should not be undoable)
+        if(dynamic_cast<cedar::aux::NamedConfigurable*>(param->getOwner()))
+        {
+          //Find the scene
+          cedar::proc::gui::Scene* scene;
+
+          QObject* parent = this;
+          while(parent != nullptr)
+          {
+            if(auto ide = dynamic_cast<cedar::proc::gui::Ide*>(parent))
+            {
+              scene = ide->mpProcessingDrawer->getScene();
+            }
+            parent = parent->parent();
+          }
+          CEDAR_ASSERT(scene != nullptr);
+
+          before[index] = this->parameter()->at(index);
+          cedar::proc::gui::Ide::mpUndoStack->push(
+                  new cedar::proc::undoRedo::commands::ChangeVectorParameterValue<ValueType>(param, before,
+                                                                                             after, scene));
+        }
+        else
+        {
+          param->setValue(after);
+        }
       }
 
       // update parameter value

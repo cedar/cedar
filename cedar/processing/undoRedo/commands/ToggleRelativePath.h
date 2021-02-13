@@ -62,13 +62,16 @@ class cedar::proc::undoRedo::commands::ToggleRelativePath : public cedar::proc::
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ToggleRelativePath(QCheckBox *checkBox, bool targetState, cedar::aux::FileParameter* parameter)
+  ToggleRelativePath(cedar::aux::FileParameter* parameter, bool targetState, cedar::proc::gui::Scene* scene = nullptr)
   :
-  mpCheckBox(checkBox),
   mTargetState(targetState),
-  mpParameter(parameter)
+  mpParameter(parameter),
+  mpScene(scene),
+  isInitialRedo(true)
   {
-    setText(QString::fromStdString(mpParameter->getName() + ":" + getOwnerName()));
+    mParentName = getParentName(parameter);
+    mParameterName = parameter->getName();
+    setText(QString::fromStdString(mParameterName + ":" + mParentName));
   }
 
   //!@brief Destructor
@@ -81,45 +84,94 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  void updateParameterPointer()
+  {
+    if(this->mpScene != nullptr)
+    {
+      QList<QGraphicsItem *> sceneItems = this->mpScene->items();
+      for (QGraphicsItem *item : sceneItems)
+      {
+        if (auto gui_element = dynamic_cast<cedar::proc::gui::Element*>(item))
+        {
+          cedar::proc::Element* element = gui_element->getElement().get();
+          if (element != nullptr)
+          {
+            if(!element->getName().compare(this->mParentName))
+            {
+              this->mpParameter = element->getParameter<cedar::aux::FileParameter>(this->mParameterName).get();
+              this->mpParentElement = gui_element;
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
+
   void undo()
   {
-    this->mpCheckBox->setChecked(!this->mTargetState);
-    if(this->mTargetState)
+    this->isInitialRedo = false;
+
+    this->updateParameterPointer();
+    if(this->mpParameter != nullptr)
     {
-      this->mpParameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_ABSOLUTE);
+      if(this->mTargetState)
+      {
+        this->mpParameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_ABSOLUTE);
+      }
+      else
+      {
+        this->mpParameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
+      }
+      if(this->mpParentElement != nullptr && this->mpScene != nullptr)
+      {
+        this->mpScene->selectNone();
+        this->mpParentElement->setSelected(true);
+      }
     }
     else
     {
-      this->mpParameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
+      std::cout << "parameter is null" << std::endl;
     }
   }
 
   void redo()
   {
-    this->mpCheckBox->setChecked(this->mTargetState);
-    if(this->mTargetState)
+    this->updateParameterPointer();
+    if(this->mpParameter != nullptr)
     {
-      this->mpParameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
+      if(this->mTargetState)
+      {
+        this->mpParameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
+      }
+      else
+      {
+        this->mpParameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_ABSOLUTE);
+      }
+      if(!this->isInitialRedo && this->mpParentElement != nullptr && this->mpScene != nullptr)
+      {
+        this->mpScene->selectNone();
+        this->mpParentElement->setSelected(true);
+      }
     }
     else
     {
-      this->mpParameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_ABSOLUTE);
+      std::cout << "parameter is null" << std::endl;
     }
   }
 
   std::string getMacroIdentifier() const override
   {
-    std::string macroId = getOwnerName();
-    if(!macroId.compare(""))
+    if(!this->mParentName.compare(""))
     {
       return "";
     }
-    return macroId + "." + this->mpParameter->getName();
+    return this->mParentName + "." + this->mParameterName;
   }
 
-  std::string getOwnerName() const
+  std::string getParentName(cedar::aux::FileParameter* parameter) const
   {
-    if(auto namedConfig = dynamic_cast<cedar::aux::NamedConfigurable*>(this->mpParameter->getOwner()))
+    if(auto namedConfig = dynamic_cast<cedar::aux::NamedConfigurable*>(parameter->getOwner()))
     {
       return namedConfig->getName();
     }
@@ -147,10 +199,15 @@ private:
 protected:
   // none yet
 private:
-
-  QCheckBox* mpCheckBox;
-  bool mTargetState;
+  std::string mParentName;
+  std::string mParameterName;
   cedar::aux::FileParameter* mpParameter;
+  cedar::proc::gui::Element* mpParentElement;
+
+  bool mTargetState;
+  bool isInitialRedo;
+
+  cedar::proc::gui::Scene* mpScene;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

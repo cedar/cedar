@@ -146,7 +146,7 @@ void cedar::proc::aux::gui::FileParameter::parameterValueChanged()
   this->mpEdit->setReadOnly(false);
   this->mpEdit->setText(QString::fromStdString(parameter->getPath()));
   this->mpEdit->setReadOnly(true);
-
+  this->mpCheckRelative->setChecked(parameter->getPathMode() == cedar::aux::FileParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
   this->mpCheckRelative->setEnabled(!parameter->isPathModeConstant());
 }
 
@@ -173,8 +173,30 @@ void cedar::proc::aux::gui::FileParameter::onBrowseClicked()
   }
   if (!value.isEmpty())
   {
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeParameterValue<std::string,
-                     cedar::aux::FileParameter>(parameter.get(), parameter->getPath(), value.toStdString()));
+    // If parameter belongs to a step, push to undo stack (e.g. settings parameter should not be undoable)
+    if(dynamic_cast<cedar::aux::NamedConfigurable*>(parameter->getOwner()))
+    {
+      //Find the scene
+      cedar::proc::gui::Scene* scene;
+
+      QObject* parent = this;
+      while(parent != nullptr)
+      {
+        if(auto ide = dynamic_cast<cedar::proc::gui::Ide*>(parent))
+        {
+          scene = ide->mpProcessingDrawer->getScene();
+        }
+        parent = parent->parent();
+      }
+      CEDAR_ASSERT(scene != nullptr);
+
+      cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeParameterValue<std::string,
+              cedar::aux::FileParameter>(parameter.get(), parameter->getPath(), value.toStdString(), scene));
+    }
+    else
+    {
+      parameter->setValue(value.toStdString());
+    }
   }
 }
 
@@ -182,6 +204,36 @@ void cedar::proc::aux::gui::FileParameter::onUseRelativeClicked()
 {
   if(auto parameter = boost::dynamic_pointer_cast<cedar::aux::FileParameter>(this->getParameter()))
   {
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ToggleRelativePath(this->mpCheckRelative, this->mpCheckRelative->isChecked(), parameter.get()));
+    // If parameter belongs to a step, push to undo stack (e.g. settings parameter should not be undoable)
+    if(dynamic_cast<cedar::aux::NamedConfigurable*>(parameter->getOwner()))
+    {
+      //Find the scene
+      cedar::proc::gui::Scene* scene;
+
+      QObject* parent = this;
+      while(parent != nullptr)
+      {
+        if(auto ide = dynamic_cast<cedar::proc::gui::Ide*>(parent))
+        {
+          scene = ide->mpProcessingDrawer->getScene();
+        }
+        parent = parent->parent();
+      }
+      CEDAR_ASSERT(scene != nullptr);
+
+      cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ToggleRelativePath(
+              parameter.get(), this->mpCheckRelative->isChecked(), scene));
+    }
+    else
+    {
+      if(this->mpCheckRelative->isChecked())
+      {
+        parameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
+      }
+      else
+      {
+        parameter->setPathMode(cedar::aux::FileParameter::PathMode::PATH_MODE_ABSOLUTE);
+      }
+    }
   }
 }

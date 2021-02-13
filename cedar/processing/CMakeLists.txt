@@ -220,13 +220,6 @@ cedar_add_library(cedarproc
   steps/HopfOscillatorRHS.h
   steps/NaNCheck.h
   steps/PositionOfMaximum.h
-  undoRedo/UndoStack.h
-  undoRedo/UndoCommand.h
-  undoRedo/commands/ChangeVectorParameterValue.h
-  undoRedo/commands/ChangeParameterValue.h
-  undoRedo/commands/CreateDeleteConnection.h
-  undoRedo/commands/CreateDeleteStep.h
-  undoRedo/commands/MoveElement.h
   CppScript.h
   Group.h
   Step.h

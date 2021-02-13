@@ -111,7 +111,7 @@ void cedar::proc::undoRedo::commands::MoveElement::updateElementAddress()
     {
       if(!element->getElement()->getName().compare(mElementName))
       {
-        mpElement = element;
+        this->mpElement = element;
       }
     }
   }

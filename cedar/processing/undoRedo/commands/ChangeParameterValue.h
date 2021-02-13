@@ -45,6 +45,12 @@
 #include "cedar/auxiliaries/ParameterTemplate.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/processing/gui/Scene.h"
+#include "cedar/processing/gui/Element.h"
+#include "cedar/processing/Element.h"
+#include "cedar/processing/gui/Connectable.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/processing/gui/GraphicsBase.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/undoRedo/commands/ChangeParameterValue.fwd.h"
@@ -72,25 +78,34 @@ class cedar::proc::undoRedo::commands::ChangeParameterValue : public cedar::proc
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ChangeParameterValue(ParameterType* parameter, ValueType oldValue, ValueType newValue)
+  ChangeParameterValue(ParameterType* parameter, ValueType oldValue, ValueType newValue,
+                       cedar::proc::gui::Scene* scene = nullptr)
   :
   mpParameter(parameter),
   mOldValue(oldValue),
   mNewValue(newValue),
-  mLockSet(false)
+  mpScene(scene),
+  mLockSet(false),
+  isInitialRedo(true)
   {
-    setText(QString::fromStdString(mpParameter->getName() + ":" + getOwnerName()));
+    mParentName = getParentName(parameter);
+    mParameterName = parameter->getName();
+    setText(QString::fromStdString(mParameterName + ":" + mParentName));
   }
 
-  ChangeParameterValue(ParameterType* parameter, ValueType oldValue, ValueType newValue, bool lock)
+  ChangeParameterValue(ParameterType* parameter, ValueType oldValue, ValueType newValue, bool lock, cedar::proc::gui::Scene* scene = nullptr)
   :
   mpParameter(parameter),
   mOldValue(oldValue),
   mNewValue(newValue),
+  mpScene(scene),
   mLockSet(true),
-  mLock(lock)
+  mLock(lock),
+  isInitialRedo(true)
   {
-    setText(QString::fromStdString(mpParameter->getName() + ":" + getOwnerName()));
+    mParentName = getParentName(parameter);
+    mParameterName = parameter->getName();
+    setText(QString::fromStdString(mParameterName + ":" + mParentName));
   }
 
   //!@brief Destructor
@@ -103,32 +118,82 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  void updateParameterPointer()
+  {
+    if(this->mpScene != nullptr)
+    {
+      QList<QGraphicsItem *> sceneItems = this->mpScene->items();
+      for (QGraphicsItem *item : sceneItems)
+      {
+        if (auto gui_element = dynamic_cast<cedar::proc::gui::Element*>(item))
+        {
+          cedar::proc::Element* element = gui_element->getElement().get();
+          if (element != nullptr)
+          {
+            if(!element->getName().compare(this->mParentName))
+            {
+              this->mpParameter = element->getParameter<ParameterType>(this->mParameterName).get();
+              this->mpParentElement = gui_element;
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
+
   void undo()
   {
-    if(this->mLockSet)
+    this->isInitialRedo = false;
+
+    this->updateParameterPointer();
+    if(this->mpParameter != nullptr)
     {
-      this->mpParameter->setValue(this->mOldValue, this->mLock);
-      //this->mpParameter->setValue(this->mOldValue);
+      if (this->mLockSet)
+      {
+        this->mpParameter->setValue(this->mOldValue, this->mLock);
+      }
+      else
+      {
+        this->mpParameter->setValue(this->mOldValue);
+      }
+      this->mpParameter->emitChangedSignal();
+      if(this->mpParentElement != nullptr && this->mpScene != nullptr)
+      {
+        this->mpScene->selectNone();
+        this->mpParentElement->setSelected(true);
+      }
     }
     else
     {
-      this->mpParameter->setValue(this->mOldValue);
+      std::cout << "parameter is null" << std::endl;
     }
-    this->mpParameter->emitChangedSignal();
   }
 
   void redo()
   {
-    if(this->mLockSet)
+    this->updateParameterPointer();
+    if(this->mpParameter != nullptr)
     {
-      this->mpParameter->setValue(this->mNewValue, this->mLock);
-      //this->mpParameter->setValue(this->mNewValue);
+      if (this->mLockSet)
+      {
+        this->mpParameter->setValue(this->mNewValue, this->mLock);
+      }
+      else
+      {
+        this->mpParameter->setValue(this->mNewValue);
+      }
+      this->mpParameter->emitChangedSignal();
+      if(!this->isInitialRedo && this->mpParentElement != nullptr && this->mpScene != nullptr)
+      {
+        this->mpScene->selectNone();
+        this->mpParentElement->setSelected(true);
+      }
     }
     else
     {
-      this->mpParameter->setValue(this->mNewValue);
+      std::cout << "parameter is null" << std::endl;
     }
-    this->mpParameter->emitChangedSignal();
   }
 
   bool mergeWith(const QUndoCommand* other)
@@ -141,7 +206,6 @@ public:
     {
       if(!getMacroIdentifier().compare(command->getMacroIdentifier()))
       {
-        CEDAR_ASSERT(this->mpParameter == command->mpParameter)
         this->mNewValue = command->mNewValue;
         return true;
       }
@@ -153,17 +217,16 @@ public:
 
   std::string getMacroIdentifier() const override
   {
-    std::string macroId = getOwnerName();
-    if(!macroId.compare(""))
+    if(!this->mParentName.compare(""))
     {
       return "";
     }
-    return macroId + "." + this->mpParameter->getName();
+    return this->mParentName + "." + this->mParameterName;
   }
 
-  std::string getOwnerName() const
+  std::string getParentName(ParameterType* parameter) const
   {
-    if(auto namedConfig = dynamic_cast<cedar::aux::NamedConfigurable*>(this->mpParameter->getOwner()))
+    if(auto namedConfig = dynamic_cast<cedar::aux::NamedConfigurable*>(parameter->getOwner()))
     {
       return namedConfig->getName();
     }
@@ -189,14 +252,21 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-private:
-
+  std::string mParentName;
+  std::string mParameterName;
   ParameterType* mpParameter;
+  cedar::proc::gui::Element* mpParentElement;
+
   ValueType mOldValue;
   ValueType mNewValue;
   bool mLock;
   bool mLockSet;
+  bool isInitialRedo;
+
+  cedar::proc::gui::Scene* mpScene;
+
+private:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

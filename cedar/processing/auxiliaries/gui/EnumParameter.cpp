@@ -37,14 +37,19 @@
 // CEDAR INCLUDES
 #include "cedar/processing/auxiliaries/gui/EnumParameter.h"
 #include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/undoRedo/commands/ChangeParameterValue.h"
 #include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/defines.h"
 #include "cedar/processing/auxiliaries/TypeBasedFactory.h"
 #include "cedar/processing/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
 
 // SYSTEM INCLUDES
+#include <QGraphicsItem>
+#include <QWidget>
+#include <QObject>
 #include <QHBoxLayout>
 #include <QStandardItemModel>
 #include <iostream>
@@ -176,10 +181,32 @@ void cedar::proc::aux::gui::EnumParameter::currentIndexChanged(const QString&)
     cedar::aux::EnumParameterPtr parameter;
     parameter = boost::dynamic_pointer_cast<cedar::aux::EnumParameter>(this->getParameter());
     QString value = this->mpEdit->itemData(this->mpEdit->currentIndex(), Qt::UserRole).toString();
-    cedar::proc::gui::Ide::mpUndoStack->push(
-            new cedar::proc::undoRedo::commands::ChangeParameterValue<std::string, cedar::aux::EnumParameter>(
-                    parameter.get(), parameter->getValue().name(), value.toStdString(), true));
 
+    // If parameter belongs to a step, push to undo stack (e.g. settings parameter should not be undoable)
+    if(dynamic_cast<cedar::aux::NamedConfigurable*>(parameter->getOwner()))
+    {
+      //Find the scene
+      cedar::proc::gui::Scene* scene;
+
+      QObject* parent = this;
+      while(parent != nullptr)
+      {
+        if(auto ide = dynamic_cast<cedar::proc::gui::Ide*>(parent))
+        {
+          scene = ide->mpProcessingDrawer->getScene();
+        }
+        parent = parent->parent();
+      }
+      CEDAR_ASSERT(scene != nullptr);
+
+      cedar::proc::gui::Ide::mpUndoStack->push(
+              new cedar::proc::undoRedo::commands::ChangeParameterValue<std::string, cedar::aux::EnumParameter>(
+                      parameter.get(), parameter->getValue().name(), value.toStdString(), true, scene));
+    }
+    else
+    {
+      parameter->setValue(value.toStdString(), true);
+    }
   }
 }
 

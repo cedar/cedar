@@ -41,8 +41,10 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/undoRedo/UndoCommand.h"
 #include "cedar/auxiliaries/VectorParameter.h"
+#include "cedar/processing/undoRedo/UndoCommand.h"
+#include "cedar/processing/gui/Element.h"
+#include "cedar/processing/Element.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/undoRedo/commands/ChangeVectorParameterValue.fwd.h"
@@ -69,14 +71,18 @@ class cedar::proc::undoRedo::commands::ChangeVectorParameterValue : public cedar
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ChangeVectorParameterValue(cedar::aux::VectorParameter<ValueType>* parameter,
-                             std::vector<ValueType> oldValue, std::vector<ValueType> newValue)
+  ChangeVectorParameterValue(cedar::aux::VectorParameter<ValueType>* parameter, std::vector<ValueType> oldValue,
+                             std::vector<ValueType> newValue, cedar::proc::gui::Scene* scene = nullptr)
   :
   mpParameter(parameter),
   mOldValue(oldValue),
-  mNewValue(newValue)
+  mNewValue(newValue),
+  mpScene(scene),
+  isInitialRedo(true)
   {
-    setText(QString::fromStdString(mpParameter->getName() + ":" + getOwnerName()));
+    mParentName = getParentName(parameter);
+    mParameterName = parameter->getName();
+    setText(QString::fromStdString(mParameterName + ":" + mParentName));
   }
 
   //!@brief Destructor
@@ -89,14 +95,66 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  void updateParameterPointer()
+  {
+    if(this->mpScene != nullptr)
+    {
+      QList<QGraphicsItem *> sceneItems = this->mpScene->items();
+      for (QGraphicsItem *item : sceneItems)
+      {
+        if (auto gui_element = dynamic_cast<cedar::proc::gui::Element*>(item))
+        {
+          cedar::proc::Element* element = gui_element->getElement().get();
+          if (element != nullptr)
+          {
+            if(!element->getName().compare(this->mParentName))
+            {
+              this->mpParameter = element->getParameter<cedar::aux::VectorParameter<ValueType>>(this->mParameterName).get();
+              this->mpParentElement = gui_element;
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
+
   void undo()
   {
-    this->mpParameter->setValue(this->mOldValue);
+    this->isInitialRedo = false;
+
+    this->updateParameterPointer();
+    if(this->mpParameter != nullptr)
+    {
+      this->mpParameter->setValue(this->mOldValue);
+      if(this->mpParentElement != nullptr && this->mpScene != nullptr)
+      {
+        this->mpScene->selectNone();
+        this->mpParentElement->setSelected(true);
+      }
+    }
+    else
+    {
+      std::cout << "parameter is null" << std::endl;
+    }
   }
 
   void redo()
   {
-    this->mpParameter->setValue(this->mNewValue);
+    this->updateParameterPointer();
+    if(this->mpParameter != nullptr)
+    {
+      this->mpParameter->setValue(this->mNewValue);
+      if(!this->isInitialRedo && this->mpParentElement != nullptr && this->mpScene != nullptr)
+      {
+        this->mpScene->selectNone();
+        this->mpParentElement->setSelected(true);
+      }
+    }
+    else
+    {
+      std::cout << "parameter is null" << std::endl;
+    }
   }
 
   bool mergeWith(const QUndoCommand* other)
@@ -119,28 +177,18 @@ public:
 
   std::string getMacroIdentifier() const override
   {
-    std::string macroId = getOwnerName();
-    if(!macroId.compare(""))
+    if(!this->mParentName.compare(""))
     {
       return "";
     }
-    return macroId + "." + this->mpParameter->getName();
+    return this->mParentName + "." + this->mParameterName;
   }
 
-  std::string getOwnerName() const
+  std::string getParentName(cedar::aux::VectorParameter<ValueType>* parameter) const
   {
-    if(auto namedConfig = dynamic_cast<cedar::aux::NamedConfigurable*>(this->mpParameter->getOwner()))
+    if(auto namedConfig = dynamic_cast<cedar::aux::NamedConfigurable*>(parameter->getOwner()))
     {
-      if(this->mOldValue.size() == this->mNewValue.size())
-      {
-        for(int i = 0; i < this->mOldValue.size(); i++)
-        {
-          if(this->mOldValue.at(i) != this->mNewValue.at(i))
-          {
-            return namedConfig->getName() + "." + this->mpParameter->getName() + "." + std::to_string(i);
-          }
-        }
-      }
+      return namedConfig->getName();
     }
     else
     {
@@ -166,10 +214,16 @@ private:
 protected:
   // none yet
 private:
-
+  std::string mParentName;
+  std::string mParameterName;
   cedar::aux::VectorParameter<ValueType>* mpParameter;
+  cedar::proc::gui::Element* mpParentElement;
+
   std::vector<ValueType> mOldValue;
   std::vector<ValueType> mNewValue;
+  bool isInitialRedo;
+
+  cedar::proc::gui::Scene* mpScene;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

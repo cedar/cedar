@@ -116,8 +116,30 @@ void cedar::proc::aux::gui::BoolParameter::stateChanged(int state)
   parameter = boost::dynamic_pointer_cast<cedar::aux::BoolParameter>(this->getParameter());
   if (value != parameter->getValue())
   {
-    cedar::proc::gui::Ide::mpUndoStack->push(
-            new cedar::proc::undoRedo::commands::ChangeParameterValue<bool>(parameter.get(), !value, value));
+    // If parameter belongs to a step, push to undo stack (e.g. settings parameter should not be undoable)
+    if(dynamic_cast<cedar::aux::NamedConfigurable*>(parameter->getOwner()))
+    {
+      // Find the scene
+      cedar::proc::gui::Scene *scene;
+
+      QObject *parent = this;
+      while (parent != nullptr)
+      {
+        if (auto ide = dynamic_cast<cedar::proc::gui::Ide *>(parent))
+        {
+          scene = ide->mpProcessingDrawer->getScene();
+        }
+        parent = parent->parent();
+      }
+      CEDAR_ASSERT(scene != nullptr);
+
+      cedar::proc::gui::Ide::mpUndoStack->push(
+              new cedar::proc::undoRedo::commands::ChangeParameterValue<bool>(parameter.get(), !value, value, scene));
+    }
+    else
+    {
+      parameter->setValue(value, true);
+    }
   }
 }
 

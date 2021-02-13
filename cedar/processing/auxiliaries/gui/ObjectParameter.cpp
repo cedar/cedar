@@ -192,6 +192,29 @@ void cedar::proc::aux::gui::ObjectParameter::currentTypeChanged(int index)
   if (index != -1)
   {
     std::string type = this->getSelectedType();
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeObjectParameterValue(this->getObjectParameter().get(), this->getObjectParameter()->getTypeId(), type));
+    if(dynamic_cast<cedar::aux::NamedConfigurable*>(this->getObjectParameter()->getOwner()))
+    {
+      //Find the scene
+      cedar::proc::gui::Scene* scene;
+
+      QObject* parent = this;
+      while(parent != nullptr)
+      {
+        if(auto ide = dynamic_cast<cedar::proc::gui::Ide*>(parent))
+        {
+          scene = ide->mpProcessingDrawer->getScene();
+        }
+        parent = parent->parent();
+      }
+      CEDAR_ASSERT(scene != nullptr);
+
+      cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeObjectParameterValue(
+              this->getObjectParameter().get(), this->getObjectParameter()->getTypeId(), type, scene));
+    }
+    else
+    {
+      this->getObjectParameter()->setType(type);
+    }
+
   }
 }

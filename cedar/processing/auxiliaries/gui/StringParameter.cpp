@@ -46,6 +46,7 @@
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/processing/undoRedo/commands/ChangeParameterValue.h"
+#include "cedar/processing/undoRedo/commands/ChangeNameParameterValue.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
@@ -133,9 +134,30 @@ void cedar::proc::aux::gui::StringParameter::textEdited(const QString& text)
   try
   {
     std::string oldValue = parameter->getValue();
-    cedar::proc::gui::Ide::mpUndoStack->push(
-            new cedar::proc::undoRedo::commands::ChangeParameterValue<std::string>(
-                    parameter.get(), oldValue, text.toStdString()));
+    // If parameter belongs to a step, push to undo stack (e.g. settings parameter should not be undoable)
+    if(dynamic_cast<cedar::aux::NamedConfigurable*>(parameter->getOwner()))
+    {
+      // Find the scene
+      cedar::proc::gui::Scene *scene;
+
+      QObject *parent = this;
+      while (parent != nullptr)
+      {
+        if (auto ide = dynamic_cast<cedar::proc::gui::Ide *>(parent))
+        {
+          scene = ide->mpProcessingDrawer->getScene();
+        }
+        parent = parent->parent();
+      }
+      CEDAR_ASSERT(scene != nullptr);
+      cedar::proc::gui::Ide::mpUndoStack->push(
+              new cedar::proc::undoRedo::commands::ChangeParameterValue<std::string>(
+                      parameter.get(), oldValue, text.toStdString(), scene));
+    }
+    else
+    {
+      parameter->setValue(text.toStdString());
+    }
   }
   catch (cedar::aux::ValidationFailedException& exc)
   {
