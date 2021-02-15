@@ -51,7 +51,7 @@
 #include <cedar/processing/Step.h>
 #include <cedar/processing/gui/StepItem.h>
 #include <cedar/processing/gui/Group.h>
-#include <cedar/processing/sources/CoPYObject.h>
+#include <cedar/processing/gui/CoPYObject.h>
 // SYSTEM INCLUDES
 
 #ifndef Q_MOC_RUN
@@ -81,24 +81,46 @@ public:
   CoPYWidget(QWidget *pParent = NULL);
   //! Destructor.
   ~CoPYWidget();
+
+  //!@brief setter for cedar::proc::gui::Ide.cpp
   void setScene(cedar::proc::gui::Scene* pScene);
-  void lineNumberAreaPaintEvent(QPaintEvent *event);
+
+  //!@brief methods for using existing StepItems in CoPY
   void importStepInformation(cedar::proc::gui::StepItem* pStep);
   void importStepInformation(QList<QGraphicsItem*> pSteps);
+
 private slots:
   void executeButtonClicked();
-  void updateCodeString();
 private:
+  //Highlighter for Console
   cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter *mpHighlighter;
+
+  //Layout-Objects
   QPushButton* mpExecuteButton;
   PythonQtConsole* console;
   PythonQtObjectPtr context;
-  int selCounter;
+
+  //Reference to Scene
   cedar::proc::gui::Scene* mpScene;
+
+  //"Python Objects"
   CoPYObjectWrapper* pyWrap;
   CoPYObject* mPy;
+
+  //counter to overview Exisiting-Step-Selections and not overwrite the python object.
+  int selCounter;
+
+private:
+
+  //private methods
+
+  //!@brief convert cedar::proc::gui::StepItem* to std::string of shape "groupId.stepName"
   std::string getStepInfo(cedar::proc::gui::StepItem* pStep);
+
+  //!@brief method to execute code
   void executeCode();
+
+  //!@brief insert command for creating dragged cedar::proc::Step
   void dropEvent(QDropEvent *pEvent);
   void dragEnterEvent(QDragEnterEvent *pEvent);
   void dragMoveEvent(QDragMoveEvent *pEvent);

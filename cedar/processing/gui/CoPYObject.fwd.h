@@ -2,8 +2,8 @@
 // Created by fred on 1/7/21.
 //
 
-#ifndef CEDAR_COPYOBJECT_H
-#define CEDAR_COPYOBJECT_H
+#ifndef CEDAR_PROC_GUI_COPY_OBJECT_FWD_H
+#define CEDAR_PROC_GUI_COPY_OBJECT_FWD_H
 
 
 // CEDAR CONFIGURATION
@@ -22,12 +22,13 @@ namespace cedar
 {
   namespace proc
   {
-    namespace sources
+    namespace gui
     {
       CEDAR_DECLARE_PROC_CLASS(CoPYObject);
+      CEDAR_DECLARE_PROC_CLASS(CoPYObjectWrapper);
     }
   }
 }
 
 
-#endif //CEDAR_COPYOBJECT_H
+#endif //CEDAR_PROC_GUI_COPY_OBJECT_FWD_H

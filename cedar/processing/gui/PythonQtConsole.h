@@ -114,10 +114,8 @@ protected:
   //! Sets the current font
   void setCurrentFont(const QColor& color = QColor(0,0,0), bool bold = false);
 
-
   //! flush output that was not yet printed
   void flushStdOut();
-
 
 private:
 
@@ -126,7 +124,6 @@ private:
   void executeCode(const QString& code);
 
   PythonQtObjectPtr _context;
-
 
   QString _clickedAnchor;
   QString _storageKey;

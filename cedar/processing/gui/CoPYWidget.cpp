@@ -56,6 +56,7 @@ cedar::proc::gui::CoPYWidget::CoPYWidget(QWidget* pParent)
 :
 QWidget(pParent)
 {
+  //create QTLayout
   QVBoxLayout *layout = new QVBoxLayout(reinterpret_cast<QWidget *>(this));
   layout->setMargin(0);
 
@@ -64,27 +65,30 @@ QWidget(pParent)
   context = PythonQt::self()->getMainModule();
   console = new PythonQtConsole(NULL, context);
   selCounter = 0;
+
   //finalize widget and button
   layout->addWidget(console);
   layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-  QPushButton *mpExecuteButton = new QPushButton("Execute");
+  QPushButton *mpExecuteButton = new QPushButton("Execute Code");
   QObject::connect(mpExecuteButton, SIGNAL (clicked()), this, SLOT(executeButtonClicked()));
   layout->addWidget(mpExecuteButton);
 
   setAcceptDrops(true);
+
   //appendHighlighter to Editor
   this->mpHighlighter = new cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter(console->document());
 
-  QObject::connect(static_cast<cedar::proc::gui::CodeWidgetScope::CodeEditor*>(console), SIGNAL(textChanged()), this, SLOT(updateCodeString()));
-
+  //Import CoPYObject Type To Python
   qRegisterMetaType<CoPYObject>("CoPYObject");
   PythonQt::self()->registerCPPClass("CoPYObject", "", "copy", PythonQtCreateObject<CoPYObjectWrapper>);
 
-  pyWrap = new CoPYObjectWrapper(2);
+  //Init Wrapper of Type QObject to import in Python
+  pyWrap = new CoPYObjectWrapper();
   context.addObject("py", pyWrap);
-  mPy = pyWrap -> getO();
 
-  context.evalScript("import numpy as np\nfrom PythonQt.copy import CoPYObject\npy = py.object()\n");
+  //reassign both cpp and python Object with getObject()-Method to be of type cedar::proc::gui::CoPYObject not cedar::proc::gui::CoPYObjectWrapper
+  mPy = pyWrap -> getO();
+  context.evalScript("from PythonQt.copy import CoPYObject\npy = py.object()\n");
 
 }
 
@@ -97,21 +101,18 @@ cedar::proc::gui::CoPYWidget::~CoPYWidget()
 // Set up methods
 //----------------------------------------------------------------------------------------------------------------------
 
-//!@brief set Scene out of cedar::proc::gui::Ide.cpp
 void cedar::proc::gui::CoPYWidget::setScene(cedar::proc::gui::Scene* pScene)
 {
   this->mpScene = pScene;
   mPy->setScene(this->mpScene);
   mPy->setGroup(pScene->getRootGroup()->getGroup());
-  std::cout << pScene->getRootGroup()->getGroup()->getName() << std::endl;
   console->setScene(this->mpScene);
 }
 
-
-
 void cedar::proc::gui::CoPYWidget::importStepInformation(cedar::proc::gui::StepItem* pStep)
 {
-  console->appendPlainText(QString::fromUtf8(this->getStepInfo(pStep).c_str()));
+  std::string output = '"' + this->getStepInfo(pStep) + '"';
+  console->appendPlainText(QString::fromUtf8(output.c_str()));
 }
 
 void cedar::proc::gui::CoPYWidget::importStepInformation(QList<QGraphicsItem*> pSteps){
@@ -123,13 +124,21 @@ void cedar::proc::gui::CoPYWidget::importStepInformation(QList<QGraphicsItem*> p
       steps.push_back(step);
     }
   }
-  QStringList list;
-  std::string sel = "selection" + std::to_string(++selCounter);
-  for(cedar::proc::gui::StepItem* step : steps) list.append(QString::fromUtf8(this->getStepInfo(step).c_str()));
+  if(steps.size() > 1)
+  {
+    QStringList list;
+    std::string sel = "selection" + std::to_string(++selCounter);
+    for (cedar::proc::gui::StepItem *step : steps) list.append(QString::fromUtf8(this->getStepInfo(step).c_str()));
 
-  context.addVariable(QString(sel.c_str()), list);
-  console->consoleMessage(QString::fromUtf8(("Selected Items where imported to CoPY as '" + sel + "'").c_str()), false);
-  console->appendPlainText(QString::fromUtf8(sel.c_str()));
+    context.addVariable(QString(sel.c_str()), list);
+    console->consoleMessage(QString::fromUtf8(("Selected Items where imported to CoPY as '" + sel + "'").c_str()),
+                            false);
+    console->appendPlainText(QString::fromUtf8(sel.c_str()));
+  }
+  else
+  {
+    this->importStepInformation(steps.back());
+  }
 }
 
 void cedar::proc::gui::CoPYWidget::reset()
@@ -152,7 +161,8 @@ std::string cedar::proc::gui::CoPYWidget::getStepInfo(cedar::proc::gui::StepItem
   std::string group_name = pStep->getStep()->getGroup()->getName();
   if (group_name == "") group_name = "root";
   std::string step_name = pStep->getStep()->getName();
-  std::string full_name = '"' + group_name + "." + step_name + '"';
+  std::string full_name = group_name + "." + step_name;
+  std::cout << full_name << std::endl;
   return full_name;
 }
 
@@ -187,7 +197,3 @@ void cedar::proc::gui::CoPYWidget::executeButtonClicked()
   this->executeCode();
 }
 
-void cedar::proc::gui::CoPYWidget::updateCodeString()
-{
-
-}

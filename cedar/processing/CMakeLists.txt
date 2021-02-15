@@ -85,7 +85,8 @@ cedar_add_library(cedarproc
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureWidget.h
   gui/BoostControl.h
-        gui/CoPYWidget.h
+  gui/CoPYWidget.h
+  gui/CoPYObject.h
   gui/CodeWidget.h
   gui/CommentWidget.h
   gui/Connectable.h
@@ -122,7 +123,7 @@ cedar_add_library(cedarproc
   sources/LocalReader.h
   sinks/LocalWriter.h
   sources/BoxInput.h
-  sources/CoPYObject.h
+        gui/CoPYObject.h
   sources/GaussInput.h
   sources/RealSense.h
   steps/VariableBox.h

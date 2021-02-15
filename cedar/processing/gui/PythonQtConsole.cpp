@@ -45,13 +45,9 @@
 
 
 #include <QMenu>
-#include <QMouseEvent>
 #include <QKeyEvent>
-#include <QApplication>
 #include <QTextDocumentFragment>
-#include <QTextBlock>
 #include <QTextCursor>
-#include <QDebug>
 #include <QCompleter>
 #include <QStringListModel>
 #include <QScrollBar>
@@ -78,7 +74,7 @@ cedar::proc::gui::CodeWidgetScope::CodeEditor(parent)
 
   connect(PythonQt::self(), SIGNAL(pythonStdOut(const QString&)), this, SLOT(stdOut(const QString&)));
   connect(PythonQt::self(), SIGNAL(pythonStdErr(const QString&)), this, SLOT(stdErr(const QString&)));
-  insertPlainText("#Controller imported as py\n#Drop steps here for creation and further instructions\nimport numpy as np");
+  insertPlainText("#Controller imported as py\n#Drop steps here for creation and further instructions");
 }
 
 //-----------------------------------------------------------------------------
