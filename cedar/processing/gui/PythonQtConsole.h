@@ -59,6 +59,7 @@
 
 #include "PythonQt.h"
 #include "Scene.h"
+#include "CoPYObject.h"
 #include <QVariant>
 #include <QTextEdit>
 #include <QGraphicsScene>
@@ -71,14 +72,18 @@ class PythonQtConsole : public cedar::proc::gui::CodeWidgetScope::CodeEditor
 {
 Q_OBJECT
 
+
+
 public:
-  PythonQtConsole(QWidget* parent, const PythonQtObjectPtr& context, Qt::WindowFlags i = 0);
+  PythonQtConsole(QWidget* parent, Qt::WindowFlags i = 0);
 
   ~PythonQtConsole();
 
 public Q_SLOTS:
   //! execute current line
   void executeLine();
+
+  void executeCode(const QString& code);
 
   //! derived key press event
   void keyPressEvent (QKeyEvent * e);
@@ -103,13 +108,17 @@ public:
   }
   void setScene(cedar::proc::gui::Scene *pScene);
 
+  void reset();
+
+  void addVariable(const QString &name, const QVariant& variable);
+
+  QStringList getVariables();
 protected:
   //! handle the pressing of tab
   void handleTabCompletion();
 
   //! Returns the position of the command prompt
   int commandPromptPosition();
-
 
   //! Sets the current font
   void setCurrentFont(const QColor& color = QColor(0,0,0), bool bold = false);
@@ -121,9 +130,10 @@ private:
 
   void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
 
-  void executeCode(const QString& code);
+  cedar::proc::gui::CoPYObjectWrapper *mpPyWrap;
+  cedar::proc::gui::CoPYObject *mpPy;
 
-  PythonQtObjectPtr _context;
+  PythonQtObjectPtr mpContext;
 
   QString _clickedAnchor;
   QString _storageKey;
@@ -140,6 +150,7 @@ private:
   cedar::proc::gui::Scene* mpScene;
 
   bool _hadError;
+
 
 };
 

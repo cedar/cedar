@@ -421,6 +421,8 @@ private:
 
   void handleTriggerModeChange();
 
+  QStringList getGroupCoordinates(const QPointF &mousePosition);
+
   //! Responsible for highlighting group targets when the mouse is dragging items around.
   void highlightTargetGroups(const QPointF& mousePosition);
 
@@ -492,6 +494,7 @@ private:
 
   //! Group into which the items currently being moved would be added
   cedar::proc::GroupPtr mTargetGroup;
+
 
   //! The view displaying the scene.
   cedar::proc::gui::View* mpeParentView;

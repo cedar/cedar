@@ -39,6 +39,8 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include <QMenu>
+#include <QContextMenuEvent>
 #include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/Parameter.h"
 
@@ -53,6 +55,7 @@ cedar::aux::gui::Parameter::Parameter(QWidget *pParent)
 QWidget(pParent)
 {
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterChanged()));
+  setContextMenuPolicy(Qt::DefaultContextMenu);
 }
 
 //!@brief Destructor
@@ -94,6 +97,7 @@ cedar::aux::ParameterPtr cedar::aux::gui::Parameter::getParameter()
   return this->mParameter;
 }
 
+
 void cedar::aux::gui::Parameter::parameterChanged()
 {
 }
@@ -105,3 +109,8 @@ void cedar::aux::gui::Parameter::propertiesChanged()
 void cedar::aux::gui::Parameter::valueChanged()
 {
 }
+
+
+
+
+

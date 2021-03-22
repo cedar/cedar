@@ -46,7 +46,8 @@
 #include <QHBoxLayout>
 #include <QWidget>
 #include <QPushButton>
-
+#include <QCheckBox>
+#include <thread>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -56,39 +57,42 @@ cedar::proc::gui::CoPYWidget::CoPYWidget(QWidget* pParent)
 :
 QWidget(pParent)
 {
+
   //create QTLayout
   QVBoxLayout *layout = new QVBoxLayout(reinterpret_cast<QWidget *>(this));
   layout->setMargin(0);
 
-  //init PythonQt with Console
-  PythonQt::init(PythonQt::RedirectStdOut);
-  context = PythonQt::self()->getMainModule();
-  console = new PythonQtConsole(NULL, context);
-  selCounter = 0;
+  mpConsole = new PythonQtConsole(this);
 
-  //finalize widget and button
-  layout->addWidget(console);
-  layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-  QPushButton *mpExecuteButton = new QPushButton("Execute Code");
-  QObject::connect(mpExecuteButton, SIGNAL (clicked()), this, SLOT(executeButtonClicked()));
-  layout->addWidget(mpExecuteButton);
-
-  setAcceptDrops(true);
+  this->reset();
 
   //appendHighlighter to Editor
-  this->mpHighlighter = new cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter(console->document());
+  this->mpHighlighter = new cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter(mpConsole->document());
+  mSelCounter = 0;
 
-  //Import CoPYObject Type To Python
-  qRegisterMetaType<CoPYObject>("CoPYObject");
-  PythonQt::self()->registerCPPClass("CoPYObject", "", "copy", PythonQtCreateObject<CoPYObjectWrapper>);
+  //finalize widget and button
+  layout->addWidget(mpConsole);
+  layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
-  //Init Wrapper of Type QObject to import in Python
-  pyWrap = new CoPYObjectWrapper();
-  context.addObject("py", pyWrap);
+  QHBoxLayout *buttons = new QHBoxLayout();
+  mpExecuteButton = new QPushButton("Execute");
+  QObject::connect(mpExecuteButton, SIGNAL (clicked()), this, SLOT(executeButtonClicked()));
+  buttons->addWidget(mpExecuteButton);
+  mpResetButton = new QPushButton("Reset");
+  QObject::connect(mpResetButton, SIGNAL (clicked()), this, SLOT(resetButtonClicked()));
+  buttons->addWidget(mpResetButton);
+  mpAutoResetCheckbox = new QCheckBox("Auto Reset");
+  buttons->addWidget(mpAutoResetCheckbox);
+  /*mpSaveButton = new QPushButton("S");-
+  QObject::connect(mpSaveButton, SIGNAL (clicked()), this, SLOT(saveButtonClicked()));
+  buttons->addWidget(mpSaveButton);
+  mpLoadButton = new QPushButton("L");
+  QObject::connect(mpLoadButton, SIGNAL (clicked()), this, SLOT(loadButtonClicked()));
+  buttons->addWidget(mpLoadButton);*/
 
-  //reassign both cpp and python Object with getObject()-Method to be of type cedar::proc::gui::CoPYObject not cedar::proc::gui::CoPYObjectWrapper
-  mPy = pyWrap -> getO();
-  context.evalScript("from PythonQt.copy import CoPYObject\npy = py.object()\n");
+
+  layout->addLayout(buttons);
+  setAcceptDrops(true);
 
 }
 
@@ -103,16 +107,13 @@ cedar::proc::gui::CoPYWidget::~CoPYWidget()
 
 void cedar::proc::gui::CoPYWidget::setScene(cedar::proc::gui::Scene* pScene)
 {
-  this->mpScene = pScene;
-  mPy->setScene(this->mpScene);
-  mPy->setGroup(pScene->getRootGroup()->getGroup());
-  console->setScene(this->mpScene);
+  mpConsole->setScene(pScene);
 }
 
 void cedar::proc::gui::CoPYWidget::importStepInformation(cedar::proc::gui::StepItem* pStep)
 {
   std::string output = '"' + this->getStepInfo(pStep) + '"';
-  console->appendPlainText(QString::fromUtf8(output.c_str()));
+  mpConsole->appendPlainText(QString::fromUtf8(output.c_str()));
 }
 
 void cedar::proc::gui::CoPYWidget::importStepInformation(QList<QGraphicsItem*> pSteps){
@@ -127,13 +128,19 @@ void cedar::proc::gui::CoPYWidget::importStepInformation(QList<QGraphicsItem*> p
   if(steps.size() > 1)
   {
     QStringList list;
-    std::string sel = "selection" + std::to_string(++selCounter);
-    for (cedar::proc::gui::StepItem *step : steps) list.append(QString::fromUtf8(this->getStepInfo(step).c_str()));
-
-    context.addVariable(QString(sel.c_str()), list);
-    console->consoleMessage(QString::fromUtf8(("Selected Items where imported to CoPY as '" + sel + "'").c_str()),
+    std::string sel = "selection" + std::to_string(++mSelCounter);
+    bool sameType = true;
+    for (cedar::proc::gui::StepItem *step : steps){
+      list.append(QString::fromUtf8(this->getStepInfo(step).c_str()));
+      step->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_SEARCH_RESULT);
+    }
+    std::string outputString;
+    for (QString item : list) outputString += item.toStdString() + ", ";
+    mpConsole->addVariable(QString(sel.c_str()), list);
+    mpConsole->consoleMessage(QString::fromUtf8(("Selected Items were imported to CoPY as '" + sel + "'").c_str()),
                             false);
-    console->appendPlainText(QString::fromUtf8(sel.c_str()));
+    mpConsole->executeCode("print("+ QString::fromStdString(sel) + ")");
+    mpConsole->appendPlainText(QString::fromUtf8(sel.c_str()));
   }
   else
   {
@@ -141,9 +148,13 @@ void cedar::proc::gui::CoPYWidget::importStepInformation(QList<QGraphicsItem*> p
   }
 }
 
+void cedar::proc::gui::CoPYWidget::appendToConsole(std::string text){
+  mpConsole->appendPlainText(QString::fromStdString(text));
+}
+
 void cedar::proc::gui::CoPYWidget::reset()
 {
-  //init Python CoPYObject and cast it to CPPObject
+  mpConsole -> reset();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -153,9 +164,21 @@ void cedar::proc::gui::CoPYWidget::reset()
 //!@brief main execute method for executing CoPY
 void cedar::proc::gui::CoPYWidget::executeCode()
 {
-  console->executeLine();
-  //this->reset();
+  mpConsole->executeLine();
+  if(mpAutoResetCheckbox->isChecked()){
+    this->reset();
+  }
 }
+
+/*void cedar::proc::gui::CoPYWidget::updateDict()
+{
+  PyObject* dict = NULL;
+  if (PyModule_Check(mpContext)) {
+    dict = PyModule_GetDict(mpContext);
+  } else if (PyDict_Check(mpContext)) {
+    dict = mpContext;
+    dict
+}*/
 
 std::string cedar::proc::gui::CoPYWidget::getStepInfo(cedar::proc::gui::StepItem* pStep){
   std::string group_name = pStep->getStep()->getGroup()->getName();
@@ -182,10 +205,10 @@ void cedar::proc::gui::CoPYWidget::dropEvent(QDropEvent *pEvent)
 
   if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration *>(declaration))
   {
-    console->insertPlainText(QString(QString("\n#Usage: py.create(classId, xPos, yPos, amount)\npy.create('") + QString(elem_declaration->getClassName().c_str()) +  QString("', 0, 0, 1)\n")));
+    mpConsole->insertPlainText(QString(QString("\n#Usage: py.create(classId, xPos, yPos, amount)\npy.create('") + QString(elem_declaration->getClassName().c_str()) +  QString("', 0, 0, 1)\n")));
   } else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration *>(declaration))
   {
-    console->insertPlainText(QString(QString("\n#Usage: py.createGroup(groupId, xPos, yPos)\npy.createGroup('") + QString(group_declaration->getClassName().c_str()) +  QString("', 0, 0)\n")));
+    mpConsole->insertPlainText(QString(QString("\n#Usage: py.createGroup(groupId, xPos, yPos)\npy.createGroup('") + QString(group_declaration->getClassName().c_str()) +  QString("', 0, 0)\n")));
   }
   pEvent->acceptProposedAction();
 }
@@ -197,3 +220,17 @@ void cedar::proc::gui::CoPYWidget::executeButtonClicked()
   this->executeCode();
 }
 
+void cedar::proc::gui::CoPYWidget::resetButtonClicked()
+{
+  this->reset();
+}
+
+void cedar::proc::gui::CoPYWidget::saveButtonClicked()
+{
+  this->reset();
+}
+
+void cedar::proc::gui::CoPYWidget::loadButtonClicked()
+{
+  this->reset();
+}

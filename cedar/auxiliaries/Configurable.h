@@ -142,6 +142,12 @@ public:
   //!@brief get a list of all parameters registered at this Configurable
   ParameterList& getParameters();
 
+  //!@brief sets the configurable parent
+  void setParent(cedar::aux::Configurable* child);
+
+  //!@brief sets the configurable parent
+  cedar::aux::Configurable* getParent();
+
   /*!@brief add a Configurable as a child to this instance of Configurable - if name is duplicate, an exception is
    * thrown
    */
@@ -411,6 +417,9 @@ private:
 
   //!@brief map of children of this Configurable instance
   Children mChildren;
+
+  //!@brief parent of this Configurable instance
+  cedar::aux::Configurable* mpParent;
 
   //!@brief Whether this is an advanced configurable; usually only makes sense, when this is a child.
   bool mIsAdvanced;

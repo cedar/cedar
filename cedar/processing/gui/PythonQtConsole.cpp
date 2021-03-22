@@ -42,6 +42,7 @@
 #include "PythonQtConsole.h"
 #include "ElementList.h"
 #include "Group.h"
+#include "CoPYObject.h"
 
 
 #include <QMenu>
@@ -55,14 +56,13 @@
 
 //-----------------------------------------------------------------------------
 
-PythonQtConsole::PythonQtConsole(QWidget* parent, const PythonQtObjectPtr& context, Qt::WindowFlags windowFlags)
+PythonQtConsole::PythonQtConsole(QWidget* parent, Qt::WindowFlags windowFlags)
 :
 cedar::proc::gui::CodeWidgetScope::CodeEditor(parent)
 {
   setWindowFlags(windowFlags);
 
   _defaultTextCharacterFormat = currentCharFormat();
-  _context                    = context;
   _hadError                   = false;
 
   _completer = new QCompleter(this);
@@ -72,9 +72,23 @@ cedar::proc::gui::CodeWidgetScope::CodeEditor(parent)
 
   clear();
 
-  connect(PythonQt::self(), SIGNAL(pythonStdOut(const QString&)), this, SLOT(stdOut(const QString&)));
-  connect(PythonQt::self(), SIGNAL(pythonStdErr(const QString&)), this, SLOT(stdErr(const QString&)));
-  insertPlainText("#Controller imported as py\n#Drop steps here for creation and further instructions");
+  //init PythonQt with mpConsole
+  PythonQt::setEnableThreadSupport(true);
+  PythonQt::init(PythonQt::RedirectStdOut);
+
+  //Import CoPYObject Type To Python
+  qRegisterMetaType<cedar::proc::gui::CoPYObject>("CoPYObject");
+  PythonQt::self()->registerCPPClass("CoPYObject", "", "copy", PythonQtCreateObject<cedar::proc::gui::CoPYObjectWrapper>);
+
+  //Init Wrapper of Type QObject to import in Python
+  mpPyWrap = new cedar::proc::gui::CoPYObjectWrapper();
+  mpPy = mpPyWrap->getO();
+
+  mpContext = PythonQt::self()->createUniqueModule();
+
+  QObject::connect(PythonQt::self(), SIGNAL(pythonStdOut(const QString&)), this, SLOT(stdOut(const QString&)));
+  QObject::connect(PythonQt::self(), SIGNAL(pythonStdErr(const QString&)), this, SLOT(stdErr(const QString&)));
+  insertPlainText("#Controller imported as py\n#Drop steps here for creation and further instructions\npy.setParameter(\"root.Neural Field\",\"sizes\",[2,2])");
 }
 
 //-----------------------------------------------------------------------------
@@ -119,6 +133,11 @@ PythonQtConsole::~PythonQtConsole() {
 
 //-----------------------------------------------------------------------------
 
+void PythonQtConsole::addVariable(const QString &name, const QVariant &variable)
+{
+  mpContext.addVariable(name, variable);
+}
+
 void PythonQtConsole::executeLine()
 {
   QString code = this->toPlainText();
@@ -129,14 +148,12 @@ void PythonQtConsole::executeLine()
   }
 
   if (!code.isEmpty()) {
-
     _currentMultiLineCode = code + "\n";
     executeCode(_currentMultiLineCode);
     _currentMultiLineCode = "";
-
   }
-
 }
+
 
 void PythonQtConsole::executeCode(const QString& code)
 {
@@ -145,17 +162,15 @@ void PythonQtConsole::executeCode(const QString& code)
   cursor.movePosition(QTextCursor::End);
   setTextCursor(cursor);
 
-  int cursorPosition = this->textCursor().position();
-
   // evaluate the code
   _stdOut = "";
   _stdErr = "";
   PythonQtObjectPtr p;
   PyObject* dict = NULL;
-  if (PyModule_Check(_context)) {
-    dict = PyModule_GetDict(_context);
-  } else if (PyDict_Check(_context)) {
-    dict = _context;
+  if (PyModule_Check(mpContext)) {
+    dict = PyModule_GetDict(mpContext);
+  } else if (PyDict_Check(mpContext)) {
+    dict = mpContext;
   }
   if (dict) {
     p.setNewRef(PyRun_String(QStringToPythonConstCharPointer(code), Py_file_input, dict, dict));
@@ -221,14 +236,14 @@ void PythonQtConsole::insertCompletion(const QString& completion)
 //-----------------------------------------------------------------------------
 void PythonQtConsole::handleTabCompletion()
 {
+
   QTextCursor textCursor = this->textCursor();
   int pos = textCursor.position();
-  textCursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+  textCursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);
   int startPos = textCursor.selectionStart();
 
   int offset = pos-startPos;
   QString text = textCursor.selectedText();
-
   QString textToComplete;
   int cur = offset;
   while (cur--) {
@@ -250,7 +265,7 @@ void PythonQtConsole::handleTabCompletion()
   if (!lookup.isEmpty() || !compareText.isEmpty()) {
     compareText = compareText.toLower();
     QStringList found;
-    QStringList l = PythonQt::self()->introspection(_context, lookup, PythonQt::Anything);
+    QStringList l = PythonQt::self()->introspection(mpContext, lookup, PythonQt::Anything);
     Q_FOREACH (QString n, l) {
         if (n.toLower().startsWith(compareText)) {
           found << n;
@@ -312,7 +327,6 @@ void PythonQtConsole::keyPressEvent(QKeyEvent* event) {
       this->insertPlainText(QString(" ").repeated(2 - this->textCursor().positionInBlock() % 2));
       eventHandled = true;
       break;
-
     default:
       break;
   }
@@ -325,12 +339,12 @@ void PythonQtConsole::keyPressEvent(QKeyEvent* event) {
   } else {
 
     cedar::proc::gui::CodeWidgetScope::CodeEditor::keyPressEvent(event);
-    //QString text = event->text();
-    /*if (!text.isEmpty()) {
+    QString text = event->text();
+    if (!text.isEmpty()) {
       handleTabCompletion();
     } else {
       _completer->popup()->hide();
-    }*/
+    }
     eventHandled = true;
   }
 }
@@ -341,25 +355,47 @@ void PythonQtConsole::keyPressEvent(QKeyEvent* event) {
 void PythonQtConsole::setScene(cedar::proc::gui::Scene* pScene)
 {
   mpScene = pScene;
+  mpPy->setScene(pScene);
+  mpPy->setGroup(pScene->getRootGroup()->getGroup());
+}
+
+QStringList PythonQtConsole::getVariables(){
+  QStringList output = PythonQt::self()->introspectObject(mpContext, PythonQt::Anything);
+
+  for(QString o : output)
+    std::cout << o.toStdString() << std::endl;
+
+  return output;
+}
+
+void PythonQtConsole::reset()
+{
+  mpContext.removeVariable("py");
+  mpContext = PythonQt::self()->createUniqueModule();
+
+  //reassign both cpp and python Object with getObject()-Method to be of type cedar::proc::gui::CoPYObject not cedar::proc::gui::CoPYObjectWrapper
+  mpContext.addObject("pyWrap", mpPyWrap);
+  mpContext.evalScript("from PythonQt.copy import CoPYObject\npy = pyWrap.object()\n");
 }
 
 void PythonQtConsole::consoleMessage(const QString & message, bool error) {
-
   if(!error)
   {
   cedar::aux::LogSingleton::getInstance()->message
           (
-                  std::string("[CoPY] ").append(message.toStdString()),
+                  message.toStdString(),
                   "void cedar::proc::gui::PythonQtConsole::consoleMessage(const QString & text)",
                   "CoPY"
           );
   }
-  else
+  else if(!message.startsWith("Type") && !message.startsWith("File") && !message.startsWith("Traceback") && !message.startsWith("Line"))
   {
     cedar::aux::LogSingleton::getInstance()->error(
-              std::string("[CoPY] ").append(message.toStdString()),
+              message.trimmed().toStdString(),
               "void cedar::proc::gui::PythonQtConsole::consoleMessage(const QString & text)",
               "CoPY"
       );
   }
 }
+
+

@@ -821,6 +821,16 @@ const cedar::aux::Configurable::Children& cedar::aux::Configurable::configurable
   return this->mChildren;
 }
 
+cedar::aux::Configurable* cedar::aux::Configurable::getParent()
+{
+  return this->mpParent;
+}
+
+void cedar::aux::Configurable::setParent(cedar::aux::Configurable* parent)
+{
+  this->mpParent = parent;
+}
+
 void cedar::aux::Configurable::addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child)
 {
   if (this->mChildren.find(name) != this->mChildren.end())
@@ -829,6 +839,10 @@ void cedar::aux::Configurable::addConfigurableChild(const std::string& name, ced
                                                     + name + "\".");
   }
   this->mChildren[name] = child;
+  if(child.get() != nullptr)
+  {
+    child->setParent(this);
+  }
   // emit boost signal
   mTreeChanged();
 }
@@ -841,6 +855,10 @@ void cedar::aux::Configurable::removeConfigurableChild(const std::string& name)
     CEDAR_THROW(cedar::aux::UnknownNameException, "There is no configurable child with the name \"" + name + "\".");
   }
   this->mChildren.erase(child);
+  if(child->second.get() != nullptr)
+  {
+    child->second->setParent(nullptr);
+  }
   // emit boost signal
   mTreeChanged();
 }

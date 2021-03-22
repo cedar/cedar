@@ -65,6 +65,8 @@
 #include <stdexcept>
 #include <QApplication>
 #include <QVBoxLayout>
+#include <QCheckBox>
+#include <QHBoxLayout>
 #include <QTextEdit>
 #include <map>
 #include <QGraphicsSceneDragDropEvent>
@@ -75,7 +77,9 @@
 //!@brief A class for Scripting with Python to copy/create things.
 class cedar::proc::gui::CoPYWidget : public QWidget
 {
-  Q_OBJECT;
+  Q_OBJECT
+
+
 public:
   //!@brief The standard constructor.
   CoPYWidget(QWidget *pParent = NULL);
@@ -89,26 +93,30 @@ public:
   void importStepInformation(cedar::proc::gui::StepItem* pStep);
   void importStepInformation(QList<QGraphicsItem*> pSteps);
 
+  //!@brief method for appending Text in CoPY
+  void appendToConsole(std::string text);
 private slots:
   void executeButtonClicked();
+  void saveButtonClicked();
+  void loadButtonClicked();
+  void resetButtonClicked();
 private:
   //Highlighter for Console
   cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter *mpHighlighter;
 
   //Layout-Objects
   QPushButton* mpExecuteButton;
-  PythonQtConsole* console;
-  PythonQtObjectPtr context;
+  QPushButton* mpResetButton;
+  QPushButton* mpSaveButton;
+  QPushButton* mpLoadButton;
+  QCheckBox* mpAutoResetCheckbox;
+  PythonQtConsole* mpConsole;
 
   //Reference to Scene
   cedar::proc::gui::Scene* mpScene;
 
-  //"Python Objects"
-  CoPYObjectWrapper* pyWrap;
-  CoPYObject* mPy;
-
   //counter to overview Exisiting-Step-Selections and not overwrite the python object.
-  int selCounter;
+  int mSelCounter;
 
 private:
 
@@ -125,6 +133,8 @@ private:
   void dragEnterEvent(QDragEnterEvent *pEvent);
   void dragMoveEvent(QDragMoveEvent *pEvent);
   void reset();
+
+  void updateDict();
 
 };
 

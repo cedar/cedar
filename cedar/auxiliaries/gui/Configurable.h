@@ -126,6 +126,7 @@ public slots:
   //! Resizes the rows to fit their contents.
   void fitRowsToContents();
 
+  void showContextMenu(const QPoint &);
 
 signals:
   //! Emitted, whenever a parameter in the widget changes.

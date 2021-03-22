@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/Configurable.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/ObjectParameter.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/Configurable.h"
@@ -48,8 +49,12 @@
 #include "cedar/auxiliaries/ObjectListParameter.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/kernel/Box.h"
+
 #if !defined CEDAR_OS_APPLE
+
 #include "cedar/processing/Step.h"
+#include "cedar/processing/Group.h"
+
 #endif
 
 // SYSTEM INCLUDES
@@ -62,13 +67,18 @@
 #include <QList>
 #include <QLabel>
 #include <typeinfo>
+
 #ifdef CEDAR_USE_QT5
+
 #include <QPushButton>
+
 #else
 #include <QtGui/QPushButton>
 #endif
 
 #include <boost/tokenizer.hpp>
+#include <QMenu>
+#include <cedar/processing/gui/CoPYWidget.h>
 
 #define PARAMETER_NAME_COLUMN 0
 #define PARAMETER_EDITOR_COLUMN 1
@@ -79,13 +89,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::aux::gui::Configurable::DataDelegate::DataDelegate
-(
-  cedar::aux::gui::Configurable* configurableWidget,
-  bool readOnly
-)
-:
-mConfigurableWidget(configurableWidget),
-mReadOnly(readOnly)
+        (
+                cedar::aux::gui::Configurable *configurableWidget,
+                bool readOnly
+        )
+        :
+        mConfigurableWidget(configurableWidget),
+        mReadOnly(readOnly)
 {
 }
 
@@ -99,24 +109,27 @@ cedar::aux::gui::Configurable::DataDelegate::~DataDelegate()
   }
 }
 
-QWidget* cedar::aux::gui::Configurable::DataDelegate::createEditor(QWidget *pParent, const QStyleOptionViewItem& /*option*/, const QModelIndex &index) const
+QWidget *
+cedar::aux::gui::Configurable::DataDelegate::createEditor(QWidget *pParent, const QStyleOptionViewItem & /*option*/,
+                                                          const QModelIndex &index) const
 {
   cedar::aux::ParameterPtr parameter = this->mConfigurableWidget->parameterFromModelIndex(index);
 
-  QWidget* p_ret = nullptr;
+  QWidget *p_ret = nullptr;
   try
   {
     cedar::aux::gui::Parameter *p_widget
-      = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
+            = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
     p_widget->setParameter(parameter);
-    QObject::connect(p_widget, SIGNAL(heightChanged()), this->mConfigurableWidget, SLOT(fitRowsToContents()), Qt::QueuedConnection);
+    QObject::connect(p_widget, SIGNAL(heightChanged()), this->mConfigurableWidget, SLOT(fitRowsToContents()),
+                     Qt::QueuedConnection);
     QObject::connect(parameter.get(), SIGNAL(valueChanged()), this->mConfigurableWidget, SIGNAL(settingsChanged()));
     p_ret = p_widget;
     p_widget->setReadOnly(this->mReadOnly);
   }
-  catch (cedar::aux::UnknownTypeException& e)
+  catch (cedar::aux::UnknownTypeException &e)
   {
-    QLabel* p_no_widget_label = new QLabel("(No widget for type)");
+    QLabel *p_no_widget_label = new QLabel("(No widget for type)");
     p_no_widget_label->setToolTip(QString::fromStdString(e.exceptionInfo()));
     p_no_widget_label->setAlignment(Qt::AlignCenter);
     p_no_widget_label->setAutoFillBackground(true);
@@ -125,17 +138,17 @@ QWidget* cedar::aux::gui::Configurable::DataDelegate::createEditor(QWidget *pPar
   }
 
   p_ret->setParent(pParent);
-  connect(p_ret, SIGNAL(destroyed(QObject*)), this, SLOT(widgetDestroyed(QObject*)));
+  connect(p_ret, SIGNAL(destroyed(QObject * )), this, SLOT(widgetDestroyed(QObject * )));
   mOpenedEditors.insert(p_ret);
 
   //Choose 5 as a fixed value, to disambiguate between Parameters and VectorParameters. Other values might be nicer, we will have to do a field study.
-  p_ret->setContentsMargins(0,5,0,5);
+  p_ret->setContentsMargins(0, 5, 0, 5);
   return p_ret;
 }
 
-void cedar::aux::gui::Configurable::DataDelegate::widgetDestroyed(QObject* removed)
+void cedar::aux::gui::Configurable::DataDelegate::widgetDestroyed(QObject *removed)
 {
-  if (auto widget = dynamic_cast<QObject*>(removed))
+  if (auto widget = dynamic_cast<QObject *>(removed))
   {
     auto entry = mOpenedEditors.find(widget);
     if (entry != mOpenedEditors.end())
@@ -149,14 +162,14 @@ void cedar::aux::gui::Configurable::DataDelegate::widgetDestroyed(QObject* remov
 class cedar::aux::gui::Configurable::ParameterItem : public QTreeWidgetItem
 {
 public:
-  ParameterItem(cedar::aux::ParameterPtr parameter, const std::string& path)
-  :
-  mParameter(parameter)
+  ParameterItem(cedar::aux::ParameterPtr parameter, const std::string &path)
+          :
+          mParameter(parameter)
   {
-    auto name= parameter->getName();
+    auto name = parameter->getName();
     this->setText(PARAMETER_NAME_COLUMN, QString::fromStdString(name));
 
-    this->setData(PARAMETER_NAME_COLUMN, Qt::UserRole, QVariant::fromValue(static_cast<void*>(parameter.get())));
+    this->setData(PARAMETER_NAME_COLUMN, Qt::UserRole, QVariant::fromValue(static_cast<void *>(parameter.get())));
     this->setData(PARAMETER_EDITOR_COLUMN, Qt::UserRole, QString::fromStdString(path));
   }
 
@@ -181,6 +194,11 @@ public:
     }
   }
 
+  cedar::aux::ParameterPtr getParameter()
+  {
+    return mParameter;
+  }
+
 private:
   cedar::aux::ParameterPtr mParameter;
 };
@@ -190,14 +208,14 @@ private:
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::Configurable::Configurable(QWidget* pParent)
-:
-QWidget(pParent)
+cedar::aux::gui::Configurable::Configurable(QWidget *pParent)
+        :
+        QWidget(pParent)
 {
 
   delButtonSignalMapper = new QSignalMapper();
   // create layout
-  QVBoxLayout* p_layout = new QVBoxLayout();
+  QVBoxLayout *p_layout = new QVBoxLayout();
   this->setLayout(p_layout);
 
   // insert property tree
@@ -205,6 +223,11 @@ QWidget(pParent)
   p_layout->addWidget(mpPropertyTree, 1);
   p_layout->setContentsMargins(0, 0, 0, 0);
   this->mpPropertyTree->setAlternatingRowColors(true);
+
+  //enable context Menu
+  this->mpPropertyTree->setContextMenuPolicy(Qt::CustomContextMenu);
+  QObject::connect(mpPropertyTree, SIGNAL(customContextMenuRequested(const QPoint &)), this,
+                   SLOT(showContextMenu(const QPoint &)));
 
   // setup header
   this->mpPropertyTree->setColumnCount(2);
@@ -224,11 +247,12 @@ QWidget(pParent)
 
   QObject::connect(this, SIGNAL(parameterAdded(int, QString)), this, SLOT(parameterAddedSlot(int, QString)));
   QObject::connect(this, SIGNAL(parameterRemoved(int, QVariant)), this, SLOT(parameterRemovedSlot(int, QVariant)));
-  QObject::connect(this, SIGNAL(parameterRenamed(int, QString, QString)), this, SLOT(parameterRenamedSlot(int, QString, QString)));
+  QObject::connect(this, SIGNAL(parameterRenamed(int, QString, QString)), this,
+                   SLOT(parameterRenamedSlot(int, QString, QString)));
 
 
-  QObject::connect(delButtonSignalMapper, SIGNAL(mapped(QString)),this, SIGNAL(delButtonClickedSignal(QString)));
-  QObject::connect(this, SIGNAL(delButtonClickedSignal(QString)),this, SLOT(handleDeleteButtonClicked(QString)));
+  QObject::connect(delButtonSignalMapper, SIGNAL(mapped(QString)), this, SIGNAL(delButtonClickedSignal(QString)));
+  QObject::connect(this, SIGNAL(delButtonClickedSignal(QString)), this, SLOT(handleDeleteButtonClicked(QString)));
 }
 
 cedar::aux::gui::Configurable::~Configurable()
@@ -240,9 +264,9 @@ cedar::aux::gui::Configurable::~Configurable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-int cedar::aux::gui::Configurable::getRootIndexForItem(QTreeWidgetItem* pItem) const
+int cedar::aux::gui::Configurable::getRootIndexForItem(QTreeWidgetItem *pItem) const
 {
-  QTreeWidgetItem* p_root = pItem;
+  QTreeWidgetItem *p_root = pItem;
 
   while (p_root->parent())
   {
@@ -260,28 +284,32 @@ int cedar::aux::gui::Configurable::getRootIndexForItem(QTreeWidgetItem* pItem) c
   CEDAR_THROW(cedar::aux::NotFoundException, "Could not find the item in the tree widget.");
 }
 
-cedar::aux::ParameterPtr cedar::aux::gui::Configurable::parameterFromModelIndex(const QModelIndex& index)
+cedar::aux::ParameterPtr cedar::aux::gui::Configurable::parameterFromModelIndex(const QModelIndex &index)
 {
-  QTreeWidgetItem* p_item = this->mpPropertyTree->getItemFromIndex(index);
+  QTreeWidgetItem *p_item = this->mpPropertyTree->getItemFromIndex(index);
   size_t i = static_cast<size_t>(this->getRootIndexForItem(p_item));
 
   std::string parameter_path = index.data(Qt::UserRole).toString().toStdString();
   return this->mDisplayedConfigurables[i]->getParameter(parameter_path);
 }
 
-void cedar::aux::gui::Configurable::translateParameterAddedSignal(unsigned int configurableIndex, cedar::aux::ParameterPtr parameter)
+void cedar::aux::gui::Configurable::translateParameterAddedSignal(unsigned int configurableIndex,
+                                                                  cedar::aux::ParameterPtr parameter)
 {
   QString path = QString::fromStdString(parameter->getName());
   emit parameterAdded(static_cast<int>(configurableIndex), path);
 }
 
-void cedar::aux::gui::Configurable::translateParameterRemovedSignal(unsigned int configurableIndex, cedar::aux::ParameterPtr parameter)
+void cedar::aux::gui::Configurable::translateParameterRemovedSignal(unsigned int configurableIndex,
+                                                                    cedar::aux::ParameterPtr parameter)
 {
-  QVariant parameter_variant = QVariant::fromValue((void*)(parameter.get()));
+  QVariant parameter_variant = QVariant::fromValue((void *) (parameter.get()));
   emit parameterRemoved(static_cast<int>(configurableIndex), parameter_variant);
 }
 
-void cedar::aux::gui::Configurable::translateParameterNameChangedSignal(unsigned int configurableIndex, const std::string& oldName, const std::string& newName)
+void cedar::aux::gui::Configurable::translateParameterNameChangedSignal(unsigned int configurableIndex,
+                                                                        const std::string &oldName,
+                                                                        const std::string &newName)
 {
   QString old_name = QString::fromStdString(oldName);
   QString new_name = QString::fromStdString(newName);
@@ -302,7 +330,7 @@ void cedar::aux::gui::Configurable::parameterAddedSlot(int configurableIndex, QS
 
 void cedar::aux::gui::Configurable::parameterRemovedSlot(int /* configurableIndex */, QVariant parameterP)
 {
-  auto parameter = (cedar::aux::Parameter*) parameterP.value<void*>();
+  auto parameter = (cedar::aux::Parameter *) parameterP.value<void *>();
   auto item = this->getItemForParameter(parameter);
   CEDAR_ASSERT(item != nullptr);
   delete item;
@@ -318,7 +346,8 @@ void cedar::aux::gui::Configurable::parameterRemovedSlot(int /* configurableInde
 
 void cedar::aux::gui::Configurable::parameterRenamedSlot(int configurableIndex, QString /* oldName */, QString newName)
 {
-  auto parameter = this->mDisplayedConfigurables[static_cast<size_t>(configurableIndex)]->getParameter(newName.toStdString());
+  auto parameter = this->mDisplayedConfigurables[static_cast<size_t>(configurableIndex)]->getParameter(
+          newName.toStdString());
   auto item = this->getItemForParameter(parameter.get());
   item->setText(0, newName);
 }
@@ -328,15 +357,15 @@ void cedar::aux::gui::Configurable::fitRowsToContents()
   this->mpPropertyTree->doItemsLayout();
 }
 
-QTreeWidgetItem* cedar::aux::gui::Configurable::appendHeading(QTreeWidgetItem* pParent, const QString& text, int hLevel)
+QTreeWidgetItem *cedar::aux::gui::Configurable::appendHeading(QTreeWidgetItem *pParent, const QString &text, int hLevel)
 {
-  QTreeWidgetItem* p_item = new QTreeWidgetItem();
+  QTreeWidgetItem *p_item = new QTreeWidgetItem();
   pParent->addChild(p_item);
   this->makeHeading(p_item, text, hLevel);
   return p_item;
 }
 
-void cedar::aux::gui::Configurable::makeHeading(QTreeWidgetItem* pItem, const QString& text, int hLevel)
+void cedar::aux::gui::Configurable::makeHeading(QTreeWidgetItem *pItem, const QString &text, int hLevel)
 {
   pItem->setFirstColumnSpanned(true);
   QFont font = pItem->font(0);
@@ -347,7 +376,7 @@ void cedar::aux::gui::Configurable::makeHeading(QTreeWidgetItem* pItem, const QS
   switch (hLevel)
   {
     case 1:
-      font.setWeight( QFont::Light );
+      font.setWeight(QFont::Light);
       font.setPointSize(font.pointSize() + 3 - hLevel);
       break;
     case 2:
@@ -357,7 +386,7 @@ void cedar::aux::gui::Configurable::makeHeading(QTreeWidgetItem* pItem, const QS
       pItem->setForeground(0, this->palette().brush(QPalette::Light));
       break;
     case 3:
-      font.setPointSize(font.pointSize() - 1 );
+      font.setPointSize(font.pointSize() - 1);
       pItem->setTextAlignment(0, Qt::AlignLeft | Qt::AlignVCenter);
       break;
     default:
@@ -374,7 +403,8 @@ void cedar::aux::gui::Configurable::display(std::vector<cedar::aux::Configurable
 {
   this->clear();
 
-  this->mpPropertyTree->setItemDelegateForColumn(PARAMETER_EDITOR_COLUMN, new cedar::aux::gui::Configurable::DataDelegate(this, false));
+  this->mpPropertyTree->setItemDelegateForColumn(PARAMETER_EDITOR_COLUMN,
+                                                 new cedar::aux::gui::Configurable::DataDelegate(this, false));
 
   for (auto configurable : configurables)
   {
@@ -385,8 +415,9 @@ void cedar::aux::gui::Configurable::display(std::vector<cedar::aux::Configurable
 void cedar::aux::gui::Configurable::display(cedar::aux::ConfigurablePtr configurable, bool readOnly)
 {
   this->clear();
-  
-  this->mpPropertyTree->setItemDelegateForColumn(PARAMETER_EDITOR_COLUMN, new cedar::aux::gui::Configurable::DataDelegate(this, readOnly));
+
+  this->mpPropertyTree->setItemDelegateForColumn(PARAMETER_EDITOR_COLUMN,
+                                                 new cedar::aux::gui::Configurable::DataDelegate(this, readOnly));
 
   this->appendRootConfigurable(configurable);
 }
@@ -401,10 +432,9 @@ void cedar::aux::gui::Configurable::appendRootConfigurable(cedar::aux::Configura
   auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(configurable);
   if (step)
   {
-    type_name= type_name.substr( type_name.rfind(":") + 1 );
-  }
-  else
-#endif      
+    type_name = type_name.substr(type_name.rfind(":") + 1);
+  } else
+#endif
   {
     type_name = cedar::aux::replace(type_name, "::", ".");
   }
@@ -413,38 +443,37 @@ void cedar::aux::gui::Configurable::appendRootConfigurable(cedar::aux::Configura
   p_item->setExpanded(true);
   //Debug Change Layout:
 
-
-
   this->mpPropertyTree->setRootIsDecorated(false);
 
   this->append(index, configurable, p_item, std::string());
 
   this->mParameterAddedConnection = configurable->connectToParameterAddedSignal
-                                    (
-                                      boost::bind
-                                      (
-                                        &cedar::aux::gui::Configurable::translateParameterAddedSignal,
-                                        this,
-                                        index,
-                                        _1
-                                      )
-                                    );
+          (
+                  boost::bind
+                          (
+                                  &cedar::aux::gui::Configurable::translateParameterAddedSignal,
+                                  this,
+                                  index,
+                                  _1
+                          )
+          );
 
   this->mParameterRemovedConnection = configurable->connectToParameterRemovedSignal
-                                      (
-                                        boost::bind
-                                        (
-                                          &cedar::aux::gui::Configurable::translateParameterRemovedSignal,
-                                          this,
-                                          index,
-                                          _1
-                                        )
-                                      );
+          (
+                  boost::bind
+                          (
+                                  &cedar::aux::gui::Configurable::translateParameterRemovedSignal,
+                                  this,
+                                  index,
+                                  _1
+                          )
+          );
 }
 
-void cedar::aux::gui::Configurable::append(size_t configurableIndex, cedar::aux::ConfigurablePtr configurable, QTreeWidgetItem* pItem, const std::string& pathSoFar)
+void cedar::aux::gui::Configurable::append(size_t configurableIndex, cedar::aux::ConfigurablePtr configurable,
+                                           QTreeWidgetItem *pItem, const std::string &pathSoFar)
 {
-  QTreeWidgetItem* advanced_node = new QTreeWidgetItem();
+  QTreeWidgetItem *advanced_node = new QTreeWidgetItem();
   // the advanced node needs to be added here already as some properties (e.g., setFirstColumnSpanned) will otherwise not work
   pItem->addChild(advanced_node);
   this->makeHeading(advanced_node, "advanced", 3);
@@ -462,7 +491,7 @@ void cedar::aux::gui::Configurable::append(size_t configurableIndex, cedar::aux:
 
   for (auto name_child_pair : configurable->configurableChildren())
   {
-    const std::string& child_name = name_child_pair.first;
+    const std::string &child_name = name_child_pair.first;
     cedar::aux::ConfigurablePtr child = name_child_pair.second;
 
     std::string path = pathSoFar;
@@ -472,7 +501,7 @@ void cedar::aux::gui::Configurable::append(size_t configurableIndex, cedar::aux:
     }
     path += child_name;
 
-    QTreeWidgetItem* parent_node = pItem;
+    QTreeWidgetItem *parent_node = pItem;
     if (child->isAdvanced())
     {
       parent_node = advanced_node;
@@ -489,7 +518,8 @@ void cedar::aux::gui::Configurable::append(size_t configurableIndex, cedar::aux:
   }
 }
 
-void cedar::aux::gui::Configurable::append(size_t configurableIndex, cedar::aux::ParameterPtr parameter, QTreeWidgetItem* pNode, const std::string& pathSoFar)
+void cedar::aux::gui::Configurable::append(size_t configurableIndex, cedar::aux::ParameterPtr parameter,
+                                           QTreeWidgetItem *pNode, const std::string &pathSoFar)
 {
   if (parameter->isHidden())
   {
@@ -497,16 +527,16 @@ void cedar::aux::gui::Configurable::append(size_t configurableIndex, cedar::aux:
   }
 
   this->mParameterRenamedConnections[parameter.get()] =
-                  parameter->connectToNameChangedSignal
+          parameter->connectToNameChangedSignal
                   (
-                    boost::bind
-                    (
-                      &cedar::aux::gui::Configurable::translateParameterNameChangedSignal,
-                      this,
-                      configurableIndex,
-                      _1,
-                      _2
-                    )
+                          boost::bind
+                                  (
+                                          &cedar::aux::gui::Configurable::translateParameterNameChangedSignal,
+                                          this,
+                                          configurableIndex,
+                                          _1,
+                                          _2
+                                  )
                   );
 
   std::string path = pathSoFar;
@@ -516,7 +546,7 @@ void cedar::aux::gui::Configurable::append(size_t configurableIndex, cedar::aux:
   }
   path += parameter->getName();
 
-  ParameterItem* parameter_item = new ParameterItem(parameter, path);
+  ParameterItem *parameter_item = new ParameterItem(parameter, path);
   pNode->addChild(parameter_item);
   this->mpPropertyTree->openPersistentEditor(parameter_item, PARAMETER_EDITOR_COLUMN);
   this->updateChangeState(parameter_item, parameter.get(), true);
@@ -531,7 +561,7 @@ void cedar::aux::gui::Configurable::append(size_t configurableIndex, cedar::aux:
     QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(objectParameterValueChanged()));
     parameter_item->setExpanded(true);
   }
-  // check if parameter is an object list parameter
+    // check if parameter is an object list parameter
   else if (parameter->canHaveConfigurableChildren())
   {
     QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(objectListParameterValueChanged()));
@@ -541,12 +571,12 @@ void cedar::aux::gui::Configurable::append(size_t configurableIndex, cedar::aux:
 }
 
 void cedar::aux::gui::Configurable::appendObjectListParameter
-(
-  size_t configurableIndex,
-  cedar::aux::ParameterPtr objectListParameter,
-  QTreeWidgetItem* pParent,
-  const std::string& path
-)
+        (
+                size_t configurableIndex,
+                cedar::aux::ParameterPtr objectListParameter,
+                QTreeWidgetItem *pParent,
+                const std::string &path
+        )
 {
   for (size_t i = 0; i < objectListParameter->getNumberOfConfigurableChildren(); ++i)
   {
@@ -558,25 +588,26 @@ void cedar::aux::gui::Configurable::appendObjectListParameter
     {
       configurableType = " (Gauss)";
 
-    } else if(boost::dynamic_pointer_cast<cedar::aux::kernel::Box>(configurable))
+    } else if (boost::dynamic_pointer_cast<cedar::aux::kernel::Box>(configurable))
     {
       configurableType = " (Box)";
     }
 
-    QString label =QString::fromStdString(objectListParameter->getName()+" [")+QString::number(i)+QString::fromStdString("]"+configurableType);
+    QString label = QString::fromStdString(objectListParameter->getName() + " [") + QString::number(i) +
+                    QString::fromStdString("]" + configurableType);
     auto sub_item = this->appendHeading(pParent, label, 2);
 
     //Build a widget that contains a placeholder and the deletebutton!
     int margins = 0;
     int spacing = 2;
     int button_size = 20;
-    QWidget* objectListHeadingWidget = new QWidget();
+    QWidget *objectListHeadingWidget = new QWidget();
     QGridLayout *p_layout = new QGridLayout();
     p_layout->setContentsMargins(margins, margins, margins, margins);
     p_layout->setSpacing(spacing);
     objectListHeadingWidget->setLayout(p_layout);
     //This is just the placeholder. Other Solutions are probably better practice, but this works.
-    QLabel* placeHolderLabel = new QLabel();
+    QLabel *placeHolderLabel = new QLabel();
     p_layout->addWidget(placeHolderLabel, 0, 0);
 
     //The deletebutton
@@ -584,17 +615,18 @@ void cedar::aux::gui::Configurable::appendObjectListParameter
     delButton->setToolTip("Remove this kernel");
     delButton->setMaximumWidth(button_size);
     delButton->setFlat(true);
-    delButton->setStyleSheet("QPushButton{ qproperty-icon: url(:/cedar/auxiliaries/gui/clear.svg); } QPushButton:hover{qproperty-icon: url(:/cedar/auxiliaries/gui/clear_white.svg); }"); // The hover part has no effect unfortunately
+    delButton->setStyleSheet(
+            "QPushButton{ qproperty-icon: url(:/cedar/auxiliaries/gui/clear.svg); } QPushButton:hover{qproperty-icon: url(:/cedar/auxiliaries/gui/clear_white.svg); }"); // The hover part has no effect unfortunately
 //    delButton->setStyleSheet("QPushButton{ border-image: url(:/cedar/auxiliaries/gui/delete.svg); } QPushButton:hover{border-image:url(:/cedar/auxiliaries/gui/delete_white.svg); }"); //Hover works here, but the button is stretched...
     p_layout->addWidget(delButton, 0, 1);
 
     // Set up the correct Signal Linking using a signalMapper
     QObject::connect(delButton, SIGNAL(clicked()), delButtonSignalMapper, SLOT(map()));
-    QString pathLabel = QString::fromStdString(path)+"#"+QString::number(i);
+    QString pathLabel = QString::fromStdString(path) + "#" + QString::number(i);
     delButtonSignalMapper->setMapping(delButton, pathLabel);
 
     //Add the buttons widget at the sub_item_position
-    this->mpPropertyTree->setItemWidget(sub_item,1,objectListHeadingWidget);
+    this->mpPropertyTree->setItemWidget(sub_item, 1, objectListHeadingWidget);
     //End of Adding the KerneldeleteButton
 
     this->append(configurableIndex, configurable, sub_item, subpath);
@@ -610,40 +642,38 @@ void cedar::aux::gui::Configurable::handleDeleteButtonClicked(QString fullPath)
     //String Splitting at #
     std::vector<std::string> splitOutput;
     std::string::size_type prev_pos = 0, pos = 0;
-    while((pos = path.find('#', pos)) != std::string::npos)
+    while ((pos = path.find('#', pos)) != std::string::npos)
     {
-      std::string substring( path.substr(prev_pos, pos-prev_pos) );
+      std::string substring(path.substr(prev_pos, pos - prev_pos));
       splitOutput.push_back(substring);
       prev_pos = ++pos;
     }
-    splitOutput.push_back(path.substr(prev_pos, pos-prev_pos));
+    splitOutput.push_back(path.substr(prev_pos, pos - prev_pos));
 
-    if(splitOutput.size() == 2)
+    if (splitOutput.size() == 2)
     {
       int index = boost::lexical_cast<int>(splitOutput[1]);
       std::string parameterPath = splitOutput[0];
       auto parameter = this->mDisplayedConfigurables[i]->getParameter(parameterPath);
-      if(auto objectListParameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
+      if (auto objectListParameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
       {
         objectListParameter->removeObject(index);
-      }
-      else
+      } else
       {
-        std::cout<<"We did not get the right objectlistParameter :("<<std::endl;
+        std::cout << "We did not get the right objectlistParameter :(" << std::endl;
       }
-    }
-    else
+    } else
     {
-      std::cout<<"The name seems to contain a #, this caused the splitting of the path in " << splitOutput.size() << " parts" << std::endl;
+      std::cout << "The name seems to contain a #, this caused the splitting of the path in " << splitOutput.size()
+                << " parts" << std::endl;
     }
   }
 }
 
 
-
 void cedar::aux::gui::Configurable::objectListParameterValueChanged()
 {
-  auto p_parameter = dynamic_cast<cedar::aux::Parameter*>(QObject::sender());
+  auto p_parameter = dynamic_cast<cedar::aux::Parameter *>(QObject::sender());
   CEDAR_DEBUG_ASSERT(p_parameter != nullptr);
   CEDAR_DEBUG_ASSERT(p_parameter->canHaveConfigurableChildren());
 
@@ -652,10 +682,11 @@ void cedar::aux::gui::Configurable::objectListParameterValueChanged()
   if (item == nullptr)
   {
     cedar::aux::LogSingleton::getInstance()->debugMessage
-    (
-      "Could not update object parameter \"" + p_parameter->getName() + "\": corresponding item not found.",
-      "void cedar::aux::gui::Configurable::objectListParameterValueChanged()"
-    );
+            (
+                    "Could not update object parameter \"" + p_parameter->getName() +
+                    "\": corresponding item not found.",
+                    "void cedar::aux::gui::Configurable::objectListParameterValueChanged()"
+            );
     return;
   }
 
@@ -673,7 +704,7 @@ void cedar::aux::gui::Configurable::objectListParameterValueChanged()
 
 void cedar::aux::gui::Configurable::objectParameterValueChanged()
 {
-  auto p_parameter = dynamic_cast<cedar::aux::Parameter*>(QObject::sender());
+  auto p_parameter = dynamic_cast<cedar::aux::Parameter *>(QObject::sender());
   CEDAR_DEBUG_ASSERT(p_parameter != nullptr);
   CEDAR_DEBUG_ASSERT(p_parameter->hasSingleConfigurableChild());
 
@@ -682,10 +713,11 @@ void cedar::aux::gui::Configurable::objectParameterValueChanged()
   if (item == nullptr)
   {
     cedar::aux::LogSingleton::getInstance()->debugMessage
-    (
-      "Could not update object parameter \"" + p_parameter->getName() + "\": corresponding item not found.",
-      "void cedar::aux::gui::Configurable::parameterChangeFlagChanged()"
-    );
+            (
+                    "Could not update object parameter \"" + p_parameter->getName() +
+                    "\": corresponding item not found.",
+                    "void cedar::aux::gui::Configurable::parameterChangeFlagChanged()"
+            );
     return;
   }
 
@@ -696,19 +728,20 @@ void cedar::aux::gui::Configurable::objectParameterValueChanged()
     this->disconnect(child_item);
     item->removeChild(child_item);
   }
-  
+
   size_t i = static_cast<size_t>(this->getRootIndexForItem(item));
   this->append(i, p_parameter->getSingleConfigurableChild(), item, this->getPathFromItem(item).toStdString());
 }
 
-QString cedar::aux::gui::Configurable::getPathFromItem(QTreeWidgetItem* item)
+QString cedar::aux::gui::Configurable::getPathFromItem(QTreeWidgetItem *item)
 {
   return item->data(PARAMETER_EDITOR_COLUMN, Qt::UserRole).toString();
 }
 
-void cedar::aux::gui::Configurable::disconnect(QTreeWidgetItem* item)
+void cedar::aux::gui::Configurable::disconnect(QTreeWidgetItem *item)
 {
-  auto parameter = static_cast<cedar::aux::Parameter*>(item->data(PARAMETER_NAME_COLUMN, Qt::UserRole).value<void*>());
+  auto parameter = static_cast<cedar::aux::Parameter *>(item->data(PARAMETER_NAME_COLUMN,
+                                                                   Qt::UserRole).value<void *>());
   if (parameter != nullptr)
   {
     QObject::disconnect(parameter, SIGNAL(changedFlagChanged()), this, SLOT(parameterChangeFlagChanged()));
@@ -716,8 +749,7 @@ void cedar::aux::gui::Configurable::disconnect(QTreeWidgetItem* item)
     if (parameter->hasSingleConfigurableChild())
     {
       QObject::disconnect(parameter, SIGNAL(valueChanged()), this, SLOT(objectParameterValueChanged()));
-    }
-    else if (parameter->canHaveConfigurableChildren())
+    } else if (parameter->canHaveConfigurableChildren())
     {
       QObject::disconnect(parameter, SIGNAL(valueChanged()), this, SLOT(objectListParameterValueChanged()));
     }
@@ -733,7 +765,7 @@ void cedar::aux::gui::Configurable::clear()
   }
 
   this->mpPropertyTree->clear();
-  QAbstractItemDelegate * p_delegate = this->mpPropertyTree->itemDelegateForColumn(PARAMETER_EDITOR_COLUMN);
+  QAbstractItemDelegate *p_delegate = this->mpPropertyTree->itemDelegateForColumn(PARAMETER_EDITOR_COLUMN);
   if (p_delegate != nullptr)
   {
     delete p_delegate;
@@ -752,7 +784,7 @@ void cedar::aux::gui::Configurable::clear()
 
 void cedar::aux::gui::Configurable::parameterChangeFlagChanged()
 {
-  cedar::aux::Parameter *p_parameter = dynamic_cast<cedar::aux::Parameter*>(QObject::sender());
+  cedar::aux::Parameter *p_parameter = dynamic_cast<cedar::aux::Parameter *>(QObject::sender());
   CEDAR_DEBUG_ASSERT(p_parameter != nullptr);
 
   auto item = this->getItemForParameter(p_parameter);
@@ -760,25 +792,25 @@ void cedar::aux::gui::Configurable::parameterChangeFlagChanged()
   if (item != nullptr)
   {
     this->updateChangeState(item, p_parameter, false);
-  }
-  else
+  } else
   {
     cedar::aux::LogSingleton::getInstance()->debugMessage
-    (
-      "Could not update changed state of parameter \"" + p_parameter->getName() + "\": corresponding item not found.",
-      "void cedar::aux::gui::Configurable::parameterChangeFlagChanged()"
-    );
+            (
+                    "Could not update changed state of parameter \"" + p_parameter->getName() +
+                    "\": corresponding item not found.",
+                    "void cedar::aux::gui::Configurable::parameterChangeFlagChanged()"
+            );
   }
 }
 
-QTreeWidgetItem* cedar::aux::gui::Configurable::getItemForParameter(cedar::aux::Parameter* parameter)
+QTreeWidgetItem *cedar::aux::gui::Configurable::getItemForParameter(cedar::aux::Parameter *parameter)
 {
   CEDAR_DEBUG_ASSERT(parameter != nullptr);
 
   for (QTreeWidgetItemIterator iter(this->mpPropertyTree); *iter != nullptr; ++iter)
   {
     auto item = *iter;
-    if (item->data(PARAMETER_NAME_COLUMN, Qt::UserRole).value<void*>() == static_cast<void*>(parameter))
+    if (item->data(PARAMETER_NAME_COLUMN, Qt::UserRole).value<void *>() == static_cast<void *>(parameter))
     {
       return item;
     }
@@ -787,7 +819,7 @@ QTreeWidgetItem* cedar::aux::gui::Configurable::getItemForParameter(cedar::aux::
   return nullptr;
 }
 
-void cedar::aux::gui::Configurable::updateLinkState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter)
+void cedar::aux::gui::Configurable::updateLinkState(QTreeWidgetItem *item, cedar::aux::Parameter *pParameter)
 {
   QFont font = item->font(PARAMETER_NAME_COLUMN);
   font.setItalic(pParameter->isLinked());
@@ -800,7 +832,8 @@ void cedar::aux::gui::Configurable::updateLinkState(QTreeWidgetItem* item, cedar
   }
 }
 
-void cedar::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter, bool firstUpdate)
+void cedar::aux::gui::Configurable::updateChangeState(QTreeWidgetItem *item, cedar::aux::Parameter *pParameter,
+                                                      bool firstUpdate)
 {
   QFont font = item->font(PARAMETER_NAME_COLUMN);
   auto name = pParameter->getName();
@@ -838,5 +871,46 @@ void cedar::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* item, ced
 
   font.setKerning(true);
   item->setFont(PARAMETER_NAME_COLUMN, font);
+}
+
+void cedar::aux::gui::Configurable::showContextMenu(const QPoint &pos)
+{
+  ParameterItem *item = dynamic_cast<ParameterItem *>(mpPropertyTree->itemAt(pos));
+  if (!item)
+    return;
+  QMenu context_menu(tr("Context Menu"), this);
+
+  QAction *use_in_copy = context_menu.addAction("use in CoPY");
+  QAction *a = context_menu.exec(mpPropertyTree->viewport()->mapToGlobal(pos));
+  if (a == use_in_copy)
+  {
+    cedar::aux::Configurable* owner = item->getParameter()->getOwner();
+    while(owner != nullptr)
+    {
+      if (auto step = dynamic_cast<cedar::proc::Step*>(owner))
+      {
+        break;
+      }
+      owner = owner->getParent();
+    }
+    if(owner == nullptr)
+    {
+      return;
+    }
+    auto step = dynamic_cast<cedar::proc::Step*>(owner);
+
+    std::string paramName = step->findParameterPath(item->getParameter());
+    std::string groupName = (step->getGroup()->isRoot())?"root" : step->getGroup()->getName();
+    std::string stepName = step->getName();
+
+    //get CoPYWidget and append
+    QObject* object = this;
+    while(object->parent()){
+      object = object->parent();
+    }
+    if(auto copyWidget = object->findChild<cedar::proc::gui::CoPYWidget*>("mpCopy")){
+      copyWidget->appendToConsole("py.setParameter(\"" + groupName + "." + stepName + "\",\"" + paramName +"\", VALUE)\n");
+    }
+  }
 }
 

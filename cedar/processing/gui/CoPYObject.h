@@ -46,13 +46,16 @@ public:
   //!@brief copy StepConfiguration from source to target
   void copyTo(const QString &fromStep, const QString &targetStep);
 
+  //!@brief set specific parameter of given elementString
+  void setParameter(const QString &elem, const QString &param, const QVariant &value);
+
   cedar::proc::GroupPtr _mpGroup;
 
   cedar::proc::GroupPtr _mpRootGroup;
 
   cedar::proc::gui::Scene* _mpScene;
 private:
-  cedar::proc::StepPtr getStepByName(const std::string& stepId);
+  cedar::proc::StepPtr getStepByName(const std::string& groupId, const std::string& stepId);
   cedar::proc::GroupPtr getGroupByName(const std::string& name);
 };
 
@@ -100,5 +103,9 @@ public Q_SLOTS:
   { o->createGroup(groupId, x, y, amount); }
 
   void copy(CoPYObject *o, const QString &source, const QVariant &target);
+
+  void setParameter(CoPYObject *o, const QString &elem, const QString &param, const QVariant& value){
+    o->setParameter(elem, param, value);
+  };
 };
 #endif //CEDAR_PROC_GUI_COPY_OBJECT_H

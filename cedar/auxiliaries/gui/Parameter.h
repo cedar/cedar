@@ -125,14 +125,19 @@ private slots:
    */
   virtual void valueChanged();
 
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
   //!@brief parameter, which is graphically represented by this instance
   cedar::aux::ParameterPtr mParameter;
+
+
 }; // class cedar::aux::gui::Parameter
 
 CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::gui::ParameterFactory);
