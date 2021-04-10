@@ -46,7 +46,7 @@
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/processing/undoRedo/commands/ChangeParameterValue.h"
-#include "cedar/processing/undoRedo/commands/ChangeNameParameterValue.h"
+//#include "cedar/processing/undoRedo/commands/ChangeNameParameterValue.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>

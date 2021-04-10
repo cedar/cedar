@@ -75,7 +75,8 @@
 #include "Ide.h"
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/undoRedo/UndoStack.h"
-#include "cedar/processing/undoRedo/commands/CreateDeleteStep.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteElement.h"
+#include "cedar/processing/undoRedo/commands/CreateGroupTemplate.h"
 
 // SYSTEM INCLUDES
 #include <QEvent>
@@ -346,6 +347,7 @@ void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
   }
   QPointF mapped = pEvent->scenePos();
   cedar::proc::GroupPtr target_group = this->getGroup();
+
   if (!this->isRootGroup())
   {
     mapped -= this->scenePos();
@@ -354,22 +356,12 @@ void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
   if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration *>(declaration))
   {
     //Push a createDeleteCommand (as a create) onto the UndoStack
-    cedar::proc::gui::Ide::mpUndoStack->push(
-            new cedar::proc::undoRedo::commands::CreateDeleteStep(mapped,elem_declaration->getClassName(),target_group,mpScene,undoRedo::commands::CreateDeleteStep::Action::CREATE)
-    );
-
-  //TODO: Do Group Declaration (with an own Command). This works with Json Templates
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteElement(mapped,elem_declaration->getClassName(),target_group,mpScene,undoRedo::commands::CreateDeleteElement::Action::CREATE));
   }
+  //TODO: Do Group Declaration (with an own Command). This works with Json Templates
   else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration *>(declaration))
   {
-
-    auto elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup
-            (
-                    group_declaration->getClassName(),
-                    target_group,
-                    pEvent->modifiers().testFlag(Qt::ControlModifier)
-            );
-    this->mpScene->getGraphicsItemFor(elem)->setPos(mapped);
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateGroupTemplate(group_declaration, target_group, pEvent, mapped, this->mpScene));
   }
   else
   {

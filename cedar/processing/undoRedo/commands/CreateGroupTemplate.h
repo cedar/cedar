@@ -22,68 +22,53 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CreateDeleteStep.h
+    File:        CreateGroupTemplate.h
 
     Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.rub.de
-    Date:        2020 07 23
+    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
+    Date:        2021 01 20
 
-    Description: Header file for the class cedar::proc::undoRedo::commands::CreateDeleteStep.
+    Description: Header file for the class cedar::proc::undoRedo::commands::CreateGroupTemplate.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_STEP_H
-#define CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_STEP_H
+#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_GROUP_H
+#define CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_GROUP_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/GroupDeclaration.h"
+#include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/undoRedo/UndoCommand.h"
-#include "cedar/processing/gui/Group.h"
-#include "cedar/processing/gui/Element.h"
-#include "cedar/processing/gui/Connectable.h"
-
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/undoRedo/commands/CreateDeleteStep.fwd.h"
-
+#include "cedar/processing/undoRedo/commands/CreateGroupTemplate.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QPointF>
 
-/*! Create/Delete Step
- *
- * Undo/redo command for step creation/deletion
+
+/*!
+ *  Undo/redo command for creating a groupTemplate
  */
-class cedar::proc::undoRedo::commands::CreateDeleteStep : public UndoCommand
+class cedar::proc::undoRedo::commands::CreateGroupTemplate : public UndoCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  //--------------------------------------------------------------------------------------------------------------------
-  // enums
-  //--------------------------------------------------------------------------------------------------------------------
-public:
 
-  enum Action
-  {
-    CREATE,
-    DELETE
-  };
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //Constructor for creating an element
-  CreateDeleteStep(QPointF position,std::string classId, cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene,cedar::proc::undoRedo::commands::CreateDeleteStep::Action action);
-  //Constructor for deleting an element
-  CreateDeleteStep(cedar::proc::gui::Element* element, cedar::proc::gui::Scene* scene, cedar::proc::undoRedo::commands::CreateDeleteStep::Action action);
+  //!@brief The standard constructor.
+  CreateGroupTemplate(const cedar::proc::GroupDeclaration*, cedar::proc::GroupPtr, QGraphicsSceneDragDropEvent *pEvent, QPointF mapped, cedar::proc::gui::Scene* scene);
 
   //!@brief Destructor
-  virtual ~CreateDeleteStep();
+  virtual ~CreateGroupTemplate();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -96,11 +81,12 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void createStep();
-  void deleteStep();
-  void saveStepConfiguration();
-  void loadStepConfiguration();
-  void updateElementName();
+  void createGroupTemplate();
+  void createElement();
+  void deleteGroupTemplate();
+  void saveElementConfiguration();
+  void loadElementConfiguration();
+  void updateElementIdentifier();
   void updateElementAddress();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -115,14 +101,7 @@ private:
 protected:
   // none yet
 private:
-  cedar::aux::ConfigurationNode mElementConfiguration;
-  cedar::proc::gui::Element* mpGuiElement;
-  std::string mElementName;
-  cedar::proc::GroupPtr mpGroup;
-  cedar::proc::gui::Scene* mpScene;
-  std::string mClassId;
-  QPointF mPosition;
-  Action mAction;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -131,9 +110,18 @@ protected:
   // none yet
 
 private:
-  // none yet
+  const cedar::proc::GroupDeclaration* mpGroupDeclaration;
+  cedar::proc::GroupPtr mpTargetGroup;
+  QGraphicsSceneDragDropEvent* mpEvent;
+  cedar::proc::gui::Scene* mpScene;
+  cedar::proc::GroupPtr mpGroup;
+  QPointF mPosition;
+  cedar::aux::ConfigurationNode mElementConfiguration;
+  cedar::proc::gui::Element* mpGuiElement;
+  std::string mElementName;
+  std::string mClassId;
+  bool mIsInitialRedo;
+}; //class cedar::proc::undoRedo::commands::CreateGroupTemplate
 
-};
-
-#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_STEP_H
+#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_GROUP_H
 

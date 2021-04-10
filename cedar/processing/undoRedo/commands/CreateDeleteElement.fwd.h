@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CreateDeleteStep.fwd.h
+    File:        CreateDeleteElement.fwd.h
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
-    Date:        2020 07 23
+    Maintainer:  Yogeshwar Agnihotri
+    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
+    Date:        2021 04 07
 
-    Description: Forward declaration file for the class cedar::proc::undoRedo::commands::CreateDeleteStep.
+    Description: Forward declaration file for the class cedar::proc::undoRedo::commands::CreateDeleteElement.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_STEP_FWD_H
-#define CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_STEP_FWD_H
+#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_ELEMENT_FWD_H
+#define CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_ELEMENT_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -58,7 +58,7 @@ namespace cedar
       namespace commands
       {
         //!@cond SKIPPED_DOCUMENTATION
-        CEDAR_DECLARE_PROC_CLASS(CreateDeleteStep);
+        CEDAR_DECLARE_PROC_CLASS(CreateDeleteElement);
         //!@endcond
       }
     }
@@ -66,5 +66,5 @@ namespace cedar
 }
 
 
-#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_STEP_FWD_H
+#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_ELEMENT_FWD_H
 

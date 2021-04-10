@@ -22,42 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MoveElement.h
+    File:        CreateDeleteElement.h
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
-    Date:        2020 07 23
+    Maintainer:  Yogeshwar Agnihotri
+    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
+    Date:        2021 04 07
 
-    Description: Header file for the class cedar::proc::undoRedo::commands::MoveElement.
+    Description: Header file for the class cedar::proc::undoRedo::commands::CreateDeleteElement.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_MOVE_ELEMENT_H
-#define CEDAR_PROC_UNDO_REDO_COMMANDS_MOVE_ELEMENT_H
+#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_ELEMENT_H
+#define CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_ELEMENT_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/undoRedo/UndoCommand.h"
-#include "cedar/processing/gui/Element.h"
 #include "cedar/processing/gui/Group.h"
+#include "cedar/processing/gui/Element.h"
+#include "cedar/processing/gui/Connectable.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/undoRedo/commands/MoveElement.fwd.h"
-#include "cedar/processing/gui/GraphicsBase.fwd.h"
-#include "cedar/processing/gui/Scene.fwd.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteElement.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QPointF>
 
-/*! Move ELement Command
- *
- * An UndoCommand implementation for moving an element in the scene (e.g. a step)
+/*!
+ *  Undo/redo command for element creation/deletion
  */
-class cedar::proc::undoRedo::commands::MoveElement : public UndoCommand
+class cedar::proc::undoRedo::commands::CreateDeleteElement : public UndoCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -67,11 +65,23 @@ class cedar::proc::undoRedo::commands::MoveElement : public UndoCommand
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  MoveElement(cedar::proc::gui::GraphicsBase* element, const QPointF sourcePosition, cedar::proc::gui::Scene* pScene);
+
+  enum Action
+  {
+    CREATE,
+    DELETE
+  };
+  //--------------------------------------------------------------------------------------------------------------------
+  // constructors and destructor
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //Constructor for creating an element
+  CreateDeleteElement(QPointF position,std::string classId, cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene,cedar::proc::undoRedo::commands::CreateDeleteElement::Action action);
+  //Constructor for deleting an element
+  CreateDeleteElement(cedar::proc::gui::Element* element, cedar::proc::gui::Scene* scene, cedar::proc::undoRedo::commands::CreateDeleteElement::Action action);
 
   //!@brief Destructor
-  virtual ~MoveElement();
+  virtual ~CreateDeleteElement();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -84,8 +94,14 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  void createElement();
+  void deleteElement();
+  void saveElementConfiguration();
+  void loadElementConfiguration();
   void updateElementIdentifier();
   void updateElementAddress();
+  void updateParentGroupAddress();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -98,13 +114,16 @@ private:
 protected:
   // none yet
 private:
-  cedar::proc::gui::GraphicsBase* mpElement;
+  cedar::aux::ConfigurationNode mElementConfiguration;
   cedar::proc::gui::Element* mpGuiElement;
+  std::string mElementIdentifier;
   cedar::proc::GroupPtr mpGroup;
-  std::string mElementName;
-  const QPointF mSourcePosition;
-  const QPointF mTargetPosition;
   cedar::proc::gui::Scene* mpScene;
+  std::string mClassId;
+  std::string mElementName;
+  QPointF mPosition;
+  Action mAction;
+  bool mIsInitialRedo;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -115,7 +134,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::undoRedo::commands::MoveElement
+};// class cedar::proc::undoRedo::commands::CreateDeleteElement
 
-#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_MOVE_ELEMENT_H
+#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_ELEMENT_H
 

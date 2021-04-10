@@ -56,7 +56,7 @@
 #include "cedar/processing/steps/PythonScript.h"
 #include "cedar/processing/undoRedo/commands/MoveElement.h"
 #include "cedar/processing/undoRedo/commands/CreateDeleteConnection.h"
-#include "cedar/processing/undoRedo/commands/CreateDeleteStep.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteElement.h"
 #include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/GroupDeclaration.h"
@@ -310,14 +310,19 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
     //Check if there is any connection to the current item that was NOT in the items list
     if(auto element = dynamic_cast<cedar::proc::gui::Connectable*>(graphics_base))
     {
-      //Get all Input DataSlots of the Element
-      cedar::proc::gui::Connectable::DataSlotNameMap &inputDataSlotMap = element->getSlotItems(
-              cedar::proc::DataRole::INPUT);
-      //Get all Output DataSlots of the Element
-      cedar::proc::gui::Connectable::DataSlotNameMap &outputDataSlotMap = element->getSlotItems(
-              cedar::proc::DataRole::OUTPUT);
+      cedar::proc::gui::Connectable::DataSlotNameMap inputDataSlotMap;
+      if(element->getNumberOfSlotsFor(cedar::proc::DataRole::INPUT) != 0)
+      {
+        //Get all Input DataSlots of the Element
+        inputDataSlotMap = element->getSlotItems(cedar::proc::DataRole::INPUT);
+      }
+      cedar::proc::gui::Connectable::DataSlotNameMap outputDataSlotMap;
+      if(element->getNumberOfSlotsFor(cedar::proc::DataRole::OUTPUT) != 0)
+      {
+        //Get all Output DataSlots of the Element
+        outputDataSlotMap = element->getSlotItems(cedar::proc::DataRole::OUTPUT);
+      }
 
-      std::map<std::string, cedar::proc::gui::DataSlotItem*> test;
 
       //iterate over inputDataSlotMap
       for(std::pair<std::string, cedar::proc::gui::DataSlotItem*> const& nameMap : inputDataSlotMap)
@@ -363,7 +368,7 @@ void cedar::proc::gui::Scene::deleteElement(QGraphicsItem* pItem)
 {
   if (cedar::proc::gui::Element* element = dynamic_cast<cedar::proc::gui::Element*>(pItem))
   {
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteStep(element, this,undoRedo::commands::CreateDeleteStep::Action::DELETE));
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteElement(element, this,undoRedo::commands::CreateDeleteElement::Action::DELETE));
   }
 }
 

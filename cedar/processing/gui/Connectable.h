@@ -353,6 +353,9 @@ public slots:
 
   cedar::proc::gui::Group* getGuiGroup();
 
+  //! Returns the number of slots defined for the given role.
+  unsigned int getNumberOfSlotsFor(cedar::proc::DataRole::Id role) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -468,7 +471,6 @@ protected:
 
   //! Returns the background color for this connectable that was set by the user.
   QColor getBackgroundColor() const;
-
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -498,9 +500,6 @@ private:
   void showTriggerChains();
 
   void hideTriggerChains();
-
-  //! Returns the number of slots defined for the given role.
-  unsigned int getNumberOfSlotsFor(cedar::proc::DataRole::Id role) const;
 
   //! Returns the number of connections on all slots of the given role.
   unsigned int getNumberOfConnections(cedar::proc::DataRole::Id role) const;

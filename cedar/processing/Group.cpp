@@ -2587,6 +2587,19 @@ bool cedar::proc::Group::contains(cedar::proc::ConstElementPtr element) const
   return false;
 }
 
+//TODO: Rename this or function above
+bool cedar::proc::Group::contains(std::string elementName) const
+{
+  for (auto it = mElements.begin(); it != mElements.end(); ++it)
+  {
+    if (!it->first.compare(elementName))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool cedar::proc::Group::isRoot() const
 {
   return !static_cast<bool>(this->getGroup());

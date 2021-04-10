@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MoveElement.cpp
+    File:        CreateGroupTemplate.cpp
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
-    Date:        2020 07 23
+    Maintainer:  Yogeshwar Agnihotri
+    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
+    Date:        2021 01 20
 
-    Description: Source file for the class cedar::proc::undoRedo::commands::MoveElement.
+    Description: Source file for the class cedar::proc::undoRedo::commands::CreateGroupTemplate.
 
     Credits:
 
@@ -38,60 +38,121 @@
 #include "cedar/configuration.h"
 
 // CLASS HEADER
-#include "cedar/processing/undoRedo/commands/MoveElement.h"
+#include "cedar/processing/undoRedo/commands/CreateGroupTemplate.h"
+#include "cedar/processing/gui/Group.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/GraphicsBase.h"
-#include "cedar/processing/gui/Scene.h"
+#include "cedar/processing/GroupDeclarationManager.h"
+#include "cedar/processing/gui/Element.h"
 #include "cedar/processing/Element.h"
-// SYSTEM INCLUDES
+#include "cedar/processing/DeclarationRegistry.h"
 #include <boost/algorithm/string.hpp>
+#include <iostream>
+#include <cstdlib>
 
+// SYSTEM INCLUDES
+#include <QGraphicsSceneDragDropEvent>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::undoRedo::commands::MoveElement::MoveElement(cedar::proc::gui::GraphicsBase* element, const QPointF sourcePosition, cedar::proc::gui::Scene* scene)
+cedar::proc::undoRedo::commands::CreateGroupTemplate::CreateGroupTemplate(const cedar::proc::GroupDeclaration* groupDeclaration, cedar::proc::GroupPtr group, QGraphicsSceneDragDropEvent* pEvent, QPointF mapped, cedar::proc::gui::Scene* scene)
 :
-mpGuiElement(dynamic_cast<cedar::proc::gui::Element *>(element)),
-mSourcePosition(sourcePosition),
-mTargetPosition(element->pos()),
-mpScene(scene)
+mpGroupDeclaration(groupDeclaration),
+mpGroup(group),
+mpEvent(pEvent),
+mPosition(mapped),
+mpScene(scene),
+mIsInitialRedo(true)
 {
-  updateElementIdentifier();
-  setText(QString::fromStdString("Moved element" + mElementName));
 }
 
-cedar::proc::undoRedo::commands::MoveElement::~MoveElement()
+cedar::proc::undoRedo::commands::CreateGroupTemplate::~CreateGroupTemplate()
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-// Move element back to the source
-void cedar::proc::undoRedo::commands::MoveElement::undo()
+void cedar::proc::undoRedo::commands::CreateGroupTemplate::undo()
 {
+  //Before deleting the element update the adress of the element in case it has been changed through a create
   updateElementAddress();
-  if(this->mpGuiElement != nullptr && this->mpScene->items().contains(this->mpGuiElement))
+  if(mpGuiElement != nullptr)
   {
-    this->mpGuiElement->setPos(this->mSourcePosition);
+    //Before deleting the element the configuration has to be saved, so when its created it again in redo, the load old parameter are loaded
+    saveElementConfiguration();
+    //Undo of createElement = deleteElement
+    deleteGroupTemplate();
   }
 }
 
-// Move element to the target
-void cedar::proc::undoRedo::commands::MoveElement::redo()
+void cedar::proc::undoRedo::commands::CreateGroupTemplate::redo()
 {
-  updateElementAddress();
-  if(this->mpGuiElement != nullptr && this->mpScene->items().contains(this->mpGuiElement))
+  //Only create grouptemplate once at inital redo, else just create a normal element and loads its s
+  if(mIsInitialRedo)
   {
-    this->mpGuiElement->setPos(this->mTargetPosition);
+    mIsInitialRedo = false;
+    createGroupTemplate();
+    updateElementIdentifier();
+    //Set name of the element. This name is is only set once, so it can be used to find the element again after deleting and creating it
+    setText(QString::fromStdString("Created GroupTemplate:" + mpGuiElement->getElement()->getName()));
+  }
+  else
+  {
+    updateElementAddress();
+    createElement();
+    //Loadings its old values, that we saved when it was deleted
+    loadElementConfiguration();
+    //Set Name of the Element. This Name is is only set once, so it can be used to find the element again after deleting and creating it
+    updateElementIdentifier();
   }
 }
 
-void cedar::proc::undoRedo::commands::MoveElement::updateElementIdentifier()
+void cedar::proc::undoRedo::commands::CreateGroupTemplate::createGroupTemplate()
+{
+  auto elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup
+          (
+                  mpGroupDeclaration->getClassName(),
+                  mpGroup,
+                  mpEvent->modifiers().testFlag(Qt::ControlModifier)
+          );
+  mpGuiElement = mpScene->getGraphicsItemFor(elem);
+  mpGuiElement->setPos(mPosition);
+  updateElementAddress();
+  mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(elem);
+}
+
+void cedar::proc::undoRedo::commands::CreateGroupTemplate::createElement()
+{
+  cedar::proc::Element* Element = mpScene->createElement(mpGroup,mClassId,mPosition).get();
+  mpGuiElement = mpScene->getGraphicsItemFor(Element);
+}
+
+void cedar::proc::undoRedo::commands::CreateGroupTemplate::deleteGroupTemplate()
+{
+  if(this->mpGuiElement != nullptr && this->mpScene->items().contains(this->mpGuiElement))
+  {
+    mpGuiElement->deleteElement();
+  }
+}
+
+void cedar::proc::undoRedo::commands::CreateGroupTemplate::saveElementConfiguration()
+{
+  mElementConfiguration.clear();
+  mpGuiElement->getElement()->writeConfiguration(mElementConfiguration);
+}
+
+void cedar::proc::undoRedo::commands::CreateGroupTemplate::loadElementConfiguration()
+{
+  if(mElementConfiguration.empty() == false)
+  {
+    mpGuiElement->getElement()->readConfiguration(mElementConfiguration);
+  }
+}
+
+void cedar::proc::undoRedo::commands::CreateGroupTemplate::updateElementIdentifier()
 {
   //Element identifier is 'elementName' if the element is in the rootGroup and 'groupName.elementName' if in a subgroup
 
@@ -111,7 +172,7 @@ void cedar::proc::undoRedo::commands::MoveElement::updateElementIdentifier()
   }
 }
 
-void cedar::proc::undoRedo::commands::MoveElement::updateElementAddress()
+void cedar::proc::undoRedo::commands::CreateGroupTemplate::updateElementAddress()
 {
   //Use the elementIdentifier to find the mpGuiElement in the scene
 
