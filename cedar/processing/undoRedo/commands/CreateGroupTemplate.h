@@ -52,7 +52,7 @@
 
 
 /*!
- *  Undo/redo command for creating a groupTemplate
+ *  Undo/redo command for creating a groupTemplate. This is only for creating a groupTemplate. Once a groupTemplate is created CEDAR treats it as a element so the deletion is managed via CreateDeleteElement class
  */
 class cedar::proc::undoRedo::commands::CreateGroupTemplate : public UndoCommand
 {
@@ -81,14 +81,29 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief Creates a groupTemplate and sets its mpGuiElement, mpGroup and mClassId values
   void createGroupTemplate();
-  void createElement();
-  void deleteGroupTemplate();
-  void saveElementConfiguration();
-  void loadElementConfiguration();
-  void updateElementIdentifier();
-  void updateElementAddress();
 
+  //!@brief Creates a empty element. This is used to redo groupTemplates, since createGroupTemplate is only used once on the initalRedo
+  void createElement();
+
+  //!@brief Deletes the element
+  void deleteGroupTemplate();
+
+  //!@brief Saves the configuration of the element into the configurationNode 'mElementConfiguration'
+  void saveElementConfiguration();
+
+  //!@brief Loads the configuration from the configurationNode 'mElementConfiguration' into mpGuiElement
+  void loadElementConfiguration();
+
+  //!@brief Returns a unique elementIdentifier for a given guiElement. The elementIdentifier is 'group.group...elementName'. If the element is in rootGroup the identifier is simply 'elementName'
+  std::string getElementIdentifier(cedar::proc::gui::Element* guiElement);
+
+  //!@brief Return the address of the guiElement, which is searched via the given elementIdentifier
+  cedar::proc::gui::Element* getElementAddress(std::string elementIdentifier, cedar::proc::gui::Scene* scene);
+
+  //!@brief Return the address of the group of the guiElement, which is searched via the given elementIdentifier
+  cedar::proc::GroupPtr getElementGroupAddress(std::string elementIdentifier, cedar::proc::gui::Scene* scene);
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -118,7 +133,7 @@ private:
   QPointF mPosition;
   cedar::aux::ConfigurationNode mElementConfiguration;
   cedar::proc::gui::Element* mpGuiElement;
-  std::string mElementName;
+  std::string mElementIdentifier;
   std::string mClassId;
   bool mIsInitialRedo;
 }; //class cedar::proc::undoRedo::commands::CreateGroupTemplate

@@ -75,9 +75,10 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //Constructor for creating an element
+  //!@brief Constructor for creating an element
   CreateDeleteElement(QPointF position,std::string classId, cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene,cedar::proc::undoRedo::commands::CreateDeleteElement::Action action);
-  //Constructor for deleting an element
+
+  //!@brief Constructor for deleting an element
   CreateDeleteElement(cedar::proc::gui::Element* element, cedar::proc::gui::Scene* scene, cedar::proc::undoRedo::commands::CreateDeleteElement::Action action);
 
   //!@brief Destructor
@@ -88,19 +89,33 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   void undo();
+
   void redo();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief Creates an element and sets its mpGuiElement
   void createElement();
+
+  //!@brief Deletes an element
   void deleteElement();
+
+  //!@brief Saves the configuration of the element into the configurationNode 'mElementConfiguration'
   void saveElementConfiguration();
+
+  //!@brief Loads the configuration from the configurationNode 'mElementConfiguration' into mpGuiElement
   void loadElementConfiguration();
-  void updateElementIdentifier();
-  void updateElementAddress();
-  void updateParentGroupAddress();
+
+  //!@brief Returns a unique elementIdentifier for a given guiElement. The elementIdentifier is 'group.group...elementName'. If the element is in rootGroup the identifier is simply 'elementName'
+  std::string getElementIdentifier(cedar::proc::gui::Element* guiElement);
+
+  //!@brief Return the address of the guiElement, which is searched via the given elementIdentifier
+  cedar::proc::gui::Element* getElementAddress(std::string elementIdentifier, cedar::proc::gui::Scene* scene);
+
+  //!@brief Return the address of the group of the guiElement, which is searched via the given elementIdentifier
+  cedar::proc::GroupPtr getElementGroupAddress(std::string elementIdentifier, cedar::proc::gui::Scene* scene);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -114,13 +129,12 @@ private:
 protected:
   // none yet
 private:
-  cedar::aux::ConfigurationNode mElementConfiguration;
   cedar::proc::gui::Element* mpGuiElement;
   std::string mElementIdentifier;
   cedar::proc::GroupPtr mpGroup;
+  cedar::aux::ConfigurationNode mElementConfiguration;
   cedar::proc::gui::Scene* mpScene;
   std::string mClassId;
-  std::string mElementName;
   QPointF mPosition;
   Action mAction;
   bool mIsInitialRedo;

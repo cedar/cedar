@@ -59,8 +59,8 @@ mSourcePosition(sourcePosition),
 mTargetPosition(element->pos()),
 mpScene(scene)
 {
-  updateElementIdentifier();
-  setText(QString::fromStdString("Moved element" + mElementName));
+  mElementIdentifier = getElementIdentifier(mpGuiElement);
+  setText(QString::fromStdString("Moved element" + mElementIdentifier));
 }
 
 cedar::proc::undoRedo::commands::MoveElement::~MoveElement()
@@ -74,7 +74,8 @@ cedar::proc::undoRedo::commands::MoveElement::~MoveElement()
 // Move element back to the source
 void cedar::proc::undoRedo::commands::MoveElement::undo()
 {
-  updateElementAddress();
+  mpGuiElement = getElementAddress(mElementIdentifier,mpScene);
+
   if(this->mpGuiElement != nullptr && this->mpScene->items().contains(this->mpGuiElement))
   {
     this->mpGuiElement->setPos(this->mSourcePosition);
@@ -84,41 +85,39 @@ void cedar::proc::undoRedo::commands::MoveElement::undo()
 // Move element to the target
 void cedar::proc::undoRedo::commands::MoveElement::redo()
 {
-  updateElementAddress();
+  mpGuiElement = getElementAddress(mElementIdentifier,mpScene);
+
   if(this->mpGuiElement != nullptr && this->mpScene->items().contains(this->mpGuiElement))
   {
     this->mpGuiElement->setPos(this->mTargetPosition);
   }
 }
 
-void cedar::proc::undoRedo::commands::MoveElement::updateElementIdentifier()
+std::string cedar::proc::undoRedo::commands::MoveElement::getElementIdentifier(cedar::proc::gui::Element* guiElement)
 {
-  //Element identifier is 'elementName' if the element is in the rootGroup and 'groupName.elementName' if in a subgroup
-
   //Get parentItem of the element
-  QGraphicsItem* parentItem = mpGuiElement->parentItem();
-  mElementName = mpGuiElement->getElement()->getName();
+  QGraphicsItem* parentItem = guiElement->parentItem();
+  std::string elementName = guiElement->getElement()->getName();
 
   while(parentItem != nullptr)
   {
-    if (cedar::proc::gui::Group* group = dynamic_cast<cedar::proc::gui::Group *>(parentItem))
+    if (cedar::proc::gui::Group* group = dynamic_cast<cedar::proc::gui::Group*>(parentItem))
     {
       std::string groupName = group->getGroup()->getName();
-      mElementName = groupName + "." + mElementName;
+      elementName = groupName + "." + elementName;
     }
     //Get the next parentItem of the parentItem before.
     parentItem = parentItem->parentItem();
   }
+  return elementName;
 }
 
-void cedar::proc::undoRedo::commands::MoveElement::updateElementAddress()
+cedar::proc::gui::Element* cedar::proc::undoRedo::commands::MoveElement::getElementAddress(std::string elementIdentifier, cedar::proc::gui::Scene* scene)
 {
-  //Use the elementIdentifier to find the mpGuiElement in the scene
-
   std::vector<std::string> mElementNameSplitted;
-  boost::split(mElementNameSplitted, mElementName, boost::is_any_of("."));
+  boost::split(mElementNameSplitted, elementIdentifier, boost::is_any_of("."));
 
-  cedar::proc::gui::GroupPtr rootGroup = this->mpScene->getRootGroup();
+  cedar::proc::gui::GroupPtr rootGroup = scene->getRootGroup();
 
   cedar::proc::gui::Group* currentGroup = rootGroup.get();
   //Go through all subgroups
@@ -128,25 +127,24 @@ void cedar::proc::undoRedo::commands::MoveElement::updateElementAddress()
     {
       if (cedar::proc::ElementPtr element = currentGroup->getGroup()->getElement(mElementNameSplitted[i]))
       {
-        cedar::proc::gui::Element *guiElement = mpScene->getGraphicsItemFor(element);
-        if (cedar::proc::gui::Group *group = dynamic_cast<cedar::proc::gui::Group *>(guiElement))
+        cedar::proc::gui::Element* guiElement = scene->getGraphicsItemFor(element);
+        if (cedar::proc::gui::Group* group = dynamic_cast<cedar::proc::gui::Group*>(guiElement))
         {
           currentGroup = group;
-          //Update the group adress. Could have been changed
-          this->mpGroup = currentGroup->getGroup();
         }
       }
     }
   }
 
-  //Set the mpGuiElement
+  //Set the guiElement
   if(currentGroup->getGroup()->contains(mElementNameSplitted[mElementNameSplitted.size() - 1]))
   {
+    //Search in the group of the element
     if (cedar::proc::ElementPtr element = currentGroup->getGroup()->getElement(mElementNameSplitted[mElementNameSplitted.size() - 1]))
     {
-      if (cedar::proc::gui::Element *guiElement = mpScene->getGraphicsItemFor(element))
+      if (cedar::proc::gui::Element* guiElement = scene->getGraphicsItemFor(element))
       {
-        mpGuiElement = guiElement;
+        return guiElement;
       }
     }
   }

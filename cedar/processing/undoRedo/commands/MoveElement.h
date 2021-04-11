@@ -53,9 +53,7 @@
 // SYSTEM INCLUDES
 #include <QPointF>
 
-/*! Move ELement Command
- *
- * An UndoCommand implementation for moving an element in the scene (e.g. a step)
+/*! Move element command. An UndoCommand implementation for moving an element in the scene (e.g. a step)
  */
 class cedar::proc::undoRedo::commands::MoveElement : public UndoCommand
 {
@@ -84,8 +82,11 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void updateElementIdentifier();
-  void updateElementAddress();
+  //!@brief Returns a unique elementIdentifier for a given guiElement. The elementIdentifier is 'group.group...elementName'. If the element is in rootGroup the identifier is simply 'elementName'
+  std::string getElementIdentifier(cedar::proc::gui::Element* guiElement);
+
+  //!@brief Return the address of the guiElement, which is searched via the given elementIdentifier
+  cedar::proc::gui::Element* getElementAddress(std::string elementIdentifier, cedar::proc::gui::Scene* scene);
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -101,7 +102,7 @@ private:
   cedar::proc::gui::GraphicsBase* mpElement;
   cedar::proc::gui::Element* mpGuiElement;
   cedar::proc::GroupPtr mpGroup;
-  std::string mElementName;
+  std::string mElementIdentifier;
   const QPointF mSourcePosition;
   const QPointF mTargetPosition;
   cedar::proc::gui::Scene* mpScene;
