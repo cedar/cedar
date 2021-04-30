@@ -236,6 +236,14 @@ public:
    */
   const TriggerMap& getTriggerMap() const;
 
+  /*!@brief Returns gui element using the full path.
+   */
+  cedar::proc::gui::Element* getElementByFullPath(std::string elementIdentifier);
+
+  /*!@brief Returns the group of the E
+   */
+  cedar::proc::GroupPtr getGroupOfElementByFullPath(std::string elementIdentifier);
+
   /*!@brief Returns the gui::group that displays the given group.
    */
   cedar::proc::gui::Group* getGroupFor(cedar::proc::ConstGroup* group);
