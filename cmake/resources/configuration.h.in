@@ -47,6 +47,7 @@
 #cmakedefine CEDAR_USE_FFTW_THREADED
 #cmakedefine CEDAR_USE_LIB_DC1394
 #cmakedefine CEDAR_USE_YARP
+#cmakedefine CEDAR_USE_REALSENSE
 #cmakedefine CEDAR_USE_QGLVIEWER
 
 #cmakedefine CEDAR_USE_VTK
