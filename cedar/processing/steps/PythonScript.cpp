@@ -1211,7 +1211,7 @@ void cedar::proc::steps::PythonScript::freePythonVariables() {
   Py_DecRef(poAttrList);
 }
 
-void cedar::proc::steps::PythonScript::executePythonScript()
+void cedar::proc::steps::PythonScript::executePythonScript(bool use_lock)
 {
   mutex.lock();
 
@@ -1240,9 +1240,6 @@ void cedar::proc::steps::PythonScript::executePythonScript()
       cedar::aux::ConstDataPtr inputMatrixPointer = this->getInputSlot(makeInputSlotName(i))->getData();
       if(inputMatrixPointer != 0)
       {
-        // Lock input matrix
-        auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(inputMatrixPointer);
-        QReadLocker input_l(&mat_data->getLock());
         try
         {
           if(pColorSpaceAnnotation == nullptr)
@@ -1254,10 +1251,22 @@ void cedar::proc::steps::PythonScript::executePythonScript()
         {
           pColorSpaceAnnotation = nullptr;
         }
-        cv::Mat inputMatrix = mat_data->getData().clone();
 
-        // Unlock input matrix
-        input_l.unlock();
+        auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(inputMatrixPointer);
+        cv::Mat inputMatrix;
+
+        if (use_lock)
+        {
+          // Lock input matrix
+          // (do not lock when calling from compute())
+          QReadLocker input_l(&mat_data->getLock());
+          inputMatrix = mat_data->getData().clone();
+        }
+        else
+        {
+          inputMatrix = mat_data->getData().clone();
+        }
+
         // Convert input matrix to numpy array
         PyObject* inputMatrix_np = cvt.toNDArray(inputMatrix);
         // Include it to Python
@@ -1504,7 +1513,7 @@ void cedar::proc::steps::PythonScript::compute(const cedar::proc::Arguments&)
 {
   if(!this->mIsExecuting)
   {
-    executePythonScript();
+    executePythonScript(false);
   }
 }
 
@@ -1512,7 +1521,7 @@ void cedar::proc::steps::PythonScript::compute(const cedar::proc::Arguments&)
 void cedar::proc::steps::PythonScript::executeButtonClicked(){
   if(!this->mIsExecuting)
   {
-    executePythonScript();
+    executePythonScript(true);
   }
 }
 

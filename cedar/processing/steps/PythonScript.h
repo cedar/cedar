@@ -160,7 +160,7 @@ protected:
 private:
 
   void compute(const cedar::proc::Arguments&);
-  void executePythonScript();
+  void executePythonScript(bool use_lock);
 
   void freePythonVariables();
 
