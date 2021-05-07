@@ -1682,7 +1682,8 @@ void cedar::proc::gui::Group::writeScene(cedar::aux::ConfigurationNode &root) co
 {
   cedar::aux::ConfigurationNode scene;
 
-  // only write sticky notes for the root network
+  // only save scene-stuff for the root network
+  // (Workaround to avoid crashes: don't access the Scene from wrong thread!).
   if (this->getGroup()->isRoot())
   {
     std::vector<cedar::proc::gui::StickyNote *> stickyNotes = this->mpScene->getStickyNotes();
@@ -1704,64 +1705,65 @@ void cedar::proc::gui::Group::writeScene(cedar::aux::ConfigurationNode &root) co
       node.put("color blue", color.blue());
       scene.push_back(cedar::aux::ConfigurationNode::value_type("", node));
     }
-  }
 
-  //Save ConnectionAnchor (drag-points of Connection)
-  cedar::aux::ConfigurationNode connNode;
-  connNode.put("type", "connections");
-  cedar::aux::ConfigurationNode allConnections;
-  auto data_cons = this->getGroup()->getDataConnections();
-  QList<QGraphicsItem *> items = this->mpScene->items();
+    //Save ConnectionAnchor (drag-points of Connection)
+    cedar::aux::ConfigurationNode connNode;
+    connNode.put("type", "connections");
+    cedar::aux::ConfigurationNode allConnections;
+    auto data_cons = this->getGroup()->getDataConnections();
+    QList<QGraphicsItem *> items = this->mpScene->items();
 
-  for (int i = 0; i < items.size(); ++i)
-  {
-    if (cedar::proc::gui::Connection *con = dynamic_cast<cedar::proc::gui::Connection *>(items[i]))
+    for (int i = 0; i < items.size(); ++i)
     {
-      for(cedar::proc::DataConnectionPtr data_con : data_cons)
+      if (cedar::proc::gui::Connection *con = dynamic_cast<cedar::proc::gui::Connection *>(items[i]))
       {
-        //Save ConnectionAnchors of every connection in this group
-        if (!con->getSourceSlotName().toStdString().compare(data_con->getSource()->getParent() + "." + data_con->getSource()->getName())
-         && !con->getTargetSlotName().toStdString().compare(data_con->getTarget()->getParent() + "." + data_con->getTarget()->getName()))
+        for(cedar::proc::DataConnectionPtr data_con : data_cons)
         {
-          if(con->getConnectionAnchorPoints().size() <= 0 || !con->isSourceTargetSlotNameValid()) continue;
-          cedar::aux::ConfigurationNode connection;
-          connection.put("source slot", con->getSourceSlotName().toStdString());
-          connection.put("target slot", con->getTargetSlotName().toStdString());
-          cedar::aux::ConfigurationNode anchorsNode;
-          std::vector<cedar::proc::gui::ConnectionAnchor*> anchorsToSave;
-
-          //Remove duplicates (may result from previous bug)
-          for(cedar::proc::gui::ConnectionAnchor *anchor : con->getConnectionAnchorPoints())
+          //Save ConnectionAnchors of every connection in this group
+          if (!con->getSourceSlotName().toStdString().compare(data_con->getSource()->getParent() + "." + data_con->getSource()->getName())
+           && !con->getTargetSlotName().toStdString().compare(data_con->getTarget()->getParent() + "." + data_con->getTarget()->getName()))
           {
-            bool duplicate = false;
-            for (cedar::proc::gui::ConnectionAnchor *savedAnchor : anchorsToSave)
+            if(con->getConnectionAnchorPoints().size() <= 0 || !con->isSourceTargetSlotNameValid()) continue;
+            cedar::aux::ConfigurationNode connection;
+            connection.put("source slot", con->getSourceSlotName().toStdString());
+            connection.put("target slot", con->getTargetSlotName().toStdString());
+            cedar::aux::ConfigurationNode anchorsNode;
+            std::vector<cedar::proc::gui::ConnectionAnchor*> anchorsToSave;
+
+            //Remove duplicates (may result from previous bug)
+            for(cedar::proc::gui::ConnectionAnchor *anchor : con->getConnectionAnchorPoints())
             {
-              if(static_cast<int>(anchor->posMiddle().x()) == static_cast<int>(savedAnchor->posMiddle().x()) && static_cast<int>(anchor->posMiddle().y()) == static_cast<int>(savedAnchor->posMiddle().y()))
+              bool duplicate = false;
+              for (cedar::proc::gui::ConnectionAnchor *savedAnchor : anchorsToSave)
               {
-                duplicate = true;
+                if(static_cast<int>(anchor->posMiddle().x()) == static_cast<int>(savedAnchor->posMiddle().x()) && static_cast<int>(anchor->posMiddle().y()) == static_cast<int>(savedAnchor->posMiddle().y()))
+                {
+                  duplicate = true;
+                }
+              }
+              if(!duplicate)
+              {
+                anchorsToSave.push_back(anchor);
               }
             }
-            if(!duplicate)
+            //Save anchors
+            for(cedar::proc::gui::ConnectionAnchor *anchor : anchorsToSave)
             {
-              anchorsToSave.push_back(anchor);
+              cedar::aux::ConfigurationNode anchorNode;
+              anchorNode.put("x", static_cast<int>(anchor->posMiddle().x()));
+              anchorNode.put("y", static_cast<int>(anchor->posMiddle().y()));
+              anchorsNode.push_back(cedar::aux::ConfigurationNode::value_type("", anchorNode));
             }
+            connection.add_child("anchors", anchorsNode);
+            allConnections.push_back(cedar::aux::ConfigurationNode::value_type("", connection));
           }
-          //Save anchors
-          for(cedar::proc::gui::ConnectionAnchor *anchor : anchorsToSave)
-          {
-            cedar::aux::ConfigurationNode anchorNode;
-            anchorNode.put("x", static_cast<int>(anchor->posMiddle().x()));
-            anchorNode.put("y", static_cast<int>(anchor->posMiddle().y()));
-            anchorsNode.push_back(cedar::aux::ConfigurationNode::value_type("", anchorNode));
-          }
-          connection.add_child("anchors", anchorsNode);
-          allConnections.push_back(cedar::aux::ConfigurationNode::value_type("", connection));
         }
       }
     }
+    connNode.put_child("connections", allConnections);
+    scene.push_back(cedar::aux::ConfigurationNode::value_type("", connNode));
   }
-  connNode.put_child("connections", allConnections);
-  scene.push_back(cedar::aux::ConfigurationNode::value_type("", connNode));
+
   auto elements = this->getGroup()->getElements();
 
   for
