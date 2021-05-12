@@ -66,7 +66,8 @@
 cedar::aux::Configurable::Configurable()
 :
 mIsAdvanced(false),
-mIsConfigured(true)
+mIsConfigured(true),
+mpParent(nullptr)
 {
   this->connectToTreeChangedSignal(boost::bind(&cedar::aux::Configurable::updateLockSet, this));
 }
@@ -77,6 +78,13 @@ cedar::aux::Configurable::~Configurable()
   for (auto parameter_connection_pair : this->mNameChangedConnections)
   {
     parameter_connection_pair.second.disconnect();
+  }
+  // Remove all children to unregister their parents
+  Children::iterator child = this->mChildren.begin();
+  while (child != this->mChildren.end())
+  {
+    this->removeConfigurableChild(child->first);
+    ++child;
   }
 }
 
@@ -816,6 +824,16 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
   this->configurationLoaded();
 }
 
+cedar::aux::Configurable* cedar::aux::Configurable::getParent()
+{
+  return this->mpParent;
+}
+
+void cedar::aux::Configurable::setParent(cedar::aux::Configurable* parent)
+{
+  this->mpParent = parent;
+}
+
 const cedar::aux::Configurable::Children& cedar::aux::Configurable::configurableChildren() const
 {
   return this->mChildren;
@@ -829,6 +847,10 @@ void cedar::aux::Configurable::addConfigurableChild(const std::string& name, ced
                                                     + name + "\".");
   }
   this->mChildren[name] = child;
+  if(child.get() != nullptr)
+  {
+    child->setParent(this);
+  }
   // emit boost signal
   mTreeChanged();
 }
@@ -839,6 +861,10 @@ void cedar::aux::Configurable::removeConfigurableChild(const std::string& name)
   if (child == this->mChildren.end())
   {
     CEDAR_THROW(cedar::aux::UnknownNameException, "There is no configurable child with the name \"" + name + "\".");
+  }
+  if(child->second.get() != nullptr)
+  {
+    child->second->setParent(nullptr);
   }
   this->mChildren.erase(child);
   // emit boost signal

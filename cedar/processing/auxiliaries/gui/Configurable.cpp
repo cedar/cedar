@@ -40,6 +40,9 @@
 // CEDAR INCLUDES
 #include "cedar/processing/auxiliaries/gui/Configurable.h"
 #include "cedar/processing/auxiliaries/gui/Parameter.h"
+#include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/undoRedo/commands/ChangeObjectListParameterValue.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/processing/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/Configurable.h"
@@ -623,9 +626,34 @@ void cedar::proc::aux::gui::Configurable::handleDeleteButtonClicked(QString full
       int index = boost::lexical_cast<int>(splitOutput[1]);
       std::string parameterPath = splitOutput[0];
       auto parameter = this->mDisplayedConfigurables[i]->getParameter(parameterPath);
+
       if(auto objectListParameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
       {
-        objectListParameter->removeObject(index);
+        // If parameter belongs to a step/element, push to undo stack (e.g. settings parameter should not be undoable)
+        cedar::aux::NamedConfigurable* owner = objectListParameter->getNamedConfigurableOwner();
+        if(owner != nullptr)
+        {
+          //Find the scene
+          cedar::proc::gui::Scene* scene;
+
+          QObject* parent = this;
+          while(parent != nullptr)
+          {
+            if(auto ide = dynamic_cast<cedar::proc::gui::Ide*>(parent))
+            {
+              scene = ide->mpProcessingDrawer->getScene();
+            }
+            parent = parent->parent();
+          }
+          CEDAR_ASSERT(scene != nullptr);
+
+          cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeObjectListParameterValue(
+                  objectListParameter.get(), index, owner, scene));
+        }
+        else
+        {
+          objectListParameter->removeObject(index);
+        }
       }
       else
       {

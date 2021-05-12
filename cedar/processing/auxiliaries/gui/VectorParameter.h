@@ -47,7 +47,7 @@
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/undoRedo/UndoStack.h"
-#include "cedar/processing/undoRedo/commands/ChangeVectorParameterValue.h"
+#include "cedar/processing/undoRedo/commands/ChangeParameterValueTemplate.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/auxiliaries/gui/VectorParameter.fwd.h"
@@ -207,7 +207,8 @@ protected:
       if (auto param = dynamic_cast<cedar::aux::VectorParameter<ValueType> *>(this->getParameter().get()))
       {
         // If parameter belongs to a step, push to undo stack (e.g. settings parameter should not be undoable)
-        if(dynamic_cast<cedar::aux::NamedConfigurable*>(param->getOwner()))
+        cedar::aux::NamedConfigurable* owner = param->getNamedConfigurableOwner();
+        if(owner != nullptr)
         {
           //Find the scene
           cedar::proc::gui::Scene* scene;
@@ -225,8 +226,8 @@ protected:
 
           before[index] = this->parameter()->at(index);
           cedar::proc::gui::Ide::mpUndoStack->push(
-                  new cedar::proc::undoRedo::commands::ChangeVectorParameterValue<ValueType>(param, before,
-                                                                                             after, scene));
+                  new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::vector<ValueType>, cedar::aux::VectorParameter<ValueType>>(param, before,
+                                                                                             after, owner, scene));
         }
         else
         {

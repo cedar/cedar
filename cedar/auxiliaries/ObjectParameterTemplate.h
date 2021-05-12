@@ -139,7 +139,9 @@ public:
   void setValue(BaseTypePtr object)
   {
     this->mObject = object;
-
+    if(auto config = dynamic_cast<cedar::aux::Configurable*>(object.get())){
+      config->setParent(this->getOwner());
+    }
     this->emitChangedSignal();
   }
 

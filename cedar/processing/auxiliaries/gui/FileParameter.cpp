@@ -36,7 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/auxiliaries/gui/FileParameter.h"
-#include "cedar/processing/undoRedo/commands/ChangeParameterValue.h"
+#include "cedar/processing/undoRedo/commands/ChangeParameterValueTemplate.h"
 #include "cedar/processing/undoRedo/commands/ToggleRelativePath.h"
 #include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/processing/gui/Ide.h"
@@ -174,7 +174,8 @@ void cedar::proc::aux::gui::FileParameter::onBrowseClicked()
   if (!value.isEmpty())
   {
     // If parameter belongs to a step, push to undo stack (e.g. settings parameter should not be undoable)
-    if(dynamic_cast<cedar::aux::NamedConfigurable*>(parameter->getOwner()))
+    cedar::aux::NamedConfigurable* owner = parameter->getNamedConfigurableOwner();
+    if(owner != nullptr)
     {
       //Find the scene
       cedar::proc::gui::Scene* scene;
@@ -190,8 +191,8 @@ void cedar::proc::aux::gui::FileParameter::onBrowseClicked()
       }
       CEDAR_ASSERT(scene != nullptr);
 
-      cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeParameterValue<std::string,
-              cedar::aux::FileParameter>(parameter.get(), parameter->getPath(), value.toStdString(), scene));
+      cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::string,
+              cedar::aux::FileParameter>(parameter.get(), parameter->getPath(), value.toStdString(), owner, scene));
     }
     else
     {

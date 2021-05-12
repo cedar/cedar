@@ -45,7 +45,7 @@
 #include "cedar/processing/auxiliaries/Singleton.h"
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/undoRedo/UndoStack.h"
-#include "cedar/processing/undoRedo/commands/ChangeParameterValue.h"
+#include "cedar/processing/undoRedo/commands/ChangeParameterValueTemplate.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
@@ -134,7 +134,8 @@ void cedar::proc::aux::gui::StringParameter::textEdited(const QString& text)
   {
     std::string oldValue = parameter->getValue();
     // If parameter belongs to a step, push to undo stack (e.g. settings parameter should not be undoable)
-    if(dynamic_cast<cedar::aux::NamedConfigurable*>(parameter->getOwner()))
+    cedar::aux::NamedConfigurable* owner = parameter->getNamedConfigurableOwner();
+    if(owner != nullptr)
     {
       // Find the scene
       cedar::proc::gui::Scene *scene;
@@ -150,8 +151,8 @@ void cedar::proc::aux::gui::StringParameter::textEdited(const QString& text)
       }
       CEDAR_ASSERT(scene != nullptr);
       cedar::proc::gui::Ide::mpUndoStack->push(
-              new cedar::proc::undoRedo::commands::ChangeParameterValue<std::string>(
-                      parameter.get(), oldValue, text.toStdString(), scene));
+              new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::string>(
+                      parameter.get(), oldValue, text.toStdString(), owner, scene));
     }
     else
     {

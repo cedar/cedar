@@ -46,7 +46,7 @@
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/undoRedo/UndoStack.h"
-#include "cedar/processing/undoRedo/commands/ChangeParameterValue.h"
+#include "cedar/processing/undoRedo/commands/ChangeParameterValueTemplate.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/auxiliaries/gui/NumericParameter.fwd.h"
@@ -218,8 +218,9 @@ protected:
     // push to undo stack
     if (oldvalue != value)
     {
-      // If parameter belongs to a step, push to undo stack (e.g. settings parameter should not be undoable)
-      if(dynamic_cast<cedar::aux::NamedConfigurable*>(parameter->getOwner()))
+      // If parameter belongs to a step/element, push to undo stack (e.g. settings parameter should not be undoable)
+      cedar::aux::NamedConfigurable* owner = parameter->getNamedConfigurableOwner();
+      if(owner != nullptr)
       {
         // Find the scene
         cedar::proc::gui::Scene *scene;
@@ -233,10 +234,11 @@ protected:
           }
           parent = parent->parent();
         }
-        CEDAR_ASSERT(scene != nullptr);
+        CEDAR_ASSERT(scene != nullptr)
 
         cedar::proc::gui::Ide::mpUndoStack->push(
-                new cedar::proc::undoRedo::commands::ChangeParameterValue<ValueType>(parameter.get(), oldvalue, value, true, scene));
+                new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<ValueType>(parameter.get(), oldvalue,
+                                                                                     value, owner, true, scene));
       }
       else
       {
@@ -244,8 +246,7 @@ protected:
       }
     }
 
-    // update parameter value
-    parameter->setValue(value, true);
+    // notify parameter value update
     WidgetPolicy::manuallyChangedValue(this->mpWidget, value, oldvalue);
   }
 
