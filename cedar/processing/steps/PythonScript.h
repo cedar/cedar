@@ -164,6 +164,8 @@ private:
 
   void freePythonVariables();
 
+  void reset();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -179,11 +181,12 @@ protected:
   // none yet
 private:
 
-  cedar::aux::MatDataPtr mOutput;
+  // js: this is not needed? cedar::aux::MatDataPtr mOutput;
   int mIsExecuting = 0;
 
   std::vector< cedar::aux::ConstMatDataPtr > mInputs;
   std::vector< cedar::aux::MatDataPtr > mOutputs;
+  std::vector< cedar::aux::MatDataPtr > mStates;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
