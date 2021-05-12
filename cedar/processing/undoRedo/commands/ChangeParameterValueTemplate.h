@@ -48,10 +48,10 @@
 
 // SYSTEM INCLUDES
 
-
-/*!@todo describe.
+/*!Parameter change command
  *
- * @todo describe more.
+ * Implementation for the abstract class ChangeParameterValue. Can be used for numerous parameter types.
+ * Currently not supported: ObjectParameter and ObjectListParameter. (use ChangeObject(List)Parameter class)
  */
 template <typename ValueT, typename ParameterT = cedar::aux::ParameterTemplate<ValueT>>
 class cedar::proc::undoRedo::commands::ChangeParameterValueTemplate : public ChangeParameterValue<ValueT, ParameterT>
