@@ -82,11 +82,6 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Returns a unique elementIdentifier for a given guiElement. The elementIdentifier is 'group.group...elementName'. If the element is in rootGroup the identifier is simply 'elementName'
-  std::string getElementIdentifier(cedar::proc::gui::Element* guiElement);
-
-  //!@brief Return the address of the guiElement, which is searched via the given elementIdentifier
-  cedar::proc::gui::Element* getElementAddress(std::string elementIdentifier, cedar::proc::gui::Scene* scene);
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------

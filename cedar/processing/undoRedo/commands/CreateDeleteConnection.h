@@ -43,6 +43,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/undoRedo/UndoCommand.h"
+#include "cedar/processing/gui/Element.h"
+#include "cedar/processing/gui/DataSlotItem.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/undoRedo/commands/CreateDeleteConnection.fwd.h"
@@ -78,11 +80,11 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-  CreateDeleteConnection(cedar::proc::gui::Connection* connection, Action action, bool createConnectorGroup = false);
-
+  //!@brief Constructor for creating a connection
   CreateDeleteConnection(cedar::proc::gui::GraphicsBase* source, cedar::proc::gui::GraphicsBase* target, Action action,
                    bool createConnectorGroup = false);
+  //!@brief Constructor for deleting a connection
+  CreateDeleteConnection(cedar::proc::gui::Connection* connection, Action action, bool createConnectorGroup = false);
 
   //!@brief Destructor
   virtual ~CreateDeleteConnection();
@@ -91,7 +93,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
   void undo();
   void redo();
 
@@ -99,9 +100,13 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief Creates a connection between the source and target
   void createConnection();
+  //!@brief Deletes a connection between the source and target
   void deleteConnection();
+  //!@brief Updates the identifiers of source and target
   void updateSourceTargetNameAndSlotName();
+  //!@brief Updates the source and target elements by the identifiers
   void updateSourceAndTargetConnectors();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -116,14 +121,17 @@ private:
 protected:
   // none yet
 private:
-
   cedar::proc::gui::GraphicsBase* mpSource;
   cedar::proc::gui::GraphicsBase* mpTarget;
 
-  std::string mSourceElementName;
-  std::string mTargetElementName;
+  std::string mSourceElementIdentifier;
+  std::string mTargetElementIdentifier;
   std::string mSourceSlotName;
   std::string mTargetSlotName;
+
+  //Identifiers when a connection is created between 2 different groups. ExternalOutput/ExternalInput is used.
+  std::string mSourceExternal;
+  std::string mTargetExternal;
 
   cedar::proc::gui::Scene* mpScene;
   Action mAction;

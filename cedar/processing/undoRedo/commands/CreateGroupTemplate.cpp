@@ -46,9 +46,7 @@
 #include "cedar/processing/gui/Element.h"
 #include "cedar/processing/Element.h"
 #include "cedar/processing/DeclarationRegistry.h"
-#include <boost/algorithm/string.hpp>
 #include <iostream>
-#include <cstdlib>
 
 // SYSTEM INCLUDES
 #include <QGraphicsSceneDragDropEvent>
@@ -79,8 +77,8 @@ void cedar::proc::undoRedo::commands::CreateGroupTemplate::undo()
 {
   //Before deleting the element update the address of the element and its parentGroup in case it has been changed through a create
   //Uses elementIdentifier
-  mpGuiElement = getElementAddress(mElementIdentifier,mpScene);
-  mpGroup = getElementGroupAddress(mElementIdentifier,mpScene);
+  mpGuiElement = mpScene->getElementByFullPath(mElementIdentifier);
+  mpGroup = mpScene->getGroupOfElementByFullPath(mElementIdentifier);
 
   if(mpGuiElement != nullptr)
   {
@@ -98,19 +96,19 @@ void cedar::proc::undoRedo::commands::CreateGroupTemplate::redo()
   {
     mIsInitialRedo = false;
     createGroupTemplate();
-    mElementIdentifier = getElementIdentifier(mpGuiElement);
+    mElementIdentifier = mpGuiElement->getElement()->getFullPath();
     //Set text for the 'Undo/Redo Stack'
     setText(QString::fromStdString("Created GroupTemplate:" + mpGuiElement->getElement()->getName()));
   }
   else
   {
     //Group could have been changed
-    mpGroup = getElementGroupAddress(mElementIdentifier,mpScene);
+    mpGroup = mpScene->getGroupOfElementByFullPath(mElementIdentifier);
     createElement();
     //Loadings its old values, that we saved when it was deleted
     loadElementConfiguration();
 
-    mElementIdentifier = getElementIdentifier(mpGuiElement);
+    mElementIdentifier = mpGuiElement->getElement()->getFullPath();
   }
 }
 
@@ -120,7 +118,7 @@ void cedar::proc::undoRedo::commands::CreateGroupTemplate::createGroupTemplate()
 
   mpGuiElement = mpScene->getGraphicsItemFor(element);
   mpGuiElement->setPos(mPosition);
-  mpGroup = getElementGroupAddress(mElementIdentifier,mpScene);
+  mpGroup = mpScene->getGroupOfElementByFullPath(mElementIdentifier);
   mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(element);
 }
 
@@ -150,87 +148,4 @@ void cedar::proc::undoRedo::commands::CreateGroupTemplate::loadElementConfigurat
   {
     mpGuiElement->getElement()->readConfiguration(mElementConfiguration);
   }
-}
-
-std::string cedar::proc::undoRedo::commands::CreateGroupTemplate::getElementIdentifier(cedar::proc::gui::Element* guiElement)
-{
-  //Get parentItem of the element
-  QGraphicsItem* parentItem = guiElement->parentItem();
-  std::string elementName = guiElement->getElement()->getName();
-
-  while(parentItem != nullptr)
-  {
-    if (cedar::proc::gui::Group* group = dynamic_cast<cedar::proc::gui::Group*>(parentItem))
-    {
-      std::string groupName = group->getGroup()->getName();
-      elementName = groupName + "." + elementName;
-    }
-    //Get the next parentItem of the parentItem before.
-    parentItem = parentItem->parentItem();
-  }
-  return elementName;
-}
-
-cedar::proc::gui::Element* cedar::proc::undoRedo::commands::CreateGroupTemplate::getElementAddress(std::string elementIdentifier, cedar::proc::gui::Scene* scene)
-{
-  std::vector<std::string> mElementNameSplitted;
-  boost::split(mElementNameSplitted, elementIdentifier, boost::is_any_of("."));
-
-  cedar::proc::gui::GroupPtr rootGroup = scene->getRootGroup();
-
-  cedar::proc::gui::Group* currentGroup = rootGroup.get();
-  //Go through all subgroups
-  for (std::size_t i = 0; i < mElementNameSplitted.size()-1; i++)
-  {
-    if(currentGroup->getGroup()->contains(mElementNameSplitted[i]))
-    {
-      if (cedar::proc::ElementPtr element = currentGroup->getGroup()->getElement(mElementNameSplitted[i]))
-      {
-        cedar::proc::gui::Element* guiElement = scene->getGraphicsItemFor(element);
-        if (cedar::proc::gui::Group* group = dynamic_cast<cedar::proc::gui::Group*>(guiElement))
-        {
-          currentGroup = group;
-        }
-      }
-    }
-  }
-
-  //Set the guiElement
-  if(currentGroup->getGroup()->contains(mElementNameSplitted[mElementNameSplitted.size() - 1]))
-  {
-    //Search in the group of the element
-    if (cedar::proc::ElementPtr element = currentGroup->getGroup()->getElement(mElementNameSplitted[mElementNameSplitted.size() - 1]))
-    {
-      if (cedar::proc::gui::Element* guiElement = scene->getGraphicsItemFor(element))
-      {
-        return guiElement;
-      }
-    }
-  }
-}
-
-cedar::proc::GroupPtr cedar::proc::undoRedo::commands::CreateGroupTemplate::getElementGroupAddress(std::string elementIdentifier, cedar::proc::gui::Scene* scene)
-{
-  std::vector<std::string> mElementNameSplitted;
-  boost::split(mElementNameSplitted, elementIdentifier, boost::is_any_of("."));
-
-  cedar::proc::gui::GroupPtr rootGroup = scene->getRootGroup();
-
-  cedar::proc::gui::Group* currentGroup = rootGroup.get();
-  //Go through all subgroups
-  for (std::size_t i = 0; i < mElementNameSplitted.size()-1; i++)
-  {
-    if(currentGroup->getGroup()->contains(mElementNameSplitted[i]))
-    {
-      if (cedar::proc::ElementPtr element = currentGroup->getGroup()->getElement(mElementNameSplitted[i]))
-      {
-        cedar::proc::gui::Element* guiElement = scene->getGraphicsItemFor(element);
-        if (cedar::proc::gui::Group* group = dynamic_cast<cedar::proc::gui::Group*>(guiElement))
-        {
-          currentGroup = group;
-        }
-      }
-    }
-  }
-  return currentGroup->getGroup();
 }
