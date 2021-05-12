@@ -204,6 +204,7 @@ private:
   cedar::aux::BoolParameterPtr _mHasScriptFile;
   cedar::aux::FileParameterPtr _mScriptFile;
   cedar::aux::BoolParameterPtr _mAutoConvertDoubleToFloat; // advanced
+  bool mWasResetted;
 
 };
 

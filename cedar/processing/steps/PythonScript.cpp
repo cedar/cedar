@@ -807,9 +807,10 @@ cedar::proc::Step(isLooped)
 mInputs(1, cedar::aux::MatDataPtr()),
 mOutputs(1, cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))),
 mStates(0, cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))),
+mWasResetted(true),
 
 // Declare Properties
-_mCodeStringForSavingArchitecture (new cedar::aux::StringParameter(this, "code", "import numpy as np\nimport pycedar as pc\n\n#Print to messages tab:\n# pc.messagePrint('text')\n# pc.messagePrint(str(...))\n\n#Inputs: (NumPy Arrays)\n# pc.inputs[0]\n# pc.inputs[1]\n# ...\n\n#Outputs:\n# pc.outputs[0]\n# pc.outputs[1]\n# ...\n\n\ninput = pc.inputs[0]\n\npc.outputs[0] = input * 2\n\n\n# Experimental:\n# A state that is kept between executions:\n# if len(pc.states) == 0:\n#   pc.states.append( 41 )\n# pc.states[0]= 42\n")),
+_mCodeStringForSavingArchitecture (new cedar::aux::StringParameter(this, "code", "import numpy as np\nimport pycedar as pc\n\n#Print to messages tab:\n# pc.messagePrint('text')\n# pc.messagePrint(str(...))\n\n#Inputs: (NumPy Arrays)\n# pc.inputs[0]\n# pc.inputs[1]\n# ...\n\n#Outputs:\n# pc.outputs[0]\n# pc.outputs[1]\n# ...\n\n\ninput = pc.inputs[0]\n\npc.outputs[0] = input * 2\n\n\n# Experimental:\n# A state that is kept between executions:\n# if len(pc.states) == 0:\n#   pc.states.append( 41 )\n# pc.states[0]= pc.states[0] + 1\n\n# Experimental:\n# Did a reset just occur?\n# if pc.reset:\n#   pc.messagePrint('reset occured')\n")),
 _mNumberOfInputs (new cedar::aux::UIntParameter(this, "number of inputs", 1,0,255)),
 _mNumberOfOutputs (new cedar::aux::UIntParameter(this, "number of outputs", 1,0,255)),
 _mHasScriptFile (new cedar::aux::BoolParameter(this, "use script file", false)),
@@ -1314,6 +1315,8 @@ void cedar::proc::steps::PythonScript::executePythonScript(bool use_data_lock)
     }
     boost::python::scope(pycedar_module).attr("states") = statesListBefore;
 
+    // add the 'just resetted' information
+    boost::python::scope(pycedar_module).attr("reset") = mWasResetted;
 
 
     // Adding empty matrices to the output list so that the length of the list in python is correctly set
@@ -1547,6 +1550,7 @@ void cedar::proc::steps::PythonScript::executePythonScript(bool use_data_lock)
 
   this->mIsExecuting = 0;
   mutex.unlock();
+  mWasResetted= false;
 }
 
 void cedar::proc::steps::PythonScript::inputConnectionChanged(const std::string& inputName)
@@ -1582,6 +1586,7 @@ void cedar::proc::steps::PythonScript::executeButtonClicked(){
 void cedar::proc::steps::PythonScript::reset()
 {
   mStates.clear();
+  mWasResetted= true;
 }
 
 #endif // CEDAR_USE_PYTHON
