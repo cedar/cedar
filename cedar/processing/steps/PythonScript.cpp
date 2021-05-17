@@ -810,7 +810,7 @@ mStates(0, cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(1, 1, C
 mWasResetted(true),
 
 // Declare Properties
-_mCodeStringForSavingArchitecture (new cedar::aux::StringParameter(this, "code", "import numpy as np\nimport pycedar as pc\n\n#Print to messages tab:\n# pc.messagePrint('text')\n# pc.messagePrint(str(...))\n\n#Inputs: (NumPy Arrays)\n# pc.inputs[0]\n# pc.inputs[1]\n# ...\n\n#Outputs:\n# pc.outputs[0]\n# pc.outputs[1]\n# ...\n\n\ninput = pc.inputs[0]\n\npc.outputs[0] = input * 2\n\n\n# Experimental:\n# A state that is kept between executions:\n# if len(pc.states) == 0:\n#   pc.states.append( 41 )\n# pc.states[0]= pc.states[0] + 1\n\n# Experimental:\n# Did a reset just occur?\n# if pc.reset:\n#   pc.messagePrint('reset occured')\n")),
+_mCodeStringForSavingArchitecture (new cedar::aux::StringParameter(this, "code", "import numpy as np\nimport pycedar as pc\n\n#Print to messages tab:\n# pc.messagePrint('text')\n# pc.messagePrint(str(...))\n\n#Inputs: (List of NumPy Arrays)\n# pc.inputs[0]\n# pc.inputs[1]\n# ...\n\n#Outputs: (List of NumPy Arrays)\n# pc.outputs[0]\n# pc.outputs[1]\n# ...\n\n\ninput1 = pc.inputs[0]\n\npc.outputs[0] = input1 * 2\n\n\n# Experimental:\n# A state that is kept between executions:\n# if len(pc.states) == 0:\n#   pc.states.append( 41 )\n# pc.states[0]= pc.states[0] + 1\n\n# Experimental:\n# Did a reset just occur?\n# if pc.reset:\n#   pc.messagePrint('reset occured')\n#   pc.states[0]= 41\n")),
 _mNumberOfInputs (new cedar::aux::UIntParameter(this, "number of inputs", 1,0,255)),
 _mNumberOfOutputs (new cedar::aux::UIntParameter(this, "number of outputs", 1,0,255)),
 _mHasScriptFile (new cedar::aux::BoolParameter(this, "use script file", false)),
@@ -1307,7 +1307,7 @@ void cedar::proc::steps::PythonScript::executePythonScript(bool use_data_lock)
     std::list<boost::python::handle<>>  statesListBefore;
     for(unsigned int i = 0; i < mStates.size(); i++)
     {
-      cv::Mat stateMatrix= mStates[i]->getData(); // ? .clone();
+      cv::Mat stateMatrix= mStates[i]->getData(); //.clone(); // do we need clone?
 
       PyObject* stateMatrix_np = cvt.toNDArray(stateMatrix);
       boost::python::handle<> stateMatrix_np_handle(stateMatrix_np);
