@@ -300,11 +300,13 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
   while (delete_connections_stack.size() > 0)
   {
     cedar::proc::gui::Connection* p_current_connection = delete_connections_stack.back();
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(p_current_connection, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::DELETE));
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(
+            p_current_connection, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::DELETE));
     delete_connections_stack.pop_back();
   }
 
-  //Delete all connections that are connected to any step which is on the "delete_stack" and not already deleted (happens if a element gets deleted but the connection was not selected)
+  // Delete all connections that are connected to any step which is on the "delete_stack" and not already
+  // deleted (happens if a element gets deleted but the connection was not selected)
   for(cedar::proc::gui::GraphicsBase* graphics_base : delete_stack)
   {
     //Check if there is any connection to the current item that was NOT in the items list
@@ -332,7 +334,8 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
 
         for(cedar::proc::gui::Connection* connection : connectionsFrom)
         {
-          cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(connection, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::DELETE));
+          cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(
+                  connection, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::DELETE));
         }
       }
 
@@ -344,7 +347,8 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
 
         for(cedar::proc::gui::Connection* connection : connectionsFrom)
         {
-          cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(connection, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::DELETE));
+          cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(
+                  connection, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::DELETE));
         }
       }
     }
@@ -352,6 +356,15 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
 
   // sort stack (make it a real stack)
   std::sort(delete_stack.begin(), delete_stack.end(), this->sortElements);
+
+  // If multiple elements are to be deleted, start a macro on the undo stack, so all delete commands are
+  // undone with one action
+  bool delete_multiple_elements = delete_stack.size() > 1;
+  if(delete_multiple_elements)
+  {
+    cedar::proc::gui::Ide::mpUndoStack->beginMacro("Deleted selected Elements");
+  }
+
   // while stack is not empty, check if any items must be added, then delete the current item
   while (delete_stack.size() > 0)
   {
@@ -362,13 +375,18 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
     deleteElement(current_item);
     delete_stack.pop_back();
   }
+  if(delete_multiple_elements)
+  {
+    cedar::proc::gui::Ide::mpUndoStack->endMacro();
+  }
 }
 
 void cedar::proc::gui::Scene::deleteElement(QGraphicsItem* pItem)
 {
   if (cedar::proc::gui::Element* element = dynamic_cast<cedar::proc::gui::Element*>(pItem))
   {
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteElement(element, this,undoRedo::commands::CreateDeleteElement::Action::DELETE));
+    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteElement(
+            element, this,undoRedo::commands::CreateDeleteElement::Action::DELETE));
   }
 }
 
