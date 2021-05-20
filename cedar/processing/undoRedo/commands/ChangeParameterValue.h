@@ -102,7 +102,14 @@ public:
     }
     if(owner != nullptr)
     {
-      this->mParentIdentifier = owner->getName(); //TODO change to scene->getFullPath(owner)
+      if(auto element = dynamic_cast<cedar::proc::Element*>(owner))
+      {
+        this->mParentIdentifier = element->getFullPath();
+      }
+      else
+      {
+        this->mParentIdentifier = owner->getName();
+      }
       this->mParameterIdentifier = owner->findParameterPath(parameter);
       setText(QString::fromStdString(this->mParentIdentifier + ":" + this->mParameterIdentifier)); //TODO change to something more readable, maybe include value?
     }
@@ -130,9 +137,16 @@ public:
     }
     if(owner != nullptr)
     {
-      this->mParentIdentifier = owner->getName(); //TODO change to scene->getFullPath(owner)
+      if(auto element = dynamic_cast<cedar::proc::Element*>(owner))
+      {
+        this->mParentIdentifier = element->getFullPath();
+      }
+      else
+      {
+        this->mParentIdentifier = owner->getName();
+      }
       this->mParameterIdentifier = owner->findParameterPath(parameter);
-      setText(QString::fromStdString(this->mParentIdentifier + ":" + this->mParameterIdentifier));
+      setText(QString::fromStdString(this->mParentIdentifier + ": " + this->mParameterIdentifier));
     }
     else
     {
@@ -153,23 +167,31 @@ public:
   void updateParameterPointer()
   {
     this->mpParameter = nullptr;
-    this->mpParentElement = nullptr;
-    //TODO change to scene->getItemByFullPath
-    if(this->mpScene != nullptr && this->mParentIdentifier.compare(""))
+
+    this->mpParentElement = this->mpScene->getElementByFullPath(this->mParentIdentifier);
+
+    if(this->mpParentElement != nullptr)
     {
-      QList<QGraphicsItem *> sceneItems = this->mpScene->items();
-      for (QGraphicsItem *item : sceneItems)
+      this->mpParameter = this->mpParentElement->getElement()->getParameter<ParameterType>(this->mParameterIdentifier).get();
+    }
+    else
+    {
+      if (this->mpScene != nullptr && this->mParentIdentifier.compare(""))
       {
-        if (auto gui_element = dynamic_cast<cedar::proc::gui::Element*>(item))
+        QList<QGraphicsItem *> sceneItems = this->mpScene->items();
+        for (QGraphicsItem *item : sceneItems)
         {
-          cedar::proc::Element* element = gui_element->getElement().get();
-          if (element != nullptr)
+          if (auto gui_element = dynamic_cast<cedar::proc::gui::Element *>(item))
           {
-            if(!element->getName().compare(this->mParentIdentifier)) //TODO this does not work for groups
+            cedar::proc::Element *element = gui_element->getElement().get();
+            if (element != nullptr)
             {
-              this->mpParameter = element->getParameter<ParameterType>(this->mParameterIdentifier).get();
-              this->mpParentElement = gui_element;
-              return;
+              if (!element->getName().compare(this->mParentIdentifier))
+              {
+                this->mpParameter = element->getParameter<ParameterType>(this->mParameterIdentifier).get();
+                this->mpParentElement = gui_element;
+                return;
+              }
             }
           }
         }
@@ -191,7 +213,14 @@ public:
       cedar::aux::NamedConfigurable* owner = this->mpParameter->getNamedConfigurableOwner();
       if(owner != nullptr)
       {
-        this->mParentIdentifier = owner->getName(); //TODO change to scene->getFullPath(owner)
+        if(auto element = dynamic_cast<cedar::proc::Element*>(owner))
+        {
+          this->mParentIdentifier = element->getFullPath();
+        }
+        else
+        {
+          this->mParentIdentifier = owner->getName();
+        }
         this->mParameterIdentifier = owner->findParameterPath(this->mpParameter);
       }
 
@@ -228,7 +257,14 @@ public:
       cedar::aux::NamedConfigurable* owner = this->mpParameter->getNamedConfigurableOwner();
       if(owner != nullptr)
       {
-        this->mParentIdentifier = owner->getName(); //TODO change to scene->getFullPath(owner)
+        if(auto element = dynamic_cast<cedar::proc::Element*>(owner))
+        {
+          this->mParentIdentifier = element->getFullPath();
+        }
+        else
+        {
+          this->mParentIdentifier = owner->getName();
+        }
         this->mParameterIdentifier = owner->findParameterPath(this->mpParameter);
       }
 
