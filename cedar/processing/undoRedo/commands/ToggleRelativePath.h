@@ -71,7 +71,7 @@ public:
   {
     mParentName = getParentName(parameter);
     mParameterName = parameter->getName();
-    setText(QString::fromStdString(mParameterName + ":" + mParentName));
+    setText(QString::fromStdString(mParameterName + ": " + mParentName));
   }
 
   //!@brief Destructor

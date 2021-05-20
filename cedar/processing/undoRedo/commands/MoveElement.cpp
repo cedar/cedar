@@ -58,7 +58,7 @@ mTargetPosition(element->pos()),
 mpScene(scene)
 {
   mElementIdentifier = mpGuiElement->getElement()->getFullPath();
-  setText(QString::fromStdString("Moved element" + mElementIdentifier));
+  setText(QString::fromStdString("Moved element: " + mElementIdentifier));
 }
 
 cedar::proc::undoRedo::commands::MoveElement::~MoveElement()

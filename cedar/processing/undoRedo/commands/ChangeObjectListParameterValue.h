@@ -93,8 +93,6 @@ public:
 
     if(owner != nullptr)
     {
-      this->mParentIdentifier = owner->getName(); //TODO change to scene->getFullPath(owner)
-      this->mParameterIdentifier = owner->findParameterPath(parameter);
       setText(QString::fromStdString("[+] " + typeStr + ":" + this->mParentIdentifier + ":"
                   + this->mParameterIdentifier));
     }
@@ -123,13 +121,11 @@ public:
 
     if(owner != nullptr)
     {
-      this->mParentIdentifier = owner->getName(); //TODO change to scene->getFullPath(owner)
-      this->mParameterIdentifier = owner->findParameterPath(parameter);
-      setText(QString::fromStdString("[-] " + typeStr + ":" + this->mParentIdentifier + ":" + this->mParameterIdentifier));
+      setText(QString::fromStdString("[-] " + typeStr + ": " + this->mParentIdentifier + ": " + this->mParameterIdentifier));
     }
     else
     {
-      setText(QString::fromStdString("[-] " + typeStr + ":" + this->mpParameter->getName() + ": - Error -"));
+      setText(QString::fromStdString("[-] " + typeStr + ": " + this->mpParameter->getName() + ": - Error -"));
     }
   }
 

@@ -111,7 +111,7 @@ public:
         this->mParentIdentifier = owner->getName();
       }
       this->mParameterIdentifier = owner->findParameterPath(parameter);
-      setText(QString::fromStdString(this->mParentIdentifier + ":" + this->mParameterIdentifier)); //TODO change to something more readable, maybe include value?
+      setText(QString::fromStdString(this->mParentIdentifier + ": " + this->mParameterIdentifier)); //TODO change to something more readable, maybe include value?
     }
     else
     {
