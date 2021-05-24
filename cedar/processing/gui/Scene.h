@@ -491,7 +491,10 @@ private:
   //! The parameter for the current mode.
   QString mModeParam;
 
-  QPointF mStartMovingPosition;
+  //! When selected items are moved this variable saves their source position. Is used for undoing MoveElement
+  std::vector<QPointF> mStartMovingPosition;
+
+  QPointF mStartMovingPositionOfClicked;
 
   //! The group displayed by the scene.
   cedar::proc::gui::GroupPtr mGroup;

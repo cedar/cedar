@@ -148,8 +148,8 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::redo()
       {
         mIsInitialRedo = false;
         createElement();
-        mElementIdentifier = mpGuiElement->getElement()->getFullPath();
         //Set text for the 'Undo/Redo Stack'
+        mElementIdentifier = mpGuiElement->getElement()->getFullPath();
         setText(QString::fromStdString("Created element:" + mElementIdentifier));
       }
       else
@@ -159,7 +159,6 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::redo()
         createElement();
         //Reload old values which have been saved
         loadElementConfiguration();
-
         mElementIdentifier = mpGuiElement->getElement()->getFullPath();
       }
       break;

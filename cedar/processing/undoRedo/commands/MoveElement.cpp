@@ -50,15 +50,30 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::undoRedo::commands::MoveElement::MoveElement(cedar::proc::gui::GraphicsBase* element, const QPointF sourcePosition, cedar::proc::gui::Scene* scene)
+cedar::proc::undoRedo::commands::MoveElement::MoveElement(std::list<QGraphicsItem*> elements,
+                                                          cedar::proc::gui::Group* sourceGroup,
+                                                          cedar::proc::gui::Group* targetGroup,
+                                                          std::vector<QPointF> sourcePosition,
+                                                          cedar::proc::gui::Scene* scene)
 :
-mpGuiElement(dynamic_cast<cedar::proc::gui::Element *>(element)),
+mSourceGroup(sourceGroup),
+mTargetGroup(targetGroup),
 mSourcePosition(sourcePosition),
-mTargetPosition(element->pos()),
 mpScene(scene)
 {
-  mElementIdentifier = mpGuiElement->getElement()->getFullPath();
-  setText(QString::fromStdString("Moved element" + mElementIdentifier));
+  //Iterate over elements and extract their target position and element identifier
+  for(QGraphicsItem* element : elements)
+  {
+    if(auto guiElement = dynamic_cast<cedar::proc::gui::Element*>(element))
+    {
+      mTargetPosition.push_back(guiElement->pos());
+      mElementIdentifier.push_back(guiElement->getElement()->getFullPath());
+      mGuiElements.push_back(guiElement);
+    }
+  }
+
+  //Set text for undo redo stack visualizier
+  setText(QString::fromStdString("Moved all selected elements"));
 }
 
 cedar::proc::undoRedo::commands::MoveElement::~MoveElement()
@@ -72,21 +87,101 @@ cedar::proc::undoRedo::commands::MoveElement::~MoveElement()
 // Move element back to the source
 void cedar::proc::undoRedo::commands::MoveElement::undo()
 {
-  mpGuiElement = mpScene->getElementByFullPath(mElementIdentifier);
-
-  if(this->mpGuiElement != nullptr && this->mpScene->items().contains(this->mpGuiElement))
-  {
-    this->mpGuiElement->setPos(this->mSourcePosition);
-  }
+  //Move back the the original position and group where the elements were before moving
+  move(this->mSourcePosition,this->mSourceGroup);
 }
 
 // Move element to the target
 void cedar::proc::undoRedo::commands::MoveElement::redo()
 {
-  mpGuiElement = mpScene->getElementByFullPath(mElementIdentifier);
+  //Move to the position and group were the elements were moved to intially by the user
+  move(this->mTargetPosition,this->mTargetGroup);
+}
 
-  if(this->mpGuiElement != nullptr && this->mpScene->items().contains(this->mpGuiElement))
+void cedar::proc::undoRedo::commands::MoveElement::move(std::vector<QPointF> position, cedar::proc::gui::Group* group)
+{
+  //Update the pointer of all elements using their fullpath
+  updateElementPointer();
+
+  //Set position to target to the elements
+  if(!this->mGuiElements.empty() && !position.empty())
   {
-    this->mpGuiElement->setPos(this->mTargetPosition);
+    int i = 0;
+    for(cedar::proc::gui::Element* element : mGuiElements)
+    {
+      element->setPos(position.at(i));
+      i++;
+    }
+  }
+  //GuiElements get deleted by the addElement() function, so the non gui elements have to be saved and later the guiElements get updated
+  std::vector<cedar::proc::Element*> elements;
+
+  //Add elements only accepts std::list<QGrapicsItem*>, so the guiElements have to be converted first
+  std::list<QGraphicsItem*> qGraphicsItems;
+  for(cedar::proc::gui::Element* guiElement:mGuiElements)
+  {
+    elements.push_back(guiElement->getElement().get());
+    if(QGraphicsItem* item = dynamic_cast<QGraphicsItem*>(guiElement))
+    {
+      qGraphicsItems.push_back(item);
+    }
+  }
+
+  if(this->mSourceGroup != this->mTargetGroup && !this->mGuiElements.empty())
+  {
+    std::cout << "sourceGroup: " << mSourceGroup << " targetGroup: " << mTargetGroup << std::endl;
+    //Add to the group if pointer is not nullptr, if nullptr that means the group where the elements should be moved is the rootgroup
+    if(group != nullptr)
+    {
+      group->addElements(qGraphicsItems);
+    }
+    else
+    {
+      this->mpScene->getRootGroup()->addElements(qGraphicsItems);
+    }
+
+    //Update the guiElements again before leaving the function. Their have been newly created by addElements()
+    mGuiElements.clear();
+    for(cedar::proc::Element* element:elements)
+    {
+      mGuiElements.push_back(this->mpScene->getGraphicsItemFor(element));
+    }
+
+    //Since the group of the elements has been changed, we need to update the fullpaths
+    updateElementIdentifier();
+
+    for(auto singleIdentifier:mElementIdentifier)
+    {
+      std::cout << "Changed Group. New Fullpath: " << singleIdentifier << std::endl;
+    }
+  }
+}
+
+
+void cedar::proc::undoRedo::commands::MoveElement::updateElementPointer()
+{
+  int i = 0;
+  for(auto &element : this->mGuiElements)
+  {
+    cedar::proc::gui::Element* guiElement = this->mpScene->getElementByFullPath(mElementIdentifier.at(i));
+    element = guiElement;
+    i++;
+  }
+}
+
+void cedar::proc::undoRedo::commands::MoveElement::updateElementIdentifier()
+{
+  int i = 0;
+  for(QGraphicsItem* element : mGuiElements)
+  {
+    if(auto guiElement = dynamic_cast<cedar::proc::gui::Element*>(element))
+    {
+      mElementIdentifier.at(i) = guiElement->getElement()->getFullPath();
+    }
+    else
+    {
+      mElementIdentifier.at(i) = "";
+    }
+    i++;
   }
 }
