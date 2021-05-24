@@ -111,11 +111,11 @@ public:
         this->mParentIdentifier = owner->getName();
       }
       this->mParameterIdentifier = owner->findParameterPath(parameter);
-      setText(QString::fromStdString(this->mParentIdentifier + ": " + this->mParameterIdentifier)); //TODO change to something more readable, maybe include value?
+      this->setText(QString::fromStdString(this->mParentIdentifier + ": " + this->mParameterIdentifier)); //TODO change to something more readable, maybe include value?
     }
     else
     {
-      setText(QString::fromStdString(parameter->getName() + ": - Error -"));
+      this->setText(QString::fromStdString(parameter->getName() + ": "));
     }
   }
 
@@ -146,11 +146,13 @@ public:
         this->mParentIdentifier = owner->getName();
       }
       this->mParameterIdentifier = owner->findParameterPath(parameter);
-      setText(QString::fromStdString(this->mParentIdentifier + ": " + this->mParameterIdentifier));
+      this->setText(QString::fromStdString(this->mParentIdentifier + ": " + this->mParameterIdentifier));
     }
     else
     {
-      setText(QString::fromStdString(parameter->getName() + ": - Error -"));
+      this->mParentIdentifier = "";
+      this->mParameterIdentifier = "";
+      this->setText(QString::fromStdString(parameter->getName() + ": "));
     }
   }
 
@@ -166,13 +168,17 @@ public:
 public:
   void updateParameterPointer()
   {
+    if(!this->mParentIdentifier.compare(""))
+    {
+      return;
+    }
     this->mpParameter = nullptr;
 
     this->mpParentElement = this->mpScene->getElementByFullPath(this->mParentIdentifier);
 
     if(this->mpParentElement != nullptr)
     {
-      this->mpParameter = this->mpParentElement->getElement()->getParameter<ParameterType>(this->mParameterIdentifier).get();
+      this->mpParameter = this->mpParentElement->getElement()->getParameter<ParameterType>(this->mParameterIdentifier).get(); //TODO error
     }
     else
     {
