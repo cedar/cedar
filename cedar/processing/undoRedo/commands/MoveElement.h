@@ -85,9 +85,9 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void move(std::vector<QPointF> position, cedar::proc::gui::Group* group);
-  void updateElementIdentifier();
-  void updateElementPointer();
+  void addElementsToGroup(std::vector<QPointF> position, cedar::proc::gui::Group* group);
+  void updateIdentifier();
+  void updatePointer();
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -106,6 +106,8 @@ private:
   std::vector<QPointF> mSourcePosition;
   std::vector<QPointF> mTargetPosition;
   std::vector<std::string> mElementIdentifier;
+  std::string mSourceGroupIdentifier;
+  std::string mTargetGroupIdentifier;
   cedar::proc::gui::Scene* mpScene;
 
   //--------------------------------------------------------------------------------------------------------------------

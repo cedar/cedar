@@ -1273,8 +1273,6 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
       }
     }
 
-
-
     // read background color
     auto color_node = node.find("background color");
     if (color_node != node.not_found())

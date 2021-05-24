@@ -88,10 +88,10 @@ cedar::proc::undoRedo::commands::MoveElement::~MoveElement()
 void cedar::proc::undoRedo::commands::MoveElement::undo()
 {
   //Update the pointer of all elements using their fullpath
-  updateElementPointer();
+  updatePointer();
 
   //Move back the the original position and group where the elements were before moving
-  move(this->mSourcePosition,this->mSourceGroup);
+  addElementsToGroup(this->mSourcePosition,this->mSourceGroup);
 
   //Set position to target to the elements
   if(!this->mGuiElements.empty() && !this->mSourcePosition.empty())
@@ -109,7 +109,7 @@ void cedar::proc::undoRedo::commands::MoveElement::undo()
 void cedar::proc::undoRedo::commands::MoveElement::redo()
 {
   //Update the pointer of all elements using their fullpath
-  updateElementPointer();
+  updatePointer();
 
   //Set position to target to the elements
   if(!this->mGuiElements.empty() && !mTargetPosition.empty())
@@ -123,10 +123,10 @@ void cedar::proc::undoRedo::commands::MoveElement::redo()
   }
 
   //Move to the position and group were the elements were moved to intially by the user
-  move(this->mTargetPosition,this->mTargetGroup);
+  addElementsToGroup(this->mTargetPosition,this->mTargetGroup);
 }
 
-void cedar::proc::undoRedo::commands::MoveElement::move(std::vector<QPointF> position, cedar::proc::gui::Group* group)
+void cedar::proc::undoRedo::commands::MoveElement::addElementsToGroup(std::vector<QPointF> position, cedar::proc::gui::Group* group)
 {
   //GuiElements get deleted by the addElement() function, so the non gui elements have to be saved and later the guiElements get updated
   std::vector<cedar::proc::Element*> elements;
@@ -162,12 +162,12 @@ void cedar::proc::undoRedo::commands::MoveElement::move(std::vector<QPointF> pos
     }
 
     //Since the group of the elements has been changed, we need to update the fullpaths
-    updateElementIdentifier();
+    updateIdentifier();
   }
 }
 
 
-void cedar::proc::undoRedo::commands::MoveElement::updateElementPointer()
+void cedar::proc::undoRedo::commands::MoveElement::updatePointer()
 {
   int i = 0;
   for(auto &element : this->mGuiElements)
@@ -176,21 +176,66 @@ void cedar::proc::undoRedo::commands::MoveElement::updateElementPointer()
     element = guiElement;
     i++;
   }
+
+  if(mSourceGroupIdentifier == "")
+  {
+    this->mSourceGroup = nullptr;
+  }
+  else
+  {
+    cedar::proc::gui::Element* sourceGroupElement = this->mpScene->getElementByFullPath(mSourceGroupIdentifier);
+    CEDAR_ASSERT(sourceGroupElement != nullptr)
+    auto group = dynamic_cast<cedar::proc::gui::Group*>(sourceGroupElement);
+    CEDAR_ASSERT(group != nullptr)
+    this->mSourceGroup = group;
+  }
+
+  if(mTargetGroupIdentifier == "")
+  {
+    this->mTargetGroup = nullptr;
+  }
+  else
+  {
+    cedar::proc::gui::Element* targetGroupElement = this->mpScene->getElementByFullPath(mTargetGroupIdentifier);
+    CEDAR_ASSERT(targetGroupElement != nullptr)
+    auto group = dynamic_cast<cedar::proc::gui::Group*>(targetGroupElement);
+    CEDAR_ASSERT(group != nullptr)
+    this->mTargetGroup = group;
+  }
 }
 
-void cedar::proc::undoRedo::commands::MoveElement::updateElementIdentifier()
+void cedar::proc::undoRedo::commands::MoveElement::updateIdentifier()
 {
   int i = 0;
   for(QGraphicsItem* element : mGuiElements)
   {
     if(auto guiElement = dynamic_cast<cedar::proc::gui::Element*>(element))
     {
-      mElementIdentifier.at(i) = guiElement->getElement()->getFullPath();
+      this->mElementIdentifier.at(i) = guiElement->getElement()->getFullPath();
     }
     else
     {
-      mElementIdentifier.at(i) = "";
+      this->mElementIdentifier.at(i) = "";
     }
     i++;
   }
+
+  if(this->mSourceGroup != nullptr)
+  {
+    this->mSourceGroupIdentifier = this->mSourceGroup->getGroup()->getFullPath();
+  }
+  else
+  {
+    this->mSourceGroupIdentifier = "";
+  }
+
+  if(this->mTargetGroup != nullptr)
+  {
+    this->mTargetGroupIdentifier = this->mTargetGroup->getGroup()->getFullPath();
+  }
+  else
+  {
+    this->mTargetGroupIdentifier = "";
+  }
+  std::cout << mTargetGroupIdentifier << std::endl;
 }
