@@ -1143,9 +1143,9 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
   else
   {
     //First item of list is enough, since all have the same group
-    if(cedar::proc::gui::Element* guielement = dynamic_cast<cedar::proc::gui::Element*>(items_to_move.front()))
+    if(cedar::proc::gui::Element* guiElement = dynamic_cast<cedar::proc::gui::Element*>(items_to_move.front()))
     {
-      targetGroup = this->getGroupFor(guielement->getElement()->getGroup().get());
+      targetGroup = this->getGroupFor(guiElement->getElement()->getGroup().get());
     }
   }
 
@@ -1894,9 +1894,7 @@ cedar::proc::gui::Group* cedar::proc::gui::Scene::getGroupFor(cedar::proc::Const
   GroupMap::iterator iter = this->mGroupMap.find(group);
   if (iter == this->mGroupMap.end())
   {
-#ifdef DEBUG
-    std::cout << "Could not find gui::group for group \"" << group->getName() << "\"" << std::endl;
-#endif // DEBUG
+    //Is rootGroup
     return NULL;
   }
   else

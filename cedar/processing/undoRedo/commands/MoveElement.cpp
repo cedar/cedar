@@ -87,32 +87,47 @@ cedar::proc::undoRedo::commands::MoveElement::~MoveElement()
 // Move element back to the source
 void cedar::proc::undoRedo::commands::MoveElement::undo()
 {
+  //Update the pointer of all elements using their fullpath
+  updateElementPointer();
+
   //Move back the the original position and group where the elements were before moving
   move(this->mSourcePosition,this->mSourceGroup);
+
+  //Set position to target to the elements
+  if(!this->mGuiElements.empty() && !this->mSourcePosition.empty())
+  {
+    int i = 0;
+    for(cedar::proc::gui::Element* element : mGuiElements)
+    {
+      element->setPos(this->mSourcePosition.at(i));
+      i++;
+    }
+  }
 }
 
 // Move element to the target
 void cedar::proc::undoRedo::commands::MoveElement::redo()
 {
+  //Update the pointer of all elements using their fullpath
+  updateElementPointer();
+
+  //Set position to target to the elements
+  if(!this->mGuiElements.empty() && !mTargetPosition.empty())
+  {
+    int i = 0;
+    for(cedar::proc::gui::Element* element : mGuiElements)
+    {
+      element->setPos(mTargetPosition.at(i));
+      i++;
+    }
+  }
+
   //Move to the position and group were the elements were moved to intially by the user
   move(this->mTargetPosition,this->mTargetGroup);
 }
 
 void cedar::proc::undoRedo::commands::MoveElement::move(std::vector<QPointF> position, cedar::proc::gui::Group* group)
 {
-  //Update the pointer of all elements using their fullpath
-  updateElementPointer();
-
-  //Set position to target to the elements
-  if(!this->mGuiElements.empty() && !position.empty())
-  {
-    int i = 0;
-    for(cedar::proc::gui::Element* element : mGuiElements)
-    {
-      element->setPos(position.at(i));
-      i++;
-    }
-  }
   //GuiElements get deleted by the addElement() function, so the non gui elements have to be saved and later the guiElements get updated
   std::vector<cedar::proc::Element*> elements;
 
@@ -129,7 +144,6 @@ void cedar::proc::undoRedo::commands::MoveElement::move(std::vector<QPointF> pos
 
   if(this->mSourceGroup != this->mTargetGroup && !this->mGuiElements.empty())
   {
-    std::cout << "sourceGroup: " << mSourceGroup << " targetGroup: " << mTargetGroup << std::endl;
     //Add to the group if pointer is not nullptr, if nullptr that means the group where the elements should be moved is the rootgroup
     if(group != nullptr)
     {
@@ -149,11 +163,6 @@ void cedar::proc::undoRedo::commands::MoveElement::move(std::vector<QPointF> pos
 
     //Since the group of the elements has been changed, we need to update the fullpaths
     updateElementIdentifier();
-
-    for(auto singleIdentifier:mElementIdentifier)
-    {
-      std::cout << "Changed Group. New Fullpath: " << singleIdentifier << std::endl;
-    }
   }
 }
 
