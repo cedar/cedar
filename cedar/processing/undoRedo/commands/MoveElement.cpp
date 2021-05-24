@@ -71,9 +71,20 @@ mpScene(scene)
       mGuiElements.push_back(guiElement);
     }
   }
+  updateIdentifier();
 
-  //Set text for undo redo stack visualizier
-  setText(QString::fromStdString("Moved all selected elements"));
+  if(elements.size() == 1)
+  {
+    if(auto element = dynamic_cast<cedar::proc::gui::Element*>(elements.front()))
+    {
+      setText(QString::fromStdString("Moved element: " + element->getElement()->getName()));
+    }
+  }
+  else
+  {
+    //Set text for undo redo stack visualizier
+    setText(QString::fromStdString("Moved all selected elements"));
+  }
 }
 
 cedar::proc::undoRedo::commands::MoveElement::~MoveElement()
