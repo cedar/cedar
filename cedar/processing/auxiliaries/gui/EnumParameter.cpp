@@ -38,7 +38,7 @@
 #include "cedar/processing/auxiliaries/gui/EnumParameter.h"
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/Scene.h"
-#include "cedar/processing/undoRedo/commands/ChangeParameterValue.h"
+#include "cedar/processing/undoRedo/commands/ChangeParameterValueTemplate.h"
 #include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/defines.h"
@@ -182,8 +182,9 @@ void cedar::proc::aux::gui::EnumParameter::currentIndexChanged(const QString&)
     parameter = boost::dynamic_pointer_cast<cedar::aux::EnumParameter>(this->getParameter());
     QString value = this->mpEdit->itemData(this->mpEdit->currentIndex(), Qt::UserRole).toString();
 
-    // If parameter belongs to a step, push to undo stack (e.g. settings parameter should not be undoable)
-    if(dynamic_cast<cedar::aux::NamedConfigurable*>(parameter->getOwner()))
+    // If parameter belongs to a step/element, push to undo stack (e.g. settings parameter should not be undoable)
+    cedar::aux::NamedConfigurable* owner = parameter->getNamedConfigurableOwner();
+    if(owner != nullptr)
     {
       //Find the scene
       cedar::proc::gui::Scene* scene;
@@ -199,9 +200,10 @@ void cedar::proc::aux::gui::EnumParameter::currentIndexChanged(const QString&)
       }
       CEDAR_ASSERT(scene != nullptr);
 
+
       cedar::proc::gui::Ide::mpUndoStack->push(
-              new cedar::proc::undoRedo::commands::ChangeParameterValue<std::string, cedar::aux::EnumParameter>(
-                      parameter.get(), parameter->getValue().name(), value.toStdString(), true, scene));
+              new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::string, cedar::aux::EnumParameter>(
+                      parameter.get(), parameter->getValue().name(), value.toStdString(), owner, true, scene));
     }
     else
     {

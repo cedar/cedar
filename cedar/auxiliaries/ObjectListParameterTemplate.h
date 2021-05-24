@@ -200,6 +200,13 @@ public:
     return this->at(index);
   }
 
+  //!@brief allocate and insert an object at given index
+  void insert(int index, const std::string& typeId)
+  {
+    BaseTypePtr object = FactorySingleton::getInstance()->allocate(typeId);
+    this->insert(index, object);
+  }
+
   //!@brief add an object before the index position
   void insert(size_t index, BaseTypePtr object)
   {

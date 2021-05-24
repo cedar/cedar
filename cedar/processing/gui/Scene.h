@@ -240,7 +240,7 @@ public:
    */
   cedar::proc::gui::Element* getElementByFullPath(std::string elementIdentifier);
 
-  /*!@brief Returns the group of the E
+  /*!@brief Returns the group of the Element
    */
   cedar::proc::GroupPtr getGroupOfElementByFullPath(std::string elementIdentifier);
 

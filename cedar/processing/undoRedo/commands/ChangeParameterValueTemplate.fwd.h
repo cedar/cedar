@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ChangeObjectParameterValue.fwd.h
+    File:        ChangeParameterValueTemplate.fwd.h
 
     Maintainer:  Lars Janssen
     Email:       lars.janssen@ini.rub.de
-    Date:        2020 07 28
+    Date:        2021 05 12
 
-    Description: Forward declaration file for the class cedar::proc::undoRedo::commands::ChangeParameterValue.
+    Description: Forward declaration file for the class cedar::proc::undoRedo::commands::ChangeParameterValueTemplate.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_OBJECT_PARAMETER_VALUE_FWD_H
-#define CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_OBJECT_PARAMETER_VALUE_FWD_H
+#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_PARAMETER_VALUE_TEMPLATE_FWD_H
+#define CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_PARAMETER_VALUE_TEMPLATE_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -58,7 +58,8 @@ namespace cedar
       namespace commands
       {
         //!@cond SKIPPED_DOCUMENTATION
-        CEDAR_DECLARE_PROC_CLASS(ChangeObjectParameterValue);
+        template<typename T, typename PT>
+        class ChangeParameterValueTemplate;
         //!@endcond
       }
     }
@@ -66,5 +67,5 @@ namespace cedar
 }
 
 
-#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_OBJECT_PARAMETER_VALUE_FWD_H
+#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CHANGE_PARAMETER_VALUE_TEMPLATE_FWD_H
 

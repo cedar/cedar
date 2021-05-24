@@ -50,6 +50,7 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Configurable.fwd.h"
+#include "cedar/auxiliaries/NamedConfigurable.fwd.h"
 #include "cedar/auxiliaries/Parameter.fwd.h"
 
 // SYSTEM INCLUDES
@@ -260,6 +261,9 @@ public:
   {
     return this->mpOwner;
   }
+
+  //! Returns the first parent/owner that is a NamedConfigurable, or nullptr if there exists none
+  cedar::aux::NamedConfigurable* getNamedConfigurableOwner() const;
 
   /*! @brief Adds a deprecated name to the parameter.
    *

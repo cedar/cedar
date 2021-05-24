@@ -192,7 +192,10 @@ void cedar::proc::aux::gui::ObjectParameter::currentTypeChanged(int index)
   if (index != -1)
   {
     std::string type = this->getSelectedType();
-    if(dynamic_cast<cedar::aux::NamedConfigurable*>(this->getObjectParameter()->getOwner()))
+    cedar::aux::ObjectParameterPtr parameter = this->getObjectParameter();
+    // If parameter belongs to a step/element, push to undo stack (e.g. settings parameter should not be undoable)
+    cedar::aux::NamedConfigurable* owner = parameter->getNamedConfigurableOwner();
+    if(owner != nullptr)
     {
       //Find the scene
       cedar::proc::gui::Scene* scene;
@@ -209,7 +212,7 @@ void cedar::proc::aux::gui::ObjectParameter::currentTypeChanged(int index)
       CEDAR_ASSERT(scene != nullptr);
 
       cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeObjectParameterValue(
-              this->getObjectParameter().get(), this->getObjectParameter()->getTypeId(), type, scene));
+              parameter.get(), parameter->getTypeId(), type, owner, scene));
     }
     else
     {

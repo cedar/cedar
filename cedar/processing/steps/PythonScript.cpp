@@ -912,24 +912,27 @@ std::vector<cedar::proc::steps::PythonScript::TemplateName> cedar::proc::steps::
   {
     boost::property_tree::ptree root;
     boost::property_tree::read_json(cedar::aux::Path("resource://pythonTemplates/python.json").absolute(), root);
-    for (boost::property_tree::ptree::value_type &nodeOuter : root.get_child("steps"))
+    if(root.find("steps") != root.not_found())
     {
-      std::string left = nodeOuter.first;
-      boost::trim(left);
-      bool isLooped = false, isNonLooped = false;
-      if(!left.compare("cedar.processing.steps.PythonScriptLooped")) isLooped = true;
-      if(!left.compare("cedar.processing.steps.PythonScript")) isNonLooped = true;
-      if(isLooped || isNonLooped)
+      for (boost::property_tree::ptree::value_type &nodeOuter : root.get_child("steps"))
       {
-        for (boost::property_tree::ptree::value_type &node : nodeOuter.second)
+        std::string left = nodeOuter.first;
+        boost::trim(left);
+        bool isLooped = false, isNonLooped = false;
+        if (!left.compare("cedar.processing.steps.PythonScriptLooped")) isLooped = true;
+        if (!left.compare("cedar.processing.steps.PythonScript")) isNonLooped = true;
+        if (isLooped || isNonLooped)
         {
-          std::string left = node.first;
-          boost::trim(left);
-          if(!left.compare("name"))
+          for (boost::property_tree::ptree::value_type &node : nodeOuter.second)
           {
-            list.push_back(TemplateName());
-            list[list.size() - 1].name = node.second.data();
-            list[list.size() - 1].isLooped = isLooped;
+            std::string left = node.first;
+            boost::trim(left);
+            if (!left.compare("name"))
+            {
+              list.push_back(TemplateName());
+              list[list.size() - 1].name = node.second.data();
+              list[list.size() - 1].isLooped = isLooped;
+            }
           }
         }
       }

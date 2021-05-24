@@ -98,7 +98,7 @@ mpScene(scene)
   mElementIdentifier = mpGuiElement->getElement()->getFullPath();
 
   //Set text for the 'Undo/Redo Stack'
-  setText(QString::fromStdString("Deleted element:" + mElementIdentifier));
+  setText(QString::fromStdString("Deleted element: " + mElementIdentifier));
 }
 
 cedar::proc::undoRedo::commands::CreateDeleteElement::~CreateDeleteElement()
