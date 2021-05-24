@@ -697,6 +697,7 @@ cedar::proc::gui::Element* cedar::proc::gui::Scene::getElementByFullPath(std::st
       }
     }
   }
+  return nullptr;
 }
 
 cedar::proc::GroupPtr cedar::proc::gui::Scene::getGroupOfElementByFullPath(std::string elementIdentifier)
@@ -861,7 +862,8 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
                 if(connection != nullptr)
                 {
                   mpConnectionStart = connection->getSource();
-                  if(mpConnectionStart != nullptr) {
+                  if(mpConnectionStart != nullptr)
+                  {
                     mpConnectionToBeReconnected = connection;
                     CEDAR_DEBUG_ASSERT(mpConnectionStart->canConnect());
                     this->mMode = MODE_CONNECT;
@@ -890,6 +892,15 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
   //!@todo This should probably be done by overriding mouseMoveEvent etc in GraphicsBase/Connectable
   if (pMouseEvent->button() == Qt::LeftButton && mpConnectionStart == nullptr)
   {
+    //Save the source poisition of the selected items
+    mStartMovingPosition.clear();
+    QList<QGraphicsItem *> selected = this->getSelectedParents();
+
+    for(int i = 0; i < selected.size(); i++)
+    {
+      mStartMovingPosition.push_back(selected.at(i)->pos());
+    }
+
     auto items = this->items(pMouseEvent->scenePos(), Qt::IntersectsItemShape, Qt::DescendingOrder);
     // this is only the case if an item under the mouse is selected
     // (resize handles make an exception, they can be dragged without being selected)
@@ -903,7 +914,7 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
           {
             if (graphics_base->isSelected() && graphics_base->canBeDragged())
             {
-              this->mStartMovingPosition = graphics_base->pos();
+              this->mStartMovingPositionOfClicked = graphics_base->pos();
               this->mpDraggingGraphicsBase = graphics_base;
               this->mDraggingItems = true;
               this->mpeParentView->startScrollTimer();
@@ -1081,12 +1092,7 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
 
   mpConnectionToBeReconnected = nullptr;
 
-  // Push dragged element on the undo/redo stack if position has changed
-  if (this->mDraggingItems && this->mpDraggingGraphicsBase && this->mStartMovingPosition != this->mpDraggingGraphicsBase->pos())
-  {
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::MoveElement(this->mpDraggingGraphicsBase, this->mStartMovingPosition, this));
-  }
-  this->mDraggingItems = false;
+  cedar::proc::gui::Group* sourceGroup = nullptr;
 
   // reset highlighting of the groups from which the items are being removed
   auto selected = this->selectedItems();
@@ -1096,30 +1102,63 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
     if (auto group = dynamic_cast<cedar::proc::gui::Group*>(item->parentItem()))
     {
       group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      /*Set the group where the elements are being pulled from. Since this is same for all pulled elements (you cant
+      put elements in 2 groups with one mouseReleaseEvent) this assigment can be made here*/
+      sourceGroup = group;
     }
   }
 
-  if (mTargetGroup)
+  cedar::proc::gui::Group* targetGroup = nullptr;
+  std::list<QGraphicsItem*> items_to_move;
+
+  //Add elements that need to be moved into a list
+  for (auto p_item : this->getSelectedParents())
   {
-    std::list<QGraphicsItem*> items_to_move;
-    for (auto p_item : this->getSelectedParents())
+    auto graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(p_item);
+    if (graphics_item && !graphics_item->isReadOnly())
     {
-      auto graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(p_item);
-      if (graphics_item && !graphics_item->isReadOnly())
-      {
-        items_to_move.push_back(p_item);
-      }
-    }
-    if (auto group_item = dynamic_cast<cedar::proc::gui::Group*>(mpDropTarget))
-    {
-      group_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-      group_item->addElements(items_to_move);
-    }
-    else
-    {
-      this->mGroup->addElements(items_to_move);
+      items_to_move.push_back(p_item);
     }
   }
+
+  /*mTargetGroup is only filled with a value if the user dragged the elements from one group to different one
+  it does not have a value if a elements is moved in the same group*/
+  if(mTargetGroup)
+  {
+    //Case 1: Any group into a created group
+    if (cedar::proc::gui::Group *group_item = dynamic_cast<cedar::proc::gui::Group *>(mpDropTarget))
+    {
+      //Set the highlighting
+      group_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      targetGroup = group_item;
+    }
+    //Case 2: Created Group into rootGroup (mpDropTarget is nullptr when moved into rootGroup)
+    else
+    {
+      //Nullptr stands for rootGroup in Cedar
+      targetGroup = nullptr;
+    }
+  }
+  //Case 3: Moving between same groups
+  else
+  {
+    //First item of list is enough, since all have the same group
+    if(cedar::proc::gui::Element* guielement = dynamic_cast<cedar::proc::gui::Element*>(items_to_move.front()))
+    {
+      targetGroup = this->getGroupFor(guielement->getElement()->getGroup().get());
+    }
+  }
+
+  if (this->mDraggingItems && this->mpDraggingGraphicsBase && this->mStartMovingPositionOfClicked != this->mpDraggingGraphicsBase->pos())
+  {
+    cedar::proc::gui::Ide::mpUndoStack->push(
+            new cedar::proc::undoRedo::commands::MoveElement(items_to_move,
+                                                             sourceGroup,
+                                                             targetGroup,
+                                                             this->mStartMovingPosition,
+                                                             this));
+  }
+  this->mDraggingItems = false;
   mTargetGroup.reset();
   this->resetBackgroundColor();
   mpDropTarget = NULL;

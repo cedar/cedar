@@ -66,8 +66,11 @@ class cedar::proc::undoRedo::commands::MoveElement : public UndoCommand
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  MoveElement(cedar::proc::gui::GraphicsBase* element, const QPointF sourcePosition, cedar::proc::gui::Scene* pScene);
-
+  MoveElement(std::list<QGraphicsItem*> elements,
+              cedar::proc::gui::Group* sourceGroup,
+              cedar::proc::gui::Group* targetGroup,
+              std::vector<QPointF> sourcePosition,
+              cedar::proc::gui::Scene* scene);
   //!@brief Destructor
   virtual ~MoveElement();
 
@@ -82,6 +85,9 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  void move(std::vector<QPointF> position, cedar::proc::gui::Group* group);
+  void updateElementIdentifier();
+  void updateElementPointer();
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,12 +100,12 @@ private:
 protected:
   // none yet
 private:
-  cedar::proc::gui::GraphicsBase* mpElement;
-  cedar::proc::gui::Element* mpGuiElement;
-  cedar::proc::GroupPtr mpGroup;
-  std::string mElementIdentifier;
-  const QPointF mSourcePosition;
-  const QPointF mTargetPosition;
+  std::list<cedar::proc::gui::Element*> mGuiElements;
+  cedar::proc::gui::Group* mSourceGroup;
+  cedar::proc::gui::Group* mTargetGroup;
+  std::vector<QPointF> mSourcePosition;
+  std::vector<QPointF> mTargetPosition;
+  std::vector<std::string> mElementIdentifier;
   cedar::proc::gui::Scene* mpScene;
 
   //--------------------------------------------------------------------------------------------------------------------
