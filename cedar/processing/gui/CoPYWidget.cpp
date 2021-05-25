@@ -39,6 +39,7 @@
 #include "cedar/processing/gui/CoPYWidget.h"
 #include <cedar/processing/Step.h>
 #include <cedar/processing/gui/StepItem.h>
+#include <cedar/auxiliaries/Settings.h>
 
 #include "ElementList.h"
 
@@ -48,6 +49,9 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <thread>
+#include <QFileDialog>
+#include <fstream>
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -83,12 +87,15 @@ QWidget(pParent)
   buttons->addWidget(mpResetButton);
   mpAutoResetCheckbox = new QCheckBox("Auto Reset");
   buttons->addWidget(mpAutoResetCheckbox);
-  /*mpSaveButton = new QPushButton("S");-
+  mpSaveButton = new QPushButton("S");
+  QSizePolicy policy0 = mpSaveButton->sizePolicy();
+  policy0.setHorizontalStretch(.5);
+  mpSaveButton->setSizePolicy(policy0);
   QObject::connect(mpSaveButton, SIGNAL (clicked()), this, SLOT(saveButtonClicked()));
   buttons->addWidget(mpSaveButton);
   mpLoadButton = new QPushButton("L");
   QObject::connect(mpLoadButton, SIGNAL (clicked()), this, SLOT(loadButtonClicked()));
-  buttons->addWidget(mpLoadButton);*/
+  buttons->addWidget(mpLoadButton);
 
 
   layout->addLayout(buttons);
@@ -112,8 +119,7 @@ void cedar::proc::gui::CoPYWidget::setScene(cedar::proc::gui::Scene* pScene)
 
 void cedar::proc::gui::CoPYWidget::importStepInformation(cedar::proc::gui::StepItem* pStep)
 {
-  std::string output = '"' + this->getStepInfo(pStep) + '"';
-  mpConsole->appendPlainText(QString::fromUtf8(output.c_str()));
+  mpConsole->appendPlainText(QString::fromStdString('"'+ pStep->getStep()->getFullPath() + '"'));
 }
 
 void cedar::proc::gui::CoPYWidget::importStepInformation(QList<QGraphicsItem*> pSteps){
@@ -131,7 +137,7 @@ void cedar::proc::gui::CoPYWidget::importStepInformation(QList<QGraphicsItem*> p
     std::string sel = "selection" + std::to_string(++mSelCounter);
     bool sameType = true;
     for (cedar::proc::gui::StepItem *step : steps){
-      list.append(QString::fromUtf8(this->getStepInfo(step).c_str()));
+      list.append(QString::fromStdString(step->getStep()->getFullPath()));
       step->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_SEARCH_RESULT);
     }
     std::string outputString;
@@ -164,7 +170,7 @@ void cedar::proc::gui::CoPYWidget::reset()
 //!@brief main execute method for executing CoPY
 void cedar::proc::gui::CoPYWidget::executeCode()
 {
-  mpConsole->executeLine();
+  mpConsole->executeCode();
   if(mpAutoResetCheckbox->isChecked()){
     this->reset();
   }
@@ -181,12 +187,8 @@ void cedar::proc::gui::CoPYWidget::executeCode()
 }*/
 
 std::string cedar::proc::gui::CoPYWidget::getStepInfo(cedar::proc::gui::StepItem* pStep){
-  std::string group_name = pStep->getStep()->getGroup()->getName();
-  if (group_name == "") group_name = "root";
-  std::string step_name = pStep->getStep()->getName();
-  std::string full_name = group_name + "." + step_name;
-  std::cout << full_name << std::endl;
-  return full_name;
+
+  return pStep->getStep()->getFullPath();
 }
 
 void cedar::proc::gui::CoPYWidget::dragEnterEvent(QDragEnterEvent *p_event)
@@ -225,12 +227,68 @@ void cedar::proc::gui::CoPYWidget::resetButtonClicked()
   this->reset();
 }
 
-void cedar::proc::gui::CoPYWidget::saveButtonClicked()
+bool cedar::proc::gui::CoPYWidget::saveButtonClicked()
 {
-  this->reset();
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
+  QString file = QFileDialog::getSaveFileName(this, // parent
+                                              "Select where to save", // caption
+                                              last_dir->getValue().absolutePath(), // initial directory;
+                                              "pythonScript (*.py)", // filter(s), separated by ';;'
+                                              0,
+          // js: Workaround for freezing file dialogs in QT5 (?)
+                                              QFileDialog::DontUseNativeDialog
+  );
+  if (file.isEmpty())
+  {
+    return false;
+  }
+  if (!file.endsWith(".py"))
+  {
+    file += ".py";
+  }
+  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
+  cedar::aux::SettingsSingleton::getInstance()->setCurrentArchitectureFileName(file.toStdString());
+  std::ofstream outfile;
+  outfile.open(file.toStdString());
+  outfile << mpConsole->toPlainText().toStdString();
+  outfile.close();
+  QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+  last_dir->setValue(path);
+  return true;
 }
 
 void cedar::proc::gui::CoPYWidget::loadButtonClicked()
 {
-  this->reset();
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
+
+  QFileDialog filedialog(this, "Select which file to load");
+  filedialog.setNameFilter( tr("pythonScript (*.py)"));
+  filedialog.setDirectory( last_dir->getValue().absolutePath()); // initial directory
+  filedialog.setFilter( QDir::AllDirs | QDir::Files
+                        | QDir::NoDot
+                        | QDir::Hidden );
+  // see hidden files to see the backup files
+#ifdef CEDAR_USE_QT5
+  filedialog.setOptions( QFileDialog::DontUseNativeDialog );
+  // js: Workaround for freezing file dialogs in QT5 (?)
+#endif
+  QString file;
+  if (filedialog.exec())
+  {
+    QStringList filelist;
+    filelist = filedialog.selectedFiles();
+    file= filelist.first();
+  }
+  if (!file.isEmpty())
+  {
+    std::ifstream infile(file.toStdString(), std::ios_base::binary);
+    if (infile.fail())
+    {
+     return mpConsole->consoleMessage(QString::fromStdString("Failed to open file " + file.toStdString()), true);
+    }
+    std::stringstream buffer;
+    buffer << infile.rdbuf();
+    mpConsole->clear();
+    mpConsole->appendPlainText(QString::fromStdString(buffer.str()));
+  }
 }

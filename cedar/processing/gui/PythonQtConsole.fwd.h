@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef _PythonQtConsole_H
-#define _PythonQtConsole_H
+#ifndef CEDAR_PROC_GUI_PYTHONQTCONSOLE_H
+#define CEDAR_PROC_GUI_PYTHONQTCONSOLE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -62,5 +62,5 @@ namespace cedar
 
 //!@endcond
 
-#endif // CEDAR_PROC_GUI_RECORDER_PROPERTY_FWD_H
+#endif // CEDAR_PROC_GUI_PYTHONQTCONSOLE_H
 

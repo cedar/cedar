@@ -145,6 +145,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
   /*!@brief Handler for mouse press events that happen within the bounds of the scene.
    */
   void mousePressEvent(QGraphicsSceneMouseEvent *pMouseEvent);
@@ -232,6 +233,8 @@ public:
   /*!@brief Returns the trigger map.
    */
   const TriggerMap& getTriggerMap() const;
+
+  cedar::proc::gui::Element* getElementByFullPath(std::string elementIdentifier);
 
   /*!@brief Returns the gui::group that displays the given group.
    */

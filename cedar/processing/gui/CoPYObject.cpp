@@ -20,11 +20,18 @@ cedar::proc::gui::CoPYObject::createElem(const QString &classId, const int &x, c
   //todo dont hardcode vertical size of steps
   for (int i = 0; i < amount * 45; i += 45)
   {
-    cedar::proc::Step *step = dynamic_cast<cedar::proc::Step *>(_mpScene->createElement(_mpGroup, classId.toStdString(),
-                                                                                        QPointF(x, y + i)).get());
-    QString stepName = QString::fromUtf8(step->getName().c_str());
-    _mpScene->getStepItemFor(step)->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_SEARCH_RESULT);
-    list.append(groupname + "." + stepName);
+    auto elem = _mpScene->createElement(_mpGroup, classId.toStdString(),
+                                        QPointF(x, y + i)).get();
+    if (cedar::proc::Step *step = dynamic_cast<cedar::proc::Step *>(elem))
+    {
+      _mpScene->getStepItemFor(step)->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_SEARCH_RESULT);
+      list.append(QString::fromStdString(step->getFullPath()));
+    }
+    if (cedar::proc::Group *group = dynamic_cast<cedar::proc::Group *>(elem))
+    {
+      list.append(QString::fromStdString(group->getFullPath()));
+    }
+
   }
   return list;
 }
@@ -42,11 +49,8 @@ void cedar::proc::gui::CoPYObject::createGroup(const QString &groupId, const int
 
 void cedar::proc::gui::CoPYObject::copyTo(const QString &fromStep, const QString &targetStep)
 {
-  std::string source_group, source_step, target_group, target_step;
-  cedar::aux::splitFirst(fromStep.toStdString(), ".", source_group, source_step);
-  cedar::aux::splitFirst(targetStep.toStdString(), ".", target_group, target_step);
 
-  this->getStepByName(target_group, target_step)->copyFrom(this->getStepByName(source_group, source_step));
+  this->getStepByName(fromStep.toStdString())->copyFrom(this->getStepByName(targetStep.toStdString()));
 
   /*cedar::proc::StepPtr pSource = this->getGroupByName(source_group)->getElement<cedar::proc::Step>(source_slot_name);
   cedar::proc::gui::StepItem* source = dynamic_cast<cedar::proc::gui::StepItem*>(_mpScene->getStepItemFor(pSource))
@@ -58,16 +62,8 @@ void
 cedar::proc::gui::CoPYObject::connectSlots(const QString &source, const int &sourceSlotIndex, const QString &target,
                                            const int &targetSlotIndex)
 {
-  std::string source_group, source_step, target_group, target_step;
-  cedar::aux::splitFirst(source.toStdString(), ".", source_group, source_step);
-  cedar::aux::splitFirst(target.toStdString(), ".", target_group, target_step);
-
-  auto sourceSlots = this->getGroupByName(source_group)
-          ->getElement<cedar::proc::Connectable>(source_step)
-          ->getOrderedDataSlots(1);
-  auto targetSlots = this->getGroupByName(target_group)
-          ->getElement<cedar::proc::Connectable>(target_step)
-          ->getOrderedDataSlots(0);
+  auto sourceSlots = dynamic_cast<cedar::proc::gui::Connectable*>(this->_mpScene->getElementByFullPath(source.toStdString().c_str())) ->getConnectable()->getOrderedDataSlots(1);
+  auto targetSlots = dynamic_cast<cedar::proc::gui::Connectable*>(this->_mpScene->getElementByFullPath(target.toStdString().c_str())) ->getConnectable()->getOrderedDataSlots(0);
 
   if(sourceSlotIndex < 0 or sourceSlotIndex > (sourceSlots.size() - 1) or targetSlotIndex < 0 or targetSlotIndex > (targetSlots.size() - 1))
     throw std::invalid_argument("Wrong Slot Index");
@@ -82,9 +78,7 @@ cedar::proc::gui::CoPYObject::connectSlots(const QString &source, const int &sou
 
 void cedar::proc::gui::CoPYObject::setParameter(const QString &elem, const QString &paramName, const QVariant &value)
 {
-  std::string groupId, stepName;
-  cedar::aux::splitFirst(elem.toStdString(), ".", groupId, stepName);
-  cedar::aux::ParameterPtr param = this->getStepByName(groupId, stepName)->getParameter(
+  cedar::aux::ParameterPtr param = this->getStepByName(elem.toStdString())->getParameter(
           paramName.toStdString().c_str());
   if (param->isConstant())
   {
@@ -183,7 +177,7 @@ cedar::proc::GroupPtr cedar::proc::gui::CoPYObject::getGroupByName(const std::st
   {
     if (auto group = dynamic_cast<cedar::proc::gui::Group *>(item))
     {
-      if (group->getGroup()->getName() == groupId)
+      if (group->getGroup()->getFullPath() == groupId)
       {
         return group->getGroup();
       }
@@ -192,20 +186,13 @@ cedar::proc::GroupPtr cedar::proc::gui::CoPYObject::getGroupByName(const std::st
   throw std::invalid_argument("Group \"" + groupId + "\" was not found");
 }
 
-cedar::proc::StepPtr cedar::proc::gui::CoPYObject::getStepByName(const std::string &groupId, const std::string &stepId)
+cedar::proc::StepPtr cedar::proc::gui::CoPYObject::getStepByName(const std::string &elementIdentifier)
 {
-  auto list = _mpScene->items();
-  for (QGraphicsItem *item : list)
+  if(auto step = dynamic_cast<cedar::proc::gui::StepItem*>(this->_mpScene->getElementByFullPath(elementIdentifier.c_str())))
   {
-    if (auto step = dynamic_cast<cedar::proc::gui::StepItem *>(item))
-    {
-      if (step->getStep()->getName() == stepId && step->getStep()->getGroup() == this->getGroupByName(groupId))
-      {
-        return step->getStep();
-      }
-    }
+    return step->getStep();
   }
-  throw std::invalid_argument("Step \"" + groupId + "." + stepId + "\" was not found");
+  throw std::invalid_argument("Step \"" + elementIdentifier + "\" was not found");
 }
 
 

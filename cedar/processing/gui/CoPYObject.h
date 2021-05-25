@@ -55,7 +55,7 @@ public:
 
   cedar::proc::gui::Scene* _mpScene;
 private:
-  cedar::proc::StepPtr getStepByName(const std::string& groupId, const std::string& stepId);
+  cedar::proc::StepPtr getStepByName(const std::string& elementIdentifier);
   cedar::proc::GroupPtr getGroupByName(const std::string& name);
 };
 

@@ -79,7 +79,6 @@ class cedar::proc::gui::CoPYWidget : public QWidget
 {
   Q_OBJECT
 
-
 public:
   //!@brief The standard constructor.
   CoPYWidget(QWidget *pParent = NULL);
@@ -97,10 +96,12 @@ public:
   void appendToConsole(std::string text);
 private slots:
   void executeButtonClicked();
-  void saveButtonClicked();
+  bool saveButtonClicked();
   void loadButtonClicked();
   void resetButtonClicked();
 private:
+  QThread mPythonThread;
+
   //Highlighter for Console
   cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter *mpHighlighter;
 
@@ -110,12 +111,12 @@ private:
   QPushButton* mpSaveButton;
   QPushButton* mpLoadButton;
   QCheckBox* mpAutoResetCheckbox;
-  PythonQtConsole* mpConsole;
+  cedar::proc::gui::PythonQtConsole* mpConsole;
 
   //Reference to Scene
   cedar::proc::gui::Scene* mpScene;
 
-  //counter to overview Exisiting-Step-Selections and not overwrite the python object.
+  //counter to overview Existing-Step-Selections and not overwrite the python object.
   int mSelCounter;
 
 private:

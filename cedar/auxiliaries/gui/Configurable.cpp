@@ -900,8 +900,7 @@ void cedar::aux::gui::Configurable::showContextMenu(const QPoint &pos)
     auto step = dynamic_cast<cedar::proc::Step*>(owner);
 
     std::string paramName = step->findParameterPath(item->getParameter());
-    std::string groupName = (step->getGroup()->isRoot())?"root" : step->getGroup()->getName();
-    std::string stepName = step->getName();
+    std::string stepName = step->getFullPath();
 
     //get CoPYWidget and append
     QObject* object = this;
@@ -909,7 +908,7 @@ void cedar::aux::gui::Configurable::showContextMenu(const QPoint &pos)
       object = object->parent();
     }
     if(auto copyWidget = object->findChild<cedar::proc::gui::CoPYWidget*>("mpCopy")){
-      copyWidget->appendToConsole("py.setParameter(\"" + groupName + "." + stepName + "\",\"" + paramName +"\", VALUE)\n");
+      copyWidget->appendToConsole("py.setParameter(\""+ stepName + "\",\"" + paramName +"\", VALUE)\n");
     }
   }
 }

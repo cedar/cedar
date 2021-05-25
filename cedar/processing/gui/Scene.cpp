@@ -136,6 +136,8 @@ cedar::proc::gui::Scene::~Scene()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+
+
 cedar::aux::gui::Configurable *cedar::proc::gui::Scene::getConfigurableWidget() const
 {
   return this->mpConfigurableWidget;
@@ -593,6 +595,46 @@ const cedar::proc::gui::Scene::GroupMap &cedar::proc::gui::Scene::getGroupMap() 
 const cedar::proc::gui::Scene::TriggerMap &cedar::proc::gui::Scene::getTriggerMap() const
 {
   return this->mTriggerMap;
+}
+
+cedar::proc::gui::Element* cedar::proc::gui::Scene::getElementByFullPath(std::string elementIdentifier)
+{
+  std::vector<std::string> mElementNameSplitted;
+  boost::split(mElementNameSplitted, elementIdentifier, boost::is_any_of("."));
+
+  cedar::proc::gui::GroupPtr rootGroup = this->getRootGroup();
+
+  cedar::proc::gui::Group* currentGroup = rootGroup.get();
+  //Go through all subgroups
+  for (std::size_t i = 0; i < mElementNameSplitted.size()-1; i++)
+  {
+    if(currentGroup->getGroup()->contains(mElementNameSplitted[i]))
+    {
+      if (cedar::proc::ElementPtr element = currentGroup->getGroup()->getElement(mElementNameSplitted[i]))
+      {
+        cedar::proc::gui::Element* guiElement = this->getGraphicsItemFor(element);
+        if (cedar::proc::gui::Group* group = dynamic_cast<cedar::proc::gui::Group*>(guiElement))
+        {
+          currentGroup = group;
+        }
+      }
+    }
+  }
+
+  //Set the guiElement
+  if(currentGroup->getGroup()->contains(mElementNameSplitted[mElementNameSplitted.size() - 1]))
+  {
+    //Search in the group of the element
+    if (cedar::proc::ElementPtr element = currentGroup->getGroup()->getElement(mElementNameSplitted[mElementNameSplitted.size() - 1]))
+    {
+      if (cedar::proc::gui::Element* guiElement = this->getGraphicsItemFor(element))
+      {
+        return guiElement;
+      }
+    }
+  }
+  return nullptr;
+  //throw std::invalid_argument("Step \"" + elementIdentifier + "\" was not found");
 }
 
 void cedar::proc::gui::Scene::setGroup(cedar::proc::gui::GroupPtr group)
