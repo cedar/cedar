@@ -46,10 +46,13 @@
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
 
+
 // FORWARD DECLARATIONS
 #include "TCPReader.fwd.h"
 
 // SYSTEM INCLUDES
+#include <chrono>
+
 #ifdef _WIN32
 #include <winsock2.h>
 #include <Ws2tcpip.h>
