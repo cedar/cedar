@@ -119,6 +119,8 @@ cedar_add_library(cedarproc
   gui/WidgetContainerItem.h
   sources/LocalReader.h
   sinks/LocalWriter.h
+  sinks/TCPWriter.h
+  sources/TCPReader.h
   sources/BoxInput.h
   sources/GaussInput.h
   sources/RealSense.h
