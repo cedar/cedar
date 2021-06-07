@@ -104,6 +104,7 @@ _mTau(new cedar::aux::TimeParameter
      ),
 _mLowerLimit(new cedar::aux::DoubleParameter(this, "lowerLimit", 0.0, -10000.0, 10000.0)),
 _mUpperLimit(new cedar::aux::DoubleParameter(this, "upperLimit", 1.0, -10000.0, 10000.0)),
+mJumpToFixPoint(new cedar::aux::BoolParameter(this, "jump to fixed point", false)),
 mMakeCyclic(new cedar::aux::BoolParameter(this, "use cyclic mean", false))
 {
   // declare all data
@@ -113,6 +114,7 @@ mMakeCyclic(new cedar::aux::BoolParameter(this, "use cyclic mean", false))
   this->mOutput->getData().at<float>(0,0) = 0.0;
   this->limitsChanged();
 
+  mJumpToFixPoint->markAdvanced(true);
   mMakeCyclic->markAdvanced(true);
 
   // connect the parameter's change signal
@@ -249,37 +251,47 @@ void cedar::dyn::SpaceToRateCode::eulerStep(const cedar::unit::Time& time)
   }
 
 
-  double dt = time / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second);
-  //!@todo use the time unit throughout the computation
-  double tau = this->getTau() / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second);
+  double fixed_point= o / s;
 
-  // the result is simply input * gain; see explanation above for variable names
-  double h = dt;
-  if (h / tau * s >= 2) // stability criterion
+  if (!mJumpToFixPoint->getValue())
   {
-    h = tau / s; // select a value that is very stable, i.e., is far from the point of instability
-  }
+    double dt = time / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second);
+    //!@todo use the time unit throughout the computation
+    double tau = this->getTau() / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second);
 
-  // again, see above for the meaning of the variables
-  double T = floor(dt / h);
-  double h_r = dt - h * T;
-  double v = 1.0 - h * s / tau;
-  double v_rest = 1.0 - h_r * s / tau; // defined just like v, just with h_r instead of h
-  double x_0 = this->mOutput->getData().at<float>(0,0);
-  double v_pow_T = pow(v, T);
+    // the result is simply input * gain; see explanation above for variable names
+    double h = dt;
+    if (h / tau * s >= 2) // stability criterion
+    {
+      h = tau / s; // select a value that is very stable, i.e., is far from the point of instability
+    }
 
-  double s_T;
-  if (v != 1.0)
-  {
-    s_T = (1 - v_pow_T) / (1 - v);
+    // again, see above for the meaning of the variables
+    double T = floor(dt / h);
+    double h_r = dt - h * T;
+    double v = 1.0 - h * s / tau;
+    double v_rest = 1.0 - h_r * s / tau; // defined just like v, just with h_r instead of h
+    double x_0 = this->mOutput->getData().at<float>(0,0);
+    double v_pow_T = pow(v, T);
+
+    double s_T;
+    if (v != 1.0)
+    {
+      s_T = (1 - v_pow_T) / (1 - v);
+    }
+    else
+    {
+      s_T = T;
+    }
+    this->mOutput->getData().at<float>(0,0) = v_rest * (v_pow_T * x_0 + h * o / tau * s_T) + h_r * o / tau;
   }
   else
   {
-    s_T = T;
+    // directly jump to the fixed point. useful for debugging
+    this->mOutput->getData().at<float>(0,0) = fixed_point;
   }
-  this->mOutput->getData().at<float>(0,0) = v_rest * (v_pow_T * x_0 + h * o / tau * s_T) + h_r * o / tau;
 
-  this->mFixPoint->getData().at<float>(0,0) = o / s;
+  this->mFixPoint->getData().at<float>(0,0) = fixed_point;
 }
 
 void cedar::dyn::SpaceToRateCode::reset()
