@@ -82,7 +82,7 @@ mpScene(scene)
   }
   else
   {
-    //Set text for undo redo stack visualizier
+    //Set text for undo redo stack visualizer
     setText(QString::fromStdString("Moved all selected elements"));
   }
 }

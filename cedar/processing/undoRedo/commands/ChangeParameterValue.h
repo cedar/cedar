@@ -84,7 +84,7 @@ class cedar::proc::undoRedo::commands::ChangeParameterValue : public cedar::proc
   //--------------------------------------------------------------------------------------------------------------------
 
 public:
-  //!@brief The standard constructor.
+  //!@brief The standard constructors.
   ChangeParameterValue(ParameterType* parameter, ValueType oldValue, ValueType newValue, cedar::aux::NamedConfigurable* owner,
                        cedar::proc::gui::Scene* scene = nullptr)
   :
@@ -95,28 +95,7 @@ public:
   mLockSet(false),
   mIsInitialRedo(true)
   {
-    CEDAR_ASSERT(mpParameter != nullptr)
-    if(owner == nullptr)
-    {
-      owner = parameter->getNamedConfigurableOwner();
-    }
-    if(owner != nullptr)
-    {
-      if(auto element = dynamic_cast<cedar::proc::Element*>(owner))
-      {
-        this->mParentIdentifier = element->getFullPath();
-      }
-      else
-      {
-        this->mParentIdentifier = owner->getName();
-      }
-      this->mParameterIdentifier = owner->findParameterPath(parameter);
-      this->setText(QString::fromStdString(this->mParentIdentifier + ": " + this->mParameterIdentifier)); //TODO change to something more readable, maybe include value?
-    }
-    else
-    {
-      this->setText(QString::fromStdString(parameter->getName() + ": "));
-    }
+    init(owner);
   }
 
   ChangeParameterValue(ParameterType* parameter, ValueType oldValue, ValueType newValue, cedar::aux::NamedConfigurable* owner, bool lock,
@@ -130,10 +109,16 @@ public:
   mLock(lock),
   mIsInitialRedo(true)
   {
-    CEDAR_ASSERT(mpParameter != nullptr)
+    init(owner);
+  }
+
+  // This mainly sets the identifiers for both the parent element and the parameter inside the parent element
+  void init(cedar::aux::NamedConfigurable* owner)
+  {
+    CEDAR_ASSERT(this->mpParameter != nullptr)
     if(owner == nullptr)
     {
-      owner = parameter->getNamedConfigurableOwner();
+      owner = this->mpParameter->getNamedConfigurableOwner();
     }
     if(owner != nullptr)
     {
@@ -145,14 +130,14 @@ public:
       {
         this->mParentIdentifier = owner->getName();
       }
-      this->mParameterIdentifier = owner->findParameterPath(parameter);
-      this->setText(QString::fromStdString(this->mParentIdentifier + ": " + this->mParameterIdentifier));
+      this->mParameterIdentifier = owner->findParameterPath(this->mpParameter);
+      this->setText(QString::fromStdString(this->mParentIdentifier + ": " + this->mParameterIdentifier));  //TODO change to something more readable, maybe include value?
     }
     else
     {
       this->mParentIdentifier = "";
       this->mParameterIdentifier = "";
-      this->setText(QString::fromStdString(parameter->getName() + ": "));
+      this->setText(QString::fromStdString(this->mpParameter->getName() + ": "));
     }
   }
 
@@ -166,6 +151,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 
 public:
+  // Update the pointers of the parameter and the parent element using the full paths (identifier)
   void updateParameterPointer()
   {
     if(!this->mParentIdentifier.compare(""))
@@ -178,7 +164,7 @@ public:
 
     if(this->mpParentElement != nullptr)
     {
-      this->mpParameter = this->mpParentElement->getElement()->getParameter<ParameterType>(this->mParameterIdentifier).get(); //TODO error
+      this->mpParameter = this->mpParentElement->getElement()->getParameter<ParameterType>(this->mParameterIdentifier).get();
     }
     else
     {
@@ -205,6 +191,7 @@ public:
     }
   }
 
+  // Undo the parameter change.
   void undo()
   {
     this->mIsInitialRedo = false;
