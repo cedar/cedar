@@ -253,7 +253,7 @@ class cedar::proc::gui::Ide::OpenableUndoRedoStack : public cedar::proc::gui::Id
 public:
   OpenableUndoRedoStack()
           :
-          OpenableDialog("Undo/Redo Stack", ":/menus/undo.svg", "undo redo stack")
+          OpenableDialog("Undo History", ":/menus/undo.svg", "undo redo stack")
   {
   }
 
