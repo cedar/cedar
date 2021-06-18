@@ -131,13 +131,13 @@ public:
         this->mParentIdentifier = owner->getName();
       }
       this->mParameterIdentifier = owner->findParameterPath(this->mpParameter);
-      this->setText(QString::fromStdString(this->mParentIdentifier + ": " + this->mParameterIdentifier));  //TODO change to something more readable, maybe include value?
+      this->setText(QString::fromStdString("Parameter changed: " + this->mParentIdentifier + "::" + this->mParameterIdentifier));  //TODO change to something more readable, maybe include value?
     }
     else
     {
       this->mParentIdentifier = "";
       this->mParameterIdentifier = "";
-      this->setText(QString::fromStdString(this->mpParameter->getName() + ": "));
+      this->setText(QString::fromStdString("Parameter changed: unknown parent::" + this->mpParameter->getName()));
     }
   }
 

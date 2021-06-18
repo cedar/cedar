@@ -121,8 +121,6 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::undo()
 
       if(mpGuiElement != nullptr)
       {
-        //Before deleting the element the configuration has to be saved, so when its created it again in redo, the load old parameter are loaded
-        saveElementConfiguration();
         //Undo of createElement = deleteElement
         deleteElement();
       }
@@ -131,10 +129,6 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::undo()
       //Update group since it could have changed
       mpGroup = mpScene->getGroupOfElementByFullPath(mElementIdentifier);
       createElement();
-      //Loadings its old values, that we saved when it was deleted
-      loadElementConfiguration();
-      //Since the group the element is in could have changed its name the elementIdentifier has to be updated
-      mElementIdentifier = mpGuiElement->getElement()->getFullPath();
       break;
   }
 }
@@ -150,16 +144,13 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::redo()
         createElement();
         //Set text for the 'Undo/Redo Stack'
         mElementIdentifier = mpGuiElement->getElement()->getFullPath();
-        setText(QString::fromStdString("Created element:" + mElementIdentifier));
+        setText(QString::fromStdString("Created element: " + mElementIdentifier));
       }
       else
       {
         //Group could have been changed
         mpGroup = mpScene->getGroupOfElementByFullPath(mElementIdentifier);
         createElement();
-        //Reload old values which have been saved
-        loadElementConfiguration();
-        mElementIdentifier = mpGuiElement->getElement()->getFullPath();
       }
       break;
 
@@ -170,8 +161,6 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::redo()
 
       if(mpGuiElement != nullptr)
       {
-        //Before deleting the element the configuration has to be saved, so when its created it again in redo, the load old parameter are loaded
-        saveElementConfiguration();
         //Undo of createElement = deleteElement
         deleteElement();
       }
@@ -181,15 +170,24 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::redo()
 
 void cedar::proc::undoRedo::commands::CreateDeleteElement::createElement()
 {
-  cedar::proc::Element* Element = mpScene->createElement(mpGroup,mClassId,mPosition).get();
-  mpGuiElement = mpScene->getGraphicsItemFor(Element);
+  cedar::proc::Element* element = mpScene->createElement(mpGroup,mClassId,mPosition).get();
+  mpGuiElement = mpScene->getGraphicsItemFor(element);
+
+  //Loadings its old values, that we saved when it was deleted
+	loadElementConfiguration();
+
+	//Since the group the element is in could have changed its name the elementIdentifier has to be updated
+	mElementIdentifier = mpGuiElement->getElement()->getFullPath();
 }
 
 void cedar::proc::undoRedo::commands::CreateDeleteElement::deleteElement()
 {
   if(this->mpGuiElement != nullptr && this->mpScene->items().contains(this->mpGuiElement))
   {
-    mpGuiElement->deleteElement();
+		//Before deleting the element the configuration has to be saved, so when its created it again in redo, the load old parameter are loaded
+		saveElementConfiguration();
+
+		mpGuiElement->deleteElement();
   }
 }
 

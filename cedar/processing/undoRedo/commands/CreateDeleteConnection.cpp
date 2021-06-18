@@ -101,7 +101,7 @@ mCreateConnectorGroup(createConnectorGroup)
   {
     text = "Removed";
   }
-  setText(QString::fromStdString(text + " connection: " + mSourceElementIdentifier + "->" + mTargetElementIdentifier));
+  setText(QString::fromStdString(text + " connection: " + mSourceElementIdentifier + "-> " + mTargetElementIdentifier));
 }
 
 cedar::proc::undoRedo::commands::CreateDeleteConnection::~CreateDeleteConnection()

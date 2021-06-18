@@ -98,7 +98,7 @@ void cedar::proc::undoRedo::commands::CreateGroupTemplate::redo()
     createGroupTemplate();
     mElementIdentifier = mpGuiElement->getElement()->getFullPath();
     //Set text for the 'Undo/Redo Stack'
-    setText(QString::fromStdString("Created GroupTemplate: " + mpGuiElement->getElement()->getName()));
+    setText(QString::fromStdString("Created groupTemplate: " + mpGuiElement->getElement()->getName()));
   }
   else
   {
