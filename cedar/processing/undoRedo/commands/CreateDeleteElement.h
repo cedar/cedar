@@ -121,7 +121,7 @@ protected:
   // none yet
 private:
   cedar::proc::gui::Element* mpGuiElement;
-  std::string mElementIdentifier;
+  std::string mElementFullPath;
   cedar::proc::GroupPtr mpGroup;
   cedar::aux::ConfigurationNode mElementConfiguration;
   cedar::proc::gui::Scene* mpScene;

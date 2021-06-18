@@ -112,7 +112,7 @@ public:
     init(owner);
   }
 
-  // This mainly sets the identifiers for both the parent element and the parameter inside the parent element
+  // This mainly sets the fullPaths for both the parent element and the parameter inside the parent element
   void init(cedar::aux::NamedConfigurable* owner)
   {
     CEDAR_ASSERT(this->mpParameter != nullptr)
@@ -124,19 +124,19 @@ public:
     {
       if(auto element = dynamic_cast<cedar::proc::Element*>(owner))
       {
-        this->mParentIdentifier = element->getFullPath();
+        this->mParentFullPath = element->getFullPath();
       }
       else
       {
-        this->mParentIdentifier = owner->getName();
+        this->mParentFullPath = owner->getName();
       }
-      this->mParameterIdentifier = owner->findParameterPath(this->mpParameter);
-      this->setText(QString::fromStdString("Parameter changed: " + this->mParentIdentifier + "::" + this->mParameterIdentifier));  //TODO change to something more readable, maybe include value?
+      this->mParameterFullPath = owner->findParameterPath(this->mpParameter);
+      this->setText(QString::fromStdString("Parameter changed: " + this->mParentFullPath + "::" + this->mParameterFullPath));  //TODO change to something more readable, maybe include value?
     }
     else
     {
-      this->mParentIdentifier = "";
-      this->mParameterIdentifier = "";
+      this->mParentFullPath = "";
+      this->mParameterFullPath = "";
       this->setText(QString::fromStdString("Parameter changed: unknown parent::" + this->mpParameter->getName()));
     }
   }
@@ -151,24 +151,24 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 
 public:
-  // Update the pointers of the parameter and the parent element using the full paths (identifier)
+  // Update the pointers of the parameter and the parent element using the full paths
   void updateParameterPointer()
   {
-    if(!this->mParentIdentifier.compare(""))
+    if(!this->mParentFullPath.compare(""))
     {
       return;
     }
     this->mpParameter = nullptr;
 
-    this->mpParentElement = this->mpScene->getElementByFullPath(this->mParentIdentifier);
+    this->mpParentElement = this->mpScene->getElementByFullPath(this->mParentFullPath);
 
     if(this->mpParentElement != nullptr)
     {
-      this->mpParameter = this->mpParentElement->getElement()->getParameter<ParameterType>(this->mParameterIdentifier).get();
+      this->mpParameter = this->mpParentElement->getElement()->getParameter<ParameterType>(this->mParameterFullPath).get();
     }
     else
     {
-      if (this->mpScene != nullptr && this->mParentIdentifier.compare(""))
+      if (this->mpScene != nullptr && this->mParentFullPath.compare(""))
       {
         QList<QGraphicsItem *> sceneItems = this->mpScene->items();
         for (QGraphicsItem *item : sceneItems)
@@ -178,9 +178,9 @@ public:
             cedar::proc::Element *element = gui_element->getElement().get();
             if (element != nullptr)
             {
-              if (!element->getName().compare(this->mParentIdentifier))
+              if (!element->getName().compare(this->mParentFullPath))
               {
-                this->mpParameter = element->getParameter<ParameterType>(this->mParameterIdentifier).get();
+                this->mpParameter = element->getParameter<ParameterType>(this->mParameterFullPath).get();
                 this->mpParentElement = gui_element;
                 return;
               }
@@ -208,13 +208,13 @@ public:
       {
         if(auto element = dynamic_cast<cedar::proc::Element*>(owner))
         {
-          this->mParentIdentifier = element->getFullPath();
+          this->mParentFullPath = element->getFullPath();
         }
         else
         {
-          this->mParentIdentifier = owner->getName();
+          this->mParentFullPath = owner->getName();
         }
-        this->mParameterIdentifier = owner->findParameterPath(this->mpParameter);
+        this->mParameterFullPath = owner->findParameterPath(this->mpParameter);
       }
 
       //Select owner in scene
@@ -252,13 +252,13 @@ public:
       {
         if(auto element = dynamic_cast<cedar::proc::Element*>(owner))
         {
-          this->mParentIdentifier = element->getFullPath();
+          this->mParentFullPath = element->getFullPath();
         }
         else
         {
-          this->mParentIdentifier = owner->getName();
+          this->mParentFullPath = owner->getName();
         }
-        this->mParameterIdentifier = owner->findParameterPath(this->mpParameter);
+        this->mParameterFullPath = owner->findParameterPath(this->mpParameter);
       }
 
       //Select owner in scene
@@ -303,7 +303,7 @@ public:
 
   std::string getMacroIdentifier() const override
   {
-    return this->mParentIdentifier + "." + this->mParameterIdentifier;
+    return this->mParentFullPath + "." + this->mParameterFullPath;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -325,8 +325,8 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  std::string mParentIdentifier;
-  std::string mParameterIdentifier;
+  std::string mParentFullPath;
+  std::string mParameterFullPath;
   ParameterType* mpParameter;
   cedar::proc::gui::Element* mpParentElement;
 

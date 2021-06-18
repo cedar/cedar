@@ -93,11 +93,11 @@ public:
 
     if(owner != nullptr)
     {
-      setText(QString::fromStdString("Object added: " + this->mParentIdentifier + "::" + typeStr + "::" + this->mParameterIdentifier));
+      setText(QString::fromStdString("Object added: " + this->mParentFullPath + "::" + typeStr + "::" + this->mParameterFullPath));
     }
     else
     {
-      setText(QString::fromStdString("Object added: " + this->mParentIdentifier + "::" + typeStr + ": - Error -"));
+      setText(QString::fromStdString("Object added: " + this->mParentFullPath + "::" + typeStr + ": - Error -"));
     }
   }
 
@@ -120,11 +120,11 @@ public:
 
     if(owner != nullptr)
     {
-      setText(QString::fromStdString("Object removed: " + this->mParentIdentifier + "::" + typeStr + "::" + this->mParameterIdentifier));
+      setText(QString::fromStdString("Object removed: " + this->mParentFullPath + "::" + typeStr + "::" + this->mParameterFullPath));
     }
     else
     {
-      setText(QString::fromStdString("Object removed: " + this->mParentIdentifier + "::" + typeStr + ": - Error -"));
+      setText(QString::fromStdString("Object removed: " + this->mParentFullPath + "::" + typeStr + ": - Error -"));
     }
   }
 
