@@ -150,7 +150,6 @@ void cedar::proc::undoRedo::commands::CreateDeleteConnection::createConnection()
 
 void cedar::proc::undoRedo::commands::CreateDeleteConnection::deleteConnection()
 {
-  //Update the SourceElementName/SourceSlotName and TargetElementName/TargetSlotName before deleting
   updateSourceAndTargetConnectors();
 
   cedar::proc::gui::DataSlotItem* sourceGuiDataSlot = dynamic_cast<cedar::proc::gui::DataSlotItem*>(mpSource);

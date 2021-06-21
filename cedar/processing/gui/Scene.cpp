@@ -296,6 +296,14 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
     }
   }
 
+  // If multiple elements are to be deleted, start a macro on the undo stack, so all delete commands are
+  // undone with one action
+  bool delete_multiple_elements = (delete_stack.size() + delete_connections_stack.size()) > 1;
+  if(delete_multiple_elements)
+  {
+    cedar::proc::gui::Ide::mpUndoStack->beginMacro("Deleted selected Elements");
+  }
+
   //Delete all connections that were on the "delete_connection_stack"
   while (delete_connections_stack.size() > 0)
   {
@@ -356,14 +364,6 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
 
   // sort stack (make it a real stack)
   std::sort(delete_stack.begin(), delete_stack.end(), this->sortElements);
-
-  // If multiple elements are to be deleted, start a macro on the undo stack, so all delete commands are
-  // undone with one action
-  bool delete_multiple_elements = delete_stack.size() > 1;
-  if(delete_multiple_elements)
-  {
-    cedar::proc::gui::Ide::mpUndoStack->beginMacro("Deleted selected Elements");
-  }
 
   // while stack is not empty, check if any items must be added, then delete the current item
   while (delete_stack.size() > 0)
