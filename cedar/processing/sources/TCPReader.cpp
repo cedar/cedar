@@ -54,7 +54,7 @@
 #include <string>
 
 #ifdef _WIN32
-    #include <winsock.h>
+    #include <winsock2.h>
 #else
     #include <arpa/inet.h>  /* definition of inet_ntoa */
     #include <netdb.h>      /* definition of gethostbyname */
@@ -70,8 +70,6 @@
 //Non-Blocking Includes
 //#include <bits/fcntl.h>
 #include <fcntl.h>
-
-#define PORT 10020
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -121,7 +119,7 @@ cedar::proc::sources::TCPReader::TCPReader()
         _mBufferLength(new cedar::aux::UIntParameter(this, "buffer size", 32768)),
         _mPort(new cedar::aux::UIntParameter(this, "port", 50000,49152,65535)), //ephemeral ports only
         _mTimeOutBetweenPackets(new cedar::aux::UIntParameter(this, "packet timeout (ms)", 3000)),
-        _mTimeStepsBetweenAcceptTrials(new cedar::aux::UIntParameter(this, "accept interval (steps)", 10))
+        _mTimeStepsBetweenAcceptTrials(new cedar::aux::UIntParameter(this, "accept interval (steps)", 30))
 {
     cedar::proc::sources::TCPReader::mpDataLock = new QReadWriteLock();
 
@@ -178,19 +176,41 @@ int cedar::proc::sources::TCPReader::create_socket_server(int port)
         return -1;
     }
 
-    const int opt = 1;
-    if ( setsockopt(sfd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)) == -1)
-    {
-        std::cout<<"Error setting Socketopt!"<<std::endl;
-        return -1;
-    }
+//    const int opt = 1;
+//    if ( setsockopt(sfd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)) == -1)
+//    {
+//        std::cout<<"Error setting Socketopt!"<<std::endl;
+//        return -1;
+//    }
 
 #ifdef _WIN32
-    unsigned long on = 1;
-        ioctlsocket(sfd, FIONBIO, &on); //make socket Non-blockable in windows
+    const char opt = 1;
+            if (setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR,
+                           &opt, sizeof(opt)))
+            {
+                std::cout << "Error Setting Socket Options" << std::endl;
+            }
+
+            unsigned long on = 1;
+            ioctlsocket(sfd, FIONBIO, &on); //make socket Non-blockable in windows
 #else
+    int opt = 1;
+    if (setsockopt(sfd, SOL_SOCKET, SO_REUSEPORT,
+                   &opt, sizeof(opt)))
+    {
+        std::cout << "Error Setting Socket Options" << std::endl;
+    }
     fcntl(sfd, F_SETFL, O_NONBLOCK); //make socket Non-blockable
 #endif
+
+
+
+//#ifdef _WIN32
+//    unsigned long on = 1;
+//        ioctlsocket(sfd, FIONBIO, &on); //make socket Non-blockable in windows
+//#else
+//    fcntl(sfd, F_SETFL, O_NONBLOCK); //make socket Non-blockable
+//#endif
 
     /* fill in socket address */
     memset(&address, 0, sizeof(struct sockaddr_in));
@@ -432,7 +452,7 @@ void cedar::proc::sources::TCPReader::compute(const cedar::proc::Arguments &)
 void cedar::proc::sources::TCPReader::confirmAliveStatus()
 {
     std::string msgContent = this->getName() + " is alive!";
-    send(socket_h, msgContent.c_str(), msgContent.size(), 0);
+    send(socket_h, msgContent.c_str(), msgContent.size(), MSG_NOSIGNAL);
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::sources::TCPReader::determineInputValidity

@@ -55,7 +55,20 @@
 
 //Socket Tutorial Includes
 #include <stdio.h>
+
+#ifdef _WIN32
+#include <winsock2.h>
+#include <Ws2tcpip.h>
+#else
+#include <arpa/inet.h>  /* definition of inet_ntoa */
+#include <netdb.h>      /* definition of gethostbyname */
+#include <netinet/in.h> /* definition of struct sockaddr_in */
 #include <sys/socket.h>
+#include <sys/time.h>
+#include <unistd.h> /* definition of close */
+#endif
+
+
 #include <sys/types.h>
 #include <unistd.h>
 #include <string.h>
@@ -64,8 +77,6 @@
 //Non-Blocking Includes
 //#include <bits/fcntl.h>
 #include <fcntl.h>
-
-#define PORT 10020
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -190,7 +201,7 @@ void cedar::proc::sinks::TCPWriter::sendMatData(cedar::aux::ConstMatDataPtr data
     unsigned int checkSum = cedar::aux::generateCR32Checksum(stream.str().c_str(), stream.str().size());
     std::string streamContent = stream.str() + MATMSG_CHK + std::to_string(checkSum) + MATMSG_END;
 
-    send(socket_h, streamContent.c_str(), streamContent.size(), 0);
+    send(socket_h, streamContent.c_str(), streamContent.size(), MSG_NOSIGNAL);
 
 }
 
