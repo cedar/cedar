@@ -140,11 +140,11 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::redo()
     case Action::CREATE:
       if(mIsInitialRedo)
       {
-        mIsInitialRedo = false;
         createElement();
         //Set text for the 'Undo/Redo Stack'
         mElementFullPath = mpGuiElement->getElement()->getFullPath();
         setText(QString::fromStdString("Created element: " + mElementFullPath));
+				mIsInitialRedo = false;
       }
       else
       {
@@ -176,6 +176,27 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::createElement()
   //Loadings its old values, that we saved when it was deleted
 	loadElementConfiguration();
 
+	if(!mIsInitialRedo)
+	{
+		//If the element that is being created is a group, load the measurements of the group and the location of the elements in the group
+		if (auto group = dynamic_cast<cedar::proc::gui::Group *>(mpGuiElement))
+		{
+			group->setSize(mWidthOfGroup, mHeightOfGroup);
+
+			//Set positions of elements
+			std::map<std::string, cedar::proc::ElementPtr> elements = group->getGroup()->getElements();
+			int i = 0;
+			for (std::pair<std::string, cedar::proc::ElementPtr> element:elements)
+			{
+				cedar::proc::gui::Element *guiElement = this->mpScene->getGraphicsItemFor(element.second.get());
+				if (guiElement != nullptr)
+				{
+					guiElement->setPos(mPositionOfElementsInGroup[i]);
+					i++;
+				}
+			}
+		}
+	}
 	//Since the group the element is in could have changed its name the elementFullPath has to be updated
 	mElementFullPath = mpGuiElement->getElement()->getFullPath();
 }
@@ -187,6 +208,24 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::deleteElement()
 		//Before deleting the element the configuration has to be saved, so when its created it again in redo, the load old parameter are loaded
 		saveElementConfiguration();
 
+		//If the element that is being deleted is a group, save the measurements of the group and the location of the elements in the group
+		if(auto group = dynamic_cast<cedar::proc::gui::Group*>(mpGuiElement))
+		{
+			//Save size of the group
+			mWidthOfGroup = group->width();
+			mHeightOfGroup = group->height();
+
+			//Save to positions of the elements
+			std::map<std::string, cedar::proc::ElementPtr> elements = group->getGroup()->getElements();
+			for(std::pair<std::string, cedar::proc::ElementPtr> element:elements)
+			{
+				cedar::proc::gui::Element* guiElement = this->mpScene->getGraphicsItemFor(element.second.get());
+				if(guiElement!=nullptr)
+				{
+					mPositionOfElementsInGroup.push_back(guiElement->pos());
+				}
+			}
+		}
 		mpGuiElement->deleteElement();
   }
 }

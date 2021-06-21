@@ -280,10 +280,9 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
     }
   }
 
-  //Stack for everything else that has to be deleted
-  std::vector<cedar::proc::gui::GraphicsBase*> delete_stack;
+  std::vector<cedar::proc::gui::GraphicsBase*> selectedElements;
 
-  //Go through all items and push them onto the delete_stack if they are deleteable
+  //Go through all items and push them onto the selectedElements if they are deleteable
   for (int i = 0; i < items.size(); ++i)
   {
     auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]);
@@ -291,14 +290,14 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
     {
       if (!graphics_base->isReadOnly())
       {
-        delete_stack.push_back(graphics_base);
+        selectedElements.push_back(graphics_base);
       }
     }
   }
 
   // If multiple elements are to be deleted, start a macro on the undo stack, so all delete commands are
   // undone with one action
-  bool delete_multiple_elements = (delete_stack.size() + delete_connections_stack.size()) > 1;
+  bool delete_multiple_elements = (selectedElements.size() + delete_connections_stack.size()) > 1;
   if(delete_multiple_elements)
   {
     cedar::proc::gui::Ide::mpUndoStack->beginMacro("Deleted selected Elements");
@@ -313,9 +312,9 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
     delete_connections_stack.pop_back();
   }
 
-  // Delete all connections that are connected to any step which is on the "delete_stack" and not already
+  // Delete all connections that are connected to any step which is on the "selectedElements" and not already
   // deleted (happens if a element gets deleted but the connection was not selected)
-  for(cedar::proc::gui::GraphicsBase* graphics_base : delete_stack)
+  for(cedar::proc::gui::GraphicsBase* graphics_base : selectedElements)
   {
     //Check if there is any connection to the current item that was NOT in the items list
     if(auto element = dynamic_cast<cedar::proc::gui::Connectable*>(graphics_base))
@@ -363,18 +362,47 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
   }
 
   // sort stack (make it a real stack)
-  std::sort(delete_stack.begin(), delete_stack.end(), this->sortElements);
+  std::sort(selectedElements.begin(), selectedElements.end(), this->sortElements);
 
-  // while stack is not empty, check if any items must be added, then delete the current item
-  while (delete_stack.size() > 0)
+  std::vector<cedar::proc::gui::Group*> groupStack;
+	std::vector<cedar::proc::gui::GraphicsBase*> deleteStack;
+
+	//Dont delete groups yet
+	for(cedar::proc::gui::GraphicsBase* element:selectedElements)
   {
-    // look at first item
-    QGraphicsItem* current_item = delete_stack.back();
-
-    // now delete the current element
-    deleteElement(current_item);
-    delete_stack.pop_back();
+    if(auto group = dynamic_cast<cedar::proc::gui::Group*>(element))
+		{
+    	groupStack.push_back(group);
+		}
+    else
+		{
+    	deleteStack.push_back(element);
+		}
   }
+
+	//Find subgroups
+  while(groupStack.size() > 0)
+	{
+  	cedar::proc::gui::Group* group = groupStack.front();
+		groupStack.pop_back();
+  	std::map<std::string, cedar::proc::ElementPtr> elements = group->getGroup()->getElements();
+  	for(std::pair<std::string, cedar::proc::ElementPtr> element:elements)
+		{
+			cedar::proc::gui::Element* guiElement = this->getGraphicsItemFor(element.second.get());
+  		if(auto subGroup = dynamic_cast<cedar::proc::gui::Group*>(guiElement))
+			{
+  			groupStack.push_back(subGroup);
+			}
+		}
+		deleteStack.push_back(group);
+	}
+
+	//Delete all items on stack
+	for(cedar::proc::gui::GraphicsBase* element:deleteStack)
+	{
+		deleteElement(element);
+	}
+
   if(delete_multiple_elements)
   {
     cedar::proc::gui::Ide::mpUndoStack->endMacro();
