@@ -61,17 +61,17 @@ mTargetGroup(targetGroup),
 mSourcePosition(sourcePosition),
 mpScene(scene)
 {
-  //Iterate over elements and extract their target position and element identifier
+  //Iterate over elements and extract their target position and elementFullPath
   for(QGraphicsItem* element : elements)
   {
     if(auto guiElement = dynamic_cast<cedar::proc::gui::Element*>(element))
     {
       mTargetPosition.push_back(guiElement->pos());
-      mElementIdentifier.push_back(guiElement->getElement()->getFullPath());
+      mElementFullPaths.push_back(guiElement->getElement()->getFullPath());
       mGuiElements.push_back(guiElement);
     }
   }
-  updateIdentifier();
+	updateFullPath();
 
   if(elements.size() == 1)
   {
@@ -173,7 +173,7 @@ void cedar::proc::undoRedo::commands::MoveElement::addElementsToGroup(std::vecto
     }
 
     //Since the group of the elements has been changed, we need to update the fullpaths
-    updateIdentifier();
+		updateFullPath();
   }
 }
 
@@ -183,31 +183,31 @@ void cedar::proc::undoRedo::commands::MoveElement::updatePointer()
   int i = 0;
   for(auto &element : this->mGuiElements)
   {
-    cedar::proc::gui::Element* guiElement = this->mpScene->getElementByFullPath(mElementIdentifier.at(i));
+    cedar::proc::gui::Element* guiElement = this->mpScene->getElementByFullPath(mElementFullPaths.at(i));
     element = guiElement;
     i++;
   }
 
-  if(mSourceGroupIdentifier == "")
+  if(mSourceGroupFullPath == "")
   {
     this->mSourceGroup = nullptr;
   }
   else
   {
-    cedar::proc::gui::Element* sourceGroupElement = this->mpScene->getElementByFullPath(mSourceGroupIdentifier);
+    cedar::proc::gui::Element* sourceGroupElement = this->mpScene->getElementByFullPath(mSourceGroupFullPath);
     CEDAR_ASSERT(sourceGroupElement != nullptr)
     auto group = dynamic_cast<cedar::proc::gui::Group*>(sourceGroupElement);
     CEDAR_ASSERT(group != nullptr)
     this->mSourceGroup = group;
   }
 
-  if(mTargetGroupIdentifier == "")
+  if(mTargetGroupFullPath == "")
   {
     this->mTargetGroup = nullptr;
   }
   else
   {
-    cedar::proc::gui::Element* targetGroupElement = this->mpScene->getElementByFullPath(mTargetGroupIdentifier);
+    cedar::proc::gui::Element* targetGroupElement = this->mpScene->getElementByFullPath(mTargetGroupFullPath);
     CEDAR_ASSERT(targetGroupElement != nullptr)
     auto group = dynamic_cast<cedar::proc::gui::Group*>(targetGroupElement);
     CEDAR_ASSERT(group != nullptr)
@@ -215,38 +215,38 @@ void cedar::proc::undoRedo::commands::MoveElement::updatePointer()
   }
 }
 
-void cedar::proc::undoRedo::commands::MoveElement::updateIdentifier()
+void cedar::proc::undoRedo::commands::MoveElement::updateFullPath()
 {
   int i = 0;
   for(QGraphicsItem* element : mGuiElements)
   {
     if(auto guiElement = dynamic_cast<cedar::proc::gui::Element*>(element))
     {
-      this->mElementIdentifier.at(i) = guiElement->getElement()->getFullPath();
+      this->mElementFullPaths.at(i) = guiElement->getElement()->getFullPath();
     }
     else
     {
-      this->mElementIdentifier.at(i) = "";
+      this->mElementFullPaths.at(i) = "";
     }
     i++;
   }
 
   if(this->mSourceGroup != nullptr)
   {
-    this->mSourceGroupIdentifier = this->mSourceGroup->getGroup()->getFullPath();
+    this->mSourceGroupFullPath = this->mSourceGroup->getGroup()->getFullPath();
   }
   else
   {
-    this->mSourceGroupIdentifier = "";
+    this->mSourceGroupFullPath = "";
   }
 
   if(this->mTargetGroup != nullptr)
   {
-    this->mTargetGroupIdentifier = this->mTargetGroup->getGroup()->getFullPath();
+    this->mTargetGroupFullPath = this->mTargetGroup->getGroup()->getFullPath();
   }
   else
   {
-    this->mTargetGroupIdentifier = "";
+    this->mTargetGroupFullPath = "";
   }
-  std::cout << mTargetGroupIdentifier << std::endl;
+  std::cout << mTargetGroupFullPath << std::endl;
 }

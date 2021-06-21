@@ -104,9 +104,9 @@ protected:
   void createConnection();
   //!@brief Deletes a connection between the source and target
   void deleteConnection();
-  //!@brief Updates the identifiers of source and target
+  //!@brief Updates the fullPaths of source and target
   void updateSourceTargetNameAndSlotName();
-  //!@brief Updates the source and target elements by the identifiers
+  //!@brief Updates the source and target elements by the fullPaths
   void updateSourceAndTargetConnectors();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -124,8 +124,8 @@ private:
   cedar::proc::gui::GraphicsBase* mpSource;
   cedar::proc::gui::GraphicsBase* mpTarget;
 
-  std::string mSourceElementIdentifier;
-  std::string mTargetElementIdentifier;
+  std::string mSourceElementFullPath;
+  std::string mTargetElementFullPath;
   std::string mSourceSlotName;
   std::string mTargetSlotName;
 

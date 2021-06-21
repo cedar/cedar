@@ -75,7 +75,7 @@ mCreateConnectorGroup(createConnectorGroup)
   {
     text = "Removed";
   }
-  setText(QString::fromStdString(text + " connection: " + mSourceElementIdentifier + "->" + mTargetElementIdentifier));
+  setText(QString::fromStdString(text + " connection: " + mSourceElementFullPath + "->" + mTargetElementFullPath));
 }
 
 cedar::proc::undoRedo::commands::CreateDeleteConnection::CreateDeleteConnection(cedar::proc::gui::Connection* connection,
@@ -101,7 +101,7 @@ mCreateConnectorGroup(createConnectorGroup)
   {
     text = "Removed";
   }
-  setText(QString::fromStdString(text + " connection: " + mSourceElementIdentifier + "->" + mTargetElementIdentifier));
+  setText(QString::fromStdString(text + " connection: " + mSourceElementFullPath + "-> " + mTargetElementFullPath));
 }
 
 cedar::proc::undoRedo::commands::CreateDeleteConnection::~CreateDeleteConnection()
@@ -182,7 +182,7 @@ void cedar::proc::undoRedo::commands::CreateDeleteConnection::updateSourceTarget
       //Normal case
       if(cedar::proc::gui::Element* guiElement = this->mpScene->getGraphicsItemFor(element))
       {
-        mSourceElementIdentifier = guiElement->getElement()->getFullPath();
+				mSourceElementFullPath = guiElement->getElement()->getFullPath();
         mSourceExternal = "";
       }
       //This happens if the externalElement is used
@@ -190,7 +190,7 @@ void cedar::proc::undoRedo::commands::CreateDeleteConnection::updateSourceTarget
       {
         auto group = dynamic_cast<cedar::proc::Element*>(element->getGroup().get());
         CEDAR_ASSERT(group!=nullptr)
-        mSourceElementIdentifier = this->mpScene->getGraphicsItemFor(group)->getElement()->getFullPath();
+				mSourceElementFullPath = this->mpScene->getGraphicsItemFor(group)->getElement()->getFullPath();
         mSourceExternal = element->getName();
       }
     }
@@ -207,7 +207,7 @@ void cedar::proc::undoRedo::commands::CreateDeleteConnection::updateSourceTarget
       //Normal case
       if(cedar::proc::gui::Element* guiElement = this->mpScene->getGraphicsItemFor(element))
       {
-        mTargetElementIdentifier = guiElement->getElement()->getFullPath();
+				mTargetElementFullPath = guiElement->getElement()->getFullPath();
         mTargetExternal = "";
       }
       //This happens if the externalElement is used
@@ -215,7 +215,7 @@ void cedar::proc::undoRedo::commands::CreateDeleteConnection::updateSourceTarget
       {
         auto group = dynamic_cast<cedar::proc::Element*>(element->getGroup().get());
         CEDAR_ASSERT(group!=nullptr)
-        mTargetElementIdentifier = this->mpScene->getGraphicsItemFor(group)->getElement()->getFullPath();
+				mTargetElementFullPath = this->mpScene->getGraphicsItemFor(group)->getElement()->getFullPath();
         mTargetExternal = element->getName();
       }
     }
@@ -224,8 +224,8 @@ void cedar::proc::undoRedo::commands::CreateDeleteConnection::updateSourceTarget
 
 void cedar::proc::undoRedo::commands::CreateDeleteConnection::updateSourceAndTargetConnectors()
 {
-  cedar::proc::gui::Element* sourceGuiElement = mpScene->getElementByFullPath(mSourceElementIdentifier);
-  cedar::proc::gui::Element* targetGuiElement = mpScene->getElementByFullPath(mTargetElementIdentifier);
+  cedar::proc::gui::Element* sourceGuiElement = mpScene->getElementByFullPath(mSourceElementFullPath);
+  cedar::proc::gui::Element* targetGuiElement = mpScene->getElementByFullPath(mTargetElementFullPath);
 
 
   if(cedar::proc::gui::Connectable* connectable = dynamic_cast<cedar::proc::gui::Connectable*>(sourceGuiElement))

@@ -124,7 +124,7 @@ private:
   QPointF mPosition;
   cedar::aux::ConfigurationNode mElementConfiguration;
   cedar::proc::gui::Element* mpGuiElement;
-  std::string mElementIdentifier;
+  std::string mElementFullPath;
   std::string mClassId;
   bool mIsInitialRedo;
 }; //class cedar::proc::undoRedo::commands::CreateGroupTemplate
