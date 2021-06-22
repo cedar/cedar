@@ -70,7 +70,6 @@
 
 
 #include <sys/types.h>
-#include <unistd.h>
 #include <string.h>
 #include <cedar/auxiliaries/UIntParameter.h>
 
@@ -201,7 +200,11 @@ void cedar::proc::sinks::TCPWriter::sendMatData(cedar::aux::ConstMatDataPtr data
     unsigned int checkSum = cedar::aux::generateCR32Checksum(stream.str().c_str(), stream.str().size());
     std::string streamContent = stream.str() + MATMSG_CHK + std::to_string(checkSum) + MATMSG_END;
 
+#ifdef _WIN32
+    send(socket_h, streamContent.c_str(), streamContent.size(), 0);
+#else
     send(socket_h, streamContent.c_str(), streamContent.size(), MSG_NOSIGNAL);
+#endif
 
 }
 

@@ -452,7 +452,11 @@ void cedar::proc::sources::TCPReader::compute(const cedar::proc::Arguments &)
 void cedar::proc::sources::TCPReader::confirmAliveStatus()
 {
     std::string msgContent = this->getName() + " is alive!";
+#ifdef _WIN32
+    send(socket_h, msgContent.c_str(), msgContent.size(), 0);
+#else
     send(socket_h, msgContent.c_str(), msgContent.size(), MSG_NOSIGNAL);
+#endif
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::sources::TCPReader::determineInputValidity
