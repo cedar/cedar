@@ -2178,6 +2178,9 @@ void cedar::proc::gui::Ide::newFile()
   this->displayFilename("unnamed file");
   cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName("unnamed file");
 
+  // Reset the undo/redo stack
+  mpUndoStack->clear();
+
   // set the smart connection button
   this->mpActionToggleSmartConnections->blockSignals(true);
   this->mpActionToggleSmartConnections->setChecked(this->mGroup->getSmartConnection());
@@ -2606,6 +2609,9 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
   last_dir->setValue(path);
+
+  // Reset the undo/redo stack
+  mpUndoStack->clear();
 
   // set the smart connection button
   this->mpActionToggleSmartConnections->blockSignals(true);
