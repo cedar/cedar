@@ -437,7 +437,7 @@ void cedar::proc::gui::StepItem::writeConfiguration(cedar::aux::ConfigurationNod
 
 bool cedar::proc::gui::StepItem::manualDeletionRequiresConfirmation() const
 {
-  return true;
+  return false;
 }
 
 void cedar::proc::gui::StepItem::openActionsDock()
