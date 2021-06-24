@@ -2430,11 +2430,6 @@ void cedar::proc::gui::Ide::load()
 
 void cedar::proc::gui::Ide::loadFile(QString file)
 {
-  if (!this->checkSave())
-  {
-    return;
-  }
-
   // print message
   cedar::aux::LogSingleton::getInstance()->message
                                            (
@@ -2628,6 +2623,10 @@ void cedar::proc::gui::Ide::recentFileItemTriggered()
   CEDAR_DEBUG_ASSERT(p_sender != NULL);
 
   const QString& file = p_sender->text();
+  if (!this->checkSave())
+  {
+    return;
+  }
   try
   {
     this->loadFile(file);
