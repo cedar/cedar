@@ -55,7 +55,7 @@ cedar::proc::undoRedo::UndoStack::UndoStack(QObject *parent)
 :
 QUndoStack(parent)
 {
-  this->setUndoLimit(100);
+  this->setUndoLimit(3000);
 }
 
 cedar::proc::undoRedo::UndoStack::~UndoStack()
