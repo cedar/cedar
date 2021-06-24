@@ -164,6 +164,7 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::redo()
         //Undo of createElement = deleteElement
         deleteElement();
       }
+      mIsInitialRedo = false;
       break;
   }
 }
