@@ -3087,7 +3087,7 @@ void cedar::proc::Group::pruneUnusedConnectors()
       std::vector<cedar::proc::DataConnectionPtr> incoming_connections;
       this->getGroup()->getDataConnectionsTo(this_as_connectable, input_slot->getName(), incoming_connections);
       // check if any slots are unsused
-      if (outgoing_connections.size() == 0 || incoming_connections.size() == 0)
+      if (outgoing_connections.size() == 0 && incoming_connections.size() == 0)
       {
         to_delete[connector.first] = connector.second;
       }
@@ -3102,7 +3102,7 @@ void cedar::proc::Group::pruneUnusedConnectors()
       std::vector<cedar::proc::DataConnectionPtr> incoming_connections;
       this->getDataConnectionsTo(group_sink, "input", incoming_connections);
       // check if any slots are unsused
-      if (outgoing_connections.size() == 0 || incoming_connections.size() == 0)
+      if (outgoing_connections.size() == 0 && incoming_connections.size() == 0)
       {
         to_delete[connector.first] = connector.second;
       }
