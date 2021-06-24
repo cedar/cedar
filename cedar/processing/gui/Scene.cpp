@@ -282,7 +282,7 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
 
   std::vector<cedar::proc::gui::GraphicsBase*> selectedElements;
 
-  //Go through all items and push them onto the selectedElements if they are deleteable
+  //Go through all items and put them in the selectedElements list if they are deleteable
   for (int i = 0; i < items.size(); ++i)
   {
     auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]);
@@ -312,79 +312,66 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
     delete_connections_stack.pop_back();
   }
 
-  // Delete all connections that are connected to any step which is on the "selectedElements" and not already
-  // deleted (happens if a element gets deleted but the connection was not selected)
+  // Delete all connections that are connected to any step which is in the "selectedElements" and not already
+  // deleted (happens if an element gets deleted but the connection was not selected)
   for(cedar::proc::gui::GraphicsBase* graphics_base : selectedElements)
   {
-    //Check if there is any connection to the current item that was NOT in the items list
+    //Check if there is any connection from/to the current item that was NOT in the items list
     if(auto element = dynamic_cast<cedar::proc::gui::Connectable*>(graphics_base))
     {
-      cedar::proc::gui::Connectable::DataSlotNameMap inputDataSlotMap;
+      std::set<cedar::proc::gui::DataSlotItem*> dataSlotSet;
+      cedar::proc::gui::Connectable::DataSlotNameMap dataSlotMap;
       if(element->getNumberOfSlotsFor(cedar::proc::DataRole::INPUT) != 0)
       {
-        //Get all Input DataSlots of the Element
-        inputDataSlotMap = element->getSlotItems(cedar::proc::DataRole::INPUT);
+        // Get all input DataSlots of the element
+        dataSlotMap = element->getSlotItems(cedar::proc::DataRole::INPUT);
       }
-      cedar::proc::gui::Connectable::DataSlotNameMap outputDataSlotMap;
       if(element->getNumberOfSlotsFor(cedar::proc::DataRole::OUTPUT) != 0)
       {
-        //Get all Output DataSlots of the Element
+        // Get all output DataSlots of the element and append them to the dataSlotMap
+        cedar::proc::gui::Connectable::DataSlotNameMap outputDataSlotMap;
         outputDataSlotMap = element->getSlotItems(cedar::proc::DataRole::OUTPUT);
+        dataSlotMap.insert(outputDataSlotMap.begin(), outputDataSlotMap.end());
+      }
+      // Save all connectinos from/to the dataslots in a set to remove duplicates
+      std::set<cedar::proc::gui::Connection*> connectionSet;
+      for(std::pair<std::string, cedar::proc::gui::DataSlotItem*> const& nameMap : dataSlotMap)
+      {
+        // Get all connections of this dataslot
+        std::vector<cedar::proc::gui::Connection*> connections = nameMap.second->getConnections();
+        connectionSet.insert(connections.begin(), connections.end());
       }
 
-
-      //iterate over inputDataSlotMap
-      for(std::pair<std::string, cedar::proc::gui::DataSlotItem*> const& nameMap : inputDataSlotMap)
+      // Delete connections (push to undo stack)
+      for(cedar::proc::gui::Connection* connection : connectionSet)
       {
-        //Get all connection from this dataslor
-        std::vector<cedar::proc::gui::Connection*> connectionsFrom = nameMap.second->getConnections();
-
-        for(cedar::proc::gui::Connection* connection : connectionsFrom)
-        {
-          cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(
-                  connection, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::DELETE));
-        }
-      }
-
-      //iterate over outputDataSlotMap
-      for(std::pair<std::string, cedar::proc::gui::DataSlotItem*> const& nameMap : outputDataSlotMap)
-      {
-        //Get all connection from this dataslor
-        std::vector<cedar::proc::gui::Connection*> connectionsFrom = nameMap.second->getConnections();
-
-        for(cedar::proc::gui::Connection* connection : connectionsFrom)
-        {
-          cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(
-                  connection, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::DELETE));
-        }
+        cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(
+                connection, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::DELETE));
       }
     }
   }
 
-  // sort stack (make it a real stack)
-  std::sort(selectedElements.begin(), selectedElements.end(), this->sortElements);
-
   std::vector<cedar::proc::gui::Group*> groupStack;
 	std::vector<cedar::proc::gui::GraphicsBase*> deleteStack;
 
-	//Dont delete groups yet
-	for(cedar::proc::gui::GraphicsBase* element:selectedElements)
+	// Don't delete groups yet
+	for(cedar::proc::gui::GraphicsBase* graphicsBase:selectedElements)
   {
-    if(auto group = dynamic_cast<cedar::proc::gui::Group*>(element))
+    if(auto group = dynamic_cast<cedar::proc::gui::Group*>(graphicsBase))
 		{
     	groupStack.push_back(group);
 		}
-    else
+    else if(auto element = dynamic_cast<cedar::proc::gui::Element*>(graphicsBase))
 		{
     	deleteStack.push_back(element);
 		}
   }
 
-	//Find subgroups
-  while(groupStack.size() > 0)
+	// Find subgroups
+	int index = 0;
+  while(index < groupStack.size())
 	{
-  	cedar::proc::gui::Group* group = groupStack.front();
-		groupStack.pop_back();
+  	cedar::proc::gui::Group* group = groupStack.at(index);
   	std::map<std::string, cedar::proc::ElementPtr> elements = group->getGroup()->getElements();
   	for(std::pair<std::string, cedar::proc::ElementPtr> element:elements)
 		{
@@ -394,13 +381,29 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
   			groupStack.push_back(subGroup);
 			}
 		}
-		deleteStack.push_back(group);
+  	index++;
 	}
 
-	//Delete all items on stack
+  // Remove duplicates
+  std::set<cedar::proc::gui::Group*> groupSet( groupStack.begin(), groupStack.end() );
+  groupStack.assign( groupSet.begin(), groupSet.end() );
+
+  // Sort subgroups (innermost groups first) and put onto delete stack
+  std::sort(groupStack.begin(), groupStack.end(),
+      [](const cedar::proc::gui::Group * a, const cedar::proc::gui::Group * b) -> bool
+      {
+        int a_size = QString::fromStdString(a->getGroup()->getFullPath()).split('.').size();
+        int b_size = QString::fromStdString(b->getGroup()->getFullPath()).split('.').size();
+        return a_size > b_size;
+      });
+
+  // Append groups
+  deleteStack.insert(deleteStack.end(), groupStack.begin(), groupStack.end());
+
+	// Delete all items on stack
 	for(cedar::proc::gui::GraphicsBase* element:deleteStack)
 	{
-		deleteElement(element);
+    deleteElement(element);
 	}
 
   if(delete_multiple_elements)
@@ -416,26 +419,6 @@ void cedar::proc::gui::Scene::deleteElement(QGraphicsItem* pItem)
     cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteElement(
             element, this,undoRedo::commands::CreateDeleteElement::Action::DELETE));
   }
-}
-
-bool cedar::proc::gui::Scene::sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem)
-{
-  unsigned int depth_first_item = 0;
-  unsigned int depth_second_item = 0;
-  QGraphicsItem* p_current_item = pFirstItem;
-  while (p_current_item != nullptr && p_current_item->parentItem() != nullptr)
-  {
-    ++depth_first_item;
-    p_current_item = p_current_item->parentItem();
-  }
-
-  p_current_item = pSecondItem;
-  while (p_current_item != nullptr && p_current_item->parentItem() != nullptr)
-  {
-    ++depth_second_item;
-    p_current_item = p_current_item->parentItem();
-  }
-  return (depth_first_item < depth_second_item);
 }
 
 void cedar::proc::gui::Scene::emitSceneChanged()

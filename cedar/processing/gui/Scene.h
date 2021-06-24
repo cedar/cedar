@@ -356,11 +356,6 @@ public:
   cedar::proc::gui::CommentWidget* getCommentWidget() const;
   
   cedar::proc::gui::CodeWidget* getCodeWidget() const;
-  
-
-  /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
-   */
-  static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
 
   /*! Returns a list of selected items where those items whose parents are in the selection are removed.
    */
