@@ -58,6 +58,7 @@ mIsInitialRedo(true),
 mPosition(position),
 mClassId(classId),
 mpGroup(group),
+mGroupIsCollapsed(false),
 mpScene(scene)
 {
 }
@@ -68,6 +69,7 @@ cedar::proc::undoRedo::commands::CreateDeleteElement::CreateDeleteElement(cedar:
 mpGuiElement(element),
 mAction(action),
 mIsInitialRedo(true),
+mGroupIsCollapsed(false),
 mpScene(scene)
 {
   mPosition = element->pos();
@@ -182,8 +184,11 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::createElement()
 		//If the element that is being created is a group, load the measurements of the group and the location of the elements in the group
 		if (auto group = dynamic_cast<cedar::proc::gui::Group *>(mpGuiElement))
 		{
-			group->setSize(mWidthOfGroup, mHeightOfGroup);
-
+      group->setSize(mWidthOfGroup, mHeightOfGroup);
+		  if(this->mGroupIsCollapsed)
+      {
+        group->setCollapsed(true);
+      }
 			//Set positions of elements
 			std::map<std::string, cedar::proc::ElementPtr> elements = group->getGroup()->getElements();
 			int i = 0;
@@ -213,8 +218,17 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::deleteElement()
 		if(auto group = dynamic_cast<cedar::proc::gui::Group*>(mpGuiElement))
 		{
 			//Save size of the group
-			mWidthOfGroup = group->width();
-			mHeightOfGroup = group->height();
+      this->mGroupIsCollapsed = group->isCollapsed();
+      if(this->mGroupIsCollapsed)
+      {
+        this->mWidthOfGroup = group->getUncollapsedWidth();
+        this->mHeightOfGroup = group->getUncollapsedHeight();
+      }
+      else
+      {
+        this->mWidthOfGroup = group->width();
+        this->mHeightOfGroup = group->height();
+      }
 
 			//Save to positions of the elements
 			std::map<std::string, cedar::proc::ElementPtr> elements = group->getGroup()->getElements();

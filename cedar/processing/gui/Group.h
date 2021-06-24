@@ -316,6 +316,11 @@ public slots:
   //! set collapsedness of this group
   void setCollapsed(bool collapsed);
 
+  //! get the size of the uncollapsed group
+  double getUncollapsedWidth();
+
+  double getUncollapsedHeight();
+
   //! handes a change in step name
   void handleStepNameChanged(const std::string& from, const std::string& to);
 

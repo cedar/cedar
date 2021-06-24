@@ -127,9 +127,12 @@ private:
   cedar::proc::gui::Scene* mpScene;
   std::string mClassId;
   QPointF mPosition;
+
   qreal mWidthOfGroup;
   qreal mHeightOfGroup;
+  bool mGroupIsCollapsed;
   std::vector<QPointF> mPositionOfElementsInGroup;
+
   Action mAction;
   bool mIsInitialRedo;
 

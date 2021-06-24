@@ -165,7 +165,7 @@ void cedar::proc::undoRedo::commands::MoveElement::addElementsToGroup(std::vecto
       this->mpScene->getRootGroup()->addElements(qGraphicsItems);
     }
 
-    //Update the guiElements again before leaving the function. Their have been newly created by addElements()
+    //Update the guiElements again before leaving the function. There have been newly created by addElements()
     mGuiElements.clear();
     for(cedar::proc::Element* element:elements)
     {

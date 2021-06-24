@@ -815,6 +815,16 @@ void cedar::proc::gui::Group::sizeChanged()
   this->updateDecorationPositions();
 }
 
+double cedar::proc::gui::Group::getUncollapsedWidth()
+{
+  return this->_mUncollapsedWidth->getValue();
+}
+
+double cedar::proc::gui::Group::getUncollapsedHeight()
+{
+  return this->_mUncollapsedHeight->getValue();
+}
+
 void cedar::proc::gui::Group::updateTextBounds()
 {
   qreal bounds_factor = static_cast<qreal>(2);
