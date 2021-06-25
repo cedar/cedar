@@ -87,20 +87,19 @@ QWidget(pParent)
   buttons->addWidget(mpResetButton);
   mpAutoResetCheckbox = new QCheckBox("Auto Reset");
   buttons->addWidget(mpAutoResetCheckbox);
-  mpSaveButton = new QPushButton("S");
+  mpSaveButton = new QPushButton("Save");
   QSizePolicy policy0 = mpSaveButton->sizePolicy();
   policy0.setHorizontalStretch(.5);
   mpSaveButton->setSizePolicy(policy0);
   QObject::connect(mpSaveButton, SIGNAL (clicked()), this, SLOT(saveButtonClicked()));
   buttons->addWidget(mpSaveButton);
-  mpLoadButton = new QPushButton("L");
+  mpLoadButton = new QPushButton("Load");
   QObject::connect(mpLoadButton, SIGNAL (clicked()), this, SLOT(loadButtonClicked()));
   buttons->addWidget(mpLoadButton);
 
 
   layout->addLayout(buttons);
   setAcceptDrops(true);
-
 }
 
 cedar::proc::gui::CoPYWidget::~CoPYWidget()

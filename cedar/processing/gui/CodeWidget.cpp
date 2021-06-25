@@ -256,6 +256,7 @@ const QTextCharFormat cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter
 }
 
 int cedar::proc::gui::CodeWidget::dontMark;
+#ifdef CEDAR_USE_PYTHON
 
 cedar::proc::gui::CodeWidget::CodeWidget()
 :
@@ -418,7 +419,7 @@ void cedar::proc::gui::CodeWidget::updateCodeString()
   }
 }
 
-
+#endif
 
 // CodeEditor implementation
 

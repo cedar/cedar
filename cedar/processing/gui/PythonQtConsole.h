@@ -80,7 +80,7 @@ namespace cedar
     {
       namespace PythonQtConsoleScope
       {
-        /*class PythonWorker : public QObject
+        class PythonWorker : public QObject
         {
         Q_OBJECT
           PythonQtObjectPtr mContext;
@@ -88,251 +88,112 @@ namespace cedar
           cedar::proc::gui::CoPYObject *mpPy;
 
         public:
-          PythonWorker()
+
+          static std::string hasToStop;
+
+          PythonWorker(cedar::proc::gui::CoPYObject* pyObject)
           {
+
             //init PythonQt with mpConsole
             PythonQt::setEnableThreadSupport(true);
-            PythonQt::init(PythonQt::RedirectStdOut);
+            PythonQt::init(PythonQt::IgnoreSiteModule|PythonQt::RedirectStdOut);
 
             //Import CoPYObject Type To Python
-            qRegisterMetaType<cedar::proc::gui::CoPYObject>("CoPYObject");
+            //qRegisterMetaType<cedar::proc::gui::CoPYObject>("CoPYObject");
+            //qRegisterMetaType<cedar::proc::gui::CoPYObject>;
             PythonQt::self()->registerCPPClass("CoPYObject", "", "copy",
                                                PythonQtCreateObject<cedar::proc::gui::CoPYObjectWrapper>);
 
             //Init Wrapper of Type QObject to import in Python
             mpPyWrap = new cedar::proc::gui::CoPYObjectWrapper();
-            mpPy = mpPyWrap->getO();
+            mpPy = pyObject;
+
+            QObject::connect(mpPyWrap, SIGNAL(createSig(const QString &, const int &, const int &, const int &)), mpPy, SLOT(createElem(const QString &, const int &, const int &, const int &)),Qt::BlockingQueuedConnection);
+            QObject::connect(mpPyWrap, SIGNAL(copySig(const QString &, const QString &)), mpPy, SLOT(copyTo(const QString &, const QString &)),Qt::BlockingQueuedConnection);
+            QObject::connect(mpPyWrap, SIGNAL(setGroupSig(const QString &)), mpPy, SLOT(setGroup(const QString &)),Qt::BlockingQueuedConnection);
+            QObject::connect(mpPyWrap, SIGNAL(connectSig(const QString &, const int &, const QString &, const int &)), mpPy, SLOT(connectSlots(const QString &, const int &, const QString &, const int &)),Qt::BlockingQueuedConnection);
+            QObject::connect(mpPyWrap, SIGNAL(createGroupSig(const QString &, const int &, const int &, const int &)), mpPy, SLOT(createGroup(const QString &, const int &, const int &, const int &)),Qt::BlockingQueuedConnection);
+            QObject::connect(mpPyWrap, SIGNAL(setParameterSig(const QString &, const QString &, const QVariant &)), mpPy, SLOT(setParameter(const QString &, const QString &, const QVariant &)),Qt::BlockingQueuedConnection);
+            QObject::connect(mpPyWrap, SIGNAL(disconnectSig(const QString &, const int &, const QString &, const int &)), mpPy, SLOT(disconnectSlots(const QString &, const int &, const QString &, const int &)),Qt::BlockingQueuedConnection);
 
             mContext = PythonQt::self()->createUniqueModule();
-            PyThreadState *state = PyEval_SaveThread();
+            mContext.addObject("py", mpPyWrap);
+
+            QObject::connect(PythonQt::self(), SIGNAL(pythonStdOut(const QString&)), this,
+                             SLOT(stdOut(const QString&)));
+            QObject::connect(PythonQt::self(), SIGNAL(pythonStdErr(const QString&)), this,
+                             SLOT(stdErr(const QString&)));
             emit setup(mContext);
 
           };
-
-        public slots:
-
-          void executeCode(const QString &code)
-          {
-            PYTHONQT_GIL_SCOPE
-            PythonQtObjectPtr p;
-            PyObject *dict = NULL;
-            if (PyModule_Check(mContext))
-            {
-              dict = PyModule_GetDict(mContext);
-            } else if (PyDict_Check(mContext))
-            {
-              dict = mContext;
-            }
-            if (dict)
-            {
-              p.setNewRef(PyRun_String(QStringToPythonConstCharPointer(code), Py_file_input, dict, dict));
-            }
-            if (!p)
-            {
-              PythonQt::self()->handleError();
-            }
-          }
-
-          void addVariable(const QString &name, const QVariant &variable)
-          {
-            PYTHONQT_GIL_SCOPE
-            mContext.addVariable(name, variable);
-          }
-
-          void reset()
-          {
-            PYTHONQT_GIL_SCOPE
-            mContext = PythonQt::self()->createUniqueModule();
-
-            //reassign both cpp and python Object with getObject()-Method to be of type cedar::proc::gui::CoPYObject not cedar::proc::gui::CoPYObjectWrapper
-            mContext.addObject("pyWrap", mpPyWrap);
-            mContext.evalScript("from PythonQt.copy import CoPYObject\npy = pyWrap.object()\n");
-          }
-
-          void setScene(cedar::proc::gui::Scene *pScene)
-          {
-            mpPy->setScene(pScene);
-            mpPy->setGroup(pScene->getRootGroup()->getGroup());
-          };
-        signals:
-
-          void setup(PythonQtObjectPtr mContext);
-        };*/
-
-        class ThreadedPythonContext : public QThread
-        {
-        Q_OBJECT
         private:
-          //static bool hasToStop;
-          static int counter;
-        public:
-          ThreadedPythonContext() :
-                  QThread(),
-                  _running(true)
+
+          int static traceHook(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
           {
-
-            //init PythonQt with mpConsole
-            PythonQt::setEnableThreadSupport(true);
-            PythonQt::init(PythonQt::IgnoreSiteModule || PythonQt::RedirectStdOut);
-            //PythonQt::init(PythonQt::IgnoreSiteModule|PythonQt::RedirectStdOut);
-
-            //Import CoPYObject Type To Python
-            qRegisterMetaType<cedar::proc::gui::CoPYObject>("CoPYObject");
-            PythonQt::self()->registerCPPClass("CoPYObject", "", "copy",
-                                               PythonQtCreateObject<cedar::proc::gui::CoPYObjectWrapper>);
-
-            //Init Wrapper of Type QObject to import in Python
-            mpPyWrap = new cedar::proc::gui::CoPYObjectWrapper();
-            mpPy = mpPyWrap->getO();
-
-            _context = PythonQt::self()->getMainModule();
-            _context.addObject("pyWrap", mpPyWrap);
-            _context.evalScript("from PythonQt.copy import CoPYObject\npy = pyWrap.object()\n");
-
-
-            PyThreadState *state = PyEval_SaveThread();
-          }
-
-          ~ThreadedPythonContext()
-          {
-            _running = false;
-            wait();
-          }
-
-          PythonQtObjectPtr getContext()
-          {
-            return _context;
-          };
-
-          void setScene(cedar::proc::gui::Scene *pScene)
-          {
-            mpPy->setScene(pScene);
-            mpPy->setGroup(pScene->getRootGroup()->getGroup());
-          };
-
-          void setContext(const PythonQtObjectPtr &context)
-          {
-            _context = context;
-          };
-
-          void setHasToStop()
-          {
-            //hasToStop = true;
-          }
-
-          void issue(const QString &code)
-          {
-            _lock.lock();
-            std::cout << code.toStdString() << std::endl;
-            _commands.enqueue(code);
-            _lock.unlock();
-
-            _CommandQueued.wakeOne();
-          }
-
-          bool isCommandQueueEmpty()
-          {
-            QMutexLocker lock(&_lock);
-            return _commands.isEmpty();
-          }
-
-          static int traceHook(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
-          {
-            //function should call for each python line execute
-
-            if( false ) //hasToStop
+            if (hasToStop != "")
             {
-              QString type;
-              if( what == PyTrace_CALL ) type = "PyTrace_CALL";
-              else if( what == PyTrace_EXCEPTION ) type = "PyTrace_EXCEPTION";
-              else if( what == PyTrace_LINE ) type = "PyTrace_LINE";
-              else if( what == PyTrace_RETURN ) type = "PyTrace_RETURN";
-              else if( what == PyTrace_C_CALL ) type = "PyTrace_C_CALL";
-              else if( what == PyTrace_C_EXCEPTION ) type = "PyTrace_C_EXCEPTION";
-              else if( what == PyTrace_C_RETURN ) type = "PyTrace_C_RETURN";
-
-              PyErr_SetString( PyExc_Exception,
-                               tr("Interruption of script at line [%1] [%2].")
-                                       .arg(PyFrame_GetLineNumber(frame))
-                                       .arg(type).toStdString().c_str() );
-              //hasToStop = false;
+              PyErr_SetString(PyExc_Exception,
+                              hasToStop.c_str());
+              hasToStop = "";
               return -1;
             }
 
             return 0;
           };
+        public slots:
 
-        protected:
-          QString dequeue()
+          void stdOut(const QString &stdOut)
           {
-            QMutexLocker lock(&_lock);
-            QString cmd(_commands.dequeue());
+            emit flushStdOut(stdOut);
+          };
 
-            return cmd.isEmpty() ? "\n" : cmd;
+          void stdErr(const QString &stdErr)
+          {
+            emit flushStdErr(stdErr);
           }
 
-          void run()
+          void executeCode(const QString &code)
           {
-
-            QMutex signal;
-
-            while (_running)
-            {
-              // wait to be signaled ...
-              signal.lock();
-              _CommandQueued.wait(&signal, 1);
-              signal.unlock();
-              if (isCommandQueueEmpty())
-              {
-                continue;
-              }
-              while (!isCommandQueueEmpty())
-              {
-
-                PythonQtObjectPtr p;
-                PyObject *dict = NULL;
-
-                if (PyModule_Check(_context))
-                {
-                  dict = PyModule_GetDict(_context);
-                } else if (PyDict_Check(_context))
-                {
-                  dict = _context;
-                }
-
-                if (dict)
-                {
-                  // this command blocks until the code has completed execution
-                  emit python_busy(true);
-                  PYTHONQT_GIL_SCOPE
-                  PyEval_SetTrace(traceHook, _context.object());
-                  _context.evalScript(dequeue().toLatin1().data());
-                  emit python_busy(false);
-                }
-
-                // error in the kernel
-                if (!p)
-                {
-                  PythonQt::self()->handleError();
-                }
-              }
-            }
+            emit pythonBusy(true);
+            PyEval_SetTrace(traceHook, mContext.object());
+            mContext.evalScript(code);
+            emit pythonBusy(false);
           }
 
-          PythonQtObjectPtr _context;
-          cedar::proc::gui::CoPYObjectWrapper *mpPyWrap;
-          cedar::proc::gui::CoPYObject *mpPy;
 
-          QMutex _lock;
-          QQueue<QString> _commands;
+          void addVariable(const QString &name, const QVariant &variable)
+          {
+            mContext.addVariable(name, variable);
+          }
 
-          QWaitCondition _CommandQueued;
-          bool _running;
+          void reset()
+          {
+            mContext = PythonQt::self()->createUniqueModule();
+            //reassign both cpp and python Object with getObject()-Method to be of type cedar::proc::gui::CoPYObject not cedar::proc::gui::CoPYObjectWrapper
+            mContext.addObject("py", mpPyWrap);
+          }
 
+          void removeVariable(const QString& name)
+          {
+            mContext.removeVariable(name);
+          }
+
+          void setScene(cedar::proc::gui::Scene *pScene)
+          {
+            mpPy->setScene(pScene);
+            mpPy->setGroup(pScene->getRootGroup()->getGroup());
+          };
         signals:
 
-          void python_busy(bool);
+          void flushStdOut(const QString &);
+
+          void flushStdErr(const QString &);
+
+          void setup(PythonQtObjectPtr mContext);
+
+          void pythonBusy(const bool &);
         };
+
       }
     }
   }
@@ -349,9 +210,8 @@ public:
 
   ~PythonQtConsole();
 
-  inline static bool hasToStop = false;
-
 public Q_SLOTS:
+
   //! derived key press event
   void keyPressEvent(QKeyEvent *e);
 
@@ -368,7 +228,8 @@ public Q_SLOTS:
 
   void handleSetup(PythonQtObjectPtr mContext);
 
-  void handleTimeout();
+  void handleBusyStateChange(const bool &state);
+
 
 signals:
 
@@ -392,7 +253,7 @@ public:
 
   void setScene(cedar::proc::gui::Scene *pScene);
 
-  void reset();
+  void reset(std::string msg = "Aborted by User", bool fromOut = false);
 
   void addVariable(const QString &name, const QVariant &variable);
 
@@ -409,12 +270,12 @@ protected:
   void flushStdOut();
 
 private:
-  //cedar::proc::gui::PythonQtConsoleScope::PythonWorker *mpPythonWorker;
-  //QThread mPythonThread;
+  cedar::proc::gui::PythonQtConsoleScope::PythonWorker *mpPythonWorker;
+  QThread mPythonThread;
   PythonQtObjectPtr mpModule;
-  //cedar::proc::gui::CoPYObjectWrapper *mpPyWrap;
-  //cedar::proc::gui::CoPYObject *mpPy;
-  cedar::proc::gui::PythonQtConsoleScope::ThreadedPythonContext mContext;
+  bool pythonBusy;
+  cedar::proc::gui::Scene *mpScene;
+  cedar::proc::gui::CoPYObject *mpCopyObject;
 
   void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
 

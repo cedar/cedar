@@ -1164,11 +1164,8 @@ void cedar::proc::gui::Scene::multiItemContextMenuEvent(QGraphicsSceneContextMen
   }
   if (a == delete_action)
   {
-    for (auto elem : this->selectedItems())
-    {
-      if(auto guiElem = dynamic_cast<cedar::proc::gui::Element*>(elem))
-        guiElem->deleteElement();
-    }
+    QList<QGraphicsItem*> items = this -> selectedItems();
+    this ->deleteElements(items, false);
   }
   pContextMenuEvent->accept();
 }
