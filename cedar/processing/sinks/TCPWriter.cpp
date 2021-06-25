@@ -60,12 +60,14 @@
 #include <winsock2.h>
 #include <Ws2tcpip.h>
 #else
+
 #include <arpa/inet.h>  /* definition of inet_ntoa */
 #include <netdb.h>      /* definition of gethostbyname */
 #include <netinet/in.h> /* definition of struct sockaddr_in */
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <unistd.h> /* definition of close */
+
 #endif
 
 
@@ -82,29 +84,29 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace
 {
-    bool declare()
-    {
-        using cedar::proc::ElementDeclarationPtr;
-        using cedar::proc::ElementDeclarationTemplate;
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
 
-        ElementDeclarationPtr input_declaration
-                (
-                        new ElementDeclarationTemplate<cedar::proc::sinks::TCPWriter>
-                                (
-                                        "Sinks",
-                                        "cedar.processing.sinks.TCPWriter"
-                                )
-                );
-        input_declaration->setIconPath(":/steps/tcp_writer.svg");
-        input_declaration->setDescription("Forwards a tensor via a TCP Socket to a destination."
-                                          "See also the TCPReader step.");
+    ElementDeclarationPtr input_declaration
+            (
+                    new ElementDeclarationTemplate<cedar::proc::sinks::TCPWriter>
+                            (
+                                    "Sinks",
+                                    "cedar.processing.sinks.TCPWriter"
+                            )
+            );
+    input_declaration->setIconPath(":/steps/tcp_writer.svg");
+    input_declaration->setDescription("Forwards a tensor via a TCP Socket to a destination."
+                                      "See also the TCPReader step.");
 
-        input_declaration->declare();
+    input_declaration->declare();
 
-        return true;
-    }
+    return true;
+  }
 
-    bool declared = declare();
+  bool declared = declare();
 }
 
 QReadWriteLock *cedar::proc::sinks::TCPWriter::mpDataLock = NULL;
@@ -127,15 +129,15 @@ cedar::proc::sinks::TCPWriter::TCPWriter()
         _mMaxTimeouts(new cedar::aux::UIntParameter(this, "max timeouts", 50)),
         _mSendInterval(new cedar::aux::UIntParameter(this, "send interval (timesteps)", 1))
 {
-    cedar::proc::sinks::TCPWriter::mpDataLock = new QReadWriteLock();
+  cedar::proc::sinks::TCPWriter::mpDataLock = new QReadWriteLock();
 
-    _mReconnectionTimeOut->markAdvanced(true);
-    _mMaxTimeouts->markAdvanced(true);
-    _mSendInterval->markAdvanced(true);
+  _mReconnectionTimeOut->markAdvanced(true);
+  _mMaxTimeouts->markAdvanced(true);
+  _mSendInterval->markAdvanced(true);
 
 
-    // declare all data
-    this->declareInput("input");
+  // declare all data
+  this->declareInput("input");
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -143,104 +145,123 @@ cedar::proc::sinks::TCPWriter::TCPWriter()
 
 void cedar::proc::sinks::TCPWriter::onStart()
 {
-    _mPort->setConstant(true);
-    _mIpAdress->setConstant(true);
-    this->establishConnection();
+  _mPort->setConstant(true);
+  _mIpAdress->setConstant(true);
+  this->establishConnection();
 }
 
 void cedar::proc::sinks::TCPWriter::reconnect()
 {
-    closeConnection();
-    establishConnection();
+  closeConnection();
+  establishConnection();
 }
 
 
 void cedar::proc::sinks::TCPWriter::establishConnection()
 {
-    socket_h = 0;
+  socket_h = 0;
 #ifdef _WIN32
-    /* initialize the socket api */
-        WSADATA info;
-        int rc = WSAStartup(MAKEWORD(1, 1), &info); /* Winsock 1.1 */
-        if (rc != 0)
-        {
-            printf("cannot initialize Winsock\n");
-            return;
-        }
+  /* initialize the socket api */
+      WSADATA info;
+      int rc = WSAStartup(MAKEWORD(1, 1), &info); /* Winsock 1.1 */
+      if (rc != 0)
+      {
+          printf("cannot initialize Winsock\n");
+          return;
+      }
 #endif
 
-    if ((socket_h = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-    {
-        std::cout << "Socket creation error" << std::endl;
+  if ((socket_h = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+  {
+    std::cout << "Socket creation error" << std::endl;
 
+  } else
+  {
+
+#ifdef _WIN32
+    const char opt = 1;
+          if (setsockopt(socket_h, SOL_SOCKET, SO_REUSEADDR,
+                         &opt, sizeof(opt)))
+          {
+              std::cout << "Error Setting Socket Options" << std::endl;
+          }
+
+          unsigned long on = 1;
+          ioctlsocket(socket_h, FIONBIO, &on); //make socket Non-blockable in windows
+#else
+    int opt = 1;
+    if (setsockopt(socket_h, SOL_SOCKET, SO_REUSEPORT,
+                   &opt, sizeof(opt)))
+    {
+      std::cout << "Error Setting Socket Options" << std::endl;
+    }
+    fcntl(socket_h, F_SETFL, O_NONBLOCK); //make socket Non-blockable
+#endif
+
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(_mPort->getValue());
+
+    if (inet_pton(AF_INET, this->_mIpAdress->getValue().c_str(), &serv_addr.sin_addr) <= 0)
+    {
+      std::cout << "Invalid address/ Address not supported" << std::endl;
     } else
     {
-        fcntl(socket_h, F_SETFL, O_NONBLOCK);
-        serv_addr.sin_family = AF_INET;
-        serv_addr.sin_port = htons(_mPort->getValue());
-
-        if (inet_pton(AF_INET, this->_mIpAdress->getValue().c_str(), &serv_addr.sin_addr) <= 0)
-        {
-            std::cout << "Invalid address/ Address not supported" << std::endl;
-        } else
-        {
-            ::connect(socket_h, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
-        }
+      ::connect(socket_h, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
     }
+  }
 
 }
 
 
 void cedar::proc::sinks::TCPWriter::sendMatData(cedar::aux::ConstMatDataPtr data)
 {
-    std::ostringstream stream;
-    data->serialize(stream, cedar::aux::SerializationFormat::Compact);
+  std::ostringstream stream;
+  data->serialize(stream, cedar::aux::SerializationFormat::Compact);
 
-
-    unsigned int checkSum = cedar::aux::generateCR32Checksum(stream.str().c_str(), stream.str().size());
-    std::string streamContent = stream.str() + MATMSG_CHK + std::to_string(checkSum) + MATMSG_END;
+  unsigned int checkSum = cedar::aux::generateCR32Checksum(stream.str().c_str(), stream.str().size());
+  std::string streamContent = stream.str() + MATMSG_CHK + std::to_string(checkSum) + MATMSG_END;
 
 #ifdef _WIN32
-    send(socket_h, streamContent.c_str(), streamContent.size(), 0);
+  send(socket_h, streamContent.c_str(), streamContent.size(), 0);
 #else
-    send(socket_h, streamContent.c_str(), streamContent.size(), MSG_NOSIGNAL);
+  send(socket_h, streamContent.c_str(), streamContent.size(), MSG_NOSIGNAL);
 #endif
 
 }
 
 void cedar::proc::sinks::TCPWriter::onStop()
 {
-    _mPort->setConstant(false);
-    _mIpAdress->setConstant(false);
-    closeConnection();
+  _mPort->setConstant(false);
+  _mIpAdress->setConstant(false);
+  closeConnection();
 }
 
 void cedar::proc::sinks::TCPWriter::reset()
 {
-    this->reconnect();
-    this->onTrigger();
+  this->reconnect();
+  this->onTrigger();
 }
 
 void cedar::proc::sinks::TCPWriter::compute(const cedar::proc::Arguments &)
 {
-    if (0 == _mPort->getValue() || _mIpAdress->getValue() == "")
+  if (0 == _mPort->getValue() || _mIpAdress->getValue() == "")
+  {
+    this->setState(cedar::proc::Step::STATE_EXCEPTION, "Port and Ip Address must not be empty!");
+  } else
+  {
+    stepCounter = stepCounter + 1;
+    if (stepCounter >= this->_mSendInterval->getValue())
     {
-        this->setState(cedar::proc::Step::STATE_EXCEPTION, "Port and Ip Address must not be empty!");
-    } else
-    {
-        stepCounter = stepCounter + 1;
-        if (stepCounter >= this->_mSendInterval->getValue())
-        {
-            stepCounter = 0;
-            sendMatData(this->mInput);
-            bool isReaderAlive = checkReaderStatus();
+      stepCounter = 0;
+      sendMatData(this->mInput);
+      bool isReaderAlive = checkReaderStatus();
 
-            if (!isReaderAlive)
-            {
-                reconnect();
-            }
-        }
+      if (!isReaderAlive)
+      {
+        reconnect();
+      }
     }
+  }
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::sinks::TCPWriter::determineInputValidity
@@ -249,87 +270,93 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::sinks::TCPWriter::determineInputVal
                 cedar::aux::ConstDataPtr data
         ) const
 {
-    // First, let's make sure that this is really the input in case anyone ever changes our interface.
-    CEDAR_DEBUG_ASSERT(slot->getName() == "input")
+  // First, let's make sure that this is really the input in case anyone ever changes our interface.
+  CEDAR_DEBUG_ASSERT(slot->getName() == "input")
 
-    if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
-    {
-        return cedar::proc::DataSlot::VALIDITY_VALID;
-    } else
-    {
-        return cedar::proc::DataSlot::VALIDITY_ERROR;
-    }
+  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
+  {
+    return cedar::proc::DataSlot::VALIDITY_VALID;
+  } else
+  {
+    return cedar::proc::DataSlot::VALIDITY_ERROR;
+  }
 }
 
 void cedar::proc::sinks::TCPWriter::inputConnectionChanged(const std::string &inputName)
 {
-    // Again, let's first make sure that this is really the input in case anyone ever changes our interface.
-    CEDAR_DEBUG_ASSERT(inputName == "input");
+  // Again, let's first make sure that this is really the input in case anyone ever changes our interface.
+  CEDAR_DEBUG_ASSERT(inputName == "input");
 
-    // Assign the input to the member. This saves us from casting in every computation step.
-    this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
+  // Assign the input to the member. This saves us from casting in every computation step.
+  this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
 
-    if (!this->mInput)
-    {
-        return;
-    }
+  if (!this->mInput)
+  {
+    return;
+  }
 }
 
 
 bool cedar::proc::sinks::TCPWriter::checkReaderStatus()
 {
-    const int mBufferLength = 32768;
-    char *readBuffer = (char *) malloc(mBufferLength * sizeof(char));
-    memset(readBuffer, 0, mBufferLength);
-    int msgLength = recv(socket_h, readBuffer, mBufferLength, 0);
+  const int mBufferLength = 32768;
+  char *readBuffer = (char *) malloc(mBufferLength * sizeof(char));
+  memset(readBuffer, 0, mBufferLength);
+
+#ifdef _WIN32
+  int msgLength = recv(socket_h, readBuffer, mBufferLength, 0);
+#else
+  int msgLength = recv(socket_h, readBuffer, mBufferLength, MSG_DONTWAIT);
+#endif
 
 
-    if (msgLength > 0)
+  if (msgLength > 0)
+  {
+    std::string message = std::string(readBuffer, msgLength);
+    free(readBuffer);
+
+    this->setState(cedar::proc::Step::STATE_RUNNING, "Connected");
+    startMeasurement = std::chrono::steady_clock::now();
+    numConsecutiveTimeOuts = 0;
+    return true;
+  } else
+  {
+    free(readBuffer);
+    std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+    unsigned int elapsedMilliSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(
+            currentTime - startMeasurement).count();
+    //I could not read! The original socket is  not there anymore
+    if (elapsedMilliSeconds > _mReconnectionTimeOut->getValue())
     {
-        std::string message = std::string(readBuffer, msgLength);
-        free(readBuffer);
-
-        this->setState(cedar::proc::Step::STATE_RUNNING, "Connected");
-        startMeasurement = std::chrono::steady_clock::now();
-        numConsecutiveTimeOuts = 0;
-        return true;
-    } else
-    {
-        free(readBuffer);
-        std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
-        unsigned int elapsedMilliSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(
-                currentTime - startMeasurement).count();
-        //I could not read! The original socket is  not there anymore
-        if (elapsedMilliSeconds > _mReconnectionTimeOut->getValue())
-        {
-            startMeasurement = std::chrono::steady_clock::now();
-            numConsecutiveTimeOuts = numConsecutiveTimeOuts + 1;
-            if (numConsecutiveTimeOuts > _mMaxTimeouts->getValue())
-            {
-                this->setState(cedar::proc::Step::STATE_EXCEPTION,
-                               "More than " + std::to_string(_mMaxTimeouts->getValue()) +
-                               " consecutive timeouts. Press Reset to start Reconnecting again.");
-            } else
-            {
-                this->setState(cedar::proc::Step::STATE_INITIALIZING,
-                               "Timeout of at least " + std::to_string(_mReconnectionTimeOut->getValue()) + " ms.");
-            }
+      startMeasurement = std::chrono::steady_clock::now();
+      numConsecutiveTimeOuts = numConsecutiveTimeOuts + 1;
+      if (numConsecutiveTimeOuts > _mMaxTimeouts->getValue())
+      {
+        this->setState(cedar::proc::Step::STATE_EXCEPTION,
+                       "More than " + std::to_string(_mMaxTimeouts->getValue()) +
+                       " consecutive timeouts. Press Reset to start Reconnecting again.");
+      } else
+      {
+        this->setState(cedar::proc::Step::STATE_INITIALIZING,
+                       "Timeout of at least " + std::to_string(_mReconnectionTimeOut->getValue()) + " ms.");
+      }
 
 
-            return false;
-        }
+      return false;
     }
-    return true; //Technically here the Status is unknown, but we will continue to try
+  }
+
+  return true; //Technically here the Status is unknown, but we will continue to try
 }
 
 void cedar::proc::sinks::TCPWriter::closeConnection()
 {
 #ifdef _WIN32
-    closesocket(socket_h);
-    WSACleanup();
+  closesocket(socket_h);
+  WSACleanup();
 #else
-    close(socket_h);
+  close(socket_h);
 #endif
 
-    numConsecutiveTimeOuts = 0;
+  numConsecutiveTimeOuts = 0;
 }
