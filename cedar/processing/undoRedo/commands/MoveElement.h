@@ -69,7 +69,7 @@ public:
   MoveElement(std::list<QGraphicsItem*> elements,
               cedar::proc::gui::Group* sourceGroup,
               cedar::proc::gui::Group* targetGroup,
-              std::vector<QPointF> sourcePosition,
+              std::vector<QPointF> sourcePositions,
               cedar::proc::gui::Scene* scene);
   //!@brief Destructor
   virtual ~MoveElement();
@@ -85,8 +85,13 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void addElementsToGroup(std::vector<QPointF> position, cedar::proc::gui::Group* group);
+	//!@brief moves the mGuiElements to given position
+	void move(std::vector<QPointF> positions);
+	//!@brief adds the mGuiElements to given group
+  void addElementsToGroup(cedar::proc::gui::Group* group);
+	//!@brief updates full path of all guiElements, sourceGroup and targetGroup
   void updateFullPath();
+		//!@brief updates pointer of all guiElements, sourceGroup and targetGroup
   void updatePointer();
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -100,14 +105,23 @@ private:
 protected:
   // none yet
 private:
+	//!@brief instances of all guiElements used in the move
   std::list<cedar::proc::gui::Element*> mGuiElements;
+
+	//!@brief source and target groups of the moving. Is set to nullptr if rootgroup.
   cedar::proc::gui::Group* mSourceGroup;
   cedar::proc::gui::Group* mTargetGroup;
-  std::vector<QPointF> mSourcePosition;
-  std::vector<QPointF> mTargetPosition;
+
+	//!@brief positions
+  std::vector<QPointF> mSourcePositions;
+  std::vector<QPointF> mTargetPositions;
+
+	//!@brief full paths to identify the elements when their pointer is outdated
   std::vector<std::string> mElementFullPaths;
   std::string mSourceGroupFullPath;
   std::string mTargetGroupFullPath;
+
+	//!@brief instance of scene
   cedar::proc::gui::Scene* mpScene;
 
   //--------------------------------------------------------------------------------------------------------------------

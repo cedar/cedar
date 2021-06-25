@@ -24,8 +24,11 @@
 
     File:        MoveElement.cpp
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
+		Maintainer:  Lars Janssen,
+                 Yogeshwar Agnihotri,
+    Email:       lars.janssen@ini.rub.de,
+                 yogeshwar.agnihotri@ini.rub.de
+
     Date:        2020 07 23
 
     Description: Source file for the class cedar::proc::undoRedo::commands::MoveElement.
@@ -53,12 +56,12 @@
 cedar::proc::undoRedo::commands::MoveElement::MoveElement(std::list<QGraphicsItem*> elements,
                                                           cedar::proc::gui::Group* sourceGroup,
                                                           cedar::proc::gui::Group* targetGroup,
-                                                          std::vector<QPointF> sourcePosition,
+                                                          std::vector<QPointF> sourcePositions,
                                                           cedar::proc::gui::Scene* scene)
 :
 mSourceGroup(sourceGroup),
 mTargetGroup(targetGroup),
-mSourcePosition(sourcePosition),
+mSourcePositions(sourcePositions),
 mpScene(scene)
 {
   //Iterate over elements and extract their target position and elementFullPath
@@ -66,12 +69,13 @@ mpScene(scene)
   {
     if(auto guiElement = dynamic_cast<cedar::proc::gui::Element*>(element))
     {
-      mTargetPosition.push_back(guiElement->pos());
-      mElementFullPaths.push_back(guiElement->getElement()->getFullPath());
-      mGuiElements.push_back(guiElement);
+      this->mTargetPositions.push_back(guiElement->pos());
+      this->mElementFullPaths.push_back(guiElement->getElement()->getFullPath());
+      this->mGuiElements.push_back(guiElement);
     }
   }
-	updateFullPath();
+  //TODO: is this here needed? Only for grouppaths? Can they be setted manually her?
+  updateFullPath();
 
   if(elements.size() == 1)
   {
@@ -98,55 +102,49 @@ cedar::proc::undoRedo::commands::MoveElement::~MoveElement()
 // Move element back to the source
 void cedar::proc::undoRedo::commands::MoveElement::undo()
 {
-  //Update the pointer of all elements using their fullpath
+  //Update the pointer of all elements using their full path
   updatePointer();
 
-  //Move back the the original position and group where the elements were before moving
-  addElementsToGroup(this->mSourcePosition,this->mSourceGroup);
-
-  //Set position to target to the elements
-  if(!this->mGuiElements.empty() && !this->mSourcePosition.empty())
-  {
-    int i = 0;
-    for(cedar::proc::gui::Element* element : mGuiElements)
-    {
-      element->setPos(this->mSourcePosition.at(i));
-      i++;
-    }
-  }
+  //Add to old group and move to old position. In undo they have to be added first then moved
+	addElementsToGroup(this->mSourceGroup);
+	move(this->mSourcePositions);
 }
 
 // Move element to the target
 void cedar::proc::undoRedo::commands::MoveElement::redo()
 {
-  //Update the pointer of all elements using their fullpath
+  //Update the pointer of all elements using their full path
   updatePointer();
 
-  //Set position to target to the elements
-  if(!this->mGuiElements.empty() && !mTargetPosition.empty())
-  {
-    int i = 0;
-    for(cedar::proc::gui::Element* element : mGuiElements)
-    {
-      element->setPos(mTargetPosition.at(i));
-      i++;
-    }
-  }
-
-  //Move to the position and group were the elements were moved to intially by the user
-  addElementsToGroup(this->mTargetPosition,this->mTargetGroup);
+	//Add to new group and move to new position. In redo they have to be moved first then added
+	move(this->mTargetPositions);
+  addElementsToGroup(this->mTargetGroup);
 }
 
-void cedar::proc::undoRedo::commands::MoveElement::addElementsToGroup(std::vector<QPointF> position, cedar::proc::gui::Group* group)
+void cedar::proc::undoRedo::commands::MoveElement::move(std::vector<QPointF> positions)
+{
+	if(!this->mGuiElements.empty() && !positions.empty())
+	{
+		int i = 0;
+		for(cedar::proc::gui::Element* element : mGuiElements)
+		{
+			element->setPos(positions.at(i));
+			i++;
+		}
+	}
+}
+
+void cedar::proc::undoRedo::commands::MoveElement::addElementsToGroup(cedar::proc::gui::Group* group)
 {
   //GuiElements get deleted by the addElement() function, so the non gui elements have to be saved and later the guiElements get updated
   std::vector<cedar::proc::Element*> elements;
 
   //Add elements only accepts std::list<QGrapicsItem*>, so the guiElements have to be converted first
   std::list<QGraphicsItem*> qGraphicsItems;
-  for(cedar::proc::gui::Element* guiElement:mGuiElements)
+  for(cedar::proc::gui::Element* guiElement:this->mGuiElements)
   {
     elements.push_back(guiElement->getElement().get());
+
     if(QGraphicsItem* item = dynamic_cast<QGraphicsItem*>(guiElement))
     {
       qGraphicsItems.push_back(item);
@@ -166,13 +164,13 @@ void cedar::proc::undoRedo::commands::MoveElement::addElementsToGroup(std::vecto
     }
 
     //Update the guiElements again before leaving the function. There have been newly created by addElements()
-    mGuiElements.clear();
+    this->mGuiElements.clear();
     for(cedar::proc::Element* element:elements)
     {
-      mGuiElements.push_back(this->mpScene->getGraphicsItemFor(element));
+      this->mGuiElements.push_back(this->mpScene->getGraphicsItemFor(element));
     }
 
-    //Since the group of the elements has been changed, we need to update the fullpaths
+    //Since the group of the elements has been changed, we need to update the full paths
 		updateFullPath();
   }
 }
@@ -218,7 +216,7 @@ void cedar::proc::undoRedo::commands::MoveElement::updatePointer()
 void cedar::proc::undoRedo::commands::MoveElement::updateFullPath()
 {
   int i = 0;
-  for(QGraphicsItem* element : mGuiElements)
+  for(QGraphicsItem* element : this->mGuiElements)
   {
     if(auto guiElement = dynamic_cast<cedar::proc::gui::Element*>(element))
     {
@@ -248,5 +246,4 @@ void cedar::proc::undoRedo::commands::MoveElement::updateFullPath()
   {
     this->mTargetGroupFullPath = "";
   }
-  std::cout << mTargetGroupFullPath << std::endl;
 }
