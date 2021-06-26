@@ -83,6 +83,10 @@ cedar::proc::gui::PythonQtConsole::PythonQtConsole(QWidget *parent, Qt::WindowFl
   //connect slots for savely accessing other thread
   connect(this, &cedar::proc::gui::PythonQtConsole::execute, mpPythonWorker,
           &cedar::proc::gui::PythonQtConsoleScope::PythonWorker::executeCode);
+  connect(this, &cedar::proc::gui::PythonQtConsole::getVariablesFromWorker, mpPythonWorker,
+          &cedar::proc::gui::PythonQtConsoleScope::PythonWorker::giveVariables, Qt::BlockingQueuedConnection);
+  connect(this, &cedar::proc::gui::PythonQtConsole::removeVariableFromPython, mpPythonWorker,
+          &cedar::proc::gui::PythonQtConsoleScope::PythonWorker::removeVariable, Qt::BlockingQueuedConnection);
   connect(this, &cedar::proc::gui::PythonQtConsole::resetPython, mpPythonWorker,
           &cedar::proc::gui::PythonQtConsoleScope::PythonWorker::reset);
   connect(this, &cedar::proc::gui::PythonQtConsole::giveScene, mpPythonWorker,
@@ -99,6 +103,7 @@ cedar::proc::gui::PythonQtConsole::PythonQtConsole(QWidget *parent, Qt::WindowFl
 
   insertPlainText(
           "#Controller imported as py\n#Drop steps here for creation and further instructions\npy.setParameter(\"root.Neural Field\",\"sizes\",[2,2])");
+  emit giveVariables(emit getVariablesFromWorker());
 }
 
 //-----------------------------------------------------------------------------
@@ -153,6 +158,12 @@ cedar::proc::gui::PythonQtConsole::~PythonQtConsole()
 void cedar::proc::gui::PythonQtConsole::addVariable(const QString &name, const QVariant &variable)
 {
   emit addVariableToPython(name, variable);
+}
+
+void cedar::proc::gui::PythonQtConsole::removeVariable(const QString& name)
+{
+  emit removeVariableFromPython(name);
+  emit giveVariables(emit getVariablesFromWorker());
 }
 
 void cedar::proc::gui::PythonQtConsole::executeCode()
@@ -349,21 +360,15 @@ void cedar::proc::gui::PythonQtConsole::setScene(cedar::proc::gui::Scene *pScene
   emit giveScene(pScene);
 }
 
-//todo
-QStringList cedar::proc::gui::PythonQtConsole::getVariables()
-{
-  QStringList output = PythonQt::self()->introspectObject(mpModule, PythonQt::Anything);
-
-  for (QString o : output)
-    std::cout << o.toStdString() << std::endl;
-
-  return output;
-}
 std::string cedar::proc::gui::PythonQtConsoleScope::PythonWorker::hasToStop;
 void cedar::proc::gui::PythonQtConsole::reset(std::string msg, bool fromOut)
 {
   if(pythonBusy) cedar::proc::gui::PythonQtConsoleScope::PythonWorker::hasToStop = msg;
-  if(!pythonBusy && !fromOut) emit resetPython();
+  if(!pythonBusy && !fromOut)
+  {
+    emit resetPython();
+    emit giveVariables(emit getVariablesFromWorker());
+  }
 }
 
 void cedar::proc::gui::PythonQtConsole::consoleMessage(const QString &message, bool error)
@@ -390,11 +395,55 @@ void cedar::proc::gui::PythonQtConsole::consoleMessage(const QString &message, b
 void cedar::proc::gui::PythonQtConsole::handleSetup(PythonQtObjectPtr mContext)
 {
   mpModule = mContext;
+  emit giveVariables(emit getVariablesFromWorker());
 };
 
 void cedar::proc::gui::PythonQtConsole::handleBusyStateChange(const bool& state)
 {
-  if(!state) mpScene->snapAllItemsToGrid();
   pythonBusy = state;
+  if(!pythonBusy) emit giveVariables(emit getVariablesFromWorker());
 }
 
+
+QMap<QString, QString> cedar::proc::gui::PythonQtConsoleScope::PythonWorker::giveVariables()
+{
+  QMap<QString, QString> map;
+  QStringList vars = PythonQt::self()->introspectObject(mContext, PythonQt::Variable);
+  for (QString var: vars)
+  {
+    if(!var.startsWith("__"))
+    {
+      QVariant val = mContext.getVariable(var);
+      if (val.canConvert<QString>())
+      {
+        map.insert(var, val.toString());
+        continue;
+      }
+      if (val.canConvert<QStringList>())
+      {
+        QString out = "[";
+        for (QString oneVal : val.toStringList())
+        {
+          out.append(oneVal);
+          out.append(", ");
+        }
+        out.append("]");
+        map.insert(var, out);
+        continue;
+      }
+      map.insert(var, val.typeName());
+
+    }
+  }
+  QStringList funcs = PythonQt::self()->introspectObject(mContext, PythonQt::Function);
+  for (QString func : funcs)
+  {
+    map.insert(func, QString("Function"));
+  }
+  QStringList classes = PythonQt::self()->introspectObject(mContext, PythonQt::Class);
+  for (QString cls : classes)
+  {
+    map.insert(cls, QString("Class"));
+  }
+  return map;
+}

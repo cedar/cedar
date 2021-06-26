@@ -229,6 +229,7 @@ cedar::proc::StepPtr cedar::proc::gui::CoPYObject::getStepByName(const std::stri
 void cedar::proc::gui::CoPYObject::throwError(std::string msg)
 {
   pQtConsole->reset(msg, true);
+  CEDAR_THROW(cedar::aux::InvalidValueException, msg);
 }
 
 void cedar::proc::gui::CoPYObject::jumpToStep(cedar::proc::Element* element){

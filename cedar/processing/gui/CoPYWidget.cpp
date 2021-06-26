@@ -68,6 +68,11 @@ QWidget(pParent)
 
   mpConsole = new PythonQtConsole(this);
 
+  mpVariableView = new QTableWidget(this->parentWidget());
+  mpVariableView->setWindowFlags(Qt::Tool);
+  mpVariableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  mpVariableView->mapToParent(QPoint(0,0));
+
   this->reset();
 
   //appendHighlighter to Editor
@@ -96,7 +101,11 @@ QWidget(pParent)
   mpLoadButton = new QPushButton("Load");
   QObject::connect(mpLoadButton, SIGNAL (clicked()), this, SLOT(loadButtonClicked()));
   buttons->addWidget(mpLoadButton);
+  mpVariablesButton = new QPushButton("Show Vars");
+  QObject::connect(mpVariablesButton, SIGNAL (clicked()), this, SLOT(getVariablesButtonClicked()));
+  buttons->addWidget(mpVariablesButton);
 
+  QObject::connect(mpConsole, SIGNAL(giveVariables(QMap<QString, QString>)), this, SLOT(setVariables(QMap<QString, QString>)));
 
   layout->addLayout(buttons);
   setAcceptDrops(true);
@@ -175,16 +184,6 @@ void cedar::proc::gui::CoPYWidget::executeCode()
   }
 }
 
-/*void cedar::proc::gui::CoPYWidget::updateDict()
-{
-  PyObject* dict = NULL;
-  if (PyModule_Check(mpContext)) {
-    dict = PyModule_GetDict(mpContext);
-  } else if (PyDict_Check(mpContext)) {
-    dict = mpContext;
-    dict
-}*/
-
 std::string cedar::proc::gui::CoPYWidget::getStepInfo(cedar::proc::gui::StepItem* pStep){
 
   return pStep->getStep()->getFullPath();
@@ -206,10 +205,10 @@ void cedar::proc::gui::CoPYWidget::dropEvent(QDropEvent *pEvent)
 
   if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration *>(declaration))
   {
-    mpConsole->insertPlainText(QString(QString("\n#Usage: py.create(classId, xPos, yPos, amount)\npy.create('") + QString(elem_declaration->getClassName().c_str()) +  QString("', 0, 0, 1)\n")));
+    mpConsole->insertPlainText(QString(QString("py.create('") + QString(elem_declaration->getClassName().c_str()) +  QString("', 0, 0, 1)")));
   } else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration *>(declaration))
   {
-    mpConsole->insertPlainText(QString(QString("\n#Usage: py.createGroup(groupId, xPos, yPos)\npy.createGroup('") + QString(group_declaration->getClassName().c_str()) +  QString("', 0, 0)\n")));
+    mpConsole->insertPlainText(QString(QString("py.createGroup('") + QString(group_declaration->getClassName().c_str()) +  QString("', 0, 0)")));
   }
   pEvent->acceptProposedAction();
 }
@@ -224,6 +223,11 @@ void cedar::proc::gui::CoPYWidget::executeButtonClicked()
 void cedar::proc::gui::CoPYWidget::resetButtonClicked()
 {
   this->reset();
+}
+
+void cedar::proc::gui::CoPYWidget::getVariablesButtonClicked()
+{
+  mpVariableView->show();
 }
 
 bool cedar::proc::gui::CoPYWidget::saveButtonClicked()
@@ -255,6 +259,38 @@ bool cedar::proc::gui::CoPYWidget::saveButtonClicked()
   last_dir->setValue(path);
   return true;
 }
+void cedar::proc::gui::CoPYWidget::setVariables(QMap<QString, QString> vars)
+{
+  QList<QStandardItem*> keys;
+  QList<QStandardItem*> values;
+  mpVariableView->setRowCount(vars.count());
+  mpVariableView->setColumnCount(3);
+  mpVariableView->setColumnWidth(2, 10);
+  mpVariableView->setGridStyle(Qt::NoPen);
+  mpVariableView->clear();
+  QStringList header;
+  header.append(QString("Variable"));
+  header.append(QString("Value"));
+  header.append(QString(""));
+  mpVariableView->setHorizontalHeaderLabels(header);
+
+  int i = 0;
+  for(QString var : vars.keys())
+  {
+    mpVariableView->setItem(i, 0, new QTableWidgetItem(var));
+    mpVariableView->setItem(i, 1, new QTableWidgetItem(vars.value(var)));
+    QPushButton* delBtn = new QPushButton("X");
+    delBtn->setStyleSheet("font: bold;height: 10px;width: 10px;");
+    delBtn->setParent(mpVariableView);
+    delBtn->setVisible(true);
+    mpVariableView->setCellWidget(i, 2, delBtn);
+    connect(delBtn, &QPushButton::clicked, [this, var]() {
+      mpConsole->removeVariable(var);
+    });
+    i++;
+  }
+}
+
 
 void cedar::proc::gui::CoPYWidget::loadButtonClicked()
 {

@@ -68,6 +68,7 @@
 #include <QCheckBox>
 #include <QHBoxLayout>
 #include <QTextEdit>
+#include <QTableWidget>
 #include <map>
 #include <QGraphicsSceneDragDropEvent>
 #include <QGraphicsObject>
@@ -94,11 +95,14 @@ public:
 
   //!@brief method for appending Text in CoPY
   void appendToConsole(std::string text);
+
 private slots:
   void executeButtonClicked();
   bool saveButtonClicked();
   void loadButtonClicked();
   void resetButtonClicked();
+  void getVariablesButtonClicked();
+  void setVariables(QMap<QString, QString> vars);
 private:
   QThread mPythonThread;
 
@@ -110,8 +114,11 @@ private:
   QPushButton* mpResetButton;
   QPushButton* mpSaveButton;
   QPushButton* mpLoadButton;
+  QPushButton* mpVariablesButton;
   QCheckBox* mpAutoResetCheckbox;
   cedar::proc::gui::PythonQtConsole* mpConsole;
+
+  QTableWidget* mpVariableView;
 
   //Reference to Scene
   cedar::proc::gui::Scene* mpScene;

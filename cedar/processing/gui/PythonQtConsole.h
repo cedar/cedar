@@ -142,6 +142,8 @@ namespace cedar
           };
         public slots:
 
+          QMap<QString, QString> giveVariables();
+
           void stdOut(const QString &stdOut)
           {
             emit flushStdOut(stdOut);
@@ -233,6 +235,12 @@ public Q_SLOTS:
 
 signals:
 
+  void removeVariableFromPython(const QString&name);
+
+  void giveVariables(QMap<QString, QString> vars);
+
+  QMap<QString, QString> getVariablesFromWorker();
+
   void execute(const QString &code);
 
   void addVariableToPython(const QString &name, const QVariant &variable);
@@ -247,6 +255,8 @@ public:
 
   void executeCode(const QString &code);
 
+  void removeVariable(const QString& name);
+
   //! returns true if python cerr had an error
   bool hadError()
   { return _hadError; }
@@ -256,8 +266,6 @@ public:
   void reset(std::string msg = "Aborted by User", bool fromOut = false);
 
   void addVariable(const QString &name, const QVariant &variable);
-
-  QStringList getVariables();
 
 protected:
   //! handle the pressing of tab
