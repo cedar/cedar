@@ -24,8 +24,10 @@
 
     File:        CreateDeleteElement.h
 
-    Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
+    Maintainer:  Yogeshwar Agnihotri,
+    						 Lars Janssen
+    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de,
+    						 lars.janssen@ini.rub.de
     Date:        2021 04 07
 
     Description: Header file for the class cedar::proc::undoRedo::commands::CreateDeleteElement.
@@ -57,29 +59,27 @@
  */
 class cedar::proc::undoRedo::commands::CreateDeleteElement : public UndoCommand
 {
+public:
+	//!@brief enum for which action (create or delete) the command is used
+	enum Action
+	{
+		CREATE,
+		DELETE
+	};
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // constructors and destructor
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-
-  enum Action
-  {
-    CREATE,
-    DELETE
-  };
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Constructor for creating an element
-  CreateDeleteElement(QPointF position,std::string classId, cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene,cedar::proc::undoRedo::commands::CreateDeleteElement::Action action);
+  CreateDeleteElement(QPointF position,std::string classId, cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene,
+  				cedar::proc::undoRedo::commands::CreateDeleteElement::Action action);
 
   //!@brief Constructor for deleting an element
-  CreateDeleteElement(cedar::proc::gui::Element* element, cedar::proc::gui::Scene* scene, cedar::proc::undoRedo::commands::CreateDeleteElement::Action action);
+  CreateDeleteElement(cedar::proc::gui::Element* element, cedar::proc::gui::Scene* scene,
+  				cedar::proc::undoRedo::commands::CreateDeleteElement::Action action);
 
   //!@brief Destructor
   virtual ~CreateDeleteElement();
@@ -120,22 +120,29 @@ private:
 protected:
   // none yet
 private:
+	//!@brief pointer to different instances of objects
   cedar::proc::gui::Element* mpGuiElement;
-  std::string mElementFullPath;
-  cedar::proc::GroupPtr mpGroup;
-  cedar::aux::ConfigurationNode mElementConfiguration;
-  cedar::proc::gui::Scene* mpScene;
-  std::string mClassId;
-  QPointF mPosition;
+	cedar::proc::GroupPtr mpGroup;
+	cedar::proc::gui::Scene* mpScene;
 
+	//!@brief full paths to identify the elements when their pointer is outdated
+  std::string mElementFullPath;
+	std::string mClassId;
+
+  cedar::aux::ConfigurationNode mElementConfiguration;
+
+	//!@brief positions and sizes
+  QPointF mPosition;
   qreal mWidthOfGroup;
   qreal mHeightOfGroup;
-  bool mGroupIsCollapsed;
   std::vector<QPointF> mPositionOfElementsInGroup;
 
   Action mAction;
-  bool mIsInitialRedo;
 
+	//!@brief if the element is a group this stores if its collapsed or not
+	bool mGroupIsCollapsed;
+	//!@brief boolean for the first redo
+  bool mIsInitialRedo;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------

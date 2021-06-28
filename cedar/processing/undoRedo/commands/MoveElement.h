@@ -24,8 +24,10 @@
 
     File:        MoveElement.h
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
+    Maintainer:  Lars Janssen,
+    						 Yogeshwar Agnihotri
+    Email:       lars.janssen@ini.rub.de,
+								 yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
     Date:        2020 07 23
 
     Description: Header file for the class cedar::proc::undoRedo::commands::MoveElement.

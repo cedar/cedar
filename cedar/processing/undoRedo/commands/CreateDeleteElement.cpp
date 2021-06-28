@@ -24,8 +24,10 @@
 
     File:        CreateDeleteElement.cpp
 
-    Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
+    Maintainer:  Yogeshwar Agnihotri,
+    						 Lars Janssen
+    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de,
+    						 lars.janssen@ini.rub.de
     Date:        2021 04 07
 
     Description: Source file for the class cedar::proc::undoRedo::commands::CreateDeleteElement.
@@ -53,13 +55,14 @@
 //Constructor for creating an element
 cedar::proc::undoRedo::commands::CreateDeleteElement::CreateDeleteElement(QPointF position,std::string classId, cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene,cedar::proc::undoRedo::commands::CreateDeleteElement::Action action)
 :
-mAction(action),
-mIsInitialRedo(true),
-mPosition(position),
-mClassId(classId),
+mpGuiElement(nullptr),
 mpGroup(group),
+mpScene(scene),
+mClassId(classId),
+mPosition(position),
 mGroupIsCollapsed(false),
-mpScene(scene)
+mAction(action),
+mIsInitialRedo(true)
 {
 }
 
@@ -67,22 +70,23 @@ mpScene(scene)
 cedar::proc::undoRedo::commands::CreateDeleteElement::CreateDeleteElement(cedar::proc::gui::Element* element, cedar::proc::gui::Scene* scene, cedar::proc::undoRedo::commands::CreateDeleteElement::Action action)
 :
 mpGuiElement(element),
-mAction(action),
-mIsInitialRedo(true),
+mpScene(scene),
 mGroupIsCollapsed(false),
-mpScene(scene)
+mAction(action),
+mIsInitialRedo(true)
 {
-  mPosition = element->pos();
-  mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(element->getElement());
+	//set some vars since the element already exists
+  this->mPosition = element->pos();
+	this->mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(element->getElement());
 
   //Finding the highest level group the element is in
   QGraphicsItem* parentItem = element->parentItem();
   while(parentItem != nullptr)
   {
     //Check if the parentItem is a group, if yes set the parentItem as the group of the element
-    if (cedar::proc::gui::Group* groupOfElement = dynamic_cast<cedar::proc::gui::Group*>(parentItem))
+    if (auto* groupOfElement = dynamic_cast<cedar::proc::gui::Group*>(parentItem))
     {
-      mpGroup = groupOfElement->getGroup();
+			this->mpGroup = groupOfElement->getGroup();
       break;
     }
     else
@@ -93,14 +97,14 @@ mpScene(scene)
 
   if(parentItem == nullptr)
   {
-    mpGroup = scene->getRootGroup()->getGroup();
+		this->mpGroup = scene->getRootGroup()->getGroup();
   }
 
   //Since the element already exists, set the elementFullPath
-  mElementFullPath = mpGuiElement->getElement()->getFullPath();
+	this->mElementFullPath = mpGuiElement->getElement()->getFullPath();
 
   //Set text for the 'Undo/Redo Stack'
-  setText(QString::fromStdString("Deleted element: " + mElementFullPath));
+  setText(QString::fromStdString("Deleted element: " + this->mElementFullPath));
 }
 
 cedar::proc::undoRedo::commands::CreateDeleteElement::~CreateDeleteElement()
@@ -113,15 +117,15 @@ cedar::proc::undoRedo::commands::CreateDeleteElement::~CreateDeleteElement()
 
 void cedar::proc::undoRedo::commands::CreateDeleteElement::undo()
 {
-  switch(mAction)
+  switch(this->mAction)
   {
     case Action::CREATE:
       //Before deleting the element update the address of the element and its parentGroup in case it has been changed through a create
       //Uses elementFullPath
-      mpGuiElement = mpScene->getElementByFullPath(mElementFullPath);
-      mpGroup = mpScene->getGroupOfElementByFullPath(mElementFullPath);
+			this->mpGuiElement = mpScene->getElementByFullPath(this->mElementFullPath);
+			this->mpGroup = mpScene->getGroupOfElementByFullPath(this->mElementFullPath);
 
-      if(mpGuiElement != nullptr)
+      if(this->mpGuiElement != nullptr)
       {
         //Undo of createElement = deleteElement
         deleteElement();
@@ -129,7 +133,7 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::undo()
       break;
     case Action::DELETE:
       //Update group since it could have changed
-      mpGroup = mpScene->getGroupOfElementByFullPath(mElementFullPath);
+			this->mpGroup = this->mpScene->getGroupOfElementByFullPath(this->mElementFullPath);
       createElement();
       break;
   }
@@ -137,54 +141,54 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::undo()
 
 void cedar::proc::undoRedo::commands::CreateDeleteElement::redo()
 {
-  switch(mAction)
+  switch(this->mAction)
   {
     case Action::CREATE:
-      if(mIsInitialRedo)
+      if(this->mIsInitialRedo)
       {
         createElement();
         //Set text for the 'Undo/Redo Stack'
-        mElementFullPath = mpGuiElement->getElement()->getFullPath();
-        setText(QString::fromStdString("Created element: " + mElementFullPath));
-				mIsInitialRedo = false;
+				this->mElementFullPath = this->mpGuiElement->getElement()->getFullPath();
+        setText(QString::fromStdString("Created element: " + this->mElementFullPath));
+				this->mIsInitialRedo = false;
       }
       else
       {
         //Group could have been changed
-        mpGroup = mpScene->getGroupOfElementByFullPath(mElementFullPath);
+				this->mpGroup = this->mpScene->getGroupOfElementByFullPath(this->mElementFullPath);
         createElement();
       }
       break;
 
     case Action::DELETE:
       //Update guiElement and group before deleting if they have been changed
-      mpGuiElement = mpScene->getElementByFullPath(mElementFullPath);
-      mpGroup = mpScene->getGroupOfElementByFullPath(mElementFullPath);
+			this->mpGuiElement = this->mpScene->getElementByFullPath(this->mElementFullPath);
+			this->mpGroup = this->mpScene->getGroupOfElementByFullPath(this->mElementFullPath);
 
-      if(mpGuiElement != nullptr)
+      if(this->mpGuiElement != nullptr)
       {
         //Undo of createElement = deleteElement
         deleteElement();
       }
-      mIsInitialRedo = false;
+			this->mIsInitialRedo = false;
       break;
   }
 }
 
 void cedar::proc::undoRedo::commands::CreateDeleteElement::createElement()
 {
-  cedar::proc::Element* element = mpScene->createElement(mpGroup,mClassId,mPosition).get();
-  mpGuiElement = mpScene->getGraphicsItemFor(element);
+  cedar::proc::Element* element = this->mpScene->createElement(this->mpGroup,this->mClassId,this->mPosition).get();
+	this->mpGuiElement = this->mpScene->getGraphicsItemFor(element);
 
   //Loadings its old values, that we saved when it was deleted
 	loadElementConfiguration();
 
-	if(!mIsInitialRedo)
+	if(!this->mIsInitialRedo)
 	{
 		//If the element that is being created is a group, load the measurements of the group and the location of the elements in the group
-		if (auto group = dynamic_cast<cedar::proc::gui::Group *>(mpGuiElement))
+		if (auto group = dynamic_cast<cedar::proc::gui::Group *>(this->mpGuiElement))
 		{
-      group->setSize(mWidthOfGroup, mHeightOfGroup);
+      group->setSize(this->mWidthOfGroup, this->mHeightOfGroup);
 		  if(this->mGroupIsCollapsed)
       {
         group->setCollapsed(true);
@@ -197,14 +201,14 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::createElement()
 				cedar::proc::gui::Element *guiElement = this->mpScene->getGraphicsItemFor(element.second.get());
 				if (guiElement != nullptr)
 				{
-					guiElement->setPos(mPositionOfElementsInGroup[i]);
+					guiElement->setPos(this->mPositionOfElementsInGroup[i]);
 					i++;
 				}
 			}
 		}
 	}
 	//Since the group the element is in could have changed its name the elementFullPath has to be updated
-	mElementFullPath = mpGuiElement->getElement()->getFullPath();
+	this->mElementFullPath = this->mpGuiElement->getElement()->getFullPath();
 }
 
 void cedar::proc::undoRedo::commands::CreateDeleteElement::deleteElement()
@@ -215,7 +219,7 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::deleteElement()
 		saveElementConfiguration();
 
 		//If the element that is being deleted is a group, save the measurements of the group and the location of the elements in the group
-		if(auto group = dynamic_cast<cedar::proc::gui::Group*>(mpGuiElement))
+		if(auto* group = dynamic_cast<cedar::proc::gui::Group*>(mpGuiElement))
 		{
 			//Save size of the group
       this->mGroupIsCollapsed = group->isCollapsed();
@@ -237,24 +241,24 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::deleteElement()
 				cedar::proc::gui::Element* guiElement = this->mpScene->getGraphicsItemFor(element.second.get());
 				if(guiElement!=nullptr)
 				{
-					mPositionOfElementsInGroup.push_back(guiElement->pos());
+					this->mPositionOfElementsInGroup.push_back(guiElement->pos());
 				}
 			}
 		}
-		mpGuiElement->deleteElement();
+		this->mpGuiElement->deleteElement();
   }
 }
 
 void cedar::proc::undoRedo::commands::CreateDeleteElement::saveElementConfiguration()
 {
-  mElementConfiguration.clear();
-  mpGuiElement->getElement()->writeConfiguration(mElementConfiguration);
+	this->mElementConfiguration.clear();
+	this->mpGuiElement->getElement()->writeConfiguration(this->mElementConfiguration);
 }
 
 void cedar::proc::undoRedo::commands::CreateDeleteElement::loadElementConfiguration()
 {
-  if(!mElementConfiguration.empty())
+  if(!this->mElementConfiguration.empty())
   {
-    mpGuiElement->getElement()->readConfiguration(mElementConfiguration);
+		this->mpGuiElement->getElement()->readConfiguration(this->mElementConfiguration);
   }
 }
