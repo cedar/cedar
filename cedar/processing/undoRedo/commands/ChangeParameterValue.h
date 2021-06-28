@@ -66,7 +66,7 @@
 
 /*!@ Parameter change command
  *
- * UndoCommand Implementation for changing multiple types of Parameters (PatameterTemplate<>)
+ * UndoCommand Implementation for changing multiple types of Parameters (ParameterTemplate<>)
  */
 template <typename ValueT, typename ParameterT = cedar::aux::ParameterTemplate<ValueT>>
 class cedar::proc::undoRedo::commands::ChangeParameterValue : public cedar::proc::undoRedo::UndoCommand
@@ -89,11 +89,12 @@ public:
                        cedar::proc::gui::Scene* scene = nullptr)
   :
   mpParameter(parameter),
+  mpParentElement(nullptr),
   mOldValue(oldValue),
   mNewValue(newValue),
-  mpScene(scene),
   mLockSet(false),
-  mIsInitialRedo(true)
+  mIsInitialRedo(true),
+  mpScene(scene)
   {
     init(owner);
   }
@@ -102,12 +103,13 @@ public:
                        cedar::proc::gui::Scene* scene = nullptr)
   :
   mpParameter(parameter),
+  mpParentElement(nullptr),
   mOldValue(oldValue),
   mNewValue(newValue),
-  mpScene(scene),
-  mLockSet(true),
   mLock(lock),
-  mIsInitialRedo(true)
+  mLockSet(true),
+  mIsInitialRedo(true),
+  mpScene(scene)
   {
     init(owner);
   }
@@ -122,6 +124,7 @@ public:
     }
     if(owner != nullptr)
     {
+      // Found parent, get its full path
       if(auto element = dynamic_cast<cedar::proc::Element*>(owner))
       {
         this->mParentFullPath = element->getFullPath();
@@ -135,6 +138,7 @@ public:
     }
     else
     {
+      // Did not find the parent
       this->mParentFullPath = "";
       this->mParameterFullPath = "";
       this->setText(QString::fromStdString("Parameter changed: unknown parent::" + this->mpParameter->getName()));
@@ -154,6 +158,7 @@ public:
   // Update the pointers of the parameter and the parent element using the full paths
   void updateParameterPointer()
   {
+    // If no parent was found earlier, do not attempt to update the pointer
     if(!this->mParentFullPath.compare(""))
     {
       return;
@@ -168,6 +173,7 @@ public:
     }
     else
     {
+      //! this can probably be deleted, as getElementByFullPath() should already handle this
       if (this->mpScene != nullptr && this->mParentFullPath.compare(""))
       {
         QList<QGraphicsItem *> sceneItems = this->mpScene->items();
@@ -199,10 +205,11 @@ public:
     this->updateParameterPointer();
     if(this->mpParameter != nullptr)
     {
+      // Do the undo operation
       this->undoAction();
       this->mpParameter->emitChangedSignal();
 
-      //If name property was changed, update name
+      // If name property was changed, update name
       cedar::aux::NamedConfigurable* owner = this->mpParameter->getNamedConfigurableOwner();
       if(owner != nullptr)
       {
@@ -217,7 +224,7 @@ public:
         this->mParameterFullPath = owner->findParameterPath(this->mpParameter);
       }
 
-      //Select owner in scene
+      // Select owner in scene
       if(this->mpParentElement != nullptr && this->mpScene != nullptr)
       {
         QList<QGraphicsItem *> selected_items = this->mpScene->selectedItems();
@@ -237,6 +244,8 @@ public:
       }
     }
   }
+
+  // TODO merge most of the undo() and redo() code, as it is pretty much the same
 
   void redo()
   {
@@ -282,6 +291,7 @@ public:
     }
   }
 
+  // Merges this command to another one if possible. This is used to build the parameter-change macro on the fly
   virtual bool mergeWith(const QUndoCommand* other)
   {
     if(!cedar::proc::gui::SettingsSingleton::getInstance()->getUndoRedoAutoMacro())
@@ -298,8 +308,6 @@ public:
     }
     return false;
   }
-
-  //TODO comments
 
   std::string getMacroIdentifier() const override
   {

@@ -699,7 +699,7 @@ cedar::proc::gui::Element* cedar::proc::gui::Scene::getElementByFullPath(std::st
   //Set the guiElement
   if(currentGroup->getGroup()->contains(mElementNameSplitted[mElementNameSplitted.size() - 1]))
   {
-    //Search in the group of the element
+    //Search in the group for the element
     if (cedar::proc::ElementPtr element = currentGroup->getGroup()->getElement(mElementNameSplitted[mElementNameSplitted.size() - 1]))
     {
       if (cedar::proc::gui::Element* guiElement = this->getGraphicsItemFor(element))

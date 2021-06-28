@@ -108,7 +108,7 @@ void cedar::proc::undoRedo::commands::CreateGroupTemplate::redo()
     //Loadings its old values, that we saved when it was deleted
     loadElementConfiguration();
 
-		mElementFullPath = mpGuiElement->getElement()->getFullPath();
+    mElementFullPath = mpGuiElement->getElement()->getFullPath();
   }
 }
 
