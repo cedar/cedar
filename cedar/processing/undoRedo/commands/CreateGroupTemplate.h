@@ -116,17 +116,20 @@ protected:
   // none yet
 
 private:
+	//!@brief This is given to the command. Stores which declaration should be used
   const cedar::proc::GroupDeclaration* mpGroupDeclaration;
-  cedar::proc::GroupPtr mpTargetGroup;
+	//!@brief Target group of the create command. Rootgroup = nullptr
+	cedar::proc::GroupPtr mpTargetGroup;
+  //TODO: needed for what?
   QGraphicsSceneDragDropEvent* mpEvent;
-  cedar::proc::gui::Scene* mpScene;
-  cedar::proc::GroupPtr mpGroup;
+
   QPointF mPosition;
   cedar::aux::ConfigurationNode mElementConfiguration;
   cedar::proc::gui::Element* mpGuiElement;
   std::string mElementFullPath;
   std::string mClassId;
   bool mIsInitialRedo;
+	cedar::proc::gui::Scene* mpScene;
 }; //class cedar::proc::undoRedo::commands::CreateGroupTemplate
 
 #endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_GROUP_H

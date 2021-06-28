@@ -58,7 +58,7 @@
 cedar::proc::undoRedo::commands::CreateGroupTemplate::CreateGroupTemplate(const cedar::proc::GroupDeclaration* groupDeclaration, cedar::proc::GroupPtr group, QGraphicsSceneDragDropEvent* pEvent, QPointF mapped, cedar::proc::gui::Scene* scene)
 :
 mpGroupDeclaration(groupDeclaration),
-mpGroup(group),
+mpTargetGroup(group),
 mpEvent(pEvent),
 mPosition(mapped),
 mpScene(scene),
@@ -78,7 +78,7 @@ void cedar::proc::undoRedo::commands::CreateGroupTemplate::undo()
   //Before deleting the element update the address of the element and its parentGroup in case it has been changed through a create
   //Uses elementFullPath
   mpGuiElement = mpScene->getElementByFullPath(mElementFullPath);
-  mpGroup = mpScene->getGroupOfElementByFullPath(mElementFullPath);
+	mpTargetGroup = mpScene->getGroupOfElementByFullPath(mElementFullPath);
 
   if(mpGuiElement != nullptr)
   {
@@ -103,28 +103,28 @@ void cedar::proc::undoRedo::commands::CreateGroupTemplate::redo()
   else
   {
     //Group could have been changed
-    mpGroup = mpScene->getGroupOfElementByFullPath(mElementFullPath);
+		mpTargetGroup = mpScene->getGroupOfElementByFullPath(mElementFullPath);
     createElement();
     //Loadings its old values, that we saved when it was deleted
     loadElementConfiguration();
 
-    mElementFullPath = mpGuiElement->getElement()->getFullPath();
+		mElementFullPath = mpGuiElement->getElement()->getFullPath();
   }
 }
 
 void cedar::proc::undoRedo::commands::CreateGroupTemplate::createGroupTemplate()
 {
-  auto element = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup(mpGroupDeclaration->getClassName(),mpGroup,mpEvent->modifiers().testFlag(Qt::ControlModifier));
+  auto element = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup(mpGroupDeclaration->getClassName(),mpTargetGroup,mpEvent->modifiers().testFlag(Qt::ControlModifier));
 
   mpGuiElement = mpScene->getGraphicsItemFor(element);
   mpGuiElement->setPos(mPosition);
-  mpGroup = mpScene->getGroupOfElementByFullPath(mElementFullPath);
+	mpTargetGroup = mpScene->getGroupOfElementByFullPath(mElementFullPath);
   mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(element);
 }
 
 void cedar::proc::undoRedo::commands::CreateGroupTemplate::createElement()
 {
-  cedar::proc::Element* Element = mpScene->createElement(mpGroup,mClassId,mPosition).get();
+  cedar::proc::Element* Element = mpScene->createElement(mpTargetGroup,mClassId,mPosition).get();
   mpGuiElement = mpScene->getGraphicsItemFor(Element);
 }
 
