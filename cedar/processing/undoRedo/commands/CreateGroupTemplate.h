@@ -24,8 +24,10 @@
 
     File:        CreateGroupTemplate.h
 
-    Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
+    Maintainer:  Yogeshwar Agnihotri,
+    						 Lars Janssen
+    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de,
+    						 lars.janssen@ini.rub.de
     Date:        2021 01 20
 
     Description: Header file for the class cedar::proc::undoRedo::commands::CreateGroupTemplate.
@@ -52,7 +54,8 @@
 
 
 /*!
- *  Undo/redo command for creating a groupTemplate. This is only for creating a groupTemplate. Once a groupTemplate is created CEDAR treats it as a element so the deletion is managed via CreateDeleteElement class
+ *  Undo/redo command for creating a groupTemplate. This is only for creating a groupTemplate. Once a groupTemplate is
+ *  created CEDAR treats it as a element so the deletion is managed via CreateDeleteElement class
  */
 class cedar::proc::undoRedo::commands::CreateGroupTemplate : public UndoCommand
 {
@@ -65,7 +68,8 @@ class cedar::proc::undoRedo::commands::CreateGroupTemplate : public UndoCommand
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CreateGroupTemplate(const cedar::proc::GroupDeclaration*, cedar::proc::GroupPtr, QGraphicsSceneDragDropEvent *pEvent, QPointF position, cedar::proc::gui::Scene* scene);
+  CreateGroupTemplate(const cedar::proc::GroupDeclaration*, cedar::proc::GroupPtr, QGraphicsSceneDragDropEvent *pEvent,
+  				QPointF position, cedar::proc::gui::Scene* scene);
 
   //!@brief Destructor
   virtual ~CreateGroupTemplate();
@@ -109,17 +113,24 @@ protected:
 private:
 	//!@brief This is given to the command. Stores which declaration should be used
   const cedar::proc::GroupDeclaration* mpGroupDeclaration;
-	//!@brief Target group of the create command. Rootgroup = nullptr
-	cedar::proc::GroupPtr mpTargetGroup;
-  //TODO: needed for what?
-  QGraphicsSceneDragDropEvent* mpEvent;
 
-  cedar::proc::gui::Scene* mpScene;
+	//!@brief pointer to different instances of objects that are needed
+	cedar::proc::gui::Element* mpGuiElement;
+  cedar::proc::GroupPtr mpTargetGroup;
+	cedar::proc::gui::Scene* mpScene;
+
+	//!@brief mpEvent is needed to set mLinkedGroupFlag. If Ctrl Key is pressed a linked group has to be created.
+  QGraphicsSceneDragDropEvent* mpEvent;
+	bool mLinkedGroupFlag;
+
+	//!@brief full paths to identify the elements when their pointer is outdated
+	std::string mElementFullPath;
+	std::string mClassId;
+
+	//!@brief position of the element
   QPointF mPosition;
-  cedar::aux::ConfigurationNode mElementConfiguration;
-  cedar::proc::gui::Element* mpGuiElement;
-  std::string mElementFullPath;
-  std::string mClassId;
+
+	//!@brief boolean to realize the first redo
   bool mIsInitialRedo;
 };
 

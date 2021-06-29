@@ -24,8 +24,10 @@
 
     File:        CreateGroupTemplate.cpp
 
-    Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
+    Maintainer:  Yogeshwar Agnihotri,
+    						 Lars Janssen
+    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de,
+    						 lars.janssen@ini.rub.de
     Date:        2021 01 20
 
     Description: Source file for the class cedar::proc::undoRedo::commands::CreateGroupTemplate.
@@ -55,14 +57,16 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::undoRedo::commands::CreateGroupTemplate::CreateGroupTemplate(const cedar::proc::GroupDeclaration* groupDeclaration, cedar::proc::GroupPtr targetGroup, QGraphicsSceneDragDropEvent* pEvent, QPointF position, cedar::proc::gui::Scene* scene)
+cedar::proc::undoRedo::commands::CreateGroupTemplate::CreateGroupTemplate(
+				const cedar::proc::GroupDeclaration*groupDeclaration, cedar::proc::GroupPtr targetGroup,
+				QGraphicsSceneDragDropEvent* pEvent, QPointF position, cedar::proc::gui::Scene* scene)
 :
 mpGroupDeclaration(groupDeclaration),
-mpTargetGroup(targetGroup),
-mpEvent(pEvent),
-mpScene(scene),
-mPosition(position),
 mpGuiElement(nullptr),
+mpTargetGroup(targetGroup),
+mpScene(scene),
+mpEvent(pEvent),
+mPosition(position),
 mIsInitialRedo(true)
 {
 }
@@ -76,11 +80,12 @@ cedar::proc::undoRedo::commands::CreateGroupTemplate::~CreateGroupTemplate()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::undoRedo::commands::CreateGroupTemplate::undo()
 {
-  //Before deleting the element update the address of the element and its parentGroup in case it has been changed through something that was on the stack after this command (e.g deletion of this element)
-  mpGuiElement = mpScene->getElementByFullPath(mElementFullPath);
-  mpTargetGroup = mpScene->getGroupOfElementByFullPath(mElementFullPath);
+  //Before deleting the element update the address of the element and its parentGroup in case it has been changed
+  // through something that was on the stack after this command (e.g deletion of this element)
+  this->mpGuiElement = this->mpScene->getElementByFullPath(this->mElementFullPath);
+	this->mpTargetGroup = this->mpScene->getGroupOfElementByFullPath(this->mElementFullPath);
 
-  if(mpGuiElement != nullptr)
+  if(this->mpGuiElement != nullptr)
   {
     deleteGroupTemplate();
   }
@@ -88,37 +93,39 @@ void cedar::proc::undoRedo::commands::CreateGroupTemplate::undo()
 
 void cedar::proc::undoRedo::commands::CreateGroupTemplate::redo()
 {
-  if(mIsInitialRedo)
+  if(this->mIsInitialRedo)
   {
-    mIsInitialRedo = false;
+		this->mIsInitialRedo = false;
+    //Check if Ctrl key is pressed. If yes set the linkedGroup flag to true
+		this->mLinkedGroupFlag = this->mpEvent->modifiers().testFlag(Qt::ControlModifier);
     createGroupTemplate();
-    //get now to full path since it has been created right now
-    mElementFullPath = mpGuiElement->getElement()->getFullPath();
     //Set text for the 'Undo/Redo Stack'
-    setText(QString::fromStdString("Created group template: " + mpGuiElement->getElement()->getName()));
+    setText(QString::fromStdString("Created group template: " + this->mpGuiElement->getElement()->getName()));
   }
   else
   {
     //Group could have changed
-    mpTargetGroup = mpScene->getGroupOfElementByFullPath(mElementFullPath);
+		this->mpTargetGroup = this->mpScene->getGroupOfElementByFullPath(this->mElementFullPath);
     createGroupTemplate();
-    //get now to full path since it has been created right now
-    mElementFullPath = mpGuiElement->getElement()->getFullPath();
   }
 }
 
 void cedar::proc::undoRedo::commands::CreateGroupTemplate::createGroupTemplate()
 {
-  cedar::proc::ElementPtr element = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup(mpGroupDeclaration->getClassName(), mpTargetGroup, mpEvent->modifiers().testFlag(Qt::ControlModifier));
+  cedar::proc::ElementPtr element = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->
+  				addGroupTemplateToGroup(this->mpGroupDeclaration->getClassName(), this->mpTargetGroup,
+																	this->mLinkedGroupFlag);
 
   if(element!=nullptr)
   {
-    mpGuiElement = mpScene->getGraphicsItemFor(element);
-    if(mpGuiElement!=nullptr)
+		this->mpGuiElement = this->mpScene->getGraphicsItemFor(element);
+    if(this->mpGuiElement!=nullptr)
     {
-      mpGuiElement->setPos(mPosition);
+			this->mpGuiElement->setPos(this->mPosition);
+			//get now to full path since it has been created right now
+			this->mElementFullPath = this->mpGuiElement->getElement()->getFullPath();
     }
-    mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(element);
+		this->mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(element);
   }
 }
 
@@ -126,6 +133,6 @@ void cedar::proc::undoRedo::commands::CreateGroupTemplate::deleteGroupTemplate()
 {
   if(this->mpGuiElement != nullptr && this->mpScene->items().contains(this->mpGuiElement))
   {
-    mpGuiElement->deleteElement();
+		this->mpGuiElement->deleteElement();
   }
 }

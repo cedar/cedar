@@ -120,9 +120,9 @@ private:
 protected:
   // none yet
 private:
-	//!@brief pointer to different instances of objects
+	//!@brief pointer to different instances of objects that are needed
   cedar::proc::gui::Element* mpGuiElement;
-	cedar::proc::GroupPtr mpGroup;
+	cedar::proc::GroupPtr mpTargetGroup;
 	cedar::proc::gui::Scene* mpScene;
 
 	//!@brief full paths to identify the elements when their pointer is outdated
@@ -137,11 +137,13 @@ private:
   qreal mHeightOfGroup;
   std::vector<QPointF> mPositionOfElementsInGroup;
 
+	//!@brief instance of the action enum. Saves for what to command was intended (create or delete)
   Action mAction;
 
 	//!@brief if the element is a group this stores if its collapsed or not
 	bool mGroupIsCollapsed;
-	//!@brief boolean for the first redo
+
+	//!@brief boolean to realize the first redo
   bool mIsInitialRedo;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

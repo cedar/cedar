@@ -56,7 +56,7 @@
 cedar::proc::undoRedo::commands::CreateDeleteElement::CreateDeleteElement(QPointF position,std::string classId, cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene,cedar::proc::undoRedo::commands::CreateDeleteElement::Action action)
 :
 mpGuiElement(nullptr),
-mpGroup(group),
+mpTargetGroup(group),
 mpScene(scene),
 mClassId(classId),
 mPosition(position),
@@ -86,7 +86,7 @@ mIsInitialRedo(true)
     //Check if the parentItem is a group, if yes set the parentItem as the group of the element
     if (auto* groupOfElement = dynamic_cast<cedar::proc::gui::Group*>(parentItem))
     {
-			this->mpGroup = groupOfElement->getGroup();
+			this->mpTargetGroup = groupOfElement->getGroup();
       break;
     }
     else
@@ -97,7 +97,7 @@ mIsInitialRedo(true)
 
   if(parentItem == nullptr)
   {
-		this->mpGroup = scene->getRootGroup()->getGroup();
+		this->mpTargetGroup = scene->getRootGroup()->getGroup();
   }
 
   //Since the element already exists, set the elementFullPath
@@ -123,7 +123,7 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::undo()
       //Before deleting the element update the address of the element and its parentGroup in case it has been changed through a create
       //Uses elementFullPath
 			this->mpGuiElement = mpScene->getElementByFullPath(this->mElementFullPath);
-			this->mpGroup = mpScene->getGroupOfElementByFullPath(this->mElementFullPath);
+			this->mpTargetGroup = mpScene->getGroupOfElementByFullPath(this->mElementFullPath);
 
       if(this->mpGuiElement != nullptr)
       {
@@ -133,7 +133,7 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::undo()
       break;
     case Action::DELETE:
       //Update group since it could have changed
-			this->mpGroup = this->mpScene->getGroupOfElementByFullPath(this->mElementFullPath);
+			this->mpTargetGroup = this->mpScene->getGroupOfElementByFullPath(this->mElementFullPath);
       createElement();
       break;
   }
@@ -155,7 +155,7 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::redo()
       else
       {
         //Group could have been changed
-				this->mpGroup = this->mpScene->getGroupOfElementByFullPath(this->mElementFullPath);
+				this->mpTargetGroup = this->mpScene->getGroupOfElementByFullPath(this->mElementFullPath);
         createElement();
       }
       break;
@@ -163,7 +163,7 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::redo()
     case Action::DELETE:
       //Update guiElement and group before deleting if they have been changed
 			this->mpGuiElement = this->mpScene->getElementByFullPath(this->mElementFullPath);
-			this->mpGroup = this->mpScene->getGroupOfElementByFullPath(this->mElementFullPath);
+			this->mpTargetGroup = this->mpScene->getGroupOfElementByFullPath(this->mElementFullPath);
 
       if(this->mpGuiElement != nullptr)
       {
@@ -177,7 +177,7 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::redo()
 
 void cedar::proc::undoRedo::commands::CreateDeleteElement::createElement()
 {
-  cedar::proc::Element* element = this->mpScene->createElement(this->mpGroup,this->mClassId,this->mPosition).get();
+  cedar::proc::Element* element = this->mpScene->createElement(this->mpTargetGroup, this->mClassId, this->mPosition).get();
 	this->mpGuiElement = this->mpScene->getGraphicsItemFor(element);
 
   //Loadings its old values, that we saved when it was deleted
