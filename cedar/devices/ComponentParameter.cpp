@@ -127,7 +127,6 @@ cedar::dev::ComponentPtr cedar::dev::ComponentParameter::getValue() const
 
 std::string cedar::dev::ComponentParameter::getStringRepresentation() const
 {
-
   if (auto component = this->mWeakComponent.lock())
   {
     return component->getPath();

@@ -147,8 +147,8 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::redo()
       if(this->mIsInitialRedo)
       {
         createElement();
+        this->mElementFullPath = this->mpGuiElement->getElement()->getFullPath();
         //Set text for the 'Undo/Redo Stack'
-				this->mElementFullPath = this->mpGuiElement->getElement()->getFullPath();
         setText(QString::fromStdString("Created element: " + this->mElementFullPath));
 				this->mIsInitialRedo = false;
       }

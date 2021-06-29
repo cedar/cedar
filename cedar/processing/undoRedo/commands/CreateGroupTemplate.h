@@ -65,7 +65,7 @@ class cedar::proc::undoRedo::commands::CreateGroupTemplate : public UndoCommand
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CreateGroupTemplate(const cedar::proc::GroupDeclaration*, cedar::proc::GroupPtr, QGraphicsSceneDragDropEvent *pEvent, QPointF mapped, cedar::proc::gui::Scene* scene);
+  CreateGroupTemplate(const cedar::proc::GroupDeclaration*, cedar::proc::GroupPtr, QGraphicsSceneDragDropEvent *pEvent, QPointF position, cedar::proc::gui::Scene* scene);
 
   //!@brief Destructor
   virtual ~CreateGroupTemplate();
@@ -74,27 +74,18 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void undo();
-  void redo();
+  void undo() override;
+  void redo() override;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Creates a groupTemplate and sets its mpGuiElement, mpGroup and mClassId values
+  //!@brief Creates a groupTemplate and sets its mpGuiElement, mpTargetGroup and mClassId values
   void createGroupTemplate();
-
-  //!@brief Creates a empty element. This is used to redo groupTemplates, since createGroupTemplate is only used once on the initalRedo
-  void createElement();
 
   //!@brief Deletes the element
   void deleteGroupTemplate();
-
-  //!@brief Saves the configuration of the element into the configurationNode 'mElementConfiguration'
-  void saveElementConfiguration();
-
-  //!@brief Loads the configuration from the configurationNode 'mElementConfiguration' into mpGuiElement
-  void loadElementConfiguration();
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -123,14 +114,14 @@ private:
   //TODO: needed for what?
   QGraphicsSceneDragDropEvent* mpEvent;
 
+  cedar::proc::gui::Scene* mpScene;
   QPointF mPosition;
   cedar::aux::ConfigurationNode mElementConfiguration;
   cedar::proc::gui::Element* mpGuiElement;
   std::string mElementFullPath;
   std::string mClassId;
   bool mIsInitialRedo;
-	cedar::proc::gui::Scene* mpScene;
-}; //class cedar::proc::undoRedo::commands::CreateGroupTemplate
+};
 
 #endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_GROUP_H
 
