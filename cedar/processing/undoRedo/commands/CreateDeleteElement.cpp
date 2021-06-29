@@ -53,7 +53,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 //Constructor for creating an element
-cedar::proc::undoRedo::commands::CreateDeleteElement::CreateDeleteElement(QPointF position,std::string classId, cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene,cedar::proc::undoRedo::commands::CreateDeleteElement::Action action)
+cedar::proc::undoRedo::commands::CreateDeleteElement::CreateDeleteElement(QPointF position,std::string classId,
+				cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene,
+				cedar::proc::undoRedo::commands::CreateDeleteElement::Action action)
 :
 mpGuiElement(nullptr),
 mpTargetGroup(group),
@@ -67,7 +69,8 @@ mIsInitialRedo(true)
 }
 
 //Constructor for deleting an element
-cedar::proc::undoRedo::commands::CreateDeleteElement::CreateDeleteElement(cedar::proc::gui::Element* element, cedar::proc::gui::Scene* scene, cedar::proc::undoRedo::commands::CreateDeleteElement::Action action)
+cedar::proc::undoRedo::commands::CreateDeleteElement::CreateDeleteElement(cedar::proc::gui::Element* element,
+				cedar::proc::gui::Scene* scene, cedar::proc::undoRedo::commands::CreateDeleteElement::Action action)
 :
 mpGuiElement(element),
 mpScene(scene),
@@ -120,7 +123,8 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::undo()
   switch(this->mAction)
   {
     case Action::CREATE:
-      //Before deleting the element update the address of the element and its parentGroup in case it has been changed through a create
+      //Before deleting the element update the address of the element and its parentGroup in case it has been changed
+      // through a create
       //Uses elementFullPath
 			this->mpGuiElement = mpScene->getElementByFullPath(this->mElementFullPath);
 			this->mpTargetGroup = mpScene->getGroupOfElementByFullPath(this->mElementFullPath);
@@ -177,7 +181,8 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::redo()
 
 void cedar::proc::undoRedo::commands::CreateDeleteElement::createElement()
 {
-  cedar::proc::Element* element = this->mpScene->createElement(this->mpTargetGroup, this->mClassId, this->mPosition).get();
+  cedar::proc::Element* element = this->mpScene->createElement(this->mpTargetGroup, this->mClassId,
+  				this->mPosition).get();
 	this->mpGuiElement = this->mpScene->getGraphicsItemFor(element);
 
   //Loadings its old values, that we saved when it was deleted
@@ -185,7 +190,8 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::createElement()
 
 	if(!this->mIsInitialRedo)
 	{
-		//If the element that is being created is a group, load the measurements of the group and the location of the elements in the group
+		//If the element that is being created is a group, load the measurements of the group and the location of the
+		// elements in the group
 		if (auto group = dynamic_cast<cedar::proc::gui::Group *>(this->mpGuiElement))
 		{
       group->setSize(this->mWidthOfGroup, this->mHeightOfGroup);
@@ -215,10 +221,12 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::deleteElement()
 {
   if(this->mpGuiElement != nullptr && this->mpScene->items().contains(this->mpGuiElement))
   {
-		//Before deleting the element the configuration has to be saved, so when its created it again in redo, the load old parameter are loaded
+		//Before deleting the element the configuration has to be saved, so when its created it again in redo, the load old
+		// parameter are loaded
 		saveElementConfiguration();
 
-		//If the element that is being deleted is a group, save the measurements of the group and the location of the elements in the group
+		//If the element that is being deleted is a group, save the measurements of the group and the location of the
+		// elements in the group
 		if(auto* group = dynamic_cast<cedar::proc::gui::Group*>(mpGuiElement))
 		{
 			//Save size of the group
