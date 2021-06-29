@@ -362,7 +362,8 @@ void cedar::proc::sources::TCPReader::receiveMatData()
         numberOfFailedReads = 0;
         reconnect();
       }
-
+	  //This should be freed again!
+	  free(buffer);
       return;
     }
 

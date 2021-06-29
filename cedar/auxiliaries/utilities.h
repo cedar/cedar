@@ -104,7 +104,7 @@ namespace cedar
 
     /*!@brief CRC-32 Checksum
      */
-    unsigned int generateCR32Checksum(const char *message, int message_length);
+    CEDAR_AUX_LIB_EXPORT unsigned int generateCR32Checksum(const char *message, int message_length);
 
     /*!@brief Structure holding information about an frame in a stack trace.
      */
