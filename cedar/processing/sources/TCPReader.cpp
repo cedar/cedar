@@ -118,6 +118,7 @@ cedar::proc::sources::TCPReader::TCPReader()
         timeSinceLastConnectTrial(0),
         numberOfFailedReads(0),
         lastReadMatrix(cv::Mat::zeros(50, 50, CV_32F)),
+        lastReadDimensions(cv::Mat(2, 1, CV_32S,50)),
         mOverflowBuffer(""),
         _mBufferLength(new cedar::aux::UIntParameter(this, "buffer size", 32768)),
         _mPort(new cedar::aux::UIntParameter(this, "port", 50000, 49152, 65535)), //ephemeral ports only
@@ -442,6 +443,15 @@ void cedar::proc::sources::TCPReader::compute(const cedar::proc::Arguments &)
   {
     receiveMatData();
     mOutput->setData(lastReadMatrix);
+
+    if(lastReadMatrix.rows != lastReadDimensions.at<int>(0,0) || lastReadMatrix.cols != lastReadDimensions.at<int>(1,0))
+    {
+        this->emitOutputPropertiesChangedSignal("output");
+        lastReadDimensions.at<int>(0,0) = lastReadMatrix.rows;
+        lastReadDimensions.at<int>(1,0) = lastReadMatrix.cols;
+    }
+
+
     confirmAliveStatus();
 
     if (isConnected)

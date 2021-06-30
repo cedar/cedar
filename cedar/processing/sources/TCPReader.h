@@ -169,6 +169,7 @@ private:
   unsigned int timeSinceLastConnectTrial;
   unsigned int numberOfFailedReads;
   cv::Mat lastReadMatrix;
+  cv::Mat lastReadDimensions;
   std::string mOverflowBuffer;
 
 public:
