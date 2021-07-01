@@ -260,6 +260,12 @@ set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
       endif(YARP_FOUND)
     endif(CEDAR_INCLUDE_YARP)
 
+#WINSOCKET
+#Search should not be required as those libraries are part of the windows sdk
+if (WIN32)
+	link_libraries(wsock32 ws2_32)
+endif(WIN32)
+
 if(NOT CEDAR_PORTABLE_MINIMAL_VERSION)
 
     # libFRI

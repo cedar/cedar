@@ -221,7 +221,7 @@ void cedar::proc::steps::MatrixSlice::inputConnectionChanged(const std::string& 
 
 void cedar::proc::steps::MatrixSlice::updateDimensionality()
 {
-  if (!this->mInput)
+  if (!this->mInput || this->mInput->isEmpty())
   {
     return;
   }

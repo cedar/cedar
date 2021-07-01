@@ -1573,6 +1573,7 @@ void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode &
   }
 
   // write down robots
+  if(this->getGroup()->isRoot()) // Why was the condition missing?
   {
     //Todo: Write only robots down that are actually used in the architecture
     cedar::dev::RobotManagerSingleton::getInstance()->writeRobotConfigurations(generic);

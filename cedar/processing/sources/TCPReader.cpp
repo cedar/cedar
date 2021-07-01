@@ -54,14 +54,16 @@
 #include <string>
 
 #ifdef _WIN32
-    #include <winsock.h>
+#include <winsock2.h>
 #else
-    #include <arpa/inet.h>  /* definition of inet_ntoa */
-    #include <netdb.h>      /* definition of gethostbyname */
-    #include <netinet/in.h> /* definition of struct sockaddr_in */
-    #include <sys/socket.h>
-    #include <sys/time.h>
-    #include <unistd.h> /* definition of close */
+
+#include <arpa/inet.h>  /* definition of inet_ntoa */
+#include <netdb.h>      /* definition of gethostbyname */
+#include <netinet/in.h> /* definition of struct sockaddr_in */
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <unistd.h> /* definition of close */
+
 #endif
 
 #include <string.h>
@@ -71,36 +73,34 @@
 //#include <bits/fcntl.h>
 #include <fcntl.h>
 
-#define PORT 10020
-
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
 namespace
 {
-    bool declare()
-    {
-        using cedar::proc::ElementDeclarationPtr;
-        using cedar::proc::ElementDeclarationTemplate;
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
 
-        ElementDeclarationPtr input_declaration
-                (
-                        new ElementDeclarationTemplate<cedar::proc::sources::TCPReader>
-                                (
-                                        "Sources",
-                                        "cedar.processing.sources.TCPReader"
-                                )
-                );
-        input_declaration->setIconPath(":/steps/tcp_reader.svg");
-        input_declaration->setDescription("Forwards a tensor via a TCP Socket to a destination."
-                                          "See also the TCPReader step.");
+    ElementDeclarationPtr input_declaration
+            (
+                    new ElementDeclarationTemplate<cedar::proc::sources::TCPReader>
+                            (
+                                    "Sources",
+                                    "cedar.processing.sources.TCPReader"
+                            )
+            );
+    input_declaration->setIconPath(":/steps/tcp_reader.svg");
+    input_declaration->setDescription("Forwards a tensor via a TCP Socket to a destination."
+                                      "See also the TCPReader step.");
 
-        input_declaration->declare();
+    input_declaration->declare();
 
-        return true;
-    }
+    return true;
+  }
 
-    bool declared = declare();
+  bool declared = declare();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -116,20 +116,27 @@ cedar::proc::sources::TCPReader::TCPReader()
         mOutput(new cedar::aux::MatData(cv::Mat())),
         isConnected(false),
         timeSinceLastConnectTrial(0),
-        lastReadMatrix(cv::Mat::zeros(50,50,CV_32F)),
+        numberOfFailedReads(0),
+        lastReadMatrix(cv::Mat::zeros(50, 50, CV_32F)),
+        lastReadDimensions(cv::Mat(2, 1, CV_32S,50)),
         mOverflowBuffer(""),
         _mBufferLength(new cedar::aux::UIntParameter(this, "buffer size", 32768)),
-        _mPort(new cedar::aux::UIntParameter(this, "port", 50000,49152,65535)), //ephemeral ports only
-        _mTimeOutBetweenPackets(new cedar::aux::UIntParameter(this, "packet timeout (ms)", 3000)),
-        _mTimeStepsBetweenAcceptTrials(new cedar::aux::UIntParameter(this, "accept interval (steps)", 10))
+        _mPort(new cedar::aux::UIntParameter(this, "port", 50000, 49152, 65535)), //ephemeral ports only
+        _mTimeOutBetweenPackets(new cedar::aux::UIntParameter(this, "packet timeout (ms)", 500)),
+        _mTimeStepsBetweenMessages(new cedar::aux::UIntParameter(this, "message timeout (ms)", 50)),
+        _mTimeStepsBetweenAcceptTrials(new cedar::aux::UIntParameter(this, "accept interval (steps)", 30))
 {
-    cedar::proc::sources::TCPReader::mpDataLock = new QReadWriteLock();
+  cedar::proc::sources::TCPReader::mpDataLock = new QReadWriteLock();
 
-    _mBufferLength->markAdvanced(true);
-    _mTimeOutBetweenPackets->markAdvanced(true);
-    _mTimeStepsBetweenAcceptTrials->markAdvanced(true);
+  _mBufferLength->markAdvanced(true);
+  _mTimeOutBetweenPackets->markAdvanced(true);
+  _mTimeStepsBetweenMessages->markAdvanced(true);
+  _mTimeStepsBetweenAcceptTrials->markAdvanced(true);
 
-    this->declareOutput("output", mOutput);
+
+  this->declareOutput("output", mOutput);
+
+  mOutput->setData(lastReadMatrix);
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -137,302 +144,334 @@ cedar::proc::sources::TCPReader::TCPReader()
 
 void cedar::proc::sources::TCPReader::onStart()
 {
-    this->establishConnection();
+  this->establishConnection();
 }
 
 
 void cedar::proc::sources::TCPReader::establishConnection()
 {
-    raw_socket_h = create_socket_server(_mPort->getValue());
-    socket_h = accept_client(raw_socket_h);
+  raw_socket_h = create_socket_server(_mPort->getValue());
+  socket_h = accept_client(raw_socket_h);
 
 }
 
 void cedar::proc::sources::TCPReader::reconnect()
 {
-    closeSocket();
-    establishConnection();
+  closeSocket();
+  establishConnection();
 }
 
 int cedar::proc::sources::TCPReader::create_socket_server(int port)
 {
-    int sfd, rc;
-    struct sockaddr_in address;
+  int sfd, rc;
+  struct sockaddr_in address;
 
 #ifdef _WIN32
-    /* initialize the socket api */
-        WSADATA info;
+  /* initialize the socket api */
+      WSADATA info;
 
-        rc = WSAStartup(MAKEWORD(1, 1), &info); /* Winsock 1.1 */
-        if (rc != 0)
-        {
-            printf("cannot initialize Winsock\n");
-            return -1;
-        }
+      rc = WSAStartup(MAKEWORD(1, 1), &info); /* Winsock 1.1 */
+      if (rc != 0)
+      {
+          printf("cannot initialize Winsock\n");
+          return -1;
+      }
 #endif
-    /* create the socket */
-    sfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sfd == -1)
-    {
-        std::cout << "cannot create socket"<<std::endl;
-        return -1;
-    }
+  /* create the socket */
+  sfd = socket(AF_INET, SOCK_STREAM, 0);
+  if (sfd == -1)
+  {
+    std::cout << "cannot create socket" << std::endl;
+    return -1;
+  }
 
-    const int opt = 1;
-    if ( setsockopt(sfd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)) == -1)
-    {
-        std::cout<<"Error setting Socketopt!"<<std::endl;
-        return -1;
-    }
 
 #ifdef _WIN32
-    unsigned long on = 1;
-        ioctlsocket(sfd, FIONBIO, &on); //make socket Non-blockable in windows
+  const char opt = 1;
+          if (setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR,
+                         &opt, sizeof(opt)))
+          {
+              std::cout << "Error Setting Socket Options" << std::endl;
+          }
+
+          unsigned long on = 1;
+          ioctlsocket(sfd, FIONBIO, &on); //make socket Non-blockable in windows
 #else
-    fcntl(sfd, F_SETFL, O_NONBLOCK); //make socket Non-blockable
+  int opt = 1;
+  if (setsockopt(sfd, SOL_SOCKET, SO_REUSEPORT,
+                 &opt, sizeof(opt)))
+  {
+    std::cout << "Error Setting Socket Options" << std::endl;
+  }
+  fcntl(sfd, F_SETFL, O_NONBLOCK); //make socket Non-blockable
 #endif
 
-    /* fill in socket address */
-    memset(&address, 0, sizeof(struct sockaddr_in));
-    address.sin_family = AF_INET;
-    address.sin_port = htons(port);
-    address.sin_addr.s_addr = INADDR_ANY;
+
+  /* fill in socket address */
+  memset(&address, 0, sizeof(struct sockaddr_in));
+  address.sin_family = AF_INET;
+  address.sin_port = htons(port);
+  address.sin_addr.s_addr = INADDR_ANY;
 
 
-    /* bind to port */
-    rc = bind(sfd, (struct sockaddr *) &address, sizeof(struct sockaddr));
-    if (rc == -1)
-    {
-        printf("cannot bind port %d\n", port);
+  /* bind to port */
+  rc = bind(sfd, (struct sockaddr *) &address, sizeof(struct sockaddr));
+  if (rc == -1)
+  {
+    printf("cannot bind port %d\n", port);
 #ifdef _WIN32
-        closesocket(sfd);
+    closesocket(sfd);
 #else
-        close(sfd);
+    close(sfd);
 #endif
-        return -1;
-    }
+    return -1;
+  }
 
-    /* listen for connections */
-    if (listen(sfd, 1) == -1)
-    {
-        printf("cannot listen for connections\n");
+  /* listen for connections */
+  if (listen(sfd, 1) == -1)
+  {
+    printf("cannot listen for connections\n");
 #ifdef _WIN32
-        closesocket(sfd);
+    closesocket(sfd);
 #else
-        close(sfd);
+    close(sfd);
 #endif
-        return -1;
-    }
-    printf("Waiting for a connection on port %d...\n", port);
+    return -1;
+  }
+  printf("Waiting for a connection on port %d...\n", port);
 
-    return sfd;
+  return sfd;
 
 }
 
 int cedar::proc::sources::TCPReader::accept_client(int server_fd)
 {
-    int cfd;
-    struct sockaddr_in client;
+  int cfd;
+  struct sockaddr_in client;
 
 #ifndef _WIN32
-    socklen_t asize;
+  socklen_t asize;
 #else
-    int asize;
+  int asize;
 #endif
 
-    struct hostent *client_info;
+  struct hostent *client_info;
 
-    asize = sizeof(struct sockaddr_in);
+  asize = sizeof(struct sockaddr_in);
 
-    cfd = accept(server_fd, (struct sockaddr *) &client, &asize);
-    if (cfd == -1)
-    {
-        return -1;
-    }
+  cfd = accept(server_fd, (struct sockaddr *) &client, &asize);
+  if (cfd == -1)
+  {
+    return -1;
+  }
 
-    client_info = gethostbyname((char *) inet_ntoa(client.sin_addr));
-    printf("Accepted connection from: %s \n", client_info->h_name);
+  client_info = gethostbyname((char *) inet_ntoa(client.sin_addr));
+  printf("Accepted connection from: %s \n", client_info->h_name);
 
-    isConnected = true;
-    FD_ZERO(&rfds);
-    FD_SET(cfd, &rfds);
+  isConnected = true;
+  FD_ZERO(&rfds);
+  FD_SET(cfd, &rfds);
 
-    return cfd;
+  return cfd;
 }
 
 void cedar::proc::sources::TCPReader::receiveMatData()
 {
-    if (!isConnected)
+  if (!isConnected)
+  {
+    timeSinceLastConnectTrial = timeSinceLastConnectTrial + 1;
+    if (timeSinceLastConnectTrial > _mTimeStepsBetweenAcceptTrials->getValue())
     {
-        timeSinceLastConnectTrial = timeSinceLastConnectTrial + 1;
-        if (timeSinceLastConnectTrial > _mTimeStepsBetweenAcceptTrials->getValue())
-        {
-            timeSinceLastConnectTrial = 0;
-            if (raw_socket_h != -1)
-            {
-                //Just wait for some connection!
-                socket_h = accept_client(raw_socket_h);
-            } else
-            {
-                reconnect();
-            }
-        }
-        return;
-    }
-
-    FD_ZERO(&rfds);
-    FD_SET(socket_h, &rfds);
-    // Size may be varied. Just picked this number for now.
-    char *buffer = (char *) malloc(_mBufferLength->getValue() * sizeof(char));
-    std::string fullMessageString = "";
-
-    //I am not sure anymore, if this works guaranteed
-    if (mOverflowBuffer != "")
-    {
-        fullMessageString += mOverflowBuffer;
-        mOverflowBuffer = "";
-    }
-
-    bool endFound = false;
-    bool timeout = false;
-    int msgLength;
-
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-
-    while (!endFound && !timeout)
-    {
-        end = std::chrono::steady_clock::now();
-        timeout = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() > _mTimeOutBetweenPackets->getValue(); //3second timeout
-
-        memset(buffer, 0, _mBufferLength->getValue());
-        msgLength = recv(socket_h, buffer, _mBufferLength->getValue(), 0);
-
-        if (msgLength > 0)
-        {
-            std::string concatString = std::string(buffer, msgLength); //This should do it properly
-
-            //Let's see, if we found the end of a Msg
-            if (concatString.find(MATMSG_END) != std::string::npos)
-            {
-                endFound = true;
-                std::vector<std::string> splitStrings;
-                cedar::aux::split(concatString, MATMSG_END, splitStrings);
-                if (splitStrings.size() == 2)
-                {
-                    concatString = splitStrings[0];
-                    mOverflowBuffer = splitStrings[1];
-                    fullMessageString += concatString; // The final Matrix String
-                } else if (splitStrings.size() > 2)
-                { //"We have more than one Message in this one reading!
-                    fullMessageString = splitStrings[splitStrings.size() - 2]; //The last guaranteed full Matrix
-                    mOverflowBuffer = splitStrings[splitStrings.size() - 1];
-                }
-
-            } else
-            { // We are not at the end! Let's continue concatenating.
-                fullMessageString += concatString;
-            }
-        } else
-        {
-            //We failed to read! Accumulated Buffer is therefore likely irrelevant. Ultimately might lead to a timeout anyway
-            mOverflowBuffer = "";
-        }
-
-    }
-    free(buffer); //Good old Malloc ...
-
-    if(timeout)
-    {
+      timeSinceLastConnectTrial = 0;
+      if (raw_socket_h != -1)
+      {
+        //Just wait for some connection!
+        socket_h = accept_client(raw_socket_h);
+      } else
+      {
         reconnect();
-        return;
+      }
     }
+    return;
+  }
 
+  FD_ZERO(&rfds);
+  FD_SET(socket_h, &rfds);
+  // Size may be varied. Just picked this number for now.
+  char *buffer = (char *) malloc(_mBufferLength->getValue() * sizeof(char));
+  std::string fullMessageString = "";
 
-    std::vector<std::string> chkSumSplit;
-    cedar::aux::split(fullMessageString, MATMSG_CHK, chkSumSplit);
+  if (mOverflowBuffer != "")
+  {
+    fullMessageString += mOverflowBuffer;
+    mOverflowBuffer = "";
+  }
 
-    std::string matrixString = "";
-    std::string sentChecksum = "";
+  bool endFound = false;
+  bool timeout = false;
+  int msgLength;
 
-    if (chkSumSplit.size() == 2)
+  std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+  std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+  while (!endFound && !timeout)
+  {
+
+    end = std::chrono::steady_clock::now();
+    timeout = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() >
+              _mTimeOutBetweenPackets->getValue();
+
+    memset(buffer, 0, _mBufferLength->getValue());
+
+#ifdef _WIN32
+    msgLength = recv(socket_h, buffer, _mBufferLength->getValue(), 0);
+#else
+    msgLength = recv(socket_h, buffer, _mBufferLength->getValue(), MSG_DONTWAIT);
+#endif
+    if (msgLength > 0)
     {
-        matrixString = chkSumSplit[0];
-        sentChecksum = chkSumSplit[1];
+      numberOfFailedReads = 0;
+      std::string concatString = std::string(buffer, msgLength);
+
+      //Let's see, if we found the end of a Msg
+      if (concatString.find(MATMSG_END) != std::string::npos)
+      {
+        endFound = true;
+        std::vector<std::string> splitStrings;
+        cedar::aux::split(concatString, MATMSG_END, splitStrings);
+        if (splitStrings.size() == 2)
+        {
+          concatString = splitStrings[0];
+          mOverflowBuffer = splitStrings[1];
+          fullMessageString += concatString; // The final Matrix String
+        } else if (splitStrings.size() > 2)
+        { //"We have more than one Message in this one reading!
+          fullMessageString = splitStrings[splitStrings.size() - 2]; //The last guaranteed full Matrix
+          mOverflowBuffer = splitStrings[splitStrings.size() - 1];
+        }
+
+      } else
+      { // We are not at the end! Let's continue concatenating.
+        fullMessageString += concatString;
+      }
     } else
     {
-        //Something went wrong. The message had more than one Checksum included. Abort
-        return;
+      numberOfFailedReads = numberOfFailedReads + 1;
+
+      if (numberOfFailedReads > _mTimeStepsBetweenMessages->getValue())
+      {
+        numberOfFailedReads = 0;
+        reconnect();
+      }
+	  //This should be freed again!
+	  free(buffer);
+      return;
     }
 
-    std::string genChecksum = std::to_string(cedar::aux::generateCR32Checksum(matrixString.c_str(), matrixString.size()));
+  }
+  free(buffer); //Good old Malloc ...
 
-    if (genChecksum != sentChecksum)
-    {
-        std::cout << "Checksums do not match! Retrieved Checksum: >" << sentChecksum << "<\nGenerated Checksum: >" << genChecksum << "<" << std::endl;
-        return;
-    }
+  if (timeout)
+  {
+    reconnect();
+    return;
+  }
 
 
-    std::stringstream inputStream; // In the future we might get rid of the stream here
-    inputStream << fullMessageString;
+  std::vector<std::string> chkSumSplit;
+  cedar::aux::split(fullMessageString, MATMSG_CHK, chkSumSplit);
 
-    cedar::aux::MatData transformData;
-    transformData.deserialize(inputStream,cedar::aux::SerializationFormat::Compact);
-    lastReadMatrix = transformData.getData();
+  std::string matrixString = "";
+  std::string sentChecksum = "";
+
+  if (chkSumSplit.size() == 2)
+  {
+    matrixString = chkSumSplit[0];
+    sentChecksum = chkSumSplit[1];
+  } else
+  {
+    //Something went wrong. The message had more than one Checksum included. Abort
+    return;
+  }
+
+  std::string genChecksum = std::to_string(cedar::aux::generateCR32Checksum(matrixString.c_str(), matrixString.size()));
+
+  if (genChecksum != sentChecksum)
+  {
+    return;
+  }
+
+
+  std::stringstream inputStream; // In the future we might get rid of the stream here
+  inputStream << fullMessageString;
+
+  cedar::aux::MatData transformData;
+  transformData.deserialize(inputStream, cedar::aux::SerializationFormat::Compact);
+  lastReadMatrix = transformData.getData();
 }
 
 void cedar::proc::sources::TCPReader::onStop()
 {
-    _mPort->setConstant(false);
-    closeSocket();
+  _mPort->setConstant(false);
+  closeSocket();
 }
 
 void cedar::proc::sources::TCPReader::closeSocket()
 {
 #ifdef _WIN32
-    closesocket(socket_h);
-    closesocket(raw_socket_h);
-    WSACleanup();
+  closesocket(socket_h);
+  closesocket(raw_socket_h);
+  WSACleanup();
 #else
-    close(socket_h);
-    close(raw_socket_h);
+  close(socket_h);
+  close(raw_socket_h);
 #endif
-    isConnected = false;
+  isConnected = false;
 }
 
 void cedar::proc::sources::TCPReader::reset()
 {
-    reconnect();
-    this->onTrigger();
+  reconnect();
 }
 
 void cedar::proc::sources::TCPReader::compute(const cedar::proc::Arguments &)
 {
-    if (0 == _mPort->getValue())
+  if (0 == _mPort->getValue())
+  {
+    this->setState(cedar::proc::Step::STATE_EXCEPTION, "Port must not be empty!");
+  } else
+  {
+    receiveMatData();
+    mOutput->setData(lastReadMatrix);
+
+    if(lastReadMatrix.rows != lastReadDimensions.at<int>(0,0) || lastReadMatrix.cols != lastReadDimensions.at<int>(1,0))
     {
-        this->setState(cedar::proc::Step::STATE_EXCEPTION, "Port must not be empty!");
+        this->emitOutputPropertiesChangedSignal("output");
+        lastReadDimensions.at<int>(0,0) = lastReadMatrix.rows;
+        lastReadDimensions.at<int>(1,0) = lastReadMatrix.cols;
+    }
+
+
+    confirmAliveStatus();
+
+    if (isConnected)
+    {
+      this->setState(cedar::proc::Step::STATE_RUNNING, "Connected");
     } else
     {
-        receiveMatData();
-        mOutput->setData(lastReadMatrix);
-        confirmAliveStatus();
-
-        if(isConnected)
-        {
-            this->setState(cedar::proc::Step::STATE_RUNNING,"Connected");
-        }
-        else
-        {
-            this->setState(cedar::proc::Step::STATE_INITIALIZING, "Waiting for Incoming Connections... ");
-        }
+      this->setState(cedar::proc::Step::STATE_INITIALIZING, "Waiting for Incoming Connections... ");
     }
+  }
 }
 
 void cedar::proc::sources::TCPReader::confirmAliveStatus()
 {
-    std::string msgContent = this->getName() + " is alive!";
-    send(socket_h, msgContent.c_str(), msgContent.size(), 0);
+  std::string msgContent = this->getName() + " is alive!";
+#ifdef _WIN32
+  send(socket_h, msgContent.c_str(), msgContent.size(), 0);
+#else
+  send(socket_h, msgContent.c_str(), msgContent.size(), MSG_NOSIGNAL);
+#endif
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::sources::TCPReader::determineInputValidity
@@ -441,14 +480,14 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::sources::TCPReader::determineInputV
                 cedar::aux::ConstDataPtr data
         ) const
 {
-    // First, let's make sure that this is really the input in case anyone ever changes our interface.
-    CEDAR_DEBUG_ASSERT(slot->getName() == "input")
+  // First, let's make sure that this is really the input in case anyone ever changes our interface.
+  CEDAR_DEBUG_ASSERT(slot->getName() == "input")
 
-    if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
-    {
-        return cedar::proc::DataSlot::VALIDITY_VALID;
-    } else
-    {
-        return cedar::proc::DataSlot::VALIDITY_ERROR;
-    }
+  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
+  {
+    return cedar::proc::DataSlot::VALIDITY_VALID;
+  } else
+  {
+    return cedar::proc::DataSlot::VALIDITY_ERROR;
+  }
 }

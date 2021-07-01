@@ -57,14 +57,15 @@
 #include <winsock2.h>
 #include <Ws2tcpip.h>
 #else
+
 #include <arpa/inet.h>  /* definition of inet_ntoa */
 #include <netdb.h>      /* definition of gethostbyname */
 #include <netinet/in.h> /* definition of struct sockaddr_in */
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <unistd.h> /* definition of close */
-#endif
 
+#endif
 
 
 #include <cedar/auxiliaries/UIntParameter.h>
@@ -78,7 +79,7 @@ class cedar::proc::sources::TCPReader : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
+Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -96,14 +97,16 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Updates the output matrix.
-  void compute(const cedar::proc::Arguments& arguments);
+  void compute(const cedar::proc::Arguments &arguments);
+
   void onStart();
+
   void onStop();
 
 
   /*! Returns the name of the port.
    */
-  inline  unsigned int getPort() const
+  inline unsigned int getPort() const
   {
     return this->_mPort->getValue();
   }
@@ -122,10 +125,10 @@ public slots:
 protected:
   //!@brief Determines whether the data item can be connected to the slot.
   cedar::proc::DataSlot::VALIDITY determineInputValidity
-                                  (
-                                    cedar::proc::ConstDataSlotPtr slot,
-                                    cedar::aux::ConstDataPtr data
-                                  ) const;
+          (
+                  cedar::proc::ConstDataSlotPtr slot,
+                  cedar::aux::ConstDataPtr data
+          ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -133,12 +136,19 @@ protected:
 private:
   //!@brief Resets the step and recreates the yarp connection.
   void reset();
+
   void establishConnection();
+
   void receiveMatData();
+
   int accept_client(int server_fd);
+
   int create_socket_server(int port);
+
   void confirmAliveStatus();
+
   void closeSocket();
+
   void reconnect();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -151,14 +161,16 @@ protected:
   std::string oldName = "";
   std::string debugString = "";
 private:
-    int socket_h; //socket handle
-    int raw_socket_h; //raw_handle
-    struct sockaddr_in serv_addr; //Server Adress Object
-    bool isConnected;
-    fd_set rfds;
-    unsigned int timeSinceLastConnectTrial;
-    cv::Mat lastReadMatrix;
-    std::string mOverflowBuffer;
+  int socket_h; //socket handle
+  int raw_socket_h; //raw_handle
+  struct sockaddr_in serv_addr; //Server Adress Object
+  bool isConnected;
+  fd_set rfds;
+  unsigned int timeSinceLastConnectTrial;
+  unsigned int numberOfFailedReads;
+  cv::Mat lastReadMatrix;
+  cv::Mat lastReadDimensions;
+  std::string mOverflowBuffer;
 
 public:
   //--------------------------------------------------------------------------------------------------------------------
@@ -168,12 +180,13 @@ private:
   cedar::aux::UIntParameterPtr _mBufferLength;
   cedar::aux::UIntParameterPtr _mPort;
   cedar::aux::UIntParameterPtr _mTimeOutBetweenPackets;
+  cedar::aux::UIntParameterPtr _mTimeStepsBetweenMessages;
   cedar::aux::UIntParameterPtr _mTimeStepsBetweenAcceptTrials;
 
   // locking for thread safety
   static QReadWriteLock *mpDataLock;
 
-  static std::map<std::string, cv::Mat>& accessData()
+  static std::map<std::string, cv::Mat> &accessData()
   {
     static std::map<std::string, cv::Mat> mData;
     return mData; // returns a reference!
