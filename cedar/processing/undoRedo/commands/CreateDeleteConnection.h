@@ -105,15 +105,16 @@ protected:
   //!@brief Deletes a connection between the source and target
   void deleteConnection();
   //!@brief Updates the fullPaths of source and target
-  void updateSourceTargetNameAndSlotName();
+  void setIdentifier();
   //!@brief Updates the source and target elements by the fullPaths
   void updateSourceAndTargetConnectors();
-
+  //!@brief Sets the text for the command in the undoRedo stack visualizer
+  void setTextForUndoRedoStackVisualizer();
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void setIdentifierInternal(cedar::proc::gui::GraphicsBase* slot, std::string& slotName, std::string& elementFullPath, std::string& external);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

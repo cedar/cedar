@@ -35,7 +35,6 @@
 ======================================================================================================================*/
 
 // CEDAR CONFIGURATION
-#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/undoRedo/commands/CreateDeleteConnection.h"
@@ -52,32 +51,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::undoRedo::commands::CreateDeleteConnection::CreateDeleteConnection(cedar::proc::gui::GraphicsBase* source,
-                                                                                cedar::proc::gui::GraphicsBase* target,
-                                                                                cedar::proc::undoRedo::commands::CreateDeleteConnection::Action action,
-                                                                                bool createConnectorGroup)
+//Constructor for creating a connection
+cedar::proc::undoRedo::commands::CreateDeleteConnection::CreateDeleteConnection(
+        cedar::proc::gui::GraphicsBase* source,
+        cedar::proc::gui::GraphicsBase* target,
+        cedar::proc::undoRedo::commands::CreateDeleteConnection::Action action,
+        bool createConnectorGroup)
 :
 mpSource(source),
 mpTarget(target),
 mAction(action),
 mCreateConnectorGroup(createConnectorGroup)
 {
-  this->mpScene = dynamic_cast<cedar::proc::gui::Scene *>(this->mpTarget->scene());
+  this->mpScene = dynamic_cast<cedar::proc::gui::Scene*>(this->mpTarget->scene());
   CEDAR_DEBUG_ASSERT(this->mpScene)
-  updateSourceTargetNameAndSlotName();
-
-  std::string text;
-  if(action == CREATE)
-  {
-    text = "Added";
-  }
-  else if(action == DELETE)
-  {
-    text = "Removed";
-  }
-  setText(QString::fromStdString(text + " connection: " + mSourceElementFullPath + "->" + mTargetElementFullPath));
+  setIdentifier();
+  setTextForUndoRedoStackVisualizer();
 }
 
+//Constructor for deleting a connection
 cedar::proc::undoRedo::commands::CreateDeleteConnection::CreateDeleteConnection(cedar::proc::gui::Connection* connection,
                                                                                 cedar::proc::undoRedo::commands::CreateDeleteConnection::Action action,
                                                                                 bool createConnectorGroup)
@@ -89,19 +81,8 @@ mCreateConnectorGroup(createConnectorGroup)
 {
   this->mpScene = dynamic_cast<cedar::proc::gui::Scene *>(this->mpTarget->scene());
   CEDAR_DEBUG_ASSERT(this->mpScene)
-
-  updateSourceTargetNameAndSlotName();
-
-  std::string text;
-  if(action == CREATE)
-  {
-    text = "Added";
-  }
-  else if(action == DELETE)
-  {
-    text = "Removed";
-  }
-  setText(QString::fromStdString(text + " connection: " + mSourceElementFullPath + "-> " + mTargetElementFullPath));
+  setIdentifier();
+  setTextForUndoRedoStackVisualizer();
 }
 
 cedar::proc::undoRedo::commands::CreateDeleteConnection::~CreateDeleteConnection()
@@ -169,54 +150,35 @@ void cedar::proc::undoRedo::commands::CreateDeleteConnection::deleteConnection()
   }
 }
 
-void cedar::proc::undoRedo::commands::CreateDeleteConnection::updateSourceTargetNameAndSlotName()
+void cedar::proc::undoRedo::commands::CreateDeleteConnection::setIdentifier()
 {
-  //mpSource (graphicsBase) casted down to a dataSlotItem (graphical representation of DataSlot)
-  if(auto sourceSlot = dynamic_cast<cedar::proc::gui::DataSlotItem*>(mpSource))
+  setIdentifierInternal(mpSource, mSourceSlotName, mSourceElementFullPath, mSourceExternal);
+  setIdentifierInternal(mpTarget, mTargetSlotName, mTargetElementFullPath, mTargetExternal);
+}
+
+void cedar::proc::undoRedo::commands::CreateDeleteConnection::setIdentifierInternal(cedar::proc::gui::GraphicsBase* slot, std::string& slotName, std::string& elementFullPath, std::string& external)
+{
+  // (graphicsBase) casted down to a dataSlotItem (graphical representation of DataSlot)
+  if(auto* dataSlotItem = dynamic_cast<cedar::proc::gui::DataSlotItem*>(slot))
   {
     //Name of the slot itself
-    this->mSourceSlotName = sourceSlot->getSlot()->getName();
+    slotName = dataSlotItem->getSlot()->getName();
 
-    if(cedar::proc::Element* element = dynamic_cast<cedar::proc::Element*>(sourceSlot->getSlot()->getParentPtr()))
+    if (auto* element = dynamic_cast<cedar::proc::Element *>(dataSlotItem->getSlot()->getParentPtr()))
     {
       //Normal case
-      if(cedar::proc::gui::Element* guiElement = this->mpScene->getGraphicsItemFor(element))
+      if (cedar::proc::gui::Element *guiElement = this->mpScene->getGraphicsItemFor(element))
       {
-				mSourceElementFullPath = guiElement->getElement()->getFullPath();
-        mSourceExternal = "";
+        elementFullPath = guiElement->getElement()->getFullPath();
+        external = "";
       }
-      //This happens if the externalElement is used
+        //This happens if the externalElement is used
       else
       {
-        auto group = dynamic_cast<cedar::proc::Element*>(element->getGroup().get());
-        CEDAR_ASSERT(group!=nullptr)
-				mSourceElementFullPath = this->mpScene->getGraphicsItemFor(group)->getElement()->getFullPath();
-        mSourceExternal = element->getName();
-      }
-    }
-  }
-
-  if(auto targetSlot = dynamic_cast<cedar::proc::gui::DataSlotItem*>(mpTarget))
-  {
-    //Name of the slot itself
-    this->mTargetSlotName = targetSlot->getSlot()->getName();
-
-    //This block checks if the connection is connected from a externalOutput
-    if(cedar::proc::Element* element = dynamic_cast<cedar::proc::Element*>(targetSlot->getSlot()->getParentPtr()))
-    {
-      //Normal case
-      if(cedar::proc::gui::Element* guiElement = this->mpScene->getGraphicsItemFor(element))
-      {
-				mTargetElementFullPath = guiElement->getElement()->getFullPath();
-        mTargetExternal = "";
-      }
-      //This happens if the externalElement is used
-      else
-      {
-        auto group = dynamic_cast<cedar::proc::Element*>(element->getGroup().get());
-        CEDAR_ASSERT(group!=nullptr)
-				mTargetElementFullPath = this->mpScene->getGraphicsItemFor(group)->getElement()->getFullPath();
-        mTargetExternal = element->getName();
+        auto* group = dynamic_cast<cedar::proc::Element *>(element->getGroup().get());
+        CEDAR_ASSERT(group != nullptr)
+        elementFullPath = this->mpScene->getGraphicsItemFor(group)->getElement()->getFullPath();
+        external = element->getName();
       }
     }
   }
@@ -268,4 +230,18 @@ void cedar::proc::undoRedo::commands::CreateDeleteConnection::updateSourceAndTar
       }
     }
   }
+}
+
+void cedar::proc::undoRedo::commands::CreateDeleteConnection::setTextForUndoRedoStackVisualizer()
+{
+  std::string text;
+  if(mAction == CREATE)
+  {
+    text = "Added";
+  }
+  else if(mAction == DELETE)
+  {
+    text = "Removed";
+  }
+  setText(QString::fromStdString(text + " connection: " + mSourceElementFullPath + "-> " + mTargetElementFullPath));
 }
