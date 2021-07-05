@@ -24,8 +24,10 @@
 
     File:        UndoCommand.cpp
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
+    Maintainer:  Yogeshwar Agnihotri,
+    						 Lars Janssen
+    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de,
+    						 lars.janssen@ini.rub.de
     Date:        2020 07 23
 
     Description: Source file for the class cedar::proc::undoRedo::UndoCommand.
@@ -60,7 +62,7 @@ cedar::proc::undoRedo::UndoCommand::~UndoCommand()
 
 int cedar::proc::undoRedo::UndoCommand::id() const
 {
-  return cedar::proc::gui::Ide::mpUndoStack->idIndex(this->getMacroIdentifier());
+  return cedar::proc::gui::Ide::pUndoStack->idIndex(this->getMacroIdentifier());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -211,7 +211,7 @@ void cedar::proc::aux::gui::ObjectParameter::currentTypeChanged(int index)
       }
       CEDAR_ASSERT(scene != nullptr);
 
-      cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeObjectParameterValue(
+      cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::ChangeObjectParameterValue(
               parameter.get(), parameter->getTypeId(), type, owner, scene));
     }
     else

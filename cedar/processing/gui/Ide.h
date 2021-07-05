@@ -448,7 +448,7 @@ signals:
 public:
 
   //! Undo Stack
-  static cedar::proc::undoRedo::UndoStack* mpUndoStack;
+  static cedar::proc::undoRedo::UndoStack* pUndoStack;
 protected:
   // none yet
 private:

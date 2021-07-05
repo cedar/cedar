@@ -24,8 +24,10 @@
 
     File:        ChangeParameterValue.h
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
+    Maintainer:  Yogeshwar Agnihotri,
+    						 Lars Janssen
+    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de,
+    						 lars.janssen@ini.rub.de
     Date:        2020 07 28
 
     Description: Header file for the class cedar::proc::undoRedo::commands::ChangeParameterValue.
@@ -85,8 +87,8 @@ class cedar::proc::undoRedo::commands::ChangeParameterValue : public cedar::proc
 
 public:
   //!@brief The standard constructors.
-  ChangeParameterValue(ParameterType* parameter, ValueType oldValue, ValueType newValue, cedar::aux::NamedConfigurable* owner,
-                       cedar::proc::gui::Scene* scene = nullptr)
+  ChangeParameterValue(ParameterType* parameter, ValueType oldValue, ValueType newValue,
+                       cedar::aux::NamedConfigurable* owner, cedar::proc::gui::Scene* scene = nullptr)
   :
   mpParameter(parameter),
   mpParentElement(nullptr),
@@ -99,8 +101,8 @@ public:
     init(owner);
   }
 
-  ChangeParameterValue(ParameterType* parameter, ValueType oldValue, ValueType newValue, cedar::aux::NamedConfigurable* owner, bool lock,
-                       cedar::proc::gui::Scene* scene = nullptr)
+  ChangeParameterValue(ParameterType* parameter, ValueType oldValue, ValueType newValue,
+                       cedar::aux::NamedConfigurable* owner, bool lock, cedar::proc::gui::Scene* scene = nullptr)
   :
   mpParameter(parameter),
   mpParentElement(nullptr),
@@ -134,7 +136,8 @@ public:
         this->mParentFullPath = owner->getName();
       }
       this->mParameterFullPath = owner->findParameterPath(this->mpParameter);
-      this->setText(QString::fromStdString("Parameter changed: " + this->mParentFullPath + "::" + this->mParameterFullPath));  //TODO change to something more readable, maybe include value?
+      this->setText(QString::fromStdString("Parameter changed: " + this->mParentFullPath + "::" +
+            this->mParameterFullPath));  //TODO Maybe include value?
     }
     else
     {
@@ -164,12 +167,12 @@ public:
       return;
     }
     this->mpParameter = nullptr;
-
     this->mpParentElement = this->mpScene->getElementByFullPath(this->mParentFullPath);
 
     if(this->mpParentElement != nullptr)
     {
-      this->mpParameter = this->mpParentElement->getElement()->getParameter<ParameterType>(this->mParameterFullPath).get();
+      this->mpParameter = this->mpParentElement->getElement()->getParameter<ParameterType>(
+              this->mParameterFullPath).get();
     }
     else
     {
@@ -197,8 +200,7 @@ public:
     }
   }
 
-  // Undo the parameter change.
-  void undo()
+  void undo() override
   {
     this->mIsInitialRedo = false;
 
@@ -207,86 +209,71 @@ public:
     {
       // Do the undo operation
       this->undoAction();
-      this->mpParameter->emitChangedSignal();
 
-      // If name property was changed, update name
-      cedar::aux::NamedConfigurable* owner = this->mpParameter->getNamedConfigurableOwner();
-      if(owner != nullptr)
-      {
-        if(auto element = dynamic_cast<cedar::proc::Element*>(owner))
-        {
-          this->mParentFullPath = element->getFullPath();
-        }
-        else
-        {
-          this->mParentFullPath = owner->getName();
-        }
-        this->mParameterFullPath = owner->findParameterPath(this->mpParameter);
-      }
+      // Handle things that have to be done after every parameter change
+      this->postUndoRedo();
 
       // Select owner in scene
-      if(this->mpParentElement != nullptr && this->mpScene != nullptr)
-      {
-        QList<QGraphicsItem *> selected_items = this->mpScene->selectedItems();
-        if(selected_items.size() != 1)
-        {
-          this->mpScene->selectNone();
-          this->mpParentElement->setSelected(true);
-        }
-        else
-        {
-          if(selected_items.at(0) != this->mpParentElement)
-          {
-            this->mpScene->selectNone();
-            this->mpParentElement->setSelected(true);
-          }
-        }
-      }
+      this->selectParentElementInScene();
     }
   }
 
-  // TODO merge most of the undo() and redo() code, as it is pretty much the same
-
-  void redo()
+  void redo() override
   {
     this->updateParameterPointer();
     if(this->mpParameter != nullptr)
     {
+      // Do the redo operation
       this->redoAction();
-      this->mpParameter->emitChangedSignal();
 
-      //If name property was changed, update name
-      cedar::aux::NamedConfigurable* owner = this->mpParameter->getNamedConfigurableOwner();
-      if(owner != nullptr)
-      {
-        if(auto element = dynamic_cast<cedar::proc::Element*>(owner))
-        {
-          this->mParentFullPath = element->getFullPath();
-        }
-        else
-        {
-          this->mParentFullPath = owner->getName();
-        }
-        this->mParameterFullPath = owner->findParameterPath(this->mpParameter);
-      }
+      // Handle things that have to be done after every parameter change
+      this->postUndoRedo();
 
       //Select owner in scene
-      if(!this->mIsInitialRedo && this->mpParentElement != nullptr && this->mpScene != nullptr)
+      if(!this->mIsInitialRedo)
       {
-        QList<QGraphicsItem *> selected_items = this->mpScene->selectedItems();
-        if(selected_items.size() != 1)
-        {
-          this->mpScene->selectNone();
-          this->mpParentElement->setSelected(true);
-        }
-        else
-        {
-          if(selected_items.at(0) != this->mpParentElement)
-          {
-            this->mpScene->selectNone();
-            this->mpParentElement->setSelected(true);
-          }
-        }
+        this->selectParentElementInScene();
+      }
+    }
+  }
+
+  void postUndoRedo()
+  {
+    this->mpParameter->emitChangedSignal();
+
+    //If name property was changed, update name
+    cedar::aux::NamedConfigurable* owner = this->mpParameter->getNamedConfigurableOwner();
+    if(owner != nullptr)
+    {
+      if(auto element = dynamic_cast<cedar::proc::Element*>(owner))
+      {
+        this->mParentFullPath = element->getFullPath();
+      }
+      else
+      {
+        this->mParentFullPath = owner->getName();
+      }
+      this->mParameterFullPath = owner->findParameterPath(this->mpParameter);
+    }
+  }
+
+  void selectParentElementInScene()
+  {
+    if(this->mpParentElement != nullptr && this->mpScene != nullptr)
+    {
+      QList<QGraphicsItem *> selected_items = this->mpScene->selectedItems();
+
+      // If element is not already selected, select it
+      bool already_selected = false;
+      if(selected_items.size() == 1)
+      {
+        already_selected = selected_items.at(0) == this->mpParentElement;
+      }
+
+      if(!already_selected)
+      {
+        this->mpScene->selectNone();
+        this->mpParentElement->setSelected(true);
       }
     }
   }
@@ -298,7 +285,8 @@ public:
     {
       return false;
     }
-    if(auto command = dynamic_cast<const cedar::proc::undoRedo::commands::ChangeParameterValue<ValueType, ParameterType>*>(other))
+    if(auto command =
+            dynamic_cast<const cedar::proc::undoRedo::commands::ChangeParameterValue<ValueType, ParameterType>*>(other))
     {
       if(!getMacroIdentifier().compare(command->getMacroIdentifier()))
       {
@@ -309,6 +297,7 @@ public:
     return false;
   }
 
+  // Used to identify the parameter this command changes, for the use with mergeWith()
   std::string getMacroIdentifier() const override
   {
     return this->mParentFullPath + "." + this->mParameterFullPath;

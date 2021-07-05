@@ -647,7 +647,7 @@ void cedar::proc::aux::gui::Configurable::handleDeleteButtonClicked(QString full
           }
           CEDAR_ASSERT(scene != nullptr);
 
-          cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeObjectListParameterValue(
+          cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::ChangeObjectListParameterValue(
                   objectListParameter.get(), index, owner, scene));
         }
         else

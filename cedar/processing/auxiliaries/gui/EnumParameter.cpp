@@ -201,7 +201,7 @@ void cedar::proc::aux::gui::EnumParameter::currentIndexChanged(const QString&)
       CEDAR_ASSERT(scene != nullptr);
 
 
-      cedar::proc::gui::Ide::mpUndoStack->push(
+      cedar::proc::gui::Ide::pUndoStack->push(
               new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::string, cedar::aux::EnumParameter>(
                       parameter.get(), parameter->getValue().name(), value.toStdString(), owner, true, scene));
     }

@@ -259,7 +259,7 @@ public:
 
   QWidget* createOpenable() const
   {
-    return new QUndoView(cedar::proc::gui::Ide::mpUndoStack);
+    return new QUndoView(cedar::proc::gui::Ide::pUndoStack);
   }
 };
 
@@ -389,7 +389,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   mpFindDialog = new cedar::proc::gui::FindDialog(this, this->mpProcessingDrawer);
   mpPerformanceOverview = new cedar::proc::gui::PerformanceOverview(this);
-  mpUndoStack = new cedar::proc::undoRedo::UndoStack(this);
+  pUndoStack = new cedar::proc::undoRedo::UndoStack(this);
 
   // manually added components
   // toolbar: custom timestep
@@ -1192,12 +1192,12 @@ void cedar::proc::gui::Ide::duplicateSelected()
 
 void cedar::proc::gui::Ide::undo()
 {
-  mpUndoStack->undo();
+  pUndoStack->undo();
 }
 
 void cedar::proc::gui::Ide::redo()
 {
-  mpUndoStack->redo();
+  pUndoStack->redo();
 }
 
 void cedar::proc::gui::Ide::copy()
@@ -2179,7 +2179,7 @@ void cedar::proc::gui::Ide::newFile()
   cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName("unnamed file");
 
   // Reset the undo/redo stack
-  mpUndoStack->clear();
+  pUndoStack->clear();
 
   // set the smart connection button
   this->mpActionToggleSmartConnections->blockSignals(true);
@@ -2606,7 +2606,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   last_dir->setValue(path);
 
   // Reset the undo/redo stack
-  mpUndoStack->clear();
+  pUndoStack->clear();
 
   // set the smart connection button
   this->mpActionToggleSmartConnections->blockSignals(true);

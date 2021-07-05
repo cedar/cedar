@@ -356,12 +356,12 @@ void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
   if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration *>(declaration))
   {
     //Push a createDeleteCommand (as a create) onto the UndoStack
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteElement(mapped,elem_declaration->getClassName(),target_group,mpScene,undoRedo::commands::CreateDeleteElement::Action::CREATE));
+    cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteElement(mapped,elem_declaration->getClassName(),target_group,mpScene,undoRedo::commands::CreateDeleteElement::Action::CREATE));
   }
   //TODO: Do Group Declaration (with an own Command). This works with Json Templates
   else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration *>(declaration))
   {
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateGroupTemplate(group_declaration, target_group, pEvent, mapped, this->mpScene));
+    cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateGroupTemplate(group_declaration, target_group, pEvent, mapped, this->mpScene));
   }
   else
   {
