@@ -24,8 +24,10 @@
 
     File:        CreateDeleteConnection.h
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
+		Maintainer:  Lars Janssen,
+                 Yogeshwar Agnihotri,
+    Email:       lars.janssen@ini.rub.de,
+                 yogeshwar.agnihotri@ini.rub.de
     Date:        2020 07 23
 
     Description: Header file for the class cedar::proc::undoRedo::commands::CreateDeleteConnection.
@@ -69,7 +71,7 @@ class cedar::proc::undoRedo::commands::CreateDeleteConnection : public cedar::pr
   // enums
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
+	//!@brief This class is used as a command for both create and delete. This enum is set using the constructor.
   enum Action
   {
     CREATE,
@@ -93,8 +95,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void undo();
-  void redo();
+  void undo() override;
+  void redo() override;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -106,15 +108,26 @@ protected:
   void deleteConnection();
   //!@brief Updates the fullPaths of source and target
   void setIdentifier();
+	//!@brief Internal function of setIdentifier
+  void setIdentifierInternal(cedar::proc::gui::GraphicsBase* slot, std::string& slotName, std::string& elementFullPath,
+														 std::string& external);
   //!@brief Updates the source and target elements by the fullPaths
   void updateSourceAndTargetConnectors();
+	//!@brief Internal function of updateSourceAndTargetConnections
+	void updateSourceAndTargetConnectorsInternal(std::string fullPath, std::string external, std::string slotName,
+																							 cedar::proc::gui::GraphicsBase*& slot,
+																							 cedar::proc::DataRole::Id dataRole);
   //!@brief Sets the text for the command in the undoRedo stack visualizer
   void setTextForUndoRedoStackVisualizer();
+
+
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void setIdentifierInternal(cedar::proc::gui::GraphicsBase* slot, std::string& slotName, std::string& elementFullPath, std::string& external);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -122,20 +135,26 @@ private:
 protected:
   // none yet
 private:
+	//!@brief Slots
   cedar::proc::gui::GraphicsBase* mpSource;
   cedar::proc::gui::GraphicsBase* mpTarget;
 
+  //!@brief Different identifier
   std::string mSourceElementFullPath;
   std::string mTargetElementFullPath;
   std::string mSourceSlotName;
   std::string mTargetSlotName;
-
   //Identifiers when a connection is created between 2 different groups. ExternalOutput/ExternalInput is used.
-  std::string mSourceExternal;
-  std::string mTargetExternal;
+  std::string mSourceExternalName;
+  std::string mTargetExternalName;
 
+  //!@brief saved instance of scene
   cedar::proc::gui::Scene* mpScene;
+
+  //!@brief instance of action
   Action mAction;
+
+	//!@brief if a connector group should be/is created. Default false if not given.
   bool mCreateConnectorGroup;
 
   //--------------------------------------------------------------------------------------------------------------------
