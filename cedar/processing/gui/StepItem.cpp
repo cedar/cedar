@@ -54,7 +54,7 @@
 #include "cedar/devices/KinematicChain.h"
 #include "cedar/devices/gui/KinematicChainWidget.h"
 #include "cedar/devices/ComponentSlot.h"
-#include "cedar/auxiliaries/gui/DataPlotter.h"
+#include "cedar/processing/auxiliaries/gui/DataPlotter.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
@@ -437,7 +437,7 @@ void cedar::proc::gui::StepItem::writeConfiguration(cedar::aux::ConfigurationNod
 
 bool cedar::proc::gui::StepItem::manualDeletionRequiresConfirmation() const
 {
-  return true;
+  return false;
 }
 
 void cedar::proc::gui::StepItem::openActionsDock()

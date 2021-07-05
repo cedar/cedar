@@ -43,7 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/devices/ComponentParameter.h"
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/processing/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/ParameterTemplate.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
@@ -62,7 +62,7 @@ namespace cedar
     namespace details
     {
       //!@todo This mixes GUI and step -- is this ok?
-      class ComponentStepUserSelectableCommandTypeSubsetParameterWidget : public cedar::aux::gui::Parameter
+      class ComponentStepUserSelectableCommandTypeSubsetParameterWidget : public cedar::proc::aux::gui::Parameter
       {
         Q_OBJECT
 

@@ -38,7 +38,7 @@
 #define CEDAR_PROC_PROPERTY_PANE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/PropertyPane.h"
+#include "cedar/processing/auxiliaries/gui/PropertyPane.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/PropertyPane.fwd.h"
@@ -53,7 +53,7 @@
  *        cedar::aux::Configurable interface. Parameters of the configurable are displayed in a tabular widget by their
  *        name and have an edit widget associated with them.
  */
-class cedar::proc::gui::PropertyPane : public cedar::aux::gui::PropertyPane
+class cedar::proc::gui::PropertyPane : public cedar::proc::aux::gui::PropertyPane
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

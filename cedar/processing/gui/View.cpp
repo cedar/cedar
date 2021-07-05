@@ -244,7 +244,7 @@ void cedar::proc::gui::View::showCodeWidget()
 void cedar::proc::gui::View::setWidgets
         (
                 QMainWindow *pMainWindow,
-                cedar::aux::gui::Configurable *pConigurableWidget,
+                cedar::proc::aux::gui::Configurable *pConigurableWidget,
                 cedar::proc::gui::RecorderWidget *pRecorderWidget,
                 cedar::proc::gui::CommentWidget *pCommentWidget,
                 cedar::proc::gui::CodeWidget *pCodeWidget

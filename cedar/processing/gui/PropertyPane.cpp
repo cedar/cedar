@@ -48,7 +48,7 @@
 
 cedar::proc::gui::PropertyPane::PropertyPane(QWidget *pParent)
 :
-cedar::aux::gui::PropertyPane(pParent)
+cedar::proc::aux::gui::PropertyPane(pParent)
 {
 }
 

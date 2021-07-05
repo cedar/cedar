@@ -164,18 +164,30 @@ bool cedar::aux::FileParameter::canCopyFrom(cedar::aux::ConstParameterPtr other)
   return static_cast<bool>(boost::dynamic_pointer_cast<cedar::aux::ConstFileParameter>(other));
 }
 
-void cedar::aux::FileParameter::setValue(const std::string& value)
+void cedar::aux::FileParameter::setValue(const std::string& value, bool lock)
 {
+  QDir newValue;
   if(this->getPathMode()==PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR)
   {
 //    QDir combinedPath1 = this->getCurrentArchitectureFileDirectory().relativeFilePath(QString::fromStdString(value));
     QDir combinedPath = this->getCurrentArchitectureFileDirectory().filePath(QString::fromStdString(value));
 //    std::cout<<"c1 : " << combinedPath1.absolutePath().toStdString() << " c2: " << combinedPath2.absolutePath().toStdString() << std::endl;
-    this->mValue = combinedPath;
+    newValue = combinedPath;
   }
   else
   {
-    this->mValue = QString::fromStdString(value);
+    newValue = QString::fromStdString(value);
+  }
+
+  cedar::aux::Parameter::WriteLockerPtr write_locker;
+  if (lock)
+  {
+    write_locker = cedar::aux::Parameter::WriteLockerPtr(new cedar::aux::Parameter::WriteLocker(this));
+  }
+  this->mValue = newValue;
+  if (lock)
+  {
+    write_locker->unlock();
   }
 
 //  std::cout<<"FileParameter::setValue(string). value:  " << value << " mValue: "<< this->mValue.absolutePath().toStdString() << std::endl;
@@ -184,9 +196,18 @@ void cedar::aux::FileParameter::setValue(const std::string& value)
   this->emitChangedSignal();
 }
 
-void cedar::aux::FileParameter::setValue(const QDir& value)
+void cedar::aux::FileParameter::setValue(const QDir& value, bool lock)
 {
+  cedar::aux::Parameter::WriteLockerPtr write_locker;
+  if (lock)
+  {
+    write_locker = cedar::aux::Parameter::WriteLockerPtr(new cedar::aux::Parameter::WriteLocker(this));
+  }
   this->mValue = value;
+  if (lock)
+  {
+    write_locker->unlock();
+  }
 
   this->emitChangedSignal();
 }
