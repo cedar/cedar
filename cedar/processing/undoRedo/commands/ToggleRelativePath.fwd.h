@@ -58,7 +58,7 @@ namespace cedar
       namespace commands
       {
         //!@cond SKIPPED_DOCUMENTATION
-        class ToggleRelativePath;
+        CEDAR_DECLARE_PROC_CLASS(ToggleRelativePath);
         //!@endcond
       }
     }

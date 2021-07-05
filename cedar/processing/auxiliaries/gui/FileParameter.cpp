@@ -206,7 +206,8 @@ void cedar::proc::aux::gui::FileParameter::onUseRelativeClicked()
   if(auto parameter = boost::dynamic_pointer_cast<cedar::aux::FileParameter>(this->getParameter()))
   {
     // If parameter belongs to a step, push to undo stack (e.g. settings parameter should not be undoable)
-    if(dynamic_cast<cedar::aux::NamedConfigurable*>(parameter->getOwner()))
+    cedar::aux::NamedConfigurable* owner = parameter->getNamedConfigurableOwner();
+    if(owner != nullptr)
     {
       //Find the scene
       cedar::proc::gui::Scene* scene;
@@ -221,9 +222,8 @@ void cedar::proc::aux::gui::FileParameter::onUseRelativeClicked()
         parent = parent->parent();
       }
       CEDAR_ASSERT(scene != nullptr);
-
       cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::ToggleRelativePath(
-              parameter.get(), this->mpCheckRelative->isChecked(), scene));
+              parameter.get(), this->mpCheckRelative->isChecked(), owner, scene));
     }
     else
     {
