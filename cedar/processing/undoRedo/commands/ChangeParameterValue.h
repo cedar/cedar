@@ -164,6 +164,7 @@ public:
     // If no parent was found earlier, do not attempt to update the pointer
     if(!this->mParentFullPath.compare(""))
     {
+      CEDAR_THROW(cedar::aux::UnknownNameException, "Parameter was not found.");
       return;
     }
     this->mpParameter = nullptr;
@@ -197,6 +198,8 @@ public:
           }
         }
       }
+      this->mpParameter = nullptr;
+      CEDAR_THROW(cedar::aux::UnknownNameException, "Parameter \"" + this->mParameterFullPath + "\" was not found.");
     }
   }
 
