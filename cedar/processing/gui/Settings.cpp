@@ -313,6 +313,13 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
                   "by right-clicking on the connection and selecting \"add drag node\". "
                   "This adds a small circle which can be dragged to customize the path of the connection.</p>"
           );
+  this->addOneTimeMessage
+          (
+                  CEDAR_MAKE_VERSION(6, 2, 0), // introduces in this version
+                  "undoredo",
+                  "Undo/Redo",
+                  "<p>You can now undo and redo actions by pressing CTRL+Z and CTRL+Y.</p>"
+          );
 }
 
 cedar::proc::gui::Settings::UserDefinedColor::UserDefinedColor(const std::string& stringToParse)
