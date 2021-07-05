@@ -172,7 +172,7 @@ public:
 
     if(this->mpParentElement != nullptr)
     {
-      this->mpParameter = this->mpParentElement->getElement()->getParameter<ParameterType>(
+      this->mpParameter = this->mpParentElement->getElement()->template getParameter<ParameterType>(
               this->mParameterFullPath).get();
     }
     else
