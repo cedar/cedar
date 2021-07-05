@@ -225,7 +225,7 @@ protected:
           CEDAR_ASSERT(scene != nullptr);
 
           before[index] = this->parameter()->at(index);
-          cedar::proc::gui::Ide::mpUndoStack->push(
+          cedar::proc::gui::Ide::pUndoStack->push(
                   new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::vector<ValueType>, cedar::aux::VectorParameter<ValueType>>(param, before,
                                                                                              after, owner, scene));
         }

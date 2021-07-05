@@ -236,7 +236,7 @@ protected:
         }
         CEDAR_ASSERT(scene != nullptr)
 
-        cedar::proc::gui::Ide::mpUndoStack->push(
+        cedar::proc::gui::Ide::pUndoStack->push(
                 new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<ValueType>(parameter.get(), oldvalue,
                                                                                      value, owner, true, scene));
       }

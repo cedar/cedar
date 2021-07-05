@@ -961,7 +961,7 @@ void cedar::proc::gui::Connection::contextMenuEvent(QGraphicsSceneContextMenuEve
     }
     else if (selectedAction == deleteAction)
     {
-      cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(this, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::DELETE));
+      cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(this, cedar::proc::undoRedo::commands::CreateDeleteConnection::Action::DELETE));
     }
   }
 }

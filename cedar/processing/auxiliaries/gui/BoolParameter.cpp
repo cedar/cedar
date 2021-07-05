@@ -134,7 +134,7 @@ void cedar::proc::aux::gui::BoolParameter::stateChanged(int state)
       }
       CEDAR_ASSERT(scene != nullptr);
 
-      cedar::proc::gui::Ide::mpUndoStack->push(
+      cedar::proc::gui::Ide::pUndoStack->push(
               new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<bool>(parameter.get(), !value, value, owner, scene));
     }
     else

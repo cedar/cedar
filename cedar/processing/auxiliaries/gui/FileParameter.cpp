@@ -191,7 +191,7 @@ void cedar::proc::aux::gui::FileParameter::onBrowseClicked()
       }
       CEDAR_ASSERT(scene != nullptr);
 
-      cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::string,
+      cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::string,
               cedar::aux::FileParameter>(parameter.get(), parameter->getPath(), value.toStdString(), owner, scene));
     }
     else
@@ -222,7 +222,7 @@ void cedar::proc::aux::gui::FileParameter::onUseRelativeClicked()
       }
       CEDAR_ASSERT(scene != nullptr);
 
-      cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ToggleRelativePath(
+      cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::ToggleRelativePath(
               parameter.get(), this->mpCheckRelative->isChecked(), scene));
     }
     else

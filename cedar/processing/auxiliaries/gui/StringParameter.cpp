@@ -150,7 +150,7 @@ void cedar::proc::aux::gui::StringParameter::textEdited(const QString& text)
         parent = parent->parent();
       }
       CEDAR_ASSERT(scene != nullptr);
-      cedar::proc::gui::Ide::mpUndoStack->push(
+      cedar::proc::gui::Ide::pUndoStack->push(
               new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::string>(
                       parameter.get(), oldValue, text.toStdString(), owner, scene));
     }

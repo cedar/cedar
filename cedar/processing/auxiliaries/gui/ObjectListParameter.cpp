@@ -145,7 +145,7 @@ void cedar::proc::aux::gui::ObjectListParameter::addClicked()
     }
     CEDAR_ASSERT(scene != nullptr);
 
-    cedar::proc::gui::Ide::mpUndoStack->push(new cedar::proc::undoRedo::commands::ChangeObjectListParameterValue(
+    cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::ChangeObjectListParameterValue(
             parameter.get(), this->getSelectedType(), owner, scene));
   }
   else

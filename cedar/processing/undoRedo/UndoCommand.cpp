@@ -62,7 +62,7 @@ cedar::proc::undoRedo::UndoCommand::~UndoCommand()
 
 int cedar::proc::undoRedo::UndoCommand::id() const
 {
-  return cedar::proc::gui::Ide::mpUndoStack->idIndex(this->getMacroIdentifier());
+  return cedar::proc::gui::Ide::pUndoStack->idIndex(this->getMacroIdentifier());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
