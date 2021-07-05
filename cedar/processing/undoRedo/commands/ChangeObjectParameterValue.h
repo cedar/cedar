@@ -24,8 +24,10 @@
 
     File:        ChangeObjectParameterValue.h
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
+    Maintainer:  Yogeshwar Agnihotri,
+    						 Lars Janssen
+    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de,
+    						 lars.janssen@ini.rub.de
     Date:        2020 07 28
 
     Description: Header file for the class cedar::proc::undoRedo::commands::ChangeParameterValue.
@@ -54,7 +56,8 @@
  *
  * UndoCommand Implementation for ObjectParameter
  */
-class cedar::proc::undoRedo::commands::ChangeObjectParameterValue : public cedar::proc::undoRedo::commands::ChangeParameterValue<std::string, cedar::aux::ObjectParameter>
+class cedar::proc::undoRedo::commands::ChangeObjectParameterValue :
+        public cedar::proc::undoRedo::commands::ChangeParameterValue<std::string, cedar::aux::ObjectParameter>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

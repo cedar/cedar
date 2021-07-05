@@ -24,8 +24,10 @@
 
     File:        ChangeObjectListParameterValue.h
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
+    Maintainer:  Yogeshwar Agnihotri,
+    						 Lars Janssen
+    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de,
+    						 lars.janssen@ini.rub.de
     Date:        2020 07 28
 
     Description: Header file for the class cedar::proc::undoRedo::commands::ChangeParameterValue.
@@ -57,7 +59,8 @@
  *
  * UndoCommand Implementation for ObjectListParameter
  */
-class cedar::proc::undoRedo::commands::ChangeObjectListParameterValue : public cedar::proc::undoRedo::commands::ChangeParameterValue<std::string, cedar::aux::ObjectListParameter>
+class cedar::proc::undoRedo::commands::ChangeObjectListParameterValue :
+        public cedar::proc::undoRedo::commands::ChangeParameterValue<std::string, cedar::aux::ObjectListParameter>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // enums
@@ -83,22 +86,7 @@ public:
   mIndex(-1),
   mAction(CREATE)
   {
-    std::string typeStr = this->mOldValue;
-    std::vector<std::string> parts;
-    cedar::aux::split(this->mOldValue, ".", parts);
-    if(parts.size() > 0)
-    {
-      typeStr = parts[parts.size() - 1];
-    }
-
-    if(owner != nullptr)
-    {
-      setText(QString::fromStdString("Object added: " + this->mParentFullPath + "::" + typeStr + "::" + this->mParameterFullPath));
-    }
-    else
-    {
-      setText(QString::fromStdString("Object added: " + this->mParentFullPath + "::" + typeStr + ": - Error -"));
-    }
+    setText(QString::fromStdString("Object added: " + this->getVisualizationTextInternal(owner)));
   }
 
   //!@brief Constructor for removing objects
@@ -110,22 +98,7 @@ public:
   mAction(DELETE),
   mIndex(index)
   {
-    std::string typeStr = this->mOldValue;
-    std::vector<std::string> parts;
-    cedar::aux::split(this->mOldValue, ".", parts);
-    if(parts.size() > 0)
-    {
-      typeStr = parts[parts.size() - 1];
-    }
-
-    if(owner != nullptr)
-    {
-      setText(QString::fromStdString("Object removed: " + this->mParentFullPath + "::" + typeStr + "::" + this->mParameterFullPath));
-    }
-    else
-    {
-      setText(QString::fromStdString("Object removed: " + this->mParentFullPath + "::" + typeStr + ": - Error -"));
-    }
+    setText(QString::fromStdString("Object removed: " + this->getVisualizationTextInternal(owner)));
   }
 
   //!@brief Destructor
@@ -137,6 +110,26 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
+  std::string getVisualizationTextInternal(cedar::aux::NamedConfigurable* owner)
+  {
+    // Extract a readable type name from the last part of the type string
+    std::string typeStr = this->mOldValue;
+    std::vector<std::string> parts;
+    cedar::aux::split(this->mOldValue, ".", parts);
+    if(parts.size() > 0)
+    {
+      typeStr = parts[parts.size() - 1];
+    }
+    if(owner != nullptr)
+    {
+      return this->mParentFullPath + "::" + typeStr + "::" + this->mParameterFullPath;
+    }
+    else
+    {
+      return this->mParentFullPath + "::" + typeStr + ": - Error -";
+    }
+  }
 
   void createObject(){
     // If index is specified, insert, otherwise push_back
@@ -151,7 +144,8 @@ public:
     }
 
     // Load saved configuration, if it was saved
-    auto kernelListParameter = dynamic_cast<cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel>*>(this->mpParameter);
+    auto kernelListParameter =
+            dynamic_cast<cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel>*>(this->mpParameter);
     if(kernelListParameter != nullptr && !this->mConfig.empty())
     {
       cedar::aux::kernel::Kernel* kernel = kernelListParameter->at(this->mIndex).get();
@@ -167,7 +161,8 @@ public:
 
     // Save configuration. This is only possible if the type of ObjectListParameterTemplate is known. If more
     // ObjectListParameters get implemented, these can be added here and in the createObject() function
-    if(auto kernelListParameter = dynamic_cast<cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel>*>(this->mpParameter))
+    if(auto kernelListParameter =
+            dynamic_cast<cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel>*>(this->mpParameter))
     {
       kernelListParameter->at(this->mIndex)->writeConfiguration(this->mConfig);
     }
