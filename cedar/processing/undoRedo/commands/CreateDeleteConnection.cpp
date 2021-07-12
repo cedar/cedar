@@ -57,12 +57,12 @@
 cedar::proc::undoRedo::commands::CreateDeleteConnection::CreateDeleteConnection(
         cedar::proc::gui::GraphicsBase* source,
         cedar::proc::gui::GraphicsBase* target,
-        cedar::proc::undoRedo::commands::CreateDeleteConnection::Action action,
+        bool isCreateCommand,
         bool createConnectorGroup)
 :
 mpSource(source),
 mpTarget(target),
-mAction(action),
+mIsCreateCommand(isCreateCommand),
 mCreateConnectorGroup(createConnectorGroup)
 {
   this->mpScene = dynamic_cast<cedar::proc::gui::Scene*>(this->mpTarget->scene());
@@ -74,12 +74,12 @@ mCreateConnectorGroup(createConnectorGroup)
 //Constructor for deleting a connection
 cedar::proc::undoRedo::commands::CreateDeleteConnection::CreateDeleteConnection(
 				cedar::proc::gui::Connection* connection,
-				cedar::proc::undoRedo::commands::CreateDeleteConnection::Action action,
+				bool isCreateCommand,
 				bool createConnectorGroup)
 :
 mpSource(connection->getSource()),
 mpTarget(connection->getTarget()),
-mAction(action),
+mIsCreateCommand(isCreateCommand),
 mCreateConnectorGroup(createConnectorGroup)
 {
   this->mpScene = dynamic_cast<cedar::proc::gui::Scene *>(this->mpTarget->scene());
@@ -98,12 +98,12 @@ cedar::proc::undoRedo::commands::CreateDeleteConnection::~CreateDeleteConnection
 
 void cedar::proc::undoRedo::commands::CreateDeleteConnection::undo()
 {
-  switch(this->mAction)
+  switch(this->mIsCreateCommand)
   {
-    case Action::CREATE:
+    case true:
       deleteConnection();
       break;
-    case Action::DELETE:
+    case false:
       createConnection();
       break;
   }
@@ -111,12 +111,12 @@ void cedar::proc::undoRedo::commands::CreateDeleteConnection::undo()
 
 void cedar::proc::undoRedo::commands::CreateDeleteConnection::redo()
 {
-  switch(this->mAction)
+  switch(this->mIsCreateCommand)
   {
-    case Action::CREATE:
+    case true:
       createConnection();
       break;
-    case Action::DELETE:
+    case false:
       deleteConnection();
       break;
   }
@@ -237,11 +237,11 @@ void cedar::proc::undoRedo::commands::CreateDeleteConnection::updateSourceAndTar
 void cedar::proc::undoRedo::commands::CreateDeleteConnection::setTextForUndoRedoStackVisualizer()
 {
   std::string text;
-  if(this->mAction == CREATE)
+  if(this->mIsCreateCommand)
   {
     text = "Added";
   }
-  else if(this->mAction == DELETE)
+  else
   {
     text = "Removed";
   }

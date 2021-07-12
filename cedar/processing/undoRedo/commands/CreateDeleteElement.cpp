@@ -55,7 +55,7 @@
 //Constructor for creating an element
 cedar::proc::undoRedo::commands::CreateDeleteElement::CreateDeleteElement(QPointF position,std::string classId,
 				cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene,
-				cedar::proc::undoRedo::commands::CreateDeleteElement::Action action)
+				bool isCreateCommand)
 :
 mpGuiElement(nullptr),
 mpTargetGroup(group),
@@ -63,19 +63,19 @@ mpScene(scene),
 mClassId(classId),
 mPosition(position),
 mGroupIsCollapsed(false),
-mAction(action),
+mIsCreateCommand(isCreateCommand),
 mIsInitialRedo(true)
 {
 }
 
 //Constructor for deleting an element
 cedar::proc::undoRedo::commands::CreateDeleteElement::CreateDeleteElement(cedar::proc::gui::Element* element,
-				cedar::proc::gui::Scene* scene, cedar::proc::undoRedo::commands::CreateDeleteElement::Action action)
+				cedar::proc::gui::Scene* scene, bool isCreateCommand)
 :
 mpGuiElement(element),
 mpScene(scene),
 mGroupIsCollapsed(false),
-mAction(action),
+mIsCreateCommand(isCreateCommand),
 mIsInitialRedo(true)
 {
 	//set some vars since the element already exists
@@ -120,9 +120,9 @@ cedar::proc::undoRedo::commands::CreateDeleteElement::~CreateDeleteElement()
 
 void cedar::proc::undoRedo::commands::CreateDeleteElement::undo()
 {
-  switch(this->mAction)
+  switch(this->mIsCreateCommand)
   {
-    case Action::CREATE:
+    case true:
       //Before deleting the element update the address of the element and its parentGroup in case it has been changed
       // through a create
       //Uses elementFullPath
@@ -135,7 +135,7 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::undo()
         deleteElement();
       }
       break;
-    case Action::DELETE:
+    case false:
       //Update group since it could have changed
 			this->mpTargetGroup = this->mpScene->getGroupOfElementByFullPath(this->mElementFullPath);
       createElement();
@@ -145,9 +145,9 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::undo()
 
 void cedar::proc::undoRedo::commands::CreateDeleteElement::redo()
 {
-  switch(this->mAction)
+  switch(this->mIsCreateCommand)
   {
-    case Action::CREATE:
+    case true:
       if(this->mIsInitialRedo)
       {
         createElement();
@@ -164,7 +164,7 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::redo()
       }
       break;
 
-    case Action::DELETE:
+    case false:
       //Update guiElement and group before deleting if they have been changed
 			this->mpGuiElement = this->mpScene->getElementByFullPath(this->mElementFullPath);
 			this->mpTargetGroup = this->mpScene->getGroupOfElementByFullPath(this->mElementFullPath);

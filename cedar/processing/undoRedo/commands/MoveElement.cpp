@@ -74,7 +74,6 @@ mpScene(scene)
       this->mGuiElements.push_back(guiElement);
     }
   }
-  //TODO: is this here needed? Only for grouppaths? Can they be setted manually her?
   updateFullPath();
 
   if(elements.size() == 1)

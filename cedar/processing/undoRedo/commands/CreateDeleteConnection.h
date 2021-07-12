@@ -64,29 +64,15 @@
 class cedar::proc::undoRedo::commands::CreateDeleteConnection : public cedar::proc::undoRedo::UndoCommand
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
-  //--------------------------------------------------------------------------------------------------------------------
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // enums
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-	//!@brief This class is used as a command for both create and delete. This enum is set using the constructor.
-  enum Action
-  {
-    CREATE,
-    DELETE
-  };
-
-  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Constructor for creating a connection
-  CreateDeleteConnection(cedar::proc::gui::GraphicsBase* source, cedar::proc::gui::GraphicsBase* target, Action action,
-                   bool createConnectorGroup = false);
+  CreateDeleteConnection(cedar::proc::gui::GraphicsBase* source, cedar::proc::gui::GraphicsBase* target,
+          bool isInitialRedo, bool createConnectorGroup = false);
   //!@brief Constructor for deleting a connection
-  CreateDeleteConnection(cedar::proc::gui::Connection* connection, Action action, bool createConnectorGroup = false);
+  CreateDeleteConnection(cedar::proc::gui::Connection* connection, bool isInitialRedo,
+          bool createConnectorGroup = false);
 
   //!@brief Destructor
   virtual ~CreateDeleteConnection();
@@ -152,7 +138,7 @@ private:
   cedar::proc::gui::Scene* mpScene;
 
   //!@brief instance of action
-  Action mAction;
+  bool mIsCreateCommand;
 
 	//!@brief if a connector group should be/is created. Default false if not given.
   bool mCreateConnectorGroup;
