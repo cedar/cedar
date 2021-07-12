@@ -59,27 +59,17 @@
  */
 class cedar::proc::undoRedo::commands::CreateDeleteElement : public UndoCommand
 {
-public:
-	//!@brief enum for which action (create or delete) the command is used
-	enum Action
-	{
-		CREATE,
-		DELETE
-	};
-  //--------------------------------------------------------------------------------------------------------------------
-  // nested types
-  //--------------------------------------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Constructor for creating an element
   CreateDeleteElement(QPointF position,std::string classId, cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene,
-  				cedar::proc::undoRedo::commands::CreateDeleteElement::Action action);
+  				bool isCreateCommand);
 
   //!@brief Constructor for deleting an element
   CreateDeleteElement(cedar::proc::gui::Element* element, cedar::proc::gui::Scene* scene,
-  				cedar::proc::undoRedo::commands::CreateDeleteElement::Action action);
+                bool isCreateCommand);
 
   //!@brief Destructor
   virtual ~CreateDeleteElement();
@@ -117,30 +107,30 @@ private:
 protected:
   // none yet
 private:
-	//!@brief pointer to different instances of objects that are needed
+  //!@brief pointer to different instances of objects that are needed
   cedar::proc::gui::Element* mpGuiElement;
 	cedar::proc::GroupPtr mpTargetGroup;
 	cedar::proc::gui::Scene* mpScene;
 
-	//!@brief full paths to identify the elements when their pointer is outdated
+  //!@brief full paths to identify the elements when their pointer is outdated
   std::string mElementFullPath;
-	std::string mClassId;
+  std::string mClassId;
 
   cedar::aux::ConfigurationNode mElementConfiguration;
 
-	//!@brief positions and sizes
+  //!@brief positions and sizes
   QPointF mPosition;
   qreal mWidthOfGroup;
   qreal mHeightOfGroup;
   std::vector<QPointF> mPositionOfElementsInGroup;
 
-	//!@brief instance of the action enum. Saves for what to command was intended (create or delete)
-  Action mAction;
+  //!@brief instance of the action enum. Saves for what to command was intended (create or delete)
+  bool mIsCreateCommand;
 
-	//!@brief if the element is a group this stores if its collapsed or not
-	bool mGroupIsCollapsed;
+  //!@brief if the element is a group this stores if its collapsed or not
+  bool mGroupIsCollapsed;
 
-	//!@brief boolean to realize the first redo
+  //!@brief boolean to realize the first redo
   bool mIsInitialRedo;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
