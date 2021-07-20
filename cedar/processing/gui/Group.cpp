@@ -77,6 +77,7 @@
 #include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/processing/undoRedo/commands/CreateDeleteElement.h"
 #include "cedar/processing/undoRedo/commands/CreateGroupTemplate.h"
+#include <cedar/processing/undoRedo/commands/ChangeParameterValueTemplate.h>
 
 // SYSTEM INCLUDES
 #include <QEvent>
@@ -1058,6 +1059,27 @@ void cedar::proc::gui::Group::addElements(const std::list<QGraphicsItem *> &elem
     graphics_item->writeConfiguration(config);
     item_configs[element] = config;
   }
+
+  for(auto element : elements_to_move)
+	{
+  	//Check if the element name already exists in group
+  	if(this->getGroup()->nameExists(element->getName()))
+		{
+			cedar::aux::ParameterPtr nameParameter = element->getParameter("name");
+			std::string currentName = element->getName();
+
+			// If parameter belongs to a step/element, push to undo stack (e.g. settings parameter should not be undoable)
+			cedar::aux::NamedConfigurable* owner = nameParameter->getNamedConfigurableOwner();
+			if(owner != nullptr)
+			{
+				auto parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(nameParameter);
+
+				cedar::proc::gui::Ide::pUndoStack->push(
+								new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::string>(parameter.get(),
+												currentName, this->getGroup()->getUniqueIdentifier(currentName), owner, this->mpScene));
+			}
+		}
+	}
 
   this->getGroup()->add(elements_to_move);
 

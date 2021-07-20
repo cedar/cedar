@@ -1154,12 +1154,10 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
 
   if (this->mDraggingItems && this->mpDraggingGraphicsBase && this->mStartMovingPositionOfClicked != this->mpDraggingGraphicsBase->pos())
   {
-    cedar::proc::gui::Ide::pUndoStack->push(
-            new cedar::proc::undoRedo::commands::MoveElement(items_to_move,
-                                                             sourceGroup,
-                                                             targetGroup,
-                                                             this->mStartMovingPosition,
-                                                             this));
+		cedar::proc::gui::Ide::pUndoStack->beginMacro("Moved selected elements");
+    cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::MoveElement(items_to_move,
+    				sourceGroup, targetGroup,this->mStartMovingPosition,this));
+		cedar::proc::gui::Ide::pUndoStack->endMacro();
   }
   this->mDraggingItems = false;
   mTargetGroup.reset();
