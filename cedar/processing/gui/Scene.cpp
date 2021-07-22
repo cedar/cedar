@@ -668,25 +668,13 @@ cedar::proc::gui::Element* cedar::proc::gui::Scene::getElementByFullPath(std::st
 {
   std::vector<std::string> mElementNameSplitted;
   boost::split(mElementNameSplitted, elementIdentifier, boost::is_any_of("."));
+	cedar::proc::gui::Group* currentGroup;
 
-  cedar::proc::gui::GroupPtr rootGroup = this->getRootGroup();
-
-  cedar::proc::gui::Group* currentGroup = rootGroup.get();
-  //Go through all subgroups
-  for (std::size_t i = 0; i < mElementNameSplitted.size()-1; i++)
-  {
-    if(currentGroup->getGroup()->contains(mElementNameSplitted[i]))
-    {
-      if (cedar::proc::ElementPtr element = currentGroup->getGroup()->getElement(mElementNameSplitted[i]))
-      {
-        cedar::proc::gui::Element* guiElement = this->getGraphicsItemFor(element);
-        if (cedar::proc::gui::Group* group = dynamic_cast<cedar::proc::gui::Group*>(guiElement))
-        {
-          currentGroup = group;
-        }
-      }
-    }
-  }
+	if (cedar::proc::gui::Group* group = dynamic_cast<cedar::proc::gui::Group*>(
+					this->getGraphicsItemFor(this->getGroupOfElementByFullPath(elementIdentifier))))
+	{
+		currentGroup = group;
+	}
 
   //Set the guiElement
   if(currentGroup->getGroup()->contains(mElementNameSplitted[mElementNameSplitted.size() - 1]))
