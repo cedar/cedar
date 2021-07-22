@@ -1648,8 +1648,8 @@ void cedar::proc::gui::Ide::paste()
           QPointF newPositionOfStep = mousePositionScenePos + vectorFromCenterToStep;
 
           //Set new position
-          uiPair.second.put("positionX", std::to_string(newPositionOfStep.x()));
-          uiPair.second.put("positionY", std::to_string(newPositionOfStep.y()));
+          uiPair.second.put("positionX", newPositionOfStep.x());
+          uiPair.second.put("positionY", newPositionOfStep.y());
 
           singleUiValue.push_back(cedar::aux::ConfigurationNode::value_type("", uiPair.second));
         }
