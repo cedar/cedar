@@ -118,7 +118,7 @@ void cedar::proc::steps::Sinus::recompute()
 
   const float &x= data->getData().at<float>(0, 0);
 
-  float shift;
+  float shift= 0;
   bool  has_shift_input;
 
   auto shiftinput = getInput("phase shift (optional)");
