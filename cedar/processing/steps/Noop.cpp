@@ -158,3 +158,9 @@ void cedar::proc::steps::Noop::recompute()
   //this->mOutput->copyAnnotationsFrom(this->mInput);
 }
 
+void cedar::proc::steps::Noop::reset()
+{
+  // Looped: make sure that no "residual" data is in the architecture
+  recompute();
+}
+

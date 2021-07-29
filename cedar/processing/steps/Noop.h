@@ -88,6 +88,7 @@ private:
 
   void compute(const cedar::proc::Arguments& arguments);
   void recompute();
+  void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
