@@ -278,7 +278,6 @@ void cedar::aux::detail::LoopedThreadWorker::work()
 
 
 
-
     // NEW AND SHINY:
     case cedar::aux::LoopMode::RealDT:
     case cedar::aux::LoopMode::FakeDT:
@@ -308,6 +307,8 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         time_factor = this->mTimeFactor.member();
       }
       auto minimum_step_size= mpWrapper->getMinimumStepSize();
+            // TODO: the minimal Sleep Time Parameter is practically
+            //       useless and can be replaced by a small constant
       auto orig_fake_step_size= mpWrapper->getFakeStepSize();
 
       //////// START LOOP
@@ -452,8 +453,11 @@ void cedar::aux::detail::LoopedThreadWorker::work()
 
           // try to hit the next step size, starting from before we
           // dived into step() (important!)
-          scheduled_wakeup = old_scheduled_wakeup
-                             + modified_sleep_time;
+          //scheduled_wakeup = old_scheduled_wakeup
+          //                   + modified_sleep_time;
+          scheduled_wakeup = current_time_after_step + orig_step_size / 20;
+            // the /20 here is completely arbitrary. should be small enough
+            // not to clogg up the system. TODO
 
           // js: there was a while loop here, that could spin a lot. removed
         }
