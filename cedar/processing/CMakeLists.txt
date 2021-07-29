@@ -193,6 +193,7 @@ cedar_add_library(cedarproc
   steps/HopfOscillatorRHS.h
   steps/NaNCheck.h
   steps/PositionOfMaximum.h
+  steps/DiagonalReadout.h
   CppScript.h
   Group.h
   Step.h
