@@ -75,7 +75,9 @@ bool declare()
     "Optionally, you can use a BDF5 (backwards differentiation formula fifth order) method which will yield better results than the Euler step for non-stochastic signals, especially for stiff differential equations.\n"
     "The initial state input is also optional and will be used when initialzing the state if available. If not, a zero valued tensor of appropriate size will be the initial state. "
     "You can choose to re-initialize the values on an architecture reset via the corresponding parameter.\n"
-    "The delay input is optional and can be used to override the internal estimate of 'dt', the time step, which comes from the global clock. (Hint: There is a buffer in the Field step which will yields the accurate deltaT that was used for that field, since actual time steps will differ especially if architectures get large. So use this input and connect it to the aforementioned deltaT buffer of fields to get precice intergration regarding the Field as source of a signal.). "
+    "The delay input is optional and can be used to override the internal estimate of 'dt', the time step, which comes from the global clock. (Hint: There is a buffer in the Field step which will yields the accurate deltaT that was used for that field, since actual time steps will differ especially if architectures get large. So use this input and connect it to the aforementioned deltaT buffer of fields to get precice intergration regarding the Field as source of a signal.). \n"
+    "The optional reset signal input can be used to trigger additional "
+    "re-initializations (for example from a ResetDetector step)."
   );
 
   declaration->declare();
@@ -106,6 +108,7 @@ mUseBDF5(new cedar::aux::BoolParameter(this, "use BDF5", false))
   cedar::proc::DataSlotPtr input = this->declareInput("input");
   cedar::proc::DataSlotPtr input2 = this->declareInput("initial state (optional)", false); // optional
   cedar::proc::DataSlotPtr input3 = this->declareInput("delay (optional)", false); // optional
+  cedar::proc::DataSlotPtr input4 = this->declareInput("reset signal (optional)", false); // optional
 
   this->declareOutput("integration result", mOutput);
 
@@ -175,10 +178,31 @@ void cedar::proc::steps::NumericalIntegration::reset()
 
 void cedar::proc::steps::NumericalIntegration::inputConnectionChanged(const std::string& inputName)
 {
-  // TODO: you may want to replace this code by using a cedar::proc::InputSlotHelper
+  if (inputName == "reset signal (optional)")
+  {
+    auto input_reset= getInput("reset signal (optional)");
 
-  // Again, let's first make sure that this is really the input in case anyone ever changes our interface.
-  //CEDAR_DEBUG_ASSERT(inputName == "input");
+    if (input_reset)
+    {
+      auto data_reset = boost::dynamic_pointer_cast
+                             <const cedar::aux::MatData>(input_reset);
+      if (data_reset)
+      {
+        if (!data_reset->isEmpty())
+        {
+          cv::Mat mat_reset= data_reset->getData();
+
+          if (mat_reset.at<float>(0,0) != 0.0)
+          {
+            reinitialize();
+          }
+        }
+      }
+    }
+      
+    return;
+  }
+
   if (inputName != "input")
     return; // do nothing for delay
 
