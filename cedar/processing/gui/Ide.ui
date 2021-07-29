@@ -156,6 +156,9 @@
     <property name="title">
      <string>Edit</string>
     </property>
+    <addaction name="mpActionUndo"/>
+    <addaction name="mpActionRedo"/>
+    <addaction name="separator"/>
     <addaction name="mpActionCopy"/>
     <addaction name="mpActionPaste"/>
     <addaction name="mpActionCopyConfiguration"/>
@@ -299,7 +302,7 @@
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_6">
          <item>
-          <widget class="cedar::aux::gui::Configurable" name="mpPropertyTable"/>
+          <widget class="cedar::proc::aux::gui::Configurable" name="mpPropertyTable"/>
          </item>
         </layout>
        </widget>
@@ -678,6 +681,9 @@
    <addaction name="mpActionResetSimulation"/>
    <addaction name="mpThreadsSingleStep"/>
    <addaction name="separator"/>
+   <addaction name="mpActionUndo"/>
+   <addaction name="mpActionRedo"/>
+   <addaction name="separator"/>
    <addaction name="mpActionRecord"/>
    <addaction name="mpActionSnapshot"/>
    <addaction name="separator"/>
@@ -1051,7 +1057,30 @@
     <string>Ctrl+C</string>
    </property>
   </action>
-
+  <action name="mpActionUndo">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/menus/undo.svg</normaloff>:/menus/undo.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="mpActionRedo">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/menus/redo.svg</normaloff>:/menus/redo.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
+   </property>
+  </action>
   <action name="mpActionCopyConfiguration">
    <property name="text">
     <string>Copy step configuration</string>
@@ -1060,7 +1089,6 @@
     <string>Ctrl+Shift+C</string>
    </property>
   </action>
-
   <action name="mpActionPaste">
    <property name="text">
     <string>Paste</string>
@@ -1222,9 +1250,9 @@
    <header location="global">cedar/processing/gui/View.h</header>
   </customwidget>
   <customwidget>
-   <class>cedar::aux::gui::Configurable</class>
+   <class>cedar::proc::aux::gui::Configurable</class>
    <extends>QTableWidget</extends>
-   <header>cedar/auxiliaries/gui/Configurable.h</header>
+   <header>cedar/processing/auxiliaries/gui/Configurable.h</header>
   </customwidget>
   <customwidget>
    <class>cedar::aux::gui::Log</class>

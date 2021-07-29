@@ -43,7 +43,7 @@
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/experiment/ActionSequence.h"
 #include "cedar/processing/experiment/gui/ActionSequence.h"
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/processing/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/units/Time.h"

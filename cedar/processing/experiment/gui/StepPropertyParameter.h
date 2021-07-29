@@ -41,7 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/processing/auxiliaries/gui/Parameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/gui/StepPropertyParameter.fwd.h"
@@ -53,7 +53,7 @@
 /*!@brief GUI implementation of cedar::proc::experiment::StepPropertyParameter
  *
  */
-class cedar::proc::experiment::gui::StepPropertyParameter : public cedar::aux::gui::Parameter
+class cedar::proc::experiment::gui::StepPropertyParameter : public cedar::proc::aux::gui::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

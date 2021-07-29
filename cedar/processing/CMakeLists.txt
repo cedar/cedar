@@ -56,6 +56,36 @@ cedar_add_library(cedarproc
   cedarunits
   cedardev
   MOC_HEADERS
+  auxiliaries/gui/AccelerationParameter.h
+  auxiliaries/gui/AngularVelocityParameter.h
+  auxiliaries/gui/BoolParameter.h
+  auxiliaries/gui/BoolVectorParameter.h
+  auxiliaries/gui/Configurable.h
+  auxiliaries/gui/DataPlotter.h
+  auxiliaries/gui/DirectoryParameter.h
+  auxiliaries/gui/DoubleParameter.h
+  auxiliaries/gui/DoubleVectorParameter.h
+  auxiliaries/gui/EnumParameter.h
+  auxiliaries/gui/FileParameter.h
+  auxiliaries/gui/FrequencyParameter.h
+  auxiliaries/gui/IgnoreLocaleDoubleSpinBox.h
+  auxiliaries/gui/IntParameter.h
+  auxiliaries/gui/IntVectorParameter.h
+  auxiliaries/gui/LengthParameter.h
+  auxiliaries/gui/ObjectParameter.h
+  auxiliaries/gui/ObjectListParameter.h
+  auxiliaries/gui/Parameter.h
+  auxiliaries/gui/PlaneAngleParameter.h
+  auxiliaries/gui/PropertyPane.h
+  auxiliaries/gui/SettingsWidget.h
+  auxiliaries/gui/StringParameter.h
+  auxiliaries/gui/StringVectorParameter.h
+  auxiliaries/gui/TimeParameter.h
+  auxiliaries/gui/UIntParameter.h
+  auxiliaries/gui/UIntVectorParameter.h
+  auxiliaries/gui/VelocityParameter.h
+  devices/gui/ComponentParameter.h
+  devices/gui/RobotManager.h
   experiment/Experiment.h
   experiment/ActionParameter.h
   experiment/PropertyParameter.h

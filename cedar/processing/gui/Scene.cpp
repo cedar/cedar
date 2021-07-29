@@ -54,13 +54,17 @@
 #include "cedar/processing/gui/CommentWidget.h"
 #include "cedar/processing/gui/CodeWidget.h"
 #include "cedar/processing/steps/PythonScript.h"
+#include "cedar/processing/undoRedo/commands/MoveElement.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteConnection.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteElement.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/GroupDeclarationManager.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
-#include "cedar/auxiliaries/gui/PropertyPane.h"
+#include "cedar/processing/auxiliaries/gui/PropertyPane.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -91,6 +95,7 @@
 #include <iostream>
 #include <set>
 #include <list>
+#include <boost/algorithm/string.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -129,11 +134,12 @@ cedar::proc::gui::Scene::~Scene()
   this->clear();
 }
 
+cedar::proc::undoRedo::UndoStack* cedar::proc::gui::Ide::pUndoStack;
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-cedar::aux::gui::Configurable* cedar::proc::gui::Scene::getConfigurableWidget() const
+cedar::proc::aux::gui::Configurable* cedar::proc::gui::Scene::getConfigurableWidget() const
 {
   return this->mpConfigurableWidget;
 }
@@ -186,6 +192,7 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
 void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
 // not sure why, but the drop event starts out as accepted; thus, reset its accepted state
+
   pEvent->setAccepted(false);
 
   this->QGraphicsScene::dropEvent(pEvent);
@@ -258,22 +265,24 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
     }
   }
 
+  //Stack for all connections that have to be deleted
   std::vector<cedar::proc::gui::Connection*> delete_connections_stack;
-  // remove connections
+
+  //Go through all items and add all found connections to the delete_connection stack
   for (int i = 0; i < items.size(); ++i)
   {
-    // delete connections first
     if (auto p_connection = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
     {
-      // store for later deletion
       delete_connections_stack.push_back(p_connection);
 
-      // take connections out of the list of graphic elements
+      //Take the connection out of the list so it dosent gets added twice
       items[i] = nullptr;
     }
   }
-  std::vector<cedar::proc::gui::GraphicsBase*> delete_stack;
-  // fill stack with elements
+
+  std::vector<cedar::proc::gui::GraphicsBase*> selectedElements;
+
+  //Go through all items and put them in the selectedElements list if they are deleteable
   for (int i = 0; i < items.size(); ++i)
   {
     auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]);
@@ -281,59 +290,127 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool 
     {
       if (!graphics_base->isReadOnly())
       {
-        delete_stack.push_back(graphics_base);
+        selectedElements.push_back(graphics_base);
       }
     }
   }
 
-  // delete all connections
+  // Start a macro on the undo stack, so all following delete commands are undone with one action (if multiple elements
+  // have to be deleted)
+  cedar::proc::gui::Ide::pUndoStack->beginMacro("Deleted selected Elements");
+
+  //Delete all connections that were on the "delete_connection_stack"
   while (delete_connections_stack.size() > 0)
   {
     cedar::proc::gui::Connection* p_current_connection = delete_connections_stack.back();
-    p_current_connection->disconnectUnderlying();
+    cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(
+            p_current_connection, false));
     delete_connections_stack.pop_back();
   }
 
-  // sort stack (make it a real stack)
-  std::sort(delete_stack.begin(), delete_stack.end(), this->sortElements);
-  // while stack is not empty, check if any items must be added, then delete the current item
-  while (delete_stack.size() > 0)
+  // Delete all connections that are connected to any step which is in the "selectedElements" and not already
+  // deleted (happens if an element gets deleted but the connection was not selected)
+  for(cedar::proc::gui::GraphicsBase* graphics_base : selectedElements)
   {
-    // look at first item
-    QGraphicsItem* current_item = delete_stack.back();
+    //Check if there is any connection from/to the current item that was NOT in the items list
+    if(auto element = dynamic_cast<cedar::proc::gui::Connectable*>(graphics_base))
+    {
+      std::set<cedar::proc::gui::DataSlotItem*> dataSlotSet;
+      cedar::proc::gui::Connectable::DataSlotNameMap dataSlotMap;
+      if(element->getNumberOfSlotsFor(cedar::proc::DataRole::INPUT) != 0)
+      {
+        // Get all input DataSlots of the element
+        dataSlotMap = element->getSlotItems(cedar::proc::DataRole::INPUT);
+      }
+      if(element->getNumberOfSlotsFor(cedar::proc::DataRole::OUTPUT) != 0)
+      {
+        // Get all output DataSlots of the element and append them to the dataSlotMap
+        cedar::proc::gui::Connectable::DataSlotNameMap outputDataSlotMap;
+        outputDataSlotMap = element->getSlotItems(cedar::proc::DataRole::OUTPUT);
+        dataSlotMap.insert(outputDataSlotMap.begin(), outputDataSlotMap.end());
+      }
+      // Save all connectinos from/to the dataslots in a set to remove duplicates
+      std::set<cedar::proc::gui::Connection*> connectionSet;
+      for(std::pair<std::string, cedar::proc::gui::DataSlotItem*> const& nameMap : dataSlotMap)
+      {
+        // Get all connections of this dataslot
+        std::vector<cedar::proc::gui::Connection*> connections = nameMap.second->getConnections();
+        connectionSet.insert(connections.begin(), connections.end());
+      }
 
-    // now delete the current element
-    deleteElement(current_item);
-    delete_stack.pop_back();
+      // Delete connections (push to undo stack)
+      for(cedar::proc::gui::Connection* connection : connectionSet)
+      {
+        cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(
+                connection, false));
+      }
+    }
   }
+
+  std::vector<cedar::proc::gui::Group*> groupStack;
+	std::vector<cedar::proc::gui::GraphicsBase*> deleteStack;
+
+	// Don't delete groups yet
+	for(cedar::proc::gui::GraphicsBase* graphicsBase:selectedElements)
+  {
+    if(auto group = dynamic_cast<cedar::proc::gui::Group*>(graphicsBase))
+		{
+    	groupStack.push_back(group);
+		}
+    else if(auto element = dynamic_cast<cedar::proc::gui::Element*>(graphicsBase))
+		{
+    	deleteStack.push_back(element);
+		}
+  }
+
+	// Find subgroups
+	int index = 0;
+  while(index < groupStack.size())
+	{
+  	cedar::proc::gui::Group* group = groupStack.at(index);
+  	std::map<std::string, cedar::proc::ElementPtr> elements = group->getGroup()->getElements();
+  	for(std::pair<std::string, cedar::proc::ElementPtr> element:elements)
+		{
+			cedar::proc::gui::Element* guiElement = this->getGraphicsItemFor(element.second.get());
+  		if(auto subGroup = dynamic_cast<cedar::proc::gui::Group*>(guiElement))
+			{
+  			groupStack.push_back(subGroup);
+			}
+		}
+  	index++;
+	}
+
+  // Remove duplicates
+  std::set<cedar::proc::gui::Group*> groupSet( groupStack.begin(), groupStack.end() );
+  groupStack.assign( groupSet.begin(), groupSet.end() );
+
+  // Sort subgroups (innermost groups first) and put onto delete stack
+  std::sort(groupStack.begin(), groupStack.end(),
+      [](const cedar::proc::gui::Group * a, const cedar::proc::gui::Group * b) -> bool
+      {
+        int a_size = QString::fromStdString(a->getGroup()->getFullPath()).split('.').size();
+        int b_size = QString::fromStdString(b->getGroup()->getFullPath()).split('.').size();
+        return a_size > b_size;
+      });
+
+  // Append groups
+  deleteStack.insert(deleteStack.end(), groupStack.begin(), groupStack.end());
+
+	// Delete all items on stack
+	for(cedar::proc::gui::GraphicsBase* element:deleteStack)
+	{
+    deleteElement(element);
+	}
+  cedar::proc::gui::Ide::pUndoStack->endMacro();
 }
 
 void cedar::proc::gui::Scene::deleteElement(QGraphicsItem* pItem)
 {
-  if (auto element = dynamic_cast<cedar::proc::gui::Element*>(pItem))
+  if (cedar::proc::gui::Element* element = dynamic_cast<cedar::proc::gui::Element*>(pItem))
   {
-    element->deleteElement();
+    cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteElement(
+            element, this, false));
   }
-}
-
-bool cedar::proc::gui::Scene::sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem)
-{
-  unsigned int depth_first_item = 0;
-  unsigned int depth_second_item = 0;
-  QGraphicsItem* p_current_item = pFirstItem;
-  while (p_current_item != nullptr && p_current_item->parentItem() != nullptr)
-  {
-    ++depth_first_item;
-    p_current_item = p_current_item->parentItem();
-  }
-
-  p_current_item = pSecondItem;
-  while (p_current_item != nullptr && p_current_item->parentItem() != nullptr)
-  {
-    ++depth_second_item;
-    p_current_item = p_current_item->parentItem();
-  }
-  return (depth_first_item < depth_second_item);
 }
 
 void cedar::proc::gui::Scene::emitSceneChanged()
@@ -351,7 +428,6 @@ void cedar::proc::gui::Scene::helpEvent(QGraphicsSceneHelpEvent* pHelpEvent)
       base_item->updateToolTip();
     }
   }
-
   QGraphicsScene::helpEvent(pHelpEvent);
 }
 
@@ -389,7 +465,7 @@ void cedar::proc::gui::Scene::exportSvg(const QString& file)
   }
 }
 
-void cedar::proc::gui::Scene::setConfigurableWidget(cedar::aux::gui::Configurable* pConfigurableWidget)
+void cedar::proc::gui::Scene::setConfigurableWidget(cedar::proc::aux::gui::Configurable* pConfigurableWidget)
 {
   this->mpConfigurableWidget = pConfigurableWidget;
 }
@@ -588,6 +664,71 @@ const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::getTriggerMa
   return this->mTriggerMap;
 }
 
+cedar::proc::gui::Element* cedar::proc::gui::Scene::getElementByFullPath(std::string elementIdentifier)
+{
+  std::vector<std::string> mElementNameSplitted;
+  boost::split(mElementNameSplitted, elementIdentifier, boost::is_any_of("."));
+
+  cedar::proc::gui::GroupPtr rootGroup = this->getRootGroup();
+
+  cedar::proc::gui::Group* currentGroup = rootGroup.get();
+  //Go through all subgroups
+  for (std::size_t i = 0; i < mElementNameSplitted.size()-1; i++)
+  {
+    if(currentGroup->getGroup()->contains(mElementNameSplitted[i]))
+    {
+      if (cedar::proc::ElementPtr element = currentGroup->getGroup()->getElement(mElementNameSplitted[i]))
+      {
+        cedar::proc::gui::Element* guiElement = this->getGraphicsItemFor(element);
+        if (cedar::proc::gui::Group* group = dynamic_cast<cedar::proc::gui::Group*>(guiElement))
+        {
+          currentGroup = group;
+        }
+      }
+    }
+  }
+
+  //Set the guiElement
+  if(currentGroup->getGroup()->contains(mElementNameSplitted[mElementNameSplitted.size() - 1]))
+  {
+    //Search in the group for the element
+    if (cedar::proc::ElementPtr element = currentGroup->getGroup()->getElement(mElementNameSplitted[mElementNameSplitted.size() - 1]))
+    {
+      if (cedar::proc::gui::Element* guiElement = this->getGraphicsItemFor(element))
+      {
+        return guiElement;
+      }
+    }
+  }
+  return nullptr;
+}
+
+cedar::proc::GroupPtr cedar::proc::gui::Scene::getGroupOfElementByFullPath(std::string elementIdentifier)
+{
+  std::vector<std::string> mElementNameSplitted;
+  boost::split(mElementNameSplitted, elementIdentifier, boost::is_any_of("."));
+
+  cedar::proc::gui::GroupPtr rootGroup = this->getRootGroup();
+
+  cedar::proc::gui::Group* currentGroup = rootGroup.get();
+  //Go through all subgroups
+  for (std::size_t i = 0; i < mElementNameSplitted.size()-1; i++)
+  {
+    if(currentGroup->getGroup()->contains(mElementNameSplitted[i]))
+    {
+      if (cedar::proc::ElementPtr element = currentGroup->getGroup()->getElement(mElementNameSplitted[i]))
+      {
+        cedar::proc::gui::Element* guiElement = this->getGraphicsItemFor(element);
+        if (cedar::proc::gui::Group* group = dynamic_cast<cedar::proc::gui::Group*>(guiElement))
+        {
+          currentGroup = group;
+        }
+      }
+    }
+  }
+  return currentGroup->getGroup();
+}
+
 void cedar::proc::gui::Scene::setGroup(cedar::proc::gui::GroupPtr group)
 {
   this->mGroup = group;
@@ -724,7 +865,8 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
                 if(connection != nullptr)
                 {
                   mpConnectionStart = connection->getSource();
-                  if(mpConnectionStart != nullptr) {
+                  if(mpConnectionStart != nullptr)
+                  {
                     mpConnectionToBeReconnected = connection;
                     CEDAR_DEBUG_ASSERT(mpConnectionStart->canConnect());
                     this->mMode = MODE_CONNECT;
@@ -753,6 +895,15 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
   //!@todo This should probably be done by overriding mouseMoveEvent etc in GraphicsBase/Connectable
   if (pMouseEvent->button() == Qt::LeftButton && mpConnectionStart == nullptr)
   {
+    //Save the source poisition of the selected items
+    mStartMovingPosition.clear();
+    QList<QGraphicsItem *> selected = this->getSelectedParents();
+
+    for(int i = 0; i < selected.size(); i++)
+    {
+      mStartMovingPosition.push_back(selected.at(i)->pos());
+    }
+
     auto items = this->items(pMouseEvent->scenePos(), Qt::IntersectsItemShape, Qt::DescendingOrder);
     // this is only the case if an item under the mouse is selected
     // (resize handles make an exception, they can be dragged without being selected)
@@ -766,7 +917,8 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
           {
             if (graphics_base->isSelected() && graphics_base->canBeDragged())
             {
-              // we cannot move with a
+              this->mStartMovingPositionOfClicked = graphics_base->pos();
+              this->mpDraggingGraphicsBase = graphics_base;
               this->mDraggingItems = true;
               this->mpeParentView->startScrollTimer();
             }
@@ -926,7 +1078,6 @@ void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition
   }
 }
 
-
 void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouseEvent)
 {
   switch (this->mMode)
@@ -943,8 +1094,8 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
   }
 
   mpConnectionToBeReconnected = nullptr;
-  this->mDraggingItems = false;
 
+  cedar::proc::gui::Group* sourceGroup = nullptr;
 
   // reset highlighting of the groups from which the items are being removed
   auto selected = this->selectedItems();
@@ -954,32 +1105,63 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
     if (auto group = dynamic_cast<cedar::proc::gui::Group*>(item->parentItem()))
     {
       group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      /*Set the group where the elements are being pulled from. Since this is same for all pulled elements (you cant
+      put elements in 2 groups with one mouseReleaseEvent) this assigment can be made here*/
+      sourceGroup = group;
     }
   }
 
-  if (mTargetGroup)
+  cedar::proc::gui::Group* targetGroup = nullptr;
+  std::list<QGraphicsItem*> items_to_move;
+
+  //Add elements that need to be moved into a list
+  for (auto p_item : this->getSelectedParents())
   {
-    std::list<QGraphicsItem*> items_to_move;
-    for (auto p_item : this->getSelectedParents())
+    auto graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(p_item);
+    if (graphics_item && !graphics_item->isReadOnly())
     {
-      auto graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(p_item);
-      if (graphics_item && !graphics_item->isReadOnly())
-      {
-        items_to_move.push_back(p_item);
-      }
+      items_to_move.push_back(p_item);
     }
-    if (auto group_item = dynamic_cast<cedar::proc::gui::Group*>(mpDropTarget))
+  }
+
+  /*mTargetGroup is only filled with a value if the user dragged the elements from one group to different one
+  it does not have a value if a elements is moved in the same group*/
+  if(mTargetGroup)
+  {
+    //Case 1: Any group into a created group
+    if (cedar::proc::gui::Group *group_item = dynamic_cast<cedar::proc::gui::Group *>(mpDropTarget))
     {
+      //Set the highlighting
       group_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-      group_item->addElements(items_to_move);
+      targetGroup = group_item;
     }
+    //Case 2: Created Group into rootGroup (mpDropTarget is nullptr when moved into rootGroup)
     else
     {
-      this->mGroup->addElements(items_to_move);
+      //Nullptr stands for rootGroup in Cedar
+      targetGroup = nullptr;
+    }
+  }
+  //Case 3: Moving between same groups
+  else
+  {
+    //First item of list is enough, since all have the same group
+    if(cedar::proc::gui::Element* guiElement = dynamic_cast<cedar::proc::gui::Element*>(items_to_move.front()))
+    {
+      targetGroup = this->getGroupFor(guiElement->getElement()->getGroup().get());
     }
   }
 
-
+  if (this->mDraggingItems && this->mpDraggingGraphicsBase && this->mStartMovingPositionOfClicked != this->mpDraggingGraphicsBase->pos())
+  {
+    cedar::proc::gui::Ide::pUndoStack->push(
+            new cedar::proc::undoRedo::commands::MoveElement(items_to_move,
+                                                             sourceGroup,
+                                                             targetGroup,
+                                                             this->mStartMovingPosition,
+                                                             this));
+  }
+  this->mDraggingItems = false;
   mTargetGroup.reset();
   this->resetBackgroundColor();
   mpDropTarget = NULL;
@@ -1249,19 +1431,21 @@ void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEv
 
 void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEvent* pMouseEvent)
 {
-  if(mpConnectionToBeReconnected != nullptr)
+  if(this->mpConnectionToBeReconnected != nullptr)
   {
-    mpConnectionToBeReconnected->disconnectUnderlying();
-    mpConnectionToBeReconnected = nullptr;
+    cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(
+            this->mpConnectionToBeReconnected, false));
+    //TODO ConnectionMove-Command or macro for de-/ recoupling connections
+    this->mpConnectionToBeReconnected = nullptr;
   }
-  if (mpNewConnectionIndicator != NULL)
+  if (this->mpNewConnectionIndicator != NULL)
   {
-    QPointF p2 = pMouseEvent->scenePos() - mpConnectionStart->scenePos();
+    QPointF p2 = pMouseEvent->scenePos() - this->mpConnectionStart->scenePos();
 
     for (const auto& element_gui_ptr_pair : this->mElementMap)
     {
       auto p_gui_connectable = dynamic_cast<cedar::proc::gui::Connectable*>(element_gui_ptr_pair.second);
-      if (p_gui_connectable && mpConnectionStart->canConnectTo(p_gui_connectable))
+      if (p_gui_connectable && this->mpConnectionStart->canConnectTo(p_gui_connectable))
       {
         p_gui_connectable->magnetizeSlots(pMouseEvent->scenePos());
       }
@@ -1323,6 +1507,75 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
   }
 }
 
+void cedar::proc::gui::Scene::createConnection(cedar::proc::gui::GraphicsBase* source, cedar::proc::gui::GraphicsBase* target, bool create_connector_group)
+{
+  QList<QGraphicsItem*> itemsInScene = this->items();
+  if(itemsInScene.contains(source) && itemsInScene.contains(target) &&
+      source->canConnectTo(target) != cedar::proc::gui::CONNECT_NO)
+  {
+    switch (source->getGroup())
+    {
+      // source item is a data item
+      case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM:
+      {
+        cedar::proc::gui::DataSlotItem *p_source = dynamic_cast<cedar::proc::gui::DataSlotItem *>(source);
+        CEDAR_DEBUG_ASSERT(p_source != NULL);
+
+        switch (target->getGroup())
+        {
+          // case: connecting two data slots
+          case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM:
+          {
+            cedar::proc::gui::DataSlotItem *p_data_target = dynamic_cast<cedar::proc::gui::DataSlotItem *>(target);
+            this->connectSlots(p_source, p_data_target, create_connector_group);
+            break;
+          } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM
+        }
+
+        break;
+      } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM
+
+        // source item is a trigger
+      case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
+      {
+        cedar::proc::gui::TriggerItem *source = dynamic_cast<cedar::proc::gui::TriggerItem *>(source);
+        CEDAR_DEBUG_ASSERT(source != NULL);
+
+        switch (target->getGroup()) {
+          case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
+          {
+            cedar::proc::gui::TriggerItem *p_trigger = dynamic_cast<cedar::proc::gui::TriggerItem *>(target);
+            source->getTrigger()->getGroup()->connectTrigger(source->getTrigger(), p_trigger->getTrigger());
+            break; // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
+          }
+
+          case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP:
+          {
+            cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem *>(target);
+            source->getTrigger()->getGroup()->connectTrigger(source->getTrigger(), p_step_item->getStep());
+            break;
+          } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
+
+          case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP:
+          {
+            cedar::proc::gui::Group *p_group = dynamic_cast<cedar::proc::gui::Group *>(target);
+            source->getTrigger()->getGroup()->connectTrigger(source->getTrigger(), p_group->getGroup());
+            break;
+          } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP
+
+          default:
+            CEDAR_DEBUG_ASSERT(false); // this should not happen
+            break;
+        } // switch (target->getGroup())
+
+      } // case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
+
+      default:
+        break;
+    } // switch (mpConnectionStart->getGroup())
+  }
+}
+
 void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouseEvent * pMouseEvent)
 {
   if (mpNewConnectionIndicator != nullptr)
@@ -1351,69 +1604,9 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
       )
       {
         connected = true;
-
-        switch (mpConnectionStart->getGroup())
-        {
-          // source item is a data item
-          case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM:
-          {
-            cedar::proc::gui::DataSlotItem *p_source = dynamic_cast<cedar::proc::gui::DataSlotItem*>(mpConnectionStart);
-            CEDAR_DEBUG_ASSERT(p_source != NULL);
-
-            switch (target->getGroup())
-            {
-              // case: connecting two data slots
-              case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM:
-              {
-                cedar::proc::gui::DataSlotItem *p_data_target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(target);
-                bool create_connector_group = pMouseEvent->modifiers().testFlag(Qt::ShiftModifier);
-                this->connectSlots(p_source, p_data_target, create_connector_group);
-                break;
-              } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM
-            }
-
-            break;
-          } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM
-
-          // source item is a trigger
-          case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
-          {
-            cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(mpConnectionStart);
-            CEDAR_DEBUG_ASSERT(source != NULL);
-
-            switch (target->getGroup())
-            {
-              case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
-              {
-                cedar::proc::gui::TriggerItem *p_trigger = dynamic_cast<cedar::proc::gui::TriggerItem*>(target);
-                source->getTrigger()->getGroup()->connectTrigger(source->getTrigger(), p_trigger->getTrigger());
-                break; // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
-              }
-
-              case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP:
-              {
-                cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(target);
-                source->getTrigger()->getGroup()->connectTrigger(source->getTrigger(), p_step_item->getStep());
-                break;
-              } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
-
-              case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP:
-              {
-                cedar::proc::gui::Group* p_group = dynamic_cast<cedar::proc::gui::Group*>(target);
-                source->getTrigger()->getGroup()->connectTrigger(source->getTrigger(), p_group->getGroup());
-                break;
-              } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP
-
-              default:
-                CEDAR_DEBUG_ASSERT(false); // this should not happen
-                break;
-            } // switch (target->getGroup())
-
-          } // case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
-
-          default:
-            break;
-        } // switch (mpConnectionStart->getGroup())
+        bool create_connector_group = pMouseEvent->modifiers().testFlag(Qt::ShiftModifier);
+        cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(mpConnectionStart,
+                target, true, create_connector_group));
       }
       else if 
       (
@@ -1705,9 +1898,7 @@ cedar::proc::gui::Group* cedar::proc::gui::Scene::getGroupFor(cedar::proc::Const
   GroupMap::iterator iter = this->mGroupMap.find(group);
   if (iter == this->mGroupMap.end())
   {
-#ifdef DEBUG
-    std::cout << "Could not find gui::group for group \"" << group->getName() << "\"" << std::endl;
-#endif // DEBUG
+    //Is rootGroup
     return NULL;
   }
   else

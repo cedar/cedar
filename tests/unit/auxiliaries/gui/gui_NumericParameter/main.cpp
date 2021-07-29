@@ -63,9 +63,9 @@ int main(int, char**)
 // INCLUDE THE CLASS TO TEST
 #define private public
 #define protected public
-#include "cedar/auxiliaries/gui/UIntParameter.h"
-#include "cedar/auxiliaries/gui/IntParameter.h"
-#include "cedar/auxiliaries/gui/DoubleParameter.h"
+#include "cedar/processing/auxiliaries/gui/UIntParameter.h"
+#include "cedar/processing/auxiliaries/gui/IntParameter.h"
+#include "cedar/processing/auxiliaries/gui/DoubleParameter.h"
 
 
 
@@ -228,7 +228,7 @@ int test_parameter_limits()
   cedar::aux::DoubleParameterPtr parameter
     = new cedar::aux::DoubleParameter(test_cfg.get(), "test", 1.0, cedar::aux::DoubleParameter::LimitType(lower_limit, 10.0));
 
-  auto p_widget = new cedar::aux::gui::DoubleParameter();
+  auto p_widget = new cedar::proc::aux::gui::DoubleParameter();
   p_widget->setParameter(parameter);
 
   p_widget->mpWidget->setValue(0.0);
@@ -258,21 +258,21 @@ int main(int argc, char** argv)
   errors += test_parameter
       <
         cedar::aux::UIntParameter,
-        cedar::aux::gui::UIntParameter,
+        cedar::proc::aux::gui::UIntParameter,
         unsigned int
       >(0, 100, 2, 5, 3);
 
   errors += test_parameter
       <
         cedar::aux::IntParameter,
-        cedar::aux::gui::IntParameter,
+        cedar::proc::aux::gui::IntParameter,
         int
       >(-100, 0, -2, -3, -4);
 
   errors += test_parameter
       <
         cedar::aux::DoubleParameter,
-        cedar::aux::gui::DoubleParameter,
+        cedar::proc::aux::gui::DoubleParameter,
         int
       >(-100, 0, -2, -3, -4);
 

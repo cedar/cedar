@@ -156,15 +156,15 @@ _mOutputActivation(new cedar::aux::BoolParameter(this, "activation as output", f
 _mDiscreteMetric(new cedar::aux::BoolParameter(this, "discrete metric (workaround)", false)),
 _mUpdateStepGui(new cedar::aux::BoolParameter(this, "update stepIcon according to output", true)),
 _mUpdateStepGuiThreshold
-        (
-                new cedar::aux::DoubleParameter
-                        (
-                                this,
-                                "threshold for updating the stepIcon",
-                                0.8,
-                                cedar::aux::DoubleParameter::LimitType::positiveZero()
-                        )
-        ),
+(
+  new cedar::aux::DoubleParameter
+    (
+            this,
+            "threshold for updating the stepIcon",
+            0.8,
+            cedar::aux::DoubleParameter::LimitType::positiveZero()
+    )
+),
 _mDimensionality
 (
   new cedar::aux::UIntParameter
@@ -209,15 +209,15 @@ mRestingLevel
   )
 ),
 _mInputNoiseGain
-        (
-                new cedar::aux::DoubleParameter
-                        (
-                                this,
-                                "input noise gain",
-                                0.1,
-                                cedar::aux::DoubleParameter::LimitType::positiveZero()
-                        )
-        ),
+(
+new cedar::aux::DoubleParameter
+  (
+          this,
+          "input noise gain",
+          0.1,
+          cedar::aux::DoubleParameter::LimitType::positiveZero()
+  )
+),
 _mMultiplicativeNoiseInput(new cedar::aux::BoolParameter(this, "multiplicative noise (input)", false)),
 _mMultiplicativeNoiseActivation(new cedar::aux::BoolParameter(this, "multiplicative noise (activation)", false)),
 _mSigmoid

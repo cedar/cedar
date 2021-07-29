@@ -60,7 +60,7 @@
 #include "cedar/devices/Component.h"
 #include "cedar/devices/gui/KinematicChainWidget.h"
 #include "cedar/processing/LoopedTrigger.h"
-#include "cedar/auxiliaries/gui/Configurable.h"
+#include "cedar/processing/auxiliaries/gui/Configurable.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/ColorGradient.h"
@@ -774,6 +774,27 @@ void cedar::proc::gui::Connectable::hideTriggerChains()
 
 //!@todo This belongs into a cedar::proc::gui::Element class ...
 cedar::proc::gui::ConstGroup* cedar::proc::gui::Connectable::getGuiGroup() const
+{
+  if (auto scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene()))
+  {
+    auto group = this->getElement()->getGroup();
+    CEDAR_DEBUG_ASSERT(group);
+    if (group != scene->getRootGroup()->getGroup())
+    {
+      return scene->getGroupFor(group.get());
+    }
+    else
+    {
+      return scene->getRootGroup().get();
+    }
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+cedar::proc::gui::Group* cedar::proc::gui::Connectable::getGuiGroup()
 {
   if (auto scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene()))
   {
@@ -1680,7 +1701,7 @@ void cedar::proc::gui::Connectable::displayStyleMenuTriggered(QAction* pAction)
 
 void cedar::proc::gui::Connectable::openProperties()
 {
-  auto configurable_widget = new cedar::aux::gui::Configurable();
+  auto configurable_widget = new cedar::proc::aux::gui::Configurable();
   configurable_widget->display(this->getConnectable(), this->isReadOnly());
   auto p_widget = this->createDockWidget("Properties", configurable_widget);
   p_widget->show();

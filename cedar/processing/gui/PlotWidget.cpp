@@ -38,7 +38,7 @@
 // CEDAR INCLUDES
 #include "cedar/configuration.h"
 #include "PlotWidget.h"
-#include "cedar/auxiliaries/gui/DataPlotter.h"
+#include "cedar/processing/auxiliaries/gui/DataPlotter.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/gui/Settings.h"

@@ -96,7 +96,7 @@
       <widget class="QLineEdit" name="mpTargetParameterName"/>
      </item>
      <item row="4" column="0" colspan="2">
-      <widget class="cedar::aux::gui::Configurable" name="mpLinkParameters" native="true">
+      <widget class="cedar::proc::aux::gui::Configurable" name="mpLinkParameters" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -111,9 +111,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>cedar::aux::gui::Configurable</class>
+   <class>cedar::proc::aux::gui::Configurable</class>
    <extends>QWidget</extends>
-   <header>cedar/auxiliaries/gui/Configurable.h</header>
+   <header>cedar/processing/auxiliaries/gui/Configurable.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -321,6 +321,12 @@ public:
     return this->_mHighlightHoveredConnections->getValue();
   }
 
+  //! Returns whether or not undo operations on the same parameter value should be processed at once
+  inline bool getUndoRedoAutoMacro() const
+  {
+    return this->_mUndoRedoAutoMacro->getValue();
+  }
+
   //! Returns whether or not deprecated steps should be displayed in the element list.
   bool getElementListShowsDeprecated() const;
 
@@ -493,6 +499,9 @@ private:
 
   //! Size of the Snapgrid, when snapping is enabled
   cedar::aux::UIntParameterPtr _mAutoSaveInterval;
+
+  //!@brief Disables or enables simultaneous undo operations on the same parameter value
+  cedar::aux::BoolParameterPtr _mUndoRedoAutoMacro;
 
   //! Use Field Icons that switch depending on a present peak
   cedar::aux::BoolParameterPtr _mUseDynamicFieldIcons;

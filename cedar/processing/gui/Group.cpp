@@ -72,6 +72,11 @@
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/processing/gui/StickyNote.h"
 #include "cedar/processing/gui/GroupParameterDesigner.h"
+#include "Ide.h"
+#include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteElement.h"
+#include "cedar/processing/undoRedo/commands/CreateGroupTemplate.h"
 
 // SYSTEM INCLUDES
 #include <QEvent>
@@ -335,13 +340,14 @@ void cedar::proc::gui::Group::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
 
 void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
-  auto declaration = cedar::proc::gui::ElementList::declarationFromDrop(pEvent);
+  cedar::aux::ConstPluginDeclaration* declaration = cedar::proc::gui::ElementList::declarationFromDrop(pEvent);
   if (declaration == nullptr)
   {
     return;
   }
   QPointF mapped = pEvent->scenePos();
-  auto target_group = this->getGroup();
+  cedar::proc::GroupPtr target_group = this->getGroup();
+
   if (!this->isRootGroup())
   {
     mapped -= this->scenePos();
@@ -349,18 +355,17 @@ void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 
   if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration *>(declaration))
   {
-    //!@todo can createElement be moved into gui::Group?
-    this->mpScene->createElement(target_group, elem_declaration->getClassName(), mapped);
-  } else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration *>(declaration))
+    //Push a createDeleteCommand (as a create) onto the UndoStack
+    cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteElement(
+            mapped, elem_declaration->getClassName(), target_group, mpScene, true));
+  }
+  //TODO: Do Group Declaration (with an own Command). This works with Json Templates
+  else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration *>(declaration))
   {
-    auto elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup
-            (
-                    group_declaration->getClassName(),
-                    target_group,
-                    pEvent->modifiers().testFlag(Qt::ControlModifier)
-            );
-    this->mpScene->getGraphicsItemFor(elem)->setPos(mapped);
-  } else
+    cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateGroupTemplate(
+            group_declaration, target_group, pEvent, mapped, this->mpScene));
+  }
+  else
   {
     CEDAR_THROW(cedar::aux::NotFoundException, "Could not cast the dropped declaration to any known type.");
   }
@@ -812,6 +817,16 @@ void cedar::proc::gui::Group::sizeChanged()
   this->updateDecorationPositions();
 }
 
+double cedar::proc::gui::Group::getUncollapsedWidth()
+{
+  return this->_mUncollapsedWidth->getValue();
+}
+
+double cedar::proc::gui::Group::getUncollapsedHeight()
+{
+  return this->_mUncollapsedHeight->getValue();
+}
+
 void cedar::proc::gui::Group::updateTextBounds()
 {
   qreal bounds_factor = static_cast<qreal>(2);
@@ -1205,13 +1220,13 @@ void cedar::proc::gui::Group::readJson(const cedar::aux::Path &source)
 
 void cedar::proc::gui::Group::readJsonFromString(std::string jsonString)
 {
-  std::stringstream jsonFromClipboardStream;
-  jsonFromClipboardStream << jsonString;
+  std::stringstream jsonStream;
+  jsonStream << jsonString;
 
   cedar::aux::ConfigurationNode root;
 
   //Debugged: Works
-  read_json(jsonFromClipboardStream, root);
+  read_json(jsonStream, root);
 
 
   this->readRobots(root);
@@ -1269,8 +1284,6 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
         this->_mArchitectureWidgets[key] = value.get_value<std::string>();
       }
     }
-
-
 
     // read background color
     auto color_node = node.find("background color");

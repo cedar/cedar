@@ -41,7 +41,7 @@
 #include "cedar/processing/gui/SimulationControl.h"
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/LoopedTrigger.h"
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/processing/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/auxiliaries/casts.h"
 
@@ -462,7 +462,7 @@ void cedar::proc::gui::SimulationControl::loopedTriggerAdded(QTreeWidgetItem* pI
   for (const auto& name : parameter_names)
   {
     auto parameter = loopedTrigger->getParameter(name);
-    auto widget = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
+    auto widget = cedar::proc::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
     this->mpTree->setItemWidget(pItem, column, widget);
     widget->setParameter(parameter);
     ++column;

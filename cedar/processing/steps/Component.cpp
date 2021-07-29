@@ -93,7 +93,7 @@ namespace
 
 namespace
 {
-  bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->add
+  bool registered = cedar::proc::aux::gui::ParameterFactorySingleton::getInstance()->add
       <
         cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameter,
         cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameterWidget

@@ -37,7 +37,7 @@
 // CEDAR INCLUDES
 #include <cedar/auxiliaries/Configurable.h>
 #include <cedar/auxiliaries/DoubleParameter.h>
-#include <cedar/auxiliaries/gui/PropertyPane.h>
+#include <cedar/processing/auxiliaries/gui/PropertyPane.h>
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -173,7 +173,7 @@ int main(int argc, char** argv)
 
   GroupDemoPtr my_configurable_object(new GroupDemo());
 
-  cedar::aux::gui::PropertyPane *p_pane = new cedar::aux::gui::PropertyPane();
+  cedar::proc::aux::gui::PropertyPane *p_pane = new cedar::proc::aux::gui::PropertyPane();
   p_pane->show(); // makes qt show the widget
   p_pane->display(my_configurable_object);
 

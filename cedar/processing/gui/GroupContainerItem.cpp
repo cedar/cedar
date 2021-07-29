@@ -65,7 +65,7 @@ mpGroupWidget(new cedar::proc::gui::GroupWidget(pGroup))
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::GroupContainerItem::setConfigurableWidget(cedar::aux::gui::Configurable* pConfigurableWidget)
+void cedar::proc::gui::GroupContainerItem::setConfigurableWidget(cedar::proc::aux::gui::Configurable* pConfigurableWidget)
 {
   this->mpGroupWidget->setConfigurableWidget(pConfigurableWidget);
 }
