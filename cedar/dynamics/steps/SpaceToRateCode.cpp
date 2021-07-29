@@ -251,7 +251,16 @@ void cedar::dyn::SpaceToRateCode::eulerStep(const cedar::unit::Time& time)
   }
 
 
-  double fixed_point= o / s;
+  double x_0 = this->mOutput->getData().at<float>(0,0);
+  double fixed_point;
+  if (s == 0)
+  {
+    fixed_point= 0; // workaround
+  }
+  else
+  {
+    fixed_point= o / s;
+  }
 
   if (!mJumpToFixPoint->getValue())
   {
@@ -271,7 +280,7 @@ void cedar::dyn::SpaceToRateCode::eulerStep(const cedar::unit::Time& time)
     double h_r = dt - h * T;
     double v = 1.0 - h * s / tau;
     double v_rest = 1.0 - h_r * s / tau; // defined just like v, just with h_r instead of h
-    double x_0 = this->mOutput->getData().at<float>(0,0);
+
     double v_pow_T = pow(v, T);
 
     double s_T;
