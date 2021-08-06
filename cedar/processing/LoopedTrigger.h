@@ -111,6 +111,12 @@ public:
 
   bool canConnectTo(cedar::proc::ConstTriggerablePtr target) const;
 
+  //! Called when the trigger is started.
+  void prepareStart(); // JT: Made this public for the alternate way to loop triggers
+
+  //! Called when the trigger is started.
+  void processQuit();  // JT: Made this public for the alternate way to loop triggers
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
@@ -150,11 +156,9 @@ private:
    */
   void addListener(cedar::proc::TriggerablePtr triggerable);
 
-  //! Called when the trigger is started.
-  void prepareStart();
 
-  //! Called when the trigger is started.
-  void processQuit();
+
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

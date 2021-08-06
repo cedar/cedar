@@ -41,6 +41,7 @@
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/auxiliaries/GlobalClock.h"
 
 // SYSTEM INCLUDES
 #include <QWriteLocker>
@@ -117,6 +118,15 @@ _mLoopMode
     cedar::aux::LoopMode::typePtr(),
     mode
   )
+),
+_mUseDefaultCPUStep
+(
+  new cedar::aux::BoolParameter
+  (
+    this,
+    "use default CPU step",
+    true
+  )
 )
 {
   init();
@@ -190,7 +200,16 @@ _mLoopMode
     cedar::aux::LoopMode::typePtr(),
     mode
   )
-)
+),
+_mUseDefaultCPUStep
+(
+        new cedar::aux::BoolParameter
+        (
+                this,
+                "use default CPU step",
+                true
+                )
+                )
 {
   init();
 }
@@ -198,15 +217,25 @@ _mLoopMode
 void cedar::aux::LoopedThread::init()
 {
   // connect to mode change signal
-  QObject::connect(_mLoopMode.get(), SIGNAL(valueChanged()), this, SLOT(modeChanged()));
+//  QObject::connect(_mLoopMode.get(), SIGNAL(valueChanged()), this, SLOT(modeChanged()));
+  QObject::connect(_mUseDefaultCPUStep.get(),SIGNAL(valueChanged()),this,SLOT(stepSizeManagementChanged()));
+
   // initially set available parameters
-  this->modeChanged();
+//  this->modeChanged();
+  this->processSimulationModeChange(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode());
+  this->stepSizeManagementChanged();
 
   //this->connectToStartSignal(boost::bind(&cedar::aux::LoopedThread::prepareStart, this));
   this->connectToQuitSignal(boost::bind(&cedar::aux::LoopedThread::processStop, this ));
 
+
+
   mStartConnection = this->connectToStartSignal(boost::bind(&cedar::aux::LoopedThread::makeParametersConst, this, true));
   mStopConnection = this->connectToStopSignal(boost::bind(&cedar::aux::LoopedThread::makeParametersConst, this, false));
+
+  mDefaultCPUStepSizeChangeConnection = cedar::aux::GlobalClockSingleton::getInstance()->connectToDefaultCPUStepSizeChangedSignal(boost::bind(&cedar::aux::LoopedThread::processDefaultStepSizeChange,this,_1));
+  mSimulationModeChangeConnection = cedar::aux::GlobalClockSingleton::getInstance()->connectToLoopModeChangedSignal(boost::bind(&cedar::aux::LoopedThread::processSimulationModeChange,this,_1));
+  mSimulationStepSizeChangeConnection = cedar::aux::GlobalClockSingleton::getInstance()->connectToSimulationStepSizeChangedSignal(boost::bind(&cedar::aux::ConstLoopedThread::processSimulationStepSizeChanged,this,_1));
 }
 
 cedar::aux::LoopedThread::~LoopedThread()
@@ -249,12 +278,22 @@ void cedar::aux::LoopedThread::makeParametersConst(bool makeConst)
   // the loop mode itself is not affected by this, so this must be made const/unconst every time
   this->_mLoopMode->setConstant(makeConst);
 
+  if(!makeConst) //parameters should be made available again
+  {
+    this->_mUseDefaultCPUStep->setConstant(this->_mLoopMode->getValue() == cedar::aux::LoopMode::FakeDT);
+  } else
+  {
+    this->_mUseDefaultCPUStep->setConstant(makeConst);
+  }
+
+  //Todo:This should all vanish later, the different modes will be deprecated
   // then, make everything else const if set to do so (if not, the restrictions from above are kept)
   if (makeConst)
   {
     this->_mIdleTime->setConstant(makeConst);
     this->_mStepSize->setConstant(makeConst);
     this->_mSimulatedTime->setConstant(makeConst);
+
   }
 }
 
@@ -369,70 +408,136 @@ cedar::aux::detail::ThreadWorker* cedar::aux::LoopedThread::resetWorker()
     // intentionally return pointer, see parent
 }
 
+cedar::unit::Time cedar::aux::LoopedThread::getDefaultStepSize()
+{
+  return cedar::aux::GlobalClockSingleton::getInstance()->getDefaultCPUStepSize();
+}
+
 void cedar::aux::LoopedThread::modeChanged()
 {
-  switch (_mLoopMode->getValue())
+
+
+  //todo: Either Remove or use this function!
+//  switch (_mLoopMode->getValue())
+//  {
+//
+//    // old and boring: DEPRECATE ME
+//    case cedar::aux::LoopMode::Simulated:
+//    {
+//      this->_mStepSize->setConstant(true);
+//      this->_mIdleTime->setConstant(false);
+//      this->_mSimulatedTime->setConstant(false);
+//      this->_mFakeStepSize->setConstant(true);
+//      this->_mMinimumStepSize->setConstant(true);
+//      break;
+//    }
+//    case cedar::aux::LoopMode::RealTime:
+//    {
+//      this->_mStepSize->setConstant(true);
+//      this->_mIdleTime->setConstant(false);
+//      this->_mSimulatedTime->setConstant(true);
+//      this->_mFakeStepSize->setConstant(true);
+//      this->_mMinimumStepSize->setConstant(true);
+//      break;
+//    }
+//    case cedar::aux::LoopMode::Fixed:
+//    case cedar::aux::LoopMode::FixedAdaptive:
+//    {
+//      this->_mStepSize->setConstant(false);
+//      this->_mIdleTime->setConstant(true);
+//      this->_mSimulatedTime->setConstant(true);
+//      this->_mFakeStepSize->setConstant(true);
+//      this->_mMinimumStepSize->setConstant(true);
+//      break;
+//    }
+//
+//
+//    case cedar::aux::LoopMode::RealDT:
+//    {
+//      this->_mStepSize->setConstant(false);
+//      this->_mFakeStepSize->setConstant(true);
+//      this->_mMinimumStepSize->setConstant(false);
+//
+//      //legacy:
+//      this->_mIdleTime->setConstant(true);
+//      this->_mSimulatedTime->setConstant(true);
+//      break;
+//    }
+//    case cedar::aux::LoopMode::FakeDT:
+//    {
+//      this->_mStepSize->setConstant(false);
+//      this->_mFakeStepSize->setConstant(false);
+//      this->_mMinimumStepSize->setConstant(false);
+//
+//      //legacy:
+//      this->_mIdleTime->setConstant(true);
+//      this->_mSimulatedTime->setConstant(true);
+//      break;
+//    }
+//
+//    default:
+//    {
+//      // all valid cases are covered above
+//      CEDAR_ASSERT(false);
+//    }
+//  }
+}
+
+void cedar::aux::LoopedThread::stepSizeManagementChanged()
+{
+  std::cout<<"LoopedThread StepSizeMangagementChanged. New Value: " << this->_mUseDefaultCPUStep->getValue() << std::endl;
+  if(this->_mUseDefaultCPUStep->getValue())
   {
-
-    // old and boring: DEPRECATE ME
-    case cedar::aux::LoopMode::Simulated:
-    {
-      this->_mStepSize->setConstant(true);
-      this->_mIdleTime->setConstant(false);
-      this->_mSimulatedTime->setConstant(false);
-      this->_mFakeStepSize->setConstant(true);
-      this->_mMinimumStepSize->setConstant(true);
-      break;
-    }
-    case cedar::aux::LoopMode::RealTime:
-    {
-      this->_mStepSize->setConstant(true);
-      this->_mIdleTime->setConstant(false);
-      this->_mSimulatedTime->setConstant(true);
-      this->_mFakeStepSize->setConstant(true);
-      this->_mMinimumStepSize->setConstant(true);
-      break;
-    }
-    case cedar::aux::LoopMode::Fixed:
-    case cedar::aux::LoopMode::FixedAdaptive:
-    {
-      this->_mStepSize->setConstant(false);
-      this->_mIdleTime->setConstant(true);
-      this->_mSimulatedTime->setConstant(true);
-      this->_mFakeStepSize->setConstant(true);
-      this->_mMinimumStepSize->setConstant(true);
-      break;
-    }
-
-
-    case cedar::aux::LoopMode::RealDT:
-    {
-      this->_mStepSize->setConstant(false);
-      this->_mFakeStepSize->setConstant(true);
-      this->_mMinimumStepSize->setConstant(false);
-
-      //legacy:
-      this->_mIdleTime->setConstant(true);
-      this->_mSimulatedTime->setConstant(true);
-      break;
-    }
-    case cedar::aux::LoopMode::FakeDT:
-    {
-      this->_mStepSize->setConstant(false);
-      this->_mFakeStepSize->setConstant(false);
-      this->_mMinimumStepSize->setConstant(false);
-
-      //legacy:
-      this->_mIdleTime->setConstant(true);
-      this->_mSimulatedTime->setConstant(true);
-      break;
-    }
-
-    default:
-    {
-      // all valid cases are covered above
-      CEDAR_ASSERT(false);
-    }
+    _mPreviousCustomStepSize = this->_mStepSize->getValue();
+    this->_mStepSize->setValue(this->getDefaultStepSize());
+    this->_mStepSize->setConstant(true);
+  }
+  else
+  {
+    this->_mStepSize->setValue(_mPreviousCustomStepSize);
+    this->_mStepSize->setConstant(false);
   }
 }
 
+void cedar::aux::LoopedThread::processDefaultStepSizeChange(cedar::unit::Time newStepSize)
+{
+  //Todo: This might need some Locking! And I am not sure if some changes get lost this way... Check if there is a use case
+  if(!this->isRunning() && this->_mUseDefaultCPUStep->getValue())
+  {
+    this->_mStepSize->setValue(newStepSize);
+  }
+}
+
+void cedar::aux::LoopedThread::processSimulationModeChange(cedar::aux::LoopMode::Id newMode)
+{
+  std::cout<<"This is LoopedThread::processSimulationModeChange with newMode: " << newMode <<std::endl;
+  switch(newMode)
+  {
+    case cedar::aux::LoopMode::RealDT:
+    case cedar::aux::LoopMode::Fixed:
+    case cedar::aux::LoopMode::FixedAdaptive:
+    case cedar::aux::LoopMode::RealTime:
+      this->_mUseDefaultCPUStep->setConstant(false);
+      this->_mStepSize->setConstant(this->_mUseDefaultCPUStep->getValue());
+      break;
+    default:
+      this->_mUseDefaultCPUStep->setValue(true);
+      this->_mUseDefaultCPUStep->setConstant(true);
+      this->_mStepSize->setConstant(true);
+    }
+    //Todo:Do we need to lock this? Even if this is only settable outside of a running system?
+    QWriteLocker locker(this->_mLoopMode->getLock());
+    this->_mLoopMode->setValue(newMode);
+    std::cout<<"This thread changed to Mode:" << newMode << std::endl;
+}
+
+void cedar::aux::LoopedThread::processSimulationStepSizeChanged(cedar::unit::Time newStepSize)
+{
+  QWriteLocker locker (this->_mFakeStepSize->getLock());
+  this->_mFakeStepSize->setValue(newStepSize);
+}
+
+unsigned long cedar::aux::LoopedThread::getNumberOfSteps()
+{
+  return mpWorker->getNumberOfSteps();
+}

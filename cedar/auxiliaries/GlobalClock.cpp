@@ -43,7 +43,13 @@
 cedar::aux::GlobalClock::GlobalClock()
 :
 mpAccessLock(new QReadWriteLock()),
-mRunning(false)
+mpSimulationStepsTakenLock(new QReadWriteLock()),
+mRunning(false),
+mAdditionalTakenSteps(0),
+mpSimulationStepsTaken(0),
+mDefaultCPUStepSize(cedar::unit::Time(20 * cedar::unit::milli * cedar::unit::seconds)),
+mSimulationStepSize(cedar::unit::Time(20 * cedar::unit::milli * cedar::unit::seconds)),
+mLoopMode(cedar::aux::LoopMode::FakeDT)
 {
   this->mGlobalTimeFactorConnection = cedar::aux::SettingsSingleton::getInstance()->connectToGlobalTimeFactorChangedSignal
   (
@@ -68,19 +74,27 @@ void cedar::aux::GlobalClock::addTime(const cedar::unit::Time& time)
 
 void cedar::aux::GlobalClock::globalTimeFactorChanged(double newFactor)
 {
+  //Todo: This will become irrelevant
   this->addCurrentToAdditionalElapsedTime();
   this->mCurrentTimeFactor = newFactor;
 }
 
 double cedar::aux::GlobalClock::getCurrentElapsedMSec() const
 {
+  //This is the Internal Update
   double elapsed = static_cast<double>(this->mTimer.elapsed());
   return elapsed * this->mCurrentTimeFactor;
 }
 
 void cedar::aux::GlobalClock::addCurrentToAdditionalElapsedTime()
 {
+
+  //This keeps track of the time while the simulation is stopped
   this->mAdditionalElapsedTime += this->getCurrentElapsedMSec();
+  QWriteLocker locker(this->mpSimulationStepsTakenLock);
+  std::cout<<"GlobalClock::addCurrentToAdditionalElapsedTime with StepsTaken: " << this->mpSimulationStepsTaken << " amd currently AdditionalSteps: " << mAdditionalTakenSteps << std::endl;
+  mAdditionalTakenSteps += this->mpSimulationStepsTaken;
+  this->mpSimulationStepsTaken = 0;
   this->mTimer.restart();
 }
 
@@ -115,7 +129,10 @@ void cedar::aux::GlobalClock::start()
 void cedar::aux::GlobalClock::reset()
 {
   QWriteLocker w_locker(this->mpAccessLock);
+  QWriteLocker w_locker_steps(this->mpSimulationStepsTakenLock);
 
+  this->mpSimulationStepsTaken = 0;
+  this->mAdditionalTakenSteps = 0;
   this->mAdditionalElapsedTime = 0;
   this->mTimer.restart();
 }
@@ -146,12 +163,74 @@ cedar::unit::Time cedar::aux::GlobalClock::getTime() const
   QReadLocker locker(this->mpAccessLock);
   double time_msecs = this->mAdditionalElapsedTime;
 
-  if (this->mRunning)
+  if (this->mRunning && this->mLoopMode == cedar::aux::LoopMode::RealDT)
   {
     time_msecs += this->getCurrentElapsedMSec();
   }
 
-  return cedar::unit::Time(static_cast<double>(time_msecs) * cedar::unit::milli * cedar::unit::seconds);
+//  if(this->mLoopMode == cedar::aux::LoopMode::FakeDT)
+//  {
+//    unsigned long stepsTaken = this->getNumOfTakenSteps() + mAdditionalTakenSteps;
+//    return  cedar::unit::Time(static_cast<double>(stepsTaken) * this->mSimulationStepSize);
+//  }
+//  else
+//  {
+    return cedar::unit::Time(static_cast<double>(time_msecs) * cedar::unit::milli * cedar::unit::seconds);
+//  }
+
+}
+
+void cedar::aux::GlobalClock::setDefaultCPUStepSize(cedar::unit::Time newDefaultStepSize)
+{
+  mDefaultCPUStepSize = newDefaultStepSize;
+  this->mDefaultCPUStepSizeChangedSignal(newDefaultStepSize);
+}
+
+cedar::unit::Time cedar::aux::GlobalClock::getDefaultCPUStepSize()
+{
+  return mDefaultCPUStepSize;
+}
+
+void cedar::aux::GlobalClock::setSimulationStepSize(cedar::unit::Time newSimulationStepSize)
+{
+  mSimulationStepSize = newSimulationStepSize;
+  this->mSimualtionStepSizeChangedSignal(newSimulationStepSize);
+}
+
+cedar::unit::Time cedar::aux::GlobalClock::getSimulationStepSize()
+{
+  return mSimulationStepSize;
+}
+
+void cedar::aux::GlobalClock::setLoopMode(cedar::aux::LoopMode::Id newLoopMode)
+{
+  mLoopMode = newLoopMode;
+  this->mLoopModeChangedSignal(newLoopMode);
+}
+
+cedar::aux::LoopMode::Id cedar::aux::GlobalClock::getLoopMode()
+{
+  return mLoopMode;
+}
+
+void cedar::aux::GlobalClock::updateTakenSteps(unsigned long newStepsTaken)
+{
+  if (this->mRunning)
+  {
+    QWriteLocker locker(this->mpSimulationStepsTakenLock);
+    std::cout<<"GlobalClock::updateTakenSteps newStepsTaken: " << newStepsTaken << std::endl;
+    if(newStepsTaken > mpSimulationStepsTaken)
+    {
+      mpSimulationStepsTaken = newStepsTaken;
+    }
+  }
+}
+
+unsigned long cedar::aux::GlobalClock::getNumOfTakenSteps() const
+{
+  QReadLocker locker (this->mpSimulationStepsTakenLock);
+  unsigned long copyStepsTaken = this->mpSimulationStepsTaken;
+  return copyStepsTaken;
 }
 
 

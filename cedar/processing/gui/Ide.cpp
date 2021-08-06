@@ -391,60 +391,118 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   mpPerformanceOverview = new cedar::proc::gui::PerformanceOverview(this);
   pUndoStack = new cedar::proc::undoRedo::UndoStack(this);
 
+
+
   // manually added components
+
+
+  // Old Stuff!!!!!!
   // toolbar: custom timestep
-  auto p_enable_custom_time_step = new QCheckBox();
-  p_enable_custom_time_step->setToolTip("When enabled, the specified time step is used to iterate all steps connected to looped triggers once when single-step is clicked. Otherwise, the time step to be used is determined automatically.");
-  p_enable_custom_time_step->setChecked(false);
-  this->mpToolBar->insertWidget(this->mpActionRecord, p_enable_custom_time_step);
+//  auto p_enable_custom_time_step = new QCheckBox();
+//  p_enable_custom_time_step->setToolTip("When enabled, the specified time step is used to iterate all steps connected to looped triggers once when single-step is clicked. Otherwise, the time step to be used is determined automatically.");
+//  p_enable_custom_time_step->setChecked(false);
+//  this->mpToolBar->insertWidget(this->mpActionRecord, p_enable_custom_time_step);
 
-  this->mpCustomTimeStep = new QDoubleSpinBox();
-  this->mpCustomTimeStep->setToolTip("When enabled, this time step is passed to all looped triggers when single-stepping the architecture.");
-  this->mpCustomTimeStep->setValue(10.0);
-  this->mpCustomTimeStep->setMinimum(1.0);
-  this->mpCustomTimeStep->setSuffix(" ms");
-  this->mpCustomTimeStep->setMaximum(10000.0);
-  this->mpCustomTimeStep->setDecimals(1);
-  this->mpCustomTimeStep->setAlignment(Qt::AlignRight);
-  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpCustomTimeStep);
+//  this->mpCustomTimeStep = new QDoubleSpinBox();
+//  this->mpCustomTimeStep->setToolTip("When enabled, this time step is passed to all looped triggers when single-stepping the architecture.");
+//  this->mpCustomTimeStep->setValue(10.0);
+//  this->mpCustomTimeStep->setMinimum(1.0);
+//  this->mpCustomTimeStep->setSuffix(" ms");
+//  this->mpCustomTimeStep->setMaximum(10000.0);
+//  this->mpCustomTimeStep->setDecimals(1);
+//  this->mpCustomTimeStep->setAlignment(Qt::AlignRight);
+//  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpCustomTimeStep);
 
-  this->mpCustomTimeStep->setEnabled(false);
-  QObject::connect(p_enable_custom_time_step, SIGNAL(toggled(bool)), this->mpCustomTimeStep, SLOT(setEnabled(bool)));
+//  this->mpCustomTimeStep->setEnabled(false);
+//  QObject::connect(p_enable_custom_time_step, SIGNAL(toggled(bool)), this->mpCustomTimeStep, SLOT(setEnabled(bool)));
 
-
-  this->mpToolBar->insertSeparator(this->mpActionRecord);
-
-  // toolbar: global time factor widgets
-  double global_time_factor_min = 0.00;
-  double global_time_factor_max = 2.00;
-  double global_time_factor_step = 0.05;
-  double global_time_factor_value = cedar::aux::SettingsSingleton::getInstance()->getGlobalTimeFactor();
-
-  double slider_factor = 100.0;
-  this->mpGlobalTimeFactorSlider = new QSlider(Qt::Horizontal);
-  this->mpGlobalTimeFactorSlider->setMinimum(slider_factor * global_time_factor_min);
-  this->mpGlobalTimeFactorSlider->setMaximum(slider_factor * global_time_factor_max);
-  this->mpGlobalTimeFactorSlider->setSingleStep(slider_factor * global_time_factor_step);
-  this->mpGlobalTimeFactorSlider->setValue(slider_factor * global_time_factor_value);
-  this->mpGlobalTimeFactorSlider->setFixedWidth(80);
-  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpGlobalTimeFactorSlider);
-
-  QObject::connect(this->mpGlobalTimeFactorSlider, SIGNAL(valueChanged(int)), this, SLOT(globalTimeFactorSliderChanged(int)));
-
-  this->mpGlobalTimeFactor = new QDoubleSpinBox();
-  this->mpGlobalTimeFactor->setToolTip("Factor for the fake DT (only for thread running with fake DT for the Euler step).");
-  this->mpGlobalTimeFactor->setMinimum(global_time_factor_min);
-  this->mpGlobalTimeFactor->setMaximum(global_time_factor_max);
-  this->mpGlobalTimeFactor->setDecimals(2);
-  this->mpGlobalTimeFactor->setSingleStep(global_time_factor_step);
-  this->mpGlobalTimeFactor->setValue(global_time_factor_value);
-  this->mpGlobalTimeFactor->setSuffix("x");
-  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpGlobalTimeFactor);
-
-  QObject::connect(this->mpGlobalTimeFactor, SIGNAL(valueChanged(double)), this, SLOT(globalTimeFactorSpinboxChanged(double)));
 
 //  this->mpToolBar->insertSeparator(this->mpActionRecord);
 
+  // toolbar: global time factor widgets
+//  double global_time_factor_min = 0.00;
+//  double global_time_factor_max = 2.00;
+//  double global_time_factor_step = 0.05;
+//  double global_time_factor_value = cedar::aux::SettingsSingleton::getInstance()->getGlobalTimeFactor();
+
+//  double slider_factor = 100.0;
+//  this->mpSimulatedTimeStepSlider = new QSlider(Qt::Horizontal);
+//  this->mpSimulatedTimeStepSlider->setMinimum(slider_factor * global_time_factor_min);
+//  this->mpSimulatedTimeStepSlider->setMaximum(slider_factor * global_time_factor_max);
+//  this->mpSimulatedTimeStepSlider->setSingleStep(slider_factor * global_time_factor_step);
+//  this->mpSimulatedTimeStepSlider->setValue(slider_factor * global_time_factor_value);
+//  this->mpSimulatedTimeStepSlider->setFixedWidth(80);
+//  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpSimulatedTimeStepSlider);
+//
+//  QObject::connect(this->mpSimulatedTimeStepSlider, SIGNAL(valueChanged(int)), this, SLOT(simulatedTimeStepSliderChanged(int)));
+
+//  this->mpSimulatedTimeStepSpinBox = new QDoubleSpinBox();
+//  this->mpSimulatedTimeStepSpinBox->setToolTip("Factor for the fake DT (only for thread running with fake DT for the Euler step).");
+//  this->mpSimulatedTimeStepSpinBox->setMinimum(global_time_factor_min);
+//  this->mpSimulatedTimeStepSpinBox->setMaximum(global_time_factor_max);
+//  this->mpSimulatedTimeStepSpinBox->setDecimals(2);
+//  this->mpSimulatedTimeStepSpinBox->setSingleStep(global_time_factor_step);
+//  this->mpSimulatedTimeStepSpinBox->setValue(global_time_factor_value);
+//  this->mpSimulatedTimeStepSpinBox->setSuffix("x");
+//  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpSimulatedTimeStepSpinBox);
+//
+//  QObject::connect(this->mpSimulatedTimeStepSpinBox, SIGNAL(valueChanged(double)), this, SLOT(simulatedTimeStepSpinBoxChanged(double)));
+
+
+
+
+// NEW GUI STUFF HERE: ******************************************************
+    this->mpSimulationModeComboBox = new QComboBox;
+    this->mpSimulationModeComboBox->setToolTip("Choose to run the architecture in simulated or real time");
+    this->mpSimulationModeComboBox->insertItem(0,QString::fromStdString("Simulated Time"));
+    this->mpSimulationModeComboBox->insertItem(1,QString::fromStdString("Real Time"));
+    this->mpSimulationModeComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+    this->mpToolBar->insertWidget(this->mpActionRecord, this->mpSimulationModeComboBox);
+
+    QObject::connect(this->mpSimulationModeComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(simulationModeComboBoxChanged(int)));
+
+    //Todo Connect to something meaningful! Maybe fill with enum...
+
+//     toolbar: simulated step size
+      double simulated_time_step_min = 0.001;
+      double simulated_time_step_max = 1.00;
+      double global_time_factor_step = 0.001;
+
+      double global_time_factor_value = 0.02; // Todo: This should be loaded from somewhere
+      if(this->mGroup)
+      {
+        global_time_factor_value = this->mGroup->getGroup()->getSimulationTimeStep()/cedar::unit::Time(1.0*cedar::unit::seconds);
+      }
+
+
+      //Todo: Rename variables
+      //Todo: Maybe make nonlinear behavior?
+      double slider_factor = 100.0;
+      this->mpSimulatedTimeStepSlider = new QSlider(Qt::Horizontal);
+      this->mpSimulatedTimeStepSlider->setMinimum(slider_factor * simulated_time_step_min);
+      this->mpSimulatedTimeStepSlider->setMaximum(slider_factor * simulated_time_step_max);
+      this->mpSimulatedTimeStepSlider->setSingleStep(slider_factor * global_time_factor_step);
+      this->mpSimulatedTimeStepSlider->setValue(slider_factor * global_time_factor_value);
+      this->mpSimulatedTimeStepSlider->setFixedWidth(100);
+      this->mpToolBar->insertWidget(this->mpActionRecord, this->mpSimulatedTimeStepSlider);
+
+      QObject::connect(this->mpSimulatedTimeStepSlider, SIGNAL(valueChanged(int)), this, SLOT(simulatedTimeStepSliderChanged(int)));
+
+      this->mpSimulatedTimeStepSpinBox = new QDoubleSpinBox();
+      this->mpSimulatedTimeStepSpinBox->setToolTip("Euler step size when choosing simulated time");
+      this->mpSimulatedTimeStepSpinBox->setMinimum(simulated_time_step_min);
+      this->mpSimulatedTimeStepSpinBox->setMaximum(simulated_time_step_max);
+      this->mpSimulatedTimeStepSpinBox->setDecimals(3);
+      this->mpSimulatedTimeStepSpinBox->setSingleStep(global_time_factor_step);
+      this->mpSimulatedTimeStepSpinBox->setValue(global_time_factor_value);
+      this->mpSimulatedTimeStepSpinBox->setSuffix("s");
+      this->mpToolBar->insertWidget(this->mpActionRecord, this->mpSimulatedTimeStepSpinBox);
+
+      QObject::connect(this->mpSimulatedTimeStepSpinBox, SIGNAL(valueChanged(double)), this, SLOT(simulatedTimeStepSpinBoxChanged(double)));
+
+
+    this->mpToolBar->insertSeparator(this->mpActionRecord);
   // PlotGroupsComboBox, insert it before the displayplotgroup action
   this->mpPlotGroupsComboBox = new QComboBox;
 //  this->mpPlotGroupsComboBox->setVisible(false); // jokeit, 2016
@@ -655,6 +713,9 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
       (
         boost::bind(&cedar::proc::gui::Ide::translateGlobalTimeFactorChangedSignal, this, _1)
       );
+
+  mSimulationModeChangedConnection = cedar::aux::GlobalClockSingleton::getInstance()->connectToLoopModeChangedSignal(boost::bind(&cedar::proc::gui::Ide::processLoopModeChangedSignal,this,_1));
+  mSimulationStepSizeChangedConnection = cedar::aux::GlobalClockSingleton::getInstance()->connectToSimulationStepSizeChangedSignal(boost::bind(&cedar::proc::gui::Ide::processSimulationStepChangedSignal,this,_1));
 
   QObject::connect(this, SIGNAL(signalGlobalTimeFactorSettingChanged(double)), this, SLOT(globalTimeFactorSettingChanged(double)));
 
@@ -901,7 +962,12 @@ void cedar::proc::gui::Ide::timerEvent(QTimerEvent*)
 {
   cedar::unit::Time time = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
   std::string formatted_time = cedar::aux::formatDuration(time);
-  this->mpGlobalTimeLabel->setText(QString("simulation time: ") + QString::fromStdString(formatted_time));
+
+//  std::cout<<"Timer event: " << formatted_time <<std::endl;
+
+  std::string timeLabel = cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::RealDT  ? "Elapsed real time: " : "Elapsed simulated time ";
+
+  this->mpGlobalTimeLabel->setText(QString::fromStdString(timeLabel) + QString::fromStdString(formatted_time));
 
   //std::string components_desc = cedar::dev::Component::describeAllRunningComponents();
   std::string components_desc = cedar::dev::Component::describeAllRunningConfigurations();
@@ -934,29 +1000,54 @@ void cedar::proc::gui::Ide::translateGlobalTimeFactorChangedSignal(double newVal
 
 void cedar::proc::gui::Ide::globalTimeFactorSettingChanged(double newValue)
 {
-  bool blocked = this->mpGlobalTimeFactorSlider->blockSignals(true);
-  this->mpGlobalTimeFactorSlider->setValue(static_cast<int>(newValue * 100.0));
-  this->mpGlobalTimeFactorSlider->blockSignals(blocked);
-
-  blocked = this->mpGlobalTimeFactor->blockSignals(true);
-  this->mpGlobalTimeFactor->setValue(newValue);
-  this->mpGlobalTimeFactor->blockSignals(blocked);
+  //Todo:Eventually Remove this!
+//  bool blocked = this->mpSimulatedTimeStepSlider->blockSignals(true);
+//  this->mpSimulatedTimeStepSlider->setValue(static_cast<int>(newValue * 100.0));
+//  this->mpSimulatedTimeStepSlider->blockSignals(blocked);
+//
+//  blocked = this->mpSimulatedTimeStepSpinBox->blockSignals(true);
+//  this->mpSimulatedTimeStepSpinBox->setValue(newValue);
+//  this->mpSimulatedTimeStepSpinBox->blockSignals(blocked);
 }
 
-void cedar::proc::gui::Ide::globalTimeFactorSliderChanged(int newValue)
+void cedar::proc::gui::Ide::simulationModeComboBoxChanged(int newIndex)
 {
-  this->mpGlobalTimeFactor->setValue(static_cast<double>(newValue) / 100.0);
+  if(newIndex != 0 ) //For now Zero is the default index, which is simulated Time. Todo:Use an Enum for the mode
+  {
+    this->mpSimulatedTimeStepSlider->setEnabled(false);
+    this->mpSimulatedTimeStepSpinBox->setEnabled(false);
+
+    if(this->mGroup)
+    {
+      this->mGroup->getGroup()->setLoopMode(cedar::aux::LoopMode::RealDT);
+    }
+  }
+  else
+  {
+    this->mpSimulatedTimeStepSlider->setEnabled(true);
+    this->mpSimulatedTimeStepSpinBox->setEnabled(true);
+
+    if(this->mGroup)
+    {
+      this->mGroup->getGroup()->setLoopMode(cedar::aux::LoopMode::FakeDT);
+    }
+  }
 }
 
-void cedar::proc::gui::Ide::globalTimeFactorSpinboxChanged(double newValue)
+void cedar::proc::gui::Ide::simulatedTimeStepSliderChanged(int newValue)
 {
-  bool blocked = this->mpGlobalTimeFactorSlider->blockSignals(true);
-  this->mpGlobalTimeFactorSlider->setValue(static_cast<int>(newValue * 100.0));
-  this->mpGlobalTimeFactorSlider->blockSignals(blocked);
+  this->mpSimulatedTimeStepSpinBox->setValue(static_cast<double>(newValue) / 100.0);
+}
+
+void cedar::proc::gui::Ide::simulatedTimeStepSpinBoxChanged(double newValue)
+{
+  bool blocked = this->mpSimulatedTimeStepSlider->blockSignals(true);
+  this->mpSimulatedTimeStepSlider->setValue(static_cast<int>(newValue * 100.0));
+  this->mpSimulatedTimeStepSlider->blockSignals(blocked);
 
   if (this->mGroup)
   {
-    this->mGroup->getGroup()->setTimeFactor(newValue);
+    this->mGroup->getGroup()->setSimulationTimeStep(cedar::unit::Time(newValue*cedar::unit::seconds));
   }
 }
 void cedar::proc::gui::Ide::toggleDataSlotPositioning()
@@ -2107,6 +2198,10 @@ void cedar::proc::gui::Ide::triggerStarted()
   this->updateSimulationRunningIcon(this->mSimulationRunning.member());
 
   this->mpActionResetSimulation->setEnabled(true);
+
+  this->mpSimulatedTimeStepSlider->setEnabled(false);
+  this->mpSimulatedTimeStepSpinBox->setEnabled(false);
+  this->mpSimulationModeComboBox->setEnabled(false);
 }
 
 void cedar::proc::gui::Ide::allTriggersStopped()
@@ -2114,6 +2209,10 @@ void cedar::proc::gui::Ide::allTriggersStopped()
   QWriteLocker locker(this->mSimulationRunning.getLockPtr());
   this->mSimulationRunning.member() = false;
   this->updateSimulationRunningIcon(this->mSimulationRunning.member());
+
+  this->mpSimulationModeComboBox->setEnabled(true);
+  this->mpSimulatedTimeStepSlider->setEnabled(mpSimulationModeComboBox->currentIndex() == 0);
+  this->mpSimulatedTimeStepSpinBox->setEnabled(mpSimulationModeComboBox->currentIndex() == 0);
 }
 
 void cedar::proc::gui::Ide::updateSimulationRunningIcon(bool running)
@@ -2969,6 +3068,9 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   }
 
   this->mGroup->getGroup()->applyTimeFactor();
+  this->mGroup->getGroup()->applyLoopMode();
+  this->mGroup->getGroup()->applySimulationTimeStep();
+  this->mGroup->getGroup()->applyDefaultCPUStep();
 }
 
 void cedar::proc::gui::Ide::updateArchitectureWidgetsMenu()
@@ -3075,6 +3177,26 @@ void cedar::proc::gui::Ide::resizeEvent(QResizeEvent* event)
   QMainWindow::resizeEvent(event);
   cedar::proc::gui::SettingsSingleton::getInstance()->setIdeSize(QPoint(this->width(),this->height()));
 //  std::cout<<"This is the IDE resize event! My new size is: " << this->width() << ", " << this->height() << std::endl;
+}
+
+void cedar::proc::gui::Ide::processLoopModeChangedSignal(cedar::aux::LoopMode::Id newMode)
+{
+  switch(newMode)
+  {
+    case cedar::aux::LoopMode::RealDT:
+    case cedar::aux::LoopMode::Fixed:
+    case cedar::aux::LoopMode::FixedAdaptive:
+    case cedar::aux::LoopMode::RealTime:
+      this->mpSimulationModeComboBox->setCurrentIndex(1);
+      break;
+    default:
+      this->mpSimulationModeComboBox->setCurrentIndex(0);
+  }
+}
+
+void cedar::proc::gui::Ide::processSimulationStepChangedSignal(cedar::unit::Time newStep)
+{
+  this->mpSimulatedTimeStepSpinBox->setValue(newStep / cedar::unit::Time(1.0*cedar::unit::seconds));
 }
 
 

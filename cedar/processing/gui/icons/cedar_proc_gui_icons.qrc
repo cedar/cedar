@@ -108,6 +108,7 @@
         <file>menus/settings.svg</file>
         <file>group.svg</file>
         <file>toolbaricons/save.svg</file>
+		<file>toolbaricons/open.svg</file>
         <file>toolbaricons/grid.svg</file>
         <file>toolbaricons/reset.svg</file>
         <file>toolbaricons/brakeall.svg</file>

@@ -242,7 +242,7 @@ public:
 
   void postUndoRedo()
   {
-    this->mpParameter->emitChangedSignal();
+    //this->mpParameter->emitChangedSignal();
 
     //If name property was changed, update name
     cedar::aux::NamedConfigurable* owner = this->mpParameter->getNamedConfigurableOwner();

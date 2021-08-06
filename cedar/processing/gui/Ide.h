@@ -48,6 +48,7 @@
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/auxiliaries/LogInterface.h"
 #include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/LoopMode.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
@@ -411,6 +412,10 @@ private:
 
   void translateGlobalTimeFactorChangedSignal(double newValue);
 
+  void processLoopModeChangedSignal(cedar::aux::LoopMode::Id newMode);
+
+  void processSimulationStepChangedSignal(cedar::unit::Time newStep);
+
   void resetWarningAndErrorStateIndicators();
 
   void backupSaveCallback();
@@ -418,9 +423,12 @@ private:
   void showEvent( QShowEvent *event );
 
 private slots:
-  void globalTimeFactorSliderChanged(int newValue);
 
-  void globalTimeFactorSpinboxChanged(double value);
+  void simulationModeComboBoxChanged( int newIndex);
+
+  void simulatedTimeStepSliderChanged(int newValue);
+
+  void simulatedTimeStepSpinBoxChanged(double value);
 
   void globalTimeFactorSettingChanged(double newValue);
 
@@ -479,13 +487,16 @@ private:
   cedar::aux::CallFunctionInThreadPtr mStopThreadsCaller;
 
   //! Combobox to select plot groups
+  QComboBox* mpSimulationModeComboBox;
+
+  //! Combobox to select plot groups
   QComboBox* mpPlotGroupsComboBox;
 
   //! Spinbox for controlling the global time step.
-  QDoubleSpinBox* mpGlobalTimeFactor;
+  QDoubleSpinBox* mpSimulatedTimeStepSpinBox;
 
   //! Spinbox for controlling the global time step.
-  QSlider* mpGlobalTimeFactorSlider;
+  QSlider* mpSimulatedTimeStepSlider;
 
   //! Whether the save on close dialog should be suppressed.
   bool mSuppressCloseDialog;
@@ -509,6 +520,10 @@ private:
   std::map<std::string, OpenableDialogPtr> mOpenableDialogs;
 
   boost::signals2::scoped_connection mGlobalTimeFactorSettingChangedConnection;
+
+  boost::signals2::scoped_connection mSimulationModeChangedConnection;
+
+  boost::signals2::scoped_connection mSimulationStepSizeChangedConnection;
 
   // permanent status bar widgets
   //! Icon that indicates steps in a warning state.

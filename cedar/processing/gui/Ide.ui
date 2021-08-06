@@ -675,14 +675,14 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="mpActionLoad"/>
    <addaction name="mpActionSave"/>
+   <addaction name="mpActionUndo"/>
+   <addaction name="mpActionRedo"/>
    <addaction name="separator"/>
    <addaction name="mpActionStartPauseSimulation"/>
    <addaction name="mpActionResetSimulation"/>
    <addaction name="mpThreadsSingleStep"/>
-   <addaction name="separator"/>
-   <addaction name="mpActionUndo"/>
-   <addaction name="mpActionRedo"/>
    <addaction name="separator"/>
    <addaction name="mpActionRecord"/>
    <addaction name="mpActionSnapshot"/>
@@ -733,6 +733,10 @@
   <action name="mpActionLoad">
    <property name="text">
     <string>Open file...</string>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/open.svg</normaloff>:/toolbaricons/open.svg</iconset>
    </property>
    <property name="toolTip">
     <string>Load an architecture file</string>

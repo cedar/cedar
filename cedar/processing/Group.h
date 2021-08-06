@@ -48,9 +48,13 @@
 #include "cedar/auxiliaries/MapParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/TimeParameter.h"
 #include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 #include "cedar/units/Time.h"
+#include "cedar/auxiliaries/LoopMode.h"
+#include "cedar/processing/TriggerStepper.fwd.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/BoolParameter.h"
@@ -701,6 +705,33 @@ public:
   //! Applies the group's time factor, i.e., sets it at the cedar::aux::SettingsSingleton.
   void applyTimeFactor();
 
+  //! Sets the time factor to be used for simulating this group. Only applied by the root group.
+  void setLoopMode(cedar::aux::LoopMode::Id mode);
+
+  //! Returns the time factor set for this architecture.
+  cedar::aux::LoopMode::Id getLoopMode() const;
+
+  //! Applies the group's loop mode, i.e., sets it at the cedar::aux::GlobalClockSingleton.
+  void applyLoopMode();
+
+  //! Sets the time factor to be used for simulating this group. Only applied by the root group.
+  void setSimulationTimeStep(cedar::unit::Time stepsize);
+
+  //! Returns the time factor set for this architecture.
+  cedar::unit::Time getSimulationTimeStep() const;
+
+  //! Applies the group's simulation Timeste[, i.e., sets it at the cedar::aux::GlobalClockSingleton.
+  void applySimulationTimeStep();
+
+  //! Sets the time factor to be used for simulating this group. Only applied by the root group.
+  void setDefaultCPUStep(cedar::unit::Time stepsize);
+
+  //! Returns the time factor set for this architecture.
+  cedar::unit::Time getDefaultCPUStep() const;
+
+  //! Applies the group's simulation Timeste[, i.e., sets it at the cedar::aux::GlobalClockSingleton.
+  void applyDefaultCPUStep();
+
   //! Returns the number of triggerables in this group that are in a warning state
   unsigned int getTriggerablesInWarningStateCount() const;
 
@@ -907,6 +938,8 @@ private:
   //! Flag if trigger chain updates should be executed (during connecting/loading)
   bool mHoldTriggerChainUpdates;
 
+  cedar::proc::TriggerStepperPtr mTriggerStepper;
+
   //! Map of scripts present in this architecture
   cedar::aux::LockableMember<std::set<cedar::proc::CppScriptPtr>> mScripts;
 
@@ -934,6 +967,16 @@ protected:
   cedar::aux::BoolParameterPtr _mIsLooped;
 
   cedar::aux::DoubleParameterPtr _mTimeFactor;
+
+  /*! These global Parameters are stored in the RootGroup to save them with each architecture.
+   */
+
+  cedar::aux::EnumParameterPtr _mLoopMode;
+
+  cedar::aux::TimeParameterPtr _mSimulationTimeStep;
+
+  cedar::aux::TimeParameterPtr _mDefaultCPUStep;
+
 }; // class cedar::proc::Group
 
 Q_DECLARE_METATYPE(cedar::proc::Group::ConnectionChange)

@@ -96,7 +96,7 @@ namespace
 
 cedar::proc::LoopedTrigger::LoopedTrigger(cedar::unit::Time stepSize, const std::string& name)
 :
-cedar::aux::LoopedThread(cedar::aux::LoopMode::RealDT, stepSize), // changed: cedar 6.1
+cedar::aux::LoopedThread(cedar::aux::LoopMode::FakeDT, stepSize), // changed: cedar 6.1 //Changed 05.08.2021
 cedar::proc::Trigger(name),
 mStarted(false),
 mStatistics(new TimeAverage(50)),
@@ -207,6 +207,12 @@ void cedar::proc::LoopedTrigger::processQuit()
 
 void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
 {
+  //OpenCV needs a new seed for every thread... This function is called by a different thread and therefore needs to generate its own seed. Will look for a better solution
+  auto seed = boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds();
+  srand(seed);
+  cv::theRNG().state = seed;
+
+
   cedar::proc::ArgumentsPtr arguments(new cedar::proc::StepTime(time));
 
   QReadLocker locker(this->mListeners.getLockPtr());
@@ -216,6 +222,13 @@ void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
     listener->onTrigger(arguments, this_ptr);
   }
   this->mStatistics->append(time);
+
+//  unsigned long stepsTaken = this->getNumberOfSteps();
+//  std::cout<<this->getName() << " has taken " << stepsTaken << " steps. In LoopMode: "<< this->getLoopModeParameter() <<std::endl;
+//  if(this->getLoopModeParameter() == cedar::aux::LoopMode::FakeDT)
+//  {
+//    cedar::aux::GlobalClockSingleton ::getInstance()->updateTakenSteps(stepsTaken);
+//  }
 }
 
 cedar::proc::LoopedTrigger::ConstTimeAveragePtr cedar::proc::LoopedTrigger::getStatistics() const

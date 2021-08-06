@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>713</width>
-    <height>593</height>
+    <width>500</width>
+    <height>250</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -42,26 +42,27 @@
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
+      <widget class="QLabel" name="mpSpinBoxLabel">
+      <property name="text">
+       <string>Default CPU Step Size: </string>
+      </property>
+      </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_2">
+      <widget class="QDoubleSpinBox" name="mpCPUStepSpinBox">
+       <property name="suffix">
+        <string> s</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_1">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>10</width>
+         <width>1</width>
          <height>20</height>
         </size>
        </property>
@@ -126,22 +127,12 @@
      </column>
      <column>
       <property name="text">
-       <string>Mode</string>
+       <string>CPU Step Size</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Step Size</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Fake Euler Step</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Minimum Sleep Time</string>
+       <string>Use Default CPU Step</string>
       </property>
      </column>
     </widget>

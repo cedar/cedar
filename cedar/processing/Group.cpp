@@ -80,6 +80,7 @@
 #include "cedar/processing/undoRedo/commands/CreateDeleteConnection.h"
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/DataSlotItem.h"
+#include "cedar/processing/TriggerStepper.h"
 
 #include "cedar/processing/consistency/LoopedElementNotConnected.h"
 #include "cedar/processing/consistency/LoopedElementInNonLoopedGroup.h"
@@ -170,16 +171,28 @@ cedar::proc::Group::Group()
 :
 Triggerable(false),
 mHoldTriggerChainUpdates(false),
+mTriggerStepper(new cedar::proc::TriggerStepper()),
 mTriggerablesInWarningStates(0),
 mTriggerablesInErrorStates(0),
 _mConnectors(new ConnectorMapParameter(this, "connectors", ConnectorMap())),
 _mIsLooped(new cedar::aux::BoolParameter(this, "is looped", false)),
-_mTimeFactor(new cedar::aux::DoubleParameter(this, "time factor", 1.0, cedar::aux::DoubleParameter::LimitType::positiveZero()))
+_mTimeFactor(new cedar::aux::DoubleParameter(this, "time factor", 1.0, cedar::aux::DoubleParameter::LimitType::positiveZero())),
+_mLoopMode(new cedar::aux::EnumParameter(this,"loop mode", cedar::aux::LoopMode::typePtr(),cedar::aux::LoopMode::FakeDT)),
+_mSimulationTimeStep(new cedar::aux::TimeParameter(this,"simulation euler step",cedar::unit::Time(20 * cedar::unit::milli * cedar::unit::seconds), cedar::aux::TimeParameter::LimitType::positive())),
+_mDefaultCPUStep(new cedar::aux::TimeParameter(this,"default CPU step",cedar::unit::Time(20 * cedar::unit::milli * cedar::unit::seconds), cedar::aux::TimeParameter::LimitType::positive()))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->_mConnectors->setHidden(true);
   this->_mTimeFactor->setHidden(true);
   this->_mIsLooped->setHidden(true);
+  this->_mLoopMode->setHidden(true);
+  this->_mSimulationTimeStep->setHidden(true);
+  this->_mDefaultCPUStep->setHidden(true);
+
+
+//  mTriggerStepper = cedar::proc::TriggerStepper(cedar::aux::asserted_pointer_cast<cedar::proc::Group>(this->shared_from_this()));
+
+
 #if (BOOST_VERSION / 100000 < 2 && BOOST_VERSION / 100 % 1000 < 54) // interface change in boost::bind
   mParentGroupChangedConnection = this->connectToGroupChanged(boost::bind<void>(&cedar::proc::Group::onParentGroupChanged, this));
 #else
@@ -333,6 +346,80 @@ double cedar::proc::Group::getTimeFactor() const
 {
   QReadLocker locker(this->_mTimeFactor->getLock());
   double value = this->_mTimeFactor->getValue();
+  locker.unlock();
+
+  return value;
+}
+
+void cedar::proc::Group::applyLoopMode()
+{
+  QReadLocker locker(this->_mLoopMode->getLock());
+  auto value = this->_mLoopMode->getValue();
+  locker.unlock();
+
+  cedar::aux::GlobalClockSingleton ::getInstance()->setLoopMode(value);
+}
+
+void cedar::proc::Group::setLoopMode(cedar::aux::LoopMode::Id mode)
+{
+  this->_mLoopMode->setValue(mode, true);
+  this->applyLoopMode();
+}
+
+cedar::aux::LoopMode::Id cedar::proc::Group::getLoopMode() const
+{
+  QReadLocker locker(this->_mLoopMode->getLock());
+  cedar::aux::LoopMode::Id value = this->_mLoopMode->getValue();
+  locker.unlock();
+
+  return value;
+}
+
+void cedar::proc::Group::applySimulationTimeStep()
+{
+  QReadLocker locker(this->_mSimulationTimeStep->getLock());
+  cedar::unit::Time value  = this->_mSimulationTimeStep->getValue();
+  locker.unlock();
+
+  cedar::aux::GlobalClockSingleton ::getInstance()->setSimulationStepSize(value);
+}
+
+void cedar::proc::Group::setSimulationTimeStep(cedar::unit::Time stepsize)
+{
+  this->_mSimulationTimeStep->setValue(stepsize, true);
+
+  this->applySimulationTimeStep();
+}
+
+cedar::unit::Time cedar::proc::Group::getSimulationTimeStep() const
+{
+  QReadLocker locker(this->_mSimulationTimeStep->getLock());
+  cedar::unit::Time value = this->_mSimulationTimeStep->getValue();
+  locker.unlock();
+
+  return value;
+}
+
+void cedar::proc::Group::applyDefaultCPUStep()
+{
+  QReadLocker locker(this->_mDefaultCPUStep->getLock());
+  cedar::unit::Time value  = this->_mDefaultCPUStep->getValue();
+  locker.unlock();
+
+  cedar::aux::GlobalClockSingleton ::getInstance()->setDefaultCPUStepSize(value);
+}
+
+void cedar::proc::Group::setDefaultCPUStep(cedar::unit::Time stepsize)
+{
+  this->_mDefaultCPUStep->setValue(stepsize, true);
+
+  this->applyDefaultCPUStep();
+}
+
+cedar::unit::Time cedar::proc::Group::getDefaultCPUStep() const
+{
+  QReadLocker locker(this->_mDefaultCPUStep->getLock());
+  cedar::unit::Time value = this->_mDefaultCPUStep->getValue();
   locker.unlock();
 
   return value;
@@ -775,30 +862,47 @@ std::vector<cedar::proc::LoopedTriggerPtr> cedar::proc::Group::listLoopedTrigger
 
 void cedar::proc::Group::startTriggers(bool wait)
 {
-  std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
-
-  for (auto trigger : triggers)
+  std::cout<<"cedar::proc::Group::startTriggers"<<std::endl;
+  if(this->getLoopMode() == cedar::aux::LoopMode::FakeDT)
   {
-    if (!trigger->isRunning() && trigger->startWithAll())
+    //The new way... Probably going to Fail
+
+    if(!mTriggerStepper->isRunning())
     {
-      trigger->start();
+      std::cout<<"cedar::proc::Group::startTriggers  Let's Set the Triggers!"<<std::endl;
+      mTriggerStepper->setTriggers(this->listLoopedTriggers());
+      std::cout<<"cedar::proc::Group::startTriggers  Stuff is set let's go and run!"<<std::endl;
+      mTriggerStepper->run();
+      emit triggerStarted();
     }
   }
-
-  std::set<GroupPtr> subgroups;
-  this->listSubgroups(subgroups);
-  for (auto subgroup : subgroups)
+  else
   {
-    subgroup->startTriggers(wait);
-  }
+    std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
 
-  if (wait)
-  {
     for (auto trigger : triggers)
     {
-      while (!trigger->isRunning() && trigger->startWithAll())
+      if (!trigger->isRunning() && trigger->startWithAll())
       {
-        cedar::aux::sleep(0.005 * cedar::unit::seconds);
+        trigger->start();
+      }
+    }
+
+    std::set<GroupPtr> subgroups;
+    this->listSubgroups(subgroups);
+    for (auto subgroup : subgroups)
+    {
+      subgroup->startTriggers(wait);
+    }
+
+    if (wait)
+    {
+      for (auto trigger : triggers)
+      {
+        while (!trigger->isRunning() && trigger->startWithAll())
+        {
+          cedar::aux::sleep(0.005 * cedar::unit::seconds);
+        }
       }
     }
   }
@@ -806,6 +910,19 @@ void cedar::proc::Group::startTriggers(bool wait)
 
 void cedar::proc::Group::stopTriggers(bool wait)
 {
+
+  std::cout<<"cedar::proc::Group::stopTriggers"<<std::endl;
+  if(this->getLoopMode() == cedar::aux::LoopMode::FakeDT)
+  {
+    if(mTriggerStepper->isRunning())
+    {
+      std::cout<<"cedar::proc::Group:: Let's really Stop!"<<std::endl;
+      mTriggerStepper->stop();
+      emit triggerStopped();
+    }
+  }
+  else
+  {
   bool blocked = this->blockSignals(true);
   std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
 
@@ -836,6 +953,8 @@ void cedar::proc::Group::stopTriggers(bool wait)
   }
 
   this->blockSignals(blocked);
+  }
+
   emit allTriggersStopped();
 }
 
@@ -3274,3 +3393,6 @@ bool cedar::proc::Group::isRecorded() const
   }
   return false;
 }
+
+
+

@@ -39,6 +39,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Singleton.fwd.h"
 #include "cedar/units/Time.h"
+#include "cedar/auxiliaries/LoopMode.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/GlobalClock.fwd.h"
@@ -93,6 +94,38 @@ public:
   //! Adds the given amount of time to the global clock.
   void addTime(const cedar::unit::Time& time);
 
+  cedar::unit::Time getDefaultCPUStepSize();
+
+  void setDefaultCPUStepSize(cedar::unit::Time newDefaultStepSize);
+
+  cedar::unit::Time getSimulationStepSize();
+
+  void setSimulationStepSize(cedar::unit::Time newSimulationStepSize);
+
+  cedar::aux::LoopMode::Id getLoopMode();
+
+  void setLoopMode(cedar::aux::LoopMode::Id newLoopMode);
+
+  void updateTakenSteps(unsigned long newStepsTaken);
+
+  unsigned long getNumOfTakenSteps() const;
+
+
+  boost::signals2::connection connectToDefaultCPUStepSizeChangedSignal(boost::function<void(cedar::unit::Time)> slot)
+  {
+    return this->mDefaultCPUStepSizeChangedSignal.connect(slot);
+  }
+
+  boost::signals2::connection connectToSimulationStepSizeChangedSignal(boost::function<void(cedar::unit::Time)> slot)
+  {
+    return this->mSimualtionStepSizeChangedSignal.connect(slot);
+  }
+
+  boost::signals2::connection connectToLoopModeChangedSignal(boost::function<void(cedar::aux::LoopMode::Id)> slot)
+  {
+    return this->mLoopModeChangedSignal.connect(slot);
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -115,6 +148,8 @@ private:
   //! Lock used to synchronize access to the global clock.
   mutable QReadWriteLock* mpAccessLock;
 
+  mutable QReadWriteLock* mpSimulationStepsTakenLock;
+
   //!@brief Flag that indicates when the timer starts/stops
   bool mRunning;
 
@@ -124,11 +159,28 @@ private:
   //!@brief This time is added to the elapsed time. It is used to track, e.g., times when the global clock is paused.
   double mAdditionalElapsedTime;
 
+  unsigned long mAdditionalTakenSteps;
+
   //! A copy of the current time factor, to avoid unnecessary locking/synchronization issues.
   double mCurrentTimeFactor;
 
+  unsigned long mpSimulationStepsTaken;
+
+
+  cedar::unit::Time mDefaultCPUStepSize;
+
+  cedar::unit::Time mSimulationStepSize;
+
+  cedar::aux::LoopMode::Id mLoopMode;
+
   //! Connected to the change signal of the global time factor.
   boost::signals2::scoped_connection mGlobalTimeFactorConnection;
+
+  boost::signals2::signal<void(cedar::unit::Time)> mDefaultCPUStepSizeChangedSignal;
+
+  boost::signals2::signal<void(cedar::unit::Time)> mSimualtionStepSizeChangedSignal;
+
+  boost::signals2::signal<void(cedar::aux::LoopMode::Id)> mLoopModeChangedSignal;
 };
 
 #include "cedar/auxiliaries/Singleton.h"
