@@ -172,7 +172,8 @@ protected:
 private:
   //!@brief plan creation and destruction is not thread-safe, must be locked
   static QReadWriteLock mPlanLock;
-  static bool mMultiThreadActivated;
+  static std::once_flag mInitThreadFlag;
+  static std::atomic_bool mMultiThreadActivated;
   static std::set<std::string> mLoadedWisdoms;
   static std::map<std::string, fftw_plan> mForwardPlans;
   static std::map<std::string, fftw_plan> mBackwardPlans;

@@ -240,7 +240,8 @@ void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr trigger
 {
   cedar::proc::Trigger::addListener(triggerable);
   triggerable->setLoopedTrigger(boost::static_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this()));
-  if (this->isRunningNolocking())
+  //Todo This Running Interface should work also for the single stepping mode
+  if (this->isRunningNolocking() || this->getGroup()->isTriggerStepperRunning())
   {
     triggerable->callOnStart();
   }
@@ -249,7 +250,9 @@ void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr trigger
 void cedar::proc::LoopedTrigger::removeListener(cedar::proc::Triggerable* triggerable)
 {
   cedar::proc::Trigger::removeListener(triggerable);
-  if (this->isRunningNolocking())
+
+
+  if (this->isRunningNolocking() || (this->getGroup() && this->getGroup()->isTriggerStepperRunning())) //The && operator should make sure that this->getGroup() is checked first
   {
     triggerable->callOnStop();
   }

@@ -100,6 +100,10 @@ public:
 
   cedar::unit::Time getSimulationStepSize();
 
+  void setMinimumComputationTime(cedar::unit::Time newMinComputationTime);
+
+  cedar::unit::Time getMinimumComputationTime();
+
   void setSimulationStepSize(cedar::unit::Time newSimulationStepSize);
 
   cedar::aux::LoopMode::Id getLoopMode();
@@ -114,6 +118,11 @@ public:
   boost::signals2::connection connectToDefaultCPUStepSizeChangedSignal(boost::function<void(cedar::unit::Time)> slot)
   {
     return this->mDefaultCPUStepSizeChangedSignal.connect(slot);
+  }
+
+  boost::signals2::connection connectToMinimumComputationTimeChangedSignal(boost::function<void(cedar::unit::Time)> slot)
+  {
+    return this->mMinimumComputationTimeChangedSignal.connect(slot);
   }
 
   boost::signals2::connection connectToSimulationStepSizeChangedSignal(boost::function<void(cedar::unit::Time)> slot)
@@ -169,6 +178,8 @@ private:
 
   cedar::unit::Time mDefaultCPUStepSize;
 
+  cedar::unit::Time mMinimumComputationTime;
+
   cedar::unit::Time mSimulationStepSize;
 
   cedar::aux::LoopMode::Id mLoopMode;
@@ -177,6 +188,8 @@ private:
   boost::signals2::scoped_connection mGlobalTimeFactorConnection;
 
   boost::signals2::signal<void(cedar::unit::Time)> mDefaultCPUStepSizeChangedSignal;
+
+  boost::signals2::signal<void(cedar::unit::Time)> mMinimumComputationTimeChangedSignal;
 
   boost::signals2::signal<void(cedar::unit::Time)> mSimualtionStepSizeChangedSignal;
 

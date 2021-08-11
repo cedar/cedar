@@ -166,6 +166,14 @@ mSimulationRunning(false)
   this->mpCPUStepSpinBox->setValue(defaultTimeStep);
   this->mpCPUStepSpinBox->setSingleStep(0.01);
 
+  this->mpMinimumSleepSpinBox->setDecimals(4);
+  this->mpMinimumSleepSpinBox->setMinimum(0.0000);
+  this->mpMinimumSleepSpinBox->setMaximum(5.0000);
+  this->mpMinimumSleepSpinBox->setSingleStep(0.01);
+  auto minimumComputationTime = cedar::aux::GlobalClockSingleton::getInstance()->getMinimumComputationTime()/cedar::unit::Time(1.0 * cedar::unit::seconds);
+  this->mpMinimumSleepSpinBox->setValue(minimumComputationTime);
+
+
 
   auto element_filter = [] (cedar::proc::ConstElementPtr element)
   {
@@ -200,8 +208,9 @@ mSimulationRunning(false)
   QObject::connect(this->mpTree, SIGNAL(elementNameChanged(QTreeWidgetItem*)), this, SLOT(elementNameChanged()));
   QObject::connect(this, SIGNAL(signalTriggerCountChanged(QString)), this, SLOT(triggerCountChanged(QString)));
   QObject::connect(this->mpCPUStepSpinBox,SIGNAL(valueChanged(double)),this,SLOT(defaultCPUStepSizeChanged(double)));
+  QObject::connect(this->mpMinimumSleepSpinBox,SIGNAL(valueChanged(double)),this,SLOT(minimumComputationTimeChanged(double)));
 
-  this->mSimulationModeChangedConnection = cedar::aux::GlobalClockSingleton::getInstance()->connectToLoopModeChangedSignal(boost::bind(&cedar::proc::gui::SimulationControl::toggleCPUSpinBoxUsability,this,_1));
+  this->mSimulationModeChangedConnection = cedar::aux::GlobalClockSingleton::getInstance()->connectToLoopModeChangedSignal(boost::bind(&cedar::proc::gui::SimulationControl::toggleSpinBoxUsability,this,_1));
 
   if (cedar::aux::GlobalClockSingleton::getInstance()->isRunning())
   {
@@ -366,7 +375,7 @@ void cedar::proc::gui::SimulationControl::setGroup(cedar::proc::gui::GroupPtr gr
   auto defaultTimeStep = this->mGroup->getGroup()->getDefaultCPUStep()/cedar::unit::Time(1.0 * cedar::unit::seconds);
   this->mpCPUStepSpinBox->setValue(defaultTimeStep);
 
-  this->toggleCPUSpinBoxUsability(this->mGroup->getGroup()->getLoopMode());
+  this->toggleSpinBoxUsability(this->mGroup->getGroup()->getLoopMode());
 
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(triggerStarted()), this, SLOT(triggerStarted()));
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(allTriggersStopped()), this, SLOT(allTriggersStopped()));
@@ -561,8 +570,7 @@ void cedar::proc::gui::SimulationControl::startPauseSimulationClicked()
 
     // pause global timer
     cedar::aux::GlobalClockSingleton::getInstance()->stop();
-//    this->mpCPUStepSpinBox->setEnabled(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode()==cedar::aux::LoopMode::RealDT);
-    this->mpCPUStepSpinBox->setEnabled(true);
+
   }
   else if (!running)
   {
@@ -575,8 +583,7 @@ void cedar::proc::gui::SimulationControl::startPauseSimulationClicked()
     // start global timer
     //!@todo Should this happen automatically as soon as one of the triggers is started? Or should this remain the responsibility of the GUI?
     cedar::aux::GlobalClockSingleton::getInstance()->start();
-//    this->mpCPUStepSpinBox->setEnabled(false);
-    this->mpCPUStepSpinBox->setEnabled(true);
+
 
   }
 }
@@ -587,6 +594,9 @@ void cedar::proc::gui::SimulationControl::triggerStarted()
   this->mSimulationRunning.member() = true;
   this->updateSimulationRunningIcon(this->mSimulationRunning.member());
 
+  this->mpCPUStepSpinBox->setEnabled(false);
+  this->mpMinimumSleepSpinBox->setEnabled(false);
+
   this->mpPlayPauseButton->setEnabled(true);
 }
 
@@ -595,6 +605,9 @@ void cedar::proc::gui::SimulationControl::allTriggersStopped()
   QWriteLocker locker(this->mSimulationRunning.getLockPtr());
   this->mSimulationRunning.member() = false;
   this->updateSimulationRunningIcon(this->mSimulationRunning.member());
+
+  this->mpCPUStepSpinBox->setEnabled(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode()==cedar::aux::LoopMode::RealDT);
+  this->mpMinimumSleepSpinBox->setEnabled(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode()==cedar::aux::LoopMode::FakeDT);
 }
 
 void cedar::proc::gui::SimulationControl::updateSimulationRunningIcon(bool running)
@@ -612,19 +625,24 @@ void cedar::proc::gui::SimulationControl::updateSimulationRunningIcon(bool runni
 void cedar::proc::gui::SimulationControl::defaultCPUStepSizeChanged(double newValue)
 {
   this->mGroup->getGroup()->setDefaultCPUStep(cedar::unit::Time(newValue * cedar::unit::seconds));
-//  cedar::aux::GlobalClockSingleton::getInstance()->setDefaultCPUStepSize();
 }
 
-void cedar::proc::gui::SimulationControl::toggleCPUSpinBoxUsability(cedar::aux::LoopMode::Id curLoopMode)
+void cedar::proc::gui::SimulationControl::minimumComputationTimeChanged(double newValue)
 {
-  //Todo: This is required, if we want to give the user Control again
+  this->mGroup->getGroup()->setMinimumComputationTime(cedar::unit::Time(newValue * cedar::unit::seconds));
+}
+
+void cedar::proc::gui::SimulationControl::toggleSpinBoxUsability(cedar::aux::LoopMode::Id curLoopMode)
+{
+  bool running = this->mSimulationRunning.member();
   switch(curLoopMode)
   {
     case cedar::aux::LoopMode::RealDT:
-      this->mpCPUStepSpinBox->setEnabled(true);
+      this->mpCPUStepSpinBox->setEnabled(!running);
+      this->mpMinimumSleepSpinBox->setEnabled(false);
       break;
     default:
-//      this->mpCPUStepSpinBox->setEnabled(false);
-        this->mpCPUStepSpinBox->setEnabled(true);
+      this->mpCPUStepSpinBox->setEnabled(false);
+      this->mpMinimumSleepSpinBox->setEnabled(!running);
   }
 }

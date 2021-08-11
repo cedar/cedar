@@ -90,7 +90,8 @@ void cedar::aux::GlobalClock::addCurrentToAdditionalElapsedTime()
 {
 
   //This keeps track of the time while the simulation is stopped
-  this->mAdditionalElapsedTime += this->getCurrentElapsedMSec();
+  if(this->mLoopMode == cedar::aux::LoopMode::RealDT)
+    this->mAdditionalElapsedTime += this->getCurrentElapsedMSec();
   QWriteLocker locker(this->mpSimulationStepsTakenLock);
   std::cout<<"GlobalClock::addCurrentToAdditionalElapsedTime with StepsTaken: " << this->mpSimulationStepsTaken << " amd currently AdditionalSteps: " << mAdditionalTakenSteps << std::endl;
   mAdditionalTakenSteps += this->mpSimulationStepsTaken;
@@ -121,7 +122,10 @@ void cedar::aux::GlobalClock::start()
   // since we unlocked for a brief moment, we need to check again if we're running
   if (!this->mRunning)
   {
-    this->mTimer.start();
+    if(this->mLoopMode == cedar::aux::LoopMode::RealDT)
+    {
+      this->mTimer.start();
+    }
     this->mRunning = true;
   }
 }
@@ -134,7 +138,10 @@ void cedar::aux::GlobalClock::reset()
   this->mpSimulationStepsTaken = 0;
   this->mAdditionalTakenSteps = 0;
   this->mAdditionalElapsedTime = 0;
-  this->mTimer.restart();
+  if(this->mLoopMode == cedar::aux::LoopMode::RealDT)
+  {
+    this->mTimer.restart();
+  }
 }
 
 
@@ -168,15 +175,7 @@ cedar::unit::Time cedar::aux::GlobalClock::getTime() const
     time_msecs += this->getCurrentElapsedMSec();
   }
 
-//  if(this->mLoopMode == cedar::aux::LoopMode::FakeDT)
-//  {
-//    unsigned long stepsTaken = this->getNumOfTakenSteps() + mAdditionalTakenSteps;
-//    return  cedar::unit::Time(static_cast<double>(stepsTaken) * this->mSimulationStepSize);
-//  }
-//  else
-//  {
     return cedar::unit::Time(static_cast<double>(time_msecs) * cedar::unit::milli * cedar::unit::seconds);
-//  }
 
 }
 
@@ -189,6 +188,18 @@ void cedar::aux::GlobalClock::setDefaultCPUStepSize(cedar::unit::Time newDefault
 cedar::unit::Time cedar::aux::GlobalClock::getDefaultCPUStepSize()
 {
   return mDefaultCPUStepSize;
+}
+
+void cedar::aux::GlobalClock::setMinimumComputationTime(cedar::unit::Time newMinComputationTime)
+{
+  mMinimumComputationTime = newMinComputationTime;
+  this->mMinimumComputationTimeChangedSignal(newMinComputationTime);
+
+}
+
+cedar::unit::Time cedar::aux::GlobalClock::getMinimumComputationTime()
+{
+  return mMinimumComputationTime;
 }
 
 void cedar::aux::GlobalClock::setSimulationStepSize(cedar::unit::Time newSimulationStepSize)
@@ -204,7 +215,14 @@ cedar::unit::Time cedar::aux::GlobalClock::getSimulationStepSize()
 
 void cedar::aux::GlobalClock::setLoopMode(cedar::aux::LoopMode::Id newLoopMode)
 {
+  bool isNewLoop = mLoopMode == newLoopMode;
   mLoopMode = newLoopMode;
+
+  if(isNewLoop)
+  {
+    this->stop();
+    this->reset();
+  }
   this->mLoopModeChangedSignal(newLoopMode);
 }
 

@@ -198,7 +198,9 @@ private slots:
 
   void defaultCPUStepSizeChanged(double newValue);
 
-  void toggleCPUSpinBoxUsability(cedar::aux::LoopMode::Id curLoopMode );
+  void minimumComputationTimeChanged(double newValue);
+
+  void toggleSpinBoxUsability(cedar::aux::LoopMode::Id curLoopMode );
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -392,65 +392,6 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   pUndoStack = new cedar::proc::undoRedo::UndoStack(this);
 
 
-
-  // manually added components
-
-
-  // Old Stuff!!!!!!
-  // toolbar: custom timestep
-//  auto p_enable_custom_time_step = new QCheckBox();
-//  p_enable_custom_time_step->setToolTip("When enabled, the specified time step is used to iterate all steps connected to looped triggers once when single-step is clicked. Otherwise, the time step to be used is determined automatically.");
-//  p_enable_custom_time_step->setChecked(false);
-//  this->mpToolBar->insertWidget(this->mpActionRecord, p_enable_custom_time_step);
-
-//  this->mpCustomTimeStep = new QDoubleSpinBox();
-//  this->mpCustomTimeStep->setToolTip("When enabled, this time step is passed to all looped triggers when single-stepping the architecture.");
-//  this->mpCustomTimeStep->setValue(10.0);
-//  this->mpCustomTimeStep->setMinimum(1.0);
-//  this->mpCustomTimeStep->setSuffix(" ms");
-//  this->mpCustomTimeStep->setMaximum(10000.0);
-//  this->mpCustomTimeStep->setDecimals(1);
-//  this->mpCustomTimeStep->setAlignment(Qt::AlignRight);
-//  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpCustomTimeStep);
-
-//  this->mpCustomTimeStep->setEnabled(false);
-//  QObject::connect(p_enable_custom_time_step, SIGNAL(toggled(bool)), this->mpCustomTimeStep, SLOT(setEnabled(bool)));
-
-
-//  this->mpToolBar->insertSeparator(this->mpActionRecord);
-
-  // toolbar: global time factor widgets
-//  double global_time_factor_min = 0.00;
-//  double global_time_factor_max = 2.00;
-//  double global_time_factor_step = 0.05;
-//  double global_time_factor_value = cedar::aux::SettingsSingleton::getInstance()->getGlobalTimeFactor();
-
-//  double slider_factor = 100.0;
-//  this->mpSimulatedTimeStepSlider = new QSlider(Qt::Horizontal);
-//  this->mpSimulatedTimeStepSlider->setMinimum(slider_factor * global_time_factor_min);
-//  this->mpSimulatedTimeStepSlider->setMaximum(slider_factor * global_time_factor_max);
-//  this->mpSimulatedTimeStepSlider->setSingleStep(slider_factor * global_time_factor_step);
-//  this->mpSimulatedTimeStepSlider->setValue(slider_factor * global_time_factor_value);
-//  this->mpSimulatedTimeStepSlider->setFixedWidth(80);
-//  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpSimulatedTimeStepSlider);
-//
-//  QObject::connect(this->mpSimulatedTimeStepSlider, SIGNAL(valueChanged(int)), this, SLOT(simulatedTimeStepSliderChanged(int)));
-
-//  this->mpSimulatedTimeStepSpinBox = new QDoubleSpinBox();
-//  this->mpSimulatedTimeStepSpinBox->setToolTip("Factor for the fake DT (only for thread running with fake DT for the Euler step).");
-//  this->mpSimulatedTimeStepSpinBox->setMinimum(global_time_factor_min);
-//  this->mpSimulatedTimeStepSpinBox->setMaximum(global_time_factor_max);
-//  this->mpSimulatedTimeStepSpinBox->setDecimals(2);
-//  this->mpSimulatedTimeStepSpinBox->setSingleStep(global_time_factor_step);
-//  this->mpSimulatedTimeStepSpinBox->setValue(global_time_factor_value);
-//  this->mpSimulatedTimeStepSpinBox->setSuffix("x");
-//  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpSimulatedTimeStepSpinBox);
-//
-//  QObject::connect(this->mpSimulatedTimeStepSpinBox, SIGNAL(valueChanged(double)), this, SLOT(simulatedTimeStepSpinBoxChanged(double)));
-
-
-
-
 // NEW GUI STUFF HERE: ******************************************************
     this->mpSimulationModeComboBox = new QComboBox;
     this->mpSimulationModeComboBox->setToolTip("Choose to run the architecture in simulated or real time");
@@ -465,11 +406,11 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
     //Todo Connect to something meaningful! Maybe fill with enum...
 
 //     toolbar: simulated step size
-      double simulated_time_step_min = 0.001;
-      double simulated_time_step_max = 1.00;
+      double simulated_time_step_min = 0.0001;
+      double simulated_time_step_max = 0.1;
       double global_time_factor_step = 0.001;
 
-      double global_time_factor_value = 0.02; // Todo: This should be loaded from somewhere
+      double global_time_factor_value = 0.02;
       if(this->mGroup)
       {
         global_time_factor_value = this->mGroup->getGroup()->getSimulationTimeStep()/cedar::unit::Time(1.0*cedar::unit::seconds);
@@ -483,6 +424,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
       this->mpSimulatedTimeStepSlider->setMinimum(slider_factor * simulated_time_step_min);
       this->mpSimulatedTimeStepSlider->setMaximum(slider_factor * simulated_time_step_max);
       this->mpSimulatedTimeStepSlider->setSingleStep(slider_factor * global_time_factor_step);
+      this->mpSimulatedTimeStepSlider->setTickInterval(slider_factor * global_time_factor_step);
       this->mpSimulatedTimeStepSlider->setValue(slider_factor * global_time_factor_value);
       this->mpSimulatedTimeStepSlider->setFixedWidth(100);
       this->mpToolBar->insertWidget(this->mpActionRecord, this->mpSimulatedTimeStepSlider);
@@ -493,7 +435,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
       this->mpSimulatedTimeStepSpinBox->setToolTip("Euler step size when choosing simulated time");
       this->mpSimulatedTimeStepSpinBox->setMinimum(simulated_time_step_min);
       this->mpSimulatedTimeStepSpinBox->setMaximum(simulated_time_step_max);
-      this->mpSimulatedTimeStepSpinBox->setDecimals(3);
+      this->mpSimulatedTimeStepSpinBox->setDecimals(5);
       this->mpSimulatedTimeStepSpinBox->setSingleStep(global_time_factor_step);
       this->mpSimulatedTimeStepSpinBox->setValue(global_time_factor_value);
       this->mpSimulatedTimeStepSpinBox->setSuffix("s");
@@ -3071,6 +3013,7 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   this->mGroup->getGroup()->applyLoopMode();
   this->mGroup->getGroup()->applySimulationTimeStep();
   this->mGroup->getGroup()->applyDefaultCPUStep();
+  this->mGroup->getGroup()->applyMinimumComputationTime();
 }
 
 void cedar::proc::gui::Ide::updateArchitectureWidgetsMenu()

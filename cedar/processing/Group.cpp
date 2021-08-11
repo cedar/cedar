@@ -179,7 +179,8 @@ _mIsLooped(new cedar::aux::BoolParameter(this, "is looped", false)),
 _mTimeFactor(new cedar::aux::DoubleParameter(this, "time factor", 1.0, cedar::aux::DoubleParameter::LimitType::positiveZero())),
 _mLoopMode(new cedar::aux::EnumParameter(this,"loop mode", cedar::aux::LoopMode::typePtr(),cedar::aux::LoopMode::FakeDT)),
 _mSimulationTimeStep(new cedar::aux::TimeParameter(this,"simulation euler step",cedar::unit::Time(20 * cedar::unit::milli * cedar::unit::seconds), cedar::aux::TimeParameter::LimitType::positive())),
-_mDefaultCPUStep(new cedar::aux::TimeParameter(this,"default CPU step",cedar::unit::Time(20 * cedar::unit::milli * cedar::unit::seconds), cedar::aux::TimeParameter::LimitType::positive()))
+_mDefaultCPUStep(new cedar::aux::TimeParameter(this,"default CPU step",cedar::unit::Time(20 * cedar::unit::milli * cedar::unit::seconds), cedar::aux::TimeParameter::LimitType::positive())),
+_mMinimumComputationTime(new cedar::aux::TimeParameter(this,"min computation time",cedar::unit::Time(20 * cedar::unit::milli * cedar::unit::seconds), cedar::aux::TimeParameter::LimitType::positive()))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->_mConnectors->setHidden(true);
@@ -188,6 +189,7 @@ _mDefaultCPUStep(new cedar::aux::TimeParameter(this,"default CPU step",cedar::un
   this->_mLoopMode->setHidden(true);
   this->_mSimulationTimeStep->setHidden(true);
   this->_mDefaultCPUStep->setHidden(true);
+  this->_mMinimumComputationTime->setHidden(true);
 
 
 //  mTriggerStepper = cedar::proc::TriggerStepper(cedar::aux::asserted_pointer_cast<cedar::proc::Group>(this->shared_from_this()));
@@ -420,6 +422,31 @@ cedar::unit::Time cedar::proc::Group::getDefaultCPUStep() const
 {
   QReadLocker locker(this->_mDefaultCPUStep->getLock());
   cedar::unit::Time value = this->_mDefaultCPUStep->getValue();
+  locker.unlock();
+
+  return value;
+}
+
+void cedar::proc::Group::applyMinimumComputationTime()
+{
+  QReadLocker locker(this->_mMinimumComputationTime->getLock());
+  cedar::unit::Time value  = this->_mMinimumComputationTime->getValue();
+  locker.unlock();
+
+  cedar::aux::GlobalClockSingleton ::getInstance()->setMinimumComputationTime(value);
+}
+
+void cedar::proc::Group::setMinimumComputationTime(cedar::unit::Time newMinTime)
+{
+  this->_mMinimumComputationTime->setValue(newMinTime, true);
+
+  this->applyMinimumComputationTime();
+}
+
+cedar::unit::Time cedar::proc::Group::getMinimumComputationTime() const
+{
+  QReadLocker locker(this->_mMinimumComputationTime->getLock());
+  cedar::unit::Time value = this->_mMinimumComputationTime->getValue();
   locker.unlock();
 
   return value;
@@ -865,7 +892,7 @@ void cedar::proc::Group::startTriggers(bool wait)
   std::cout<<"cedar::proc::Group::startTriggers"<<std::endl;
   if(this->getLoopMode() == cedar::aux::LoopMode::FakeDT)
   {
-    //The new way... Probably going to Fail
+    //The new way... still in evaluation...
 
     if(!mTriggerStepper->isRunning())
     {
@@ -3392,6 +3419,11 @@ bool cedar::proc::Group::isRecorded() const
     }
   }
   return false;
+}
+
+bool cedar::proc::Group::isTriggerStepperRunning()
+{
+  return this->mTriggerStepper->isRunning();
 }
 
 

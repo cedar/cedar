@@ -56,6 +56,26 @@
       </widget>
      </item>
      <item>
+      <widget class="QLabel" name="mpSpinBoxLabel2">
+       <property name="text">
+        <string>Minimum CPU Sleep Time: </string>
+       </property>
+       <property name="toolTip">
+        <string>Enforces the simulation to take at least this time for one euler step. Increase this value, if your simulation  runs too fast to be properly observed. Reduce it to zero to simulate as fast as possible.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="mpMinimumSleepSpinBox">
+       <property name="suffix">
+        <string> s</string>
+       </property>
+       <property name="toolTip">
+        <string>Enforces the simulation to take at least this time for one euler step. Increase this value, if your simulation  runs too fast to be properly observed. Reduce it to zero to simulate as fast as possible.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_1">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>

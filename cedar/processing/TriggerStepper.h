@@ -105,6 +105,7 @@ private:
   std::atomic_bool mRunning;
   std::atomic_bool mAbortRequested;
   std::vector<cedar::proc::LoopedTriggerPtr> mTriggerList;
+  cedar::unit::Time minimalSleepTime;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

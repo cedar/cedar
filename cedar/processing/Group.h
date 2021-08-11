@@ -729,8 +729,17 @@ public:
   //! Returns the time factor set for this architecture.
   cedar::unit::Time getDefaultCPUStep() const;
 
-  //! Applies the group's simulation Timeste[, i.e., sets it at the cedar::aux::GlobalClockSingleton.
+  //! Applies the group's CPU TimeStep, i.e., sets it at the cedar::aux::GlobalClockSingleton.
   void applyDefaultCPUStep();
+
+  //! Sets the time factor to be used for simulating this group. Only applied by the root group.
+  void setMinimumComputationTime(cedar::unit::Time newMinTime);
+
+  //! Returns the time factor set for this architecture.
+  cedar::unit::Time getMinimumComputationTime() const;
+
+  //! Applies the group's minimum simulation time, i.e., sets it at the cedar::aux::GlobalClockSingleton.
+  void applyMinimumComputationTime();
 
   //! Returns the number of triggerables in this group that are in a warning state
   unsigned int getTriggerablesInWarningStateCount() const;
@@ -746,6 +755,8 @@ public:
 
   //! Returns if this group is marked as being recorded.
   bool isRecorded() const;
+
+  bool isTriggerStepperRunning();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -976,6 +987,8 @@ protected:
   cedar::aux::TimeParameterPtr _mSimulationTimeStep;
 
   cedar::aux::TimeParameterPtr _mDefaultCPUStep;
+
+  cedar::aux::TimeParameterPtr _mMinimumComputationTime;
 
 }; // class cedar::proc::Group
 
