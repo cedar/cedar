@@ -629,26 +629,10 @@ void cedar::proc::aux::gui::Configurable::handleDeleteButtonClicked(QString full
 
       if(auto objectListParameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
       {
-        // If parameter belongs to a step/element, push to undo stack (e.g. settings parameter should not be undoable)
-        cedar::aux::NamedConfigurable* owner = objectListParameter->getNamedConfigurableOwner();
-        if(owner != nullptr)
+        if(auto scene = cedar::proc::undoRedo::UndoCommand::sceneIfUndoable(objectListParameter.get(), this))
         {
-          //Find the scene
-          cedar::proc::gui::Scene* scene;
-
-          QObject* parent = this;
-          while(parent != nullptr)
-          {
-            if(auto ide = dynamic_cast<cedar::proc::gui::Ide*>(parent))
-            {
-              scene = ide->mpProcessingDrawer->getScene();
-            }
-            parent = parent->parent();
-          }
-          CEDAR_ASSERT(scene != nullptr);
-
           cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::ChangeObjectListParameterValue(
-                  objectListParameter.get(), index, owner, scene));
+                  objectListParameter.get(), index, objectListParameter->getNamedConfigurableOwner(), scene));
         }
         else
         {

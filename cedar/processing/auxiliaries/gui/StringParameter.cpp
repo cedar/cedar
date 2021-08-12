@@ -133,26 +133,11 @@ void cedar::proc::aux::gui::StringParameter::textEdited(const QString& text)
   try
   {
     std::string oldValue = parameter->getValue();
-    // If parameter belongs to a step, push to undo stack (e.g. settings parameter should not be undoable)
-    cedar::aux::NamedConfigurable* owner = parameter->getNamedConfigurableOwner();
-    if(owner != nullptr)
+    if(auto scene = cedar::proc::undoRedo::UndoCommand::sceneIfUndoable(parameter.get(), this))
     {
-      // Find the scene
-      cedar::proc::gui::Scene *scene;
-
-      QObject *parent = this;
-      while (parent != nullptr)
-      {
-        if (auto ide = dynamic_cast<cedar::proc::gui::Ide *>(parent))
-        {
-          scene = ide->mpProcessingDrawer->getScene();
-        }
-        parent = parent->parent();
-      }
-      CEDAR_ASSERT(scene != nullptr);
       cedar::proc::gui::Ide::pUndoStack->push(
               new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::string>(
-                      parameter.get(), oldValue, text.toStdString(), owner, scene));
+                      parameter.get(), oldValue, text.toStdString(), parameter->getNamedConfigurableOwner(), scene));
     }
     else
     {

@@ -43,6 +43,8 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/processing/gui/Scene.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/undoRedo/UndoCommand.fwd.h"
@@ -77,6 +79,9 @@ public:
 public:
 
   int id() const;
+
+  //Returns the scene if parameter should be undoable
+  static cedar::proc::gui::Scene* sceneIfUndoable(cedar::aux::Parameter* parameter, QObject* reference);
 
   // Reimplement this to allow merging of UndoCommands. If a newly added command has the same macro identifier (and is
   // not "") as the last pushed command, the stack will try to merge them.
