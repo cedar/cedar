@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LinearLateralShift.cpp
+    File:        NoopLooped.cpp
 
     Maintainer:  jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        
+    Date:        2021
 
-    Description: Source file for the class cedar::proc::steps::LinearLateralShift.
+    Description: Source file for the class cedar::proc::steps::NoopLooped.
 
     Credits:
 
@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CLASS HEADER
-#include "cedar/processing/steps/LinearLateralShift.h"
+#include "cedar/processing/steps/NoopLooped.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/typecheck/IsMatrix.h"
@@ -58,17 +58,17 @@ bool declare()
 
   ElementDeclarationPtr declaration
   (
-    new ElementDeclarationTemplate<cedar::proc::steps::LinearLateralShift>
+    new ElementDeclarationTemplate<cedar::proc::steps::NoopLooped>
     (
-      "DFT",
-      "cedar.processing.steps.LinearLateralShift"
+      "Programming",
+      "cedar.processing.steps.NoopLooped"
     )
   );
 
-  declaration->setIconPath(":/steps/linear_lateralshift.svg");
+  declaration->setIconPath(":/steps/noop.svg"); // TODO: use a different icon?
   declaration->setDescription
   (
-    "Translates a 1D feature space representation by means of a linear function: a + bx"
+    "Decouples your input to a different trigger (thread)."
   );
 
   declaration->declare();
@@ -83,37 +83,29 @@ bool declared = declare();
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::steps::LinearLateralShift::LinearLateralShift()
+cedar::proc::steps::NoopLooped::NoopLooped()
 :
+cedar::proc::Step(true),
 // outputs
-mOutput(new cedar::aux::MatData(cv::Mat())),
-//mSize(new cedar::aux::UIntParameter(this, "size", 50, 1, 5000)),
-//mLowerLimit(new cedar::aux::DoubleParameter(this, "lower limit")),
-//mUpperLimit(new cedar::aux::DoubleParameter(this, "upper limit")),
-mA(new cedar::aux::DoubleParameter(this, "offset a", 0.0)),
-mB(new cedar::aux::DoubleParameter(this, "factor b", 1.0))
+mOutput(new cedar::aux::MatData(cv::Mat()))
 {
   // declare all data
   cedar::proc::DataSlotPtr input = this->declareInput("input");
-  this->declareInput("factor b (optional)", false); // optional
   this->declareOutput("output", mOutput);
 
   input->setCheck(cedar::proc::typecheck::IsMatrix());
-
-  QObject::connect(mA.get(), SIGNAL(valueChanged()), this, SLOT(parametersChanged()), Qt::DirectConnection);
-  QObject::connect(mB.get(), SIGNAL(valueChanged()), this, SLOT(parametersChanged()), Qt::DirectConnection);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::steps::LinearLateralShift::inputConnectionChanged(const std::string& inputName)
+void cedar::proc::steps::NoopLooped::inputConnectionChanged(const std::string& inputName)
 {
   // TODO: you may want to replace this code by using a cedar::proc::InputSlotHelper
 
   // Again, let's first make sure that this is really the input in case anyone ever changes our interface.
-  //CEDAR_DEBUG_ASSERT(inputName == "input");
+  CEDAR_DEBUG_ASSERT(inputName == "input");
 
   // Assign the input to the member. This saves us from casting in every computation step.
   this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
@@ -134,7 +126,6 @@ void cedar::proc::steps::LinearLateralShift::inputConnectionChanged(const std::s
     if (input.type() != this->mOutput->getData().type() || input.size != this->mOutput->getData().size)
     {
       output_changed = true;
-      this->mOutput->setData(cv::Mat());
     }
 
     // Make a copy to create a matrix of the same type, dimensions, ...
@@ -147,109 +138,24 @@ void cedar::proc::steps::LinearLateralShift::inputConnectionChanged(const std::s
   }
 }
 
-void cedar::proc::steps::LinearLateralShift::compute(const cedar::proc::Arguments&)
+void cedar::proc::steps::NoopLooped::compute(const cedar::proc::Arguments&)
 {
   this->recompute();
 }
 
-void cedar::proc::steps::LinearLateralShift::recompute()
+void cedar::proc::steps::NoopLooped::recompute()
 {
   auto input = getInput("input");
 
   if (!input)
     return;
 
-  auto input_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(input);
+  auto data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(input);
 
-  if (!input_data)
+  if (!data)
     return;
 
-  cv::Mat input_mat = input_data->getData();
-
-  if (input_mat.empty())
-    return;
-
-  int siz = static_cast<int>( input_mat.rows );
-
-  cv::Mat output_mat;
-
-  if (!this->mOutput)
-  {
-    output_mat= cv::Mat(siz, 1, CV_32F );
-  }
-  else
-  {
-    output_mat= mOutput->getData();
-  }
-
-  if (output_mat.empty()
-      || output_mat.rows != input_mat.rows
-      || output_mat.cols != input_mat.cols)
-  {
-    output_mat= cv::Mat(siz, 1, CV_32F );
-  }
-
-
-
-
-  // shift:
-  double factorB= 1.0;
-  bool has_factor_input= false;
-
-  auto factorinput = getInput("factor b (optional)");
-  if (factorinput)
-  {
-    auto factordata = boost::dynamic_pointer_cast<const cedar::aux::MatData>(factorinput);
-    if (factordata
-        && !factordata->getData().empty())
-    {
-      has_factor_input= true;
-      factorB= factordata->getData().at<float>(0, 0);
-    }
-  }
-
-  if (!has_factor_input)
-  {
-    factorB= this->mB->getValue();
-  }
-
-
-  //auto lower = mLowerLimit->getValue();
-  //auto upper = mUpperLimit->getValue();
-
-  int i= 0;
-  int index_in_last= -1;
-  float last_value;
-
-  last_value= input_mat.at<float>(0,0);
-
-  for(; i < siz; i++)
-  {
-    int index_in;
-
-    index_in= round( ( static_cast<float>(i) - this->mA->getValue() ) 
-                     / factorB );
-
-    if (index_in < siz
-        && index_in >= 0
-        && index_in_last < index_in)
-    {
-      last_value= input_mat.at<float>(index_in, 0);
-      output_mat.at<float>(i, 0)= last_value;
-      index_in_last= index_in;
-    }
-    else
-    {
-      output_mat.at<float>(i, 0)= last_value;
-    }
-  }
-
-  this->mOutput->setData( output_mat );
-}
-
-
-void cedar::proc::steps::LinearLateralShift::parametersChanged()
-{
-  this->recompute();
+  this->mOutput->setData(getInput("input")->getData<cv::Mat>()); //input.clone());
+  //this->mOutput->copyAnnotationsFrom(this->mInput);
 }
 

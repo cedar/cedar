@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,59 +22,54 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NumericalIntegration.h
+    File:        DiagonalReadout.h
 
-    Maintainer:  jokeit
-    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Maintainer:  
+    Email:       
     Date:        
 
-    Description: Header file for the class cedar::proc::steps::NumericalIntegration.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS__NUMERICAL_INTEGRATION_H
-#define CEDAR_PROC_STEPS__NUMERICAL_INTEGRATION_H
-
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
+#ifndef CEDAR_PROC_STEPS_DIAGONAL_READOUT_H
+#define CEDAR_PROC_STEPS_DIAGONAL_READOUT_H
 
 // CEDAR INCLUDES
-#include <cedar/processing/Step.h>
-#include <cedar/processing/InputSlotHelper.h>
-#include <cedar/auxiliaries/MatData.h>
-#include <cedar/auxiliaries/DoubleParameter.h>
-#include <opencv2/opencv.hpp>
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/EnumParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/NumericalIntegration.fwd.h"
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/processing/steps/DiagonalReadout.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A class that multiplies two matrices component-wise.
  */
-class cedar::proc::steps::NumericalIntegration : public cedar::proc::Step
+class cedar::proc::steps::DiagonalReadout : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  NumericalIntegration();
+  DiagonalReadout();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void inputConnectionChanged(const std::string& inputName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -86,47 +81,27 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void inputConnectionChanged(const std::string& inputName);
-
-  void compute(const cedar::proc::Arguments& arguments);
-  void recompute(bool force_reinit);
-  void reset();
-  void reinitialize();
+  void compute(const cedar::proc::Arguments&);
+  void recompute();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
-  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
-  cedar::aux::ConstMatDataPtr mInput;
-  cedar::aux::ConstMatDataPtr mDelayOptional;
-  cedar::aux::ConstMatDataPtr mInitialOptional;
-  cedar::aux::ConstMatDataPtr mResetOptional;
-
-  //!@brief The output data.
   cedar::aux::MatDataPtr mOutput;
-
-  cv::Mat mOneBack;
-  cv::Mat mTwoBack;
-  cv::Mat mThreeBack;
-  cv::Mat mFourBack;
-
-  cv::Mat mLastState;
+  cedar::aux::ConstMatDataPtr mInput;
+  cedar::aux::ConstMatDataPtr mInput2;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
-private:
-  cedar::unit::Time mLastTime;
 
-  cedar::aux::BoolParameterPtr mInitializeOnReset;
-  cedar::aux::BoolParameterPtr mUseBDF5;
+}; // class cedar::proc::steps::DiagonalReadout
 
-}; // class cedar::proc::steps::NumericalIntegration
-
-#endif // CEDAR_PROC_STEPS__NUMERICAL_INTEGRATION_H
-
+#endif // CEDAR_PROC_STEPS_DIAGONAL_READOUT_H

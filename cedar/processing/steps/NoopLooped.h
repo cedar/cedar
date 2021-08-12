@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NumericalIntegration.h
+    File:        NoopLooped.h
 
     Maintainer:  jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        
+    Date:        2021
 
-    Description: Header file for the class cedar::proc::steps::NumericalIntegration.
+    Description: Header file for the class cedar::proc::steps::NoopLooped.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS__NUMERICAL_INTEGRATION_H
-#define CEDAR_PROC_STEPS__NUMERICAL_INTEGRATION_H
+#ifndef CEDAR_PROC_STEPS_NOOP_LOOPED_H
+#define CEDAR_PROC_STEPS_NOOP_LOOPED_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -44,11 +44,9 @@
 #include <cedar/processing/Step.h>
 #include <cedar/processing/InputSlotHelper.h>
 #include <cedar/auxiliaries/MatData.h>
-#include <cedar/auxiliaries/DoubleParameter.h>
-#include <opencv2/opencv.hpp>
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/NumericalIntegration.fwd.h"
+#include "cedar/processing/steps/NoopLooped.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -57,7 +55,7 @@
  *
  * @todo describe more.
  */
-class cedar::proc::steps::NumericalIntegration : public cedar::proc::Step
+class cedar::proc::steps::NoopLooped : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -68,7 +66,7 @@ class cedar::proc::steps::NumericalIntegration : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  NumericalIntegration();
+  NoopLooped();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -89,9 +87,7 @@ private:
   void inputConnectionChanged(const std::string& inputName);
 
   void compute(const cedar::proc::Arguments& arguments);
-  void recompute(bool force_reinit);
-  void reset();
-  void reinitialize();
+  void recompute();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -101,32 +97,20 @@ protected:
 private:
   //!@brief MatrixData representing the input. Storing it like this saves time during computation.
   cedar::aux::ConstMatDataPtr mInput;
-  cedar::aux::ConstMatDataPtr mDelayOptional;
-  cedar::aux::ConstMatDataPtr mInitialOptional;
-  cedar::aux::ConstMatDataPtr mResetOptional;
 
   //!@brief The output data.
   cedar::aux::MatDataPtr mOutput;
-
-  cv::Mat mOneBack;
-  cv::Mat mTwoBack;
-  cv::Mat mThreeBack;
-  cv::Mat mFourBack;
-
-  cv::Mat mLastState;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
 private:
-  cedar::unit::Time mLastTime;
+  // none yet
 
-  cedar::aux::BoolParameterPtr mInitializeOnReset;
-  cedar::aux::BoolParameterPtr mUseBDF5;
+}; // class cedar::proc::steps::NoopLooped
 
-}; // class cedar::proc::steps::NumericalIntegration
-
-#endif // CEDAR_PROC_STEPS__NUMERICAL_INTEGRATION_H
+#endif // CEDAR_PROC_STEPS_NOOP_LOOPED_H
 

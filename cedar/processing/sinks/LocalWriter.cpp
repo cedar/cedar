@@ -110,6 +110,9 @@ _mPort(new cedar::aux::StringParameter(this, "port", "default local port"))
 
 void cedar::proc::sinks::LocalWriter::onStart()
 {
+  if (!this->mInput)
+    return;
+
   _mPort->setConstant(true);
     if("" != oldName && oldName != _mPort->getValue())
     {

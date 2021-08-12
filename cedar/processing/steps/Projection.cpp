@@ -192,6 +192,9 @@ void cedar::proc::steps::Projection::reconfigure(bool triggerSubsequent)
     return;
   }
 
+  if (mInput->getData().empty())
+    return; // silently ignore. for example if a NetReader isn't initialized, yet
+
   unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
   unsigned int output_dimensionality = _mOutputDimensionality->getValue();
 
