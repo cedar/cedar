@@ -485,7 +485,6 @@ void cedar::aux::LoopedThread::modeChanged()
 
 void cedar::aux::LoopedThread::stepSizeManagementChanged()
 {
-  std::cout<<"LoopedThread StepSizeMangagementChanged. New Value: " << this->_mUseDefaultCPUStep->getValue() << std::endl;
   if(this->_mUseDefaultCPUStep->getValue())
   {
     _mPreviousCustomStepSize = this->_mStepSize->getValue();
@@ -510,7 +509,6 @@ void cedar::aux::LoopedThread::processDefaultStepSizeChange(cedar::unit::Time ne
 
 void cedar::aux::LoopedThread::processSimulationModeChange(cedar::aux::LoopMode::Id newMode)
 {
-  std::cout<<"This is LoopedThread::processSimulationModeChange with newMode: " << newMode <<std::endl;
   switch(newMode)
   {
     case cedar::aux::LoopMode::RealDT:
@@ -528,7 +526,6 @@ void cedar::aux::LoopedThread::processSimulationModeChange(cedar::aux::LoopMode:
     //Todo:Do we need to lock this? Even if this is only settable outside of a running system?
     QWriteLocker locker(this->_mLoopMode->getLock());
     this->_mLoopMode->setValue(newMode);
-    std::cout<<"This thread changed to Mode:" << newMode << std::endl;
 }
 
 void cedar::aux::LoopedThread::processSimulationStepSizeChanged(cedar::unit::Time newStepSize)

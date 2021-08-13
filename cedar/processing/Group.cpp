@@ -889,16 +889,13 @@ std::vector<cedar::proc::LoopedTriggerPtr> cedar::proc::Group::listLoopedTrigger
 
 void cedar::proc::Group::startTriggers(bool wait)
 {
-  std::cout<<"cedar::proc::Group::startTriggers"<<std::endl;
   if(this->getLoopMode() == cedar::aux::LoopMode::FakeDT)
   {
     //The new way... still in evaluation...
 
     if(!mTriggerStepper->isRunning())
     {
-      std::cout<<"cedar::proc::Group::startTriggers  Let's Set the Triggers!"<<std::endl;
       mTriggerStepper->setTriggers(this->listLoopedTriggers());
-      std::cout<<"cedar::proc::Group::startTriggers  Stuff is set let's go and run!"<<std::endl;
       mTriggerStepper->run();
       emit triggerStarted();
     }
@@ -938,7 +935,6 @@ void cedar::proc::Group::startTriggers(bool wait)
 void cedar::proc::Group::stopTriggers(bool wait)
 {
 
-  std::cout<<"cedar::proc::Group::stopTriggers"<<std::endl;
   if(this->getLoopMode() == cedar::aux::LoopMode::FakeDT)
   {
     if(mTriggerStepper->isRunning())
@@ -987,17 +983,30 @@ void cedar::proc::Group::stopTriggers(bool wait)
 
 void cedar::proc::Group::stepTriggers()
 {
-  std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
-  cedar::unit::Time time_step(std::numeric_limits<double>::max() * cedar::unit::milli * cedar::unit::second);
-  // find the shortest time step of all triggers
-  for (auto trigger : triggers)
+
+  //Todo: This function needs to be rethought conceptually
+  if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT)
   {
-    if (trigger->getSimulatedTimeParameter() < time_step)
-    {
-      time_step = trigger->getSimulatedTimeParameter();
-    }
+    this->stepTriggers(cedar::aux::GlobalClockSingleton::getInstance()->getSimulationStepSize());
   }
-  this->stepTriggers(time_step);
+  else
+  {
+    //Todo: This is still not right, but neither is the idea of single Stepping in RealTime. Maybe Forbid this?
+    this->stepTriggers(cedar::aux::GlobalClockSingleton::getInstance()->getDefaultCPUStepSize());
+  }
+
+// Todo: Old Function!
+//  std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
+//  cedar::unit::Time time_step(std::numeric_limits<double>::max() * cedar::unit::milli * cedar::unit::second);
+//  // find the shortest time step of all triggers
+//  for (auto trigger : triggers)
+//  {
+//    if (trigger->getSimulatedTimeParameter() < time_step)
+//    {
+//      time_step = trigger->getSimulatedTimeParameter();
+//    }
+//  }
+//  this->stepTriggers(time_step);
 }
 
 void cedar::proc::Group::stepTriggers(cedar::unit::Time timeStep)

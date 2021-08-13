@@ -406,14 +406,14 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
     //Todo Connect to something meaningful! Maybe fill with enum...
 
 //     toolbar: simulated step size
-      double simulated_time_step_min = 0.0001;
-      double simulated_time_step_max = 0.1;
-      double global_time_factor_step = 0.001;
+      double simulated_time_step_min = 0.1;
+      double simulated_time_step_max = 100;
+      double global_time_factor_step = 1;
 
-      double global_time_factor_value = 0.02;
+      double global_time_factor_value = 20;
       if(this->mGroup)
       {
-        global_time_factor_value = this->mGroup->getGroup()->getSimulationTimeStep()/cedar::unit::Time(1.0*cedar::unit::seconds);
+        global_time_factor_value =  this->mGroup->getGroup()->getSimulationTimeStep()/cedar::unit::Time(1.0* cedar::unit::milli *cedar::unit::seconds) ;
       }
 
 
@@ -435,10 +435,10 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
       this->mpSimulatedTimeStepSpinBox->setToolTip("Euler step size when choosing simulated time");
       this->mpSimulatedTimeStepSpinBox->setMinimum(simulated_time_step_min);
       this->mpSimulatedTimeStepSpinBox->setMaximum(simulated_time_step_max);
-      this->mpSimulatedTimeStepSpinBox->setDecimals(5);
+      this->mpSimulatedTimeStepSpinBox->setDecimals(1);
       this->mpSimulatedTimeStepSpinBox->setSingleStep(global_time_factor_step);
       this->mpSimulatedTimeStepSpinBox->setValue(global_time_factor_value);
-      this->mpSimulatedTimeStepSpinBox->setSuffix("s");
+      this->mpSimulatedTimeStepSpinBox->setSuffix("ms");
       this->mpToolBar->insertWidget(this->mpActionRecord, this->mpSimulatedTimeStepSpinBox);
 
       QObject::connect(this->mpSimulatedTimeStepSpinBox, SIGNAL(valueChanged(double)), this, SLOT(simulatedTimeStepSpinBoxChanged(double)));
@@ -956,16 +956,20 @@ void cedar::proc::gui::Ide::simulationModeComboBoxChanged(int newIndex)
 {
   if(newIndex != 0 ) //For now Zero is the default index, which is simulated Time. Todo:Use an Enum for the mode
   {
+    //Case RealTime
     this->mpSimulatedTimeStepSlider->setEnabled(false);
     this->mpSimulatedTimeStepSpinBox->setEnabled(false);
+    this->mpThreadsSingleStep->setEnabled(false);
 
     if(this->mGroup)
     {
       this->mGroup->getGroup()->setLoopMode(cedar::aux::LoopMode::RealDT);
     }
+
   }
   else
   {
+    //Case Simulated Time
     this->mpSimulatedTimeStepSlider->setEnabled(true);
     this->mpSimulatedTimeStepSpinBox->setEnabled(true);
 
@@ -973,6 +977,11 @@ void cedar::proc::gui::Ide::simulationModeComboBoxChanged(int newIndex)
     {
       this->mGroup->getGroup()->setLoopMode(cedar::aux::LoopMode::FakeDT);
     }
+
+    QReadLocker locker(this->mSimulationRunning.getLockPtr());
+    bool running = this->mSimulationRunning.member();
+
+    this->mpThreadsSingleStep->setEnabled(!running);
   }
 }
 
@@ -989,7 +998,7 @@ void cedar::proc::gui::Ide::simulatedTimeStepSpinBoxChanged(double newValue)
 
   if (this->mGroup)
   {
-    this->mGroup->getGroup()->setSimulationTimeStep(cedar::unit::Time(newValue*cedar::unit::seconds));
+    this->mGroup->getGroup()->setSimulationTimeStep(cedar::unit::Time(newValue*cedar::unit::milli*cedar::unit::seconds));
   }
 }
 void cedar::proc::gui::Ide::toggleDataSlotPositioning()
@@ -2226,15 +2235,9 @@ void cedar::proc::gui::Ide::resetSimulationClicked()
 void cedar::proc::gui::Ide::stepThreads()
 {
   this->mpActionResetSimulation->setEnabled(true);
-  if (this->mpCustomTimeStep->isEnabled())
-  {
-    cedar::unit::Time step_size(this->mpCustomTimeStep->value() * cedar::unit::milli * cedar::unit::seconds);
-    this->mGroup->getGroup()->stepTriggers(step_size);
-  }
-  else
-  {
-    this->mGroup->getGroup()->stepTriggers();
-  }
+
+  this->mGroup->getGroup()->stepTriggers();
+
 }
 
 void cedar::proc::gui::Ide::newFile()
@@ -3139,7 +3142,7 @@ void cedar::proc::gui::Ide::processLoopModeChangedSignal(cedar::aux::LoopMode::I
 
 void cedar::proc::gui::Ide::processSimulationStepChangedSignal(cedar::unit::Time newStep)
 {
-  this->mpSimulatedTimeStepSpinBox->setValue(newStep / cedar::unit::Time(1.0*cedar::unit::seconds));
+  this->mpSimulatedTimeStepSpinBox->setValue( newStep / cedar::unit::Time(1.0*cedar::unit::milli*cedar::unit::seconds));
 }
 
 

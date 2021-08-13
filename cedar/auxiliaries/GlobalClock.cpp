@@ -93,7 +93,6 @@ void cedar::aux::GlobalClock::addCurrentToAdditionalElapsedTime()
   if(this->mLoopMode == cedar::aux::LoopMode::RealDT)
     this->mAdditionalElapsedTime += this->getCurrentElapsedMSec();
   QWriteLocker locker(this->mpSimulationStepsTakenLock);
-  std::cout<<"GlobalClock::addCurrentToAdditionalElapsedTime with StepsTaken: " << this->mpSimulationStepsTaken << " amd currently AdditionalSteps: " << mAdditionalTakenSteps << std::endl;
   mAdditionalTakenSteps += this->mpSimulationStepsTaken;
   this->mpSimulationStepsTaken = 0;
   this->mTimer.restart();

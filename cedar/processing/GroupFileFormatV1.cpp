@@ -338,6 +338,17 @@ void cedar::proc::GroupFileFormatV1::read
   {
     group->processConnectors();
 
+    //JT: This checks, whether the architecture has been created before the SimulationMode Update. It should not throw an exception though.
+    auto loop_mode = root.find("loop mode");
+    auto euler_step = root.find("simulation euler step");
+    auto default_cpu = root.find("default CPU step");
+    auto min_compute_time = root.find("min computation time");
+    if(loop_mode==root.not_found()||euler_step==root.not_found()||default_cpu==root.not_found()||min_compute_time==root.not_found())
+    {
+      cedar::aux::LogSingleton ::getInstance()->warning("Your architecture has been created with an older version of cedar. Simulation Modes are now regulated globally. Choose the appropriate Simulation Mode in the toolbar and possibly retune your architecture accordingly!","cedar::proc::GroupFileFormatV1::readConfiguration");
+    }
+
+
     auto steps = root.find("steps");
     if (steps != root.not_found())
     {
