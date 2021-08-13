@@ -346,9 +346,6 @@ public:
   // protected methods
   //----------------------------------------------------------------------------
 protected:
-  //The number of steps the Worker has taken
-  unsigned long getNumberOfSteps();
-
   //----------------------------------------------------------------------------
   // private methods
   //----------------------------------------------------------------------------
@@ -373,18 +370,14 @@ private:
   //! Called when the thread is started and stopped; marks some parameters that cannot be changed at runtime const.
   void makeParametersConst(bool makeConst);
 
-  cedar::unit::Time getDefaultStepSize();
 
-  void processDefaultStepSizeChange(cedar::unit::Time newStepSize);
 
-  void processSimulationModeChange(cedar::aux::LoopMode::Id newMode);
 
-  void processSimulationStepSizeChanged(cedar::unit::Time newStepSize);
 
 private slots:
   void modeChanged();
 
-  void stepSizeManagementChanged();
+
   //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------
@@ -397,21 +390,15 @@ private:
   boost::signals2::scoped_connection mStartConnection;
   boost::signals2::scoped_connection mStopConnection;
 
-  boost::signals2::scoped_connection mDefaultCPUStepSizeChangeConnection;
 
-  boost::signals2::scoped_connection mSimulationModeChangeConnection;
-
-  boost::signals2::scoped_connection mSimulationStepSizeChangeConnection;
-
-  cedar::unit::Time _mPreviousCustomStepSize;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
 
-private:
+
+
 
   //!@brief desired length of a single step, in milliseconds
   cedar::aux::TimeParameterPtr _mStepSize;
@@ -435,6 +422,9 @@ private:
   cedar::aux::EnumParameterPtr _mLoopMode;
 
   cedar::aux::BoolParameterPtr _mUseDefaultCPUStep;
+
+private:
+    // none yet
 
 }; // class cedar::aux::LoopedThread
 

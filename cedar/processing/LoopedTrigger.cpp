@@ -102,6 +102,16 @@ mStarted(false),
 mStatistics(new TimeAverage(50)),
 _mStartWithAll(new cedar::aux::BoolParameter(this, "start with all", true))
 {
+  QObject::connect(_mUseDefaultCPUStep.get(),SIGNAL(valueChanged()),this,SLOT(stepSizeManagementChanged()));
+
+  this->processSimulationModeChange(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode());
+  this->stepSizeManagementChanged();
+
+  mDefaultCPUStepSizeChangeConnection = cedar::aux::GlobalClockSingleton::getInstance()->connectToDefaultCPUStepSizeChangedSignal(boost::bind(&cedar::proc::LoopedTrigger::processDefaultStepSizeChange,this,_1));
+  mSimulationModeChangeConnection = cedar::aux::GlobalClockSingleton::getInstance()->connectToLoopModeChangedSignal(boost::bind(&cedar::proc::LoopedTrigger::processSimulationModeChange,this,_1));
+  mSimulationStepSizeChangeConnection = cedar::aux::GlobalClockSingleton::getInstance()->connectToSimulationStepSizeChangedSignal(boost::bind(&cedar::proc::LoopedTrigger::processSimulationStepSizeChanged,this,_1));
+
+
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 
@@ -263,4 +273,63 @@ void cedar::proc::LoopedTrigger::removeListener(cedar::proc::Triggerable* trigge
 bool cedar::proc::LoopedTrigger::canConnectTo(cedar::proc::ConstTriggerablePtr target) const
 {
   return target->isLooped() && !target->getLoopedTrigger();
+}
+
+
+
+void cedar::proc::LoopedTrigger::stepSizeManagementChanged()
+{
+  if(this->_mUseDefaultCPUStep->getValue())
+  {
+    _mPreviousCustomStepSize = this->_mStepSize->getValue();
+    this->_mStepSize->setValue(this->getDefaultStepSize());
+    this->_mStepSize->setConstant(true);
+  }
+  else
+  {
+    this->_mStepSize->setValue(_mPreviousCustomStepSize);
+    this->_mStepSize->setConstant(false);
+  }
+}
+
+void cedar::proc::LoopedTrigger::processDefaultStepSizeChange(cedar::unit::Time newStepSize)
+{
+  //Todo: This might need some Locking! And I am not sure if some changes get lost this way... Check if there is a use case
+  if(!this->isRunning() && this->_mUseDefaultCPUStep->getValue())
+  {
+    this->_mStepSize->setValue(newStepSize);
+  }
+}
+
+void cedar::proc::LoopedTrigger::processSimulationModeChange(cedar::aux::LoopMode::Id newMode)
+{
+  switch(newMode)
+  {
+    case cedar::aux::LoopMode::RealDT:
+      case cedar::aux::LoopMode::Fixed:
+        case cedar::aux::LoopMode::FixedAdaptive:
+          case cedar::aux::LoopMode::RealTime:
+            this->_mUseDefaultCPUStep->setConstant(false);
+            this->_mStepSize->setConstant(this->_mUseDefaultCPUStep->getValue());
+            break;
+            default:
+              this->_mUseDefaultCPUStep->setValue(true);
+              this->_mUseDefaultCPUStep->setConstant(true);
+              this->_mStepSize->setConstant(true);
+  }
+  //Todo:Do we need to lock this? Even if this is only settable outside of a running system?
+  QWriteLocker locker(this->_mLoopMode->getLock());
+  this->_mLoopMode->setValue(newMode);
+
+}
+
+void cedar::proc::LoopedTrigger::processSimulationStepSizeChanged(cedar::unit::Time newStepSize)
+{
+  QWriteLocker locker (this->_mFakeStepSize->getLock());
+  this->_mFakeStepSize->setValue(newStepSize);
+}
+
+cedar::unit::Time cedar::proc::LoopedTrigger::getDefaultStepSize()
+{
+  return cedar::aux::GlobalClockSingleton::getInstance()->getDefaultCPUStepSize();
 }

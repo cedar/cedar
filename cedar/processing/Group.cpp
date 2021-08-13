@@ -939,7 +939,6 @@ void cedar::proc::Group::stopTriggers(bool wait)
   {
     if(mTriggerStepper->isRunning())
     {
-      std::cout<<"cedar::proc::Group:: Let's really Stop!"<<std::endl;
       mTriggerStepper->stop();
       emit triggerStopped();
     }

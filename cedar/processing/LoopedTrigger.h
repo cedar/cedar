@@ -156,7 +156,16 @@ private:
    */
   void addListener(cedar::proc::TriggerablePtr triggerable);
 
+  void processDefaultStepSizeChange(cedar::unit::Time newStepSize);
 
+  void processSimulationModeChange(cedar::aux::LoopMode::Id newMode);
+
+  void processSimulationStepSizeChanged(cedar::unit::Time newStepSize);
+
+  cedar::unit::Time getDefaultStepSize();
+
+private slots:
+  void stepSizeManagementChanged();
 
 
 
@@ -174,6 +183,14 @@ private:
   QMutex mStartedMutex;
 
   TimeAveragePtr mStatistics;
+
+  boost::signals2::scoped_connection mDefaultCPUStepSizeChangeConnection;
+
+  boost::signals2::scoped_connection mSimulationModeChangeConnection;
+
+  boost::signals2::scoped_connection mSimulationStepSizeChangeConnection;
+
+  cedar::unit::Time _mPreviousCustomStepSize;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

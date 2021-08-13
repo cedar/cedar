@@ -76,7 +76,6 @@ void cedar::proc::TriggerStepper::stop()
 void cedar::proc::TriggerStepper::run()
 {
   mAbortRequested.store(false);
-  std::cout<<"cedar::proc::TriggerStepper::run" << std::endl;
   this->minimalSleepTime = cedar::aux::GlobalClockSingleton ::getInstance()->getMinimumComputationTime();
     try
     {
