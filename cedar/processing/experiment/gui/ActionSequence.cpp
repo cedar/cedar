@@ -46,7 +46,7 @@
 #include "cedar/processing/experiment/gui/ActionListParameter.h"
 #include "cedar/processing/gui/ExperimentDialog.h"
 #include "cedar/auxiliaries/Parameter.h"
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/processing/auxiliaries/gui/Parameter.h"
 
 // SYSTEM INCLUDES
 #include <QLineEdit>
@@ -107,8 +107,8 @@ void cedar::proc::experiment::gui::ActionSequence::update()
   //Add Name Label and Remove Button
   QHBoxLayout* nameRow = new QHBoxLayout;
   cedar::aux::ParameterPtr nameParameter = this->mSequence->getParameter("name");
-  cedar::aux::gui::Parameter* name
-        = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(nameParameter)->allocateRaw();
+  cedar::proc::aux::gui::Parameter* name
+        = cedar::proc::aux::gui::ParameterFactorySingleton::getInstance()->get(nameParameter)->allocateRaw();
   name->setParent(this);
   name->setParameter(nameParameter);
   QPushButton* rm = new QPushButton(QIcon(":/cedar/auxiliaries/gui/trashcan.svg"), "");
@@ -135,8 +135,8 @@ void cedar::proc::experiment::gui::ActionSequence::update()
   try
   {
       cedar::aux::ParameterPtr condition = this->mSequence->getParameter("Condition");
-      cedar::aux::gui::Parameter* conditionSelector
-              = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(condition)->allocateRaw();
+      cedar::proc::aux::gui::Parameter* conditionSelector
+              = cedar::proc::aux::gui::ParameterFactorySingleton::getInstance()->get(condition)->allocateRaw();
       conditionSelector->setParent(this);
       conditionSelector->setParameter(condition);
       conditionRow->addWidget(conditionSelector);

@@ -143,9 +143,9 @@ public:
   ParameterList& getParameters();
 
   //!@brief sets the configurable parent
-  void setParent(cedar::aux::Configurable* child);
+  void setParent(cedar::aux::Configurable* parent);
 
-  //!@brief sets the configurable parent
+  //!@brief gets the configurable parent
   cedar::aux::Configurable* getParent();
 
   /*!@brief add a Configurable as a child to this instance of Configurable - if name is duplicate, an exception is

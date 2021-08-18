@@ -85,8 +85,6 @@ SOFTWARE.
 #include <QReadWriteLock>
 #include <QRegExpValidator>
 
-
-
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
@@ -808,9 +806,11 @@ cedar::proc::Step(isLooped)
 ,
 mInputs(1, cedar::aux::MatDataPtr()),
 mOutputs(1, cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))),
+mStates(0, cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))),
+mWasResetted(true),
 
 // Declare Properties
-_mCodeStringForSavingArchitecture (new cedar::aux::StringParameter(this, "code", "import numpy as np\nimport pycedar as pc\n\n#Print to messages tab:\n# pc.messagePrint('text')\n# pc.messagePrint(str(...))\n\n#Inputs: (NumPy Arrays)\n# pc.inputs[0]\n# pc.inputs[1]\n# ...\n\n#Outputs:\n# pc.outputs[0]\n# pc.outputs[1]\n# ...\n\n\ninput = pc.inputs[0]\n\npc.outputs[0] = input * 2\n")),
+_mCodeStringForSavingArchitecture (new cedar::aux::StringParameter(this, "code", "import numpy as np\nimport pycedar as pc\n\n#Print to messages tab:\n# pc.messagePrint('text')\n# pc.messagePrint(str(...))\n\n#Inputs: (List of NumPy Arrays)\n# pc.inputs[0]\n# pc.inputs[1]\n# ...\n\n#Outputs: (List of NumPy Arrays)\n# pc.outputs[0]\n# pc.outputs[1]\n# ...\n\n\ninput1 = pc.inputs[0]\n\npc.outputs[0] = input1 * 2\n\n\n# Experimental:\n# A state that is kept between executions:\n# if len(pc.states) == 0:\n#   pc.states.append( 41 )\n# pc.states[0]= pc.states[0] + 1\n\n# Experimental:\n# Did a reset just occur?\n# if pc.reset:\n#   pc.messagePrint('reset occured')\n#   pc.states[0]= 41\n")),
 _mNumberOfInputs (new cedar::aux::UIntParameter(this, "number of inputs", 1,0,255)),
 _mNumberOfOutputs (new cedar::aux::UIntParameter(this, "number of outputs", 1,0,255)),
 _mHasScriptFile (new cedar::aux::BoolParameter(this, "use script file", false)),
@@ -912,24 +912,27 @@ std::vector<cedar::proc::steps::PythonScript::TemplateName> cedar::proc::steps::
   {
     boost::property_tree::ptree root;
     boost::property_tree::read_json(cedar::aux::Path("resource://pythonTemplates/python.json").absolute(), root);
-    for (boost::property_tree::ptree::value_type &nodeOuter : root.get_child("steps"))
+    if(root.find("steps") != root.not_found())
     {
-      std::string left = nodeOuter.first;
-      boost::trim(left);
-      bool isLooped = false, isNonLooped = false;
-      if(!left.compare("cedar.processing.steps.PythonScriptLooped")) isLooped = true;
-      if(!left.compare("cedar.processing.steps.PythonScript")) isNonLooped = true;
-      if(isLooped || isNonLooped)
+      for (boost::property_tree::ptree::value_type &nodeOuter : root.get_child("steps"))
       {
-        for (boost::property_tree::ptree::value_type &node : nodeOuter.second)
+        std::string left = nodeOuter.first;
+        boost::trim(left);
+        bool isLooped = false, isNonLooped = false;
+        if (!left.compare("cedar.processing.steps.PythonScriptLooped")) isLooped = true;
+        if (!left.compare("cedar.processing.steps.PythonScript")) isNonLooped = true;
+        if (isLooped || isNonLooped)
         {
-          std::string left = node.first;
-          boost::trim(left);
-          if(!left.compare("name"))
+          for (boost::property_tree::ptree::value_type &node : nodeOuter.second)
           {
-            list.push_back(TemplateName());
-            list[list.size() - 1].name = node.second.data();
-            list[list.size() - 1].isLooped = isLooped;
+            std::string left = node.first;
+            boost::trim(left);
+            if (!left.compare("name"))
+            {
+              list.push_back(TemplateName());
+              list[list.size() - 1].name = node.second.data();
+              list[list.size() - 1].isLooped = isLooped;
+            }
           }
         }
       }
@@ -1211,7 +1214,7 @@ void cedar::proc::steps::PythonScript::freePythonVariables() {
   Py_DecRef(poAttrList);
 }
 
-void cedar::proc::steps::PythonScript::executePythonScript()
+void cedar::proc::steps::PythonScript::executePythonScript(bool use_data_lock)
 {
   mutex.lock();
 
@@ -1223,8 +1226,8 @@ void cedar::proc::steps::PythonScript::executePythonScript()
   // Swap to the interpreter of this specific PythonScript step
   
   // Python...
-  try{
-
+  try
+  {
     // Loading main module
     boost::python::object main_module = boost::python::import("__main__");
     boost::python::object main_namespace = main_module.attr("__dict__");
@@ -1240,9 +1243,7 @@ void cedar::proc::steps::PythonScript::executePythonScript()
       cedar::aux::ConstDataPtr inputMatrixPointer = this->getInputSlot(makeInputSlotName(i))->getData();
       if(inputMatrixPointer != 0)
       {
-        // Lock input matrix
-        auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(inputMatrixPointer);
-        QReadLocker input_l(&mat_data->getLock());
+
         try
         {
           if(pColorSpaceAnnotation == nullptr)
@@ -1254,10 +1255,23 @@ void cedar::proc::steps::PythonScript::executePythonScript()
         {
           pColorSpaceAnnotation = nullptr;
         }
-        cv::Mat inputMatrix = mat_data->getData().clone();
 
-        // Unlock input matrix
-        input_l.unlock();
+        auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(inputMatrixPointer);
+
+        cv::Mat inputMatrix;
+
+        if (use_data_lock)
+        {
+          // Lock input matrix
+          // (do not lock when calling from compute())
+          QReadLocker input_l(&mat_data->getLock());
+          inputMatrix = mat_data->getData().clone();
+        }
+        else
+        {
+          inputMatrix = mat_data->getData().clone();
+        }
+
         // Convert input matrix to numpy array
         PyObject* inputMatrix_np = cvt.toNDArray(inputMatrix);
         // Include it to Python
@@ -1291,6 +1305,23 @@ void cedar::proc::steps::PythonScript::executePythonScript()
       }
     }
     boost::python::scope(pycedar_module).attr("inputs") = inputsList;
+
+    // fill the "states" matrix:
+    std::list<boost::python::handle<>>  statesListBefore;
+    for(unsigned int i = 0; i < mStates.size(); i++)
+    {
+      cv::Mat stateMatrix= mStates[i]->getData(); //.clone(); // do we need clone?
+
+      PyObject* stateMatrix_np = cvt.toNDArray(stateMatrix);
+      boost::python::handle<> stateMatrix_np_handle(stateMatrix_np);
+      statesListBefore.push_back(stateMatrix_np_handle);
+    }
+    boost::python::scope(pycedar_module).attr("states") = statesListBefore;
+
+    // add the 'just resetted' information
+    boost::python::scope(pycedar_module).attr("reset") = mWasResetted;
+
+
     // Adding empty matrices to the output list so that the length of the list in python is correctly set
     std::list<boost::python::handle<>> outputsList;
     boost::python::handle<> hand(cvt.toNDArray( cv::Mat::zeros(1, 1, CV_32F) ));
@@ -1419,6 +1450,44 @@ void cedar::proc::steps::PythonScript::executePythonScript()
       i++;
     }
     
+    // update the "state" variable. It will be held until the next iteration
+    std::list<PyObject*> pythonStatesList = boost::python::extract<std::list<PyObject*>>(boost::python::scope(pycedar_module).attr("states"));
+
+    auto pythonStateSize= pythonStatesList.size();
+    auto oldStateSize= mStates.size();
+
+    if (pythonStateSize != oldStateSize)
+    {
+      mStates.clear();
+      for(unsigned int j=0; j < pythonStateSize; j++)
+      {
+        mStates.push_back( cedar::aux::MatDataPtr(new cedar::aux::MatData() ) );
+        //cv::Mat::zeros(1, 1, CV_32F)))
+      }
+    }
+
+    i = 0;
+    for (auto const& pythonStatesPointer : pythonStatesList)
+    {
+      cv::Mat &stateMatrix = mStates[i]->getData();
+      stateMatrix = cvt.toMat(pythonStatesPointer, i); // overwriting
+
+      // Convert 1D and 2D matrices of type CV_64F (double) to CV_32F (float)
+      if (this->_mAutoConvertDoubleToFloat->getValue())
+      {
+        if (stateMatrix.dims <= 2
+            && stateMatrix.type() == CV_64F)
+        {
+          stateMatrix.convertTo(stateMatrix, CV_32F);
+        }
+        else if (stateMatrix.dims == 3
+                 && stateMatrix.type() == CV_64F)
+        {
+          stateMatrix = convert3DMatToFloat<double>(stateMatrix);
+        }
+      }
+      i++;
+    }
   }
   catch(const boost::python::error_already_set&){
 
@@ -1484,6 +1553,7 @@ void cedar::proc::steps::PythonScript::executePythonScript()
 
   this->mIsExecuting = 0;
   mutex.unlock();
+  mWasResetted= false;
 }
 
 void cedar::proc::steps::PythonScript::inputConnectionChanged(const std::string& inputName)
@@ -1504,7 +1574,7 @@ void cedar::proc::steps::PythonScript::compute(const cedar::proc::Arguments&)
 {
   if(!this->mIsExecuting)
   {
-    executePythonScript();
+    executePythonScript(false);
   }
 }
 
@@ -1512,8 +1582,14 @@ void cedar::proc::steps::PythonScript::compute(const cedar::proc::Arguments&)
 void cedar::proc::steps::PythonScript::executeButtonClicked(){
   if(!this->mIsExecuting)
   {
-    executePythonScript();
+    executePythonScript(true);
   }
+}
+
+void cedar::proc::steps::PythonScript::reset()
+{
+  mStates.clear();
+  mWasResetted= true;
 }
 
 #endif // CEDAR_USE_PYTHON

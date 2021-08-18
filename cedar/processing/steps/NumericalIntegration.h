@@ -103,6 +103,7 @@ private:
   cedar::aux::ConstMatDataPtr mInput;
   cedar::aux::ConstMatDataPtr mDelayOptional;
   cedar::aux::ConstMatDataPtr mInitialOptional;
+  cedar::aux::ConstMatDataPtr mResetOptional;
 
   //!@brief The output data.
   cedar::aux::MatDataPtr mOutput;

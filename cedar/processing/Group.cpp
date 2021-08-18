@@ -76,6 +76,10 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteConnection.h"
+#include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/gui/DataSlotItem.h"
 
 #include "cedar/processing/consistency/LoopedElementNotConnected.h"
 #include "cedar/processing/consistency/LoopedElementInNonLoopedGroup.h"
@@ -3083,7 +3087,7 @@ void cedar::proc::Group::pruneUnusedConnectors()
       std::vector<cedar::proc::DataConnectionPtr> incoming_connections;
       this->getGroup()->getDataConnectionsTo(this_as_connectable, input_slot->getName(), incoming_connections);
       // check if any slots are unsused
-      if (outgoing_connections.size() == 0 || incoming_connections.size() == 0)
+      if (outgoing_connections.size() == 0 && incoming_connections.size() == 0)
       {
         to_delete[connector.first] = connector.second;
       }
@@ -3098,7 +3102,7 @@ void cedar::proc::Group::pruneUnusedConnectors()
       std::vector<cedar::proc::DataConnectionPtr> incoming_connections;
       this->getDataConnectionsTo(group_sink, "input", incoming_connections);
       // check if any slots are unsused
-      if (outgoing_connections.size() == 0 || incoming_connections.size() == 0)
+      if (outgoing_connections.size() == 0 && incoming_connections.size() == 0)
       {
         to_delete[connector.first] = connector.second;
       }

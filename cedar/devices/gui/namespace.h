@@ -53,14 +53,12 @@ namespace cedar
     namespace gui
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_DEV_CLASS(ComponentParameter);
       CEDAR_DECLARE_DEV_CLASS(KinematicChainWidget);
       CEDAR_DECLARE_DEV_CLASS(KinematicChainMonitorWidget);
       CEDAR_DECLARE_DEV_CLASS(KinematicChainCommandWidget);
       CEDAR_DECLARE_DEV_CLASS(MountedCameraViewer);
       CEDAR_DECLARE_DEV_CLASS(RobotCard);
       CEDAR_DECLARE_DEV_CLASS(RobotCardIconHolder);
-      CEDAR_DECLARE_DEV_CLASS(RobotManager);
       //!@endcond
     }
   }

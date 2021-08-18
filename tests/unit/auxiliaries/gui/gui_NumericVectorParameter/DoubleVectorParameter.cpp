@@ -40,8 +40,8 @@
 
 // CEDAR INCLUDES
 #include "DoubleVectorParameter.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
-#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
@@ -52,7 +52,7 @@
 
 DoubleVectorParameter::DoubleVectorParameter(QWidget* pParent)
 :
-cedar::aux::gui::DoubleVectorParameter(pParent)
+cedar::proc::aux::gui::DoubleVectorParameter(pParent)
 {
 }
 
@@ -69,7 +69,7 @@ unsigned int DoubleVectorParameter::size() const
   return this->mWidgets.size();
 }
 
-cedar::aux::gui::IgnoreLocaleDoubleSpinBox* DoubleVectorParameter::widgetAt(int i)
+cedar::proc::aux::gui::IgnoreLocaleDoubleSpinBox* DoubleVectorParameter::widgetAt(int i)
 {
   return this->mWidgets.at(i);
 }

@@ -156,15 +156,15 @@ _mOutputActivation(new cedar::aux::BoolParameter(this, "activation as output", f
 _mDiscreteMetric(new cedar::aux::BoolParameter(this, "discrete metric (workaround)", false)),
 _mUpdateStepGui(new cedar::aux::BoolParameter(this, "update stepIcon according to output", true)),
 _mUpdateStepGuiThreshold
-        (
-                new cedar::aux::DoubleParameter
-                        (
-                                this,
-                                "threshold for updating the stepIcon",
-                                0.8,
-                                cedar::aux::DoubleParameter::LimitType::positiveZero()
-                        )
-        ),
+(
+  new cedar::aux::DoubleParameter
+    (
+            this,
+            "threshold for updating the stepIcon",
+            0.8,
+            cedar::aux::DoubleParameter::LimitType::positiveZero()
+    )
+),
 _mDimensionality
 (
   new cedar::aux::UIntParameter
@@ -209,15 +209,15 @@ mRestingLevel
   )
 ),
 _mInputNoiseGain
-        (
-                new cedar::aux::DoubleParameter
-                        (
-                                this,
-                                "input noise gain",
-                                0.1,
-                                cedar::aux::DoubleParameter::LimitType::positiveZero()
-                        )
-        ),
+(
+new cedar::aux::DoubleParameter
+  (
+          this,
+          "input noise gain",
+          0.1,
+          cedar::aux::DoubleParameter::LimitType::positiveZero()
+  )
+),
 _mMultiplicativeNoiseInput(new cedar::aux::BoolParameter(this, "multiplicative noise (input)", false)),
 _mMultiplicativeNoiseActivation(new cedar::aux::BoolParameter(this, "multiplicative noise (activation)", false)),
 _mSigmoid
@@ -821,7 +821,7 @@ void cedar::dyn::NeuralField::updateEducationalKernel()
   int secondDimLeft = 0;
   int secondDimRight = 0;
 
-  //TODO: We won't use 3D Kernels for educational purposes, that is why I left that out for now
+//  //TODO: We won't use 3D Kernels for educational purposes, that is why I left that out for now
   if (this->getDimensionality() == 1 || this->getDimensionality() == 2)
   {
     int dim1Size = this->_mSizes->getValue().at(0);
@@ -847,12 +847,42 @@ void cedar::dyn::NeuralField::updateEducationalKernel()
 
 
     cv::copyMakeBorder(curkernel, paddedKernel, firstDimLeft, firstDimRight, secondDimLeft, secondDimRight , cv::BORDER_CONSTANT, 0.0);
-    this->mLateralKernelEducational->setData(paddedKernel+this->mGlobalInhibition->getValue());
+
+    if(!curkernel.empty())
+    {
+        this->mLateralKernelEducational->setData(paddedKernel+this->mGlobalInhibition->getValue());
+    }
+    else
+    {
+        this->mLateralKernelEducational->setData(cv::Mat(this->_mSizes->getValue().at(0), this->getDimensionality() == 2 ? this->_mSizes->getValue().at(1):1,CV_32F,this->mGlobalInhibition->getValue()));
+    }
+
+  }
+  else // this->getDimensionality()>2 || this->getDimensionality() < 1
+  {
+    if(!curkernel.empty())
+    {
+        this->mLateralKernelEducational->setData(
+                curkernel + this->mGlobalInhibition->getValue()); //TODO: ADD Padding for 3D
+    }
+    else
+    {
+
+        if(this->getDimensionality() == 1)
+        {
+            this->mLateralKernelEducational->setData(
+                    cv::Mat(1, 1, CV_32F, this->mGlobalInhibition->getValue()));
+        }
+        else if(this->getDimensionality() == 3)
+        {
+            int sizearray[3] = {(int)this->_mSizes->getValue().at(0),(int)this->_mSizes->getValue().at(1),(int)this->_mSizes->getValue().at(2)};
+            this->mLateralKernelEducational->setData(cv::Mat(3,sizearray,CV_32F,this->mGlobalInhibition->getValue()));
+        }
+    }
   }
 
-  if(this->getDimensionality()>2 || this->getDimensionality() < 1)
-  {
-    this->mLateralKernelEducational->setData(curkernel +this->mGlobalInhibition->getValue()); //TODO: ADD Padding for 3D
-  }
+
+
+
 
 }

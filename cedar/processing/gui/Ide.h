@@ -60,6 +60,7 @@
 #include "cedar/processing/gui/Ide.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"
 #include "cedar/processing/gui/FindDialog.fwd.h"
+#include "cedar/processing/undoRedo/UndoStack.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
@@ -88,6 +89,8 @@ private:
   //! A class that takes care of dialog that can be opened by the Ide, such as the boost control.
   class OpenableDialog;
   CEDAR_GENERATE_POINTER_TYPES(OpenableDialog);
+
+  class OpenableUndoRedoStack;
 
   class OpenableArchitectureConsistencyCheck;
 
@@ -300,6 +303,12 @@ public slots:
     return this->mpLog;
   }
 
+  //!@brief undo last action
+  void undo();
+
+  //!@brief redo last action
+  void redo();
+
   //!@brief copy selected elements (cross instance)
   void copy();
 
@@ -440,6 +449,10 @@ signals:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+
+  //! Undo Stack
+  static cedar::proc::undoRedo::UndoStack* pUndoStack;
 protected:
   // none yet
 private:
@@ -447,6 +460,7 @@ private:
   cedar::proc::gui::GroupPtr mGroup;
 
   cedar::proc::StepPtr mLastCopiedStep;
+
 
   //! Performance overview.
   cedar::proc::gui::PerformanceOverview* mpPerformanceOverview;

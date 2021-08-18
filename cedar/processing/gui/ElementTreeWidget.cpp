@@ -45,6 +45,7 @@
 // SYSTEM INCLUDES
 #include <QMessageBox>
 #include <boost/bind.hpp>
+#include <QHeaderView>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -56,6 +57,7 @@ QTreeWidget(pParent),
 mNameColumn(0),
 mNameEditingEnabled(false)
 {
+  this->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
   QObject::connect(this, SIGNAL(elementAddedSignal(QString)), this, SLOT(elementAdded(QString)));
   QObject::connect(this, SIGNAL(elementRemovedSignal(QString)), this, SLOT(elementRemoved(QString)));
   QObject::connect(this, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(itemChanged(QTreeWidgetItem*, int)));

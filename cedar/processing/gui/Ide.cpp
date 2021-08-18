@@ -59,10 +59,11 @@
 #include "cedar/processing/gui/SimulationControl.h"
 #include "cedar/processing/gui/OneTimeMessageDialog.h"
 #include "cedar/processing/gui/StickyNote.h"
-#include "cedar/processing/DataConnection.h"
 #include "cedar/processing/gui/ExperimentDialog.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
+#include "cedar/processing/DataConnection.h"
 #include "cedar/processing/exceptions.h"
-#include "cedar/devices/gui/RobotManager.h"
+#include "cedar/processing/devices/gui/RobotManager.h"
 #include "cedar/devices/Component.h"
 #include "cedar/auxiliaries/CommandLineParser.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
@@ -94,6 +95,7 @@
 #include <QInputDialog>
 #include <QTableWidget>
 #include <QMimeData>
+#include <QUndoView>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/algorithm/string.hpp>
@@ -245,6 +247,22 @@ private:
   bool mIsInToolBar;
 };
 
+// An internal class that implements the undo/redo stack as an openable dialog.
+class cedar::proc::gui::Ide::OpenableUndoRedoStack : public cedar::proc::gui::Ide::OpenableDialog
+{
+public:
+  OpenableUndoRedoStack()
+          :
+          OpenableDialog("Undo History", ":/menus/undo.svg", "undo redo stack")
+  {
+  }
+
+  QWidget* createOpenable() const
+  {
+    return new QUndoView(cedar::proc::gui::Ide::pUndoStack);
+  }
+};
+
 // An internal class that implements the architecture consistency check as an openable dialog.
 class cedar::proc::gui::Ide::OpenableArchitectureConsistencyCheck : public cedar::proc::gui::Ide::OpenableDialog
 {
@@ -371,9 +389,9 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   mpFindDialog = new cedar::proc::gui::FindDialog(this, this->mpProcessingDrawer);
   mpPerformanceOverview = new cedar::proc::gui::PerformanceOverview(this);
+  pUndoStack = new cedar::proc::undoRedo::UndoStack(this);
 
   // manually added components
-
   // toolbar: custom timestep
   auto p_enable_custom_time_step = new QCheckBox();
   p_enable_custom_time_step->setToolTip("When enabled, the specified time step is used to iterate all steps connected to looped triggers once when single-step is clicked. Otherwise, the time step to be used is determined automatically.");
@@ -535,6 +553,8 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   QObject::connect(mpActionCopy, SIGNAL(triggered()), this, SLOT(copy()));
   QObject::connect(mpActionPaste, SIGNAL(triggered()), this, SLOT(paste()));
+  QObject::connect(mpActionUndo, SIGNAL(triggered()), this, SLOT(undo()));
+  QObject::connect(mpActionRedo, SIGNAL(triggered()), this, SLOT(redo()));
   QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateSelected()));
   QObject::connect(mpActionCopyConfiguration, SIGNAL(triggered()), this, SLOT(copyStepConfiguration()));
   QObject::connect(mpActionPasteConfiguration, SIGNAL(triggered()), this, SLOT(pasteStepConfiguration()));
@@ -596,6 +616,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   openable_dialogs.push_back(OpenableDialogPtr(new OpenableSimulationControl()));
   openable_dialogs.push_back(boost_ctrl);
   openable_dialogs.push_back(OpenableDialogPtr(new OpenableArchitectureConsistencyCheck(this->mpProcessingDrawer)));
+  openable_dialogs.push_back(OpenableDialogPtr(new OpenableUndoRedoStack()));
 
   // actions are added at end of menu (jokeit: 2016, before: at front, iterated in reverse)
   for (auto iter = openable_dialogs.begin(); iter != openable_dialogs.end(); ++iter)
@@ -967,7 +988,7 @@ void cedar::proc::gui::Ide::showRobotManager()
   auto p_dialog = new QDialog(this);
   auto p_layout = new QVBoxLayout();
   p_dialog->setLayout(p_layout);
-  auto p_robot_manager = new cedar::dev::gui::RobotManager();
+  auto p_robot_manager = new cedar::proc::dev::gui::RobotManager();
   QObject::connect(p_robot_manager, SIGNAL(closeRobotManager(void)), p_dialog, SLOT(close(void)));
   p_layout->addWidget(p_robot_manager);
   p_dialog->setMinimumHeight(800);
@@ -1183,6 +1204,16 @@ void cedar::proc::gui::Ide::duplicateSelected()
   }
 }
 
+void cedar::proc::gui::Ide::undo()
+{
+  pUndoStack->undo();
+}
+
+void cedar::proc::gui::Ide::redo()
+{
+  pUndoStack->redo();
+}
+
 void cedar::proc::gui::Ide::copy()
 {
   ////Nodes
@@ -1218,6 +1249,7 @@ void cedar::proc::gui::Ide::copy()
       node.put("y", static_cast<int>(stickyNote->scenePos().y()));
       node.put("text", stickyNote->getText());
       node.put("font size", stickyNote->getFontSize());
+
       QColor color = stickyNote->getColor();
       node.put("color red", color.red());
       node.put("color green", color.green());
@@ -1312,16 +1344,16 @@ void cedar::proc::gui::Ide::copy()
   for (int i = 0; i < items_to_duplicate.length(); i++)
   {
     QGraphicsItem *currentQGraphicsItem = items_to_duplicate.at(i);
-    if (auto p_base = dynamic_cast<cedar::proc::gui::Element *>(currentQGraphicsItem))
+    if (cedar::proc::gui::Element* p_base = dynamic_cast<cedar::proc::gui::Element*>(currentQGraphicsItem))
     {
       if(dynamic_cast<cedar::proc::gui::Group *>(currentQGraphicsItem) != nullptr)
       {
         continue;
       }
       //Get the element to duplicate (with its name)
-      auto elementToDuplicate = p_base->getElement();
+      cedar::proc::ElementPtr elementToDuplicate = p_base->getElement();
       //Get UI Element
-      auto elementToDuplicateUi = p_base;
+      cedar::proc::gui::Element* elementToDuplicateUi = p_base;
 
       //Create Configuration Node for Element and its UI
       cedar::aux::ConfigurationNode tempElementConfigurationNode;
@@ -2183,6 +2215,9 @@ void cedar::proc::gui::Ide::newFile()
   this->displayFilename("unnamed file");
   cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName("unnamed file");
 
+  // Reset the undo/redo stack
+  pUndoStack->clear();
+
   // set the smart connection button
   this->mpActionToggleSmartConnections->blockSignals(true);
   this->mpActionToggleSmartConnections->setChecked(this->mGroup->getSmartConnection());
@@ -2432,11 +2467,6 @@ void cedar::proc::gui::Ide::load()
 
 void cedar::proc::gui::Ide::loadFile(QString file)
 {
-  if (!this->checkSave())
-  {
-    return;
-  }
-
   // print message
   cedar::aux::LogSingleton::getInstance()->message
                                            (
@@ -2612,6 +2642,9 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
   last_dir->setValue(path);
 
+  // Reset the undo/redo stack
+  pUndoStack->clear();
+
   // set the smart connection button
   this->mpActionToggleSmartConnections->blockSignals(true);
   this->mpActionToggleSmartConnections->setChecked(this->mGroup->getSmartConnection());
@@ -2627,6 +2660,10 @@ void cedar::proc::gui::Ide::recentFileItemTriggered()
   CEDAR_DEBUG_ASSERT(p_sender != NULL);
 
   const QString& file = p_sender->text();
+  if (!this->checkSave())
+  {
+    return;
+  }
   try
   {
     this->loadFile(file);

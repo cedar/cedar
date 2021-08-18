@@ -41,9 +41,9 @@
 #include "cedar/processing/experiment/gui/ConnectableParameter.h"
 #include "cedar/processing/experiment/ConnectableParameter.h"
 #include "cedar/processing/experiment/Supervisor.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
-#include "cedar/auxiliaries/Singleton.h"
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/Singleton.h"
+#include "cedar/processing/auxiliaries/gui/Parameter.h"
 
 // SYSTEM INCLUDES
 #include <QFormLayout>
@@ -57,7 +57,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace
 {
-  bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->add
+  bool registered = cedar::proc::aux::gui::ParameterFactorySingleton::getInstance()->add
       <
         cedar::proc::experiment::ConnectableParameter,
         cedar::proc::experiment::gui::ConnectableParameter
@@ -70,7 +70,7 @@ namespace
 
 cedar::proc::experiment::gui::ConnectableParameter::ConnectableParameter(QWidget* pParent)
 :
-cedar::aux::gui::Parameter(pParent),
+cedar::proc::aux::gui::Parameter(pParent),
 mpConnectableComboBox(new QComboBox())
 {
   this->mpConnectableComboBox->setEditable(true);

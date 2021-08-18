@@ -152,7 +152,7 @@ void cedar::proc::sources::LocalReader::compute(const cedar::proc::Arguments&)
     cv::Mat read = cedar::proc::sinks::LocalWriter::getMatrix( _mPort->getValue() );
 
     bool changed = (old.type() != read.type() || old.size != read.size);
-    this->mOutput->setData(read.clone());
+    this->mOutput->setData(read.clone()); // this should already be a clone, but I get crashes when I remove the .clone() here
     if (changed)
     {
       this->emitOutputPropertiesChangedSignal("output");

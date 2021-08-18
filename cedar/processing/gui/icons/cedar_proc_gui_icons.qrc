@@ -70,6 +70,8 @@
         <file>steps/static_gain_larger_minus_one.svg</file>
         <file>steps/static_gain_smaller_minus_one.svg</file>
         <file>steps/switch.svg</file>
+        <file>steps/tcp_writer.svg</file>
+		<file>steps/tcp_reader.svg</file>
         <file>steps/threshold.svg</file>
 	<file>steps/two_step_input.svg</file>
         <file>steps/matrix_multiply.svg</file>
@@ -101,6 +103,8 @@
         <file>menus/actions.svg</file>
         <file>menus/display_style.svg</file>
         <file>menus/consistency_check.svg</file>
+        <file>menus/undo.svg</file>
+        <file>menus/redo.svg</file>
         <file>menus/settings.svg</file>
         <file>group.svg</file>
         <file>toolbaricons/save.svg</file>

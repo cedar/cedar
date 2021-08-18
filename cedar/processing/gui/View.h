@@ -88,7 +88,7 @@ public:
   void setWidgets
   (
     QMainWindow* pMainWindow,
-    cedar::aux::gui::Configurable* pConigurableWidget,
+    cedar::proc::aux::gui::Configurable* pConigurableWidget,
     cedar::proc::gui::RecorderWidget* pRecorderWidget,
     cedar::proc::gui::CommentWidget* pCommentWidget,
     cedar::proc::gui::CodeWidget* pCodeWidget
@@ -250,7 +250,7 @@ private:
 
   QMainWindow* mpMainWindow;
 
-  cedar::aux::gui::Configurable* mpConigurableWidget;
+  cedar::proc::aux::gui::Configurable* mpConigurableWidget;
 
   cedar::proc::gui::RecorderWidget* mpRecorderWidget;
 

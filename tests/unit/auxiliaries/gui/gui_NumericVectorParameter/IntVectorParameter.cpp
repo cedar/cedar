@@ -38,8 +38,8 @@
 #include "IntVectorParameter.h"
 #include "cedar/auxiliaries/IntVectorParameter.h"
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
-#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 
@@ -49,7 +49,7 @@
 
 IntVectorParameter::IntVectorParameter(QWidget *pParent)
 :
-cedar::aux::gui::IntVectorParameter(pParent)
+cedar::proc::aux::gui::IntVectorParameter(pParent)
 {
 }
 

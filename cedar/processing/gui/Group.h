@@ -195,7 +195,7 @@ public:
   }
 
   //! Opens the kinematic chain control widget from saved configuration file
-  void openKinematicChainWidget(const aux::ConfigurationNode &node);
+  void openKinematicChainWidget(const cedar::aux::ConfigurationNode &node);
 
   void insertKinematicChainWidget(cedar::dev::gui::KinematicChainWidget* kinematicChainWidget) const;
 #ifdef CEDAR_USE_QGLVIEWER
@@ -315,6 +315,11 @@ public slots:
 
   //! set collapsedness of this group
   void setCollapsed(bool collapsed);
+
+  //! get the size of the uncollapsed group
+  double getUncollapsedWidth();
+
+  double getUncollapsedHeight();
 
   //! handes a change in step name
   void handleStepNameChanged(const std::string& from, const std::string& to);

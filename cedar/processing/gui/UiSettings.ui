@@ -31,7 +31,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="cedar::aux::gui::BoolParameter" name="mpUseGraphicsEffectsEdit" native="true"/>
+       <widget class="cedar::proc::aux::gui::BoolParameter" name="mpUseGraphicsEffectsEdit" native="true"/>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_3">
@@ -41,7 +41,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="cedar::aux::gui::EnumParameter" name="mpStepDisplayMode" native="true"/>
+       <widget class="cedar::proc::aux::gui::EnumParameter" name="mpStepDisplayMode" native="true"/>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_7">
@@ -51,7 +51,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="cedar::aux::gui::BoolParameter" name="mpHighlightConnections" native="true"/>
+       <widget class="cedar::proc::aux::gui::BoolParameter" name="mpHighlightConnections" native="true"/>
       </item>
       <item row="4" column="0">
        <widget class="QLabel" name="label_8">
@@ -61,7 +61,7 @@
        </widget>
       </item>
       <item row="4" column="1">
-       <widget class="cedar::aux::gui::UIntParameter" name="mpMaximumNumberOfLogMessages" native="true"/>
+       <widget class="cedar::proc::aux::gui::UIntParameter" name="mpMaximumNumberOfLogMessages" native="true"/>
       </item>
       <item row="3" column="0">
        <widget class="QLabel" name="label_9">
@@ -71,7 +71,7 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="cedar::aux::gui::BoolParameter" name="mpHighlightHoveredConnection" native="true"/>
+       <widget class="cedar::proc::aux::gui::BoolParameter" name="mpHighlightHoveredConnection" native="true"/>
       </item>
       <item row="6" column="0">
        <widget class="QLabel" name="label_41">
@@ -81,7 +81,7 @@
        </widget>
       </item>
       <item row="6" column="1">
-       <widget class="cedar::aux::gui::BoolParameter" name="mpUseDynamicFieldIcons" native="true"/>
+       <widget class="cedar::proc::aux::gui::BoolParameter" name="mpUseDynamicFieldIcons" native="true"/>
       </item>
       <item row="7" column="0">
        <widget class="QLabel" name="label_42">
@@ -91,19 +91,9 @@
        </widget>
       </item>
       <item row="7" column="1">
-       <widget class="cedar::aux::gui::UIntParameter" name="mpAutoSaveInterval" native="true"/>
+       <widget class="cedar::proc::aux::gui::UIntParameter" name="mpAutoSaveInterval" native="true"/>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>* changes only take effect after a restart of the application</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-     </property>
     </widget>
    </item>
    <item row="1" column="0">
@@ -120,7 +110,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="cedar::aux::gui::DoubleParameter" name="mpGrowthFactor" native="true"/>
+       <widget class="cedar::proc::aux::gui::DoubleParameter" name="mpGrowthFactor" native="true"/>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_5">
@@ -130,7 +120,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="cedar::aux::gui::DoubleParameter" name="mpSensitivity" native="true"/>
+       <widget class="cedar::proc::aux::gui::DoubleParameter" name="mpSensitivity" native="true"/>
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_6">
@@ -140,36 +130,65 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="cedar::aux::gui::BoolParameter" name="mpSlotGrowthEnabled" native="true"/>
+       <widget class="cedar::proc::aux::gui::BoolParameter" name="mpSlotGrowthEnabled" native="true"/>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Miscellaneous</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Undo individual changes of a parameter value at once</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="cedar::proc::aux::gui::BoolParameter" name="mpUndoRedoAutoMacro" native="true"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>* changes only take effect after a restart of the application</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+     </property>
     </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>cedar::aux::gui::EnumParameter</class>
+   <class>cedar::proc::aux::gui::EnumParameter</class>
    <extends>QWidget</extends>
-   <header>cedar/auxiliaries/gui/EnumParameter.h</header>
+   <header>cedar/processing/auxiliaries/gui/EnumParameter.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>cedar::aux::gui::BoolParameter</class>
+   <class>cedar::proc::aux::gui::BoolParameter</class>
    <extends>QWidget</extends>
-   <header>cedar/auxiliaries/gui/BoolParameter.h</header>
+   <header>cedar/processing/auxiliaries/gui/BoolParameter.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>cedar::aux::gui::DoubleParameter</class>
+   <class>cedar::proc::aux::gui::DoubleParameter</class>
    <extends>QWidget</extends>
-   <header>cedar/auxiliaries/gui/DoubleParameter.h</header>
+   <header>cedar/processing/auxiliaries/gui/DoubleParameter.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>cedar::aux::gui::UIntParameter</class>
+   <class>cedar::proc::aux::gui::UIntParameter</class>
    <extends>QWidget</extends>
-   <header>cedar/auxiliaries/gui/UIntParameter.h</header>
+   <header>cedar/processing/auxiliaries/gui/UIntParameter.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -221,7 +221,7 @@ void cedar::proc::steps::MatrixSlice::inputConnectionChanged(const std::string& 
 
 void cedar::proc::steps::MatrixSlice::updateDimensionality()
 {
-  if (!this->mInput)
+  if (!this->mInput || this->mInput->isEmpty())
   {
     return;
   }
@@ -384,6 +384,11 @@ void cedar::proc::steps::MatrixSlice::rangeChanged()
 
 void cedar::proc::steps::MatrixSlice::compute(const cedar::proc::Arguments&)
 {
+  if (!this->mInput || this->mInput->isEmpty())
+  {
+    return;
+  }
+
   const cv::Mat& input = this->mInput->getData();
   cv::Mat& output = this->mOutput->getData();
 

@@ -40,8 +40,8 @@
 // CEDAR INCLUDES
 #include "BoolVectorParameter.h"
 #include "cedar/auxiliaries/BoolVectorParameter.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
-#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 //
@@ -50,10 +50,10 @@
 ////----------------------------------------------------------------------------------------------------------------------
 //namespace
 //{
-//  bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->add
+//  bool registered = cedar::proc::aux::gui::ParameterFactorySingleton::getInstance()->add
 //      <
 //        cedar::aux::BoolVectorParameter,
-//        cedar::aux::gui::BoolVectorParameter
+//        cedar::proc::aux::gui::BoolVectorParameter
 //      >();
 //}
 
@@ -63,7 +63,7 @@
 
 BoolVectorParameter::BoolVectorParameter(QWidget* pParent)
 :
-cedar::aux::gui::BoolVectorParameter(pParent)
+cedar::proc::aux::gui::BoolVectorParameter(pParent)
 {
 }
 

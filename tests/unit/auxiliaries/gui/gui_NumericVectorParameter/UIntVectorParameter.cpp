@@ -41,8 +41,8 @@
 // CEDAR INCLUDES
 #include "UIntVectorParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
-#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -54,7 +54,7 @@
 
 UIntVectorParameter::UIntVectorParameter(QWidget *pParent)
 :
-cedar::aux::gui::UIntVectorParameter(pParent)
+cedar::proc::aux::gui::UIntVectorParameter(pParent)
 {
 }
 

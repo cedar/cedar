@@ -38,6 +38,7 @@
 #define CEDAR_AUX_OBJECT_PARAMETER_TEMPLATE_H
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/ObjectParameter.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/FactoryManager.h"
@@ -139,7 +140,9 @@ public:
   void setValue(BaseTypePtr object)
   {
     this->mObject = object;
-
+    if(auto config = dynamic_cast<cedar::aux::Configurable*>(object.get())){
+      config->setParent(this->getOwner());
+    }
     this->emitChangedSignal();
   }
 

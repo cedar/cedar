@@ -72,6 +72,11 @@
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/processing/gui/StickyNote.h"
 #include "cedar/processing/gui/GroupParameterDesigner.h"
+#include "Ide.h"
+#include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteElement.h"
+#include "cedar/processing/undoRedo/commands/CreateGroupTemplate.h"
 
 // SYSTEM INCLUDES
 #include <QEvent>
@@ -335,13 +340,14 @@ void cedar::proc::gui::Group::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
 
 void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
-  auto declaration = cedar::proc::gui::ElementList::declarationFromDrop(pEvent);
+  cedar::aux::ConstPluginDeclaration* declaration = cedar::proc::gui::ElementList::declarationFromDrop(pEvent);
   if (declaration == nullptr)
   {
     return;
   }
   QPointF mapped = pEvent->scenePos();
-  auto target_group = this->getGroup();
+  cedar::proc::GroupPtr target_group = this->getGroup();
+
   if (!this->isRootGroup())
   {
     mapped -= this->scenePos();
@@ -349,18 +355,17 @@ void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 
   if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration *>(declaration))
   {
-    //!@todo can createElement be moved into gui::Group?
-    this->mpScene->createElement(target_group, elem_declaration->getClassName(), mapped);
-  } else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration *>(declaration))
+    //Push a createDeleteCommand (as a create) onto the UndoStack
+    cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteElement(
+            mapped, elem_declaration->getClassName(), target_group, mpScene, true));
+  }
+  //TODO: Do Group Declaration (with an own Command). This works with Json Templates
+  else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration *>(declaration))
   {
-    auto elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup
-            (
-                    group_declaration->getClassName(),
-                    target_group,
-                    pEvent->modifiers().testFlag(Qt::ControlModifier)
-            );
-    this->mpScene->getGraphicsItemFor(elem)->setPos(mapped);
-  } else
+    cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateGroupTemplate(
+            group_declaration, target_group, pEvent, mapped, this->mpScene));
+  }
+  else
   {
     CEDAR_THROW(cedar::aux::NotFoundException, "Could not cast the dropped declaration to any known type.");
   }
@@ -812,6 +817,16 @@ void cedar::proc::gui::Group::sizeChanged()
   this->updateDecorationPositions();
 }
 
+double cedar::proc::gui::Group::getUncollapsedWidth()
+{
+  return this->_mUncollapsedWidth->getValue();
+}
+
+double cedar::proc::gui::Group::getUncollapsedHeight()
+{
+  return this->_mUncollapsedHeight->getValue();
+}
+
 void cedar::proc::gui::Group::updateTextBounds()
 {
   qreal bounds_factor = static_cast<qreal>(2);
@@ -1205,13 +1220,13 @@ void cedar::proc::gui::Group::readJson(const cedar::aux::Path &source)
 
 void cedar::proc::gui::Group::readJsonFromString(std::string jsonString)
 {
-  std::stringstream jsonFromClipboardStream;
-  jsonFromClipboardStream << jsonString;
+  std::stringstream jsonStream;
+  jsonStream << jsonString;
 
   cedar::aux::ConfigurationNode root;
 
   //Debugged: Works
-  read_json(jsonFromClipboardStream, root);
+  read_json(jsonStream, root);
 
 
   this->readRobots(root);
@@ -1269,8 +1284,6 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
         this->_mArchitectureWidgets[key] = value.get_value<std::string>();
       }
     }
-
-
 
     // read background color
     auto color_node = node.find("background color");
@@ -1573,6 +1586,7 @@ void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode &
   }
 
   // write down robots
+  if(this->getGroup()->isRoot()) // Why was the condition missing?
   {
     //Todo: Write only robots down that are actually used in the architecture
     cedar::dev::RobotManagerSingleton::getInstance()->writeRobotConfigurations(generic);
@@ -1682,7 +1696,8 @@ void cedar::proc::gui::Group::writeScene(cedar::aux::ConfigurationNode &root) co
 {
   cedar::aux::ConfigurationNode scene;
 
-  // only write sticky notes for the root network
+  // only save scene-stuff for the root network
+  // (Workaround to avoid crashes: don't access the Scene from wrong thread!).
   if (this->getGroup()->isRoot())
   {
     std::vector<cedar::proc::gui::StickyNote *> stickyNotes = this->mpScene->getStickyNotes();
@@ -1704,64 +1719,65 @@ void cedar::proc::gui::Group::writeScene(cedar::aux::ConfigurationNode &root) co
       node.put("color blue", color.blue());
       scene.push_back(cedar::aux::ConfigurationNode::value_type("", node));
     }
-  }
 
-  //Save ConnectionAnchor (drag-points of Connection)
-  cedar::aux::ConfigurationNode connNode;
-  connNode.put("type", "connections");
-  cedar::aux::ConfigurationNode allConnections;
-  auto data_cons = this->getGroup()->getDataConnections();
-  QList<QGraphicsItem *> items = this->mpScene->items();
+    //Save ConnectionAnchor (drag-points of Connection)
+    cedar::aux::ConfigurationNode connNode;
+    connNode.put("type", "connections");
+    cedar::aux::ConfigurationNode allConnections;
+    auto data_cons = this->getGroup()->getDataConnections();
+    QList<QGraphicsItem *> items = this->mpScene->items();
 
-  for (int i = 0; i < items.size(); ++i)
-  {
-    if (cedar::proc::gui::Connection *con = dynamic_cast<cedar::proc::gui::Connection *>(items[i]))
+    for (int i = 0; i < items.size(); ++i)
     {
-      for(cedar::proc::DataConnectionPtr data_con : data_cons)
+      if (cedar::proc::gui::Connection *con = dynamic_cast<cedar::proc::gui::Connection *>(items[i]))
       {
-        //Save ConnectionAnchors of every connection in this group
-        if (!con->getSourceSlotName().toStdString().compare(data_con->getSource()->getParent() + "." + data_con->getSource()->getName())
-         && !con->getTargetSlotName().toStdString().compare(data_con->getTarget()->getParent() + "." + data_con->getTarget()->getName()))
+        for(cedar::proc::DataConnectionPtr data_con : data_cons)
         {
-          if(con->getConnectionAnchorPoints().size() <= 0 || !con->isSourceTargetSlotNameValid()) continue;
-          cedar::aux::ConfigurationNode connection;
-          connection.put("source slot", con->getSourceSlotName().toStdString());
-          connection.put("target slot", con->getTargetSlotName().toStdString());
-          cedar::aux::ConfigurationNode anchorsNode;
-          std::vector<cedar::proc::gui::ConnectionAnchor*> anchorsToSave;
-
-          //Remove duplicates (may result from previous bug)
-          for(cedar::proc::gui::ConnectionAnchor *anchor : con->getConnectionAnchorPoints())
+          //Save ConnectionAnchors of every connection in this group
+          if (!con->getSourceSlotName().toStdString().compare(data_con->getSource()->getParent() + "." + data_con->getSource()->getName())
+           && !con->getTargetSlotName().toStdString().compare(data_con->getTarget()->getParent() + "." + data_con->getTarget()->getName()))
           {
-            bool duplicate = false;
-            for (cedar::proc::gui::ConnectionAnchor *savedAnchor : anchorsToSave)
+            if(con->getConnectionAnchorPoints().size() <= 0 || !con->isSourceTargetSlotNameValid()) continue;
+            cedar::aux::ConfigurationNode connection;
+            connection.put("source slot", con->getSourceSlotName().toStdString());
+            connection.put("target slot", con->getTargetSlotName().toStdString());
+            cedar::aux::ConfigurationNode anchorsNode;
+            std::vector<cedar::proc::gui::ConnectionAnchor*> anchorsToSave;
+
+            //Remove duplicates (may result from previous bug)
+            for(cedar::proc::gui::ConnectionAnchor *anchor : con->getConnectionAnchorPoints())
             {
-              if(static_cast<int>(anchor->posMiddle().x()) == static_cast<int>(savedAnchor->posMiddle().x()) && static_cast<int>(anchor->posMiddle().y()) == static_cast<int>(savedAnchor->posMiddle().y()))
+              bool duplicate = false;
+              for (cedar::proc::gui::ConnectionAnchor *savedAnchor : anchorsToSave)
               {
-                duplicate = true;
+                if(static_cast<int>(anchor->posMiddle().x()) == static_cast<int>(savedAnchor->posMiddle().x()) && static_cast<int>(anchor->posMiddle().y()) == static_cast<int>(savedAnchor->posMiddle().y()))
+                {
+                  duplicate = true;
+                }
+              }
+              if(!duplicate)
+              {
+                anchorsToSave.push_back(anchor);
               }
             }
-            if(!duplicate)
+            //Save anchors
+            for(cedar::proc::gui::ConnectionAnchor *anchor : anchorsToSave)
             {
-              anchorsToSave.push_back(anchor);
+              cedar::aux::ConfigurationNode anchorNode;
+              anchorNode.put("x", static_cast<int>(anchor->posMiddle().x()));
+              anchorNode.put("y", static_cast<int>(anchor->posMiddle().y()));
+              anchorsNode.push_back(cedar::aux::ConfigurationNode::value_type("", anchorNode));
             }
+            connection.add_child("anchors", anchorsNode);
+            allConnections.push_back(cedar::aux::ConfigurationNode::value_type("", connection));
           }
-          //Save anchors
-          for(cedar::proc::gui::ConnectionAnchor *anchor : anchorsToSave)
-          {
-            cedar::aux::ConfigurationNode anchorNode;
-            anchorNode.put("x", static_cast<int>(anchor->posMiddle().x()));
-            anchorNode.put("y", static_cast<int>(anchor->posMiddle().y()));
-            anchorsNode.push_back(cedar::aux::ConfigurationNode::value_type("", anchorNode));
-          }
-          connection.add_child("anchors", anchorsNode);
-          allConnections.push_back(cedar::aux::ConfigurationNode::value_type("", connection));
         }
       }
     }
+    connNode.put_child("connections", allConnections);
+    scene.push_back(cedar::aux::ConfigurationNode::value_type("", connNode));
   }
-  connNode.put_child("connections", allConnections);
-  scene.push_back(cedar::aux::ConfigurationNode::value_type("", connNode));
+
   auto elements = this->getGroup()->getElements();
 
   for

@@ -563,6 +563,7 @@ public:
   //!@brief checks if group itself or any child group contains the given element
   bool contains(cedar::proc::ConstElementPtr element) const;
 
+  //!@brief checks if group itself or any child group contains the given element Name
   bool contains(std::string elementName) const;
 
   //!@brief returns if this is the root group

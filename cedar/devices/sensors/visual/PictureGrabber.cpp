@@ -171,12 +171,19 @@ void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
   {
     const std::string filename = getPictureChannel(channel)->_mSourceFileName->getPath(true);
 
-    // lock image-matrix for writing
-    mpReadWriteLock->lockForWrite();
-    getImageMat(channel) = cv::imread(filename);
-    mpReadWriteLock->unlock();
-
-    if (getImageMat(channel).empty())
+    bool failed = false;
+    if(cedar::aux::Path(filename).isDirectory())
+    {
+      failed = true;
+    }
+    else
+    {
+      // lock image-matrix for writing
+      mpReadWriteLock->lockForWrite();
+      getImageMat(channel) = cv::imread(filename);
+      mpReadWriteLock->unlock();
+    }
+    if(failed || getImageMat(channel).empty())
     {
       std::string message = this->getName() + ": FileNameChanged: Grabbing failed on Channel "
                             + cedar::aux::toString(channel) + " from \"" + filename + "\"" ;

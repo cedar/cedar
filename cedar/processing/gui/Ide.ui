@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1017</width>
-    <height>811</height>
+    <width>983</width>
+    <height>762</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,6 +33,7 @@
     </property>
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
+
       <property name="currentIndex">
        <number>0</number>
       </property>
@@ -83,8 +84,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1017</width>
-     <height>22</height>
+     <width>983</width>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -155,6 +156,9 @@
     <property name="title">
      <string>Edit</string>
     </property>
+    <addaction name="mpActionUndo"/>
+    <addaction name="mpActionRedo"/>
+    <addaction name="separator"/>
     <addaction name="mpActionCopy"/>
     <addaction name="mpActionPaste"/>
     <addaction name="mpActionCopyConfiguration"/>
@@ -301,7 +305,7 @@
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_6">
          <item>
-          <widget class="cedar::aux::gui::Configurable" name="mpPropertyTable"/>
+          <widget class="cedar::proc::aux::gui::Configurable" name="mpPropertyTable"/>
          </item>
         </layout>
        </widget>
@@ -321,7 +325,7 @@
               <x>0</x>
               <y>0</y>
               <width>254</width>
-              <height>421</height>
+              <height>495</height>
              </rect>
             </property>
             <property name="palette">
@@ -439,7 +443,7 @@
               <x>0</x>
               <y>0</y>
               <width>254</width>
-              <height>421</height>
+              <height>495</height>
              </rect>
             </property>
             <property name="palette">
@@ -557,7 +561,7 @@
               <x>0</x>
               <y>0</y>
               <width>254</width>
-              <height>421</height>
+              <height>495</height>
              </rect>
             </property>
             <property name="palette">
@@ -679,6 +683,9 @@
    <addaction name="mpActionStartPauseSimulation"/>
    <addaction name="mpActionResetSimulation"/>
    <addaction name="mpThreadsSingleStep"/>
+   <addaction name="separator"/>
+   <addaction name="mpActionUndo"/>
+   <addaction name="mpActionRedo"/>
    <addaction name="separator"/>
    <addaction name="mpActionRecord"/>
    <addaction name="mpActionSnapshot"/>
@@ -1096,6 +1103,30 @@
     <string>Ctrl+C</string>
    </property>
   </action>
+  <action name="mpActionUndo">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/menus/undo.svg</normaloff>:/menus/undo.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="mpActionRedo">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/menus/redo.svg</normaloff>:/menus/redo.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
+   </property>
+  </action>
   <action name="mpActionCopyConfiguration">
    <property name="text">
     <string>Copy step configuration</string>
@@ -1104,6 +1135,7 @@
     <string>Ctrl+Shift+C</string>
    </property>
   </action>
+
   <action name="mpActionPaste">
    <property name="text">
     <string>Paste</string>
@@ -1112,6 +1144,7 @@
     <string>Ctrl+V</string>
    </property>
   </action>
+
   <action name="mpActionPasteConfiguration">
    <property name="text">
     <string>Paste step configuration</string>
@@ -1264,10 +1297,9 @@
    <header location="global">cedar/processing/gui/View.h</header>
   </customwidget>
   <customwidget>
-   <class>cedar::aux::gui::Configurable</class>
+   <class>cedar::proc::aux::gui::Configurable</class>
    <extends>QTableWidget</extends>
-   <header>cedar/auxiliaries/gui/Configurable.h</header>
-   <container>1</container>
+   <header>cedar/processing/auxiliaries/gui/Configurable.h</header>
   </customwidget>
   <customwidget>
    <class>cedar::aux::gui::Log</class>

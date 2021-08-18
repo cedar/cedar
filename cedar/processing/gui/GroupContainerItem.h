@@ -48,7 +48,7 @@
 #include "cedar/processing/gui/GroupContainerItem.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"
 #include "cedar/processing/gui/GroupWidget.fwd.h"
-#include "cedar/auxiliaries/gui/Configurable.fwd.h"
+#include "cedar/processing/auxiliaries/gui/Configurable.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -75,7 +75,7 @@ public:
 public:
   /*!@brief Sets the widget used for displaying/editing the parameters of configurables in the group.
    */
-  void setConfigurableWidget(cedar::aux::gui::Configurable* pConfigurableWidget);
+  void setConfigurableWidget(cedar::proc::aux::gui::Configurable* pConfigurableWidget);
 
   /*!@brief Sets the widget used for displaying/editing the record parameters in the group.
    */
