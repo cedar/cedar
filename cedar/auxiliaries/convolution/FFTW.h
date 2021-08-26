@@ -54,6 +54,7 @@
 #include <map>
 #include <string>
 #include <set>
+#include <mutex>
 
 /*!@brief A convolution engine based on the FFTW library.
  */
