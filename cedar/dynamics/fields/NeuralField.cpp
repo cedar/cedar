@@ -546,7 +546,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
 
 void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 {
-  if(this->getName() == "DebugField")
+  if(this->getName().find("Debug") != std::string::npos)
   {
     std::cout<<"This is field: " << this->getName() << ". I perform my euler step with a delta t of: " << time << std::endl;
   }

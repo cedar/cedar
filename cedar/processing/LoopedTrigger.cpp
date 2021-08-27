@@ -223,7 +223,7 @@ void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
   cv::theRNG().state = seed;
 
 
-  cedar::proc::ArgumentsPtr arguments(new cedar::proc::StepTime(time));
+  cedar::proc::ArgumentsPtr arguments(new cedar::proc::StepTime(time,cedar::aux::GlobalClockSingleton::getInstance()->getTime()));
 
   QReadLocker locker(this->mListeners.getLockPtr());
   auto this_ptr = boost::static_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this());

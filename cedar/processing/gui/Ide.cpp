@@ -822,7 +822,7 @@ void cedar::proc::gui::Ide::setSimulationControlsEnabled(bool enabled)
 {
   this->mpActionStartPauseSimulation->setEnabled(enabled);
   // jokeit: see above this->mpActionResetSimulation->setEnabled(enabled);
-  this->mpThreadsSingleStep->setEnabled(enabled);
+  this->mpThreadsSingleStep->setEnabled(enabled && cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT);
 }
 
 void cedar::proc::gui::Ide::buildStatusBar()
@@ -2176,7 +2176,8 @@ void cedar::proc::gui::Ide::updateSimulationRunningIcon(bool running)
   else
   {
     this->mpActionStartPauseSimulation->setIcon(QIcon(":/cedar/auxiliaries/gui/start.svg"));
-    this->mpThreadsSingleStep->setEnabled(true);
+//    this->mpThreadsSingleStep->setEnabled(true);
+    this->mpThreadsSingleStep->setEnabled(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT);
   }
 }
 
