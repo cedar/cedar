@@ -243,8 +243,6 @@ public:
 
   void postUndoRedo()
   {
-    this->mpParameter->emitChangedSignal();
-
     //If name property was changed, update name
     this->updateFullPaths();
   }

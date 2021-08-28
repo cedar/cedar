@@ -151,6 +151,13 @@ public:
   virtual void makeDefault()
   {
     this->mObjectList = this->mDefaults;
+    for(BaseTypePtr object : this->mObjectList)
+    {
+      if(auto configurable = dynamic_cast<cedar::aux::Configurable*>(object.get()))
+      {
+        configurable->setParent(this->getOwner());
+      }
+    }
   }
 
 
@@ -213,6 +220,10 @@ public:
     this->mObjectList.insert(this->mObjectList.begin() + index, object);
     this->mObjectAdded(index);
     this->emitChangedSignal();
+    if(auto configurable = dynamic_cast<cedar::aux::Configurable*>(object.get()))
+    {
+      configurable->setParent(this->getOwner());
+    }
   }
 
   //!@brief allocate and add an object at the end
@@ -230,6 +241,10 @@ public:
 
     this->mObjectAdded(this->mObjectList.size() - 1);
     this->emitChangedSignal();
+    if(auto configurable = dynamic_cast<cedar::aux::Configurable*>(object.get()))
+    {
+      configurable->setParent(this->getOwner());
+    }
   }
 
   //!@brief remove an object at the given index
