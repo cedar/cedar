@@ -42,6 +42,8 @@
 // CLASS HEADER
 #include "cedar/processing/undoRedo/UndoCommand.h"
 #include "cedar/processing/undoRedo/UndoStack.h"
+#include "cedar/processing/undoRedo/commands/ChangeParameterValue.h"
+#include "cedar/processing/undoRedo/commands/ChangeParameterValueTemplate.h"
 #include "cedar/processing/gui/ExperimentDialog.h"
 #include "cedar/processing/gui/Ide.h"
 
@@ -63,6 +65,11 @@ cedar::proc::undoRedo::UndoCommand::~UndoCommand()
 
 int cedar::proc::undoRedo::UndoCommand::id() const
 {
+  // Reserve id 0 for string parameters, so "name" parameter works with the macro system
+  if(dynamic_cast<const cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::string>*>(this))
+  {
+    return 0;
+  }
   return cedar::proc::gui::Ide::pUndoStack->idIndex(this->getMacroIdentifier());
 }
 
