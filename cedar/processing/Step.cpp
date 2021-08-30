@@ -85,7 +85,7 @@ cedar::proc::Step::Step(bool isLooped)
 Triggerable(isLooped),
 // initialize parameters
 mAutoLockInputsAndOutputs(true),
-lastExecutionTime(cedar::unit::Time(-1.0*cedar::unit::seconds)) //not sure about the right initialization yet
+mLastExecutionTime(cedar::unit::Time(-1.0*cedar::unit::seconds)) //not sure about the right initialization yet
 {
   this->mComputeTimeId = this->registerTimeMeasurement("compute call");
   this->mLockingTimeId = this->registerTimeMeasurement("locking");
@@ -179,6 +179,7 @@ void cedar::proc::Step::callReset()
   // lock everything
   cedar::proc::Step::ReadLocker locker(this);
 
+  this->mLastExecutionTime = cedar::unit::Time(-1.0*cedar::unit::seconds); //not sure about the right initialization yet;
   // reset the step
   this->reset();
 
@@ -386,10 +387,10 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
       if(auto step_time = boost::dynamic_pointer_cast< cedar::proc::StepTime>(arguments))
       {
         // The arguments cam from a step trigger and contain a TimeStamp. Only execute, if the timesstamp is newer than the last executed one
-        if(step_time->getGlobalTimeStamp() > this->lastExecutionTime)
+        if(step_time->getGlobalTimeStamp() > this->mLastExecutionTime)
         {
           this->compute(*(arguments.get()));
-          this->lastExecutionTime = step_time->getGlobalTimeStamp();
+          this->mLastExecutionTime = step_time->getGlobalTimeStamp();
         }
       }
       else

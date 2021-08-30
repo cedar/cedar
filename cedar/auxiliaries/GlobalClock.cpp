@@ -83,7 +83,7 @@ double cedar::aux::GlobalClock::getCurrentElapsedMSec() const
 {
   //This is the Internal Update
   double elapsed = static_cast<double>(this->mTimer.elapsed());
-  return elapsed * this->mCurrentTimeFactor;
+  return elapsed; //* this->mCurrentTimeFactor; //Time Factor should not be used anymore
 }
 
 void cedar::aux::GlobalClock::addCurrentToAdditionalElapsedTime()

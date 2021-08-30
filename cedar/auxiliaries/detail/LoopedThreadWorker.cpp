@@ -306,6 +306,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         QReadLocker locker(this->mTimeFactor.getLockPtr());
         time_factor = this->mTimeFactor.member();
       }
+
       auto minimum_step_size=  cedar::unit::Time(1.0 * cedar::unit::micro * cedar::unit::seconds); //mpWrapper->getMinimumStepSize();
             // TODO: the minimal Sleep Time Parameter is practically
             //       useless and can be replaced by a small constant
@@ -396,6 +397,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
             cedar::unit::Time( 
               static_cast<long>( orig_fake_step_size / cedar::unit::Time(1.0 * cedar::unit::micro * cedar::unit::second))
               * cedar::unit::micro * cedar::unit::seconds);
+          //JT: Time Factor was removed from this calculation.
 
           mpWrapper->step( modified_fake_step_size );
         }

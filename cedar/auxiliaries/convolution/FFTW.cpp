@@ -674,7 +674,6 @@ void cedar::aux::conv::FFTW::initThreads()
   {
     // this should be done only once
     // JT:09.08.2021 This is now ensured through the std::call_once function
-    std::cout<<"Init Threads! Am I alone?" << std::endl;
     fftw_init_threads();
     omp_set_num_threads(cedar::aux::SettingsSingleton::getInstance()->getFFTWNumberOfThreads());
     fftw_set_timelimit(30.0);
