@@ -391,6 +391,18 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getGroupSteps()
   return path_strings;
 }
 
+std::vector<std::string> cedar::proc::experiment::Experiment::getGroupStepsMatching(std::function<bool(cedar::proc::ConstElementPtr)> matcher)
+{
+    auto paths = this->mGroup->listElementPaths(matcher);
+
+    std::vector<std::string> path_strings;
+    for (const auto& path : paths)
+    {
+        path_strings.push_back(path.toString());
+    }
+    return path_strings;
+}
+
 unsigned int cedar::proc::experiment::Experiment::getCurrentTrial()
 {
   return this->mCurrentTrial;

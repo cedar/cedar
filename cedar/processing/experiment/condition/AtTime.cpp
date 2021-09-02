@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/GlobalClock.h"
 
 // SYSTEM INCLUDES
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -76,5 +77,6 @@ bool cedar::proc::experiment::condition::AtTime::check() const
 {
   // reset the activated flag if the time is below the time to check
   cedar::unit::Time time = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
+
   return time >= this->_mTime->getValue();
 }

@@ -145,6 +145,7 @@ mActivation(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mSigmoidalActivation(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mLateralInteraction(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mInputSum(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
+mInputSumExperiment(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mInputNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mNeuralNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mMaximumLocation(new cedar::aux::MatData(cv::Mat::zeros(2, 1, CV_32F))),
@@ -552,6 +553,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   cv::Mat& neural_noise = this->mNeuralNoise->getData();
   cv::Mat& u = this->mActivation->getData();
   cv::Mat& input_sum = this->mInputSum->getData();
+  cv::Mat& input_sum_experiment = this->mInputSumExperiment->getData();
   const double& h = mRestingLevel->getValue();
   const double& tau = mTau->getValue();
   const double& global_inhibition = mGlobalInhibition->getValue();
@@ -659,7 +661,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   CEDAR_ASSERT(u.size == input_sum.size);
 
   // the field equation
-  cv::Mat d_u = -u + h + lateral_interaction + global_inhibition * cv::sum(sigmoid_u)[0] + input_sum;
+  cv::Mat d_u = -u + h + lateral_interaction + global_inhibition * cv::sum(sigmoid_u)[0] + input_sum + input_sum_experiment;
 
   boost::shared_ptr<QWriteLocker> activation_write_locker;
   if (this->activationIsOutput())
@@ -755,6 +757,7 @@ void cedar::dyn::NeuralField::updateMatrices()
     this->mInputNoise->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
     this->mNeuralNoise->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
     this->mInputSum->setData(cv::Mat(1, 1, CV_32F, cv::Scalar(0)));
+    this->mInputSumExperiment->setData(cv::Mat(1, 1, CV_32F, cv::Scalar(0)));
   }
   else if (dimensionality == 1)
   {
@@ -764,6 +767,7 @@ void cedar::dyn::NeuralField::updateMatrices()
     this->mInputNoise->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
     this->mNeuralNoise->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
     this->mInputSum->setData(cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0)));
+    this->mInputSumExperiment->setData(cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0)));
   }
   else
   {
@@ -773,6 +777,7 @@ void cedar::dyn::NeuralField::updateMatrices()
     this->mInputNoise->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
     this->mNeuralNoise->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
     this->mInputSum->setData(cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0)));
+    this->mInputSumExperiment->setData(cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0)));
   }
   this->unlockAll();
   if (dimensionality > 0) // only adapt kernel in non-0D case
@@ -793,6 +798,10 @@ void cedar::dyn::NeuralField::updateMatrices()
     this->emitOutputPropertiesChangedSignal("activation");
   }
   this->emitOutputPropertiesChangedSignal("sigmoided activation");
+}
+
+void cedar::dyn::NeuralField::setInputSumExperimentData(cv::Mat data) {
+    this->mInputSumExperiment->setData(data);
 }
 
 void cedar::dyn::NeuralField::onStart()
