@@ -226,6 +226,7 @@ protected:
       }
       else
       {
+          parameter->setValue(value, true);
       }
     }
 
