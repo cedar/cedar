@@ -163,22 +163,9 @@ public:
   //!@brief Set the size at given dimension of the field.
   inline void setSize(unsigned int dim, unsigned int size)
   {
-      CEDAR_ASSERT(dim < this->_mSizes->size());
-      this->_mSizes->setValue(dim, size);
+    CEDAR_ASSERT(dim < this->_mSizes->size());
+    this->_mSizes->setValue(dim, size);
   }
-
-  inline std::vector<int> getSizes()
-  {
-      int dimensionality = static_cast<int>(this->getDimensionality());
-      std::vector<int> sizes(dimensionality);
-      for (int dim = 0; dim < dimensionality; ++dim)
-      {
-          sizes[dim] = _mSizes->at(dim);
-      }
-      return sizes;
-  }
-
-  void setInputSumExperimentData(cv::Mat data);
 
   //! Returns the resting level (h) of the field.
   inline double getRestingLevel() const
@@ -270,11 +257,8 @@ protected:
   //!@brief this SpaceCode matrix contains the current lateral interactions of the NeuralField, i.e. convolution result
   cedar::aux::MatDataPtr mLateralInteraction;
 
-  //!@brief this SpaceCode matrix contains the external input to the field from other steps
+  //!@brief this SpaceCode matrix contains the current lateral interactions of the NeuralField, i.e. convolution result
   cedar::aux::MatDataPtr mInputSum;
-
-  //!@brief this SpaceCode matrix contains the external input to the field from the experiment framework
-  cedar::aux::MatDataPtr mInputSumExperiment;
 
   //!@brief this MatData contains the input noise
   cedar::aux::MatDataPtr mInputNoise;

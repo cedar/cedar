@@ -238,9 +238,6 @@ public:
   //!@brief Get all steps of the current group
   std::vector<std::string> getGroupSteps();
 
-  //!@brief Get all steps of the current group which match the provided predicate
-  std::vector<std::string> getGroupStepsMatching(std::function<bool(cedar::proc::ConstElementPtr)> matcher);
-
   //!@brief Returns the actual trial that is currently running
   unsigned int getCurrentTrial();
 

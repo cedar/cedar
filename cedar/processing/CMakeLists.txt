@@ -91,18 +91,15 @@ cedar_add_library(cedarproc
   experiment/PropertyParameter.h
   experiment/ConnectableParameter.h
   experiment/StepPropertyParameter.h
-        experiment/NeuralFieldBoostParameter.h
   experiment/Supervisor.h
   experiment/condition/OnMatrixValue.h
   experiment/action/IterateDirectoryContents.h
-        experiment/action/ProvideBoost.h
   experiment/gui/ActionListParameter.h
   experiment/gui/ActionSequence.h
   experiment/gui/ActionParameter.h
   experiment/gui/ExperimentItemWidget.h
   experiment/gui/ConnectableParameter.h
   experiment/gui/StepPropertyParameter.h
-        experiment/gui/NeuralFieldBoostParameter.h
   gui/ArchitectureWidgetList.h
   gui/ArchitectureScriptEditor.h
   gui/stepViews/BoostView.h
