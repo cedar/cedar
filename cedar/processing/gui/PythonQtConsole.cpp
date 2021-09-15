@@ -39,11 +39,12 @@
 */
 //----------------------------------------------------------------------------------
 
-#include "PythonQtConsole.h"
-#include "ElementList.h"
-#include "Group.h"
-#include "CoPYObject.h"
-
+#include "cedar/processing/gui/PythonQtConsole.h"
+#include "cedar/processing/gui/ElementList.h"
+#include "cedar/processing/gui/Group.h"
+#include "cedar/processing/gui/CoPYObject.h"
+#include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
 
 #include <QMenu>
 #include <QKeyEvent>
@@ -363,7 +364,10 @@ void cedar::proc::gui::PythonQtConsole::setScene(cedar::proc::gui::Scene *pScene
 std::string cedar::proc::gui::PythonQtConsoleScope::PythonWorker::hasToStop;
 void cedar::proc::gui::PythonQtConsole::reset(std::string msg, bool fromOut)
 {
-  if(pythonBusy) cedar::proc::gui::PythonQtConsoleScope::PythonWorker::hasToStop = msg;
+  if(pythonBusy)
+  {
+    cedar::proc::gui::PythonQtConsoleScope::PythonWorker::hasToStop = msg;
+  }
   if(!pythonBusy && !fromOut)
   {
     emit resetPython();
@@ -401,7 +405,15 @@ void cedar::proc::gui::PythonQtConsole::handleSetup(PythonQtObjectPtr mContext)
 void cedar::proc::gui::PythonQtConsole::handleBusyStateChange(const bool& state)
 {
   pythonBusy = state;
-  if(!pythonBusy) emit giveVariables(emit getVariablesFromWorker());
+  if(pythonBusy)
+  {
+    cedar::proc::gui::Ide::pUndoStack->beginMacro("Python Script");
+  }
+  else
+  {
+    cedar::proc::gui::Ide::pUndoStack->endMacro();
+    emit giveVariables(emit getVariablesFromWorker());
+  }
 }
 
 
@@ -411,7 +423,7 @@ QMap<QString, QString> cedar::proc::gui::PythonQtConsoleScope::PythonWorker::giv
   QStringList vars = PythonQt::self()->introspectObject(mContext, PythonQt::Variable);
   for (QString var: vars)
   {
-    if(!var.startsWith("__"))
+    if(!var.startsWith("__") && var != "py")
     {
       QVariant val = mContext.getVariable(var);
       if (val.canConvert<QString>())

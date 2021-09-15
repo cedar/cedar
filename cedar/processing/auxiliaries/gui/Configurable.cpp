@@ -52,7 +52,6 @@
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/kernel/Box.h"
 #if !defined CEDAR_OS_APPLE
-#include "cedar/processing/Step.h"
 #endif
 
 // SYSTEM INCLUDES
@@ -864,7 +863,7 @@ void cedar::proc::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* ite
   item->setFont(PARAMETER_NAME_COLUMN, font);
 }
 
-void cedar::aux::gui::Configurable::showContextMenu(const QPoint &pos)
+void cedar::proc::aux::gui::Configurable::showContextMenu(const QPoint &pos)
 {
   ParameterItem *item = dynamic_cast<ParameterItem *>(mpPropertyTree->itemAt(pos));
   if (!item)
@@ -876,30 +875,20 @@ void cedar::aux::gui::Configurable::showContextMenu(const QPoint &pos)
   if (a == use_in_copy)
   {
     cedar::aux::Configurable* owner = item->getParameter()->getOwner();
-    while(owner != nullptr)
+
+    if(auto element = dynamic_cast<cedar::proc::Element *>(item->getParameter()->getNamedConfigurableOwner()))
     {
-      if (auto step = dynamic_cast<cedar::proc::Step*>(owner))
-      {
-        break;
+      std::string paramName = element->findParameterPath(item->getParameter());
+      std::string stepName =  element->getFullPath();
+
+      //get CoPYWidget and append
+      QObject* object = this;
+      while(object->parent()){
+        object = object->parent();
       }
-      owner = owner->getParent();
-    }
-    if(owner == nullptr)
-    {
-      return;
-    }
-    auto step = dynamic_cast<cedar::proc::Step*>(owner);
-
-    std::string paramName = step->findParameterPath(item->getParameter());
-    std::string stepName = step->getFullPath();
-
-    //get CoPYWidget and append
-    QObject* object = this;
-    while(object->parent()){
-      object = object->parent();
-    }
-    if(auto copyWidget = object->findChild<cedar::proc::gui::CoPYWidget*>("mpCopy")){
-      copyWidget->appendToConsole("py.setParameter(\""+ stepName + "\",\"" + paramName +"\", VALUE)\n");
+      if(auto copyWidget = object->findChild<cedar::proc::gui::CoPYWidget*>("mpCopy")){
+        copyWidget->appendToConsole("py.setParameter(\""+ stepName + "\",\"" + paramName +"\", VALUE)\n");
+      }
     }
   }
 }

@@ -839,16 +839,6 @@ const cedar::aux::Configurable::Children& cedar::aux::Configurable::configurable
   return this->mChildren;
 }
 
-cedar::aux::Configurable* cedar::aux::Configurable::getParent()
-{
-  return this->mpParent;
-}
-
-void cedar::aux::Configurable::setParent(cedar::aux::Configurable* parent)
-{
-  this->mpParent = parent;
-}
-
 void cedar::aux::Configurable::addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child)
 {
   if (this->mChildren.find(name) != this->mChildren.end())
