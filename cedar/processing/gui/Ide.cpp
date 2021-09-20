@@ -86,6 +86,7 @@
 #include "cedar/configuration.h"
 #include "cedar/devices/RobotManager.h"
 #include "cedar/processing/GroupFileFormatV1.h"
+#include "cedar/processing/undoRedo/commands/Paste.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -1528,277 +1529,58 @@ void cedar::proc::gui::Ide::copy()
 
 void cedar::proc::gui::Ide::paste()
 {
-  cedar::aux::ConfigurationNode emptyNode;
+	//cedar::proc::gui::Ide::pUndoStack->beginMacro("Pasted elements");
 
-  //Get mouse position and convert it to scene coordinates
-  QPoint mousePosition = this->getArchitectureView()->mapFromGlobal(QCursor::pos());
-  QPointF mousePositionScenePos = this->getArchitectureView()->mapToScene(mousePosition);
+//Get mouse position and convert it to scene coordinates
+	QPoint mousePosition = this->getArchitectureView()->mapFromGlobal(QCursor::pos());
+	QPointF mousePositionScenePos = this->getArchitectureView()->mapToScene(mousePosition);
 
-  ////Get json from global clipboard and convert it to string
-  //Get global clipboard
-  QClipboard *clipboard = QApplication::clipboard();
+//Get global clipboard
+	QClipboard *clipboard = QApplication::clipboard();
+//Get clipboard MimeData and convert to string
+	const QMimeData *qMimeDataFromClipboard = clipboard->mimeData(QClipboard::Clipboard);
+	std::string jsonFromClipboard = qMimeDataFromClipboard->data("application/json").toStdString();
 
-  //Get clipboard MimeData and convert to string
-  const QMimeData *qMimeDataFromClipboard = clipboard->mimeData(QClipboard::Clipboard);
-  std::string stringJsonFromClipboard = qMimeDataFromClipboard->data("application/json").toStdString();
-
-
-  //Convert back to ConfigurationNode
-  cedar::aux::ConfigurationNode inputNode;
-  std::stringstream jsonFromClipboardStream;
-  jsonFromClipboardStream << stringJsonFromClipboard;
-  read_json(jsonFromClipboardStream, inputNode);
-
-  //Get steps and ui tree
-  cedar::aux::ConfigurationNode &stepsTree = inputNode.get_child("steps");
-  cedar::aux::ConfigurationNode &uiTree = inputNode.get_child("ui");
-  cedar::aux::ConfigurationNode &groupTree = inputNode.get_child("groups");
-
-  //Get center of pasted elements to paste elements to the cursor position
-  //Determine the position offset of the duplicates as the average of the positions of all selected elements
-  QPointF center(0.0, 0.0);
-  int counterofUis = 0;
-  for (auto &uiPair:uiTree)
-  {
-    boost::property_tree::ptree::const_assoc_iterator it = uiPair.second.find("positionX");
-    if(it != uiPair.second.not_found())
-    {
-      double positionX = uiPair.second.find("positionX")->second.get_value<double>();
-      double positionY = uiPair.second.find("positionY")->second.get_value<double>();
-      QPointF pointofStep(positionX, positionY);
-      center += pointofStep;
-      counterofUis++;
-    }
-    boost::property_tree::ptree::const_assoc_iterator itType = uiPair.second.find("type");
-    if(itType != uiPair.second.not_found())
-    {
-      if (itType->second.get_value<std::string>() == "stickyNote")
-      {
-        double positionX = uiPair.second.find("x")->second.get_value<double>();
-        double positionY = uiPair.second.find("y")->second.get_value<double>();
-        QPointF pointofStep(positionX, positionY);
-        center += pointofStep;
-        counterofUis++;
-      }
-    }
-  }
-  for(auto &groupPair:groupTree)
-  {
-    auto ui_generic = groupPair.second.find("ui generic");
-    double positionX = ui_generic->second.find("positionX")->second.get_value<double>();
-    double positionY = ui_generic->second.find("positionY")->second.get_value<double>();
-    double width = ui_generic->second.find("width")->second.get_value<double>();
-    double height = ui_generic->second.find("height")->second.get_value<double>();
-    QPointF pointofGroup(positionX + width / 2,positionY + height / 2);
-    center += pointofGroup;
-    counterofUis++;
-  }
-
-  center /= counterofUis;
-  boost::optional<boost::property_tree::ptree &> connectionsTree = inputNode.get_child_optional("connections");
-  //Get gui connections tree
-  boost::optional<boost::property_tree::ptree &> uiConnectionsTree;
-  for(auto &uiPair:uiTree)
-  {
-    boost::property_tree::ptree::const_assoc_iterator it = uiPair.second.find("type");
-    if(it != uiPair.second.not_found())
-    {
-      std::string type = it->second.get_value<std::string>();
-      if (type == "connections")
-      {
-        uiConnectionsTree = uiPair.second.get_child_optional("connections");
-        if(uiConnectionsTree)
-        {
-          break;
-        }
-      }
-    }
-  }
-
-  //Rename and add steps, rename connections
-  for (auto &stepsPair:stepsTree)
-  {
-    cedar::aux::ConfigurationNode singleUiValue;
-
-    cedar::aux::ConfigurationNode singleStepValue;
-
-    std::string oldName = stepsPair.second.find("name")->second.get_value<std::string>();
-    std::string newName = this->mGroup->getGroup()->getUniqueIdentifier(oldName);
-
-    //In UI rename every occurrence of oldName to newName and change position
-    for (auto &uiPair:uiTree)
-    {
-      boost::property_tree::ptree::const_assoc_iterator it = uiPair.second.find("step");
-      if(it != uiPair.second.not_found())
-      {
-        std::string uiName = uiPair.second.find("step")->second.get_value<std::string>();
-
-        if (uiName == oldName)
-        {
-          //Rename occurence
-          uiPair.second.put("step", newName);
-
-          ////Change position
-          double positionX = uiPair.second.find("positionX")->second.get_value<double>();
-          double positionY = uiPair.second.find("positionY")->second.get_value<double>();
-          QPointF pointofStep(positionX, positionY);
-
-          //Add vector from center to step to mouse position
-          QPointF vectorFromCenterToStep = pointofStep - center;
-          QPointF newPositionOfStep = mousePositionScenePos + vectorFromCenterToStep;
-
-          //Set new position
-          uiPair.second.put("positionX", newPositionOfStep.x());
-          uiPair.second.put("positionY", newPositionOfStep.y());
-
-          singleUiValue.push_back(cedar::aux::ConfigurationNode::value_type("", uiPair.second));
-        }
-      }
-    }
-
-    if(connectionsTree)
-    {
-      renameElementInConnection(*connectionsTree, oldName, newName, "source", "target");
-    }
-    if(uiConnectionsTree)
-    {
-      renameElementInConnection(*uiConnectionsTree, oldName, newName, "source slot", "target slot");
-    }
-
-    stepsPair.second.put("name", newName);
-
-    cedar::aux::ConfigurationNode rootNode;
-
-    singleStepValue.push_front(cedar::aux::ConfigurationNode::value_type(stepsPair.first, stepsPair.second));
-    cedar::aux::ConfigurationNode emptyNode;
-
-    this->pasteConfigurationNodes(singleStepValue, singleUiValue, emptyNode, emptyNode);
-  }
-
-  ////StickyNotes
-  for (auto &uiPair:uiTree)
-  {
-    cedar::aux::ConfigurationNode singleUiValue;
-
-    boost::property_tree::ptree::const_assoc_iterator it = uiPair.second.find("type");
-    if(it != uiPair.second.not_found() && it->second.get_value<std::string>() == "stickyNote")
-    {
-      ////Change position
-      //Get
-      double positionX = uiPair.second.find("x")->second.get_value<double>();
-      double positionY = uiPair.second.find("y")->second.get_value<double>();
-      QPointF pointOfNote(positionX,positionY);
-
-      //Add vector from center to stickynote to mouse position
-      QPointF vectorFromCenterToNote = pointOfNote - center;
-      QPointF newPostionOfNote = mousePositionScenePos + vectorFromCenterToNote;
-
-      //Set
-      uiPair.second.put("x", std::to_string((int)newPostionOfNote.x()));
-      uiPair.second.put("y",  std::to_string((int)newPostionOfNote.y()));
-      singleUiValue.push_back(cedar::aux::ConfigurationNode::value_type("", uiPair.second));
-    }
-
-    cedar::aux::ConfigurationNode emptyNode;
-    this->pasteConfigurationNodes(emptyNode,singleUiValue,emptyNode,emptyNode);
-  }
-  //Rename and add groups
-  for(auto &groupPair:groupTree)
-  {
-    std::string oldName = groupPair.first;
-    std::string newName = this->mGroup->getGroup()->getUniqueIdentifier(oldName);
-
-    ////Change position
-    auto ui_generic = groupPair.second.find("ui generic");
-    double positionX = ui_generic->second.find("positionX")->second.get_value<double>();
-    double positionY = ui_generic->second.find("positionY")->second.get_value<double>();
-    QPointF pointofGroup(positionX,positionY);
-
-    //Manipulate: Get vector from center to step and add this vector to the mouse
-    QPointF vectorFromCenterToGroup = pointofGroup - center;
-    QPointF newPostionofGroup = mousePositionScenePos + vectorFromCenterToGroup;
-    //Set
-    ui_generic->second.put("positionX", std::to_string(newPostionofGroup.x()));
-    ui_generic->second.put("positionY",  std::to_string(newPostionofGroup.y()));
-
-    //Rename other occurences at "name" and ui generic/group
-    groupPair.second.put("name", newName);
-    groupPair.second.find("ui generic")->second.put("group", newName);
-    if (connectionsTree)
-    {
-      renameElementInConnection(*connectionsTree, oldName, newName, "source", "target");
-    }
-    if(uiConnectionsTree)
-    {
-      renameElementInConnection(*uiConnectionsTree, oldName, newName, "source slot", "target slot");
-    }
-
-    cedar::aux::ConfigurationNode singleGroupPair;
-    singleGroupPair.push_front(cedar::aux::ConfigurationNode::value_type(newName, groupPair.second));
-
-    cedar::aux::ConfigurationNode emptyNode;
-    this->pasteConfigurationNodes(emptyNode,emptyNode,emptyNode,singleGroupPair);
-
-  }
-
-  ////Generate Configuration node for ui connections
-  cedar::aux::ConfigurationNode uiConnectionsNode;
-  for (auto &uiPair:uiTree)
-  {
-    boost::property_tree::ptree::const_assoc_iterator it = uiPair.second.find("type");
-    if(it != uiPair.second.not_found())
-    {
-      std::string type = it->second.get_value<std::string>();
-      if (type == "connections")
-      {
-        uiConnectionsNode.push_front(cedar::aux::ConfigurationNode::value_type(uiPair.first, uiPair.second));
-        break;
-      }
-    }
-  }
-
-  ////Paste connections
-  if (connectionsTree)
-  {
-    cedar::aux::ConfigurationNode emptyNode;
-    this->pasteConfigurationNodes(emptyNode, uiConnectionsNode, *connectionsTree, emptyNode);
-  }
+	cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::Paste(jsonFromClipboard,this->mGroup, mousePositionScenePos));
 }
 
-void cedar::proc::gui::Ide::pasteConfigurationNodes(cedar::aux::ConfigurationNode stepNode, cedar::aux::ConfigurationNode uiNode, cedar::aux::ConfigurationNode connectionNode, cedar::aux::ConfigurationNode groupNode)
+//TODO: Does this have to stay in ide? i moved it for now in paste.cpp, since its only used there
+/*void cedar::proc::gui::Ide::pasteConfigurationNodes(cedar::aux::ConfigurationNode stepNode,
+				cedar::aux::ConfigurationNode uiNode, cedar::aux::ConfigurationNode connectionNode,
+				cedar::aux::ConfigurationNode groupNode)
 {
-  cedar::aux::ConfigurationNode rootNode;
+	cedar::aux::ConfigurationNode rootNode;
 
-  //Add meta Infos
-  cedar::aux::ConfigurationNode metaNode;
-  metaNode.put("format", "1");
+	//Add meta Infos
+	cedar::aux::ConfigurationNode metaNode;
+	metaNode.put("format", "1");
 
-  rootNode.add_child("meta", metaNode);
-  rootNode.add_child("steps", stepNode);
-  rootNode.add_child("ui", uiNode);
-  rootNode.add_child("connections", connectionNode);
-  rootNode.add_child("groups", groupNode);
+	rootNode.add_child("meta", metaNode);
+	rootNode.add_child("steps", stepNode);
+	rootNode.add_child("ui", uiNode);
+	rootNode.add_child("connections", connectionNode);
+	rootNode.add_child("groups", groupNode);
 
-  std::stringstream stringstream;
-  boost::property_tree::write_json(stringstream, rootNode);
+	std::stringstream stringstream;
+	boost::property_tree::write_json(stringstream, rootNode);
 
-  //Debug: Print modified pasted
-  //boost::property_tree::write_json("Paste: Modified Final Into read Function.json", rootNode);
+	//Debug: Print modified pasted
+	//boost::property_tree::write_json("Paste: Modified Final Into read Function.json", rootNode);
 
-  //Use readJsonFromString to paste the stringJson
-  try
-  {
-    this->mGroup->readJsonFromString(stringstream.str());
+	//Use readJsonFromString to paste the stringJson
+	try
+	{
+		this->mGroup->readJsonFromString(stringstream.str());
+	}
+	catch (const boost::property_tree::json_parser_error &e)
+	{
+		std::string info(e.what());
+		std::cout << info << std::endl;
+	}
+}*/
 
-  }
-  catch (const boost::property_tree::json_parser_error &e)
-  {
-    std::string info(e.what());
-    std::cout << info << std::endl;
-  }
-}
-
-void cedar::proc::gui::Ide::copyStepConfiguration() {
+void cedar::proc::gui::Ide::copyStepConfiguration()
+{
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
   // make sure there is only one item
   if (selected_items.size() > 1)
@@ -1815,7 +1597,8 @@ void cedar::proc::gui::Ide::copyStepConfiguration() {
   }
 }
 
-void cedar::proc::gui::Ide::renameElementInConnection(boost::property_tree::ptree& connectionTree, std::string oldName, std::string newName,
+//TODO: Does this have to stay in ide? i moved it for now in paste.cpp, since its only used there
+/*void cedar::proc::gui::Ide::renameElementInConnection(boost::property_tree::ptree& connectionTree, std::string oldName, std::string newName,
                                                       std::string sourceSlotName, std::string targetSlotName)
 {
   for (auto &connectionPair:connectionTree)
@@ -1840,7 +1623,7 @@ void cedar::proc::gui::Ide::renameElementInConnection(boost::property_tree::ptre
       }
     }
   }
-}
+}*/
 
 void cedar::proc::gui::Ide::pasteStepConfiguration() {
   if (this->mLastCopiedStep) // is there a step in the buffer?

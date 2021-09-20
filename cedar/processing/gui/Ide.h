@@ -313,11 +313,13 @@ public slots:
   //!@brief paste elements in the clipboard
   void paste();
 
+	//TODO: Does this have to stay in ide? i moved it for now in paste.cpp, since its only used there
   //!@brief change an elements name in the connection section of json
-  void renameElementInConnection(boost::property_tree::ptree& connectionTree, std::string oldName, std::string newName, std::string sourceSlotName, std::string targetSlotName);
+  //void renameElementInConnection(boost::property_tree::ptree& connectionTree, std::string oldName, std::string newName, std::string sourceSlotName, std::string targetSlotName);
 
+	//TODO: Does this have to stay in ide? i moved it for now in paste.cpp, since its only used there
   //!@brief paste one element using json data nodes
-  void pasteConfigurationNodes(cedar::aux::ConfigurationNode stepNode, cedar::aux::ConfigurationNode uiNode, cedar::aux::ConfigurationNode connectionNode, cedar::aux::ConfigurationNode groupNode);
+  //void pasteConfigurationNodes(cedar::aux::ConfigurationNode stepNode, cedar::aux::ConfigurationNode uiNode, cedar::aux::ConfigurationNode connectionNode, cedar::aux::ConfigurationNode groupNode);
 
   //!@brief copy the configuration of one step
   void copyStepConfiguration();

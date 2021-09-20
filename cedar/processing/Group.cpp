@@ -2160,7 +2160,6 @@ void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& 
     cedar::proc::ArchitectureLoadingException exception(exceptions);
     CEDAR_THROW_EXCEPTION(exception);
   }
-
 }
 
 void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions)
