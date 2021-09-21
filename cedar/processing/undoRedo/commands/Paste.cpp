@@ -49,7 +49,6 @@
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
-#include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -76,20 +75,20 @@ cedar::proc::undoRedo::commands::Paste::~Paste()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::undoRedo::commands::Paste::undo()
 {
-
+	std::vector<cedar::proc::gui::Element*> guiElements;
+	for(std::string fullPath:mFullPathsOfPastedElements)
+	{
+		cedar::proc::gui::Element* guiElement = mpScene->getElementByFullPath(fullPath);
+		if(guiElement!= nullptr)
+		{
+			guiElement->deleteElement();
+		}
+	}
 }
 void cedar::proc::undoRedo::commands::Paste::redo()
 {
 	////Make list of elements that were there before pasting
 	QList<QGraphicsItem *> itemsBeforeImport =  mpScene->items();
-	std::cout << "\nitems before import" << std::endl;
-	for(auto* qGraphicsItem:itemsBeforeImport)
-	{
-		if(auto element = dynamic_cast<cedar::proc::gui::Element*>(qGraphicsItem))
-		{
-			std::cout << element->getElement()->getName() << std::endl;
-		}
-	}
 
 	////Actual paste code
 	//Convert back to ConfigurationNode
@@ -205,11 +204,11 @@ void cedar::proc::undoRedo::commands::Paste::redo()
 
 		if(connectionsTree)
 		{
-			renameElementInConnection(*connectionsTree, oldName, newName, "source", "target");
+			cedar::proc::gui::Ide::renameElementInConnection(*connectionsTree, oldName, newName, "source", "target");
 		}
 		if(uiConnectionsTree)
 		{
-			renameElementInConnection(*uiConnectionsTree, oldName, newName, "source slot", "target slot");
+			cedar::proc::gui::Ide::renameElementInConnection(*uiConnectionsTree, oldName, newName, "source slot", "target slot");
 		}
 
 		stepsPair.second.put("name", newName);
@@ -273,11 +272,12 @@ void cedar::proc::undoRedo::commands::Paste::redo()
 		groupPair.second.find("ui generic")->second.put("group", newName);
 		if (connectionsTree)
 		{
-			renameElementInConnection(*connectionsTree, oldName, newName, "source", "target");
+			cedar::proc::gui::Ide::renameElementInConnection(*connectionsTree, oldName, newName,
+							"source", "target");
 		}
 		if(uiConnectionsTree)
 		{
-			renameElementInConnection(*uiConnectionsTree, oldName, newName, "source slot", "target slot");
+			cedar::proc::gui::Ide::renameElementInConnection(*uiConnectionsTree, oldName, newName, "source slot", "target slot");
 		}
 
 		cedar::aux::ConfigurationNode singleGroupPair;
@@ -312,45 +312,24 @@ void cedar::proc::undoRedo::commands::Paste::redo()
 
 	////Make list of elements that were there after pasting
 	QList<QGraphicsItem *> itemsAfterImport =  mpScene->items();
-	std::cout << "items after import" << std::endl;
-	for(auto* qGraphicsItem:itemsAfterImport)
-	{
-		if(auto element = dynamic_cast<cedar::proc::gui::Element*>(qGraphicsItem))
-		{
-			std::cout << element->getElement()->getName() << std::endl;
-		}
-	}
-}
 
-void cedar::proc::undoRedo::commands::Paste::renameElementInConnection(boost::property_tree::ptree& connectionTree, std::string oldName, std::string newName,
-																											std::string sourceSlotName, std::string targetSlotName)
-{
-	for (auto &connectionPair:connectionTree)
+	for(QGraphicsItem* itemAfterImport:itemsAfterImport)
 	{
-		//Get source and target string of connectionPair
-		boost::property_tree::ptree::const_assoc_iterator it = connectionPair.second.find(sourceSlotName);
-		if(it != connectionPair.second.not_found()) {
-			std::string sourceString = connectionPair.second.find(sourceSlotName)->second.get_value<std::string>();
-			std::string targetString = connectionPair.second.find(targetSlotName)->second.get_value<std::string>();
-			//Split and replace the first part (before the .) with the new Name
-			std::vector<std::string> sourceStringSplitted;
-			std::vector<std::string> targetStringSplitted;
-			boost::split(sourceStringSplitted, sourceString, boost::is_any_of("."));
-			boost::split(targetStringSplitted, targetString, boost::is_any_of("."));
-			if (sourceStringSplitted[0] == oldName) {
-				std::string newSource = newName + "." + sourceStringSplitted[1];
-				connectionPair.second.put(sourceSlotName, newSource);
-			}
-			if (targetStringSplitted[0] == oldName) {
-				std::string newTarget = newName + "." + targetStringSplitted[1];
-				connectionPair.second.put(targetSlotName, newTarget);
+		if(!itemsBeforeImport.contains(itemAfterImport))
+		{
+			//This means the item is new. So it has to be added to the deletion list.
+			mNewItemsAfterPasting.append(itemAfterImport);
+			if(auto* element = dynamic_cast<cedar::proc::gui::Element*>(itemAfterImport))
+			{
+				mFullPathsOfPastedElements.push_back(element->getElement()->getFullPath());
 			}
 		}
 	}
 }
 
 void cedar::proc::undoRedo::commands::Paste::pasteConfigurationNodes(cedar::aux::ConfigurationNode stepNode,
-																										cedar::aux::ConfigurationNode uiNode, cedar::aux::ConfigurationNode connectionNode,
+																										cedar::aux::ConfigurationNode uiNode,
+																										cedar::aux::ConfigurationNode connectionNode,
 																										cedar::aux::ConfigurationNode groupNode)
 {
 	cedar::aux::ConfigurationNode rootNode;

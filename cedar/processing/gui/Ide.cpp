@@ -1597,8 +1597,7 @@ void cedar::proc::gui::Ide::copyStepConfiguration()
   }
 }
 
-//TODO: Does this have to stay in ide? i moved it for now in paste.cpp, since its only used there
-/*void cedar::proc::gui::Ide::renameElementInConnection(boost::property_tree::ptree& connectionTree, std::string oldName, std::string newName,
+void cedar::proc::gui::Ide::renameElementInConnection(boost::property_tree::ptree& connectionTree, std::string oldName, std::string newName,
                                                       std::string sourceSlotName, std::string targetSlotName)
 {
   for (auto &connectionPair:connectionTree)
@@ -1623,7 +1622,7 @@ void cedar::proc::gui::Ide::copyStepConfiguration()
       }
     }
   }
-}*/
+}
 
 void cedar::proc::gui::Ide::pasteStepConfiguration() {
   if (this->mLastCopiedStep) // is there a step in the buffer?

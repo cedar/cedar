@@ -89,11 +89,9 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-	//!@brief change an elements name in the connection section of json
-	void renameElementInConnection(boost::property_tree::ptree& connectionTree, std::string oldName, std::string newName, std::string sourceSlotName, std::string targetSlotName);
-
 	//!@brief paste one element using json data nodes
-	void pasteConfigurationNodes(cedar::aux::ConfigurationNode stepNode, cedar::aux::ConfigurationNode uiNode, cedar::aux::ConfigurationNode connectionNode, cedar::aux::ConfigurationNode groupNode);
+	void pasteConfigurationNodes(cedar::aux::ConfigurationNode stepNode, cedar::aux::ConfigurationNode uiNode,
+					cedar::aux::ConfigurationNode connectionNode, cedar::aux::ConfigurationNode groupNode);
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -113,7 +111,8 @@ private:
 	std::string mJson;
 	QPointF mMousePositionScenePos;
 	cedar::proc::gui::Scene* mpScene;
-  // none yet
+	QList<QGraphicsItem*> mNewItemsAfterPasting;
+	std::vector<std::string> mFullPathsOfPastedElements;
 
 }; // class cedar::proc::undoRedo::commands::Paste
 
