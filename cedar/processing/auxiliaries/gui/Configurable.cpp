@@ -874,21 +874,33 @@ void cedar::proc::aux::gui::Configurable::showContextMenu(const QPoint &pos)
   QAction *a = context_menu.exec(mpPropertyTree->viewport()->mapToGlobal(pos));
   if (a == use_in_copy)
   {
-    cedar::aux::Configurable* owner = item->getParameter()->getOwner();
-
-    if(auto element = dynamic_cast<cedar::proc::Element *>(item->getParameter()->getNamedConfigurableOwner()))
+    cedar::aux::ParameterPtr parameter = item->getParameter();
+    std::string stepName = "unkown";
+    std::string text = "";
+    if(auto element = dynamic_cast<cedar::proc::Element *>(parameter->getNamedConfigurableOwner()))
     {
-      std::string paramName = element->findParameterPath(item->getParameter());
-      std::string stepName =  element->getFullPath();
+      stepName =  element->getFullPath();
+    }
+    else if(auto element = dynamic_cast<cedar::proc::Element *>(parameter->getOwner()->getParent()))
+    {
+      stepName = element->getFullPath();
+    }
 
-      //get CoPYWidget and append
-      QObject* object = this;
-      while(object->parent()){
-        object = object->parent();
-      }
-      if(auto copyWidget = object->findChild<cedar::proc::gui::CoPYWidget*>("mpCopy")){
-        copyWidget->appendToConsole("py.setParameter(\""+ stepName + "\",\"" + paramName +"\", VALUE)\n");
-      }
+    if(auto objectListParameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
+    {
+      std::vector<std::string> typelist;
+      objectListParameter ->listTypes(typelist);
+      text="py.addObjectList(\"" + stepName + "\",\"" + parameter->getName() + "\",\"" + typelist[0] +"\")";
+    }
+
+    //get CoPYWidget and append
+    QObject* object = this;
+    while(object->parent()){
+      object = object->parent();
+    }
+    if(auto copyWidget = object->findChild<cedar::proc::gui::CoPYWidget*>("mpCopy")){
+      if(text == "") text = "py.setParameter(\""+ stepName + "\",\"" + this->getPathFromItem(item).toStdString() +"\", VALUE)\n";
+      copyWidget->appendToConsole(text);
     }
   }
 }

@@ -1,34 +1,41 @@
 //
 // Created by fred on 1/7/21.
 //
-#include <cedar/configuration.h>
+#include "cedar/configuration.h"
 
 #ifndef CEDAR_PROC_GUI_COPY_OBJECT_H
 #define CEDAR_PROC_GUI_COPY_OBJECT_H
 
 #include "PythonQt.h"
-#include <cedar/processing/gui/Scene.h>
-#include <cedar/processing/gui/Settings.h>
-#include <cedar/processing/gui/PythonQtConsole.fwd.h>
-#include <cedar/processing/gui/Group.h>
-#include <cedar/processing/Group.h>
-#include <cedar/processing/DataSlot.h>
-#include <cedar/processing/ElementDeclaration.h>
+#include "cedar/processing/gui/Scene.h"
+#include "cedar/processing/gui/Settings.h"
+#include "cedar/processing/gui/PythonQtConsole.fwd.h"
+#include "cedar/processing/gui/Group.h"
+#include "cedar/processing/Group.h"
+#include "cedar/processing/DataSlot.h"
+#include "cedar/processing/ElementDeclaration.h"
 #include <QObject>
 #include <QGraphicsSceneDragDropEvent>
-#include <cedar/auxiliaries/Log.h>
-#include <cedar/auxiliaries/gui/Settings.h>
-#include <cedar/processing/gui/CoPYObject.fwd.h>
+#include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/gui/Settings.h"
+#include "cedar/processing/gui/CoPYObject.fwd.h"
+#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/processing/DeclarationRegistry.h"
+
+
 
 class cedar::proc::gui::CoPYObject : public QObject
 {
+
+  #define STEP_ASSERT(expr, step) if (!(expr)) { std::string info = "Step not found: " + step; CEDAR_THROW(cedar::aux::ExceptionBase, info); }
+  #define CLASS_ASSERT(classId) std::vector<std::string> types;cedar::proc::ElementManagerSingleton::getInstance()->getFactoryManager()->listTypes(types); if(!(std::find(types.begin(), types.end(), classId.toStdString()) != types.end())) {CEDAR_THROW(cedar::aux::ExceptionBase, "Class " + classId.toStdString() + " not found");}
+  #define GROUP_ASSERT(expr, group) if (!(expr)) { std::string info = "Group not found: " + group; CEDAR_THROW(cedar::aux::ExceptionBase, info); }
 Q_OBJECT
 public:
   CoPYObject(cedar::proc::gui::PythonQtConsole* pConsole) {pQtConsole = pConsole;}
   ~CoPYObject(){
 
-}
-  cedar::proc::GroupPtr _mpGroup;
+  }
 
   cedar::proc::GroupPtr _mpRootGroup;
 
@@ -39,19 +46,16 @@ public:
   /*!@brief setter for a reference to the scene*/
   void setScene(cedar::proc::gui::Scene* pScene) {_mpScene = pScene;}
 
-  void setGroup(cedar::proc::GroupPtr pGroup) {_mpGroup = pGroup; _mpRootGroup = pGroup;}
+  void setGroup(cedar::proc::GroupPtr pGroup) {_mpRootGroup = pGroup;}
 
 public slots:
   /*!@brief setter for a constant reference to the Root, callable by cpp*/
 
-  /*!@brief setter to change the scope we are coding/creating in*/
-  void setGroup(const QString& groupId);
-
   /*!@brief create an Element in the GroupScope*/
-  QStringList createElem(const QString& classId, const int& x, const int& y, const int& amount);
+  QStringList createElem(const QString& classId, const int& x, const int& y, const QString &groupId, const int& amount);
 
   /*!@brief create a Group in Subgroup*/
-  void createGroup(const QString& classId, const int& x, const int& y, const int& amount);
+  QStringList createGroupTemplate(const QString& classId, const int& x, const int& y, const QString &groupId, const int& amount);
 
   /*!@brief connect two Steps at indexed DataSlots*/
   void connectSlots(const QString& source, const int& sourceSlot, const QString& target, const int& targetSlot);
@@ -64,6 +68,9 @@ public slots:
 
   //!@brief set specific parameter of given elementString
   void setParameter(const QString &elem, const QString &param, const QVariant &value);
+
+  //!@brief add Object to ObjectListParameter of given step, paramName and type
+  void addObjectList(const QString &step, const QString &param, const QString& type);
 
 private:
   cedar::proc::StepPtr getStepByName(const std::string& elementIdentifier);
@@ -95,35 +102,39 @@ public Q_SLOTS:
 
   /* Methods to call in Python eg. (py.setGroup), calling slots in CPP-CoPY-Object */
 
-  void setGroup(const QString &groupId = "root")
-  { emit setGroupSig(groupId);}
-
   void connect(const QVariant &first, const QVariant &second, const int &firstSlot = 0,
                const int &secondSlot = 0);
 
   void disconnect(const QVariant &first, const QVariant &second, const int &firstSlot = 0,
                const int &secondSlot = 0);
 
-  QStringList create(const QString &classId, const int &x, const int &y, const int &amount = 1)
+  QStringList create(const QString &classId, const int &x, const int &y, const QString &groupId = "root", const int &amount = 1)
   {
-    return emit createSig(classId, x, y, amount);
+    return emit createSig(classId, x, y, groupId, amount);
   }
 
-  void createGroup(const QString &groupId, const int &x, const int &y, const int &amount = 1)
-  { emit createGroupSig(groupId, x, y, amount); }
+  QStringList createGroupTemplate(const QString &templateId, const int &x, const int &y, const QString &groupId = "root", const int &amount = 1)
+  { return emit createGroupTemplateSig(templateId, x, y, groupId, amount); }
 
   void copy(const QString &source, const QVariant &target);
 
-  void setParameter(const QString &elem, const QString &param, const QVariant& value){
+  void setParameter(const QString &elem, const QString &param, const QVariant& value)
+  {
     emit setParameterSig(elem, param, value);
   }
+
+  void addObjectList(const QString &step, const QString &param, const QString& type)
+  {
+    emit addObjectListSig(step, param, type);
+  }
+
 signals:
-  QStringList createSig(const QString &classId, const int &x, const int &y, const int &amount);
+  QStringList createSig(const QString &classId, const int &x, const int &y, const QString &groupId, const int &amount);
   void setParameterSig(const QString &elem, const QString &param, const QVariant& value);
   void copySig(const QString &source, const QString &target);
-  void createGroupSig(const QString &groupId, const int &x, const int &y, const int &amount);
+  QStringList createGroupTemplateSig(const QString &templateId, const int &x, const int &y, const QString &groupId, const int &amount);
   void connectSig(const QString &src, const int &firstSlot, const QString &tgt, const int &targetSlot);
   void disconnectSig(const QString &src, const int &firstSlot, const QString &tgt, const int &targetSlot);
-  void setGroupSig(const QString &groupId);
+  void addObjectListSig(const QString &step, const QString &param, const QString& type);
 };
 #endif //CEDAR_PROC_GUI_COPY_OBJECT_H
