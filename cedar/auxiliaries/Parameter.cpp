@@ -143,16 +143,18 @@ cedar::aux::ConstConfigurablePtr cedar::aux::Parameter::retrieveConfigurableChil
 
 cedar::aux::NamedConfigurable* cedar::aux::Parameter::getNamedConfigurableOwner() const
 {
+  CEDAR_ASSERT(this != nullptr)
   cedar::aux::Configurable* owner = this->getOwner();
+  cedar::aux::NamedConfigurable* namedConfigurable = nullptr;
   while(owner != nullptr)
   {
-    if (auto namedConfigurable = dynamic_cast<cedar::aux::NamedConfigurable *>(owner))
+    if (auto namedConfig = dynamic_cast<cedar::aux::NamedConfigurable *>(owner))
     {
-      return namedConfigurable;
+      namedConfigurable = namedConfig;
     }
     owner = owner->getParent();
   }
-  return nullptr;
+  return namedConfigurable;
 }
 
 bool cedar::aux::Parameter::isLinked() const

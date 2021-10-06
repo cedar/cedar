@@ -85,7 +85,7 @@ public:
 
   // Reimplement this to allow merging of UndoCommands. If a newly added command has the same macro identifier (and is
   // not "") as the last pushed command, the stack will try to merge them.
-  virtual std::string getMacroIdentifier() const
+  virtual std::string getMacroIdentifier(bool old = false) const
   {
     return "";
   }
