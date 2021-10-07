@@ -1,6 +1,7 @@
 //
 // Created by fred on 1/7/21.
 //
+#ifdef CEDAR_USE_COPY
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/CoPYObject.h"
 #include "cedar/processing/GroupDeclarationManager.h"
@@ -310,4 +311,4 @@ void cedar::proc::gui::CoPYObjectWrapper::copy(const QString &source, const QVar
     emit copySig(source, tgt);
   }
 };
-
+#endif

@@ -39,8 +39,7 @@
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-#ifdef CEDAR_USE_PYTHON
-
+#ifdef CEDAR_USE_PYTHONSTEP
 // CEDAR INCLUDES
 #include <cedar/processing/Step.h>
 #include <cedar/auxiliaries/MatData.h>
@@ -392,7 +391,6 @@ namespace cedar
 
 //enum { ARG_NONE = 0, ARG_MAT = 1, ARG_SCALAR = 2 };
 
-#endif // CEDAR_USE_PYTHON
-
+#endif // CEDAR_USE_PYTHONSTEP
 #endif // CEDAR_PROC_STEPS_PYTHON_SCRIPT_H
 

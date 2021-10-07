@@ -34,7 +34,7 @@
 
 ======================================================================================================================*/
 #include "cedar/configuration.h"
-
+#ifdef CEDAR_USE_COPY
 // CEDAR INCLUDES
 #include "cedar/processing/gui/CoPYWidget.h"
 #include <cedar/processing/Step.h>
@@ -327,3 +327,4 @@ void cedar::proc::gui::CoPYWidget::loadButtonClicked()
     mpConsole->appendPlainText(QString::fromStdString(buffer.str()));
   }
 }
+#endif

@@ -23,11 +23,11 @@ else(NOT CEDAR_USE_QT5)
     else(APPLE)
         if(NOT WIN32)
             find_library(PYTHONQT_LIBS
-                    NAMES libPythonQt_QtAll-Qt5-Python3.6.so
+                    NAMES libPythonQt_QtAll-Qt5-Python3.8.so
                     PATHS ${CEDAR_DEPENDENCY_LIBRARIES} ${PYTHONQT_PATH_LIB}
                     )
             find_library(PYTHONQT_LIBS_TMP
-                    NAMES libPythonQt-Qt5-Python3.6.so
+                    NAMES libPythonQt-Qt5-Python3.8.so
                     PATHS ${CEDAR_DEPENDENCY_LIBRARIES} ${PYTHONQT_PATH_LIB}
                     )
             set(PYTHONQT_LIBS ${PYTHONQT_LIBS} ${PYTHONQT_LIBS_TMP})

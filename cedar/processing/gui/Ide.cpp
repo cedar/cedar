@@ -470,8 +470,9 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   mpMenuWindows->addAction(this->mpItemsWidget->toggleViewAction());
   mpMenuWindows->addAction(this->mpPropertiesWidget->toggleViewAction());
   mpMenuWindows->addAction(this->mpLogWidget->toggleViewAction());
+  #ifdef CEDAR_USE_COPY
   mpMenuWindows->addAction(this->mpCopyWidget->toggleViewAction());
-
+  #endif
   QObject::connect(this->tabWidget,SIGNAL(currentChanged(int)),this, SLOT(updateTabs(int))); //Fixes a Bug under Mac OS
 
     //do not remove this line, init the qglviewer, allowing the robotic framework to work as intended. Hotfix part 1. Needs a better fix. TODO
@@ -665,10 +666,12 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   mBackupSaveThreadWrapper= cedar::aux::CallFunctionInThreadPtr( new cedar::aux::CallFunctionInThread( boost::bind( &cedar::proc::gui::Ide::backupSaveCallback, this ) ) );
   mBackupSaveThreadWrapper->start();
 
+#ifdef CEDAR_USE_COPY
   //send Scene to CoPYWidget
   mpCopy->setScene(mpProcessingDrawer->getScene());
   mpProcessingDrawer->getScene()->setCoPYWidget(mpCopy);
-#ifdef CEDAR_USE_PYTHON
+#endif
+#ifdef CEDAR_USE_PYTHONSTEP
   cedar::proc::steps::PythonScript::importStepsFromTemplate();
 #endif
 }
@@ -710,7 +713,9 @@ void cedar::proc::gui::Ide::lockUI(bool lock)
   widgets.push_back(this->mpItemsWidget);
   widgets.push_back(this->mpPropertiesWidget);
   widgets.push_back(this->mpLogWidget);
+  #ifdef CEDAR_USE_COPY
   widgets.push_back(this->mpCopyWidget);
+  #endif
 
   for (auto widget : widgets)
   {
@@ -2037,7 +2042,9 @@ void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
 void cedar::proc::gui::Ide::storeSettings()
 {
   cedar::proc::gui::SettingsSingleton::getInstance()->logSettings()->getFrom(this->mpLogWidget);
+  #ifdef CEDAR_USE_COPY
   cedar::proc::gui::SettingsSingleton::getInstance()->coPYSettings()->getFrom(this->mpCopyWidget);
+  #endif
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->getFrom(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->getFrom(this->mpItemsWidget);
 
@@ -2055,7 +2062,9 @@ void cedar::proc::gui::Ide::storeSettings()
 void cedar::proc::gui::Ide::restoreSettings()
 {
   cedar::proc::gui::SettingsSingleton::getInstance()->logSettings()->setTo(this->mpLogWidget);
+  #ifdef CEDAR_USE_COPY
   cedar::proc::gui::SettingsSingleton::getInstance()->coPYSettings()->setTo(this->mpCopyWidget);
+  #endif
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->setTo(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->setTo(this->mpItemsWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->restoreMainWindow(this);

@@ -1,11 +1,14 @@
 //
 // Created by fred on 1/7/21.
 //
+
+
 #include <cedar/configuration.h>
 
 #ifndef CEDAR_PROC_GUI_COPY_OBJECT_H
 #define CEDAR_PROC_GUI_COPY_OBJECT_H
 
+#ifdef CEDAR_USE_COPY
 #include "PythonQt.h"
 #include <cedar/processing/gui/Scene.h>
 #include <cedar/processing/gui/Settings.h>
@@ -126,4 +129,5 @@ signals:
   void disconnectSig(const QString &src, const int &firstSlot, const QString &tgt, const int &targetSlot);
   void setGroupSig(const QString &groupId);
 };
+#endif //CEDAR_USE_COPY
 #endif //CEDAR_PROC_GUI_COPY_OBJECT_H

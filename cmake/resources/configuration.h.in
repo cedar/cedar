@@ -61,8 +61,8 @@
 #cmakedefine CEDAR_PORTABLE_MAC_BUNDLE_PATHS
 #cmakedefine CEDAR_PORTABLE_MINIMAL_VERSION
 
-#cmakedefine CEDAR_USE_PYTHON
-
+#cmakedefine CEDAR_USE_PYTHONSTEP
+#cmakedefine CEDAR_USE_COPY
 #cmakedefine HAVE_SNPRINTF
 
 // Specific robot libraries ============================================================================================

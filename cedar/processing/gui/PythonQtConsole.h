@@ -47,6 +47,7 @@
 #ifndef _PythonQtConsole_H
 #define _PythonQtConsole_H
 
+#ifdef CEDAR_USE_COPY
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/PythonQtConsole.fwd.h"
 
@@ -302,6 +303,6 @@ private:
   bool _hadError;
 };
 
-
+#endif
 #endif
 

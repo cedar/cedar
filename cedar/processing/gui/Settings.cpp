@@ -84,7 +84,9 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   this->addConfigurableChild("ui", ui_settings);
   
   ui_settings->addConfigurableChild("log", mLog);
+  #ifdef CEDAR_USE_COPY
   ui_settings->addConfigurableChild("copywidget", mCoPY);
+  #endif
   ui_settings->addConfigurableChild("steps", mSteps);
   ui_settings->addConfigurableChild("tools", mTools);
   ui_settings->addConfigurableChild("properties", mProperties);

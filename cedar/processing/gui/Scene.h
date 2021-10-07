@@ -306,8 +306,9 @@ public:
   void setCommentWidget(cedar::proc::gui::CommentWidget* pCommentWidget);
   
   void setCodeWidget(cedar::proc::gui::CodeWidget* pCodeWidget);
-
+  #ifdef CEDAR_USE_COPY
   void setCoPYWidget(cedar::proc::gui::CoPYWidget* pCoPYWidget);
+  #endif
 
   /*!@brief Exports the scene to an svg file
    */
@@ -359,9 +360,9 @@ public:
   cedar::proc::gui::CommentWidget* getCommentWidget() const;
   
   cedar::proc::gui::CodeWidget* getCodeWidget() const;
-
+  #ifdef CEDAR_USE_COPY
   cedar::proc::gui::CoPYWidget* getCoPYWidget() const;
-
+  #endif
   /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
    */
   static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
@@ -556,9 +557,9 @@ private:
   cedar::proc::gui::CommentWidget* mpCommentWidget;
   
   cedar::proc::gui::CodeWidget* mpCodeWidget;
-
+  #ifdef CEDAR_USE_COPY
   cedar::proc::gui::CoPYWidget* mpCoPYWidget;
-
+  #endif
   //! Saves the mouse x position in the scene
   int mMousePosX;
 

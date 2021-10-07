@@ -60,8 +60,7 @@ SOFTWARE.
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-#ifdef CEDAR_USE_PYTHON
-
+#ifdef CEDAR_USE_PYTHONSTEP
 // CLASS HEADER
 #include "cedar/processing/steps/PythonScript.h"
 
@@ -1592,4 +1591,4 @@ void cedar::proc::steps::PythonScript::reset()
   mWasResetted= true;
 }
 
-#endif // CEDAR_USE_PYTHON
+#endif // CEDAR_USE_PYTHONSTEP

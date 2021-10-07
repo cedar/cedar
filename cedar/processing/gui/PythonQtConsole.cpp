@@ -56,7 +56,7 @@
 #include <QAbstractItemView>
 
 //-----------------------------------------------------------------------------
-
+#ifdef CEDAR_USE_COPY
 cedar::proc::gui::PythonQtConsole::PythonQtConsole(QWidget *parent, Qt::WindowFlags windowFlags)
         :
         cedar::proc::gui::CodeWidgetScope::CodeEditor(parent)
@@ -459,3 +459,4 @@ QMap<QString, QString> cedar::proc::gui::PythonQtConsoleScope::PythonWorker::giv
   }
   return map;
 }
+#endif

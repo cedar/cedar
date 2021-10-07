@@ -33,6 +33,7 @@
     Credits:
 
 ======================================================================================================================*/
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
@@ -42,7 +43,7 @@
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/CoPYWidget.fwd.h"
 #include "cedar/processing/gui/CodeWidget.h"
-
+#ifdef CEDAR_USE_COPY
 // CEDAR INCLUDES
 #include <PythonQt.h>
 #include <pythonrun.h>
@@ -145,6 +146,6 @@ private:
   void updateDict();
 
 };
-
+#endif // CEDAR_USE_COPY
 #endif // CEDAR_PROC_GUI_COPY_WIDGET_H
 

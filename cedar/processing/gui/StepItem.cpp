@@ -484,11 +484,11 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   this->connect(p_reset, SIGNAL(triggered()), SLOT(reset()));
   QAction *p_delete = menu.addAction("delete");
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
-
+  #ifdef CEDAR_USE_COPY
   QAction *p_use_in_copy = menu.addAction("use In CoPY");
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
-
+  #endif
   QMenu *p_actions_menu = menu.addMenu("actions");
   p_actions_menu->setIcon(QIcon(":/menus/actions.svg"));
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
@@ -592,11 +592,13 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
       p_scene->deleteElements(items, event->modifiers() & Qt::ControlModifier);
     }
   }
+  #ifdef CEDAR_USE_COPY
   else if(a == p_use_in_copy)
   {
     cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
     p_scene->getCoPYWidget()->importStepInformation(this);
   }
+  #endif
   else
   {
     this->handleContextMenuAction(a, event);

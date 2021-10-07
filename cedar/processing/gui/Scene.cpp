@@ -158,12 +158,12 @@ cedar::proc::gui::CodeWidget* cedar::proc::gui::Scene::getCodeWidget() const
 {
   return this->mpCodeWidget;
 }
-
+#ifdef CEDAR_USE_COPY
 cedar::proc::gui::CoPYWidget *cedar::proc::gui::Scene::getCoPYWidget() const
 {
   return this->mpCoPYWidget;
 }
-
+#endif
 void cedar::proc::gui::Scene::dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
   this->QGraphicsScene::dragEnterEvent(pEvent);
@@ -490,12 +490,12 @@ void cedar::proc::gui::Scene::setCodeWidget(cedar::proc::gui::CodeWidget* pCodeW
   this->mpCodeWidget = pCodeWidget;
   mpeParentView->hideCodeWidget();
 }
-
+#ifdef CEDAR_USE_COPY
 void cedar::proc::gui::Scene::setCoPYWidget(cedar::proc::gui::CoPYWidget *pCoPYWidget)
 {
   this->mpCoPYWidget = pCoPYWidget;
 }
-
+#endif
 void cedar::proc::gui::Scene::itemSelected()
 {
   // either show the resize handles if only one item is selected, or hide them if more than one is selected
@@ -543,7 +543,7 @@ void cedar::proc::gui::Scene::itemSelected()
         }
       }
 
-#ifdef CEDAR_USE_PYTHON
+#ifdef CEDAR_USE_PYTHONSTEP
       auto connectable_pythonScript = boost::dynamic_pointer_cast<cedar::proc::steps::PythonScript>(p_element->getElement());
       if (this->mpCodeWidget != nullptr)
       {
@@ -1282,7 +1282,9 @@ void cedar::proc::gui::Scene::multiItemContextMenuEvent(QGraphicsSceneContextMen
     }
   }
   auto delete_action = menu.addAction("delete");
+  #ifdef CEDAR_USE_COPY
   auto p_use_in_py = menu.addAction("use in CoPY");
+  #endif
   auto p_assign_to_trigger = menu.addMenu("assign to trigger");
 
 
@@ -1309,10 +1311,12 @@ void cedar::proc::gui::Scene::multiItemContextMenuEvent(QGraphicsSceneContextMen
   }
 
   QAction *a = menu.exec(pContextMenuEvent->screenPos());
+  #ifdef CEDAR_USE_COPY
   if (a == p_use_in_py)
   {
     mpCoPYWidget->importStepInformation(this->selectedItems());
   }
+  #endif
   if (a == delete_action)
   {
     QList<QGraphicsItem*> items = this -> selectedItems();

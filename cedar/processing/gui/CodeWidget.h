@@ -41,7 +41,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/configuration.h"
+#ifdef CEDAR_USE_COPY
 #include "gui/PythonQtScriptingConsole.h"
+#endif
 // FORWARD DECLARATIONS
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/gui/CodeWidget.fwd.h"
@@ -57,8 +59,6 @@
 #include <QPushButton>
 #include <QSyntaxHighlighter>
 
-
-#ifdef CEDAR_USE_PYTHON
 
 
 /*!@brief Syntax Highlighter for QTextEdit to highlight Python code
@@ -89,6 +89,7 @@ ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WIT
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#if defined(CEDAR_USE_PYTHONSTEP) || defined(CEDAR_USE_COPY)
 namespace cedar
 {
   namespace proc
@@ -108,7 +109,6 @@ namespace cedar
             nth = n;
             format = matchingFormat;
           }
-
           QString originalRuleStr;
           QRegExp pattern;
           int nth;
@@ -202,9 +202,11 @@ namespace cedar
     }
   }
 }
+#endif
 
 /*!@brief GUI representation for the code section.
   */
+#ifdef CEDAR_USE_PYTHONSTEP
 class cedar::proc::gui::CodeWidget
 :
 public QWidget
@@ -278,8 +280,8 @@ private:
 };
 
 
-#else // CEDAR_USE_PYTHON
 
+#else // CEDAR_USE_PYTHONSTEP
 class cedar::proc::gui::CodeWidget
 :
 public QWidget
@@ -295,8 +297,7 @@ public:
   }
 };
 
-#endif // CEDAR_USE_PYTHON
-
+#endif // CEDAR_USE_PYTHONSTEP
 #endif // CEDAR_PROC_GUI_CODE_WIDGET_H
 
 

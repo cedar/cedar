@@ -862,7 +862,7 @@ void cedar::proc::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* ite
   font.setKerning(true);
   item->setFont(PARAMETER_NAME_COLUMN, font);
 }
-
+#ifdef CEDAR_USE_COPY
 void cedar::proc::aux::gui::Configurable::showContextMenu(const QPoint &pos)
 {
   ParameterItem *item = dynamic_cast<ParameterItem *>(mpPropertyTree->itemAt(pos));
@@ -892,4 +892,5 @@ void cedar::proc::aux::gui::Configurable::showContextMenu(const QPoint &pos)
     }
   }
 }
+#endif
 

@@ -54,8 +54,7 @@
 #include <QPainter>
 
 
-#ifdef CEDAR_USE_PYTHON
-
+#if defined(CEDAR_USE_PYTHONSTEP) || defined (CEDAR_USE_COPY)
 
 /*
 $Id: PythonSyntaxHighlighter.cpp 167 2013-11-03 17:01:22Z oliver $
@@ -254,10 +253,12 @@ const QTextCharFormat cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter
     charFormat.setFontItalic(true);
   return charFormat;
 }
-
+#ifdef CEDAR_USE_PYTHONSTEP
 int cedar::proc::gui::CodeWidget::dontMark;
-#ifdef CEDAR_USE_PYTHON
+#endif
+#endif
 
+#ifdef CEDAR_USE_PYTHONSTEP
 cedar::proc::gui::CodeWidget::CodeWidget()
 :
 mpHighlighter(nullptr)
@@ -428,9 +429,9 @@ cedar::proc::gui::CodeWidgetScope::CodeEditor::CodeEditor(QWidget *parent)
 QPlainTextEdit(parent)
 {
   lineNumberArea = new LineNumberArea(this);
-
+#ifdef CEDAR_USE_PYTHONSTEP
   cedar::proc::gui::CodeWidget::dontMark = 0;
-
+#endif
   connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
   connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
   connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
@@ -440,7 +441,9 @@ QPlainTextEdit(parent)
 }
 
 cedar::proc::gui::CodeWidgetScope::CodeEditor::~CodeEditor(){
+#ifdef CEDAR_USE_PYTHONSTEP
   cedar::proc::gui::CodeWidget::dontMark = 1;
+#endif
 }
 
 int cedar::proc::gui::CodeWidgetScope::CodeEditor::lineNumberAreaWidth()
@@ -499,7 +502,7 @@ void cedar::proc::gui::CodeWidgetScope::CodeEditor::highlightCurrentLine()
 
   setExtraSelections(extraSelections);
 }
-
+#ifdef CEDAR_USE_PYTHONSTEP
 void cedar::proc::gui::CodeWidgetScope::CodeEditor::markErrorLine(long lineno)
 {
 
@@ -526,7 +529,7 @@ void cedar::proc::gui::CodeWidgetScope::CodeEditor::markErrorLine(long lineno)
     setExtraSelections(extraSelections);
   }
 }
-
+#endif
 void cedar::proc::gui::CodeWidgetScope::CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
   QPainter painter(lineNumberArea);
@@ -569,5 +572,3 @@ void cedar::proc::gui::CodeWidgetScope::CodeEditor::keyPressEvent(QKeyEvent *e)
   }
 }
 
-
-#endif // CEDAR_USE_PYTHON
