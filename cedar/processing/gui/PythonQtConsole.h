@@ -109,13 +109,13 @@ namespace cedar
             mpPyWrap = new cedar::proc::gui::CoPYObjectWrapper();
             mpPy = pyObject;
 
-            QObject::connect(mpPyWrap, SIGNAL(createSig(const QString &, const int &, const int &, const int &)), mpPy, SLOT(createElem(const QString &, const int &, const int &, const int &)),Qt::BlockingQueuedConnection);
+            QObject::connect(mpPyWrap, SIGNAL(createSig(const QString &, const int &, const int &, const QString&, const int &)), mpPy, SLOT(createElem(const QString &, const int &, const int &, const QString&, const int &)),Qt::BlockingQueuedConnection);
             QObject::connect(mpPyWrap, SIGNAL(copySig(const QString &, const QString &)), mpPy, SLOT(copyTo(const QString &, const QString &)),Qt::BlockingQueuedConnection);
-            QObject::connect(mpPyWrap, SIGNAL(setGroupSig(const QString &)), mpPy, SLOT(setGroup(const QString &)),Qt::BlockingQueuedConnection);
             QObject::connect(mpPyWrap, SIGNAL(connectSig(const QString &, const int &, const QString &, const int &)), mpPy, SLOT(connectSlots(const QString &, const int &, const QString &, const int &)),Qt::BlockingQueuedConnection);
-            QObject::connect(mpPyWrap, SIGNAL(createGroupSig(const QString &, const int &, const int &, const int &)), mpPy, SLOT(createGroup(const QString &, const int &, const int &, const int &)),Qt::BlockingQueuedConnection);
+            QObject::connect(mpPyWrap, SIGNAL(createGroupTemplateSig(const QString &, const int &, const int &, const QString&, const int &)), mpPy, SLOT(createGroupTemplate(const QString &, const int &, const int &, const QString&, const int &)),Qt::BlockingQueuedConnection);
             QObject::connect(mpPyWrap, SIGNAL(setParameterSig(const QString &, const QString &, const QVariant &)), mpPy, SLOT(setParameter(const QString &, const QString &, const QVariant &)),Qt::BlockingQueuedConnection);
             QObject::connect(mpPyWrap, SIGNAL(disconnectSig(const QString &, const int &, const QString &, const int &)), mpPy, SLOT(disconnectSlots(const QString &, const int &, const QString &, const int &)),Qt::BlockingQueuedConnection);
+            QObject::connect(mpPyWrap, SIGNAL(addObjectListSig(const QString &, const QString &, const QString &)), mpPy, SLOT(addObjectList(const QString &, const QString &, const QString &)),Qt::BlockingQueuedConnection);
 
             mContext = PythonQt::self()->createUniqueModule();
             mContext.addObject("py", mpPyWrap);
@@ -258,10 +258,6 @@ public:
 
   void removeVariable(const QString& name);
 
-  //! returns true if python cerr had an error
-  bool hadError()
-  { return _hadError; }
-
   void setScene(cedar::proc::gui::Scene *pScene);
 
   void reset(std::string msg = "Aborted by User", bool fromOut = false);
@@ -300,7 +296,6 @@ private:
   QTextCharFormat _defaultTextCharacterFormat;
   QCompleter *_completer;
 
-  bool _hadError;
 };
 
 #endif

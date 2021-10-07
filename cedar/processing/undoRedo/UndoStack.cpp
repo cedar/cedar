@@ -74,9 +74,9 @@ int cedar::proc::undoRedo::UndoStack::idIndex(std::string id)
   {
     if(!this->idList.at(i).compare(id))
     {
-      return i;
+      return i + 1;
     }
   }
   this->idList.push_back(id);
-  return this->idList.size() - 1;
+  return this->idList.size();
 }

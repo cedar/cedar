@@ -135,6 +135,7 @@ public:
       {
         this->mParentFullPath = owner->getName();
       }
+      this->mOldParentFullPath = this->mParentFullPath;
       this->mParameterFullPath = owner->findParameterPath(this->mpParameter);
       this->setText(QString::fromStdString("Parameter changed: " + this->mParentFullPath + "::" +
             this->mParameterFullPath));  //TODO Maybe include value?
@@ -143,6 +144,7 @@ public:
     {
       // Did not find the parent
       this->mParentFullPath = "";
+      this->mOldParentFullPath = "";
       this->mParameterFullPath = "";
       this->setText(QString::fromStdString("Parameter changed: unknown parent::" + this->mpParameter->getName()));
     }
@@ -228,7 +230,6 @@ public:
     {
       // Do the redo operation
       this->redoAction();
-
       // Handle things that have to be done after every parameter change
       this->postUndoRedo();
 
@@ -242,9 +243,12 @@ public:
 
   void postUndoRedo()
   {
-    this->mpParameter->emitChangedSignal();
-
     //If name property was changed, update name
+    this->updateFullPaths();
+  }
+
+  void updateFullPaths()
+  {
     cedar::aux::NamedConfigurable* owner = this->mpParameter->getNamedConfigurableOwner();
     if(owner != nullptr)
     {
@@ -291,9 +295,15 @@ public:
     if(auto command =
             dynamic_cast<const cedar::proc::undoRedo::commands::ChangeParameterValue<ValueType, ParameterType>*>(other))
     {
-      if(!getMacroIdentifier().compare(command->getMacroIdentifier()))
+      std::string otherIdentifier = command->getMacroIdentifier();
+      if(!this->mParameterFullPath.compare("name"))
+      {
+        otherIdentifier = command->getMacroIdentifier(true);
+      }
+      if(!getMacroIdentifier().compare(otherIdentifier))
       {
         this->mNewValue = command->mNewValue;
+        this->updateFullPaths();
         return true;
       }
     }
@@ -301,9 +311,16 @@ public:
   }
 
   // Used to identify the parameter this command changes, for the use with mergeWith()
-  std::string getMacroIdentifier() const override
+  std::string getMacroIdentifier(bool old = false) const override
   {
-    return this->mParentFullPath + "." + this->mParameterFullPath;
+    if(old)
+    {
+      return this->mOldParentFullPath + "." + this->mParameterFullPath;
+    }
+    else
+    {
+      return this->mParentFullPath + "." + this->mParameterFullPath;
+    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -326,6 +343,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   std::string mParentFullPath;
+  std::string mOldParentFullPath;
   std::string mParameterFullPath;
   ParameterType* mpParameter;
   cedar::proc::gui::Element* mpParentElement;

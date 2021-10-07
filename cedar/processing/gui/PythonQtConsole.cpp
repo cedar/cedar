@@ -64,7 +64,6 @@ cedar::proc::gui::PythonQtConsole::PythonQtConsole(QWidget *parent, Qt::WindowFl
   setWindowFlags(windowFlags);
 
   _defaultTextCharacterFormat = currentCharFormat();
-  _hadError = false;
 
   _completer = new QCompleter(this);
   _completer->setWidget(this);
@@ -115,6 +114,7 @@ void cedar::proc::gui::PythonQtConsole::stdOut(const QString &s)
   int idx;
   while ((idx = _stdOut.indexOf('\n')) != -1)
   {
+
     consoleMessage(_stdOut.left(idx), false);
     std::cout << QStringToPythonConstCharPointer(_stdOut.left(idx)) << std::endl;
     _stdOut = _stdOut.mid(idx + 1);
@@ -123,7 +123,6 @@ void cedar::proc::gui::PythonQtConsole::stdOut(const QString &s)
 
 void cedar::proc::gui::PythonQtConsole::stdErr(const QString &s)
 {
-  _hadError = true;
   _stdErr += s;
   int idx;
   while ((idx = _stdErr.indexOf('\n')) != -1)
@@ -131,18 +130,6 @@ void cedar::proc::gui::PythonQtConsole::stdErr(const QString &s)
     consoleMessage(_stdErr.left(idx), true);
     std::cerr << QStringToPythonConstCharPointer(_stdErr.left(idx)) << std::endl;
     _stdErr = _stdErr.mid(idx + 1);
-  }
-}
-
-void cedar::proc::gui::PythonQtConsole::flushStdOut()
-{
-  if (!_stdOut.isEmpty())
-  {
-    stdOut("\n");
-  }
-  if (!_stdErr.isEmpty())
-  {
-    stdErr("\n");
   }
 }
 
@@ -250,13 +237,25 @@ void cedar::proc::gui::PythonQtConsole::handleTabCompletion()
     lookup = compareText.mid(0, dot);
     compareText = compareText.mid(dot + 1, offset);
   }
+
   if (!lookup.isEmpty() || !compareText.isEmpty())
   {
     compareText = compareText.toLower();
     QStringList found;
     PYTHONQT_GIL_SCOPE
+
     QStringList l = PythonQt::self()->introspection(mpModule, lookup, PythonQt::Anything);
-    l.append({"setParameter", "copy", "create", "connect", "createGroup", "setGroup"});
+    l.append({"setParameter", "copy", "create", "connect", "createGroupTemplate"});
+
+    QList<QGraphicsItem*> itemsList = mpScene->items();
+    for(QGraphicsItem* item : itemsList)
+    {
+      if(auto step = dynamic_cast<cedar::proc::gui::StepItem*>(item))
+      {
+        l.append(QString::fromStdString(step->getStep()->getFullPath()));
+      }
+    }
+
     Q_FOREACH (QString n, l)
       {
         if (n.toLower().startsWith(compareText))

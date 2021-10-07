@@ -81,7 +81,7 @@ QWidget(pParent)
 
   //finalize widget and button
   layout->addWidget(mpConsole);
-  layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+  layout->setAlignment(Qt::AlignRight | Qt::AlignTop);
 
   QHBoxLayout *buttons = new QHBoxLayout();
   mpExecuteButton = new QPushButton("Execute");
@@ -143,7 +143,6 @@ void cedar::proc::gui::CoPYWidget::importStepInformation(QList<QGraphicsItem*> p
   {
     QStringList list;
     std::string sel = "selection" + std::to_string(++mSelCounter);
-    bool sameType = true;
     for (cedar::proc::gui::StepItem *step : steps){
       list.append(QString::fromStdString(step->getStep()->getFullPath()));
       step->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_SEARCH_RESULT);
@@ -205,10 +204,10 @@ void cedar::proc::gui::CoPYWidget::dropEvent(QDropEvent *pEvent)
 
   if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration *>(declaration))
   {
-    mpConsole->insertPlainText(QString(QString("py.create('") + QString(elem_declaration->getClassName().c_str()) +  QString("', 0, 0, 1)")));
+    mpConsole->insertPlainText(QString(QString("py.create('") + QString(elem_declaration->getClassName().c_str()) +  QString("', 0, 0, \"root\", 1)")));
   } else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration *>(declaration))
   {
-    mpConsole->insertPlainText(QString(QString("py.createGroup('") + QString(group_declaration->getClassName().c_str()) +  QString("', 0, 0)")));
+    mpConsole->insertPlainText(QString(QString("py.createGroupTemplate('") + QString(group_declaration->getClassName().c_str()) +  QString("', 0, 0, \"root\", 1)")));
   }
   pEvent->acceptProposedAction();
 }
