@@ -237,13 +237,25 @@ void cedar::proc::gui::PythonQtConsole::handleTabCompletion()
     lookup = compareText.mid(0, dot);
     compareText = compareText.mid(dot + 1, offset);
   }
+
   if (!lookup.isEmpty() || !compareText.isEmpty())
   {
     compareText = compareText.toLower();
     QStringList found;
     PYTHONQT_GIL_SCOPE
+
     QStringList l = PythonQt::self()->introspection(mpModule, lookup, PythonQt::Anything);
-    l.append({"setParameter", "copy", "create", "connect", "createGroup", "setGroup"});
+    l.append({"setParameter", "copy", "create", "connect", "createGroupTemplate"});
+
+    QList<QGraphicsItem*> itemsList = mpScene->items();
+    for(QGraphicsItem* item : itemsList)
+    {
+      if(auto step = dynamic_cast<cedar::proc::gui::StepItem*>(item))
+      {
+        l.append(QString::fromStdString(step->getStep()->getFullPath()));
+      }
+    }
+
     Q_FOREACH (QString n, l)
       {
         if (n.toLower().startsWith(compareText))

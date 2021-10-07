@@ -11,7 +11,7 @@ find_path(PYTHONQT_INCLUDE_DIRS
 # find library in set of paths
 if(NOT CEDAR_USE_QT5)
     find_library(QGLViewer_LIBS
-            NAMES libPythonQt-Qt5-Python3.8 libPythonQt_QtAll-Qt5-Python3.8
+            NAMES libPythonQt-Qt5-Python3.6 libPythonQt_QtAll-Qt5-Python3.6
             PATHS ${CEDAR_DEPENDENCY_LIBRARIES} ${PYTHONQT_PATH_LIB}
             )
 else(NOT CEDAR_USE_QT5)
