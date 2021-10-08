@@ -1,0 +1,50 @@
+installpath="/usr/local/lib"
+if [[ $# -eq 0 ]];
+  then
+    echo "Using default path: ${installpath}"
+  else
+    installpath=$1
+    echo "Using selected path: ${installpath}"
+fi
+python=$(python3 -V)
+pythonv=(${python//./ })
+py_major=${pythonv[1]}
+py_minor=${pythonv[2]}
+pythonv=${py_major}.${py_minor}
+echo "PythonVersion: ${pythonv}"
+requiredPkgs='python-dev pip git libboost-python-dev'
+for REQUIRED_PKG in $requiredPkgs;
+do
+  PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG|grep "install ok installed")
+  echo Checking for $REQUIRED_PKG: $PKG_OK
+  if [ "" = "$PKG_OK" ];  then
+    echo "No $REQUIRED_PKG. Setting up $REQUIRED_PKG."
+    sudo apt-get --yes install $REQUIRED_PKG
+  fi
+done
+python${pythonv} -m pip install python-config
+cd $installpath
+sudo git clone https://github.com/MeVisLab/pythonqt.git
+cd pythonqt/build
+changeLine=$(sudo awk '/unix:PYTHON_VERSION=/{ print NR; exit }' python.prf)
+echo "line to change: ${changeLine}"
+sudo awk 'NR=='"${changeLine}"' {$0="  unix:PYTHON_VERSION="'${pythonv}'} 1' python.prf #> /dev/null 2>&1
+echo "Changed PythonQt PYTHON_VERSION to ${pythonv}"
+cd ../src
+changeLine=$(sudo awk '/#undef _POSIX_THREADS/{ print NR; exit }' PythonQtPythonInclude.h)
+if [ $py_minor -gt 6 -a $py_major -eq 3 ]
+  then  
+    sudo awk 'NR=='"${changeLine}"' {$0="'//'#undef _POSIX_THREADS"} 1' PythonQtPythonInclude.h #> /dev/null 2>&1
+  else
+    sudo awk 'NR=='"${changeLine}"' {$0="#undef _POSIX_THREADS"} 1' PythonQtPythonInclude.h #> /dev/null 2>&1
+fi
+echo -e "Necessary changes made. \nNow building PythonQt" 
+cd ..
+sudo qmake
+sudo make all
+echo -e "Successfully built PythonQt. \nIn CEDAR.CONF do the following changes: \n"
+echo "SET (CEDAR_INCLUDE_PYTHON   1)"
+echo "SET (PYTHON_MAJOR_VERSION   ${py_major})"
+echo "SET (PYTHON_MINOR_VERSION   ${py_minor})"
+echo "SET (CEDAR_USE_PYTHONQT     1)"
+echo "SET (PYTHONQT_PATH     '${installpath}/pythonqt')"

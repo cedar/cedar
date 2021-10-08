@@ -423,7 +423,7 @@ void cedar::proc::gui::CodeWidget::updateCodeString()
 #endif
 
 // CodeEditor implementation
-
+#if defined(CEDAR_USE_PYTHONSTEP) || defined (CEDAR_USE_COPY)
 cedar::proc::gui::CodeWidgetScope::CodeEditor::CodeEditor(QWidget *parent)
 :
 QPlainTextEdit(parent)
@@ -571,4 +571,4 @@ void cedar::proc::gui::CodeWidgetScope::CodeEditor::keyPressEvent(QKeyEvent *e)
     QPlainTextEdit::keyPressEvent(e);
   }
 }
-
+#endif

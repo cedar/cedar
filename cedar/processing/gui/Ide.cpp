@@ -91,6 +91,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QDockWidget>
 #include <QDialogButtonBox>
 #include <QInputDialog>
 #include <QTableWidget>
@@ -442,7 +443,32 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   this->mpToolBar->insertWidget(this->mpActionRecord, this->mpGlobalTimeFactor);
 
   QObject::connect(this->mpGlobalTimeFactor, SIGNAL(valueChanged(double)), this, SLOT(globalTimeFactorSpinboxChanged(double)));
-
+  #ifdef CEDAR_USE_COPY
+  //CopyWidget
+  mpCopyWidget = new QDockWidget(this);
+  mpCopyWidget->setObjectName(QString::fromUtf8("mpCopyWidget"));
+  QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+  sizePolicy.setHorizontalStretch(0);
+  sizePolicy.setVerticalStretch(0);
+  sizePolicy.setHeightForWidth(mpCopyWidget->sizePolicy().hasHeightForWidth());
+  mpCopyWidget->setSizePolicy(sizePolicy);
+  mpCopyWidget->setFeatures(QDockWidget::DockWidgetFeatureMask);
+  QWidget* dockWidgetContents_10 = new QWidget();
+  dockWidgetContents_10->setObjectName(QString::fromUtf8("dockWidgetContents_10"));
+  QHBoxLayout* verticalLayout_10 = new QHBoxLayout(dockWidgetContents_10);
+  verticalLayout_10->setObjectName(QString::fromUtf8("verticalLayout_10"));
+  verticalLayout_10->setContentsMargins(0, 0, 0, 0);
+  mpCopy = new cedar::proc::gui::CoPYWidget(dockWidgetContents_10);
+  mpCopy->setObjectName(QString::fromUtf8("mpCopy"));
+  QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Expanding);
+  sizePolicy1.setHorizontalStretch(1);
+  sizePolicy1.setVerticalStretch(0);
+  sizePolicy1.setHeightForWidth(mpCopy->sizePolicy().hasHeightForWidth());
+  mpCopy->setSizePolicy(sizePolicy1);
+  verticalLayout_10->addWidget(mpCopy);
+  mpCopyWidget->setWidget(dockWidgetContents_10);
+  this->addDockWidget(static_cast<Qt::DockWidgetArea>(4), mpCopyWidget);
+  #endif
 //  this->mpToolBar->insertSeparator(this->mpActionRecord);
 
   // PlotGroupsComboBox, insert it before the displayplotgroup action
@@ -471,7 +497,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   mpMenuWindows->addAction(this->mpPropertiesWidget->toggleViewAction());
   mpMenuWindows->addAction(this->mpLogWidget->toggleViewAction());
   #ifdef CEDAR_USE_COPY
-  mpMenuWindows->addAction(this->mpCopyWidget->toggleViewAction());
+  mpMenuWindows->addAction(mpCopyWidget->toggleViewAction());
   #endif
   QObject::connect(this->tabWidget,SIGNAL(currentChanged(int)),this, SLOT(updateTabs(int))); //Fixes a Bug under Mac OS
 
@@ -714,7 +740,7 @@ void cedar::proc::gui::Ide::lockUI(bool lock)
   widgets.push_back(this->mpPropertiesWidget);
   widgets.push_back(this->mpLogWidget);
   #ifdef CEDAR_USE_COPY
-  widgets.push_back(this->mpCopyWidget);
+  widgets.push_back(mpCopyWidget);
   #endif
 
   for (auto widget : widgets)
@@ -2043,7 +2069,7 @@ void cedar::proc::gui::Ide::storeSettings()
 {
   cedar::proc::gui::SettingsSingleton::getInstance()->logSettings()->getFrom(this->mpLogWidget);
   #ifdef CEDAR_USE_COPY
-  cedar::proc::gui::SettingsSingleton::getInstance()->coPYSettings()->getFrom(this->mpCopyWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->coPYSettings()->getFrom(mpCopyWidget);
   #endif
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->getFrom(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->getFrom(this->mpItemsWidget);
@@ -2063,7 +2089,7 @@ void cedar::proc::gui::Ide::restoreSettings()
 {
   cedar::proc::gui::SettingsSingleton::getInstance()->logSettings()->setTo(this->mpLogWidget);
   #ifdef CEDAR_USE_COPY
-  cedar::proc::gui::SettingsSingleton::getInstance()->coPYSettings()->setTo(this->mpCopyWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->coPYSettings()->setTo(mpCopyWidget);
   #endif
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->setTo(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->setTo(this->mpItemsWidget);

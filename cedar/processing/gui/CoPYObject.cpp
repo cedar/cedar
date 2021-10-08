@@ -1,7 +1,7 @@
 //
 // Created by fred on 1/7/21.
 //
-#ifdef CEDAR_USE_COPY
+
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/CoPYObject.h"
 #include "cedar/processing/GroupDeclarationManager.h"
@@ -24,6 +24,7 @@
 #include "cedar/processing/gui/StepItem.h"
 #include <QGraphicsSceneDragDropEvent>
 
+#ifdef CEDAR_USE_COPY
 QStringList cedar::proc::gui::CoPYObject::createElem(const QString &classId, const int &x, const int &y, const QString &groupname, const int &amount)
 {
   try

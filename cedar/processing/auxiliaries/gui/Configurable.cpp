@@ -862,14 +862,14 @@ void cedar::proc::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* ite
   font.setKerning(true);
   item->setFont(PARAMETER_NAME_COLUMN, font);
 }
-#ifdef CEDAR_USE_COPY
+
 void cedar::proc::aux::gui::Configurable::showContextMenu(const QPoint &pos)
 {
   ParameterItem *item = dynamic_cast<ParameterItem *>(mpPropertyTree->itemAt(pos));
   if (!item)
     return;
   QMenu context_menu(tr("Context Menu"), this);
-
+  #ifdef CEDAR_USE_COPY
   QAction *use_in_copy = context_menu.addAction("use in CoPY");
   QAction *a = context_menu.exec(mpPropertyTree->viewport()->mapToGlobal(pos));
   if (a == use_in_copy)
@@ -903,6 +903,7 @@ void cedar::proc::aux::gui::Configurable::showContextMenu(const QPoint &pos)
       copyWidget->appendToConsole(text);
     }
   }
+  #endif
 }
-#endif
+
 

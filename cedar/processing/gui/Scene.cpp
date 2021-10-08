@@ -1282,19 +1282,16 @@ void cedar::proc::gui::Scene::multiItemContextMenuEvent(QGraphicsSceneContextMen
     }
   }
   auto delete_action = menu.addAction("delete");
+  auto p_assign_to_trigger = menu.addMenu("assign to trigger");
   #ifdef CEDAR_USE_COPY
   auto p_use_in_py = menu.addAction("use in CoPY");
-  #endif
-  auto p_assign_to_trigger = menu.addMenu("assign to trigger");
-
-
   if (can_be_used_in_py)
   {
   } else
   {
     p_use_in_py->setEnabled(false);
   }
-
+  #endif
   if (can_connect)
   {
     cedar::proc::gui::Connectable::buildConnectTriggerMenu

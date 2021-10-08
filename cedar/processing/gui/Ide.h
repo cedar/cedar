@@ -461,6 +461,10 @@ private:
 
   cedar::proc::StepPtr mLastCopiedStep;
 
+  #ifdef CEDAR_USE_COPY
+  QDockWidget* mpCopyWidget;
+  cedar::proc::gui::CoPYWidget* mpCopy;
+  #endif
 
   //! Performance overview.
   cedar::proc::gui::PerformanceOverview* mpPerformanceOverview;

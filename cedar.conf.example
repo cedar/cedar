@@ -61,11 +61,13 @@ set (CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS    0           CACHE BOOL "Use opencv deb
 #set (CEDAR_STOP_ON_MISSING_LIBRARIES     0           CACHE BOOL "Stop when libraries cannot be found by cmake?")
 set (CEDAR_INCLUDE_YARP                   1          CACHE BOOL "Compile cedar with YARP to communicate over Network")
 set (CEDAR_INCLUDE_PYTHON                 0          CACHE BOOL "Compile cedar with PYTHON to use the Python Step (in development, linux only currently)")
-set (CEDAR_USE_PYTHON3                    1          CACHE BOOL "Use the python version 3 instead of 2 for compiling python (only has effect if CEDAR_INCLUDE_PYTHON is set to 1)")
-set (CEDAR_USE_PYTHON37                   0          CACHE BOOL "Use the python version 3.7 instead of 2 for compiling python (only has effect if CEDAR_INCLUDE_PYTHON is set to 1)")
-set (CEDAR_USE_PYTHON38                   0          CACHE BOOL "Use the python version 3.8 instead of 2 for compiling python (only has effect if CEDAR_INCLUDE_PYTHON is set to 1)")
-set (CEDAR_USE_QT5						  1			 CACHE BOOL "This at the moment required for plugins...  should go in future versions")
+set (PYTHON_MAJOR_VERSION                 3                                                         )
+set (PYTHON_MINOR_VERSION                 8                                                         )
+set (CEDAR_USE_PYTHONSCRIPTSTEP           0          CACHE BOOL "Compile PythonStep")
+set (CEDAR_USE_PYTHONQT                   1          CACHE BOOL "Use PythonQt for the COPY ScriptingTOOL")
+set (PYTHONQT_PATH "/usr/local/lib/pythonqt"         CACHE PATH "Directory where CMake will find PythonQt Libraries")set (CEDAR_USE_PYTHON3                    1          CACHE BOOL "Use the python version 3 instead of 2 for compiling python (only has effect if CEDAR_INCLUDE_PYTHON is set to 1)")
 
+set (CEDAR_USE_QT5						  1			 CACHE BOOL "This at the moment required for plugins...  should go in future versions")
 
 # extra tests
 set (CEDAR_BUILD_TESTS                    1           CACHE BOOL "Build unit and interactive tests? (Disabling this can save compile time.)")
