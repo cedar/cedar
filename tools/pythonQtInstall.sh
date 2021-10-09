@@ -28,16 +28,21 @@ sudo git clone https://github.com/MeVisLab/pythonqt.git
 cd pythonqt/build
 changeLine=$(sudo awk '/unix:PYTHON_VERSION=/{ print NR; exit }' python.prf)
 echo "line to change: ${changeLine}"
-sudo awk 'NR=='"${changeLine}"' {$0="  unix:PYTHON_VERSION="'${pythonv}'} 1' python.prf #> /dev/null 2>&1
+#sudo sed -i ''"${changeLine}"'s/.*/  unix:PYTHON_VERSION='"${pythonv}"'' python.prf
+sudo awk 'NR=='"${changeLine}"' {$0="  unix:PYTHON_VERSION="'${pythonv}'} 1' python.prf > python1.prf
+sudo cp python1.prf python.prf
+sudo rm python1.prf
 echo "Changed PythonQt PYTHON_VERSION to ${pythonv}"
 cd ../src
 changeLine=$(sudo awk '/#undef _POSIX_THREADS/{ print NR; exit }' PythonQtPythonInclude.h)
 if [ $py_minor -gt 6 -a $py_major -eq 3 ]
   then  
-    sudo awk 'NR=='"${changeLine}"' {$0="'//'#undef _POSIX_THREADS"} 1' PythonQtPythonInclude.h #> /dev/null 2>&1
+    sudo awk 'NR=='"${changeLine}"' {$0="'//'#undef _POSIX_THREADS"} 1' PythonQtPythonInclude.h > PythonQtPythonInclude1.h
   else
-    sudo awk 'NR=='"${changeLine}"' {$0="#undef _POSIX_THREADS"} 1' PythonQtPythonInclude.h #> /dev/null 2>&1
+    sudo awk 'NR=='"${changeLine}"' {$0="#undef _POSIX_THREADS"} 1' PythonQtPythonInclude.h  > PythonQtPythonInclude1.h
 fi
+sudo cp PythonQtPythonInclude1.h PythonQtPythonInclude.h
+sudo rm PythonQtPythonInclude1.h
 echo -e "Necessary changes made. \nNow building PythonQt" 
 cd ..
 sudo qmake

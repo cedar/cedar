@@ -393,6 +393,10 @@ pythonScript(pScript)
   init();
 }
 
+cedar::proc::steps::PythonScriptScope::ValidationMaskInputDialog::~ValidationMaskInputDialog()
+{
+
+}
 
 void cedar::proc::steps::PythonScriptScope::NDArrayConverter::init()
 {
@@ -835,6 +839,7 @@ _mAutoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "auto-convert do
 
 #if PY_MAJOR_VERSION >= 3
   PyImport_AppendInittab("pycedar", &PyInit_pycedar);
+  PyEval_InitThreads();
 #else // PY_MAJOR_VERSION >= 3
   PyImport_AppendInittab("pycedar", &initpycedar);
   PyEval_InitThreads();
@@ -844,7 +849,10 @@ _mAutoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "auto-convert do
 
 }
 
-cedar::proc::steps::PythonScript::~PythonScript() { }
+cedar::proc::steps::PythonScript::~PythonScript()
+{
+
+}
 
 template<typename T>
 cv::Mat cedar::proc::steps::PythonScript::convert3DMatToFloat(cv::Mat &mat)

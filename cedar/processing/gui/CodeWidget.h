@@ -122,7 +122,7 @@ namespace cedar
 
           public:
             PythonSyntaxHighlighter(QTextDocument *parent = 0);
-
+            ~PythonSyntaxHighlighter();
           protected:
              void highlightBlock(const QString &text);
 
@@ -254,7 +254,7 @@ private:
   //!@brief Resets the widget and its GUI elements.
   void clearLayout();
 
-private slots:
+public slots:
   void updateCodeString();
   //void errorMessageUpdated();
   void errorMessageLineNumberUpdated(long);

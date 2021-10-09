@@ -360,6 +360,14 @@ void cedar::proc::gui::CoPYObject::jumpToStep(cedar::proc::Element* element){
   }
 }
 
+cedar::proc::gui::CoPYObject::~CoPYObject() {
+
+}
+
+cedar::proc::gui::CoPYObjectWrapper::~CoPYObjectWrapper() {
+
+}
+
 
 void cedar::proc::gui::CoPYObjectWrapper::connect(const QVariant &source, const QVariant &target,
                                                   const int &sourceSlot,

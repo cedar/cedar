@@ -105,8 +105,6 @@ private slots:
   void getVariablesButtonClicked();
   void setVariables(QMap<QString, QString> vars);
 private:
-  QThread mPythonThread;
-
   //Highlighter for Console
   cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter *mpHighlighter;
 
@@ -131,7 +129,7 @@ private:
 
   //private methods
 
-  //!@brief convert cedar::proc::gui::StepItem* to std::string of shape "groupId.stepName"
+  //!@brief cvonert cedar::proc::gui::StepItem* to std::string of shape "groupId.stepName"
   std::string getStepInfo(cedar::proc::gui::StepItem* pStep);
 
   //!@brief method to execute code

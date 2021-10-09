@@ -57,6 +57,13 @@
 
 //-----------------------------------------------------------------------------
 #ifdef CEDAR_USE_COPY
+cedar::proc::gui::PythonQtConsoleScope::PythonWorker::~PythonWorker()
+{
+
+}
+
+
+
 cedar::proc::gui::PythonQtConsole::PythonQtConsole(QWidget *parent, Qt::WindowFlags windowFlags)
         :
         cedar::proc::gui::CodeWidgetScope::CodeEditor(parent)

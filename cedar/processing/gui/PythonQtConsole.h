@@ -127,6 +127,8 @@ namespace cedar
             emit setup(mContext);
 
           };
+
+          ~PythonWorker();
         private:
 
           int static traceHook(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)

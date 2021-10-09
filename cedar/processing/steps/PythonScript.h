@@ -232,6 +232,8 @@ namespace cedar
             this->unacceptedStrings = unacceptedStrings;
           };
 
+          ~ValidationMaskInputDialog();
+
           QString getText(QWidget *, const QString &title, const QString &label,
                           QLineEdit::EchoMode echo = QLineEdit::Normal,
                           const QString &text = QString(), bool *ok = nullptr,

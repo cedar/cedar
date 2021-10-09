@@ -34,9 +34,7 @@ class cedar::proc::gui::CoPYObject : public QObject
 Q_OBJECT
 public:
   CoPYObject(cedar::proc::gui::PythonQtConsole* pConsole) {pQtConsole = pConsole;}
-  ~CoPYObject(){
-
-  }
+  ~CoPYObject();
 
   cedar::proc::GroupPtr _mpRootGroup;
 
@@ -91,13 +89,7 @@ public:
 
   CoPYObjectWrapper(){};
 
-  ~CoPYObjectWrapper()
-  {};
-/*
-  CoPYObject *o;
-
-  CoPYObject *getO()
-  { return this->o; };*/
+  ~CoPYObjectWrapper();
 
 public Q_SLOTS:
 

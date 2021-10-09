@@ -41,6 +41,7 @@
 #include "cedar/processing/auxiliaries/gui/Configurable.h"
 #include "cedar/processing/auxiliaries/gui/Parameter.h"
 #include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/Step.h"
 #include "cedar/processing/undoRedo/commands/ChangeObjectListParameterValue.h"
 #include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/processing/auxiliaries/TypeBasedFactory.h"
