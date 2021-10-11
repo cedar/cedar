@@ -12,7 +12,7 @@ py_major=${pythonv[1]}
 py_minor=${pythonv[2]}
 pythonv=${py_major}.${py_minor}
 echo "PythonVersion: ${pythonv}"
-requiredPkgs='python-dev pip git libboost-python-dev'
+requiredPkgs='qtmultimedia5-dev libqt5multimediawidgets5 libqt5multimedia5-plugins libqt5multimedia5 qtdeclarative5-dev libqt5svg5-dev libqt5xmlpatterns5-dev qttools5-dev qtbase5-private-dev qt5-default python-dev pip python3-pip git libboost-python-dev'
 for REQUIRED_PKG in $requiredPkgs;
 do
   PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG|grep "install ok installed")
@@ -22,7 +22,7 @@ do
     sudo apt-get --yes install $REQUIRED_PKG
   fi
 done
-python${pythonv} -m pip install python-config
+python3 -m pip install python-config
 cd $installpath
 sudo git clone https://github.com/MeVisLab/pythonqt.git
 cd pythonqt/build
