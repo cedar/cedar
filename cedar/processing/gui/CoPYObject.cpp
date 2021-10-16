@@ -23,6 +23,8 @@
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/processing/gui/StepItem.h"
 #include <QGraphicsSceneDragDropEvent>
+#include <cedar/auxiliaries/FileParameter.h>
+#include <cedar/auxiliaries/FileLog.fwd.h>
 
 #ifdef CEDAR_USE_COPY
 QStringList cedar::proc::gui::CoPYObject::createElem(const QString &classId, const int &x, const int &y, const QString &groupname, const int &amount)
@@ -264,19 +266,11 @@ void cedar::proc::gui::CoPYObject::setParameter(const QString &elem, const QStri
         }
       }
     }
-    /*else if (auto paramSet = dynamic_cast<cedar::aux::ObjectListParameter *>(param.get()))
+    else if (auto paramSet = dynamic_cast<cedar::aux::FileParameter *>(param.get()))
   {
-    std::vector<std::string> typeList;
-    paramSet->listTypes(typeList);
-    for (std::string type: typeList)
-    {
-      if (QString::fromStdString(type).contains(value.toString()))
-      {
-        paramSet->setType();
-        break;
-      }
-    }
-  }*/else
+    cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::string, cedar::aux::FileParameter>(paramSet, paramSet->getPath(), value.toString().toStdString(), param->getNamedConfigurableOwner(), _mpScene));
+
+  }else
     {
       CEDAR_THROW(cedar::aux::ExceptionBase, "No matching parameter type for " + paramName.toStdString() + " found.");
     }

@@ -11,6 +11,7 @@ pythonv=(${python//./ })
 py_major=${pythonv[1]}
 py_minor=${pythonv[2]}
 pythonv=${py_major}.${py_minor}
+
 echo "PythonVersion: ${pythonv}"
 requiredPkgs='qtmultimedia5-dev libqt5multimediawidgets5 libqt5multimedia5-plugins libqt5multimedia5 qtdeclarative5-dev libqt5svg5-dev libqt5xmlpatterns5-dev qttools5-dev qtbase5-private-dev qt5-default python-dev pip python3-pip git libboost-python-dev'
 for REQUIRED_PKG in $requiredPkgs;
@@ -29,7 +30,7 @@ cd pythonqt/build
 changeLine=$(sudo awk '/unix:PYTHON_VERSION=/{ print NR; exit }' python.prf)
 echo "line to change: ${changeLine}"
 #sudo sed -i ''"${changeLine}"'s/.*/  unix:PYTHON_VERSION='"${pythonv}"'' python.prf
-sudo awk 'NR=='"${changeLine}"' {$0="  unix:PYTHON_VERSION="'${pythonv}'} 1' python.prf > python1.prf
+sudo awk 'NR=='"${changeLine}"' {$0="  unix:PYTHON_VERSION='"${pythonv}"'"} 1' python.prf > python1.prf
 sudo cp python1.prf python.prf
 sudo rm python1.prf
 echo "Changed PythonQt PYTHON_VERSION to ${pythonv}"
