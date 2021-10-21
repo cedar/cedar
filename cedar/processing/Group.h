@@ -426,6 +426,8 @@ public:
    */
   const ElementMap& getElements() const;
 
+  std::string getFreeConnector(cedar::proc::DataRole::Id);
+
   //! Recursively lists all elements in the group and all its subgroups.
   std::vector<cedar::proc::GroupPath> listAllElementPaths(const cedar::proc::GroupPath& base_path = cedar::proc::GroupPath()) const;
 
