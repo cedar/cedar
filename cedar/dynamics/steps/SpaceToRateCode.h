@@ -41,6 +41,7 @@
 #include "cedar/dynamics/Dynamics.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/TimeParameter.h"
 
 // FORWARD DECLARATIONS
@@ -160,6 +161,8 @@ protected:
   //!@brief the upper limit of the mapped interval
   cedar::aux::DoubleParameterPtr _mUpperLimit;
 
+
+  cedar::aux::BoolParameterPtr mJumpToFixPoint;
 
   cedar::aux::BoolParameterPtr mMakeCyclic;
 private:

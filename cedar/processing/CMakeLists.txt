@@ -149,8 +149,11 @@ cedar_add_library(cedarproc
   gui/WidgetContainerItem.h
   sources/LocalReader.h
   sinks/LocalWriter.h
+  sinks/TCPWriter.h
+  sources/TCPReader.h
   sources/BoxInput.h
   sources/GaussInput.h
+  sources/RealSense.h
   steps/VariableBox.h
   steps/VariableGauss.h
   steps/Sinus.h
@@ -220,13 +223,7 @@ cedar_add_library(cedarproc
   steps/HopfOscillatorRHS.h
   steps/NaNCheck.h
   steps/PositionOfMaximum.h
-  undoRedo/UndoStack.h
-  undoRedo/UndoCommand.h
-  undoRedo/commands/ChangeParameterValue.h
-  undoRedo/commands/CreateGroupTemplate.h
-  undoRedo/commands/CreateDeleteConnection.h
-  undoRedo/commands/CreateDeleteElement.h
-  undoRedo/commands/MoveElement.h
+  steps/DiagonalReadout.h
   CppScript.h
   Group.h
   Step.h

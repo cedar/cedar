@@ -172,10 +172,15 @@ protected:
   cedar::aux::DoubleParameterPtr _mMemoryNodeGlobalInhibitionWeight; // c_5
   //!@brief weight between an ordinal node and the corresponding memory node
   cedar::aux::DoubleParameterPtr _mOrdinalNodeToSameMemoryNodeWeight; // c_6
-
+  //!@brief weight between an ordinal node and its predecessor memory node
+  cedar::aux::DoubleParameterPtr _mOrdinalNodeToPreviousMemoryNodeWeight; // c_7
 
   //!@brief sigmoid function used to determine the output of all nodes
   SigmoidParameterPtr _mSigmoid;
+
+  //!@brief determines if the serial order mechanism is cyclic (i.e., when it reaches the last ordinal node, the first one will be next again)
+  cedar::aux::BoolParameterPtr _mIsCyclic;
+
 }; // class cedar::dyn::SerialOrder
 
 #endif // CEDAR_DYN_SERIAL_ORDER_H

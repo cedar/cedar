@@ -95,6 +95,7 @@ mB(new cedar::aux::DoubleParameter(this, "factor b", 1.0))
 {
   // declare all data
   cedar::proc::DataSlotPtr input = this->declareInput("input");
+  this->declareInput("factor b (optional)", false); // optional
   this->declareOutput("output", mOutput);
 
   input->setCheck(cedar::proc::typecheck::IsMatrix());
@@ -112,7 +113,7 @@ void cedar::proc::steps::LinearLateralShift::inputConnectionChanged(const std::s
   // TODO: you may want to replace this code by using a cedar::proc::InputSlotHelper
 
   // Again, let's first make sure that this is really the input in case anyone ever changes our interface.
-  CEDAR_DEBUG_ASSERT(inputName == "input");
+  //CEDAR_DEBUG_ASSERT(inputName == "input");
 
   // Assign the input to the member. This saves us from casting in every computation step.
   this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
@@ -189,7 +190,29 @@ void cedar::proc::steps::LinearLateralShift::recompute()
   }
 
 
+
+
   // shift:
+  double factorB= 1.0;
+  bool has_factor_input= false;
+
+  auto factorinput = getInput("factor b (optional)");
+  if (factorinput)
+  {
+    auto factordata = boost::dynamic_pointer_cast<const cedar::aux::MatData>(factorinput);
+    if (factordata
+        && !factordata->getData().empty())
+    {
+      has_factor_input= true;
+      factorB= factordata->getData().at<float>(0, 0);
+    }
+  }
+
+  if (!has_factor_input)
+  {
+    factorB= this->mB->getValue();
+  }
+
 
   //auto lower = mLowerLimit->getValue();
   //auto upper = mUpperLimit->getValue();
@@ -205,7 +228,7 @@ void cedar::proc::steps::LinearLateralShift::recompute()
     int index_in;
 
     index_in= round( ( static_cast<float>(i) - this->mA->getValue() ) 
-                     / this->mB->getValue() );
+                     / factorB );
 
     if (index_in < siz
         && index_in >= 0

@@ -76,6 +76,7 @@ public:
 public:
   //!@brief Writes the output matrix to a video file.
   void compute(const cedar::proc::Arguments& arguments);
+  void inputConnectionChanged(const std::string& inputName);
   void onStart();
   void onStop();
 

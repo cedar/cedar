@@ -125,7 +125,7 @@ _mOrdinalNodeSelfExcitationWeight
   (
     this,
     "ordinal self excitation",
-    6,
+    11,
     cedar::aux::DoubleParameter::LimitType::positive()
   )
 ),
@@ -156,6 +156,16 @@ _mMemoryNodeToSameOrdinalNodeWeight
     this,
     "memory to same ordinal",
     -5,
+    cedar::aux::DoubleParameter::LimitType::negative()
+  )
+),
+_mOrdinalNodeToPreviousMemoryNodeWeight
+(
+  new cedar::aux::DoubleParameter
+  (
+    this,
+    "ordinal to prev memory",
+    -7,
     cedar::aux::DoubleParameter::LimitType::negative()
   )
 ),
@@ -207,7 +217,8 @@ _mSigmoid
     "sigmoid",
     cedar::aux::math::SigmoidPtr(new cedar::aux::math::AbsSigmoid(0.0, 100.0))
   )
-)
+),
+_mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
 {
   // declare the inputs
   this->declareInput("CoS signal input", false);
@@ -336,15 +347,27 @@ void cedar::dyn::SerialOrder::eulerStep(const cedar::unit::Time& time)
                     + c1 * (sum_of_ordinal_outputs - f_d)
                     + c3 * f_dm;
 
-    // for the first ordinal position only
-    if (i == 0)
-    {
-      d_dot += c2;
-    }
-    // for all other nodes
-    else
-    {
-      d_dot += c2 * mMemoryNodeOutputs.at(i-1)->getData();
+    if (!this->_mIsCyclic->getValue()) {
+      // for the first ordinal position only
+      if (i == 0)
+      {
+        d_dot += c2;
+      }
+      // for all other nodes
+      else
+      {
+        d_dot += c2 * mMemoryNodeOutputs.at(i-1)->getData();
+      }
+    } else {
+      // input from predecessor memory node with a cyclic predecessor
+      if (i == 0)
+      {
+        d_dot += c2 * mMemoryNodeOutputs.at(mOrdinalNodes.size()-1)->getData();
+      }
+      else
+      {
+        d_dot += c2 * mMemoryNodeOutputs.at(i-1)->getData();
+      }
     }
 
     //!@todo explain that the expected input is positive (CoS signal)
@@ -360,11 +383,17 @@ void cedar::dyn::SerialOrder::eulerStep(const cedar::unit::Time& time)
     const float& c4 = this->_mMemoryNodeSelfExcitationWeight->getValue(); // 3.5
     const float& c5 = this->_mMemoryNodeGlobalInhibitionWeight->getValue(); // 2.0
     const float& c6 = this->_mOrdinalNodeToSameMemoryNodeWeight->getValue(); // 2.6
+    const float& c7 = this->_mOrdinalNodeToPreviousMemoryNodeWeight->getValue();
 
     // compute the change rate of the memory node
     cv::Mat dm_dot = -dm + hm + c4 * f_dm
                     + c5 * (sum_of_ordinal_outputs - f_dm)
                     + c6 * f_d;
+
+    if (this->_mIsCyclic->getValue()) {
+      // each memory node has to be inhibited by its successor ordinal node
+      dm_dot += c7 * mOrdinalNodeOutputs.at((i+1)%mOrdinalNodes.size())->getData();
+    }
 
     dm += time / cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds) * dm_dot;
 
@@ -382,7 +411,11 @@ void cedar::dyn::SerialOrder::reset()
   for (unsigned int i = 0; i < mOrdinalNodes.size(); ++i)
   {
     cv::Mat& d = this->mOrdinalNodes.at(i)->getData();
-    d = cv::Mat::ones(1, 1, CV_32F) * _mOrdinalNodeRestingLevel->getValue();
+    if (i == 0 && this->_mIsCyclic->getValue()) {
+      d = cv::Mat::ones(1, 1, CV_32F) * (_mOrdinalNodeRestingLevel->getValue() + _mOrdinalNodeSelfExcitationWeight->getValue() + _mMemoryNodeToNextOrdinalNodeWeight->getValue());
+    } else {
+      d = cv::Mat::ones(1, 1, CV_32F) * _mOrdinalNodeRestingLevel->getValue();
+    }
 
     cv::Mat f_d = _mSigmoid->getValue()->compute<float>(d);
     this->mOrdinalNodeOutputs.at(i)->getData() = f_d;

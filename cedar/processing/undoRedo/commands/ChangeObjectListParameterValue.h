@@ -63,17 +63,6 @@ class cedar::proc::undoRedo::commands::ChangeObjectListParameterValue :
         public cedar::proc::undoRedo::commands::ChangeParameterValue<std::string, cedar::aux::ObjectListParameter>
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // enums
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-
-  enum Action
-  {
-    CREATE,
-    DELETE
-  };
-
-  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -84,7 +73,7 @@ public:
   :
   ChangeParameterValue(parameter, type, type, owner, scene),
   mIndex(-1),
-  mAction(CREATE)
+  mIsCreateCommand(true)
   {
     setText(QString::fromStdString("Object added: " + this->getVisualizationTextInternal(owner)));
   }
@@ -95,7 +84,7 @@ public:
   :
   ChangeParameterValue(parameter, parameter->getTypeOfObject(parameter->getConfigurableChild(index)),
                        parameter->getTypeOfObject(parameter->getConfigurableChild(index)), owner, scene),
-  mAction(DELETE),
+  mIsCreateCommand(false),
   mIndex(index)
   {
     setText(QString::fromStdString("Object removed: " + this->getVisualizationTextInternal(owner)));
@@ -186,11 +175,11 @@ protected:
 
   void undoAction() override
   {
-    switch(this->mAction){
-      case CREATE:
+    switch(this->mIsCreateCommand){
+      case true:
         removeObject();
         break;
-      case DELETE:
+      case false:
         createObject();
         break;
     }
@@ -198,11 +187,11 @@ protected:
 
   void redoAction() override
   {
-    switch(this->mAction){
-      case CREATE:
+    switch(this->mIsCreateCommand){
+      case true:
         createObject();
         break;
-      case DELETE:
+      case false:
         removeObject();
         break;
     }
@@ -222,7 +211,7 @@ protected:
 private:
 
   int mIndex;
-  Action mAction;
+  bool mIsCreateCommand;
   cedar::aux::ConfigurationNode mConfig;
 
   //--------------------------------------------------------------------------------------------------------------------

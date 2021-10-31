@@ -93,7 +93,7 @@ mOutput(new cedar::aux::MatData(cv::Mat()))
   cedar::proc::DataSlotPtr input2 = this->declareInput("input below");
   this->declareOutput("output", mOutput);
 
-  input->setCheck(cedar::proc::typecheck::IsMatrix());
+  //input->setCheck(cedar::proc::typecheck::IsMatrix());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -113,7 +113,10 @@ void cedar::proc::steps::ConcatVertically::inputConnectionChanged(const std::str
   }
 
   bool output_changed = false;
-  if (!this->mInput)
+  if (!this->mInput
+      || this->mInput->isEmpty()
+      || !this->mInput2
+      || this->mInput2->isEmpty())
   {
     // no input -> no output
     this->mOutput->setData(cv::Mat());
@@ -121,6 +124,10 @@ void cedar::proc::steps::ConcatVertically::inputConnectionChanged(const std::str
   }
   else
   {
+    if (!this->mOutput
+        || this->mOutput->isEmpty()) // will have a value afterwards
+      output_changed = true;
+
     // Make a copy to create a matrix of the same type, dimensions, ...
     this->recompute();
   }
@@ -150,9 +157,11 @@ void cedar::proc::steps::ConcatVertically::recompute()
   auto data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(input);
   auto data2 = boost::dynamic_pointer_cast<const cedar::aux::MatData>(input2);
 
-  if (!data)
+  if (!data
+      || data->isEmpty())
     return;
-  if (!data2)
+  if (!data2
+      || data2->isEmpty())
     return;
 
   cv::Mat result;

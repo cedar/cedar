@@ -140,7 +140,8 @@ void cedar::proc::steps::TransferFunction::somethingChanged()
 
 void cedar::proc::steps::TransferFunction::recompute()
 {
-  if (!this->mInput)
+  if (!this->mInput
+      || this->mInput->isEmpty())
     return;
 
   // get all members
@@ -148,7 +149,7 @@ void cedar::proc::steps::TransferFunction::recompute()
   cv::Mat& sigmoid_u = this->mOutput->getData();
 
   // calculate output
-  sigmoid_u = _mTransferFunction->getValue()->compute(input);
+  sigmoid_u = _mTransferFunction->getValue()->compute(input.clone());
 }
 
 void cedar::proc::steps::TransferFunction::inputConnectionChanged(const std::string& inputName)

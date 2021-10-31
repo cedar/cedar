@@ -164,9 +164,9 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
     delete mpThread;
     this->mpThread = NULL;
   }
-#ifndef CEDAR_OS_WINDOWS
-  mDestructingMutex.unlock();
-#endif	
+
+//  mDestructingMutex.unlock(); //responsible for crashes under win64 and MacOS do we need it under linux?
+
 }
 
 //------------------------------------------------------------------------------
@@ -175,7 +175,14 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
 
 bool cedar::aux::ThreadWrapper::isRunning() const
 {
+  if (mDestructing)
+    return false;
+
   QMutexLocker general_access_lock(&mGeneralAccessLock);
+
+  if (mDestructing)
+    return false;
+
   QReadLocker thread_worker_readlock(&mThreadAndWorkerLock);
 
   if (mDestructing)

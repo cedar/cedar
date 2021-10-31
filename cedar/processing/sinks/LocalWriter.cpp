@@ -110,15 +110,21 @@ _mPort(new cedar::aux::StringParameter(this, "port", "default local port"))
 
 void cedar::proc::sinks::LocalWriter::onStart()
 {
+  if (!this->mInput)
+    return;
+
   _mPort->setConstant(true);
     if("" != oldName && oldName != _mPort->getValue())
     {
         if(getPortCount(oldName) > 0)
         {
-            accessData().erase(oldName);
+            QWriteLocker lock( mpDataLock ); 
+            accessDataUnlocked().erase(oldName);
+            lock.unlock();
         }
         oldName = "";
     }
+
     if("" != _mPort->getValue())
     {
         this->setMatrix( _mPort->getValue(), this->mInput->getData() );
@@ -207,13 +213,20 @@ void cedar::proc::sinks::LocalWriter::validatePortName(const std::string& portNa
 void cedar::proc::sinks::LocalWriter::setMatrix(const std::string &key, const cv::Mat &mat)
 {
   QWriteLocker lock( mpDataLock );
-  accessData()[ key ]= mat.clone();
+  accessDataUnlocked()[ key ]= mat.clone();
 }
 
 cv::Mat cedar::proc::sinks::LocalWriter::getMatrix(const std::string &key)
 {
   QReadLocker lock( mpDataLock ); // locking for multi-threaded writers/readers
-  auto res= accessData()[ key ];
+  auto data= accessDataUnlocked();
+
+  // there is no guarantee that the key already exists
+  auto found= data.find( key );
+  if  (found == data.end())
+    return cv::Mat();
+
+  auto res= found->second;
 
   return res.clone(); // cloning is important since the cv::Mats share 
                       // their memory
@@ -222,6 +235,6 @@ cv::Mat cedar::proc::sinks::LocalWriter::getMatrix(const std::string &key)
 unsigned int cedar::proc::sinks::LocalWriter::getPortCount(const std::string &key)
 {
   QReadLocker lock( mpDataLock );
-  return accessData().count( key );
+  return accessDataUnlocked().count( key );
 }
 

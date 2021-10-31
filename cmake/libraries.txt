@@ -59,6 +59,16 @@ message("[${CMAKE_CXX_COMPILER_VERSION}]")
   
 endif()
 
+# realsense2
+message("-- Searching for realsense2...")
+find_package(realsense2 QUIET)
+if(realsense2_FOUND)
+    message("realsense2 found: " ${realsense2_DIR}) 
+    link_libraries(${realsense2_LIBRARY})
+    set(CEDAR_USE_REALSENSE ON)
+endif(realsense2_FOUND)
+
+
 # Qt
 message("-- Searching for Qt...")
 
@@ -130,11 +140,15 @@ if (CEDAR_USE_PYTHON)
   if (CEDAR_USE_PYTHON37)
     find_package(Boost 1.56.0 COMPONENTS system date_time filesystem regex python37)
   else (CEDAR_USE_PYTHON37)
-    if (CEDAR_USE_PYTHON3)
+  if (CEDAR_USE_PYTHON38)
+        find_package(Boost 1.56.0 COMPONENTS system date_time filesystem regex python38)
+  else (CEDAR_USE_PYTHON38)
+  if (CEDAR_USE_PYTHON3)
       find_package(Boost 1.56.0 COMPONENTS system date_time filesystem regex python3)
     else (CEDAR_USE_PYTHON3)
       find_package(Boost 1.40.0 COMPONENTS system date_time filesystem regex python-py27)
     endif (CEDAR_USE_PYTHON3)
+  endif (CEDAR_USE_PYTHON38)
   endif (CEDAR_USE_PYTHON37)
 else (CEDAR_USE_PYTHON)
   find_package(Boost 1.40.0 COMPONENTS system date_time filesystem regex)
@@ -249,6 +263,12 @@ set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
         message("-- Looking for YARP packages - not found")
       endif(YARP_FOUND)
     endif(CEDAR_INCLUDE_YARP)
+
+#WINSOCKET
+#Search should not be required as those libraries are part of the windows sdk
+if (WIN32)
+	link_libraries(wsock32 ws2_32)
+endif(WIN32)
 
 if(NOT CEDAR_PORTABLE_MINIMAL_VERSION)
 

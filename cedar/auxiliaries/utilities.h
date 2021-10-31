@@ -102,6 +102,10 @@ namespace cedar
       return unmangleName(typeid(*object));
     }
 
+    /*!@brief CRC-32 Checksum
+     */
+    CEDAR_AUX_LIB_EXPORT unsigned int generateCR32Checksum(const char *message, int message_length);
+
     /*!@brief Structure holding information about an frame in a stack trace.
      */
     struct CEDAR_AUX_LIB_EXPORT StackEntry

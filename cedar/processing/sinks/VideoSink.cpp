@@ -110,24 +110,39 @@ cedar::proc::sinks::VideoSink::~VideoSink()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sinks::VideoSink::onStart()
 {
-  mVideoWriter.open
-               (
-                 _mOutputFileName->getValue().absolutePath().toStdString(),
+    if (auto data = this->getInput("input"))
+    {
+        if(auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
+        {
+            mVideoWriter.open
+                    (
+                    _mOutputFileName->getValue().absolutePath().toStdString(),
 #if CEDAR_OPENCV_MAJOR_VERSION >= 3
-                 cv::VideoWriter::fourcc('P','I','M','1')
+                    cv::VideoWriter::fourcc('M','J','P','G')
 #else
-                 static_cast<unsigned int>(CV_FOURCC('P','I','M','1'))
+                    static_cast<unsigned int>(CV_FOURCC('M','J','P','G'))
 #endif
-                 ,
-                 _mFrameRate->getValue(),
-                 this->getInput("input")->getData<cv::Mat>().size(),
-                 true
-               );
+                    ,
+                    _mFrameRate->getValue(),
+                    this->getInput("input")->getData<cv::Mat>().size(),
+                    true
+            );
+        }
+    }
 }
 
 void cedar::proc::sinks::VideoSink::onStop()
 {
-  mVideoWriter = cv::VideoWriter();
+    if (mVideoWriter.isOpened())
+    {
+        mVideoWriter.release();
+    }
+}
+
+void cedar::proc::sinks::VideoSink::inputConnectionChanged(const std::string& inputName)
+{
+    this->onStop();
+    this->onStart();
 }
 
 void cedar::proc::sinks::VideoSink::compute(const cedar::proc::Arguments& arguments)

@@ -139,7 +139,7 @@ private:
   // locking for thread safety
   static QReadWriteLock *mpDataLock;
 
-  static std::map<std::string, cv::Mat>& accessData()
+  static std::map<std::string, cv::Mat>& accessDataUnlocked()
   {
     static std::map<std::string, cv::Mat> mData;
     return mData; // returns a reference!

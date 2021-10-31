@@ -59,6 +59,9 @@ float cedar::aux::math::TransferFunction::compute(float value) const
 
 cv::Mat cedar::aux::math::TransferFunction::compute(const cv::Mat& values) const
 {
+  if (values.empty())
+    return cv::Mat();
+
   cv::Mat result = values.clone();
   if (values.type() == CV_32F)
   {

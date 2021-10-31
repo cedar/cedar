@@ -435,6 +435,9 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
         if (!measurementData) // test again after the lock
           continue;
 
+        if (measurementData->isEmpty())
+          continue;
+
         cv::Mat measurementMat = measurementData->getData().clone();
         measurementLocker.unlock();
         std::string name = component->getNameForMeasurementType(measurement);
@@ -563,6 +566,9 @@ void cedar::proc::steps::Component::rebuildOutputs()
     auto measurementData = component->getMeasurementData(measurement);
     if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(measurementData))
     {
+      if (measurementData->getData<cv::Mat>().empty())
+        break;
+
       cv::Mat measurementMat = measurementData->getData<cv::Mat>().clone();
       cedar::aux::MatDataPtr dataPtr = cedar::aux::MatDataPtr(new cedar::aux::MatData(measurementMat));
       this->declareOutput(name, dataPtr);

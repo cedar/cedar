@@ -160,9 +160,11 @@ protected:
 private:
 
   void compute(const cedar::proc::Arguments&);
-  void executePythonScript();
+  void executePythonScript(bool use_lock);
 
   void freePythonVariables();
+
+  void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -179,11 +181,12 @@ protected:
   // none yet
 private:
 
-  cedar::aux::MatDataPtr mOutput;
+  // js: this is not needed? cedar::aux::MatDataPtr mOutput;
   int mIsExecuting = 0;
 
   std::vector< cedar::aux::ConstMatDataPtr > mInputs;
   std::vector< cedar::aux::MatDataPtr > mOutputs;
+  std::vector< cedar::aux::MatDataPtr > mStates;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -201,6 +204,7 @@ private:
   cedar::aux::BoolParameterPtr _mHasScriptFile;
   cedar::aux::FileParameterPtr _mScriptFile;
   cedar::aux::BoolParameterPtr _mAutoConvertDoubleToFloat; // advanced
+  bool mWasResetted;
 
 };
 

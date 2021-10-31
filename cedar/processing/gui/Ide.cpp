@@ -1454,51 +1454,60 @@ void cedar::proc::gui::Ide::copy()
     {
       bool foundSourceString = false;
       bool foundTargetString = false;
-      //Get source and target string of connectionPair
-      std::string sourceString = connectionPair.second.find("source")->second.get_value<std::string>();
-      std::string targetString = connectionPair.second.find("target")->second.get_value<std::string>();
-      //Split and replace the step name (before the .) with the new Name
-      std::vector<std::string> sourceStringSplitted;
-      std::vector<std::string> targetStringSplitted;
-      boost::split(sourceStringSplitted, sourceString, boost::is_any_of("."));
-      boost::split(targetStringSplitted, targetString, boost::is_any_of("."));
-      //Loop through steps
-      for (auto &pair:stepsNode)
+      if(connectionPair.second.find("source") != connectionPair.second.not_found())
       {
-        //Get name of that step
-        std::string stepName = pair.second.find("name")->second.get_value<std::string>();
-        if (sourceStringSplitted[0] == stepName)
+        //Get source and target string of connectionPair
+        std::string sourceString = connectionPair.second.find("source")->second.get_value<std::string>();
+        std::string targetString = connectionPair.second.find("target")->second.get_value<std::string>();
+        //Split and replace the step name (before the .) with the new Name
+        std::vector<std::string> sourceStringSplitted;
+        std::vector<std::string> targetStringSplitted;
+        boost::split(sourceStringSplitted, sourceString, boost::is_any_of("."));
+        boost::split(targetStringSplitted, targetString, boost::is_any_of("."));
+        //Loop through steps
+        for (auto &pair:stepsNode)
         {
-          foundSourceString = true;
-        }
-        if (targetStringSplitted[0] == stepName)
-        {
-          foundTargetString = true;
-        }
-      }
-      if (!(foundSourceString && foundTargetString))
-      {
-        //Loop through groups
-        for (auto &pair:groupNode)
-        {
-          //Get name of that group
-          std::string groupName = pair.second.find("name")->second.get_value<std::string>();
-          if (sourceStringSplitted[0] == groupName)
+          if(pair.second.find("name") != pair.second.not_found())
           {
-            foundSourceString = true;
-          }
-          if (targetStringSplitted[0] == groupName)
-          {
-            foundTargetString = true;
+            //Get name of that step
+            std::string stepName = pair.second.find("name")->second.get_value<std::string>();
+            if (sourceStringSplitted[0] == stepName)
+            {
+              foundSourceString = true;
+            }
+            if (targetStringSplitted[0] == stepName)
+            {
+              foundTargetString = true;
+            }
           }
         }
-      }
-      if (foundSourceString && foundTargetString)
-      {
-        cedar::aux::ConfigurationNode connectionNode;
-        connectionNode.put("source", sourceString);
-        connectionNode.put("target", targetString);
-        filteredConnectionsNode.push_back(cedar::aux::ConfigurationNode::value_type("", connectionNode));
+        if (!(foundSourceString && foundTargetString))
+        {
+          //Loop through groups
+          for (auto &pair:groupNode)
+          {
+            if(pair.second.find("name") != pair.second.not_found())
+            {
+              //Get name of that group
+              std::string groupName = pair.second.find("name")->second.get_value<std::string>();
+              if (sourceStringSplitted[0] == groupName)
+              {
+                foundSourceString = true;
+              }
+              if (targetStringSplitted[0] == groupName)
+              {
+                foundTargetString = true;
+              }
+            }
+          }
+        }
+        if (foundSourceString && foundTargetString)
+        {
+          cedar::aux::ConfigurationNode connectionNode;
+          connectionNode.put("source", sourceString);
+          connectionNode.put("target", targetString);
+          filteredConnectionsNode.push_back(cedar::aux::ConfigurationNode::value_type("", connectionNode));
+        }
       }
     }
     rootNode.add_child("connections", filteredConnectionsNode);
@@ -1603,8 +1612,7 @@ void cedar::proc::gui::Ide::renameElementInConnection(boost::property_tree::ptre
   for (auto &connectionPair:connectionTree)
   {
     //Get source and target string of connectionPair
-    boost::property_tree::ptree::const_assoc_iterator it = connectionPair.second.find(sourceSlotName);
-    if(it != connectionPair.second.not_found()) {
+    if(connectionPair.second.find(sourceSlotName) != connectionPair.second.not_found()) {
       std::string sourceString = connectionPair.second.find(sourceSlotName)->second.get_value<std::string>();
       std::string targetString = connectionPair.second.find(targetSlotName)->second.get_value<std::string>();
       //Split and replace the first part (before the .) with the new Name

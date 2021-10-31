@@ -497,7 +497,13 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
     {
       if (!this->mFinishedChainResult.isStarted() || this->mFinishedChainResult.isFinished())
       {
-        this->mFinishedChainResult = QtConcurrent::run(boost::bind(&cedar::proc::Trigger::trigger, this->getFinishedTrigger(), cedar::proc::ArgumentsPtr()));
+        // WHY WHY WHY ??? jokeit: commented out Jun 2021. 
+        // this leads to a multitude of threads running simultaneously and 
+        // clogging up the chain of steps/locking wildly.
+        // Initial tests show much better latency with the change.
+        //this->mFinishedChainResult = QtConcurrent::run(boost::bind(&cedar::proc::Trigger::trigger, this->getFinishedTrigger(), cedar::proc::ArgumentsPtr()));
+        // jokeit: instead to this:
+        this->getFinishedTrigger()->trigger();
       }
     }
     else
