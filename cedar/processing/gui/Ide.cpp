@@ -1553,41 +1553,6 @@ void cedar::proc::gui::Ide::paste()
 	cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::Paste(jsonFromClipboard,this->mGroup, mousePositionScenePos));
 }
 
-//TODO: Does this have to stay in ide? i moved it for now in paste.cpp, since its only used there
-/*void cedar::proc::gui::Ide::pasteConfigurationNodes(cedar::aux::ConfigurationNode stepNode,
-				cedar::aux::ConfigurationNode uiNode, cedar::aux::ConfigurationNode connectionNode,
-				cedar::aux::ConfigurationNode groupNode)
-{
-	cedar::aux::ConfigurationNode rootNode;
-
-	//Add meta Infos
-	cedar::aux::ConfigurationNode metaNode;
-	metaNode.put("format", "1");
-
-	rootNode.add_child("meta", metaNode);
-	rootNode.add_child("steps", stepNode);
-	rootNode.add_child("ui", uiNode);
-	rootNode.add_child("connections", connectionNode);
-	rootNode.add_child("groups", groupNode);
-
-	std::stringstream stringstream;
-	boost::property_tree::write_json(stringstream, rootNode);
-
-	//Debug: Print modified pasted
-	//boost::property_tree::write_json("Paste: Modified Final Into read Function.json", rootNode);
-
-	//Use readJsonFromString to paste the stringJson
-	try
-	{
-		this->mGroup->readJsonFromString(stringstream.str());
-	}
-	catch (const boost::property_tree::json_parser_error &e)
-	{
-		std::string info(e.what());
-		std::cout << info << std::endl;
-	}
-}*/
-
 void cedar::proc::gui::Ide::copyStepConfiguration()
 {
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
