@@ -63,7 +63,6 @@
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
-#include <QShowEvent>
 #include <QKeyEvent>
 #include <QDoubleSpinBox>
 #include <QComboBox>
@@ -318,10 +317,6 @@ public slots:
 	static void renameElementInConnection(boost::property_tree::ptree& connectionTree, std::string oldName,
 					std::string newName, std::string sourceSlotName, std::string targetSlotName);
 
-	//TODO: Does this have to stay in ide? i moved it for now in paste.cpp, since its only used there
-  //!@brief paste one element using json data nodes
-  //void pasteConfigurationNodes(cedar::aux::ConfigurationNode stepNode, cedar::aux::ConfigurationNode uiNode, cedar::aux::ConfigurationNode connectionNode, cedar::aux::ConfigurationNode groupNode);
-
   //!@brief copy the configuration of one step
   void copyStepConfiguration();
 
@@ -416,8 +411,6 @@ private:
   void resetWarningAndErrorStateIndicators();
 
   void backupSaveCallback();
-
-  void showEvent( QShowEvent *event );
 
 private slots:
   void globalTimeFactorSliderChanged(int newValue);

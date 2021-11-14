@@ -347,8 +347,8 @@ void cedar::proc::undoRedo::commands::Paste::pasteConfigurationNodes(cedar::aux:
 	std::stringstream stringstream;
 	boost::property_tree::write_json(stringstream, rootNode);
 
-	//Debug: Print modified pasted
-	//boost::property_tree::write_json("Paste: Modified Final Into read Function.json", rootNode);
+	/*//Debug Option: Print modified pasted
+	boost::property_tree::write_json("Paste: Modified Final Into read Function.json", rootNode);*/
 
 	//Use readJsonFromString to paste the stringJson
 	try
