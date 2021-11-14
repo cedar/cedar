@@ -52,9 +52,9 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*
+Command that does undo redo of pasting. The redo procedure is simple pasting. Undoing it is just deleting the pasted
+ elements.
  */
 class cedar::proc::undoRedo::commands::Paste : public UndoCommand
 {
