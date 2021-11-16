@@ -1133,11 +1133,14 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
   //Case 3: Moving between same groups
   else
   {
-    //First item of list is enough, since all have the same group
-    if(cedar::proc::gui::Element* guiElement = dynamic_cast<cedar::proc::gui::Element*>(items_to_move.front()))
-    {
-      targetGroup = this->getGroupFor(guiElement->getElement()->getGroup().get());
-    }
+	if(items_to_move.size() != 0)
+	{
+		//First item of list is enough, since all have the same group
+		if(cedar::proc::gui::Element* guiElement = dynamic_cast<cedar::proc::gui::Element*>(items_to_move.front()))
+		{
+		  targetGroup = this->getGroupFor(guiElement->getElement()->getGroup().get());
+		}
+	}
   }
 
   if (this->mDraggingItems && this->mpDraggingGraphicsBase && this->mStartMovingPositionOfClicked != this->mpDraggingGraphicsBase->pos())
