@@ -112,10 +112,9 @@ namespace cedar
 
             QObject::connect(mpPyWrap, SIGNAL(createSig(const QString &, const int &, const int &, const QString&, const int &)), mpPy, SLOT(createElem(const QString &, const int &, const int &, const QString&, const int &)),Qt::BlockingQueuedConnection);
             QObject::connect(mpPyWrap, SIGNAL(copySig(const QString &, const QString &)), mpPy, SLOT(copyTo(const QString &, const QString &)),Qt::BlockingQueuedConnection);
-            QObject::connect(mpPyWrap, SIGNAL(connectSig(const QString &, const int &, const QString &, const int &)), mpPy, SLOT(connectSlots(const QString &, const int &, const QString &, const int &)),Qt::BlockingQueuedConnection);
+            QObject::connect(mpPyWrap, SIGNAL(connectSig(const QString &, const QVariant &, const QString &, const QVariant &, const bool &)), mpPy, SLOT(connectSlots(const QString &, const QVariant &, const QString &, const QVariant &, const bool&)),Qt::BlockingQueuedConnection);
             QObject::connect(mpPyWrap, SIGNAL(createGroupTemplateSig(const QString &, const int &, const int &, const QString&, const int &)), mpPy, SLOT(createGroupTemplate(const QString &, const int &, const int &, const QString&, const int &)),Qt::BlockingQueuedConnection);
             QObject::connect(mpPyWrap, SIGNAL(setParameterSig(const QString &, const QString &, const QVariant &)), mpPy, SLOT(setParameter(const QString &, const QString &, const QVariant &)),Qt::BlockingQueuedConnection);
-            QObject::connect(mpPyWrap, SIGNAL(disconnectSig(const QString &, const int &, const QString &, const int &)), mpPy, SLOT(disconnectSlots(const QString &, const int &, const QString &, const int &)),Qt::BlockingQueuedConnection);
             QObject::connect(mpPyWrap, SIGNAL(addObjectListSig(const QString &, const QString &, const QString &)), mpPy, SLOT(addObjectList(const QString &, const QString &, const QString &)),Qt::BlockingQueuedConnection);
 
             mContext = PythonQt::self()->createUniqueModule();

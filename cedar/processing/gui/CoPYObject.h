@@ -57,10 +57,7 @@ public slots:
   QStringList createGroupTemplate(const QString& classId, const int& x, const int& y, const QString &groupId, const int& amount);
 
   /*!@brief connect two Steps at indexed DataSlots*/
-  void connectSlots(const QString& source, const int& sourceSlot, const QString& target, const int& targetSlot);
-
-  /*!@brief connect two Steps at indexed DataSlots*/
-  void disconnectSlots(const QString& source, const int& sourceSlot, const QString& target, const int& targetSlot);
+  void connectSlots(const QString& source, const QVariant& sourceSlot, const QString& target, const QVariant& targetSlot, const bool& disconnect);
 
   //!@brief copy StepConfiguration from source to target
   void copyTo(const QString &fromStep, const QString &targetStep);
@@ -95,11 +92,11 @@ public Q_SLOTS:
 
   /* Methods to call in Python eg. (py.setGroup), calling slots in CPP-CoPY-Object */
 
-  void connect(const QVariant &first, const QVariant &second, const int &firstSlot = 0,
-               const int &secondSlot = 0);
+  void connect(const QVariant &first, const QVariant &second, const QVariant &firstSlot = 0,
+               const QVariant &secondSlot = 0);
 
-  void disconnect(const QVariant &first, const QVariant &second, const int &firstSlot = 0,
-               const int &secondSlot = 0);
+  void disconnect(const QVariant &first, const QVariant &second, const QVariant &firstSlot = 0,
+                  const QVariant &secondSlot = 0);
 
   QStringList create(const QString &classId, const int &x, const int &y, const QString &groupId = "root", const int &amount = 1)
   {
@@ -126,8 +123,7 @@ signals:
   void setParameterSig(const QString &elem, const QString &param, const QVariant& value);
   void copySig(const QString &source, const QString &target);
   QStringList createGroupTemplateSig(const QString &templateId, const int &x, const int &y, const QString &groupId, const int &amount);
-  void connectSig(const QString &src, const int &firstSlot, const QString &tgt, const int &targetSlot);
-  void disconnectSig(const QString &src, const int &firstSlot, const QString &tgt, const int &targetSlot);
+  void connectSig(const QString &src, const QVariant &firstSlot, const QString &tgt, const QVariant &targetSlot, const bool &disconnect);
   void addObjectListSig(const QString &step, const QString &param, const QString& type);
 };
 #endif //CEDAR_USE_COPY

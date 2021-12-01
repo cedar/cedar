@@ -120,9 +120,10 @@ void cedar::proc::gui::CoPYObject::copyTo(const QString &fromStep, const QString
 }
 
 void
-cedar::proc::gui::CoPYObject::connectSlots(const QString &source, const int &sourceSlotIndex, const QString &target,
-                                           const int &targetSlotIndex)
+cedar::proc::gui::CoPYObject::connectSlots(const QString &source, const QVariant &sourceSlot, const QString &target,
+                                           const QVariant &targetSlot, const bool& disconnect)
 {
+
   try
   {
     auto sourceElement = getStepByName(source.toStdString());
@@ -134,15 +135,56 @@ cedar::proc::gui::CoPYObject::connectSlots(const QString &source, const int &sou
             source.toStdString().c_str()))->getConnectable()->getOrderedDataSlots(1);
     auto targetSlots = dynamic_cast<cedar::proc::gui::Connectable *>(this->_mpScene->getElementByFullPath(
             target.toStdString().c_str()))->getConnectable()->getOrderedDataSlots(0);
-
+    bool srcSlotIsString = false;
+    bool tgtSlotIsString = false;
+    int sourceSlotIndex = -1;
+    int targetSlotIndex = -1;
+    if (sourceSlot.userType() == QMetaType::QString)
+    {
+      srcSlotIsString = true;
+    } else
+    {
+      sourceSlotIndex = sourceSlot.toInt();
+    }
+    if (targetSlot.userType() == QMetaType::QString)
+    {
+      tgtSlotIsString = true;
+    }else
+    {
+      targetSlotIndex = targetSlot.toInt();
+    }
+    if(srcSlotIsString)
+    {
+      int i = 0;
+      for(cedar::proc::DataSlotPtr slt : sourceSlots){
+        if(slt->getName() == sourceSlot.toString().toStdString())
+        {
+          sourceSlotIndex = i;
+          break;
+        }
+        i++;
+      }
+    }
+    if(tgtSlotIsString)
+    {
+      int i = 0;
+      for(cedar::proc::DataSlotPtr slt : targetSlots){
+        if(slt->getName() == targetSlot.toString().toStdString())
+        {
+          targetSlotIndex = i;
+          break;
+        }
+        i++;
+      }
+    }
     if (sourceSlotIndex < 0 or sourceSlotIndex > (sourceSlots.size() - 1) or targetSlotIndex < 0 or
         targetSlotIndex > (targetSlots.size() - 1))
-      CEDAR_THROW(cedar::aux::ExceptionBase, "Wrong Slot Index");
+      CEDAR_THROW(cedar::aux::ExceptionBase, "Wrong Slot Name or Index");
 
     cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(
             dynamic_cast<cedar::proc::gui::GraphicsBase*>(dynamic_cast<cedar::proc::gui::StepItem*>(_mpScene->getGraphicsItemFor(sourceElement))->getSlotItem(sourceSlots[sourceSlotIndex]->getRole(), sourceSlots[sourceSlotIndex]->getName())),
             dynamic_cast<cedar::proc::gui::GraphicsBase*>(dynamic_cast<cedar::proc::gui::StepItem*>(_mpScene->getGraphicsItemFor(targetElement))->getSlotItem(targetSlots[targetSlotIndex]->getRole(), targetSlots[targetSlotIndex]->getName())),
-            true,
+            !disconnect,
             false));
 
     jumpToStep(dynamic_cast<cedar::proc::Element*>(getStepByName(target.toStdString()).get()));
@@ -151,39 +193,6 @@ cedar::proc::gui::CoPYObject::connectSlots(const QString &source, const int &sou
     throwError(e.getMessage());
   }
 }
-
-void
-cedar::proc::gui::CoPYObject::disconnectSlots(const QString &source, const int &sourceSlotIndex, const QString &target,
-                                           const int &targetSlotIndex)
-{
-  try
-  {
-    auto sourceElement = getStepByName(source.toStdString());
-    auto targetElement = getStepByName(target.toStdString());
-    STEP_ASSERT(sourceElement, source.toStdString());
-    STEP_ASSERT(targetElement, target.toStdString());
-
-    auto sourceSlots = dynamic_cast<cedar::proc::gui::Connectable *>(this->_mpScene->getElementByFullPath(
-            source.toStdString().c_str()))->getConnectable()->getOrderedDataSlots(1);
-    auto targetSlots = dynamic_cast<cedar::proc::gui::Connectable *>(this->_mpScene->getElementByFullPath(
-            target.toStdString().c_str()))->getConnectable()->getOrderedDataSlots(0);
-
-    if (sourceSlotIndex < 0 or sourceSlotIndex > (sourceSlots.size() - 1) or targetSlotIndex < 0 or
-        targetSlotIndex > (targetSlots.size() - 1))
-    CEDAR_THROW(cedar::aux::ExceptionBase, "Wrong Slot Index");
-
-    cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(
-            dynamic_cast<cedar::proc::gui::GraphicsBase*>(dynamic_cast<cedar::proc::gui::StepItem*>(_mpScene->getGraphicsItemFor(sourceElement))->getSlotItem(sourceSlots[sourceSlotIndex]->getRole(), sourceSlots[sourceSlotIndex]->getName())),
-            dynamic_cast<cedar::proc::gui::GraphicsBase*>(dynamic_cast<cedar::proc::gui::StepItem*>(_mpScene->getGraphicsItemFor(targetElement))->getSlotItem(targetSlots[targetSlotIndex]->getRole(), targetSlots[targetSlotIndex]->getName())),
-            false,
-            false));
-    jumpToStep(dynamic_cast<cedar::proc::Element*>(getStepByName(target.toStdString()).get()));
-  }
-  catch (cedar::aux::ExceptionBase e) {
-    throwError(e.getMessage());
-  }
-}
-
 
 void cedar::proc::gui::CoPYObject::setParameter(const QString &elem, const QString &paramName, const QVariant &value)
 {
@@ -364,27 +373,27 @@ cedar::proc::gui::CoPYObjectWrapper::~CoPYObjectWrapper() {
 
 
 void cedar::proc::gui::CoPYObjectWrapper::connect(const QVariant &source, const QVariant &target,
-                                                  const int &sourceSlot,
-                                                  const int &targetSlot)
+                                                  const QVariant &sourceSlot,
+                                                  const QVariant &targetSlot)
 {
   for (QString src : source.toStringList())
   {
     for (QString tgt : target.toStringList())
     {
-      emit connectSig(src, sourceSlot, tgt, targetSlot);
+      emit connectSig(src, sourceSlot, tgt, targetSlot, false);
     }
   }
 };
 
 void cedar::proc::gui::CoPYObjectWrapper::disconnect(const QVariant &source, const QVariant &target,
-                                                  const int &sourceSlot,
-                                                  const int &targetSlot)
+                                                     const QVariant &sourceSlot,
+                                                     const QVariant &targetSlot)
 {
   for (QString src : source.toStringList())
   {
     for (QString tgt : target.toStringList())
     {
-      emit disconnectSig(src, sourceSlot, tgt, targetSlot);
+      emit connectSig(src, sourceSlot, tgt, targetSlot, true);
     }
   }
 };
