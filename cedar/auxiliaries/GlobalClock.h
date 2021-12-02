@@ -40,6 +40,7 @@
 #include "cedar/auxiliaries/Singleton.fwd.h"
 #include "cedar/units/Time.h"
 #include "cedar/auxiliaries/LoopMode.h"
+#include "cedar/auxiliaries/Configurable.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/GlobalClock.fwd.h"
@@ -114,6 +115,11 @@ public:
 
   unsigned long getNumOfTakenSteps() const;
 
+  double getCurrentMinTau();
+
+  void updateCurrentMinTau();
+
+  void updateFieldTauMap(cedar::aux::ConfigurableWeakPtr confWPointer, double tauValue);
 
   boost::signals2::connection connectToDefaultCPUStepSizeChangedSignal(boost::function<void(cedar::unit::Time)> slot)
   {
@@ -133,6 +139,11 @@ public:
   boost::signals2::connection connectToLoopModeChangedSignal(boost::function<void(cedar::aux::LoopMode::Id)> slot)
   {
     return this->mLoopModeChangedSignal.connect(slot);
+  }
+
+  boost::signals2::connection connectToCurMinTauChangedSignal(boost::function<void()> slot)
+  {
+      return this->mMinCurTauChangedSignal.connect(slot);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -184,6 +195,11 @@ private:
 
   cedar::aux::LoopMode::Id mLoopMode;
 
+  //Current Minimal Tau across all Fields in the Architecture
+  std::atomic<double> mCurMinTau;
+
+  std::map<cedar::aux::ConfigurableWeakPtr , double> mFieldTauMap;
+
   //! Connected to the change signal of the global time factor.
   boost::signals2::scoped_connection mGlobalTimeFactorConnection;
 
@@ -194,6 +210,8 @@ private:
   boost::signals2::signal<void(cedar::unit::Time)> mSimualtionStepSizeChangedSignal;
 
   boost::signals2::signal<void(cedar::aux::LoopMode::Id)> mLoopModeChangedSignal;
+
+  boost::signals2::signal<void()> mMinCurTauChangedSignal;
 };
 
 #include "cedar/auxiliaries/Singleton.h"

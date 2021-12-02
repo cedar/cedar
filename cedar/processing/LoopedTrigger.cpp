@@ -100,9 +100,13 @@ cedar::aux::LoopedThread(cedar::aux::LoopMode::FakeDT, stepSize), // changed: ce
 cedar::proc::Trigger(name),
 mStarted(false),
 mStatistics(new TimeAverage(50)),
-_mStartWithAll(new cedar::aux::BoolParameter(this, "start with all", true))
+_mStartWithAll(new cedar::aux::BoolParameter(this, "start with all", true)),
+_mPreviousCustomStepSize(new cedar::aux::TimeParameter(this,"previous custom step size", cedar::unit::Time(20 * cedar::unit::milli * cedar::unit::seconds), cedar::aux::TimeParameter::LimitType::fromLower(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))))
 {
+  _mPreviousCustomStepSize->markAdvanced();
+  _mPreviousUseDefaultCPUStepSize = _mUseDefaultCPUStep->getValue();
   QObject::connect(_mUseDefaultCPUStep.get(),SIGNAL(valueChanged()),this,SLOT(stepSizeManagementChanged()));
+
 
   this->processSimulationModeChange(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode());
   this->stepSizeManagementChanged();
@@ -279,43 +283,56 @@ bool cedar::proc::LoopedTrigger::canConnectTo(cedar::proc::ConstTriggerablePtr t
 
 void cedar::proc::LoopedTrigger::stepSizeManagementChanged()
 {
-  if(this->_mUseDefaultCPUStep->getValue())
+//  std::cout << "LoopedTrigger::stepSizeManagementChanged(). Use default:  "<< this->_mUseDefaultCPUStep->getValue() << std::endl;
+
+  if(this->_mPreviousUseDefaultCPUStepSize != this->_mUseDefaultCPUStep->getValue())
   {
-    _mPreviousCustomStepSize = this->_mStepSize->getValue();
-    this->_mStepSize->setValue(this->getDefaultStepSize());
-    this->_mStepSize->setConstant(true);
-  }
-  else
-  {
-    this->_mStepSize->setValue(_mPreviousCustomStepSize);
-    this->_mStepSize->setConstant(false);
+      if(this->_mUseDefaultCPUStep->getValue())
+      {
+        _mPreviousCustomStepSize->setValue(this->_mStepSize->getValue());
+//        std::cout << "Use DefaultCPUStep! Old CustomStepSize: "<< _mPreviousCustomStepSize->getValue()  << std::endl;
+        this->_mStepSize->setValue(this->getDefaultStepSize());
+        this->_mStepSize->setConstant(true);
+      }
+      else
+      {
+//          std::cout << "Use CustomStepsize:! Old CustomStepSize: " << _mPreviousCustomStepSize->getValue() << std::endl;
+        this->_mStepSize->setValue(_mPreviousCustomStepSize->getValue());
+        this->_mStepSize->setConstant(false);
+      }
+
+    this->_mPreviousUseDefaultCPUStepSize = this->_mUseDefaultCPUStep->getValue();
   }
 }
 
 void cedar::proc::LoopedTrigger::processDefaultStepSizeChange(cedar::unit::Time newStepSize)
 {
+//    std::cout << "LoopedTrigger::processDefaultStepSizeChange: newStepSize: " << newStepSize << " Use default:  " << this->_mUseDefaultCPUStep->getValue() << std::endl;
   //Todo: This might need some Locking! And I am not sure if some changes get lost this way... Check if there is a use case
   if(!this->isRunning() && this->_mUseDefaultCPUStep->getValue())
   {
+//    std::cout << " newStepSize: " << newStepSize << " is applied!" << std::endl;
     this->_mStepSize->setValue(newStepSize);
   }
 }
 
 void cedar::proc::LoopedTrigger::processSimulationModeChange(cedar::aux::LoopMode::Id newMode)
 {
+
+//  std::cout << "LoopedTrigger::processSimulationModeChange: " << newMode << std::endl;
   switch(newMode)
   {
     case cedar::aux::LoopMode::RealDT:
-      case cedar::aux::LoopMode::Fixed:
-        case cedar::aux::LoopMode::FixedAdaptive:
-          case cedar::aux::LoopMode::RealTime:
-            this->_mUseDefaultCPUStep->setConstant(false);
-            this->_mStepSize->setConstant(this->_mUseDefaultCPUStep->getValue());
-            break;
-            default:
-              this->_mUseDefaultCPUStep->setValue(true);
-              this->_mUseDefaultCPUStep->setConstant(true);
-              this->_mStepSize->setConstant(true);
+    case cedar::aux::LoopMode::Fixed:
+    case cedar::aux::LoopMode::FixedAdaptive:
+    case cedar::aux::LoopMode::RealTime:
+        this->_mUseDefaultCPUStep->setConstant(false);
+        this->_mStepSize->setConstant(this->_mUseDefaultCPUStep->getValue());
+        break;
+    default:
+        //this->_mUseDefaultCPUStep->setValue(true); // Why this?
+        this->_mUseDefaultCPUStep->setConstant(true);
+        this->_mStepSize->setConstant(true);
   }
   //Todo:Do we need to lock this? Even if this is only settable outside of a running system?
   QWriteLocker locker(this->_mLoopMode->getLock());
@@ -326,10 +343,23 @@ void cedar::proc::LoopedTrigger::processSimulationModeChange(cedar::aux::LoopMod
 void cedar::proc::LoopedTrigger::processSimulationStepSizeChanged(cedar::unit::Time newStepSize)
 {
   QWriteLocker locker (this->_mFakeStepSize->getLock());
+//  std::cout << "LoopedTrigger::processSimulationStepSizeChanged: newStepSize: " << newStepSize << std::endl;
   this->_mFakeStepSize->setValue(newStepSize);
 }
 
 cedar::unit::Time cedar::proc::LoopedTrigger::getDefaultStepSize()
 {
   return cedar::aux::GlobalClockSingleton::getInstance()->getDefaultCPUStepSize();
+}
+
+void cedar::proc::LoopedTrigger::setUseDefaultCPUStepSize(bool useDefaultCPUStepSize)
+{
+//    std::cout<<"cedar::proc::LoopedTrigger::setUseDefaultCPUStepSize: " << useDefaultCPUStepSize << std::endl;
+    this->_mUseDefaultCPUStep->setValue(useDefaultCPUStepSize);
+}
+
+void cedar::proc::LoopedTrigger::setPreviousCustomCPUStepSize(cedar::unit::Time time)
+{
+//    std::cout << "LoopedTrigger::setPreviousCustomCPUStepSize:: time " << time << std::endl;
+    this->_mPreviousCustomStepSize->setValue(time);
 }

@@ -51,6 +51,9 @@ mDefaultCPUStepSize(cedar::unit::Time(20 * cedar::unit::milli * cedar::unit::sec
 mSimulationStepSize(cedar::unit::Time(20 * cedar::unit::milli * cedar::unit::seconds)),
 mLoopMode(cedar::aux::LoopMode::FakeDT)
 {
+  //Initialize to 100.0, which is the default field value
+  mCurMinTau.store(100.0);
+
   this->mGlobalTimeFactorConnection = cedar::aux::SettingsSingleton::getInstance()->connectToGlobalTimeFactorChangedSignal
   (
     boost::bind(&cedar::aux::GlobalClock::globalTimeFactorChanged, this, _1)
@@ -235,7 +238,6 @@ void cedar::aux::GlobalClock::updateTakenSteps(unsigned long newStepsTaken)
   if (this->mRunning)
   {
     QWriteLocker locker(this->mpSimulationStepsTakenLock);
-    std::cout<<"GlobalClock::updateTakenSteps newStepsTaken: " << newStepsTaken << std::endl;
     if(newStepsTaken > mpSimulationStepsTaken)
     {
       mpSimulationStepsTaken = newStepsTaken;
@@ -251,4 +253,52 @@ unsigned long cedar::aux::GlobalClock::getNumOfTakenSteps() const
 }
 
 
+double cedar::aux::GlobalClock::getCurrentMinTau()
+{
+    return mCurMinTau.load();
+}
 
+void cedar::aux::GlobalClock::updateCurrentMinTau()
+{
+    auto it_min = min_element(mFieldTauMap.begin(), mFieldTauMap.end(),
+                              [](decltype(mFieldTauMap)::value_type& l, decltype(mFieldTauMap)::value_type& r) -> bool { return l.second < r.second; });
+
+    if (it_min != mFieldTauMap.end())
+    {
+        if (cedar::aux::ConfigurablePtr confPtr = it_min->first.lock())
+        {
+            mCurMinTau.store(it_min->second);
+            this->mMinCurTauChangedSignal();
+        } else
+        {
+            mFieldTauMap.erase(it_min);
+            updateCurrentMinTau();
+        }
+    }
+
+    if(mFieldTauMap.size() == 0)
+    {
+        mCurMinTau.store(100.0);
+        this->mMinCurTauChangedSignal();
+    }
+
+
+
+}
+
+void cedar::aux::GlobalClock::updateFieldTauMap(cedar::aux::ConfigurableWeakPtr confWPointer, double tauValue)
+{
+    auto it = mFieldTauMap.find(confWPointer);
+    if( it != mFieldTauMap.end())
+    {
+        it->second = tauValue;
+    }
+    else
+    {
+        mFieldTauMap.insert(std::pair<cedar::aux::ConfigurableWeakPtr,double>(confWPointer,tauValue));
+    }
+
+    updateCurrentMinTau();
+
+
+}

@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/GlobalClock.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -123,7 +124,7 @@ void cedar::proc::TriggerStepper::runFunc()
         double sleepTime = minimumComputeTimeMilliSeconds - elapsedMilliSeconds;
 //        std::cout<<"Triggerstepper sleeps: " << sleepTime << " milliseconds" <<std::endl;
         int sleepTimeMicroSeconds = (int) (sleepTime* 1000);
-        usleep(sleepTimeMicroSeconds);
+        cedar::aux::usleep(sleepTimeMicroSeconds);
       }
     }
     catch (std::runtime_error &e)
