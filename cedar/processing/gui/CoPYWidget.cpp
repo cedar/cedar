@@ -42,6 +42,8 @@
 #include <cedar/auxiliaries/Settings.h>
 
 #include "ElementList.h"
+#include "cedar/auxiliaries/FileParameter.h"
+#include "cedar/auxiliaries/ObjectParameter.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
@@ -161,8 +163,74 @@ void cedar::proc::gui::CoPYWidget::importStepInformation(QList<QGraphicsItem*> p
   }
 }
 
-void cedar::proc::gui::CoPYWidget::appendToConsole(std::string text){
+void cedar::proc::gui::CoPYWidget::appendToConsole(std::string text)
+{
   mpConsole->appendPlainText(QString::fromStdString(text));
+}
+
+void cedar::proc::gui::CoPYWidget::appendParameterToText(cedar::aux::ParameterPtr param, const std::string paramPath)
+{
+  std::string stepName = "unkown";
+  std::string text = "";
+  if(auto element = dynamic_cast<cedar::proc::Element *>(param->getNamedConfigurableOwner()))
+  {
+    stepName =  element->getFullPath();
+  }
+  else if(auto element = dynamic_cast<cedar::proc::Element *>(param->getOwner()->getParent()))
+  {
+    stepName = element->getFullPath();
+  }
+  std::string paramValue;
+  if (auto paramSet = dynamic_cast<cedar::aux::ParameterTemplate<double> *>(param.get()))
+  {
+    paramValue = removeTrailingZeros(paramSet->getValue());
+  } else if (auto paramSet = dynamic_cast<cedar::aux::ParameterTemplate<std::string> *>(param.get()))
+  {
+    paramValue = "\"" + paramSet->getValue() + "\"";
+  } else if (auto paramSet = dynamic_cast<cedar::aux::VectorParameter<double> *>(param.get()))
+  {
+    std::vector<double> valVec = paramSet->getValue();
+    paramValue="[";
+    for (double val : valVec)
+    {
+      paramValue += removeTrailingZeros(val) + ",";
+    }
+    paramValue = paramValue.substr(0, paramValue.length() - 1) + "]";
+  } else if (auto paramSet = dynamic_cast<cedar::aux::VectorParameter<unsigned int> *>(param.get()))
+  {
+    std::vector<unsigned int> valVec = paramSet->getValue();
+    paramValue="[";
+    for (unsigned int val : valVec)
+    {
+      paramValue += std::to_string(val) + ",";
+    }
+    paramValue = paramValue.substr(0, paramValue.length() - 1) + "]";
+  } else if (auto paramSet = dynamic_cast<cedar::aux::ParameterTemplate<unsigned int> *>(param.get()))
+  {
+    paramValue = std::to_string(paramSet->getValue());
+  }  else if (auto paramSet = dynamic_cast<cedar::aux::ParameterTemplate<bool> *>(param.get()))
+  {
+    paramValue = std::to_string(paramSet->getValue());
+  } else if (auto paramSet = dynamic_cast<cedar::aux::EnumParameter *>(param.get()))
+  {
+    paramValue = "\"" + paramSet->getEnumDeclaration().get(paramSet->getValue()).prettyString() + "\"";
+  } else if (auto paramSet = dynamic_cast<cedar::aux::ObjectParameter *>(param.get()))
+  {
+    paramValue = paramSet->getTypeId();
+  }
+  else if (auto paramSet = dynamic_cast<cedar::aux::FileParameter *>(param.get()))
+  {
+    bool pathMode = paramSet -> getPathMode();
+    paramValue = "[\"" + paramSet->getPath() + "\", " + std::to_string(pathMode) + "]";
+  }
+  if(auto objectListParameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(param))
+  {
+    std::vector<std::string> typelist;
+    objectListParameter ->listTypes(typelist);
+    text="py.addObjectList(\"" + stepName + "\",\"" + param->getName() + "\",\"" + typelist[0] +"\")";
+  }
+  if(text == "") text = "py.setParameter(\""+ stepName + "\", \"" + paramPath +"\", " + paramValue + ")\n";
+  this->appendToConsole(text);
 }
 
 void cedar::proc::gui::CoPYWidget::reset()
@@ -173,6 +241,20 @@ void cedar::proc::gui::CoPYWidget::reset()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+std::string cedar::proc::gui::CoPYWidget::removeTrailingZeros(const double& num)
+{
+  std::string str = std::to_string(num);
+  // Remove trailing zeroes
+  str = str.substr(0, str.find_last_not_of('0')+1);
+  // If the decimal point is now the last character, remove that as well
+  if(str.find(',')) str.replace(str.find(","), 1, ".");
+  if(str.find('.') == str.size()-1)
+  {
+    str = str.substr(0, str.size()-1);
+  }
+  return str;
+}
 
 //!@brief main execute method for executing CoPY
 void cedar::proc::gui::CoPYWidget::executeCode()

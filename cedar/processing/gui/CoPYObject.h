@@ -56,6 +56,9 @@ public slots:
   /*!@brief create a Group in Subgroup*/
   QStringList createGroupTemplate(const QString& classId, const int& x, const int& y, const QString &groupId, const int& amount);
 
+  /*!@brief return all elements of a Group*/
+  QStringList getElementsByGroup(const QString& groupId);
+
   /*!@brief connect two Steps at indexed DataSlots*/
   void connectSlots(const QString& source, const QVariant& sourceSlot, const QString& target, const QVariant& targetSlot, const bool& disconnect);
 
@@ -106,7 +109,7 @@ public Q_SLOTS:
   QStringList createGroupTemplate(const QString &templateId, const int &x, const int &y, const QString &groupId = "root", const int &amount = 1)
   { return emit createGroupTemplateSig(templateId, x, y, groupId, amount); }
 
-  void copy(const QString &source, const QVariant &target);
+  void copyAllParameters(const QString &source, const QVariant &target);
 
   void setParameter(const QString &elem, const QString &param, const QVariant& value)
   {
@@ -118,6 +121,10 @@ public Q_SLOTS:
     emit addObjectListSig(step, param, type);
   }
 
+  QStringList getElementsByGroup(const QString &group)
+  {
+    return emit getElementsByGroupSig(group);
+  };
 signals:
   QStringList createSig(const QString &classId, const int &x, const int &y, const QString &groupId, const int &amount);
   void setParameterSig(const QString &elem, const QString &param, const QVariant& value);
@@ -125,6 +132,7 @@ signals:
   QStringList createGroupTemplateSig(const QString &templateId, const int &x, const int &y, const QString &groupId, const int &amount);
   void connectSig(const QString &src, const QVariant &firstSlot, const QString &tgt, const QVariant &targetSlot, const bool &disconnect);
   void addObjectListSig(const QString &step, const QString &param, const QString& type);
+  QStringList getElementsByGroupSig(const QString &group);
 };
 #endif //CEDAR_USE_COPY
 #endif //CEDAR_PROC_GUI_COPY_OBJECT_H

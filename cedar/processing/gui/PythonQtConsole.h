@@ -116,6 +116,7 @@ namespace cedar
             QObject::connect(mpPyWrap, SIGNAL(createGroupTemplateSig(const QString &, const int &, const int &, const QString&, const int &)), mpPy, SLOT(createGroupTemplate(const QString &, const int &, const int &, const QString&, const int &)),Qt::BlockingQueuedConnection);
             QObject::connect(mpPyWrap, SIGNAL(setParameterSig(const QString &, const QString &, const QVariant &)), mpPy, SLOT(setParameter(const QString &, const QString &, const QVariant &)),Qt::BlockingQueuedConnection);
             QObject::connect(mpPyWrap, SIGNAL(addObjectListSig(const QString &, const QString &, const QString &)), mpPy, SLOT(addObjectList(const QString &, const QString &, const QString &)),Qt::BlockingQueuedConnection);
+            QObject::connect(mpPyWrap, SIGNAL(getElementsByGroupSig(const QString &)), mpPy, SLOT(getElementsByGroup(const QString &)),Qt::BlockingQueuedConnection);
 
             mContext = PythonQt::self()->createUniqueModule();
             mContext.addObject("py", mpPyWrap);

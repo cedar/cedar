@@ -265,15 +265,27 @@ void cedar::proc::gui::CoPYObject::setParameter(const QString &elem, const QStri
     {
       std::vector<std::string> typeList;
       paramSet->listTypes(typeList);
+      std::string newType;
+      if(value.canConvert<int>()) newType = typeList[value.toDouble()];
       for (std::string type: typeList)
       {
         if (QString::fromStdString(type).contains(value.toString()))
         {
-          cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::ChangeObjectParameterValue(
-                  paramSet, paramSet->getTypeId(), type, param->getNamedConfigurableOwner(), _mpScene
-          ));
+          newType = type;
+          break;
         }
       }
+      if(!newType.empty())
+      {
+        cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::ChangeObjectParameterValue(
+                paramSet, paramSet->getTypeId(), newType, param->getNamedConfigurableOwner(), _mpScene
+        ));
+      }
+      else
+      {
+        CEDAR_THROW(cedar::aux::ExceptionBase, "No matching object type" + value.toString().toStdString() + "in Parameter " + paramName.toStdString() + " found. Use for example the index 0 or \"" + typeList[0] + "\".");
+      }
+
     }
     else if (auto paramSet = dynamic_cast<cedar::aux::FileParameter *>(param.get()))
   {
@@ -289,6 +301,22 @@ void cedar::proc::gui::CoPYObject::setParameter(const QString &elem, const QStri
   {
     throwError(e.getMessage());
   }
+}
+
+QStringList cedar::proc::gui::CoPYObject::getElementsByGroup(const QString &groupId)
+{
+  std::map<std::basic_string<char>, boost::shared_ptr<cedar::proc::Element>> elemMap = getGroupByName(groupId.toStdString())->getElements();
+  std::map<std::basic_string<char>, boost::shared_ptr<cedar::proc::Element>>::iterator it = elemMap.begin();
+  QStringList elemList;
+  while (it != elemMap.end())
+  {
+    if(auto step = dynamic_cast<cedar::proc::Step*>(it->second.get()))
+    {
+      elemList.append(QString::fromStdString(it->first));
+    }
+    it++;
+  }
+  return elemList;
 }
 
 void cedar::proc::gui::CoPYObject::addObjectList(const QString &step, const QString &param, const QString &type)
@@ -398,11 +426,12 @@ void cedar::proc::gui::CoPYObjectWrapper::disconnect(const QVariant &source, con
   }
 };
 
-void cedar::proc::gui::CoPYObjectWrapper::copy(const QString &source, const QVariant &target)
+void cedar::proc::gui::CoPYObjectWrapper::copyAllParameters(const QString &source, const QVariant &target)
 {
   for (QString tgt : target.toStringList())
   {
     emit copySig(source, tgt);
   }
 };
+
 #endif

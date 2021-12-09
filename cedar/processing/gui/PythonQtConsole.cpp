@@ -252,7 +252,7 @@ void cedar::proc::gui::PythonQtConsole::handleTabCompletion()
     PYTHONQT_GIL_SCOPE
 
     QStringList l = PythonQt::self()->introspection(mpModule, lookup, PythonQt::Anything);
-    l.append({"setParameter", "copy", "create", "connect", "createGroupTemplate"});
+    l.append({"setParameter", "copyAllParameters", "create", "connect", "createGroupTemplate"});
 
     QList<QGraphicsItem*> itemsList = mpScene->items();
     for(QGraphicsItem* item : itemsList)

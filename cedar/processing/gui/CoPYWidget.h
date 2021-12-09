@@ -96,7 +96,8 @@ public:
 
   //!@brief method for appending Text in CoPY
   void appendToConsole(std::string text);
-
+  //!@brief append set Parameter Command to Console
+  void appendParameterToText(cedar::aux::ParameterPtr parameter, const std::string paramPath);
 private slots:
   void executeButtonClicked();
   bool saveButtonClicked();
@@ -105,6 +106,7 @@ private slots:
   void getVariablesButtonClicked();
   void setVariables(QMap<QString, QString> vars);
 private:
+  std::string removeTrailingZeros(const double& num);
   //Highlighter for Console
   cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter *mpHighlighter;
 

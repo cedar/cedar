@@ -875,33 +875,13 @@ void cedar::proc::aux::gui::Configurable::showContextMenu(const QPoint &pos)
   QAction *a = context_menu.exec(mpPropertyTree->viewport()->mapToGlobal(pos));
   if (a == use_in_copy)
   {
-    cedar::aux::ParameterPtr parameter = item->getParameter();
-    std::string stepName = "unkown";
-    std::string text = "";
-    if(auto element = dynamic_cast<cedar::proc::Element *>(parameter->getNamedConfigurableOwner()))
-    {
-      stepName =  element->getFullPath();
-    }
-    else if(auto element = dynamic_cast<cedar::proc::Element *>(parameter->getOwner()->getParent()))
-    {
-      stepName = element->getFullPath();
-    }
-
-    if(auto objectListParameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
-    {
-      std::vector<std::string> typelist;
-      objectListParameter ->listTypes(typelist);
-      text="py.addObjectList(\"" + stepName + "\",\"" + parameter->getName() + "\",\"" + typelist[0] +"\")";
-    }
-
     //get CoPYWidget and append
     QObject* object = this;
     while(object->parent()){
       object = object->parent();
     }
     if(auto copyWidget = object->findChild<cedar::proc::gui::CoPYWidget*>("mpCopy")){
-      if(text == "") text = "py.setParameter(\""+ stepName + "\",\"" + this->getPathFromItem(item).toStdString() +"\", VALUE)\n";
-      copyWidget->appendToConsole(text);
+      copyWidget->appendParameterToText( item->getParameter(), this->getPathFromItem(item).toStdString());
     }
   }
   #endif
