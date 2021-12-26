@@ -225,7 +225,10 @@ void cedar::proc::gui::Scene::keyPressEvent(QKeyEvent* pEvent)
 void cedar::proc::gui::Scene::deleteSelectedElements(bool skipConfirmation)
 {
   auto selected_items = this->selectedItems();
-  this->deleteElements(selected_items, skipConfirmation);
+  if(!selected_items.empty())
+  {
+    this->deleteElements(selected_items, skipConfirmation);
+  }
 }
 
 void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool skipConfirmation)
