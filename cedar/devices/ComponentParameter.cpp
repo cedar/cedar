@@ -150,6 +150,11 @@ void cedar::dev::ComponentParameter::setValue(const std::string& componentPath)
 		cedar::dev::ComponentSlotPtr slot = cedar::dev::RobotManagerSingleton::getInstance()->findComponentSlot(componentPath);
 		this->setValue(slot);
 	}
+	else
+	{
+		cedar::dev::ComponentSlotPtr slot = nullptr;
+		this->setValue(slot);
+	}
 }
 
 
