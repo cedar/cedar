@@ -240,8 +240,8 @@ void cedar::proc::undoRedo::commands::Paste::redo()
 			QPointF newPostionOfNote = this->mMousePositionScenePos + vectorFromCenterToNote;
 
 			//Set
-			uiPair.second.put("x", std::to_string((int)newPostionOfNote.x()));
-			uiPair.second.put("y",  std::to_string((int)newPostionOfNote.y()));
+			uiPair.second.put("x", newPostionOfNote.x());
+			uiPair.second.put("y",  newPostionOfNote.y());
 			singleUiValue.push_back(cedar::aux::ConfigurationNode::value_type("", uiPair.second));
 		}
 
@@ -264,8 +264,8 @@ void cedar::proc::undoRedo::commands::Paste::redo()
 		QPointF vectorFromCenterToGroup = pointofGroup - center;
 		QPointF newPostionofGroup = this->mMousePositionScenePos + vectorFromCenterToGroup;
 		//Set
-		ui_generic->second.put("positionX", std::to_string(newPostionofGroup.x()));
-		ui_generic->second.put("positionY",  std::to_string(newPostionofGroup.y()));
+		ui_generic->second.put("positionX", newPostionofGroup.x());
+		ui_generic->second.put("positionY",  newPostionofGroup.y());
 
 		//Rename other occurences at "name" and ui generic/group
 		groupPair.second.put("name", newName);
