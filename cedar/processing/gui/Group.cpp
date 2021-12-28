@@ -3107,14 +3107,12 @@ void cedar::proc::gui::Group::readConnections(const cedar::aux::ConfigurationNod
 
 void cedar::proc::gui::Group::readStickyNotes(const cedar::aux::ConfigurationNode &node)
 {
-
   for (auto iter = node.begin(); iter != node.end(); ++iter)
   {
     const auto &sticky_node = iter->second;
     const std::string &type = sticky_node.get<std::string>("type");
     if (type == "stickyNote")
     {
-
       int x = sticky_node.get<int>("x");
       int y = sticky_node.get<int>("y");
       int witdh = sticky_node.get<int>("width");

@@ -240,8 +240,9 @@ void cedar::proc::undoRedo::commands::Paste::redo()
 			QPointF newPostionOfNote = this->mMousePositionScenePos + vectorFromCenterToNote;
 
 			//Set
-			uiPair.second.put("x", newPostionOfNote.x());
-			uiPair.second.put("y",  newPostionOfNote.y());
+			QPoint newPostionOfNoteInt = newPostionOfNote.toPoint();
+			uiPair.second.put("x", newPostionOfNoteInt.x());
+			uiPair.second.put("y",  newPostionOfNoteInt.y());
 			singleUiValue.push_back(cedar::aux::ConfigurationNode::value_type("", uiPair.second));
 		}
 
