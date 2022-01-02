@@ -225,7 +225,10 @@ void cedar::proc::gui::Scene::keyPressEvent(QKeyEvent* pEvent)
 void cedar::proc::gui::Scene::deleteSelectedElements(bool skipConfirmation)
 {
   auto selected_items = this->selectedItems();
-  this->deleteElements(selected_items, skipConfirmation);
+  if(!selected_items.empty())
+  {
+    this->deleteElements(selected_items, skipConfirmation);
+  }
 }
 
 void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool skipConfirmation)
@@ -1133,11 +1136,14 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
   //Case 3: Moving between same groups
   else
   {
-    //First item of list is enough, since all have the same group
-    if(cedar::proc::gui::Element* guiElement = dynamic_cast<cedar::proc::gui::Element*>(items_to_move.front()))
-    {
-      targetGroup = this->getGroupFor(guiElement->getElement()->getGroup().get());
-    }
+	if(items_to_move.size() != 0)
+	{
+		//First item of list is enough, since all have the same group
+		if(cedar::proc::gui::Element* guiElement = dynamic_cast<cedar::proc::gui::Element*>(items_to_move.front()))
+		{
+		  targetGroup = this->getGroupFor(guiElement->getElement()->getGroup().get());
+		}
+	}
   }
 
   if (this->mDraggingItems && this->mpDraggingGraphicsBase && this->mStartMovingPositionOfClicked != this->mpDraggingGraphicsBase->pos())
