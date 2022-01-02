@@ -353,7 +353,7 @@ void cedar::proc::undoRedo::commands::Paste::pasteConfigurationNodes(cedar::aux:
 	//Use readJsonFromString to paste the stringJson
 	try
 	{
-		this->mGroup->readJsonFromString(stringstream.str());
+		this->mGroup->readJsonFromString(stringstream.str(), false);
 	}
 	catch (const boost::property_tree::json_parser_error &e)
 	{

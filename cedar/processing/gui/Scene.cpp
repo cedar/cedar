@@ -1739,8 +1739,7 @@ void cedar::proc::gui::Scene::snapAllItemsToGrid()
         {
           cedar::proc::gui::ConnectionAnchor* anchor = anchors.at(j);
           anchor->setSelected(true);
-          anchor->move(QPointF(anchor->scenePos().x() + 1, anchor->scenePos().y() + 1), anchor->scenePos());
-          anchor->mouseReleaseEvent(nullptr);
+          anchor->snapToGrid();
           anchor->setSelected(false);
         }
       }
