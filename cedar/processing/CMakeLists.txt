@@ -219,6 +219,7 @@ cedar_add_library(cedarproc
   steps/AddConstant.h
   steps/Count.h
   steps/Switch.h
+  steps/SynapticConnection.h
   steps/LinearLateralShift.h
   steps/HopfOscillatorRHS.h
   steps/NaNCheck.h
