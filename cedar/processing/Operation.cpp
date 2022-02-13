@@ -22,84 +22,64 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SynapticConnection.cpp
+    File:        Operation.cpp
 
     Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.rub.de
-    Date:        2022 02 10
+    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
+    Date:        2022 02 13
 
-    Description: Source file for the class cedar::proc::steps::SynapticConnection.
+    Description: Source file for the class cedar::proc::Operation.
 
     Credits:
 
 ======================================================================================================================*/
 
 // CEDAR CONFIGURATION
-#include <iostream>
 #include "cedar/configuration.h"
 
 // CLASS HEADER
-#include "cedar/processing/steps/SynapticConnection.h"
+#include "cedar/processing/Operation.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/ElementDeclaration.h"
-#include "cedar/processing/Operation.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
-// register the class
+// Static members
 //----------------------------------------------------------------------------------------------------------------------
-namespace
-{
-	bool declare()
-	{
-		using cedar::proc::ElementDeclarationPtr;
-		using cedar::proc::ElementDeclarationTemplate;
 
-    //Todo: Add right name, icon and description
-		ElementDeclarationPtr declaration
-						(
-										new ElementDeclarationTemplate<cedar::proc::steps::SynapticConnection>
-														(
-																		"Programming",
-																		"cedar.processing.SynapticConnection"
-														)
-						);
-		declaration->setIconPath(":/steps/<em>YOURICON</em>.svg");
-    declaration->setDescription
-						(
-										"<em>ADD A DESCRIPTION FOR THE TOOLTIP OF YOUR STEP IN HERE</em>"
-						);
+cedar::aux::EnumType<cedar::proc::Operation> cedar::proc::Operation::mType("cedar::proc::Operation::");
 
-		declaration->declare();
+// From Enum.dox:"MSVC doesn't need (read: want) you to declare these again because they have values assigned in the
+// header and thus are const expressions; gcc is the opposite, thus the ifdef"
+#ifndef CEDAR_COMPILER_MSVC
+const cedar::proc::Operation::Id cedar::proc::Operation::StaticGain;
+const cedar::proc::Operation::Id cedar::proc::Operation::Convolution;
+#endif
 
-		return true;
-	}
-
-	bool declared = declare();
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::steps::SynapticConnection::SynapticConnection()
-:
-mOperation(new cedar::aux::EnumParameter(this, "Operation", cedar::proc::Operation::typePtr(),cedar::proc::Operation::StaticGain))
-{
-
-}
-
-cedar::proc::steps::SynapticConnection::~SynapticConnection()
-{
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-// The arguments are unused here
-void cedar::proc::steps::SynapticConnection::compute(const cedar::proc::Arguments&)
+void cedar::proc::Operation::construct()
 {
+  mType.type()->def(cedar::aux::Enum(cedar::proc::Operation::StaticGain, "StaticGain",
+                                     "Static Gain"));
+  mType.type()->def(cedar::aux::Enum(cedar::proc::Operation::Convolution, "Convolution",
+                                     "Convolution"));
+}
 
+const cedar::aux::EnumBase& cedar::proc::Operation::type()
+{
+  return *cedar::proc::Operation::mType.type();
+}
+
+const cedar::proc::Operation::TypePtr& cedar::proc::Operation::typePtr()
+{
+  return cedar::proc::Operation::mType.type();
 }

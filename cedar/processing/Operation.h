@@ -22,63 +22,68 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SynapticConnection.h
+    File:        Operation.h
 
     Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.rub.de
-    Date:        2022 02 10
+    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
+    Date:        2022 02 13
 
-    Description: Header file for the class cedar::proc::steps::SynapticConnection.
+    Description: Header file for the class cedar::proc::Operation.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_SYNAPTIC_CONNECTION_H
-#define CEDAR_PROC_STEPS_SYNAPTIC_CONNECTION_H
+#ifndef CEDAR_PROC_OPERATION_H
+#define CEDAR_PROC_OPERATION_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include <cedar/processing/Step.h>
-#include <cedar/auxiliaries/MatData.h>
-#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/EnumType.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/SynapticConnection.fwd.h"
+#include "cedar/processing/Operation.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief An enum class for the different operations that can be done by the SynapticConnection
  */
-class cedar::proc::steps::SynapticConnection : public cedar::proc::Step
+class cedar::proc::Operation
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-	Q_OBJECT
+public:
+  //! The type of the enum values.
+  typedef cedar::aux::EnumId Id;
+
+  //! The pointer type of the enum base object.
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  SynapticConnection();
-
-  //!@brief Destructor
-  virtual ~SynapticConnection();
+  // none
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  /*!@brief Initializes the enum values.
+ */
+  static void construct();
 
+  /*!@brief Returns a reference to the enum base object.
+ */
+  static const cedar::aux::EnumBase& type();
+
+  /*!@brief Returns a pointer to the enum base object.
+ */
+  static const cedar::proc::Operation::TypePtr& typePtr();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,10 +99,15 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  //Values of the Enum
+  static const Id StaticGain = 0;
+  static const Id Convolution = 1;
+
 protected:
   // none yet
 private:
-  cedar::aux::EnumParameterPtr mOperation;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -106,10 +116,10 @@ protected:
   // none yet
 
 private:
-  // none yet
+  //! The enum object.
+  static cedar::aux::EnumType<cedar::proc::Operation> mType;
 
-  void compute(const Arguments &);
-};
+}; // class cedar::proc::Operation
 
-#endif // CEDAR_PROC_STEPS_SYNAPTIC_CONNECTION_H
+#endif // CEDAR_PROC_OPERATION_H
 
