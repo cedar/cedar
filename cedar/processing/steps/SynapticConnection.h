@@ -44,6 +44,7 @@
 #include <cedar/processing/Step.h>
 #include <cedar/auxiliaries/MatData.h>
 #include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/steps/SynapticConnection.fwd.h"
@@ -59,9 +60,9 @@
 class cedar::proc::steps::SynapticConnection : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-	Q_OBJECT
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -79,6 +80,9 @@ public:
 public:
   // none yet
 
+public slots:
+  void recompute();
+  void operationChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -89,7 +93,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void compute(const Arguments &);
+  void inputConnectionChanged(const std::string& inputName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -97,7 +102,18 @@ private:
 protected:
   // none yet
 private:
+
   cedar::aux::EnumParameterPtr mOperation;
+
+  //! Members for StaticGain
+
+  cedar::aux::DoubleParameterPtr mGainFactor;
+  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
+  cedar::aux::ConstMatDataPtr mInput;
+  //!@brief The data containing the output.
+  cedar::aux::MatDataPtr mOutput;
+
+  //! Members for Convolution
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -107,8 +123,6 @@ protected:
 
 private:
   // none yet
-
-  void compute(const Arguments &);
 };
 
 #endif // CEDAR_PROC_STEPS_SYNAPTIC_CONNECTION_H
