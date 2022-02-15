@@ -43,8 +43,10 @@
 // CEDAR INCLUDES
 #include <cedar/processing/Step.h>
 #include <cedar/auxiliaries/MatData.h>
+#include <cedar/auxiliaries/ObjectListParameterTemplate.h>
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/kernel/Kernel.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/steps/SynapticConnection.fwd.h"
@@ -63,6 +65,17 @@ class cedar::proc::steps::SynapticConnection : public cedar::proc::Step
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+	//--------------------------------------------------------------------------------------------------------------------
+	// nested types
+	//--------------------------------------------------------------------------------------------------------------------
+private:
+	//!@brief a parameter for kernel objects
+	typedef cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel> KernelListParameter;
+
+	//!@cond SKIPPED_DOCUMENTATION
+	CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(KernelListParameter);
+	//!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -105,15 +118,17 @@ private:
 
   cedar::aux::EnumParameterPtr mSynapticWeightPatternParameter;
 
-  //! Members for StaticGain
+  ////// Members for StaticGain
 
-  cedar::aux::DoubleParameterPtr mGainFactor;
+  cedar::aux::DoubleParameterPtr mGainFactorParameter;
   //!@brief MatrixData representing the input. Storing it like this saves time during computation.
   cedar::aux::ConstMatDataPtr mInput;
   //!@brief The data containing the output.
   cedar::aux::MatDataPtr mOutput;
 
-  //! Members for Convolution
+	////// Members for Convolution
+	KernelListParameterPtr mKernelsParameter;
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

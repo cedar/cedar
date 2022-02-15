@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Operation.cpp
+    File:        SynapticWeightPatternParameter.cpp
 
     Maintainer:  Yogeshwar Agnihotri
     Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
     Date:        2022 02 13
 
-    Description: Source file for the class cedar::proc::Operation.
+    Description: Source file for the class cedar::proc::SynapticWeightPatternParameter.
 
     Credits:
 
@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CLASS HEADER
-#include "cedar/processing/Operation.h"
+#include "cedar/processing/SynapticWeightPatternParameter.h"
 
 // CEDAR INCLUDES
 
@@ -48,13 +48,13 @@
 // Static members
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::EnumType<cedar::proc::Operation> cedar::proc::Operation::mType("cedar::proc::Operation::");
+cedar::aux::EnumType<cedar::proc::SynapticWeightPatternParameter> cedar::proc::SynapticWeightPatternParameter::mType("cedar::proc::SynapticWeightPatternParameter::");
 
 // From Enum.dox:"MSVC doesn't need (read: want) you to declare these again because they have values assigned in the
 // header and thus are const expressions; gcc is the opposite, thus the ifdef"
 #ifndef CEDAR_COMPILER_MSVC
-const cedar::proc::Operation::Id cedar::proc::Operation::StaticGain;
-const cedar::proc::Operation::Id cedar::proc::Operation::Convolution;
+const cedar::proc::SynapticWeightPatternParameter::Id cedar::proc::SynapticWeightPatternParameter::StaticGain;
+const cedar::proc::SynapticWeightPatternParameter::Id cedar::proc::SynapticWeightPatternParameter::Convolution;
 #endif
 
 
@@ -66,20 +66,20 @@ const cedar::proc::Operation::Id cedar::proc::Operation::Convolution;
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::Operation::construct()
+void cedar::proc::SynapticWeightPatternParameter::construct()
 {
-  mType.type()->def(cedar::aux::Enum(cedar::proc::Operation::StaticGain, "StaticGain",
-                                     "Static Gain"));
-  mType.type()->def(cedar::aux::Enum(cedar::proc::Operation::Convolution, "Convolution",
-                                     "Convolution"));
+	mType.type()->def(cedar::aux::Enum(cedar::proc::SynapticWeightPatternParameter::StaticGain,
+					"StaticGain","Static Gain"));
+	mType.type()->def(cedar::aux::Enum(cedar::proc::SynapticWeightPatternParameter::Convolution,
+					"Convolution","Convolution"));
 }
 
-const cedar::aux::EnumBase& cedar::proc::Operation::type()
+const cedar::aux::EnumBase& cedar::proc::SynapticWeightPatternParameter::type()
 {
-  return *cedar::proc::Operation::mType.type();
+	return *cedar::proc::SynapticWeightPatternParameter::mType.type();
 }
 
-const cedar::proc::Operation::TypePtr& cedar::proc::Operation::typePtr()
+const cedar::proc::SynapticWeightPatternParameter::TypePtr& cedar::proc::SynapticWeightPatternParameter::typePtr()
 {
-  return cedar::proc::Operation::mType.type();
+	return cedar::proc::SynapticWeightPatternParameter::mType.type();
 }

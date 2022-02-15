@@ -341,7 +341,6 @@ void cedar::proc::steps::Convolution::readConfiguration(const cedar::aux::Config
       );
 }
 
-
 void cedar::proc::steps::Convolution::slotKernelAdded(size_t kernelIndex)
 {
   cedar::aux::kernel::KernelPtr kernel = this->_mKernels->at(kernelIndex);
@@ -374,7 +373,6 @@ unsigned int cedar::proc::steps::Convolution::getDimensionality() const
     return 2;
   }
 }
-
 
 void cedar::proc::steps::Convolution::addKernelToConvolution(cedar::aux::kernel::KernelPtr kernel)
 {
