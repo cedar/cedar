@@ -82,7 +82,7 @@ public:
 
 public slots:
   void recompute();
-  void operationChanged();
+  void synapticWeightPatternParameterChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -103,7 +103,7 @@ protected:
   // none yet
 private:
 
-  cedar::aux::EnumParameterPtr mOperation;
+  cedar::aux::EnumParameterPtr mSynapticWeightPatternParameter;
 
   //! Members for StaticGain
 

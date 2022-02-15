@@ -43,7 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/ElementDeclaration.h"
-#include "cedar/processing/Operation.h"
+#include "cedar/processing/SynapticWeightPatternParameter.h"
 #include "cedar/processing/typecheck/IsMatrix.h"
 
 // SYSTEM INCLUDES
@@ -88,8 +88,9 @@ namespace
 cedar::proc::steps::SynapticConnection::SynapticConnection()
 :
 mOutput(new cedar::aux::MatData(cv::Mat())),
-mOperation(new cedar::aux::EnumParameter(this, "operation", cedar::proc::Operation::typePtr()
-                                         ,cedar::proc::Operation::StaticGain)),
+mSynapticWeightPatternParameter(new cedar::aux::EnumParameter(this, "synaptic weight pattern",
+				cedar::proc::SynapticWeightPatternParameter::typePtr(),
+				cedar::proc::SynapticWeightPatternParameter::StaticGain)),
 mGainFactor(new cedar::aux::DoubleParameter(this, "gain factor", 1.0,
                                             -10000.0, 10000.0))
 {
@@ -102,8 +103,8 @@ mGainFactor(new cedar::aux::DoubleParameter(this, "gain factor", 1.0,
   //If values of parameters change, recompute the output
   QObject::connect(this->mGainFactor.get(), SIGNAL(valueChanged()),
                    this, SLOT(recompute()));
-  QObject::connect(this->mOperation.get(), SIGNAL(valueChanged()),
-                   this, SLOT(operationChanged()));
+  QObject::connect(this->mSynapticWeightPatternParameter.get(), SIGNAL(valueChanged()),
+                   this, SLOT(synapticWeightPatternParameterChanged()));
 }
 
 cedar::proc::steps::SynapticConnection::~SynapticConnection()
@@ -117,7 +118,7 @@ cedar::proc::steps::SynapticConnection::~SynapticConnection()
 void cedar::proc::steps::SynapticConnection::compute(const cedar::proc::Arguments&)
 {
 
-  if(this->mOperation->getValue() ==  cedar::proc::Operation::StaticGain)
+  if(this->mSynapticWeightPatternParameter->getValue() ==  cedar::proc::SynapticWeightPatternParameter::StaticGain)
   {
     // the result is simply input * gain.
     if (mInput)
@@ -128,7 +129,7 @@ void cedar::proc::steps::SynapticConnection::compute(const cedar::proc::Argument
       this->mOutput->setData(cv::Mat());
     }
   }
-  else if(this->mOperation->getValue() ==  cedar::proc::Operation::Convolution)
+  else if(this->mSynapticWeightPatternParameter->getValue() ==  cedar::proc::SynapticWeightPatternParameter::Convolution)
   {
 
   }
@@ -176,24 +177,24 @@ void cedar::proc::steps::SynapticConnection::inputConnectionChanged(const std::s
   }
 }
 
-void cedar::proc::steps::SynapticConnection::operationChanged()
+void cedar::proc::steps::SynapticConnection::synapticWeightPatternParameterChanged()
 {
-  //Gray out the other parameters of the other operation that is currently not selected in the operation enumparameter
-  if(this->mOperation->getValue() == cedar::proc::Operation::StaticGain)
+  //Gray out the parameters of the not selected synaptic weight pattern
+  if(this->mSynapticWeightPatternParameter->getValue() == cedar::proc::SynapticWeightPatternParameter::StaticGain)
   {
     //Activate every parameter that has to do with static gain
     mGainFactor->setConstant(false);
 
     //Gray out everything that has to do with convolution
   }
-  else if(this->mOperation->getValue() == cedar::proc::Operation::Convolution)
+  else if(this->mSynapticWeightPatternParameter->getValue() == cedar::proc::SynapticWeightPatternParameter::Convolution)
   {
     //Activate every parameter that has to do with convolution
 
     //Gray out every parameter that has to do with static gain
     mGainFactor->setConstant(true);
   }
-  //When user switches between two operations recompute everything (Uses the previous grayed out parameters that are
-  // now active again
+  //When user switches between two synaptic weigh pattern
+  // recompute everything (Uses the previous grayed out parameters that are now active again
   recompute();
 }

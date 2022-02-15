@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Operation.fwd.h
+    File:        SynapticWeightPatternParameter.fwd.h
 
     Maintainer:  Yogeshwar Agnihotri
-    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2022 02 13
+    Email:       yogeshwar.agnihotri@ini.rub.de
+    Date:        2022 02 15
 
-    Description: Forward declaration file for the class cedar::proc::Operation.
+    Description: Forward declaration file for the class cedar::proc::SynapticWeightPatternParameter.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_OPERATION_FWD_H
-#define CEDAR_PROC_OPERATION_FWD_H
+#ifndef CEDAR_PROC_SYNAPTIC_WEIGHT_PATTERN_PARAMETER_FWD_H
+#define CEDAR_PROC_SYNAPTIC_WEIGHT_PATTERN_PARAMETER_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -54,11 +54,11 @@ namespace cedar
   namespace proc
   {
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_PROC_CLASS(Operation);
+    CEDAR_DECLARE_PROC_CLASS(SynapticWeightPatternParameter);
     //!@endcond
   }
 }
 
 
-#endif // CEDAR_PROC_OPERATION_FWD_H
+#endif // CEDAR_PROC_SYNAPTIC_WEIGHT_PATTERN_PARAMETER_FWD_H
 
