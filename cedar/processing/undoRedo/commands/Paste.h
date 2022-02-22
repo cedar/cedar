@@ -22,58 +22,55 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CreateDeleteElement.h
+    File:        Paste.h
 
     Maintainer:  Yogeshwar Agnihotri,
     						 Lars Janssen
     Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de,
     						 lars.janssen@ini.rub.de
-    Date:        2021 04 07
+    Date:        2021 09 20
 
-    Description: Header file for the class cedar::proc::undoRedo::commands::CreateDeleteElement.
+    Description: Header file for the class cedar::proc::undoRedo::commands::Paste.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_ELEMENT_H
-#define CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_ELEMENT_H
+#ifndef CEDAR_PROC_UNDO_REDO_COMMANDS_PASTE_H
+#define CEDAR_PROC_UNDO_REDO_COMMANDS_PASTE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/undoRedo/UndoCommand.h"
-#include "cedar/processing/gui/Group.h"
-#include "cedar/processing/gui/Element.h"
-#include "cedar/processing/gui/Connectable.h"
+#include <cedar/processing/gui/Group.h>
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/undoRedo/commands/CreateDeleteElement.fwd.h"
+#include "cedar/processing/undoRedo/commands/Paste.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QPointF>
 
-/*!
- *  Undo/redo command for element creation/deletion
+
+/*
+Command that does undo redo of pasting. The redo procedure is simple pasting. Undoing it is just deleting the pasted
+ elements.
  */
-class cedar::proc::undoRedo::commands::CreateDeleteElement : public UndoCommand
+class cedar::proc::undoRedo::commands::Paste : public UndoCommand
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Constructor for creating an element
-	CreateDeleteElement(std::string classId,
-	cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene, bool isCreateCommand,
-	QPointF position);
-
-  //!@brief Constructor for deleting an element
-  CreateDeleteElement(cedar::proc::gui::Element* element, cedar::proc::gui::Scene* scene,
-                bool isCreateCommand);
+  //!@brief The standard constructor.
+  Paste(std::string json, cedar::proc::gui::GroupPtr group, QPointF mousePositionScenePos);
 
   //!@brief Destructor
-  virtual ~CreateDeleteElement();
+  virtual ~Paste();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -86,54 +83,23 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Creates an element and sets its mpGuiElement
-  void createElement();
-
-  //!@brief Deletes an element
-  void deleteElement();
-
-  //!@brief Saves the configuration of the element into the configurationNode 'mElementConfiguration'
-  void saveElementConfiguration();
-
-  //!@brief Loads the configuration from the configurationNode 'mElementConfiguration' into mpGuiElement
-  void loadElementConfiguration();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+	//!@brief paste one element using json data nodes
+	void pasteConfigurationNodes(cedar::aux::ConfigurationNode stepNode, cedar::aux::ConfigurationNode uiNode,
+					cedar::aux::ConfigurationNode connectionNode, cedar::aux::ConfigurationNode groupNode);
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
 private:
-  //!@brief pointer to different instances of objects that are needed
-  cedar::proc::gui::Element* mpGuiElement;
-	cedar::proc::GroupPtr mpTargetGroup;
-	cedar::proc::gui::Scene* mpScene;
+  // none yet
 
-  //!@brief full paths to identify the elements when their pointer is outdated
-  std::string mElementFullPath;
-  std::string mClassId;
-
-  cedar::aux::ConfigurationNode mElementConfiguration;
-
-  //!@brief positions and sizes
-  QPointF mPosition;
-  qreal mWidthOfGroup;
-  qreal mHeightOfGroup;
-  std::vector<QPointF> mPositionOfElementsInGroup;
-
-  //!@brief instance of the action enum. Saves for what to command was intended (create or delete)
-  bool mIsCreateCommand;
-
-  //!@brief if the element is a group this stores if its collapsed or not
-  bool mGroupIsCollapsed;
-
-  //!@brief boolean to realize the first redo
-  bool mIsInitialRedo;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -141,9 +107,14 @@ protected:
   // none yet
 
 private:
-  // none yet
+	cedar::proc::gui::GroupPtr mGroup;
+	std::string mJson;
+	QPointF mMousePositionScenePos;
+	cedar::proc::gui::Scene* mpScene;
+	QList<QGraphicsItem*> mNewItemsAfterPasting;
+	std::vector<std::string> mFullPathsOfPastedElements;
 
-};// class cedar::proc::undoRedo::commands::CreateDeleteElement
+}; // class cedar::proc::undoRedo::commands::Paste
 
-#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_CREATE_DELETE_ELEMENT_H
+#endif // CEDAR_PROC_UNDO_REDO_COMMANDS_PASTE_H
 

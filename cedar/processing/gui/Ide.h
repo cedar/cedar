@@ -64,7 +64,6 @@
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
-#include <QShowEvent>
 #include <QKeyEvent>
 #include <QDoubleSpinBox>
 #include <QComboBox>
@@ -316,10 +315,8 @@ public slots:
   void paste();
 
   //!@brief change an elements name in the connection section of json
-  void renameElementInConnection(boost::property_tree::ptree& connectionTree, std::string oldName, std::string newName, std::string sourceSlotName, std::string targetSlotName);
-
-  //!@brief paste one element using json data nodes
-  void pasteConfigurationNodes(cedar::aux::ConfigurationNode stepNode, cedar::aux::ConfigurationNode uiNode, cedar::aux::ConfigurationNode connectionNode, cedar::aux::ConfigurationNode groupNode);
+	static void renameElementInConnection(boost::property_tree::ptree& connectionTree, std::string oldName,
+					std::string newName, std::string sourceSlotName, std::string targetSlotName);
 
   //!@brief copy the configuration of one step
   void copyStepConfiguration();
@@ -415,8 +412,6 @@ private:
   void resetWarningAndErrorStateIndicators();
 
   void backupSaveCallback();
-
-  void showEvent( QShowEvent *event );
 
 private slots:
   void globalTimeFactorSliderChanged(int newValue);

@@ -77,6 +77,7 @@
 #include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/processing/undoRedo/commands/CreateDeleteElement.h"
 #include "cedar/processing/undoRedo/commands/CreateGroupTemplate.h"
+#include <cedar/processing/undoRedo/commands/ChangeParameterValueTemplate.h>
 
 // SYSTEM INCLUDES
 #include <QEvent>
@@ -357,7 +358,7 @@ void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
   {
     //Push a createDeleteCommand (as a create) onto the UndoStack
     cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteElement(
-            mapped, elem_declaration->getClassName(), target_group, mpScene, true));
+            elem_declaration->getClassName(), target_group, mpScene, true, mapped));
   }
   //TODO: Do Group Declaration (with an own Command). This works with Json Templates
   else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration *>(declaration))
@@ -1059,6 +1060,27 @@ void cedar::proc::gui::Group::addElements(const std::list<QGraphicsItem *> &elem
     item_configs[element] = config;
   }
 
+  for(auto element : elements_to_move)
+	{
+  	//Check if the element name already exists in group
+  	if(this->getGroup()->nameExists(element->getName()))
+		{
+			cedar::aux::ParameterPtr nameParameter = element->getParameter("name");
+			std::string currentName = element->getName();
+
+			// If parameter belongs to a step/element, push to undo stack (e.g. settings parameter should not be undoable)
+			cedar::aux::NamedConfigurable* owner = nameParameter->getNamedConfigurableOwner();
+			if(owner != nullptr)
+			{
+				auto parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(nameParameter);
+
+				cedar::proc::gui::Ide::pUndoStack->push(
+								new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::string>(parameter.get(),
+												currentName, this->getGroup()->getUniqueIdentifier(currentName), owner, this->mpScene));
+			}
+		}
+	}
+
   this->getGroup()->add(elements_to_move);
 
   for (auto element : all_elements)
@@ -1220,14 +1242,11 @@ void cedar::proc::gui::Group::readJson(const cedar::aux::Path &source)
 
 void cedar::proc::gui::Group::readJsonFromString(std::string jsonString)
 {
+	cedar::aux::ConfigurationNode root;
   std::stringstream jsonStream;
+
   jsonStream << jsonString;
-
-  cedar::aux::ConfigurationNode root;
-
-  //Debugged: Works
   read_json(jsonStream, root);
-
 
   this->readRobots(root);
   this->mGroup->readConfiguration(root);

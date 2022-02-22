@@ -678,25 +678,13 @@ cedar::proc::gui::Element* cedar::proc::gui::Scene::getElementByFullPath(std::st
 {
   std::vector<std::string> mElementNameSplitted;
   boost::split(mElementNameSplitted, elementIdentifier, boost::is_any_of("."));
+	cedar::proc::gui::Group* currentGroup;
 
-  cedar::proc::gui::GroupPtr rootGroup = this->getRootGroup();
-
-  cedar::proc::gui::Group* currentGroup = rootGroup.get();
-  //Go through all subgroups
-  for (std::size_t i = 0; i < mElementNameSplitted.size()-1; i++)
-  {
-    if(currentGroup->getGroup()->contains(mElementNameSplitted[i]))
-    {
-      if (cedar::proc::ElementPtr element = currentGroup->getGroup()->getElement(mElementNameSplitted[i]))
-      {
-        cedar::proc::gui::Element* guiElement = this->getGraphicsItemFor(element);
-        if (cedar::proc::gui::Group* group = dynamic_cast<cedar::proc::gui::Group*>(guiElement))
-        {
-          currentGroup = group;
-        }
-      }
-    }
-  }
+	if (cedar::proc::gui::Group* group = dynamic_cast<cedar::proc::gui::Group*>(
+					this->getGraphicsItemFor(this->getGroupOfElementByFullPath(elementIdentifier))))
+	{
+		currentGroup = group;
+	}
 
   //Set the guiElement
   if(currentGroup->getGroup()->contains(mElementNameSplitted[mElementNameSplitted.size() - 1]))
@@ -1170,21 +1158,22 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
   //Case 3: Moving between same groups
   else
   {
-    //First item of list is enough, since all have the same group
-    if(cedar::proc::gui::Element* guiElement = dynamic_cast<cedar::proc::gui::Element*>(items_to_move.front()))
-    {
-      targetGroup = this->getGroupFor(guiElement->getElement()->getGroup().get());
-    }
+	if(items_to_move.size() != 0)
+	{
+		//First item of list is enough, since all have the same group
+		if(cedar::proc::gui::Element* guiElement = dynamic_cast<cedar::proc::gui::Element*>(items_to_move.front()))
+		{
+		  targetGroup = this->getGroupFor(guiElement->getElement()->getGroup().get());
+		}
+	}
   }
 
   if (this->mDraggingItems && this->mpDraggingGraphicsBase && this->mStartMovingPositionOfClicked != this->mpDraggingGraphicsBase->pos())
   {
-    cedar::proc::gui::Ide::pUndoStack->push(
-            new cedar::proc::undoRedo::commands::MoveElement(items_to_move,
-                                                             sourceGroup,
-                                                             targetGroup,
-                                                             this->mStartMovingPosition,
-                                                             this));
+		cedar::proc::gui::Ide::pUndoStack->beginMacro("Moved selected elements");
+    cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::MoveElement(items_to_move,
+    				sourceGroup, targetGroup,this->mStartMovingPosition,this));
+		cedar::proc::gui::Ide::pUndoStack->endMacro();
   }
   this->mDraggingItems = false;
   mTargetGroup.reset();
