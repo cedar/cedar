@@ -47,6 +47,7 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
+#if CV_MAJOR_VERSION >= 4 || (CV_MAJOR_VERSION == 3 && CV_MINOR_VERSION >= 3)
 
 namespace cedar
 {
@@ -61,6 +62,7 @@ namespace cedar
   }
 }
 
+#endif // CV_MAJOR_VERSION >= 4 || (CV_MAJOR_VERSION == 3 && CV_MINOR_VERSION >= 3)
 
 #endif // CEDAR_PROC_STEPS_DNN_FWD_H
 

@@ -37,6 +37,8 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+#if CV_MAJOR_VERSION >= 4 || (CV_MAJOR_VERSION == 3 && CV_MINOR_VERSION >= 3)
+
 // CLASS HEADER
 #include "cedar/processing/steps/DNN.h"
 
@@ -236,3 +238,5 @@ void cedar::proc::steps::DNN::compute(const cedar::proc::Arguments&)
     }
 
 }
+
+#endif // CV_MAJOR_VERSION >= 4 || (CV_MAJOR_VERSION == 3 && CV_MINOR_VERSION >= 3)

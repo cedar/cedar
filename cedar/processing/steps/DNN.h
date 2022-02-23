@@ -40,6 +40,8 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+#if CV_MAJOR_VERSION >= 4 || (CV_MAJOR_VERSION == 3 && CV_MINOR_VERSION >= 3)
+
 // CEDAR INCLUDES
 #include <cedar/processing/Step.h>
 #include <cedar/processing/InputSlotHelper.h>
@@ -161,6 +163,8 @@ private:
     cedar::aux::EnumParameterPtr _mDnnType;
 
 }; // class cedar::proc::steps::DNN
+
+#endif // CV_MAJOR_VERSION >= 4 || (CV_MAJOR_VERSION == 3 && CV_MINOR_VERSION >= 3)
 
 #endif // CEDAR_PROC_STEPS_DNN_H
 
