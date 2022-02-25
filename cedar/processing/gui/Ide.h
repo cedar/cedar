@@ -63,6 +63,7 @@
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
+#include <QShowEvent>
 #include <QKeyEvent>
 #include <QDoubleSpinBox>
 #include <QComboBox>
@@ -405,6 +406,8 @@ private:
   void setRecordingControlsEnabled(bool enabled);
 
   void setSimulationControlsEnabled(bool enabled);
+
+  void showEvent( QShowEvent *event );
 
   void translateGlobalTimeFactorChangedSignal(double newValue);
 

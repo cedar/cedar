@@ -670,6 +670,13 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 #endif
 }
 
+void cedar::proc::gui::Ide::showEvent( QShowEvent *event )
+{
+  QWidget::showEvent( event );
+  //do not remove this line, init the qglviewer, allowing the robotic framework to work as intended. Hotfix part 2. Needs a better fix. TODO
+  this->tabWidget->setCurrentIndex(0);
+}
+
 cedar::proc::gui::Ide::~Ide()
 {
   if (this->mpPropertyTable != nullptr)
