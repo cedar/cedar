@@ -74,20 +74,26 @@ _mMode
 mKernelList(new cedar::aux::conv::KernelList()),
 _mEngine
 (
-  new cedar::aux::conv::EngineParameter(this, "engine", cedar::aux::conv::EnginePtr(new cedar::aux::conv::OpenCV()))
+  new cedar::aux::conv::EngineParameter(this, "engine",
+                                        cedar::aux::conv::EnginePtr(new cedar::aux::conv::OpenCV()))
 ),
-_mAlternateEvenKernelCenter(new cedar::aux::BoolParameter(this, "alternate even kernel center", false))
+_mAlternateEvenKernelCenter(new cedar::aux::BoolParameter(this, "alternate even kernel center",
+                                                          false))
 {
   this->_mEngine->markAdvanced();
   this->selectedEngineChanged();
 
   // this needs to be a direct connection because the connected slot also updates the kernel list pointer in the engine
   // if this were not the case, there could be short periods where the engine is changed but its kernel list is not updated
-  QObject::connect(this->_mEngine.get(), SIGNAL(valueChanged()), this, SLOT(selectedEngineChanged()), Qt::DirectConnection);
+  QObject::connect(this->_mEngine.get(), SIGNAL(valueChanged()), this,
+                   SLOT(selectedEngineChanged()), Qt::DirectConnection);
 
-  QObject::connect(this->_mMode.get(), SIGNAL(valueChanged()), this, SIGNAL(configurationChanged()));
-  QObject::connect(this->_mBorderType.get(), SIGNAL(valueChanged()), this, SIGNAL(configurationChanged()));
-  QObject::connect(this->_mAlternateEvenKernelCenter.get(), SIGNAL(valueChanged()), this, SIGNAL(configurationChanged()));
+  QObject::connect(this->_mMode.get(), SIGNAL(valueChanged()), this,
+                   SIGNAL(configurationChanged()));
+  QObject::connect(this->_mBorderType.get(), SIGNAL(valueChanged()), this,
+                   SIGNAL(configurationChanged()));
+  QObject::connect(this->_mAlternateEvenKernelCenter.get(), SIGNAL(valueChanged()),
+                   this, SIGNAL(configurationChanged()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -109,7 +115,8 @@ void cedar::aux::conv::Convolution::setAllowedModes(const std::set<cedar::aux::c
 void cedar::aux::conv::Convolution::slotKernelAdded(size_t index)
 {
   cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList()->getKernel(index);
-  QObject::connect(kernel.get(), SIGNAL(kernelUpdated()), this, SLOT(updateCombinedKernel()));
+  QObject::connect(kernel.get(), SIGNAL(kernelUpdated()), this,
+                   SLOT(updateCombinedKernel()));
   this->updateCombinedKernel();
 }
 
@@ -197,13 +204,15 @@ void cedar::aux::conv::Convolution::updateEngineCapabilities()
   for (size_t i = 0; i < border_types.size(); ++i)
   {
     const cedar::aux::Enum& enum_value = border_types.at(i);
-    this->_mBorderType->setEnabled(enum_value, this->getEngine()->checkBorderTypeCapability(enum_value));
+    this->_mBorderType->setEnabled(enum_value,
+                                   this->getEngine()->checkBorderTypeCapability(enum_value));
   }
 }
 
 cv::Mat cedar::aux::conv::Convolution::convolve(const cv::Mat& matrix) const
 {
-  return this->getEngine()->convolve(matrix, this->getBorderType(), this->getMode(), this->getAlternateEvenKernelCenter());
+  return this->getEngine()->convolve(matrix, this->getBorderType(),
+                                     this->getMode(), this->getAlternateEvenKernelCenter());
 }
 
 cv::Mat cedar::aux::conv::Convolution::convolve
@@ -213,7 +222,8 @@ cv::Mat cedar::aux::conv::Convolution::convolve
   const std::vector<int>& anchor
 ) const
 {
-  return this->getEngine()->convolve(matrix, kernel, this->getBorderType(), this->getMode(), anchor, this->getAlternateEvenKernelCenter());
+  return this->getEngine()->convolve(matrix, kernel, this->getBorderType(),
+                                     this->getMode(), anchor, this->getAlternateEvenKernelCenter());
 }
 
 cv::Mat cedar::aux::conv::Convolution::convolve
@@ -222,7 +232,8 @@ cv::Mat cedar::aux::conv::Convolution::convolve
   cedar::aux::kernel::ConstKernelPtr kernel
 ) const
 {
-  return this->getEngine()->convolve(matrix, kernel, this->getBorderType(), this->getMode(), this->getAlternateEvenKernelCenter());
+  return this->getEngine()->convolve(matrix, kernel, this->getBorderType(),
+                                     this->getMode(), this->getAlternateEvenKernelCenter());
 }
 
 cv::Mat cedar::aux::conv::Convolution::convolveSeparable
@@ -231,7 +242,8 @@ cv::Mat cedar::aux::conv::Convolution::convolveSeparable
   cedar::aux::kernel::ConstSeparablePtr kernel
 ) const
 {
-  return this->getEngine()->convolveSeparable(matrix, kernel, this->getBorderType(), this->getMode(), this->getAlternateEvenKernelCenter());
+  return this->getEngine()->convolveSeparable(matrix, kernel, this->getBorderType(), this->getMode(),
+                                              this->getAlternateEvenKernelCenter());
 }
 
 cv::Mat cedar::aux::conv::Convolution::convolve
@@ -240,5 +252,6 @@ cv::Mat cedar::aux::conv::Convolution::convolve
   cedar::aux::conv::ConstKernelListPtr kernelList
 ) const
 {
-  return this->getEngine()->convolve(matrix, kernelList, this->getBorderType(), this->getMode(), this->getAlternateEvenKernelCenter());
+  return this->getEngine()->convolve(matrix, kernelList, this->getBorderType(), this->getMode(),
+                                     this->getAlternateEvenKernelCenter());
 }

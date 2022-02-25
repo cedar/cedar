@@ -50,6 +50,7 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/steps/SynapticConnection.fwd.h"
+#include "cedar/auxiliaries/convolution/Convolution.h"
 
 // SYSTEM INCLUDES
 
@@ -108,6 +109,8 @@ protected:
 private:
   void compute(const Arguments &);
   void inputConnectionChanged(const std::string& inputName);
+  /*void setStaticGainParamterConstantValue(bool constant);
+  void setConvolutionParameterConstantValue(bool constant);*/
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -119,14 +122,15 @@ private:
   cedar::aux::EnumParameterPtr mSynapticWeightPatternParameter;
 
   ////// Members for StaticGain
-
   cedar::aux::DoubleParameterPtr mGainFactorParameter;
+
   //!@brief MatrixData representing the input. Storing it like this saves time during computation.
   cedar::aux::ConstMatDataPtr mInput;
   //!@brief The data containing the output.
   cedar::aux::MatDataPtr mOutput;
 
 	////// Members for Convolution
+  cedar::aux::conv::ConvolutionPtr mConvolution;
 	KernelListParameterPtr mKernelsParameter;
 
 

@@ -154,6 +154,12 @@ public:
     return this->_mAnchor->getValue();
   }
 
+  //Todo: Add description
+  void setAnchorParameterConstantValue(bool constant);
+
+  //Todo: Add description
+  //void set
+
   //!@brief returns the size of a given dimension
   virtual unsigned int getSize(size_t dimension) const;
 
