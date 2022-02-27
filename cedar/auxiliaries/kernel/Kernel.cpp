@@ -147,9 +147,3 @@ void cedar::aux::kernel::Kernel::updateKernel()
   this->calculate();
   emit kernelUpdated();
 }
-
-//TODO: Delete if we dont end up with setContant
-void cedar::aux::kernel::Kernel::setAnchorParameterConstantValue(bool constant)
-{
-    this->_mAnchor->setConstant(constant);
-}

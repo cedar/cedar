@@ -109,8 +109,6 @@ protected:
 private:
   void compute(const Arguments &);
   void inputConnectionChanged(const std::string& inputName);
-  /*void setStaticGainParamterConstantValue(bool constant);
-  void setConvolutionParameterConstantValue(bool constant);*/
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

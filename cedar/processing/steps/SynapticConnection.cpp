@@ -205,12 +205,6 @@ void cedar::proc::steps::SynapticConnection::synapticWeightPatternParameterChang
     this->mConvolution->_mMode->setHidden(true);
     this->mConvolution->_mAlternateEvenKernelCenter->setHidden(true);
 
-    /*//Activate every parameter that has to do with static gain
-    setStaticGainParamterConstantValue(false);
-
-    //Gray out everything that has to do with convolution
-    setConvolutionParameterConstantValue(true);*/
-
   }
   else if(this->mSynapticWeightPatternParameter->getValue() == cedar::proc::SynapticWeightPatternParameter::Convolution)
   {
@@ -221,33 +215,5 @@ void cedar::proc::steps::SynapticConnection::synapticWeightPatternParameterChang
     this->mConvolution->_mAlternateEvenKernelCenter->setHidden(false);
 
     mGainFactorParameter->setHidden(true);
-    /*//Activate every parameter that has to do with convolution
-    setConvolutionParameterConstantValue(false);
-
-    //Gray out every parameter that has to do with static gain
-    setStaticGainParamterConstantValue(true);*/
-
   }
 }
-
-/*void cedar::proc::steps::SynapticConnection::setStaticGainParamterConstantValue(bool constant)
-{
-  this->mGainFactorParameter->setConstant(constant);
-}
-
-void cedar::proc::steps::SynapticConnection::setConvolutionParameterConstantValue(bool constant)
-{
-  this->mKernelsParameter->setConstant(constant);
-
-  //Set all kernels from the objectListParameter to Constant
-  int size = this->mKernelsParameter->getNumberOfConfigurableChildren();
-  for(int i = 0; i < size; i++)
-  {
-    std::cout << size << std::endl;
-    this->mKernelsParameter->at(i)->setAnchorParameterConstantValue(constant);
-  }
-
-  this->mConvolution->_mEngine->setConstant(constant);
-  this->mConvolution->_mBorderType->setConstant(constant);
-  this->mConvolution->_mMode->setConstant(constant);
-}*/
