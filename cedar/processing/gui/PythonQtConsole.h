@@ -97,8 +97,8 @@ namespace cedar
 
             //init PythonQt with mpConsole
             PythonQt::setEnableThreadSupport(true);
-            PythonQt::init(PythonQt::IgnoreSiteModule|PythonQt::RedirectStdOut);
-            //PythonQt::overwriteSysPath()
+            PythonQt::init(PythonQt::RedirectStdOut);
+            //PythonQt::overwriteSysPath(QStringList(QString::fromStdString("/home/fred/repos/cedar/lib/cpython")));
 
             //Import CoPYObject Type To Python
             //qRegisterMetaType<cedar::proc::gui::CoPYObject>("CoPYObject");

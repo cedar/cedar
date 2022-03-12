@@ -101,7 +101,7 @@ public:
   PythonScript(bool);
 
   //!@brief Destructor
-  ~PythonScript();
+  virtual ~PythonScript();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public structs
@@ -232,7 +232,7 @@ namespace cedar
             this->unacceptedStrings = unacceptedStrings;
           };
 
-          ~ValidationMaskInputDialog();
+          virtual ~ValidationMaskInputDialog();
 
           QString getText(QWidget *, const QString &title, const QString &label,
                           QLineEdit::EchoMode echo = QLineEdit::Normal,

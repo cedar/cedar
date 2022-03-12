@@ -126,10 +126,6 @@ cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter::PythonSyntaxHighligh
   
   
 }
-cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter::~PythonSyntaxHighlighter()
-{
-
-}
 
 
 void cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter::initializeRules()

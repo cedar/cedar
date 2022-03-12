@@ -67,7 +67,7 @@ public:
   PythonScriptLooped();
 
   //!@brief Destructor
-  ~PythonScriptLooped();
+  virtual ~PythonScriptLooped();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

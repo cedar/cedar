@@ -50,6 +50,19 @@ else(CEDAR_USE_QGLVIEWER)
   set(qglviewer_moc_headers "")
 endif(CEDAR_USE_QGLVIEWER)
 
+if (CEDAR_USE_COPY)
+  set(copyscript_moc_headers gui/CoPYWidget.h gui/CoPYObject.h gui/PythonQtConsole.h)
+else(CEDAR_USE_COPY)
+  set(copyscript_moc_headers "")
+endif(CEDAR_USE_COPY)
+
+if (CEDAR_USE_PYTHONSTEP)
+  set(pythonstep_moc_headers steps/PythonScript.h steps/PythonScriptLooped.h)
+else(CEDAR_USE_COPY)
+  set(pythonstep_moc_headers "")
+endif(CEDAR_USE_COPY)
+
+
 cedar_add_library(cedarproc
   LINK_LIBRARIES
   cedaraux
@@ -115,8 +128,7 @@ cedar_add_library(cedarproc
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureWidget.h
   gui/BoostControl.h
-  gui/CoPYWidget.h
-  gui/CoPYObject.h
+  ${copyscript_moc_headers}
   gui/CodeWidget.h
   gui/CommentWidget.h
   gui/Connectable.h
@@ -136,7 +148,6 @@ cedar_add_library(cedarproc
   gui/PlotDockWidget.h
   gui/ProjectionMappingParameter.h
   gui/PerformanceOverview.h
-  gui/PythonQtConsole.h
   gui/RecorderWidget.h
   gui/RecorderProperty.h
   gui/Scene.h
@@ -155,9 +166,9 @@ cedar_add_library(cedarproc
   sinks/TCPWriter.h
   sources/TCPReader.h
   sources/BoxInput.h
-        gui/CoPYObject.h
   sources/GaussInput.h
   sources/RealSense.h
+        ${pythonstep_moc_headers}
   steps/VariableBox.h
   steps/VariableGauss.h
   steps/Sinus.h

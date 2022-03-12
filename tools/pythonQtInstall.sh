@@ -1,5 +1,5 @@
 installpath="/usr/local/lib"
-if [[ $# -eq 0 ]];
+if [[ $# -eq 0 ]]
   then
     echo "Using default path: ${installpath}"
   else
@@ -7,9 +7,15 @@ if [[ $# -eq 0 ]];
     echo "Using selected path: ${installpath}"
 fi
 python=$(python3 -V)
-pythonv=(${python//./ })
+IFS=" "
+read -a python <<< "$python"
+python=${python[1]}
+IFS="."
+read -a python <<< "$python"
 py_major=${pythonv[1]}
 py_minor=${pythonv[2]}
+py_major=3
+py_minor=8
 pythonv=${py_major}.${py_minor}
 
 echo "PythonVersion: ${pythonv}"
@@ -47,10 +53,10 @@ sudo rm PythonQtPythonInclude1.h
 echo -e "Necessary changes made. \nNow building PythonQt" 
 cd ..
 sudo qmake
-sudo make all
-echo -e "Successfully built PythonQt. \nIn CEDAR.CONF do the following changes: \n"
-echo "SET (CEDAR_INCLUDE_PYTHON   1)"
-echo "SET (PYTHON_MAJOR_VERSION   ${py_major})"
-echo "SET (PYTHON_MINOR_VERSION   ${py_minor})"
-echo "SET (CEDAR_USE_PYTHONQT     1)"
+sudo make all &&
+echo -e "Successfully built PythonQt. \nIn CEDAR.CONF do the following changes: \n" &&
+echo "SET (CEDAR_INCLUDE_PYTHON   1)" 
+echo "SET (PYTHON_MAJOR_VERSION   ${py_major})" &&
+echo "SET (PYTHON_MINOR_VERSION   ${py_minor})" &&
+echo "SET (CEDAR_USE_PYTHONQT     1)" &&
 echo "SET (PYTHONQT_PATH     '${installpath}/pythonqt')"

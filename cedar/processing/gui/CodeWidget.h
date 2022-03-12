@@ -122,7 +122,9 @@ namespace cedar
 
           public:
             PythonSyntaxHighlighter(QTextDocument *parent = 0);
-            ~PythonSyntaxHighlighter();
+            virtual ~PythonSyntaxHighlighter()
+            {}
+            ;
           protected:
              void highlightBlock(const QString &text);
 
@@ -153,8 +155,7 @@ namespace cedar
 
         public:
             CodeEditor(QWidget *parent = 0);
-            ~CodeEditor();
-
+            virtual ~CodeEditor();
             void lineNumberAreaPaintEvent(QPaintEvent *event);
             int lineNumberAreaWidth();
             void markErrorLine(long);
@@ -206,7 +207,7 @@ namespace cedar
 
 /*!@brief GUI representation for the code section.
   */
-#ifdef CEDAR_USE_PYTHONSTEP
+//#ifdef CEDAR_USE_PYTHONSTEP
 class cedar::proc::gui::CodeWidget
 :
 public QWidget
@@ -281,7 +282,7 @@ private:
 
 
 
-#else // CEDAR_USE_PYTHONSTEP
+/*#else // CEDAR_USE_PYTHONSTEP
 class cedar::proc::gui::CodeWidget
 :
 public QWidget
@@ -297,7 +298,7 @@ public:
   }
 };
 
-#endif // CEDAR_USE_PYTHONSTEP
+#endif // CEDAR_USE_PYTHONSTEP*/
 #endif // CEDAR_PROC_GUI_CODE_WIDGET_H
 
 
