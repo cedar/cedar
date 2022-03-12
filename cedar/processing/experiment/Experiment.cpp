@@ -504,7 +504,7 @@ void cedar::proc::experiment::Experiment::step(cedar::unit::Time)
   cedar::aux::NamedConfigurable::readJson(filename);
   for (ActionSequencePtr action_sequence: this->getActionSequences())
   {
-    action_sequence->setExperiment(this->shared_from_this());
+    action_sequence->setExperiment(boost::dynamic_pointer_cast<cedar::proc::experiment::Experiment>(this->shared_from_this()));
   }
 }
 

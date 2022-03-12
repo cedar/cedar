@@ -152,7 +152,7 @@ cedar::aux::NamedConfigurable* cedar::aux::Parameter::getNamedConfigurableOwner(
     {
       namedConfigurable = namedConfig;
     }
-    owner = owner->getParent();
+    owner = owner->getParent().get();
   }
   return namedConfigurable;
 }

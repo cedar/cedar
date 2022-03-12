@@ -89,7 +89,7 @@ cedar::proc::Trigger::~Trigger()
 
   for (auto listener : this->mListeners.member())
   {
-    listener->noLongerTriggeredBy(boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this()));
+    listener->noLongerTriggeredBy(boost::dynamic_pointer_cast<cedar::proc::Trigger>(this->shared_from_this()));
   }
 
   this->mListeners.member().clear();
@@ -504,7 +504,7 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
   std::vector<cedar::proc::TriggerablePtr> to_explore;
   std::set<cedar::proc::TriggerablePtr> explored;
 
-  auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
+  auto this_ptr = boost::dynamic_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
 
   // -- explore the root node --
 
@@ -600,7 +600,7 @@ void cedar::proc::Trigger::updateTriggeringOrder(std::set<cedar::proc::Trigger*>
 
   // append all listeners of this step; they all have a distance of one, because they follow this step directly
   //!@todo Can this take results from other triggers into account? Otherwise, multiple triggers might calculate the same thing over and over again.
-  cedar::proc::TriggerPtr this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
+  cedar::proc::TriggerPtr this_ptr = boost::dynamic_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
   auto this_node = graph.getNodeByPayload(this_ptr);
   auto distances = graph.getMaximumDistance(this_node);
 
@@ -776,7 +776,7 @@ void cedar::proc::Trigger::updateTriggeringOrderRecurseUpSource(cedar::proc::sou
 
 void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
-  auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
+  auto this_ptr = boost::dynamic_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
 
   QReadLocker lock(this->mTriggeringOrder.getLockPtr());
 
@@ -811,7 +811,7 @@ void cedar::proc::Trigger::onTrigger(cedar::proc::ArgumentsPtr, cedar::proc::Tri
 
 void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr triggerable)
 {
-  auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
+  auto this_ptr = boost::dynamic_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
 
   size_t count = 0;
   QWriteLocker lock(this->mListeners.getLockPtr());
@@ -849,7 +849,7 @@ void cedar::proc::Trigger::removeListener(cedar::proc::TriggerablePtr triggerabl
 
 void cedar::proc::Trigger::removeListener(cedar::proc::Triggerable* triggerable)
 {
-  auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
+  auto this_ptr = boost::dynamic_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
 
   QWriteLocker lock(this->mListeners.getLockPtr());
   size_t count;

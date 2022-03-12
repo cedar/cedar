@@ -80,7 +80,7 @@ mMainWindowGeometry(new cedar::aux::StringParameter(this, "mainWindowGeometry", 
 mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
 {
   cedar::aux::ConfigurablePtr ui_settings(new cedar::aux::Configurable());
-  this->addConfigurableChild("ui", ui_settings);
+  this->addConfigurableChild("ui", ui_settings, false);
   
   ui_settings->addConfigurableChild("log", mLog);
   ui_settings->addConfigurableChild("steps", mSteps);
@@ -92,7 +92,7 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   this->declareDockSettings("undo redo stack", false);
 
   cedar::aux::ConfigurablePtr slot_growth(new cedar::aux::Configurable());
-  this->addConfigurableChild("slot growth", slot_growth);
+  this->addConfigurableChild("slot growth", slot_growth, false);
 
   this->_mDataSlotScalingEnabled = new cedar::aux::BoolParameter(slot_growth.get(), "enabled", true);
   auto growth_limits = cedar::aux::DoubleParameter::LimitType::positive();
@@ -150,7 +150,7 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
           );
 
   cedar::aux::ConfigurablePtr display_settings(new cedar::aux::Configurable());
-  this->addConfigurableChild("displaySettings", display_settings);
+  this->addConfigurableChild("displaySettings", display_settings, false);
   mUseGraphicsItemShadowEffects = cedar::aux::BoolParameterPtr
                                   (
                                     new cedar::aux::BoolParameter
@@ -173,7 +173,7 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
       );
 
   cedar::aux::ConfigurablePtr recent_files(new cedar::aux::Configurable());
-  this->addConfigurableChild("fileHistory", recent_files);
+  this->addConfigurableChild("fileHistory", recent_files, false);
   this->_mMaxFileHistorySize = new cedar::aux::UIntParameter(recent_files.get(), "maximum history size", 10);
 
   this->_mExperimentDialogDirectory = new cedar::aux::DirectoryParameter(recent_files.get(), "experiment dialog director", "");

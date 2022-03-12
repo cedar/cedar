@@ -411,7 +411,7 @@ void cedar::proc::Group::addScript(cedar::proc::CppScriptPtr script)
   this->mScripts.member().insert(script);
   locker.unlock();
 
-  script->setGroup(cedar::aux::asserted_pointer_cast<cedar::proc::Group>(this->shared_from_this()));
+  script->setGroup(boost::dynamic_pointer_cast<cedar::proc::Group>(this->shared_from_this()));
 
   this->signalScriptAdded(script->getName());
 }
@@ -652,7 +652,7 @@ void cedar::proc::Group::addParameterLink
   info.mParameterLink = link;
   info.mSourceElement = sourceElement;
   info.mTargetElement = targetElement;
-  info.mGroup = boost::static_pointer_cast<cedar::proc::Group>(this->shared_from_this());
+  info.mGroup = boost::dynamic_pointer_cast<cedar::proc::Group>(this->shared_from_this());
   this->mParameterLinks.push_back(info);
 
   this->signalParameterLinkAdded(this->mParameterLinks.back());
@@ -1166,6 +1166,7 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element, bool destr
 void cedar::proc::Group::create(std::string className, std::string instanceName)
 {
   cedar::proc::ElementPtr element = cedar::proc::ElementManagerSingleton::getInstance()->allocate(className);
+  element->postConstructor();
   this->add(element, instanceName);
 }
 
@@ -1317,7 +1318,7 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
           = old_group->getRealTargets
                          (
                            source_slot,
-                           boost::static_pointer_cast<cedar::proc::ConstGroup>(this->shared_from_this())
+                           boost::dynamic_pointer_cast<cedar::proc::ConstGroup>(this->shared_from_this())
                          );
         for (auto real_target : targets)
         {
@@ -1341,7 +1342,7 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
           = old_group->getRealSources
                          (
                            target_slot,
-                           boost::static_pointer_cast<cedar::proc::ConstGroup>(this->shared_from_this())
+                           boost::dynamic_pointer_cast<cedar::proc::ConstGroup>(this->shared_from_this())
                          );
         for (auto real_source : sources)
         {
@@ -1410,7 +1411,7 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
     }
     old_group->remove(element);
   }
-  element->setGroup(boost::static_pointer_cast<cedar::proc::Group>(this->shared_from_this()));
+  element->setGroup(boost::dynamic_pointer_cast<cedar::proc::Group>(this->shared_from_this()));
 
   // we might have to restore recorder entries
   if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
@@ -2058,7 +2059,7 @@ void cedar::proc::Group::disconnectTriggerInternal(cedar::proc::TriggerPtr sourc
 void cedar::proc::Group::writeConfiguration(cedar::aux::ConfigurationNode& root) const
 {
   cedar::proc::GroupFileFormatV1 format;
-  format.write(boost::static_pointer_cast<cedar::proc::ConstGroup>(this->shared_from_this()), root);
+  format.write(boost::dynamic_pointer_cast<cedar::proc::ConstGroup>(this->shared_from_this()), root);
 }
 
 void cedar::proc::Group::writeData(cedar::aux::ConfigurationNode& root) const
@@ -2199,7 +2200,7 @@ void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& 
     case 1:
     {
       GroupFileFormatV1 reader;
-      reader.read(boost::static_pointer_cast<cedar::proc::Group>(this->shared_from_this()), root, exceptions);
+      reader.read(boost::dynamic_pointer_cast<cedar::proc::Group>(this->shared_from_this()), root, exceptions);
       break;
     }
   }
@@ -3242,7 +3243,7 @@ void cedar::proc::Group::onLoopedChanged()
     return;
   }
 
-  auto group = boost::static_pointer_cast<cedar::proc::Group>(group_raw->shared_from_this());
+  auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(group_raw->shared_from_this());
   CEDAR_DEBUG_ASSERT(group);
 
   auto is_looped = group->isLooped();

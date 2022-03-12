@@ -836,12 +836,12 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
   this->configurationLoaded();
 }
 
-cedar::aux::Configurable* cedar::aux::Configurable::getParent()
+cedar::aux::ConfigurablePtr cedar::aux::Configurable::getParent()
 {
   return this->mpParent;
 }
 
-void cedar::aux::Configurable::setParent(cedar::aux::Configurable* parent)
+void cedar::aux::Configurable::setParent(cedar::aux::ConfigurablePtr parent)
 {
   this->mpParent = parent;
 }
@@ -851,7 +851,7 @@ const cedar::aux::Configurable::Children& cedar::aux::Configurable::configurable
   return this->mChildren;
 }
 
-void cedar::aux::Configurable::addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child)
+void cedar::aux::Configurable::addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child, bool addParent)
 {
   if (this->mChildren.find(name) != this->mChildren.end())
   {
@@ -859,9 +859,9 @@ void cedar::aux::Configurable::addConfigurableChild(const std::string& name, ced
                                                     + name + "\".");
   }
   this->mChildren[name] = child;
-  if(child.get() != nullptr)
+  if(addParent && child.get() != nullptr)
   {
-    child->setParent(this);
+    child->setParent(this->shared_from_this());
   }
   // emit boost signal
   mTreeChanged();

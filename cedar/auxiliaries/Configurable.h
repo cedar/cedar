@@ -72,7 +72,7 @@
 /*!@brief An interface for classes that can store and load parameters from files.
  *
  */
-class cedar::aux::Configurable : public boost::noncopyable
+class cedar::aux::Configurable : public boost::noncopyable, public boost::enable_shared_from_this<cedar::aux::Configurable>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // friends
@@ -143,15 +143,15 @@ public:
   ParameterList& getParameters();
 
   //!@brief sets the configurable parent
-  void setParent(cedar::aux::Configurable* parent);
+  void setParent(cedar::aux::ConfigurablePtr parent);
 
   //!@brief gets the configurable parent
-  cedar::aux::Configurable* getParent();
+  cedar::aux::ConfigurablePtr getParent();
 
   /*!@brief add a Configurable as a child to this instance of Configurable - if name is duplicate, an exception is
    * thrown
    */
-  void addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child);
+  void addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child, bool addParent = true);
 
   //!@brief removes a child configuration from the configuration tree - if name is not found, an exception is thrown
   void removeConfigurableChild(const std::string& name);
@@ -419,7 +419,7 @@ private:
   Children mChildren;
 
   //!@brief parent of this Configurable instance
-  cedar::aux::Configurable* mpParent;
+  cedar::aux::ConfigurablePtr mpParent;
 
   //!@brief Whether this is an advanced configurable; usually only makes sense, when this is a child.
   bool mIsAdvanced;

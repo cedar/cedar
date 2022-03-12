@@ -306,7 +306,7 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
     this->getGroup()->disconnectSlot
                       (
                         role,
-                        boost::static_pointer_cast<Connectable>(this->shared_from_this()),
+                        boost::dynamic_pointer_cast<Connectable>(this->shared_from_this()),
                         slot->getName()
                       );
   }
@@ -1104,7 +1104,7 @@ void cedar::proc::Connectable::updateTargetSlots(cedar::proc::DataSlotWeakPtr sl
   std::vector<cedar::proc::DataConnectionPtr> connections;
   group->getDataConnectionsFrom
   (
-    boost::static_pointer_cast<cedar::proc::Connectable>(this->shared_from_this()),
+    boost::dynamic_pointer_cast<cedar::proc::Connectable>(this->shared_from_this()),
     slot->getName(),
     connections
   );
@@ -1131,7 +1131,7 @@ void cedar::proc::Connectable::freeTargetSlots(cedar::proc::DataSlotWeakPtr slot
   std::vector<cedar::proc::DataConnectionPtr> connections;
   group->getDataConnectionsFrom
   (
-    boost::static_pointer_cast<cedar::proc::Connectable>(this->shared_from_this()),
+    boost::dynamic_pointer_cast<cedar::proc::Connectable>(this->shared_from_this()),
     slot->getName(),
     connections
   );

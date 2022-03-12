@@ -119,7 +119,7 @@ _mKernels
 
   QObject::connect(this->mConvolution.get(), SIGNAL(configurationChanged()), this, SLOT(recompute()));
 
-  this->addConfigurableChild("convolution", this->mConvolution);
+  this->addConfigurableChild("convolution", this->mConvolution, false);
 
   mKernelAddedConnection
     = this->_mKernels->connectToObjectAddedSignal

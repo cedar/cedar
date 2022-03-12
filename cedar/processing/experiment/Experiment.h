@@ -73,7 +73,7 @@
  *        experiment session.
  *
  */
-class cedar::proc::experiment::Experiment : public QObject, public cedar::aux::NamedConfigurable, public boost::enable_shared_from_this<cedar::proc::experiment::Experiment>
+class cedar::proc::experiment::Experiment : public QObject, public cedar::aux::NamedConfigurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

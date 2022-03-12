@@ -121,7 +121,7 @@ public:
     object->readConfiguration(node);
     this->mObject = object;
     if(auto config = dynamic_cast<cedar::aux::Configurable*>(object.get())){
-      config->setParent(this->getOwner());
+      //config->setParent(this->getOwner());
     }
   }
 
@@ -144,7 +144,7 @@ public:
   {
     this->mObject = object;
     if(auto config = dynamic_cast<cedar::aux::Configurable*>(object.get())){
-      config->setParent(this->getOwner());
+      //config->setParent(this->getOwner());
     }
     this->emitChangedSignal();
   }

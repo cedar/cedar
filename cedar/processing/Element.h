@@ -63,8 +63,7 @@
  */
 class cedar::proc::Element
 :
-virtual public cedar::aux::NamedConfigurable,
-public boost::enable_shared_from_this<cedar::proc::Element>
+virtual public cedar::aux::NamedConfigurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -75,6 +74,8 @@ public:
 
   //!@brief The destructor.
   virtual ~Element();
+
+  virtual void postConstructor() {}
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

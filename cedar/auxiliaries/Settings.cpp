@@ -77,7 +77,7 @@ _mYarpConfigInfo(new cedar::aux::StringParameter(this,"yarp config info","134.14
                         );
 
   cedar::aux::ConfigurablePtr plugins(new cedar::aux::Configurable());
-  this->addConfigurableChild("plugins", plugins);
+  this->addConfigurableChild("plugins", plugins, false);
 
   this->_mPluginsToLoad = new cedar::aux::StringSetParameter
                           (

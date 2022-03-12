@@ -357,7 +357,7 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
       const std::string& slot_name = slot_iter->first;
       const cedar::aux::ConfigurationNode& slot_config = slot_iter->second;
 
-      cedar::dev::ComponentSlotPtr slot(new cedar::dev::ComponentSlot(this->shared_from_this(), slot_name));
+      cedar::dev::ComponentSlotPtr slot(new cedar::dev::ComponentSlot(boost::dynamic_pointer_cast<cedar::dev::Robot>(this->shared_from_this()), slot_name));
       slot->readConfiguration(slot_config);      
       mComponentSlots[slot_name] = slot;
     }
@@ -395,7 +395,7 @@ void cedar::dev::Robot::readVisualisation(const cedar::aux::ConfigurationNode &n
   {
     // The robots visual representation in the internal simulator    
     mpRobotVisualisation = cedar::dev::gl::RobotVisualisationManagerSingleton::getInstance()->allocate(vis_class_node->second.data());
-    mpRobotVisualisation->setRobotPtr(this->shared_from_this());
+    mpRobotVisualisation->setRobotPtr(boost::dynamic_pointer_cast<cedar::dev::Robot>(this->shared_from_this()));
 
     // BUG: purely reading a file shouldnt start the visualisation. this doesnt belong here!
     // WORKAROUND: access to QT Qidgets only allowed from the GUI thread

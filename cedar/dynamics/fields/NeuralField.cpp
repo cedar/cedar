@@ -299,13 +299,13 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   std::set<cedar::aux::conv::Mode::Id> allowed_convolution_modes;
   allowed_convolution_modes.insert(cedar::aux::conv::Mode::Same);
 
-  this->addConfigurableChild("noise correlation kernel", mNoiseCorrelationKernel);
+  this->addConfigurableChild("noise correlation kernel", mNoiseCorrelationKernel, false);
   mNoiseCorrelationKernel->markAdvanced();
   this->_mNoiseCorrelationKernelConvolution->getKernelList()->append(mNoiseCorrelationKernel);
   this->_mNoiseCorrelationKernelConvolution->setMode(cedar::aux::conv::Mode::Same);
   this->_mNoiseCorrelationKernelConvolution->setBorderType(cedar::aux::conv::BorderType::Zero);
 
-  this->addConfigurableChild("lateral kernel convolution", _mLateralKernelConvolution);
+  this->addConfigurableChild("lateral kernel convolution", _mLateralKernelConvolution, false);
   this->_mLateralKernelConvolution->setAllowedModes(allowed_convolution_modes);
 
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
@@ -329,6 +329,12 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 
   // now check the dimensionality and sizes of all matrices
   this->updateMatrices();
+}
+
+void cedar::dyn::NeuralField::postConstructor(){
+  std::cout << "postConstructor" << std::endl;
+  mNoiseCorrelationKernel->cedar::aux::Configurable::setParent(this->shared_from_this());
+  _mLateralKernelConvolution->cedar::aux::Configurable::setParent(this->shared_from_this());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

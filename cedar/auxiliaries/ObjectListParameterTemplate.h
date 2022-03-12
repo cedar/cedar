@@ -155,7 +155,7 @@ public:
     {
       if(auto configurable = dynamic_cast<cedar::aux::Configurable*>(object.get()))
       {
-        configurable->setParent(this->getOwner());
+        //configurable->setParent(this->getOwner());
       }
     }
   }
@@ -222,7 +222,7 @@ public:
     this->emitChangedSignal();
     if(auto configurable = dynamic_cast<cedar::aux::Configurable*>(object.get()))
     {
-      configurable->setParent(this->getOwner());
+      //configurable->setParent(this->getOwner());
     }
   }
 
@@ -243,7 +243,7 @@ public:
     this->emitChangedSignal();
     if(auto configurable = dynamic_cast<cedar::aux::Configurable*>(object.get()))
     {
-      configurable->setParent(this->getOwner());
+      //configurable->setParent(this->getOwner());
     }
   }
 
