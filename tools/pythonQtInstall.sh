@@ -14,8 +14,6 @@ IFS="."
 read -a python <<< "$python"
 py_major=${pythonv[1]}
 py_minor=${pythonv[2]}
-py_major=3
-py_minor=8
 pythonv=${py_major}.${py_minor}
 
 echo "PythonVersion: ${pythonv}"

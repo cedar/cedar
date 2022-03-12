@@ -847,6 +847,7 @@ _mAutoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "auto-convert do
 
   Py_Initialize();
 
+  PyThreadState* tstate = Py_NewInterpreter();
 }
 
 cedar::proc::steps::PythonScript::~PythonScript()
@@ -1233,141 +1234,141 @@ void cedar::proc::steps::PythonScript::executePythonScript(bool use_data_lock)
   // Swap to the interpreter of this specific PythonScript step
   boost::python::object main_module((boost::python::handle<>(boost::python::borrowed(PyImport_AddModule("__main__")))));
   boost::python::object main_namespace = main_module.attr("__dict__");
-//  // Python...
-//  try
-//  {
-//    // Loading main module
-//    //boost::python::object main_module = boost::python::import("__main__");
-//    boost::python::object main_module((boost::python::handle<>(boost::python::borrowed(PyImport_AddModule("__main__")))));
-//    boost::python::object main_namespace = main_module.attr("__dict__");
-//
-//    // Loading pycedar module
-//    boost::python::object pycedar_module( (boost::python::handle<>(PyImport_ImportModule("pycedar"))) );
-//
-//    std::list<boost::python::handle<>> inputsList;
-//    cedar::proc::steps::PythonScriptScope::NDArrayConverter cvt(this);
-//    cedar::aux::annotation::ConstColorSpacePtr pColorSpaceAnnotation = nullptr;
-//    for(unsigned int i = 0; i < mInputs.size(); i++)
-//    {
-//      cedar::aux::ConstDataPtr inputMatrixPointer = this->getInputSlot(makeInputSlotName(i))->getData();
-//      if(inputMatrixPointer != 0)
-//      {
-//
-//        try
-//        {
-//          if(pColorSpaceAnnotation == nullptr)
-//          {
-//            pColorSpaceAnnotation = inputMatrixPointer->getAnnotation<cedar::aux::annotation::ColorSpace>();
-//          }
-//        }
-//        catch(std::exception)
-//        {
-//          pColorSpaceAnnotation = nullptr;
-//        }
-//
-//        auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(inputMatrixPointer);
-//
-//        cv::Mat inputMatrix;
-//
-//        if (use_data_lock)
-//        {
-//          // Lock input matrix
-//          // (do not lock when calling from compute())
-//          QReadLocker input_l(&mat_data->getLock());
-//          inputMatrix = mat_data->getData().clone();
-//        }
-//        else
-//        {
-//          inputMatrix = mat_data->getData().clone();
-//        }
-//
-//        // Convert input matrix to numpy array
-//        PyObject* inputMatrix_np = cvt.toNDArray(inputMatrix);
-//        // Include it to Python
-//        boost::python::handle<> inputMatrix_np_handle(inputMatrix_np);
-//        inputsList.push_back(inputMatrix_np_handle);
-//
-//        // Old way: Setting the Input to pc.input1, pc.input2 etc.
-//        /*
-//
-//        boost::python::object inputMatrix_object(inputMatrix_np_handle);
-//        // Setting the input directly in the global pycedar scope
-//        const char* attrName = std::string("input").append(std::to_string(i + 1)).c_str();
-//        boost::python::scope(pycedar_module).attr(attrName) = inputMatrix_object;
-//
-//        */
-//      }
-//      else
-//      {
-//        // Old way: Setting the Input to pc.input1, pc.input2 etc.
-//        /*
-//
-//        const char* attrName = std::string("input").append(std::to_string(i + 1)).c_str();
-//        boost::python::scope(pycedar_module).attr(attrName) = -1;
-//
-//        */
-//
-//        PyObject* matrix_np = cvt.toNDArray(cv::Mat::zeros(1, 1, CV_32F));
-//        boost::python::handle<> matrix_np_handle(matrix_np);
-//        inputsList.push_back(matrix_np_handle);
-//
-//      }
-//    }
-//    boost::python::scope(pycedar_module).attr("inputs") = inputsList;
-//
-//    // fill the "states" matrix:
-//    std::list<boost::python::handle<>>  statesListBefore;
-//    for(unsigned int i = 0; i < mStates.size(); i++)
-//    {
-//      cv::Mat stateMatrix= mStates[i]->getData(); //.clone(); // do we need clone?
-//
-//      PyObject* stateMatrix_np = cvt.toNDArray(stateMatrix);
-//      boost::python::handle<> stateMatrix_np_handle(stateMatrix_np);
-//      statesListBefore.push_back(stateMatrix_np_handle);
-//    }
-//    boost::python::scope(pycedar_module).attr("states") = statesListBefore;
-//
-//    // add the 'just resetted' information
-//    boost::python::scope(pycedar_module).attr("reset") = mWasResetted;
-//
-//
-//    // Adding empty matrices to the output list so that the length of the list in python is correctly set
-//    std::list<boost::python::handle<>> outputsList;
-//    boost::python::handle<> hand(cvt.toNDArray( cv::Mat::zeros(1, 1, CV_32F) ));
-//
-//    for(unsigned int i = 0; i < mOutputs.size(); i++)
-//      outputsList.push_back(hand);
-//
-//    boost::python::scope(pycedar_module).attr("outputs") = outputsList;
-//    // Old way: Setting the Output to pc.output1, pc.output2 etc.
-//    /*
-//
-//    // Remove output data of old calls
-//    for(unsigned int i = 0; i < mOutputs.size(); i++){
-//      const char* attrName = std::string("output").append(std::to_string(i + 1)).c_str();
-//
-//      // Test if the output object exists in the pycedar scope
-//      try
-//      {
-//        boost::python::scope(pycedar_module).attr(attrName);
-//      }
-//      catch(const boost::python::error_already_set&)
-//      {
-//        continue;
-//      }
-//
-//      // Create empty matrix
-//      PyObject* emptyMatrix_np = cvt.toNDArray(cv::Mat::zeros(1, 1, CV_32F));
-//
-//      // Include it to Python
-//      boost::python::handle<> emptyMatrix_np_handle(emptyMatrix_np);
-//      boost::python::object emptyMatrix_object(emptyMatrix_np_handle);
-//
-//      boost::python::scope(pycedar_module).attr(attrName) = emptyMatrix_object;
-//    }
-//
-//    */
-//
+  // Python...
+  try
+  {
+    // Loading main module
+    //boost::python::object main_module = boost::python::import("__main__");
+    boost::python::object main_module((boost::python::handle<>(boost::python::borrowed(PyImport_AddModule("__main__")))));
+    boost::python::object main_namespace = main_module.attr("__dict__");
+
+    // Loading pycedar module
+    boost::python::object pycedar_module( (boost::python::handle<>(PyImport_ImportModule("pycedar"))) );
+
+    std::list<boost::python::handle<>> inputsList;
+    cedar::proc::steps::PythonScriptScope::NDArrayConverter cvt(this);
+    cedar::aux::annotation::ConstColorSpacePtr pColorSpaceAnnotation = nullptr;
+    for(unsigned int i = 0; i < mInputs.size(); i++)
+    {
+      cedar::aux::ConstDataPtr inputMatrixPointer = this->getInputSlot(makeInputSlotName(i))->getData();
+      if(inputMatrixPointer != 0)
+      {
+
+        try
+        {
+          if(pColorSpaceAnnotation == nullptr)
+          {
+            pColorSpaceAnnotation = inputMatrixPointer->getAnnotation<cedar::aux::annotation::ColorSpace>();
+          }
+        }
+        catch(std::exception)
+        {
+          pColorSpaceAnnotation = nullptr;
+        }
+
+        auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(inputMatrixPointer);
+
+        cv::Mat inputMatrix;
+
+        if (use_data_lock)
+        {
+          // Lock input matrix
+          // (do not lock when calling from compute())
+          QReadLocker input_l(&mat_data->getLock());
+          inputMatrix = mat_data->getData().clone();
+        }
+        else
+        {
+          inputMatrix = mat_data->getData().clone();
+        }
+
+        // Convert input matrix to numpy array
+        PyObject* inputMatrix_np = cvt.toNDArray(inputMatrix);
+        // Include it to Python
+        boost::python::handle<> inputMatrix_np_handle(inputMatrix_np);
+        inputsList.push_back(inputMatrix_np_handle);
+
+        // Old way: Setting the Input to pc.input1, pc.input2 etc.
+        /*
+
+        boost::python::object inputMatrix_object(inputMatrix_np_handle);
+        // Setting the input directly in the global pycedar scope
+        const char* attrName = std::string("input").append(std::to_string(i + 1)).c_str();
+        boost::python::scope(pycedar_module).attr(attrName) = inputMatrix_object;
+
+        */
+      }
+      else
+      {
+        // Old way: Setting the Input to pc.input1, pc.input2 etc.
+        /*
+
+        const char* attrName = std::string("input").append(std::to_string(i + 1)).c_str();
+        boost::python::scope(pycedar_module).attr(attrName) = -1;
+
+        */
+
+        PyObject* matrix_np = cvt.toNDArray(cv::Mat::zeros(1, 1, CV_32F));
+        boost::python::handle<> matrix_np_handle(matrix_np);
+        inputsList.push_back(matrix_np_handle);
+
+      }
+    }
+    boost::python::scope(pycedar_module).attr("inputs") = inputsList;
+
+    // fill the "states" matrix:
+    std::list<boost::python::handle<>>  statesListBefore;
+    for(unsigned int i = 0; i < mStates.size(); i++)
+    {
+      cv::Mat stateMatrix= mStates[i]->getData(); //.clone(); // do we need clone?
+
+      PyObject* stateMatrix_np = cvt.toNDArray(stateMatrix);
+      boost::python::handle<> stateMatrix_np_handle(stateMatrix_np);
+      statesListBefore.push_back(stateMatrix_np_handle);
+    }
+    boost::python::scope(pycedar_module).attr("states") = statesListBefore;
+
+    // add the 'just resetted' information
+    boost::python::scope(pycedar_module).attr("reset") = mWasResetted;
+
+
+    // Adding empty matrices to the output list so that the length of the list in python is correctly set
+    std::list<boost::python::handle<>> outputsList;
+    boost::python::handle<> hand(cvt.toNDArray( cv::Mat::zeros(1, 1, CV_32F) ));
+
+    for(unsigned int i = 0; i < mOutputs.size(); i++)
+      outputsList.push_back(hand);
+
+    boost::python::scope(pycedar_module).attr("outputs") = outputsList;
+    // Old way: Setting the Output to pc.output1, pc.output2 etc.
+    /*
+
+    // Remove output data of old calls
+    for(unsigned int i = 0; i < mOutputs.size(); i++){
+      const char* attrName = std::string("output").append(std::to_string(i + 1)).c_str();
+
+      // Test if the output object exists in the pycedar scope
+      try
+      {
+        boost::python::scope(pycedar_module).attr(attrName);
+      }
+      catch(const boost::python::error_already_set&)
+      {
+        continue;
+      }
+
+      // Create empty matrix
+      PyObject* emptyMatrix_np = cvt.toNDArray(cv::Mat::zeros(1, 1, CV_32F));
+
+      // Include it to Python
+      boost::python::handle<> emptyMatrix_np_handle(emptyMatrix_np);
+      boost::python::object emptyMatrix_object(emptyMatrix_np_handle);
+
+      boost::python::scope(pycedar_module).attr(attrName) = emptyMatrix_object;
+    }
+
+    */
+
     bool executedFromFile = false;
     // Execute script from the specified file, if the hasScriptFile Parameter is set and the file exists
     if(this->_mHasScriptFile->getValue())
@@ -1425,144 +1426,144 @@ void cedar::proc::steps::PythonScript::executePythonScript(bool use_data_lock)
     */
 
     // Get the outputs from python
-//    std::list<PyObject*> list = boost::python::extract<std::list<PyObject*>>(boost::python::scope(pycedar_module).attr("outputs"));
-//
-//    unsigned int i = 0;
-//    for (auto const& outputPointer : list) {
-//      if(i >= mOutputs.size()) break;
-//
-//      cv::Mat &outputNodeMatrix = mOutputs[i]->getData();
-//      outputNodeMatrix = cvt.toMat(outputPointer, i);
-//
-//      // Convert 1D and 2D matrices of type CV_64F (double) to CV_32F (float)
-//      if (this->_mAutoConvertDoubleToFloat->getValue())
-//      {
-//        if (outputNodeMatrix.dims <= 2 &&
-//            outputNodeMatrix.type() == CV_64F)
-//        {
-//          outputNodeMatrix.convertTo(outputNodeMatrix, CV_32F); // added
-//        }
-//        else if (outputNodeMatrix.dims == 3 &&
-//             outputNodeMatrix.type() == CV_64F)
-//        {
-//          outputNodeMatrix = convert3DMatToFloat<double>(outputNodeMatrix);
-//        }
-//      }
-//      if(outputNodeMatrix.type() == CV_8UC3 && pColorSpaceAnnotation != nullptr)
-//      {
-//        mOutputs[i]->setAnnotation(cedar::aux::annotation::ColorSpacePtr(new cedar::aux::annotation::ColorSpace(*pColorSpaceAnnotation)));
-//      }
-//      else
-//      {
-//        mOutputs[i]->removeAnnotations<cedar::aux::annotation::ColorSpace>();
-//      }
-//      i++;
-//    }
-//
-//    // update the "state" variable. It will be held until the next iteration
-//    std::list<PyObject*> pythonStatesList = boost::python::extract<std::list<PyObject*>>(boost::python::scope(pycedar_module).attr("states"));
-//
-//    auto pythonStateSize= pythonStatesList.size();
-//    auto oldStateSize= mStates.size();
-//
-//    if (pythonStateSize != oldStateSize)
-//    {
-//      mStates.clear();
-//      for(unsigned int j=0; j < pythonStateSize; j++)
-//      {
-//        mStates.push_back( cedar::aux::MatDataPtr(new cedar::aux::MatData() ) );
-//        //cv::Mat::zeros(1, 1, CV_32F)))
-//      }
-//    }
-//
-//    i = 0;
-//    for (auto const& pythonStatesPointer : pythonStatesList)
-//    {
-//      cv::Mat &stateMatrix = mStates[i]->getData();
-//      stateMatrix = cvt.toMat(pythonStatesPointer, i); // overwriting
-//
-//      // Convert 1D and 2D matrices of type CV_64F (double) to CV_32F (float)
-//      if (this->_mAutoConvertDoubleToFloat->getValue())
-//      {
-//        if (stateMatrix.dims <= 2
-//            && stateMatrix.type() == CV_64F)
-//        {
-//          stateMatrix.convertTo(stateMatrix, CV_32F);
-//        }
-//        else if (stateMatrix.dims == 3
-//                 && stateMatrix.type() == CV_64F)
-//        {
-//          stateMatrix = convert3DMatToFloat<double>(stateMatrix);
-//        }
-//      }
-//      i++;
-//    }
-//  }
-//  catch(const boost::python::error_already_set&){
-//
-//    cedar::proc::steps::PythonScript::executionFailed = 1;
-//
-//    if(PyErr_Occurred() == 0) std::cout << "No PyErr occured!" << std::endl;
-//
-//    // Try to extract the error message from python
-//    std::string errorMessage = "Undefined Error";
-//    try{
-//      PyObject *exc,*val,*tb;
-//      PyErr_Fetch(&exc,&val,&tb);
-//      PyErr_NormalizeException(&exc,&val,&tb);
-//      boost::python::handle<> hexc(exc),hval(boost::python::allow_null(val)),htb(boost::python::allow_null(tb));
-//      if(!hval)
-//      {
-//        errorMessage = boost::python::extract<std::string>(boost::python::str(hexc));
-//      }
-//      else
-//      {
-//        // Get Error message
-//        boost::python::object traceback(boost::python::import("traceback"));
-//        boost::python::object format_exception(traceback.attr("format_exception"));
-//        boost::python::object formatted_list(format_exception(hexc,hval,htb));
-//        boost::python::object formatted(boost::python::str("").join(formatted_list));
-//
-//        errorMessage = boost::python::extract<std::string>(formatted);
-//
-//        // Cutoff empty line at the end
-//        if(errorMessage.at(errorMessage.length() - 1) == '\n') errorMessage = errorMessage.substr(0, errorMessage.length() - 1);
-//
-//        // Extract line number
-//        std::string substring = errorMessage.substr(errorMessage.find("line") + 4, errorMessage.length());
-//        std::stringstream stream(substring);
-//        long lineno;
-//        stream >> lineno;
-//        if(stream) emit errorMessageLineNumberChanged(lineno);
-//      }
-//    }
-//    catch(const std::exception& e)
-//    {
-//      errorMessage = e.what();
-//    }
-//    catch(const boost::python::error_already_set&)
-//    {
-//      errorMessage = "Undefined error";
-//    }
-//
-//    // Post the error in the Log section of cedar
-//    cedar::aux::LogSingleton::getInstance()->error
-//      (
-//        errorMessage,
-//        "void cedar::proc::steps::PythonScript::executePythonScript()",
-//        this->getName()
-//      );
-//
-//  }
-//
-//  if(cedar::proc::steps::PythonScript::executionFailed) this->setState(cedar::proc::Triggerable::STATE_EXCEPTION, "An exception occured");
-//  else this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
-//
-//  freePythonVariables();
-//
-//  this->mIsExecuting = 0;
-//  mutex.unlock();
-//  mWasResetted= false;
+    std::list<PyObject*> list = boost::python::extract<std::list<PyObject*>>(boost::python::scope(pycedar_module).attr("outputs"));
+
+    unsigned int i = 0;
+    for (auto const& outputPointer : list) {
+      if(i >= mOutputs.size()) break;
+
+      cv::Mat &outputNodeMatrix = mOutputs[i]->getData();
+      outputNodeMatrix = cvt.toMat(outputPointer, i);
+
+      // Convert 1D and 2D matrices of type CV_64F (double) to CV_32F (float)
+      if (this->_mAutoConvertDoubleToFloat->getValue())
+      {
+        if (outputNodeMatrix.dims <= 2 &&
+            outputNodeMatrix.type() == CV_64F)
+        {
+          outputNodeMatrix.convertTo(outputNodeMatrix, CV_32F); // added
+        }
+        else if (outputNodeMatrix.dims == 3 &&
+             outputNodeMatrix.type() == CV_64F)
+        {
+          outputNodeMatrix = convert3DMatToFloat<double>(outputNodeMatrix);
+        }
+      }
+      if(outputNodeMatrix.type() == CV_8UC3 && pColorSpaceAnnotation != nullptr)
+      {
+        mOutputs[i]->setAnnotation(cedar::aux::annotation::ColorSpacePtr(new cedar::aux::annotation::ColorSpace(*pColorSpaceAnnotation)));
+      }
+      else
+      {
+        mOutputs[i]->removeAnnotations<cedar::aux::annotation::ColorSpace>();
+      }
+      i++;
+    }
+
+    // update the "state" variable. It will be held until the next iteration
+    std::list<PyObject*> pythonStatesList = boost::python::extract<std::list<PyObject*>>(boost::python::scope(pycedar_module).attr("states"));
+
+    auto pythonStateSize= pythonStatesList.size();
+    auto oldStateSize= mStates.size();
+
+    if (pythonStateSize != oldStateSize)
+    {
+      mStates.clear();
+      for(unsigned int j=0; j < pythonStateSize; j++)
+      {
+        mStates.push_back( cedar::aux::MatDataPtr(new cedar::aux::MatData() ) );
+        //cv::Mat::zeros(1, 1, CV_32F)))
+      }
+    }
+
+    i = 0;
+    for (auto const& pythonStatesPointer : pythonStatesList)
+    {
+      cv::Mat &stateMatrix = mStates[i]->getData();
+      stateMatrix = cvt.toMat(pythonStatesPointer, i); // overwriting
+
+      // Convert 1D and 2D matrices of type CV_64F (double) to CV_32F (float)
+      if (this->_mAutoConvertDoubleToFloat->getValue())
+      {
+        if (stateMatrix.dims <= 2
+            && stateMatrix.type() == CV_64F)
+        {
+          stateMatrix.convertTo(stateMatrix, CV_32F);
+        }
+        else if (stateMatrix.dims == 3
+                 && stateMatrix.type() == CV_64F)
+        {
+          stateMatrix = convert3DMatToFloat<double>(stateMatrix);
+        }
+      }
+      i++;
+    }
+  }
+  catch(const boost::python::error_already_set&){
+
+    cedar::proc::steps::PythonScript::executionFailed = 1;
+
+    if(PyErr_Occurred() == 0) std::cout << "No PyErr occured!" << std::endl;
+
+    // Try to extract the error message from python
+    std::string errorMessage = "Undefined Error";
+    try{
+      PyObject *exc,*val,*tb;
+      PyErr_Fetch(&exc,&val,&tb);
+      PyErr_NormalizeException(&exc,&val,&tb);
+      boost::python::handle<> hexc(exc),hval(boost::python::allow_null(val)),htb(boost::python::allow_null(tb));
+      if(!hval)
+      {
+        errorMessage = boost::python::extract<std::string>(boost::python::str(hexc));
+      }
+      else
+      {
+        // Get Error message
+        boost::python::object traceback(boost::python::import("traceback"));
+        boost::python::object format_exception(traceback.attr("format_exception"));
+        boost::python::object formatted_list(format_exception(hexc,hval,htb));
+        boost::python::object formatted(boost::python::str("").join(formatted_list));
+
+        errorMessage = boost::python::extract<std::string>(formatted);
+
+        // Cutoff empty line at the end
+        if(errorMessage.at(errorMessage.length() - 1) == '\n') errorMessage = errorMessage.substr(0, errorMessage.length() - 1);
+
+        // Extract line number
+        std::string substring = errorMessage.substr(errorMessage.find("line") + 4, errorMessage.length());
+        std::stringstream stream(substring);
+        long lineno;
+        stream >> lineno;
+        if(stream) emit errorMessageLineNumberChanged(lineno);
+      }
+    }
+    catch(const std::exception& e)
+    {
+      errorMessage = e.what();
+    }
+    catch(const boost::python::error_already_set&)
+    {
+      errorMessage = "Undefined error";
+    }
+
+    // Post the error in the Log section of cedar
+    cedar::aux::LogSingleton::getInstance()->error
+      (
+        errorMessage,
+        "void cedar::proc::steps::PythonScript::executePythonScript()",
+        this->getName()
+      );
+
+  }
+
+  if(cedar::proc::steps::PythonScript::executionFailed) this->setState(cedar::proc::Triggerable::STATE_EXCEPTION, "An exception occured");
+  else this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
+
+  freePythonVariables();
+
+  this->mIsExecuting = 0;
+  mutex.unlock();
+  mWasResetted= false;
 }
 
 void cedar::proc::steps::PythonScript::inputConnectionChanged(const std::string& inputName)
