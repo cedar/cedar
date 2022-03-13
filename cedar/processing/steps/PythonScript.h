@@ -117,6 +117,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  static void initPython();
+
   void inputConnectionChanged(const std::string& inputName);
   
   void executeButtonClicked();
@@ -186,6 +188,9 @@ private:
   std::vector< cedar::aux::ConstMatDataPtr > mInputs;
   std::vector< cedar::aux::MatDataPtr > mOutputs;
   std::vector< cedar::aux::MatDataPtr > mStates;
+
+  //For restoring threads
+  PyThreadState* _nstate;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

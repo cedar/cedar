@@ -123,6 +123,7 @@
 
 #endif // CEDAR_USE_YARP
 
+
 //----------------------------------------------------------------------------------------------------------------------
 // nested private classes
 //----------------------------------------------------------------------------------------------------------------------
@@ -393,6 +394,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   mpPerformanceOverview = new cedar::proc::gui::PerformanceOverview(this);
   pUndoStack = new cedar::proc::undoRedo::UndoStack(this);
 
+  cedar::proc::steps::PythonScript::initPython();
   // manually added components
   // toolbar: custom timestep
   auto p_enable_custom_time_step = new QCheckBox();
@@ -1743,13 +1745,21 @@ void cedar::proc::gui::Ide::updateSimulationRunningIcon(bool running)
 
 void cedar::proc::gui::Ide::startPauseSimulationClicked()
 {
+
   if (this->mStopThreadsCaller->isRunning() || this->mStartThreadsCaller->isRunning())
   {
     return;
   }
 
+
   QReadLocker locker(this->mSimulationRunning.getLockPtr());
   bool running = this->mSimulationRunning.member();
+
+
+  #ifdef CEDAR_USE_COPY
+  //lock execute Button when simulating
+  mpCopy->lockExecuteButton(!running);
+  #endif
 
   if (running)
   {

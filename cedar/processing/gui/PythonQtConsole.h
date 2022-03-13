@@ -87,6 +87,7 @@ namespace cedar
           PythonQtObjectPtr mContext;
           cedar::proc::gui::CoPYObjectWrapper *mpPyWrap;
           cedar::proc::gui::CoPYObject *mpPy;
+          PyThreadState* _module;
 
         public:
 
@@ -97,7 +98,7 @@ namespace cedar
 
             //init PythonQt with mpConsole
             PythonQt::setEnableThreadSupport(true);
-            PythonQt::init(PythonQt::RedirectStdOut);
+            PythonQt::init(PythonQt::RedirectStdOut | PythonQt::PythonAlreadyInitialized);
             //PythonQt::overwriteSysPath(QStringList(QString::fromStdString("/home/fred/repos/cedar/lib/cpython")));
 
             //Import CoPYObject Type To Python
@@ -105,7 +106,6 @@ namespace cedar
             //qRegisterMetaType<cedar::proc::gui::CoPYObject>;
             PythonQt::self()->registerCPPClass("CoPYObject", "", "copy",
                                                PythonQtCreateObject<cedar::proc::gui::CoPYObjectWrapper>);
-
             //Init Wrapper of Type QObject to import in Python
             mpPyWrap = new cedar::proc::gui::CoPYObjectWrapper();
             mpPy = pyObject;
@@ -121,6 +121,7 @@ namespace cedar
             mContext = PythonQt::self()->createUniqueModule();
             mContext.addObject("py", mpPyWrap);
 
+            _module = PyThreadState_Get();
             QObject::connect(PythonQt::self(), SIGNAL(pythonStdOut(const QString&)), this,
                              SLOT(stdOut(const QString&)));
             QObject::connect(PythonQt::self(), SIGNAL(pythonStdErr(const QString&)), this,
@@ -160,6 +161,9 @@ namespace cedar
 
           void executeCode(const QString &code)
           {
+            //Get Thread back for Connection
+            PyThreadState_Swap(_module);
+
             emit pythonBusy(true);
             PyEval_SetTrace(traceHook, mContext.object());
             mContext.evalScript(code);

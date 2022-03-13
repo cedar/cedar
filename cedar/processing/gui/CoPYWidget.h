@@ -89,6 +89,8 @@ public:
 
   //!@brief setter for cedar::proc::gui::Ide.cpp
   void setScene(cedar::proc::gui::Scene* pScene);
+  //!@brief Lock Execute Button when simulation is running for cedar::proc::gui::Ide.cpp
+  void lockExecuteButton(const bool disabled);
 
   //!@brief methods for using existing StepItems in CoPY
   void importStepInformation(cedar::proc::gui::StepItem* pStep);
@@ -105,6 +107,7 @@ private slots:
   void resetButtonClicked();
   void getVariablesButtonClicked();
   void setVariables(QMap<QString, QString> vars);
+
 private:
   std::string removeTrailingZeros(const double& num);
   //Highlighter for Console

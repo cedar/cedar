@@ -81,7 +81,6 @@ cedar::proc::gui::PythonQtConsole::PythonQtConsole(QWidget *parent, Qt::WindowFl
 
   //init thread and connect
 
-
   mpCopyObject = new cedar::proc::gui::CoPYObject(this);
   mpPythonWorker = new cedar::proc::gui::PythonQtConsoleScope::PythonWorker(mpCopyObject);
   mpPythonWorker->moveToThread(&mPythonThread);
@@ -109,7 +108,7 @@ cedar::proc::gui::PythonQtConsole::PythonQtConsole(QWidget *parent, Qt::WindowFl
   mPythonThread.start();
 
   insertPlainText(
-          "#Controller imported as py\n#Drop steps here for creation and further instructions\npy.setParameter(\"root.Neural Field\",\"sizes\",[2,2])");
+          "#Controller imported as py\n#Drop steps here for creation and further instructions\ni = 0\nprint(i)\ni+=1");
   emit giveVariables(emit getVariablesFromWorker());
 }
 
@@ -169,6 +168,7 @@ void cedar::proc::gui::PythonQtConsole::executeCode()
 
 void cedar::proc::gui::PythonQtConsole::executeCode(const QString &code)
 {
+  PythonQt::init(PythonQt::PythonAlreadyInitialized|PythonQt::RedirectStdOut);
   // evaluate the code
   _stdOut = "";
   _stdErr = "";
@@ -249,9 +249,12 @@ void cedar::proc::gui::PythonQtConsole::handleTabCompletion()
   {
     compareText = compareText.toLower();
     QStringList found;
-    PYTHONQT_GIL_SCOPE
+    //PYTHONQT_GIL_SCOPE
 
-    QStringList l = PythonQt::self()->introspection(mpModule, lookup, PythonQt::Anything);
+    QMap<QString, QString> map = emit getVariablesFromWorker();
+    //QStringList l = PythonQt::self()->introspection(mpModule, lookup, PythonQt::Anything);
+    //QStringList l = PythonQt::self()->introspectObject(cedar::proc::gui::PythonQtConsoleScope::PythonWorker::m mpModule, PythonQt::Anything);
+    QStringList l = map.keys();
     l.append({"setParameter", "copyAllParameters", "create", "connect", "createGroupTemplate"});
 
     QList<QGraphicsItem*> itemsList = mpScene->items();

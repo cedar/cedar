@@ -242,6 +242,11 @@ void cedar::proc::gui::CoPYWidget::reset()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::CoPYWidget::lockExecuteButton(const bool disable)
+{
+  mpExecuteButton->setDisabled(disable);
+}
+
 std::string cedar::proc::gui::CoPYWidget::removeTrailingZeros(const double& num)
 {
   std::string str = std::to_string(num);
@@ -295,6 +300,7 @@ void cedar::proc::gui::CoPYWidget::dropEvent(QDropEvent *pEvent)
 }
 
 //SLOTS
+
 
 void cedar::proc::gui::CoPYWidget::executeButtonClicked()
 {

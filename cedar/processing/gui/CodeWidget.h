@@ -207,7 +207,8 @@ namespace cedar
 
 /*!@brief GUI representation for the code section.
   */
-//#ifdef CEDAR_USE_PYTHONSTEP
+
+#ifdef CEDAR_USE_PYTHONSTEP
 class cedar::proc::gui::CodeWidget
 :
 public QWidget
@@ -282,7 +283,7 @@ private:
 
 
 
-/*#else // CEDAR_USE_PYTHONSTEP
+#else // CEDAR_USE_PYTHONSTEP
 class cedar::proc::gui::CodeWidget
 :
 public QWidget
@@ -298,7 +299,7 @@ public:
   }
 };
 
-#endif // CEDAR_USE_PYTHONSTEP*/
+#endif // CEDAR_USE_PYTHONSTEP
 #endif // CEDAR_PROC_GUI_CODE_WIDGET_H
 
 

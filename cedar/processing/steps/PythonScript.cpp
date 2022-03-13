@@ -837,18 +837,27 @@ _mAutoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "auto-convert do
   
   cedar::proc::steps::PythonScript::executionFailed = 0;
 
+//#if PY_MAJOR_VERSION >= 3
+//  PyImport_AppendInittab("pycedar", &PyInit_pycedar);
+//#else // PY_MAJOR_VERSION >= 3
+//  PyImport_AppendInittab("pycedar", &initpycedar);
+//#endif // PY_MAJOR_VERSION >= 3
+//  PyEval_InitThreads();
+//  Py_Initialize();
+  //_nstate = Py_NewInterpreter();
+}
+
+void cedar::proc::steps::PythonScript::initPython()
+{
 #if PY_MAJOR_VERSION >= 3
   PyImport_AppendInittab("pycedar", &PyInit_pycedar);
-  PyEval_InitThreads();
 #else // PY_MAJOR_VERSION >= 3
   PyImport_AppendInittab("pycedar", &initpycedar);
-  PyEval_InitThreads();
 #endif // PY_MAJOR_VERSION >= 3
-
+  PyEval_InitThreads();
   Py_Initialize();
-
-  PyThreadState* tstate = Py_NewInterpreter();
 }
+
 
 cedar::proc::steps::PythonScript::~PythonScript()
 {
@@ -1224,16 +1233,18 @@ void cedar::proc::steps::PythonScript::freePythonVariables() {
 
 void cedar::proc::steps::PythonScript::executePythonScript(bool use_data_lock)
 {
-  mutex.lock();
 
+  mutex.lock();
+  //PyThreadState_Swap(_nstate);
+
+  //Interpreter
+  //cedar::proc::steps::PythonScriptScope::PyEnsureGIL gil;
   this->mIsExecuting = 1;
   cedar::proc::steps::PythonScript::executionFailed = 0;
 
   nameOfExecutingStep = this->getName();
 
   // Swap to the interpreter of this specific PythonScript step
-  boost::python::object main_module((boost::python::handle<>(boost::python::borrowed(PyImport_AddModule("__main__")))));
-  boost::python::object main_namespace = main_module.attr("__dict__");
   // Python...
   try
   {
@@ -1562,6 +1573,7 @@ void cedar::proc::steps::PythonScript::executePythonScript(bool use_data_lock)
   freePythonVariables();
 
   this->mIsExecuting = 0;
+
   mutex.unlock();
   mWasResetted= false;
 }
@@ -1573,6 +1585,7 @@ void cedar::proc::steps::PythonScript::inputConnectionChanged(const std::string&
 
   unsigned slot_id;
   std::istringstream(inputName.substr(5)) >> slot_id;
+
 
   if (slot_id < mInputs.size())
   {
