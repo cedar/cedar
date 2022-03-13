@@ -12,13 +12,12 @@ read -a python <<< "$python"
 python=${python[1]}
 IFS="."
 read -a python <<< "$python"
-py_major=${pythonv[1]}
-py_minor=${pythonv[2]}
+py_major=${python[0]}
+py_minor=${python[1]}
 pythonv=${py_major}.${py_minor}
-
 echo "PythonVersion: ${pythonv}"
-requiredPkgs='qtmultimedia5-dev libqt5multimediawidgets5 libqt5multimedia5-plugins libqt5multimedia5 qtdeclarative5-dev libqt5svg5-dev libqt5xmlpatterns5-dev qttools5-dev qtbase5-private-dev qt5-default python-dev pip python3-pip git libboost-python-dev'
-for REQUIRED_PKG in $requiredPkgs;
+requiredPkgs=('make' 'qtmultimedia5-dev' 'libqt5multimediawidgets5' 'libqt5multimedia5-plugins libqt5multimedia5' 'qtdeclarative5-dev' 'libqt5svg5-dev' 'libqt5xmlpatterns5-dev' 'qttools5-dev' 'qtbase5-private-dev' 'qt5-default' 'python-dev' 'pip' 'python3-pip' 'git' 'libboost-python-dev')
+for REQUIRED_PKG in ${requiredPkgs[@]};
 do
   PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG|grep "install ok installed")
   echo Checking for $REQUIRED_PKG: $PKG_OK
@@ -29,6 +28,7 @@ do
 done
 python3 -m pip install python-config
 cd $installpath
+sudo rm pythonqt -r
 sudo git clone https://github.com/MeVisLab/pythonqt.git
 cd pythonqt/build
 changeLine=$(sudo awk '/unix:PYTHON_VERSION=/{ print NR; exit }' python.prf)

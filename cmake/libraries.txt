@@ -146,7 +146,7 @@ if(Python_FOUND)
   endforeach()
  
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Python_LIBRARIES})
-  #set(Python_INCLUDE_DIRS ${Python_INCLUDE_DIRS} ~/.local/lib/python3.9/site-packages/numpy/core/include)
+  set(Python_INCLUDE_DIRS ${Python_INCLUDE_DIRS} ~/.local/lib/python3.8/site-packages/numpy/core/include)
   include_directories(${Python_INCLUDE_DIRS})
   link_directories(${Python_INCLUDE_DIRS})
   if(CEDAR_USE_PYTHONSCRIPTSTEP)
