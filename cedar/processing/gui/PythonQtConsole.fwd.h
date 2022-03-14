@@ -30,12 +30,12 @@
 
     Description: Forward declaration file for the class cedar::proc::gui::RecorderProperty.
 
-    Credits:
+    Credits:Florian Link - mevis.de
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_PYTHONQTCONSOLE_H
-#define CEDAR_PROC_GUI_PYTHONQTCONSOLE_H
+#ifndef CEDAR_PROC_GUI_PYTHONQTCONSOLE_FWD_H
+#define CEDAR_PROC_GUI_PYTHONQTCONSOLE_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"

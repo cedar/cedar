@@ -42,15 +42,15 @@
 #define CEDAR_PROC_STEP_ITEM_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/EnumType.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/Step.h"
 #include "cedar/processing/gui/Connectable.h"
 #include "cedar/processing/gui/PlotWidget.h"
-#include "cedar/processing/ElementDeclaration.h"
-#include "cedar/auxiliaries/EnumType.h"
-#include "cedar/processing/gui/CoPYWidget.h"
 
 // FORWARD DECLARATION
+
 #include "cedar/auxiliaries/gui/PlotDeclaration.fwd.h"
 #include "cedar/processing/gui/DataSlotItem.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"

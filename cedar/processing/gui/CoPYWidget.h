@@ -28,7 +28,7 @@
     Email:       frederik.bendel@ruhr-uni-bochum.de
     Date:        2020 12 22
 
-    Description: Header for the \em cedar::aux::Log class.
+    Description:
 
     Credits:
 
@@ -39,20 +39,20 @@
 
 #ifndef CEDAR_PROC_GUI_COPY_WIDGET_H
 #define CEDAR_PROC_GUI_COPY_WIDGET_H
+#ifdef CEDAR_USE_COPY
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Parameter.fwd.h"
+#include "cedar/processing/Step.fwd.h"
 #include "cedar/processing/gui/CoPYWidget.fwd.h"
-#include "cedar/processing/gui/CodeWidget.h"
-#ifdef CEDAR_USE_COPY
+#include "cedar/processing/gui/CoPYObject.fwd.h"
+#include "cedar/processing/gui/Group.fwd.h"
+#include "cedar/processing/gui/PythonQtConsole.fwd.h"
+#include "cedar/processing/gui/Scene.fwd.h"
+#include "cedar/processing/gui/StepItem.fwd.h"
+
 // CEDAR INCLUDES
-#include <PythonQt.h>
-#include <pythonrun.h>
-#include <cedar/processing/gui/PythonQtConsole.h>
-#include <cedar/processing/gui/Scene.h>
-#include <cedar/processing/Step.h>
-#include <cedar/processing/gui/StepItem.h>
-#include <cedar/processing/gui/Group.h>
-#include <cedar/processing/gui/CoPYObject.h>
+#include "cedar/processing/gui/CodeWidget.h"
 // SYSTEM INCLUDES
 
 #ifndef Q_MOC_RUN
@@ -67,9 +67,16 @@
 #include <QApplication>
 #include <QVBoxLayout>
 #include <QCheckBox>
+#include <QGraphicsItem>
+#include <QGraphicsObject>
+#include <QGraphicsSceneDragDropEvent>
 #include <QHBoxLayout>
 #include <QTextEdit>
 #include <QTableWidget>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QWidget>
 #include <map>
 #include <QGraphicsSceneDragDropEvent>
 #include <QGraphicsObject>
@@ -80,7 +87,6 @@
 class cedar::proc::gui::CoPYWidget : public QWidget
 {
   Q_OBJECT
-
 public:
   //!@brief The standard constructor.
   CoPYWidget(QWidget *pParent = NULL);

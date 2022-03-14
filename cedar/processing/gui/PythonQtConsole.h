@@ -1,77 +1,72 @@
+/*======================================================================================================================
 
+    Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
-/*
- *
- *  Copyright (C) 2010 MeVis Medical Solutions AG All Rights Reserved.
- *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2.1 of the License, or (at your option) any later version.
- *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
- *
- *  Further, this software is distributed without any warranty that it is
- *  free of the rightful claim of any third person regarding infringement
- *  or the like.  Any license provided herein, whether implied or
- *  otherwise, applies only to this software file.  Patent licenses, if
- *  any, provided herein do not apply to combinations of this program with
- *  other software, or any other product whatsoever.
- *
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with this library; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *  Contact information: MeVis Medical Solutions AG, Universitaetsallee 29,
- *  28359 Bremen, Germany or:
- *
- *  http://www.mevis.de
- *
- */
+    This file is part of cedar.
 
-//----------------------------------------------------------------------------------
-/*!
-// \file    PythonQtConsole.h
-// \author  Florian Link
-// \author  Last changed by $Author: florian $
-// \date    2006-10
-*/
-//----------------------------------------------------------------------------------
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        PythonQtConsole.h
+
+    Maintainer:  Frederik Bendel
+    Email:       frederik.bendel@ruhr-uni-bochum.de
+    Date:        2020 12 22
+
+    Description:
+    Credits: Florian Link - mevis.de
+========================================================================================================================*/
+#ifndef CEDAR_PROC_GUI_PYTHONQTCONSOLE_H
+#define CEDAR_PROC_GUI_PYTHONQTCONSOLE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-#ifndef _PythonQtConsole_H
-#define _PythonQtConsole_H
-
 #ifdef CEDAR_USE_COPY
+
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/PythonQtConsole.fwd.h"
+#include "cedar/auxiliaries/Log.fwd.h"
+#include "cedar/auxiliaries/Singleton.fwd.h"
+#include "cedar/processing/gui/CoPYObject.fwd.h"
+#include "cedar/processing/GroupDeclaration.fwd.h"
+#include "cedar/processing/ElementDeclaration.fwd.h"
+#include "cedar/processing/gui/Scene.fwd.h"
 
-#include "cedar/auxiliaries/Log.h"
-#include "cedar/configuration.h"
+// CEDAR INCLUDES
+
 #include "cedar/processing/gui/CodeWidget.h"
-#include <cedar/auxiliaries/Singleton.h>
-#include <cedar/processing/GroupDeclaration.h>
-#include <cedar/processing/ElementDeclaration.h>
 
-#include <boost/python.hpp>
+// SYSTEM INCLUDES
 #include "PythonQt.h"
-#include "Scene.h"
-#include "CoPYObject.h"
-#include <QVariant>
-#include <QTextEdit>
+#include <QCompleter>
 #include <QGraphicsScene>
-#include <QQueue>
-#include <QWaitCondition>
 #include <QMutexLocker>
+#include <QMutexLocker>
+#include <QQueue>
+#include <QTextEdit>
+#include <QTextEdit>
+#include <QThread>
+#include <QVariant>
+#include <QVariant>
+#include <QWaitCondition>
+#include <boost/python.hpp>
 #include <frameobject.h>
-
-
-class QCompleter;
 
 namespace cedar
 {
@@ -83,135 +78,40 @@ namespace cedar
       {
         class PythonWorker : public QObject
         {
-        Q_OBJECT
+          Q_OBJECT
 
-        public:
-          PythonWorker(cedar::proc::gui::CoPYObject* pyObject)
-          {
+          public:
+            PythonWorker(cedar::proc::gui::CoPYObject* pyObject);
 
-            //init PythonQt with mpConsole
-            PythonQt::setEnableThreadSupport(true);
-            #ifdef CEDAR_USE_PYTHONSTEP
-            PythonQt::init(PythonQt::RedirectStdOut | PythonQt::PythonAlreadyInitialized);
-            #else CEDAR_USE_PYTHONSTEP
-            PythonQt::init(PythonQt::RedirectStdOut);
-            #endif CEDAR_USE_PYTHONSTEP
+            ~PythonWorker();
+          private:
+            int static traceHook(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg);
 
-            //PythonQt::overwriteSysPath(QStringList(QString::fromStdString("/home/fred/repos/cedar/lib/cpython")));
+          public slots:
+            QMap<QString, QString> giveVariables();
+            void stdOut(const QString &stdOut);
+            void stdErr(const QString &stdErr);
+            void executeCode(const QString &code);
+            void addVariable(const QString &name, const QVariant &variable);
+            void reset();
+            void removeVariable(const QString& name);
+            void setScene(cedar::proc::gui::Scene *pScene);
 
-            //Import CoPYObject Type To Python
-            //qRegisterMetaType<cedar::proc::gui::CoPYObject>("CoPYObject");
-            //qRegisterMetaType<cedar::proc::gui::CoPYObject>;
-            PythonQt::self()->registerCPPClass("CoPYObject", "", "copy",
-                                               PythonQtCreateObject<cedar::proc::gui::CoPYObjectWrapper>);
-            //Init Wrapper of Type QObject to import in Python
-            mpPyWrap = new cedar::proc::gui::CoPYObjectWrapper();
-            mpPy = pyObject;
+          signals:
+            void flushStdOut(const QString &);
+            void flushStdErr(const QString &);
+            void setup(PythonQtObjectPtr mContext);
+            void pythonBusy(const bool &);
 
-            QObject::connect(mpPyWrap, SIGNAL(createSig(const QString &, const int &, const int &, const QString&, const int &)), mpPy, SLOT(createElem(const QString &, const int &, const int &, const QString&, const int &)),Qt::BlockingQueuedConnection);
-            QObject::connect(mpPyWrap, SIGNAL(copySig(const QString &, const QString &)), mpPy, SLOT(copyTo(const QString &, const QString &)),Qt::BlockingQueuedConnection);
-            QObject::connect(mpPyWrap, SIGNAL(connectSig(const QString &, const QVariant &, const QString &, const QVariant &, const bool &)), mpPy, SLOT(connectSlots(const QString &, const QVariant &, const QString &, const QVariant &, const bool&)),Qt::BlockingQueuedConnection);
-            QObject::connect(mpPyWrap, SIGNAL(createGroupTemplateSig(const QString &, const int &, const int &, const QString&, const int &)), mpPy, SLOT(createGroupTemplate(const QString &, const int &, const int &, const QString&, const int &)),Qt::BlockingQueuedConnection);
-            QObject::connect(mpPyWrap, SIGNAL(setParameterSig(const QString &, const QString &, const QVariant &)), mpPy, SLOT(setParameter(const QString &, const QString &, const QVariant &)),Qt::BlockingQueuedConnection);
-            QObject::connect(mpPyWrap, SIGNAL(addObjectListSig(const QString &, const QString &, const QString &)), mpPy, SLOT(addObjectList(const QString &, const QString &, const QString &)),Qt::BlockingQueuedConnection);
-            QObject::connect(mpPyWrap, SIGNAL(getElementsByGroupSig(const QString &)), mpPy, SLOT(getElementsByGroup(const QString &)),Qt::BlockingQueuedConnection);
+          public:
+            static std::string hasToStop;
 
-            mContext = PythonQt::self()->createUniqueModule();
-            mContext.addObject("py", mpPyWrap);
-
-            _module = PyThreadState_Get();
-            QObject::connect(PythonQt::self(), SIGNAL(pythonStdOut(const QString&)), this,
-                             SLOT(stdOut(const QString&)));
-            QObject::connect(PythonQt::self(), SIGNAL(pythonStdErr(const QString&)), this,
-                             SLOT(stdErr(const QString&)));
-            emit setup(mContext);
-
-          };
-
-          ~PythonWorker();
-        private:
-
-          int static traceHook(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
-          {
-            if (hasToStop != "")
-            {
-              PyErr_SetString(PyExc_Exception,
-                              hasToStop.c_str());
-              hasToStop = "";
-              return -1;
-            }
-
-            return 0;
-          };
-        public slots:
-
-          QMap<QString, QString> giveVariables();
-
-          void stdOut(const QString &stdOut)
-          {
-            emit flushStdOut(stdOut);
-          };
-
-          void stdErr(const QString &stdErr)
-          {
-            emit flushStdErr(stdErr);
-          }
-
-          void executeCode(const QString &code)
-          {
-            //Get Thread back for Connection
-            PyThreadState_Swap(_module);
-
-            emit pythonBusy(true);
-            PyEval_SetTrace(traceHook, mContext.object());
-            mContext.evalScript(code);
-            emit pythonBusy(false);
-          }
-
-
-          void addVariable(const QString &name, const QVariant &variable)
-          {
-            mContext.addVariable(name, variable);
-          }
-
-          void reset()
-          {
-            mContext = PythonQt::self()->createUniqueModule();
-            //reassign both cpp and python Object with getObject()-Method to be of type cedar::proc::gui::CoPYObject not cedar::proc::gui::CoPYObjectWrapper
-            mContext.addObject("py", mpPyWrap);
-          }
-
-          void removeVariable(const QString& name)
-          {
-            mContext.removeVariable(name);
-          }
-
-          void setScene(cedar::proc::gui::Scene *pScene)
-          {
-            mpPy->setScene(pScene);
-            mpPy->setGroup(pScene->getRootGroup()->getGroup());
-          };
-        signals:
-
-          void flushStdOut(const QString &);
-
-          void flushStdErr(const QString &);
-
-          void setup(PythonQtObjectPtr mContext);
-
-          void pythonBusy(const bool &);
-
-
-        public:
-          static std::string hasToStop;
-
-        private:
-          PythonQtObjectPtr mContext;
-          cedar::proc::gui::CoPYObjectWrapper *mpPyWrap;
-          cedar::proc::gui::CoPYObject *mpPy;
-
+          private:
+            PyThreadState * _module;
+            PythonQtObjectPtr mContext;
+            cedar::proc::gui::CoPYObjectWrapper *mpPyWrap;
+            cedar::proc::gui::CoPYObject *mpPy;
         };
-
       }
     }
   }
@@ -219,98 +119,82 @@ namespace cedar
 
 //-------------------------------------------------------------------------------
 //! A simple console for python scripting
-class cedar::proc::gui::PythonQtConsole : public cedar::proc::gui::CodeWidgetScope::CodeEditor
+class cedar::proc::gui::PythonQtConsole
+:
+public cedar::proc::gui::CodeWidgetScope::CodeEditor
 {
-Q_OBJECT
+  Q_OBJECT
 
-public:
-  PythonQtConsole(QWidget *parent, Qt::WindowFlags i = 0);
+  public:
+    PythonQtConsole(QWidget *parent);
+    ~PythonQtConsole();
+  public Q_SLOTS:
+    //! derived key press event
+    void keyPressEvent(QKeyEvent *e);
+    //! output redirection
+    void stdOut(const QString &s);
+    //! output redirection
+    void stdErr(const QString &s);
+    //! execute current line
+    void executeCode();
+    void insertCompletion(const QString &);
+    void handleSetup(PythonQtObjectPtr mContext);
+    void handleBusyStateChange(const bool &state);
 
-  ~PythonQtConsole();
+  signals:
 
-public Q_SLOTS:
+    void removeVariableFromPython(const QString&name);
 
-  //! derived key press event
-  void keyPressEvent(QKeyEvent *e);
+    void giveVariables(QMap<QString, QString> vars);
 
-  //! output redirection
-  void stdOut(const QString &s);
+    QMap<QString, QString> getVariablesFromWorker();
 
-  //! output redirection
-  void stdErr(const QString &s);
+    void execute(const QString &code);
 
-  //! execute current line
-  void executeCode();
+    void addVariableToPython(const QString &name, const QVariant &variable);
 
-  void insertCompletion(const QString &);
+    void resetPython();
 
-  void handleSetup(PythonQtObjectPtr mContext);
+    void giveScene(cedar::proc::gui::Scene *pScene);
 
-  void handleBusyStateChange(const bool &state);
+  public:
+    //! output from console
+    void consoleMessage(const QString &message, bool error);
 
+    void executeCode(const QString &code);
 
-signals:
+    void removeVariable(const QString& name);
 
-  void removeVariableFromPython(const QString&name);
+    void setScene(cedar::proc::gui::Scene *pScene);
 
-  void giveVariables(QMap<QString, QString> vars);
+    void reset(std::string msg = "Aborted by User", bool fromOut = false);
 
-  QMap<QString, QString> getVariablesFromWorker();
+    void addVariable(const QString &name, const QVariant &variable);
 
-  void execute(const QString &code);
+  protected:
+    //! handle the pressing of tab
+    void handleTabCompletion();
 
-  void addVariableToPython(const QString &name, const QVariant &variable);
+    //! Sets the current font
+    void setCurrentFont(const QColor &color = QColor(0, 0, 0), bool bold = false);
 
-  void resetPython();
+    //! flush output that was not yet printed
+    void flushStdOut();
 
-  void giveScene(cedar::proc::gui::Scene *pScene);
+  private:
+    cedar::proc::gui::PythonQtConsoleScope::PythonWorker *mpPythonWorker;
+    QThread mPythonThread;
+    PythonQtObjectPtr mpModule;
+    bool pythonBusy;
+    cedar::proc::gui::Scene *mpScene;
+    cedar::proc::gui::CoPYObject *mpCopyObject;
 
-public:
-  //! output from console
-  void consoleMessage(const QString &message, bool error);
+    void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
 
-  void executeCode(const QString &code);
-
-  void removeVariable(const QString& name);
-
-  void setScene(cedar::proc::gui::Scene *pScene);
-
-  void reset(std::string msg = "Aborted by User", bool fromOut = false);
-
-  void addVariable(const QString &name, const QVariant &variable);
-
-protected:
-  //! handle the pressing of tab
-  void handleTabCompletion();
-
-  //! Sets the current font
-  void setCurrentFont(const QColor &color = QColor(0, 0, 0), bool bold = false);
-
-  //! flush output that was not yet printed
-  void flushStdOut();
-
-private:
-  cedar::proc::gui::PythonQtConsoleScope::PythonWorker *mpPythonWorker;
-  QThread mPythonThread;
-  PythonQtObjectPtr mpModule;
-  bool pythonBusy;
-  cedar::proc::gui::Scene *mpScene;
-  cedar::proc::gui::CoPYObject *mpCopyObject;
-
-  void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
-
-  QString _clickedAnchor;
-  QString _storageKey;
-  QString _commandPrompt;
-
-  QString _currentMultiLineCode;
-
-  QString _stdOut;
-  QString _stdErr;
-
-  QTextCharFormat _defaultTextCharacterFormat;
-  QCompleter *_completer;
-
+    QString mStdOut;
+    QString mStdErr;
+    QTextCharFormat mDefaultTextCharacterFormat;
+    QCompleter *mpCompleter;
 };
 
 #endif

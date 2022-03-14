@@ -168,7 +168,7 @@ cedar_add_library(cedarproc
   sources/BoxInput.h
   sources/GaussInput.h
   sources/RealSense.h
-        ${pythonstep_moc_headers}
+  ${pythonstep_moc_headers}
   steps/VariableBox.h
   steps/VariableGauss.h
   steps/Sinus.h

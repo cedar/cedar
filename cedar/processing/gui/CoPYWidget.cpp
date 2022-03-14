@@ -36,24 +36,30 @@
 #include "cedar/configuration.h"
 #ifdef CEDAR_USE_COPY
 // CEDAR INCLUDES
-#include "cedar/processing/gui/CoPYWidget.h"
-#include <cedar/processing/Step.h>
-#include <cedar/processing/gui/StepItem.h>
-#include <cedar/auxiliaries/Settings.h>
 
-#include "ElementList.h"
 #include "cedar/auxiliaries/FileParameter.h"
 #include "cedar/auxiliaries/ObjectParameter.h"
+#include "cedar/auxiliaries/Settings.h"
+#include "cedar/processing/GroupDeclaration.h"
+#include "cedar/processing/Step.h"
+#include "cedar/processing/gui/CoPYObject.h"
+#include "cedar/processing/gui/CoPYWidget.h"
+#include "cedar/processing/gui/Group.h"
+#include "cedar/processing/gui/PythonQtConsole.h"
+#include "cedar/processing/gui/Scene.h"
+#include "cedar/processing/gui/StepItem.h"
+
+#include "ElementList.h"
 
 // SYSTEM INCLUDES
-#include <QHBoxLayout>
-#include <QWidget>
-#include <QPushButton>
 #include <QCheckBox>
-#include <thread>
 #include <QFileDialog>
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QWidget>
 #include <fstream>
 #include <iostream>
+#include <thread>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -68,7 +74,7 @@ QWidget(pParent)
   QVBoxLayout *layout = new QVBoxLayout(reinterpret_cast<QWidget *>(this));
   layout->setMargin(0);
 
-  mpConsole = new PythonQtConsole(this);
+  mpConsole = new cedar::proc::gui::PythonQtConsole(this);
 
   mpVariableView = new QTableWidget(this->parentWidget());
   mpVariableView->setWindowFlags(Qt::Tool);
@@ -133,7 +139,7 @@ void cedar::proc::gui::CoPYWidget::importStepInformation(cedar::proc::gui::StepI
 }
 
 void cedar::proc::gui::CoPYWidget::importStepInformation(QList<QGraphicsItem*> pSteps){
-  std::list<cedar::proc::gui::StepItem*> steps;
+  std::list <cedar::proc::gui::StepItem*> steps;
   for (auto item : pSteps)
   {
     if (auto step = dynamic_cast<cedar::proc::gui::StepItem*>(item))

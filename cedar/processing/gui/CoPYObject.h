@@ -1,6 +1,40 @@
-//
-// Created by fred on 1/7/21.
-//
+/*======================================================================================================================
+
+    Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        CoPYObject.h
+
+    Maintainer:  Frederik Bendel
+    Email:       frederik.bendel@ruhr-uni-bochum.de
+    Date:        2020 12 22
+
+    Description:
+
+    Credits:
+
+======================================================================================================================*/
+//CEDAR CONFIGURATION
+
 #include <cedar/configuration.h>
 
 #ifndef CEDAR_PROC_GUI_COPY_OBJECT_H
@@ -8,21 +42,22 @@
 
 #ifdef CEDAR_USE_COPY
 
-#include "PythonQt.h"
-#include "cedar/processing/gui/Scene.h"
-#include "cedar/processing/gui/Settings.h"
+//FORWARD DECLARATIONS
+
 #include "cedar/processing/gui/PythonQtConsole.fwd.h"
-#include "cedar/processing/gui/Group.h"
-#include "cedar/processing/Group.h"
-#include "cedar/processing/DataSlot.h"
-#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/gui/CoPYObject.fwd.h"
+#include "cedar/processing/gui/Scene.fwd.h"
+#include "cedar/processing/Group.fwd.h"
+
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/Settings.h"
+
+// SYSTEM INCLUDES
+#include "PythonQt.h"
 #include <QObject>
 #include <QGraphicsSceneDragDropEvent>
-#include "cedar/auxiliaries/Log.h"
-#include "cedar/auxiliaries/gui/Settings.h"
-#include "cedar/processing/gui/CoPYObject.fwd.h"
-#include "cedar/auxiliaries/exceptions.h"
-#include "cedar/processing/DeclarationRegistry.h"
 
 
 class cedar::proc::gui::CoPYObject : public QObject
@@ -38,18 +73,18 @@ public:
 
   ~CoPYObject();
 
-  cedar::proc::GroupPtr _mpRootGroup;
+  cedar::proc::GroupPtr mpRootGroup;
 
-  cedar::proc::gui::Scene *_mpScene;
+  cedar::proc::gui::Scene *mpScene;
 
   cedar::proc::gui::PythonQtConsole *pQtConsole;
 
   /*!@brief setter for a reference to the scene*/
   void setScene(cedar::proc::gui::Scene *pScene)
-  { _mpScene = pScene; }
+  { mpScene = pScene; }
 
   void setGroup(cedar::proc::GroupPtr pGroup)
-  { _mpRootGroup = pGroup; }
+  { mpRootGroup = pGroup; }
 
 public slots:
   /*!@brief setter for a constant reference to the Root, callable by cpp*/

@@ -837,14 +837,6 @@ _mAutoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "auto-convert do
   
   cedar::proc::steps::PythonScript::executionFailed = 0;
 
-//#if PY_MAJOR_VERSION >= 3
-//  PyImport_AppendInittab("pycedar", &PyInit_pycedar);
-//#else // PY_MAJOR_VERSION >= 3
-//  PyImport_AppendInittab("pycedar", &initpycedar);
-//#endif // PY_MAJOR_VERSION >= 3
-//  PyEval_InitThreads();
-//  Py_Initialize();
-  //_nstate = Py_NewInterpreter();
 }
 
 void cedar::proc::steps::PythonScript::initPython()

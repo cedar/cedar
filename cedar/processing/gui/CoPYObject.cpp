@@ -1,30 +1,75 @@
-//
-// Created by fred on 1/7/21.
-//
+/*======================================================================================================================
 
-#include "cedar/processing/gui/View.h"
-#include "cedar/processing/gui/CoPYObject.h"
-#include "cedar/processing/GroupDeclarationManager.h"
-#include "cedar/processing/gui/Element.h"
-#include "cedar/auxiliaries/casts.h"
-#include "cedar/processing/gui/StepItem.h"
+    Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a Copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        CoPYObject.cpp
+
+    Maintainer:  Frederik Bendel
+    Email:       frederik.bendel@ruhr-uni-bochum.de
+    Date:        2020 12 22
+
+    Description:
+
+    Credits:
+
+======================================================================================================================*/
+
+//CEDAR INCLUDES
+
+#include "cedar/auxiliaries/FileLog.fwd.h"
+#include "cedar/auxiliaries/FileParameter.h"
+#include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
+#include "cedar/auxiliaries/casts.h"
+#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/gui/Settings.h"
 #include "cedar/auxiliaries/math/TransferFunction.h"
+#include "cedar/processing/DataSlot.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/Group.h"
+#include "cedar/processing/GroupDeclaration.h"
+#include "cedar/processing/GroupDeclarationManager.h"
+#include "cedar/processing/gui/CoPYObject.h"
+#include "cedar/processing/gui/Element.h"
+#include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/Ide.h"
-#include "cedar/processing/undoRedo/commands/CreateDeleteElement.h"
-#include "cedar/processing/undoRedo/commands/CreateGroupTemplate.h"
-#include "cedar/processing/undoRedo/commands/CreateDeleteConnection.h"
-#include "cedar/processing/undoRedo/commands/ChangeParameterValue.h"
-#include "cedar/processing/undoRedo/commands/ChangeParameterValueTemplate.h"
+#include "cedar/processing/gui/PythonQtConsole.h"
+#include "cedar/processing/gui/Scene.h"
+#include "cedar/processing/gui/View.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/processing/undoRedo/commands/ChangeObjectListParameterValue.h"
 #include "cedar/processing/undoRedo/commands/ChangeObjectParameterValue.h"
-#include "cedar/processing/undoRedo/UndoStack.h"
-#include "cedar/processing/GroupDeclaration.h"
-#include "cedar/processing/gui/GraphicsBase.h"
-#include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/undoRedo/commands/ChangeParameterValue.h"
+#include "cedar/processing/undoRedo/commands/ChangeParameterValueTemplate.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteConnection.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteElement.h"
+#include "cedar/processing/undoRedo/commands/CreateGroupTemplate.h"
+
+// SYSTEM INCLUDES
+
 #include <QGraphicsSceneDragDropEvent>
-#include <cedar/auxiliaries/FileParameter.h>
-#include <cedar/auxiliaries/FileLog.fwd.h>
 
 #ifdef CEDAR_USE_COPY
 
@@ -41,7 +86,7 @@ cedar::proc::gui::CoPYObject::createElem(const QString &classId, const int &x, c
       auto group = getGroupByName(groupname.toStdString());
       GROUP_ASSERT(group, groupname.toStdString());
       CLASS_ASSERT(classId);
-      auto elem = _mpScene->createElement(group, classId.toStdString(), QPointF(x, y + i)).get();
+      auto elem = mpScene->createElement(group, classId.toStdString(), QPointF(x, y + i)).get();
       if (cedar::proc::Step *step = dynamic_cast<cedar::proc::Step *>(elem))
       {
         list.append(QString::fromStdString(step->getFullPath()));
@@ -51,14 +96,14 @@ cedar::proc::gui::CoPYObject::createElem(const QString &classId, const int &x, c
         list.append(QString::fromStdString(group->getFullPath()));
       }
       jumpToStep(elem);
-      _mpScene->getGraphicsItemFor(elem)->deleteElement();
+      mpScene->getGraphicsItemFor(elem)->deleteElement();
       cedar::proc::gui::Ide::pUndoStack->push(
               new cedar::proc::undoRedo::commands::CreateDeleteElement(classId.toStdString(),
                                                                        getGroupByName(groupname.toStdString()),
-                                                                       _mpScene, true, QPointF(x, y + i)));
+                                                                       mpScene, true, QPointF(x, y + i)));
 
     }
-    _mpScene->snapAllItemsToGrid();
+    mpScene->snapAllItemsToGrid();
     return list;
   } catch (cedar::aux::ExceptionBase e)
   {
@@ -89,10 +134,10 @@ QStringList cedar::proc::gui::CoPYObject::createGroupTemplate(const QString &tem
         list.append(QString::fromStdString(group->getFullPath()));
       }
       jumpToStep(elem);
-      _mpScene->getGraphicsItemFor(elem)->deleteElement();
+      mpScene->getGraphicsItemFor(elem)->deleteElement();
       cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateGroupTemplate(
               new cedar::proc::GroupDeclaration(templateId.toStdString(), "", "", ""),
-              getGroupByName(groupId.toStdString()), new QGraphicsSceneDragDropEvent(), QPointF(x, y + i), _mpScene));
+              getGroupByName(groupId.toStdString()), new QGraphicsSceneDragDropEvent(), QPointF(x, y + i), mpScene));
     }
     return list;
   } catch (cedar::aux::ExceptionBase e)
@@ -130,9 +175,9 @@ cedar::proc::gui::CoPYObject::connectSlots(const QString &source, const QVariant
     STEP_ASSERT(sourceElement, source.toStdString());
     STEP_ASSERT(targetElement, target.toStdString());
 
-    auto sourceSlots = dynamic_cast<cedar::proc::gui::Connectable *>(this->_mpScene->getElementByFullPath(
+    auto sourceSlots = dynamic_cast<cedar::proc::gui::Connectable *>(this->mpScene->getElementByFullPath(
             source.toStdString().c_str()))->getConnectable()->getOrderedDataSlots(1);
-    auto targetSlots = dynamic_cast<cedar::proc::gui::Connectable *>(this->_mpScene->getElementByFullPath(
+    auto targetSlots = dynamic_cast<cedar::proc::gui::Connectable *>(this->mpScene->getElementByFullPath(
             target.toStdString().c_str()))->getConnectable()->getOrderedDataSlots(0);
     bool srcSlotIsString = false;
     bool tgtSlotIsString = false;
@@ -183,10 +228,10 @@ cedar::proc::gui::CoPYObject::connectSlots(const QString &source, const QVariant
     CEDAR_THROW(cedar::aux::ExceptionBase, "Wrong Slot Name or Index");
 
     cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(
-            dynamic_cast<cedar::proc::gui::GraphicsBase *>(dynamic_cast<cedar::proc::gui::StepItem *>(_mpScene->getGraphicsItemFor(
+            dynamic_cast<cedar::proc::gui::GraphicsBase *>(dynamic_cast<cedar::proc::gui::StepItem *>(mpScene->getGraphicsItemFor(
                     sourceElement))->getSlotItem(sourceSlots[sourceSlotIndex]->getRole(),
                                                  sourceSlots[sourceSlotIndex]->getName())),
-            dynamic_cast<cedar::proc::gui::GraphicsBase *>(dynamic_cast<cedar::proc::gui::StepItem *>(_mpScene->getGraphicsItemFor(
+            dynamic_cast<cedar::proc::gui::GraphicsBase *>(dynamic_cast<cedar::proc::gui::StepItem *>(mpScene->getGraphicsItemFor(
                     targetElement))->getSlotItem(targetSlots[targetSlotIndex]->getRole(),
                                                  targetSlots[targetSlotIndex]->getName())), !disconnect, false));
 
@@ -219,7 +264,7 @@ void cedar::proc::gui::CoPYObject::setParameter(const QString &elem, const QStri
               new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<double>(paramSet, paramSet->getValue(),
                                                                                         value.toDouble(),
                                                                                         param->getNamedConfigurableOwner(),
-                                                                                        _mpScene));
+                                                                                        mpScene));
     } else if (auto paramSet = dynamic_cast<cedar::aux::ParameterTemplate<std::string> *>(param.get()))
     {
       if (!(value.userType() == QMetaType::QString))
@@ -231,7 +276,7 @@ void cedar::proc::gui::CoPYObject::setParameter(const QString &elem, const QStri
                                                                                              paramSet->getValue(),
                                                                                              value.toString().toStdString(),
                                                                                              param->getNamedConfigurableOwner(),
-                                                                                             _mpScene));
+                                                                                             mpScene));
     } else if (auto paramSet = dynamic_cast<cedar::aux::VectorParameter<double> *>(param.get()))
     {
 
@@ -249,7 +294,7 @@ void cedar::proc::gui::CoPYObject::setParameter(const QString &elem, const QStri
       }
       cedar::proc::gui::Ide::pUndoStack->push(
               new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::vector<double>, cedar::aux::VectorParameter<double>>(
-                      paramSet, paramSet->getValue(), vector, param->getNamedConfigurableOwner(), _mpScene));
+                      paramSet, paramSet->getValue(), vector, param->getNamedConfigurableOwner(), mpScene));
     } else if (auto paramSet = dynamic_cast<cedar::aux::VectorParameter<unsigned int> *>(param.get()))
     {
       int originalSize = paramSet->getValue().size();
@@ -266,7 +311,7 @@ void cedar::proc::gui::CoPYObject::setParameter(const QString &elem, const QStri
       }
       cedar::proc::gui::Ide::pUndoStack->push(
               new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::vector<unsigned int>, cedar::aux::VectorParameter<unsigned int>>(
-                      paramSet, paramSet->getValue(), vector, param->getNamedConfigurableOwner(), _mpScene));
+                      paramSet, paramSet->getValue(), vector, param->getNamedConfigurableOwner(), mpScene));
     } else if (auto paramSet = dynamic_cast<cedar::aux::ParameterTemplate<unsigned int> *>(param.get()))
     {
       cedar::proc::gui::Ide::pUndoStack->push(
@@ -274,7 +319,7 @@ void cedar::proc::gui::CoPYObject::setParameter(const QString &elem, const QStri
                                                                                               paramSet->getValue(),
                                                                                               value.toUInt(),
                                                                                               param->getNamedConfigurableOwner(),
-                                                                                              _mpScene));
+                                                                                              mpScene));
     } else if (auto paramSet = dynamic_cast<cedar::aux::ParameterTemplate<bool> *>(param.get()))
     {
       if (!(value.userType() == QMetaType::Bool || value == 1 || value == 0))
@@ -285,7 +330,7 @@ void cedar::proc::gui::CoPYObject::setParameter(const QString &elem, const QStri
               new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<bool>(paramSet, paramSet->getValue(),
                                                                                       value.toBool(),
                                                                                       param->getNamedConfigurableOwner(),
-                                                                                      _mpScene));
+                                                                                      mpScene));
     } else if (auto paramSet = dynamic_cast<cedar::aux::EnumParameter *>(param.get()))
     {
       cedar::aux::Enum targetId;
@@ -307,7 +352,7 @@ void cedar::proc::gui::CoPYObject::setParameter(const QString &elem, const QStri
               new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::string, cedar::aux::EnumParameter>(
                       paramSet, paramSet->getValue().name(),
                       targetId.name(),
-                      param->getNamedConfigurableOwner(), false, _mpScene));
+                      param->getNamedConfigurableOwner(), false, mpScene));
     } else if (auto paramSet = dynamic_cast<cedar::aux::ObjectParameter *>(param.get()))
     {
       std::vector<std::string> typeList;
@@ -328,7 +373,7 @@ void cedar::proc::gui::CoPYObject::setParameter(const QString &elem, const QStri
                 new cedar::proc::undoRedo::commands::ChangeObjectParameterValue(paramSet, paramSet->getTypeId(),
                                                                                 newType,
                                                                                 param->getNamedConfigurableOwner(),
-                                                                                _mpScene));
+                                                                                mpScene));
       } else
       {
         CEDAR_THROW(cedar::aux::ExceptionBase,
@@ -341,7 +386,7 @@ void cedar::proc::gui::CoPYObject::setParameter(const QString &elem, const QStri
       cedar::proc::gui::Ide::pUndoStack->push(
               new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::string, cedar::aux::FileParameter>(
                       paramSet, paramSet->getPath(), value.toString().toStdString(), param->getNamedConfigurableOwner(),
-                      _mpScene));
+                      mpScene));
 
     } else
     {
@@ -388,7 +433,7 @@ void cedar::proc::gui::CoPYObject::addObjectList(const QString &step, const QStr
               new cedar::proc::undoRedo::commands::ChangeObjectListParameterValue(objectListParameter.get(),
                                                                                   type.toStdString(),
                                                                                   parameter->getNamedConfigurableOwner(),
-                                                                                  _mpScene));
+                                                                                  mpScene));
     }
   } catch (cedar::aux::ExceptionBase e)
   {
@@ -400,9 +445,9 @@ cedar::proc::GroupPtr cedar::proc::gui::CoPYObject::getGroupByName(const std::st
 {
   if (groupId == "root")
   {
-    return _mpRootGroup;
+    return mpRootGroup;
   }
-  auto list = _mpScene->items();
+  auto list = mpScene->items();
   for (QGraphicsItem *item: list)
   {
     if (auto group = dynamic_cast<cedar::proc::gui::Group *>(item))
@@ -420,7 +465,7 @@ cedar::proc::StepPtr cedar::proc::gui::CoPYObject::getStepByName(const std::stri
 {
   try
   {
-    auto step = dynamic_cast<cedar::proc::gui::StepItem *>(this->_mpScene->getElementByFullPath(
+    auto step = dynamic_cast<cedar::proc::gui::StepItem *>(this->mpScene->getElementByFullPath(
             elementIdentifier.c_str()));
     STEP_ASSERT(step, elementIdentifier);
     return step->getStep();
@@ -438,11 +483,11 @@ void cedar::proc::gui::CoPYObject::throwError(std::string msg)
 
 void cedar::proc::gui::CoPYObject::jumpToStep(cedar::proc::Element *element)
 {
-  if (auto item = this->_mpScene->getGraphicsItemFor(element))
+  if (auto item = this->mpScene->getGraphicsItemFor(element))
   {
     item->setSelected(true);
     item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_SEARCH_RESULT);
-    _mpScene->getParentView()->centerOn(item);
+    mpScene->getParentView()->centerOn(item);
   }
 }
 

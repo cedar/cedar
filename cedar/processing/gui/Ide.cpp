@@ -39,6 +39,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+
 #include "cedar/processing/experiment/Supervisor.h"
 #include "cedar/processing/steps/PythonScript.h"
 #include "cedar/processing/gui/Ide.h"
@@ -49,6 +50,8 @@
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.h"
 #include "cedar/processing/gui/PerformanceOverview.h"
 #include "cedar/processing/gui/BoostControl.h"
+#include "cedar/processing/gui/CodeWidget.h"
+#include "cedar/processing/gui/CoPYWidget.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/SettingsDialog.h"
@@ -396,7 +399,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   #ifdef CEDAR_USE_PYTHONSTEP
   cedar::proc::steps::PythonScript::initPython();
-  #endif CEDAR_USE_PYTHONSTEP
+  #endif //CEDAR_USE_PYTHONSTEP
 
   // manually added components
   // toolbar: custom timestep

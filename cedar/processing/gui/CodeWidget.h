@@ -155,7 +155,7 @@ namespace cedar
 
         public:
             CodeEditor(QWidget *parent = 0);
-            virtual ~CodeEditor();
+            ~CodeEditor();
             void lineNumberAreaPaintEvent(QPaintEvent *event);
             int lineNumberAreaWidth();
             void markErrorLine(long);
