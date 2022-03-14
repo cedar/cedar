@@ -189,8 +189,6 @@ private:
   std::vector< cedar::aux::MatDataPtr > mOutputs;
   std::vector< cedar::aux::MatDataPtr > mStates;
 
-  //For restoring threads
-  PyThreadState* _nstate;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

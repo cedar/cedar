@@ -1167,6 +1167,7 @@ std::string cedar::proc::steps::PythonScript::makeOutputSlotName(const int i)
 }
 
 void cedar::proc::steps::PythonScript::freePythonVariables() {
+
   PyObject * poMainModule = PyImport_AddModule("__main__");
 
   PyObject * poAttrList = PyObject_Dir(poMainModule);

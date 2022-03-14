@@ -361,6 +361,8 @@ void cedar::proc::gui::PythonQtConsole::setScene(cedar::proc::gui::Scene *pScene
 }
 
 std::string cedar::proc::gui::PythonQtConsoleScope::PythonWorker::hasToStop;
+PyThreadState* cedar::proc::gui::PythonQtConsoleScope::PythonWorker::threadState;
+
 void cedar::proc::gui::PythonQtConsole::reset(std::string msg, bool fromOut)
 {
   if(pythonBusy)
@@ -494,7 +496,7 @@ cedar::proc::gui::PythonQtConsoleScope::PythonWorker::PythonWorker(cedar::proc::
   mContext = PythonQt::self()->createUniqueModule();
   mContext.addObject("py", mpPyWrap);
 
-  _module = PyThreadState_Get();
+  threadState = PyThreadState_Get();
   QObject::connect(PythonQt::self(), SIGNAL(pythonStdOut(const QString&)), this,
   SLOT(stdOut(const QString&)));
   QObject::connect(PythonQt::self(), SIGNAL(pythonStdErr(const QString&)), this,
@@ -521,7 +523,7 @@ void cedar::proc::gui::PythonQtConsoleScope::PythonWorker::stdErr(const QString 
 void cedar::proc::gui::PythonQtConsoleScope::PythonWorker::executeCode(const QString &code)
 {
   //Get Thread back for Connection
-  PyThreadState_Swap(_module);
+  PyThreadState_Swap(threadState);
 
   emit pythonBusy(true);
   PyEval_SetTrace(traceHook, mContext.object());
@@ -556,6 +558,8 @@ void cedar::proc::gui::PythonQtConsoleScope::PythonWorker::setScene(cedar::proc:
 
 int cedar::proc::gui::PythonQtConsoleScope::PythonWorker::traceHook(PyObject *, PyFrameObject *, int , PyObject *)
 {
+  PyThreadState_Swap(threadState);
+
   if (hasToStop != "")
   {
   PyErr_SetString(PyExc_Exception,

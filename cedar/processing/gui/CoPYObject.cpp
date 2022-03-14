@@ -66,6 +66,8 @@
 #include "cedar/processing/undoRedo/commands/CreateDeleteConnection.h"
 #include "cedar/processing/undoRedo/commands/CreateDeleteElement.h"
 #include "cedar/processing/undoRedo/commands/CreateGroupTemplate.h"
+#include "cedar/processing/steps/PythonScript.h"
+#include "cedar/processing/steps/PythonScriptLooped.h"
 
 // SYSTEM INCLUDES
 
@@ -172,6 +174,11 @@ cedar::proc::gui::CoPYObject::connectSlots(const QString &source, const QVariant
   {
     auto sourceElement = getStepByName(source.toStdString());
     auto targetElement = getStepByName(target.toStdString());
+
+    if(dynamic_cast<cedar::proc::steps::PythonScript*>(targetElement.get()) || dynamic_cast<cedar::proc::steps::PythonScriptLooped*>(targetElement.get()))
+    {
+      CEDAR_THROW(cedar::aux::ExceptionBase, "You can't connect to PythonScript Steps in CoPY due to Python issues.");
+    }
     STEP_ASSERT(sourceElement, source.toStdString());
     STEP_ASSERT(targetElement, target.toStdString());
 

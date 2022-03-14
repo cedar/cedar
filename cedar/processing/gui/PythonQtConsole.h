@@ -105,9 +105,8 @@ namespace cedar
 
           public:
             static std::string hasToStop;
-
+            static PyThreadState* threadState;
           private:
-            PyThreadState * _module;
             PythonQtObjectPtr mContext;
             cedar::proc::gui::CoPYObjectWrapper *mpPyWrap;
             cedar::proc::gui::CoPYObject *mpPy;
