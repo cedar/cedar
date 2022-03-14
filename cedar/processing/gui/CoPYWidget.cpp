@@ -56,7 +56,10 @@
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QDesktopServices>
+#include <QUrl>
 #include <QWidget>
+#include <QSizePolicy>
 #include <fstream>
 #include <iostream>
 #include <thread>
@@ -112,6 +115,11 @@ QWidget(pParent)
   mpVariablesButton = new QPushButton("Show Vars");
   QObject::connect(mpVariablesButton, SIGNAL (clicked()), this, SLOT(getVariablesButtonClicked()));
   buttons->addWidget(mpVariablesButton);
+  mpHelpButton = new QPushButton("?");
+  mpHelpButton->setFixedWidth(30);
+  QObject::connect(mpHelpButton, SIGNAL (clicked()), this, SLOT(helpButtonClicked()));
+  buttons->addWidget(mpHelpButton);
+
 
   QObject::connect(mpConsole, SIGNAL(giveVariables(QMap<QString, QString>)), this, SLOT(setVariables(QMap<QString, QString>)));
 
@@ -325,6 +333,11 @@ void cedar::proc::gui::CoPYWidget::resetButtonClicked()
 void cedar::proc::gui::CoPYWidget::getVariablesButtonClicked()
 {
   mpVariableView->show();
+}
+
+void cedar::proc::gui::CoPYWidget::helpButtonClicked()
+{
+  QDesktopServices::openUrl(QUrl("file://" + QApplication::applicationDirPath() + "/../resources/CoPYDocumentation.pdf"));
 }
 
 bool cedar::proc::gui::CoPYWidget::saveButtonClicked()

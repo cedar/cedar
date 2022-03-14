@@ -52,6 +52,7 @@
 #include <vector>
 #include <QTextEdit>
 #include <QPainter>
+#include <QDesktopServices>
 
 
 #if defined(CEDAR_USE_PYTHONSTEP) || defined (CEDAR_USE_COPY)
@@ -387,8 +388,7 @@ void cedar::proc::gui::CodeWidget::fillInCodeSection(std::string& code)
   this->mpHighlighter = new cedar::proc::gui::CodeWidgetScope::PythonSyntaxHighlighter(this->mpCodeTextField->document());
 
   QObject::connect(this->mpCodeTextField, SIGNAL(textChanged()), this, SLOT(updateCodeString()));
-  
-  
+
   code_widget_layout->addWidget(this->mpCodeTextField);
   
   this->mpExecuteButton = new QPushButton("Execute");
@@ -400,6 +400,8 @@ void cedar::proc::gui::CodeWidget::fillInCodeSection(std::string& code)
 }
 
 void cedar::proc::gui::CodeWidget::executeButtonClicked(){
+
+
   if(this->mpCodeTextField != nullptr)
   {
     if(this->mPythonScript)

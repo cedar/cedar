@@ -112,6 +112,7 @@ private slots:
   void loadButtonClicked();
   void resetButtonClicked();
   void getVariablesButtonClicked();
+  void helpButtonClicked();
   void setVariables(QMap<QString, QString> vars);
 
 private:
@@ -125,6 +126,7 @@ private:
   QPushButton* mpSaveButton;
   QPushButton* mpLoadButton;
   QPushButton* mpVariablesButton;
+  QPushButton* mpHelpButton;
   QCheckBox* mpAutoResetCheckbox;
   cedar::proc::gui::PythonQtConsole* mpConsole;
 

@@ -100,7 +100,7 @@ cedar::proc::gui::PythonQtConsole::PythonQtConsole(QWidget *parent) : cedar::pro
   mPythonThread.start();
 
   insertPlainText(
-          "#Controller imported as py\n#Drop steps here for creation and further instructions\ni = 0\nprint(i)\ni+=1");
+          "#Controller imported as py\n#Code something here or press the help button for documentation\n");
   emit giveVariables(emit getVariablesFromWorker());
 }
 
