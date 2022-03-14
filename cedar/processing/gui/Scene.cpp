@@ -230,7 +230,10 @@ void cedar::proc::gui::Scene::keyPressEvent(QKeyEvent* pEvent)
 void cedar::proc::gui::Scene::deleteSelectedElements(bool skipConfirmation)
 {
   auto selected_items = this->selectedItems();
-  this->deleteElements(selected_items, skipConfirmation);
+  if(!selected_items.empty())
+  {
+    this->deleteElements(selected_items, skipConfirmation);
+  }
 }
 
 void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool skipConfirmation)
@@ -1801,8 +1804,7 @@ void cedar::proc::gui::Scene::snapAllItemsToGrid()
         {
           cedar::proc::gui::ConnectionAnchor* anchor = anchors.at(j);
           anchor->setSelected(true);
-          anchor->move(QPointF(anchor->scenePos().x() + 1, anchor->scenePos().y() + 1), anchor->scenePos());
-          anchor->mouseReleaseEvent(nullptr);
+          anchor->snapToGrid();
           anchor->setSelected(false);
         }
       }

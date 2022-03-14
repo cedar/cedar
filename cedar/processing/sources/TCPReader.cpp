@@ -123,7 +123,7 @@ cedar::proc::sources::TCPReader::TCPReader()
         _mBufferLength(new cedar::aux::UIntParameter(this, "buffer size", 32768)),
         _mPort(new cedar::aux::UIntParameter(this, "port", 50000, 49152, 65535)), //ephemeral ports only
         _mTimeOutBetweenPackets(new cedar::aux::UIntParameter(this, "packet timeout (ms)", 500)),
-        _mTimeStepsBetweenMessages(new cedar::aux::UIntParameter(this, "message timeout (ms)", 50)),
+        _mTimeStepsBetweenMessages(new cedar::aux::UIntParameter(this, "message timeout (ms)", 5)),
         _mTimeStepsBetweenAcceptTrials(new cedar::aux::UIntParameter(this, "accept interval (steps)", 30))
 {
   cedar::proc::sources::TCPReader::mpDataLock = new QReadWriteLock();
@@ -246,6 +246,7 @@ int cedar::proc::sources::TCPReader::create_socket_server(int port)
 
 int cedar::proc::sources::TCPReader::accept_client(int server_fd)
 {
+  isConnected = false;
   int cfd;
   struct sockaddr_in client;
 
@@ -266,7 +267,8 @@ int cedar::proc::sources::TCPReader::accept_client(int server_fd)
   }
 
   client_info = gethostbyname((char *) inet_ntoa(client.sin_addr));
-  printf("Accepted connection from: %s \n", client_info->h_name);
+//  printf("Accepted connection from: %s \n", client_info->h_name);
+  std::cout<< this->getName() << " accepted connection from: " << client_info->h_name << " on port: " << this->_mPort->getValue() << std::endl;
 
   isConnected = true;
   FD_ZERO(&rfds);
@@ -277,6 +279,7 @@ int cedar::proc::sources::TCPReader::accept_client(int server_fd)
 
 void cedar::proc::sources::TCPReader::receiveMatData()
 {
+//  std::cout<<this->getName() << " receiveMatData()" << std::endl;
   if (!isConnected)
   {
     timeSinceLastConnectTrial = timeSinceLastConnectTrial + 1;
@@ -295,8 +298,12 @@ void cedar::proc::sources::TCPReader::receiveMatData()
     return;
   }
 
-  FD_ZERO(&rfds);
-  FD_SET(socket_h, &rfds);
+//  std::cout<<this->getName() << " before FD_SET" << std::endl;
+//  FD_ZERO(&rfds);
+//  FD_SET(socket_h, &rfds);
+
+
+//  std::cout<<this->getName() << " before malloc" << std::endl;
   // Size may be varied. Just picked this number for now.
   char *buffer = (char *) malloc(_mBufferLength->getValue() * sizeof(char));
   std::string fullMessageString = "";
@@ -314,6 +321,8 @@ void cedar::proc::sources::TCPReader::receiveMatData()
   std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
   std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
+//  std::cout<<this->getName() << " before While" << std::endl;
+
   while (!endFound && !timeout)
   {
 
@@ -321,7 +330,7 @@ void cedar::proc::sources::TCPReader::receiveMatData()
     timeout = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() >
               _mTimeOutBetweenPackets->getValue();
 
-    memset(buffer, 0, _mBufferLength->getValue());
+    memset(buffer, 0, _mBufferLength->getValue() * sizeof(char));
 
 #ifdef _WIN32
     msgLength = recv(socket_h, buffer, _mBufferLength->getValue(), 0);
@@ -360,8 +369,20 @@ void cedar::proc::sources::TCPReader::receiveMatData()
 
       if (numberOfFailedReads > _mTimeStepsBetweenMessages->getValue())
       {
+        std::cout<< this->getName()<< " failed reading for " << _mTimeStepsBetweenMessages->getValue() << " times"<<std::endl;
         numberOfFailedReads = 0;
-        reconnect();
+        free(buffer);
+        if (raw_socket_h != -1)
+        {
+          //Just wait for some connection!
+//          std::cout<<this->getName()<<" tried to ACCEPT again because " << _mTimeStepsBetweenMessages->getValue() << " reading trials did fail!" << std::endl;
+          socket_h = accept_client(raw_socket_h);
+        } else
+        {
+//          std::cout<<this->getName()<<" tried to RECONNECT again because " << _mTimeStepsBetweenMessages->getValue() << " reading trials did fail!" << std::endl;
+          reconnect();
+        }
+        return;
       }
 	  //This should be freed again!
 	  free(buffer);

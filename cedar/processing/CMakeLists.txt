@@ -180,6 +180,7 @@ cedar_add_library(cedarproc
   steps/ColorConversion.h
   steps/ComponentMultiply.h
   steps/DivideElementwise.h
+  steps/DNN.h
   steps/SubtractElementwise.h
   steps/CoordinateTransformation.h
   steps/ForwardKinematics.h

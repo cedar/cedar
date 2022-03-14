@@ -510,6 +510,9 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   #endif
   QObject::connect(this->tabWidget,SIGNAL(currentChanged(int)),this, SLOT(updateTabs(int))); //Fixes a Bug under Mac OS
 
+  //do not remove this line, init the qglviewer, allowing the robotic framework to work as intended. Hotfix part 1. Needs a better fix. TODO
+  this->tabWidget->setCurrentIndex(1);
+
   // set the property pane as the scene's property displayer
 
   QObject::connect(this->mpActionStartPauseSimulation, SIGNAL(triggered()), this, SLOT(startPauseSimulationClicked()));
@@ -706,6 +709,13 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 #ifdef CEDAR_USE_PYTHONSTEP
   cedar::proc::steps::PythonScript::importStepsFromTemplate();
 #endif
+}
+
+void cedar::proc::gui::Ide::showEvent( QShowEvent *event )
+{
+  QWidget::showEvent( event );
+  //do not remove this line, init the qglviewer, allowing the robotic framework to work as intended. Hotfix part 2. Needs a better fix. TODO
+  this->tabWidget->setCurrentIndex(0);
 }
 
 cedar::proc::gui::Ide::~Ide()

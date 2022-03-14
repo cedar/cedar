@@ -83,7 +83,19 @@ cedar::aux::Configurable::~Configurable()
   Children::iterator child = this->mChildren.begin();
   while (child != this->mChildren.end())
   {
-    this->removeConfigurableChild(child->first);
+    if (child->second.get() != nullptr)
+    {
+      child->second->setParent(nullptr);
+    }
+    //TODO: Needs fix. Memory Leak.
+    //Only compile this line when the OS is not Apple. Leads to crashes when deleting some elements that have subchildren
+    //like neural step, camera and convolution
+    #ifndef CEDAR_OS_APPLE:
+    this->mChildren.erase(child);
+    #endif
+
+    // emit boost signal
+    mTreeChanged();
     ++child;
   }
 }
@@ -867,10 +879,7 @@ void cedar::aux::Configurable::removeConfigurableChild(const std::string& name)
     child->second->setParent(nullptr);
   }
   this->mChildren.erase(child);
-  if(child->second.get() != nullptr)
-  {
-    child->second->setParent(nullptr);
-  }
+
   // emit boost signal
   mTreeChanged();
 }
