@@ -116,7 +116,6 @@ private:
 protected:
   // none yet
 private:
-
   cedar::aux::EnumParameterPtr mSynapticWeightPatternParameter;
 
   ////// Members for StaticGain

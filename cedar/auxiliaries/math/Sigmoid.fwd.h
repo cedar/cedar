@@ -37,7 +37,7 @@
 #ifndef CEDAR_AUX_MATH_SIGMOID_FWD_H
 #define CEDAR_AUX_MATH_SIGMOID_FWD_H
 
-// CEDAR CONFIGURATION
+// CEDAR CONFIGURATIONgetGraphicsItemFor
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES

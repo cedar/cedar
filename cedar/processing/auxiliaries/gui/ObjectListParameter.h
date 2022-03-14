@@ -69,7 +69,7 @@ class cedar::proc::aux::gui::ObjectListParameter : public cedar::proc::aux::gui:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ObjectListParameter();
+	ObjectListParameter();
 
   //!@brief Destructor
   ~ObjectListParameter();
@@ -78,7 +78,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void setBlacklist(std::vector<std::string> blacklist);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -116,6 +116,9 @@ private:
 
   //! Button for adding a new child
   QPushButton *mpAddButton;
+
+  //! Blacklist for types in the mpTypeSelector that shouldn't be shown
+   std::vector<std::string> blacklist;
 }; // class cedar::proc::aux::gui::ObjectListParameter
 
 #endif // CEDAR_AUX_GUI_OBJECT_LIST_PARAMETER_H

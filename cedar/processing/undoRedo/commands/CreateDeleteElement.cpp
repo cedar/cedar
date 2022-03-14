@@ -47,6 +47,7 @@
 
 // SYSTEM INCLUDES
 #include <string>
+#include <cedar/processing/auxiliaries/gui/Parameter.fwd.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -155,7 +156,11 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::redo()
         //Set text for the 'Undo/Redo Stack'
         setText(QString::fromStdString("Created element: " + this->mElementFullPath));
 				this->mIsInitialRedo = false;
-      }
+
+				cedar::aux::ParameterPtr parameter = this->mpGuiElement->getElement()->getParameter("kernels");
+
+
+			}
       else
       {
         //Group could have been changed

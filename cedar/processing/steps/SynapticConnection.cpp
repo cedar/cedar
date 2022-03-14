@@ -105,6 +105,8 @@ mKernelsParameter
 ),
 mConvolution(new cedar::aux::conv::Convolution())
 {
+	//Blacklist setting
+
   //Intial input and output of the step is set for static gain, as it's the first value in the EnumParameter
   cedar::proc::DataSlotPtr input = this->declareInput("input");
   this->declareOutput("output", mOutput);
