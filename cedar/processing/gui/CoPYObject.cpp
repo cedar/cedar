@@ -34,6 +34,8 @@
 
 ======================================================================================================================*/
 
+#include "cedar/configuration.h"
+#ifdef CEDAR_USE_COPY
 //CEDAR INCLUDES
 
 #include "cedar/auxiliaries/FileLog.fwd.h"
@@ -66,14 +68,16 @@
 #include "cedar/processing/undoRedo/commands/CreateDeleteConnection.h"
 #include "cedar/processing/undoRedo/commands/CreateDeleteElement.h"
 #include "cedar/processing/undoRedo/commands/CreateGroupTemplate.h"
+
+#ifdef CEDAR_USE_PYTHONSTEP
 #include "cedar/processing/steps/PythonScript.h"
 #include "cedar/processing/steps/PythonScriptLooped.h"
+#endif // CEDAR_USE_PYTHONSTEP
 
 // SYSTEM INCLUDES
 
 #include <QGraphicsSceneDragDropEvent>
 
-#ifdef CEDAR_USE_COPY
 
 QStringList
 cedar::proc::gui::CoPYObject::createElem(const QString &classId, const int &x, const int &y, const QString &groupname,
@@ -175,10 +179,13 @@ cedar::proc::gui::CoPYObject::connectSlots(const QString &source, const QVariant
     auto sourceElement = getStepByName(source.toStdString());
     auto targetElement = getStepByName(target.toStdString());
 
+    #ifdef CEDAR_USE_PYTHONSTEP
     if(dynamic_cast<cedar::proc::steps::PythonScript*>(targetElement.get()) || dynamic_cast<cedar::proc::steps::PythonScriptLooped*>(targetElement.get()))
     {
       CEDAR_THROW(cedar::aux::ExceptionBase, "You can't connect to PythonScript Steps in CoPY due to Python issues.");
     }
+    #endif // CEDAR_USE_PYTHONSTEP
+
     STEP_ASSERT(sourceElement, source.toStdString());
     STEP_ASSERT(targetElement, target.toStdString());
 

@@ -96,7 +96,6 @@ public:
   //!@brief setter for cedar::proc::gui::Ide.cpp
   void setScene(cedar::proc::gui::Scene* pScene);
   //!@brief Lock Execute Button when simulation is running for cedar::proc::gui::Ide.cpp
-  void lockExecuteButton(const bool disabled);
 
   //!@brief methods for using existing StepItems in CoPY
   void importStepInformation(cedar::proc::gui::StepItem* pStep);
@@ -106,6 +105,7 @@ public:
   void appendToConsole(std::string text);
   //!@brief append set Parameter Command to Console
   void appendParameterToText(cedar::aux::ParameterPtr parameter, const std::string paramPath);
+  void lockExecuteButton(const bool disabled);
 private slots:
   void executeButtonClicked();
   bool saveButtonClicked();

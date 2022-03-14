@@ -1728,7 +1728,6 @@ void cedar::proc::gui::Ide::notify(const QString& message)
 {
   QMessageBox::critical(this,"Notification", message);
 }
-
 void cedar::proc::gui::Ide::triggerStarted()
 {
   QWriteLocker locker(this->mSimulationRunning.getLockPtr());
@@ -1747,6 +1746,11 @@ void cedar::proc::gui::Ide::allTriggersStopped()
 
 void cedar::proc::gui::Ide::updateSimulationRunningIcon(bool running)
 {
+  #ifdef CEDAR_USE_COPY
+  //lock execute Button when simulating
+  this->mpCopy->lockExecuteButton(running);
+  #endif
+
   if (running)
   {
     this->mpActionStartPauseSimulation->setIcon(QIcon(":/cedar/auxiliaries/gui/pause.svg"));
@@ -1772,10 +1776,7 @@ void cedar::proc::gui::Ide::startPauseSimulationClicked()
   bool running = this->mSimulationRunning.member();
 
 
-  #ifdef CEDAR_USE_COPY
-  //lock execute Button when simulating
-  mpCopy->lockExecuteButton(!running);
-  #endif
+
 
   if (running)
   {

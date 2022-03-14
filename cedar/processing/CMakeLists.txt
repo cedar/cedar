@@ -58,9 +58,9 @@ endif(CEDAR_USE_COPY)
 
 if (CEDAR_USE_PYTHONSTEP)
   set(pythonstep_moc_headers steps/PythonScript.h steps/PythonScriptLooped.h)
-else(CEDAR_USE_COPY)
+else(CEDAR_USE_PYTHONSTEP)
   set(pythonstep_moc_headers "")
-endif(CEDAR_USE_COPY)
+endif(CEDAR_USE_PYTHONSTEP)
 
 
 cedar_add_library(cedarproc

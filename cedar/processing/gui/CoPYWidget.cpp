@@ -251,6 +251,10 @@ void cedar::proc::gui::CoPYWidget::reset()
 void cedar::proc::gui::CoPYWidget::lockExecuteButton(const bool disable)
 {
   mpExecuteButton->setDisabled(disable);
+  if(disable)
+  {
+    mpConsole->reset("Aborted by User", true);
+  }
 }
 
 std::string cedar::proc::gui::CoPYWidget::removeTrailingZeros(const double& num)

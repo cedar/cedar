@@ -31,6 +31,8 @@
     Description:
     Credits: Florian Link - mevis.de
 ========================================================================================================================*/
+#include "cedar/configuration.h"
+#ifdef CEDAR_USE_COPY
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/PythonQtConsole.h"
@@ -54,7 +56,7 @@
 #include <QAbstractItemView>
 
 //-----------------------------------------------------------------------------
-#ifdef CEDAR_USE_COPY
+
 
 //PythonQtConsole
 cedar::proc::gui::PythonQtConsole::PythonQtConsole(QWidget *parent) : cedar::proc::gui::CodeWidgetScope::CodeEditor(parent)

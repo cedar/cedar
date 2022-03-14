@@ -43,7 +43,8 @@
 #include "cedar/configuration.h"
 #ifdef CEDAR_USE_COPY
 #include "gui/PythonQtScriptingConsole.h"
-#endif
+#endif //CEDAR_USE_COPY
+
 // FORWARD DECLARATIONS
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/gui/CodeWidget.fwd.h"
