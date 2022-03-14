@@ -84,21 +84,19 @@ namespace cedar
         class PythonWorker : public QObject
         {
         Q_OBJECT
-          PythonQtObjectPtr mContext;
-          cedar::proc::gui::CoPYObjectWrapper *mpPyWrap;
-          cedar::proc::gui::CoPYObject *mpPy;
-          PyThreadState* _module;
 
         public:
-
-          static std::string hasToStop;
-
           PythonWorker(cedar::proc::gui::CoPYObject* pyObject)
           {
 
             //init PythonQt with mpConsole
             PythonQt::setEnableThreadSupport(true);
+            #ifdef CEDAR_USE_PYTHONSTEP
             PythonQt::init(PythonQt::RedirectStdOut | PythonQt::PythonAlreadyInitialized);
+            #else CEDAR_USE_PYTHONSTEP
+            PythonQt::init(PythonQt::RedirectStdOut);
+            #endif CEDAR_USE_PYTHONSTEP
+
             //PythonQt::overwriteSysPath(QStringList(QString::fromStdString("/home/fred/repos/cedar/lib/cpython")));
 
             //Import CoPYObject Type To Python
@@ -202,6 +200,16 @@ namespace cedar
           void setup(PythonQtObjectPtr mContext);
 
           void pythonBusy(const bool &);
+
+
+        public:
+          static std::string hasToStop;
+
+        private:
+          PythonQtObjectPtr mContext;
+          cedar::proc::gui::CoPYObjectWrapper *mpPyWrap;
+          cedar::proc::gui::CoPYObject *mpPy;
+
         };
 
       }

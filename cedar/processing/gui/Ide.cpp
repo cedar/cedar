@@ -394,7 +394,10 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   mpPerformanceOverview = new cedar::proc::gui::PerformanceOverview(this);
   pUndoStack = new cedar::proc::undoRedo::UndoStack(this);
 
+  #ifdef CEDAR_USE_PYTHONSTEP
   cedar::proc::steps::PythonScript::initPython();
+  #endif CEDAR_USE_PYTHONSTEP
+
   // manually added components
   // toolbar: custom timestep
   auto p_enable_custom_time_step = new QCheckBox();

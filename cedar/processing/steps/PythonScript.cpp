@@ -854,8 +854,8 @@ void cedar::proc::steps::PythonScript::initPython()
 #else // PY_MAJOR_VERSION >= 3
   PyImport_AppendInittab("pycedar", &initpycedar);
 #endif // PY_MAJOR_VERSION >= 3
-  PyEval_InitThreads();
   Py_Initialize();
+  PyEval_InitThreads();
 }
 
 
