@@ -288,6 +288,12 @@
             "requires channel": "yarp",
             "readPortName": "webots/youbotColorCameraStatusFramework"
           }
+        },
+		"simulator":
+        {
+          "cedar.dev.SimulatedCamera":
+          {
+          }
         }
       },
       "shared component parameters":
@@ -306,6 +312,12 @@
       "cedar.dev.YarpChannel<cv.Mat>":
       {
 		  "ip address": "134.147.176.97"
+      }
+    },
+	"simulator":
+    {
+      "cedar.dev.SimulatedKinematicChain":
+      {
       }
     }
   }

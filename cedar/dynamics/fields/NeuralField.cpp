@@ -62,6 +62,8 @@
 #include "cedar/auxiliaries/MatrixIterator.h"
 #include "cedar/units/prefixes.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/processing/Group.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -314,6 +316,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   QObject::connect(_mDiscreteMetric.get(), SIGNAL(valueChanged()), this, SLOT(discreteMetricChanged()));
   QObject::connect(mGlobalInhibition.get(),SIGNAL(valueChanged()),this , SLOT(updateEducationalKernel()));
   QObject::connect(_mLateralKernelConvolution.get(),SIGNAL(combinedKernelUpdated()),this , SLOT(updateEducationalKernel())); //,Qt::DirectConnection
+  QObject::connect(mTau.get(),SIGNAL(valueChanged()),this,SLOT(timescaleChanged()));
 
 
 
@@ -329,6 +332,14 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 
   // now check the dimensionality and sizes of all matrices
   this->updateMatrices();
+}
+
+cedar::dyn::NeuralField::~NeuralField()
+{
+    if(auto clockSingleton = cedar::aux::GlobalClockSingleton::getInstance())
+    {
+        clockSingleton->updateCurrentMinTau();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -887,9 +898,10 @@ void cedar::dyn::NeuralField::updateEducationalKernel()
         }
     }
   }
+}
 
-
-
-
-
+void cedar::dyn::NeuralField::timescaleChanged()
+{
+    cedar::proc::ElementWeakPtr weakElementPtr(shared_from_this());
+    cedar::aux::GlobalClockSingleton::getInstance()->updateFieldTauMap(weakElementPtr,this->mTau->getValue());
 }

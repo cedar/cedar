@@ -117,6 +117,10 @@ public:
   //! Called when the trigger is started.
   void processQuit();  // JT: Made this public for the alternate way to loop triggers
 
+  void setUseDefaultCPUStepSize(bool useDefaultCPUStepSize);
+
+  void setPreviousCustomCPUStepSize(cedar::unit::Time time);
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
@@ -190,7 +194,9 @@ private:
 
   boost::signals2::scoped_connection mSimulationStepSizeChangeConnection;
 
-  cedar::unit::Time _mPreviousCustomStepSize;
+  
+
+  bool _mPreviousUseDefaultCPUStepSize;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -200,6 +206,8 @@ protected:
 
 private:
   cedar::aux::BoolParameterPtr _mStartWithAll;
+
+  cedar::aux::TimeParameterPtr _mPreviousCustomStepSize;
 
 }; // class cedar::proc::LoopedTrigger
 

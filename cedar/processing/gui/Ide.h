@@ -430,6 +430,8 @@ private slots:
 
   void simulatedTimeStepSpinBoxChanged(double value);
 
+  void updateTimeStepSpinBoxColor();
+
   void globalTimeFactorSettingChanged(double newValue);
 
   void architectureChanged();
@@ -524,6 +526,8 @@ private:
   boost::signals2::scoped_connection mSimulationModeChangedConnection;
 
   boost::signals2::scoped_connection mSimulationStepSizeChangedConnection;
+
+  boost::signals2::scoped_connection mCurMinTauChangedConnection;
 
   // permanent status bar widgets
   //! Icon that indicates steps in a warning state.

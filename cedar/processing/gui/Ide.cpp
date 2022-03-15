@@ -658,6 +658,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   mSimulationModeChangedConnection = cedar::aux::GlobalClockSingleton::getInstance()->connectToLoopModeChangedSignal(boost::bind(&cedar::proc::gui::Ide::processLoopModeChangedSignal,this,_1));
   mSimulationStepSizeChangedConnection = cedar::aux::GlobalClockSingleton::getInstance()->connectToSimulationStepSizeChangedSignal(boost::bind(&cedar::proc::gui::Ide::processSimulationStepChangedSignal,this,_1));
+  mCurMinTauChangedConnection = cedar::aux::GlobalClockSingleton::getInstance()->connectToCurMinTauChangedSignal(boost::bind(&cedar::proc::gui::Ide::updateTimeStepSpinBoxColor,this));
 
   QObject::connect(this, SIGNAL(signalGlobalTimeFactorSettingChanged(double)), this, SLOT(globalTimeFactorSettingChanged(double)));
 
@@ -954,6 +955,7 @@ void cedar::proc::gui::Ide::globalTimeFactorSettingChanged(double newValue)
 
 void cedar::proc::gui::Ide::simulationModeComboBoxChanged(int newIndex)
 {
+  std::cout<<"Ide::simulationModeComboBoxChanged index: " << newIndex << std::endl;
   if(newIndex != 0 ) //For now Zero is the default index, which is simulated Time. Todo:Use an Enum for the mode
   {
     //Case RealTime
@@ -1000,7 +1002,25 @@ void cedar::proc::gui::Ide::simulatedTimeStepSpinBoxChanged(double newValue)
   {
     this->mGroup->getGroup()->setSimulationTimeStep(cedar::unit::Time(newValue*cedar::unit::milli*cedar::unit::seconds));
   }
+    updateTimeStepSpinBoxColor();
 }
+
+void cedar::proc::gui::Ide::updateTimeStepSpinBoxColor()
+{
+    double curMinTau = cedar::aux::GlobalClockSingleton ::getInstance()->getCurrentMinTau();
+
+    double spinBoxValue = this->mpSimulatedTimeStepSpinBox->value();
+
+    if(curMinTau < spinBoxValue)
+    {
+        this->mpSimulatedTimeStepSpinBox->setStyleSheet("color: rgb(255,0,0); ");
+    }
+    else
+    {
+        this->mpSimulatedTimeStepSpinBox->setStyleSheet("color: rgb(0,0,0); ");
+    }
+}
+
 void cedar::proc::gui::Ide::toggleDataSlotPositioning()
 {
 
