@@ -97,6 +97,8 @@
 #include <QFileDialog>
 #include <QDockWidget>
 #include <QDialogButtonBox>
+#include <QDesktopServices>
+#include <QUrl>
 #include <QInputDialog>
 #include <QTableWidget>
 #include <QMimeData>
@@ -608,7 +610,14 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   QObject::connect(mpActionParameterLinker, SIGNAL(triggered()), this, SLOT(openParameterLinker()));
   QObject::connect(mpActionDataSlotPositioning, SIGNAL(triggered()), this, SLOT(toggleDataSlotPositioning()));
 
+  #ifdef CEDAR_USE_COPY
+  mpActionShowCoPYDocumentation = this->findChild<QMenu*>("menuHelp")->addAction("Show CoPY Documentation");
 
+  QObject::connect(this->mpActionShowCoPYDocumentation,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(showCoPYDocumentation()));
+  #endif
   QObject::connect(this->mpRecorderWidget,
                    SIGNAL(settingsChanged()),
                    this,
@@ -710,6 +719,12 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   cedar::proc::steps::PythonScript::importStepsFromTemplate();
 #endif
 }
+
+void cedar::proc::gui::Ide::showCoPYDocumentation()
+{
+  QDesktopServices::openUrl(QUrl("file://" + QApplication::applicationDirPath() + "/../resources/CoPYDocumentation.pdf"));
+}
+
 
 void cedar::proc::gui::Ide::showEvent( QShowEvent *event )
 {

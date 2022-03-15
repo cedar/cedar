@@ -417,6 +417,9 @@ private:
   void backupSaveCallback();
 
 private slots:
+  #ifdef CEDAR_USE_COPY
+  void showCoPYDocumentation();
+  #endif
   void globalTimeFactorSliderChanged(int newValue);
 
   void globalTimeFactorSpinboxChanged(double value);
@@ -462,6 +465,7 @@ private:
   #ifdef CEDAR_USE_COPY
   QDockWidget* mpCopyWidget;
   cedar::proc::gui::CoPYWidget* mpCopy;
+  QAction* mpActionShowCoPYDocumentation;
   #endif
 
   //! Performance overview.

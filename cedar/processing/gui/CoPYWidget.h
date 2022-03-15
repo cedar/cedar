@@ -112,7 +112,6 @@ private slots:
   void loadButtonClicked();
   void resetButtonClicked();
   void getVariablesButtonClicked();
-  void helpButtonClicked();
   void setVariables(QMap<QString, QString> vars);
 
 private:
