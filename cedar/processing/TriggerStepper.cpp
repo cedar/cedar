@@ -117,14 +117,14 @@ void cedar::proc::TriggerStepper::runFunc()
       boost::posix_time::time_duration measured_step_time_unitless = time_after_stepping - start_time;
       double elapsedMilliSeconds = measured_step_time_unitless.total_microseconds() / 1000.0;
       double minimumComputeTimeMilliSeconds = static_cast<double>(minimalSleepTime / (0.001 * cedar::unit::seconds));
-//      std::cout<<"TriggerStepper: Stepping lasted " << elapsedMilliSeconds  <<  " milliseconds and minimum Steptime is " << minimumComputeTimeMilliSeconds << std::endl;
-      if(elapsedMilliSeconds < minimumComputeTimeMilliSeconds)
-      {
-        double sleepTime = minimumComputeTimeMilliSeconds - elapsedMilliSeconds;
-//        std::cout<<"Triggerstepper sleeps: " << sleepTime << " milliseconds" <<std::endl;
-        int sleepTimeMicroSeconds = (int) (sleepTime* 1000);
-        usleep(sleepTimeMicroSeconds);
-      }
+      std::cout<<"TriggerStepper: Stepping lasted " << elapsedMilliSeconds  <<  " milliseconds and minimum Steptime is " << minimumComputeTimeMilliSeconds << std::endl;
+//      if(elapsedMilliSeconds < minimumComputeTimeMilliSeconds)
+//      {
+//        double sleepTime = minimumComputeTimeMilliSeconds - elapsedMilliSeconds;
+////        std::cout<<"Triggerstepper sleeps: " << sleepTime << " milliseconds" <<std::endl;
+//        int sleepTimeMicroSeconds = (int) (sleepTime* 1000);
+//        usleep(sleepTimeMicroSeconds);
+//      }
     }
     catch (std::runtime_error &e)
     {
@@ -160,8 +160,8 @@ void cedar::proc::TriggerStepper::stepTriggers()
 {
   if(!this->mTriggerList.empty())
   {
-    auto timeStep = cedar::aux::GlobalClockSingleton::getInstance()->getSimulationStepSize();
-    cedar::aux::GlobalClockSingleton ::getInstance()->addTime(timeStep);
+//    auto timeStep = cedar::aux::GlobalClockSingleton::getInstance()->getSimulationStepSize();
+//    cedar::aux::GlobalClockSingleton ::getInstance()->addTime(timeStep);
 
     std::vector<std::thread> threadList;
     for(auto trigger: mTriggerList)

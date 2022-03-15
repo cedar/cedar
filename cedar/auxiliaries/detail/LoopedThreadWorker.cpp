@@ -346,7 +346,6 @@ void cedar::aux::detail::LoopedThreadWorker::work()
 //          minimum_step_size= mpWrapper->getMinimumStepSize();
 //        }
 
-        //JT: Why the double max operation?
         effective_sleep_duration_safe_mus= std::max<long>( 
                          effective_sleep_duration_safe_mus,
                          static_cast<long>(

@@ -666,8 +666,15 @@ const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::getTriggerMa
 
 cedar::proc::gui::Element* cedar::proc::gui::Scene::getElementByFullPath(std::string elementIdentifier)
 {
+//  std::cout<<"cedar::proc::gui::Scene::getElementByFullPath: elementIdentifier: " << elementIdentifier << std::endl;
+
   std::vector<std::string> mElementNameSplitted;
   boost::split(mElementNameSplitted, elementIdentifier, boost::is_any_of("."));
+
+  if(this == nullptr)
+  {
+    std::cout<<"This is null!" << std::endl;
+  }
 
   cedar::proc::gui::GroupPtr rootGroup = this->getRootGroup();
 
