@@ -720,11 +720,12 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 #endif
 }
 
+#ifdef CEDAR_USE_COPY
 void cedar::proc::gui::Ide::showCoPYDocumentation()
 {
   QDesktopServices::openUrl(QUrl("file://" + QApplication::applicationDirPath() + "/../resources/CoPYDocumentation.pdf"));
 }
-
+#endif
 
 void cedar::proc::gui::Ide::showEvent( QShowEvent *event )
 {

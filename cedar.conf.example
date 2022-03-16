@@ -67,9 +67,6 @@ set (CEDAR_USE_PYTHONQT                   1          CACHE BOOL "Use PythonQt fo
 set (PYTHONQT_PATH "/usr/local/lib/pythonqt"         CACHE PATH "Directory where CMake will find PythonQt Libraries")
 
 set(NUMPY_INCLUDEDIR "${CEDAR_HOME}/lib/python/lib/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}/site-packages/numpy/core/include/")
-include_directories(${NUMPY_INCLUDEDIR})
-link_directories(${NUMPY_INCLUDEDIR})
-
 
 set (CEDAR_USE_QT5						  1			 CACHE BOOL "This at the moment required for plugins...  should go in future versions")
 
