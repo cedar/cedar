@@ -195,7 +195,6 @@ void cedar::proc::steps::SynapticConnection::inputConnectionChanged(const std::s
 
 void cedar::proc::steps::SynapticConnection::synapticWeightPatternParameterChanged()
 {
-
   //Gray out the parameters of the not selected synaptic weight pattern
   if(this->mSynapticWeightPatternParameter->getValue() == cedar::proc::SynapticWeightPatternParameter::StaticGain)
   {

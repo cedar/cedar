@@ -157,9 +157,23 @@ void cedar::proc::undoRedo::commands::CreateDeleteElement::redo()
         setText(QString::fromStdString("Created element: " + this->mElementFullPath));
 				this->mIsInitialRedo = false;
 
-				cedar::aux::ParameterPtr parameter = this->mpGuiElement->getElement()->getParameter("kernels");
+				//Set the blacklist for synaptic connection
+				//Get the guiParameter of kernel, cast it to objectlistparamter and set the blacklist
 
+				/*cedar::aux::Parameter* parameter = this->mpGuiElement->getElement()->getParameter("kernels").get();
 
+				std::cout << "1" << std::endl;
+				if(auto element = dynamic_cast<cedar::proc::Element*>(parameter))
+				{
+					std::cout << "2" << std::endl;
+					auto guiParameter = this->mpScene->getGraphicsItemFor(element);
+					std::cout << guiParameter->getElement()->getName() << std::endl;
+				}*/
+
+				for(auto parameter : this->mpGuiElement->getElement()->getParameters())
+				{
+					std::cout << parameter->getName()<< std::endl;
+				}
 			}
       else
       {
