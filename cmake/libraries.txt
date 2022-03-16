@@ -115,7 +115,7 @@ set(CEDAR_USE_PYTHON3 (PYTHON_MAJOR_VERSION EQUAL 3))
 message("-- Searching for Python...")
 if (CEDAR_USE_PYTHON3)
   message("Vorher: ${Python_INCLUDE_DIRS}")
-  find_package(Python COMPONENTS Interpreter Development.Embed)
+  find_package(Python COMPONENTS Interpreter Development) #Development.Embed
   message("${Python_LIBRARIES}")
   if(Python_FOUND)
     message("-- Python Version ${Python_VERSION_MAJOR}.${Python_VERSION_MINOR} was found in ${Python_INCLUDE_DIRS}")
