@@ -92,6 +92,7 @@
 #include <QToolTip>
 #include <QDialogButtonBox>
 #include <QMessageBox>
+#include <QClipboard>
 #include <iostream>
 #include <set>
 #include <list>

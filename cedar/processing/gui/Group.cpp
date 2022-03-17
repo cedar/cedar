@@ -93,6 +93,7 @@
 #include <QListWidget>
 #include <QScrollBar>
 #include <QMutexLocker>
+#include <QClipboard>
 
 #ifndef Q_MOC_RUN
 
