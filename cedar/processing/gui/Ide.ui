@@ -67,7 +67,7 @@
       </widget>
       <widget class="QWidget" name="tabVisualisation">
        <attribute name="title">
-        <string>visualisation</string>
+        <string>visualization</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
