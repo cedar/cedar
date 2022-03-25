@@ -65,9 +65,9 @@
 
 cedar::aux::Configurable::Configurable()
 :
+mHasShared(false),
 mIsAdvanced(false),
-mIsConfigured(true),
-mpParent(nullptr)
+mIsConfigured(true)
 {
   this->connectToTreeChangedSignal(boost::bind(&cedar::aux::Configurable::updateLockSet, this));
 }
@@ -83,10 +83,6 @@ cedar::aux::Configurable::~Configurable()
   Children::iterator child = this->mChildren.begin();
   while (child != this->mChildren.end())
   {
-    if (child->second.get() != nullptr)
-    {
-      child->second->setParent(nullptr);
-    }
     //TODO: Needs fix. Memory Leak.
     //Only compile this line when the OS is not Apple. Leads to crashes when deleting some elements that have subchildren
     //like neural step, camera and convolution
@@ -103,6 +99,28 @@ cedar::aux::Configurable::~Configurable()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+
+void cedar::aux::Configurable::postConstructor()
+{
+  this->mHasShared = true;
+  for(auto child : this->mChildren)
+  {
+    if (child.second.get() != nullptr)
+    {
+      child.second->postConstructor();
+    }
+  }
+  for(cedar::aux::ParameterPtr parameter : this->mParameterList)
+  {
+    parameter->postConstructor();
+  }
+}
+
+bool cedar::aux::Configurable::hasShared()
+{
+  return this->mHasShared;
+}
 
 void cedar::aux::Configurable::addDeprecatedName(cedar::aux::ParameterPtr parameter, const std::string& deprecatedName)
 {
@@ -836,12 +854,12 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
   this->configurationLoaded();
 }
 
-cedar::aux::ConfigurablePtr cedar::aux::Configurable::getParent()
+cedar::aux::ConfigurableWeakPtr cedar::aux::Configurable::getParent()
 {
   return this->mpParent;
 }
 
-void cedar::aux::Configurable::setParent(cedar::aux::ConfigurablePtr parent)
+void cedar::aux::Configurable::setParent(ConfigurableWeakPtr parent)
 {
   this->mpParent = parent;
 }
@@ -873,10 +891,6 @@ void cedar::aux::Configurable::removeConfigurableChild(const std::string& name)
   if (child == this->mChildren.end())
   {
     CEDAR_THROW(cedar::aux::UnknownNameException, "There is no configurable child with the name \"" + name + "\".");
-  }
-  if(child->second.get() != nullptr)
-  {
-    child->second->setParent(nullptr);
   }
   this->mChildren.erase(child);
 

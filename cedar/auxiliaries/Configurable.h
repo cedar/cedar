@@ -103,6 +103,11 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
+  virtual void postConstructor();
+
+  bool hasShared();
+
   //!@brief read a configuration for all registered parameters from a cedar::aux::ConfigurationNode
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
@@ -143,10 +148,10 @@ public:
   ParameterList& getParameters();
 
   //!@brief sets the configurable parent
-  void setParent(cedar::aux::ConfigurablePtr parent);
+  void setParent(cedar::aux::ConfigurableWeakPtr parent);
 
   //!@brief gets the configurable parent
-  cedar::aux::ConfigurablePtr getParent();
+  cedar::aux::ConfigurableWeakPtr getParent();
 
   /*!@brief add a Configurable as a child to this instance of Configurable - if name is duplicate, an exception is
    * thrown
@@ -419,13 +424,15 @@ private:
   Children mChildren;
 
   //!@brief parent of this Configurable instance
-  cedar::aux::ConfigurablePtr mpParent;
+  cedar::aux::ConfigurableWeakPtr mpParent;
 
   //!@brief Whether this is an advanced configurable; usually only makes sense, when this is a child.
   bool mIsAdvanced;
 
   //!@brief Wether a configuration has been read.
   bool mIsConfigured;
+
+  bool mHasShared;
 
   /*!@brief   The lockable used for locking this configurable and all its parameters.
    *

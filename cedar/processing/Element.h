@@ -75,12 +75,11 @@ public:
   //!@brief The destructor.
   virtual ~Element();
 
-  virtual void postConstructor() {}
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
   //!@brief sets the group at which this element is registered
   void setGroup(cedar::proc::GroupPtr group);
 

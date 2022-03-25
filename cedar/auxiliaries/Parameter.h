@@ -158,6 +158,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
+  virtual void postConstructor();
+
   //! Set the owner of the parameter. Can only be called if the parameter doesn't have an owner yet.
   void setOwner(cedar::aux::Configurable *pOwner);
 

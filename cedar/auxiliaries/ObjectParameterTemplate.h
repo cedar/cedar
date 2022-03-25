@@ -106,6 +106,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
+  void postConstructor() override
+  {
+    this->makeParenting();
+    cedar::aux::Parameter::postConstructor();
+  }
+
   //!@brief set parameter to default
   virtual void makeDefault()
   {
@@ -120,9 +127,7 @@ public:
     BaseTypePtr object = FactoryManagerSingleton::getInstance()->allocate(type);
     object->readConfiguration(node);
     this->mObject = object;
-    if(auto config = dynamic_cast<cedar::aux::Configurable*>(object.get())){
-      //config->setParent(this->getOwner());
-    }
+    this->makeParenting();
   }
 
   //!@brief Write the parameter's value to a configuration node.
@@ -143,10 +148,18 @@ public:
   void setValue(BaseTypePtr object)
   {
     this->mObject = object;
-    if(auto config = dynamic_cast<cedar::aux::Configurable*>(object.get())){
-      //config->setParent(this->getOwner());
-    }
+    this->makeParenting();
     this->emitChangedSignal();
+  }
+
+  void makeParenting()
+  {
+    if(auto config = dynamic_cast<cedar::aux::Configurable*>(this->mObject.get())){
+      if(this->getOwner()->hasShared())
+      {
+        config->setParent(cedar::aux::ConfigurableWeakPtr(this->getOwner()->shared_from_this()));
+      }
+    }
   }
 
   //!@brief returns the stored object (const)

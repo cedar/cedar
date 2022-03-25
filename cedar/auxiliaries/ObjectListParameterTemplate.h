@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/Configurable.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/ObjectListParameterTemplate.fwd.h"
@@ -102,6 +103,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
+  void postConstructor() override
+  {
+    makeParenting();
+    cedar::aux::Parameter::postConstructor();
+  }
+
   bool canHaveConfigurableChildren() const
   {
     return true;
@@ -151,15 +159,30 @@ public:
   virtual void makeDefault()
   {
     this->mObjectList = this->mDefaults;
-    for(BaseTypePtr object : this->mObjectList)
+    this->makeParenting();
+  }
+
+  void makeParenting(BaseTypePtr object = nullptr){
+    std::vector<BaseTypePtr> objectsToParent;
+    if(object){
+      objectsToParent.push_back(object);
+    }
+    else
     {
-      if(auto configurable = dynamic_cast<cedar::aux::Configurable*>(object.get()))
+      objectsToParent = this->mObjectList;
+    }
+    for(BaseTypePtr objectToParent : objectsToParent)
+    {
+      if(auto configurable = dynamic_cast<cedar::aux::Configurable*>(objectToParent.get()))
       {
-        //configurable->setParent(this->getOwner());
+        std::cout << this->getOwner()->hasShared() << std::endl;
+        if(this->getOwner()->hasShared())
+        {
+          configurable->setParent(cedar::aux::ConfigurableWeakPtr(this->getOwner()->shared_from_this()));
+        }
       }
     }
   }
-
 
   //!@brief return the size of the vector
   size_t size() const
@@ -220,10 +243,8 @@ public:
     this->mObjectList.insert(this->mObjectList.begin() + index, object);
     this->mObjectAdded(index);
     this->emitChangedSignal();
-    if(auto configurable = dynamic_cast<cedar::aux::Configurable*>(object.get()))
-    {
-      //configurable->setParent(this->getOwner());
-    }
+
+    this->makeParenting(object);
   }
 
   //!@brief allocate and add an object at the end
@@ -241,10 +262,8 @@ public:
 
     this->mObjectAdded(this->mObjectList.size() - 1);
     this->emitChangedSignal();
-    if(auto configurable = dynamic_cast<cedar::aux::Configurable*>(object.get()))
-    {
-      //configurable->setParent(this->getOwner());
-    }
+
+    this->makeParenting(object);
   }
 
   //!@brief remove an object at the given index

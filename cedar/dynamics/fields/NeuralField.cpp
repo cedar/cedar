@@ -332,9 +332,9 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 }
 
 void cedar::dyn::NeuralField::postConstructor(){
-  std::cout << "postConstructor" << std::endl;
   mNoiseCorrelationKernel->cedar::aux::Configurable::setParent(this->shared_from_this());
   _mLateralKernelConvolution->cedar::aux::Configurable::setParent(this->shared_from_this());
+  cedar::aux::Configurable::postConstructor();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
