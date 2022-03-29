@@ -269,6 +269,27 @@ public:
   void listTypes(std::vector<std::string>& types) const
   {
     FactorySingleton::getInstance()->listTypes(types);
+
+    if(!this->mWhitelist.empty())
+    {
+      std::vector<std::string>::iterator type = types.begin();
+
+      while(type != types.end())
+      {
+        //Check if type on whitelist, if not remove it from the types vector
+        if(std::find(this->mWhitelist.begin(), this->mWhitelist.end(), *type) == this->mWhitelist.end())
+        {
+          //If not found in whitelist, then remove the type from the vector
+          type = types.erase(type);
+        }
+        else ++type;
+      }
+    }
+  }
+
+  void setWhitelist(std::vector<std::string> whitelist)
+  {
+    this->mWhitelist = whitelist;
   }
 
   //!@brief returns the type id of an object

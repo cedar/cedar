@@ -110,13 +110,8 @@ void cedar::proc::aux::gui::ObjectListParameter::parameterPointerChanged()
   for (size_t i = 0; i < types.size(); ++i)
   {
     QString type_id = QString::fromStdString(types.at(i));
-    std::cout << type_id.toStdString() << std::endl;
-    //Search for the type in the blacklist. If not found (iterator is at end) then add it to the combobox (mpTypeSelector)
-    if(std::find(blacklist.begin(), blacklist.end(), type_id.toStdString()) == blacklist.end())
-		{
-			this->mpTypeSelector->addItem(this->prettyTypeId(type_id));
-			this->mpTypeSelector->setItemData(i, type_id);
-		}
+    this->mpTypeSelector->addItem(this->prettyTypeId(type_id));
+    this->mpTypeSelector->setItemData(i, type_id);
   }
 }
 
@@ -155,9 +150,4 @@ std::string cedar::proc::aux::gui::ObjectListParameter::getSelectedType() const
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "No type selected.");
   }
-}
-
-void cedar::proc::aux::gui::ObjectListParameter::setBlacklist(std::vector<std::string> blacklist)
-{
-	this->blacklist = blacklist;
 }

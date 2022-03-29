@@ -105,9 +105,11 @@ mKernelsParameter
 ),
 mConvolution(new cedar::aux::conv::Convolution())
 {
-	//Blacklist setting
+	//Setting whitelist
+  std::vector<std::string> whitelist = {"cedar.aux.kernel.Gauss"};
+  this->mKernelsParameter->setWhitelist(whitelist);
 
-  //Intial input and output of the step is set for static gain, as it's the first value in the EnumParameter
+  //Initial input and output of the step is set for static gain, as it's the first value in the EnumParameter
   cedar::proc::DataSlotPtr input = this->declareInput("input");
   this->declareOutput("output", mOutput);
   input->setCheck(cedar::proc::typecheck::IsMatrix());
