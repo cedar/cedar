@@ -45,6 +45,8 @@
 #include "cedar/processing/SynapticWeightPatternParameter.h"
 #include "cedar/processing/typecheck/IsMatrix.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
+#include "cedar/processing/steps/Convolution.h"
+#include "cedar/auxiliaries/convolution/FFTW.h"
 
 // SYSTEM INCLUDES
 
@@ -87,11 +89,7 @@ namespace
 
 cedar::proc::steps::SynapticConnection::SynapticConnection()
 :
-mOutput(new cedar::aux::MatData(cv::Mat())),
-mSynapticWeightPatternParameter(
-        new cedar::aux::EnumParameter(this, "synaptic weight pattern",
-                                      cedar::proc::SynapticWeightPatternParameter::typePtr(),
-                                      cedar::proc::SynapticWeightPatternParameter::StaticGain)),
+mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
 mGainFactorParameter(new cedar::aux::DoubleParameter(this, "gain factor", 1.0,
 																										 -10000.0, 10000.0)),
 mKernelsParameter
@@ -103,26 +101,32 @@ mKernelsParameter
 		std::vector<cedar::aux::kernel::KernelPtr>()
 	)
 ),
-mConvolution(new cedar::aux::conv::Convolution())
+mConvolution(new cedar::aux::conv::Convolution()),
+mRevalidating(false)
 {
-	//Setting whitelist
+	////Convolution part of SynapticConnection
+	//Setting whitelist to limit the kernels for SynapticConnection
   std::vector<std::string> whitelist = {"cedar.aux.kernel.Gauss"};
   this->mKernelsParameter->setWhitelist(whitelist);
 
-  //Initial input and output of the step is set for static gain, as it's the first value in the EnumParameter
-  cedar::proc::DataSlotPtr input = this->declareInput("input");
-  this->declareOutput("output", mOutput);
-  input->setCheck(cedar::proc::typecheck::IsMatrix());
-
+  //Initial input and output of the step is set
+	this->declareInput("matrix", true);
+	this->declareInput("kernel", false);
+	this->declareOutput("result", mOutput);
+	QObject::connect(this->mConvolution.get(), SIGNAL(configurationChanged()), this, SLOT(recompute()));
+  //Add convolution parameter
   this->addConfigurableChild("convolution", this->mConvolution);
 
-  //Signal slot events for different parameter
-  QObject::connect(this->mGainFactorParameter.get(), SIGNAL(valueChanged()),
-                   this, SLOT(recompute()));
-  QObject::connect(this->mSynapticWeightPatternParameter.get(), SIGNAL(valueChanged()),
-                   this, SLOT(synapticWeightPatternParameterChanged()));
+	mKernelAddedConnection = this->mKernelsParameter->connectToObjectAddedSignal(
+									boost::bind(&cedar::proc::steps::SynapticConnection::slotKernelAdded, this, _1));
+	mKernelRemovedConnection
+					= this->mKernelsParameter->connectToObjectRemovedSignal(
+									boost::bind(&cedar::proc::steps::SynapticConnection::removeKernelFromConvolution, this, _1));
 
-  synapticWeightPatternParameterChanged();
+	this->transferKernelsToConvolution();
+
+  ////Static gain part of SynapticConneciton
+  QObject::connect(this->mGainFactorParameter.get(), SIGNAL(valueChanged()),this, SLOT(recompute()));
 }
 
 cedar::proc::steps::SynapticConnection::~SynapticConnection()
@@ -135,22 +139,30 @@ cedar::proc::steps::SynapticConnection::~SynapticConnection()
 // The arguments are unused here
 void cedar::proc::steps::SynapticConnection::compute(const cedar::proc::Arguments&)
 {
+	////First: Convolution
+	const cv::Mat& matrix = mMatrix->getData();
+	if (mKernel)
+	{
+		const cv::Mat& kernel = mKernel->getData();
+		mOutput->setData(this->mConvolution->convolve(matrix, kernel));
+	}
+	else if (this->mKernelsParameter->size() > 0)
+	{
+		if (this->mKernelsParameter->at(0)->getDimensionality() != this->getDimensionality())
+		{
+			this->inputDimensionalityChanged();
+		}
+		mOutput->setData(this->mConvolution->convolve(matrix));
+	}
+	else
+	{
+		mOutput->setData(this->mMatrix->getData().clone());
+	}
 
-  if(this->mSynapticWeightPatternParameter->getValue() ==  cedar::proc::SynapticWeightPatternParameter::StaticGain)
-  {
-    // the result is simply input * gain.
-    if (mInput)
-    {
-      this->mOutput->setData(this->mInput->getData() * this->mGainFactorParameter->getValue());
-    } else
-    {
-      this->mOutput->setData(cv::Mat());
-    }
-  }
-  else if(this->mSynapticWeightPatternParameter->getValue() ==  cedar::proc::SynapticWeightPatternParameter::Convolution)
-  {
+	////Second: Static Gain
+	this->mOutput->setData(this->mOutput->getData() * this->mGainFactorParameter->getValue());
 
-  }
+	////Third: Projection
 }
 
 void cedar::proc::steps::SynapticConnection::recompute()
@@ -158,65 +170,138 @@ void cedar::proc::steps::SynapticConnection::recompute()
   this->onTrigger();
 }
 
+////Functions copied from cedar::proc::steps::Convolution
+//Todo: This is currently only the code from convolution, because the input is the same as convolution and static gain
+// and projection come after the convoltion
 void cedar::proc::steps::SynapticConnection::inputConnectionChanged(const std::string& inputName)
 {
-  // Again, let's first make sure that this is really the input in case anyone ever changes our interface.
-  CEDAR_DEBUG_ASSERT(inputName == "input");
+// Again, let's first make sure that this is really the input in case anyone ever changes our interface.
+	CEDAR_DEBUG_ASSERT(inputName == "matrix" || inputName == "kernel");
 
-  // Assign the input to the member. This saves us from casting in every computation step.
-  this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
+	cv::Mat old_output = this->mOutput->getData().clone();
 
-  bool output_changed = false;
-  if (!this->mInput)
-  {
-    output_changed = !this->mOutput->getData().empty();
-    this->mOutput->setData(cv::Mat());
-  }
-  else
-  {
-    // Let's get a reference to the input matrix.
-    const cv::Mat& input = this->mInput->getData();
+	if (inputName == "matrix")
+	{
+		// Assign the input to the member. This saves us from casting in every computation step.
+		this->mMatrix = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
+		// This should always work since other types should not be accepted.
+		if (!this->mMatrix)
+		{
+			return;
+		}
 
-    // check if the input is different from the output
-    if (input.type() != this->mOutput->getData().type() || input.size != this->mOutput->getData().size)
-    {
-      output_changed = true;
-    }
+		this->mOutput->copyAnnotationsFrom(this->mMatrix);
 
-    // Make a copy to create a matrix of the same type, dimensions, ...
-    this->mOutput->setData(input.clone());
+		const auto& list = this->getConvolution()->getKernelList();
+		std::vector<bool> blocked(list->size());
 
-    this->mOutput->copyAnnotationsFrom(this->mInput);
-  }
+		// Block signals from the kernel because they might otherwise call onTrigger (via kernelChanged -> recompute), which leads to trouble in inputConnectionChanged.
+		for (size_t i = 0; i < list->size(); ++i)
+		{
+			blocked[i] = list->getKernel(i)->blockSignals(true);
+		}
 
-  if (output_changed)
-  {
-    this->emitOutputPropertiesChangedSignal("output");
-  }
+		this->inputDimensionalityChanged();
+
+		// restore blocked state for each kernel
+		for (size_t i = 0; i < list->size(); ++i)
+		{
+			list->getKernel(i)->blockSignals(blocked[i]);
+		}
+
+		if (!mRevalidating)
+		{
+			mRevalidating = true;
+			this->revalidateInputSlot("kernel");
+			mRevalidating = false;
+		}
+	}
+	else if (inputName == "kernel")
+	{
+		// Assign the input to the member. This saves us from casting in every computation step.
+		this->mKernel = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
+
+		if (!mRevalidating)
+		{
+			mRevalidating = true;
+			this->revalidateInputSlot("matrix");
+			mRevalidating = false;
+		}
+	}
+	this->callComputeWithoutTriggering();
+
+	if
+					(
+					!mRevalidating // if the step is revalidating, the revalidating call will also check this after revalidation is complete.
+					&& (!cedar::aux::math::matrixSizesEqual(old_output, this->mOutput->getData()) || old_output.type() != this->mOutput->getData().type()))
+	{
+		this->emitOutputPropertiesChangedSignal("result");
+	}
 }
 
-void cedar::proc::steps::SynapticConnection::synapticWeightPatternParameterChanged()
+void cedar::proc::steps::SynapticConnection::slotKernelAdded(size_t kernelIndex)
 {
-  //Gray out the parameters of the not selected synaptic weight pattern
-  if(this->mSynapticWeightPatternParameter->getValue() == cedar::proc::SynapticWeightPatternParameter::StaticGain)
-  {
-    mGainFactorParameter->setHidden(false);
+	cedar::aux::kernel::KernelPtr kernel = this->mKernelsParameter->at(kernelIndex);
+	this->addKernelToConvolution(kernel);
 
-    this->mKernelsParameter->setHidden(true);
-    this->mConvolution->_mEngine->setHidden(true);
-    this->mConvolution->_mBorderType->setHidden(true);
-    this->mConvolution->_mMode->setHidden(true);
-    this->mConvolution->_mAlternateEvenKernelCenter->setHidden(true);
-
-  }
-  else if(this->mSynapticWeightPatternParameter->getValue() == cedar::proc::SynapticWeightPatternParameter::Convolution)
-  {
-    this->mKernelsParameter->setHidden(false);
-    this->mConvolution->_mEngine->setHidden(false);
-    this->mConvolution->_mBorderType->setHidden(false);
-    this->mConvolution->_mMode->setHidden(false);
-    this->mConvolution->_mAlternateEvenKernelCenter->setHidden(false);
-
-    mGainFactorParameter->setHidden(true);
-  }
+	this->onTrigger();
 }
+
+void cedar::proc::steps::SynapticConnection::addKernelToConvolution(cedar::aux::kernel::KernelPtr kernel)
+{
+	kernel->setDimensionality(this->getDimensionality());
+	this->getConvolution()->getKernelList()->append(kernel);
+	QObject::connect(kernel.get(), SIGNAL(kernelUpdated()), this, SLOT(recompute()));
+}
+
+void cedar::proc::steps::SynapticConnection::removeKernelFromConvolution(size_t index)
+{
+	auto kernel = this->getConvolution()->getKernelList()->getKernel(index);
+	//!@todo remove this const cast
+	const_cast<cedar::aux::kernel::Kernel*>(kernel.get())->disconnect(SIGNAL(kernelUpdated()), this, SLOT(recompute()));
+	this->getConvolution()->getKernelList()->remove(index);
+	this->onTrigger();
+}
+
+void cedar::proc::steps::SynapticConnection::transferKernelsToConvolution()
+{
+	this->getConvolution()->getKernelList()->clear();
+	for (size_t kernel = 0; kernel < this->mKernelsParameter->size(); ++ kernel)
+	{
+		this->addKernelToConvolution(this->mKernelsParameter->at(kernel));
+	}
+}
+
+void cedar::proc::steps::SynapticConnection::inputDimensionalityChanged()
+{
+	unsigned int new_dimensionality = this->getDimensionality();
+#ifdef CEDAR_USE_FFTW
+	if (new_dimensionality >= 3)
+	{
+		this->mConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
+	}
+#endif // CEDAR_USE_FFTW
+
+
+	for (size_t i = 0; i < this->mKernelsParameter->size(); ++i)
+	{
+		this->mKernelsParameter->at(i)->setDimensionality(new_dimensionality);
+	}
+}
+
+unsigned int cedar::proc::steps::SynapticConnection::getDimensionality() const
+{
+	if (this->mMatrix)
+	{
+		return cedar::aux::math::getDimensionalityOf(this->mMatrix->getData());
+	}
+	else if (this->mKernelsParameter->size() > 0)
+	{
+		return this->mKernelsParameter->at(0)->getDimensionality();
+	}
+	else
+	{
+		return 2;
+	}
+}
+

@@ -96,7 +96,6 @@ public:
 
 public slots:
   void recompute();
-  void synapticWeightPatternParameterChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -108,29 +107,62 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void compute(const Arguments &);
+
+	////Functions copied from Convolution Step
+
   void inputConnectionChanged(const std::string& inputName);
 
+	/*!@brief Updates the convolution object when a new kernel is added.
+ 	*/
+	void slotKernelAdded(size_t kernelIndex);
+
+	/*!@brief Adds a kernel to the convolution object.
+ */
+	void addKernelToConvolution(cedar::aux::kernel::KernelPtr kernel);
+
+	/*!@brief Removes a kernel from the convolution object.
+ 	*/
+	void removeKernelFromConvolution(size_t index);
+
+	//!@brief Makes the kernel list stored in the convolution equal to the one in the field.
+	void transferKernelsToConvolution();
+
+	/*!@brief Returns the convolution object currently selected.
+ 	*/
+	inline cedar::aux::conv::ConvolutionPtr getConvolution()
+	{
+		return this->mConvolution;
+	}
+
+	unsigned int getDimensionality() const;
+
+	void inputDimensionalityChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
 private:
-  cedar::aux::EnumParameterPtr mSynapticWeightPatternParameter;
-
   ////// Members for StaticGain
   cedar::aux::DoubleParameterPtr mGainFactorParameter;
 
-  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
-  cedar::aux::ConstMatDataPtr mInput;
-  //!@brief The data containing the output.
-  cedar::aux::MatDataPtr mOutput;
-
 	////// Members for Convolution
+	//!@brief The Data containing the input matrix
+	cedar::aux::ConstMatDataPtr mMatrix;
+
+	//!@brief The Data containing the input kernel
+	cedar::aux::ConstMatDataPtr mKernel;
+
+	//!@brief The data containing the result of the convolution.
+	cedar::aux::MatDataPtr mOutput;
+
   cedar::aux::conv::ConvolutionPtr mConvolution;
 	KernelListParameterPtr mKernelsParameter;
 
+	boost::signals2::connection mKernelAddedConnection;
+	boost::signals2::connection mKernelRemovedConnection;
 
+	bool mRevalidating;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
