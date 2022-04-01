@@ -203,6 +203,8 @@ public slots:
 public:
   static cedar::aux::ConstPluginDeclaration* declarationFromDrop(QGraphicsSceneDragDropEvent* pEvent);
 
+  static cedar::aux::ConstPluginDeclaration* declarationFromDrop(QDropEvent* pEvent);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

@@ -93,6 +93,7 @@
 #include <QListWidget>
 #include <QScrollBar>
 #include <QMutexLocker>
+#include <QClipboard>
 
 #ifndef Q_MOC_RUN
 
@@ -2851,6 +2852,9 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
     QObject::connect(edit_parameters_action, SIGNAL(triggered()), this, SLOT(openParameterEditor()));
   }
 
+  QAction* p_copyCoordinates = menu.addAction("copy coordinates");
+
+
   //!@todo Fully implement showing groups in cotnainers
   // currently, this feature is disabled because there are too many bugs
 //  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
@@ -2913,6 +2917,11 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
     QList<QGraphicsItem*> items;
     items.append(this);
     this->getScene()->deleteElements(items, event->modifiers() & Qt::ControlModifier);
+  }
+  else if (a == p_copyCoordinates)
+  {
+    QClipboard *p_Clipboard = QApplication::clipboard();
+    p_Clipboard->setText(QString::number(event->pos().x()) + ", " + QString::number(event->pos().y()));
   }
   // plot data
   else

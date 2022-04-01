@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,46 +22,44 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PythonScriptLooped.fwd.h
+    File:        CoPYObject.fwd.h
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
-    Date:        2019 04 01
+    Maintainer:  Frederik Bendel
+    Email:       frederik.bendel@ruhr-uni-bochum.de
+    Date:        2020 12 22
 
-    Description: Forward declaration file for the class PythonScriptLooped.
+    Description: Forward declaration file for the class cedar::aux::gui::CoPYObject.
 
     Credits:
 
 ======================================================================================================================*/
+#ifndef CEDAR_PROC_GUI_COPY_OBJECT_FWD_H
+#define CEDAR_PROC_GUI_COPY_OBJECT_FWD_H
 
-#ifndef CEDAR_PROC_STEPS_PYTHON_SCRIPT_LOOPED_FWD_H
-#define CEDAR_PROC_STEPS_PYTHON_SCRIPT_LOOPED_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-#ifdef CEDAR_USE_PYTHONSTEP
+
 // CEDAR INCLUDES
 #include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
-  #include <boost/smart_ptr.hpp>
+#include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
-
 
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace proc
   {
-    namespace steps
+    namespace gui
     {
-      CEDAR_DECLARE_PROC_CLASS(PythonScriptLooped);
+      CEDAR_DECLARE_PROC_CLASS(CoPYObject);
+      CEDAR_DECLARE_PROC_CLASS(CoPYObjectWrapper);
     }
   }
 }
-//!@endcond
 
-#endif // CEDAR_USE_PYTHONSTEP
-#endif // CEDAR_PROC_STEPS_PYTHON_SCRIPT_LOOPED_FWD_H
 
+#endif //CEDAR_PROC_GUI_COPY_OBJECT_FWD_H

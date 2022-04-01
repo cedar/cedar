@@ -22,24 +22,24 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PythonScriptLooped.fwd.h
+    File:        CoPYWidget.fwd.h
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
-    Date:        2019 04 01
+    Maintainer:  Frederik Bendel
+    Email:       frederik.bendel@ruhr-uni-bochum.de
+    Date:        2020 12 22
 
-    Description: Forward declaration file for the class PythonScriptLooped.
+    Description: Forward declaration file for the class cedar::aux::gui::CoPYWidget.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_PYTHON_SCRIPT_LOOPED_FWD_H
-#define CEDAR_PROC_STEPS_PYTHON_SCRIPT_LOOPED_FWD_H
+#ifndef CEDAR_PROC_GUI_COPY_WIDGET_FWD_H
+#define CEDAR_PROC_GUI_COPY_WIDGET_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-#ifdef CEDAR_USE_PYTHONSTEP
+
 // CEDAR INCLUDES
 #include "cedar/processing/lib.h"
 
@@ -48,20 +48,19 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace proc
   {
-    namespace steps
+    namespace gui
     {
-      CEDAR_DECLARE_PROC_CLASS(PythonScriptLooped);
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_PROC_CLASS(CoPYWidget);
+      //!@endcond
     }
   }
 }
-//!@endcond
 
-#endif // CEDAR_USE_PYTHONSTEP
-#endif // CEDAR_PROC_STEPS_PYTHON_SCRIPT_LOOPED_FWD_H
+
+#endif // CEDAR_PROC_GUI_COPY_WIDGET_FWD_H
 

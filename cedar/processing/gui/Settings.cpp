@@ -73,6 +73,7 @@ cedar::proc::gui::Settings::Settings()
 cedar::aux::Configurable(),
 mWritingDisabled(false),
 mLog(new cedar::proc::gui::Settings::DockSettings()),
+mCoPY(new cedar::proc::gui::Settings::DockSettings()),
 mSteps(new cedar::proc::gui::Settings::DockSettings()),
 mTools(new cedar::proc::gui::Settings::DockSettings()),
 mProperties(new cedar::proc::gui::Settings::DockSettings()),
@@ -83,6 +84,9 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   this->addConfigurableChild("ui", ui_settings);
   
   ui_settings->addConfigurableChild("log", mLog);
+  #ifdef CEDAR_USE_COPY
+  ui_settings->addConfigurableChild("copywidget", mCoPY);
+  #endif
   ui_settings->addConfigurableChild("steps", mSteps);
   ui_settings->addConfigurableChild("tools", mTools);
   ui_settings->addConfigurableChild("properties", mProperties);
@@ -319,6 +323,14 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
                   "undoredo",
                   "Undo/Redo",
                   "<p>You can now undo and redo actions by pressing CTRL+Z and CTRL+Y.</p>"
+          );
+
+  this->addOneTimeMessage
+          (
+                  CEDAR_MAKE_VERSION(6, 3, 0), // introduces in this version
+                  "copy scripting console",
+                  "CoPY Scripting tool",
+                  "<p>You can now script python code to e.g. create or connect Steps programmatically. Read the Documentation under [Help->Show CoPY Documentation]</p>"
           );
 }
 
@@ -750,6 +762,11 @@ void cedar::proc::gui::Settings::DockSettings::setTo(QDockWidget *pDock)
 cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::logSettings()
 {
   return this->mLog;
+}
+
+cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::coPYSettings()
+{
+  return this->mCoPY;
 }
 
 cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::toolsSettings()

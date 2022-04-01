@@ -61,8 +61,7 @@ SOFTWARE.
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-#ifdef CEDAR_USE_PYTHON
-
+#ifdef CEDAR_USE_PYTHONSTEP
 // CLASS HEADER
 #include "cedar/processing/steps/PythonScriptLooped.h"
 
@@ -118,4 +117,4 @@ cedar::proc::steps::PythonScriptLooped::~PythonScriptLooped()
   
 }
 
-#endif // CEDAR_USE_PYTHON
+#endif // CEDAR_USE_PYTHONSTEP

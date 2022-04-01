@@ -43,7 +43,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/CommentWidget.h"
-#include "cedar/processing/gui/CodeWidget.h"
+#include "cedar/processing/gui/CodeWidget.fwd.h"
+#include "cedar/processing/gui/CoPYWidget.fwd.h"
 #include "cedar/processing/gui/ui_Ide.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/auxiliaries/LogInterface.h"
@@ -416,6 +417,9 @@ private:
   void backupSaveCallback();
 
 private slots:
+  #ifdef CEDAR_USE_COPY
+  void showCoPYDocumentation();
+  #endif
   void globalTimeFactorSliderChanged(int newValue);
 
   void globalTimeFactorSpinboxChanged(double value);
@@ -458,6 +462,11 @@ private:
 
   cedar::proc::StepPtr mLastCopiedStep;
 
+  #ifdef CEDAR_USE_COPY
+  QDockWidget* mpCopyWidget;
+  cedar::proc::gui::CoPYWidget* mpCopy;
+  QAction* mpActionShowCoPYDocumentation;
+  #endif
 
   //! Performance overview.
   cedar::proc::gui::PerformanceOverview* mpPerformanceOverview;

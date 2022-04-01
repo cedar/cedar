@@ -39,6 +39,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+
 #include "cedar/processing/experiment/Supervisor.h"
 #include "cedar/processing/steps/PythonScript.h"
 #include "cedar/processing/gui/Ide.h"
@@ -49,6 +50,8 @@
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.h"
 #include "cedar/processing/gui/PerformanceOverview.h"
 #include "cedar/processing/gui/BoostControl.h"
+#include "cedar/processing/gui/CodeWidget.h"
+#include "cedar/processing/gui/CoPYWidget.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/SettingsDialog.h"
@@ -92,7 +95,10 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QDockWidget>
 #include <QDialogButtonBox>
+#include <QDesktopServices>
+#include <QUrl>
 #include <QInputDialog>
 #include <QTableWidget>
 #include <QMimeData>
@@ -121,6 +127,7 @@
 #include <cedar/auxiliaries/gui/Settings.h>
 
 #endif // CEDAR_USE_YARP
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // nested private classes
@@ -392,6 +399,10 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   mpPerformanceOverview = new cedar::proc::gui::PerformanceOverview(this);
   pUndoStack = new cedar::proc::undoRedo::UndoStack(this);
 
+  #ifdef CEDAR_USE_PYTHONSTEP
+  cedar::proc::steps::PythonScript::initPython();
+  #endif //CEDAR_USE_PYTHONSTEP
+
   // manually added components
   // toolbar: custom timestep
   auto p_enable_custom_time_step = new QCheckBox();
@@ -443,7 +454,32 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   this->mpToolBar->insertWidget(this->mpActionRecord, this->mpGlobalTimeFactor);
 
   QObject::connect(this->mpGlobalTimeFactor, SIGNAL(valueChanged(double)), this, SLOT(globalTimeFactorSpinboxChanged(double)));
-
+  #ifdef CEDAR_USE_COPY
+  //CopyWidget
+  mpCopyWidget = new QDockWidget(this);
+  mpCopyWidget->setObjectName(QString::fromUtf8("mpCopyWidget"));
+  QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+  sizePolicy.setHorizontalStretch(0);
+  sizePolicy.setVerticalStretch(0);
+  sizePolicy.setHeightForWidth(mpCopyWidget->sizePolicy().hasHeightForWidth());
+  mpCopyWidget->setSizePolicy(sizePolicy);
+  mpCopyWidget->setFeatures(QDockWidget::DockWidgetFeatureMask);
+  QWidget* dockWidgetContents_10 = new QWidget();
+  dockWidgetContents_10->setObjectName(QString::fromUtf8("dockWidgetContents_10"));
+  QHBoxLayout* verticalLayout_10 = new QHBoxLayout(dockWidgetContents_10);
+  verticalLayout_10->setObjectName(QString::fromUtf8("verticalLayout_10"));
+  verticalLayout_10->setContentsMargins(0, 0, 0, 0);
+  mpCopy = new cedar::proc::gui::CoPYWidget(dockWidgetContents_10);
+  mpCopy->setObjectName(QString::fromUtf8("mpCopy"));
+  QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Expanding);
+  sizePolicy1.setHorizontalStretch(1);
+  sizePolicy1.setVerticalStretch(0);
+  sizePolicy1.setHeightForWidth(mpCopy->sizePolicy().hasHeightForWidth());
+  mpCopy->setSizePolicy(sizePolicy1);
+  verticalLayout_10->addWidget(mpCopy);
+  mpCopyWidget->setWidget(dockWidgetContents_10);
+  this->addDockWidget(static_cast<Qt::DockWidgetArea>(4), mpCopyWidget);
+  #endif
 //  this->mpToolBar->insertSeparator(this->mpActionRecord);
 
   // PlotGroupsComboBox, insert it before the displayplotgroup action
@@ -471,7 +507,9 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   mpMenuWindows->addAction(this->mpItemsWidget->toggleViewAction());
   mpMenuWindows->addAction(this->mpPropertiesWidget->toggleViewAction());
   mpMenuWindows->addAction(this->mpLogWidget->toggleViewAction());
-
+  #ifdef CEDAR_USE_COPY
+  mpMenuWindows->addAction(mpCopyWidget->toggleViewAction());
+  #endif
   QObject::connect(this->tabWidget,SIGNAL(currentChanged(int)),this, SLOT(updateTabs(int))); //Fixes a Bug under Mac OS
 
   //do not remove this line, init the qglviewer, allowing the robotic framework to work as intended. Hotfix part 1. Needs a better fix. TODO
@@ -572,7 +610,14 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   QObject::connect(mpActionParameterLinker, SIGNAL(triggered()), this, SLOT(openParameterLinker()));
   QObject::connect(mpActionDataSlotPositioning, SIGNAL(triggered()), this, SLOT(toggleDataSlotPositioning()));
 
+  #ifdef CEDAR_USE_COPY
+  mpActionShowCoPYDocumentation = this->findChild<QMenu*>("menuHelp")->addAction("Show CoPY Documentation");
 
+  QObject::connect(this->mpActionShowCoPYDocumentation,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(showCoPYDocumentation()));
+  #endif
   QObject::connect(this->mpRecorderWidget,
                    SIGNAL(settingsChanged()),
                    this,
@@ -665,10 +710,22 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   mBackupSaveThreadWrapper= cedar::aux::CallFunctionInThreadPtr( new cedar::aux::CallFunctionInThread( boost::bind( &cedar::proc::gui::Ide::backupSaveCallback, this ) ) );
   mBackupSaveThreadWrapper->start();
 
-#ifdef CEDAR_USE_PYTHON
+#ifdef CEDAR_USE_COPY
+  //send Scene to CoPYWidget
+  mpCopy->setScene(mpProcessingDrawer->getScene());
+  mpProcessingDrawer->getScene()->setCoPYWidget(mpCopy);
+#endif
+#ifdef CEDAR_USE_PYTHONSTEP
   cedar::proc::steps::PythonScript::importStepsFromTemplate();
 #endif
 }
+
+#ifdef CEDAR_USE_COPY
+void cedar::proc::gui::Ide::showCoPYDocumentation()
+{
+  QDesktopServices::openUrl(QUrl("file://" + QApplication::applicationDirPath() + "/../resources/CoPYDocumentation.pdf"));
+}
+#endif
 
 void cedar::proc::gui::Ide::showEvent( QShowEvent *event )
 {
@@ -708,6 +765,9 @@ void cedar::proc::gui::Ide::lockUI(bool lock)
   widgets.push_back(this->mpItemsWidget);
   widgets.push_back(this->mpPropertiesWidget);
   widgets.push_back(this->mpLogWidget);
+  #ifdef CEDAR_USE_COPY
+  widgets.push_back(mpCopyWidget);
+  #endif
 
   for (auto widget : widgets)
   {
@@ -1612,6 +1672,9 @@ void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
 void cedar::proc::gui::Ide::storeSettings()
 {
   cedar::proc::gui::SettingsSingleton::getInstance()->logSettings()->getFrom(this->mpLogWidget);
+  #ifdef CEDAR_USE_COPY
+  cedar::proc::gui::SettingsSingleton::getInstance()->coPYSettings()->getFrom(mpCopyWidget);
+  #endif
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->getFrom(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->getFrom(this->mpItemsWidget);
 
@@ -1629,9 +1692,11 @@ void cedar::proc::gui::Ide::storeSettings()
 void cedar::proc::gui::Ide::restoreSettings()
 {
   cedar::proc::gui::SettingsSingleton::getInstance()->logSettings()->setTo(this->mpLogWidget);
+  #ifdef CEDAR_USE_COPY
+  cedar::proc::gui::SettingsSingleton::getInstance()->coPYSettings()->setTo(mpCopyWidget);
+  #endif
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->setTo(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->setTo(this->mpItemsWidget);
-
   cedar::proc::gui::SettingsSingleton::getInstance()->restoreMainWindow(this);
 }
 
@@ -1679,7 +1744,6 @@ void cedar::proc::gui::Ide::notify(const QString& message)
 {
   QMessageBox::critical(this,"Notification", message);
 }
-
 void cedar::proc::gui::Ide::triggerStarted()
 {
   QWriteLocker locker(this->mSimulationRunning.getLockPtr());
@@ -1698,6 +1762,11 @@ void cedar::proc::gui::Ide::allTriggersStopped()
 
 void cedar::proc::gui::Ide::updateSimulationRunningIcon(bool running)
 {
+  #ifdef CEDAR_USE_COPY
+  //lock execute Button when simulating
+  this->mpCopy->lockExecuteButton(running);
+  #endif
+
   if (running)
   {
     this->mpActionStartPauseSimulation->setIcon(QIcon(":/cedar/auxiliaries/gui/pause.svg"));
@@ -1712,13 +1781,18 @@ void cedar::proc::gui::Ide::updateSimulationRunningIcon(bool running)
 
 void cedar::proc::gui::Ide::startPauseSimulationClicked()
 {
+
   if (this->mStopThreadsCaller->isRunning() || this->mStartThreadsCaller->isRunning())
   {
     return;
   }
 
+
   QReadLocker locker(this->mSimulationRunning.getLockPtr());
   bool running = this->mSimulationRunning.member();
+
+
+
 
   if (running)
   {

@@ -53,6 +53,7 @@
 #include <QSlider>
 #include <QLineEdit>
 #include <QTimer>
+#include <QLabel>
 
 
 /*!@brief Class that displays a cedar::proc::gui::Scene.
@@ -135,7 +136,9 @@ public:
 
   //! Stops the ScrollTimer which is responsible for extending the scene during dragging
   void stopScrollTimer();
-  
+
+  //! Sets the Coordinate Display
+  void setCoordinatesDisplay(const QStringList& coordinates);
   
   //!Hide or show the Code Tab (is only shown if "PythonScript" Step is selected)
   void hideCodeWidget();
@@ -209,6 +212,8 @@ private slots:
    */
   void fitZoomToArchitecture();
 
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -221,7 +226,13 @@ private:
   //! Pointer to the zoom level slider;
   QSlider* mpZoomLevelSlider;
 
-  QLineEdit* mpZoomLevelDisplay;
+  QLabel* mpZoomLevelDisplay;
+
+  QLabel* mpGroupDisplay;
+
+  QLabel* mpXDisplay;
+
+  QLabel* mpYDisplay;
 
   //!@brief Variable to keep track of the current zoom level.
   qreal mCurrentZoomLevel;

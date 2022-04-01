@@ -41,6 +41,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/configuration.h"
+#ifdef CEDAR_USE_COPY
+#include "gui/PythonQtScriptingConsole.h"
+#endif //CEDAR_USE_COPY
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Connectable.fwd.h"
@@ -57,8 +60,6 @@
 #include <QPushButton>
 #include <QSyntaxHighlighter>
 
-
-#ifdef CEDAR_USE_PYTHON
 
 
 /*!@brief Syntax Highlighter for QTextEdit to highlight Python code
@@ -89,6 +90,7 @@ ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WIT
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#if defined(CEDAR_USE_PYTHONSTEP) || defined(CEDAR_USE_COPY)
 namespace cedar
 {
   namespace proc
@@ -108,7 +110,6 @@ namespace cedar
             nth = n;
             format = matchingFormat;
           }
-
           QString originalRuleStr;
           QRegExp pattern;
           int nth;
@@ -122,7 +123,9 @@ namespace cedar
 
           public:
             PythonSyntaxHighlighter(QTextDocument *parent = 0);
-
+            virtual ~PythonSyntaxHighlighter()
+            {}
+            ;
           protected:
              void highlightBlock(const QString &text);
 
@@ -147,14 +150,13 @@ namespace cedar
 
 
         //!@brief Implementation of QPlainTextEdit with Code-Editor features (like Syntaxhighlighting, line marking, line numbers etc.)
-        class CodeEditor : public QPlainTextEdit
+      class CodeEditor : public QPlainTextEdit
         {
             Q_OBJECT
 
         public:
             CodeEditor(QWidget *parent = 0);
             ~CodeEditor();
-
             void lineNumberAreaPaintEvent(QPaintEvent *event);
             int lineNumberAreaWidth();
             void markErrorLine(long);
@@ -173,8 +175,6 @@ namespace cedar
         private:
             QWidget *lineNumberArea;
         };
-
-
 
 
         /*!@brief Widget to paint line numbers in the code section
@@ -204,9 +204,12 @@ namespace cedar
     }
   }
 }
+#endif
 
 /*!@brief GUI representation for the code section.
   */
+
+#ifdef CEDAR_USE_PYTHONSTEP
 class cedar::proc::gui::CodeWidget
 :
 public QWidget
@@ -254,7 +257,7 @@ private:
   //!@brief Resets the widget and its GUI elements.
   void clearLayout();
 
-private slots:
+public slots:
   void updateCodeString();
   //void errorMessageUpdated();
   void errorMessageLineNumberUpdated(long);
@@ -280,8 +283,8 @@ private:
 };
 
 
-#else // CEDAR_USE_PYTHON
 
+#else // CEDAR_USE_PYTHONSTEP
 class cedar::proc::gui::CodeWidget
 :
 public QWidget
@@ -297,8 +300,7 @@ public:
   }
 };
 
-#endif // CEDAR_USE_PYTHON
-
+#endif // CEDAR_USE_PYTHONSTEP
 #endif // CEDAR_PROC_GUI_CODE_WIDGET_H
 
 
