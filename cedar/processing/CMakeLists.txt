@@ -164,6 +164,7 @@ cedar_add_library(cedarproc
   steps/Convolution.h
   steps/ColorConversion.h
   steps/ComponentMultiply.h
+  steps/CoordinateToCameraAngles.h
   steps/DivideElementwise.h
   steps/DNN.h
   steps/SubtractElementwise.h
@@ -171,6 +172,7 @@ cedar_add_library(cedarproc
   steps/ForwardKinematics.h
   steps/PseudoInverseKinematics.h
   steps/DampedPseudoInverseKinematics.h
+  steps/DistanceImageCoordinateTransform.h
   steps/ConfigurationLimits.h
   steps/PseudoInverse.h
   steps/VehicleObstacleAvoidanceForceLet.h

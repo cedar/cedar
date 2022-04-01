@@ -228,8 +228,12 @@ void cedar::dyn::steps::HebbianConnection::updateAssociationDimension()
   int new_dim = static_cast<int>(mAssociationDimension->getValue());
   mAssociationSizes->resize(new_dim, mAssociationSizes->getDefaultValue());
 
-  mWeightCenters->resize(determineWeightDimension(), mWeightCenters->getDefaultValue());
-  mWeightSigmas->resize(determineWeightDimension(), mWeightCenters->getDefaultValue());
+
+  auto newWeightDimension = determineWeightDimension();
+
+
+  mWeightCenters->resize(newWeightDimension, mWeightCenters->getDefaultValue());
+  mWeightSigmas->resize(newWeightDimension, mWeightCenters->getDefaultValue());
   mWeightSizeX = determineWeightSizes(0);
   mWeightSizeY = determineWeightSizes(1);
 
@@ -242,8 +246,11 @@ void cedar::dyn::steps::HebbianConnection::updateInputDimension()
   int new_dim = static_cast<int>(mInputDimension->getValue());
   mInputSizes->resize(new_dim, mInputSizes->getDefaultValue());
 
-  mWeightCenters->resize(determineWeightDimension(), mWeightCenters->getDefaultValue());
-  mWeightSigmas->resize(determineWeightDimension(), mWeightCenters->getDefaultValue());
+  auto newWeightDimension = determineWeightDimension();
+
+
+  mWeightCenters->resize(newWeightDimension, mWeightCenters->getDefaultValue());
+  mWeightSigmas->resize(newWeightDimension, mWeightCenters->getDefaultValue());
 
 //  std::cout<<"updateInputDimension: WeightDim! " << determineWeightDimension() << " WeightX=" << determineWeightSizes(0) << " WeightY=" << determineWeightSizes(1) << std::endl;
 
@@ -258,9 +265,15 @@ void cedar::dyn::steps::HebbianConnection::updateLearningRule()
   switch (this->mLearningRule->getValue())
   {
     case cedar::dyn::steps::HebbianConnection::LearningRule::OJA:
-      mInputDimension->setValue(2);
+      if(mInputDimension->getValue()>2)
+      {
+        mInputDimension->setValue(2);
+      }
       mInputDimension->setMaximum(2);
-      mAssociationDimension->setValue(2);
+      if(mAssociationDimension->getValue()>2)
+      {
+        mAssociationDimension->setValue(2);
+      }
       mAssociationDimension->setMaximum(2);
       mSetWeights->setConstant(false);
       //Unfortunately no iteration
@@ -269,8 +282,8 @@ void cedar::dyn::steps::HebbianConnection::updateLearningRule()
       mMinThetaValue->setConstant(true);
       mUseFixedTheta->setConstant(true);
       mFixedThetaValue->setConstant(true);
-
       break;
+
     case cedar::dyn::steps::HebbianConnection::LearningRule::BCM:
       mInputDimension->setMaximum(3);
       mInputDimension->setValue(3);
@@ -328,7 +341,8 @@ cv::Mat cedar::dyn::steps::HebbianConnection::initializeWeightMatrix()
         std::vector<unsigned int> curSizes;
         curSizes.push_back(mWeightSizeX);
         curSizes.push_back(mWeightSizeY);
-        if (mAssociationDimension->getValue() != 0)
+
+        if (mAssociationDimension->getValue() != 0 && mWeightSigmas->getValue().size()== mAssociationDimension->getValue() && mWeightCenters->getValue().size() == mAssociationDimension->getValue() )
         {
           myWeightMat = cedar::aux::math::gaussMatrix(mAssociationDimension->getValue(), curSizes,
                                                       mWeightAmplitude->getValue(), mWeightSigmas->getValue(),
@@ -665,6 +679,10 @@ unsigned int cedar::dyn::steps::HebbianConnection::determineWeightDimension()
   auto assoDim = mAssociationDimension->getValue();
   auto inputDim = mInputDimension->getValue();
 
+//  std::cout<<"\ncedar::dyn::steps::HebbianConnection::determineWeightDimension!"<<std::endl;
+//  std::cout<<"assoDim: " << assoDim << " inputDim: " << inputDim << std::endl;
+//  std::cout<<"LearningRule: " << this->mLearningRule->getValue() << std::endl;
+
   switch(this->mLearningRule->getValue())
   {
     case cedar::dyn::steps::HebbianConnection::LearningRule::OJA:
@@ -691,6 +709,7 @@ unsigned int cedar::dyn::steps::HebbianConnection::determineWeightDimension()
     }
     default:
       //This should not happen
+      std::cout<<"DetermineInputDimension did not recognize the Learning Rule! This should not happen!" <<std::endl;
       return 0;
   }
 }

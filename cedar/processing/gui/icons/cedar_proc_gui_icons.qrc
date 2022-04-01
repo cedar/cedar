@@ -28,6 +28,7 @@
         <file>steps/no_icon.svg</file>
         <file>steps/broken_icon.svg</file>
         <file>steps/absolute_value.svg</file>
+		<file>steps/distance_image_coordinate_transform.svg</file>
         <file>steps/camera_grabber.svg</file>
         <file>steps/channel_merge.svg</file>
         <file>steps/channel_split.svg</file>
@@ -37,6 +38,7 @@
         <file>steps/a_minus_b.svg</file>
         <file>steps/convolution.svg</file>
         <file>steps/coordinate_transformation.svg</file>
+		<file>steps/coordinate_to_camera_angles.svg</file>
         <file>steps/flip.svg</file>
         <file>steps/gauss_input.svg</file>
         <file>steps/histogram.svg</file>
