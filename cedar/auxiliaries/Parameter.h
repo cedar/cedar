@@ -351,8 +351,6 @@ signals:
   //!@brief Signal that is emitted when mChanged is changed.
   void changedFlagChanged();
 
-  //!@brief Signal that is emitted when the gui of the paramter should be reapinted
-  void repaintSignal();
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------

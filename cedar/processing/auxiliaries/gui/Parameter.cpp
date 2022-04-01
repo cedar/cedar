@@ -39,10 +39,8 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include <cedar/processing/gui/Element.h>
 #include "cedar/processing/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/Parameter.h"
-#include "PropertyPane.h"
 
 // SYSTEM INCLUDES
 
@@ -87,7 +85,6 @@ void cedar::proc::aux::gui::Parameter::setParameter(cedar::aux::ParameterPtr pPa
 
   QObject::connect(pParameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertiesChanged()));
   QObject::connect(pParameter.get(), SIGNAL(valueChanged()), this, SLOT(valueChanged()));
-  QObject::connect(pParameter.get(), SIGNAL(repaintSignal()), this, SLOT(repaint()));
 
   emit parameterPointerChanged();
 }
@@ -107,29 +104,4 @@ void cedar::proc::aux::gui::Parameter::propertiesChanged()
 
 void cedar::proc::aux::gui::Parameter::valueChanged()
 {
-}
-
-void cedar::proc::aux::gui::Parameter::repaint()
-{
-	std::cout << "trigger repaint" << std::endl;
-	QWidget* parent = parentWidget();
-
-	int i = 0;
-	while(!dynamic_cast<cedar::proc::aux::gui::PropertyPane*>(parent))
-	{
-		cedar::proc::gui::Element* element = dynamic_cast<cedar::proc::gui::Element*>(parent);
-		std::cout << i << " :" << std::endl;
-		parent = parent->parentWidget();
-		if(parent == nullptr)
-		{
-			std::cout << "nullptr" << std::endl;
-			break;
-		}
-		i++;
-	}
-	if(parent != nullptr)
-	{
-		dynamic_cast<cedar::proc::aux::gui::PropertyPane*>(parent)->redraw();
-		std::cout << "success" << std::endl;
-	}
 }

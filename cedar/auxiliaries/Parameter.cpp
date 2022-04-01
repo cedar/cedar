@@ -277,7 +277,6 @@ bool cedar::aux::Parameter::isHidden() const
 void cedar::aux::Parameter::setHidden(bool hide)
 {
   this->mIsHidden = hide;
-	emit repaintSignal();
 }
 
 bool cedar::aux::Parameter::getReadAutomatically() const
