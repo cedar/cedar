@@ -67,7 +67,7 @@
       </widget>
       <widget class="QWidget" name="tabVisualisation">
        <attribute name="title">
-        <string>visualisation</string>
+        <string>visualization</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
@@ -208,6 +208,9 @@
   </widget>
   <widget class="QStatusBar" name="mpStatusBar"/>
   <widget class="QDockWidget" name="mpItemsWidget">
+   <property name="floating">
+    <bool>false</bool>
+   </property>
    <property name="features">
     <set>QDockWidget::DockWidgetFeatureMask</set>
    </property>
@@ -1093,6 +1096,7 @@
     <string>Ctrl+Shift+C</string>
    </property>
   </action>
+
   <action name="mpActionPaste">
    <property name="text">
     <string>Paste</string>
@@ -1292,6 +1296,12 @@
    <class>cedar::aux::gui::SceneControl</class>
    <extends>QWidget</extends>
    <header>cedar/auxiliaries/gui/SceneControl.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cedar::proc::gui::CoPYWidget</class>
+   <extends>QWidget</extends>
+   <header>cedar/processing/gui/CoPYWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

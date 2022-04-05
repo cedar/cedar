@@ -324,9 +324,8 @@ void cedar::proc::gui::View::createZoomWidget()
   p_zoom_plus->setMaximumSize(QSize(15, 15));
 
   // zoom value display
-  this->mpZoomLevelDisplay = new QLineEdit();
+  this->mpZoomLevelDisplay = new QLabel();
   this->mpZoomLevelDisplay->setMaximumSize(QSize(60, 20));
-  this->mpZoomLevelDisplay->setReadOnly(true);
 
   // reset button
   auto p_reset_zoom = new QPushButton("100%");
@@ -343,6 +342,17 @@ void cedar::proc::gui::View::createZoomWidget()
   p_full_zoom->setMaximumSize(QSize(50, 20));
   p_full_zoom->setToolTip("Shows the full architecture by adapting the zoom level accordingly.");
 
+  // Coordinate Display
+  mpGroupDisplay = new QLabel();
+  this->mpGroupDisplay->setMaximumSize(QSize(100, 20));
+  this->mpGroupDisplay->setMinimumWidth(50);
+  mpXDisplay = new QLabel();
+  this->mpXDisplay->setMaximumSize(QSize(100, 20));
+  this->mpXDisplay->setMinimumWidth(40);
+  mpYDisplay = new QLabel();
+  this->mpYDisplay->setMaximumSize(QSize(100, 20));
+  this->mpYDisplay->setMinimumWidth(40);
+
   // create widget that contains all of the above
   auto p_widget = new QWidget();
   auto p_layout = new QHBoxLayout();
@@ -354,6 +364,9 @@ void cedar::proc::gui::View::createZoomWidget()
   p_layout->addWidget(this->mpZoomLevelDisplay);
   p_layout->addWidget(p_reset_zoom);
   p_layout->addWidget(p_full_zoom);
+  p_layout->addWidget(this->mpGroupDisplay);
+  p_layout->addWidget(this->mpXDisplay);
+  p_layout->addWidget(this->mpYDisplay);
 
   p_layout->setContentsMargins(0, 0, 0, 0);
 
@@ -456,6 +469,7 @@ void cedar::proc::gui::View::scrollTimerEvent()
 
 void cedar::proc::gui::View::mouseMoveEvent(QMouseEvent *pEvent)
 {
+
   // scroll the view if connecting to something close to the edge
   if (this->mpScene->getMode() == cedar::proc::gui::Scene::MODE_CONNECT || this->mpScene->isDragging())
   {
@@ -564,6 +578,14 @@ void cedar::proc::gui::View::mouseReleaseEvent(QMouseEvent *pEvent)
 void cedar::proc::gui::View::startScrollTimer()
 {
   this->mpScrollTimer->start(100);
+}
+
+void cedar::proc::gui::View::setCoordinatesDisplay(const QStringList& coordinates)
+{
+  //Update Display
+  mpGroupDisplay->setText(coordinates[0]);
+  mpXDisplay->setText(coordinates[1]);
+  mpYDisplay->setText(coordinates[2]);
 }
 
 void cedar::proc::gui::View::stopScrollTimer()

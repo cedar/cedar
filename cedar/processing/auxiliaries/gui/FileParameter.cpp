@@ -173,26 +173,10 @@ void cedar::proc::aux::gui::FileParameter::onBrowseClicked()
   }
   if (!value.isEmpty())
   {
-    // If parameter belongs to a step, push to undo stack (e.g. settings parameter should not be undoable)
-    cedar::aux::NamedConfigurable* owner = parameter->getNamedConfigurableOwner();
-    if(owner != nullptr)
+    if(auto scene = cedar::proc::undoRedo::UndoCommand::sceneIfUndoable(parameter.get(), this))
     {
-      //Find the scene
-      cedar::proc::gui::Scene* scene;
-
-      QObject* parent = this;
-      while(parent != nullptr)
-      {
-        if(auto ide = dynamic_cast<cedar::proc::gui::Ide*>(parent))
-        {
-          scene = ide->mpProcessingDrawer->getScene();
-        }
-        parent = parent->parent();
-      }
-      CEDAR_ASSERT(scene != nullptr);
-
       cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::string,
-              cedar::aux::FileParameter>(parameter.get(), parameter->getPath(), value.toStdString(), owner, scene));
+                                              cedar::aux::FileParameter>(parameter.get(), parameter->getPath(), value.toStdString(), parameter->getNamedConfigurableOwner(), scene));
     }
     else
     {
@@ -205,25 +189,10 @@ void cedar::proc::aux::gui::FileParameter::onUseRelativeClicked()
 {
   if(auto parameter = boost::dynamic_pointer_cast<cedar::aux::FileParameter>(this->getParameter()))
   {
-    // If parameter belongs to a step, push to undo stack (e.g. settings parameter should not be undoable)
-    cedar::aux::NamedConfigurable* owner = parameter->getNamedConfigurableOwner();
-    if(owner != nullptr)
+    if(auto scene = cedar::proc::undoRedo::UndoCommand::sceneIfUndoable(parameter.get(), this))
     {
-      //Find the scene
-      cedar::proc::gui::Scene* scene;
-
-      QObject* parent = this;
-      while(parent != nullptr)
-      {
-        if(auto ide = dynamic_cast<cedar::proc::gui::Ide*>(parent))
-        {
-          scene = ide->mpProcessingDrawer->getScene();
-        }
-        parent = parent->parent();
-      }
-      CEDAR_ASSERT(scene != nullptr);
       cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::ToggleRelativePath(
-              parameter.get(), this->mpCheckRelative->isChecked(), owner, scene));
+            parameter.get(), this->mpCheckRelative->isChecked(), parameter->getNamedConfigurableOwner(), scene));
     }
     else
     {

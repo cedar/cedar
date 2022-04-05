@@ -120,6 +120,9 @@ public:
     BaseTypePtr object = FactoryManagerSingleton::getInstance()->allocate(type);
     object->readConfiguration(node);
     this->mObject = object;
+    if(auto config = dynamic_cast<cedar::aux::Configurable*>(object.get())){
+      config->setParent(this->getOwner());
+    }
   }
 
   //!@brief Write the parameter's value to a configuration node.

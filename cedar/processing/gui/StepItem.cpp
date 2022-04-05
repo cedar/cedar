@@ -39,37 +39,39 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/StepItem.h"
-#include "cedar/processing/gui/Scene.h"
-#include "cedar/processing/gui/DataSlotItem.h"
-#include "cedar/processing/gui/TriggerItem.h"
-#include "cedar/processing/gui/Settings.h"
-#include "cedar/processing/gui/exceptions.h"
-#include "cedar/processing/gui/PlotWidget.h"
-#include "cedar/processing/gui/PropertyPane.h"
-#include "cedar/processing/DataSlot.h"
-#include "cedar/processing/Step.h"
-#include "cedar/processing/steps/Component.h"
-#include "cedar/processing/steps/ShapeVisualisation.h"
-#include "cedar/devices/KinematicChain.h"
-#include "cedar/devices/gui/KinematicChainWidget.h"
-#include "cedar/devices/ComponentSlot.h"
-#include "cedar/processing/auxiliaries/gui/DataPlotter.h"
-#include "cedar/auxiliaries/gui/PlotManager.h"
-#include "cedar/auxiliaries/gui/PlotDeclaration.h"
-#include "cedar/auxiliaries/gui/exceptions.h"
-#include "cedar/auxiliaries/gui/Viewer.h"
-#include "cedar/auxiliaries/gl/Scene.h"
-#include "cedar/auxiliaries/gl/GlobalScene.h"
-#include "cedar/auxiliaries/TypeHierarchyMap.h"
+
 #include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/Singleton.h"
-#include "cedar/auxiliaries/Log.h"
-#include "cedar/auxiliaries/casts.h"
+#include "cedar/auxiliaries/TypeHierarchyMap.h"
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/units/Time.h"
+#include "cedar/auxiliaries/casts.h"
+#include "cedar/auxiliaries/gl/GlobalScene.h"
+#include "cedar/auxiliaries/gl/Scene.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
+#include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/gui/Viewer.h"
+#include "cedar/auxiliaries/gui/exceptions.h"
+#include "cedar/devices/ComponentSlot.h"
+#include "cedar/devices/KinematicChain.h"
+#include "cedar/devices/gui/KinematicChainWidget.h"
+#include "cedar/processing/DataSlot.h"
+#include "cedar/processing/Step.h"
+#include "cedar/processing/auxiliaries/gui/DataPlotter.h"
+#include "cedar/processing/gui/CoPYWidget.h"
+#include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/PlotDockWidget.h"
+#include "cedar/processing/gui/PlotWidget.h"
+#include "cedar/processing/gui/PropertyPane.h"
+#include "cedar/processing/gui/Scene.h"
+#include "cedar/processing/gui/Settings.h"
+#include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/TriggerItem.h"
+#include "cedar/processing/gui/exceptions.h"
+#include "cedar/processing/steps/Component.h"
+#include "cedar/processing/steps/ShapeVisualisation.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <QPen>
@@ -483,7 +485,11 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   this->connect(p_reset, SIGNAL(triggered()), SLOT(reset()));
   QAction *p_delete = menu.addAction("delete");
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+  #ifdef CEDAR_USE_COPY
+  QAction *p_use_in_copy = menu.addAction("use In CoPY");
 
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+  #endif
   QMenu *p_actions_menu = menu.addMenu("actions");
   p_actions_menu->setIcon(QIcon(":/menus/actions.svg"));
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
@@ -587,6 +593,13 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
       p_scene->deleteElements(items, event->modifiers() & Qt::ControlModifier);
     }
   }
+  #ifdef CEDAR_USE_COPY
+  else if(a == p_use_in_copy)
+  {
+    cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+    p_scene->getCoPYWidget()->importStepInformation(this);
+  }
+  #endif
   else
   {
     this->handleContextMenuAction(a, event);

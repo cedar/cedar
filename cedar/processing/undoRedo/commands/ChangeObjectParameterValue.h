@@ -85,12 +85,24 @@ protected:
 
   void undoAction() override
   {
+    this->mpParameter->writeToNode(this->mNewConfig);
     this->mpParameter->setType(this->mOldValue);
+    if(!this->mOldConfig.empty())
+    {
+      this->mpParameter->readFromNode(this->mOldConfig.get_child(this->mpParameter->getName()));
+    }
+    this->mpParameter->emitChangedSignal();
   }
 
   void redoAction() override
   {
+    this->mpParameter->writeToNode(this->mOldConfig);
     this->mpParameter->setType(this->mNewValue);
+    if(!this->mNewConfig.empty())
+    {
+      this->mpParameter->readFromNode(this->mNewConfig.get_child(this->mpParameter->getName()));
+    }
+    this->mpParameter->emitChangedSignal();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -105,6 +117,9 @@ private:
 protected:
   // none yet
 private:
+
+  cedar::aux::ConfigurationNode mOldConfig;
+  cedar::aux::ConfigurationNode mNewConfig;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

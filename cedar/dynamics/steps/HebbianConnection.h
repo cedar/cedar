@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/math/functions.h"
 #include "cedar/processing/steps/TransferFunction.h"
 //#include <boost/enable_shared_from_this.hpp>
@@ -76,6 +77,45 @@ class cedar::dyn::steps::HebbianConnection : public cedar::dyn::Dynamics
 
   typedef cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction> SigmoidParameter;
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(SigmoidParameter);
+
+public:
+    //!@brief Enum class for Learnrules
+    class LearningRule
+    {
+    public:
+        //! the id of an enum entry
+        typedef cedar::aux::EnumId Id;
+
+        //! constructs the enum for all ids
+        static void construct()
+        {
+          mType.type()->def(cedar::aux::Enum(OJA, "Oja's Rule"));
+          mType.type()->def(cedar::aux::Enum(BCM, "BCM Rule"));
+        }
+
+        //! @returns A const reference to the base enum object.
+        static const cedar::aux::EnumBase& type()
+        {
+          return *(mType.type());
+        }
+
+        //! @returns A pointer to the base enum object.
+        static const cedar::proc::DataRole::TypePtr& typePtr()
+        {
+          return mType.type();
+        }
+
+    public:
+        //! flag for using Oja's rule
+        static const Id OJA = 0;
+        //! flag for using the BCM Rule adapted by Law and Cooper, 1994
+        static const Id BCM = 1;
+
+    private:
+        static cedar::aux::EnumType<LearningRule> mType;
+    };
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -88,8 +128,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  unsigned int getDimensionality();
-  cv::Mat getSizes();
+//  unsigned int getDimensionality();
+//  cv::Mat getSizes();
   std::string getOutputName();
   std::string getAssoInputName();
   std::string getRewardInputName();
@@ -106,6 +146,9 @@ public slots:
  void resetWeights();
  void toggleUseReward();
  void toggleUseManualWeights();
+ void updateLearningRule();
+ void toggleFixedTheta();
+ void applyFixedTheta();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -122,6 +165,10 @@ private:
 
   cv::Mat initializeWeightMatrix();
 
+  cv::Mat initializeThetaMatrix();
+
+  cv::Mat calculateDefaultOutput();
+
   //!@brief Updates the output matrix.
   void eulerStep(const cedar::unit::Time& time);
 
@@ -135,7 +182,7 @@ private:
 
   unsigned int determineWeightSizes(unsigned int dimension);
 
-  cv::Mat calculateWeightChange(cv::Mat inputActivation,cv::Mat associationActivation, cv::Mat rewardValue);
+  cv::Mat calculateWeightChange(const cedar::unit::Time& delta_t, cv::Mat inputActivation,cv::Mat associationActivation, cv::Mat rewardValue);
 
   cv::Mat calculateOutputMatrix( cv::Mat mat);
 
@@ -144,12 +191,17 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief The factor by which the input is multiplied.
+  cedar::aux::EnumParameterPtr mLearningRule;
   cedar::aux::UIntParameterPtr mInputDimension;
   cedar::aux::UIntVectorParameterPtr mInputSizes;
   cedar::aux::UIntParameterPtr mAssociationDimension;
   cedar::aux::UIntVectorParameterPtr mAssociationSizes;
   cedar::aux::DoubleParameterPtr mLearnRatePositive;
+  cedar::aux::DoubleParameterPtr mTauWeights;
+  cedar::aux::DoubleParameterPtr mTauTheta;
+  cedar::aux::DoubleParameterPtr mMinThetaValue;
+  cedar::aux::BoolParameterPtr  mUseFixedTheta;
+  cedar::aux::DoubleParameterPtr mFixedThetaValue;
   SigmoidParameterPtr mSigmoidF;
   SigmoidParameterPtr mSigmoidG;
   SigmoidParameterPtr mSigmoidH;
@@ -164,6 +216,7 @@ protected:
 
 
 private:
+  cedar::aux::ConfigurablePtr mBcmParameterGroup;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -172,12 +225,17 @@ protected:
   //!@brief The data containing the output.
   cedar::aux::MatDataPtr mConnectionWeights;
   cedar::aux::MatDataPtr mWeightOutput;
+  cedar::aux::MatDataPtr mBCMTheta;
+
 private:
   std::string mAssoInputName = "target field";
   std::string mOutputName = "weights";
   std::string mTriggerOutputName = "learned output";
   std::string mRewardInputName = "reward signal";
   std::string mReadOutInputName= "source node";
+
+  std::string mThetaMatrixName = "bcm theta";
+  std::string mThetaCounterName  = "theta counter";
   bool mIsRewarded = false;
   int mElapsedTime = 0;
 

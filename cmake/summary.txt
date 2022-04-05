@@ -155,7 +155,8 @@ endif(CEDAR_USE_FFTW_THREADED)
 cedar_summary_lib_found("Yarp" CEDAR_USE_YARP)
 cedar_summary_lib_found("PCL" CEDAR_USE_PCL)
 cedar_summary_lib_found("Eigen3" CEDAR_USE_EIGEN3)
-cedar_summary_lib_found("Python" CEDAR_USE_PYTHON)
+cedar_summary_lib_found("PythonStep" CEDAR_USE_PYTHONSTEP)
+cedar_summary_lib_found("COPYScriptingTool" CEDAR_USE_COPY)
 
 message("")
 

@@ -227,7 +227,7 @@ void cedar::aux::ThreadWrapper::start()
       //   incorrect TRUE: doesnt happen, since is only changed to TRUE,
       //                    and that only once
       //   incorrect FALSE: (i.e. changed to TRUE but we incorrectly
-      //                   read as FALSE) the Destructor will wait for the 
+      //                   read as FALSE) the Destructor will wait for the
       //                   GeneralAccessLock released at the end of start
 
   if (true)

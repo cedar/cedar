@@ -57,6 +57,10 @@ namespace cedar
     namespace gui
     {
       CEDAR_DECLARE_PROC_CLASS(CodeWidget);
+      namespace CodeWidgetScope
+      {
+        CEDAR_DECLARE_PROC_CLASS(CodeEditor);
+      }
     }
   }
 }

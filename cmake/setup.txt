@@ -147,6 +147,7 @@ endif(CMAKE_COMPILER_IS_GNUCC)
 
 if (CMAKE_COMPILER_IS_GNUCC)
   add_definitions(-Wall -Wextra)
+#This is outdated by now. The new standard is c++14
 #  add_definitions(-std=gnu++0x)
   	
   if (WIN32)

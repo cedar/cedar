@@ -53,9 +53,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 //Constructor for creating an element
-cedar::proc::undoRedo::commands::CreateDeleteElement::CreateDeleteElement(QPointF position,std::string classId,
-				cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene,
-				bool isCreateCommand)
+cedar::proc::undoRedo::commands::CreateDeleteElement::CreateDeleteElement(std::string classId,
+				cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene, bool isCreateCommand,
+				QPointF position = QPointF(0,0))
 :
 mpGuiElement(nullptr),
 mpTargetGroup(group),

@@ -41,6 +41,7 @@
 #include "cedar/processing/auxiliaries/gui/Configurable.h"
 #include "cedar/processing/auxiliaries/gui/Parameter.h"
 #include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/Step.h"
 #include "cedar/processing/undoRedo/commands/ChangeObjectListParameterValue.h"
 #include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/processing/auxiliaries/TypeBasedFactory.h"
@@ -52,7 +53,6 @@
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/kernel/Box.h"
 #if !defined CEDAR_OS_APPLE
-#include "cedar/processing/Step.h"
 #endif
 
 // SYSTEM INCLUDES
@@ -72,6 +72,8 @@
 #endif
 
 #include <boost/tokenizer.hpp>
+#include <QMenu>
+#include <cedar/processing/gui/CoPYWidget.h>
 
 #define PARAMETER_NAME_COLUMN 0
 #define PARAMETER_EDITOR_COLUMN 1
@@ -184,6 +186,11 @@ public:
     }
   }
 
+  cedar::aux::ParameterPtr getParameter()
+  {
+    return mParameter;
+  }
+
 private:
   cedar::aux::ParameterPtr mParameter;
 };
@@ -208,6 +215,11 @@ QWidget(pParent)
   p_layout->addWidget(mpPropertyTree, 1);
   p_layout->setContentsMargins(0, 0, 0, 0);
   this->mpPropertyTree->setAlternatingRowColors(true);
+
+  //enable context Menu
+  this->mpPropertyTree->setContextMenuPolicy(Qt::CustomContextMenu);
+  QObject::connect(mpPropertyTree, SIGNAL(customContextMenuRequested(const QPoint &)), this,
+                   SLOT(showContextMenu(const QPoint &)));
 
   // setup header
   this->mpPropertyTree->setColumnCount(2);
@@ -629,26 +641,10 @@ void cedar::proc::aux::gui::Configurable::handleDeleteButtonClicked(QString full
 
       if(auto objectListParameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
       {
-        // If parameter belongs to a step/element, push to undo stack (e.g. settings parameter should not be undoable)
-        cedar::aux::NamedConfigurable* owner = objectListParameter->getNamedConfigurableOwner();
-        if(owner != nullptr)
+        if(auto scene = cedar::proc::undoRedo::UndoCommand::sceneIfUndoable(objectListParameter.get(), this))
         {
-          //Find the scene
-          cedar::proc::gui::Scene* scene;
-
-          QObject* parent = this;
-          while(parent != nullptr)
-          {
-            if(auto ide = dynamic_cast<cedar::proc::gui::Ide*>(parent))
-            {
-              scene = ide->mpProcessingDrawer->getScene();
-            }
-            parent = parent->parent();
-          }
-          CEDAR_ASSERT(scene != nullptr);
-
           cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::ChangeObjectListParameterValue(
-                  objectListParameter.get(), index, owner, scene));
+                  objectListParameter.get(), index, objectListParameter->getNamedConfigurableOwner(), scene));
         }
         else
         {
@@ -867,4 +863,28 @@ void cedar::proc::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* ite
   font.setKerning(true);
   item->setFont(PARAMETER_NAME_COLUMN, font);
 }
+
+void cedar::proc::aux::gui::Configurable::showContextMenu(const QPoint &pos)
+{
+  ParameterItem *item = dynamic_cast<ParameterItem *>(mpPropertyTree->itemAt(pos));
+  if (!item)
+    return;
+  QMenu context_menu(tr("Context Menu"), this);
+  #ifdef CEDAR_USE_COPY
+  QAction *use_in_copy = context_menu.addAction("use in CoPY");
+  QAction *a = context_menu.exec(mpPropertyTree->viewport()->mapToGlobal(pos));
+  if (a == use_in_copy)
+  {
+    //get CoPYWidget and append
+    QObject* object = this;
+    while(object->parent()){
+      object = object->parent();
+    }
+    if(auto copyWidget = object->findChild<cedar::proc::gui::CoPYWidget*>("mpCopy")){
+      copyWidget->appendParameterToText( item->getParameter(), this->getPathFromItem(item).toStdString());
+    }
+  }
+  #endif
+}
+
 

@@ -39,6 +39,8 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include <QMenu>
+#include <QContextMenuEvent>
 #include "cedar/processing/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/Parameter.h"
 
@@ -53,6 +55,7 @@ cedar::proc::aux::gui::Parameter::Parameter(QWidget *pParent)
 QWidget(pParent)
 {
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterChanged()));
+  setContextMenuPolicy(Qt::DefaultContextMenu);
 }
 
 //!@brief Destructor

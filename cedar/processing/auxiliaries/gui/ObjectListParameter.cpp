@@ -127,26 +127,11 @@ QString cedar::proc::aux::gui::ObjectListParameter::prettyTypeId(const QString& 
 void cedar::proc::aux::gui::ObjectListParameter::addClicked()
 {
   cedar::aux::ObjectListParameterPtr parameter = this->getObjectList();
-  // If parameter belongs to a step/element, push to undo stack (e.g. settings parameter should not be undoable)
-  cedar::aux::NamedConfigurable* owner = parameter->getNamedConfigurableOwner();
-  if(owner != nullptr)
+
+  if(auto scene = cedar::proc::undoRedo::UndoCommand::sceneIfUndoable(parameter.get(), this))
   {
-    //Find the scene
-    cedar::proc::gui::Scene* scene;
-
-    QObject* parent = this;
-    while(parent != nullptr)
-    {
-      if(auto ide = dynamic_cast<cedar::proc::gui::Ide*>(parent))
-      {
-        scene = ide->mpProcessingDrawer->getScene();
-      }
-      parent = parent->parent();
-    }
-    CEDAR_ASSERT(scene != nullptr);
-
     cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::ChangeObjectListParameterValue(
-            parameter.get(), this->getSelectedType(), owner, scene));
+            parameter.get(), this->getSelectedType(), parameter->getNamedConfigurableOwner(), scene));
   }
   else
   {

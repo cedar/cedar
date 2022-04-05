@@ -43,7 +43,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/CommentWidget.h"
-#include "cedar/processing/gui/CodeWidget.h"
+#include "cedar/processing/gui/CodeWidget.fwd.h"
+#include "cedar/processing/gui/CoPYWidget.fwd.h"
 #include "cedar/processing/gui/ui_Ide.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/auxiliaries/LogInterface.h"
@@ -316,10 +317,8 @@ public slots:
   void paste();
 
   //!@brief change an elements name in the connection section of json
-  void renameElementInConnection(boost::property_tree::ptree& connectionTree, std::string oldName, std::string newName, std::string sourceSlotName, std::string targetSlotName);
-
-  //!@brief paste one element using json data nodes
-  void pasteConfigurationNodes(cedar::aux::ConfigurationNode stepNode, cedar::aux::ConfigurationNode uiNode, cedar::aux::ConfigurationNode connectionNode, cedar::aux::ConfigurationNode groupNode);
+	static void renameElementInConnection(boost::property_tree::ptree& connectionTree, std::string oldName,
+					std::string newName, std::string sourceSlotName, std::string targetSlotName);
 
   //!@brief copy the configuration of one step
   void copyStepConfiguration();
@@ -410,6 +409,8 @@ private:
 
   void setSimulationControlsEnabled(bool enabled);
 
+  void showEvent( QShowEvent *event );
+
   void translateGlobalTimeFactorChangedSignal(double newValue);
 
   void processLoopModeChangedSignal(cedar::aux::LoopMode::Id newMode);
@@ -420,9 +421,10 @@ private:
 
   void backupSaveCallback();
 
-  void showEvent( QShowEvent *event );
-
 private slots:
+  #ifdef CEDAR_USE_COPY
+  void showCoPYDocumentation();
+  #endif
 
   void simulationModeComboBoxChanged( int newIndex);
 
@@ -470,6 +472,11 @@ private:
 
   cedar::proc::StepPtr mLastCopiedStep;
 
+  #ifdef CEDAR_USE_COPY
+  QDockWidget* mpCopyWidget;
+  cedar::proc::gui::CoPYWidget* mpCopy;
+  QAction* mpActionShowCoPYDocumentation;
+  #endif
 
   //! Performance overview.
   cedar::proc::gui::PerformanceOverview* mpPerformanceOverview;

@@ -92,6 +92,7 @@
 #include <QToolTip>
 #include <QDialogButtonBox>
 #include <QMessageBox>
+#include <QClipboard>
 #include <iostream>
 #include <set>
 #include <list>
@@ -158,7 +159,12 @@ cedar::proc::gui::CodeWidget* cedar::proc::gui::Scene::getCodeWidget() const
 {
   return this->mpCodeWidget;
 }
-
+#ifdef CEDAR_USE_COPY
+cedar::proc::gui::CoPYWidget *cedar::proc::gui::Scene::getCoPYWidget() const
+{
+  return this->mpCoPYWidget;
+}
+#endif
 void cedar::proc::gui::Scene::dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
   this->QGraphicsScene::dragEnterEvent(pEvent);
@@ -225,7 +231,10 @@ void cedar::proc::gui::Scene::keyPressEvent(QKeyEvent* pEvent)
 void cedar::proc::gui::Scene::deleteSelectedElements(bool skipConfirmation)
 {
   auto selected_items = this->selectedItems();
-  this->deleteElements(selected_items, skipConfirmation);
+  if(!selected_items.empty())
+  {
+    this->deleteElements(selected_items, skipConfirmation);
+  }
 }
 
 void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool skipConfirmation)
@@ -485,7 +494,12 @@ void cedar::proc::gui::Scene::setCodeWidget(cedar::proc::gui::CodeWidget* pCodeW
   this->mpCodeWidget = pCodeWidget;
   mpeParentView->hideCodeWidget();
 }
-
+#ifdef CEDAR_USE_COPY
+void cedar::proc::gui::Scene::setCoPYWidget(cedar::proc::gui::CoPYWidget *pCoPYWidget)
+{
+  this->mpCoPYWidget = pCoPYWidget;
+}
+#endif
 void cedar::proc::gui::Scene::itemSelected()
 {
   // either show the resize handles if only one item is selected, or hide them if more than one is selected
@@ -533,7 +547,7 @@ void cedar::proc::gui::Scene::itemSelected()
         }
       }
 
-#ifdef CEDAR_USE_PYTHON
+#ifdef CEDAR_USE_PYTHONSTEP
       auto connectable_pythonScript = boost::dynamic_pointer_cast<cedar::proc::steps::PythonScript>(p_element->getElement());
       if (this->mpCodeWidget != nullptr)
       {
@@ -670,30 +684,13 @@ cedar::proc::gui::Element* cedar::proc::gui::Scene::getElementByFullPath(std::st
 
   std::vector<std::string> mElementNameSplitted;
   boost::split(mElementNameSplitted, elementIdentifier, boost::is_any_of("."));
+	cedar::proc::gui::Group* currentGroup;
 
-  if(this == nullptr)
-  {
-    std::cout<<"This is null!" << std::endl;
-  }
-
-  cedar::proc::gui::GroupPtr rootGroup = this->getRootGroup();
-
-  cedar::proc::gui::Group* currentGroup = rootGroup.get();
-  //Go through all subgroups
-  for (std::size_t i = 0; i < mElementNameSplitted.size()-1; i++)
-  {
-    if(currentGroup->getGroup()->contains(mElementNameSplitted[i]))
-    {
-      if (cedar::proc::ElementPtr element = currentGroup->getGroup()->getElement(mElementNameSplitted[i]))
-      {
-        cedar::proc::gui::Element* guiElement = this->getGraphicsItemFor(element);
-        if (cedar::proc::gui::Group* group = dynamic_cast<cedar::proc::gui::Group*>(guiElement))
-        {
-          currentGroup = group;
-        }
-      }
-    }
-  }
+	if (cedar::proc::gui::Group* group = dynamic_cast<cedar::proc::gui::Group*>(
+					this->getGraphicsItemFor(this->getGroupOfElementByFullPath(elementIdentifier))))
+	{
+		currentGroup = group;
+	}
 
   //Set the guiElement
   if(currentGroup->getGroup()->contains(mElementNameSplitted[mElementNameSplitted.size() - 1]))
@@ -952,6 +949,8 @@ void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEve
   this->mMousePosX = pMouseEvent->scenePos().x();
   this->mMousePosY = pMouseEvent->scenePos().y();
 
+  this->mpeParentView->setCoordinatesDisplay(this->getGroupCoordinates(pMouseEvent->scenePos()));
+
   if (this->mDraggingItems)
   {
     this->highlightTargetGroups(pMouseEvent->scenePos());
@@ -988,7 +987,20 @@ QList<QGraphicsItem*> cedar::proc::gui::Scene::getSelectedParents() const
   return selected_parents;
 }
 
-void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition)
+QStringList cedar::proc::gui::Scene::getGroupCoordinates(const QPointF &mousePosition)
+{
+  //Update Coordinate View
+  auto group = this->findFirstGroupItem(
+          this->items(mousePosition, Qt::IntersectsItemShape, Qt::DescendingOrder));
+  QString groupName = QString::fromStdString((!group) ? "root" : group->getGroup()->getName());
+  QPointF pos = (!group) ? mousePosition : QPointF(mMousePosX - group->pos().x(),
+                                                   mMousePosY - group->pos().y());
+  QStringList coordinates;
+  coordinates.append({groupName, QString::number(pos.x()), QString::number(pos.y())});
+  return coordinates;
+}
+
+void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF &mousePosition)
 {
   auto items_under_mouse = this->items(mousePosition, Qt::IntersectsItemShape, Qt::DescendingOrder);
   auto selected = this->getSelectedParents();
@@ -1152,24 +1164,22 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
   //Case 3: Moving between same groups
   else
   {
-      if (items_to_move.size() != 0)
+    if(items_to_move.size() != 0)
+    {
+      //First item of list is enough, since all have the same group
+      if(cedar::proc::gui::Element* guiElement = dynamic_cast<cedar::proc::gui::Element*>(items_to_move.front()))
       {
-          //First item of list is enough, since all have the same group
-          if (cedar::proc::gui::Element* guiElement = dynamic_cast<cedar::proc::gui::Element*>(items_to_move.front()))
-          {
-              targetGroup = this->getGroupFor(guiElement->getElement()->getGroup().get());
-          }
+        targetGroup = this->getGroupFor(guiElement->getElement()->getGroup().get());
       }
+    }
   }
 
   if (this->mDraggingItems && this->mpDraggingGraphicsBase && this->mStartMovingPositionOfClicked != this->mpDraggingGraphicsBase->pos())
   {
-    cedar::proc::gui::Ide::pUndoStack->push(
-            new cedar::proc::undoRedo::commands::MoveElement(items_to_move,
-                                                             sourceGroup,
-                                                             targetGroup,
-                                                             this->mStartMovingPosition,
-                                                             this));
+		cedar::proc::gui::Ide::pUndoStack->beginMacro("Moved selected elements");
+    cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::MoveElement(items_to_move,
+    				sourceGroup, targetGroup,this->mStartMovingPosition,this));
+		cedar::proc::gui::Ide::pUndoStack->endMacro();
   }
   this->mDraggingItems = false;
   mTargetGroup.reset();
@@ -1257,7 +1267,26 @@ void cedar::proc::gui::Scene::multiItemContextMenuEvent(QGraphicsSceneContextMen
     }
   }
 
+  bool can_be_used_in_py = false;
+  for (auto item : this->selectedItems())
+  {
+    if (auto step = dynamic_cast<cedar::proc::gui::StepItem *>(item))
+    {
+      can_be_used_in_py = true;
+      break;
+    }
+  }
+  auto delete_action = menu.addAction("delete");
   auto p_assign_to_trigger = menu.addMenu("assign to trigger");
+  #ifdef CEDAR_USE_COPY
+  auto p_use_in_py = menu.addAction("use in CoPY");
+  if (can_be_used_in_py)
+  {
+  } else
+  {
+    p_use_in_py->setEnabled(false);
+  }
+  #endif
   if (can_connect)
   {
     cedar::proc::gui::Connectable::buildConnectTriggerMenu
@@ -1273,8 +1302,18 @@ void cedar::proc::gui::Scene::multiItemContextMenuEvent(QGraphicsSceneContextMen
     p_assign_to_trigger->setEnabled(false);
   }
 
-  menu.exec(pContextMenuEvent->screenPos());
-
+  QAction *a = menu.exec(pContextMenuEvent->screenPos());
+  #ifdef CEDAR_USE_COPY
+  if (a == p_use_in_py)
+  {
+    mpCoPYWidget->importStepInformation(this->selectedItems());
+  }
+  #endif
+  if (a == delete_action)
+  {
+    QList<QGraphicsItem*> items = this -> selectedItems();
+    this ->deleteElements(items, false);
+  }
   pContextMenuEvent->accept();
 }
 
@@ -1341,7 +1380,8 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
   QAction* p_importStep = menu.addAction("import step from file ...");
   menu.addSeparator();
   QAction *p_addSickyNode = menu.addAction("add sticky note");
-
+  QAction *p_copyCoordinates = menu.addAction(
+          "copy coordinates");
   /// Added this menu point as a quick method to switch mode
   /// There are probably more elegant ways to do this
   QAction *p_moveOutputDataslots = nullptr;
@@ -1362,6 +1402,10 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
   else if (a == p_addSickyNode)
   {
     this->addStickyNote();
+  } else if (a == p_copyCoordinates)
+  {
+    QClipboard *p_Clipboard = QApplication::clipboard();
+    p_Clipboard->setText(QString::number(mMousePosX) + ", " + QString::number(mMousePosY));
   }
   /// switch mode to MODE_MOVE_DATASLOTS (or to MODE_SELECT if already in MODE_MOVE_DATASLOTS)
   else if(p_moveOutputDataslots != nullptr && a == p_moveOutputDataslots)
@@ -1455,7 +1499,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
     for (const auto& element_gui_ptr_pair : this->mElementMap)
     {
       auto p_gui_connectable = dynamic_cast<cedar::proc::gui::Connectable*>(element_gui_ptr_pair.second);
-      if (p_gui_connectable && this->mpConnectionStart->canConnectTo(p_gui_connectable))
+      if (p_gui_connectable && mpConnectionStart->canConnectTo(p_gui_connectable))
       {
         p_gui_connectable->magnetizeSlots(pMouseEvent->scenePos());
       }
@@ -1607,7 +1651,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
     for (int i = 0; i < items.size() && !connected; ++i)
     {
       cedar::proc::gui::GraphicsBase *target;
-      if 
+      if
       (
         (target = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
           && mpConnectionStart->canConnectTo(target) != cedar::proc::gui::CONNECT_NO
@@ -1763,8 +1807,7 @@ void cedar::proc::gui::Scene::snapAllItemsToGrid()
         {
           cedar::proc::gui::ConnectionAnchor* anchor = anchors.at(j);
           anchor->setSelected(true);
-          anchor->move(QPointF(anchor->scenePos().x() + 1, anchor->scenePos().y() + 1), anchor->scenePos());
-          anchor->mouseReleaseEvent(nullptr);
+          anchor->snapToGrid();
           anchor->setSelected(false);
         }
       }

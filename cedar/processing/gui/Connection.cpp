@@ -780,15 +780,16 @@ void cedar::proc::gui::Connection::mouseDoubleClickEvent(QGraphicsSceneMouseEven
   }
 }
 
-void cedar::proc::gui::Connection::addConnectionAnchor(QPointF addPosition, bool restoreOldPoint){
+cedar::proc::gui::ConnectionAnchor* cedar::proc::gui::Connection::addConnectionAnchor(QPointF addPosition, bool restoreOldPoint){
   if(!this->mSmartMode)
   {
     if(restoreOldPoint)
     {
       // Used when loading an architecture
-      mConnectionAnchorPoints.push_back(new cedar::proc::gui::ConnectionAnchor(addPosition.x(), addPosition.y(), mAnchorPointRadius, this));
+      cedar::proc::gui::ConnectionAnchor* anchor = new cedar::proc::gui::ConnectionAnchor(addPosition.x(), addPosition.y(), mAnchorPointRadius, this);
+      mConnectionAnchorPoints.push_back(anchor);
       this->updateGraphics();
-      return;
+      return anchor;
     }
 
     QPointF anchorPoint = addPosition;
@@ -813,9 +814,10 @@ void cedar::proc::gui::Connection::addConnectionAnchor(QPointF addPosition, bool
 
     if(mConnectionAnchorPoints.size() == 0)
     {
-      mConnectionAnchorPoints.push_back(new cedar::proc::gui::ConnectionAnchor(anchorPointMinusPos.x(), anchorPointMinusPos.y(), mAnchorPointRadius, this));
+      cedar::proc::gui::ConnectionAnchor* anchor = new cedar::proc::gui::ConnectionAnchor(anchorPointMinusPos.x(), anchorPointMinusPos.y(), mAnchorPointRadius, this);
+      mConnectionAnchorPoints.push_back(anchor);
       this->updateGraphics();
-      return;
+      return anchor;
     }
 
     float pathLength = 0.0f;
@@ -864,12 +866,14 @@ void cedar::proc::gui::Connection::addConnectionAnchor(QPointF addPosition, bool
         break;
       }
     }
-    ConnectionAnchor* anchor = new ConnectionAnchor(anchorPointMinusPos.x(), anchorPointMinusPos.y(), mAnchorPointRadius, this);
+    cedar::proc::gui::ConnectionAnchor* anchor = new ConnectionAnchor(anchorPointMinusPos.x(), anchorPointMinusPos.y(), mAnchorPointRadius, this);
 
     if(mConnectionAnchorPoints.size() == indexToInsert) mConnectionAnchorPoints.push_back(anchor);
     else mConnectionAnchorPoints.insert(mConnectionAnchorPoints.begin() + indexToInsert, anchor);
     this->updateGraphics();
+    return anchor;
   }
+  return nullptr;
 }
 
 void cedar::proc::gui::Connection::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)

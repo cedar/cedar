@@ -223,12 +223,19 @@ void cedar::proc::undoRedo::commands::CreateDeleteConnection::updateSourceAndTar
 			//Get the group of the externalOutput
 			if(cedar::proc::gui::Group* group = dynamic_cast<cedar::proc::gui::Group*>(guiElement))
 			{
-				//Getting the externalOutput itself
-				cedar::proc::Connectable* externalOutput = dynamic_cast<cedar::proc::Connectable*>(
+				//Get externalConnector (externalOutput/-Input) itself
+				cedar::proc::Connectable* externalConnector = dynamic_cast<cedar::proc::Connectable*>(
 								group->getGroup()->getElement(external).get());
-				CEDAR_ASSERT(externalOutput!= nullptr);
-				//Get the source of the externalOutput with using the sourceSlotName
-				slot = group->getSourceConnectorItem(externalOutput->getOutputSlot(slotName));
+				CEDAR_ASSERT(externalConnector!= nullptr);
+				//Get source of the externalOutput using the sourceSlotName
+        if(dataRole == cedar::proc::DataRole::OUTPUT)
+        {
+          slot = group->getSourceConnectorItem(externalConnector->getOutputSlot(slotName));
+        }
+        else
+        {
+          slot = group->getSinkConnectorItem(externalConnector->getInputSlot(slotName));
+        }
 			}
 		}
 	}

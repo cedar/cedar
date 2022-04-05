@@ -2314,7 +2314,6 @@ void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& 
     cedar::proc::ArchitectureLoadingException exception(exceptions);
     CEDAR_THROW_EXCEPTION(exception);
   }
-
 }
 
 void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions)
@@ -2905,25 +2904,31 @@ void cedar::proc::Group::connectAcrossGroups(cedar::proc::OwnedDataPtr source, c
   cedar::proc::GroupPtr target_group = target_step->getGroup();
   if (source_group->contains(target_group)) // connection going down the hierarchy
   {
-    std::string connector_name = target_group->getUniqueIdentifier("external input");
-    target_group->addConnector(connector_name, true);
+    std::string freeConnectorName = target_group->getFreeConnector(cedar::proc::DataRole::INPUT);
+    if(!freeConnectorName.compare("")){
+      freeConnectorName = target_group->getUniqueIdentifier("external input");
+      target_group->addConnector(freeConnectorName, true);
+    }
     target_group->connectSlots
                   (
-                    target_group->getElement<cedar::proc::Connectable>(connector_name)->getOutputSlot("output"),
+                    target_group->getElement<cedar::proc::Connectable>(freeConnectorName)->getOutputSlot("output"),
                     target
                   );
-    cedar::proc::Group::connectAcrossGroups(source, target_group->getInputSlot(connector_name));
+    cedar::proc::Group::connectAcrossGroups(source, target_group->getInputSlot(freeConnectorName));
   }
   else if (target_group->contains(source_group)) // connection going up the hierarchy
   {
-    std::string connector_name = source_group->getUniqueIdentifier("external output");
-    source_group->addConnector(connector_name, false);
+    std::string freeConnectorName = source_group->getFreeConnector(cedar::proc::DataRole::OUTPUT);
+    if(!freeConnectorName.compare("")){
+      freeConnectorName = source_group->getUniqueIdentifier("external output");
+      source_group->addConnector(freeConnectorName, false);
+    }
     source_group->connectSlots
                   (
                     source,
-                    source_group->getElement<cedar::proc::Connectable>(connector_name)->getInputSlot("input")
+                    source_group->getElement<cedar::proc::Connectable>(freeConnectorName)->getInputSlot("input")
                   );
-    cedar::proc::Group::connectAcrossGroups(source_group->getOutputSlot(connector_name), target);
+    cedar::proc::Group::connectAcrossGroups(source_group->getOutputSlot(freeConnectorName), target);
   }
   else if (source_group == target_group) // connection in same group
   {
@@ -2931,14 +2936,17 @@ void cedar::proc::Group::connectAcrossGroups(cedar::proc::OwnedDataPtr source, c
   }
   else // connection going through shared parent
   {
-    std::string connector_name = target_group->getUniqueIdentifier("external input");
-    target_group->addConnector(connector_name, true);
+    std::string freeConnectorName = target_group->getFreeConnector(cedar::proc::DataRole::INPUT);
+    if(!freeConnectorName.compare("")){
+      freeConnectorName = target_group->getUniqueIdentifier("external input");
+      target_group->addConnector(freeConnectorName, true);
+    }
     target_group->connectSlots
                   (
-                    target_group->getElement<cedar::proc::Connectable>(connector_name)->getOutputSlot("output"),
+                    target_group->getElement<cedar::proc::Connectable>(freeConnectorName)->getOutputSlot("output"),
                     target
                   );
-    cedar::proc::Group::connectAcrossGroups(source, target_group->getInputSlot(connector_name));
+    cedar::proc::Group::connectAcrossGroups(source, target_group->getInputSlot(freeConnectorName));
   }
 }
 
@@ -3003,6 +3011,51 @@ bool cedar::proc::Group::disconnectAcrossGroups(cedar::proc::OwnedDataPtr source
     source_group->disconnectSlots(delete_connections);
   }
   return false;
+}
+
+std::string cedar::proc::Group::getFreeConnector(cedar::proc::DataRole::Id dataRole)
+{
+  bool input = dataRole == cedar::proc::DataRole::INPUT;
+  if(!this->hasSlotForRole(dataRole))
+  {
+    return "";
+  }
+
+  auto this_as_connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(this->shared_from_this());
+  for (auto connector : _mConnectors->getValue())
+  {
+    if (input && connector.second) // input connector
+    {
+      auto group_source = this->getElement<cedar::proc::sources::GroupSource>(connector.first);
+      auto input_slot = this->getInputSlot(connector.first);
+      // get incoming and outgoing connections
+      std::vector<cedar::proc::DataConnectionPtr> outgoing_connections;
+      this->getDataConnectionsFrom(group_source, "output", outgoing_connections);
+      std::vector<cedar::proc::DataConnectionPtr> incoming_connections;
+      this->getGroup()->getDataConnectionsTo(this_as_connectable, input_slot->getName(), incoming_connections);
+      // check if any slots are unsused
+      if (outgoing_connections.size() == 0 && incoming_connections.size() == 0)
+      {
+        return connector.first;
+      }
+    }
+    else if(!input && !connector.second) // output connector
+    {
+      auto group_sink = this->getElement<cedar::proc::sinks::GroupSink>(connector.first);
+      auto output_slot = this->getOutputSlot(connector.first);
+      // get incoming and outgoing connections
+      std::vector<cedar::proc::DataConnectionPtr> outgoing_connections;
+      this->getGroup()->getDataConnectionsFrom(this_as_connectable, output_slot->getName(), outgoing_connections);
+      std::vector<cedar::proc::DataConnectionPtr> incoming_connections;
+      this->getDataConnectionsTo(group_sink, "input", incoming_connections);
+      // check if any slots are unsused
+      if (outgoing_connections.size() == 0 && incoming_connections.size() == 0)
+      {
+        return connector.first;
+      }
+    }
+  }
+  return "";
 }
 
 void cedar::proc::Group::removeAll(bool destructing)

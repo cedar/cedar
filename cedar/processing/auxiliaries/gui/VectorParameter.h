@@ -204,34 +204,19 @@ protected:
     if (WidgetAbstraction::getValue(this->mWidgets[index]) != this->parameter()->at(index))
     {
       // push to undo stack
-      if (auto param = dynamic_cast<cedar::aux::VectorParameter<ValueType> *>(this->getParameter().get()))
+      if (auto parameter = dynamic_cast<cedar::aux::VectorParameter<ValueType> *>(this->getParameter().get()))
       {
-        // If parameter belongs to a step, push to undo stack (e.g. settings parameter should not be undoable)
-        cedar::aux::NamedConfigurable* owner = param->getNamedConfigurableOwner();
-        if(owner != nullptr)
+        if(auto scene = cedar::proc::undoRedo::UndoCommand::sceneIfUndoable(parameter, this))
         {
-          //Find the scene
-          cedar::proc::gui::Scene* scene;
-
-          QObject* parent = this;
-          while(parent != nullptr)
-          {
-            if(auto ide = dynamic_cast<cedar::proc::gui::Ide*>(parent))
-            {
-              scene = ide->mpProcessingDrawer->getScene();
-            }
-            parent = parent->parent();
-          }
-          CEDAR_ASSERT(scene != nullptr);
-
           before[index] = this->parameter()->at(index);
           cedar::proc::gui::Ide::pUndoStack->push(
-                  new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::vector<ValueType>, cedar::aux::VectorParameter<ValueType>>(param, before,
-                                                                                             after, owner, scene));
+                  new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::vector<ValueType>,
+                  cedar::aux::VectorParameter<ValueType>>(parameter, before,
+                  after, parameter->getNamedConfigurableOwner(), scene));
         }
         else
         {
-          param->setValue(after);
+          parameter->setValue(after);
         }
       }
 

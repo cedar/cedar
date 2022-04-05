@@ -147,7 +147,7 @@ public:
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent*);
 
   //!@brief adds a "drag node" to the connection
-  void addConnectionAnchor(QPointF, bool);
+  cedar::proc::gui::ConnectionAnchor* addConnectionAnchor(QPointF, bool);
 
   //!@brief handles events in the context menu
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);

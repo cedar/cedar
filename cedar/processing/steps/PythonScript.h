@@ -39,8 +39,7 @@
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-#ifdef CEDAR_USE_PYTHON
-
+#ifdef CEDAR_USE_PYTHONSTEP
 // CEDAR INCLUDES
 #include <cedar/processing/Step.h>
 #include <cedar/auxiliaries/MatData.h>
@@ -102,7 +101,7 @@ public:
   PythonScript(bool);
 
   //!@brief Destructor
-  ~PythonScript();
+  virtual ~PythonScript();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public structs
@@ -118,6 +117,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  static void initPython();
+
   void inputConnectionChanged(const std::string& inputName);
   
   void executeButtonClicked();
@@ -188,6 +189,7 @@ private:
   std::vector< cedar::aux::MatDataPtr > mOutputs;
   std::vector< cedar::aux::MatDataPtr > mStates;
 
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -232,6 +234,8 @@ namespace cedar
           {
             this->unacceptedStrings = unacceptedStrings;
           };
+
+          virtual ~ValidationMaskInputDialog();
 
           QString getText(QWidget *, const QString &title, const QString &label,
                           QLineEdit::EchoMode echo = QLineEdit::Normal,
@@ -392,7 +396,6 @@ namespace cedar
 
 //enum { ARG_NONE = 0, ARG_MAT = 1, ARG_SCALAR = 2 };
 
-#endif // CEDAR_USE_PYTHON
-
+#endif // CEDAR_USE_PYTHONSTEP
 #endif // CEDAR_PROC_STEPS_PYTHON_SCRIPT_H
 

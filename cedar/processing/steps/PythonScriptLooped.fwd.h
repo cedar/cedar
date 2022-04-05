@@ -39,8 +39,7 @@
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-#ifdef CEDAR_USE_PYTHON
-
+#ifdef CEDAR_USE_PYTHONSTEP
 // CEDAR INCLUDES
 #include "cedar/processing/lib.h"
 
@@ -63,7 +62,6 @@ namespace cedar
 }
 //!@endcond
 
-#endif // CEDAR_USE_PYTHON
-
+#endif // CEDAR_USE_PYTHONSTEP
 #endif // CEDAR_PROC_STEPS_PYTHON_SCRIPT_LOOPED_FWD_H
 

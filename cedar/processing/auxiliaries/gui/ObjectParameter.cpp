@@ -39,6 +39,7 @@
 #include "cedar/processing/auxiliaries/gui/PropertyPane.h"
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/undoRedo/commands/ChangeObjectParameterValue.h"
+#include "cedar/processing/undoRedo/commands/ChangeParameterValue.h"
 #include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/processing/auxiliaries/TypeBasedFactory.h"
@@ -193,31 +194,14 @@ void cedar::proc::aux::gui::ObjectParameter::currentTypeChanged(int index)
   {
     std::string type = this->getSelectedType();
     cedar::aux::ObjectParameterPtr parameter = this->getObjectParameter();
-    // If parameter belongs to a step/element, push to undo stack (e.g. settings parameter should not be undoable)
-    cedar::aux::NamedConfigurable* owner = parameter->getNamedConfigurableOwner();
-    if(owner != nullptr)
+    if(auto scene = cedar::proc::undoRedo::UndoCommand::sceneIfUndoable(parameter.get(), this))
     {
-      //Find the scene
-      cedar::proc::gui::Scene* scene;
-
-      QObject* parent = this;
-      while(parent != nullptr)
-      {
-        if(auto ide = dynamic_cast<cedar::proc::gui::Ide*>(parent))
-        {
-          scene = ide->mpProcessingDrawer->getScene();
-        }
-        parent = parent->parent();
-      }
-      CEDAR_ASSERT(scene != nullptr);
-
       cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::ChangeObjectParameterValue(
-              parameter.get(), parameter->getTypeId(), type, owner, scene));
+              parameter.get(), parameter->getTypeId(), type, parameter->getNamedConfigurableOwner(), scene));
     }
     else
     {
       this->getObjectParameter()->setType(type);
     }
-
   }
 }

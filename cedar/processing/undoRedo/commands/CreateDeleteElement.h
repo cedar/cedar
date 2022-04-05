@@ -64,8 +64,9 @@ class cedar::proc::undoRedo::commands::CreateDeleteElement : public UndoCommand
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Constructor for creating an element
-  CreateDeleteElement(QPointF position,std::string classId, cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene,
-  				bool isCreateCommand);
+	CreateDeleteElement(std::string classId,
+	cedar::proc::GroupPtr group,cedar::proc::gui::Scene* scene, bool isCreateCommand,
+	QPointF position);
 
   //!@brief Constructor for deleting an element
   CreateDeleteElement(cedar::proc::gui::Element* element, cedar::proc::gui::Scene* scene,
@@ -80,6 +81,7 @@ public:
 public:
 	void undo() override;
 	void redo() override;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

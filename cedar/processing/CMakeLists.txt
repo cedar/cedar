@@ -50,6 +50,19 @@ else(CEDAR_USE_QGLVIEWER)
   set(qglviewer_moc_headers "")
 endif(CEDAR_USE_QGLVIEWER)
 
+if (CEDAR_USE_COPY)
+  set(copyscript_moc_headers gui/CoPYWidget.h gui/CoPYObject.h gui/PythonQtConsole.h)
+else(CEDAR_USE_COPY)
+  set(copyscript_moc_headers "")
+endif(CEDAR_USE_COPY)
+
+if (CEDAR_USE_PYTHONSTEP)
+  set(pythonstep_moc_headers steps/PythonScript.h steps/PythonScriptLooped.h)
+else(CEDAR_USE_PYTHONSTEP)
+  set(pythonstep_moc_headers "")
+endif(CEDAR_USE_PYTHONSTEP)
+
+
 cedar_add_library(cedarproc
   LINK_LIBRARIES
   cedaraux
@@ -115,6 +128,7 @@ cedar_add_library(cedarproc
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureWidget.h
   gui/BoostControl.h
+  ${copyscript_moc_headers}
   gui/CodeWidget.h
   gui/CommentWidget.h
   gui/Connectable.h
@@ -154,6 +168,7 @@ cedar_add_library(cedarproc
   sources/BoxInput.h
   sources/GaussInput.h
   sources/RealSense.h
+  ${pythonstep_moc_headers}
   steps/VariableBox.h
   steps/VariableGauss.h
   steps/Sinus.h
@@ -164,12 +179,15 @@ cedar_add_library(cedarproc
   steps/Convolution.h
   steps/ColorConversion.h
   steps/ComponentMultiply.h
+  steps/CoordinateToCameraAngles.h
   steps/DivideElementwise.h
+  steps/DNN.h
   steps/SubtractElementwise.h
   steps/CoordinateTransformation.h
   steps/ForwardKinematics.h
   steps/PseudoInverseKinematics.h
   steps/DampedPseudoInverseKinematics.h
+  steps/DistanceImageCoordinateTransform.h
   steps/ConfigurationLimits.h
   steps/PseudoInverse.h
   steps/VehicleObstacleAvoidanceForceLet.h

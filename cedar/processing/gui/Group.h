@@ -116,7 +116,7 @@ public:
   //!@brief read configuration from path
   void readJson(const cedar::aux::Path& filename);
 
-  void readJsonFromString(std::string jsonString);
+  void readJsonFromString(std::string jsonString, bool ignoreSnapToGrid = true);
 
   //!@brief called after the architecture has been loaded
   void afterArchitectureLoaded();
@@ -164,7 +164,7 @@ public:
   void setScene(cedar::proc::gui::Scene* pScene);
 
   //!@brief reads a configuration from a node
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+  void readConfiguration(const cedar::aux::ConfigurationNode& node, bool ignoreSnapToGrid = true);
 
   /*!@brief Reads the defined robots from a configuration node and initializes them in the RobotManager
    */
@@ -373,17 +373,19 @@ private:
        (
          cedar::aux::ConfigurationNode& conf,
          cedar::proc::ElementPtr element,
-         cedar::proc::gui::GraphicsBase* pSceneElement
+         cedar::proc::gui::GraphicsBase* pSceneElement,
+         bool ignoreSnapToGrid = true
        );
 
   void tryToRestoreGroupUIConfiguration
        (
          cedar::aux::ConfigurationNode& conf,
-         cedar::proc::gui::GraphicsBase* pSceneElement
+         cedar::proc::gui::GraphicsBase* pSceneElement,
+         bool ignoreSnapToGrid = true
        );
 
   //! Restores the UI configurations for any elements that are in the scene.
-  void tryRestoreUIConfigurationsOfElements(cedar::aux::ConfigurationNode& conf);
+  void tryRestoreUIConfigurationsOfElements(cedar::aux::ConfigurationNode& conf, bool ignoreSnapToGrid = true);
 
   //! Adds all the steps already in the group
   void addGuiItemsForGroup();
@@ -433,7 +435,7 @@ private:
   cedar::proc::gui::Element* getUiElementFor(cedar::proc::ElementPtr element) const;
 
   void readStickyNotes(const cedar::aux::ConfigurationNode& node);
-  void readConnections(const cedar::aux::ConfigurationNode& node);
+  void readConnections(const cedar::aux::ConfigurationNode& node, bool ignoreSnapToGrid = true);
   void readView(const cedar::aux::ConfigurationNode& node);
 
   /*!@brief this function emits a connection added signal for all connections in the underlying network.
