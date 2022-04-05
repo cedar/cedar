@@ -161,8 +161,8 @@ void cedar::proc::TriggerStepper::stepTriggers()
 {
   if(!this->mTriggerList.empty())
   {
-//    auto timeStep = cedar::aux::GlobalClockSingleton::getInstance()->getSimulationStepSize();
-//    cedar::aux::GlobalClockSingleton ::getInstance()->addTime(timeStep);
+    auto timeStep = cedar::aux::GlobalClockSingleton::getInstance()->getSimulationStepSize();
+    cedar::aux::GlobalClockSingleton ::getInstance()->addTime(timeStep);
 
     std::vector<std::thread> threadList;
     for(auto trigger: mTriggerList)

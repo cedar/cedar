@@ -147,7 +147,7 @@ endif(CMAKE_COMPILER_IS_GNUCC)
 
 if (CMAKE_COMPILER_IS_GNUCC)
   add_definitions(-Wall -Wextra)
-  add_definitions(-std=gnu++0x)
+#  add_definitions(-std=gnu++0x)
   	
   if (WIN32)
 	add_definitions(-Wno-unused-local-typedefs)

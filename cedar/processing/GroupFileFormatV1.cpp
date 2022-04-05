@@ -785,7 +785,7 @@ void cedar::proc::GroupFileFormatV1::readTriggers
        std::vector<std::string>& exceptions
      )
 {
-  std::cout << "GroupFileFormatV1::readTriggers" << std::endl;
+//  std::cout << "GroupFileFormatV1::readTriggers" << std::endl;
   int numOfTriggers = 0;
   bool readOldConfigFile = false;
 
@@ -816,21 +816,21 @@ void cedar::proc::GroupFileFormatV1::readTriggers
     try
     {
       trigger->readConfiguration(trigger_node);
-      if (auto loopedTrigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger))
-      {
-          std::cout << "Trigger Stepsize after reading configuration: " << loopedTrigger->getStepSize() << " Fake StepSize " << loopedTrigger->getFakeStepSize() << std::endl;
-      }
+//      if (auto loopedTrigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger))
+//      {
+//          std::cout << "Trigger Stepsize after reading configuration: " << loopedTrigger->getStepSize() << " Fake StepSize " << loopedTrigger->getFakeStepSize() << std::endl;
+//      }
       
       auto use_default_stepSize = trigger_node.find("use default CPU step");
       if (use_default_stepSize == trigger_node.not_found())
       {
           //We loaded an old config file!
-          std::cout << " We loaded an old config file!" << std::endl;
+          std::cout << " We loaded a config file that was created with old simulation modes!" << std::endl;
           readOldConfigFile = true;
 
           if (auto loopedTrigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger))
           {
-              std::cout << "Looped Trigger StepSize is: " << loopedTrigger->getStepSize() << std::endl;
+//              std::cout << "Looped Trigger StepSize is: " << loopedTrigger->getStepSize() << std::endl;
               loopedTrigger->setPreviousCustomCPUStepSize(loopedTrigger->getStepSize());
               loopedTrigger->setUseDefaultCPUStepSize(false);
           
@@ -890,7 +890,7 @@ void cedar::proc::GroupFileFormatV1::readTriggers
     trigger->resetChangedStates(false);
   }
 
-  std::cout << "GroupFileFormatV1 found " << numOfTriggers << " Trigger!" << std::endl;
+//  std::cout << "GroupFileFormatV1 found " << numOfTriggers << " Trigger!" << std::endl;
 
   for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
       iter != root.end();
@@ -902,10 +902,10 @@ void cedar::proc::GroupFileFormatV1::readTriggers
       cedar::proc::TriggerPtr trigger
         = group->getElement<cedar::proc::Trigger>(trigger_node.get_child("name").get_value<std::string>());
 
-      if (auto loopedTrigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger))
-      {
-          std::cout << "Trigger Stepsize after reloading configuration: " << loopedTrigger->getStepSize() << " Fake StepSize " << loopedTrigger->getFakeStepSize() << std::endl;
-      }
+//      if (auto loopedTrigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger))
+//      {
+//          std::cout << "Trigger Stepsize after reloading configuration: " << loopedTrigger->getStepSize() << " Fake StepSize " << loopedTrigger->getFakeStepSize() << std::endl;
+//      }
 
       const cedar::aux::ConfigurationNode& listeners = trigger_node.get_child("listeners");
 
