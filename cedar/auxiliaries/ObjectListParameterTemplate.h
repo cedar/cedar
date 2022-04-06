@@ -104,9 +104,10 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  //!@brief This gets called directly after the constructor once there exists a shared_ptr to the owner
   void postConstructor() override
   {
-    makeParenting();
+    childrenSetParent();
     cedar::aux::Parameter::postConstructor();
   }
 
@@ -159,23 +160,26 @@ public:
   virtual void makeDefault()
   {
     this->mObjectList = this->mDefaults;
-    this->makeParenting();
+    this->childrenSetParent();
   }
 
-  void makeParenting(BaseTypePtr object = nullptr){
-    std::vector<BaseTypePtr> objectsToParent;
-    if(object){
-      objectsToParent.push_back(object);
+  //!@brief Sets the parent of mObjectList (or the given object) to the owner of this parameter
+  void childrenSetParent(BaseTypePtr child = nullptr){
+    std::vector<BaseTypePtr> childrenToParent;
+    // Set parent of all "children" if none was given
+    if(child){
+      childrenToParent.push_back(child);
     }
     else
     {
-      objectsToParent = this->mObjectList;
+      childrenToParent = this->mObjectList;
     }
-    for(BaseTypePtr objectToParent : objectsToParent)
+    for(BaseTypePtr childToParent : childrenToParent)
     {
-      if(auto configurable = dynamic_cast<cedar::aux::Configurable*>(objectToParent.get()))
+      if(auto configurable = dynamic_cast<cedar::aux::Configurable*>(childToParent.get()))
       {
-        std::cout << this->getOwner()->hasShared() << std::endl;
+        // If there already exists a shared_ptr of the owner (i.e. this method is not called in the constructor), assign
+        // the (weak_ptr) owner as parent to all children
         if(this->getOwner()->hasShared())
         {
           configurable->setParent(cedar::aux::ConfigurableWeakPtr(this->getOwner()->shared_from_this()));
@@ -244,7 +248,7 @@ public:
     this->mObjectAdded(index);
     this->emitChangedSignal();
 
-    this->makeParenting(object);
+    this->childrenSetParent(object);
   }
 
   //!@brief allocate and add an object at the end
@@ -263,7 +267,7 @@ public:
     this->mObjectAdded(this->mObjectList.size() - 1);
     this->emitChangedSignal();
 
-    this->makeParenting(object);
+    this->childrenSetParent(object);
   }
 
   //!@brief remove an object at the given index

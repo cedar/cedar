@@ -159,6 +159,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  // This gets called directly after the constructor once there exists a shared_ptr to the owner
   virtual void postConstructor();
 
   //! Set the owner of the parameter. Can only be called if the parameter doesn't have an owner yet.

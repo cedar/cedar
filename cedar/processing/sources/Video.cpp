@@ -102,7 +102,7 @@ mTimeElapsed(0.0 * cedar::unit::seconds)
   //no exception here, so we could use it
   this->mpGrabber = grabber;
 
-  this->addConfigurableChild("VideoGrabber", this->getVideoGrabber(), false);
+  this->addConfigurableChild("VideoGrabber", this->getVideoGrabber());
   this->declareOutput("Video", mImage);
 
   QObject::connect(this->getVideoGrabber().get(), SIGNAL(doVideoChanged()), this, SLOT(updateVideo()));

@@ -102,7 +102,7 @@ cedar::proc::sources::GrabberBase(false)
   //no exception here, so we could use it
   this->mpGrabber = grabber;
 
-  this->addConfigurableChild("PictureGrabber", this->getPictureGrabber(), false);
+  this->addConfigurableChild("PictureGrabber", this->getPictureGrabber());
   this->declareOutput("Picture", mImage);
 
   QObject::connect(this->getPictureGrabber().get(), SIGNAL(pictureChanged()), this, SLOT(updatePicture()));

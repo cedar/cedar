@@ -104,8 +104,10 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  //!@brief This gets called directly after the constructor once there exists a shared_ptr to this configurable
   virtual void postConstructor();
 
+  //!@brief Returns true once the postConstructor was called and there therefor exists a shared_ptr to this configurable
   bool hasShared();
 
   //!@brief read a configuration for all registered parameters from a cedar::aux::ConfigurationNode
@@ -156,7 +158,7 @@ public:
   /*!@brief add a Configurable as a child to this instance of Configurable - if name is duplicate, an exception is
    * thrown
    */
-  void addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child, bool addParent = true);
+  void addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child);
 
   //!@brief removes a child configuration from the configuration tree - if name is not found, an exception is thrown
   void removeConfigurableChild(const std::string& name);

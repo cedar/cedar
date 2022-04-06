@@ -1702,6 +1702,7 @@ std::string cedar::proc::Group::duplicate(const std::string& elementName, const 
   std::string class_name = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(elem);
   // allocate object
   cedar::proc::ElementPtr new_elem = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_name);
+  new_elem->postConstructor();
   // copy configuration tree
   new_elem->copyFrom(elem);
   // get unique name
@@ -3075,6 +3076,7 @@ cedar::proc::ElementPtr cedar::proc::Group::importStepFromFile(const std::string
         // we found our step, add to group and configure it!
         cedar::proc::ElementPtr imported_step
           = cedar::proc::ElementDeclarationManagerSingleton::getInstance()->allocate(step_node.first);
+        imported_step->postConstructor();
         this->add(imported_step, this->getUniqueIdentifier("imported step"));
         step_node.second.put("name", this->getUniqueIdentifier(step_node.second.get<std::string>("name")));
         imported_step->readConfiguration(step_node.second);

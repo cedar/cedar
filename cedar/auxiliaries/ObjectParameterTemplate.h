@@ -107,9 +107,10 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  //!@brief This gets called directly after the constructor once there exists a shared_ptr to the owner
   void postConstructor() override
   {
-    this->makeParenting();
+    this->childSetParent();
     cedar::aux::Parameter::postConstructor();
   }
 
@@ -127,7 +128,7 @@ public:
     BaseTypePtr object = FactoryManagerSingleton::getInstance()->allocate(type);
     object->readConfiguration(node);
     this->mObject = object;
-    this->makeParenting();
+    this->childSetParent();
   }
 
   //!@brief Write the parameter's value to a configuration node.
@@ -148,13 +149,16 @@ public:
   void setValue(BaseTypePtr object)
   {
     this->mObject = object;
-    this->makeParenting();
+    this->childSetParent();
     this->emitChangedSignal();
   }
 
-  void makeParenting()
+  //!@brief Sets the parent of mObject to the owner of this parameter
+  void childSetParent()
   {
     if(auto config = dynamic_cast<cedar::aux::Configurable*>(this->mObject.get())){
+      // If there already exists a shared_ptr of the owner (i.e. this method is not called in the constructor), assign
+      // the (weak_ptr) owner as parent to all children
       if(this->getOwner()->hasShared())
       {
         config->setParent(cedar::aux::ConfigurableWeakPtr(this->getOwner()->shared_from_this()));
