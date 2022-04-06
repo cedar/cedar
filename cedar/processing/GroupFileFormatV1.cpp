@@ -346,8 +346,12 @@ void cedar::proc::GroupFileFormatV1::read
     auto euler_step = root.find("simulation euler step");
     auto default_cpu = root.find("default CPU step");
     auto min_compute_time = root.find("min computation time");
-    if(loop_mode==root.not_found()||euler_step==root.not_found()||default_cpu==root.not_found()||min_compute_time==root.not_found())
+    auto time_factor = root.find("time factor");
+
+    if((loop_mode==root.not_found()||euler_step==root.not_found()||default_cpu==root.not_found()||min_compute_time==root.not_found()) && time_factor != root.not_found())
     {
+      //apparently this reading of the format also happens while duplicating Oo
+      //The check is therefore, if time factor is there and one of the others is missing, then we have an old architecture and not some duplicating of a few steps
       cedar::aux::LogSingleton ::getInstance()->warning("Your architecture has been created with an older version of cedar. Simulation Modes are now regulated globally. Choose the appropriate Simulation Mode in the toolbar and possibly retune your architecture accordingly!","cedar::proc::GroupFileFormatV1::readConfiguration");
     }
 
@@ -825,7 +829,7 @@ void cedar::proc::GroupFileFormatV1::readTriggers
       if (use_default_stepSize == trigger_node.not_found())
       {
           //We loaded an old config file!
-          std::cout << " We loaded a config file that was created with old simulation modes!" << std::endl;
+//          std::cout << " We loaded a config file that was created with old simulation modes!" << std::endl;
           readOldConfigFile = true;
 
           if (auto loopedTrigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger))

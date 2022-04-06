@@ -1072,7 +1072,7 @@ void cedar::proc::gui::Ide::globalTimeFactorSettingChanged(double newValue)
 
 void cedar::proc::gui::Ide::simulationModeComboBoxChanged(int newIndex)
 {
-  std::cout<<"Ide::simulationModeComboBoxChanged index: " << newIndex << std::endl;
+//  std::cout<<"Ide::simulationModeComboBoxChanged index: " << newIndex << std::endl;
   if(newIndex != 0 ) //For now Zero is the default index, which is simulated Time. Todo:Use an Enum for the mode
   {
     //Case RealTime
