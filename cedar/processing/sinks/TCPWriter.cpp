@@ -125,7 +125,7 @@ cedar::proc::sinks::TCPWriter::TCPWriter()
         startMeasurement(std::chrono::steady_clock::now()),
         _mPort(new cedar::aux::UIntParameter(this, "port", 50000, 49152, 65535)), //ephemeral ports only
         _mIpAdress(new cedar::aux::StringParameter(this, "ip_adress", "127.0.0.1")),
-        _mReconnectionTimeOut(new cedar::aux::UIntParameter(this, "timeout (ms)", 3000)),
+        _mReconnectionTimeOut(new cedar::aux::UIntParameter(this, "timeout (ms)", 1000)),
         _mMaxTimeouts(new cedar::aux::UIntParameter(this, "max timeouts", 50)),
         _mSendInterval(new cedar::aux::UIntParameter(this, "send interval (timesteps)", 1))
 {
@@ -135,10 +135,22 @@ cedar::proc::sinks::TCPWriter::TCPWriter()
   _mMaxTimeouts->markAdvanced(true);
   _mSendInterval->markAdvanced(true);
 
+  mSendMatrixWasSet.store(false);
+
+  QObject::connect(this,SIGNAL(stateChanged()),this,SLOT(updateState()));
 
   // declare all data
   this->declareInput("input");
 }
+
+cedar::proc::sinks::TCPWriter::~TCPWriter()
+{
+  if(mRunning.load())
+  {
+    abortAndJoin();
+  }
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -147,7 +159,7 @@ void cedar::proc::sinks::TCPWriter::onStart()
 {
   _mPort->setConstant(true);
   _mIpAdress->setConstant(true);
-  this->establishConnection();
+  this->startCommunicationThread();
 }
 
 void cedar::proc::sinks::TCPWriter::reconnect()
@@ -186,8 +198,8 @@ void cedar::proc::sinks::TCPWriter::establishConnection()
               std::cout << "Error Setting Socket Options" << std::endl;
           }
 
-          unsigned long on = 1;
-          ioctlsocket(socket_h, FIONBIO, &on); //make socket Non-blockable in windows
+//          unsigned long on = 1;
+//          ioctlsocket(socket_h, FIONBIO, &on); //make socket Non-blockable in windows
 #else
     int opt = 1;
     if (setsockopt(socket_h, SOL_SOCKET, SO_REUSEPORT,
@@ -195,7 +207,7 @@ void cedar::proc::sinks::TCPWriter::establishConnection()
     {
       std::cout << "Error Setting Socket Options" << std::endl;
     }
-    fcntl(socket_h, F_SETFL, O_NONBLOCK); //make socket Non-blockable
+//    fcntl(socket_h, F_SETFL, O_NONBLOCK); //make socket Non-blockable
 #endif
 
     serv_addr.sin_family = AF_INET;
@@ -215,6 +227,14 @@ void cedar::proc::sinks::TCPWriter::establishConnection()
 
 void cedar::proc::sinks::TCPWriter::sendMatData(cedar::aux::ConstMatDataPtr data)
 {
+
+  if(!data->getData().isContinuous())
+  {
+    std::cout<<this->getName() << ">>Could not send data, because it was not continuous!"<<std::endl;
+    std::cout<<"Data: " << data->getData() << std::endl;
+    return;
+  }
+
   std::ostringstream stream;
   data->serialize(stream, cedar::aux::SerializationFormat::Compact);
 
@@ -233,12 +253,13 @@ void cedar::proc::sinks::TCPWriter::onStop()
 {
   _mPort->setConstant(false);
   _mIpAdress->setConstant(false);
-  closeConnection();
+  this->abortAndJoin();
 }
 
 void cedar::proc::sinks::TCPWriter::reset()
 {
-  this->reconnect();
+  this->abortAndJoin();
+  this->startCommunicationThread();
   this->onTrigger();
 }
 
@@ -249,18 +270,7 @@ void cedar::proc::sinks::TCPWriter::compute(const cedar::proc::Arguments &)
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "Port and Ip Address must not be empty!");
   } else
   {
-    stepCounter = stepCounter + 1;
-    if (stepCounter >= this->_mSendInterval->getValue())
-    {
-      stepCounter = 0;
-      sendMatData(this->mInput);
-      bool isReaderAlive = checkReaderStatus();
-
-      if (!isReaderAlive)
-      {
-        reconnect();
-      }
-    }
+    this->setMatrixToSend(this->mInput->getData());
   }
 }
 
@@ -303,10 +313,30 @@ bool cedar::proc::sinks::TCPWriter::checkReaderStatus()
   char *readBuffer = (char *) malloc(mBufferLength * sizeof(char));
   memset(readBuffer, 0, mBufferLength);
 
+  int msgLength = -1;
+
 #ifdef _WIN32
   int msgLength = recv(socket_h, readBuffer, mBufferLength, 0);
 #else
-  int msgLength = recv(socket_h, readBuffer, mBufferLength, MSG_DONTWAIT);
+  //Old Versions. MSG_DONTWAIT LAGS SOMEHOW and 0 FLAGS is smooth, but may block thread completely
+//  int msgLength = recv(socket_h, readBuffer, mBufferLength, MSG_DONTWAIT);
+//  int msgLength = recv(socket_h, readBuffer, mBufferLength, 0);
+
+// Use select for compromise
+  fd_set set;
+  struct timeval timeout;
+  FD_ZERO(&set); /* clear the set */
+  FD_SET(socket_h, &set); /* add our file descriptor to the set */
+  timeout.tv_sec = 0;
+  timeout.tv_usec = 100000;
+
+  int rv = select(socket_h + 1, &set, NULL, NULL, &timeout);
+  if (rv > 0)
+  {
+    // socket has something to read
+    msgLength = recv(socket_h, readBuffer, mBufferLength, 0);
+  }
+
 #endif
 
 
@@ -315,37 +345,45 @@ bool cedar::proc::sinks::TCPWriter::checkReaderStatus()
     std::string message = std::string(readBuffer, msgLength);
     free(readBuffer);
 
-    this->setState(cedar::proc::Step::STATE_RUNNING, "Connected");
+//    this->setState(cedar::proc::Step::STATE_RUNNING, "Connected");
+    this->setCurrentStateAndAnnotation(cedar::proc::Step::STATE_RUNNING, "Connected");
     startMeasurement = std::chrono::steady_clock::now();
     numConsecutiveTimeOuts = 0;
     return true;
-  } else
+  }
+  else
   {
     free(readBuffer);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     unsigned int elapsedMilliSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(
             currentTime - startMeasurement).count();
     //I could not read! The original socket is  not there anymore
+//    std::cout<<"\t" << this->getName() << " elapsedMilli: " << elapsedMilliSeconds <<std::endl;
     if (elapsedMilliSeconds > _mReconnectionTimeOut->getValue())
     {
       startMeasurement = std::chrono::steady_clock::now();
       numConsecutiveTimeOuts = numConsecutiveTimeOuts + 1;
       if (numConsecutiveTimeOuts > _mMaxTimeouts->getValue())
       {
-        this->setState(cedar::proc::Step::STATE_EXCEPTION,
+//        this->setState(cedar::proc::Step::STATE_EXCEPTION,
+//                       "More than " + std::to_string(_mMaxTimeouts->getValue()) +
+//                       " consecutive timeouts. Press Reset to start Reconnecting again.");
+        this->setCurrentStateAndAnnotation(cedar::proc::Step::STATE_EXCEPTION,
                        "More than " + std::to_string(_mMaxTimeouts->getValue()) +
                        " consecutive timeouts. Press Reset to start Reconnecting again.");
       } else
       {
-        this->setState(cedar::proc::Step::STATE_INITIALIZING,
+        this->setCurrentStateAndAnnotation(cedar::proc::Step::STATE_INITIALIZING,
                        "Timeout of at least " + std::to_string(_mReconnectionTimeOut->getValue()) + " ms.");
+//        this->setState(cedar::proc::Step::STATE_INITIALIZING,
+//                       "Timeout of at least " + std::to_string(_mReconnectionTimeOut->getValue()) + " ms.");
       }
-
-
+//      std::cout<<this->getName() << " elapsedMilliseconds " << elapsedMilliSeconds <<" > " << _mReconnectionTimeOut->getValue() << std::endl;
       return false;
     }
   }
 
+//  std::cout<< this->getName() <<" checkReaderStatus no msg read, but continue to try before reconnect" <<std::endl;
   return true; //Technically here the Status is unknown, but we will continue to try
 }
 
@@ -359,4 +397,119 @@ void cedar::proc::sinks::TCPWriter::closeConnection()
 #endif
 
   numConsecutiveTimeOuts = 0;
+}
+
+
+void cedar::proc::sinks::TCPWriter::startCommunicationThread()
+{
+  mAbortRequested.store(false);
+  mSendMatrixWasSet.store(false);
+  try
+  {
+    mCommunicationThread = std::thread(&cedar::proc::sinks::TCPWriter::communicationLoop, this);
+  }
+  catch (...)
+  {
+    std::cout<<" Starting the CommunicationThread of " << this->getName() << " did somehow not work!" <<std::endl;
+  }
+}
+
+void cedar::proc::sinks::TCPWriter::abortAndJoin()
+{
+//  std::cout<< this->getName() << " abortAndJoin()" <<std::endl;
+  mAbortRequested.store(true);
+  if (mCommunicationThread.joinable())
+  {
+    mCommunicationThread.join();
+  }
+  this->closeConnection();
+}
+
+
+void cedar::proc::sinks::TCPWriter::communicationLoop()
+{
+  mRunning.store(true);
+
+  this->establishConnection();
+
+  while (false == mAbortRequested.load())
+  {
+    try
+    {
+      stepCounter = stepCounter + 1;
+      if (stepCounter >= this->_mSendInterval->getValue())
+      {
+        stepCounter = 0;
+        if (mSendMatrixWasSet.load())
+        {
+          cedar::aux::ConstMatDataPtr mySendData(new cedar::aux::MatData(this->getMatrixToSend()));
+          sendMatData(mySendData);
+          bool isReaderAlive = checkReaderStatus();
+          if (!isReaderAlive)
+          {
+            reconnect();
+          }
+        }
+      }
+    }
+    catch (std::runtime_error &e)
+    {
+      std::cout<<"Caught an error: " << e.what()  << " in " << this->getName() <<std::endl;
+    }
+    catch(const std::exception& ex)
+    {
+      // speciffic handling for all exceptions extending std::exception, except
+      // std::runtime_error which is handled explicitly
+      std::cout << "Error occurred:  " << ex.what() << " while running: " << this->getName() <<  std::endl;
+    }
+    catch (...)
+    {
+      // Make sure that nothing leaves the thread for now...
+      std::cout<<"Caught something else while running " << this->getName()  <<std::endl;
+    }
+  }
+
+  mRunning.store(false);
+}
+
+void cedar::proc::sinks::TCPWriter::setMatrixToSend(cv::Mat sendMatrix)
+{
+  std::lock_guard<std::shared_timed_mutex> guard(writeMatrixMutex);
+  mMatrixToSend = sendMatrix;
+  mSendMatrixWasSet.store(true);
+}
+
+cv::Mat cedar::proc::sinks::TCPWriter::getMatrixToSend()
+{
+  std::lock_guard<std::shared_timed_mutex> guard(writeMatrixMutex);
+  return mMatrixToSend.clone();
+}
+
+cedar::proc::Triggerable::State cedar::proc::sinks::TCPWriter::getCurrentState()
+{
+  std::lock_guard<std::shared_timed_mutex> guard(stateMutex);
+  return mCurState;
+}
+
+std::string cedar::proc::sinks::TCPWriter::getCurrentAnnotation()
+{
+  std::lock_guard<std::shared_timed_mutex> guard(stateMutex);
+  return mCurStateAnnotation;
+}
+
+void cedar::proc::sinks::TCPWriter::setCurrentStateAndAnnotation(Triggerable::State state, std::string annotation)
+{
+  std::lock_guard<std::shared_timed_mutex> guard(stateMutex);
+  mCurState = state;
+  mCurStateAnnotation = annotation;
+
+  emit stateChanged();
+}
+
+void cedar::proc::sinks::TCPWriter::updateState()
+{
+  cedar::proc::Triggerable::State curState = getCurrentState();
+  std::string curAnno = getCurrentAnnotation();
+
+  this->setState(curState,curAnno);
 }
