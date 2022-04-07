@@ -253,7 +253,7 @@ int cedar::proc::sources::TCPReader::create_socket_server(int port)
     return -1;
   }
 //  printf("Waiting for a connection on port %d...\n", port);
-  std::cout<< this->getName() <<" Successfully created listening socket server on port " << port << std::endl;
+//  std::cout<< this->getName() <<" Successfully created listening socket server on port " << port << std::endl;
 
   return sfd;
 
@@ -261,8 +261,9 @@ int cedar::proc::sources::TCPReader::create_socket_server(int port)
 
 int cedar::proc::sources::TCPReader::accept_client(int server_fd)
 {
+//  std::cout<<this->getName() << " accept_client >>0<<" << std::endl;
   isConnected.store(false);
-  int cfd;
+  int cfd = -1;
   struct sockaddr_in client;
 
 #ifndef _WIN32
@@ -275,26 +276,42 @@ int cedar::proc::sources::TCPReader::accept_client(int server_fd)
 
   asize = sizeof(struct sockaddr_in);
 
-  cfd = accept(server_fd, (struct sockaddr *) &client, &asize);
+  fd_set set;
+  struct timeval selectTimeout;
+  FD_ZERO(&set); /* clear the set */
+  FD_SET(server_fd, &set); /* add our file descriptor to the set */
+  selectTimeout.tv_sec = 0;
+  selectTimeout.tv_usec = 100000;
+
+
+  int rv = select(server_fd + 1, &set, NULL, NULL, &selectTimeout);
+  if (rv > 0)
+  {
+    // socket has something to read
+    cfd = accept(server_fd, (struct sockaddr *) &client, &asize);
+  }
+
   if (cfd == -1)
   {
-    std::cout<<this->getName() << " accept failed with errno: " << errno <<std::endl;
     return -1;
   }
 
   client_info = gethostbyname((char *) inet_ntoa(client.sin_addr));
 //  printf("Accepted connection from: %s \n", client_info->h_name);
-  std::cout<< this->getName() << " accepted connection from: " << client_info->h_name << " on port: " << this->_mPort->getValue() << std::endl;
+//  std::cout<< this->getName() << " accepted connection from: " << client_info->h_name << " on port: " << this->_mPort->getValue() << std::endl;
 
   isConnected.store(true);
   FD_ZERO(&rfds);
   FD_SET(cfd, &rfds);
+
+//  std::cout<<this->getName() << " accept_client >>6<<" << std::endl;
 
   return cfd;
 }
 
 void cedar::proc::sources::TCPReader::receiveMatData()
 {
+//  std::cout<<this->getName() << " receiveMatData() >0<"<<std::endl;
   if (!isConnected.load())
   {
     timeSinceLastConnectTrial = timeSinceLastConnectTrial + 1;
@@ -313,6 +330,8 @@ void cedar::proc::sources::TCPReader::receiveMatData()
     return;
   }
 
+//  std::cout<<this->getName() << " receiveMatData() >1<"<<std::endl;
+
   // Size may be varied. Just picked this number for now.
   char *buffer = (char *) malloc(_mBufferLength->getValue() * sizeof(char));
   std::string fullMessageString = "";
@@ -325,25 +344,46 @@ void cedar::proc::sources::TCPReader::receiveMatData()
 
   bool endFound = false;
   bool timeout = false;
-  int msgLength;
+//  int msgLength;
 
+//  std::cout<<this->getName() << " receiveMatData() >2<"<<std::endl;
   std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
   std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
   while (!endFound && !timeout)
   {
 
+//    std::cout<<this->getName() << " receiveMatData() >3<"<<std::endl;
     end = std::chrono::steady_clock::now();
     timeout = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() >
               _mTimeOutBetweenPackets->getValue();
 
     memset(buffer, 0, _mBufferLength->getValue() * sizeof(char));
 
+    int msgLength = -1;
+
 #ifdef _WIN32
     msgLength = recv(socket_h, buffer, _mBufferLength->getValue(), 0);
 #else
 //    msgLength = recv(socket_h, buffer, _mBufferLength->getValue(), MSG_DONTWAIT);
-    msgLength = recv(socket_h, buffer, _mBufferLength->getValue(),0); // With the thread implementation we want to wait for connection again
+//    msgLength = recv(socket_h, buffer, _mBufferLength->getValue(),0); // With the thread implementation we want to wait for connection again
+
+    fd_set set;
+    struct timeval selectTimeout;
+    FD_ZERO(&set); /* clear the set */
+    FD_SET(socket_h, &set); /* add our file descriptor to the set */
+    selectTimeout.tv_sec = 0;
+    selectTimeout.tv_usec = 100000;
+
+    int rv = select(socket_h + 1, &set, NULL, NULL, &selectTimeout);
+    if (rv > 0)
+    {
+      // socket has something to read
+//      std::cout<<this->getName() << " receiveMatData() >4<"<<std::endl;
+      msgLength = recv(socket_h, buffer, _mBufferLength->getValue(), 0);
+    }
+
+//    std::cout<<this->getName() << " receiveMatData() >5<"<<std::endl;
 #endif
     if (msgLength > 0)
     {
@@ -403,6 +443,7 @@ void cedar::proc::sources::TCPReader::receiveMatData()
     return;
   }
 
+//  std::cout<<this->getName() << " receiveMatData() >6<"<<std::endl;
 
   std::vector<std::string> chkSumSplit;
   cedar::aux::split(fullMessageString, MATMSG_CHK, chkSumSplit);
@@ -536,28 +577,38 @@ void cedar::proc::sources::TCPReader::startCommunicationThread()
 
 void cedar::proc::sources::TCPReader::abortAndJoin()
 {
+//  std::cout<< this->getName() << " abortAndJoin()" <<std::endl;
   mAbortRequested.store(true);
   if (mCommunicationThread.joinable())
   {
     mCommunicationThread.join();
   }
+//  std::cout<< this->getName() << "Joined abortAndJoin()" <<std::endl;
 
   this->closeSocket();
+
+//  std::cout<< this->getName() << "FINISHED abortAndJoin()" <<std::endl;
 
 }
 
 
 void cedar::proc::sources::TCPReader::communicationLoop()
 {
+
+//  std::cout<<this->getName() << "communicationLoop >>0<<" <<std::endl;
   mRunning.store(true);
 
   this->establishConnection();
+
+//  std::cout<<this->getName() << "communicationLoop >>1<<" <<std::endl;
 
   while (false == mAbortRequested.load())
   {
     try
     {
+//      std::cout<<this->getName() << "communicationLoop >>2<<" <<std::endl;
       receiveMatData();
+//      std::cout<<this->getName() << "communicationLoop >>3<<" <<std::endl;
       confirmAliveStatus();
     }
     catch (std::runtime_error &e)
@@ -569,6 +620,7 @@ void cedar::proc::sources::TCPReader::communicationLoop()
       // Make sure that nothing leaves the thread for now...
       std::cout<<"Caught something else while running " << this->getName()  <<std::endl;
     }
+//    std::cout<<this->getName() << "communicationLoop >>4<<" <<std::endl;
   }
 
   mRunning.store(false);
