@@ -51,6 +51,9 @@
 #include "TCPReader.fwd.h"
 
 // SYSTEM INCLUDES
+#include "thread"
+#include "atomic"
+#include <shared_mutex>
 #include <chrono>
 
 #ifdef _WIN32
@@ -91,6 +94,7 @@ Q_OBJECT
 public:
   //!@brief The standard constructor.
   TCPReader();
+  virtual ~TCPReader();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -151,6 +155,24 @@ private:
 
   void reconnect();
 
+  void startCommunicationThread();
+
+  void abortAndJoin();
+
+  void communicationLoop();
+
+  cv::Mat getLastReadMatrix();
+
+  void setCurrentStateAndAnnotation(Triggerable::State state, std::string annotation);
+  Triggerable::State getCurrentState();
+  std::string getCurrentAnnotation();
+
+signals:
+    void stateChanged();
+
+private slots:
+    void updateState();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -164,13 +186,24 @@ private:
   int socket_h; //socket handle
   int raw_socket_h; //raw_handle
   struct sockaddr_in serv_addr; //Server Adress Object
-  bool isConnected;
+//  bool isConnected;
   fd_set rfds;
   unsigned int timeSinceLastConnectTrial;
   unsigned int numberOfFailedReads;
   cv::Mat lastReadMatrix;
   cv::Mat lastReadDimensions;
   std::string mOverflowBuffer;
+
+  //parallel communication
+  std::thread mCommunicationThread;
+  std::atomic_bool mRunning;
+  std::atomic_bool mAbortRequested;
+  std::atomic_bool isConnected;
+  mutable std::shared_timed_mutex readMatrixMutex;
+
+  mutable std::shared_timed_mutex stateMutex;
+  Triggerable::State mCurState;
+  std::string mCurStateAnnotation;
 
 public:
   //--------------------------------------------------------------------------------------------------------------------

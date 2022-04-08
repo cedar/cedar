@@ -59,6 +59,7 @@
 #include "cedar/processing/gui/RecorderWidget.fwd.h"
 #include "cedar/processing/gui/CommentWidget.fwd.h"
 #include "cedar/processing/gui/CodeWidget.fwd.h"
+#include "cedar/processing/gui/CoPYWidget.fwd.h"
 #include "cedar/processing/gui/StickyNote.fwd.h"
 #include "cedar/processing/gui/TriggerItem.fwd.h"
 #include "cedar/processing/auxiliaries/gui/Configurable.fwd.h"
@@ -305,6 +306,9 @@ public:
   void setCommentWidget(cedar::proc::gui::CommentWidget* pCommentWidget);
   
   void setCodeWidget(cedar::proc::gui::CodeWidget* pCodeWidget);
+  #ifdef CEDAR_USE_COPY
+  void setCoPYWidget(cedar::proc::gui::CoPYWidget* pCoPYWidget);
+  #endif
 
   /*!@brief Exports the scene to an svg file
    */
@@ -356,6 +360,12 @@ public:
   cedar::proc::gui::CommentWidget* getCommentWidget() const;
   
   cedar::proc::gui::CodeWidget* getCodeWidget() const;
+  #ifdef CEDAR_USE_COPY
+  cedar::proc::gui::CoPYWidget* getCoPYWidget() const;
+  #endif
+  /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
+   */
+  static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
 
   /*! Returns a list of selected items where those items whose parents are in the selection are removed.
    */
@@ -422,6 +432,8 @@ private:
   void removeGroupItem(cedar::proc::gui::Group* pGroup);
 
   void handleTriggerModeChange();
+
+  QStringList getGroupCoordinates(const QPointF &mousePosition);
 
   //! Responsible for highlighting group targets when the mouse is dragging items around.
   void highlightTargetGroups(const QPointF& mousePosition);
@@ -545,7 +557,9 @@ private:
   cedar::proc::gui::CommentWidget* mpCommentWidget;
   
   cedar::proc::gui::CodeWidget* mpCodeWidget;
-
+  #ifdef CEDAR_USE_COPY
+  cedar::proc::gui::CoPYWidget* mpCoPYWidget;
+  #endif
   //! Saves the mouse x position in the scene
   int mMousePosX;
 

@@ -48,9 +48,10 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::StepTime::StepTime(const cedar::unit::Time& stepTime)
+cedar::proc::StepTime::StepTime(const cedar::unit::Time& stepTime, const cedar::unit::Time& globalTimeStamp)
 :
-mStepTime (stepTime)
+mStepTime (stepTime),
+mGlobalTimeStamp(globalTimeStamp)
 {
 }
 
@@ -65,4 +66,9 @@ cedar::proc::StepTime::~StepTime()
 const cedar::unit::Time& cedar::proc::StepTime::getStepTime() const
 {
   return this->mStepTime;
+}
+
+const cedar::unit::Time& cedar::proc::StepTime::getGlobalTimeStamp() const
+{
+  return this->mGlobalTimeStamp;
 }

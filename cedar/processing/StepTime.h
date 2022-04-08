@@ -64,7 +64,8 @@ class cedar::proc::StepTime : public cedar::proc::Arguments
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StepTime(const cedar::unit::Time& stepTime);
+  StepTime(const cedar::unit::Time& stepTime,const cedar::unit::Time& globalTimeStamp = nullptr);
+
 
   //!@brief Destructor
   virtual ~StepTime();
@@ -75,6 +76,8 @@ public:
 public:
   //!@brief returns the last step duration
   const cedar::unit::Time& getStepTime() const;
+
+  const cedar::unit::Time& getGlobalTimeStamp() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -98,6 +101,8 @@ protected:
 private:
   //!@brief last step duration
   cedar::unit::Time mStepTime;
+
+  cedar::unit::Time mGlobalTimeStamp;
 }; // class cedar::proc::StepTime
 
 #endif // CEDAR_PROC_STEP_TIME_H

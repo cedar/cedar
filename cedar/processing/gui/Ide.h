@@ -43,11 +43,13 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/CommentWidget.h"
-#include "cedar/processing/gui/CodeWidget.h"
+#include "cedar/processing/gui/CodeWidget.fwd.h"
+#include "cedar/processing/gui/CoPYWidget.fwd.h"
 #include "cedar/processing/gui/ui_Ide.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/auxiliaries/LogInterface.h"
 #include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/LoopMode.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
@@ -411,14 +413,26 @@ private:
 
   void translateGlobalTimeFactorChangedSignal(double newValue);
 
+  void processLoopModeChangedSignal(cedar::aux::LoopMode::Id newMode);
+
+  void processSimulationStepChangedSignal(cedar::unit::Time newStep);
+
   void resetWarningAndErrorStateIndicators();
 
   void backupSaveCallback();
 
 private slots:
-  void globalTimeFactorSliderChanged(int newValue);
+  #ifdef CEDAR_USE_COPY
+  void showCoPYDocumentation();
+  #endif
 
-  void globalTimeFactorSpinboxChanged(double value);
+  void simulationModeComboBoxChanged( int newIndex);
+
+  void simulatedTimeStepSliderChanged(int newValue);
+
+  void simulatedTimeStepSpinBoxChanged(double value);
+
+  void updateTimeStepSpinBoxColor();
 
   void globalTimeFactorSettingChanged(double newValue);
 
@@ -458,6 +472,11 @@ private:
 
   cedar::proc::StepPtr mLastCopiedStep;
 
+  #ifdef CEDAR_USE_COPY
+  QDockWidget* mpCopyWidget;
+  cedar::proc::gui::CoPYWidget* mpCopy;
+  QAction* mpActionShowCoPYDocumentation;
+  #endif
 
   //! Performance overview.
   cedar::proc::gui::PerformanceOverview* mpPerformanceOverview;
@@ -477,13 +496,16 @@ private:
   cedar::aux::CallFunctionInThreadPtr mStopThreadsCaller;
 
   //! Combobox to select plot groups
+  QComboBox* mpSimulationModeComboBox;
+
+  //! Combobox to select plot groups
   QComboBox* mpPlotGroupsComboBox;
 
   //! Spinbox for controlling the global time step.
-  QDoubleSpinBox* mpGlobalTimeFactor;
+  QDoubleSpinBox* mpSimulatedTimeStepSpinBox;
 
   //! Spinbox for controlling the global time step.
-  QSlider* mpGlobalTimeFactorSlider;
+  QSlider* mpSimulatedTimeStepSlider;
 
   //! Whether the save on close dialog should be suppressed.
   bool mSuppressCloseDialog;
@@ -507,6 +529,12 @@ private:
   std::map<std::string, OpenableDialogPtr> mOpenableDialogs;
 
   boost::signals2::scoped_connection mGlobalTimeFactorSettingChangedConnection;
+
+  boost::signals2::scoped_connection mSimulationModeChangedConnection;
+
+  boost::signals2::scoped_connection mSimulationStepSizeChangedConnection;
+
+  boost::signals2::scoped_connection mCurMinTauChangedConnection;
 
   // permanent status bar widgets
   //! Icon that indicates steps in a warning state.

@@ -114,7 +114,6 @@ cedar::proc::sources::TCPReader::TCPReader()
         cedar::proc::Step(true),
 // outputs
         mOutput(new cedar::aux::MatData(cv::Mat())),
-        isConnected(false),
         timeSinceLastConnectTrial(0),
         numberOfFailedReads(0),
         lastReadMatrix(cv::Mat::zeros(50, 50, CV_32F)),
@@ -126,6 +125,8 @@ cedar::proc::sources::TCPReader::TCPReader()
         _mTimeStepsBetweenMessages(new cedar::aux::UIntParameter(this, "message timeout (ms)", 5)),
         _mTimeStepsBetweenAcceptTrials(new cedar::aux::UIntParameter(this, "accept interval (steps)", 30))
 {
+
+  isConnected.store(false);
   cedar::proc::sources::TCPReader::mpDataLock = new QReadWriteLock();
 
   _mBufferLength->markAdvanced(true);
@@ -133,10 +134,20 @@ cedar::proc::sources::TCPReader::TCPReader()
   _mTimeStepsBetweenMessages->markAdvanced(true);
   _mTimeStepsBetweenAcceptTrials->markAdvanced(true);
 
+  QObject::connect(this,SIGNAL(stateChanged()),this,SLOT(updateState()));
+
 
   this->declareOutput("output", mOutput);
 
   mOutput->setData(lastReadMatrix);
+}
+
+cedar::proc::sources::TCPReader::~TCPReader()
+{
+  if(mRunning.load())
+  {
+    abortAndJoin();
+  }
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -144,7 +155,11 @@ cedar::proc::sources::TCPReader::TCPReader()
 
 void cedar::proc::sources::TCPReader::onStart()
 {
-  this->establishConnection();
+//  this->establishConnection();
+
+//    std::cout<<this->getName() <<" onStart()!" << std::endl;
+    _mPort->setConstant(true);
+    this->startCommunicationThread();
 }
 
 
@@ -152,7 +167,6 @@ void cedar::proc::sources::TCPReader::establishConnection()
 {
   raw_socket_h = create_socket_server(_mPort->getValue());
   socket_h = accept_client(raw_socket_h);
-
 }
 
 void cedar::proc::sources::TCPReader::reconnect()
@@ -194,8 +208,8 @@ int cedar::proc::sources::TCPReader::create_socket_server(int port)
               std::cout << "Error Setting Socket Options" << std::endl;
           }
 
-          unsigned long on = 1;
-          ioctlsocket(sfd, FIONBIO, &on); //make socket Non-blockable in windows
+//          unsigned long on = 1;
+//          ioctlsocket(sfd, FIONBIO, &on); //make socket Non-blockable in windows
 #else
   int opt = 1;
   if (setsockopt(sfd, SOL_SOCKET, SO_REUSEPORT,
@@ -203,7 +217,7 @@ int cedar::proc::sources::TCPReader::create_socket_server(int port)
   {
     std::cout << "Error Setting Socket Options" << std::endl;
   }
-  fcntl(sfd, F_SETFL, O_NONBLOCK); //make socket Non-blockable
+//  fcntl(sfd, F_SETFL, O_NONBLOCK); //make socket Non-blockable
 #endif
 
 
@@ -238,7 +252,8 @@ int cedar::proc::sources::TCPReader::create_socket_server(int port)
 #endif
     return -1;
   }
-  printf("Waiting for a connection on port %d...\n", port);
+//  printf("Waiting for a connection on port %d...\n", port);
+//  std::cout<< this->getName() <<" Successfully created listening socket server on port " << port << std::endl;
 
   return sfd;
 
@@ -246,8 +261,9 @@ int cedar::proc::sources::TCPReader::create_socket_server(int port)
 
 int cedar::proc::sources::TCPReader::accept_client(int server_fd)
 {
-  isConnected = false;
-  int cfd;
+//  std::cout<<this->getName() << " accept_client >>0<<" << std::endl;
+  isConnected.store(false);
+  int cfd = -1;
   struct sockaddr_in client;
 
 #ifndef _WIN32
@@ -260,7 +276,21 @@ int cedar::proc::sources::TCPReader::accept_client(int server_fd)
 
   asize = sizeof(struct sockaddr_in);
 
-  cfd = accept(server_fd, (struct sockaddr *) &client, &asize);
+  fd_set set;
+  struct timeval selectTimeout;
+  FD_ZERO(&set); /* clear the set */
+  FD_SET(server_fd, &set); /* add our file descriptor to the set */
+  selectTimeout.tv_sec = 0;
+  selectTimeout.tv_usec = 100000;
+
+
+  int rv = select(server_fd + 1, &set, NULL, NULL, &selectTimeout);
+  if (rv > 0)
+  {
+    // socket has something to read
+    cfd = accept(server_fd, (struct sockaddr *) &client, &asize);
+  }
+
   if (cfd == -1)
   {
     return -1;
@@ -268,19 +298,21 @@ int cedar::proc::sources::TCPReader::accept_client(int server_fd)
 
   client_info = gethostbyname((char *) inet_ntoa(client.sin_addr));
 //  printf("Accepted connection from: %s \n", client_info->h_name);
-  std::cout<< this->getName() << " accepted connection from: " << client_info->h_name << " on port: " << this->_mPort->getValue() << std::endl;
+//  std::cout<< this->getName() << " accepted connection from: " << client_info->h_name << " on port: " << this->_mPort->getValue() << std::endl;
 
-  isConnected = true;
+  isConnected.store(true);
   FD_ZERO(&rfds);
   FD_SET(cfd, &rfds);
+
+//  std::cout<<this->getName() << " accept_client >>6<<" << std::endl;
 
   return cfd;
 }
 
 void cedar::proc::sources::TCPReader::receiveMatData()
 {
-//  std::cout<<this->getName() << " receiveMatData()" << std::endl;
-  if (!isConnected)
+//  std::cout<<this->getName() << " receiveMatData() >0<"<<std::endl;
+  if (!isConnected.load())
   {
     timeSinceLastConnectTrial = timeSinceLastConnectTrial + 1;
     if (timeSinceLastConnectTrial > _mTimeStepsBetweenAcceptTrials->getValue())
@@ -298,12 +330,8 @@ void cedar::proc::sources::TCPReader::receiveMatData()
     return;
   }
 
-//  std::cout<<this->getName() << " before FD_SET" << std::endl;
-//  FD_ZERO(&rfds);
-//  FD_SET(socket_h, &rfds);
+//  std::cout<<this->getName() << " receiveMatData() >1<"<<std::endl;
 
-
-//  std::cout<<this->getName() << " before malloc" << std::endl;
   // Size may be varied. Just picked this number for now.
   char *buffer = (char *) malloc(_mBufferLength->getValue() * sizeof(char));
   std::string fullMessageString = "";
@@ -316,26 +344,46 @@ void cedar::proc::sources::TCPReader::receiveMatData()
 
   bool endFound = false;
   bool timeout = false;
-  int msgLength;
+//  int msgLength;
 
+//  std::cout<<this->getName() << " receiveMatData() >2<"<<std::endl;
   std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
   std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-
-//  std::cout<<this->getName() << " before While" << std::endl;
 
   while (!endFound && !timeout)
   {
 
+//    std::cout<<this->getName() << " receiveMatData() >3<"<<std::endl;
     end = std::chrono::steady_clock::now();
     timeout = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() >
               _mTimeOutBetweenPackets->getValue();
 
     memset(buffer, 0, _mBufferLength->getValue() * sizeof(char));
 
+    int msgLength = -1;
+
 #ifdef _WIN32
     msgLength = recv(socket_h, buffer, _mBufferLength->getValue(), 0);
 #else
-    msgLength = recv(socket_h, buffer, _mBufferLength->getValue(), MSG_DONTWAIT);
+//    msgLength = recv(socket_h, buffer, _mBufferLength->getValue(), MSG_DONTWAIT);
+//    msgLength = recv(socket_h, buffer, _mBufferLength->getValue(),0); // With the thread implementation we want to wait for connection again
+
+    fd_set set;
+    struct timeval selectTimeout;
+    FD_ZERO(&set); /* clear the set */
+    FD_SET(socket_h, &set); /* add our file descriptor to the set */
+    selectTimeout.tv_sec = 0;
+    selectTimeout.tv_usec = 100000;
+
+    int rv = select(socket_h + 1, &set, NULL, NULL, &selectTimeout);
+    if (rv > 0)
+    {
+      // socket has something to read
+//      std::cout<<this->getName() << " receiveMatData() >4<"<<std::endl;
+      msgLength = recv(socket_h, buffer, _mBufferLength->getValue(), 0);
+    }
+
+//    std::cout<<this->getName() << " receiveMatData() >5<"<<std::endl;
 #endif
     if (msgLength > 0)
     {
@@ -369,17 +417,14 @@ void cedar::proc::sources::TCPReader::receiveMatData()
 
       if (numberOfFailedReads > _mTimeStepsBetweenMessages->getValue())
       {
-        std::cout<< this->getName()<< " failed reading for " << _mTimeStepsBetweenMessages->getValue() << " times"<<std::endl;
         numberOfFailedReads = 0;
         free(buffer);
         if (raw_socket_h != -1)
         {
           //Just wait for some connection!
-//          std::cout<<this->getName()<<" tried to ACCEPT again because " << _mTimeStepsBetweenMessages->getValue() << " reading trials did fail!" << std::endl;
           socket_h = accept_client(raw_socket_h);
         } else
         {
-//          std::cout<<this->getName()<<" tried to RECONNECT again because " << _mTimeStepsBetweenMessages->getValue() << " reading trials did fail!" << std::endl;
           reconnect();
         }
         return;
@@ -398,6 +443,7 @@ void cedar::proc::sources::TCPReader::receiveMatData()
     return;
   }
 
+//  std::cout<<this->getName() << " receiveMatData() >6<"<<std::endl;
 
   std::vector<std::string> chkSumSplit;
   cedar::aux::split(fullMessageString, MATMSG_CHK, chkSumSplit);
@@ -428,13 +474,15 @@ void cedar::proc::sources::TCPReader::receiveMatData()
 
   cedar::aux::MatData transformData;
   transformData.deserialize(inputStream, cedar::aux::SerializationFormat::Compact);
+
+  std::lock_guard<std::shared_timed_mutex> guard(readMatrixMutex);
   lastReadMatrix = transformData.getData();
 }
 
 void cedar::proc::sources::TCPReader::onStop()
 {
   _mPort->setConstant(false);
-  closeSocket();
+  this->abortAndJoin();
 }
 
 void cedar::proc::sources::TCPReader::closeSocket()
@@ -447,40 +495,41 @@ void cedar::proc::sources::TCPReader::closeSocket()
   close(socket_h);
   close(raw_socket_h);
 #endif
-  isConnected = false;
+  isConnected.store(false);
 }
 
 void cedar::proc::sources::TCPReader::reset()
 {
-  reconnect();
+  abortAndJoin();
+  startCommunicationThread();
 }
 
 void cedar::proc::sources::TCPReader::compute(const cedar::proc::Arguments &)
 {
   if (0 == _mPort->getValue())
   {
-    this->setState(cedar::proc::Step::STATE_EXCEPTION, "Port must not be empty!");
+    this->setCurrentStateAndAnnotation(cedar::proc::Step::STATE_EXCEPTION, "Port must not be empty!");
   } else
   {
-    receiveMatData();
-    mOutput->setData(lastReadMatrix);
 
-    if(lastReadMatrix.rows != lastReadDimensions.at<int>(0,0) || lastReadMatrix.cols != lastReadDimensions.at<int>(1,0))
+    cv::Mat lastMatrix = this->getLastReadMatrix();
+    mOutput->setData(lastMatrix);
+
+    if(lastMatrix.rows != lastReadDimensions.at<int>(0,0) || lastMatrix.cols != lastReadDimensions.at<int>(1,0))
     {
         this->emitOutputPropertiesChangedSignal("output");
-        lastReadDimensions.at<int>(0,0) = lastReadMatrix.rows;
-        lastReadDimensions.at<int>(1,0) = lastReadMatrix.cols;
+        lastReadDimensions.at<int>(0,0) = lastMatrix.rows;
+        lastReadDimensions.at<int>(1,0) = lastMatrix.cols;
     }
 
-
-    confirmAliveStatus();
-
-    if (isConnected)
+    if (isConnected.load() && mRunning.load())
     {
-      this->setState(cedar::proc::Step::STATE_RUNNING, "Connected");
+      this->setCurrentStateAndAnnotation(cedar::proc::Step::STATE_RUNNING, "Connected");
     } else
     {
-      this->setState(cedar::proc::Step::STATE_INITIALIZING, "Waiting for Incoming Connections... ");
+      std::stringstream msg;
+      msg << "Is thread running: " << mRunning.load()  << " and is socket connected: " << isConnected.load();
+      this->setCurrentStateAndAnnotation(cedar::proc::Step::STATE_INITIALIZING, msg.str()  );
     }
   }
 }
@@ -511,4 +560,105 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::sources::TCPReader::determineInputV
   {
     return cedar::proc::DataSlot::VALIDITY_ERROR;
   }
+}
+
+void cedar::proc::sources::TCPReader::startCommunicationThread()
+{
+  mAbortRequested.store(false);
+  try
+  {
+    mCommunicationThread = std::thread(&cedar::proc::sources::TCPReader::communicationLoop, this);
+  }
+  catch (...)
+  {
+    std::cout<<" Starting the CommunicationThread of " << this->getName() << " did somehow not work!" <<std::endl;
+  }
+}
+
+void cedar::proc::sources::TCPReader::abortAndJoin()
+{
+//  std::cout<< this->getName() << " abortAndJoin()" <<std::endl;
+  mAbortRequested.store(true);
+  if (mCommunicationThread.joinable())
+  {
+    mCommunicationThread.join();
+  }
+//  std::cout<< this->getName() << "Joined abortAndJoin()" <<std::endl;
+
+  this->closeSocket();
+
+//  std::cout<< this->getName() << "FINISHED abortAndJoin()" <<std::endl;
+
+}
+
+
+void cedar::proc::sources::TCPReader::communicationLoop()
+{
+
+//  std::cout<<this->getName() << "communicationLoop >>0<<" <<std::endl;
+  mRunning.store(true);
+
+  this->establishConnection();
+
+//  std::cout<<this->getName() << "communicationLoop >>1<<" <<std::endl;
+
+  while (false == mAbortRequested.load())
+  {
+    try
+    {
+//      std::cout<<this->getName() << "communicationLoop >>2<<" <<std::endl;
+      receiveMatData();
+//      std::cout<<this->getName() << "communicationLoop >>3<<" <<std::endl;
+      confirmAliveStatus();
+    }
+    catch (std::runtime_error &e)
+    {
+      std::cout<<"Caught an error: " << e.what()  << " in " << this->getName() <<std::endl;
+    }
+    catch (...)
+    {
+      // Make sure that nothing leaves the thread for now...
+      std::cout<<"Caught something else while running " << this->getName()  <<std::endl;
+    }
+//    std::cout<<this->getName() << "communicationLoop >>4<<" <<std::endl;
+  }
+
+  mRunning.store(false);
+}
+
+cv::Mat cedar::proc::sources::TCPReader::getLastReadMatrix()
+{
+  std::lock_guard<std::shared_timed_mutex> guard(readMatrixMutex);
+  cv::Mat retMat = lastReadMatrix.clone();
+  return retMat;
+}
+
+
+cedar::proc::Triggerable::State cedar::proc::sources::TCPReader::getCurrentState()
+{
+  std::lock_guard<std::shared_timed_mutex> guard(stateMutex);
+  return mCurState;
+}
+
+std::string cedar::proc::sources::TCPReader::getCurrentAnnotation()
+{
+  std::lock_guard<std::shared_timed_mutex> guard(stateMutex);
+  return mCurStateAnnotation;
+}
+
+void cedar::proc::sources::TCPReader::setCurrentStateAndAnnotation(Triggerable::State state, std::string annotation)
+{
+  std::lock_guard<std::shared_timed_mutex> guard(stateMutex);
+  mCurState = state;
+  mCurStateAnnotation = annotation;
+
+  emit stateChanged();
+}
+
+void cedar::proc::sources::TCPReader::updateState()
+{
+  cedar::proc::Triggerable::State curState = getCurrentState();
+  std::string curAnno = getCurrentAnnotation();
+
+  this->setState(curState,curAnno);
 }

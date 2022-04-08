@@ -43,8 +43,17 @@
 cedar::aux::GlobalClock::GlobalClock()
 :
 mpAccessLock(new QReadWriteLock()),
-mRunning(false)
+mpSimulationStepsTakenLock(new QReadWriteLock()),
+mRunning(false),
+mAdditionalTakenSteps(0),
+mpSimulationStepsTaken(0),
+mDefaultCPUStepSize(cedar::unit::Time(20 * cedar::unit::milli * cedar::unit::seconds)),
+mSimulationStepSize(cedar::unit::Time(20 * cedar::unit::milli * cedar::unit::seconds)),
+mLoopMode(cedar::aux::LoopMode::FakeDT)
 {
+  //Initialize to 100.0, which is the default field value
+  mCurMinTau.store(100.0);
+
   this->mGlobalTimeFactorConnection = cedar::aux::SettingsSingleton::getInstance()->connectToGlobalTimeFactorChangedSignal
   (
     boost::bind(&cedar::aux::GlobalClock::globalTimeFactorChanged, this, _1)
@@ -68,19 +77,27 @@ void cedar::aux::GlobalClock::addTime(const cedar::unit::Time& time)
 
 void cedar::aux::GlobalClock::globalTimeFactorChanged(double newFactor)
 {
+  //Todo: This will become irrelevant
   this->addCurrentToAdditionalElapsedTime();
   this->mCurrentTimeFactor = newFactor;
 }
 
 double cedar::aux::GlobalClock::getCurrentElapsedMSec() const
 {
+  //This is the Internal Update
   double elapsed = static_cast<double>(this->mTimer.elapsed());
-  return elapsed * this->mCurrentTimeFactor;
+  return elapsed; //* this->mCurrentTimeFactor; //Time Factor should not be used anymore
 }
 
 void cedar::aux::GlobalClock::addCurrentToAdditionalElapsedTime()
 {
-  this->mAdditionalElapsedTime += this->getCurrentElapsedMSec();
+
+  //This keeps track of the time while the simulation is stopped
+  if(this->mLoopMode == cedar::aux::LoopMode::RealDT)
+    this->mAdditionalElapsedTime += this->getCurrentElapsedMSec();
+  QWriteLocker locker(this->mpSimulationStepsTakenLock);
+  mAdditionalTakenSteps += this->mpSimulationStepsTaken;
+  this->mpSimulationStepsTaken = 0;
   this->mTimer.restart();
 }
 
@@ -107,7 +124,10 @@ void cedar::aux::GlobalClock::start()
   // since we unlocked for a brief moment, we need to check again if we're running
   if (!this->mRunning)
   {
-    this->mTimer.start();
+    if(this->mLoopMode == cedar::aux::LoopMode::RealDT)
+    {
+      this->mTimer.start();
+    }
     this->mRunning = true;
   }
 }
@@ -115,9 +135,15 @@ void cedar::aux::GlobalClock::start()
 void cedar::aux::GlobalClock::reset()
 {
   QWriteLocker w_locker(this->mpAccessLock);
+  QWriteLocker w_locker_steps(this->mpSimulationStepsTakenLock);
 
+  this->mpSimulationStepsTaken = 0;
+  this->mAdditionalTakenSteps = 0;
   this->mAdditionalElapsedTime = 0;
-  this->mTimer.restart();
+  if(this->mLoopMode == cedar::aux::LoopMode::RealDT)
+  {
+    this->mTimer.restart();
+  }
 }
 
 
@@ -146,13 +172,133 @@ cedar::unit::Time cedar::aux::GlobalClock::getTime() const
   QReadLocker locker(this->mpAccessLock);
   double time_msecs = this->mAdditionalElapsedTime;
 
-  if (this->mRunning)
+  if (this->mRunning && this->mLoopMode == cedar::aux::LoopMode::RealDT)
   {
     time_msecs += this->getCurrentElapsedMSec();
   }
 
-  return cedar::unit::Time(static_cast<double>(time_msecs) * cedar::unit::milli * cedar::unit::seconds);
+    return cedar::unit::Time(static_cast<double>(time_msecs) * cedar::unit::milli * cedar::unit::seconds);
+
+}
+
+void cedar::aux::GlobalClock::setDefaultCPUStepSize(cedar::unit::Time newDefaultStepSize)
+{
+  mDefaultCPUStepSize = newDefaultStepSize;
+  this->mDefaultCPUStepSizeChangedSignal(newDefaultStepSize);
+}
+
+cedar::unit::Time cedar::aux::GlobalClock::getDefaultCPUStepSize()
+{
+  return mDefaultCPUStepSize;
+}
+
+void cedar::aux::GlobalClock::setMinimumComputationTime(cedar::unit::Time newMinComputationTime)
+{
+  mMinimumComputationTime = newMinComputationTime;
+  this->mMinimumComputationTimeChangedSignal(newMinComputationTime);
+
+}
+
+cedar::unit::Time cedar::aux::GlobalClock::getMinimumComputationTime()
+{
+  return mMinimumComputationTime;
+}
+
+void cedar::aux::GlobalClock::setSimulationStepSize(cedar::unit::Time newSimulationStepSize)
+{
+  mSimulationStepSize = newSimulationStepSize;
+  this->mSimualtionStepSizeChangedSignal(newSimulationStepSize);
+}
+
+cedar::unit::Time cedar::aux::GlobalClock::getSimulationStepSize()
+{
+  return mSimulationStepSize;
+}
+
+void cedar::aux::GlobalClock::setLoopMode(cedar::aux::LoopMode::Id newLoopMode)
+{
+  bool isNewLoop = mLoopMode == newLoopMode;
+  mLoopMode = newLoopMode;
+
+  if(isNewLoop)
+  {
+    this->stop();
+    this->reset();
+  }
+  this->mLoopModeChangedSignal(newLoopMode);
+}
+
+cedar::aux::LoopMode::Id cedar::aux::GlobalClock::getLoopMode()
+{
+  return mLoopMode;
+}
+
+void cedar::aux::GlobalClock::updateTakenSteps(unsigned long newStepsTaken)
+{
+  if (this->mRunning)
+  {
+    QWriteLocker locker(this->mpSimulationStepsTakenLock);
+    if(newStepsTaken > mpSimulationStepsTaken)
+    {
+      mpSimulationStepsTaken = newStepsTaken;
+    }
+  }
+}
+
+unsigned long cedar::aux::GlobalClock::getNumOfTakenSteps() const
+{
+  QReadLocker locker (this->mpSimulationStepsTakenLock);
+  unsigned long copyStepsTaken = this->mpSimulationStepsTaken;
+  return copyStepsTaken;
 }
 
 
+double cedar::aux::GlobalClock::getCurrentMinTau()
+{
+    return mCurMinTau.load();
+}
 
+void cedar::aux::GlobalClock::updateCurrentMinTau()
+{
+    auto it_min = min_element(mFieldTauMap.begin(), mFieldTauMap.end(),
+                              [](decltype(mFieldTauMap)::value_type& l, decltype(mFieldTauMap)::value_type& r) -> bool { return l.second < r.second; });
+
+    if (it_min != mFieldTauMap.end())
+    {
+        if (cedar::aux::ConfigurablePtr confPtr = it_min->first.lock())
+        {
+            mCurMinTau.store(it_min->second);
+            this->mMinCurTauChangedSignal();
+        } else
+        {
+            mFieldTauMap.erase(it_min);
+            updateCurrentMinTau();
+        }
+    }
+
+    if(mFieldTauMap.size() == 0)
+    {
+        mCurMinTau.store(100.0);
+        this->mMinCurTauChangedSignal();
+    }
+
+
+
+}
+
+void cedar::aux::GlobalClock::updateFieldTauMap(cedar::aux::ConfigurableWeakPtr confWPointer, double tauValue)
+{
+    auto it = mFieldTauMap.find(confWPointer);
+    if( it != mFieldTauMap.end())
+    {
+        it->second = tauValue;
+    }
+    else
+    {
+        mFieldTauMap.insert(std::pair<cedar::aux::ConfigurableWeakPtr,double>(confWPointer,tauValue));
+    }
+
+    updateCurrentMinTau();
+
+
+}
