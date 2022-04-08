@@ -159,9 +159,12 @@ public:
     if(auto config = dynamic_cast<cedar::aux::Configurable*>(this->mObject.get())){
       // If there already exists a shared_ptr of the owner (i.e. this method is not called in the constructor), assign
       // the (weak_ptr) owner as parent to all children
-      if(this->getOwner()->hasShared())
+      if(this->getOwner() != nullptr)
       {
-        config->setParent(cedar::aux::ConfigurableWeakPtr(this->getOwner()->shared_from_this()));
+        if(this->getOwner()->hasShared())
+        {
+          config->setParent(cedar::aux::ConfigurableWeakPtr(this->getOwner()->shared_from_this()));
+        }
       }
     }
   }

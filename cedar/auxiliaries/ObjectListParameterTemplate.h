@@ -180,9 +180,12 @@ public:
       {
         // If there already exists a shared_ptr of the owner (i.e. this method is not called in the constructor), assign
         // the (weak_ptr) owner as parent to all children
-        if(this->getOwner()->hasShared())
+        if(this->getOwner() != nullptr)
         {
-          configurable->setParent(cedar::aux::ConfigurableWeakPtr(this->getOwner()->shared_from_this()));
+          if (this->getOwner()->hasShared())
+          {
+            configurable->setParent(cedar::aux::ConfigurableWeakPtr(this->getOwner()->shared_from_this()));
+          }
         }
       }
     }
