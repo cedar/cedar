@@ -151,37 +151,6 @@ public:
     this->_mOutputDimensionSizes->setValue(dimension, size);
   }
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@brief check if all inputs are valid, e.g. have the right size and dimensionality
-  cedar::proc::DataSlot::VALIDITY determineInputValidity
-                                  (
-                                    cedar::proc::ConstDataSlotPtr slot,
-                                    cedar::aux::ConstDataPtr data
-                                  ) const;
-
-protected slots:
-  //!@brief this slot is triggered whenever the dimensionality of its output is changed by the user
-  void outputDimensionalityChanged();
-  //!@brief this slot is triggered whenever the size of any dimension of the output is changed by the user
-  void outputDimensionSizesChanged();
-  //!@brief chooses the appropriate projection method for the current input and output
-  void reconfigure(bool triggerSubsequent = true);
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // private methods
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  //!@brief computes the projected output whenever this step is triggered
-  void compute(const cedar::proc::Arguments& arguments);
-
-  //!@brief this function is triggered whenever a new connection is connected as an input to the projection step
-  void inputConnectionChanged(const std::string& inputName);
-  //!@brief initializes or reconfigures the output matrix
-  void initializeOutputMatrix();
-
   // projection methods
 
   //!@brief expands a 0D input to an ND output
@@ -252,6 +221,108 @@ private:
 
   //!@brief compresses 2D input to 1D output
   void compress2Dto1D();
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  //!@brief check if all inputs are valid, e.g. have the right size and dimensionality
+  cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                  (
+                                    cedar::proc::ConstDataSlotPtr slot,
+                                    cedar::aux::ConstDataPtr data
+                                  ) const;
+
+protected slots:
+  //!@brief this slot is triggered whenever the dimensionality of its output is changed by the user
+  void outputDimensionalityChanged();
+  //!@brief this slot is triggered whenever the size of any dimension of the output is changed by the user
+  void outputDimensionSizesChanged();
+  //!@brief chooses the appropriate projection method for the current input and output
+  void reconfigure(bool triggerSubsequent = true);
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  //!@brief computes the projected output whenever this step is triggered
+  void compute(const cedar::proc::Arguments& arguments);
+
+  //!@brief this function is triggered whenever a new connection is connected as an input to the projection step
+  void inputConnectionChanged(const std::string& inputName);
+  //!@brief initializes or reconfigures the output matrix
+  void initializeOutputMatrix();
+
+  /*// projection methods
+
+  //!@brief expands a 0D input to an ND output
+  void expand0DtoND();
+  //!@brief expands a 0D input to an ND output (templated)
+  template<typename T>
+  void expand0DtoND();
+
+  //!@brief expands a 1D input to an 2D output
+  void expand1Dto2D();
+
+  //!@brief expands a 1D input to an 3D output
+  void expand1Dto3D();
+  //!@brief expands a 1D input to an 3D output (templated)
+  template<typename T>
+  void expand1Dto3D();
+
+  //!@brief expands a 2D input to an 3D output
+  void expand2Dto3D();
+  //!@brief expands a 2D input to an 3D output
+  template<typename T>
+  void expand2Dto3D();
+
+  //!@brief expands and permutes MD input to ND output (M <= N)
+  void expandMDtoND();
+  //!@brief expands and permutes MD input to ND output (M <= N) (templated)
+  template<typename T>
+  void expandMDtoND();
+
+  //!@brief compresses ND input to 0D output by computing the minimum over all positions
+  void compressNDto0Dmin();
+  //!@brief compresses ND input to 0D output by computing the maximum over all positions
+  void compressNDto0Dmax();
+  //!@brief compresses ND input to 0D output by computing the sum over all positions
+  void compressNDto0Dsum();
+  //!@brief compresses ND input to 0D output by computing the mean over all positions
+  void compressNDto0Dmean();
+  //!@brief compresses ND input to 0D output by computing the minimum over all positions (templated)
+  template<typename T>
+  void compressNDto0Dmin();
+  //!@brief compresses ND input to 0D output by computing the maximum over all positions (templated)
+  template<typename T>
+  void compressNDto0Dmax();
+  //!@brief compresses ND input to 0D output by computing the sum over all positions (templated)
+  template<typename T>
+  void compressNDto0Dsum();
+  //!@brief compresses ND input to 0D output by computing the mean over all positions (templated)
+  template<typename T>
+  void compressNDto0Dmean();
+
+  //!@brief compresses 3D input to 2D output
+  void compress3Dto2D();
+  //!@brief compresses 3D input to 2D output
+  template<typename T>
+  void compress3Dto2D();
+
+  //!@brief compresses 3D input to 2D output and swap the two remaining dimensions
+  void compress3Dto2DSwapped();
+  //!@brief compresses 3D input to 2D output and swap the two remaining dimensions
+  template<typename T>
+  void compress3Dto2DSwapped();
+
+  //!@brief compresses 3D input to 1D output
+  void compress3Dto1D();
+  //!@brief compresses 3D input to 1D output
+  template<typename T>
+  void compress3Dto1D();
+
+  //!@brief compresses 2D input to 1D output
+  void compress2Dto1D();*/
 
   //!@brief gets called once by cedar::proc::LoopedTrigger once prior to starting the trigger
   virtual void onStart();

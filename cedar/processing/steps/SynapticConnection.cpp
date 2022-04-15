@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/processing/steps/Convolution.h"
 #include "cedar/auxiliaries/convolution/FFTW.h"
+#include "cedar/processing/steps/Projection.h"
 
 // SYSTEM INCLUDES
 
@@ -102,9 +103,19 @@ mKernelsParameter
 	)
 ),
 mConvolution(new cedar::aux::conv::Convolution()),
-mRevalidating(false)
+mRevalidating(false),
+mProjectionDimensionMappings(new cedar::proc::ProjectionMappingParameter(this, "dimension mapping")),
+mProjectionOutputDimensionality(new cedar::aux::UIntParameter(this, "output dimensionality", 1, 0, 4)),
+mProjectionOutputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "output dimension sizes", 1, 50, 1, 1000)),
+mProjectionCompressionType(new cedar::aux::EnumParameter(
+                          this,
+                          "compression type",
+                          cedar::proc::steps::Projection::CompressionType::typePtr(),
+                          cedar::proc::steps::Projection::CompressionType::SUM
+                  )
+)
 {
-	////Convolution part of SynapticConnection
+	////Constructor part of Convolution
 	//Setting whitelist to limit the kernels for SynapticConnection
   std::vector<std::string> whitelist = {"cedar.aux.kernel.Gauss"};
   this->mKernelsParameter->setWhitelist(whitelist);
@@ -118,15 +129,25 @@ mRevalidating(false)
   this->addConfigurableChild("convolution", this->mConvolution);
 
 	mKernelAddedConnection = this->mKernelsParameter->connectToObjectAddedSignal(
-									boost::bind(&cedar::proc::steps::SynapticConnection::slotKernelAdded, this, _1));
+									boost::bind(&cedar::proc::steps::SynapticConnection::convolutionSlotKernelAdded, this, _1));
 	mKernelRemovedConnection
 					= this->mKernelsParameter->connectToObjectRemovedSignal(
 									boost::bind(&cedar::proc::steps::SynapticConnection::removeKernelFromConvolution, this, _1));
 
 	this->transferKernelsToConvolution();
 
-  ////Static gain part of SynapticConneciton
+  ////Constructor part of Static Gain
   QObject::connect(this->mGainFactorParameter.get(), SIGNAL(valueChanged()),this, SLOT(recompute()));
+
+  ////Constructor part of Projection
+  // initialize the output buffer to the correct size
+  this->projectionOutputDimensionalityChanged();
+
+  // connect signals and slots
+  QObject::connect(mProjectionDimensionMappings.get(), SIGNAL(valueChanged()), this, SLOT(reconfigure()), Qt::DirectConnection);
+  QObject::connect(mProjectionCompressionType.get(), SIGNAL(valueChanged()), this, SLOT(reconfigure()), Qt::DirectConnection);
+  QObject::connect(mProjectionOutputDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(projectionOutputDimensionalityChanged()), Qt::DirectConnection);
+  QObject::connect(mProjectionOutputDimensionSizes.get(), SIGNAL(valueChanged()), this, SLOT(projectionOutputDimensionSizesChanged()), Qt::DirectConnection);
 }
 
 cedar::proc::steps::SynapticConnection::~SynapticConnection()
@@ -144,25 +165,30 @@ void cedar::proc::steps::SynapticConnection::compute(const cedar::proc::Argument
 	if (mKernel)
 	{
 		const cv::Mat& kernel = mKernel->getData();
-		mOutput->setData(this->mConvolution->convolve(matrix, kernel));
+		mConvolutionOutput->setData(this->mConvolution->convolve(matrix, kernel));
 	}
 	else if (this->mKernelsParameter->size() > 0)
 	{
-		if (this->mKernelsParameter->at(0)->getDimensionality() != this->getDimensionality())
+		if (this->mKernelsParameter->at(0)->getDimensionality() != this->convolutionGetDimensionality())
 		{
-			this->inputDimensionalityChanged();
+      this->convolutionInputDimensionalityChanged();
 		}
-		mOutput->setData(this->mConvolution->convolve(matrix));
+    mConvolutionOutput->setData(this->mConvolution->convolve(matrix));
 	}
 	else
 	{
-		mOutput->setData(this->mMatrix->getData().clone());
+    this->mConvolutionOutput->setData(this->mMatrix->getData().clone());
 	}
 
 	////Second: Static Gain
-	this->mOutput->setData(this->mOutput->getData() * this->mGainFactorParameter->getValue());
+	this->mStaticGainOutput->setData(this->mConvolutionOutput->getData() * this->mGainFactorParameter->getValue());
 
 	////Third: Projection
+  if (!mStaticGainOutput) // quickfix
+    return;
+
+  // call the appropriate projection method via the function pointer
+  (this->*mpProjectionMethod)();
 }
 
 void cedar::proc::steps::SynapticConnection::recompute()
@@ -171,6 +197,7 @@ void cedar::proc::steps::SynapticConnection::recompute()
 }
 
 ////Functions copied from cedar::proc::steps::Convolution
+
 //Todo: This is currently only the code from convolution, because the input is the same as convolution and static gain
 // and projection come after the convoltion
 void cedar::proc::steps::SynapticConnection::inputConnectionChanged(const std::string& inputName)
@@ -201,7 +228,7 @@ void cedar::proc::steps::SynapticConnection::inputConnectionChanged(const std::s
 			blocked[i] = list->getKernel(i)->blockSignals(true);
 		}
 
-		this->inputDimensionalityChanged();
+    this->convolutionInputDimensionalityChanged();
 
 		// restore blocked state for each kernel
 		for (size_t i = 0; i < list->size(); ++i)
@@ -230,16 +257,14 @@ void cedar::proc::steps::SynapticConnection::inputConnectionChanged(const std::s
 	}
 	this->callComputeWithoutTriggering();
 
-	if
-					(
-					!mRevalidating // if the step is revalidating, the revalidating call will also check this after revalidation is complete.
-					&& (!cedar::aux::math::matrixSizesEqual(old_output, this->mOutput->getData()) || old_output.type() != this->mOutput->getData().type()))
+	if(!mRevalidating // if the step is revalidating, the revalidating call will also check this after revalidation is complete.
+      && (!cedar::aux::math::matrixSizesEqual(old_output, this->mOutput->getData()) || old_output.type() != this->mOutput->getData().type()))
 	{
 		this->emitOutputPropertiesChangedSignal("result");
 	}
 }
 
-void cedar::proc::steps::SynapticConnection::slotKernelAdded(size_t kernelIndex)
+void cedar::proc::steps::SynapticConnection::convolutionSlotKernelAdded(size_t kernelIndex)
 {
 	cedar::aux::kernel::KernelPtr kernel = this->mKernelsParameter->at(kernelIndex);
 	this->addKernelToConvolution(kernel);
@@ -249,7 +274,7 @@ void cedar::proc::steps::SynapticConnection::slotKernelAdded(size_t kernelIndex)
 
 void cedar::proc::steps::SynapticConnection::addKernelToConvolution(cedar::aux::kernel::KernelPtr kernel)
 {
-	kernel->setDimensionality(this->getDimensionality());
+	kernel->setDimensionality(this->convolutionGetDimensionality());
 	this->getConvolution()->getKernelList()->append(kernel);
 	QObject::connect(kernel.get(), SIGNAL(kernelUpdated()), this, SLOT(recompute()));
 }
@@ -272,9 +297,9 @@ void cedar::proc::steps::SynapticConnection::transferKernelsToConvolution()
 	}
 }
 
-void cedar::proc::steps::SynapticConnection::inputDimensionalityChanged()
+void cedar::proc::steps::SynapticConnection::convolutionInputDimensionalityChanged()
 {
-	unsigned int new_dimensionality = this->getDimensionality();
+	unsigned int new_dimensionality = this->convolutionGetDimensionality();
 #ifdef CEDAR_USE_FFTW
 	if (new_dimensionality >= 3)
 	{
@@ -289,7 +314,7 @@ void cedar::proc::steps::SynapticConnection::inputDimensionalityChanged()
 	}
 }
 
-unsigned int cedar::proc::steps::SynapticConnection::getDimensionality() const
+unsigned int cedar::proc::steps::SynapticConnection::convolutionGetDimensionality() const
 {
 	if (this->mMatrix)
 	{
@@ -303,5 +328,233 @@ unsigned int cedar::proc::steps::SynapticConnection::getDimensionality() const
 	{
 		return 2;
 	}
+}
+
+void cedar::proc::steps::SynapticConnection::projectionOutputDimensionalityChanged()
+{
+  // get the new output dimensionality
+  unsigned int new_dimensionality = mProjectionOutputDimensionality->getValue();
+
+  // resize the dimensionality of the output buffer
+  this->mProjectionOutputDimensionSizes->resize(new_dimensionality, mProjectionOutputDimensionSizes->getDefaultValue());
+
+  // the number of mappings from input to output is constrained by the output dimensionality
+  this->mProjectionDimensionMappings->setOutputDimensionality(new_dimensionality);
+
+  this->initializeOutputMatrix();
+
+  this->reconfigure();
+  this->emitOutputPropertiesChangedSignal("result");
+}
+
+void cedar::proc::steps::SynapticConnection::projectionOutputDimensionSizesChanged()
+{
+  this->initializeOutputMatrix();
+  this->emitOutputPropertiesChangedSignal("result");
+}
+
+void cedar::proc::steps::SynapticConnection::initializeOutputMatrix()
+{
+  int dimensionality = static_cast<int>(mProjectionOutputDimensionality->getValue());
+  // use the input type if possible
+  int type = CV_32F;
+  if (this->mStaticGainOutput)
+  {
+    type = this->mStaticGainOutput->getData().type();
+  }
+
+  if (dimensionality == 0)
+  {
+    cedar::aux::Lockable::Locker locker(this);
+    this->mOutput->getData() = cv::Mat(1, 1, type, cv::Scalar(0));
+    locker.unlock();
+  }
+  else
+  {
+    // convert the sizes of the output dimensions to signed integers so that
+    // OpenCV can handle it
+    std::vector<int> sizes(dimensionality);
+    for (int dim = 0; dim < dimensionality; ++dim)
+    {
+      sizes[dim] = mProjectionOutputDimensionSizes->at(dim);
+    }
+
+    cedar::aux::Lockable::Locker locker(this);
+    this->mOutput->getData() = cv::Mat(dimensionality, &sizes.at(0), type, cv::Scalar(0));
+    locker.unlock();
+  }
+}
+
+void cedar::proc::steps::SynapticConnection::reconfigure(bool triggerSubsequent)
+{
+  if (!this->mStaticGainOutput)
+  {
+    this->setState(
+            cedar::proc::Triggerable::STATE_EXCEPTION,
+            "Cannot reconfigure without an input."
+    );
+    return;
+  }
+
+  if (mStaticGainOutput->getData().empty())
+    return; // silently ignore. for example if a NetReader isn't initialized, yet
+
+  unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(this->mStaticGainOutput->getData());
+  unsigned int output_dimensionality = mProjectionOutputDimensionality->getValue();
+
+  // if the projection compresses ...
+  if (input_dimensionality > output_dimensionality)
+  {
+    CEDAR_DEBUG_ASSERT(input_dimensionality == mProjectionDimensionMappings->getValue()->getNumberOfMappings())
+
+    // ... compute which indices need to be compressed
+    mProjectionIndicesToCompress.clear();
+
+    for (unsigned int index = 0; index < input_dimensionality; ++index)
+    {
+      if (mProjectionDimensionMappings->getValue()->isDropped(index))
+      {
+        mProjectionIndicesToCompress.push_back(index);
+      }
+    }
+
+    // set up the appropriate function pointer for different combinations of
+    // input and output dimensionality
+    if (input_dimensionality == 3 && output_dimensionality == 2)
+    {
+      std::vector<unsigned int> mapped_indices;
+
+      for (unsigned int index = 0; index < input_dimensionality; ++index)
+      {
+        if (!mProjectionDimensionMappings->getValue()->isDropped(index))
+        {
+          mapped_indices.push_back(mProjectionDimensionMappings->getValue()->lookUp(index));
+        }
+      }
+
+      if (mapped_indices.size() == 2)
+      {
+        if (mapped_indices.at(0) == mapped_indices.at(1))
+        {
+          this->setState(
+                  cedar::proc::Triggerable::STATE_EXCEPTION,
+                  "Cannot map the same dimension onto multiple dimensions."
+          );
+          return;
+        }
+        bool swapped = mapped_indices.at(0) > mapped_indices.at(1);
+
+        if (swapped)
+        {
+          mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto2DSwapped;
+        }
+        else
+        {
+          mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto2D;
+        }
+      }
+    }
+    else if (input_dimensionality == 3 && output_dimensionality == 1)
+    {
+      mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto1D;
+    }
+    else if (input_dimensionality == 2 && output_dimensionality == 1)
+    {
+      mpProjectionMethod = &cedar::proc::steps::Projection::compress2Dto1D;
+    }
+    else if (output_dimensionality == 0)
+    {
+      if (mProjectionCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::MAXIMUM)
+      {
+        mpProjectionMethod = &cedar::proc::steps::Projection::compressNDto0Dmax;
+      }
+      else if (mProjectionCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::MINIMUM)
+      {
+        mpProjectionMethod = &cedar::proc::steps::Projection::compressNDto0Dmin;
+      }
+      else if (mProjectionCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::AVERAGE)
+      {
+        mpProjectionMethod = &cedar::proc::steps::Projection::compressNDto0Dmean;
+      }
+      else if (mProjectionCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::SUM)
+      {
+        mpProjectionMethod = &cedar::proc::steps::Projection::compressNDto0Dsum;
+      }
+    }
+    else
+    {
+      mpProjectionMethod = NULL;
+      CEDAR_THROW(cedar::aux::NotImplementedException, "The projection for this configuration is not implemented.");
+    }
+  }
+    // if the projection expands ...
+  else
+  {
+    // ... set up the appropriate function pointer
+    if (input_dimensionality == 0)
+    {
+      this->mpProjectionMethod = &cedar::proc::steps::Projection::expand0DtoND;
+    }
+    else if (input_dimensionality == 1 && output_dimensionality == 3)
+    {
+      this->mpProjectionMethod = &cedar::proc::steps::Projection::expand1Dto3D;
+    }
+    else if (input_dimensionality == 2 && output_dimensionality == 3)
+    {
+      this->mpProjectionMethod = &cedar::proc::steps::Projection::expand2Dto3D;
+    }
+    else
+    {
+      this->mpProjectionMethod = &cedar::proc::steps::Projection::expandMDtoND;
+    }
+  }
+
+  if (this->mProjectionDimensionMappings->getValue()->getValidity() == cedar::proc::ProjectionMapping::VALIDITY_ERROR)
+  {
+    this->setState(
+            cedar::proc::Triggerable::STATE_EXCEPTION,
+            "The projection, as you have set it up, does not work in the given context.\
+                    Please revise the mapping parameters."
+    );
+  }
+  else
+  {
+    this->setState(
+            cedar::proc::Triggerable::STATE_UNKNOWN,
+            "Projection mapping is set up correctly."
+    );
+  }
+
+  // reset constness of all mappings
+  this->mProjectionOutputDimensionSizes->unconstAll();
+
+  for (unsigned int input_dim = 0; input_dim < input_dimensionality; ++input_dim)
+  {
+    if (mProjectionDimensionMappings->getValue()->isDropped(input_dim))
+    {
+      continue;
+    }
+    unsigned int output_dim = mProjectionDimensionMappings->getValue()->lookUp(input_dim);
+    CEDAR_ASSERT(output_dim < output_dimensionality);
+    this->mProjectionOutputDimensionSizes->setValue(output_dim, this->mStaticGainOutput->getData().size[input_dim]);
+    this->mProjectionOutputDimensionSizes->setConstantAt(output_dim, true);
+  }
+
+  // if input type and output type do not match, we have to re-initialize the output matrix
+  if (this->mStaticGainOutput->getCvType() != this->mOutput->getCvType())
+  {
+    this->initializeOutputMatrix();
+    this->emitOutputPropertiesChangedSignal("result");
+  }
+
+  // now do a final step and try to calculate an output with the new configuration
+  if (triggerSubsequent)
+  {
+    this->onTrigger(cedar::proc::ArgumentsPtr());
+  }
+  else
+  {
+    this->callComputeWithoutTriggering();
+  }
 }
 
