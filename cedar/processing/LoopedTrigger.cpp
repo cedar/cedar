@@ -230,7 +230,7 @@ void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
   cedar::proc::ArgumentsPtr arguments(new cedar::proc::StepTime(time,cedar::aux::GlobalClockSingleton::getInstance()->getTime()));
 
   QReadLocker locker(this->mListeners.getLockPtr());
-  auto this_ptr = boost::static_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this());
+  auto this_ptr = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this());
   for (const auto& listener : this->mListeners.member())
   {
     listener->onTrigger(arguments, this_ptr);
@@ -253,7 +253,7 @@ cedar::proc::LoopedTrigger::ConstTimeAveragePtr cedar::proc::LoopedTrigger::getS
 void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr triggerable)
 {
   cedar::proc::Trigger::addListener(triggerable);
-  triggerable->setLoopedTrigger(boost::static_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this()));
+  triggerable->setLoopedTrigger(boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this()));
   //Todo This Running Interface should work also for the single stepping mode
   if (this->isRunningNolocking() || this->getGroup()->isTriggerStepperRunning())
   {

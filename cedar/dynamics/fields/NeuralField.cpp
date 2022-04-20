@@ -902,6 +902,6 @@ void cedar::dyn::NeuralField::updateEducationalKernel()
 
 void cedar::dyn::NeuralField::timescaleChanged()
 {
-    cedar::proc::ElementWeakPtr weakElementPtr(shared_from_this());
+    cedar::proc::ElementWeakPtr weakElementPtr(boost::dynamic_pointer_cast<cedar::proc::Element>(this->shared_from_this()));
     cedar::aux::GlobalClockSingleton::getInstance()->updateFieldTauMap(weakElementPtr,this->mTau->getValue());
 }

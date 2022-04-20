@@ -981,6 +981,7 @@ void cedar::proc::GroupFileFormatV1::readSteps
       try
       {
         step = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id);
+        step->postConstructor();
       }
       catch (cedar::aux::ExceptionBase& e)
       {

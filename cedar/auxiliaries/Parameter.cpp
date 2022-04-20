@@ -88,6 +88,10 @@ cedar::aux::Parameter::~Parameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::Parameter::postConstructor()
+{
+}
+
 std::string cedar::aux::Parameter::childIndexToString(size_t i) const
 {
   return cedar::aux::toString(i);
@@ -152,7 +156,7 @@ cedar::aux::NamedConfigurable* cedar::aux::Parameter::getNamedConfigurableOwner(
     {
       namedConfigurable = namedConfig;
     }
-    owner = owner->getParent();
+    owner = owner->getParent().lock().get();
   }
   return namedConfigurable;
 }

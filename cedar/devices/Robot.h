@@ -61,8 +61,7 @@
 
 /*!@brief Base class for robots.
  */
-class cedar::dev::Robot : public cedar::aux::NamedConfigurable,
-                          public boost::enable_shared_from_this<cedar::dev::Robot>
+class cedar::dev::Robot : public cedar::aux::NamedConfigurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // friends

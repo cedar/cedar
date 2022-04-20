@@ -60,7 +60,7 @@
  *
  * @todo More detailed description of the class.
  */
-class cedar::dev::ComponentSlot : public cedar::aux::Configurable, public boost::enable_shared_from_this<cedar::dev::ComponentSlot>
+class cedar::dev::ComponentSlot : public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // friends

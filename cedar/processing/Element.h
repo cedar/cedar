@@ -63,8 +63,7 @@
  */
 class cedar::proc::Element
 :
-virtual public cedar::aux::NamedConfigurable,
-public boost::enable_shared_from_this<cedar::proc::Element>
+virtual public cedar::aux::NamedConfigurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -80,6 +79,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
   //!@brief sets the group at which this element is registered
   void setGroup(cedar::proc::GroupPtr group);
 
