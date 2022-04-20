@@ -138,6 +138,7 @@ cedar::proc::sinks::TCPWriter::TCPWriter()
   mAbortRequested.store(false);
   mSendMatrixWasSet.store(false);
   mResetRequested.store(false);
+  mRunning.store(false);
 
   QObject::connect(this,SIGNAL(stateChanged()),this,SLOT(updateState()));
 
@@ -512,7 +513,6 @@ void cedar::proc::sinks::TCPWriter::closeConnection()
 
 void cedar::proc::sinks::TCPWriter::startCommunicationThread()
 {
-
     if (!mRunning.load())
     {
         mSendMatrixWasSet.store(false);

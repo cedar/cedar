@@ -129,6 +129,7 @@ cedar::proc::sources::TCPReader::TCPReader()
   isConnected.store(false);
   mAbortRequested.store(false);
   mResetRequested.store(false);
+  mRunning.store(false);
 
   cedar::proc::sources::TCPReader::mpDataLock = new QReadWriteLock();
 
@@ -588,7 +589,6 @@ void cedar::proc::sources::TCPReader::abortAndJoin()
 void cedar::proc::sources::TCPReader::communicationLoop()
 {
   mRunning.store(true);
-
   this->establishConnection();
 
   while (false == mAbortRequested.load())
