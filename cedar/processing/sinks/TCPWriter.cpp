@@ -135,7 +135,9 @@ cedar::proc::sinks::TCPWriter::TCPWriter()
   _mMaxTimeouts->markAdvanced(true);
   _mSendInterval->markAdvanced(true);
 
+  mAbortRequested.store(false);
   mSendMatrixWasSet.store(false);
+  mResetRequested.store(false);
 
   QObject::connect(this,SIGNAL(stateChanged()),this,SLOT(updateState()));
 
@@ -171,6 +173,7 @@ void cedar::proc::sinks::TCPWriter::reconnect()
 
 void cedar::proc::sinks::TCPWriter::establishConnection()
 {
+
   socket_h = 0;
 #ifdef _WIN32
   /* initialize the socket api */
@@ -220,17 +223,29 @@ void cedar::proc::sinks::TCPWriter::establishConnection()
     } else
     {
 
-
       int con = ::connect(socket_h, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
 
       fd_set myset;
       struct timeval tv;
-      int valopt;
+      
       socklen_t lon;
 
       if (con < 0) {
-        if (errno == EINPROGRESS) {
-//          fprintf(stderr, "EINPROGRESS in connect() - selecting\n");
+
+        bool keepConnecting = false;
+
+#if _WIN32
+        keepConnecting = WSAGetLastError() == WSAEWOULDBLOCK;
+#else
+        keepConnecting = errno == EINPROGRESS;
+#endif
+
+        if (keepConnecting) {
+#ifdef _WIN32
+#else
+ //          fprintf(stderr, "EINPROGRESS in connect() - selecting\n");
+#endif
+
           do {
             tv.tv_sec = 1;
             tv.tv_usec = 0;
@@ -242,8 +257,22 @@ void cedar::proc::sinks::TCPWriter::establishConnection()
               return;
             }
             else if (resSelect > 0) {
-              // Socket selected for write
               lon = sizeof(int);
+              // Socket selected for write
+#ifdef _WIN32
+              char valopt;
+              if (getsockopt(socket_h, SOL_SOCKET, SO_ERROR,&valopt, &lon) < 0) {
+                  //                fprintf(stderr, "Error in getsockopt() %d - %s\n", errno, strerror(errno));
+                  return;
+              }
+               if (valopt) {
+                 //fprintf(stderr, "Error in delayed connection() %d - %s\n", valopt, strerror(valopt));
+                return;
+              }
+
+#else
+              int valopt;
+              
               if (getsockopt(socket_h, SOL_SOCKET, SO_ERROR, (void*)(&valopt), &lon) < 0) {
 //                fprintf(stderr, "Error in getsockopt() %d - %s\n", errno, strerror(errno));
                 return;
@@ -253,32 +282,33 @@ void cedar::proc::sinks::TCPWriter::establishConnection()
 //                fprintf(stderr, "Error in delayed connection() %d - %s\n", valopt, strerror(valopt));
                 return;
               }
+#endif
               //Here we are good to go! Just set the socket to blocking again
               break;
             }
             else {
-              fprintf(stderr, "Timeout in select() - Cancelling!\n");
+              //fprintf(stderr, "Timeout in select() - Cancelling!\n");
               return;
             }
           } while (1);
         }
         else {
           fprintf(stderr, "Error connecting %d - %s\n", errno, strerror(errno));
-          exit(0);
+          return;
         }
       }
 
-
-#ifdef _WIN32
-      //Todo Windows Implementation
-#else
       //Set socket blocking again
+#ifdef _WIN32
+      unsigned long block = 0;
+      ioctlsocket(socket_h, FIONBIO, &block);
+#else
+      
       long arg;
       if( (arg = fcntl(socket_h, F_GETFL, NULL)) < 0) {
 //        fprintf(stderr, "Error fcntl(..., F_GETFL) (%s)\n", strerror(errno));
         return;
       }
-
       arg &= (~O_NONBLOCK);
       if( fcntl(socket_h, F_SETFL, arg) < 0) {
 //        fprintf(stderr, "Error fcntl(..., F_SETFL) (%s)\n", strerror(errno));
@@ -326,9 +356,18 @@ void cedar::proc::sinks::TCPWriter::onStop()
 
 void cedar::proc::sinks::TCPWriter::reset()
 {
-  this->abortAndJoin();
-  this->startCommunicationThread();
-  this->onTrigger();
+    if (!mResetRequested.load()) // Multiple hits of the reset button could issue multiple parallel calls of reset. We want to prevent that.
+    {
+        mResetRequested.store(true);
+        if (mRunning.load())
+        {
+            this->abortAndJoin();
+            this->startCommunicationThread();
+        }
+        this->onTrigger();
+
+        mResetRequested.store(false);
+    }
 }
 
 void cedar::proc::sinks::TCPWriter::compute(const cedar::proc::Arguments &)
@@ -384,7 +423,18 @@ bool cedar::proc::sinks::TCPWriter::checkReaderStatus()
   int msgLength = -1;
 
 #ifdef _WIN32
-  int msgLength = recv(socket_h, readBuffer, mBufferLength, 0);
+  fd_set set;
+  struct timeval timeout;
+  FD_ZERO(&set); /* clear the set */
+  FD_SET(socket_h, &set); /* add our file descriptor to the set */
+  timeout.tv_sec = 0;
+  timeout.tv_usec = 100000;
+
+  int rv = select(socket_h + 1, &set, NULL, NULL, &timeout);
+  if (rv > 0)
+  {
+   msgLength = recv(socket_h, readBuffer, mBufferLength, 0);
+  }
 #else
   //Old Versions. MSG_DONTWAIT LAGS SOMEHOW and 0 FLAGS is smooth, but may block thread completely
 //  int msgLength = recv(socket_h, readBuffer, mBufferLength, MSG_DONTWAIT);
@@ -462,26 +512,37 @@ void cedar::proc::sinks::TCPWriter::closeConnection()
 
 void cedar::proc::sinks::TCPWriter::startCommunicationThread()
 {
-  mAbortRequested.store(false);
-  mSendMatrixWasSet.store(false);
-  try
-  {
-    mCommunicationThread = std::thread(&cedar::proc::sinks::TCPWriter::communicationLoop, this);
-  }
-  catch (...)
-  {
-    std::cout<<" Starting the CommunicationThread of " << this->getName() << " did somehow not work!" <<std::endl;
-  }
+
+    if (!mRunning.load())
+    {
+        mSendMatrixWasSet.store(false);
+        try
+        {
+            mCommunicationThread = std::thread(&cedar::proc::sinks::TCPWriter::communicationLoop, this);
+        }
+        catch (...)
+        {
+            std::cout << " Starting the CommunicationThread of " << this->getName() << " did somehow not work!" << std::endl;
+        }
+    }
+    else
+    {
+        std::cout << "Tried to start thread even though it was already running!" << std::endl;
+    }
 }
 
 void cedar::proc::sinks::TCPWriter::abortAndJoin()
 {
-  mAbortRequested.store(true);
-  if (mCommunicationThread.joinable())
-  {
-    mCommunicationThread.join();
-  }
-  this->closeConnection();
+    if (!mAbortRequested.load()) //Only exectute abort once
+    {
+        mAbortRequested.store(true);
+        if (mCommunicationThread.joinable())
+        {
+            mCommunicationThread.join();
+        }
+        this->closeConnection();
+        mAbortRequested.store(false);
+    }
 }
 
 
@@ -489,9 +550,7 @@ void cedar::proc::sinks::TCPWriter::communicationLoop()
 {
   mRunning.store(true);
 
-
   this->establishConnection();
-
 
   while (false == mAbortRequested.load())
   {

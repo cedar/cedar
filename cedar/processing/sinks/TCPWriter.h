@@ -175,6 +175,7 @@ private:
     std::thread mCommunicationThread;
     std::atomic_bool mRunning;
     std::atomic_bool mAbortRequested;
+    std::atomic_bool mResetRequested;
     std::atomic_bool mSendMatrixWasSet;
     cv::Mat mMatrixToSend;
     mutable std::shared_timed_mutex writeMatrixMutex;

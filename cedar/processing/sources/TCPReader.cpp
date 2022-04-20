@@ -127,6 +127,9 @@ cedar::proc::sources::TCPReader::TCPReader()
 {
 
   isConnected.store(false);
+  mAbortRequested.store(false);
+  mResetRequested.store(false);
+
   cedar::proc::sources::TCPReader::mpDataLock = new QReadWriteLock();
 
   _mBufferLength->markAdvanced(true);
@@ -155,9 +158,6 @@ cedar::proc::sources::TCPReader::~TCPReader()
 
 void cedar::proc::sources::TCPReader::onStart()
 {
-//  this->establishConnection();
-
-//    std::cout<<this->getName() <<" onStart()!" << std::endl;
     _mPort->setConstant(true);
     this->startCommunicationThread();
 }
@@ -261,7 +261,6 @@ int cedar::proc::sources::TCPReader::create_socket_server(int port)
 
 int cedar::proc::sources::TCPReader::accept_client(int server_fd)
 {
-//  std::cout<<this->getName() << " accept_client >>0<<" << std::endl;
   isConnected.store(false);
   int cfd = -1;
   struct sockaddr_in client;
@@ -304,14 +303,11 @@ int cedar::proc::sources::TCPReader::accept_client(int server_fd)
   FD_ZERO(&rfds);
   FD_SET(cfd, &rfds);
 
-//  std::cout<<this->getName() << " accept_client >>6<<" << std::endl;
-
   return cfd;
 }
 
 void cedar::proc::sources::TCPReader::receiveMatData()
 {
-//  std::cout<<this->getName() << " receiveMatData() >0<"<<std::endl;
   if (!isConnected.load())
   {
     timeSinceLastConnectTrial = timeSinceLastConnectTrial + 1;
@@ -330,7 +326,6 @@ void cedar::proc::sources::TCPReader::receiveMatData()
     return;
   }
 
-//  std::cout<<this->getName() << " receiveMatData() >1<"<<std::endl;
 
   // Size may be varied. Just picked this number for now.
   char *buffer = (char *) malloc(_mBufferLength->getValue() * sizeof(char));
@@ -346,14 +341,12 @@ void cedar::proc::sources::TCPReader::receiveMatData()
   bool timeout = false;
 //  int msgLength;
 
-//  std::cout<<this->getName() << " receiveMatData() >2<"<<std::endl;
   std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
   std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
   while (!endFound && !timeout)
   {
 
-//    std::cout<<this->getName() << " receiveMatData() >3<"<<std::endl;
     end = std::chrono::steady_clock::now();
     timeout = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() >
               _mTimeOutBetweenPackets->getValue();
@@ -379,11 +372,9 @@ void cedar::proc::sources::TCPReader::receiveMatData()
     if (rv > 0)
     {
       // socket has something to read
-//      std::cout<<this->getName() << " receiveMatData() >4<"<<std::endl;
       msgLength = recv(socket_h, buffer, _mBufferLength->getValue(), 0);
     }
 
-//    std::cout<<this->getName() << " receiveMatData() >5<"<<std::endl;
 #endif
     if (msgLength > 0)
     {
@@ -443,7 +434,6 @@ void cedar::proc::sources::TCPReader::receiveMatData()
     return;
   }
 
-//  std::cout<<this->getName() << " receiveMatData() >6<"<<std::endl;
 
   std::vector<std::string> chkSumSplit;
   cedar::aux::split(fullMessageString, MATMSG_CHK, chkSumSplit);
@@ -500,8 +490,16 @@ void cedar::proc::sources::TCPReader::closeSocket()
 
 void cedar::proc::sources::TCPReader::reset()
 {
-  abortAndJoin();
-  startCommunicationThread();
+    if (!mResetRequested.load()) // Multiple hits of the reset button could issue multiple parallel calls of reset. We want to prevent that.
+    {
+        mResetRequested.store(true);
+        if (mRunning.load())
+        {
+            abortAndJoin();
+            startCommunicationThread();
+        }
+        mResetRequested.store(false);
+    }
 }
 
 void cedar::proc::sources::TCPReader::compute(const cedar::proc::Arguments &)
@@ -577,38 +575,27 @@ void cedar::proc::sources::TCPReader::startCommunicationThread()
 
 void cedar::proc::sources::TCPReader::abortAndJoin()
 {
-//  std::cout<< this->getName() << " abortAndJoin()" <<std::endl;
   mAbortRequested.store(true);
   if (mCommunicationThread.joinable())
   {
     mCommunicationThread.join();
   }
-//  std::cout<< this->getName() << "Joined abortAndJoin()" <<std::endl;
 
   this->closeSocket();
-
-//  std::cout<< this->getName() << "FINISHED abortAndJoin()" <<std::endl;
-
 }
 
 
 void cedar::proc::sources::TCPReader::communicationLoop()
 {
-
-//  std::cout<<this->getName() << "communicationLoop >>0<<" <<std::endl;
   mRunning.store(true);
 
   this->establishConnection();
-
-//  std::cout<<this->getName() << "communicationLoop >>1<<" <<std::endl;
 
   while (false == mAbortRequested.load())
   {
     try
     {
-//      std::cout<<this->getName() << "communicationLoop >>2<<" <<std::endl;
       receiveMatData();
-//      std::cout<<this->getName() << "communicationLoop >>3<<" <<std::endl;
       confirmAliveStatus();
     }
     catch (std::runtime_error &e)
@@ -620,7 +607,6 @@ void cedar::proc::sources::TCPReader::communicationLoop()
       // Make sure that nothing leaves the thread for now...
       std::cout<<"Caught something else while running " << this->getName()  <<std::endl;
     }
-//    std::cout<<this->getName() << "communicationLoop >>4<<" <<std::endl;
   }
 
   mRunning.store(false);
