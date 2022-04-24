@@ -1260,7 +1260,7 @@ void cedar::proc::gui::Ide::copy()
   //Iterate over all selected elements
   for (QGraphicsItem* singleSelected : selected)
   {
-    if(cedar::proc::gui::StickyNote* stickyNote = dynamic_cast<cedar::proc::gui::StickyNote*>(singleSelected))
+    if(auto* stickyNote = dynamic_cast<cedar::proc::gui::StickyNote*>(singleSelected))
     {
       cedar::aux::ConfigurationNode node;
       node.put("type", "stickyNote");
@@ -1281,7 +1281,7 @@ void cedar::proc::gui::Ide::copy()
 
     bool doCopy = true;
     cedar::aux::ConfigurationNode singleGroup;
-    if (Element* p_base = dynamic_cast<cedar::proc::gui::Element *>(singleSelected))
+    if (auto* p_base = dynamic_cast<cedar::proc::gui::Element *>(singleSelected))
     {
       //Get Element
       cedar::proc::ElementPtr element = p_base->getElement();
