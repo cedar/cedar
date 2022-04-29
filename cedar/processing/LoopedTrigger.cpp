@@ -255,7 +255,14 @@ void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr trigger
   cedar::proc::Trigger::addListener(triggerable);
   triggerable->setLoopedTrigger(boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this()));
   //Todo This Running Interface should work also for the single stepping mode
-  if (this->isRunningNolocking() || this->getGroup()->isTriggerStepperRunning())
+
+  bool triggerStepperIsRunning = false;
+  if(this->getGroup())
+  {
+    triggerStepperIsRunning = this->getGroup()->isTriggerStepperRunning();
+  }
+
+  if (this->isRunningNolocking() || triggerStepperIsRunning)
   {
     triggerable->callOnStart();
   }
