@@ -1221,8 +1221,162 @@ void cedar::proc::gui::Ide::exportSvg()
 void cedar::proc::gui::Ide::duplicateSelected()
 {
 	cedar::proc::gui::Ide::pUndoStack->beginMacro("Duplicated Elements");
-	this->copy();
-	this->paste();
+  //!@todo Doesn't this code belong into scene?
+  // get current mouse position
+  QPoint mouse_pos = this->getArchitectureView()->mapFromGlobal(QCursor::pos());
+  QPointF new_pos = this->getArchitectureView()->mapToScene(mouse_pos);
+
+  QList<QGraphicsItem*> selected = this->mpProcessingDrawer->getScene()->selectedItems();
+
+  // create a list of all items to be duplicated (take out items that will be duplicated by selected groups)
+  QList<QGraphicsItem*> items_to_duplicate;
+  for (auto item : selected)
+  {
+    item->setSelected(false);
+    bool add_to_list = true;
+
+    // check if item is a connection
+    if (auto graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item))
+    {
+      add_to_list = graphics_item->canDuplicate();
+    }
+    else
+    {
+      add_to_list = false;
+    }
+
+    if (add_to_list)
+    {
+      // check if the item has a parent within the selection
+      for (auto sub_item : selected)
+      {
+        if (sub_item->isAncestorOf(item))
+        {
+          // the parent should always be a group, otherwise, the item might not be duplicated correctly
+          CEDAR_DEBUG_NON_CRITICAL_ASSERT(dynamic_cast<cedar::proc::gui::Group*>(sub_item) != nullptr);
+          add_to_list = false;
+          break;
+        }
+      }
+    }
+
+    // if the item has a parent in the selection, that parent will take care of duplicating it
+    // (this should only be the case for groups)
+    if (add_to_list)
+    {
+      items_to_duplicate.append(item);
+    }
+  }
+
+  if (items_to_duplicate.empty())
+  {
+    return;
+  }
+
+  // determine the position offset of the duplicates as the average of the positions of all selected elements
+  QPointF center(0.0, 0.0);
+  for (int i = 0; i < items_to_duplicate.size(); ++i)
+  {
+    center += items_to_duplicate.at(i)->scenePos();
+  }
+  center /= static_cast<qreal>(items_to_duplicate.size());
+
+  std::vector<cedar::proc::DataConnectionPtr> duplicated_connections;
+  // now try to find all connections between duplicated items
+  for (auto connected_item : items_to_duplicate)
+  {
+    // first, try to get the underlying connectable and parent group for each item
+    if (auto p_base = dynamic_cast<cedar::proc::gui::Element*>(connected_item))
+    {
+      if (auto connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(p_base->getElement()))
+      {
+        auto group = connectable->getGroup();
+        if (group)
+        {
+          std::vector<cedar::proc::DataConnectionPtr> connections;
+          // get a list of all outgoing connections for this element
+          if (connectable->hasSlotForRole(cedar::proc::DataRole::OUTPUT))
+          {
+            for (auto slot : connectable->getDataSlots(cedar::proc::DataRole::OUTPUT))
+            {
+              std::vector<cedar::proc::DataConnectionPtr> more_connections;
+              group->getDataConnectionsFrom(connectable, slot.first, more_connections);
+              connections.insert(connections.end(), more_connections.begin(), more_connections.end());
+            }
+          }
+          // now check if any of these connections point to an element in the list of duplicates
+          for (auto con : connections)
+          {
+            auto target = this->mpProcessingDrawer->getScene()->getGraphicsItemFor(con->getTarget()->getParentPtr());
+            if (items_to_duplicate.contains(target))
+            {
+              duplicated_connections.push_back(con);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  std::vector<std::pair<cedar::proc::Connectable*, cedar::proc::OwnedDataPtr> > outgoing_slots;
+  std::vector<std::pair<cedar::proc::Connectable*, cedar::proc::ExternalDataPtr> > receiving_slots;
+  for (auto con : duplicated_connections)
+  {
+    outgoing_slots.push_back(std::make_pair(con->getSource()->getParentPtr(), con->getSource()));
+    receiving_slots.push_back(std::make_pair(con->getTarget()->getParentPtr(), con->getTarget()));
+  }
+  // perform the actual duplication
+  for (int i = 0; i < items_to_duplicate.size(); ++i)
+  {
+    if (auto p_base = dynamic_cast<cedar::proc::gui::Element*>(items_to_duplicate.at(i)))
+    {
+      try
+      {
+        if
+                (
+                auto group
+                        = dynamic_cast<cedar::proc::gui::Group*>
+                        (
+                                this->mpProcessingDrawer->getScene()->getGraphicsItemFor(p_base->getElement()->getGroup().get())
+                        )
+                )
+        {
+          auto mapped = new_pos - group->scenePos();
+          auto mapped_center = group->mapFromScene(center);
+          auto p_new = group->duplicate(mapped - (mapped_center - p_base->pos()), p_base->getElement()->getName());
+
+          // select the new item
+          p_new->setSelected(true);
+
+          // replace any slots with new ones
+          for (auto& out : outgoing_slots)
+          {
+            if (out.first == p_base->getElement().get())
+            {
+              out.second = boost::dynamic_pointer_cast<cedar::proc::Connectable>(p_new->getElement())->getOutputSlot(out.second->getName());
+            }
+          }
+          for (auto& in : receiving_slots)
+          {
+            if (in.first == p_base->getElement().get())
+            {
+              in.second = boost::dynamic_pointer_cast<cedar::proc::Connectable>(p_new->getElement())->getInputSlot(in.second->getName());
+            }
+          }
+        }
+      }
+      catch (cedar::aux::ExceptionBase& exc)
+      {
+        //!@todo Properly display an error message to the user.
+      }
+    }
+  }
+
+  // now duplicate connections between duplicated elements
+  for (unsigned int i = 0; i < outgoing_slots.size(); ++i)
+  {
+    cedar::proc::Group::connectAcrossGroups(outgoing_slots.at(i).second, receiving_slots.at(i).second);
+  }
 	cedar::proc::gui::Ide::pUndoStack->endMacro();
 }
 
