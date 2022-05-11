@@ -125,7 +125,7 @@ cedar::proc::sinks::TCPWriter::TCPWriter()
         startMeasurement(std::chrono::steady_clock::now()),
         _mPort(new cedar::aux::UIntParameter(this, "port", 50000, 49152, 65535)), //ephemeral ports only
         _mIpAdress(new cedar::aux::StringParameter(this, "ip_adress", "127.0.0.1")),
-        _mReconnectionTimeOut(new cedar::aux::UIntParameter(this, "timeout (ms)", 1000)),
+        _mReconnectionTimeOut(new cedar::aux::UIntParameter(this, "timeout (ms)", 100)),
         _mMaxTimeouts(new cedar::aux::UIntParameter(this, "max timeouts", 50)),
         _mSendInterval(new cedar::aux::UIntParameter(this, "send interval (timesteps)", 1))
 {

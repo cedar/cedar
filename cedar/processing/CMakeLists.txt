@@ -174,6 +174,7 @@ cedar_add_library(cedarproc
   steps/Sinus.h
   steps/LinearFunction.h
   steps/Logarithm.h
+  steps/AllocentricToDistanceImage.h
   steps/BufferReader.h
   steps/Component.h
   steps/Convolution.h
