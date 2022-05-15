@@ -52,6 +52,7 @@
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/processing/ProjectionMapping.h"
 #include "cedar/processing/steps/Projection.h"
+#include "cedar/processing/ProjectionFunctions.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/steps/SynapticConnection.fwd.h"
@@ -64,7 +65,7 @@
  *
  * @todo describe more.
  */
-class cedar::proc::steps::SynapticConnection : public cedar::proc::Step
+class cedar::proc::steps::SynapticConnection : public cedar::proc::Step, cedar::proc::ProjectionFunctions
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -80,7 +81,12 @@ private:
 
   //! typedef for the projection method function pointer
   //! (function pointer to a void method in cedar::proc::steps::Projection)
-  typedef void (cedar::proc::steps::Projection::*ProjectionFunctionPtr)();
+  typedef void (cedar::proc::ProjectionFunctions::
+								*ProjectionFunctionsFunctionPtr)(cedar::aux::MatDataPtr,
+																								cedar::aux::MatDataPtr,
+																								std::vector<unsigned int>,
+																								cedar::aux::EnumParameterPtr,
+																								cedar::proc::ProjectionMappingParameterPtr);
 
 	//!@cond SKIPPED_DOCUMENTATION
 	CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(KernelListParameter);
@@ -205,7 +211,7 @@ private:
   std::vector<unsigned int> mProjectionIndicesToCompress;
 
   //!@brief function pointer to one of the projection member functions
-  ProjectionFunctionPtr mpProjectionMethod;
+	ProjectionFunctionsFunctionPtr mpProjectionMethod;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

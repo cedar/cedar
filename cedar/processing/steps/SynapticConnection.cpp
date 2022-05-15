@@ -105,6 +105,7 @@ mKernelsParameter
 	)
 ),
 mConvolution(new cedar::aux::conv::Convolution()),
+mpProjectionMethod(nullptr),
 mRevalidating(false),
 mProjectionDimensionMappings(new cedar::proc::ProjectionMappingParameter(this, "dimension mapping")),
 mProjectionOutputDimensionality(new cedar::aux::UIntParameter(this, "output dimensionality", 1, 0, 4)),
@@ -190,7 +191,10 @@ void cedar::proc::steps::SynapticConnection::compute(const cedar::proc::Argument
     return;
 
   // call the appropriate projection method via the function pointer
-  //(this->*mpProjectionMethod)();
+  if(mpProjectionMethod)
+	{
+		(this->*mpProjectionMethod)(mStaticGainOutput, mOutput, mProjectionIndicesToCompress, mProjectionCompressionType, mProjectionDimensionMappings);
+	}
 }
 
 void cedar::proc::steps::SynapticConnection::recompute()
@@ -454,39 +458,39 @@ void cedar::proc::steps::SynapticConnection::reconfigure(bool triggerSubsequent)
 
         if (swapped)
         {
-          mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto2DSwapped;
+          mpProjectionMethod = &cedar::proc::ProjectionFunctions::compress3Dto2DSwapped;
         }
         else
         {
-          mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto2D;
+          mpProjectionMethod = &cedar::proc::ProjectionFunctions::compress3Dto2D;
         }
       }
     }
     else if (input_dimensionality == 3 && output_dimensionality == 1)
     {
-      mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto1D;
+      mpProjectionMethod = &cedar::proc::ProjectionFunctions::compress3Dto1D;
     }
     else if (input_dimensionality == 2 && output_dimensionality == 1)
     {
-      mpProjectionMethod = &cedar::proc::steps::Projection::compress2Dto1D;
+      mpProjectionMethod = &cedar::proc::ProjectionFunctions::compress2Dto1D;
     }
     else if (output_dimensionality == 0)
     {
       if (mProjectionCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::MAXIMUM)
       {
-        mpProjectionMethod = &cedar::proc::steps::Projection::compressNDto0Dmax;
+        mpProjectionMethod = &cedar::proc::ProjectionFunctions::compressNDto0Dmax;
       }
       else if (mProjectionCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::MINIMUM)
       {
-        mpProjectionMethod = &cedar::proc::steps::Projection::compressNDto0Dmin;
+        mpProjectionMethod = &cedar::proc::ProjectionFunctions::compressNDto0Dmin;
       }
       else if (mProjectionCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::AVERAGE)
       {
-        mpProjectionMethod = &cedar::proc::steps::Projection::compressNDto0Dmean;
+        mpProjectionMethod = &cedar::proc::ProjectionFunctions::compressNDto0Dmean;
       }
       else if (mProjectionCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::SUM)
       {
-        mpProjectionMethod = &cedar::proc::steps::Projection::compressNDto0Dsum;
+        mpProjectionMethod = &cedar::proc::ProjectionFunctions::compressNDto0Dsum;
       }
     }
     else
@@ -501,19 +505,19 @@ void cedar::proc::steps::SynapticConnection::reconfigure(bool triggerSubsequent)
     // ... set up the appropriate function pointer
     if (input_dimensionality == 0)
     {
-      this->mpProjectionMethod = &cedar::proc::steps::Projection::expand0DtoND;
+      this->mpProjectionMethod = &cedar::proc::ProjectionFunctions::expand0DtoND;
     }
     else if (input_dimensionality == 1 && output_dimensionality == 3)
     {
-      this->mpProjectionMethod = &cedar::proc::steps::Projection::expand1Dto3D;
+      this->mpProjectionMethod = &cedar::proc::ProjectionFunctions::expand1Dto3D;
     }
     else if (input_dimensionality == 2 && output_dimensionality == 3)
     {
-      this->mpProjectionMethod = &cedar::proc::steps::Projection::expand2Dto3D;
+      this->mpProjectionMethod = &cedar::proc::ProjectionFunctions::expand2Dto3D;
     }
     else
     {
-      this->mpProjectionMethod = &cedar::proc::steps::Projection::expandMDtoND;
+      this->mpProjectionMethod = &cedar::proc::ProjectionFunctions::expandMDtoND;
     }
   }
 
@@ -521,7 +525,7 @@ void cedar::proc::steps::SynapticConnection::reconfigure(bool triggerSubsequent)
   {
     this->setState(
             cedar::proc::Triggerable::STATE_EXCEPTION,
-            "The projection, as you have set it up, does not work in the given context.\
+            "The projection, as you have set it up, does not work in the given context.
                     Please revise the mapping parameters."
     );
   }
