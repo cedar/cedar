@@ -91,6 +91,8 @@ namespace
 cedar::proc::steps::SynapticConnection::SynapticConnection()
 :
 mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
+mConvolutionOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
+mStaticGainOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
 mGainFactorParameter(new cedar::aux::DoubleParameter(this, "gain factor", 1.0,
 																										 -10000.0, 10000.0)),
 mKernelsParameter
@@ -188,7 +190,7 @@ void cedar::proc::steps::SynapticConnection::compute(const cedar::proc::Argument
     return;
 
   // call the appropriate projection method via the function pointer
-  (this->*mpProjectionMethod)();
+  //(this->*mpProjectionMethod)();
 }
 
 void cedar::proc::steps::SynapticConnection::recompute()
@@ -212,7 +214,7 @@ void cedar::proc::steps::SynapticConnection::inputConnectionChanged(const std::s
 		// Assign the input to the member. This saves us from casting in every computation step.
 		this->mMatrix = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
 		// This should always work since other types should not be accepted.
-		if (!this->mMatrix)
+		if (!this->mMatrix || this->mMatrix->isEmpty())
 		{
 			return;
 		}
