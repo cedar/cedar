@@ -244,6 +244,12 @@ void cedar::proc::steps::SynapticConnection::inputConnectionChanged(const std::s
 			this->revalidateInputSlot("kernel");
 			mRevalidating = false;
 		}
+
+		unsigned int inputDimensionality = cedar::aux::math::getDimensionalityOf(this->mMatrix->getData());
+
+		this->mProjectionDimensionMappings->initialize(inputDimensionality);
+
+		this->reconfigure(false);
 	}
 	else if (inputName == "kernel")
 	{
