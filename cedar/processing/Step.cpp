@@ -221,6 +221,9 @@ bool cedar::proc::Step::isRegistered(const std::string& actionName)
   return false;
 }
 
+bool cedar::proc::Step::isXMLExportable(){
+  return this->mXmlExportable;
+}
 
 void cedar::proc::Step::callAction(const std::string& name)
 {
