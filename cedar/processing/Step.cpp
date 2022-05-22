@@ -89,6 +89,7 @@ mAutoLockInputsAndOutputs(true)
   this->mLockingTimeId = this->registerTimeMeasurement("locking");
   this->mRoundTimeId = this->registerTimeMeasurement("round time");
 
+  this->mXmlExportable = false;
 
   // create the finished trigger singleton.
   this->getFinishedTrigger();

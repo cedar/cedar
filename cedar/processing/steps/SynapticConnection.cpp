@@ -123,6 +123,8 @@ mProjectionCompressionType(new cedar::aux::EnumParameter(
   std::vector<std::string> whitelist = {"cedar.aux.kernel.Gauss"};
   this->mKernelsParameter->setWhitelist(whitelist);
 
+  this->mXmlExportable = true;
+
   //Initial input and output of the step is set
 	this->declareInput("matrix", true);
 	this->declareInput("kernel", false);

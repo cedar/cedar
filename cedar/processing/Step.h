@@ -464,7 +464,8 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief: true if step is XML exportable. By default set to false.
+  bool mXmlExportable;
 
 private:
   //!@brief flag that states if step is still computing its latest output

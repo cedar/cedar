@@ -243,6 +243,8 @@ mGlobalInhibition
 _mLateralKernelConvolution(new cedar::aux::conv::Convolution()),
 _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 {
+  this->mXmlExportable = true;
+
   this->setAutoLockInputsAndOutputs(false);
 
   this->declareBuffer("activation", mActivation);
