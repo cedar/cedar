@@ -525,8 +525,7 @@ void cedar::proc::steps::SynapticConnection::reconfigure(bool triggerSubsequent)
   {
     this->setState(
             cedar::proc::Triggerable::STATE_EXCEPTION,
-            "The projection, as you have set it up, does not work in the given context.
-                    Please revise the mapping parameters."
+            "The projection, as you have set it up, does not work in the given context. Please revise the mapping parameters."
     );
   }
   else
