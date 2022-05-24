@@ -50,6 +50,7 @@
 
 int main(int argc, char **argv)
 {
+#ifdef CEDAR_USE_QGLVIEWER
   // find resources
   std::string head_configuration_file = cedar::aux::locateResource("robots/caren_head.json");
 
@@ -93,6 +94,6 @@ int main(int argc, char **argv)
   viewer.startTimer(50);
   head->startCommunication();
   a.exec();
-
+#endif
   return 0;
 }

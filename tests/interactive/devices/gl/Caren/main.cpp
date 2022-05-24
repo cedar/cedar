@@ -54,6 +54,7 @@
 
 int main(int argc, char **argv)
 {
+#ifdef CEDAR_USE_QGLVIEWER
   QApplication a(argc, argv);
 
   // find resources
@@ -238,6 +239,6 @@ int main(int argc, char **argv)
   caren_trunk->stopCommunication();
   caren_arm->stopCommunication();
   caren_head->stopCommunication();
-
+#endif
   return 0;
 }

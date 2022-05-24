@@ -942,6 +942,9 @@
    <property name="toolTip">
     <string>Closes all plots</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
   </action>
   <action name="mpActionRecord">
    <property name="checkable">

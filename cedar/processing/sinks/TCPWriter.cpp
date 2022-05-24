@@ -357,18 +357,24 @@ void cedar::proc::sinks::TCPWriter::onStop()
 
 void cedar::proc::sinks::TCPWriter::reset()
 {
+    std::cout<<this->getName() << " reset()!" << std::endl;
     if (!mResetRequested.load()) // Multiple hits of the reset button could issue multiple parallel calls of reset. We want to prevent that.
     {
         mResetRequested.store(true);
+        std::cout<<this->getName() << this->getName() << " resetting..." << std::endl;
         if (mRunning.load())
         {
+            std::cout<<this->getName() << this->getName() << " Reset: abort and join..." << std::endl;
             this->abortAndJoin();
+            std::cout<<this->getName() << this->getName() << " Reset:  startCommunicationThread..." << std::endl;
             this->startCommunicationThread();
         }
-        this->onTrigger();
+//        std::cout<<this->getName() << this->getName() << " Reset: onTrigger..." << std::endl;
+//        this->onTrigger();
 
         mResetRequested.store(false);
     }
+   std::cout<<this->getName() << this->getName() << " Reset: Done!" << std::endl;
 }
 
 void cedar::proc::sinks::TCPWriter::compute(const cedar::proc::Arguments &)
@@ -376,7 +382,7 @@ void cedar::proc::sinks::TCPWriter::compute(const cedar::proc::Arguments &)
   if (0 == _mPort->getValue() || _mIpAdress->getValue() == "")
   {
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "Port and Ip Address must not be empty!");
-  } else
+  } else if(this->mInput)
   {
     this->setMatrixToSend(this->mInput->getData());
   }

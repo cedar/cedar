@@ -50,6 +50,7 @@
 
 int main(int argc, char **argv)
 {
+#ifdef CEDAR_USE_QGLVIEWER
   // find resources
   std::string configuration_file = cedar::aux::locateResource("robots/kuka_lwr4.json");
 
@@ -90,6 +91,6 @@ int main(int argc, char **argv)
   viewer.startTimer(20);
   p_kuka_arm->startCommunication();
   a.exec();
-
+#endif
   return 0;
 }

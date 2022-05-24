@@ -301,8 +301,8 @@ int cedar::proc::sources::TCPReader::accept_client(int server_fd)
 //  std::cout<< this->getName() << " accepted connection from: " << client_info->h_name << " on port: " << this->_mPort->getValue() << std::endl;
 
   isConnected.store(true);
-  FD_ZERO(&rfds);
-  FD_SET(cfd, &rfds);
+//  FD_ZERO(&rfds);
+//  FD_SET(cfd, &rfds);
 
   return cfd;
 }

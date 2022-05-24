@@ -50,6 +50,7 @@
 
 int main(int argc, char **argv)
 {
+#ifdef CEDAR_USE_QGLVIEWER
   // find resources
   std::string finger_one_configuration_file = cedar::aux::locateResource("robots/sdh_finger_one.json");
   std::string finger_two_configuration_file = cedar::aux::locateResource("robots/sdh_finger_two.json");
@@ -99,6 +100,6 @@ int main(int argc, char **argv)
   widget_palm.show();
   viewer.startTimer(50);
   a.exec();
-
+#endif
   return 0;
 }
