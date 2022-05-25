@@ -136,6 +136,8 @@ void cedar::proc::steps::AllocentricToDistanceImage::compute(const cedar::proc::
     float tiltRad = this->mTiltInput ? this->mTiltInput->getData().at<float>(0,0) * (M_PI/180.0) : 0; // This is rotation along pitch in Rad if present
     float panRad = this->mPanInput ? this->mPanInput->getData().at<float>(0,0) * (M_PI/180.0) :0; // This is rotation along yaw in Rad if present
 
+//    std::cout<<this->getName() << " current Roll: " << rollRad <<" Tilt: " << tiltRad << " Pan: " << panRad <<"\n\tAllocentric Dimensions. Rows: " << mAllocentricInput->getData().rows <<  " Cols: " << mAllocentricInput->getData().cols   << std::endl;
+
     cv::Mat outputMat = computeEgocentricRepresentation(mAllocentricInput->getData(), rollRad,tiltRad,panRad);
 
     mEgoOutput->setData(outputMat);
@@ -213,7 +215,7 @@ cv::Mat cedar::proc::steps::AllocentricToDistanceImage::computeEgocentricReprese
         float angleX = atan(reRotatedVector.at<float>(1, 0) / reRotatedVector.at<float>(0, 0));
         float angleY = atan(reRotatedVector.at<float>(2, 0) / reRotatedVector.at<float>(0, 0));
 
-        if (angleX <= abs(angleRangeHorizontal / 2.0) && angleY <= abs(angleRangeVertical / 2.0))
+        if (abs(angleX) <= (angleRangeHorizontal / 2.0) && abs(angleY) <= (angleRangeVertical / 2.0))
         {
           // If inside the camera add it to correct location of the output matrix with correct distance value
           float imagePosX = xZeroAnglePixel + angleX * horizontalPixelPerAngle;
