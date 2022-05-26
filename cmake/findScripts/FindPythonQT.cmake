@@ -33,14 +33,19 @@ else(NOT CEDAR_USE_QT5)
                     NAMES libPythonQt-Qt5-Python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}.so
                     PATHS ${CEDAR_DEPENDENCY_LIBRARIES} ${PYTHONQT_PATH_LIB}
                     )
-            set(PYTHONQT_LIBS ${PYTHONQT_LIBS} ${PYTHONQT_LIBS_TMP})
+            
         else(NOT WIN32)
-            find_library(QGLViewer_LIBS
-                    NAMES qglviewer-qt5 QGLViewer-qt5 QGLViewer qglviewer QGLViewer2 QGLViewer2.dll
-                    PATHS ${CEDAR_DEPENDENCY_LIBRARIES} ${CEDAR_DEPENDENCY_QGLVIEWER}
+            find_library(PYTHONQT_LIBS
+                    NAMES PythonQt_QtAll-Qt5-Python${PYTHON_MAJOR_VERSION}${PYTHON_MINOR_VERSION}.lib
+                    PATHS ${CEDAR_DEPENDENCY_LIBRARIES} ${PYTHONQT_PATH_LIB}
                     )
-        endif(NOT WIN32)
+			find_library(PYTHONQT_LIBS_TMP
+                    NAMES PythonQt-Qt5-Python${PYTHON_MAJOR_VERSION}${PYTHON_MINOR_VERSION}.lib
+                    PATHS ${CEDAR_DEPENDENCY_LIBRARIES} ${PYTHONQT_PATH_LIB}
+                    )
+        endif(NOT WIN32)		
     endif(APPLE)
+	set(PYTHONQT_LIBS ${PYTHONQT_LIBS} ${PYTHONQT_LIBS_TMP})
 endif(NOT CEDAR_USE_QT5)
 
 # now check if anything is missing
