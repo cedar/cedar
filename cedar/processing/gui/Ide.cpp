@@ -782,7 +782,11 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 #ifdef CEDAR_USE_COPY
 void cedar::proc::gui::Ide::showCoPYDocumentation()
 {
-  QDesktopServices::openUrl(QUrl("file://" + QApplication::applicationDirPath() + "/../resources/CoPYDocumentation.pdf"));
+  QString path = "/../resources/CoPYDocumentation.pdf";
+  #ifdef CEDAR_PORTABLE
+  path = "/../Cedar_Resources/CoPYDocumentation.pdf";
+  #endif // CEDAR_PORTABLE   
+  QDesktopServices::openUrl(QUrl("file://" + QApplication::applicationDirPath() + path));
 }
 #endif
 
