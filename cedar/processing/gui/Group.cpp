@@ -1187,7 +1187,8 @@ void cedar::proc::gui::Group::internalWriteXML(const cedar::aux::Path &filename)
   this->mGroup->writeConfiguration(root);
   this->writeConfiguration(root);
 
-  write_xml(filename.toString(), root);
+  boost::property_tree::xml_writer_settings<std::string> settings(' ', 4);
+  write_xml(filename.toString(), root, std::locale(), settings);
 }
 
 void cedar::proc::gui::Group::writeJson(const cedar::aux::Path &filename) const
