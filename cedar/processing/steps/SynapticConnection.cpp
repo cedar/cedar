@@ -48,6 +48,7 @@
 #include "cedar/processing/steps/Convolution.h"
 #include "cedar/auxiliaries/convolution/FFTW.h"
 #include "cedar/processing/steps/Projection.h"
+#include "cedar/auxiliaries/Configurable.h"
 
 // SYSTEM INCLUDES
 
@@ -91,47 +92,31 @@ namespace
 cedar::proc::steps::SynapticConnection::SynapticConnection()
 :
 mConvolution(new cedar::aux::conv::Convolution()),
-mKernelsParameter
-(
-	new cedar::proc::steps::SynapticConnection::KernelListParameter
-	(
-		this,
-		"kernels",
-		std::vector<cedar::aux::kernel::KernelPtr>()
-	)
-),
 mRevalidating(false),
 mConvolutionOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
-mGainFactorParameter(new cedar::aux::DoubleParameter(this, "Synapse Weight", 1.0,
-                                                     -10000.0, 10000.0)),
 mStaticGainOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
-mProjectionDimensionMappings(new cedar::proc::ProjectionMappingParameter(this, "dimension mapping")),
-mProjectionOutputDimensionality(new cedar::aux::UIntParameter(this, "output dimensionality",
-                                                              1, 0, 4)),
-mProjectionOutputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "output dimension sizes",
-                                                                    1, 50, 1,
-                                                                    1000)),
-mProjectionCompressionType(new cedar::aux::EnumParameter(
-                          this,
-                          "compression type",
-                          cedar::proc::steps::Projection::CompressionType::typePtr(),
-                          cedar::proc::steps::Projection::CompressionType::SUM)),
 mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
 mpProjectionMethod(nullptr)
 {
-	////Constructor part of Convolution
-	//Setting whitelist to limit the kernels for SynapticConnection
-  std::vector<std::string> whitelist = {"cedar.aux.kernel.Gauss"};
-  this->mKernelsParameter->setWhitelist(whitelist);
-
+	////Convolution contructor code
   //Initial input and output of the step is set
 	this->declareInput("matrix", true);
 	this->declareInput("kernel", false);
 	this->declareOutput("result", mOutput);
 	QObject::connect(this->mConvolution.get(), SIGNAL(configurationChanged()), this,
                    SLOT(recompute()));
-  //Add convolution parameter
-  this->addConfigurableChild("convolution", this->mConvolution);
+
+  //Add convolution parameter to "grouping box"
+  cedar::aux::ConfigurablePtr convolutionConfigurable = boost::shared_ptr<cedar::aux::Configurable>(
+          new cedar::aux::Configurable());
+  mKernelsParameter = new cedar::proc::steps::SynapticConnection::KernelListParameter(convolutionConfigurable.get(),"kernels",
+                                                                                      std::vector<cedar::aux::kernel::KernelPtr>());
+  //Setting whitelist to limit the kernels for SynapticConnection
+  std::vector<std::string> whitelist = {"cedar.aux.kernel.Gauss"};
+  this->mKernelsParameter->setWhitelist(whitelist);
+
+  convolutionConfigurable->addConfigurableChild("convolution parameter", this->mConvolution);
+  this->addConfigurableChild("convolution", convolutionConfigurable);
 
 	mKernelAddedConnection = this->mKernelsParameter->connectToObjectAddedSignal(
 									boost::bind(&cedar::proc::steps::SynapticConnection::convolutionSlotKernelAdded, this,
@@ -143,11 +128,40 @@ mpProjectionMethod(nullptr)
 
 	this->transferKernelsToConvolution();
 
-  ////Constructor part of Static Gain
+  ////Static Gain constructor code
+  //Add static gain parameter to "grouping box"
+  cedar::aux::ConfigurablePtr staticGainConfigurable = boost::shared_ptr<cedar::aux::Configurable>(
+          new cedar::aux::Configurable());
+  mGainFactorParameter = new cedar::aux::DoubleParameter(staticGainConfigurable.get(), "Synapse Weight",
+                                                         1.0, -10000.0, 10000.0);
+  this->addConfigurableChild("static gain", staticGainConfigurable);
+
   QObject::connect(this->mGainFactorParameter.get(), SIGNAL(valueChanged()),this,
                    SLOT(recompute()));
 
-  ////Constructor part of Projection
+  ////Projection constructor code
+  //Add projectionConfigurable parameter to "grouping box"
+  cedar::aux::ConfigurablePtr projectionConfigurable = boost::shared_ptr<cedar::aux::Configurable>(
+          new cedar::aux::Configurable());
+  mProjectionDimensionMappings = new cedar::proc::ProjectionMappingParameter(projectionConfigurable.get(),
+                                                                             "dimension mapping");
+  mProjectionOutputDimensionality = new cedar::aux::UIntParameter(projectionConfigurable.get(),
+                                                                  "output dimensionality",
+                                                                  1,
+                                                                  0,
+                                                                  4);
+  mProjectionOutputDimensionSizes = new cedar::aux::UIntVectorParameter(projectionConfigurable.get(),
+                                                                        "output dimension sizes",
+                                                                        1,
+                                                                        50,
+                                                                        1,
+                                                                        1000);
+  mProjectionCompressionType = new cedar::aux::EnumParameter(projectionConfigurable.get(),
+                                                             "compression type",
+                                                             cedar::proc::steps::SynapticConnection::ReducedCompressionType::typePtr(),
+                                                             cedar::proc::steps::SynapticConnection::ReducedCompressionType::SUM);
+  this->addConfigurableChild("projection", projectionConfigurable);
+
   // initialize the output buffer to the correct size
   this->projectionOutputDimensionalityChanged();
 
