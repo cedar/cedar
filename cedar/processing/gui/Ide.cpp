@@ -1997,9 +1997,64 @@ bool cedar::proc::gui::Ide::saveAs()
   return true;
 }
 
-void cedar::proc::gui::Ide::exportXML()
+bool cedar::proc::gui::Ide::exportXML()
 {
+  // Check if all steps in scene are exportable
+  QList<QGraphicsItem *> sceneItems = this->mpProcessingDrawer->getScene()->items();
+  std::set<std::string> nonExportableSteps;
+  for(auto item : sceneItems){
 
+    if(auto stepItem = dynamic_cast<cedar::proc::gui::StepItem*>(item)){
+      if(!stepItem->getStep()->isXMLExportable()){
+        nonExportableSteps.insert(cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(stepItem->getStep())->getClassNameWithoutNamespace());
+      }
+    }
+  }
+  if(nonExportableSteps.size() > 0){
+    std::set<std::string>::iterator itr = nonExportableSteps.begin();
+    std::string stepsString = *itr;
+    for (itr++;itr != nonExportableSteps.end(); itr++)
+    {
+      stepsString += ", " + *itr;
+    }
+    cedar::aux::LogSingleton::getInstance()->error
+            (
+                    "The following steps are not XML exportable: " + stepsString,
+                    "cedar::proc::gui::Ide::exportXml()"
+            );
+    return false;
+  }
+
+  // Export
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
+
+  QString file = QFileDialog::getSaveFileName(this, // parent
+                                              "Select where to export", // caption
+                                              last_dir->getValue().absolutePath(), // initial directory;
+                                              "architecture (*.xml)", // filter(s), separated by ';;'
+                                              0,
+          // js: Workaround for freezing file dialogs in QT5 (?)
+                                              QFileDialog::DontUseNativeDialog
+  );
+
+  if (file.isEmpty())
+  {
+    return false;
+  }
+
+  if (!file.endsWith(".xml"))
+  {
+    file += ".xml";
+  }
+
+  this->mGroup->writeXML(file.toStdString());
+  this->setArchitectureChanged(false);
+
+
+  QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+  last_dir->setValue(path);
+
+  return true;
 }
 
 void cedar::proc::gui::Ide::load()

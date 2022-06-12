@@ -97,6 +97,7 @@
 #ifndef Q_MOC_RUN
 
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 #include <boost/pointer_cast.hpp>
 #include <boost/filesystem.hpp>
 
@@ -1177,6 +1178,19 @@ void cedar::proc::gui::Group::internalWriteJson(const cedar::aux::Path &filename
   this->mGroup->writeDataFile(filename.toString() + ".data");
 }
 
+void cedar::proc::gui::Group::internalWriteXML(const cedar::aux::Path &filename) const
+{
+  QMutexLocker lock( &mIOLock );
+
+  cedar::aux::ConfigurationNode root;
+
+  this->mGroup->writeConfiguration(root);
+  this->writeConfiguration(root);
+
+  boost::property_tree::xml_writer_settings<std::string> settings(' ', 4);
+  write_xml(filename.toString(), root, std::locale(), settings);
+}
+
 void cedar::proc::gui::Group::writeJson(const cedar::aux::Path &filename) const
 {
   this->mFileName = filename.toString();
@@ -1254,6 +1268,11 @@ void cedar::proc::gui::Group::readJsonFromString(std::string jsonString, bool ig
   this->readRobots(root);
   this->mGroup->readConfiguration(root);
   this->readConfiguration(root, ignoreSnapToGrid);
+}
+
+void cedar::proc::gui::Group::writeXML(const cedar::aux::Path &filename) const
+{
+  this->internalWriteXML(filename);
 }
 
 void cedar::proc::gui::Group::readRobots(const cedar::aux::ConfigurationNode &root)

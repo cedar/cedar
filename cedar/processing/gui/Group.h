@@ -118,6 +118,9 @@ public:
 
   void readJsonFromString(std::string jsonString, bool ignoreSnapToGrid = true);
 
+  //!@brief write configuration to path
+  void writeXML(const cedar::aux::Path& filename) const;
+
   //!@brief called after the architecture has been loaded
   void afterArchitectureLoaded();
 
@@ -456,6 +459,8 @@ private:
   void addElementsToGroup();
 
   void internalWriteJson(const cedar::aux::Path& filename) const;
+
+  void internalWriteXML(const cedar::aux::Path& filename) const;
 
 signals:
   //!@brief signal that is emitted when a boost signal is received

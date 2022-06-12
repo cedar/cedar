@@ -240,6 +240,8 @@ public:
   //! True if the step currently has a run time measurement.
   bool hasRunTimeMeasurement() const;
 
+  bool isXMLExportable();
+
   /*!@brief Returns the last run time measured for this step.
    */
   cedar::unit::Time getRunTimeMeasurement() const;
