@@ -92,6 +92,50 @@ private:
 	CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(KernelListParameter);
 	//!@endcond
 
+public:
+  /*!@brief Reduced compression type for synaptic connection projection (copied from Projection.h)
+   */
+  class ReducedCompressionType
+  {
+  public:
+    //! Type of the enum's identifiers.
+    typedef cedar::aux::EnumId Id;
+
+    //! Pointer to the enum's base type.
+    typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
+    /*!@brief Static construction method that defines all values.
+     */
+    static void construct()
+    {
+      mType.type()->def(cedar::aux::Enum(SUM, "SUM", "Sum"));
+      mType.type()->def(cedar::aux::Enum(MAXIMUM, "MAXIMUM", "Maximum"));
+    }
+
+    //!@brief Returns the base object of the enum.
+    static const cedar::aux::EnumBase& type()
+    {
+      return *mType.type();
+    }
+
+    //!@brief Returns a pointer to the base object of the enum.
+    static const TypePtr& typePtr()
+    {
+      return mType.type();
+    }
+
+  public:
+
+    //! Compression is done by calculating the sum along the compressed direction.
+    static const Id SUM = CEDAR_OPENCV_CONSTANT(REDUCE_SUM);
+
+    //! Compression is done by calculating the maximum along the compressed direction.
+    static const Id MAXIMUM = CEDAR_OPENCV_CONSTANT(REDUCE_MAX);
+
+  private:
+    //!@brief The type object of the enum.
+    static cedar::aux::EnumType<ReducedCompressionType> mType;
+  };
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
