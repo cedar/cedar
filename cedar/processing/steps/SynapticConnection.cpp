@@ -52,6 +52,14 @@
 
 // SYSTEM INCLUDES
 
+cedar::aux::EnumType<cedar::proc::steps::SynapticConnection::ReducedCompressionType>
+        cedar::proc::steps::SynapticConnection::ReducedCompressionType::mType;
+
+#ifndef CEDAR_COMPILER_MSVC
+const cedar::proc::steps::SynapticConnection::ReducedCompressionType::Id cedar::proc::steps::SynapticConnection::ReducedCompressionType::SUM;
+const cedar::proc::steps::SynapticConnection::ReducedCompressionType::Id cedar::proc::steps::SynapticConnection::ReducedCompressionType::MAXIMUM;
+#endif // CEDAR_COMPILER_MSVC
+
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
