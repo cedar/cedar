@@ -139,6 +139,20 @@ public:
     }
   }
 
+  //!@brief Write the parameter's value to a configuration node.
+  virtual void writeToNodeXML(cedar::aux::ConfigurationNode& root) const
+  {
+    // only store if the object is set.
+    if (this->mObject)
+    {
+      cedar::aux::ConfigurationNode node;
+      const std::string& type_id = FactoryManagerSingleton::getInstance()->getTypeId(this->mObject);
+      node.put("type", type_id);
+      this->mObject->writeConfiguration(node);
+      root.push_back(cedar::aux::ConfigurationNode::value_type(cedar::aux::toUpperCamelCase(this->getName(), " "), node));
+    }
+  }
+
   //!@brief sets the object
   void setValue(BaseTypePtr object)
   {

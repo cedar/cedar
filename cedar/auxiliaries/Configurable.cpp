@@ -761,9 +761,8 @@ void cedar::aux::Configurable::writeConfigurationXML(cedar::aux::ConfigurationNo
   {
     if(std::find(this->mXMLParameterWhitelist.begin(), this->mXMLParameterWhitelist.end(),iter->get()->getName()) != this->mXMLParameterWhitelist.end())
     {
-      std::cout << iter->get()->getName() << std::endl;
       // write the parameter to the configuration
-      (*iter)->writeToNode(root);
+      (*iter)->writeToNodeXML(root);
     }
   }
 

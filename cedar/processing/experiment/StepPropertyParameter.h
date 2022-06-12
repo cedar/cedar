@@ -105,6 +105,9 @@ public:
    //!@brief write value to a configuration node
    void writeToNode(cedar::aux::ConfigurationNode& root) const;
 
+  //!@brief write value to a configuration node for XML
+  void writeToNodeXML(cedar::aux::ConfigurationNode& root) const;
+
    //!@brief set parameter to default
    void makeDefault();
 

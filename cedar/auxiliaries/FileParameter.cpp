@@ -149,6 +149,18 @@ void cedar::aux::FileParameter::writeToNode(cedar::aux::ConfigurationNode& root)
   // root.put(this->getName(), this->getPath());
 }
 
+void cedar::aux::FileParameter::writeToNodeXML(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::aux::ConfigurationNode fileParaNode;
+
+  fileParaNode.put("path",this->getPath());
+  fileParaNode.put("isRelative",this->mPathMode == FileParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
+
+  root.push_back(cedar::aux::ConfigurationNode::value_type(cedar::aux::toUpperCamelCase(this->getName()," "),fileParaNode));
+
+  // root.put(this->getName(), this->getPath());
+}
+
 void cedar::aux::FileParameter::copyValueFrom(cedar::aux::ConstParameterPtr other)
 {
   auto other_file = boost::dynamic_pointer_cast<cedar::aux::ConstFileParameter>(other);

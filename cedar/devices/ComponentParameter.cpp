@@ -179,6 +179,22 @@ void cedar::dev::ComponentParameter::writeToNode(cedar::aux::ConfigurationNode& 
   root.put(this->getName(), text);
 }
 
+void cedar::dev::ComponentParameter::writeToNodeXML(cedar::aux::ConfigurationNode& root) const
+{
+  std::string text;
+
+  try
+  {
+    text = this->getStringRepresentation();
+  }
+  catch (const cedar::dev::NoComponentSelectedException&)
+  {
+    text= "";
+  }
+
+  root.put(cedar::aux::toUpperCamelCase(this->getName(), " "), text);
+}
+
 void cedar::dev::ComponentParameter::makeDefault()
 {
   //!@todo Can this be set to something proper?

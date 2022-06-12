@@ -102,6 +102,9 @@ public:
   //!@brief stores a directory as string in a configuration node
   void writeToNode(cedar::aux::ConfigurationNode& root) const;
 
+  //!@brief stores a directory as string in a configuration node
+  void writeToNodeXML(cedar::aux::ConfigurationNode& root) const;
+
   //! Copies the value from another (file) parameter.
   void copyValueFrom(cedar::aux::ConstParameterPtr other);
 

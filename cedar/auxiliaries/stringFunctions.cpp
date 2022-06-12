@@ -204,3 +204,18 @@ std::string cedar::aux::camelCaseToSpaces(const std::string& camelCasedString)
 
   return spaced;
 }
+
+std::string cedar::aux::toUpperCamelCase(std::string input, std::string sperator)
+{
+  std::string output;
+  std::vector<std::string> parts;
+  cedar::aux::split(input, sperator, parts);
+
+  //Change every first letter of every entry in parts to uppercase
+  for(std::string& part:parts)
+  {
+    part[0] = toupper(part[0]);
+    output.append(part);
+  }
+  return output;
+}

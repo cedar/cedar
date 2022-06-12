@@ -375,6 +375,22 @@ public:
     root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), object_map_node));
   }
 
+  //!@brief write value to a configuration node
+  //!@todo Write this part for allocateInstances = false
+  virtual void writeToNodeXML(cedar::aux::ConfigurationNode& root) const
+  {
+    cedar::aux::ConfigurationNode object_map_node;
+    for (auto iter = this->begin(); iter != this->end(); ++iter)
+    {
+      const std::string& key = iter->first;
+      cedar::aux::ConfigurationNode object_node;
+      this->writeObject(key, object_node);
+      object_map_node.push_back(cedar::aux::ConfigurationNode::value_type(key, object_node));
+    }
+
+    root.push_back(cedar::aux::ConfigurationNode::value_type(cedar::aux::toUpperCamelCase(this->getName(), " "), object_map_node));
+  }
+
   //!@brief set parameter to default
   virtual void makeDefault()
   {

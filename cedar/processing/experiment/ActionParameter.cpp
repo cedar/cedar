@@ -119,6 +119,13 @@ void cedar::proc::experiment::ActionParameter::writeToNode(cedar::aux::Configura
   root.add_child(this->getName(), action_node);
 }
 
+void cedar::proc::experiment::ActionParameter::writeToNodeXML(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::aux::ConfigurationNode action_node;
+  action_node.put("action", this->getAction());
+  root.add_child(cedar::aux::toUpperCamelCase(this->getName(), " "), action_node);
+}
+
 void cedar::proc::experiment::ActionParameter::makeDefault()
 {
   this->mAction = "";

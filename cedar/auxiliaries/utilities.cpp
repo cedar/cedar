@@ -38,6 +38,7 @@
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
 #ifdef CEDAR_COMPILER_GCC

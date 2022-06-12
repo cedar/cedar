@@ -118,6 +118,19 @@ public:
     root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), vector_node));
   }
 
+  //!@brief store a set of type T to a configuration tree
+  void writeToNodeXML(cedar::aux::ConfigurationNode& root) const
+  {
+    cedar::aux::ConfigurationNode vector_node;
+    for (typename std::set<T>::const_iterator iter = this->mValues.begin(); iter != this->mValues.end(); ++iter)
+    {
+      cedar::aux::ConfigurationNode value_node;
+      value_node.put_value(*iter);
+      vector_node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));
+    }
+    root.push_back(cedar::aux::ConfigurationNode::value_type(cedar::aux::toUpperCamelCase(this->getName(), " "), vector_node));
+  }
+
   //!@brief get the current set of type T (const)
   const std::set<T>& get() const
   {

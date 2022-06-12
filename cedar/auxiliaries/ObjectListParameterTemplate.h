@@ -147,6 +147,28 @@ public:
     root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), object_list_node));
   }
 
+  //!@brief write value to a configuration node
+  virtual void writeToNodeXML(cedar::aux::ConfigurationNode& root) const
+  {
+    cedar::aux::ConfigurationNode object_list_node;
+    for
+            (
+            typename std::vector<BaseTypePtr>::const_iterator iter = this->mObjectList.begin();
+            iter != this->mObjectList.end();
+            ++iter
+            )
+    {
+      BaseTypePtr value = *iter;
+      cedar::aux::ConfigurationNode value_node;
+      value->writeConfiguration(value_node);
+
+      const std::string& type_id = FactorySingleton::getInstance()->getTypeId(value);
+
+      object_list_node.push_back(cedar::aux::ConfigurationNode::value_type(type_id, value_node));
+    }
+    root.push_back(cedar::aux::ConfigurationNode::value_type(cedar::aux::toUpperCamelCase(this->getName(), " "), object_list_node));
+  }
+
   //!@brief set parameter to default
   virtual void makeDefault()
   {

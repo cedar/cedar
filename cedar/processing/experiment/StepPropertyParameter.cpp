@@ -221,6 +221,38 @@ void cedar::proc::experiment::StepPropertyParameter::writeToNode(cedar::aux::Con
   root.add_child(this->getName(), step_node);
 }
 
+void cedar::proc::experiment::StepPropertyParameter::writeToNodeXML(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::aux::ConfigurationNode step_node;
+  step_node.put("element path", this->getElementPath());
+  step_node.put("parameter path", this->getParameterPath());
+
+  switch (mType)
+  {
+    case PARAMETER_VALUE:
+    {
+      if (mParameterCopy)
+      {
+        mParameterCopy->writeToNode(step_node);
+      }
+      break;
+    }
+    case PARAMETER:
+    {
+      break;
+    }
+    case OUTPUT:
+    {
+      break;
+    }
+    case BUFFER:
+    {
+      break;
+    }
+  }
+  root.add_child(cedar::aux::toUpperCamelCase(this->getName(), " "), step_node);
+}
+
 void cedar::proc::experiment::StepPropertyParameter::makeDefault()
 {
   this->mElement.reset();
