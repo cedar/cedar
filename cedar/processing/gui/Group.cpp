@@ -1184,10 +1184,9 @@ void cedar::proc::gui::Group::internalWriteXML(const cedar::aux::Path &filename)
 
   cedar::aux::ConfigurationNode root;
 
-  this->mGroup->writeConfiguration(root);
-  this->writeConfiguration(root);
+  this->mGroup->writeConfigurationXML(root);
 
-  boost::property_tree::xml_writer_settings<std::string> settings(' ', 4);
+  boost::property_tree::xml_writer_settings<std::string> settings(' ', 2);
   write_xml(filename.toString(), root, std::locale(), settings);
 }
 

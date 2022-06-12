@@ -44,6 +44,7 @@
 #include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/CppScript.h"
 #include "cedar/processing/GroupFileFormatV1.h"
+#include "cedar/processing/GroupXMLFileFormatV1.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/DataSlot.h"
@@ -2058,6 +2059,12 @@ void cedar::proc::Group::disconnectTriggerInternal(cedar::proc::TriggerPtr sourc
 void cedar::proc::Group::writeConfiguration(cedar::aux::ConfigurationNode& root) const
 {
   cedar::proc::GroupFileFormatV1 format;
+  format.write(boost::static_pointer_cast<cedar::proc::ConstGroup>(this->shared_from_this()), root);
+}
+
+void cedar::proc::Group::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::proc::GroupXMLFileFormatV1 format;
   format.write(boost::static_pointer_cast<cedar::proc::ConstGroup>(this->shared_from_this()), root);
 }
 

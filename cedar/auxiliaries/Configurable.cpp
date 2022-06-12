@@ -750,6 +750,34 @@ void cedar::aux::Configurable::writeConfiguration(cedar::aux::ConfigurationNode&
 }
 
 
+void cedar::aux::Configurable::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
+{
+  for
+    (
+    ParameterList::const_iterator iter = this->mParameterList.begin();
+    iter != this->mParameterList.end();
+    ++iter
+    )
+  {
+    // write the parameter to the configuration
+    (*iter)->writeToNode(root);
+  }
+
+  for
+    (
+    Children::const_iterator child = this->mChildren.begin();
+    child != this->mChildren.end();
+    ++child
+    )
+  {
+    cedar::aux::ConfigurationNode child_node;
+    child->second->writeConfiguration(child_node);
+    root.push_back(cedar::aux::ConfigurationNode::value_type(child->first, child_node));
+  }
+
+  this->resetChangedStates(false);
+}
+
 void cedar::aux::Configurable::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   for (ParameterList::iterator iter = this->mParameterList.begin(); iter != this->mParameterList.end(); ++iter)

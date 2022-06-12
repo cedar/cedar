@@ -212,6 +212,10 @@ public:
    */
   void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 
+  /*!@brief Writes the group to a xml style configuration node.
+   */
+  void writeConfigurationXML(cedar::aux::ConfigurationNode& root) const;
+
   /*!@brief Writes data marked as serializable to the given configuration node.
    */
   void writeData(cedar::aux::ConfigurationNode& root) const;
