@@ -753,14 +753,18 @@ void cedar::aux::Configurable::writeConfiguration(cedar::aux::ConfigurationNode&
 void cedar::aux::Configurable::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
 {
   for
-    (
+  (
     ParameterList::const_iterator iter = this->mParameterList.begin();
     iter != this->mParameterList.end();
     ++iter
-    )
+  )
   {
-    // write the parameter to the configuration
-    (*iter)->writeToNode(root);
+    if(std::find(this->mXMLParameterWhitelist.begin(), this->mXMLParameterWhitelist.end(),iter->get()->getName()) != this->mXMLParameterWhitelist.end())
+    {
+      std::cout << iter->get()->getName() << std::endl;
+      // write the parameter to the configuration
+      (*iter)->writeToNode(root);
+    }
   }
 
   for
@@ -771,7 +775,7 @@ void cedar::aux::Configurable::writeConfigurationXML(cedar::aux::ConfigurationNo
     )
   {
     cedar::aux::ConfigurationNode child_node;
-    child->second->writeConfiguration(child_node);
+    child->second->writeConfigurationXML(child_node);
     root.push_back(cedar::aux::ConfigurationNode::value_type(child->first, child_node));
   }
 

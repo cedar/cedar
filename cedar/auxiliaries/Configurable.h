@@ -406,7 +406,7 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  std::vector<std::string> mXMLParameterWhitelist;
 
 private:
   //!@brief list of parameters registered at this Configurable instance

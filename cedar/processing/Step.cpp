@@ -89,7 +89,7 @@ mAutoLockInputsAndOutputs(true)
   this->mLockingTimeId = this->registerTimeMeasurement("locking");
   this->mRoundTimeId = this->registerTimeMeasurement("round time");
 
-  this->mXmlExportable = false;
+  this->mXMLExportable = false;
 
   // create the finished trigger singleton.
   this->getFinishedTrigger();
@@ -222,7 +222,7 @@ bool cedar::proc::Step::isRegistered(const std::string& actionName)
 }
 
 bool cedar::proc::Step::isXMLExportable(){
-  return this->mXmlExportable;
+  return this->mXMLExportable;
 }
 
 void cedar::proc::Step::callAction(const std::string& name)

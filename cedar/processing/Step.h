@@ -467,7 +467,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief: true if step is XML exportable. By default set to false.
-  bool mXmlExportable;
+  bool mXMLExportable;
 
 private:
   //!@brief flag that states if step is still computing its latest output

@@ -107,7 +107,7 @@ mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
 mpProjectionMethod(nullptr)
 {
   ////General
-  this->mXmlExportable = true;
+  this->mXMLExportable = true;
 
   ////Convolution contructor code
   //Initial input and output of the step is set
