@@ -97,6 +97,8 @@ public:
   //! Returns the size of the Gauss in the given dimension.
   unsigned int getSize(unsigned int dimension) const;
 
+  void writeConfigurationXML(cedar::aux::ConfigurationNode& root) const;
+
 public slots:
   //!@brief a slot that is triggered if any of the Gauss function parameters are changed
   void updateMatrix();

@@ -127,8 +127,8 @@ public:
   //!@brief write a configuration for all registered parameters to a root node of type cedar::aux::ConfigurationNode
   virtual void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 
-  //!@brief write a configuration for all registered parameters to a root node of type cedar::aux::ConfigurationNode
-  virtual void writeConfigurationXML(cedar::aux::ConfigurationNode& root) const;
+  //!@brief write a configuration for XML exportable parameters to a root node of type cedar::aux::ConfigurationNode
+  virtual void writeConfigurationXML(cedar::aux::ConfigurationNode& root, bool ignoreWhiteList = false) const;
 
   //!@brief write a configuration to a cedar::aux::ConfigurationNode tree and store this tree in a json file
   virtual void writeJson(const cedar::aux::Path& filename) const;

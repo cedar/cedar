@@ -750,7 +750,7 @@ void cedar::aux::Configurable::writeConfiguration(cedar::aux::ConfigurationNode&
 }
 
 
-void cedar::aux::Configurable::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
+void cedar::aux::Configurable::writeConfigurationXML(cedar::aux::ConfigurationNode& root, bool ignoreWhiteList) const
 {
   for
   (
@@ -759,7 +759,8 @@ void cedar::aux::Configurable::writeConfigurationXML(cedar::aux::ConfigurationNo
     ++iter
   )
   {
-    if(std::find(this->mXMLParameterWhitelist.begin(), this->mXMLParameterWhitelist.end(),iter->get()->getName()) != this->mXMLParameterWhitelist.end())
+    if(ignoreWhiteList || std::find(this->mXMLParameterWhitelist.begin(), this->mXMLParameterWhitelist.end(),
+                                    iter->get()->getName()) != this->mXMLParameterWhitelist.end())
     {
       // write the parameter to the configuration
       (*iter)->writeToNodeXML(root);
@@ -773,9 +774,14 @@ void cedar::aux::Configurable::writeConfigurationXML(cedar::aux::ConfigurationNo
     ++child
     )
   {
-    cedar::aux::ConfigurationNode child_node;
-    child->second->writeConfigurationXML(child_node);
-    root.push_back(cedar::aux::ConfigurationNode::value_type(child->first, child_node));
+
+    if(ignoreWhiteList || std::find(this->mXMLParameterWhitelist.begin(), this->mXMLParameterWhitelist.end(),
+                                    child->first) != this->mXMLParameterWhitelist.end())
+    {
+      cedar::aux::ConfigurationNode child_node;
+      child->second->writeConfigurationXML(child_node);
+      root.push_back(cedar::aux::ConfigurationNode::value_type(child->first, child_node));
+    }
   }
 
   this->resetChangedStates(false);

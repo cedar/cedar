@@ -47,6 +47,10 @@
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/DataConnection.fwd.h"
 #include "cedar/auxiliaries/Configurable.fwd.h"
+#include "cedar/auxiliaries/ObjectParameterTemplate.fwd.h"
+#include "cedar/auxiliaries/math/TransferFunction.fwd.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/UIntVectorParameter.h"
 
 // SYSTEM INCLUDES
 #include <boost/bimap.hpp>
@@ -84,6 +88,17 @@ public:
   );
 
   static std::string nameLookupXML(std::string name, bool directionCedarToXML = true);
+
+  // Transformation functions, to transform and write a parameter's configuration according to the XML file format
+
+  // Write sigmoid parameter
+  static void writeActivationFunctionParameter(
+    cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>*, cedar::aux::ConfigurationNode&);
+
+  // Write dimensionality/sizes parameter
+  static void writeDimensionsParameter(
+    cedar::aux::UIntParameterPtr, cedar::aux::UIntVectorParameterPtr, cedar::aux::ConfigurationNode&);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

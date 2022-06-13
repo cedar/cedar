@@ -43,6 +43,7 @@
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/GroupXMLFileFormatV1.h"
 #include "cedar/auxiliaries/math/functions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -99,6 +100,8 @@ _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigma", 2, 3.0, 0.01, 1000
 _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
 {
   this->mXMLExportable = true;
+  this->mXMLParameterWhitelist = {"amplitude"};
+
   this->declareOutput("Gauss input", mOutput);
   QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
@@ -112,6 +115,14 @@ _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::sources::GaussInput::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::aux::Configurable::writeConfigurationXML(root);
+
+  // dimensionality/sizes parameter
+  cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(this->_mDimensionality, this->_mSizes, root);
+}
 
 void cedar::proc::sources::GaussInput::setDimensionality(unsigned int dimensionality)
 {

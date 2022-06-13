@@ -46,6 +46,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/GroupXMLFileFormatV1.h"
 #include "cedar/auxiliaries/annotation/DiscreteMetric.h"
 #include "cedar/auxiliaries/annotation/ValueRangeHint.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
@@ -688,6 +689,17 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
            * _mInputNoiseGain->getValue() * input_noise;
 
   mCurrentDeltaT->getData().at<float>(0,0)= time / cedar::unit::seconds;
+}
+
+void cedar::dyn::NeuralField::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::aux::Configurable::writeConfigurationXML(root);
+
+  // sigma parameter
+  cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(this->_mSigmoid.get(), root);
+
+  // dimensionality/sizes parameter
+  cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(this->_mDimensionality, this->_mSizes, root);
 }
 
 void cedar::dyn::NeuralField::updateInputSum()

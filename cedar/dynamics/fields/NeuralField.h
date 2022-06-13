@@ -179,6 +179,8 @@ public:
     return this->mRestingLevel->setValue(restingLevel, true);
   }
 
+  void writeConfigurationXML(cedar::aux::ConfigurationNode& root) const;
+
 public slots:
   //!@brief handle a change in dimensionality, which leads to creating new matrices
   void dimensionalityChanged();

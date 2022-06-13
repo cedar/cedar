@@ -41,6 +41,8 @@
 #include "cedar/processing/GroupXMLFileFormatV1.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/ObjectParameterTemplate.h"
+#include "cedar/auxiliaries/math/TransferFunction.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataConnection.h"
@@ -110,20 +112,20 @@ void cedar::proc::GroupXMLFileFormatV1::writeSteps
     if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
     {
       if
-        (
+      (
         boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(step)
         || boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(step)
-        )
+      )
       {
         continue;
       }
+      CEDAR_ASSERT(step->isXMLExportable());
       std::string class_name = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(step);
-      cedar::aux::ConfigurationNode step_node;
-      step->writeConfigurationXML(step_node);
       std::string node_name = cedar::proc::GroupXMLFileFormatV1::nameLookupXML(class_name);
-
+      cedar::aux::ConfigurationNode step_node = cedar::aux::ConfigurationNode();
+      step_node.add("<xmlattr>.name", name_element_pair.first);
+      step->writeConfigurationXML(step_node);
       steps.push_back(cedar::aux::ConfigurationNode::value_type(node_name, step_node));
-      steps.add(node_name + ".<xmlattr>.name", name_element_pair.first);
     }
   }
 }
@@ -142,7 +144,7 @@ const
   cedar::aux::ConfigurationNode connection_node;
   connection_node.put("Source", source_str);
   connection_node.put("Target", target_str);
-  root.push_back(cedar::aux::ConfigurationNode::value_type("NonSynapticConnection", connection_node));
+  root.push_back(cedar::aux::ConfigurationNode::value_type("SynapticConnection", connection_node));
 }
 
 void cedar::proc::GroupXMLFileFormatV1::writeDataConnections
@@ -181,4 +183,33 @@ std::string cedar::proc::GroupXMLFileFormatV1::nameLookupXML(std::string name, b
     }
   }
   return name;
+}
+
+
+void cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(
+  cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* sigmoid, cedar::aux::ConfigurationNode& root)
+{
+  cedar::aux::ConfigurationNode activationFunction;
+  cedar::aux::math::TransferFunctionPtr transferFunction = sigmoid->getValue();
+  transferFunction->writeConfigurationXML(activationFunction, true);
+  root.add_child("ActivationFunction", activationFunction);
+  root.add("ActivationFunction.<xmlattr>.type", "Sigmoid");
+}
+
+void cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(
+  cedar::aux::UIntParameterPtr dimensionality, cedar::aux::UIntVectorParameterPtr sizes, cedar::aux::ConfigurationNode& root)
+{
+  cedar::aux::ConfigurationNode dimensions;
+  std::vector<unsigned int> sizesVector = sizes->getValue();
+  CEDAR_ASSERT(sizesVector.size() == dimensionality->getValue());
+  for(int i = 0; i < dimensionality->getValue(); i++)
+  {
+    cedar::aux::ConfigurationNode dimension = cedar::aux::ConfigurationNode();
+    dimension.add("<xmlattr>.name", "dim_" + std::to_string(i));
+    dimension.add("<xmlattr>.lower", 0);
+    dimension.add("<xmlattr>.upper", sizesVector[i] - 1);
+    dimension.add("<xmlattr>.size", sizesVector[i]);
+    dimensions.add_child("Dimension", dimension);
+  }
+  root.add_child("Dimensions", dimensions);
 }
