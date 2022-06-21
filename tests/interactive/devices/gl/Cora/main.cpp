@@ -51,6 +51,7 @@
 
 int main(int argc, char **argv)
 {
+#ifdef CEDAR_USE_QGLVIEWER
   std::string arm_configuration_file = cedar::aux::locateResource("robots/cora_arm.json");
   std::string head_configuration_file = cedar::aux::locateResource("robots/cora_head.json");
 
@@ -98,6 +99,6 @@ int main(int argc, char **argv)
   p_cora_arm->stopCommunication();
   p_cora_head->stopCommunication();
   cedar::aux::sleep(cedar::unit::Time(1.0 * cedar::unit::second));
-
+#endif
   return 0;
 }

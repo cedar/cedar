@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,41 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepTime.h
+    File:        TriggerStepper.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 06
+    Maintainer:  Jan Tekuelve
+    Email:       jan.tekuelve@ini.rub.de
+    Date:        2021 08 05
 
-    Description:
+    Description: Header file for the class cedar::proc::TriggerStepper.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEP_TIME_H
-#define CEDAR_PROC_STEP_TIME_H
+#ifndef CEDAR_PROC_TRIGGER_STEPPER_H
+#define CEDAR_PROC_TRIGGER_STEPPER_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/Arguments.h"
-#include "cedar/units/Time.h"
+#include "cedar/processing/LoopedTrigger.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/StepTime.fwd.h"
+#include "cedar/processing/TriggerStepper.fwd.h"
 
 // SYSTEM INCLUDES
+#include "thread"
+#include "atomic"
 
-/*!@brief Derived from Arguments, StepTime contains the time that has passed since the last call of a Step.
+/*!@todo describe.
  *
+ * @todo describe more.
  */
-class cedar::proc::StepTime : public cedar::proc::Arguments
+class cedar::proc::TriggerStepper
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -64,20 +65,21 @@ class cedar::proc::StepTime : public cedar::proc::Arguments
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StepTime(const cedar::unit::Time& stepTime,const cedar::unit::Time& globalTimeStamp = nullptr);
-
+  TriggerStepper();
 
   //!@brief Destructor
-  virtual ~StepTime();
+  virtual ~TriggerStepper();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief returns the last step duration
-  const cedar::unit::Time& getStepTime() const;
+  bool isRunning();
+  void stop();
+  void run();
+  void setTriggers(std::vector<LoopedTriggerPtr> trigger);
 
-  const cedar::unit::Time& getGlobalTimeStamp() const;
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -89,21 +91,32 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+    void runFunc();
+    void abortAndJoin();
+    void stepTriggers();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  //!@brief last step duration
-  cedar::unit::Time mStepTime;
+  std::thread mThread;
+  std::atomic_bool mRunning;
+  std::atomic_bool mAbortRequested;
+  std::vector<cedar::proc::LoopedTriggerPtr> mTriggerList;
+  cedar::unit::Time minimalSleepTime;
 
-  cedar::unit::Time mGlobalTimeStamp;
-}; // class cedar::proc::StepTime
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-#endif // CEDAR_PROC_STEP_TIME_H
+private:
+  // none yet
+
+}; // class cedar::proc::TriggerStepper
+
+#endif // CEDAR_PROC_TRIGGER_STEPPER_H
 

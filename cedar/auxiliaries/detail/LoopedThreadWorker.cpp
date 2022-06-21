@@ -306,7 +306,8 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         QReadLocker locker(this->mTimeFactor.getLockPtr());
         time_factor = this->mTimeFactor.member();
       }
-      auto minimum_step_size= mpWrapper->getMinimumStepSize();
+
+      auto minimum_step_size=  cedar::unit::Time(1.0 * cedar::unit::micro * cedar::unit::seconds); //mpWrapper->getMinimumStepSize();
             // TODO: the minimal Sleep Time Parameter is practically
             //       useless and can be replaced by a small constant
       auto orig_fake_step_size= mpWrapper->getFakeStepSize();
@@ -339,10 +340,11 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         long effective_sleep_duration_safe_mus= std::max<long>(0, 
                           effective_sleep_duration.total_microseconds());
 #if 1
-        if (check_locked_vars)
-        {
-          minimum_step_size= mpWrapper->getMinimumStepSize();
-        }
+
+//        if (check_locked_vars)
+//        {
+//          minimum_step_size= mpWrapper->getMinimumStepSize();
+//        }
 
         effective_sleep_duration_safe_mus= std::max<long>( 
                          effective_sleep_duration_safe_mus,
@@ -386,15 +388,15 @@ void cedar::aux::detail::LoopedThreadWorker::work()
           if (check_locked_vars)
           {
             orig_fake_step_size= mpWrapper->getFakeStepSize();
-            QReadLocker locker(this->mTimeFactor.getLockPtr());
-            time_factor = this->mTimeFactor.member();
+//            QReadLocker locker(this->mTimeFactor.getLockPtr());
+//            time_factor = this->mTimeFactor.member();
           }
 
           auto modified_fake_step_size= 
             cedar::unit::Time( 
-              static_cast<long>( orig_fake_step_size / cedar::unit::Time(1.0 * cedar::unit::micro * cedar::unit::second) 
-              * time_factor )
+              static_cast<long>( orig_fake_step_size / cedar::unit::Time(1.0 * cedar::unit::micro * cedar::unit::second))
               * cedar::unit::micro * cedar::unit::seconds);
+          //JT: Time Factor was removed from this calculation.
 
           mpWrapper->step( modified_fake_step_size );
         }

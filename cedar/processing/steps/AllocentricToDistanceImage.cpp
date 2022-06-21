@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DistanceImageCoordinateTransform.cpp
+    File:        AllocentricToDistanceImage.cpp
 
     Maintainer:  Jan Tekuelve
     Email:       jan.tekuelve@ini.rub.de
     Date:        2022 03 02
 
-    Description: Source file for the class cedar::proc::steps::DistanceImageCoordinateTransform.
+    Description: Source file for the class cedar::proc::steps::AllocentricToDistanceImage.
 
     Credits:
 
@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CLASS HEADER
-#include "cedar/processing/steps/DistanceImageCoordinateTransform.h"
+#include "cedar/processing/steps/AllocentricToDistanceImage.h"
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
@@ -69,16 +69,16 @@ namespace
 
       ElementDeclarationPtr declaration
               (
-                      new ElementDeclarationTemplate<cedar::proc::steps::DistanceImageCoordinateTransform>
+                      new ElementDeclarationTemplate<cedar::proc::steps::AllocentricToDistanceImage>
                               (
                                       "Image Processing",
-                                      "cedar.processing.DistanceImageCoordinateTransform"
+                                      "cedar.processing.AllocentricToDistanceImage"
                               )
               );
       declaration->setIconPath(":steps/distance_image_coordinate_transform.svg");
       declaration->setDescription
               (
-                      "Transforms a Distance Image into an allocentric coordinate frame depending on the source camera's pan and tilt."
+                      "Transforms an allocentric representation into an egocentric camera frame depending on the camera's pan and tilt."
               );
 
       declaration->declare();
@@ -93,32 +93,33 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::steps::DistanceImageCoordinateTransform::DistanceImageCoordinateTransform():
+cedar::proc::steps::AllocentricToDistanceImage::AllocentricToDistanceImage():
 mCameraTranslation(new cedar::aux::DoubleVectorParameter(this,"camera joint translation (depth, horizontal, height in meter)",3,0)),
 mTiltJointDistance(new cedar::aux::DoubleParameter (this,"cam distance to tiltjoint (m)",0)),
 mCameraFrustrumAngleDeg(new cedar::aux::DoubleVectorParameter(this,"camera frustrum angle (deg)",2,45)),
-mOutputSizes(new cedar::aux::IntVectorParameter(this,"output sizes",3,100)),
-mOutputScaling(new cedar::aux::DoubleParameter(this,"field unit per meter",100,1,1000)),
-mOutputTranslation(new cedar::aux::DoubleVectorParameter(this,"output translation (m)",3,0))
+mOutputSizes(new cedar::aux::IntVectorParameter(this,"output sizes",2,100)),
+mOutputScaling(new cedar::aux::DoubleParameter(this,"allo field unit per meter",100,1,1000)),
+mOutputTranslation(new cedar::aux::DoubleVectorParameter(this,"allo translation (m)",3,0)),
+mAlloDetectionThreshold(new cedar::aux::DoubleParameter(this,"allo detection threshold",0.1))
 {
-  std::vector<int> defaultSizes {mOutputSizes->getValue().at(0),mOutputSizes->getValue().at(1),mOutputSizes->getValue().at(2)};
-  mAlloOutput = cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(3, &defaultSizes.at(0), CV_32F)));
+//  std::vector<int> defaultSizes {mOutputSizes->getValue().at(0),mOutputSizes->getValue().at(1),mOutputSizes->getValue().at(2)};
+  mEgoOutput = cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(mOutputSizes->getValue().at(0), mOutputSizes->getValue().at(1) , CV_32F)));
 
   // declare all inputs
-  cedar::proc::DataSlotPtr imageInput = this->declareInput(mDistanceImageInputName, true);
+  cedar::proc::DataSlotPtr imageInput = this->declareInput(mAllocentricInputName, true);
   cedar::proc::DataSlotPtr rollInput = this->declareInput(mRollInputName, false);
   cedar::proc::DataSlotPtr tiltInput = this->declareInput(mTiltInputName, false);
   cedar::proc::DataSlotPtr panInput = this->declareInput(mPanInputName, false);
 
   // declare output
-  auto weightTriggerOutput = this->declareOutput(mAlloOutputName, mAlloOutput);
+  auto weightTriggerOutput = this->declareOutput(mEgoOutputName, mEgoOutput);
 
   // setup connections
   QObject::connect(mOutputSizes.get(), SIGNAL(valueChanged()),this, SLOT(outputSizeChanged()));
 
 }
 
-cedar::proc::steps::DistanceImageCoordinateTransform::~DistanceImageCoordinateTransform()
+cedar::proc::steps::AllocentricToDistanceImage::~AllocentricToDistanceImage()
 {
 }
 
@@ -126,26 +127,28 @@ cedar::proc::steps::DistanceImageCoordinateTransform::~DistanceImageCoordinateTr
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::steps::DistanceImageCoordinateTransform::compute(const cedar::proc::Arguments&)
+void cedar::proc::steps::AllocentricToDistanceImage::compute(const cedar::proc::Arguments&)
 {
   //Do something if all inputs are present
-  if (mDistanceImageInput)
+  if (mAllocentricInput)
   {
     float rollRad = this->mRollInput ? this->mRollInput->getData().at<float>(0,0) * (M_PI/180.0) : 0; //Rotation along Roll if present
     float tiltRad = this->mTiltInput ? this->mTiltInput->getData().at<float>(0,0) * (M_PI/180.0) : 0; // This is rotation along pitch in Rad if present
     float panRad = this->mPanInput ? this->mPanInput->getData().at<float>(0,0) * (M_PI/180.0) :0; // This is rotation along yaw in Rad if present
 
-    cv::Mat outputMat = computeAllocentricRepresentation(mDistanceImageInput->getData(), rollRad,tiltRad,panRad);
+//    std::cout<<this->getName() << " current Roll: " << rollRad <<" Tilt: " << tiltRad << " Pan: " << panRad <<"\n\tAllocentric Dimensions. Rows: " << mAllocentricInput->getData().rows <<  " Cols: " << mAllocentricInput->getData().cols   << std::endl;
 
-    mAlloOutput->setData(outputMat);
+    cv::Mat outputMat = computeEgocentricRepresentation(mAllocentricInput->getData(), rollRad,tiltRad,panRad);
+
+    mEgoOutput->setData(outputMat);
   }
 }
 
-void cedar::proc::steps::DistanceImageCoordinateTransform::inputConnectionChanged(const std::string& inputName)
+void cedar::proc::steps::AllocentricToDistanceImage::inputConnectionChanged(const std::string& inputName)
 {
-  if (inputName == mDistanceImageInputName)
+  if (inputName == mAllocentricInputName)
   {
-    this->mDistanceImageInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
+    this->mAllocentricInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
   }
 
   if (inputName == mPanInputName)
@@ -165,68 +168,66 @@ void cedar::proc::steps::DistanceImageCoordinateTransform::inputConnectionChange
 }
 
 
-cv::Mat cedar::proc::steps::DistanceImageCoordinateTransform::computeAllocentricRepresentation(cv::Mat distanceImage,float rollRad,float tiltRad, float panRad)
+cv::Mat cedar::proc::steps::AllocentricToDistanceImage::computeEgocentricRepresentation(cv::Mat allocentricImage, float rollRad, float tiltRad, float panRad)
 {
 //  auto start_time = boost::posix_time::microsec_clock::universal_time();
+    cv::Mat returnMat = cv::Mat::zeros(mOutputSizes->getValue().at(0),mOutputSizes->getValue().at(1),CV_32F);
 
-  std::vector<int> outPutSizes {mOutputSizes->getValue().at(0),mOutputSizes->getValue().at(1),mOutputSizes->getValue().at(2)};
-  cv::Mat returnMat = cv::Mat(3, &outPutSizes.at(0), CV_32F,cv::Scalar(0));
+    float angleRangeHorizontal = this->mCameraFrustrumAngleDeg->getValue().at(0) * (M_PI/180.0); // Convert to radians
+    int horizontalPixels = returnMat.cols;
+    float horizontalPixelPerAngle = horizontalPixels / angleRangeHorizontal;
+    int xZeroAnglePixel = round(horizontalPixels/2);
 
-  // For OpenCV x and y are actually swapped
-  float angleRangeHorizontal = this->mCameraFrustrumAngleDeg->getValue().at(0) * (M_PI/180.0); // Convert to radians
-  int horizontalPixels = distanceImage.cols;
-  float horizontalAnglePerPixel = angleRangeHorizontal/(float) horizontalPixels;
-  int xZeroAnglePixel = horizontalPixels/2;
+    float angleRangeVertical = this->mCameraFrustrumAngleDeg->getValue().at(1) * (M_PI/180.0); // Convert to radians
+    int verticalPixels = returnMat.rows;
+    float verticalPixelPerAngle = verticalPixels / angleRangeVertical;
+    int yZeroAnglePixel = round(verticalPixels/2);
 
-  float angleRangeVertical = this->mCameraFrustrumAngleDeg->getValue().at(1) * (M_PI/180.0); // Convert to radians
-  int verticalPixels = distanceImage.rows;
-  float verticalAnglePerPixel = angleRangeVertical/(float) verticalPixels;
-  int yZeroAnglePixel = verticalPixels/2;
+    cv::Mat rotationMat = calculateRotationMatrix(rollRad,tiltRad,panRad);
+    cv::Mat inverseRotationMat = rotationMat.inv();
+    auto translationVectorToJoint = this->mCameraTranslation->getValue();
+    auto translationVectorJointToCam = calculateTranslationFromJointToCam(rollRad,tiltRad,panRad);
+    auto fieldUnitPerMeter = this->mOutputScaling->getValue();
+    auto outputTranslation = this->mOutputTranslation->getValue();
+    float alloDetectionThreshold = this->mAlloDetectionThreshold->getValue();
 
+  allocentricImage.forEach<float>([&returnMat,angleRangeHorizontal,xZeroAnglePixel,horizontalPixelPerAngle,angleRangeVertical,yZeroAnglePixel,verticalPixelPerAngle,inverseRotationMat,translationVectorToJoint,translationVectorJointToCam,outputTranslation,fieldUnitPerMeter,alloDetectionThreshold](float &p, const int * position) -> void {
+      if(p > alloDetectionThreshold)
+      {
+        //There is something in the allocentric representation
+        float zCoordinate = position[0] / fieldUnitPerMeter + outputTranslation.at(0);
+        float xCoordinate = position[1] / fieldUnitPerMeter + outputTranslation.at(1);
+        float yCoordiante = outputTranslation.at(2);
 
-  cv::Mat rotationMat = calculateRotationMatrix(rollRad,tiltRad,panRad);
-  auto translationVectorToJoint = this->mCameraTranslation->getValue();
-  auto translationVectorJointToCam = calculateTranslationFromJointToCam(rollRad,tiltRad,panRad);
-  auto fieldUnitPerMeter = this->mOutputScaling->getValue();
-  auto outputTranslation = this->mOutputTranslation->getValue();
+          //Subtract Camera Transform
+        zCoordinate = zCoordinate - translationVectorToJoint.at(0) - translationVectorJointToCam.at(0);
+        xCoordinate = xCoordinate - translationVectorToJoint.at(1) - translationVectorJointToCam.at(1);
+        yCoordiante = yCoordiante - translationVectorToJoint.at(2) - translationVectorJointToCam.at(2);
 
- //Parallelizing saves 30 ms per iteration on a 300x300 depthImage on my VM
-  distanceImage.forEach<float>([&returnMat,xZeroAnglePixel,horizontalAnglePerPixel,yZeroAnglePixel,verticalAnglePerPixel,rotationMat,translationVectorToJoint,translationVectorJointToCam,outputTranslation,fieldUnitPerMeter](float &p, const int * position) -> void {
-            int yImage = position[0]; //OpenCV has a weird depiction of row and column in images...
-            int xImage = position[1];
-            float distance = p;
-
-            float currentXAngle = (xImage - xZeroAnglePixel) * horizontalAnglePerPixel;
-            float currentYAngle = (yImage - yZeroAnglePixel) * verticalAnglePerPixel;
-            float xEgo = tan(currentXAngle) * distance; // Pythagoras..
-            float zEgo = distance;
-            float yEgo = tan(currentYAngle) * distance * -1; //flip y-axis from image to regular. Upwards is positive and downwards from image center is negative
-
-            cv::Mat egoVector = cv::Mat::zeros(3,1,CV_32F);
-            egoVector.at<float>(0,0) = zEgo;
-            egoVector.at<float>(1,0) = xEgo;
-            egoVector.at<float>(2,0) = yEgo;
-
-            //Rotate the whole thing!
-            cv::Mat rotatedVector = rotationMat * egoVector;
-
-            float zReal = rotatedVector.at<float>(0,0) + translationVectorToJoint.at(0) + translationVectorJointToCam.at(0);
-            float xReal = rotatedVector.at<float>(1,0) + translationVectorToJoint.at(1) + translationVectorJointToCam.at(1);
-            float yReal = rotatedVector.at<float>(2,0) + translationVectorToJoint.at(2) + translationVectorJointToCam.at(2);
+        cv::Mat alloVector = cv::Mat::zeros(3, 1, CV_32F);
+        alloVector.at<float>(0, 0) = zCoordinate;
+        alloVector.at<float>(1, 0) = xCoordinate;
+        alloVector.at<float>(2, 0) = yCoordiante;
+        //Rotate the whole thing!
+        cv::Mat reRotatedVector = inverseRotationMat * alloVector;
 
 
-            //Translate the measure values in the field coordinate frame
-            int outPutX = (int) round((xReal - outputTranslation.at(1)) * fieldUnitPerMeter);
-            int outPutY = (int) round((yReal - outputTranslation.at(2)) * fieldUnitPerMeter);
-            int outPutZ = (int) round((zReal - outputTranslation.at(0)) * fieldUnitPerMeter);
+        float angleX = atan(reRotatedVector.at<float>(1, 0) / reRotatedVector.at<float>(0, 0));
+        float angleY = atan(reRotatedVector.at<float>(2, 0) / reRotatedVector.at<float>(0, 0));
 
-            if(outPutX<returnMat.size[1] && outPutX >=0 && outPutY<returnMat.size[2] && outPutY >=0 && outPutZ<returnMat.size[0] && outPutZ >=0)
-            {
-              //Again the OpenCV Plot treats the first two dimensions in the plot different than usual (for me)
-              returnMat.at<float>(outPutZ, outPutX, outPutY) = 1;
-            }
+        if (abs(angleX) <= (angleRangeHorizontal / 2.0) && abs(angleY) <= (angleRangeVertical / 2.0))
+        {
+          // If inside the camera add it to correct location of the output matrix with correct distance value
+          float imagePosX = xZeroAnglePixel + angleX * horizontalPixelPerAngle;
+          float imagePosY = yZeroAnglePixel + angleY * verticalPixelPerAngle * -1; //y-direction is flipped
+          int imagePosXInt = round(imagePosX);
+          int imagePosYInt = round(imagePosY);
+          returnMat.at<float>(imagePosYInt, imagePosXInt) = reRotatedVector.at<float>(0, 0);
+        }
+      }
 
-          });
+  });
+
 
 
 
@@ -234,13 +235,13 @@ cv::Mat cedar::proc::steps::DistanceImageCoordinateTransform::computeAllocentric
 //  auto time_after_stepping = boost::posix_time::microsec_clock::universal_time();
 //  boost::posix_time::time_duration measured_step_time_unitless = time_after_stepping - start_time;
 //  double elapsedMilliSeconds = measured_step_time_unitless.total_microseconds()  / 1000.0;
-//  std::cout<<"Calculation of allocentric representation took: " << elapsedMilliSeconds << " ms" <<std::endl;
+//  std::cout<<"Calculation of egocentric representation took: " << elapsedMilliSeconds << " ms" <<std::endl;
 
   return returnMat;
 }
 
 
-cv::Mat cedar::proc::steps::DistanceImageCoordinateTransform::calculateRotationMatrix(float rollRad, float tiltRad,
+cv::Mat cedar::proc::steps::AllocentricToDistanceImage::calculateRotationMatrix(float rollRad, float tiltRad,
                                                                                       float panRad)
 {
 
@@ -258,7 +259,7 @@ cv::Mat cedar::proc::steps::DistanceImageCoordinateTransform::calculateRotationM
   return rotationMatrix;
 }
 
-std::vector<float> cedar::proc::steps::DistanceImageCoordinateTransform::calculateTranslationFromJointToCam(
+std::vector<float> cedar::proc::steps::AllocentricToDistanceImage::calculateTranslationFromJointToCam(
         float rollRad, float tiltRad, float panRad)
 {
   std::vector<float> returnVector {0.0,0.0,0.0};
@@ -291,12 +292,11 @@ std::vector<float> cedar::proc::steps::DistanceImageCoordinateTransform::calcula
 }
 
 
-void cedar::proc::steps::DistanceImageCoordinateTransform::outputSizeChanged()
+void cedar::proc::steps::AllocentricToDistanceImage::outputSizeChanged()
 {
 //  std::cout<<"OutputSizeChanged >> RecalculateOutputData" << std::endl;
-  std::vector<int> outPutSizes {mOutputSizes->getValue().at(0),mOutputSizes->getValue().at(1),mOutputSizes->getValue().at(2)};
-  cv::Mat outPutMat = cv::Mat::zeros(3, &outPutSizes.at(0), CV_32F);
-  mAlloOutput->setData(outPutMat);
+  cv::Mat outPutMat = cv::Mat::zeros(mOutputSizes->getValue().at(0), mOutputSizes->getValue().at(1) , CV_32F);
+  mEgoOutput->setData(outPutMat);
 
   //Recalculate the Output, if input is present
   this->onTrigger();

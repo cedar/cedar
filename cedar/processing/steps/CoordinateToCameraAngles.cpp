@@ -45,6 +45,14 @@
 #include "cedar/processing/ElementDeclaration.h"
 
 // SYSTEM INCLUDES
+#ifdef _WIN32
+    #define _USE_MATH_DEFINES
+    #include <cmath>
+#endif
+
+#include <math.h>
+
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class

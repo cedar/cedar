@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,117 +22,70 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ComponentSlot.h
+    File:        AllocentricToDistanceImage.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2012 11 23
+    Maintainer:  Jan Tekuelve
+    Email:       jan.tekuelve@ini.rub.de
+    Date:        2022 03 02
 
-    Description: Slot for components of a robot (e.g., a kinematic chain).
+    Description: Header file for the class cedar::proc::steps::AllocentricToDistanceImage.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COMPONENT_SLOT_H
-#define CEDAR_DEV_COMPONENT_SLOT_H
+#ifndef CEDAR_PROC_STEPS_ALLOCENTRIC_TO_DISTANCE_IMAGE_H
+#define CEDAR_PROC_STEPS_ALLOCENTRIC_TO_DISTANCE_IMAGE_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/MapParameter.h"
-#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/IntVectorParameter.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
+#include "cedar/processing/Step.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/FactoryManager.fwd.h"
-#include "cedar/devices/Component.fwd.h"
-#include "cedar/devices/ComponentSlot.fwd.h"
-#include "cedar/devices/Robot.fwd.h"
+#include "cedar/processing/steps/AllocentricToDistanceImage.fwd.h"
+#include "cedar/auxiliaries/MatData.fwd.h"
 
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/enable_shared_from_this.hpp>
-#endif // Q_MOC_RUN
-#include <vector>
-#include <string>
-#include <map>
 
-/*!@brief Slot for a single robot component.
+
+/*!@todo describe.
  *
- * @todo More detailed description of the class.
+ * @todo describe more.
  */
-class cedar::dev::ComponentSlot : public cedar::aux::Configurable
+class cedar::proc::steps::AllocentricToDistanceImage: public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // friends
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-  friend std::ostream& operator<<(std::ostream& stream, const cedar::dev::ComponentSlot& slot);
-
-  friend std::ostream& operator<<(std::ostream& stream, cedar::dev::ConstComponentSlotPtr slot);
-
-  friend std::ostream& operator<<(std::ostream& stream, cedar::dev::ComponentSlotPtr slot);
-
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  //!@brief a singleton factory manager for components
-  typedef cedar::aux::Singleton<cedar::aux::FactoryManager<cedar::dev::ComponentPtr> > FactorySingleton;
-
-  typedef std::map<std::string, cedar::aux::ConfigurationNode> ComponentConfigurations;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  ComponentSlot(cedar::dev::RobotPtr robot, const std::string& name);
+  //!@brief The standard constructor.
+  AllocentricToDistanceImage();
+
+  //!@brief Destructor
+  virtual ~AllocentricToDistanceImage();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Returns a pointer to the robot this component slot belongs to.
-   *
-   * @returns pointer to this slot's robot
-   */
-  inline cedar::dev::RobotPtr getRobot() const
-  {
-    auto robot = mRobot.lock();
-    CEDAR_ASSERT(robot);
-    return robot;
-  }
-
-  /*!@brief Returns the component currently docked to this component slot.
-   *
-   * @returns pointer to the component
-   */
-  cedar::dev::ComponentPtr getComponent();
-
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-  //!@brief Lists all channels in this component.
-  std::vector<std::string> listConfigurations() const;
-
-  //!@brief Checks if a channel of the given name exists.
-  bool hasConfiguration(const std::string& name) const;
-
-  //!@brief Sets the channel for this component.
-  void instantiateConfiguration(const std::string& configurationName);
-
-  //! Returns a path that identifies this component.
-  std::string getPath() const;
-
-  //! Return the name of the slot
-  std::string getName() const;
-
-  //! Return the name of the configuration
-  std::string getConfigurationName() const;
-
-  //! returns the component icon path
-  QString getIconPath() const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-
 protected:
   // none yet
 
@@ -140,42 +93,55 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void compute(const cedar::proc::Arguments& arguments);
 
+  void inputConnectionChanged(const std::string& inputName);
+
+  cv::Mat computeEgocentricRepresentation(cv::Mat allocentricImage,float rollRad,float tiltRad, float panRad);
+
+  cv::Mat calculateRotationMatrix(float rollRad,float tiltRad, float panRad);
+
+  std::vector<float> calculateTranslationFromJointToCam(float rollRad,float tiltRad,float panRad);
+
+private slots:
+  void outputSizeChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-
 private:
-  //! robot the component slot belongs to
-  cedar::dev::RobotWeakPtr mRobot;
+    cedar::aux::MatDataPtr mEgoOutput;
 
-  //! component that is currently docked to this slot
-  cedar::dev::ComponentPtr mComponent;
+    cedar::aux::ConstMatDataPtr mAllocentricInput;
+    cedar::aux::ConstMatDataPtr mPanInput;
+    cedar::aux::ConstMatDataPtr mTiltInput;
+    cedar::aux::ConstMatDataPtr mRollInput;
 
-  //! Name of the component.
-  std::string mName;
-
-  //! Path of the component icon
-  QString mIconPath;
+    std::string mAllocentricInputName = "allocentric representation";
+    std::string mPanInputName = "camera pan (deg)";
+    std::string mTiltInputName = "camera tilt (deg)";
+    std::string mRollInputName = "camera roll (deg)";
+    std::string mEgoOutputName = "egocentric representation";
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+  cedar::aux::DoubleVectorParameterPtr mCameraTranslation;
+  cedar::aux::DoubleParameterPtr mTiltJointDistance;
+  cedar::aux::DoubleVectorParameterPtr mCameraFrustrumAngleDeg;
+
+  cedar::aux::IntVectorParameterPtr mOutputSizes;
+  cedar::aux::DoubleParameterPtr mOutputScaling;
+  cedar::aux::DoubleVectorParameterPtr mOutputTranslation;
+  cedar::aux::DoubleParameterPtr mAlloDetectionThreshold;
+
 private:
-  //! Type of the channel stored in this component.
-  cedar::aux::StringParameterPtr _mConfigurationName;
+  // none yet
 
-  //! mapping of channel types to class names of components
-  std::map<std::string, std::string> mComponentTypeIds;
+}; // class cedar::proc::steps::AllocentricToDistanceImage
 
-  ComponentConfigurations _mComponentConfigurations;
+#endif // CEDAR_PROC_STEPS_ALLOCENTRIC_TO_DISTANCE_IMAGE_H
 
-  cedar::aux::ConfigurationNode mCommonParameters;
-
-}; // class cedar::dev::ComponentSlot
-#endif // CEDAR_DEV_COMPONENT_SLOT_H

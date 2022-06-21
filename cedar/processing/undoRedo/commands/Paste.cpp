@@ -106,7 +106,8 @@ void cedar::proc::undoRedo::commands::Paste::redo()
 	//Determine the position offset of the duplicates as the average of the positions of all selected elements
 	QPointF center(0.0, 0.0);
 	int counterofUis = 0;
-	for (auto &uiPair:uiTree)
+
+  for (auto &uiPair:uiTree)
 	{
 		boost::property_tree::ptree::const_assoc_iterator it = uiPair.second.find("positionX");
 		if(it != uiPair.second.not_found())
@@ -130,6 +131,7 @@ void cedar::proc::undoRedo::commands::Paste::redo()
 			}
 		}
 	}
+
 	for(auto &groupPair:groupTree)
 	{
 		auto ui_generic = groupPair.second.find("ui generic");
@@ -146,7 +148,7 @@ void cedar::proc::undoRedo::commands::Paste::redo()
 	boost::optional<boost::property_tree::ptree &> connectionsTree = inputNode.get_child_optional("connections");
 	//Get gui connections tree
 	boost::optional<boost::property_tree::ptree &> uiConnectionsTree;
-	for(auto &uiPair:uiTree)
+  for(auto &uiPair:uiTree)
 	{
 		boost::property_tree::ptree::const_assoc_iterator it = uiPair.second.find("type");
 		if(it != uiPair.second.not_found())
@@ -163,93 +165,70 @@ void cedar::proc::undoRedo::commands::Paste::redo()
 		}
 	}
 
-	//Rename and add steps, rename connections
-	for (auto &stepsPair:stepsTree)
-	{
-		cedar::aux::ConfigurationNode singleUiValue;
-		cedar::aux::ConfigurationNode singleStepValue;
-		std::string oldName = stepsPair.second.find("name")->second.get_value<std::string>();
-		std::string newName = this->mGroup->getGroup()->getUniqueIdentifier(oldName);
+  //Add uiTree to a map to reduce runtime of the following for loop
+  std::map<std::string, cedar::aux::ConfigurationNode> uiTreeMap;
+  for (auto &uiPair:uiTree)
+  {
+    boost::property_tree::ptree::const_assoc_iterator it = uiPair.second.find("step");
+    if (it != uiPair.second.not_found())
+    {
+      std::string uiName = uiPair.second.find("step")->second.get_value<std::string>();
+       uiTreeMap.insert({uiName, uiPair.second});
+    }
+  }
 
-		//In UI rename every occurrence of oldName to newName and change position
-		for (auto &uiPair:uiTree)
-		{
-			boost::property_tree::ptree::const_assoc_iterator it = uiPair.second.find("step");
-			if(it != uiPair.second.not_found())
-			{
-				std::string uiName = uiPair.second.find("step")->second.get_value<std::string>();
+  for (auto &stepsPair:stepsTree)
+  {
+    cedar::aux::ConfigurationNode singleUiValue;
+    cedar::aux::ConfigurationNode singleStepValue;
+    std::string oldName = stepsPair.second.find("name")->second.get_value<std::string>();
+    std::string newName = this->mGroup->getGroup()->getUniqueIdentifier(oldName);
 
-				if (uiName == oldName)
-				{
-					//Rename occurence
-					uiPair.second.put("step", newName);
+    //In UI rename every occurrence of oldName to newName and change position
+    std::map<std::string, cedar::aux::ConfigurationNode>::iterator iter = uiTreeMap.find(oldName);
 
-					////Change position
-					double positionX = uiPair.second.find("positionX")->second.get_value<double>();
-					double positionY = uiPair.second.find("positionY")->second.get_value<double>();
-					QPointF pointofStep(positionX, positionY);
+    if(iter != uiTreeMap.end())
+    {
+      //Rename occurence
+      iter->second.put("step", newName);
 
-					//Add vector from center to step to mouse position
-					QPointF vectorFromCenterToStep = pointofStep - center;
-					QPointF newPositionOfStep = this->mMousePositionScenePos + vectorFromCenterToStep;
+      ////Change position
+      double positionX = iter->second.find("positionX")->second.get_value<double>();
+      double positionY = iter->second.find("positionY")->second.get_value<double>();
+      QPointF pointofStep(positionX, positionY);
 
-					//Set new position
-					uiPair.second.put("positionX", newPositionOfStep.x());
-					uiPair.second.put("positionY", newPositionOfStep.y());
+      //Add vector from center to step to mouse position
+      QPointF vectorFromCenterToStep = pointofStep - center;
+      QPointF newPositionOfStep = this->mMousePositionScenePos + vectorFromCenterToStep;
 
-					singleUiValue.push_back(cedar::aux::ConfigurationNode::value_type("", uiPair.second));
-				}
-			}
-		}
+      //Set new position
+      iter->second.put("positionX", newPositionOfStep.x());
+      iter->second.put("positionY", newPositionOfStep.y());
 
-		if(connectionsTree)
-		{
-			cedar::proc::gui::Ide::renameElementInConnection(*connectionsTree, oldName, newName, "source", "target");
-		}
-		if(uiConnectionsTree)
-		{
-			cedar::proc::gui::Ide::renameElementInConnection(*uiConnectionsTree, oldName, newName, "source slot", "target slot");
-		}
+      singleUiValue.push_back(cedar::aux::ConfigurationNode::value_type("", iter->second));
+    }
 
-		stepsPair.second.put("name", newName);
 
-		cedar::aux::ConfigurationNode rootNode;
+    if(connectionsTree)
+    {
+      cedar::proc::gui::Ide::renameElementInConnection(*connectionsTree, oldName, newName, "source", "target");
+    }
+    if(uiConnectionsTree)
+    {
+      cedar::proc::gui::Ide::renameElementInConnection(*uiConnectionsTree, oldName, newName, "source slot", "target slot");
+    }
 
-		singleStepValue.push_front(cedar::aux::ConfigurationNode::value_type(stepsPair.first, stepsPair.second));
-		cedar::aux::ConfigurationNode emptyNode;
+    stepsPair.second.put("name", newName);
 
-		this->pasteConfigurationNodes(singleStepValue, singleUiValue, emptyNode, emptyNode);
-	}
+    cedar::aux::ConfigurationNode rootNode;
 
-	////StickyNotes
-	for (auto &uiPair:uiTree)
-	{
-		cedar::aux::ConfigurationNode singleUiValue;
+    singleStepValue.push_front(cedar::aux::ConfigurationNode::value_type(stepsPair.first, stepsPair.second));
+    cedar::aux::ConfigurationNode emptyNode;
 
-		boost::property_tree::ptree::const_assoc_iterator it = uiPair.second.find("type");
-		if(it != uiPair.second.not_found() && it->second.get_value<std::string>() == "stickyNote")
-		{
-			////Change position
-			//Get
-			double positionX = uiPair.second.find("x")->second.get_value<double>();
-			double positionY = uiPair.second.find("y")->second.get_value<double>();
-			QPointF pointOfNote(positionX,positionY);
+    this->pasteConfigurationNodes(singleStepValue, singleUiValue, emptyNode, emptyNode);
+  }
 
-			//Add vector from center to stickynote to mouse position
-			QPointF vectorFromCenterToNote = pointOfNote - center;
-			QPointF newPostionOfNote = this->mMousePositionScenePos + vectorFromCenterToNote;
-
-			//Set
-			QPoint newPostionOfNoteInt = newPostionOfNote.toPoint();
-			uiPair.second.put("x", newPostionOfNoteInt.x());
-			uiPair.second.put("y",  newPostionOfNoteInt.y());
-			singleUiValue.push_back(cedar::aux::ConfigurationNode::value_type("", uiPair.second));
-		}
-
-		cedar::aux::ConfigurationNode emptyNode;
-		this->pasteConfigurationNodes(emptyNode,singleUiValue,emptyNode,emptyNode);
-	}
-	//Rename and add groups
+  //Rename and add groups
 	for(auto &groupPair:groupTree)
 	{
 		std::string oldName = groupPair.first;
@@ -348,8 +327,8 @@ void cedar::proc::undoRedo::commands::Paste::pasteConfigurationNodes(cedar::aux:
 	std::stringstream stringstream;
 	boost::property_tree::write_json(stringstream, rootNode);
 
-	/*//Debug Option: Print modified pasted
-	boost::property_tree::write_json("Paste: Modified Final Into read Function.json", rootNode);*/
+	//Debug Option: Print modified pasted
+  //boost::property_tree::write_json("Paste: Modified Final Into read Function.json", rootNode);
 
 	//Use readJsonFromString to paste the stringJson
 	try

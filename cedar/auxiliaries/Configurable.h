@@ -72,7 +72,7 @@
 /*!@brief An interface for classes that can store and load parameters from files.
  *
  */
-class cedar::aux::Configurable : public boost::noncopyable
+class cedar::aux::Configurable : public boost::noncopyable, public boost::enable_shared_from_this<cedar::aux::Configurable>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // friends
@@ -103,6 +103,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
+  //!@brief This gets called directly after the constructor once there exists a shared_ptr to this configurable
+  virtual void postConstructor();
+
+  //!@brief Returns true once the postConstructor was called and there therefor exists a shared_ptr to this configurable
+  bool hasShared();
+
   //!@brief read a configuration for all registered parameters from a cedar::aux::ConfigurationNode
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
@@ -143,10 +150,10 @@ public:
   ParameterList& getParameters();
 
   //!@brief sets the configurable parent
-  void setParent(cedar::aux::Configurable* parent);
+  void setParent(cedar::aux::ConfigurableWeakPtr parent);
 
   //!@brief gets the configurable parent
-  cedar::aux::Configurable* getParent();
+  cedar::aux::ConfigurableWeakPtr getParent();
 
   /*!@brief add a Configurable as a child to this instance of Configurable - if name is duplicate, an exception is
    * thrown
@@ -419,13 +426,15 @@ private:
   Children mChildren;
 
   //!@brief parent of this Configurable instance
-  cedar::aux::Configurable* mpParent;
+  cedar::aux::ConfigurableWeakPtr mpParent;
 
   //!@brief Whether this is an advanced configurable; usually only makes sense, when this is a child.
   bool mIsAdvanced;
 
   //!@brief Wether a configuration has been read.
   bool mIsConfigured;
+
+  bool mHasShared;
 
   /*!@brief   The lockable used for locking this configurable and all its parameters.
    *

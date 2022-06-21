@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/Step.h"
+#include "cedar/processing/StepTime.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Group.h"
@@ -83,7 +84,8 @@ cedar::proc::Step::Step(bool isLooped)
 :
 Triggerable(isLooped),
 // initialize parameters
-mAutoLockInputsAndOutputs(true)
+mAutoLockInputsAndOutputs(true),
+mLastExecutionTime(cedar::unit::Time(-1.0*cedar::unit::seconds)) //not sure about the right initialization yet
 {
   this->mComputeTimeId = this->registerTimeMeasurement("compute call");
   this->mLockingTimeId = this->registerTimeMeasurement("locking");
@@ -177,6 +179,7 @@ void cedar::proc::Step::callReset()
   // lock everything
   cedar::proc::Step::ReadLocker locker(this);
 
+  this->mLastExecutionTime = cedar::unit::Time(-1.0*cedar::unit::seconds); //not sure about the right initialization yet;
   // reset the step
   this->reset();
 
@@ -380,8 +383,22 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   {
     if (arguments.get() != nullptr)
     {
-      // call the compute function with the given arguments
-      this->compute(*(arguments.get()));
+
+      if(auto step_time = boost::dynamic_pointer_cast< cedar::proc::StepTime>(arguments))
+      {
+        // The arguments cam from a step trigger and contain a TimeStamp. Only execute, if the timesstamp is newer than the last executed one
+        if(step_time->getGlobalTimeStamp() > this->mLastExecutionTime)
+        {
+          this->compute(*(arguments.get()));
+          this->mLastExecutionTime = step_time->getGlobalTimeStamp();
+        }
+      }
+      else
+      {
+        // call the compute function with the given arguments
+        this->compute(*(arguments.get()));
+      }
+
     }
     else
     {
@@ -503,12 +520,12 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
         // Initial tests show much better latency with the change.
         //this->mFinishedChainResult = QtConcurrent::run(boost::bind(&cedar::proc::Trigger::trigger, this->getFinishedTrigger(), cedar::proc::ArgumentsPtr()));
         // jokeit: instead to this:
-        this->getFinishedTrigger()->trigger();
+        this->getFinishedTrigger()->trigger(arguments);
       }
     }
     else
     {
-      this->getFinishedTrigger()->trigger();
+      this->getFinishedTrigger()->trigger(arguments);
     }
   }
 }

@@ -43,6 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ui_SimulationControl.h"
 #include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/LoopMode.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Element.fwd.h"
@@ -194,6 +195,12 @@ private slots:
 
   void triggerCountChanged(QString triggerPath);
 
+  void defaultCPUStepSizeChanged(double newValue);
+
+  void minimumComputationTimeChanged(double newValue);
+
+  void toggleSpinBoxUsability(cedar::aux::LoopMode::Id curLoopMode );
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -204,6 +211,8 @@ private:
   cedar::proc::gui::GroupPtr mGroup;
 
   boost::signals2::scoped_connection mElementAddedConnection;
+
+  boost::signals2::scoped_connection mSimulationModeChangedConnection;
 
   std::map<cedar::proc::LoopedTriggerPtr, boost::shared_ptr<boost::signals2::scoped_connection> > mTriggerCountChangedConnections;
 

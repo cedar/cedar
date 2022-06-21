@@ -34,11 +34,11 @@ else(APPLE)
 
     else(NOT WIN32)
         find_library(PYTHONQT_LIBS
-                NAMES libPythonQt_QtAll-Qt5-Python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}.dll
+                NAMES PythonQt_QtAll-Qt5-Python${PYTHON_MAJOR_VERSION}${PYTHON_MINOR_VERSION}.lib
                 PATHS ${CEDAR_DEPENDENCY_LIBRARIES} ${PYTHONQT_PATH_LIB}
                 )
         find_library(PYTHONQT_LIBS_TMP
-                NAMES libPythonQt-Qt5-Python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}.dll
+                NAMES PythonQt-Qt5-Python${PYTHON_MAJOR_VERSION}${PYTHON_MINOR_VERSION}.lib
                 PATHS ${CEDAR_DEPENDENCY_LIBRARIES} ${PYTHONQT_PATH_LIB}
                 )
     endif(NOT WIN32)

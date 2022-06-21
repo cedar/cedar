@@ -346,8 +346,6 @@ public:
   // protected methods
   //----------------------------------------------------------------------------
 protected:
-
-
   //----------------------------------------------------------------------------
   // private methods
   //----------------------------------------------------------------------------
@@ -372,8 +370,14 @@ private:
   //! Called when the thread is started and stopped; marks some parameters that cannot be changed at runtime const.
   void makeParametersConst(bool makeConst);
 
+
+
+
+
 private slots:
   void modeChanged();
+
+
   //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------
@@ -386,13 +390,15 @@ private:
   boost::signals2::scoped_connection mStartConnection;
   boost::signals2::scoped_connection mStopConnection;
 
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
 
-private:
+
+
 
   //!@brief desired length of a single step, in milliseconds
   cedar::aux::TimeParameterPtr _mStepSize;
@@ -414,6 +420,11 @@ private:
 
   //! The loop mode of the trigger
   cedar::aux::EnumParameterPtr _mLoopMode;
+
+  cedar::aux::BoolParameterPtr _mUseDefaultCPUStep;
+
+private:
+    // none yet
 
 }; // class cedar::aux::LoopedThread
 

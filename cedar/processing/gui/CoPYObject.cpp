@@ -237,8 +237,7 @@ cedar::proc::gui::CoPYObject::connectSlots(const QString &source, const QVariant
         i++;
       }
     }
-    if (sourceSlotIndex < 0 or sourceSlotIndex > (sourceSlots.size() - 1) or targetSlotIndex < 0 or
-        targetSlotIndex > (targetSlots.size() - 1))
+    if (sourceSlotIndex < 0 || sourceSlotIndex > (sourceSlots.size() - 1) || targetSlotIndex < 0 || targetSlotIndex > (targetSlots.size() - 1))
     CEDAR_THROW(cedar::aux::ExceptionBase, "Wrong Slot Name or Index");
 
     cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(

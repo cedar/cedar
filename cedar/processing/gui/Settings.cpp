@@ -324,14 +324,17 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
                   "Undo/Redo",
                   "<p>You can now undo and redo actions by pressing CTRL+Z and CTRL+Y.</p>"
           );
-
+  #ifdef CEDAR_USE_COPY
   this->addOneTimeMessage
-          (
-                  CEDAR_MAKE_VERSION(6, 3, 0), // introduces in this version
-                  "copy scripting console",
-                  "CoPY Scripting tool",
-                  "<p>You can now script python code to e.g. create or connect Steps programmatically. Read the Documentation under [Help->Show CoPY Documentation]</p>"
-          );
+  (
+      CEDAR_MAKE_VERSION(6, 3, 0), // introduces in this version
+      "copy scripting console",
+      "CoPY Scripting tool",
+      "<p>You can now script python code to e.g. create or connect Steps programmatically. Read the Documentation under [Help->Show CoPY Documentation]</p>"
+  );
+  #endif // CEDAR_USE_COPY
+
+  
 }
 
 cedar::proc::gui::Settings::UserDefinedColor::UserDefinedColor(const std::string& stringToParse)

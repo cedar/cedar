@@ -50,6 +50,7 @@
 
 int main(int argc, char **argv)
 {
+#ifdef CEDAR_USE_QGLVIEWER
   // find resources
   std::string trunk_configuration_file = cedar::aux::locateResource("robots/caren_trunk.json");
 
@@ -92,6 +93,6 @@ int main(int argc, char **argv)
   widget_trunk.show();
   viewer.startTimer(50);
   a.exec();
-
+#endif
   return 0;
 }

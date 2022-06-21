@@ -52,6 +52,9 @@
 #include "cedar/auxiliaries/ParameterDeclaration.h"
 #include "cedar/auxiliaries/Recorder.h"
 
+#include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/processing/LoopedTrigger.h"
+
 // SYSTEM INCLUDES
 #include <set>
 #include <map>
@@ -337,6 +340,21 @@ void cedar::proc::GroupFileFormatV1::read
   if (!linked)
   {
     group->processConnectors();
+
+    //JT: This checks, whether the architecture has been created before the SimulationMode Update.
+    auto loop_mode = root.find("loop mode");
+    auto euler_step = root.find("simulation euler step");
+    auto default_cpu = root.find("default CPU step");
+    auto min_compute_time = root.find("min computation time");
+    auto time_factor = root.find("time factor");
+
+    if((loop_mode==root.not_found()||euler_step==root.not_found()||default_cpu==root.not_found()||min_compute_time==root.not_found()) && time_factor != root.not_found())
+    {
+      //apparently this reading of the format also happens while duplicating Oo
+      //The check is therefore, if time factor is there and one of the others is missing, then we have an old architecture and not some duplicating of a few steps
+      cedar::aux::LogSingleton ::getInstance()->warning("Your architecture has been created with an older version of cedar. Simulation Modes are now regulated globally. Choose the appropriate Simulation Mode in the toolbar and possibly retune your architecture accordingly!","cedar::proc::GroupFileFormatV1::readConfiguration");
+    }
+
 
     auto steps = root.find("steps");
     if (steps != root.not_found())
@@ -771,6 +789,12 @@ void cedar::proc::GroupFileFormatV1::readTriggers
        std::vector<std::string>& exceptions
      )
 {
+//  std::cout << "GroupFileFormatV1::readTriggers" << std::endl;
+  int numOfTriggers = 0;
+  bool readOldConfigFile = false;
+
+  cedar::unit::Time minimalSimulatedStepSize = cedar::unit::Time(std::numeric_limits<float>::max() * cedar::unit::milli * cedar::unit::seconds);
+
   for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
       iter != root.end();
       ++iter)
@@ -785,6 +809,7 @@ void cedar::proc::GroupFileFormatV1::readTriggers
                 (
                   cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id)
                 );
+      numOfTriggers = numOfTriggers + 1;
     }
     catch (cedar::aux::ExceptionBase& e)
     {
@@ -795,10 +820,52 @@ void cedar::proc::GroupFileFormatV1::readTriggers
     try
     {
       trigger->readConfiguration(trigger_node);
+//      if (auto loopedTrigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger))
+//      {
+//          std::cout << "Trigger Stepsize after reading configuration: " << loopedTrigger->getStepSize() << " Fake StepSize " << loopedTrigger->getFakeStepSize() << std::endl;
+//      }
+      
+      auto use_default_stepSize = trigger_node.find("use default CPU step");
+      if (use_default_stepSize == trigger_node.not_found())
+      {
+          //We loaded an old config file!
+//          std::cout << " We loaded a config file that was created with old simulation modes!" << std::endl;
+          readOldConfigFile = true;
+
+          if (auto loopedTrigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger))
+          {
+//              std::cout << "Looped Trigger StepSize is: " << loopedTrigger->getStepSize() << std::endl;
+              loopedTrigger->setPreviousCustomCPUStepSize(loopedTrigger->getStepSize());
+              loopedTrigger->setUseDefaultCPUStepSize(false);
+          
+             
+              if (loopedTrigger->getFakeStepSize() < minimalSimulatedStepSize)
+              {
+                  minimalSimulatedStepSize = loopedTrigger->getFakeStepSize();
+              }
+
+              auto loopMode = loopedTrigger->getLoopModeParameter().id();
+              //Heuristic: If any Loopedtrigger was running in realTime, they all have to run in real time.
+              if (!(loopMode == cedar::aux::LoopMode::FakeDT || loopMode == cedar::aux::LoopMode::Simulated))
+              {
+                      //Any of the other realtime variants
+                      //cedar::aux::GlobalClockSingleton::getInstance()->setLoopMode(cedar::aux::LoopMode::RealDT); // This might not be required ultimately
+                  group->setLoopMode(cedar::aux::LoopMode::RealDT);
+              }
+          }
+      }
     }
     catch (cedar::aux::ExceptionBase& e)
     {
       exceptions.push_back(e.exceptionInfo());
+    }
+
+    if(readOldConfigFile)
+    {
+        //We have a legacy File 
+        //The eulerstepsize for simmulation should have the minimal stepsize of all of them
+        //cedar::aux::GlobalClockSingleton::getInstance()->setSimulationStepSize(minimalSimulatedStepSize);
+        group->setSimulationTimeStep(minimalSimulatedStepSize);
     }
 
     try
@@ -827,6 +894,8 @@ void cedar::proc::GroupFileFormatV1::readTriggers
     trigger->resetChangedStates(false);
   }
 
+//  std::cout << "GroupFileFormatV1 found " << numOfTriggers << " Trigger!" << std::endl;
+
   for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
       iter != root.end();
       ++iter)
@@ -836,6 +905,12 @@ void cedar::proc::GroupFileFormatV1::readTriggers
       const cedar::aux::ConfigurationNode& trigger_node = iter->second;
       cedar::proc::TriggerPtr trigger
         = group->getElement<cedar::proc::Trigger>(trigger_node.get_child("name").get_value<std::string>());
+
+//      if (auto loopedTrigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger))
+//      {
+//          std::cout << "Trigger Stepsize after reloading configuration: " << loopedTrigger->getStepSize() << " Fake StepSize " << loopedTrigger->getFakeStepSize() << std::endl;
+//      }
+
       const cedar::aux::ConfigurationNode& listeners = trigger_node.get_child("listeners");
 
       for (cedar::aux::ConfigurationNode::const_iterator listener_iter = listeners.begin();
@@ -906,6 +981,7 @@ void cedar::proc::GroupFileFormatV1::readSteps
       try
       {
         step = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id);
+        step->postConstructor();
       }
       catch (cedar::aux::ExceptionBase& e)
       {

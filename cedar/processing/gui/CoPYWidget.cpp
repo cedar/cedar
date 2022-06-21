@@ -183,7 +183,7 @@ void cedar::proc::gui::CoPYWidget::appendParameterToText(cedar::aux::ParameterPt
   {
     stepName =  element->getFullPath();
   }
-  else if(auto element = dynamic_cast<cedar::proc::Element *>(param->getOwner()->getParent()))
+  else if(auto element = dynamic_cast<cedar::proc::Element *>(param->getOwner()->getParent().lock().get()))
   {
     stepName = element->getFullPath();
   }

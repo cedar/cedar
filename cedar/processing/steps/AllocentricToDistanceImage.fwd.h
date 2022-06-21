@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,53 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepTime.cpp
+    File:        AllocentricToDistanceImage.fwd.h
 
+    Maintainer:  Jan Tekuelve
+    Email:       jan.tekuelve@ini.rub.de
+    Date:        2022 03 02
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 06
-
-    Description:
+    Description: Forward declaration file for the class cedar::proc::steps::AllocentricToDistanceImage.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_PROC_STEPS_ALLOCENTRIC_TO_DISTANCE_IMAGE_FWD_H
+#define CEDAR_PROC_STEPS_ALLOCENTRIC_TO_DISTANCE_IMAGE_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
-#include "StepTime.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::StepTime::StepTime(const cedar::unit::Time& stepTime, const cedar::unit::Time& globalTimeStamp)
-:
-mStepTime (stepTime),
-mGlobalTimeStamp(globalTimeStamp)
+namespace cedar
 {
+  namespace proc
+  {
+    namespace steps
+    {
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_PROC_CLASS(AllocentricToDistanceImage);
+      //!@endcond
+    }
+  }
 }
 
-cedar::proc::StepTime::~StepTime()
-{
-}
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
+#endif // CEDAR_PROC_STEPS_ALLOCENTRIC_TO_DISTANCE_IMAGE_FWD_H
 
-const cedar::unit::Time& cedar::proc::StepTime::getStepTime() const
-{
-  return this->mStepTime;
-}
-
-const cedar::unit::Time& cedar::proc::StepTime::getGlobalTimeStamp() const
-{
-  return this->mGlobalTimeStamp;
-}

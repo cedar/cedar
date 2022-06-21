@@ -41,6 +41,7 @@
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/auxiliaries/GlobalClock.h"
 
 // SYSTEM INCLUDES
 #include <QWriteLocker>
@@ -117,6 +118,15 @@ _mLoopMode
     cedar::aux::LoopMode::typePtr(),
     mode
   )
+),
+_mUseDefaultCPUStep
+(
+  new cedar::aux::BoolParameter
+  (
+    this,
+    "use default CPU step",
+    true
+  )
 )
 {
   init();
@@ -190,7 +200,16 @@ _mLoopMode
     cedar::aux::LoopMode::typePtr(),
     mode
   )
-)
+),
+_mUseDefaultCPUStep
+(
+        new cedar::aux::BoolParameter
+        (
+                this,
+                "use default CPU step",
+                true
+                )
+                )
 {
   init();
 }
@@ -198,9 +217,8 @@ _mLoopMode
 void cedar::aux::LoopedThread::init()
 {
   // connect to mode change signal
-  QObject::connect(_mLoopMode.get(), SIGNAL(valueChanged()), this, SLOT(modeChanged()));
-  // initially set available parameters
-  this->modeChanged();
+//  QObject::connect(_mLoopMode.get(), SIGNAL(valueChanged()), this, SLOT(modeChanged()));
+
 
   //this->connectToStartSignal(boost::bind(&cedar::aux::LoopedThread::prepareStart, this));
   this->connectToQuitSignal(boost::bind(&cedar::aux::LoopedThread::processStop, this ));
@@ -249,6 +267,15 @@ void cedar::aux::LoopedThread::makeParametersConst(bool makeConst)
   // the loop mode itself is not affected by this, so this must be made const/unconst every time
   this->_mLoopMode->setConstant(makeConst);
 
+  if(!makeConst) //parameters should be made available again
+  {
+    this->_mUseDefaultCPUStep->setConstant(this->_mLoopMode->getValue() == cedar::aux::LoopMode::FakeDT);
+  } else
+  {
+    this->_mUseDefaultCPUStep->setConstant(makeConst);
+  }
+
+  //Todo:This should all vanish later, the different modes will be deprecated
   // then, make everything else const if set to do so (if not, the restrictions from above are kept)
   if (makeConst)
   {
@@ -369,70 +396,75 @@ cedar::aux::detail::ThreadWorker* cedar::aux::LoopedThread::resetWorker()
     // intentionally return pointer, see parent
 }
 
+
+
 void cedar::aux::LoopedThread::modeChanged()
 {
-  switch (_mLoopMode->getValue())
-  {
 
-    // old and boring: DEPRECATE ME
-    case cedar::aux::LoopMode::Simulated:
-    {
-      this->_mStepSize->setConstant(true);
-      this->_mIdleTime->setConstant(false);
-      this->_mSimulatedTime->setConstant(false);
-      this->_mFakeStepSize->setConstant(true);
-      this->_mMinimumStepSize->setConstant(true);
-      break;
-    }
-    case cedar::aux::LoopMode::RealTime:
-    {
-      this->_mStepSize->setConstant(true);
-      this->_mIdleTime->setConstant(false);
-      this->_mSimulatedTime->setConstant(true);
-      this->_mFakeStepSize->setConstant(true);
-      this->_mMinimumStepSize->setConstant(true);
-      break;
-    }
-    case cedar::aux::LoopMode::Fixed:
-    case cedar::aux::LoopMode::FixedAdaptive:
-    {
-      this->_mStepSize->setConstant(false);
-      this->_mIdleTime->setConstant(true);
-      this->_mSimulatedTime->setConstant(true);
-      this->_mFakeStepSize->setConstant(true);
-      this->_mMinimumStepSize->setConstant(true);
-      break;
-    }
+  //todo: Either Remove or use this function!
 
-
-    case cedar::aux::LoopMode::RealDT:
-    {
-      this->_mStepSize->setConstant(false);
-      this->_mFakeStepSize->setConstant(true);
-      this->_mMinimumStepSize->setConstant(false);
-
-      //legacy:
-      this->_mIdleTime->setConstant(true);
-      this->_mSimulatedTime->setConstant(true);
-      break;
-    }
-    case cedar::aux::LoopMode::FakeDT:
-    {
-      this->_mStepSize->setConstant(false);
-      this->_mFakeStepSize->setConstant(false);
-      this->_mMinimumStepSize->setConstant(false);
-
-      //legacy:
-      this->_mIdleTime->setConstant(true);
-      this->_mSimulatedTime->setConstant(true);
-      break;
-    }
-
-    default:
-    {
-      // all valid cases are covered above
-      CEDAR_ASSERT(false);
-    }
-  }
+  //Todo: It should also have been a function in Trigger in the first place right?
+//  switch (_mLoopMode->getValue())
+//  {
+//
+//    // old and boring: DEPRECATE ME
+//    case cedar::aux::LoopMode::Simulated:
+//    {
+//      this->_mStepSize->setConstant(true);
+//      this->_mIdleTime->setConstant(false);
+//      this->_mSimulatedTime->setConstant(false);
+//      this->_mFakeStepSize->setConstant(true);
+//      this->_mMinimumStepSize->setConstant(true);
+//      break;
+//    }
+//    case cedar::aux::LoopMode::RealTime:
+//    {
+//      this->_mStepSize->setConstant(true);
+//      this->_mIdleTime->setConstant(false);
+//      this->_mSimulatedTime->setConstant(true);
+//      this->_mFakeStepSize->setConstant(true);
+//      this->_mMinimumStepSize->setConstant(true);
+//      break;
+//    }
+//    case cedar::aux::LoopMode::Fixed:
+//    case cedar::aux::LoopMode::FixedAdaptive:
+//    {
+//      this->_mStepSize->setConstant(false);
+//      this->_mIdleTime->setConstant(true);
+//      this->_mSimulatedTime->setConstant(true);
+//      this->_mFakeStepSize->setConstant(true);
+//      this->_mMinimumStepSize->setConstant(true);
+//      break;
+//    }
+//
+//
+//    case cedar::aux::LoopMode::RealDT:
+//    {
+//      this->_mStepSize->setConstant(false);
+//      this->_mFakeStepSize->setConstant(true);
+//      this->_mMinimumStepSize->setConstant(false);
+//
+//      //legacy:
+//      this->_mIdleTime->setConstant(true);
+//      this->_mSimulatedTime->setConstant(true);
+//      break;
+//    }
+//    case cedar::aux::LoopMode::FakeDT:
+//    {
+//      this->_mStepSize->setConstant(false);
+//      this->_mFakeStepSize->setConstant(false);
+//      this->_mMinimumStepSize->setConstant(false);
+//
+//      //legacy:
+//      this->_mIdleTime->setConstant(true);
+//      this->_mSimulatedTime->setConstant(true);
+//      break;
+//    }
+//
+//    default:
+//    {
+//      // all valid cases are covered above
+//      CEDAR_ASSERT(false);
+//    }
+//  }
 }
-

@@ -65,6 +65,10 @@
 #include <cedar/auxiliaries/UIntParameter.h>
 #include <chrono>
 
+#include "thread"
+#include "atomic"
+#include <shared_mutex>
+
 #define MATMSG_END "E-N-D!"
 #define MATMSG_CHK "CHK-SM"
 
@@ -86,6 +90,7 @@ class cedar::proc::sinks::TCPWriter : public cedar::proc::Step
 public:
   //!@brief The standard constructor.
   TCPWriter();
+  virtual ~TCPWriter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -136,6 +141,21 @@ private:
   void closeConnection();
   void reconnect();
 
+  void startCommunicationThread();
+  void abortAndJoin();
+  void communicationLoop();
+  void setMatrixToSend(cv::Mat sendMatrix);
+  cv::Mat getMatrixToSend();
+  void setCurrentStateAndAnnotation(Triggerable::State state, std::string annotation);
+  Triggerable::State getCurrentState();
+  std::string getCurrentAnnotation();
+
+  signals:
+  void stateChanged();
+
+private slots:
+    void updateState();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -151,6 +171,18 @@ private:
     unsigned int stepCounter;
     unsigned int numConsecutiveTimeOuts;
     std::chrono::steady_clock::time_point startMeasurement;
+
+    std::thread mCommunicationThread;
+    std::atomic_bool mRunning;
+    std::atomic_bool mAbortRequested;
+    std::atomic_bool mResetRequested;
+    std::atomic_bool mSendMatrixWasSet;
+    cv::Mat mMatrixToSend;
+    mutable std::shared_timed_mutex writeMatrixMutex;
+
+    mutable std::shared_timed_mutex stateMutex;
+    Triggerable::State mCurState;
+    std::string mCurStateAnnotation;
 
 public:
   //--------------------------------------------------------------------------------------------------------------------
