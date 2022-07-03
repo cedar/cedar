@@ -822,6 +822,18 @@ void cedar::dyn::NeuralField::onStop()
   this->_mSizes->setConstant(false);
 }
 
+bool cedar::dyn::NeuralField::isXMLExportable(std::string& errorMsg){
+  for(int i = 0; i < this->_mKernels->size(); i++)
+  {
+    if(!dynamic_cast<cedar::aux::kernel::Gauss*>(this->_mKernels->at(i).get()))
+    {
+      errorMsg = "The XML export only supports Gauss kernels.";
+      return false;
+    }
+  }
+  return true;
+}
+
 
 void cedar::dyn::NeuralField::updateEducationalKernel()
 {

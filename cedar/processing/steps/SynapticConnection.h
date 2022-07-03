@@ -150,7 +150,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+
+  bool isXMLExportable(std::string& errorMsg) override;
 
 public slots:
   void recompute();

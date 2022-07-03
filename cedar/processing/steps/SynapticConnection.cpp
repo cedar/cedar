@@ -41,6 +41,7 @@
 #include "cedar/processing/steps/SynapticConnection.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/DataConnection.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/SynapticWeightPatternParameter.h"
 #include "cedar/processing/typecheck/IsMatrix.h"
@@ -235,6 +236,22 @@ void cedar::proc::steps::SynapticConnection::compute(const cedar::proc::Argument
 void cedar::proc::steps::SynapticConnection::recompute()
 {
   this->onTrigger();
+}
+
+bool cedar::proc::steps::SynapticConnection::isXMLExportable(std::string& errorMsg){
+  SlotMap outputSlots = this->getDataSlots(DataRole::OUTPUT);
+  for(auto slot : outputSlots)
+  {
+    for(cedar::proc::DataConnectionPtr outputConn : slot.second->getDataConnections())
+    {
+      if(auto synapticConnection = dynamic_cast<cedar::proc::steps::SynapticConnection*>(outputConn.get()->getTarget()->getParentPtr()))
+      {
+        errorMsg = "The XML export does not support chains of SynapticConnections";
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 ////Functions copied from cedar::proc::steps::Convolution

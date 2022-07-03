@@ -240,6 +240,8 @@ public:
   //! True if the step currently has a run time measurement.
   bool hasRunTimeMeasurement() const;
 
+  virtual bool isXMLExportable(std::string& errorMsg);
+
   bool isXMLExportable();
 
   /*!@brief Returns the last run time measured for this step.

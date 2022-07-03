@@ -181,6 +181,8 @@ public:
 
   void writeConfigurationXML(cedar::aux::ConfigurationNode& root) const;
 
+  bool isXMLExportable(std::string& errorMsg) override;
+
 public slots:
   //!@brief handle a change in dimensionality, which leads to creating new matrices
   void dimensionalityChanged();

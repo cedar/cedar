@@ -65,6 +65,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/devices/gui/RobotManager.h"
 #include "cedar/devices/Component.h"
+#include "cedar/dynamics/fields/NeuralField.h"
 #include "cedar/auxiliaries/CommandLineParser.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/gui/PluginManagerDialog.h"
@@ -2002,11 +2003,27 @@ bool cedar::proc::gui::Ide::exportXML()
   // Check if all steps in scene are exportable
   QList<QGraphicsItem *> sceneItems = this->mpProcessingDrawer->getScene()->items();
   std::set<std::string> nonExportableSteps;
+  std::set<std::string> nonExportableKernels;
+  bool isExportable = true;
   for(auto item : sceneItems){
 
     if(auto stepItem = dynamic_cast<cedar::proc::gui::StepItem*>(item)){
-      if(!stepItem->getStep()->isXMLExportable()){
-        nonExportableSteps.insert(cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(stepItem->getStep())->getClassNameWithoutNamespace());
+      std::string errorMsg = "";
+      if(!stepItem->getStep()->isXMLExportable(errorMsg)){
+        isExportable = false;
+        if(!errorMsg.compare(""))
+        {
+          nonExportableSteps.insert(cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(stepItem->getStep())->getClassNameWithoutNamespace());
+        }
+        else
+        {
+          cedar::aux::LogSingleton::getInstance()->error
+            (
+              errorMsg + " (" + cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(
+                stepItem->getStep())->getClassNameWithoutNamespace() + ")",
+              "cedar::proc::gui::Ide::exportXML()"
+            );
+        }
       }
     }
   }
@@ -2020,8 +2037,11 @@ bool cedar::proc::gui::Ide::exportXML()
     cedar::aux::LogSingleton::getInstance()->error
             (
                     "The following steps are not XML exportable: " + stepsString,
-                    "cedar::proc::gui::Ide::exportXml()"
+                    "cedar::proc::gui::Ide::exportXML()"
             );
+  }
+  if(!isExportable)
+  {
     return false;
   }
 

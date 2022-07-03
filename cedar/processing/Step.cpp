@@ -221,8 +221,13 @@ bool cedar::proc::Step::isRegistered(const std::string& actionName)
   return false;
 }
 
-bool cedar::proc::Step::isXMLExportable(){
+bool cedar::proc::Step::isXMLExportable(std::string&){
   return this->mXMLExportable;
+}
+
+bool cedar::proc::Step::isXMLExportable(){
+  std::string str = "";
+  return this->isXMLExportable(str);
 }
 
 void cedar::proc::Step::callAction(const std::string& name)
