@@ -42,13 +42,16 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
+#include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 #include "cedar/auxiliaries/math/TransferFunction.h"
+#include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/sinks/GroupSink.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/kernel/Gauss.h"
 
 // SYSTEM INCLUDES
 #include <boost/assign.hpp>
@@ -196,6 +199,37 @@ std::string cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(boost::bimap<s
   return name;
 }
 
+
+void cedar::proc::GroupXMLFileFormatV1::writeKernelListParameter(
+  cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel>* kernels, cedar::aux::ConfigurationNode& root)
+{
+  cedar::aux::ConfigurationNode sumWeightPattern;
+  // Write configuration of each kernel
+  for(int i = 0; i < kernels->size(); i++)
+  {
+    cedar::aux::ConfigurationNode gaussWeightPattern;
+    cedar::aux::kernel::KernelPtr kernel = kernels->at(i);
+    // This must be a Gauss kernel, otherwise the architecture would not be exportable
+    auto gauss = dynamic_cast<cedar::aux::kernel::Gauss*>(kernel.get());
+    CEDAR_ASSERT(gauss != nullptr);
+    gaussWeightPattern.add("Height", gauss->getAmplitude());
+    // Write sigma data
+    if(gauss->getDimensionality() > 0)
+    {
+      cedar::aux::ConfigurationNode sigma;
+      std::ostringstream sigmaString;
+      sigmaString << gauss->getSigma(0);
+      for(int j = 1; j < gauss->getDimensionality(); j++)
+      {
+        sigmaString << ",";
+        sigmaString << gauss->getSigma(j);
+      }
+      gaussWeightPattern.add("Sigmas", sigmaString.str());
+    }
+    sumWeightPattern.add_child("GaussWeightPattern", gaussWeightPattern);
+  }
+  root.add_child("InteractionKernel.SumWeightPattern", sumWeightPattern);
+}
 
 void cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(
   cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* sigmoid, cedar::aux::ConfigurationNode& root)

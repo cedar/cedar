@@ -44,13 +44,15 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/GroupXMLFileFormatV1.fwd.h"
-#include "cedar/processing/Group.fwd.h"
-#include "cedar/processing/DataConnection.fwd.h"
-#include "cedar/auxiliaries/Configurable.fwd.h"
-#include "cedar/auxiliaries/ObjectParameterTemplate.fwd.h"
 #include "cedar/auxiliaries/math/TransferFunction.fwd.h"
+#include "cedar/auxiliaries/kernel/Kernel.fwd.h"
+#include "cedar/auxiliaries/Configurable.fwd.h"
+#include "cedar/auxiliaries/ObjectListParameterTemplate.fwd.h"
+#include "cedar/auxiliaries/ObjectParameterTemplate.fwd.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
+#include "cedar/processing/Group.fwd.h"
+#include "cedar/processing/DataConnection.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/bimap.hpp>
@@ -91,6 +93,10 @@ public:
                                         std::string name, bool directionCedarToXML = true);
 
   // Transformation functions, to transform and write a parameter's configuration according to the XML file format
+
+  // Write kernel parameter
+  static void writeKernelListParameter(
+    cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel>* kernels, cedar::aux::ConfigurationNode& root);
 
   // Write sigmoid parameter
   static void writeActivationFunctionParameter(

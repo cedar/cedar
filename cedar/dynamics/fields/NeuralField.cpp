@@ -700,6 +700,9 @@ void cedar::dyn::NeuralField::writeConfigurationXML(cedar::aux::ConfigurationNod
 
   // dimensionality/sizes parameter
   cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(this->_mDimensionality, this->_mSizes, root);
+
+  // kernels parameter
+  cedar::proc::GroupXMLFileFormatV1::writeKernelListParameter(this->_mKernels.get(), root);
 }
 
 void cedar::dyn::NeuralField::updateInputSum()
