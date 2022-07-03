@@ -87,7 +87,8 @@ public:
     cedar::aux::ConfigurationNode& root
   );
 
-  static std::string nameLookupXML(std::string name, bool directionCedarToXML = true);
+  static std::string bimapNameLookupXML(boost::bimap<std::string, std::string> bimap,
+                                        std::string name, bool directionCedarToXML = true);
 
   // Transformation functions, to transform and write a parameter's configuration according to the XML file format
 
@@ -130,7 +131,8 @@ private:
 protected:
   // none yet
 private:
-  static boost::bimap<std::string, std::string> nameLookupTableXML;
+  static boost::bimap<std::string, std::string> stepNameLookupTableXML;
+  static boost::bimap<std::string, std::string> transferFunctionNameLookupTableXML;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

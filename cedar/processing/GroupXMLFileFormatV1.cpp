@@ -121,7 +121,8 @@ void cedar::proc::GroupXMLFileFormatV1::writeSteps
       }
       CEDAR_ASSERT(step->isXMLExportable());
       std::string class_name = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(step);
-      std::string node_name = cedar::proc::GroupXMLFileFormatV1::nameLookupXML(class_name);
+      std::string node_name = cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
+        cedar::proc::GroupXMLFileFormatV1::stepNameLookupTableXML, class_name);
       cedar::aux::ConfigurationNode step_node = cedar::aux::ConfigurationNode();
       step_node.add("<xmlattr>.name", name_element_pair.first);
       step->writeConfigurationXML(step_node);
@@ -159,25 +160,35 @@ void cedar::proc::GroupXMLFileFormatV1::writeDataConnections
   }
 }
 
-boost::bimap<std::string, std::string> cedar::proc::GroupXMLFileFormatV1::nameLookupTableXML =
+boost::bimap<std::string, std::string> cedar::proc::GroupXMLFileFormatV1::stepNameLookupTableXML =
   boost::assign::list_of< boost::bimap<std::string, std::string>::relation >
     ("cedar.dynamics.NeuralField", "Field")
     ("cedar.processing.sources.GaussInput", "GaussInput");
 
-std::string cedar::proc::GroupXMLFileFormatV1::nameLookupXML(std::string name, bool directionCedarToXML)
+boost::bimap<std::string, std::string> cedar::proc::GroupXMLFileFormatV1::transferFunctionNameLookupTableXML =
+  boost::assign::list_of< boost::bimap<std::string, std::string>::relation >
+    ("cedar.aux.math.AbsSigmoid", "AbsSigmoid")
+    ("cedar.aux.math.ExpSigmoid", "ExpSigmoid")
+    ("cedar.aux.math.HeavisideSigmoid","HeavisideSigmoid")
+    ("cedar.aux.math.LinearTransferFunction","LinearTransferFunction")
+    ("cedar.aux.math.Logarithm","Logarithm")
+    ("cedar.aux.math.SemiLinearTransferFunction","SemiLinearTransferFunction");
+
+
+std::string cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(boost::bimap<std::string, std::string> bimap, std::string name, bool directionCedarToXML)
 {
   if(directionCedarToXML)
   {
-    boost::bimap<std::string, std::string>::left_const_iterator iter = cedar::proc::GroupXMLFileFormatV1::nameLookupTableXML.left.find(name);
-    if(iter != cedar::proc::GroupXMLFileFormatV1::nameLookupTableXML.left.end())
+    boost::bimap<std::string, std::string>::left_const_iterator iter = bimap.left.find(name);
+    if(iter != bimap.left.end())
     {
       return iter->second;
     }
   }
   else
   {
-    boost::bimap<std::string, std::string>::right_const_iterator iter = cedar::proc::GroupXMLFileFormatV1::nameLookupTableXML.right.find(name);
-    if(iter != cedar::proc::GroupXMLFileFormatV1::nameLookupTableXML.right.end())
+    boost::bimap<std::string, std::string>::right_const_iterator iter = bimap.right.find(name);
+    if(iter != bimap.right.end())
     {
       return iter->second;
     }
@@ -193,11 +204,14 @@ void cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(
   cedar::aux::math::TransferFunctionPtr transferFunction = sigmoid->getValue();
   transferFunction->writeConfigurationXML(activationFunction, true);
   root.add_child("ActivationFunction", activationFunction);
-  root.add("ActivationFunction.<xmlattr>.type", "Sigmoid");
+  root.add("ActivationFunction.<xmlattr>.type", cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
+    cedar::proc::GroupXMLFileFormatV1::transferFunctionNameLookupTableXML,
+    cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->getTypeId(transferFunction)
+    ));
 }
 
-void cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(
-  cedar::aux::UIntParameterPtr dimensionality, cedar::aux::UIntVectorParameterPtr sizes, cedar::aux::ConfigurationNode& root)
+void cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(cedar::aux::UIntParameterPtr dimensionality,
+  cedar::aux::UIntVectorParameterPtr sizes, cedar::aux::ConfigurationNode& root)
 {
   cedar::aux::ConfigurationNode dimensions;
   std::vector<unsigned int> sizesVector = sizes->getValue();
