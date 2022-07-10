@@ -113,7 +113,6 @@ mpProjectionMethod(nullptr)
   ////Convolution contructor code
   //Initial input and output of the step is set
 	this->declareInput("matrix", true);
-	this->declareInput("kernel", false);
 	this->declareOutput("result", mOutput);
 	QObject::connect(this->mConvolution.get(), SIGNAL(configurationChanged()), this,
                    SLOT(recompute()));
