@@ -2080,7 +2080,134 @@ bool cedar::proc::gui::Ide::exportXML()
 
 void cedar::proc::gui::Ide::importXML()
 {
+	if (!this->checkSave())
+	{
+		return;
+	}
 
+	cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
+
+	QFileDialog filedialog(this, "Select which file to load");
+	filedialog.setNameFilter( tr("architecture (*.xml)") );
+	filedialog.setDirectory( last_dir->getValue().absolutePath() ); // initial directory
+	filedialog.setFilter( QDir::AllDirs | QDir::Files
+												| QDir::NoDot
+												| QDir::Hidden );
+	// see hidden files to see the backup files
+#ifdef CEDAR_USE_QT5
+	filedialog.setOptions( QFileDialog::DontUseNativeDialog );
+	// js: Workaround for freezing file dialogs in QT5 (?)
+#endif
+
+	QString file;
+
+	if (filedialog.exec())
+	{
+		QStringList filelist;
+		filelist = filedialog.selectedFiles();
+		file= filelist.first();
+	}
+
+	if (!file.isEmpty())
+	{
+		this->importXMLLoadFile(file);
+	}
+}
+void cedar::proc::gui::Ide::importXMLLoadFile(QString file)
+{
+	// reset scene
+	this->mpProcessingDrawer->resetViewport();
+	// create new root network
+	cedar::proc::gui::GroupPtr group(new cedar::proc::gui::Group(this, this->mpProcessingDrawer->getScene()));
+	group->getGroup()->setName("root");
+	group->toggleTriggerColors(this->mpActionToggleTriggerColor->isChecked());
+	this->mpProcessingDrawer->getScene()->setGroup(group);
+
+	//This is needed for relative paths
+	cedar::aux::SettingsSingleton::getInstance()->setCurrentArchitectureFileName(file.toStdString());
+
+	// read network
+	try
+	{
+		group->readXML(file.toStdString());
+
+		group->afterArchitectureLoaded();
+	}
+	catch(const cedar::proc::ArchitectureLoadingException& e)
+	{
+		// Construct error dialog.
+		QString intro = "There were one or more errors while loading the specified file. Please review them below. <b>Note,"
+										" that this means that at least parts of your architecture have not been loaded correctly!</b>";
+		QDialog* p_dialog = new QDialog(this);
+		p_dialog->setWindowTitle("Errors while Loading Architecture");
+		p_dialog->setMinimumWidth(500);
+
+		QVBoxLayout *p_layout = new QVBoxLayout();
+		p_dialog->setLayout(p_layout);
+		QLabel* p_intro_label = new QLabel(intro);
+		p_intro_label->setWordWrap(true);
+		p_layout->addWidget(p_intro_label);
+
+		QListWidget* p_error_widget = new QListWidget();
+		p_error_widget->setWordWrap(true);
+		p_layout->addWidget(p_error_widget);
+
+		for (size_t i = 0; i < e.getMessages().size(); ++i)
+		{
+			QString error = QString::fromStdString(e.getMessages()[i]);
+			p_error_widget->addItem(error);
+		}
+
+		// Create ok button
+		QDialogButtonBox* p_button_box = new QDialogButtonBox(QDialogButtonBox::Ok);
+		p_layout->addWidget(p_button_box);
+
+		QObject::connect(p_button_box, SIGNAL(accepted()), p_dialog, SLOT(accept()));
+
+		/* int r = */ p_dialog->exec();
+		delete p_dialog;
+	}
+	catch(const cedar::aux::ExceptionBase& e)
+	{
+		auto p_dialog = new cedar::aux::gui::ExceptionDialog();
+		p_dialog->setAdditionalString("The exception occurred during loading of the architecture."
+																	" Your architecture has probably not been loaded correctly!");
+		p_dialog->displayCedarException(e);
+		p_dialog->exec();
+	}
+	catch (const boost::property_tree::json_parser::json_parser_error& e)
+	{
+		auto p_dialog = new cedar::aux::gui::ExceptionDialog();
+		p_dialog->setAdditionalString("Could not load architecture.");
+		p_dialog->displayStdException(e);
+		p_dialog->exec();
+	}
+
+	cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(QDir(file).absolutePath().toStdString());
+
+	//!@todo Why doesn't this call resetTo?
+	this->setGroup(group);
+
+	this->displayFilename(file.toStdString());
+
+	this->updateTriggerStartStopThreadCallers();
+	this->loadPlotGroupsIntoComboBox();
+
+
+	QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+	cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
+	last_dir->setValue(path);
+
+	// Reset the undo/redo stack
+	pUndoStack->clear();
+
+	// set the smart connection button
+	this->mpActionToggleSmartConnections->blockSignals(true);
+	this->mpActionToggleSmartConnections->setChecked(this->mGroup->getSmartConnection());
+	this->mpActionToggleSmartConnections->blockSignals(false);
+
+	this->setArchitectureChanged(false);
+	this->mpProcessingDrawer->setWidgets(this, this->mpPropertyTable, this->mpRecorderWidget,this->mpCommentWidget, this->mpCodeWidget);
 }
 
 void cedar::proc::gui::Ide::load()

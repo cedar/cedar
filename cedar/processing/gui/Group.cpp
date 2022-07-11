@@ -1274,6 +1274,53 @@ void cedar::proc::gui::Group::writeXML(const cedar::aux::Path &filename) const
   this->internalWriteXML(filename);
 }
 
+void cedar::proc::gui::Group::readXML(const cedar::aux::Path &source)
+{
+	QMutexLocker lock( &mIOLock );
+
+	this->mFileName = source.toString();
+	cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
+
+	cedar::aux::ConfigurationNode root;
+	read_xml(source.toString(), root);
+
+	std::vector<std::string> exceptions;
+
+	try
+	{
+		this->mGroup->readConfiguration(root);
+	}
+	catch(const cedar::proc::ArchitectureLoadingException& e)
+	{
+		exceptions.insert( std::end(exceptions),
+											 std::begin(e.getMessages()),
+											 std::end(e.getMessages()) );
+	}
+
+	try
+	{
+		this->readConfiguration(root);
+	}
+	catch(const cedar::proc::ArchitectureLoadingException& e)
+	{
+		exceptions.insert( std::end(exceptions),
+											 std::begin(e.getMessages()),
+											 std::end(e.getMessages()) );
+	}
+
+	if (boost::filesystem::exists(source.toString() + ".data"))
+	{
+		this->mGroup->readDataFile(source.toString() + ".data");
+	}
+
+	// rethrow after having finished as much as possible ...
+	if (!exceptions.empty())
+	{
+		cedar::proc::ArchitectureLoadingException exception(exceptions);
+		CEDAR_THROW_EXCEPTION(exception);
+	}
+}
+
 void cedar::proc::gui::Group::readRobots(const cedar::aux::ConfigurationNode &root)
 {
   if (root.find("ui generic") != root.not_found())
