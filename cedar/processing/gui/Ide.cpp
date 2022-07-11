@@ -489,7 +489,8 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   QObject::connect(this->mpActionSave, SIGNAL(triggered()), this, SLOT(save()));
   QObject::connect(this->mpActionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
   QObject::connect(this->mpActionExportXML, SIGNAL(triggered()), this, SLOT(exportXML()));
-  QObject::connect(this->mpActionLoad, SIGNAL(triggered()), this, SLOT(load()));
+	QObject::connect(this->mpActionImportXML, SIGNAL(triggered()), this, SLOT(importXML()));
+	QObject::connect(this->mpActionLoad, SIGNAL(triggered()), this, SLOT(load()));
 
   QObject::connect(this->mpActionSaveSerializableData, SIGNAL(triggered()), this, SLOT(saveSerializableDataAs()));
   QObject::connect(this->mpActionLoadSerializableData, SIGNAL(triggered()), this, SLOT(loadSerializableData()));
@@ -2075,6 +2076,11 @@ bool cedar::proc::gui::Ide::exportXML()
   last_dir->setValue(path);
 
   return true;
+}
+
+void cedar::proc::gui::Ide::importXML()
+{
+
 }
 
 void cedar::proc::gui::Ide::load()

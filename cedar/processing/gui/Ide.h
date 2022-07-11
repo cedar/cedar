@@ -175,6 +175,8 @@ public slots:
 
   bool exportXML();
 
+	void importXML();
+
   //! Allows the user to choose a destination for saving the data of serializable data slots in all steps.
   bool saveSerializableDataAs();
 
