@@ -2169,6 +2169,37 @@ void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& 
   }
 }
 
+void cedar::proc::Group::readConfigurationXML(const cedar::aux::ConfigurationNode& root)
+{
+	bool holding = this->holdTriggerChainUpdates();
+	this->setHoldTriggerChainUpdates(true);
+
+	std::vector<std::string> exceptions;
+	this->readConfiguration(root, exceptions);
+
+	this->setHoldTriggerChainUpdates(holding);
+	std::set<cedar::proc::Trigger*> visited;
+	this->updateTriggerChains(visited);
+
+	// holding trigger chain updates may have caused some steps to not be computed; thus, re-trigger all sources
+	for (const auto& name_element_pair : this->getElements())
+	{
+		auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(name_element_pair.second);
+		if (triggerable && triggerable->isTriggerSource() && !triggerable->isLooped())
+		{
+			triggerable->onTrigger();
+		}
+	}
+
+	// do this as late as possible so as to rescue as much as possible
+	// of the defunct architecture file
+	if (!exceptions.empty())
+	{
+		cedar::proc::ArchitectureLoadingException exception(exceptions);
+		CEDAR_THROW_EXCEPTION(exception);
+	}
+}
+
 void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions)
 {
   unsigned int format_version = 1; // default value is the current format
@@ -2210,6 +2241,11 @@ void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& 
       break;
     }
   }
+}
+
+void cedar::proc::Group::readConfigurationXML(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions)
+{
+
 }
 
 bool cedar::proc::Group::isConnected(const std::string& source, const std::string& target) const
