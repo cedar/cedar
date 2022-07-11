@@ -2110,10 +2110,10 @@ void cedar::proc::gui::Ide::importXML()
 
 	if (!file.isEmpty())
 	{
-		this->importXMLLoadFile(file);
+		this->importXMLFile(file);
 	}
 }
-void cedar::proc::gui::Ide::importXMLLoadFile(QString file)
+void cedar::proc::gui::Ide::importXMLFile(QString file)
 {
 	// reset scene
 	this->mpProcessingDrawer->resetViewport();

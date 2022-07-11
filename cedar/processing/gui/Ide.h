@@ -177,7 +177,7 @@ public slots:
 
 	void importXML();
 
-	void importXMLLoadFile(QString file);
+	void importXMLFile(QString file);
 
   //! Allows the user to choose a destination for saving the data of serializable data slots in all steps.
   bool saveSerializableDataAs();
