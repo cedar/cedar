@@ -53,6 +53,7 @@
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/DataConnection.fwd.h"
+#include "cedar/processing/steps/SynapticConnection.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/bimap.hpp>
@@ -121,6 +122,14 @@ private:
   /*!@brief Writes the steps in the group to the configuration node.
    */
   void writeSteps(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
+
+  /*!@brief Writes a synaptic connection to the configuration node.
+   */
+  void writeSynapticConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::steps::SynapticConnectionPtr connection) const;
+
+  /*!@brief Writes the data connections in the group to the configuration node.
+   */
+  void writeSynapticConnections(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief Writes a data connection to the configuration node.
    */

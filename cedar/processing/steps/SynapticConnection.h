@@ -153,6 +153,8 @@ public:
 
   bool isXMLExportable(std::string& errorMsg) override;
 
+  void writeConfigurationXML(cedar::aux::ConfigurationNode& root) const;
+
 public slots:
   void recompute();
   //--------------------------------------------------------------------------------------------------------------------
@@ -218,8 +220,6 @@ private:
 	//// Members for Convolution
 	//!@brief The Data containing the input matrix
 	cedar::aux::ConstMatDataPtr mMatrix;
-	//!@brief The Data containing the input kernel
-	cedar::aux::ConstMatDataPtr mKernel;
 
   cedar::aux::conv::ConvolutionPtr mConvolution;
 	KernelListParameterPtr mKernelsParameter;

@@ -702,7 +702,9 @@ void cedar::dyn::NeuralField::writeConfigurationXML(cedar::aux::ConfigurationNod
   cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(this->_mDimensionality, this->_mSizes, root);
 
   // kernels parameter
-  cedar::proc::GroupXMLFileFormatV1::writeKernelListParameter(this->_mKernels.get(), root);
+  cedar::aux::ConfigurationNode sumWeightPattern;
+  cedar::proc::GroupXMLFileFormatV1::writeKernelListParameter(this->_mKernels.get(), sumWeightPattern);
+  root.add_child("InteractionKernel", sumWeightPattern);
 }
 
 void cedar::dyn::NeuralField::updateInputSum()

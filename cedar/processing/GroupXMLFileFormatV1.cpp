@@ -51,6 +51,7 @@
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/sinks/GroupSink.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/steps/SynapticConnection.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 
 // SYSTEM INCLUDES
@@ -93,6 +94,7 @@ void cedar::proc::GroupXMLFileFormatV1::write
     }
 
     cedar::aux::ConfigurationNode connections;
+    this->writeSynapticConnections(group, connections);
     this->writeDataConnections(group, connections);
     if (!connections.empty())
     {
@@ -118,11 +120,12 @@ void cedar::proc::GroupXMLFileFormatV1::writeSteps
       (
         boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(step)
         || boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(step)
+        || boost::dynamic_pointer_cast<cedar::proc::steps::SynapticConnection>(step)
       )
       {
         continue;
       }
-      CEDAR_ASSERT(step->isXMLExportable());
+      CEDAR_ASSERT(step->isXMLExportable())
       std::string class_name = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(step);
       std::string node_name = cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
         cedar::proc::GroupXMLFileFormatV1::stepNameLookupTableXML, class_name);
@@ -134,6 +137,73 @@ void cedar::proc::GroupXMLFileFormatV1::writeSteps
   }
 }
 
+void cedar::proc::GroupXMLFileFormatV1::writeSynapticConnection
+  (
+    cedar::aux::ConfigurationNode& root,
+    const cedar::proc::steps::SynapticConnectionPtr connection
+  )
+const
+{
+  // Write the properties of this connection to a template node
+  cedar::aux::ConfigurationNode properties;
+  connection->writeConfigurationXML(properties);
+
+  // Enumerate all source and target steps of the connection
+  std::vector<std::string> sources;
+  std::vector<std::string> targets;
+  std::map<std::string, cedar::proc::DataSlotPtr> outputSlots = connection->getDataSlots(DataRole::OUTPUT);
+  std::map<std::string, cedar::proc::DataSlotPtr> inputSlots = connection->getDataSlots(DataRole::INPUT);
+  for(auto slot : outputSlots)
+  {
+    for(cedar::proc::DataConnectionPtr outputConn : slot.second->getDataConnections())
+    {
+      if(auto targetElement = dynamic_cast<cedar::proc::Element*>(outputConn.get()->getTarget()->getParentPtr()))
+      {
+        // This is the target step
+        targets.push_back(targetElement->getFullPath());
+      }
+    }
+  }
+  for(auto slot : inputSlots)
+  {
+    for(cedar::proc::DataConnectionPtr outputConn : slot.second->getDataConnections())
+    {
+      if(auto sourceElement = dynamic_cast<cedar::proc::Element*>(outputConn.get()->getSource()->getParentPtr()))
+      {
+        // This is the target step
+        sources.push_back(sourceElement->getFullPath());
+      }
+    }
+  }
+
+  // Save a Synpatic connection for all source/target pairs
+  for(std::string source : sources)
+  {
+    for(std::string target : targets)
+    {
+      cedar::aux::ConfigurationNode connection_node(properties);
+      connection_node.put("Source", source);
+      connection_node.put("Target", target);
+      root.push_back(cedar::aux::ConfigurationNode::value_type("SynapticConnection", connection_node));
+    }
+  }
+}
+
+void cedar::proc::GroupXMLFileFormatV1::writeSynapticConnections
+  (
+    cedar::proc::ConstGroupPtr group,
+    cedar::aux::ConfigurationNode& root
+  ) const
+{
+
+  for (auto& name_element_pair : group->getElements())
+  {
+    if(auto connection = boost::dynamic_pointer_cast<cedar::proc::steps::SynapticConnection>(name_element_pair.second))
+    {
+      this->writeSynapticConnection(root, connection);
+    }
+  }
+}
 
 void cedar::proc::GroupXMLFileFormatV1::writeDataConnection
   (
@@ -159,6 +229,11 @@ void cedar::proc::GroupXMLFileFormatV1::writeDataConnections
 {
   for (auto data_connection : group->getDataConnections())
   {
+    if(dynamic_cast<cedar::proc::steps::SynapticConnection*>(data_connection.get()->getTarget()->getParentPtr())
+      || dynamic_cast<cedar::proc::steps::SynapticConnection*>(data_connection.get()->getSource()->getParentPtr()))
+    {
+      continue;
+    }
     this->writeDataConnection(root, data_connection);
   }
 }
@@ -228,7 +303,7 @@ void cedar::proc::GroupXMLFileFormatV1::writeKernelListParameter(
     }
     sumWeightPattern.add_child("GaussWeightPattern", gaussWeightPattern);
   }
-  root.add_child("InteractionKernel.SumWeightPattern", sumWeightPattern);
+  root.add_child("SumWeightPattern", sumWeightPattern);
 }
 
 void cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(

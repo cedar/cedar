@@ -43,6 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/GroupXMLFileFormatV1.h"
 #include "cedar/processing/SynapticWeightPatternParameter.h"
 #include "cedar/processing/typecheck/IsMatrix.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
@@ -199,12 +200,7 @@ void cedar::proc::steps::SynapticConnection::compute(const cedar::proc::Argument
 {
 	////First: Convolution
 	const cv::Mat& matrix = mMatrix->getData();
-	if (mKernel)
-	{
-		const cv::Mat& kernel = mKernel->getData();
-		mConvolutionOutput->setData(this->mConvolution->convolve(matrix, kernel));
-	}
-	else if (this->mKernelsParameter->size() > 0)
+  if (this->mKernelsParameter->size() > 0)
 	{
 		if (this->mKernelsParameter->at(0)->getDimensionality() != this->convolutionGetDimensionality())
 		{
@@ -253,6 +249,22 @@ bool cedar::proc::steps::SynapticConnection::isXMLExportable(std::string& errorM
   return true;
 }
 
+void cedar::proc::steps::SynapticConnection::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
+{
+  // Write kernel weights
+  cedar::aux::ConfigurationNode sumWeightPattern;
+  cedar::proc::GroupXMLFileFormatV1::writeKernelListParameter(this->mKernelsParameter.get(), sumWeightPattern);
+  root.add_child("KernelWeights", sumWeightPattern);
+
+  // Write static gain
+  root.put("ScalarWeight", this->mGainFactorParameter->getValue());
+
+  // Write projection
+  cedar::aux::ConfigurationNode dimensionMapping;
+  this->mProjectionDimensionMappings->writeToNodeXML(dimensionMapping);
+  root.add_child("DimensionMapping", dimensionMapping);
+}
+
 ////Functions copied from cedar::proc::steps::Convolution
 
 //Todo: This is currently only the code from convolution, because the input is the same as convolution and static gain
@@ -294,30 +306,11 @@ void cedar::proc::steps::SynapticConnection::inputConnectionChanged(const std::s
 			list->getKernel(i)->blockSignals(blocked[i]);
 		}
 
-		if (!mRevalidating)
-		{
-			mRevalidating = true;
-			this->revalidateInputSlot("kernel");
-			mRevalidating = false;
-		}
-
 		unsigned int inputDimensionality = cedar::aux::math::getDimensionalityOf(this->mMatrix->getData());
 
 		this->mProjectionDimensionMappings->initialize(inputDimensionality);
 
 		this->reconfigure(false);
-	}
-	else if (inputName == "kernel")
-	{
-		// Assign the input to the member. This saves us from casting in every computation step.
-		this->mKernel = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
-
-		if (!mRevalidating)
-		{
-			mRevalidating = true;
-			this->revalidateInputSlot("matrix");
-			mRevalidating = false;
-		}
 	}
 	this->callComputeWithoutTriggering();
 
