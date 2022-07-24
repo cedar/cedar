@@ -55,6 +55,7 @@
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
 #include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/ExpSigmoid.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -835,6 +836,33 @@ bool cedar::dyn::NeuralField::isXMLExportable(std::string& errorMsg){
       errorMsg = "The XML export only supports Gauss kernels.";
       return false;
     }
+  }
+  if(this->_mLateralKernelConvolution->getBorderType() != cedar::aux::conv::BorderType::Zero)
+  {
+    errorMsg = "The XML export only supports \"zero-filled borders\" as border type.";
+    return false;
+  }
+  if(this->_mLateralKernelConvolution->getMode() != cedar::aux::conv::Mode::Same)
+  {
+    errorMsg = "The XML export only supports \"same\" as mode.";
+    return false;
+  }
+  if(this->_mLateralKernelConvolution->getAlternateEvenKernelCenter())
+  {
+    errorMsg = "The XML export only supports \"alternate even kernel center\" set to false.";
+    return false;
+  }
+  if(auto expSigmoid = dynamic_cast<cedar::aux::math::ExpSigmoid*>(this->_mSigmoid->getValue().get()))
+  {
+    if(expSigmoid->getThreshold() != 0)
+    {
+      errorMsg = "The XML export only supports 0 as the threshold for the ExpSigmoid transfer function.";
+      return false;
+    }
+  }
+  else{
+    errorMsg = "The XML export only supports \"ExpSigmoid\" as the transfer function.";
+    return false;
   }
   return true;
 }
