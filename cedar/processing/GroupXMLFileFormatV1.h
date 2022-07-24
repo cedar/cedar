@@ -81,6 +81,15 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+	/*!@brief Reads the group from a configuration node using the first version of the format.
+ */
+	void read
+	(
+		cedar::proc::GroupPtr group,
+		const cedar::aux::ConfigurationNode& root,
+		std::vector<std::string>& exceptions
+	);
+
   /*!@brief Writes the group to a configuration node using the first version of the format.
    */
   void write
@@ -130,7 +139,23 @@ private:
    */
   void writeDataConnections(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
 
+	/*!@brief Reads steps from the configuration node and adds them to the group.
+ */
+	void readSteps
+	(
+		cedar::proc::GroupPtr group,
+		const cedar::aux::ConfigurationNode& root,
+		std::vector<std::string>& exceptions
+	);
 
+	/*!@brief Reads data connections from a configuration node and adds them to the group.
+ */
+	void readDataConnections
+	(
+		cedar::proc::GroupPtr group,
+		const cedar::aux::ConfigurationNode& root,
+		std::vector<std::string>& exceptions
+	);
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

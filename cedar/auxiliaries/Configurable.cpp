@@ -873,6 +873,10 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
   this->configurationLoaded();
 }
 
+void cedar::aux::Configurable::readConfigurationXML(const cedar::aux::ConfigurationNode& node)
+{
+}
+
 cedar::aux::Configurable* cedar::aux::Configurable::getParent()
 {
   return this->mpParent;

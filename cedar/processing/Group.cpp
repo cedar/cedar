@@ -2175,7 +2175,7 @@ void cedar::proc::Group::readConfigurationXML(const cedar::aux::ConfigurationNod
 	this->setHoldTriggerChainUpdates(true);
 
 	std::vector<std::string> exceptions;
-	this->readConfiguration(root, exceptions);
+	this->readConfigurationXML(root, exceptions);
 
 	this->setHoldTriggerChainUpdates(holding);
 	std::set<cedar::proc::Trigger*> visited;
@@ -2245,7 +2245,45 @@ void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& 
 
 void cedar::proc::Group::readConfigurationXML(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions)
 {
+	unsigned int format_version = 1; // default value is the current format
+	/*try
+	{
+		const cedar::aux::ConfigurationNode& meta = root.get_child("meta");
+		format_version = meta.get<unsigned int>("format");
+	}
+	catch (const boost::property_tree::ptree_bad_path&)
+	{
+		cedar::aux::LogSingleton::getInstance()->warning
+						(
+										"Could not recognize format for group \"" + this->getName()
+										+ "\": format or meta node missing. Defaulting to current version.",
+										"Reading group",
+										"cedar::proc::Group::readFrom(const cedar::aux::ConfigurationNode&)"
+						);
+	}*/
+	// make a copy of the configuration that was read -- the ui may need to read additional information from it
+	mLastReadConfiguration = root;
+	this->signalLastReadConfigurationChanged();
 
+	// select the proper format for reading the group
+	switch (format_version)
+	{
+		default:
+			cedar::aux::LogSingleton::getInstance()->warning
+							(
+											"Could not recognize format for group \"" + this->getName() + "\": "
+											+ cedar::aux::toString(format_version)
+											+ ". Defaulting to current version.",
+											"group reading",
+											"cedar::proc::Group::readFrom(const cedar::aux::ConfigurationNode&)"
+							);
+		case 1:
+		{
+			GroupXMLFileFormatV1 reader;
+			reader.read(boost::static_pointer_cast<cedar::proc::Group>(this->shared_from_this()), root, exceptions);
+			break;
+		}
+	}
 }
 
 bool cedar::proc::Group::isConnected(const std::string& source, const std::string& target) const

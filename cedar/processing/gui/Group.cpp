@@ -1288,7 +1288,7 @@ void cedar::proc::gui::Group::readXML(const cedar::aux::Path &source)
 
 	try
 	{
-		this->mGroup->readConfiguration(root);
+		this->mGroup->readConfigurationXML(root);
 	}
 	catch(const cedar::proc::ArchitectureLoadingException& e)
 	{

@@ -55,6 +55,8 @@
 
 // SYSTEM INCLUDES
 #include <boost/assign.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -71,6 +73,32 @@ cedar::proc::GroupXMLFileFormatV1::~GroupXMLFileFormatV1()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::GroupXMLFileFormatV1::read
+(
+	cedar::proc::GroupPtr group,
+	const cedar::aux::ConfigurationNode& root,
+	std::vector<std::string>& exceptions
+)
+{
+	auto dftArchitectureIterator = root.find("DFTArchitecture");
+	CEDAR_ASSERT(dftArchitectureIterator != root.not_found())
+	auto dftArchitecture = dftArchitectureIterator->second;
+
+
+	auto steps = dftArchitecture.find("Components");
+	if (steps != dftArchitecture.not_found())
+	{
+		this->readSteps(group, steps->second, exceptions);
+	}
+
+	auto connections = root.find("Connections");
+	if (connections != root.not_found())
+	{
+		this->readDataConnections(group, connections->second, exceptions);
+	}
+}
+
 
 void cedar::proc::GroupXMLFileFormatV1::write
 (
@@ -103,10 +131,10 @@ void cedar::proc::GroupXMLFileFormatV1::write
 }
 
 void cedar::proc::GroupXMLFileFormatV1::writeSteps
-  (
-    cedar::proc::ConstGroupPtr group,
-    cedar::aux::ConfigurationNode& steps
-  ) const
+(
+	cedar::proc::ConstGroupPtr group,
+	cedar::aux::ConfigurationNode& steps
+) const
 {
   for (auto& name_element_pair : group->getElements())
   {
@@ -133,7 +161,6 @@ void cedar::proc::GroupXMLFileFormatV1::writeSteps
     }
   }
 }
-
 
 void cedar::proc::GroupXMLFileFormatV1::writeDataConnection
   (
@@ -260,4 +287,104 @@ void cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(cedar::aux::UIn
     dimensions.add_child("Dimension", dimension);
   }
   root.add_child("Dimensions", dimensions);
+}
+
+void cedar::proc::GroupXMLFileFormatV1::readSteps
+(
+	cedar::proc::GroupPtr group,
+	const cedar::aux::ConfigurationNode& root,
+	std::vector<std::string>& exceptions
+)
+{
+	for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
+			 iter != root.end();
+			 ++iter)
+	{
+		const std::string node_name = iter->first;
+		std::string class_id = cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
+						cedar::proc::GroupXMLFileFormatV1::stepNameLookupTableXML, node_name, false);
+
+		const cedar::aux::ConfigurationNode& step_node = iter->second;
+
+		// find the name of the step
+		std::string name = step_node.get<std::string>("<xmlattr>.name");
+		bool step_exists = false;
+
+		cedar::proc::ElementPtr step;
+
+		if (name.empty() || !group->nameExists(name))
+		{
+			try
+			{
+				step = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id);
+			}
+			catch (cedar::aux::ExceptionBase& e)
+			{
+				exceptions.push_back(e.exceptionInfo());
+			}
+		}
+		else
+		{
+			step = group->getElement(name);
+			step_exists = true;
+		}
+
+		if (step)
+		{
+			try
+			{
+				step->readConfiguration(step_node);
+			}
+			catch (cedar::aux::ExceptionBase& e)
+			{
+				exceptions.push_back(e.exceptionInfo());
+			}
+
+			if (!step_exists)
+			{
+				try
+				{
+					group->add(step);
+				}
+				catch (cedar::aux::ExceptionBase& e)
+				{
+					exceptions.push_back(e.exceptionInfo());
+				}
+			}
+
+			step->resetChangedStates(false);
+		}
+	}
+}
+
+void cedar::proc::GroupXMLFileFormatV1::readDataConnections
+(
+	cedar::proc::GroupPtr group,
+	const cedar::aux::ConfigurationNode& root,
+	std::vector<std::string>& exceptions
+)
+{
+	for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
+			 iter != root.end();
+			 ++iter)
+	{
+		std::string source = iter->second.get<std::string>("source");
+		std::string target = iter->second.get<std::string>("target");
+		try
+		{
+			group->connectSlots(source, target);
+		}
+		catch (cedar::aux::ExceptionBase& e)
+		{
+			std::string info = "Exception occurred while connecting \"" + source + "\" to \"" + target + "\": "
+												 + e.exceptionInfo();
+			exceptions.push_back(info);
+		}
+		catch (const std::exception& e)
+		{
+			std::string info = "Exception occurred while connecting \"" + source + "\" to \"" + target + "\": "
+												 + std::string(e.what());
+			exceptions.push_back(info);
+		}
+	}
 }
