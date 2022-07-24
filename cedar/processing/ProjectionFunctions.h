@@ -77,107 +77,107 @@ public:
 public:
 	//!@brief expands a 0D input to an ND output
 	template<typename T>
-	void expand0DtoND(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void expand0DtoND(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 										std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 										cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 
-	void expand0DtoND(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void expand0DtoND(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 										std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 										cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 
 
-	void expand1Dto2D(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void expand1Dto2D(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 										std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 										cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
-	void expand2Dto3D(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
-										std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
-										cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
-	template<typename T>
-	void expand2Dto3D(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
-										std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
-										cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
-	void expand1Dto3D(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void expand2Dto3D(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 										std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 										cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 	template<typename T>
-	void expand1Dto3D(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void expand2Dto3D(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 										std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 										cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
-	void expandMDtoND(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void expand1Dto3D(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 										std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 										cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 	template<typename T>
-	void expandMDtoND(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void expand1Dto3D(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
+										std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
+										cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
+	void expandMDtoND(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
+										std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
+										cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
+	template<typename T>
+	void expandMDtoND(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 										std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 										cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 
 
 	//!@brief compresses 2D input to 1D output
-	void compress2Dto1D(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void compress2Dto1D(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 											std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 											cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 
 	template<typename T>
-	void compress3Dto2D(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void compress3Dto2D(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 											std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 											cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 
-	void compress3Dto2D(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void compress3Dto2D(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 											std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 											cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 
 	template<typename T>
-	void compress3Dto2DSwapped(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void compress3Dto2DSwapped(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 														 std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 														 cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 
-	void compress3Dto2DSwapped(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void compress3Dto2DSwapped(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 														 std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 														 cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 
 	template<typename T>
-	void compress3Dto1D(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void compress3Dto1D(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 											std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 											cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 
-	void compress3Dto1D(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void compress3Dto1D(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 											std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 											cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 
 //!@brief compresses ND input to 0D output by computing the minimum over all positions
-	void compressNDto0Dmin(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void compressNDto0Dmin(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 												 std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 												 cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 	//!@brief compresses ND input to 0D output by computing the maximum over all positions
-	void compressNDto0Dmax(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void compressNDto0Dmax(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 												 std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 												 cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 	//!@brief compresses ND input to 0D output by computing the sum over all positions
-	void compressNDto0Dsum(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void compressNDto0Dsum(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 												 std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 												 cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 	//!@brief compresses ND input to 0D output by computing the mean over all positions
-	void compressNDto0Dmean(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void compressNDto0Dmean(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 													std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 													cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 	//!@brief compresses ND input to 0D output by computing the minimum over all positions (templated)
 	template<typename T>
-	void compressNDto0Dmin(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void compressNDto0Dmin(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 												 std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 												 cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 	//!@brief compresses ND input to 0D output by computing the maximum over all positions (templated)
 	template<typename T>
-	void compressNDto0Dmax(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void compressNDto0Dmax(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 												 std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 												 cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 	//!@brief compresses ND input to 0D output by computing the sum over all positions (templated)
 	template<typename T>
-	void compressNDto0Dsum(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void compressNDto0Dsum(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 												 std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 												 cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 	//!@brief compresses ND input to 0D output by computing the mean over all positions (templated)
 	template<typename T>
-	void compressNDto0Dmean(cedar::aux::MatDataPtr input, cedar::aux::MatDataPtr output,
+	void compressNDto0Dmean(cedar::aux::ConstMatDataPtr input, cedar::aux::MatDataPtr output,
 													std::vector<unsigned int> indicesToCompress, cedar::aux::EnumParameterPtr compressionType,
 													cedar::proc::ProjectionMappingParameterPtr dimensionMappings);
 

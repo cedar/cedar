@@ -82,11 +82,11 @@ private:
   //! typedef for the projection method function pointer
   //! (function pointer to a void method in cedar::proc::steps::Projection)
   typedef void (cedar::proc::ProjectionFunctions::
-								*ProjectionFunctionsFunctionPtr)(cedar::aux::MatDataPtr,
-																								cedar::aux::MatDataPtr,
-																								std::vector<unsigned int>,
-																								cedar::aux::EnumParameterPtr,
-																								cedar::proc::ProjectionMappingParameterPtr);
+								*ProjectionFunctionPtr)( cedar::aux::ConstMatDataPtr,
+                                                                  cedar::aux::MatDataPtr,
+                                                                  std::vector<unsigned int>,
+                                                                  cedar::aux::EnumParameterPtr,
+                                                                  cedar::proc::ProjectionMappingParameterPtr);
 
 	//!@cond SKIPPED_DOCUMENTATION
 	CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(KernelListParameter);
@@ -256,7 +256,7 @@ private:
   std::vector<unsigned int> mProjectionIndicesToCompress;
 
   //!@brief function pointer to one of the projection member functions
-	ProjectionFunctionsFunctionPtr mpProjectionMethod;
+	ProjectionFunctionPtr mpProjectionMethod;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

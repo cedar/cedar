@@ -65,7 +65,7 @@ cedar::proc::ProjectionFunctions::~ProjectionFunctions()
 
 
 template<typename T>
-void cedar::proc::ProjectionFunctions::expand0DtoND(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::expand0DtoND(cedar::aux::ConstMatDataPtr input,
 																									 cedar::aux::MatDataPtr output,
 																									 std::vector<unsigned int> indicesToCompress,
 																									 cedar::aux::EnumParameterPtr compressionType,
@@ -76,7 +76,7 @@ void cedar::proc::ProjectionFunctions::expand0DtoND(cedar::aux::MatDataPtr input
 	output->getData() = cv::Scalar(input->getData().at<T>(0));
 }
 
-void cedar::proc::ProjectionFunctions::expand0DtoND(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::expand0DtoND(cedar::aux::ConstMatDataPtr input,
 																									 cedar::aux::MatDataPtr output,
 																									 std::vector<unsigned int> indicesToCompress,
 																									 cedar::aux::EnumParameterPtr compressionType,
@@ -100,7 +100,7 @@ void cedar::proc::ProjectionFunctions::expand0DtoND(cedar::aux::MatDataPtr input
 }
 
 //! not used at the moment
-void cedar::proc::ProjectionFunctions::expand1Dto2D(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::expand1Dto2D(cedar::aux::ConstMatDataPtr input,
 																									 cedar::aux::MatDataPtr output,
 																									 std::vector<unsigned int> indicesToCompress,
 																									 cedar::aux::EnumParameterPtr compressionType,
@@ -131,7 +131,7 @@ void cedar::proc::ProjectionFunctions::expand1Dto2D(cedar::aux::MatDataPtr input
 }
 
 
-void cedar::proc::ProjectionFunctions::expand2Dto3D(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::expand2Dto3D(cedar::aux::ConstMatDataPtr input,
 																									 cedar::aux::MatDataPtr output,
 																									 std::vector<unsigned int> indicesToCompress,
 																									 cedar::aux::EnumParameterPtr compressionType,
@@ -155,7 +155,7 @@ void cedar::proc::ProjectionFunctions::expand2Dto3D(cedar::aux::MatDataPtr input
 }
 
 template<typename T>
-void cedar::proc::ProjectionFunctions::expand2Dto3D(cedar::aux::MatDataPtr _input,
+void cedar::proc::ProjectionFunctions::expand2Dto3D(cedar::aux::ConstMatDataPtr _input,
 																									 cedar::aux::MatDataPtr _output,
 																									 std::vector<unsigned int> indicesToCompress,
 																									 cedar::aux::EnumParameterPtr compressionType,
@@ -283,7 +283,7 @@ void cedar::proc::ProjectionFunctions::expand2Dto3D(cedar::aux::MatDataPtr _inpu
 }
 
 
-void cedar::proc::ProjectionFunctions::expand1Dto3D(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::expand1Dto3D(cedar::aux::ConstMatDataPtr input,
 																									 cedar::aux::MatDataPtr output,
 																									 std::vector<unsigned int> indicesToCompress,
 																									 cedar::aux::EnumParameterPtr compressionType,
@@ -307,7 +307,7 @@ void cedar::proc::ProjectionFunctions::expand1Dto3D(cedar::aux::MatDataPtr input
 }
 
 template<typename T>
-void cedar::proc::ProjectionFunctions::expand1Dto3D(cedar::aux::MatDataPtr _input,
+void cedar::proc::ProjectionFunctions::expand1Dto3D(cedar::aux::ConstMatDataPtr _input,
 																									 cedar::aux::MatDataPtr _output,
 																									 std::vector<unsigned int> indicesToCompress,
 																									 cedar::aux::EnumParameterPtr compressionType,
@@ -398,7 +398,7 @@ void cedar::proc::ProjectionFunctions::expand1Dto3D(cedar::aux::MatDataPtr _inpu
 }
 
 
-void cedar::proc::ProjectionFunctions::expandMDtoND(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::expandMDtoND(cedar::aux::ConstMatDataPtr input,
 																									 cedar::aux::MatDataPtr output,
 																									 std::vector<unsigned int> indicesToCompress,
 																									 cedar::aux::EnumParameterPtr compressionType,
@@ -422,7 +422,7 @@ void cedar::proc::ProjectionFunctions::expandMDtoND(cedar::aux::MatDataPtr input
 }
 
 template<typename T>
-void cedar::proc::ProjectionFunctions::expandMDtoND(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::expandMDtoND(cedar::aux::ConstMatDataPtr input,
 																									 cedar::aux::MatDataPtr output,
 																									 std::vector<unsigned int> indicesToCompress,
 																									 cedar::aux::EnumParameterPtr compressionType,
@@ -471,7 +471,7 @@ void cedar::proc::ProjectionFunctions::expandMDtoND(cedar::aux::MatDataPtr input
 }
 
 
-void cedar::proc::ProjectionFunctions::compress2Dto1D(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::compress2Dto1D(cedar::aux::ConstMatDataPtr input,
 																										 cedar::aux::MatDataPtr output,
 																										 std::vector<unsigned int> indicesToCompress,
 																										 cedar::aux::EnumParameterPtr compressionType,
@@ -491,7 +491,7 @@ void cedar::proc::ProjectionFunctions::compress2Dto1D(cedar::aux::MatDataPtr inp
 
 
 
-void cedar::proc::ProjectionFunctions::compress3Dto2D(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::compress3Dto2D(cedar::aux::ConstMatDataPtr input,
 																										 cedar::aux::MatDataPtr output,
 																										 std::vector<unsigned int> indicesToCompress,
 																										 cedar::aux::EnumParameterPtr compressionType,
@@ -515,7 +515,7 @@ void cedar::proc::ProjectionFunctions::compress3Dto2D(cedar::aux::MatDataPtr inp
 }
 
 template<typename T>
-void cedar::proc::ProjectionFunctions::compress3Dto2D(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::compress3Dto2D(cedar::aux::ConstMatDataPtr input,
 																										 cedar::aux::MatDataPtr output,
 																										 std::vector<unsigned int> indicesToCompress,
 																										 cedar::aux::EnumParameterPtr compressionType,
@@ -533,7 +533,7 @@ void cedar::proc::ProjectionFunctions::compress3Dto2D(cedar::aux::MatDataPtr inp
 					);
 }
 
-void cedar::proc::ProjectionFunctions::compress3Dto2DSwapped(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::compress3Dto2DSwapped(cedar::aux::ConstMatDataPtr input,
 																														cedar::aux::MatDataPtr output,
 																														std::vector<unsigned int> indicesToCompress,
 																														cedar::aux::EnumParameterPtr compressionType,
@@ -557,7 +557,7 @@ void cedar::proc::ProjectionFunctions::compress3Dto2DSwapped(cedar::aux::MatData
 }
 
 template<typename T>
-void cedar::proc::ProjectionFunctions::compress3Dto2DSwapped(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::compress3Dto2DSwapped(cedar::aux::ConstMatDataPtr input,
 																														cedar::aux::MatDataPtr output,
 																														std::vector<unsigned int> indicesToCompress,
 																														cedar::aux::EnumParameterPtr compressionType,
@@ -576,7 +576,7 @@ void cedar::proc::ProjectionFunctions::compress3Dto2DSwapped(cedar::aux::MatData
 }
 
 
-void cedar::proc::ProjectionFunctions::compress3Dto1D(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::compress3Dto1D(cedar::aux::ConstMatDataPtr input,
 																										 cedar::aux::MatDataPtr output,
 																										 std::vector<unsigned int> indicesToCompress,
 																										 cedar::aux::EnumParameterPtr compressionType,
@@ -600,7 +600,7 @@ void cedar::proc::ProjectionFunctions::compress3Dto1D(cedar::aux::MatDataPtr inp
 }
 
 template<typename T>
-void cedar::proc::ProjectionFunctions::compress3Dto1D(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::compress3Dto1D(cedar::aux::ConstMatDataPtr input,
 																										 cedar::aux::MatDataPtr output,
 																										 std::vector<unsigned int> indicesToCompress,
 																										 cedar::aux::EnumParameterPtr compressionType,
@@ -641,7 +641,7 @@ void cedar::proc::ProjectionFunctions::compress3Dto1D(cedar::aux::MatDataPtr inp
 
 
 
-void cedar::proc::ProjectionFunctions::compressNDto0Dsum(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::compressNDto0Dsum(cedar::aux::ConstMatDataPtr input,
 																												cedar::aux::MatDataPtr output,
 																												std::vector<unsigned int> indicesToCompress,
 																												cedar::aux::EnumParameterPtr compressionType,
@@ -665,7 +665,7 @@ void cedar::proc::ProjectionFunctions::compressNDto0Dsum(cedar::aux::MatDataPtr 
 }
 
 template<typename T>
-void cedar::proc::ProjectionFunctions::compressNDto0Dsum(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::compressNDto0Dsum(cedar::aux::ConstMatDataPtr input,
 																												cedar::aux::MatDataPtr output,
 																												std::vector<unsigned int> indicesToCompress,
 																												cedar::aux::EnumParameterPtr compressionType,
@@ -674,7 +674,7 @@ void cedar::proc::ProjectionFunctions::compressNDto0Dsum(cedar::aux::MatDataPtr 
 	output->getData().at<T>(0) = cv::sum(input->getData())[0];
 }
 
-void cedar::proc::ProjectionFunctions::compressNDto0Dmean(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::compressNDto0Dmean(cedar::aux::ConstMatDataPtr input,
 																												 cedar::aux::MatDataPtr output,
 																												 std::vector<unsigned int> indicesToCompress,
 																												 cedar::aux::EnumParameterPtr compressionType,
@@ -697,7 +697,7 @@ void cedar::proc::ProjectionFunctions::compressNDto0Dmean(cedar::aux::MatDataPtr
 	}
 }
 template<typename T>
-void cedar::proc::ProjectionFunctions::compressNDto0Dmean(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::compressNDto0Dmean(cedar::aux::ConstMatDataPtr input,
 																												 cedar::aux::MatDataPtr output,
 																												 std::vector<unsigned int> indicesToCompress,
 																												 cedar::aux::EnumParameterPtr compressionType,
@@ -706,7 +706,7 @@ void cedar::proc::ProjectionFunctions::compressNDto0Dmean(cedar::aux::MatDataPtr
 	output->getData().at<T>(0) = cv::mean(input->getData())[0];
 }
 
-void cedar::proc::ProjectionFunctions::compressNDto0Dmin(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::compressNDto0Dmin(cedar::aux::ConstMatDataPtr input,
 																												cedar::aux::MatDataPtr output,
 																												std::vector<unsigned int> indicesToCompress,
 																												cedar::aux::EnumParameterPtr compressionType,
@@ -729,7 +729,7 @@ void cedar::proc::ProjectionFunctions::compressNDto0Dmin(cedar::aux::MatDataPtr 
 	}
 }
 template<typename T>
-void cedar::proc::ProjectionFunctions::compressNDto0Dmin(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::compressNDto0Dmin(cedar::aux::ConstMatDataPtr input,
 																												cedar::aux::MatDataPtr output,
 																												std::vector<unsigned int> indicesToCompress,
 																												cedar::aux::EnumParameterPtr compressionType,
@@ -769,7 +769,7 @@ void cedar::proc::ProjectionFunctions::compressNDto0Dmin(cedar::aux::MatDataPtr 
 	output->getData().at<T>(0) = minimum;
 }
 
-void cedar::proc::ProjectionFunctions::compressNDto0Dmax(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::compressNDto0Dmax(cedar::aux::ConstMatDataPtr input,
 																												cedar::aux::MatDataPtr output,
 																												std::vector<unsigned int> indicesToCompress,
 																												cedar::aux::EnumParameterPtr compressionType,
@@ -793,7 +793,7 @@ void cedar::proc::ProjectionFunctions::compressNDto0Dmax(cedar::aux::MatDataPtr 
 }
 
 template<typename T>
-void cedar::proc::ProjectionFunctions::compressNDto0Dmax(cedar::aux::MatDataPtr input,
+void cedar::proc::ProjectionFunctions::compressNDto0Dmax(cedar::aux::ConstMatDataPtr input,
 																												cedar::aux::MatDataPtr output,
 																												std::vector<unsigned int> indicesToCompress,
 																												cedar::aux::EnumParameterPtr compressionType,
