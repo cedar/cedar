@@ -239,7 +239,7 @@ bool cedar::proc::steps::SynapticConnection::isXMLExportable(std::string& errorM
   {
     for(cedar::proc::DataConnectionPtr outputConn : slot.second->getDataConnections())
     {
-      if(auto synapticConnection = dynamic_cast<cedar::proc::steps::SynapticConnection*>(outputConn.get()->getTarget()->getParentPtr()))
+      if(dynamic_cast<cedar::proc::steps::SynapticConnection*>(outputConn.get()->getTarget()->getParentPtr()))
       {
         errorMsg = "The XML export does not support chains of SynapticConnections";
         return false;

@@ -2043,6 +2043,11 @@ bool cedar::proc::gui::Ide::exportXML()
   }
   if(!isExportable)
   {
+    // If the Log Pane is minimized, show a pop up
+    if(!this->getLog()->isVisible())
+    {
+      QMessageBox::warning(this, "XML export error", "An error occurred during the export process. See the Log pane for more details.");
+    }
     return false;
   }
 
