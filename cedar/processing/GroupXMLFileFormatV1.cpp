@@ -306,7 +306,7 @@ void cedar::proc::GroupXMLFileFormatV1::readSteps
 
 		const cedar::aux::ConfigurationNode& step_node = iter->second;
 
-		// find the name of the step
+		// find the name of the step here and not using parameter later since the name is included as an xml node
 		std::string name = step_node.get<std::string>("<xmlattr>.name");
 		bool step_exists = false;
 
@@ -316,7 +316,7 @@ void cedar::proc::GroupXMLFileFormatV1::readSteps
 		{
 			try
 			{
-				step = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id);
+        step = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id);
 			}
 			catch (cedar::aux::ExceptionBase& e)
 			{
@@ -333,7 +333,7 @@ void cedar::proc::GroupXMLFileFormatV1::readSteps
 		{
 			try
 			{
-				step->readConfiguration(step_node);
+				step->readConfigurationXML(step_node);
 			}
 			catch (cedar::aux::ExceptionBase& e)
 			{
@@ -344,7 +344,7 @@ void cedar::proc::GroupXMLFileFormatV1::readSteps
 			{
 				try
 				{
-					group->add(step);
+					group->add(step, name);
 				}
 				catch (cedar::aux::ExceptionBase& e)
 				{

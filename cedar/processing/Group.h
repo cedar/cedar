@@ -205,9 +205,9 @@ public:
    */
   void readConfiguration(const cedar::aux::ConfigurationNode& root);
 
-	/*!@brief Reads the group from a configuration node from XML import
- */
-	void readConfigurationXML(const cedar::aux::ConfigurationNode& root);
+  /*!@brief Reads the group from a configuration node from XML import
+  */
+  void readConfigurationXML(const cedar::aux::ConfigurationNode& root);
 
 
   void readData(const cedar::aux::ConfigurationNode& root);
