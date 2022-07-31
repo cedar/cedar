@@ -116,7 +116,7 @@ public:
     cedar::aux::UIntParameterPtr, cedar::aux::UIntVectorParameterPtr, cedar::aux::ConfigurationNode&);
 
   static void readDimensionsParameter(
-    cedar::aux::UIntParameterPtr&, cedar::aux::UIntVectorParameterPtr&, cedar::aux::ConfigurationNode&);
+    cedar::aux::UIntParameterPtr&, cedar::aux::UIntVectorParameterPtr&, const cedar::aux::ConfigurationNode&);
 
 
 

@@ -821,7 +821,6 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
       }
     }
 
-
     if (param_iter == node.not_found())
     {
       if (!parameter->getHasDefault())

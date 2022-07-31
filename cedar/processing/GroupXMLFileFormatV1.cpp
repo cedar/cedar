@@ -291,9 +291,25 @@ void cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(cedar::aux::UIn
 
 void cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(cedar::aux::UIntParameterPtr& dimensionality,
                                                                 cedar::aux::UIntVectorParameterPtr& sizes,
-                                                                cedar::aux::ConfigurationNode &node)
+                                                                const cedar::aux::ConfigurationNode& node)
 {
-  dimensionality->setValue(4);
+  std::vector<unsigned int> sizeList;
+  unsigned int dimensionalitySize = 0;
+
+  //First find dimensions
+  auto dimensions_iter = node.find("Dimensions");
+  const cedar::aux::ConfigurationNode& dimensions_value = dimensions_iter->second;
+
+  //Count the dimensionalitySize and add the sizes to the sizeList
+  for (auto iter = dimensions_value.begin(); iter != dimensions_value.end(); iter++)
+  {
+    std::string size = iter->second.get<std::string>("<xmlattr>.size");
+    sizeList.push_back(std::stoi(size));
+    dimensionalitySize++;
+  }
+
+  sizes->setValue(sizeList);
+  dimensionality->setValue(dimensionalitySize);
 }
 
 void cedar::proc::GroupXMLFileFormatV1::readSteps
