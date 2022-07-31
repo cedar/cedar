@@ -289,6 +289,13 @@ void cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(cedar::aux::UIn
   root.add_child("Dimensions", dimensions);
 }
 
+void cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(cedar::aux::UIntParameterPtr& dimensionality,
+                                                                cedar::aux::UIntVectorParameterPtr& sizes,
+                                                                cedar::aux::ConfigurationNode &node)
+{
+  dimensionality->setValue(4);
+}
+
 void cedar::proc::GroupXMLFileFormatV1::readSteps
 (
 	cedar::proc::GroupPtr group,
@@ -310,13 +317,13 @@ void cedar::proc::GroupXMLFileFormatV1::readSteps
 		std::string name = step_node.get<std::string>("<xmlattr>.name");
 		bool step_exists = false;
 
-		cedar::proc::ElementPtr step;
+		cedar::proc::ElementPtr element;
 
 		if (name.empty() || !group->nameExists(name))
 		{
 			try
 			{
-        step = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id);
+        element = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id);
 			}
 			catch (cedar::aux::ExceptionBase& e)
 			{
@@ -325,36 +332,49 @@ void cedar::proc::GroupXMLFileFormatV1::readSteps
 		}
 		else
 		{
-			step = group->getElement(name);
+      element = group->getElement(name);
 			step_exists = true;
 		}
 
-		if (step)
-		{
-			try
-			{
-				step->readConfigurationXML(step_node);
-			}
-			catch (cedar::aux::ExceptionBase& e)
-			{
-				exceptions.push_back(e.exceptionInfo());
-			}
+    // if this is a step, write this to the configuration tree
+    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
+    {
+      if
+          (
+          boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(step)
+          || boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(step)
+          )
+      {
+        continue;
+      }
 
-			if (!step_exists)
-			{
-				try
-				{
-					group->add(step, name);
-				}
-				catch (cedar::aux::ExceptionBase& e)
-				{
-					exceptions.push_back(e.exceptionInfo());
-				}
-			}
+      if (step)
+      {
+        try
+        {
+          step->readConfigurationXML(step_node);
+        }
+        catch (cedar::aux::ExceptionBase &e)
+        {
+          exceptions.push_back(e.exceptionInfo());
+        }
 
-			step->resetChangedStates(false);
-		}
-	}
+        if (!step_exists)
+        {
+          try
+          {
+            group->add(step, name);
+          }
+          catch (cedar::aux::ExceptionBase &e)
+          {
+            exceptions.push_back(e.exceptionInfo());
+          }
+        }
+
+        step->resetChangedStates(false);
+      }
+    }
+  }
 }
 
 void cedar::proc::GroupXMLFileFormatV1::readDataConnections

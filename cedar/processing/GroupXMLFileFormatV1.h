@@ -115,6 +115,10 @@ public:
   static void writeDimensionsParameter(
     cedar::aux::UIntParameterPtr, cedar::aux::UIntVectorParameterPtr, cedar::aux::ConfigurationNode&);
 
+  static void readDimensionsParameter(
+    cedar::aux::UIntParameterPtr&, cedar::aux::UIntVectorParameterPtr&, cedar::aux::ConfigurationNode&);
+
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
