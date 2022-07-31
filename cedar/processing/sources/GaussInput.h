@@ -99,7 +99,7 @@ public:
 
   void writeConfigurationXML(cedar::aux::ConfigurationNode& root) const;
 
-  void readConfigurationXML(cedar::aux::ConfigurationNode& node);
+  void readConfigurationXML(const cedar::aux::ConfigurationNode& node);
 
 public slots:
   //!@brief a slot that is triggered if any of the Gauss function parameters are changed

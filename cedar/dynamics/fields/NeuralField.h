@@ -181,6 +181,8 @@ public:
 
   void writeConfigurationXML(cedar::aux::ConfigurationNode& root) const;
 
+  void readConfigurationXML(const cedar::aux::ConfigurationNode& node);
+
   bool isXMLExportable(std::string& errorMsg) override;
 
 public slots:
