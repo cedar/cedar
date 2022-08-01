@@ -711,6 +711,8 @@ void cedar::dyn::NeuralField::readConfigurationXML(const cedar::aux::Configurati
 
   //readDimensionsParameter
   cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(this->_mDimensionality, this->_mSizes, node);
+
+  cedar::proc::GroupXMLFileFormatV1::readKernelListParameter(this->_mKernels.get(), node);
 }
 
 void cedar::dyn::NeuralField::updateInputSum()

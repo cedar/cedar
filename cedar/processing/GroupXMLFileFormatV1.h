@@ -107,9 +107,17 @@ public:
   static void writeKernelListParameter(
     cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel>* kernels, cedar::aux::ConfigurationNode& root);
 
+  static void readKernelListParameter(
+      cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel>* kernels,
+      const cedar::aux::ConfigurationNode& root);
+
   // Write sigmoid parameter
   static void writeActivationFunctionParameter(
     cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>*, cedar::aux::ConfigurationNode&);
+
+  static void readActivationFunctionParameter(
+    cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* sigmoid,
+    const cedar::aux::ConfigurationNode& root);
 
   // Write dimensionality/sizes parameter
   static void writeDimensionsParameter(

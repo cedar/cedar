@@ -258,6 +258,40 @@ void cedar::proc::GroupXMLFileFormatV1::writeKernelListParameter(
   root.add_child("InteractionKernel.SumWeightPattern", sumWeightPattern);
 }
 
+void cedar::proc::GroupXMLFileFormatV1::readKernelListParameter(
+    cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel>* kernels, const cedar::aux::ConfigurationNode& root)
+{
+  cedar::aux::ConfigurationNode sumWeightPattern = root.get_child("InteractionKernel.SumWeightPattern");
+
+  //Clear the single kernel in the list by default
+  kernels->clear();
+
+  int dimensionCounter = 0;
+
+  for(auto iter = sumWeightPattern.begin(); iter != sumWeightPattern.end(); iter++)
+  {
+    cedar::aux::ConfigurationNode gaussWeightPattern = iter->second;
+
+    //Create a new kernel that is pushed onto the ObjectListParameterTemplate
+    cedar::aux::kernel::GaussPtr kernel (new cedar::aux::kernel::Gauss());
+
+    //Get the "height" (in cedar "amplitude")
+    kernel->setAmplitude(gaussWeightPattern.get<double>("Height"));
+
+    //The sigma string is concatinated by ",", therefore split them and set the Sigma of the kernel
+    std::vector<std::string> sigmas;
+    cedar::aux::split(gaussWeightPattern.get<std::string>("Sigmas"), ",", sigmas);
+
+    for(int i = 0; i < sigmas.size(); i++)
+    {
+      std::cout << i << std::endl;
+      kernel->setSigma(i,std::stod(sigmas[i]));
+    }
+
+    kernels->pushBack(kernel);
+  }
+}
+
 void cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(
   cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* sigmoid, cedar::aux::ConfigurationNode& root)
 {
@@ -271,8 +305,16 @@ void cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(
     ));
 }
 
+void cedar::proc::GroupXMLFileFormatV1::readActivationFunctionParameter(
+  cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* sigmoid,
+  const cedar::aux::ConfigurationNode& root)
+{
+
+}
+
 void cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(cedar::aux::UIntParameterPtr dimensionality,
-  cedar::aux::UIntVectorParameterPtr sizes, cedar::aux::ConfigurationNode& root)
+                                                                 cedar::aux::UIntVectorParameterPtr sizes,
+                                                                 cedar::aux::ConfigurationNode& root)
 {
   cedar::aux::ConfigurationNode dimensions;
   std::vector<unsigned int> sizesVector = sizes->getValue();
