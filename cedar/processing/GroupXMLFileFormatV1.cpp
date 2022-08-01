@@ -320,17 +320,19 @@ void cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(
 }
 
 void cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(cedar::aux::UIntParameterPtr dimensionality,
-  cedar::aux::UIntVectorParameterPtr sizes, cedar::aux::ConfigurationNode& root)
+  cedar::aux::UIntVectorParameterPtr sizes, std::vector<cedar::aux::math::Limits<double>> sizesRange,
+  cedar::aux::ConfigurationNode& root)
 {
   cedar::aux::ConfigurationNode dimensions;
   std::vector<unsigned int> sizesVector = sizes->getValue();
   CEDAR_ASSERT(sizesVector.size() == dimensionality->getValue());
+  CEDAR_ASSERT(sizesRange.size() == dimensionality->getValue());
   for(int i = 0; i < dimensionality->getValue(); i++)
   {
     cedar::aux::ConfigurationNode dimension = cedar::aux::ConfigurationNode();
     dimension.add("<xmlattr>.name", "dim_" + std::to_string(i));
-    dimension.add("<xmlattr>.lower", 0);
-    dimension.add("<xmlattr>.upper", sizesVector[i] - 1);
+    dimension.add("<xmlattr>.lower", sizesRange.at(i).getLower());
+    dimension.add("<xmlattr>.upper", sizesRange.at(i).getUpper());
     dimension.add("<xmlattr>.size", sizesVector[i]);
     dimensions.add_child("Dimension", dimension);
   }

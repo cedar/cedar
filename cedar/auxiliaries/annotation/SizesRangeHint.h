@@ -41,8 +41,9 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-
 #include "cedar/auxiliaries/annotation/Annotation.h"
+#include "cedar/auxiliaries/math/Limits.h"
+#include "cedar/auxiliaries/Cloneable.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/annotation/SizesRangeHint.fwd.h"
@@ -52,7 +53,10 @@
 
 /*!@brief An annotation that hints at the range of dimensions
  */
-class cedar::aux::annotation::SizesRangeHint : public cedar::aux::annotation::Annotation
+class cedar::aux::annotation::SizesRangeHint
+:
+public cedar::aux::annotation::Annotation,
+public cedar::aux::Cloneable<cedar::aux::annotation::SizesRangeHint, cedar::aux::annotation::Annotation>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types

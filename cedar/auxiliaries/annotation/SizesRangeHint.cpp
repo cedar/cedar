@@ -61,24 +61,26 @@ cedar::aux::annotation::SizesRangeHint::~SizesRangeHint()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::aux::annotation::ValueRangeHint::excludeFromCopying() const
+bool cedar::aux::annotation::SizesRangeHint::excludeFromCopying() const
 {
   return true;
 }
 
-const cedar::aux::math::Limits<double>& cedar::aux::annotation::ValueRangeHint::getRange() const
+const std::vector<cedar::aux::math::Limits<double>>& cedar::aux::annotation::SizesRangeHint::getRange() const
 {
   return this->mRange;
 }
 
-std::string cedar::aux::annotation::ValueRangeHint::getDescription() const
+std::string cedar::aux::annotation::SizesRangeHint::getDescription() const
 {
-  std::string description = "dimensions should be in the range [";
+  std::string description = "dimensions should be in the range ";
   for(auto limit : this->mRange)
   {
+    description += "[";
     description += cedar::aux::toString(limit.getLower());
     description += ", ";
     description += cedar::aux::toString(limit.getUpper());
+    description += "] ";
   }
   return description;
 }

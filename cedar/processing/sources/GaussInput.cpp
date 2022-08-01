@@ -44,6 +44,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/GroupXMLFileFormatV1.h"
+#include "cedar/auxiliaries/annotation/SizesRangeHint.h"
 #include "cedar/auxiliaries/math/functions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -103,6 +104,12 @@ _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
   this->mXMLParameterWhitelist = {"amplitude"};
 
   this->declareOutput("Gauss input", mOutput);
+  std::vector<cedar::aux::math::Limits<double>> sizesRange;
+  for(unsigned int size : this->_mSizes->getValue())
+  {
+    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size));
+  }
+  this->mOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
   QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mCenters.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
@@ -121,7 +128,8 @@ void cedar::proc::sources::GaussInput::writeConfigurationXML(cedar::aux::Configu
   cedar::aux::Configurable::writeConfigurationXML(root);
 
   // dimensionality/sizes parameter
-  cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(this->_mDimensionality, this->_mSizes, root);
+  cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(this->_mDimensionality, this->_mSizes,
+            this->mOutput->getAnnotation<cedar::aux::annotation::SizesRangeHint>()->getRange(), root);
 }
 
 void cedar::proc::sources::GaussInput::setDimensionality(unsigned int dimensionality)
@@ -206,4 +214,12 @@ void cedar::proc::sources::GaussInput::updateMatrixSize()
   this->unlock();
   this->emitOutputPropertiesChangedSignal("Gauss input");
   this->onTrigger();
+  // Update the sizes annotation
+  std::vector<cedar::aux::math::Limits<double>> sizesRange;
+  for(unsigned int size : this->_mSizes->getValue())
+  {
+    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size));
+  }
+  this->mOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
+
 }

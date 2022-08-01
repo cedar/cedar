@@ -105,7 +105,8 @@ public:
 
   // Write dimensionality/sizes parameter
   static void writeDimensionsParameter(
-    cedar::aux::UIntParameterPtr, cedar::aux::UIntVectorParameterPtr, cedar::aux::ConfigurationNode&);
+    cedar::aux::UIntParameterPtr, cedar::aux::UIntVectorParameterPtr,
+    std::vector<cedar::aux::math::Limits<double>> sizesRange, cedar::aux::ConfigurationNode&);
 
 
   //--------------------------------------------------------------------------------------------------------------------
