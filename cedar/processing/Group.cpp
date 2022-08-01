@@ -1139,23 +1139,27 @@ void cedar::proc::Group::listSubgroups(std::set<cedar::proc::GroupPtr>& subgroup
 void cedar::proc::Group::reset()
 {
   // first, find all looped triggers that are running and stop them
-  auto looped_triggers = this->findAll<cedar::proc::LoopedTrigger>(true);
-  std::set<cedar::proc::LoopedTriggerPtr> running_triggers;
+  // JT:Why is this not using stopTriggers?
+  // JT:The old manual way did not work properly with the new simulation mode
+  this->stopTriggers(true);
 
-  for (auto trigger : looped_triggers)
-  {
-    if (trigger->isRunning())
-    {
-      running_triggers.insert(trigger);
-      trigger->stop();
+  //auto looped_triggers = this->findAll<cedar::proc::LoopedTrigger>(true);
+  //std::set<cedar::proc::LoopedTriggerPtr> running_triggers;
 
-      // wait for the trigger to stop
-      while (trigger->isRunning())
-      {
-        cedar::aux::sleep(0.005 * cedar::unit::seconds);
-      }
-    }
-  }
+  //for (auto trigger : looped_triggers)
+  //{
+  //  if (trigger->isRunning())
+  //  {
+  //    running_triggers.insert(trigger);
+  //    trigger->stop();
+
+  //    // wait for the trigger to stop
+  //    while (trigger->isRunning())
+  //    {
+  //      cedar::aux::sleep(0.005 * cedar::unit::seconds);
+  //    }
+  //  }
+  //}
 
   // reset all elements in this group
   for (auto name_element_pair : this->mElements)
@@ -1164,11 +1168,15 @@ void cedar::proc::Group::reset()
     element->callReset();
   }
 
-  // restart all triggers that have been stopped
-  for (auto trigger : running_triggers)
-  {
-    trigger->start();
-  }
+  //JT: Why was this not using start triggers?
+  this->startTriggers();
+
+  //JT: This old manual way did not work with the new simulation mode
+  //// restart all triggers that have been stopped
+  //for (auto trigger : running_triggers)
+  //{
+  //  trigger->start();
+  //}
 }
 
 const cedar::proc::Group::ElementMap& cedar::proc::Group::getElements() const

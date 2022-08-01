@@ -129,22 +129,76 @@ cv::Mat cedar::proc::steps::CoordinateToCameraAngles::calculateTiltPanFor3DPoint
   //assuming points to contain:  depth,horizontal translation and height
   cv::Mat distanceMat =  coordinatePoint - cameraJointPos;
 
+  //std::cout<<"\n***************************\nTargetPoint:>>" << coordinatePoint.t() << "\tCameraPos: " << cameraJointPos.t() << std::endl;
+
 //  std::cout<<"Distances between Camera and Point:\n>>" << distanceMat << std::endl;
 
   //CAREN's camera setup in mind, this assumes pan first followed by the correct tilt
 
   float panRad = atan2(distanceMat.at<float>(1,0),distanceMat.at<float>(0,0)) ;  // angle in the x,z plane
 
-  float distanceInXZPlane = sqrt(distanceMat.at<float>(0,0)*distanceMat.at<float>(0,0) + distanceMat.at<float>(1)* distanceMat.at<float>(1,0));
+  float distanceInXZPlane = sqrt(distanceMat.at<float>(0,0)*distanceMat.at<float>(0,0) + distanceMat.at<float>(1,0)* distanceMat.at<float>(1,0));
+
+  //std::cout << "DistanceInXZPlane: " << distanceInXZPlane << std::endl;
 
   // angle in the y,z plane after rotation. Distance of point is now the distance in the x,z plane. Flip sign for Caren Head, because downwards is positive
-  float tiltRad = atan2(distanceMat.at<float>(2,0),distanceInXZPlane)  * -1.0;
+  // 
+  // 
+  // This is the old way... The new way incorporates the distance between joint and camera for tilt
+  float oldTiltRad = atan2(distanceMat.at<float>(2,0),distanceInXZPlane)  * -1.0;
+
+  //To find out the correct tilt, we have to imagine the camera moving on a circle with the center being the joint and the radius the distance between cam and joint, i.e., mTiltJointDistance
+  //On this circle we need to rotate until we reach a point on the circle that is part of a tangent from the target point to this circle
+  //We know the circle_center, the radius and the target point, so we can achieve this following, for example, this shorthand formula: https://de.serlo.org/mathe/1647/tangente-an-kreis
+  //There will be two correct tangents...
+
+  //Define variables according to website
+  float r = mTiltJointDistance->getValue();
+  float pointM[2] = { 0,cameraJointPos.at<float>(0,2) };
+  cv::Mat M = cv::Mat(2, 1, CV_32F, pointM);
+  float pointQ[2] = { distanceInXZPlane,coordinatePoint.at<float>(0,2) };
+  cv::Mat Q = cv::Mat(2, 1, CV_32F, pointQ);
+  float distanceMQ = sqrt(pow(Q.at<float>(0, 0) - M.at<float>(0, 0), 2) + pow(Q.at<float>(1, 0) - M.at<float>(1, 0), 2));
+
+  //std::cout << "Parameters:\n\tM: " << M.t() <<"\n\tQ:" << Q.t() <<"\n\tr:" << r << std::endl;
+
+  float term1Top = M.at<float>(0, 0) + ((pow(r, 2) / pow(distanceMQ, 2)) * (Q.at<float>(0, 0) - M.at<float>(0, 0)));
+  float term1Bottom = M.at<float>(1, 0) + ((pow(r, 2) / pow(distanceMQ, 2)) * (Q.at<float>(1, 0) - M.at<float>(1, 0)));
+
+  float term2Factor = sqrt(pow(distanceMQ, 2) - pow(r, 2)) * (r / pow(distanceMQ, 2));
+  float term2Top = term2Factor * (-Q.at<float>(1, 0) + M.at<float>(1, 0));
+  float term2Bottom = term2Factor * (Q.at<float>(0, 0) - M.at<float>(0, 0));
+
+
+  //Resulting in two points S1 and S2
+  float S1Top = term1Top + term2Top;
+  float S1Bottom = term1Bottom + term2Bottom;
+  float pointS1[] = { S1Top,S1Bottom };
+  cv::Mat S1 = cv::Mat(2, 1, CV_32F, pointS1);
+
+  float S2Top = term1Top - term2Top;
+  float S2Bottom = term1Bottom - term2Bottom;
+  float pointS2[] = { S2Top,S2Bottom };
+  cv::Mat S2 = cv::Mat(2, 1, CV_32F, pointS2);
+
+  //std::cout << "\tS1: " << S1.t() << "\n\tS2:" << S2.t() << std::endl;
+  // To get now the tilt required to end up at this point, we can again use the atan2 formula, probably with some fixed offset, because I am currently not sure where 0 degrees is in this picture
+
+  cv::Mat differenceMS1 = S1 - M;
+  cv::Mat differenceMS2 = S2 - M;
+
+  float tiltRadS1 = atan2(differenceMS1.at<float>(1, 0), differenceMS1.at<float>(0, 0));
+  float tiltRadS2 = atan2(differenceMS2.at<float>(1, 0), differenceMS2.at<float>(0, 0));
+
+  float tiltDegS1 = tiltRadS1 * 180.0 / M_PI;
+  float tiltDegS2 = tiltRadS2 * 180.0 / M_PI;
 
   float panDeg = panRad * 180.0 / M_PI;
-  float tiltDeg = tiltRad * 180.0 / M_PI;
+  float tiltDeg = 90 - tiltDegS1; // We try with an offset and just take the positive point S1 always! Let's see when this bites us in the butt...
 
 //  std::cout<<"Distance in XZ plane \n>>" << distanceInXZPlane << std::endl;
-//  std::cout<<"PanRad: " << panRad << "\tTiltRad " << tiltRad << "\nPanDegree: " << panDeg << "\tTiltDegree " << tiltDeg << std::endl;
+  /*std::cout<<"PanRad: " << panRad << "\tTiltRad " << tiltRad << "\nPanDegree: " << panDeg << "\tTiltDegree " << tiltDeg << std::endl;*/
+  //std::cout << "TiltToS1WithOffset: " << tiltDeg << "\tTiltDegS1 " << tiltDegS1 << "\tTiltDegS2: " << tiltDegS2 << std::endl;
 
   float anglesInDegree[2] = { tiltDeg, panDeg};
   cv::Mat returnMat =  cv::Mat(2,1,CV_32F,anglesInDegree);

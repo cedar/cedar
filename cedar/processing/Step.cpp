@@ -390,8 +390,8 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
         if(step_time->getGlobalTimeStamp() > this->mLastExecutionTime)
         {
           this->compute(*(arguments.get()));
-          this->mLastExecutionTime = step_time->getGlobalTimeStamp();
         }
+        this->mLastExecutionTime = step_time->getGlobalTimeStamp(); //Guarantee that the step will be computed the next time, if it somehow got a weird initialization
       }
       else
       {
