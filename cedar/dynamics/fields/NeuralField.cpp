@@ -270,7 +270,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   std::vector<cedar::aux::math::Limits<double>> sizesRange;
   for(unsigned int size : this->_mSizes->getValue())
   {
-    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size));
+    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
   }
   this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
 
@@ -758,7 +758,7 @@ void cedar::dyn::NeuralField::dimensionSizeChanged()
   std::vector<cedar::aux::math::Limits<double>> sizesRange;
   for(unsigned int size : this->_mSizes->getValue())
   {
-    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size));
+    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
   }
   this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
 

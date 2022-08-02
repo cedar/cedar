@@ -107,7 +107,7 @@ _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
   std::vector<cedar::aux::math::Limits<double>> sizesRange;
   for(unsigned int size : this->_mSizes->getValue())
   {
-    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size));
+    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
   }
   this->mOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
   QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
@@ -218,7 +218,7 @@ void cedar::proc::sources::GaussInput::updateMatrixSize()
   std::vector<cedar::aux::math::Limits<double>> sizesRange;
   for(unsigned int size : this->_mSizes->getValue())
   {
-    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size));
+    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
   }
   this->mOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
 

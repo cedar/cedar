@@ -184,18 +184,20 @@ private:
 
 	/*!@brief Updates the convolution object when a new kernel is added.
  	*/
-	void convolutionSlotKernelAdded(size_t kernelIndex);
+	void convolutionSlotKernelAdded(cedar::aux::conv::ConvolutionPtr convolution, KernelListParameterPtr kernelsParameter,
+                                  size_t kernelIndex);
 
 	/*!@brief Adds a kernel to the convolution object.
  */
-	void addKernelToConvolution(cedar::aux::kernel::KernelPtr kernel);
+	void addKernelToConvolution(cedar::aux::conv::ConvolutionPtr convolution, cedar::aux::kernel::KernelPtr kernel);
 
 	/*!@brief Removes a kernel from the convolution object.
  	*/
-	void removeKernelFromConvolution(size_t index);
+	void removeKernelFromConvolution(cedar::aux::conv::ConvolutionPtr convolution, size_t index);
 
 	//!@brief Makes the kernel list stored in the convolution equal to the one in the field.
-	void transferKernelsToConvolution();
+	void transferKernelsToConvolution(cedar::aux::conv::ConvolutionPtr convolution,
+                                    KernelListParameterPtr kernelsParameter);
 
 	/*!@brief Returns the convolution object currently selected.
  	*/
@@ -208,6 +210,8 @@ private:
 
 	void convolutionInputDimensionalityChanged();
 
+  void preparePointWiseWeightMat(cv::Mat& pointWiseMat);
+
   ////Functions for Projection Step
   //!@brief initializes or reconfigures the output matrix
   void initializeOutputMatrix();
@@ -217,12 +221,17 @@ private:
 protected:
   // none yet
 private:
-	//// Members for Convolution
 	//!@brief The Data containing the input matrix
 	cedar::aux::ConstMatDataPtr mMatrix;
 
+  //// Members for Convolution
   cedar::aux::conv::ConvolutionPtr mConvolution;
 	KernelListParameterPtr mKernelsParameter;
+
+  //// Members for PointWiseWeight operation
+  cedar::aux::conv::ConvolutionPtr mPointWiseWeightConvolution;
+  KernelListParameterPtr mPointWiseWeightKernelsParameter;
+  cedar::aux::MatDataPtr mPreparedPointWiseMat;
 
 	boost::signals2::connection mKernelAddedConnection;
 	boost::signals2::connection mKernelRemovedConnection;

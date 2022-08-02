@@ -84,5 +84,6 @@ std::string cedar::aux::annotation::ValueRangeHint::getDescription() const
   description += cedar::aux::toString(this->mRange.getLower());
   description += ", ";
   description += cedar::aux::toString(this->mRange.getUpper());
+  description += "]";
   return description;
 }
