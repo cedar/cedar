@@ -1139,9 +1139,13 @@ void cedar::proc::Group::listSubgroups(std::set<cedar::proc::GroupPtr>& subgroup
 void cedar::proc::Group::reset()
 {
   // first, find all looped triggers that are running and stop them
+  
+  bool wasTriggerRunningUponResetCall = this->isAnyTriggerRunning();
+
   // JT:Why is this not using stopTriggers?
   // JT:The old manual way did not work properly with the new simulation mode
-  this->stopTriggers(true);
+  if(wasTriggerRunningUponResetCall)
+    this->stopTriggers(true);
 
   //auto looped_triggers = this->findAll<cedar::proc::LoopedTrigger>(true);
   //std::set<cedar::proc::LoopedTriggerPtr> running_triggers;
@@ -1169,7 +1173,8 @@ void cedar::proc::Group::reset()
   }
 
   //JT: Why was this not using start triggers?
-  this->startTriggers();
+  if(wasTriggerRunningUponResetCall)
+    this->startTriggers();
 
   //JT: This old manual way did not work with the new simulation mode
   //// restart all triggers that have been stopped
@@ -3498,5 +3503,23 @@ bool cedar::proc::Group::isTriggerStepperRunning()
   return this->mTriggerStepper->isRunning();
 }
 
+bool cedar::proc::Group::isAnyTriggerRunning()
+{
+    std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
+    switch (this->getLoopMode())
+    {
+    case cedar::aux::LoopMode::FakeDT:
+        return this->isTriggerStepperRunning();
+    case cedar::aux::LoopMode::RealDT:
+        for (auto trigger : triggers)
+        {
+            if (trigger->isRunning())
+                return true;
+        }
+        return false;
+    default: // This line is not really required obviously...
+        return false;   
+    }
+}
 
 
