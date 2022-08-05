@@ -244,6 +244,8 @@ private:
    */
   void updateInputSum();
 
+  void updateSizesRange();
+
 
 private slots:
   void activationAsOutputChanged();

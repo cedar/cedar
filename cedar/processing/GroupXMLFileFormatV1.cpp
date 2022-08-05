@@ -395,6 +395,8 @@ void cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(cedar::aux::UIn
   cedar::aux::ConfigurationNode dimensions;
   std::vector<unsigned int> sizesVector = sizes->getValue();
   CEDAR_ASSERT(sizesVector.size() == dimensionality->getValue());
+  std::cout << "sizesRange " << sizesRange.size() << std::endl;
+	std::cout << "dim " << dimensionality->getValue() << std::endl;
   CEDAR_ASSERT(sizesRange.size() == dimensionality->getValue());
   for(int i = 0; i < dimensionality->getValue(); i++)
   {

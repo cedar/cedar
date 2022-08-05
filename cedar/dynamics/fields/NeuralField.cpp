@@ -265,14 +265,10 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
     _mMultiplicativeNoiseActivation->markAdvanced(true);
 
   this->declareOutput("sigmoided activation", mSigmoidalActivation);
-  this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::ValueRangeHint(0, 1)));
-  // Set the sizes annotation
-  std::vector<cedar::aux::math::Limits<double>> sizesRange;
-  for(unsigned int size : this->_mSizes->getValue())
-  {
-    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
-  }
-  this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
+  this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(
+  				new cedar::aux::annotation::ValueRangeHint(0, 1)));
+
+  this->updateSizesRange();
 
   this->declareInputCollection("input");
 
@@ -709,7 +705,8 @@ void cedar::dyn::NeuralField::writeConfigurationXML(cedar::aux::ConfigurationNod
 
   // dimensionality/sizes parameter
   cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(this->_mDimensionality, this->_mSizes,
-              this->mSigmoidalActivation->getAnnotation<cedar::aux::annotation::SizesRangeHint>()->getRange(), root);
+              this->mSigmoidalActivation->getAnnotation<cedar::aux::annotation::SizesRangeHint>()->getRange(),
+              root);
 
   // kernels parameter
   cedar::aux::ConfigurationNode sumWeightPattern;
@@ -758,7 +755,9 @@ void cedar::dyn::NeuralField::dimensionalityChanged()
     this->_mNoiseCorrelationKernelConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
   }
 #endif // CEDAR_USE_FFTW
-  this->updateMatrices();
+
+	this->updateSizesRange();
+	this->updateMatrices();
 }
 
 void cedar::dyn::NeuralField::dimensionSizeChanged()
@@ -967,9 +966,16 @@ void cedar::dyn::NeuralField::updateEducationalKernel()
         }
     }
   }
+}
 
-
-
-
-
+void cedar::dyn::NeuralField::updateSizesRange()
+{
+	// Set the sizes annotation
+	std::vector<cedar::aux::math::Limits<double>> sizesRange;
+	for(unsigned int size : this->_mSizes->getValue())
+	{
+		sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
+	}
+	this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(
+					new cedar::aux::annotation::SizesRangeHint(sizesRange)));
 }
