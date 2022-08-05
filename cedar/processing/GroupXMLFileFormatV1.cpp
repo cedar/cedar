@@ -56,6 +56,8 @@
 
 // SYSTEM INCLUDES
 #include <boost/assign.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -72,6 +74,32 @@ cedar::proc::GroupXMLFileFormatV1::~GroupXMLFileFormatV1()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::GroupXMLFileFormatV1::read
+(
+	cedar::proc::GroupPtr group,
+	const cedar::aux::ConfigurationNode& root,
+	std::vector<std::string>& exceptions
+)
+{
+	auto dftArchitectureIterator = root.find("DFTArchitecture");
+	CEDAR_ASSERT(dftArchitectureIterator != root.not_found())
+	auto dftArchitecture = dftArchitectureIterator->second;
+
+
+	auto steps = dftArchitecture.find("Components");
+	if (steps != dftArchitecture.not_found())
+	{
+		this->readSteps(group, steps->second, exceptions);
+	}
+
+	auto connections = root.find("Connections");
+	if (connections != root.not_found())
+	{
+		this->readDataConnections(group, connections->second, exceptions);
+	}
+}
+
 
 void cedar::proc::GroupXMLFileFormatV1::write
 (
@@ -105,10 +133,10 @@ void cedar::proc::GroupXMLFileFormatV1::write
 }
 
 void cedar::proc::GroupXMLFileFormatV1::writeSteps
-  (
-    cedar::proc::ConstGroupPtr group,
-    cedar::aux::ConfigurationNode& steps
-  ) const
+(
+	cedar::proc::ConstGroupPtr group,
+	cedar::aux::ConfigurationNode& steps
+) const
 {
   for (auto& name_element_pair : group->getElements())
   {
@@ -306,6 +334,40 @@ void cedar::proc::GroupXMLFileFormatV1::writeKernelListParameter(
   root.add_child("SumWeightPattern", sumWeightPattern);
 }
 
+void cedar::proc::GroupXMLFileFormatV1::readKernelListParameter(
+    cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel>* kernels, const cedar::aux::ConfigurationNode& root)
+{
+  cedar::aux::ConfigurationNode sumWeightPattern = root.get_child("InteractionKernel.SumWeightPattern");
+
+  //Clear the single kernel in the list by default
+  kernels->clear();
+
+  int dimensionCounter = 0;
+
+  for(auto iter = sumWeightPattern.begin(); iter != sumWeightPattern.end(); iter++)
+  {
+    cedar::aux::ConfigurationNode gaussWeightPattern = iter->second;
+
+    //Create a new kernel that is pushed onto the ObjectListParameterTemplate
+    cedar::aux::kernel::GaussPtr kernel (new cedar::aux::kernel::Gauss());
+
+    //Get the "height" (in cedar "amplitude")
+    kernel->setAmplitude(gaussWeightPattern.get<double>("Height"));
+
+    //The sigma string is concatinated by ",", therefore split them and set the Sigma of the kernel
+    std::vector<std::string> sigmas;
+    cedar::aux::split(gaussWeightPattern.get<std::string>("Sigmas"), ",", sigmas);
+
+    for(int i = 0; i < sigmas.size(); i++)
+    {
+      std::cout << i << std::endl;
+      kernel->setSigma(i,std::stod(sigmas[i]));
+    }
+
+    kernels->pushBack(kernel);
+  }
+}
+
 void cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(
   cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* sigmoid, cedar::aux::ConfigurationNode& root)
 {
@@ -317,6 +379,13 @@ void cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(
     cedar::proc::GroupXMLFileFormatV1::transferFunctionNameLookupTableXML,
     cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->getTypeId(transferFunction)
     ));
+}
+
+void cedar::proc::GroupXMLFileFormatV1::readActivationFunctionParameter(
+  cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* sigmoid,
+  const cedar::aux::ConfigurationNode& root)
+{
+
 }
 
 void cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(cedar::aux::UIntParameterPtr dimensionality,
@@ -337,4 +406,140 @@ void cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(cedar::aux::UIn
     dimensions.add_child("Dimension", dimension);
   }
   root.add_child("Dimensions", dimensions);
+}
+
+void cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(cedar::aux::UIntParameterPtr& dimensionality,
+                                                                cedar::aux::UIntVectorParameterPtr& sizes,
+                                                                const cedar::aux::ConfigurationNode& node)
+{
+  std::vector<unsigned int> sizeList;
+  unsigned int dimensionalitySize = 0;
+
+  //First find dimensions
+  auto dimensions_iter = node.find("Dimensions");
+  const cedar::aux::ConfigurationNode& dimensions_value = dimensions_iter->second;
+
+  //Count the dimensionalitySize and add the sizes to the sizeList
+  for (auto iter = dimensions_value.begin(); iter != dimensions_value.end(); iter++)
+  {
+    std::string size = iter->second.get<std::string>("<xmlattr>.size");
+    sizeList.push_back(std::stoi(size));
+    dimensionalitySize++;
+  }
+
+  sizes->setValue(sizeList);
+  dimensionality->setValue(dimensionalitySize);
+}
+
+void cedar::proc::GroupXMLFileFormatV1::readSteps
+(
+	cedar::proc::GroupPtr group,
+	const cedar::aux::ConfigurationNode& root,
+	std::vector<std::string>& exceptions
+)
+{
+	for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
+			 iter != root.end();
+			 ++iter)
+	{
+		const std::string node_name = iter->first;
+		std::string class_id = cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
+						cedar::proc::GroupXMLFileFormatV1::stepNameLookupTableXML, node_name, false);
+
+		const cedar::aux::ConfigurationNode& step_node = iter->second;
+
+		// find the name of the step here and not using parameter later since the name is included as an xml node
+		std::string name = step_node.get<std::string>("<xmlattr>.name");
+		bool step_exists = false;
+
+		cedar::proc::ElementPtr element;
+
+		if (name.empty() || !group->nameExists(name))
+		{
+			try
+			{
+        element = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id);
+			}
+			catch (cedar::aux::ExceptionBase& e)
+			{
+				exceptions.push_back(e.exceptionInfo());
+			}
+		}
+		else
+		{
+      element = group->getElement(name);
+			step_exists = true;
+		}
+
+    // if this is a step, write this to the configuration tree
+    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
+    {
+      if
+          (
+          boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(step)
+          || boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(step)
+          )
+      {
+        continue;
+      }
+
+      if (step)
+      {
+        try
+        {
+          step->readConfigurationXML(step_node);
+        }
+        catch (cedar::aux::ExceptionBase &e)
+        {
+          exceptions.push_back(e.exceptionInfo());
+        }
+
+        if (!step_exists)
+        {
+          try
+          {
+            group->add(step, name);
+          }
+          catch (cedar::aux::ExceptionBase &e)
+          {
+            exceptions.push_back(e.exceptionInfo());
+          }
+        }
+
+        step->resetChangedStates(false);
+      }
+    }
+  }
+}
+
+void cedar::proc::GroupXMLFileFormatV1::readDataConnections
+(
+	cedar::proc::GroupPtr group,
+	const cedar::aux::ConfigurationNode& root,
+	std::vector<std::string>& exceptions
+)
+{
+	for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
+			 iter != root.end();
+			 ++iter)
+	{
+		std::string source = iter->second.get<std::string>("source");
+		std::string target = iter->second.get<std::string>("target");
+		try
+		{
+			group->connectSlots(source, target);
+		}
+		catch (cedar::aux::ExceptionBase& e)
+		{
+			std::string info = "Exception occurred while connecting \"" + source + "\" to \"" + target + "\": "
+												 + e.exceptionInfo();
+			exceptions.push_back(info);
+		}
+		catch (const std::exception& e)
+		{
+			std::string info = "Exception occurred while connecting \"" + source + "\" to \"" + target + "\": "
+												 + std::string(e.what());
+			exceptions.push_back(info);
+		}
+	}
 }

@@ -121,6 +121,9 @@ public:
   //!@brief write configuration to path
   void writeXML(const cedar::aux::Path& filename) const;
 
+	//!@brief read xml configuration from path
+  void readXML(const cedar::aux::Path& filename);
+
   //!@brief called after the architecture has been loaded
   void afterArchitectureLoaded();
 

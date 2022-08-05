@@ -205,6 +205,9 @@ public:
    */
   void readConfiguration(const cedar::aux::ConfigurationNode& root);
 
+  /*!@brief Reads the group from a configuration node from XML import
+  */
+  void readConfigurationXML(const cedar::aux::ConfigurationNode& root);
 
   void readData(const cedar::aux::ConfigurationNode& root);
 
@@ -747,6 +750,14 @@ private:
     const cedar::aux::ConfigurationNode& root,
     std::vector<std::string>& exceptions
   );
+
+	/*!@brief Reads the group from a configuration node and writes all exceptions into the given vector from xml import
+ */
+	void readConfigurationXML
+	(
+					const cedar::aux::ConfigurationNode& root,
+					std::vector<std::string>& exceptions
+	);
 
   /*!@brief remove a DataConnection and do a check, if any TriggerConnections must be deleted as well
    * @returns return the next iterator

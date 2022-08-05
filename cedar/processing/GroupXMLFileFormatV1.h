@@ -82,6 +82,15 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+	/*!@brief Reads the group from a configuration node using the first version of the format.
+ */
+	void read
+	(
+		cedar::proc::GroupPtr group,
+		const cedar::aux::ConfigurationNode& root,
+		std::vector<std::string>& exceptions
+	);
+
   /*!@brief Writes the group to a configuration node using the first version of the format.
    */
   void write
@@ -99,14 +108,26 @@ public:
   static void writeKernelListParameter(
     cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel>* kernels, cedar::aux::ConfigurationNode& root);
 
+  static void readKernelListParameter(
+      cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel>* kernels,
+      const cedar::aux::ConfigurationNode& root);
+
   // Write sigmoid parameter
   static void writeActivationFunctionParameter(
     cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>*, cedar::aux::ConfigurationNode&);
+
+  static void readActivationFunctionParameter(
+    cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* sigmoid,
+    const cedar::aux::ConfigurationNode& root);
 
   // Write dimensionality/sizes parameter
   static void writeDimensionsParameter(
     cedar::aux::UIntParameterPtr, cedar::aux::UIntVectorParameterPtr,
     std::vector<cedar::aux::math::Limits<double>> sizesRange, cedar::aux::ConfigurationNode&);
+
+  static void readDimensionsParameter(
+    cedar::aux::UIntParameterPtr&, cedar::aux::UIntVectorParameterPtr&, const cedar::aux::ConfigurationNode&);
+
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -140,7 +161,23 @@ private:
    */
   void writeDataConnections(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
 
+	/*!@brief Reads steps from the configuration node and adds them to the group.
+ */
+	void readSteps
+	(
+		cedar::proc::GroupPtr group,
+		const cedar::aux::ConfigurationNode& root,
+		std::vector<std::string>& exceptions
+	);
 
+	/*!@brief Reads data connections from a configuration node and adds them to the group.
+ */
+	void readDataConnections
+	(
+		cedar::proc::GroupPtr group,
+		const cedar::aux::ConfigurationNode& root,
+		std::vector<std::string>& exceptions
+	);
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

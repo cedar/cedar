@@ -106,6 +106,9 @@ public:
   //!@brief read a configuration for all registered parameters from a cedar::aux::ConfigurationNode
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
+	//!@brief read a configuration for all registered parameters from a cedar::aux::ConfigurationNode from a xml import
+	virtual void readConfigurationXML(const cedar::aux::ConfigurationNode& node);
+
   /*!@brief Reads the configuration of this object from the given json file.
    */
   virtual void readJson(const cedar::aux::Path& filename);
