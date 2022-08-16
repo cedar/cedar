@@ -131,8 +131,7 @@ mpProjectionMethod(nullptr)
 	this->declareInput("matrix", true);
 	this->declareOutput("result", mOutput);
   this->declareBuffer("convolution kernel", this->mConvolution->getCombinedKernel());
-  this->declareBuffer("point wise weights", this->mPointWiseWeightConvolution->getCombinedKernel());
-  this->declareBuffer("point wise weights (padded)", this->mPreparedPointWiseMat);
+  this->declareBuffer("point wise weights", this->mPreparedPointWiseMat);
 	QObject::connect(this->mConvolution.get(), SIGNAL(configurationChanged()), this,
                    SLOT(recompute()));
   QObject::connect(this->mPointWiseWeightConvolution.get(), SIGNAL(configurationChanged()), this,
