@@ -143,7 +143,6 @@ mpProjectionMethod(nullptr)
   mKernelsParameter = new cedar::proc::steps::SynapticConnection::KernelListParameter(
               convolutionConfigurable.get(), "kernels", std::vector<cedar::aux::kernel::KernelPtr>());
 
-  convolutionConfigurable->addConfigurableChild("parameter", this->mConvolution);
   this->addConfigurableChild("convolution", convolutionConfigurable);
 
   //Add PointWiseWeight convolution parameter to "grouping box"
@@ -153,8 +152,6 @@ mpProjectionMethod(nullptr)
                                     pointWiseWeightConvolutionConfigurable.get(),
                                     "kernels",std::vector<cedar::aux::kernel::KernelPtr>());
 
-  pointWiseWeightConvolutionConfigurable->addConfigurableChild("parameter",
-                                                               this->mPointWiseWeightConvolution);
   this->addConfigurableChild("PointWiseWeight", pointWiseWeightConvolutionConfigurable);
 
 
