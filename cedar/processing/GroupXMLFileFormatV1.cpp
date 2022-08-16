@@ -373,7 +373,10 @@ void cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(
 {
   cedar::aux::ConfigurationNode activationFunction;
   cedar::aux::math::TransferFunctionPtr transferFunction = sigmoid->getValue();
-  transferFunction->writeConfigurationXML(activationFunction, true);
+  cedar::aux::NumericParameter<double>* beta = dynamic_cast<cedar::aux::NumericParameter<double>*>(
+            transferFunction->getParameter("beta").get());
+  CEDAR_ASSERT(beta != nullptr)
+  activationFunction.put("Beta", beta->getValue());
   root.add_child("ActivationFunction", activationFunction);
   root.add("ActivationFunction.<xmlattr>.type", cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
     cedar::proc::GroupXMLFileFormatV1::transferFunctionNameLookupTableXML,
