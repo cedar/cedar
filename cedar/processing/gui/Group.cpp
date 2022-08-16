@@ -40,6 +40,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Group.h"
+#include "cedar/processing/gui/layout/Layout.h"
+#include "cedar/processing/gui/layout/GridLayout.h"
 #include "cedar/processing/gui/GroupContainerItem.h"
 #include "cedar/processing/gui/ArchitectureWidget.h"
 #include "cedar/processing/gui/Connection.h"
@@ -1299,7 +1301,7 @@ void cedar::proc::gui::Group::readXML(const cedar::aux::Path &source)
 
 	try
 	{
-		this->readConfiguration(root);
+		this->readConfigurationXML(root);
 	}
 	catch(const cedar::proc::ArchitectureLoadingException& e)
 	{
@@ -1415,6 +1417,27 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
 
   // after loading, make sure the collapsed state is properly applied
   this->updateCollapsedness();
+}
+
+void cedar::proc::gui::Group::readConfigurationXML(const cedar::aux::ConfigurationNode &root, bool ignoreSnapToGrid)
+{
+  this->toggleSmartConnectionMode(false);
+
+  // update recorder icons
+  this->stepRecordStateChanged();
+
+  //!@todo This is a quickfix, I think the entire read process needs to be revised
+  cedar::aux::ConfigurationNode root_copy = root;
+  // try to apply the UI configuration to any elements that may have already been added to the group.
+  this->tryRestoreUIConfigurationsOfElements(root_copy, ignoreSnapToGrid);
+
+  // after loading, make sure the collapsed state is properly applied
+  this->updateCollapsedness();
+
+  // Layout the steps, as there are no positions specified in the xml file
+  cedar::proc::gui::layout::Layout* layout = new cedar::proc::gui::layout::GridLayout();
+  layout->arrange(this);
+
 }
 
 void cedar::proc::gui::Group::openSceneViewer(const cedar::aux::ConfigurationNode &node)
