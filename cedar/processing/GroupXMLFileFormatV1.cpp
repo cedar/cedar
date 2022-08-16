@@ -93,8 +93,8 @@ void cedar::proc::GroupXMLFileFormatV1::read
 		this->readSteps(group, steps->second, exceptions);
 	}
 
-	auto connections = root.find("Connections");
-	if (connections != root.not_found())
+	auto connections = dftArchitecture.find("Connections");
+  if (connections != root.not_found())
 	{
 		this->readDataConnections(group, connections->second, exceptions);
 	}
@@ -528,12 +528,26 @@ void cedar::proc::GroupXMLFileFormatV1::readDataConnections
 			 iter != root.end();
 			 ++iter)
 	{
-		std::string source = iter->second.get<std::string>("source");
-		std::string target = iter->second.get<std::string>("target");
+		std::string source = iter->second.get<std::string>("Source");
+		std::string target = iter->second.get<std::string>("Target");
+    // Look for slots to append slot names to the step names
+    cedar::proc::ElementPtr sourceElement = group->getElement(source);
+    cedar::proc::ElementPtr targetElement = group->getElement(target);
+
+    auto sourceConnectable = dynamic_cast<cedar::proc::Connectable*>(sourceElement.get());
+    CEDAR_ASSERT(sourceConnectable != nullptr)
+    auto sourceSlots = sourceConnectable->getOrderedDataSlots(DataRole::OUTPUT);
+    CEDAR_ASSERT(sourceSlots.size() > 0)
+
+    auto targetConnectable = dynamic_cast<cedar::proc::Connectable*>(targetElement.get());
+    CEDAR_ASSERT(targetConnectable != nullptr)
+    auto targetSlots = targetConnectable->getOrderedDataSlots(DataRole::INPUT);
+    CEDAR_ASSERT(targetSlots.size() > 0)
 		try
 		{
-			group->connectSlots(source, target);
-		}
+      group->connectSlots(source + "." + sourceSlots.at(0)->getName(),
+                          target + "." + targetSlots.at(0)->getName());
+    }
 		catch (cedar::aux::ExceptionBase& e)
 		{
 			std::string info = "Exception occurred while connecting \"" + source + "\" to \"" + target + "\": "
