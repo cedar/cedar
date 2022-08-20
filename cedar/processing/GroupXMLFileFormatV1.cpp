@@ -94,7 +94,7 @@ void cedar::proc::GroupXMLFileFormatV1::read
 	}
 
 	auto connections = dftArchitecture.find("Connections");
-  if (connections != root.not_found())
+  if (connections != dftArchitecture.not_found())
 	{
 		this->readDataConnections(group, connections->second, exceptions);
 	}
