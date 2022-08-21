@@ -145,9 +145,15 @@ private:
    */
   void writeSteps(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
 
+  /*!@brief Reads steps from the configuration node and adds them to the group.
+  */
+  void readSteps(cedar::proc::GroupPtr group, const cedar::aux::ConfigurationNode& root,
+                 std::vector<std::string>& exceptions);
+
   /*!@brief Writes a synaptic connection to the configuration node.
    */
-  void writeSynapticConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::steps::SynapticConnectionPtr connection) const;
+  void writeSynapticConnection(cedar::aux::ConfigurationNode& root,
+                               const cedar::proc::steps::SynapticConnectionPtr connection) const;
 
   /*!@brief Writes the data connections in the group to the configuration node.
    */
@@ -160,15 +166,6 @@ private:
   /*!@brief Writes the data connections in the group to the configuration node.
    */
   void writeDataConnections(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
-
-	/*!@brief Reads steps from the configuration node and adds them to the group.
- */
-	void readSteps
-	(
-		cedar::proc::GroupPtr group,
-		const cedar::aux::ConfigurationNode& root,
-		std::vector<std::string>& exceptions
-	);
 
 	/*!@brief Reads data connections from a configuration node and adds them to the group.
  */
@@ -184,6 +181,7 @@ private:
 protected:
   // none yet
 private:
+  //!@brief: these are for switching between cedar and xml dft architecture naming conventions
   static boost::bimap<std::string, std::string> stepNameLookupTableXML;
   static boost::bimap<std::string, std::string> transferFunctionNameLookupTableXML;
 

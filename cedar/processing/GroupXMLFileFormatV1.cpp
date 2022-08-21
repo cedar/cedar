@@ -155,22 +155,101 @@ void cedar::proc::GroupXMLFileFormatV1::writeSteps
         continue;
       }
       CEDAR_ASSERT(step->isXMLExportable())
+
+      //Node_name is the name later used in the xml and class_name the typeId of cedar
       std::string class_name = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(step);
       std::string node_name = cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
         cedar::proc::GroupXMLFileFormatV1::stepNameLookupTableXML, class_name);
+
       cedar::aux::ConfigurationNode step_node = cedar::aux::ConfigurationNode();
+      //<xmlattr> writes the name into the xml tag (called xml attribute)
       step_node.add("<xmlattr>.name", name_element_pair.first);
+      //There is a base writeConfigurationXML function which writes all basic fields into the step node.
+      //However, some steps with more special fields overrite this function in their own class (still calling the
+      //base class)
       step->writeConfigurationXML(step_node);
       steps.push_back(cedar::aux::ConfigurationNode::value_type(node_name, step_node));
     }
   }
 }
 
-void cedar::proc::GroupXMLFileFormatV1::writeSynapticConnection
-  (
-    cedar::aux::ConfigurationNode& root,
-    const cedar::proc::steps::SynapticConnectionPtr connection
-  )
+void cedar::proc::GroupXMLFileFormatV1::readSteps(cedar::proc::GroupPtr group,
+                                                  const cedar::aux::ConfigurationNode& root,
+                                                  std::vector<std::string>& exceptions)
+{
+  for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin(); iter != root.end(); ++iter)
+  {
+    // Get name, class id and step node
+    const std::string node_name = iter->first;
+    std::string class_id = cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
+            cedar::proc::GroupXMLFileFormatV1::stepNameLookupTableXML, node_name, false);
+    const cedar::aux::ConfigurationNode& step_node = iter->second;
+
+    // find the name of the step here and not using parameter later since the name is included as an xml node
+    std::string name = step_node.get<std::string>("<xmlattr>.name");
+
+    cedar::proc::ElementPtr element;
+    bool step_exists = false;
+
+    //Check if step exists, if not allocate a new one if yes then just get the existing
+    if (name.empty() || !group->nameExists(name))
+    {
+      try
+      {
+        element = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id);
+      }
+      catch (cedar::aux::ExceptionBase& e)
+      {
+        exceptions.push_back(e.exceptionInfo());
+      }
+    }
+    else
+    {
+      element = group->getElement(name);
+      step_exists = true;
+    }
+
+    // if this is a step, write this to the configuration tree
+    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
+    {
+      if(boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(step) ||
+              boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(step))
+      {
+        continue;
+      }
+
+      if (step)
+      {
+        try
+        {
+          // Analog to writeSteps. The base readConfiguration reads only the fields which are set in the whitelist of
+          // each step. Everything else is done by the steps itself in their own overwritten readConfiguration function
+          step->readConfigurationXML(step_node);
+        }
+        catch (cedar::aux::ExceptionBase &e)
+        {
+          exceptions.push_back(e.exceptionInfo());
+        }
+
+        if (!step_exists)
+        {
+          try
+          {
+            group->add(step, name);
+          }
+          catch (cedar::aux::ExceptionBase &e)
+          {
+            exceptions.push_back(e.exceptionInfo());
+          }
+        }
+        step->resetChangedStates(false);
+      }
+    }
+  }
+}
+
+void cedar::proc::GroupXMLFileFormatV1::writeSynapticConnection(cedar::aux::ConfigurationNode& root,
+                                                                const cedar::proc::steps::SynapticConnectionPtr connection)
 const
 {
   // Write the properties of this connection to a template node
@@ -343,8 +422,6 @@ void cedar::proc::GroupXMLFileFormatV1::readKernelListParameter(
   //Clear the single kernel in the list by default
   kernels->clear();
 
-  int dimensionCounter = 0;
-
   for(auto iter = sumWeightPattern.begin(); iter != sumWeightPattern.end(); iter++)
   {
     cedar::aux::ConfigurationNode gaussWeightPattern = iter->second;
@@ -363,21 +440,26 @@ void cedar::proc::GroupXMLFileFormatV1::readKernelListParameter(
     {
       kernel->setSigma(i,std::stod(sigmas[i]));
     }
-
     kernels->pushBack(kernel);
   }
 }
 
 void cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(
-  cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* sigmoid, cedar::aux::ConfigurationNode& root)
+  cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* sigmoid,
+  cedar::aux::ConfigurationNode& root)
 {
   cedar::aux::ConfigurationNode activationFunction;
+
+  // get transfere function and beta parameter
   cedar::aux::math::TransferFunctionPtr transferFunction = sigmoid->getValue();
   cedar::aux::NumericParameter<double>* beta = dynamic_cast<cedar::aux::NumericParameter<double>*>(
             transferFunction->getParameter("beta").get());
   CEDAR_ASSERT(beta != nullptr)
   activationFunction.put("Beta", beta->getValue());
+  // add beta parameter to node
   root.add_child("ActivationFunction", activationFunction);
+
+  // add looked up transfer function to xml attribute
   root.add("ActivationFunction.<xmlattr>.type", cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
     cedar::proc::GroupXMLFileFormatV1::transferFunctionNameLookupTableXML,
     cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->getTypeId(transferFunction)
@@ -446,85 +528,6 @@ void cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(cedar::aux::UInt
 
   sizes->setValue(sizeList);
   dimensionality->setValue(dimensionalitySize);
-}
-
-void cedar::proc::GroupXMLFileFormatV1::readSteps
-(
-	cedar::proc::GroupPtr group,
-	const cedar::aux::ConfigurationNode& root,
-	std::vector<std::string>& exceptions
-)
-{
-	for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin(); iter != root.end(); ++iter)
-	{
-		const std::string node_name = iter->first;
-		std::string class_id = cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
-						cedar::proc::GroupXMLFileFormatV1::stepNameLookupTableXML, node_name, false);
-
-		const cedar::aux::ConfigurationNode& step_node = iter->second;
-
-		// find the name of the step here and not using parameter later since the name is included as an xml node
-		std::string name = step_node.get<std::string>("<xmlattr>.name");
-		bool step_exists = false;
-
-		cedar::proc::ElementPtr element;
-
-		if (name.empty() || !group->nameExists(name))
-		{
-			try
-			{
-        element = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id);
-			}
-			catch (cedar::aux::ExceptionBase& e)
-			{
-				exceptions.push_back(e.exceptionInfo());
-			}
-		}
-		else
-		{
-      element = group->getElement(name);
-			step_exists = true;
-		}
-
-    // if this is a step, write this to the configuration tree
-    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
-    {
-      if
-          (
-          boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(step)
-          || boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(step)
-          )
-      {
-        continue;
-      }
-
-      if (step)
-      {
-        try
-        {
-          step->readConfigurationXML(step_node);
-        }
-        catch (cedar::aux::ExceptionBase &e)
-        {
-          exceptions.push_back(e.exceptionInfo());
-        }
-
-        if (!step_exists)
-        {
-          try
-          {
-            group->add(step, name);
-          }
-          catch (cedar::aux::ExceptionBase &e)
-          {
-            exceptions.push_back(e.exceptionInfo());
-          }
-        }
-
-        step->resetChangedStates(false);
-      }
-    }
-  }
 }
 
 void cedar::proc::GroupXMLFileFormatV1::readDataConnections
