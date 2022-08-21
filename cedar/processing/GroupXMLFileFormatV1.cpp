@@ -53,6 +53,8 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/steps/SynapticConnection.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
+#include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/ExpSigmoid.h"
 
 // SYSTEM INCLUDES
 #include <boost/assign.hpp>
@@ -387,8 +389,21 @@ void cedar::proc::GroupXMLFileFormatV1::readActivationFunctionParameter(
   cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* sigmoid,
   const cedar::aux::ConfigurationNode& root)
 {
-  //get transfere function from node
-  cedar::aux::ConfigurationNode transfereFunction = root.find()
+  //get transfere function and beta values from node
+  cedar::aux::ConfigurationNode transfereFunctionNode = root.get_child("ActivationFunction");
+  std::string transfereFunctionTypeId = cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
+          cedar::proc::GroupXMLFileFormatV1::transferFunctionNameLookupTableXML,
+          transfereFunctionNode.get<std::string>("<xmlattr>.type"),
+          false);
+  double beta = transfereFunctionNode.get<double>("Beta");
+
+  //set the values in the given sigmoid field
+  if(transfereFunctionTypeId == "cedar.aux.math.ExpSigmoid")
+  {
+    // create new exp sigmoid transfere funcion with given parameter (threshhold is not export and therefore set to the
+    // default value of 0) and set it to the sigmoid
+    sigmoid->setValue(cedar::aux::math::SigmoidPtr(new cedar::aux::math::ExpSigmoid(0.0, beta)));
+  }
 }
 
 void cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(cedar::aux::UIntParameterPtr dimensionality,
@@ -441,9 +456,7 @@ void cedar::proc::GroupXMLFileFormatV1::readSteps
 	std::vector<std::string>& exceptions
 )
 {
-	for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
-			 iter != root.end();
-			 ++iter)
+	for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin(); iter != root.end(); ++iter)
 	{
 		const std::string node_name = iter->first;
 		std::string class_id = cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
