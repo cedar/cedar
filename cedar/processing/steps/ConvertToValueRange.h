@@ -22,34 +22,31 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LogTimeInterval.h
+    File:        ConvertToValueRange.h
 
-    Maintainer:  Jan TekÃ¼lve
+    Maintainer:  Jan Tekülve
     Email:       jan.tekuelve@ini.rub.de
-    Date:        2018 04 18
+    Date:        2022 08 02
 
-    Description: Header file for the class cedar::dyn::steps::LogTimeInterval.
+    Description: Header file for the class cedar::proc::steps::ConvertToValueRange.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DYN_STEPS_LOG_TIME_INTERVAL_H
-#define CEDAR_DYN_STEPS_LOG_TIME_INTERVAL_H
+#ifndef CEDAR_PROC_STEPS_CONVERT_TO_VALUE_RANGE_H
+#define CEDAR_PROC_STEPS_CONVERT_TO_VALUE_RANGE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-
-#include "cedar/dynamics/Dynamics.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
-#include "cedar/auxiliaries/FileParameter.h"
-#include "cedar/auxiliaries/StringParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/MatData.fwd.h"
-#include "cedar/dynamics/steps/LogTimeInterval.fwd.h"
+#include "cedar/processing/steps/ConvertToValueRange.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -58,8 +55,11 @@
  *
  * @todo describe more.
  */
-class cedar::dyn::steps::LogTimeInterval : public cedar::dyn::Dynamics
+class cedar::proc::steps::ConvertToValueRange : public cedar::proc::Step
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -70,65 +70,61 @@ class cedar::dyn::steps::LogTimeInterval : public cedar::dyn::Dynamics
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  LogTimeInterval();
+  ConvertToValueRange();
 
   //!@brief Destructor
-  virtual ~LogTimeInterval();
+  virtual ~ConvertToValueRange();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void reset();
+  // none yet
+
+public slots:
+    //!@brief This slot is connected to the valueChanged() event of the gain value parameter.
+    void rangeChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  cedar::proc::DataSlot::VALIDITY determineInputValidity(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data) const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief Reacts to a change in the input connection.
-  void inputConnectionChanged(const std::string& inputName);
+    void inputConnectionChanged(const std::string& inputName);
+    //!@brief Updates the output matrix.
+    void compute(const cedar::proc::Arguments& arguments);
 
-  //!@brief Updates the output matrix.
-  void eulerStep(const cedar::unit::Time& time);
-
-  void print(float loggedTime);
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // members
-  //--------------------------------------------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------------------------------------
+    // members
+    //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+    //!@brief MatrixData representing the input. Storing it like this saves time during computation.
+    cedar::aux::ConstMatDataPtr mInput;
+
+    //!@brief The data containing the output.
+    cedar::aux::MatDataPtr mOutput;
 private:
-  cedar::aux::ConstMatDataPtr _mInputFirst;
-  cedar::aux::ConstMatDataPtr _mInputSecond;
-  cedar::aux::MatDataPtr _mOutput;
-
-  std::string inputFirstName = "first input";
-  std::string inputSecondName = "second input";
-
-  float _mElapsedTime;
-  bool _mIsLogging;
-  bool _mHasLogged;
-  std::ofstream _mFile;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief the amplitude of the Gaussian function
+  cedar::aux::DoubleParameterPtr _mInputLowerBound;
+  cedar::aux::DoubleParameterPtr _mInputUpperBound;
+  cedar::aux::DoubleParameterPtr _mOutputLowerBound;
+  cedar::aux::DoubleParameterPtr _mOutputUpperBound;
 
 private:
-  cedar::aux::FileParameterPtr _mLogPath;
-  cedar::aux::StringParameterPtr _mLogPrefix;
-  cedar::aux::DoubleParameterPtr _mLogThreshold;
+  // none yet
 
-}; // class cedar::dyn::steps::LogTimeInterval
+}; // class cedar::proc::steps::ConvertToValueRange
 
-#endif // CEDAR_dyn_STEPS_LOG_TIME_INTERVAL_H
+#endif // CEDAR_PROC_STEPS_CONVERT_TO_VALUE_RANGE_H
 

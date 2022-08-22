@@ -83,6 +83,7 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::dyn::steps::LogTimeInterval::LogTimeInterval():
+        _mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
         _mElapsedTime(0.0),
         _mIsLogging(false),
         _mHasLogged(false),
@@ -90,6 +91,7 @@ cedar::dyn::steps::LogTimeInterval::LogTimeInterval():
         _mLogPrefix(new cedar::aux::StringParameter(this,"log prefix","")),
         _mLogThreshold(new cedar::aux::DoubleParameter(this, "log threshold", 0.5))
 {
+   this->declareOutput("output", _mOutput);
    this->declareInput(inputFirstName);
    this->declareInput(inputSecondName);
 }
@@ -111,6 +113,7 @@ void cedar::dyn::steps::LogTimeInterval::eulerStep(const cedar::unit::Time& time
       _mIsLogging = true;
       _mElapsedTime = 0;
       std::cout << "Logging begins" << std::endl;
+      _mOutput->getData().setTo(0);
     }
 
     if (_mInputSecond->getData().at<float>(0, 0) > this->_mLogThreshold->getValue() && _mIsLogging)
@@ -119,6 +122,7 @@ void cedar::dyn::steps::LogTimeInterval::eulerStep(const cedar::unit::Time& time
       _mHasLogged = true;
       std::cout << "Logging Ends! It took "<< _mElapsedTime<<" seconds!" << std::endl;
       this->print(_mElapsedTime);
+      _mOutput->getData().setTo(5);
     }
     _mElapsedTime +=  time / cedar::unit::Time(1*cedar::unit::milli * cedar::unit::seconds);
   }
@@ -153,6 +157,7 @@ void cedar::dyn::steps::LogTimeInterval::reset()
 {
   _mHasLogged = false;
   _mIsLogging = false;
+  _mOutput->getData().setTo(0);
 }
 
 

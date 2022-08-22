@@ -33,6 +33,7 @@
         <file>steps/channel_merge.svg</file>
         <file>steps/channel_split.svg</file>
         <file>steps/color_conversion.svg</file>
+		<file>steps/convert_to_value_range.svg</file>
         <file>steps/component_multiply.svg</file>
         <file>steps/divide_elementwise.svg</file>
         <file>steps/a_minus_b.svg</file>
