@@ -82,8 +82,12 @@ macro(cedar_add_target_executable)
   # add the executable with the given name, specifying all source files needed for compilation
   #
   # add_executable(<executable name> [WIN32] [MACOSX_BUNDLE] [EXCLUDE_FROM_ALL] source1 source2 ... sourceN)
-  add_executable(${executableExecutableName} ${sourceFiles})
-  
+  if(CEDAR_PORTABLE AND APPLE)
+    add_executable(${executableExecutableName} MACOSX_BUNDLE ${sourceFiles})
+  else(CEDAR_PORTABLE AND APPLE)
+    add_executable(${executableExecutableName} ${sourceFiles})
+  endif(CEDAR_PORTABLE AND APPLE)
+
   if (CMAKE_COMPILER_IS_GNUCC)
   	set_target_properties(${executableExecutableName} PROPERTIES LINK_FLAGS "-Wl,--no-as-needed")
   endif(CMAKE_COMPILER_IS_GNUCC)
