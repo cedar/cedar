@@ -1965,35 +1965,37 @@ bool cedar::proc::gui::Ide::saveAs()
 {
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
 
-  QString file = QFileDialog::getSaveFileName(this, // parent
-                                              "Select where to save", // caption
-                                              last_dir->getValue().absolutePath(), // initial directory;
-                                              "architecture (*.json)", // filter(s), separated by ';;'
-                                              0,
-                                              // js: Workaround for freezing file dialogs in QT5 (?)
-                                              QFileDialog::DontUseNativeDialog
-                                              );
+  QString file = "";
+  QFileDialog* fileDialog = new QFileDialog();
+
+  fileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
+  fileDialog->setAcceptMode(QFileDialog::AcceptSave);
+  fileDialog->setWindowTitle("Select where to save");
+  fileDialog->setDirectory(last_dir->getValue().absolutePath());
+  fileDialog->setNameFilter("architecture (*.json)");
+  fileDialog->setDefaultSuffix(".json");
+
+  if(fileDialog->exec() == QDialog::Accepted)
+  {
+    file = fileDialog->selectedFiles().front();
+  }
 
   if (file.isEmpty())
   {
     return false;
   }
 
-  if (!file.endsWith(".json"))
-  {
-    file += ".json";
-  }
-
   cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
-
   cedar::aux::SettingsSingleton::getInstance()->setCurrentArchitectureFileName(file.toStdString());
 
   this->mGroup->writeJson(file.toStdString());
   this->displayFilename(file.toStdString());
   this->setArchitectureChanged(false);
-  
 
+  #ifndef CEDAR_OS_WINDOWS
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+  #endif
+
   last_dir->setValue(path);
 
   return true;
