@@ -137,7 +137,11 @@ void cedar::proc::sources::GaussInput::readConfigurationXML(const cedar::aux::Co
   cedar::aux::Configurable::readConfigurationXML(node);
 
   //readDimensionsParameter
-  cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(this->_mDimensionality, this->_mSizes, node);
+  std::vector<cedar::aux::math::Limits<double>> sizesRange;
+  cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(this->_mDimensionality, this->_mSizes,
+                                                             sizesRange, node);
+  this->mOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(
+                                                                      sizesRange)));
 }
 
 void cedar::proc::sources::GaussInput::setDimensionality(unsigned int dimensionality)

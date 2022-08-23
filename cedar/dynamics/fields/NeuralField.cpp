@@ -719,9 +719,13 @@ void cedar::dyn::NeuralField::readConfigurationXML(const cedar::aux::Configurati
   cedar::aux::Configurable::readConfigurationXML(node);
 
   //readDimensionsParameter
-  cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(this->_mDimensionality, this->_mSizes, node);
+  std::vector<cedar::aux::math::Limits<double>> sizesRange;
+  cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(this->_mDimensionality, this->_mSizes, sizesRange, node);
+	this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(
+					new cedar::aux::annotation::SizesRangeHint(sizesRange)));
 
-  cedar::proc::GroupXMLFileFormatV1::readKernelListParameter(this->_mKernels.get(), node);
+  cedar::proc::GroupXMLFileFormatV1::readKernelListParameter(this->_mKernels.get(),
+                                                             node.get_child("InteractionKernel"));
 
   cedar::proc::GroupXMLFileFormatV1::readActivationFunctionParameter(this->_mSigmoid.get(), node);
 }

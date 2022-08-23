@@ -155,6 +155,8 @@ public:
 
   void writeConfigurationXML(cedar::aux::ConfigurationNode& root) const;
 
+  void readConfigurationXML(const cedar::aux::ConfigurationNode& root);
+
 public slots:
   void recompute();
   //--------------------------------------------------------------------------------------------------------------------

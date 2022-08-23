@@ -41,6 +41,8 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/UIntVectorParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/GroupXMLFileFormatV1.fwd.h"
@@ -49,11 +51,11 @@
 #include "cedar/auxiliaries/Configurable.fwd.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.fwd.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.fwd.h"
-#include "cedar/auxiliaries/UIntParameter.h"
-#include "cedar/auxiliaries/UIntVectorParameter.h"
-#include "cedar/processing/Group.fwd.h"
-#include "cedar/processing/DataConnection.fwd.h"
 #include "cedar/processing/steps/SynapticConnection.fwd.h"
+#include "cedar/processing/DataConnection.fwd.h"
+#include "cedar/processing/Group.fwd.h"
+#include "cedar/processing/ProjectionMappingParameter.fwd.h"
+#include "cedar/processing/Step.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/bimap.hpp>
@@ -126,8 +128,13 @@ public:
     std::vector<cedar::aux::math::Limits<double>> sizesRange, cedar::aux::ConfigurationNode&);
 
   static void readDimensionsParameter(
-    cedar::aux::UIntParameterPtr&, cedar::aux::UIntVectorParameterPtr&, const cedar::aux::ConfigurationNode&);
+    cedar::aux::UIntParameterPtr dimensionality, cedar::aux::UIntVectorParameterPtr sizes,
+    std::vector<cedar::aux::math::Limits<double>>& sizesRange, const cedar::aux::ConfigurationNode& node);
 
+  // Read dimension mappings of a projection
+  static void readProjectionMappingsParameter(
+    cedar::proc::ProjectionMappingParameterPtr& mappingParameter,
+    const cedar::aux::ConfigurationNode& root);
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -150,6 +157,11 @@ private:
   void readSteps(cedar::proc::GroupPtr group, const cedar::aux::ConfigurationNode& root,
                  std::vector<std::string>& exceptions);
 
+  /*!@brief Creates a step with given name class_id and properties and adds it to the group.
+  */
+  cedar::proc::StepPtr createStep(std::string name, std::string class_id, cedar::proc::GroupPtr group,
+                  const cedar::aux::ConfigurationNode& stepNode, std::vector<std::string>& exceptions);
+
   /*!@brief Writes a synaptic connection to the configuration node.
    */
   void writeSynapticConnection(cedar::aux::ConfigurationNode& root,
@@ -167,14 +179,14 @@ private:
    */
   void writeDataConnections(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
 
-	/*!@brief Reads data connections from a configuration node and adds them to the group.
+  /*!@brief Reads data connections and synaptic connections from a configuration node and adds them to the group.
  */
-	void readDataConnections
-	(
-		cedar::proc::GroupPtr group,
-		const cedar::aux::ConfigurationNode& root,
-		std::vector<std::string>& exceptions
-	);
+  void readConnections
+  (
+    cedar::proc::GroupPtr group,
+    const cedar::aux::ConfigurationNode& root,
+    std::vector<std::string>& exceptions
+  );
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

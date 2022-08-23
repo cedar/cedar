@@ -53,7 +53,6 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/steps/SynapticConnection.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
-#include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
 #include "cedar/auxiliaries/math/transferFunctions/ExpSigmoid.h"
 
 // SYSTEM INCLUDES
@@ -97,7 +96,7 @@ void cedar::proc::GroupXMLFileFormatV1::read
 	auto connections = dftArchitecture.find("Connections");
   if (connections != dftArchitecture.not_found())
 	{
-		this->readDataConnections(group, connections->second, exceptions);
+		this->readConnections(group, connections->second, exceptions);
 	}
 }
 
@@ -182,70 +181,80 @@ void cedar::proc::GroupXMLFileFormatV1::readSteps(cedar::proc::GroupPtr group,
     // Get name, class id and step node
     const std::string node_name = iter->first;
     std::string class_id = cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
-            cedar::proc::GroupXMLFileFormatV1::stepNameLookupTableXML, node_name, false);
-    const cedar::aux::ConfigurationNode& step_node = iter->second;
+      cedar::proc::GroupXMLFileFormatV1::stepNameLookupTableXML, node_name, false);
+    const cedar::aux::ConfigurationNode &stepNode = iter->second;
 
     // find the name of the step here and not using parameter later since the name is included as an xml node
-    std::string name = step_node.get<std::string>("<xmlattr>.name");
+    std::string name = stepNode.get<std::string>("<xmlattr>.name");
 
-    cedar::proc::ElementPtr element;
-    bool step_exists = false;
+    // Create the step
+    cedar::proc::StepPtr step = this->createStep(name, class_id, group, stepNode, exceptions);
 
-    //Check if step exists, if not allocate a new one if yes then just get the existing
-    if (name.empty() || !group->nameExists(name))
+    try
     {
-      try
-      {
-        element = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id);
-      }
-      catch (cedar::aux::ExceptionBase& e)
-      {
-        exceptions.push_back(e.exceptionInfo());
-      }
+      // Analog to writeSteps. The base readConfiguration reads only the fields which are set in the whitelist of
+      // each step. Everything else is done by the steps itself in their own overwritten readConfiguration function
+      step->readConfigurationXML(stepNode);
     }
-    else
+    catch (cedar::aux::ExceptionBase &e)
     {
-      element = group->getElement(name);
-      step_exists = true;
+      exceptions.push_back(e.exceptionInfo());
+    }
+  }
+}
+
+cedar::proc::StepPtr cedar::proc::GroupXMLFileFormatV1::createStep(std::string name, std::string class_id, cedar::proc::GroupPtr group,
+const cedar::aux::ConfigurationNode& stepNode, std::vector<std::string>& exceptions)
+{
+  cedar::proc::ElementPtr element;
+  bool step_exists = false;
+
+  //Check if step exists, if not allocate a new one if yes then just get the existing
+  if (name.empty() || !group->nameExists(name))
+  {
+    try
+    {
+      element = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id);
+    }
+    catch (cedar::aux::ExceptionBase& e)
+    {
+      exceptions.push_back(e.exceptionInfo());
+    }
+  }
+  else
+  {
+    element = group->getElement(name);
+    step_exists = true;
+  }
+
+  // if this is a step, write this to the configuration tree
+  if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
+  {
+    if(boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(step) ||
+            boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(step))
+    {
+      return nullptr;
     }
 
-    // if this is a step, write this to the configuration tree
-    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
+    if (step)
     {
-      if(boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(step) ||
-              boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(step))
-      {
-        continue;
-      }
 
-      if (step)
+      if (!step_exists)
       {
         try
         {
-          // Analog to writeSteps. The base readConfiguration reads only the fields which are set in the whitelist of
-          // each step. Everything else is done by the steps itself in their own overwritten readConfiguration function
-          step->readConfigurationXML(step_node);
+          group->add(step, name);
         }
         catch (cedar::aux::ExceptionBase &e)
         {
           exceptions.push_back(e.exceptionInfo());
         }
-
-        if (!step_exists)
-        {
-          try
-          {
-            group->add(step, name);
-          }
-          catch (cedar::aux::ExceptionBase &e)
-          {
-            exceptions.push_back(e.exceptionInfo());
-          }
-        }
-        step->resetChangedStates(false);
       }
+      step->resetChangedStates(false);
     }
+    return step;
   }
+  return nullptr;
 }
 
 void cedar::proc::GroupXMLFileFormatV1::writeSynapticConnection(cedar::aux::ConfigurationNode& root,
@@ -346,6 +355,99 @@ void cedar::proc::GroupXMLFileFormatV1::writeDataConnections
   }
 }
 
+
+void cedar::proc::GroupXMLFileFormatV1::readConnections
+(
+  cedar::proc::GroupPtr group,
+  const cedar::aux::ConfigurationNode& root,
+  std::vector<std::string>& exceptions
+)
+{
+  for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
+       iter != root.end();
+       ++iter)
+  {
+    // These are used later to determine whether this is a connection with special synaptic properties or not
+    auto kernelWeights = iter->second.find("KernelWeights");
+    auto pointWiseWeights = iter->second.find("PointWiseWeights");
+    auto scalarWeight = iter->second.find("ScalarWeight");
+    auto dimensionMapping = iter->second.find("DimensionMapping");
+
+    std::string source = iter->second.get<std::string>("Source");
+    std::string target = iter->second.get<std::string>("Target");
+    // Look for slots to append slot names to the step names
+    cedar::proc::ElementPtr sourceElement = group->getElement(source);
+    cedar::proc::ElementPtr targetElement = group->getElement(target);
+
+    auto sourceConnectable = dynamic_cast<cedar::proc::Connectable *>(sourceElement.get());
+    CEDAR_ASSERT(sourceConnectable != nullptr)
+    auto sourceSlots = sourceConnectable->getOrderedDataSlots(DataRole::OUTPUT);
+    CEDAR_ASSERT(sourceSlots.size() > 0)
+
+    auto targetConnectable = dynamic_cast<cedar::proc::Connectable *>(targetElement.get());
+    CEDAR_ASSERT(targetConnectable != nullptr)
+    auto targetSlots = targetConnectable->getOrderedDataSlots(DataRole::INPUT);
+    CEDAR_ASSERT(targetSlots.size() > 0)
+    try
+    {
+      if (kernelWeights    != iter->second.not_found() ||
+          pointWiseWeights != iter->second.not_found() ||
+          scalarWeight     != iter->second.not_found() ||
+          dimensionMapping != iter->second.not_found())
+      {
+        // Insert SynapticConnection step between source and target
+        std::string synName = group->getUniqueIdentifier("Synaptic Connection");
+        cedar::proc::StepPtr synStep = this->createStep(synName, "cedar.processing.SynapticConnection", group,
+                         iter->second, exceptions);
+        // Get the input and output slot for the synaptic connection step
+        auto synConnectable = dynamic_cast<cedar::proc::Connectable *>(synStep.get());
+        CEDAR_ASSERT(synConnectable != nullptr)
+
+        auto synInputSlots = synConnectable->getOrderedDataSlots(DataRole::INPUT);
+        auto synOutputSlots = synConnectable->getOrderedDataSlots(DataRole::OUTPUT);
+        CEDAR_ASSERT(synInputSlots.size() > 0)
+        CEDAR_ASSERT(synOutputSlots.size() > 0)
+
+        group->connectSlots(source + "." + sourceSlots.at(0)->getName(),
+                            synName+ "." + synInputSlots.at(0)->getName());
+        group->connectSlots(synName + "." + synOutputSlots.at(0)->getName(),
+                            target + "." + targetSlots.at(0)->getName());
+
+        try
+        {
+          // Analog to writeSteps. The base readConfiguration reads only the fields which are set in the whitelist of
+          // each step. Everything else is done by the steps itself in their own overwritten readConfiguration function
+          synStep->readConfigurationXML(iter->second);
+        }
+        catch (cedar::aux::ExceptionBase &e)
+        {
+          exceptions.push_back(e.exceptionInfo());
+        }
+      }
+      else
+      {
+        // No special properties, insert normal connection
+        group->connectSlots(source + "." + sourceSlots.at(0)->getName(),
+                            target + "." + targetSlots.at(0)->getName());
+      }
+    }
+    catch (cedar::aux::ExceptionBase &e)
+    {
+      std::string info = "Exception occurred while connecting \"" + source + "\" to \"" + target + "\": "
+                         + e.exceptionInfo();
+      exceptions.push_back(info);
+    }
+    catch (const std::exception &e)
+    {
+      std::string info = "Exception occurred while connecting \"" + source + "\" to \"" + target + "\": "
+                         + std::string(e.what());
+      exceptions.push_back(info);
+    }
+  }
+}
+
+
+
 boost::bimap<std::string, std::string> cedar::proc::GroupXMLFileFormatV1::stepNameLookupTableXML =
   boost::assign::list_of< boost::bimap<std::string, std::string>::relation >
     ("cedar.dynamics.NeuralField", "Field")
@@ -415,9 +517,10 @@ void cedar::proc::GroupXMLFileFormatV1::writeKernelListParameter(
 }
 
 void cedar::proc::GroupXMLFileFormatV1::readKernelListParameter(
-    cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel>* kernels, const cedar::aux::ConfigurationNode& root)
+    cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel>* kernels,
+    const cedar::aux::ConfigurationNode& root)
 {
-  cedar::aux::ConfigurationNode sumWeightPattern = root.get_child("InteractionKernel.SumWeightPattern");
+  cedar::aux::ConfigurationNode sumWeightPattern = root.get_child("SumWeightPattern");
 
   //Clear the single kernel in the list by default
   kernels->clear();
@@ -441,6 +544,42 @@ void cedar::proc::GroupXMLFileFormatV1::readKernelListParameter(
       kernel->setSigma(i,std::stod(sigmas[i]));
     }
     kernels->pushBack(kernel);
+  }
+}
+
+void cedar::proc::GroupXMLFileFormatV1::readProjectionMappingsParameter(
+  cedar::proc::ProjectionMappingParameterPtr& mappingParameter, const cedar::aux::ConfigurationNode& root)
+{
+  unsigned int outputDimensionality = 1;
+  // Calculate output dimensionality by max{to-dimensions}
+  for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
+       iter != root.end();
+       ++iter)
+  {
+    if(iter->second.get<std::string>("<xmlattr>.to").compare("drop"))
+    {
+      unsigned int to = iter->second.get<int>("<xmlattr>.to");
+      if(to >= outputDimensionality)
+      {
+        outputDimensionality = to + 1;
+      }
+    }
+  }
+  mappingParameter->setOutputDimensionality(outputDimensionality);
+
+  for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
+     iter != root.end();
+     ++iter)
+  {
+    unsigned int from = iter->second.get<int>("<xmlattr>.from");
+    if (!iter->second.get<std::string>("<xmlattr>.to").compare("drop"))
+    {
+      mappingParameter->drop(from);
+    }
+    else
+    {
+      mappingParameter->changeMapping(from, iter->second.get<int>("<xmlattr>.to"));
+    }
   }
 }
 
@@ -507,12 +646,14 @@ void cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(cedar::aux::UIn
   root.add_child("Dimensions", dimensions);
 }
 
-void cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(cedar::aux::UIntParameterPtr& dimensionality,
-                                                                cedar::aux::UIntVectorParameterPtr& sizes,
-                                                                const cedar::aux::ConfigurationNode& node)
+void cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(cedar::aux::UIntParameterPtr dimensionality,
+                                                              cedar::aux::UIntVectorParameterPtr sizes,
+                                                              std::vector<cedar::aux::math::Limits<double>>& sizesRange,
+                                                              const cedar::aux::ConfigurationNode& node)
 {
   std::vector<unsigned int> sizeList;
   unsigned int dimensionalitySize = 0;
+  sizesRange.clear();
 
   //First find dimensions
   auto dimensions_iter = node.find("Dimensions");
@@ -523,55 +664,12 @@ void cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(cedar::aux::UInt
   {
     std::string size = iter->second.get<std::string>("<xmlattr>.size");
     sizeList.push_back(std::stoi(size));
+    double lower = iter->second.get<double>("<xmlattr>.lower");
+    double upper = iter->second.get<double>("<xmlattr>.upper");
+    sizesRange.push_back(cedar::aux::math::Limits<double>(lower, upper));
     dimensionalitySize++;
   }
 
   sizes->setValue(sizeList);
   dimensionality->setValue(dimensionalitySize);
-}
-
-void cedar::proc::GroupXMLFileFormatV1::readDataConnections
-(
-	cedar::proc::GroupPtr group,
-	const cedar::aux::ConfigurationNode& root,
-	std::vector<std::string>& exceptions
-)
-{
-	for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
-			 iter != root.end();
-			 ++iter)
-	{
-		std::string source = iter->second.get<std::string>("Source");
-		std::string target = iter->second.get<std::string>("Target");
-    // Look for slots to append slot names to the step names
-    cedar::proc::ElementPtr sourceElement = group->getElement(source);
-    cedar::proc::ElementPtr targetElement = group->getElement(target);
-
-    auto sourceConnectable = dynamic_cast<cedar::proc::Connectable*>(sourceElement.get());
-    CEDAR_ASSERT(sourceConnectable != nullptr)
-    auto sourceSlots = sourceConnectable->getOrderedDataSlots(DataRole::OUTPUT);
-    CEDAR_ASSERT(sourceSlots.size() > 0)
-
-    auto targetConnectable = dynamic_cast<cedar::proc::Connectable*>(targetElement.get());
-    CEDAR_ASSERT(targetConnectable != nullptr)
-    auto targetSlots = targetConnectable->getOrderedDataSlots(DataRole::INPUT);
-    CEDAR_ASSERT(targetSlots.size() > 0)
-		try
-		{
-      group->connectSlots(source + "." + sourceSlots.at(0)->getName(),
-                          target + "." + targetSlots.at(0)->getName());
-    }
-		catch (cedar::aux::ExceptionBase& e)
-		{
-			std::string info = "Exception occurred while connecting \"" + source + "\" to \"" + target + "\": "
-												 + e.exceptionInfo();
-			exceptions.push_back(info);
-		}
-		catch (const std::exception& e)
-		{
-			std::string info = "Exception occurred while connecting \"" + source + "\" to \"" + target + "\": "
-												 + std::string(e.what());
-			exceptions.push_back(info);
-		}
-	}
 }

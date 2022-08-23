@@ -330,7 +330,8 @@ void cedar::proc::steps::SynapticConnection::preparePointWiseWeightMat(cv::Mat& 
   {
     leftCrop = (pointWiseMat.cols - mConvolutionOutput->getData().cols) / 2;
   }
-  pointWiseMat = pointWiseMat(cv::Rect(leftCrop, topCrop, mConvolutionOutput->getData().cols, mConvolutionOutput->getData().rows));
+  pointWiseMat = pointWiseMat(cv::Rect(leftCrop, topCrop, mConvolutionOutput->getData().cols,
+                                       mConvolutionOutput->getData().rows));
 }
 
 bool cedar::proc::steps::SynapticConnection::isXMLExportable(std::string& errorMsg){
@@ -369,6 +370,40 @@ void cedar::proc::steps::SynapticConnection::writeConfigurationXML(cedar::aux::C
   cedar::aux::ConfigurationNode dimensionMapping;
   this->mProjectionDimensionMappings->writeToNodeXML(dimensionMapping);
   root.add_child("DimensionMapping", dimensionMapping);
+}
+
+void cedar::proc::steps::SynapticConnection::readConfigurationXML(const cedar::aux::ConfigurationNode& root)
+{
+  auto kernelWeights = root.find("KernelWeights");
+  auto pointWiseWeights = root.find("PointWiseWeights");
+  auto scalarWeight = root.find("ScalarWeight");
+  auto dimensionMapping = root.find("DimensionMapping");
+
+  // Read kernel weights
+  if (kernelWeights != root.not_found())
+  {
+    cedar::proc::GroupXMLFileFormatV1::readKernelListParameter(this->mKernelsParameter.get(),
+                                                               root.get_child("KernelWeights"));
+  }
+
+  // Read point wise weights
+  if (pointWiseWeights != root.not_found())
+  {
+    cedar::proc::GroupXMLFileFormatV1::readKernelListParameter(this->mPointWiseWeightKernelsParameter.get(),
+                                                                root.get_child("PointWiseWeights"));
+  }
+  // Read static gain
+  if (scalarWeight != root.not_found())
+  {
+    this->mGainFactorParameter->setValue(root.get<double>("ScalarWeight"));
+  }
+  // Read projection
+  if (dimensionMapping != root.not_found())
+  {
+    cedar::proc::GroupXMLFileFormatV1::readProjectionMappingsParameter(
+      this->mProjectionDimensionMappings,
+      root.get_child("DimensionMapping"));
+  }
 }
 
 ////Functions copied from cedar::proc::steps::Convolution

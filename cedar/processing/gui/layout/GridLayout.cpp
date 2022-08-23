@@ -70,7 +70,10 @@ void cedar::proc::gui::layout::GridLayout::arrange(cedar::proc::gui::Group* grou
   for (auto iter = elements.begin(); iter != elements.end(); ++iter)
   {
     cedar::proc::gui::Element* guiElement = group->getScene()->getGraphicsItemFor(iter->second);
-    guiElement->setPos((i % width) * 200, (i / width) * 110);
+    if(guiElement != nullptr)
+    {
+      guiElement->setPos((i % width) * 200 + rand() % 30 - 15, (i / width) * 110 + rand() % 30 - 15);
+    }
     i++;
   }
 }
