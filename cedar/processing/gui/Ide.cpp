@@ -1963,7 +1963,9 @@ bool cedar::proc::gui::Ide::loadSerializableData()
 
 bool cedar::proc::gui::Ide::saveAs()
 {
-  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
+  //todo: maybe make this together with the export part of exportXML a function which is included in both saveAs and exportXML functions
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()
+      ->lastArchitectureLoadDialogDirectory();
 
   QString file = "";
   QFileDialog* fileDialog = new QFileDialog();
@@ -2053,35 +2055,41 @@ bool cedar::proc::gui::Ide::exportXML()
     return false;
   }
 
-  // Export
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
 
-  QString file = QFileDialog::getSaveFileName(this, // parent
-                                              "Select where to export", // caption
-                                              last_dir->getValue().absolutePath(), // initial directory;
-                                              "architecture (*.xml)", // filter(s), separated by ';;'
-                                              0,
-          // js: Workaround for freezing file dialogs in QT5 (?)
-                                              QFileDialog::DontUseNativeDialog
-  );
+  QString file = "";
+  QFileDialog* fileDialog = new QFileDialog();
+
+  fileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
+  fileDialog->setAcceptMode(QFileDialog::AcceptSave);
+  fileDialog->setWindowTitle("Select where to save");
+  fileDialog->setDirectory(last_dir->getValue().absolutePath());
+  fileDialog->setNameFilter("architecture (*.xml)");
+  fileDialog->setDefaultSuffix(".xml");
+
+  if(fileDialog->exec() == QDialog::Accepted)
+  {
+    file = fileDialog->selectedFiles().front();
+  }
 
   if (file.isEmpty())
   {
     return false;
   }
 
-  if (!file.endsWith(".xml"))
-  {
-    file += ".xml";
-  }
+
+  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
+  cedar::aux::SettingsSingleton::getInstance()->setCurrentArchitectureFileName(file.toStdString());
 
   this->mGroup->writeXML(file.toStdString());
+  this->displayFilename(file.toStdString());
   this->setArchitectureChanged(false);
 
-
+#ifndef CEDAR_OS_WINDOWS
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
-  last_dir->setValue(path);
+#endif
 
+  last_dir->setValue(path);
   return true;
 }
 
@@ -2092,17 +2100,18 @@ void cedar::proc::gui::Ide::importXML()
 		return;
 	}
 
-	cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
+	cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()
+      ->lastArchitectureLoadDialogDirectory();
 
 	QFileDialog filedialog(this, "Select which file to load");
 	filedialog.setNameFilter( tr("architecture (*.xml)") );
 	filedialog.setDirectory( last_dir->getValue().absolutePath() ); // initial directory
 	filedialog.setFilter( QDir::AllDirs | QDir::Files
 												| QDir::NoDot
-												| QDir::Hidden );
+												| QDir::Hidden);
 	// see hidden files to see the backup files
 #ifdef CEDAR_USE_QT5
-	filedialog.setOptions( QFileDialog::DontUseNativeDialog );
+	filedialog.setOptions( QFileDialog::DontUseNativeDialog);
 	// js: Workaround for freezing file dialogs in QT5 (?)
 #endif
 
