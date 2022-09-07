@@ -982,6 +982,7 @@ void cedar::dyn::NeuralField::updateSizesRange()
 	{
 		sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
 	}
-	this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(
+  CEDAR_ASSERT(this->mSigmoidalActivation);
+  this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(
 					new cedar::aux::annotation::SizesRangeHint(sizesRange)));
 }
