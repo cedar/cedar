@@ -110,6 +110,7 @@ _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
     sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
   }
   this->mOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
+  this->updateSizesRange();
   QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mCenters.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
@@ -212,6 +213,9 @@ void cedar::proc::sources::GaussInput::updateDimensionality()
   _mCenters->setDefaultSize(new_dimensionality);
   _mSizes->resize(new_dimensionality, _mSizes->getDefaultValue());
   _mSizes->setDefaultSize(new_dimensionality);
+
+  this->updateSizesRange();
+
   this->lock(cedar::aux::LOCK_TYPE_READ);
   this->compute(cedar::proc::Arguments());
   this->unlock();
@@ -226,12 +230,20 @@ void cedar::proc::sources::GaussInput::updateMatrixSize()
   this->unlock();
   this->emitOutputPropertiesChangedSignal("Gauss input");
   this->onTrigger();
+
   // Update the sizes annotation
+  this->updateSizesRange();
+}
+
+void cedar::proc::sources::GaussInput::updateSizesRange()
+{
+  // Set the sizes annotation
   std::vector<cedar::aux::math::Limits<double>> sizesRange;
   for(unsigned int size : this->_mSizes->getValue())
   {
     sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
   }
-  this->mOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
-
+  CEDAR_ASSERT(this->mOutput);
+  this->mOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(
+      new cedar::aux::annotation::SizesRangeHint(sizesRange)));
 }
