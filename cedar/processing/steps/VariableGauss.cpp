@@ -213,6 +213,7 @@ void cedar::proc::steps::VariableGauss::recompute()
            || (mat.rows > 1 && std::isnan( mat.at<float>(1,0) ) ) )
      )
   {
+    tmpvec= { 0, 0 };
     this->mOutput->setData
                    (
                      cedar::aux::math::gaussMatrix
