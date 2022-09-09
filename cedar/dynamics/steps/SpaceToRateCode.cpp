@@ -105,7 +105,8 @@ _mTau(new cedar::aux::TimeParameter
 _mLowerLimit(new cedar::aux::DoubleParameter(this, "lowerLimit", 0.0, -10000.0, 10000.0)),
 _mUpperLimit(new cedar::aux::DoubleParameter(this, "upperLimit", 1.0, -10000.0, 10000.0)),
 mJumpToFixPoint(new cedar::aux::BoolParameter(this, "jump to fixed point", false)),
-mMakeCyclic(new cedar::aux::BoolParameter(this, "use cyclic mean", false))
+mMakeCyclic(new cedar::aux::BoolParameter(this, "use cyclic mean", false)),
+mNaNIfNoPeak(new cedar::aux::BoolParameter(this, "NaN if no peak", false))
 {
   // declare all data
   this->declareInput("input");
@@ -116,6 +117,7 @@ mMakeCyclic(new cedar::aux::BoolParameter(this, "use cyclic mean", false))
 
   mJumpToFixPoint->markAdvanced(true);
   mMakeCyclic->markAdvanced(true);
+  mNaNIfNoPeak->markAdvanced(true);
 
   // connect the parameter's change signal
   QObject::connect(_mLowerLimit.get(), SIGNAL(valueChanged()), this, SLOT(limitsChanged()));
@@ -227,6 +229,15 @@ void cedar::dyn::SpaceToRateCode::eulerStep(const cedar::unit::Time& time)
 
   s = cv::sum(this->mInput->getData()).val[0];
 
+  if (s <= 0.0
+      && mNaNIfNoPeak->getValue())
+  {
+    double mynan= std::numeric_limits<double>::quiet_NaN();
+    this->mOutput->getData().at<float>(0,0) = mynan;
+    this->mFixPoint->getData().at<float>(0,0) = mynan;
+    return;
+  }
+
   if (!mMakeCyclic->getValue()) // the default case (weighted mean):
   {
     o = cv::sum(this->mInput->getData().mul(mRamp)).val[0];
@@ -252,10 +263,16 @@ void cedar::dyn::SpaceToRateCode::eulerStep(const cedar::unit::Time& time)
 
 
   double x_0 = this->mOutput->getData().at<float>(0,0);
+  if (std::isnan(x_0))
+  {
+    x_0= 0.0; // neuer Startpunkt
+    this->mOutput->getData().at<float>(0,0) = x_0;
+  }
+
   double fixed_point;
   if (s == 0)
   {
-    fixed_point= 0; // workaround
+    fixed_point= x_0; // workaround: no change
   }
   else
   {

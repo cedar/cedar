@@ -165,6 +165,8 @@ protected:
   cedar::aux::BoolParameterPtr mJumpToFixPoint;
 
   cedar::aux::BoolParameterPtr mMakeCyclic;
+
+  cedar::aux::BoolParameterPtr mNaNIfNoPeak;
 private:
 
 }; // class cedar::dyn::SpaceToRateCode
