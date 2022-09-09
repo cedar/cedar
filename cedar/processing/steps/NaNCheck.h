@@ -131,6 +131,7 @@ private:
   cedar::aux::BoolParameterPtr mCheckForNaN;
   cedar::aux::BoolParameterPtr mCheckForInf;
   cedar::aux::BoolParameterPtr mCheckForEmpty;
+  cedar::aux::BoolParameterPtr mAutoReset;
 
 public:
 signals:

@@ -100,7 +100,8 @@ mCaughtInf(false),
 mCaughtEmpty(false),
 mCheckForNaN(new cedar::aux::BoolParameter(this,"check for NaN?", true)),
 mCheckForInf(new cedar::aux::BoolParameter(this,"check for Inf?", true)),
-mCheckForEmpty(new cedar::aux::BoolParameter(this,"check for Empty?", true))
+mCheckForEmpty(new cedar::aux::BoolParameter(this,"check for Empty?", true)),
+mAutoReset(new cedar::aux::BoolParameter(this,"automatically reset", false))
 {
   // declare all data
   cedar::proc::DataSlotPtr input = this->declareInput("input");
@@ -224,6 +225,16 @@ void cedar::proc::steps::NaNCheck::recompute()
       else
       {
         this->mOutput->setData( data2->getData() );
+      }
+    }
+  }
+  else
+  {
+    if (mAutoReset->getValue())
+    {
+      if (getCaughtNaN() || getCaughtInf() || getCaughtEmpty())
+      {
+        resetStates();
       }
     }
   }
