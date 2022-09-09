@@ -42,8 +42,8 @@
 #define UNIT_TEST_AUX_GUI_NUMERIC_VECTOR_PARAMETER_UINT_VECTOR_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/NumericVectorParameter.h"
-#include "cedar/auxiliaries/gui/UIntVectorParameter.h"
+#include "cedar/processing/auxiliaries/gui/NumericVectorParameter.h"
+#include "cedar/processing/auxiliaries/gui/UIntVectorParameter.h"
 
 // FORWARD DECLARATIONS
 
@@ -53,7 +53,7 @@
 
 /* A widget for unit testing cedar::aux::UIntVectorParameters.
  */
-class UIntVectorParameter : public cedar::aux::gui::UIntVectorParameter
+class UIntVectorParameter : public cedar::proc::aux::gui::UIntVectorParameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

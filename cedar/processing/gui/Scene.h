@@ -59,9 +59,10 @@
 #include "cedar/processing/gui/RecorderWidget.fwd.h"
 #include "cedar/processing/gui/CommentWidget.fwd.h"
 #include "cedar/processing/gui/CodeWidget.fwd.h"
+#include "cedar/processing/gui/CoPYWidget.fwd.h"
 #include "cedar/processing/gui/StickyNote.fwd.h"
 #include "cedar/processing/gui/TriggerItem.fwd.h"
-#include "cedar/auxiliaries/gui/Configurable.fwd.h"
+#include "cedar/processing/auxiliaries/gui/Configurable.fwd.h"
 #include "cedar/auxiliaries/PluginDeclaration.fwd.h"
 
 // SYSTEM INCLUDES
@@ -170,6 +171,10 @@ public:
     QPointF position
   );
 
+  /*!@brief Create a connection from source to target
+   */
+  void createConnection(cedar::proc::gui::GraphicsBase* source, cedar::proc::gui::GraphicsBase* target, bool create_connector_group);
+
   /*!@brief Adds a cedar::proc::gui::StepItem for the given cedar::proc::Step to the scene at the given position.
    */
   void addProcessingStep(cedar::proc::StepPtr step, QPointF position);
@@ -232,6 +237,14 @@ public:
    */
   const TriggerMap& getTriggerMap() const;
 
+  /*!@brief Returns gui element using the full path.
+   */
+  cedar::proc::gui::Element* getElementByFullPath(std::string elementIdentifier);
+
+  /*!@brief Returns the group of the Element
+   */
+  cedar::proc::GroupPtr getGroupOfElementByFullPath(std::string elementIdentifier);
+
   /*!@brief Returns the gui::group that displays the given group.
    */
   cedar::proc::gui::Group* getGroupFor(cedar::proc::ConstGroup* group);
@@ -251,7 +264,7 @@ public:
   //! Returns the graphics item corresponding to the given element.
   cedar::proc::gui::Element* getGraphicsItemFor(cedar::proc::ConstElementPtr element);
 
-  /*!@brief Returns, whether snap-to-grid is true.
+  /*!@brief Returns, whether snap-to-grid is true.F
    */
   bool getSnapToGrid() const;
 
@@ -284,7 +297,7 @@ public:
 
   /*!@brief Sets the widget used for displaying/editing the parameters of configurables.
    */
-  void setConfigurableWidget(cedar::aux::gui::Configurable* pConfigurableWidget);
+  void setConfigurableWidget(cedar::proc::aux::gui::Configurable* pConfigurableWidget);
 
   /*!@brief Sets the widget used for displaying/editing the record parameters.
    */
@@ -293,6 +306,9 @@ public:
   void setCommentWidget(cedar::proc::gui::CommentWidget* pCommentWidget);
   
   void setCodeWidget(cedar::proc::gui::CodeWidget* pCodeWidget);
+  #ifdef CEDAR_USE_COPY
+  void setCoPYWidget(cedar::proc::gui::CoPYWidget* pCoPYWidget);
+  #endif
 
   /*!@brief Exports the scene to an svg file
    */
@@ -336,7 +352,7 @@ public:
   void emitSceneChanged();
 
   //! Returns the configurable widget of the scene.
-  cedar::aux::gui::Configurable* getConfigurableWidget() const;
+  cedar::proc::aux::gui::Configurable* getConfigurableWidget() const;
 
   //! Returns the configurable widget of the scene.
   cedar::proc::gui::RecorderWidget* getRecorderWidget() const;
@@ -344,8 +360,9 @@ public:
   cedar::proc::gui::CommentWidget* getCommentWidget() const;
   
   cedar::proc::gui::CodeWidget* getCodeWidget() const;
-  
-
+  #ifdef CEDAR_USE_COPY
+  cedar::proc::gui::CoPYWidget* getCoPYWidget() const;
+  #endif
   /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
    */
   static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
@@ -416,6 +433,8 @@ private:
 
   void handleTriggerModeChange();
 
+  QStringList getGroupCoordinates(const QPointF &mousePosition);
+
   //! Responsible for highlighting group targets when the mouse is dragging items around.
   void highlightTargetGroups(const QPointF& mousePosition);
 
@@ -479,6 +498,11 @@ private:
   //! The parameter for the current mode.
   QString mModeParam;
 
+  //! When selected items are moved this variable saves their source position. Is used for undoing MoveElement
+  std::vector<QPointF> mStartMovingPosition;
+
+  QPointF mStartMovingPositionOfClicked;
+
   //! The group displayed by the scene.
   cedar::proc::gui::GroupPtr mGroup;
 
@@ -496,6 +520,9 @@ private:
 
   //! The item from which a new connection is started.
   cedar::proc::gui::GraphicsBase* mpConnectionStart;
+
+  //! The item which is currently dragged
+  cedar::proc::gui::GraphicsBase* mpDraggingGraphicsBase;
 
   //! When reconnecting already connected input slots: The connection that should be disconnected, when the mouse is dragged.
   cedar::proc::gui::Connection* mpConnectionToBeReconnected;
@@ -522,7 +549,7 @@ private:
   bool mSnapToGrid;
 
   //! The widget used to display configurables when they are selected in the scene. May be null.
-  cedar::aux::gui::Configurable* mpConfigurableWidget;
+  cedar::proc::aux::gui::Configurable* mpConfigurableWidget;
 
   //! The widget used to display record settings of steps when they are selected in the scene. May be null.
   cedar::proc::gui::RecorderWidget* mpRecorderWidget;
@@ -530,7 +557,9 @@ private:
   cedar::proc::gui::CommentWidget* mpCommentWidget;
   
   cedar::proc::gui::CodeWidget* mpCodeWidget;
-
+  #ifdef CEDAR_USE_COPY
+  cedar::proc::gui::CoPYWidget* mpCoPYWidget;
+  #endif
   //! Saves the mouse x position in the scene
   int mMousePosX;
 

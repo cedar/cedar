@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/gui/RobotManager.h"
+#include "cedar/processing/devices/gui/RobotManager.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 {
   QApplication app(argc, argv);
 
-  cedar::dev::gui::RobotManager* p_manager = new cedar::dev::gui::RobotManager();
+  cedar::proc::dev::gui::RobotManager* p_manager = new cedar::proc::dev::gui::RobotManager();
   p_manager->show();
 
   return app.exec();

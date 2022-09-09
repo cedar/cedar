@@ -54,6 +54,7 @@
 
 int main(int argc, char **argv)
 {
+#ifdef CEDAR_USE_QGLVIEWER
   QApplication application(argc, argv);
 
   // create scene
@@ -101,6 +102,6 @@ int main(int argc, char **argv)
 
   //start the program
   application.exec();
-
+#endif
   return 0;
 }

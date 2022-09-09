@@ -41,7 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/processing/auxiliaries/gui/Parameter.h"
 #include "cedar/processing/experiment/action/Action.h"
 
 // FORWARD DECLARATIONS
@@ -53,7 +53,7 @@
 /*!@brief A GUI implementation of cedar::proc::experiment::action::Action::ActionListParamter
  *
  */
-class cedar::proc::experiment::gui::ActionListParameter : public cedar::aux::gui::Parameter
+class cedar::proc::experiment::gui::ActionListParameter : public cedar::proc::aux::gui::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

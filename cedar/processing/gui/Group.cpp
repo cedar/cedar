@@ -72,6 +72,12 @@
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/processing/gui/StickyNote.h"
 #include "cedar/processing/gui/GroupParameterDesigner.h"
+#include "Ide.h"
+#include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteElement.h"
+#include "cedar/processing/undoRedo/commands/CreateGroupTemplate.h"
+#include <cedar/processing/undoRedo/commands/ChangeParameterValueTemplate.h>
 
 // SYSTEM INCLUDES
 #include <QEvent>
@@ -87,6 +93,7 @@
 #include <QListWidget>
 #include <QScrollBar>
 #include <QMutexLocker>
+#include <QClipboard>
 
 #ifndef Q_MOC_RUN
 
@@ -335,13 +342,14 @@ void cedar::proc::gui::Group::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
 
 void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
-  auto declaration = cedar::proc::gui::ElementList::declarationFromDrop(pEvent);
+  cedar::aux::ConstPluginDeclaration* declaration = cedar::proc::gui::ElementList::declarationFromDrop(pEvent);
   if (declaration == nullptr)
   {
     return;
   }
   QPointF mapped = pEvent->scenePos();
-  auto target_group = this->getGroup();
+  cedar::proc::GroupPtr target_group = this->getGroup();
+
   if (!this->isRootGroup())
   {
     mapped -= this->scenePos();
@@ -349,18 +357,17 @@ void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 
   if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration *>(declaration))
   {
-    //!@todo can createElement be moved into gui::Group?
-    this->mpScene->createElement(target_group, elem_declaration->getClassName(), mapped);
-  } else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration *>(declaration))
+    //Push a createDeleteCommand (as a create) onto the UndoStack
+    cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteElement(
+            elem_declaration->getClassName(), target_group, mpScene, true, mapped));
+  }
+  //TODO: Do Group Declaration (with an own Command). This works with Json Templates
+  else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration *>(declaration))
   {
-    auto elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup
-            (
-                    group_declaration->getClassName(),
-                    target_group,
-                    pEvent->modifiers().testFlag(Qt::ControlModifier)
-            );
-    this->mpScene->getGraphicsItemFor(elem)->setPos(mapped);
-  } else
+    cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateGroupTemplate(
+            group_declaration, target_group, pEvent, mapped, this->mpScene));
+  }
+  else
   {
     CEDAR_THROW(cedar::aux::NotFoundException, "Could not cast the dropped declaration to any known type.");
   }
@@ -812,6 +819,16 @@ void cedar::proc::gui::Group::sizeChanged()
   this->updateDecorationPositions();
 }
 
+double cedar::proc::gui::Group::getUncollapsedWidth()
+{
+  return this->_mUncollapsedWidth->getValue();
+}
+
+double cedar::proc::gui::Group::getUncollapsedHeight()
+{
+  return this->_mUncollapsedHeight->getValue();
+}
+
 void cedar::proc::gui::Group::updateTextBounds()
 {
   qreal bounds_factor = static_cast<qreal>(2);
@@ -1044,6 +1061,27 @@ void cedar::proc::gui::Group::addElements(const std::list<QGraphicsItem *> &elem
     item_configs[element] = config;
   }
 
+  for(auto element : elements_to_move)
+	{
+  	//Check if the element name already exists in group
+  	if(this->getGroup()->nameExists(element->getName()))
+		{
+			cedar::aux::ParameterPtr nameParameter = element->getParameter("name");
+			std::string currentName = element->getName();
+
+			// If parameter belongs to a step/element, push to undo stack (e.g. settings parameter should not be undoable)
+			cedar::aux::NamedConfigurable* owner = nameParameter->getNamedConfigurableOwner();
+			if(owner != nullptr)
+			{
+				auto parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(nameParameter);
+
+				cedar::proc::gui::Ide::pUndoStack->push(
+								new cedar::proc::undoRedo::commands::ChangeParameterValueTemplate<std::string>(parameter.get(),
+												currentName, this->getGroup()->getUniqueIdentifier(currentName), owner, this->mpScene));
+			}
+		}
+	}
+
   this->getGroup()->add(elements_to_move);
 
   for (auto element : all_elements)
@@ -1203,20 +1241,17 @@ void cedar::proc::gui::Group::readJson(const cedar::aux::Path &source)
   }
 }
 
-void cedar::proc::gui::Group::readJsonFromString(std::string jsonString)
+void cedar::proc::gui::Group::readJsonFromString(std::string jsonString, bool ignoreSnapToGrid)
 {
-  std::stringstream jsonFromClipboardStream;
-  jsonFromClipboardStream << jsonString;
+	cedar::aux::ConfigurationNode root;
+  std::stringstream jsonStream;
 
-  cedar::aux::ConfigurationNode root;
-
-  //Debugged: Works
-  read_json(jsonFromClipboardStream, root);
-
+  jsonStream << jsonString;
+  read_json(jsonStream, root);
 
   this->readRobots(root);
   this->mGroup->readConfiguration(root);
-  this->readConfiguration(root);
+  this->readConfiguration(root, ignoreSnapToGrid);
 }
 
 void cedar::proc::gui::Group::readRobots(const cedar::aux::ConfigurationNode &root)
@@ -1236,7 +1271,7 @@ void cedar::proc::gui::Group::readRobots(const cedar::aux::ConfigurationNode &ro
   }
 }
 
-void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationNode &root)
+void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationNode &root, bool ignoreSnapToGrid)
 {
   if (root.find("ui generic") != root.not_found())
   {
@@ -1270,8 +1305,6 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
       }
     }
 
-
-
     // read background color
     auto color_node = node.find("background color");
     if (color_node != node.not_found())
@@ -1297,7 +1330,7 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
   if (root.find("ui") != root.not_found())
   {
     this->readStickyNotes(root.get_child("ui"));
-    this->readConnections(root.get_child("ui"));
+    this->readConnections(root.get_child("ui"), ignoreSnapToGrid);
   }
 
   if (root.find("ui view") != root.not_found())
@@ -1311,7 +1344,7 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
   //!@todo This is a quickfix, I think the entire read process needs to be revised
   cedar::aux::ConfigurationNode root_copy = root;
   // try to apply the UI configuration to any elements that may have already been added to the group.
-  this->tryRestoreUIConfigurationsOfElements(root_copy);
+  this->tryRestoreUIConfigurationsOfElements(root_copy, ignoreSnapToGrid);
 
   // after loading, make sure the collapsed state is properly applied
   this->updateCollapsedness();
@@ -1713,52 +1746,44 @@ void cedar::proc::gui::Group::writeScene(cedar::aux::ConfigurationNode &root) co
     cedar::aux::ConfigurationNode allConnections;
     auto data_cons = this->getGroup()->getDataConnections();
     QList<QGraphicsItem *> items = this->mpScene->items();
-
     for (int i = 0; i < items.size(); ++i)
     {
       if (cedar::proc::gui::Connection *con = dynamic_cast<cedar::proc::gui::Connection *>(items[i]))
       {
-        for(cedar::proc::DataConnectionPtr data_con : data_cons)
-        {
-          //Save ConnectionAnchors of every connection in this group
-          if (!con->getSourceSlotName().toStdString().compare(data_con->getSource()->getParent() + "." + data_con->getSource()->getName())
-           && !con->getTargetSlotName().toStdString().compare(data_con->getTarget()->getParent() + "." + data_con->getTarget()->getName()))
-          {
-            if(con->getConnectionAnchorPoints().size() <= 0 || !con->isSourceTargetSlotNameValid()) continue;
-            cedar::aux::ConfigurationNode connection;
-            connection.put("source slot", con->getSourceSlotName().toStdString());
-            connection.put("target slot", con->getTargetSlotName().toStdString());
-            cedar::aux::ConfigurationNode anchorsNode;
-            std::vector<cedar::proc::gui::ConnectionAnchor*> anchorsToSave;
+        if (con->getConnectionAnchorPoints().size() <= 0 || !con->isSourceTargetSlotNameValid()) continue;
+        cedar::aux::ConfigurationNode connection;
+        connection.put("source slot", con->getSourceSlotName().toStdString());
+        connection.put("target slot", con->getTargetSlotName().toStdString());
+        cedar::aux::ConfigurationNode anchorsNode;
+        std::vector<cedar::proc::gui::ConnectionAnchor *> anchorsToSave;
 
-            //Remove duplicates (may result from previous bug)
-            for(cedar::proc::gui::ConnectionAnchor *anchor : con->getConnectionAnchorPoints())
+        //Remove duplicates (may result from previous bug)
+        for (cedar::proc::gui::ConnectionAnchor *anchor: con->getConnectionAnchorPoints())
+        {
+          bool duplicate = false;
+          for (cedar::proc::gui::ConnectionAnchor *savedAnchor: anchorsToSave)
+          {
+            if (static_cast<int>(anchor->posMiddle().x()) == static_cast<int>(savedAnchor->posMiddle().x()) &&
+                static_cast<int>(anchor->posMiddle().y()) == static_cast<int>(savedAnchor->posMiddle().y()))
             {
-              bool duplicate = false;
-              for (cedar::proc::gui::ConnectionAnchor *savedAnchor : anchorsToSave)
-              {
-                if(static_cast<int>(anchor->posMiddle().x()) == static_cast<int>(savedAnchor->posMiddle().x()) && static_cast<int>(anchor->posMiddle().y()) == static_cast<int>(savedAnchor->posMiddle().y()))
-                {
-                  duplicate = true;
-                }
-              }
-              if(!duplicate)
-              {
-                anchorsToSave.push_back(anchor);
-              }
+              duplicate = true;
             }
-            //Save anchors
-            for(cedar::proc::gui::ConnectionAnchor *anchor : anchorsToSave)
-            {
-              cedar::aux::ConfigurationNode anchorNode;
-              anchorNode.put("x", static_cast<int>(anchor->posMiddle().x()));
-              anchorNode.put("y", static_cast<int>(anchor->posMiddle().y()));
-              anchorsNode.push_back(cedar::aux::ConfigurationNode::value_type("", anchorNode));
-            }
-            connection.add_child("anchors", anchorsNode);
-            allConnections.push_back(cedar::aux::ConfigurationNode::value_type("", connection));
+          }
+          if (!duplicate)
+          {
+            anchorsToSave.push_back(anchor);
           }
         }
+        //Save anchors
+        for (cedar::proc::gui::ConnectionAnchor *anchor: anchorsToSave)
+        {
+          cedar::aux::ConfigurationNode anchorNode;
+          anchorNode.put("x", static_cast<int>(anchor->posMiddle().x()));
+          anchorNode.put("y", static_cast<int>(anchor->posMiddle().y()));
+          anchorsNode.push_back(cedar::aux::ConfigurationNode::value_type("", anchorNode));
+        }
+        connection.add_child("anchors", anchorsNode);
+        allConnections.push_back(cedar::aux::ConfigurationNode::value_type("", connection));
       }
     }
     connNode.put_child("connections", allConnections);
@@ -1994,7 +2019,6 @@ void cedar::proc::gui::Group::checkTriggerConnection
                           this->getGroup()->getElement(source->getName()).get()
                   )
   );
-
   auto target_element = this->mpScene->getGraphicsItemFor
           (
                   this->getGroup()->getElement(
@@ -2219,7 +2243,8 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
 void cedar::proc::gui::Group::tryToRestoreGroupUIConfiguration
         (
                 cedar::aux::ConfigurationNode &config,
-                cedar::proc::gui::GraphicsBase *pSceneElement
+                cedar::proc::gui::GraphicsBase *pSceneElement,
+                bool ignoreSnapToGrid
         )
 {
   auto groups_iter = config.find("groups");
@@ -2235,12 +2260,18 @@ void cedar::proc::gui::Group::tryToRestoreGroupUIConfiguration
     auto group_iter = groups.find(group->getGroup()->getName());
     if (group_iter != groups.not_found())
     {
-      group->readConfiguration(group_iter->second);
+      group->readConfiguration(group_iter->second, ignoreSnapToGrid);
+      // Snap group to the grid if the grid is enabled
+      if(!ignoreSnapToGrid && this->mpScene->getSnapToGrid())
+      {
+        group->setPos(QPointF(group->pos().x() + 1, group->pos().y() + 1));
+      }
     }
   }
 }
 
-void cedar::proc::gui::Group::tryRestoreUIConfigurationsOfElements(cedar::aux::ConfigurationNode &conf)
+void cedar::proc::gui::Group::tryRestoreUIConfigurationsOfElements(cedar::aux::ConfigurationNode &conf,
+                                                                   bool ignoreSnapToGrid)
 {
   // try to apply the configuration to any steps that have already been added to the group
   for (auto name_element_iter : this->getGroup()->getElements())
@@ -2254,10 +2285,10 @@ void cedar::proc::gui::Group::tryRestoreUIConfigurationsOfElements(cedar::aux::C
       //!@todo Make these restore functions virtual functions in graphics base/gui connectable
       if (auto group = dynamic_cast<cedar::proc::gui::Group *>(ui_element))
       {
-        this->tryToRestoreGroupUIConfiguration(conf, group);
+        this->tryToRestoreGroupUIConfiguration(conf, group, ignoreSnapToGrid);
       } else
       {
-        this->tryToRestoreUIConfiguration(conf, element, ui_element);
+        this->tryToRestoreUIConfiguration(conf, element, ui_element, ignoreSnapToGrid);
       }
     }
   }
@@ -2267,7 +2298,8 @@ void cedar::proc::gui::Group::tryToRestoreUIConfiguration
         (
                 cedar::aux::ConfigurationNode &config,
                 cedar::proc::ElementPtr element,
-                cedar::proc::gui::GraphicsBase *pSceneElement
+                cedar::proc::gui::GraphicsBase *pSceneElement,
+                bool ignoreSnapToGrid
         )
 {
   std::string current_type;
@@ -2297,6 +2329,11 @@ void cedar::proc::gui::Group::tryToRestoreUIConfiguration
         if (iter->second.get<std::string>(current_type) == element->getName())
         {
           pSceneElement->readConfiguration(iter->second);
+          // Snap element to the grid if the grid is enabled
+          if(!ignoreSnapToGrid && this->mpScene->getSnapToGrid())
+          {
+            pSceneElement->setPos(QPointF(pSceneElement->pos().x() + 1, pSceneElement->pos().y() + 1));
+          }
           ui.erase(iter);
           break;
         }
@@ -2815,6 +2852,9 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
     QObject::connect(edit_parameters_action, SIGNAL(triggered()), this, SLOT(openParameterEditor()));
   }
 
+  QAction* p_copyCoordinates = menu.addAction("copy coordinates");
+
+
   //!@todo Fully implement showing groups in cotnainers
   // currently, this feature is disabled because there are too many bugs
 //  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
@@ -2877,6 +2917,11 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
     QList<QGraphicsItem*> items;
     items.append(this);
     this->getScene()->deleteElements(items, event->modifiers() & Qt::ControlModifier);
+  }
+  else if (a == p_copyCoordinates)
+  {
+    QClipboard *p_Clipboard = QApplication::clipboard();
+    p_Clipboard->setText(QString::number(event->pos().x()) + ", " + QString::number(event->pos().y()));
   }
   // plot data
   else
@@ -3014,7 +3059,7 @@ void cedar::proc::gui::Group::readView(const cedar::aux::ConfigurationNode &node
   }
 }
 
-void cedar::proc::gui::Group::readConnections(const cedar::aux::ConfigurationNode &node)
+void cedar::proc::gui::Group::readConnections(const cedar::aux::ConfigurationNode &node, bool ignoreSnapToGrid)
 {
 
   std::vector<cedar::proc::gui::Connection*> cs; // all gui connections in the scene
@@ -3063,7 +3108,13 @@ void cedar::proc::gui::Group::readConnections(const cedar::aux::ConfigurationNod
               auto anchorNode = iter2->second;
               int x = anchorNode.get<int>("x");
               int y = anchorNode.get<int>("y");
-              guiConnection->addConnectionAnchor(QPointF(x, y), true);
+              cedar::proc::gui::ConnectionAnchor* anchor = guiConnection->addConnectionAnchor(QPointF(x, y), true);
+              if(!ignoreSnapToGrid && this->mpScene->getSnapToGrid())
+              {
+                anchor->setSelected(true);
+                anchor->snapToGrid();
+                anchor->setSelected(false);
+              }
             }
           }
         }
@@ -3075,14 +3126,12 @@ void cedar::proc::gui::Group::readConnections(const cedar::aux::ConfigurationNod
 
 void cedar::proc::gui::Group::readStickyNotes(const cedar::aux::ConfigurationNode &node)
 {
-
   for (auto iter = node.begin(); iter != node.end(); ++iter)
   {
     const auto &sticky_node = iter->second;
     const std::string &type = sticky_node.get<std::string>("type");
     if (type == "stickyNote")
     {
-
       int x = sticky_node.get<int>("x");
       int y = sticky_node.get<int>("y");
       int witdh = sticky_node.get<int>("width");

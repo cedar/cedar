@@ -109,7 +109,7 @@ void cedar::proc::gui::AdvancedParameterLinker::linkInfoChanged()
     }
     else
     {
-      new_source_element = group->shared_from_this();
+      new_source_element = boost::dynamic_pointer_cast<cedar::proc::Element>(group->shared_from_this());
     }
 
     CEDAR_ASSERT(new_source_element);
@@ -136,7 +136,7 @@ void cedar::proc::gui::AdvancedParameterLinker::linkInfoChanged()
     }
     else
     {
-      new_target_element = group->shared_from_this();
+      new_target_element = boost::dynamic_pointer_cast<cedar::proc::Element>(group->shared_from_this());
     }
 
     CEDAR_ASSERT(new_target_element);

@@ -61,7 +61,9 @@ cedar::dev::RobotManager::RobotManager()
   cedar::dev::RobotManager::Template epuck_template;
   epuck_template.setIconPath(":/cedar/dev/gui/icons/epuck_icon_256.png");
   epuck_template.addNamedConfiguration("serial", cedar::aux::Path("resource://robots/epuck/serial_configuration.json"));
+#ifdef CEDAR_USE_YARP
   epuck_template.addNamedConfiguration("yarp/webots", cedar::aux::Path("resource://robots/epuck/yarp_configuration.json"));
+#endif
   this->addRobotTemplate("epuck", epuck_template);
 
   // khepera ---------------------------------------------------------------------------------------------------------
@@ -73,23 +75,33 @@ cedar::dev::RobotManager::RobotManager()
   // caren ---------------------------------------------------------------------------------------------------------
   cedar::dev::RobotManager::Template caren_template;
   caren_template.setIconPath(":/cedar/dev/gui/icons/caren_icon_256.png");
+#ifdef CEDAR_USE_KUKA_LWR
   caren_template.addNamedConfiguration("hardware", cedar::aux::Path("resource://robots/caren/hardware_configuration.json"));
+#endif
   caren_template.addNamedConfiguration("simulator", cedar::aux::Path("resource://robots/caren/simulator_configuration.json"));
+#ifdef CEDAR_USE_YARP
   caren_template.addNamedConfiguration("webots", cedar::aux::Path("resource://robots/caren/webots_configuration.json"));
-  caren_template.addNamedConfiguration("test", cedar::aux::Path("resource://robots/caren/test_configuration.json"));
+#endif
+  //caren_template.addNamedConfiguration("test", cedar::aux::Path("resource://robots/caren/test_configuration.json"));
   this->addRobotTemplate("caren", caren_template);
 
   // youbot
   cedar::dev::RobotManager::Template youbot_template;
   youbot_template.setIconPath(":/cedar/dev/gui/icons/youbot_icon_256.png");
+  youbot_template.addNamedConfiguration("simulator", cedar::aux::Path("resource://robots/youbot/simulator_configuration.json"));
+
+#ifdef CEDAR_USE_YARP
   youbot_template.addNamedConfiguration("yarp",cedar::aux::Path("resource://robots/youbot/yarp_configuration.json"));
-  youbot_template.addNamedConfiguration("simulator",cedar::aux::Path("resource://robots/youbot/simulator_configuration.json"));
+#endif
+  
   this->addRobotTemplate("youbot",youbot_template);
 
   // twoDArm
   cedar::dev::RobotManager::Template twoDArm_template;
   twoDArm_template.setIconPath(":/cedar/dev/gui/icons/twoDArm_icon_256.png");
+#ifdef CEDAR_USE_YARP
   twoDArm_template.addNamedConfiguration("yarp",cedar::aux::Path("resource://robots/twoDArm/yarp_configuration.json"));
+#endif
   twoDArm_template.addNamedConfiguration("simulator",cedar::aux::Path("resource://robots/twoDArm/simulator_configuration.json"));
   this->addRobotTemplate("twoDArm",twoDArm_template);
 

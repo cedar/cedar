@@ -20,7 +20,7 @@
    <item>
     <widget class="cedar::proc::gui::ElementTreeWidget" name="mpBoostTree">
      <attribute name="headerStretchLastSection">
-      <bool>false</bool>
+      <bool>true</bool>
      </attribute>
      <column>
       <property name="text">

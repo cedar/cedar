@@ -40,8 +40,8 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/UiSettings.h"
 #include "cedar/processing/gui/Settings.h"
-#include "cedar/auxiliaries/gui/BoolParameter.h"
-#include "cedar/auxiliaries/gui/UIntParameter.h"
+#include "cedar/processing/auxiliaries/gui/BoolParameter.h"
+#include "cedar/processing/auxiliaries/gui/UIntParameter.h"
 #include "cedar/auxiliaries/gui/Settings.h"
 #include "cedar/auxiliaries/Settings.h"
 
@@ -70,6 +70,9 @@ QWidget(pParent)
   this->mpHighlightConnections->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mHighlightConnections);
   this->mpHighlightHoveredConnection->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mHighlightHoveredConnections);
   this->mpMaximumNumberOfLogMessages->setParameter(cedar::aux::gui::SettingsSingleton::getInstance()->getMaximalNumberOfLogEntriesParameter());
+
+  // miscellaneous settings
+  this->mpUndoRedoAutoMacro->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mUndoRedoAutoMacro);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

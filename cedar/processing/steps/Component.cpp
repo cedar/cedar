@@ -93,7 +93,7 @@ namespace
 
 namespace
 {
-  bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->add
+  bool registered = cedar::proc::aux::gui::ParameterFactorySingleton::getInstance()->add
       <
         cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameter,
         cedar::proc::details::ComponentStepUserSelectableCommandTypeSubsetParameterWidget
@@ -304,7 +304,10 @@ void cedar::proc::steps::Component::communicationStepSizeChanged()
 {
   const double &paramvalue = _mCommunicationStepSize->getValue();
   const cedar::unit::Time step_size = cedar::unit::Time(paramvalue * cedar::unit::milli * cedar::unit::seconds);
-  this->getComponent()->setCommunicationStepSize(step_size);
+	if(this->hasComponent())
+	{
+		this->getComponent()->setCommunicationStepSize(step_size);
+	}
 }
 
 void cedar::proc::steps::Component::testStates(cedar::dev::ComponentPtr component)

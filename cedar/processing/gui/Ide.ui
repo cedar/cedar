@@ -67,7 +67,7 @@
       </widget>
       <widget class="QWidget" name="tabVisualisation">
        <attribute name="title">
-        <string>visualisation</string>
+        <string>visualization</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
@@ -156,6 +156,9 @@
     <property name="title">
      <string>Edit</string>
     </property>
+    <addaction name="mpActionUndo"/>
+    <addaction name="mpActionRedo"/>
+    <addaction name="separator"/>
     <addaction name="mpActionCopy"/>
     <addaction name="mpActionPaste"/>
     <addaction name="mpActionCopyConfiguration"/>
@@ -205,6 +208,9 @@
   </widget>
   <widget class="QStatusBar" name="mpStatusBar"/>
   <widget class="QDockWidget" name="mpItemsWidget">
+   <property name="floating">
+    <bool>false</bool>
+   </property>
    <property name="features">
     <set>QDockWidget::DockWidgetFeatureMask</set>
    </property>
@@ -299,7 +305,7 @@
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_6">
          <item>
-          <widget class="cedar::aux::gui::Configurable" name="mpPropertyTable"/>
+          <widget class="cedar::proc::aux::gui::Configurable" name="mpPropertyTable"/>
          </item>
         </layout>
        </widget>
@@ -672,7 +678,10 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="mpActionLoad"/>
    <addaction name="mpActionSave"/>
+   <addaction name="mpActionUndo"/>
+   <addaction name="mpActionRedo"/>
    <addaction name="separator"/>
    <addaction name="mpActionStartPauseSimulation"/>
    <addaction name="mpActionResetSimulation"/>
@@ -727,6 +736,10 @@
   <action name="mpActionLoad">
    <property name="text">
     <string>Open file...</string>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/open.svg</normaloff>:/toolbaricons/open.svg</iconset>
    </property>
    <property name="toolTip">
     <string>Load an architecture file</string>
@@ -929,6 +942,9 @@
    <property name="toolTip">
     <string>Closes all plots</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
   </action>
   <action name="mpActionRecord">
    <property name="checkable">
@@ -1051,7 +1067,30 @@
     <string>Ctrl+C</string>
    </property>
   </action>
-
+  <action name="mpActionUndo">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/menus/undo.svg</normaloff>:/menus/undo.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="mpActionRedo">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/menus/redo.svg</normaloff>:/menus/redo.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
+   </property>
+  </action>
   <action name="mpActionCopyConfiguration">
    <property name="text">
     <string>Copy step configuration</string>
@@ -1222,9 +1261,9 @@
    <header location="global">cedar/processing/gui/View.h</header>
   </customwidget>
   <customwidget>
-   <class>cedar::aux::gui::Configurable</class>
+   <class>cedar::proc::aux::gui::Configurable</class>
    <extends>QTableWidget</extends>
-   <header>cedar/auxiliaries/gui/Configurable.h</header>
+   <header>cedar/processing/auxiliaries/gui/Configurable.h</header>
   </customwidget>
   <customwidget>
    <class>cedar::aux::gui::Log</class>
@@ -1260,6 +1299,12 @@
    <class>cedar::aux::gui::SceneControl</class>
    <extends>QWidget</extends>
    <header>cedar/auxiliaries/gui/SceneControl.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cedar::proc::gui::CoPYWidget</class>
+   <extends>QWidget</extends>
+   <header>cedar/processing/gui/CoPYWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

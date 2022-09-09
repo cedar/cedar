@@ -109,10 +109,10 @@ public:
   bool canCopyFrom(cedar::aux::ConstParameterPtr other ) const;
 
   //!@brief sets a new directory from string
-  void setValue(const std::string& value);
+  void setValue(const std::string& value, bool lock = false);
 
   //!@brief sets a new directory from QDir
-  void setValue(const QDir& value);
+  void setValue(const QDir& value, bool lock = false);
 
   //!@brief sets directory to default value
   void makeDefault();
@@ -173,6 +173,6 @@ private:
 
   bool mConstantPathMode;
 
-}; // class cedar::aux::DirectoryParameter
+}; // class cedar::aux::FileParameter
 
 #endif // CEDAR_AUX_FILE_PARAMETER_H

@@ -107,6 +107,7 @@ protected:
 private:
   cedar::aux::ConstMatDataPtr _mInputFirst;
   cedar::aux::ConstMatDataPtr _mInputSecond;
+  cedar::aux::MatDataPtr _mOutput;
 
   std::string inputFirstName = "first input";
   std::string inputSecondName = "second input";

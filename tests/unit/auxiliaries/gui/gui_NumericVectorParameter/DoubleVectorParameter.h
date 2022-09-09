@@ -42,12 +42,12 @@
 #define UNIT_TEST_AUX_GUI_NUMERIC_VECTOR_PARAMETER_DOUBLE_VECTOR_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/NumericVectorParameter.h"
-#include "cedar/auxiliaries/gui/DoubleVectorParameter.h"
+#include "cedar/processing/auxiliaries/gui/NumericVectorParameter.h"
+#include "cedar/processing/auxiliaries/gui/DoubleVectorParameter.h"
 
 /* A widget for unit testing cedar::aux::DoubleVectorParameters.
  */
-class DoubleVectorParameter : public cedar::aux::gui::DoubleVectorParameter
+class DoubleVectorParameter : public cedar::proc::aux::gui::DoubleVectorParameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -67,7 +67,7 @@ public:
 public:
   bool empty() const;
   unsigned int size() const;
-  cedar::aux::gui::IgnoreLocaleDoubleSpinBox* widgetAt(int i);
+  cedar::proc::aux::gui::IgnoreLocaleDoubleSpinBox* widgetAt(int i);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

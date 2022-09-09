@@ -1,2 +1,17 @@
 {
+    "steps": {
+        "cedar.processing.steps.PythonScript": {
+            "name": "Python Script von lasrs",
+            "code": "import numpy as np\nimport pycedar as pc\n\n#Print to messages tab:\n# pc.messagePrint('text')\n# pc.messagePrint(str(...))\n\n#Inputs: (NumPy Arrays)\n# pc.inputs[0]\n# pc.inputs[1]\n# ...\n\n#Outputs:\n# pc.outputs[0]\n# pc.outputs[1]\n# ...\n\n\ninput = pc.inputs[0]\n\npc.outputs[0] = input * 2\n",
+            "number of inputs": "1",
+            "number of outputs": "1",
+            "use script file": "false",
+            "script file path": {
+                "path": "\/home\/fred\/cedar\/cedar",
+                "isRelative": "false"
+            },
+            "auto-convert double output matrices to float": "true",
+            "comments": ""
+        }
+    }
 }

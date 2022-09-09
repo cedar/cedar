@@ -97,16 +97,16 @@
        </property>
       </column>
      </widget>
-     <widget class="cedar::aux::gui::Configurable" name="mpConfigurationEditor" native="true"/>
+     <widget class="cedar::proc::aux::gui::Configurable" name="mpConfigurationEditor" native="true"/>
     </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>cedar::aux::gui::Configurable</class>
+   <class>cedar::proc::aux::gui::Configurable</class>
    <extends>QWidget</extends>
-   <header>cedar/auxiliaries/gui/Configurable.h</header>
+   <header>cedar/processing/auxiliaries/gui/Configurable.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -46,6 +46,7 @@
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/Group.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsSceneMouseEvent>
@@ -110,7 +111,7 @@ void cedar::proc::gui::ConnectionAnchor::updatePosition(QPointF sourcePos)
     {
       // finished
       this->mAbsPos = this->scenePos();
-      this->setTransformOriginPoint(this->posMiddle());
+      //this->setTransformOriginPoint(this->posMiddle());
       this->mStarted = true;
     }
   }
@@ -141,36 +142,46 @@ QPointF cedar::proc::gui::ConnectionAnchor::scenePos()
   return QGraphicsEllipseItem::scenePos();
 }
 
-void cedar::proc::gui::ConnectionAnchor::move(QPointF scenePos, QPointF buttonDownScenePos)
+void cedar::proc::gui::ConnectionAnchor::snapToGrid(bool updateParent)
 {
-  if(!this->mInitialPositionSet)
-  {
-    this->mInitialParentPos = this->pos() + this->mPosOffset; // relative to the source slot of the parent step
-    this->mInitialPosition = this->pos();
-    this->mInitialPositionSet = true;
-  }
-
-  QPointF currentParentPos = this->mapFromScene(scenePos);
-  QPointF buttonDownParentPos = this->mapFromScene(buttonDownScenePos);
-
-  QPointF temp1 = scenePos - buttonDownScenePos;
-  QPointF temp2 = currentParentPos - buttonDownParentPos;
-
-  QPointF newScenePos = this->mInitialParentPos + currentParentPos - buttonDownParentPos;
   if(cedar::proc::gui::SettingsSingleton::getInstance()->snapToGrid())
   {
+    bool wasSelected = this->isSelected();
+    if(!wasSelected)
+    {
+      this->setSelected(true);
+    }
+    QPointF position = this->pos() + this->mPosOffset;
     qreal grid_size = cedar::proc::gui::SettingsSingleton::getInstance()->getSnapGridSize();
 
     //As the source step is the parent of this coordinate system, all drag-nodes have an offset to the grid when
     //the source step is not snapped to the grid
     //Here we get the current offset of the parent to a grid cell and subtract it to compensate this
     QPointF parentOffset = mpParent->gridOffset();
+    position.rx() =
+            (cedar::aux::math::round((position.x()) / grid_size) * grid_size + (grid_size / 2 - this->mRadius) - 1) -
+            parentOffset.x();
+    position.ry() =
+            (cedar::aux::math::round((position.y()) / grid_size) * grid_size + (grid_size / 2 - this->mRadius) - 1) -
+            parentOffset.y();
 
-    newScenePos.rx() = (cedar::aux::math::round(newScenePos.x() / grid_size) * grid_size + (grid_size / 2 - this->mRadius) - 1) - parentOffset.x();
-    newScenePos.ry() = (cedar::aux::math::round(newScenePos.y() / grid_size) * grid_size + (grid_size / 2 - this->mRadius) - 1) - parentOffset.y();
+    position = position - this->mPosOffset;
+    this->setPos(position);
+    if(!wasSelected)
+    {
+      this->setSelected(false);
+    }
+    if(updateParent)
+    {
+      this->mpParent->update();
+    }
   }
-  QPointF newPos = this->mInitialPosition + (newScenePos - this->mInitialParentPos);
-  this->setPos(newPos);
+}
+
+void cedar::proc::gui::ConnectionAnchor::move(QPointF targetPos)
+{
+  this->setPos(targetPos);
+  this->snapToGrid(false);
 
   this->mpParent->update();
 }
@@ -182,8 +193,16 @@ void cedar::proc::gui::ConnectionAnchor::mouseReleaseEvent(QGraphicsSceneMouseEv
 
 void cedar::proc::gui::ConnectionAnchor::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
+  if(!this->mInitialPositionSet)
+  {
+    this->mInitialPosition = this->pos();
+    this->mInitialPositionSet = true;
+  }
+
+  QPointF mouseOffset = this->mapFromScene(event->scenePos()) - this->mapFromScene(event->buttonDownScenePos(Qt::LeftButton));
+
   // The default movement behaviour is reimplemented and is added the snap-to-grid functionality
-  this->move(event->scenePos(), event->buttonDownScenePos(Qt::LeftButton));
+  this->move(this->mInitialPosition + mouseOffset);
 }
 
 void cedar::proc::gui::ConnectionAnchor::mousePressEvent(QGraphicsSceneMouseEvent *event)

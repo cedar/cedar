@@ -47,7 +47,7 @@ int main(int, char**)
 #else // CEDAR_COMPILER_MSVC
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/StringParameter.h"
+#include "cedar/processing/auxiliaries/gui/StringParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
 
 #include "cedar/auxiliaries/Configurable.h"
@@ -76,7 +76,7 @@ int test_string(const std::string& str)
   }
 
   std::cout << "creating widget." << std::endl;
-  cedar::aux::gui::StringParameter *p_param = new cedar::aux::gui::StringParameter();
+  cedar::proc::aux::gui::StringParameter *p_param = new cedar::proc::aux::gui::StringParameter();
 
   std::cout << "passing parameter to widget." << std::endl;
   p_param->setParameter(string);

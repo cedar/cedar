@@ -28,15 +28,18 @@
         <file>steps/no_icon.svg</file>
         <file>steps/broken_icon.svg</file>
         <file>steps/absolute_value.svg</file>
+		<file>steps/distance_image_coordinate_transform.svg</file>
         <file>steps/camera_grabber.svg</file>
         <file>steps/channel_merge.svg</file>
         <file>steps/channel_split.svg</file>
         <file>steps/color_conversion.svg</file>
+		<file>steps/convert_to_value_range.svg</file>
         <file>steps/component_multiply.svg</file>
         <file>steps/divide_elementwise.svg</file>
         <file>steps/a_minus_b.svg</file>
         <file>steps/convolution.svg</file>
         <file>steps/coordinate_transformation.svg</file>
+		<file>steps/coordinate_to_camera_angles.svg</file>
         <file>steps/flip.svg</file>
         <file>steps/gauss_input.svg</file>
         <file>steps/histogram.svg</file>
@@ -103,9 +106,12 @@
         <file>menus/actions.svg</file>
         <file>menus/display_style.svg</file>
         <file>menus/consistency_check.svg</file>
+        <file>menus/undo.svg</file>
+        <file>menus/redo.svg</file>
         <file>menus/settings.svg</file>
         <file>group.svg</file>
         <file>toolbaricons/save.svg</file>
+		<file>toolbaricons/open.svg</file>
         <file>toolbaricons/grid.svg</file>
         <file>toolbaricons/reset.svg</file>
         <file>toolbaricons/brakeall.svg</file>

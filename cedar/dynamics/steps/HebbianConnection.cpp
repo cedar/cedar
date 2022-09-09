@@ -91,6 +91,7 @@ namespace
   bool declared = declare();
 }
 
+cedar::aux::EnumType<cedar::dyn::steps::HebbianConnection::LearningRule> cedar::dyn::steps::HebbianConnection::LearningRule::mType("LearningRule::");
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -98,9 +99,12 @@ namespace
 cedar::dyn::steps::HebbianConnection::HebbianConnection()
     :
       // parameters
-      mInputDimension(new cedar::aux::UIntParameter(this, "source dimension", 0, 0, 2)),
-      mInputSizes(new cedar::aux::UIntVectorParameter(this, "source sizes", 0, 50,cedar::aux::UIntParameter::LimitType::positive(5000))),
-      mAssociationDimension(new cedar::aux::UIntParameter(this, "target dimension", 2, 0, 2)),
+        mLearningRule(
+                new cedar::aux::EnumParameter(this, "learning rule", cedar::dyn::steps::HebbianConnection::LearningRule::typePtr(),
+                                              LearningRule::OJA)),
+      mInputDimension(new cedar::aux::UIntParameter(this, "source dimension", 1, 0, 3)),
+      mInputSizes(new cedar::aux::UIntVectorParameter(this, "source sizes", 1, 50,cedar::aux::UIntParameter::LimitType::positive(5000))),
+      mAssociationDimension(new cedar::aux::UIntParameter(this, "target dimension", 2, 0, 3)),
       mAssociationSizes(new cedar::aux::UIntVectorParameter(this, "target sizes", 2, 50,cedar::aux::UIntParameter::LimitType::positive(5000))),
       mLearnRatePositive(new cedar::aux::DoubleParameter(this, "learning rate", 0.01)),
       mSigmoidF
@@ -108,7 +112,7 @@ cedar::dyn::steps::HebbianConnection::HebbianConnection()
                       new cedar::dyn::steps::HebbianConnection::SigmoidParameter
                               (
                                       this,
-                                      "f",
+                                      "f (source sigmoid)",
                                       cedar::aux::math::SigmoidPtr(new cedar::aux::math::HeavisideSigmoid(0.5))
                               )
               ),
@@ -117,7 +121,7 @@ cedar::dyn::steps::HebbianConnection::HebbianConnection()
                       new cedar::dyn::steps::HebbianConnection::SigmoidParameter
                               (
                                       this,
-                                      "g",
+                         "g (reward sigmoid)",
                                       cedar::aux::math::SigmoidPtr(new cedar::aux::math::HeavisideSigmoid(0.5))
                               )
               ),
@@ -126,7 +130,7 @@ cedar::dyn::steps::HebbianConnection::HebbianConnection()
                       new cedar::dyn::steps::HebbianConnection::SigmoidParameter
                               (
                                       this,
-                                      "h",
+                                      "h (target sigmoid)",
                                       cedar::aux::math::LinearTransferFunctionPtr(new cedar::aux::math::LinearTransferFunction())
                               )
               ),
@@ -148,6 +152,26 @@ cedar::dyn::steps::HebbianConnection::HebbianConnection()
       mWeightSizeY(mAssociationDimension->getValue() > 1 ? mAssociationSizes->getValue().at(1) : 1)
 
 {
+  //Initialize 3D Matrices
+  std::vector<int> defaultThetaSizes{7,7,10};
+  mBCMTheta = cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat(3,&defaultThetaSizes.at(0), CV_32F,cv::Scalar(0.5))));
+  //Todo:Update this whenever Input Dimension Change etc.
+
+  //Parameter Groups
+  // create configurable to represent the group
+  cedar::aux::ConfigurablePtr mBcmParameterGroup(new cedar::aux::Configurable());
+  // add the group as a child
+  this->addConfigurableChild("BCM Parameters", mBcmParameterGroup);
+  mTauWeights = cedar::aux::DoubleParameterPtr(new cedar::aux::DoubleParameter(mBcmParameterGroup.get(), "tau weights", 1.0));
+  mTauTheta = cedar::aux::DoubleParameterPtr(new cedar::aux::DoubleParameter(mBcmParameterGroup.get(), "tau theta", 10000.0));
+  mMinThetaValue = cedar::aux::DoubleParameterPtr(new cedar::aux::DoubleParameter(mBcmParameterGroup.get(), "min theta value", 0.0));
+  mUseFixedTheta = cedar::aux::BoolParameterPtr (new cedar::aux::BoolParameter (mBcmParameterGroup.get(), "use fixed theta", false));
+  mFixedThetaValue = cedar::aux::DoubleParameterPtr(new cedar::aux::DoubleParameter(mBcmParameterGroup.get(), "fixed theta value", 0.5,0.0,1.0));
+  this->toggleFixedTheta(); // Set Theta and the Parameter Constness accordingly
+
+
+
+
   //deal with deprecated Names
   this->mInputDimension->addDeprecatedName("input dimension");
   this->mInputSizes->addDeprecatedName("input sizes");
@@ -160,6 +184,11 @@ cedar::dyn::steps::HebbianConnection::HebbianConnection()
   cedar::proc::DataSlotPtr readOutInput = this->declareInput(mReadOutInputName, false);
   auto weightOutput = this->declareBuffer(mOutputName, mConnectionWeights);
   weightOutput->setSerializable(true);
+
+  //New BCM Stuff
+  auto thetaBuffer = this->declareBuffer(mThetaMatrixName,mBCMTheta);
+  thetaBuffer->setSerializable(true);
+
   auto weightTriggerOutput = this->declareOutput(mTriggerOutputName, mWeightOutput);
 
   this->mConnectionWeights->getData() = initializeWeightMatrix();
@@ -184,6 +213,11 @@ cedar::dyn::steps::HebbianConnection::HebbianConnection()
   QObject::connect(mWeightCenters.get(), SIGNAL(valueChanged()), this, SLOT(resetWeights()));
   QObject::connect(mWeightSigmas.get(), SIGNAL(valueChanged()), this, SLOT(resetWeights()));
   QObject::connect(mWeightAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(resetWeights()));
+  QObject::connect(mLearningRule.get(), SIGNAL(valueChanged()), this, SLOT(updateLearningRule()));
+  QObject::connect(mUseFixedTheta.get(),SIGNAL(valueChanged()),this,SLOT(toggleFixedTheta()));
+  QObject::connect(mFixedThetaValue.get(),SIGNAL(valueChanged()),this,SLOT(applyFixedTheta()));
+
+  this->updateLearningRule();
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -195,106 +229,234 @@ void cedar::dyn::steps::HebbianConnection::updateAssociationDimension()
   mAssociationSizes->resize(new_dim, mAssociationSizes->getDefaultValue());
 
 
-  mWeightCenters->resize(determineWeightDimension(), mWeightCenters->getDefaultValue());
-  mWeightSigmas->resize(determineWeightDimension(), mWeightCenters->getDefaultValue());
+  auto newWeightDimension = determineWeightDimension();
+
+
+  mWeightCenters->resize(newWeightDimension, mWeightCenters->getDefaultValue());
+  mWeightSigmas->resize(newWeightDimension, mWeightCenters->getDefaultValue());
   mWeightSizeX = determineWeightSizes(0);
   mWeightSizeY = determineWeightSizes(1);
 
 //  std::cout<<"updateAssociationDimension: WeightDim! " << determineWeightDimension() << " WeightX=" << determineWeightSizes(0) << " WeightY=" << determineWeightSizes(1) << std::endl;
-
   this->resetWeights();
 }
 
 void cedar::dyn::steps::HebbianConnection::updateInputDimension()
 {
   int new_dim = static_cast<int>(mInputDimension->getValue());
-  mInputSizes->resize(new_dim, 50);
+  mInputSizes->resize(new_dim, mInputSizes->getDefaultValue());
 
-  mWeightCenters->resize(determineWeightDimension(), mWeightCenters->getDefaultValue());
-  mWeightSigmas->resize(determineWeightDimension(), mWeightCenters->getDefaultValue());
+  auto newWeightDimension = determineWeightDimension();
+
+
+  mWeightCenters->resize(newWeightDimension, mWeightCenters->getDefaultValue());
+  mWeightSigmas->resize(newWeightDimension, mWeightCenters->getDefaultValue());
 
 //  std::cout<<"updateInputDimension: WeightDim! " << determineWeightDimension() << " WeightX=" << determineWeightSizes(0) << " WeightY=" << determineWeightSizes(1) << std::endl;
 
   this->resetWeights();
 }
 
+void cedar::dyn::steps::HebbianConnection::updateLearningRule()
+{
+  //Not really sure yet was this entails. A lot of parameters can probably be reused
+
+
+  switch (this->mLearningRule->getValue())
+  {
+    case cedar::dyn::steps::HebbianConnection::LearningRule::OJA:
+      if(mInputDimension->getValue()>2)
+      {
+        mInputDimension->setValue(2);
+      }
+      mInputDimension->setMaximum(2);
+      if(mAssociationDimension->getValue()>2)
+      {
+        mAssociationDimension->setValue(2);
+      }
+      mAssociationDimension->setMaximum(2);
+      mSetWeights->setConstant(false);
+      //Unfortunately no iteration
+      mTauWeights->setConstant(true);
+      mTauTheta->setConstant(true);
+      mMinThetaValue->setConstant(true);
+      mUseFixedTheta->setConstant(true);
+      mFixedThetaValue->setConstant(true);
+      break;
+
+    case cedar::dyn::steps::HebbianConnection::LearningRule::BCM:
+      mInputDimension->setMaximum(3);
+      mInputDimension->setValue(3);
+      mInputDimension->setMinimum(3);
+      mAssociationDimension->setMaximum(3);
+      mAssociationDimension->setValue(3);
+      mAssociationDimension->setMinimum(3);
+      mSetWeights->setValue(false);
+      mSetWeights->setConstant(true);
+
+//      auto bcmParameterList = mBcmParameterGroup->getParameters(); //THIS CALL CRASHES. WHY?
+//      for(auto parameter:mBcmParameterGroup->getParameters())
+//      {
+//        parameter->setConstant(false);
+//      }
+//      Set Parameters to Const individually
+      mTauWeights->setConstant(false);
+      mTauTheta->setConstant(false);
+      mMinThetaValue->setConstant(false);
+      mUseFixedTheta->setConstant(false);
+      mFixedThetaValue->setConstant(!mUseFixedTheta->getValue());
+
+
+
+      break;
+  }
+
+  this->mConnectionWeights->setData(initializeWeightMatrix());
+}
+
 cv::Mat cedar::dyn::steps::HebbianConnection::initializeWeightMatrix()
 {
-  mWeightSizeX = determineWeightSizes(0);
-  mWeightSizeY = determineWeightSizes(1);
-  cv::Mat myWeightMat = cv::Mat::zeros(mWeightSizeX, mWeightSizeY, CV_32F);
-  if (!mSetWeights->getValue())
+  cv::Mat myWeightMat;
+  switch (this->mLearningRule->getValue())
   {
-    srand(static_cast<unsigned>(time(0)));
-    float HIGH = mWeightInitNoiseRange->getValue();
-    float LOW = mWeightInitBase->getValue();
-    for (unsigned int x = 0; x < mWeightSizeX; x++)
-    {
-      for (unsigned int y = 0; y < mWeightSizeY; y++)
+    case cedar::dyn::steps::HebbianConnection::LearningRule::OJA:
+      mWeightSizeX = determineWeightSizes(0);
+      mWeightSizeY = determineWeightSizes(1);
+      myWeightMat = cv::Mat::zeros(mWeightSizeX, mWeightSizeY, CV_32F);
+      if (!mSetWeights->getValue())
       {
-        float random = LOW + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (HIGH - LOW)));
-        myWeightMat.at<float>(x, y) = random;
+        srand(static_cast<unsigned>(time(0)));
+        float HIGH = mWeightInitNoiseRange->getValue();
+        float LOW = mWeightInitBase->getValue();
+        for (unsigned int x = 0; x < mWeightSizeX; x++)
+        {
+          for (unsigned int y = 0; y < mWeightSizeY; y++)
+          {
+            float random = LOW + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (HIGH - LOW)));
+            myWeightMat.at<float>(x, y) = random;
+          }
+        }
+      } else
+      {
+        std::vector<unsigned int> curSizes;
+        curSizes.push_back(mWeightSizeX);
+        curSizes.push_back(mWeightSizeY);
+
+        if (mAssociationDimension->getValue() != 0 && mWeightSigmas->getValue().size()== mAssociationDimension->getValue() && mWeightCenters->getValue().size() == mAssociationDimension->getValue() )
+        {
+          myWeightMat = cedar::aux::math::gaussMatrix(mAssociationDimension->getValue(), curSizes,
+                                                      mWeightAmplitude->getValue(), mWeightSigmas->getValue(),
+                                                      mWeightCenters->getValue(), true);
+        } else
+        {
+          myWeightMat.at<float>(0, 0) = mWeightAmplitude->getValue();
+        }
       }
-    }
-  }
-  else
-  {
-    std::vector<unsigned int> curSizes;
-    curSizes.push_back(mWeightSizeX);
-    curSizes.push_back(mWeightSizeY);
-    if (mAssociationDimension->getValue() != 0)
-    {
-      myWeightMat = cedar::aux::math::gaussMatrix(mAssociationDimension->getValue(), curSizes,
-                                                  mWeightAmplitude->getValue(), mWeightSigmas->getValue(),
-                                                  mWeightCenters->getValue(), true);
-    }
-    else
-    {
-      myWeightMat.at<float>(0,0) = mWeightAmplitude->getValue();
-    }
+      break;
+    case cedar::dyn::steps::HebbianConnection::LearningRule::BCM:
+      if(mInputSizes->getValue().size() == 3 && mAssociationSizes->getValue().size() == 3)
+      {
+        //Allow other dimensionalities in the future
+        int bcmWeightDimensionality = 4;
+        std::vector<int> bcmWeightSizes(bcmWeightDimensionality);
+        bcmWeightSizes[0] = mInputSizes->getValue().at(0);
+        bcmWeightSizes[1] = mInputSizes->getValue().at(1);
+        bcmWeightSizes[2] = mInputSizes->getValue().at(2);
+        bcmWeightSizes[3] = mAssociationSizes->getValue().at(2);
+
+        myWeightMat = cv::Mat(bcmWeightDimensionality, &bcmWeightSizes.at(0), CV_32F, cv::Scalar(0));
+      }
   }
   return myWeightMat;
 }
 
+cv::Mat cedar::dyn::steps::HebbianConnection::initializeThetaMatrix()
+{
+  std::vector<int> defaultThetaSizes;
+  for(unsigned int i = 0; i< mAssociationSizes->getValue().size();i++)
+  {
+    defaultThetaSizes.push_back((int) mAssociationSizes->getValue().at(i));
+  }
+  float defaultTheta = this->mUseFixedTheta->getValue() ? this->mFixedThetaValue->getValue() : 0.5;
+  return cv::Mat(mAssociationSizes->getValue().size(), &defaultThetaSizes.at(0), CV_32F, cv::Scalar(defaultTheta));
+}
+
+cv::Mat cedar::dyn::steps::HebbianConnection::calculateDefaultOutput()
+{
+  cv::Mat outputMatrix = cv::Mat::zeros(mAssociationDimension->getValue() > 0 ? mAssociationSizes->getValue().at(0) : 1,mAssociationDimension->getValue() > 1 ? mAssociationSizes->getValue().at(1) : 1,CV_32F);
+
+  //  Calculate an output for an Input of Zeros
+  if(this->mInputDimension->getValue()!=0)
+  {
+  std::vector<int> inputSizes;
+  for(unsigned int i = 0; i< mInputSizes->getValue().size();i++)
+  {
+    inputSizes.push_back((int) mInputSizes->getValue().at(i));
+  }
+  cv::Mat zeroInputMat = cv::Mat::zeros(mInputSizes->getValue().size(),&inputSizes.at(0),CV_32F);
+  outputMatrix = calculateOutputMatrix(zeroInputMat);
+  }
+
+
+  return outputMatrix;
+}
+
 void cedar::dyn::steps::HebbianConnection::eulerStep(const cedar::unit::Time& time)
 {
-
-  if(mInputDimension->getValue() + mAssociationDimension->getValue() > 2)
+  if(mInputDimension->getValue() + mAssociationDimension->getValue() > 2 && this->mLearningRule->getValue() == cedar::dyn::steps::HebbianConnection::LearningRule::OJA)
   {
     this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, "Current Set of Dimensions is not supported yet!");
     mWeightOutput->setData(cv::Mat::zeros(mWeightSizeX, mWeightSizeY, CV_32F));
     return;
   }
 
+  if(this->mLearningRule->getValue() == cedar::dyn::steps::HebbianConnection::LearningRule::BCM)
+  {
+    bool isBCMPossible = mConnectionWeights->getData().dims == 4 &&
+                         mAssociationSizes->getValue().at(0) == mInputSizes->getValue().at(0) &&
+                         mAssociationSizes->getValue().at(1) == mInputSizes->getValue().at(1);
+
+    if (!isBCMPossible)
+    {
+      this->setState(cedar::proc::Triggerable::STATE_INITIALIZING,
+                     "Your current setting for the BCM learn rule is not yet implemented.\nCurrent implementation requires a 3D Input and a 3D Association, which have the same sizes in the first two dimensions");
+      mWeightOutput->setData(cv::Mat::zeros(mWeightSizeX, mWeightSizeY, CV_32F));
+      return;
+    }
+  }
+
   if (mAssoInput && mRewardTrigger && mReadOutTrigger )
   {
+    //All inputs are connected
     const cv::Mat& rewardTrigger = mRewardTrigger->getData();
     if (mSigmoidG->getValue()->compute(rewardTrigger.at<float>(0, 0)) > 0) // This is for the RewardDuration Trick. Should be removed in later versions!
     {
       if (!mIsRewarded && mUseRewardDuration->getValue())
       {
+        //Reward is present and start counting
         mElapsedTime = 0;
         mIsRewarded = true;
       }
+      //Count the time the reward is present
       float curTime = time / cedar::unit::Time(1 * cedar::unit::milli * cedar::unit::seconds);
       mElapsedTime += curTime;
-
-      if (mElapsedTime < mRewardDuration->getValue() || !mUseRewardDuration->getValue())
-      {
-
-        cv::Mat currentWeights = mConnectionWeights->getData();
-        auto weightChange = calculateWeightChange(mReadOutTrigger->getData(),mAssoInput->getData(),mRewardTrigger->getData());
-        currentWeights = currentWeights + weightChange;
-        mConnectionWeights->setData(currentWeights);
-
-      }
     }
     else if (mUseRewardDuration->getValue())
     {
+      //No reward is present anymore. It can be reactivated
       mIsRewarded = false;
     }
-  }
 
+    if ((mElapsedTime < mRewardDuration->getValue() && mIsRewarded) || !mUseRewardDuration->getValue())
+    {
+      //If there is no maximum reward duration =>update
+      //If there is a maximum reward duration => update only if time is below the max time
+      cv::Mat currentWeights = mConnectionWeights->getData();
+      auto weightChange = calculateWeightChange(time,mReadOutTrigger->getData(),mAssoInput->getData(),mRewardTrigger->getData());
+      currentWeights = currentWeights + weightChange;
+      mConnectionWeights->setData(currentWeights);
+    }
+  }
 
   if (mReadOutTrigger)
   {
@@ -302,7 +464,7 @@ void cedar::dyn::steps::HebbianConnection::eulerStep(const cedar::unit::Time& ti
   }
   else
   {
-    mWeightOutput->setData(cv::Mat::zeros(mWeightSizeX, mWeightSizeY, CV_32F));
+    mWeightOutput->setData(calculateDefaultOutput());
   }
 }
 
@@ -324,60 +486,30 @@ void cedar::dyn::steps::HebbianConnection::inputConnectionChanged(const std::str
 
 cedar::proc::DataSlot::VALIDITY cedar::dyn::steps::HebbianConnection::determineInputValidity(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data) const
 {
-
-  unsigned int assoSizeX, assoSizeY, inputSizeX, inputSizeY;
-  switch (mAssociationSizes->getValue().size())
-  {
-    case 0:
-      assoSizeX=1;
-      assoSizeY=1;
-      break;
-    case 1:
-      assoSizeX = mAssociationSizes->getValue().at(0);
-      assoSizeY=1;
-      break;
-    case 2:
-      assoSizeX = mAssociationSizes->getValue().at(0);
-      assoSizeY=mAssociationSizes->getValue().at(1);
-      break;
-    default:
-      assoSizeX=1;
-      assoSizeY=1;
-  }
-
-  switch (mInputSizes->getValue().size())
-  {
-    case 0:
-      inputSizeX=1;
-      inputSizeY=1;
-      break;
-    case 1:
-      inputSizeX = mInputSizes->getValue().at(0);
-      inputSizeY=1;
-      break;
-    case 2:
-      inputSizeX = mInputSizes->getValue().at(0);
-      inputSizeY= mInputSizes->getValue().at(1);
-      break;
-    default:
-      inputSizeX=1;
-      inputSizeY=1;
-  }
-
-//  std::cout<<"DetermineInputValidity: Input " << inputSizeX << ", " << inputSizeY << " Asso " << assoSizeX << ", " << assoSizeY << std::endl;
-
   if (cedar::aux::ConstMatDataPtr input = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
   {
-    if (input && input->getDimensionality() == mAssociationDimension->getValue() && slot->getName() == mAssoInputName && (unsigned int) input->getData().rows == assoSizeX
-         && (unsigned int) input->getData().cols == assoSizeY)
+    if (input && input->getDimensionality() == mAssociationDimension->getValue() && slot->getName() == mAssoInputName)
     {
-      return cedar::proc::DataSlot::VALIDITY_VALID;
+      bool sizesMatch = true;
+      for(unsigned int d = 0 ; d< input->getDimensionality();d++)
+      {
+        if(mAssociationSizes->getValue().at(d) != (unsigned int) input->getData().size[d])
+          sizesMatch = false;
+      }
+      if(sizesMatch)
+        return cedar::proc::DataSlot::VALIDITY_VALID;
     }
 
-    if (input && input->getDimensionality() == mInputDimension->getValue() && slot->getName() == mReadOutInputName && (unsigned int) input->getData().rows == inputSizeX
-        && (unsigned int) input->getData().cols == inputSizeY)
+    if (input && input->getDimensionality() == mInputDimension->getValue() && slot->getName() == mReadOutInputName)
     {
-      return cedar::proc::DataSlot::VALIDITY_VALID;
+      bool sizesMatch = true;
+      for(unsigned int d = 0 ; d< input->getDimensionality();d++)
+      {
+        if(mInputSizes->getValue().at(d) !=  (unsigned int) input->getData().size[d])
+          sizesMatch = false;
+      }
+      if(sizesMatch)
+        return cedar::proc::DataSlot::VALIDITY_VALID;
     }
 
     if (input && input->getDimensionality() == 0 && slot->getName() == mRewardInputName )
@@ -395,15 +527,19 @@ void cedar::dyn::steps::HebbianConnection::reset()
 
 void cedar::dyn::steps::HebbianConnection::resetWeights()
 {
-  if(mInputDimension->getValue() + mAssociationDimension->getValue() > 2)
+  if(mInputDimension->getValue() + mAssociationDimension->getValue() > 2 && this->mLearningRule->getValue() == cedar::dyn::steps::HebbianConnection::LearningRule::OJA)
   {
     this->setState(cedar::proc::Triggerable::STATE_INITIALIZING, "Current Set of Dimensions is not supported yet!");
   }
 
   this->mConnectionWeights->setData(initializeWeightMatrix());
-  cv::Mat emptyOutputMat = cv::Mat::zeros(mAssociationDimension->getValue() > 0 ? mAssociationSizes->getValue().at(0) : 1,mAssociationDimension->getValue() > 1 ? mAssociationSizes->getValue().at(1) : 1,CV_32F);
-  this->mWeightOutput->setData(emptyOutputMat);
 
+  this->mWeightOutput->setData(calculateDefaultOutput());
+
+  if(this->mLearningRule->getValue() == cedar::dyn::steps::HebbianConnection::LearningRule::BCM)
+  {
+    mBCMTheta->setData(initializeThetaMatrix());
+  }
 
   this->emitOutputPropertiesChangedSignal(mTriggerOutputName);
   this->revalidateInputSlot(mAssoInputName);
@@ -426,18 +562,18 @@ void cedar::dyn::steps::HebbianConnection::toggleUseManualWeights()
 }
 
 
-unsigned int cedar::dyn::steps::HebbianConnection::getDimensionality()
-{
-  return mAssociationDimension->getValue();
-}
+//unsigned int cedar::dyn::steps::HebbianConnection::getDimensionality()
+//{
+//  return mAssociationDimension->getValue();
+//}
 
-cv::Mat cedar::dyn::steps::HebbianConnection::getSizes()
-{
-  cv::Mat sizes = cv::Mat::zeros(2, 1, CV_32F);
-  sizes.at<float>(0, 0) = mWeightSizeX;
-  sizes.at<float>(1, 0) = mWeightSizeY;
-  return sizes;
-}
+//cv::Mat cedar::dyn::steps::HebbianConnection::getSizes()
+//{
+//  cv::Mat sizes = cv::Mat::zeros(2, 1, CV_32F);
+//  sizes.at<float>(0, 0) = mWeightSizeX;
+//  sizes.at<float>(1, 0) = mWeightSizeY;
+//  return sizes;
+//}
 
 std::string cedar::dyn::steps::HebbianConnection::getOutputName()
 {
@@ -484,36 +620,51 @@ void cedar::dyn::steps::HebbianConnection::setWeights(cv::Mat newWeights)
    auto assoDim = mAssociationDimension->getValue();
    auto inputDim = mInputDimension->getValue();
 
-   if(dimension > determineWeightDimension() || determineWeightDimension() == 0)
+   switch(this->mLearningRule->getValue())
    {
-     return 1;
-   }
+     case cedar::dyn::steps::HebbianConnection::LearningRule::OJA:
+     {
+       if (dimension > determineWeightDimension() || determineWeightDimension() == 0)
+       {
+         return 1;
+       }
 
-   if(determineWeightDimension() == 1 )
-   {
-     if (assoDim == 1)
-     {
-       return dimension > 0 ? 1 : mAssociationSizes->getValue().at(0);
-     }
-     else
-     {
-       return dimension > 0 ? 1 : mInputSizes->getValue().at(0);
-     }
-   }
+       if (determineWeightDimension() == 1)
+       {
+         if (assoDim == 1)
+         {
+           return dimension > 0 ? 1 : mAssociationSizes->getValue().at(0);
+         } else
+         {
+           return dimension > 0 ? 1 : mInputSizes->getValue().at(0);
+         }
+       }
 
-   if(determineWeightDimension() == 2)
-   {
-     if (assoDim == 2)
-     {
-       return dimension == 0 ? mAssociationSizes->getValue().at(0) : mAssociationSizes->getValue().at(1);
+       if (determineWeightDimension() == 2)
+       {
+         if (assoDim == 2)
+         {
+           return dimension == 0 ? mAssociationSizes->getValue().at(0) : mAssociationSizes->getValue().at(1);
+         } else if (inputDim == 2)
+         {
+           return dimension == 0 ? mInputSizes->getValue().at(0) : mInputSizes->getValue().at(1);
+         } else if (inputDim == 1 && assoDim == 1)
+         {
+           return dimension == 0 ? mInputSizes->getValue().at(0) : mAssociationSizes->getValue().at(0);
+         }
+       }
+       break;
      }
-     else if(inputDim == 2)
+     case cedar::dyn::steps::HebbianConnection::LearningRule::BCM:
      {
-       return dimension == 0 ? mInputSizes->getValue().at(0) : mInputSizes->getValue().at(1);
-     }
-     else if (inputDim == 1 && assoDim ==1)
-     {
-       return dimension == 0 ? mInputSizes->getValue().at(0) : mAssociationSizes->getValue().at(0);
+       //Again this assumes that BCM is only working with a fixed set of weights currently
+       switch(dimension)
+       {
+         case 0: return mAssociationSizes->getValue().at(0);
+         case 1: return mAssociationSizes->getValue().at(1);
+         case 2: return mInputSizes->getValue().at(2);
+         case 3: return mAssociationSizes->getValue().at(2);
+       }
      }
    }
 
@@ -528,105 +679,279 @@ unsigned int cedar::dyn::steps::HebbianConnection::determineWeightDimension()
   auto assoDim = mAssociationDimension->getValue();
   auto inputDim = mInputDimension->getValue();
 
-  if(assoDim + inputDim == 0)
-  {
-    return 0;
-  }
-  else if(assoDim + inputDim == 1)
-  {
-    return 1; // One is a node and the other a One-D Matrix
-  } else if(assoDim + inputDim == 2)
-  {
-   return 2; // Either both are 1D which yields a 2D Matrix or one is 0D and the other is 2D
-  } else
-  {
-//    std::cout<<"This Weight Combination is not yet implemented!"<<std::endl;
-    return 0;
-  }
+//  std::cout<<"\ncedar::dyn::steps::HebbianConnection::determineWeightDimension!"<<std::endl;
+//  std::cout<<"assoDim: " << assoDim << " inputDim: " << inputDim << std::endl;
+//  std::cout<<"LearningRule: " << this->mLearningRule->getValue() << std::endl;
 
+  switch(this->mLearningRule->getValue())
+  {
+    case cedar::dyn::steps::HebbianConnection::LearningRule::OJA:
+    {
+      if (assoDim + inputDim == 0)
+      {
+        return 0;
+      } else if (assoDim + inputDim == 1)
+      {
+        return 1; // One is a node and the other a One-D Matrix
+      } else if (assoDim + inputDim == 2)
+      {
+        return 2; // Either both are 1D which yields a 2D Matrix or one is 0D and the other is 2D
+      } else
+      {
+//    std::cout<<"This Weight Combination is not yet implemented!"<<std::endl;
+        return 0;
+      }
+    }
+    case cedar::dyn::steps::HebbianConnection::LearningRule::BCM:
+    {
+      //TODO Currently BCM works for only 3 dims
+      return 4;
+    }
+    default:
+      //This should not happen
+      std::cout<<"DetermineInputDimension did not recognize the Learning Rule! This should not happen!" <<std::endl;
+      return 0;
+  }
 }
 
-cv::Mat cedar::dyn::steps::HebbianConnection::calculateWeightChange(cv::Mat inputActivation,cv::Mat associationActivation,cv::Mat rewardValue)
+cv::Mat cedar::dyn::steps::HebbianConnection::calculateWeightChange(const cedar::unit::Time& delta_t, cv::Mat inputActivation,cv::Mat associationActivation,cv::Mat rewardValue)
 {
-  double learnRate = mLearnRatePositive->getValue();
+  float learnRate = (float) mLearnRatePositive->getValue();
   cv::Mat currentWeights = mConnectionWeights->getData();
 
-  auto inputSigmoid = this->mSigmoidF->getValue()->compute(inputActivation);
   auto targetSigmoid = this->mSigmoidH->getValue()->compute(associationActivation);
   auto rewardSigValue = this->mSigmoidG->getValue()->compute(rewardValue);
+  cv::Mat inputSigmoid = this->mSigmoidF->getValue()->compute(inputActivation);
 
-  //One case is outstar the other instar
-  if(mInputDimension->getValue() == 0) // The old case! && And the 0 to 0 case! Be careful!
+  switch(this->mLearningRule->getValue())
   {
-    return learnRate * inputSigmoid.at<float>(0,0) * rewardSigValue.at<float>(0,0)  * (targetSigmoid- currentWeights);
-  }
+    case cedar::dyn::steps::HebbianConnection::LearningRule::OJA:
+    {
 
-  if(mAssociationDimension->getValue() == 0) // The reverse case
-  {
-    return learnRate * rewardSigValue.at<float>(0,0) * targetSigmoid.at<float>(0,0)   * (inputSigmoid- currentWeights);
-  }
+      //One case is outstar the other instar
+      if (mInputDimension->getValue() == 0) // The old case! && And the 0 to 0 case! Be careful!
+      {
+        return learnRate * inputSigmoid.at<float>(0, 0) * rewardSigValue.at<float>(0, 0) *
+               (targetSigmoid - currentWeights);
+      }
 
-  if(mAssociationDimension->getValue() == 1 && mInputDimension->getValue() == 1)
-  {
-    cv::Mat weightChangeMat = cv::Mat::zeros(mWeightSizeX,mWeightSizeY,CV_32F);
+      if (mAssociationDimension->getValue() == 0) // The reverse case
+      {
+        return learnRate * rewardSigValue.at<float>(0, 0) * targetSigmoid.at<float>(0, 0) *
+               (inputSigmoid - currentWeights);
+      }
 
-    for (unsigned int x = 0; x < mWeightSizeX; x++)
+      if (mAssociationDimension->getValue() == 1 && mInputDimension->getValue() == 1)
+      {
+        cv::Mat weightChangeMat = cv::Mat::zeros(mWeightSizeX, mWeightSizeY, CV_32F);
+
+        for (unsigned int x = 0; x < mWeightSizeX; x++)
         {
           for (unsigned int y = 0; y < mWeightSizeY; y++)
           {
-            float combinedValue = inputSigmoid.at<float>(x,0) * targetSigmoid.at<float>(y,0);
-            float weightChange = learnRate * ( combinedValue    - currentWeights.at<float>(x, y));
+            float combinedValue = inputSigmoid.at<float>(x, 0) * targetSigmoid.at<float>(y, 0);
+            float weightChange = learnRate * (combinedValue - currentWeights.at<float>(x, y));
             weightChangeMat.at<float>(x, y) = weightChange;
           }
         }
-    return weightChangeMat;
+        return weightChangeMat;
+      }
+      //This should not happen!
+      return cv::Mat::zeros(mWeightSizeX,mWeightSizeY,CV_32F);
+    }
+    case cedar::dyn::steps::HebbianConnection::LearningRule::BCM:
+    {
+      //Let's try naive method first and compare with optimization later
+      if (currentWeights.dims == 4) //Right now only Raul's case needs to work
+      {
+        std::vector<int> bcmSizes {currentWeights.size[0],currentWeights.size[1],currentWeights.size[2],currentWeights.size[3]};
+        cv::Mat weightChangeMat = cv::Mat(4, &bcmSizes.at(0), CV_32F, cv::Scalar(0));
+        auto thetaMat = mBCMTheta->getData();
+
+        if (rewardSigValue.at<float>(0, 0) > 0.5f)
+        {
+          //Update Weights
+          float timeFactor = (delta_t / cedar::unit::Time(
+                          mTauWeights->getValue() * cedar::unit::milli * cedar::unit::seconds));
+
+          // For the Weightupdate this is faster than the regular for loops. Probably a decent size matrix is required to benefit from parallelization
+          // Otherwise the multiple .at calls are probably not ideal
+          weightChangeMat.forEach<float>([targetSigmoid,timeFactor,thetaMat,learnRate,inputSigmoid](float &p, const int * position) -> void {
+          float sigmoidTarget = targetSigmoid.at<float>(position[0],position[1],position[3]);
+          float featureValue = inputSigmoid.at<float>(position[0],position[1],position[2]);
+          float thetaValue = thetaMat.at<float>(position[0],position[1],position[3]);
+          p =  timeFactor * learnRate * sigmoidTarget * (sigmoidTarget - thetaValue) * (featureValue / thetaValue);
+          });
+        }
+
+        //Update Theta
+        //Todo: Put in separate Function for Optimizing later
+        cv::Mat currentWeights = mConnectionWeights->getData();
+
+        if (currentWeights.dims == 4 && !this->mUseFixedTheta->getValue()) // Todo: Change dim check
+        {
+          auto targetSigmoid = this->mSigmoidH->getValue()->compute(mAssoInput->getData());
+          auto thetaMat = mBCMTheta->getData();
+          float timeFactor = (delta_t/cedar::unit::Time(mTauTheta->getValue()* cedar::unit::milli * cedar::unit::seconds));
+          float minTheta = (float) this->mMinThetaValue->getValue();
+
+
+// This should be the fastest way, but somehow it takes longer. Maybe try on non-VM
+//          thetaMat.forEach<float>([targetSigmoid,timeFactor,minTheta](float &p, const int * position) -> void {
+//            float sigmoidTarget = targetSigmoid.at<float>(position[0],position[1],position[2]);
+//              float squareTarget = sigmoidTarget * sigmoidTarget;
+//              p =  std::max(minTheta, p +  timeFactor * ( squareTarget -p));
+//          });
+
+          for (int x = 0; x < currentWeights.size[0]; x++)
+          {
+            for (int y = 0; y < currentWeights.size[1]; y++)
+            {
+              for (int d = 0; d < currentWeights.size[3]; d++)
+              {
+                float sigmoidTarget = targetSigmoid.at<float>(x, y, d);
+                float squareTarget = sigmoidTarget * sigmoidTarget;
+                thetaMat.at<float>(x, y, d) = std::max( thetaMat.at<float>(x, y, d)  + timeFactor *  ( squareTarget - thetaMat.at<float>(x, y, d)), minTheta);
+              }
+            }
+          }
+          mBCMTheta->setData(thetaMat);
+        }
+        return weightChangeMat;
+      }
+      else
+      {
+        std::cout<<"The weight Matrix has not been initialized correctly. BCM expects dimensionality of 4. Current dimensionality is: " << currentWeights.dims << std::endl;
+        break;
+      }
+
+    }
   }
-
-//  std::cout<<"calculateWeightChange?????? If you read this the current dimensions are not learnable yet!" <<std::endl;
-
+  //This should not happen!
   return cv::Mat::zeros(mWeightSizeX,mWeightSizeY,CV_32F);
-
-
 }
 
  cv::Mat cedar::dyn::steps::HebbianConnection::calculateOutputMatrix(cv::Mat inputMatrix)
 {
-  if(mInputDimension->getValue() == 0) // The old case! && And the 0 to 0 case! Be careful!
+//  std::cout<<"cedar::dyn::steps::HebbianConnection::calculateOutputMatrix with inputMatrix of dimensionality: " << inputMatrix.dims << std::endl;
+  cv::Mat currentWeights = mConnectionWeights->getData();
+
+  switch(this->mLearningRule->getValue())
   {
-   return mConnectionWeights->getData() * mSigmoidF->getValue()->compute(inputMatrix.at<float>(0, 0));
-  }
-
-  if(mAssociationDimension->getValue() == 0) // The reverse case
-  {
-    cv::Mat overlap =  mConnectionWeights->getData().mul( mSigmoidF->getValue()->compute(inputMatrix));
-    cv::Mat outputMat = cv::Mat::zeros(1,1,CV_32F);
-    double overlapDouble = cv::sum(overlap) [0];
-    outputMat.at<float>(0,0) = (float) overlapDouble; //TODO: The output might get very large
-    return outputMat;
-  }
-
-  if(mAssociationDimension->getValue() == 1 && mInputDimension->getValue() == 1)
-  {
-    cv::Mat outPutMatrix = cv::Mat::zeros(mWeightSizeY,1,CV_32F);
-
-
-    for (unsigned int y = 0; y < mWeightSizeY; y++)
+    case cedar::dyn::steps::HebbianConnection::LearningRule::OJA:
     {
-      float summedValue = 0;
-      for (unsigned int x = 0; x < mWeightSizeX; x++)
+
+      if (mInputDimension->getValue() == 0) // The old case! && And the 0 to 0 case! Be careful!
       {
-        summedValue += inputMatrix.at<float>(x,0) * mConnectionWeights->getData().at<float>(x,y);
+        return currentWeights * mSigmoidF->getValue()->compute(inputMatrix.at<float>(0, 0));
       }
 
-      outPutMatrix.at<float>(y,0) =summedValue; //Todo: Probably also some normalization
+      if (mAssociationDimension->getValue() == 0) // The reverse case
+      {
+        cv::Mat overlap = currentWeights.mul(mSigmoidF->getValue()->compute(inputMatrix));
+        cv::Mat outputMat = cv::Mat::zeros(1, 1, CV_32F);
+        double overlapDouble = cv::sum(overlap)[0];
+        outputMat.at<float>(0, 0) = (float) overlapDouble; //TODO: The output might get very large
+        return outputMat;
+      }
+
+      if (mAssociationDimension->getValue() == 1 && mInputDimension->getValue() == 1)
+      {
+        cv::Mat outPutMatrix = cv::Mat::zeros(mWeightSizeY, 1, CV_32F);
+
+
+        for (unsigned int y = 0; y < mWeightSizeY; y++)
+        {
+          float summedValue = 0;
+          for (unsigned int x = 0; x < mWeightSizeX; x++)
+          {
+            summedValue += inputMatrix.at<float>(x, 0) * currentWeights.at<float>(x, y);
+          }
+
+          outPutMatrix.at<float>(y, 0) = summedValue; //Todo: Probably also some normalization
+        }
+
+        return outPutMatrix;
+      }
+      break;
     }
 
-    return outPutMatrix;
+
+    case cedar::dyn::steps::HebbianConnection::LearningRule::BCM:
+    {
+      //Right now only Raul's case needs to work
+      if (currentWeights.dims == 4 &&  mAssociationSizes->getValue().at(0) == mInputSizes->getValue().at(0) && mAssociationSizes->getValue().at(1) == mInputSizes->getValue().at(1) )
+      {
+        std::vector<int> outPutSizes{(int)mAssociationSizes->getValue().at(0),(int) mAssociationSizes->getValue().at(1), (int)mAssociationSizes->getValue().at(2)};
+        cv::Mat outPutMatrix = cv::Mat(3,&outPutSizes.at(0) , CV_32F, cv::Scalar(0));
+
+        //The Matrix Multiplication avoids iterating through the feature dimension and halved the computation time on my VM
+        //Someone who knows more about reshaping OpenCV Matrices and Multiplication in more than 2D can probably improve this code even further.
+        for (int x = 0; x < currentWeights.size[0]; x++)
+        {
+          for (int y = 0; y < currentWeights.size[1]; y++)
+          {
+            //Extract the 2D matrices out of the 3D and 4D Tensor
+            std::vector<cv::Range> rangesFeature{cv::Range(x, x+1), cv::Range(y, y+1), cv::Range(0, currentWeights.size[2])};
+            cv::Mat subFeatureMat = cv::Mat(inputMatrix, rangesFeature);
+            std::vector<int> twoDMatrixSizeFeature {currentWeights.size[2],1};
+            cv::Mat subFeatureMat2D = subFeatureMat.reshape(1,2,&twoDMatrixSizeFeature.at(0));
+
+            std::vector<cv::Range> rangesWeights{cv::Range(x, x+1), cv::Range(y, y+1), cv::Range(0, currentWeights.size[2]),cv::Range(0, currentWeights.size[3])};
+            cv::Mat subWeightMat4D = cv::Mat(currentWeights, rangesWeights);
+            std::vector<int> twoDMatrixSizeWeight{currentWeights.size[2],currentWeights.size[3]};
+            cv::Mat subWeightMat2D = subWeightMat4D.reshape(1,2,&twoDMatrixSizeWeight.at(0));
+
+            //A lot of reshaping to do this Matrix Multiplication :-D
+            cv::Mat outPutMatrix2D = subFeatureMat2D.t() * subWeightMat2D;
+
+            for(int d=0;d<outPutMatrix2D.size[1];d++)
+            {
+              outPutMatrix.at<float>(x,y,d) = outPutMatrix2D.at<float>(0,d);
+            }
+          }
+        }
+        return outPutMatrix;
+      }
+      else
+      {
+//        std::cout<<"!Your current setting for the BCM learn rule is not yet implemented.\nCurrent implementation requires a 3D Input and a 3D Association, which have the same sizes in the first two input dimensions"<< std::endl;
+      }
+    }
   }
-
-
-//  std::cout<<"calculateOutputMatrix!!!! If you read this the current dimensions are not learnable yet!" <<std::endl;
 
   return cv::Mat::zeros(mWeightSizeX,mWeightSizeY,CV_32F);
 
+}
+
+void cedar::dyn::steps::HebbianConnection::toggleFixedTheta()
+{
+  this->mFixedThetaValue->setConstant(!this->mUseFixedTheta->getValue());
+  if(this->mUseFixedTheta->getValue())
+  {
+    this->applyFixedTheta();
+  }
+}
+
+void cedar::dyn::steps::HebbianConnection::applyFixedTheta()
+{
+  cv::Mat thetaMat = this->mBCMTheta->getData();
+  float fixedTheta = this->mFixedThetaValue->getValue();
+
+  for (int x = 0; x < thetaMat.size[0]; x++)
+  {
+    for (int y = 0; y < thetaMat.size[1]; y++)
+    {
+      for (int d = 0; d < thetaMat.size[2]; d++)
+      {
+        thetaMat.at<float>(x,y,d) = fixedTheta; //at should not be used, but pointer arithmetic, but ideally the fastest way should be foreach ...
+      }
+    }
+  }
+//  // Parallel execution using C++11 lambda. Slower for some weird reason? Todo: Try  on non-virtual machine
+//  thetaMat.forEach<float>([fixedTheta](float &p, const int * /*position*/) -> void {
+//      p = fixedTheta;
+//  });
+
+  mBCMTheta->setData(thetaMat);
 }

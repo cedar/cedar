@@ -181,7 +181,7 @@ void cedar::proc::gui::RecorderWidget::createHeader(const std::string& name)
   row_headers->addWidget(empty);
 
   // Create row header for record time.
-  QLabel* label2 = new QLabel("Record interval");
+  QLabel* label2 = new QLabel("Record interval (Real Time)");
   QFont label2_font = label2->font();
   label2_font.setKerning(true);
   label2_font.setPointSize( label2_font.pointSize() - 1 );

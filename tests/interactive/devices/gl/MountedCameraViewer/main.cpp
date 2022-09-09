@@ -66,6 +66,7 @@
 
 int main(int argc, char **argv)
 {
+#ifdef CEDAR_USE_QGLVIEWER
   QApplication a(argc, argv);
 
   // create simulated arm
@@ -160,6 +161,6 @@ int main(int argc, char **argv)
 
   // clean up
   test_arm->stopCommunication();
-
+#endif
   return 0;
 }

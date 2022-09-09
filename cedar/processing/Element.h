@@ -45,6 +45,7 @@
 #include "cedar/processing/Element.fwd.h"
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/gui/Group.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -55,14 +56,14 @@
 #include <string>
 
 
+
 /*!@brief Base class for Elements in a processing architecture.
  *
  *        Each element is described by a name that uniquely identifies it within a processing module.
  */
 class cedar::proc::Element
 :
-virtual public cedar::aux::NamedConfigurable,
-public boost::enable_shared_from_this<cedar::proc::Element>
+virtual public cedar::aux::NamedConfigurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -78,6 +79,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
   //!@brief sets the group at which this element is registered
   void setGroup(cedar::proc::GroupPtr group);
 

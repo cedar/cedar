@@ -223,6 +223,8 @@ public:
 
   //!@brief returns the settings concerning the docking behavior for the log widget
   DockSettingsPtr logSettings();
+  //!@brief returns the settings concerning the docking behavior for the CoPy widget
+  DockSettingsPtr coPYSettings();
   //!@brief returns the settings concerning the docking behavior for the tools widget
   DockSettingsPtr toolsSettings();
   //!@brief returns the settings concerning the docking behavior for the property pane
@@ -319,6 +321,12 @@ public:
   inline bool getHighlightHoveredConnections() const
   {
     return this->_mHighlightHoveredConnections->getValue();
+  }
+
+  //! Returns whether or not undo operations on the same parameter value should be processed at once
+  inline bool getUndoRedoAutoMacro() const
+  {
+    return this->_mUndoRedoAutoMacro->getValue();
   }
 
   //! Returns whether or not deprecated steps should be displayed in the element list.
@@ -440,6 +448,9 @@ private:
   //!@brief the settings concerning the docking behavior for the log widget
   DockSettingsPtr mLog;
 
+  //!@brief the settings concerning the docking behavior for the CoPY widget
+  DockSettingsPtr mCoPY;
+
   //!@brief the settings concerning the docking behavior for the steps widget
   DockSettingsPtr mSteps;
 
@@ -493,6 +504,9 @@ private:
 
   //! Size of the Snapgrid, when snapping is enabled
   cedar::aux::UIntParameterPtr _mAutoSaveInterval;
+
+  //!@brief Disables or enables simultaneous undo operations on the same parameter value
+  cedar::aux::BoolParameterPtr _mUndoRedoAutoMacro;
 
   //! Use Field Icons that switch depending on a present peak
   cedar::aux::BoolParameterPtr _mUseDynamicFieldIcons;

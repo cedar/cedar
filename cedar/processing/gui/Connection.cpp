@@ -41,11 +41,14 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/DataSlotItem.h"
+#include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/View.h"
+#include "cedar/processing/undoRedo/commands/CreateDeleteConnection.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
 #include "cedar/processing/Group.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/auxiliaries/Log.h"
@@ -777,15 +780,16 @@ void cedar::proc::gui::Connection::mouseDoubleClickEvent(QGraphicsSceneMouseEven
   }
 }
 
-void cedar::proc::gui::Connection::addConnectionAnchor(QPointF addPosition, bool restoreOldPoint){
+cedar::proc::gui::ConnectionAnchor* cedar::proc::gui::Connection::addConnectionAnchor(QPointF addPosition, bool restoreOldPoint){
   if(!this->mSmartMode)
   {
     if(restoreOldPoint)
     {
       // Used when loading an architecture
-      mConnectionAnchorPoints.push_back(new cedar::proc::gui::ConnectionAnchor(addPosition.x(), addPosition.y(), mAnchorPointRadius, this));
+      cedar::proc::gui::ConnectionAnchor* anchor = new cedar::proc::gui::ConnectionAnchor(addPosition.x(), addPosition.y(), mAnchorPointRadius, this);
+      mConnectionAnchorPoints.push_back(anchor);
       this->updateGraphics();
-      return;
+      return anchor;
     }
 
     QPointF anchorPoint = addPosition;
@@ -810,9 +814,10 @@ void cedar::proc::gui::Connection::addConnectionAnchor(QPointF addPosition, bool
 
     if(mConnectionAnchorPoints.size() == 0)
     {
-      mConnectionAnchorPoints.push_back(new cedar::proc::gui::ConnectionAnchor(anchorPointMinusPos.x(), anchorPointMinusPos.y(), mAnchorPointRadius, this));
+      cedar::proc::gui::ConnectionAnchor* anchor = new cedar::proc::gui::ConnectionAnchor(anchorPointMinusPos.x(), anchorPointMinusPos.y(), mAnchorPointRadius, this);
+      mConnectionAnchorPoints.push_back(anchor);
       this->updateGraphics();
-      return;
+      return anchor;
     }
 
     float pathLength = 0.0f;
@@ -861,12 +866,14 @@ void cedar::proc::gui::Connection::addConnectionAnchor(QPointF addPosition, bool
         break;
       }
     }
-    ConnectionAnchor* anchor = new ConnectionAnchor(anchorPointMinusPos.x(), anchorPointMinusPos.y(), mAnchorPointRadius, this);
+    cedar::proc::gui::ConnectionAnchor* anchor = new ConnectionAnchor(anchorPointMinusPos.x(), anchorPointMinusPos.y(), mAnchorPointRadius, this);
 
     if(mConnectionAnchorPoints.size() == indexToInsert) mConnectionAnchorPoints.push_back(anchor);
     else mConnectionAnchorPoints.insert(mConnectionAnchorPoints.begin() + indexToInsert, anchor);
     this->updateGraphics();
+    return anchor;
   }
+  return nullptr;
 }
 
 void cedar::proc::gui::Connection::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
@@ -958,7 +965,8 @@ void cedar::proc::gui::Connection::contextMenuEvent(QGraphicsSceneContextMenuEve
     }
     else if (selectedAction == deleteAction)
     {
-      this->disconnectUnderlying();
+      cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteConnection(
+              this, false));
     }
   }
 }

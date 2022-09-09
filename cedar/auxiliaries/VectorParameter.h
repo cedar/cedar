@@ -412,7 +412,9 @@ public:
       locker = cedar::aux::Parameter::WriteLockerPtr(new cedar::aux::Parameter::WriteLocker(this));
     }
 
-    bool changed = (this->mValues.size() != values.size());
+    bool sizeChanged = (this->mValues.size() != values.size());
+
+    bool valueChanged = false;
 
     this->resize(values.size(), this->mDefaultValue, true);
     for (size_t i = 0; i < values.size(); ++i)
@@ -420,7 +422,7 @@ public:
       if (this->mValues[i] != values[i])
       {
         this->mValues[i] = values[i];
-        changed = true;
+        valueChanged = true;
       }
     }
 
@@ -429,9 +431,13 @@ public:
       locker->unlock();
     }
 
-    if (changed)
+    if (valueChanged)
     {
       this->emitChangedSignal();
+    }
+
+    if(sizeChanged)
+    {
       this->emitPropertyChangedSignal();
     }
   }

@@ -86,6 +86,10 @@ public:
    */
   virtual void pushBack(const std::string& typeId) = 0;
 
+  /*!@brief Inserts an instance of the given type at the specified index to the object list.
+   */
+  virtual void insert(int index, const std::string& typeId) = 0;
+
   /*!@brief Removes the object at the given index.
    */
   virtual void removeObject(size_t index) = 0;

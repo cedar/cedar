@@ -33,6 +33,7 @@
  ----- Credits:
  -----------------------------------------------------------------------------*/
 
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
@@ -56,6 +57,7 @@
 
 int main(int argc, char **argv)
 {
+#ifdef CEDAR_USE_QGLVIEWER
   QApplication a(argc, argv);
 
   // create the scene administering the objects to be visualized
@@ -211,5 +213,6 @@ int main(int argc, char **argv)
   p_scene->addObjectVisualization(p_chessboard);
 
   a.exec();
+#endif
   return 0;
 }

@@ -105,11 +105,11 @@ public:
   //! return the position relative to the scene
   QPointF scenePos();
 
-  //! move the anchor 1 pixel
-  void move(QPointF, QPointF);
+  //! snaps the anchor to the grid
+  void snapToGrid(bool updateParent = true);
 
-  //! set the visibility
-  void setVisibility(bool);
+  //! move the anchor to the target position
+  void move(QPointF);
 
 public slots:
 
@@ -136,8 +136,6 @@ private:
   QPointF mPosOffset;
   //! current position in the scene
   QPointF mAbsPos;
-  //! initial position (when mouse moved) in the parent coordinate system
-  QPointF mInitialParentPos;
 
   //! position at mouse button press
   QPointF mInitialPosition;

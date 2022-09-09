@@ -42,7 +42,6 @@
 #include "cedar/devices/ComponentSlot.h"
 #include "cedar/devices/RobotManager.h"
 #include "cedar/devices/exceptions.h"
-#include "cedar/devices/gui/RobotManager.h"
 
 // SYSTEM INCLUDES
 
@@ -128,7 +127,6 @@ cedar::dev::ComponentPtr cedar::dev::ComponentParameter::getValue() const
 
 std::string cedar::dev::ComponentParameter::getStringRepresentation() const
 {
-
   if (auto component = this->mWeakComponent.lock())
   {
     return component->getPath();
@@ -147,8 +145,16 @@ void cedar::dev::ComponentParameter::setValue(cedar::dev::ComponentSlotPtr compo
 
 void cedar::dev::ComponentParameter::setValue(const std::string& componentPath)
 {
-  auto slot = cedar::dev::RobotManagerSingleton::getInstance()->findComponentSlot(componentPath);
-  this->setValue(slot);
+	if(!componentPath.empty())
+	{
+		cedar::dev::ComponentSlotPtr slot = cedar::dev::RobotManagerSingleton::getInstance()->findComponentSlot(componentPath);
+		this->setValue(slot);
+	}
+	else
+	{
+		cedar::dev::ComponentSlotPtr slot = nullptr;
+		this->setValue(slot);
+	}
 }
 
 

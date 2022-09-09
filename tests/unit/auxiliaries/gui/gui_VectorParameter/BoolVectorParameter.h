@@ -41,7 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/BoolVectorParameter.h"
+#include "cedar/processing/auxiliaries/gui/BoolVectorParameter.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 // template specializations
@@ -49,7 +49,7 @@
 
 /* A widget for unit testing VectorParameter.
  */
-class BoolVectorParameter : public cedar::aux::gui::BoolVectorParameter
+class BoolVectorParameter : public cedar::proc::aux::gui::BoolVectorParameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

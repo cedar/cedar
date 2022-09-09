@@ -39,6 +39,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+
 #include "cedar/processing/experiment/Supervisor.h"
 #include "cedar/processing/steps/PythonScript.h"
 #include "cedar/processing/gui/Ide.h"
@@ -49,6 +50,8 @@
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.h"
 #include "cedar/processing/gui/PerformanceOverview.h"
 #include "cedar/processing/gui/BoostControl.h"
+#include "cedar/processing/gui/CodeWidget.h"
+#include "cedar/processing/gui/CoPYWidget.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/SettingsDialog.h"
@@ -59,10 +62,11 @@
 #include "cedar/processing/gui/SimulationControl.h"
 #include "cedar/processing/gui/OneTimeMessageDialog.h"
 #include "cedar/processing/gui/StickyNote.h"
-#include "cedar/processing/DataConnection.h"
 #include "cedar/processing/gui/ExperimentDialog.h"
+#include "cedar/processing/undoRedo/UndoStack.h"
+#include "cedar/processing/DataConnection.h"
 #include "cedar/processing/exceptions.h"
-#include "cedar/devices/gui/RobotManager.h"
+#include "cedar/processing/devices/gui/RobotManager.h"
 #include "cedar/devices/Component.h"
 #include "cedar/auxiliaries/CommandLineParser.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
@@ -85,15 +89,20 @@
 #include "cedar/configuration.h"
 #include "cedar/devices/RobotManager.h"
 #include "cedar/processing/GroupFileFormatV1.h"
+#include "cedar/processing/undoRedo/commands/Paste.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QDockWidget>
 #include <QDialogButtonBox>
+#include <QDesktopServices>
+#include <QUrl>
 #include <QInputDialog>
 #include <QTableWidget>
 #include <QMimeData>
+#include <QUndoView>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/algorithm/string.hpp>
@@ -118,6 +127,7 @@
 #include <cedar/auxiliaries/gui/Settings.h>
 
 #endif // CEDAR_USE_YARP
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // nested private classes
@@ -243,6 +253,22 @@ private:
   QString mIconPath;
 
   bool mIsInToolBar;
+};
+
+// An internal class that implements the undo/redo stack as an openable dialog.
+class cedar::proc::gui::Ide::OpenableUndoRedoStack : public cedar::proc::gui::Ide::OpenableDialog
+{
+public:
+  OpenableUndoRedoStack()
+          :
+          OpenableDialog("Undo History", ":/menus/undo.svg", "undo redo stack")
+  {
+  }
+
+  QWidget* createOpenable() const
+  {
+    return new QUndoView(cedar::proc::gui::Ide::pUndoStack);
+  }
 };
 
 // An internal class that implements the architecture consistency check as an openable dialog.
@@ -371,62 +397,146 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   mpFindDialog = new cedar::proc::gui::FindDialog(this, this->mpProcessingDrawer);
   mpPerformanceOverview = new cedar::proc::gui::PerformanceOverview(this);
-
-  // manually added components
-
-  // toolbar: custom timestep
-  auto p_enable_custom_time_step = new QCheckBox();
-  p_enable_custom_time_step->setToolTip("When enabled, the specified time step is used to iterate all steps connected to looped triggers once when single-step is clicked. Otherwise, the time step to be used is determined automatically.");
-  p_enable_custom_time_step->setChecked(false);
-  this->mpToolBar->insertWidget(this->mpActionRecord, p_enable_custom_time_step);
-
-  this->mpCustomTimeStep = new QDoubleSpinBox();
-  this->mpCustomTimeStep->setToolTip("When enabled, this time step is passed to all looped triggers when single-stepping the architecture.");
-  this->mpCustomTimeStep->setValue(10.0);
-  this->mpCustomTimeStep->setMinimum(1.0);
-  this->mpCustomTimeStep->setSuffix(" ms");
-  this->mpCustomTimeStep->setMaximum(10000.0);
-  this->mpCustomTimeStep->setDecimals(1);
-  this->mpCustomTimeStep->setAlignment(Qt::AlignRight);
-  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpCustomTimeStep);
-
-  this->mpCustomTimeStep->setEnabled(false);
-  QObject::connect(p_enable_custom_time_step, SIGNAL(toggled(bool)), this->mpCustomTimeStep, SLOT(setEnabled(bool)));
+  pUndoStack = new cedar::proc::undoRedo::UndoStack(this);
 
 
-  this->mpToolBar->insertSeparator(this->mpActionRecord);
+  #ifdef CEDAR_USE_PYTHONSTEP
+  cedar::proc::steps::PythonScript::initPython();
+  #endif //CEDAR_USE_PYTHONSTEP
 
-  // toolbar: global time factor widgets
-  double global_time_factor_min = 0.00;
-  double global_time_factor_max = 2.00;
-  double global_time_factor_step = 0.05;
-  double global_time_factor_value = cedar::aux::SettingsSingleton::getInstance()->getGlobalTimeFactor();
-
-  double slider_factor = 100.0;
-  this->mpGlobalTimeFactorSlider = new QSlider(Qt::Horizontal);
-  this->mpGlobalTimeFactorSlider->setMinimum(slider_factor * global_time_factor_min);
-  this->mpGlobalTimeFactorSlider->setMaximum(slider_factor * global_time_factor_max);
-  this->mpGlobalTimeFactorSlider->setSingleStep(slider_factor * global_time_factor_step);
-  this->mpGlobalTimeFactorSlider->setValue(slider_factor * global_time_factor_value);
-  this->mpGlobalTimeFactorSlider->setFixedWidth(80);
-  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpGlobalTimeFactorSlider);
-
-  QObject::connect(this->mpGlobalTimeFactorSlider, SIGNAL(valueChanged(int)), this, SLOT(globalTimeFactorSliderChanged(int)));
-
-  this->mpGlobalTimeFactor = new QDoubleSpinBox();
-  this->mpGlobalTimeFactor->setToolTip("Factor for the fake DT (only for thread running with fake DT for the Euler step).");
-  this->mpGlobalTimeFactor->setMinimum(global_time_factor_min);
-  this->mpGlobalTimeFactor->setMaximum(global_time_factor_max);
-  this->mpGlobalTimeFactor->setDecimals(2);
-  this->mpGlobalTimeFactor->setSingleStep(global_time_factor_step);
-  this->mpGlobalTimeFactor->setValue(global_time_factor_value);
-  this->mpGlobalTimeFactor->setSuffix("x");
-  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpGlobalTimeFactor);
-
-  QObject::connect(this->mpGlobalTimeFactor, SIGNAL(valueChanged(double)), this, SLOT(globalTimeFactorSpinboxChanged(double)));
-
+//  // manually added components
+//  // toolbar: custom timestep
+//  auto p_enable_custom_time_step = new QCheckBox();
+//  p_enable_custom_time_step->setToolTip("When enabled, the specified time step is used to iterate all steps connected to looped triggers once when single-step is clicked. Otherwise, the time step to be used is determined automatically.");
+//  p_enable_custom_time_step->setChecked(false);
+//  this->mpToolBar->insertWidget(this->mpActionRecord, p_enable_custom_time_step);
+//
+//  this->mpCustomTimeStep = new QDoubleSpinBox();
+//  this->mpCustomTimeStep->setToolTip("When enabled, this time step is passed to all looped triggers when single-stepping the architecture.");
+//  this->mpCustomTimeStep->setValue(10.0);
+//  this->mpCustomTimeStep->setMinimum(1.0);
+//  this->mpCustomTimeStep->setSuffix(" ms");
+//  this->mpCustomTimeStep->setMaximum(10000.0);
+//  this->mpCustomTimeStep->setDecimals(1);
+//  this->mpCustomTimeStep->setAlignment(Qt::AlignRight);
+//  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpCustomTimeStep);
+//
+//  this->mpCustomTimeStep->setEnabled(false);
+//  QObject::connect(p_enable_custom_time_step, SIGNAL(toggled(bool)), this->mpCustomTimeStep, SLOT(setEnabled(bool)));
+//
+//
+//  this->mpToolBar->insertSeparator(this->mpActionRecord);
+//
+//  // toolbar: global time factor widgets
+//  double global_time_factor_min = 0.00;
+//  double global_time_factor_max = 2.00;
+//  double global_time_factor_step = 0.05;
+//  double global_time_factor_value = cedar::aux::SettingsSingleton::getInstance()->getGlobalTimeFactor();
+//
+//  double slider_factor = 100.0;
+//  this->mpGlobalTimeFactorSlider = new QSlider(Qt::Horizontal);
+//  this->mpGlobalTimeFactorSlider->setMinimum(slider_factor * global_time_factor_min);
+//  this->mpGlobalTimeFactorSlider->setMaximum(slider_factor * global_time_factor_max);
+//  this->mpGlobalTimeFactorSlider->setSingleStep(slider_factor * global_time_factor_step);
+//  this->mpGlobalTimeFactorSlider->setValue(slider_factor * global_time_factor_value);
+//  this->mpGlobalTimeFactorSlider->setFixedWidth(80);
+//  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpGlobalTimeFactorSlider);
+//
+//  QObject::connect(this->mpGlobalTimeFactorSlider, SIGNAL(valueChanged(int)), this, SLOT(globalTimeFactorSliderChanged(int)));
+//
+//  this->mpGlobalTimeFactor = new QDoubleSpinBox();
+//  this->mpGlobalTimeFactor->setToolTip("Factor for the fake DT (only for thread running with fake DT for the Euler step).");
+//  this->mpGlobalTimeFactor->setMinimum(global_time_factor_min);
+//  this->mpGlobalTimeFactor->setMaximum(global_time_factor_max);
+//  this->mpGlobalTimeFactor->setDecimals(2);
+//  this->mpGlobalTimeFactor->setSingleStep(global_time_factor_step);
+//  this->mpGlobalTimeFactor->setValue(global_time_factor_value);
+//  this->mpGlobalTimeFactor->setSuffix("x");
+//  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpGlobalTimeFactor);
+//
+//  QObject::connect(this->mpGlobalTimeFactor, SIGNAL(valueChanged(double)), this, SLOT(globalTimeFactorSpinboxChanged(double)));
+  #ifdef CEDAR_USE_COPY
+  //CopyWidget
+  mpCopyWidget = new QDockWidget(this);
+  mpCopyWidget->setObjectName(QString::fromUtf8("mpCopyWidget"));
+  QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+  sizePolicy.setHorizontalStretch(0);
+  sizePolicy.setVerticalStretch(0);
+  sizePolicy.setHeightForWidth(mpCopyWidget->sizePolicy().hasHeightForWidth());
+  mpCopyWidget->setSizePolicy(sizePolicy);
+  mpCopyWidget->setFeatures(QDockWidget::DockWidgetFeatureMask);
+  QWidget* dockWidgetContents_10 = new QWidget();
+  dockWidgetContents_10->setObjectName(QString::fromUtf8("dockWidgetContents_10"));
+  QHBoxLayout* verticalLayout_10 = new QHBoxLayout(dockWidgetContents_10);
+  verticalLayout_10->setObjectName(QString::fromUtf8("verticalLayout_10"));
+  verticalLayout_10->setContentsMargins(0, 0, 0, 0);
+  mpCopy = new cedar::proc::gui::CoPYWidget(dockWidgetContents_10);
+  mpCopy->setObjectName(QString::fromUtf8("mpCopy"));
+  QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Expanding);
+  sizePolicy1.setHorizontalStretch(1);
+  sizePolicy1.setVerticalStretch(0);
+  sizePolicy1.setHeightForWidth(mpCopy->sizePolicy().hasHeightForWidth());
+  mpCopy->setSizePolicy(sizePolicy1);
+  verticalLayout_10->addWidget(mpCopy);
+  mpCopyWidget->setWidget(dockWidgetContents_10);
+  this->addDockWidget(static_cast<Qt::DockWidgetArea>(4), mpCopyWidget);
+  #endif
 //  this->mpToolBar->insertSeparator(this->mpActionRecord);
 
+
+// NEW GUI STUFF HERE: ******************************************************
+    this->mpSimulationModeComboBox = new QComboBox;
+    this->mpSimulationModeComboBox->setToolTip("Choose to run the architecture in simulated or real time");
+    this->mpSimulationModeComboBox->insertItem(0,QString::fromStdString("Simulated Time"));
+    this->mpSimulationModeComboBox->insertItem(1,QString::fromStdString("Real Time"));
+    this->mpSimulationModeComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+    this->mpToolBar->insertWidget(this->mpActionRecord, this->mpSimulationModeComboBox);
+
+    QObject::connect(this->mpSimulationModeComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(simulationModeComboBoxChanged(int)));
+
+    //Todo Connect to something meaningful! Maybe fill with enum...
+
+//     toolbar: simulated step size
+      double simulated_time_step_min = 0.1;
+      double simulated_time_step_max = 100;
+      double global_time_factor_step = 1;
+
+      double global_time_factor_value = 20;
+      if(this->mGroup)
+      {
+        global_time_factor_value =  this->mGroup->getGroup()->getSimulationTimeStep()/cedar::unit::Time(1.0* cedar::unit::milli *cedar::unit::seconds) ;
+      }
+
+
+      //Todo: Rename variables
+      //Todo: Maybe make nonlinear behavior?
+      double slider_factor = 100.0;
+      this->mpSimulatedTimeStepSlider = new QSlider(Qt::Horizontal);
+      this->mpSimulatedTimeStepSlider->setMinimum(slider_factor * simulated_time_step_min);
+      this->mpSimulatedTimeStepSlider->setMaximum(slider_factor * simulated_time_step_max);
+      this->mpSimulatedTimeStepSlider->setSingleStep(slider_factor * global_time_factor_step);
+      this->mpSimulatedTimeStepSlider->setTickInterval(slider_factor * global_time_factor_step);
+      this->mpSimulatedTimeStepSlider->setValue(slider_factor * global_time_factor_value);
+      this->mpSimulatedTimeStepSlider->setFixedWidth(100);
+      this->mpToolBar->insertWidget(this->mpActionRecord, this->mpSimulatedTimeStepSlider);
+
+      QObject::connect(this->mpSimulatedTimeStepSlider, SIGNAL(valueChanged(int)), this, SLOT(simulatedTimeStepSliderChanged(int)));
+
+      this->mpSimulatedTimeStepSpinBox = new QDoubleSpinBox();
+      this->mpSimulatedTimeStepSpinBox->setToolTip("Euler step size when choosing simulated time");
+      this->mpSimulatedTimeStepSpinBox->setMinimum(simulated_time_step_min);
+      this->mpSimulatedTimeStepSpinBox->setMaximum(simulated_time_step_max);
+      this->mpSimulatedTimeStepSpinBox->setDecimals(1);
+      this->mpSimulatedTimeStepSpinBox->setSingleStep(global_time_factor_step);
+      this->mpSimulatedTimeStepSpinBox->setValue(global_time_factor_value);
+      this->mpSimulatedTimeStepSpinBox->setSuffix("ms");
+      this->mpToolBar->insertWidget(this->mpActionRecord, this->mpSimulatedTimeStepSpinBox);
+
+      QObject::connect(this->mpSimulatedTimeStepSpinBox, SIGNAL(valueChanged(double)), this, SLOT(simulatedTimeStepSpinBoxChanged(double)));
+
+
+    this->mpToolBar->insertSeparator(this->mpActionRecord);
   // PlotGroupsComboBox, insert it before the displayplotgroup action
   this->mpPlotGroupsComboBox = new QComboBox;
 //  this->mpPlotGroupsComboBox->setVisible(false); // jokeit, 2016
@@ -452,11 +562,13 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   mpMenuWindows->addAction(this->mpItemsWidget->toggleViewAction());
   mpMenuWindows->addAction(this->mpPropertiesWidget->toggleViewAction());
   mpMenuWindows->addAction(this->mpLogWidget->toggleViewAction());
-
+  #ifdef CEDAR_USE_COPY
+  mpMenuWindows->addAction(mpCopyWidget->toggleViewAction());
+  #endif
   QObject::connect(this->tabWidget,SIGNAL(currentChanged(int)),this, SLOT(updateTabs(int))); //Fixes a Bug under Mac OS
 
-    //do not remove this line, init the qglviewer, allowing the robotic framework to work as intended. Hotfix part 1. Needs a better fix. TODO
-    this->tabWidget->setCurrentIndex(1);
+  //do not remove this line, init the qglviewer, allowing the robotic framework to work as intended. Hotfix part 1. Needs a better fix. TODO
+  this->tabWidget->setCurrentIndex(1);
 
   // set the property pane as the scene's property displayer
 
@@ -534,6 +646,8 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   QObject::connect(mpActionCopy, SIGNAL(triggered()), this, SLOT(copy()));
   QObject::connect(mpActionPaste, SIGNAL(triggered()), this, SLOT(paste()));
+  QObject::connect(mpActionUndo, SIGNAL(triggered()), this, SLOT(undo()));
+  QObject::connect(mpActionRedo, SIGNAL(triggered()), this, SLOT(redo()));
   QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateSelected()));
   QObject::connect(mpActionCopyConfiguration, SIGNAL(triggered()), this, SLOT(copyStepConfiguration()));
   QObject::connect(mpActionPasteConfiguration, SIGNAL(triggered()), this, SLOT(pasteStepConfiguration()));
@@ -551,7 +665,14 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   QObject::connect(mpActionParameterLinker, SIGNAL(triggered()), this, SLOT(openParameterLinker()));
   QObject::connect(mpActionDataSlotPositioning, SIGNAL(triggered()), this, SLOT(toggleDataSlotPositioning()));
 
+  #ifdef CEDAR_USE_COPY
+  mpActionShowCoPYDocumentation = this->findChild<QMenu*>("menuHelp")->addAction("Show CoPY Documentation");
 
+  QObject::connect(this->mpActionShowCoPYDocumentation,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(showCoPYDocumentation()));
+  #endif
   QObject::connect(this->mpRecorderWidget,
                    SIGNAL(settingsChanged()),
                    this,
@@ -595,6 +716,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   openable_dialogs.push_back(OpenableDialogPtr(new OpenableSimulationControl()));
   openable_dialogs.push_back(boost_ctrl);
   openable_dialogs.push_back(OpenableDialogPtr(new OpenableArchitectureConsistencyCheck(this->mpProcessingDrawer)));
+  openable_dialogs.push_back(OpenableDialogPtr(new OpenableUndoRedoStack()));
 
   // actions are added at end of menu (jokeit: 2016, before: at front, iterated in reverse)
   for (auto iter = openable_dialogs.begin(); iter != openable_dialogs.end(); ++iter)
@@ -635,6 +757,10 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
         boost::bind(&cedar::proc::gui::Ide::translateGlobalTimeFactorChangedSignal, this, _1)
       );
 
+  mSimulationModeChangedConnection = cedar::aux::GlobalClockSingleton::getInstance()->connectToLoopModeChangedSignal(boost::bind(&cedar::proc::gui::Ide::processLoopModeChangedSignal,this,_1));
+  mSimulationStepSizeChangedConnection = cedar::aux::GlobalClockSingleton::getInstance()->connectToSimulationStepSizeChangedSignal(boost::bind(&cedar::proc::gui::Ide::processSimulationStepChangedSignal,this,_1));
+  mCurMinTauChangedConnection = cedar::aux::GlobalClockSingleton::getInstance()->connectToCurMinTauChangedSignal(boost::bind(&cedar::proc::gui::Ide::updateTimeStepSpinBoxColor,this));
+
   QObject::connect(this, SIGNAL(signalGlobalTimeFactorSettingChanged(double)), this, SLOT(globalTimeFactorSettingChanged(double)));
 
   QObject::connect(this->mpActionLockUIPositions, SIGNAL(toggled(bool)), this, SLOT(lockUI(bool)));
@@ -643,15 +769,30 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   mBackupSaveThreadWrapper= cedar::aux::CallFunctionInThreadPtr( new cedar::aux::CallFunctionInThread( boost::bind( &cedar::proc::gui::Ide::backupSaveCallback, this ) ) );
   mBackupSaveThreadWrapper->start();
 
-#ifdef CEDAR_USE_PYTHON
+#ifdef CEDAR_USE_COPY
+  //send Scene to CoPYWidget
+  mpCopy->setScene(mpProcessingDrawer->getScene());
+  mpProcessingDrawer->getScene()->setCoPYWidget(mpCopy);
+#endif
+#ifdef CEDAR_USE_PYTHONSTEP
   cedar::proc::steps::PythonScript::importStepsFromTemplate();
 #endif
 }
 
-void cedar::proc::gui::Ide::showEvent( QShowEvent *event ) {
-    QWidget::showEvent( event );
-    //do not remove this line, init the qglviewer, allowing the robotic framework to work as intended. Hotfix part 2. Needs a better fix. TODO
-    this->tabWidget->setCurrentIndex(0);
+#ifdef CEDAR_USE_COPY
+void cedar::proc::gui::Ide::showCoPYDocumentation()
+{
+  cedar::aux::Path path = "resource://CoPYDocumentation.pdf";
+  QString absPath = QString::fromStdString(path.absolute(false).toString()); 
+  QDesktopServices::openUrl(QUrl("file:///" + absPath));
+}
+#endif
+
+void cedar::proc::gui::Ide::showEvent( QShowEvent *event )
+{
+  QWidget::showEvent( event );
+  //do not remove this line, init the qglviewer, allowing the robotic framework to work as intended. Hotfix part 2. Needs a better fix. TODO
+  this->tabWidget->setCurrentIndex(0);
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -685,6 +826,9 @@ void cedar::proc::gui::Ide::lockUI(bool lock)
   widgets.push_back(this->mpItemsWidget);
   widgets.push_back(this->mpPropertiesWidget);
   widgets.push_back(this->mpLogWidget);
+  #ifdef CEDAR_USE_COPY
+  widgets.push_back(mpCopyWidget);
+  #endif
 
   for (auto widget : widgets)
   {
@@ -798,7 +942,7 @@ void cedar::proc::gui::Ide::setSimulationControlsEnabled(bool enabled)
 {
   this->mpActionStartPauseSimulation->setEnabled(enabled);
   // jokeit: see above this->mpActionResetSimulation->setEnabled(enabled);
-  this->mpThreadsSingleStep->setEnabled(enabled);
+  this->mpThreadsSingleStep->setEnabled(enabled && cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT);
 }
 
 void cedar::proc::gui::Ide::buildStatusBar()
@@ -880,7 +1024,12 @@ void cedar::proc::gui::Ide::timerEvent(QTimerEvent*)
 {
   cedar::unit::Time time = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
   std::string formatted_time = cedar::aux::formatDuration(time);
-  this->mpGlobalTimeLabel->setText(QString("simulation time: ") + QString::fromStdString(formatted_time));
+
+//  std::cout<<"Timer event: " << formatted_time <<std::endl;
+
+  std::string timeLabel = cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::RealDT  ? "Elapsed real time: " : "Elapsed simulated time ";
+
+  this->mpGlobalTimeLabel->setText(QString::fromStdString(timeLabel) + QString::fromStdString(formatted_time));
 
   //std::string components_desc = cedar::dev::Component::describeAllRunningComponents();
   std::string components_desc = cedar::dev::Component::describeAllRunningConfigurations();
@@ -913,31 +1062,84 @@ void cedar::proc::gui::Ide::translateGlobalTimeFactorChangedSignal(double newVal
 
 void cedar::proc::gui::Ide::globalTimeFactorSettingChanged(double newValue)
 {
-  bool blocked = this->mpGlobalTimeFactorSlider->blockSignals(true);
-  this->mpGlobalTimeFactorSlider->setValue(static_cast<int>(newValue * 100.0));
-  this->mpGlobalTimeFactorSlider->blockSignals(blocked);
-
-  blocked = this->mpGlobalTimeFactor->blockSignals(true);
-  this->mpGlobalTimeFactor->setValue(newValue);
-  this->mpGlobalTimeFactor->blockSignals(blocked);
+  //Todo:Eventually Remove this!
+//  bool blocked = this->mpSimulatedTimeStepSlider->blockSignals(true);
+//  this->mpSimulatedTimeStepSlider->setValue(static_cast<int>(newValue * 100.0));
+//  this->mpSimulatedTimeStepSlider->blockSignals(blocked);
+//
+//  blocked = this->mpSimulatedTimeStepSpinBox->blockSignals(true);
+//  this->mpSimulatedTimeStepSpinBox->setValue(newValue);
+//  this->mpSimulatedTimeStepSpinBox->blockSignals(blocked);
 }
 
-void cedar::proc::gui::Ide::globalTimeFactorSliderChanged(int newValue)
+void cedar::proc::gui::Ide::simulationModeComboBoxChanged(int newIndex)
 {
-  this->mpGlobalTimeFactor->setValue(static_cast<double>(newValue) / 100.0);
+//  std::cout<<"Ide::simulationModeComboBoxChanged index: " << newIndex << std::endl;
+  if(newIndex != 0 ) //For now Zero is the default index, which is simulated Time. Todo:Use an Enum for the mode
+  {
+    //Case RealTime
+    this->mpSimulatedTimeStepSlider->setEnabled(false);
+    this->mpSimulatedTimeStepSpinBox->setEnabled(false);
+    this->mpThreadsSingleStep->setEnabled(false);
+
+    if(this->mGroup)
+    {
+      this->mGroup->getGroup()->setLoopMode(cedar::aux::LoopMode::RealDT);
+    }
+
+  }
+  else
+  {
+    //Case Simulated Time
+    this->mpSimulatedTimeStepSlider->setEnabled(true);
+    this->mpSimulatedTimeStepSpinBox->setEnabled(true);
+
+    if(this->mGroup)
+    {
+      this->mGroup->getGroup()->setLoopMode(cedar::aux::LoopMode::FakeDT);
+    }
+
+    QReadLocker locker(this->mSimulationRunning.getLockPtr());
+    bool running = this->mSimulationRunning.member();
+
+    this->mpThreadsSingleStep->setEnabled(!running);
+  }
 }
 
-void cedar::proc::gui::Ide::globalTimeFactorSpinboxChanged(double newValue)
+void cedar::proc::gui::Ide::simulatedTimeStepSliderChanged(int newValue)
 {
-  bool blocked = this->mpGlobalTimeFactorSlider->blockSignals(true);
-  this->mpGlobalTimeFactorSlider->setValue(static_cast<int>(newValue * 100.0));
-  this->mpGlobalTimeFactorSlider->blockSignals(blocked);
+  this->mpSimulatedTimeStepSpinBox->setValue(static_cast<double>(newValue) / 100.0);
+}
+
+void cedar::proc::gui::Ide::simulatedTimeStepSpinBoxChanged(double newValue)
+{
+  bool blocked = this->mpSimulatedTimeStepSlider->blockSignals(true);
+  this->mpSimulatedTimeStepSlider->setValue(static_cast<int>(newValue * 100.0));
+  this->mpSimulatedTimeStepSlider->blockSignals(blocked);
 
   if (this->mGroup)
   {
-    this->mGroup->getGroup()->setTimeFactor(newValue);
+    this->mGroup->getGroup()->setSimulationTimeStep(cedar::unit::Time(newValue*cedar::unit::milli*cedar::unit::seconds));
   }
+    updateTimeStepSpinBoxColor();
 }
+
+void cedar::proc::gui::Ide::updateTimeStepSpinBoxColor()
+{
+    double curMinTau = cedar::aux::GlobalClockSingleton ::getInstance()->getCurrentMinTau();
+
+    double spinBoxValue = this->mpSimulatedTimeStepSpinBox->value();
+
+    if(curMinTau < spinBoxValue)
+    {
+        this->mpSimulatedTimeStepSpinBox->setStyleSheet("color: rgb(255,0,0); ");
+    }
+    else
+    {
+        this->mpSimulatedTimeStepSpinBox->setStyleSheet("color: rgb(0,0,0); ");
+    }
+}
+
 void cedar::proc::gui::Ide::toggleDataSlotPositioning()
 {
 
@@ -962,7 +1164,7 @@ void cedar::proc::gui::Ide::showRobotManager()
   auto p_dialog = new QDialog(this);
   auto p_layout = new QVBoxLayout();
   p_dialog->setLayout(p_layout);
-  auto p_robot_manager = new cedar::dev::gui::RobotManager();
+  auto p_robot_manager = new cedar::proc::dev::gui::RobotManager();
   QObject::connect(p_robot_manager, SIGNAL(closeRobotManager(void)), p_dialog, SLOT(close(void)));
   p_layout->addWidget(p_robot_manager);
   p_dialog->setMinimumHeight(800);
@@ -1020,6 +1222,7 @@ void cedar::proc::gui::Ide::exportSvg()
 
 void cedar::proc::gui::Ide::duplicateSelected()
 {
+	cedar::proc::gui::Ide::pUndoStack->beginMacro("Duplicated Elements");
   //!@todo Doesn't this code belong into scene?
   // get current mouse position
   QPoint mouse_pos = this->getArchitectureView()->mapFromGlobal(QCursor::pos());
@@ -1132,21 +1335,21 @@ void cedar::proc::gui::Ide::duplicateSelected()
       try
       {
         if
-        (
-            auto group
-              = dynamic_cast<cedar::proc::gui::Group*>
                 (
-                  this->mpProcessingDrawer->getScene()->getGraphicsItemFor(p_base->getElement()->getGroup().get())
+                auto group
+                        = dynamic_cast<cedar::proc::gui::Group*>
+                        (
+                                this->mpProcessingDrawer->getScene()->getGraphicsItemFor(p_base->getElement()->getGroup().get())
+                        )
                 )
-        )
         {
           auto mapped = new_pos - group->scenePos();
           auto mapped_center = group->mapFromScene(center);
           auto p_new = group->duplicate(mapped - (mapped_center - p_base->pos()), p_base->getElement()->getName());
-          
+
           // select the new item
           p_new->setSelected(true);
-          
+
           // replace any slots with new ones
           for (auto& out : outgoing_slots)
           {
@@ -1176,6 +1379,17 @@ void cedar::proc::gui::Ide::duplicateSelected()
   {
     cedar::proc::Group::connectAcrossGroups(outgoing_slots.at(i).second, receiving_slots.at(i).second);
   }
+	cedar::proc::gui::Ide::pUndoStack->endMacro();
+}
+
+void cedar::proc::gui::Ide::undo()
+{
+  pUndoStack->undo();
+}
+
+void cedar::proc::gui::Ide::redo()
+{
+  pUndoStack->redo();
 }
 
 void cedar::proc::gui::Ide::copy()
@@ -1202,7 +1416,7 @@ void cedar::proc::gui::Ide::copy()
   //Iterate over all selected elements
   for (QGraphicsItem* singleSelected : selected)
   {
-    if(cedar::proc::gui::StickyNote* stickyNote = dynamic_cast<cedar::proc::gui::StickyNote*>(singleSelected))
+    if(auto* stickyNote = dynamic_cast<cedar::proc::gui::StickyNote*>(singleSelected))
     {
       cedar::aux::ConfigurationNode node;
       node.put("type", "stickyNote");
@@ -1213,6 +1427,7 @@ void cedar::proc::gui::Ide::copy()
       node.put("y", static_cast<int>(stickyNote->scenePos().y()));
       node.put("text", stickyNote->getText());
       node.put("font size", stickyNote->getFontSize());
+
       QColor color = stickyNote->getColor();
       node.put("color red", color.red());
       node.put("color green", color.green());
@@ -1222,7 +1437,7 @@ void cedar::proc::gui::Ide::copy()
 
     bool doCopy = true;
     cedar::aux::ConfigurationNode singleGroup;
-    if (Element* p_base = dynamic_cast<cedar::proc::gui::Element *>(singleSelected))
+    if (auto* p_base = dynamic_cast<cedar::proc::gui::Element *>(singleSelected))
     {
       //Get Element
       cedar::proc::ElementPtr element = p_base->getElement();
@@ -1307,16 +1522,16 @@ void cedar::proc::gui::Ide::copy()
   for (int i = 0; i < items_to_duplicate.length(); i++)
   {
     QGraphicsItem *currentQGraphicsItem = items_to_duplicate.at(i);
-    if (auto p_base = dynamic_cast<cedar::proc::gui::Element *>(currentQGraphicsItem))
+    if (cedar::proc::gui::Element* p_base = dynamic_cast<cedar::proc::gui::Element*>(currentQGraphicsItem))
     {
       if(dynamic_cast<cedar::proc::gui::Group *>(currentQGraphicsItem) != nullptr)
       {
         continue;
       }
       //Get the element to duplicate (with its name)
-      auto elementToDuplicate = p_base->getElement();
+      cedar::proc::ElementPtr elementToDuplicate = p_base->getElement();
       //Get UI Element
-      auto elementToDuplicateUi = p_base;
+      cedar::proc::gui::Element* elementToDuplicateUi = p_base;
 
       //Create Configuration Node for Element and its UI
       cedar::aux::ConfigurationNode tempElementConfigurationNode;
@@ -1514,291 +1729,21 @@ void cedar::proc::gui::Ide::copy()
 
 void cedar::proc::gui::Ide::paste()
 {
-  cedar::aux::ConfigurationNode emptyNode;
+	//Get mouse position and convert it to scene coordinates
+	QPoint mousePosition = this->getArchitectureView()->mapFromGlobal(QCursor::pos());
+	QPointF mousePositionScenePos = this->getArchitectureView()->mapToScene(mousePosition);
 
-  //Get mouse position and convert it to scene coordinates
-  QPoint mousePosition = this->getArchitectureView()->mapFromGlobal(QCursor::pos());
-  QPointF mousePositionScenePos = this->getArchitectureView()->mapToScene(mousePosition);
+	//Get global clipboard
+	QClipboard *clipboard = QApplication::clipboard();
+	//Get clipboard MimeData and convert to string
+	const QMimeData *qMimeDataFromClipboard = clipboard->mimeData(QClipboard::Clipboard);
+	std::string jsonFromClipboard = qMimeDataFromClipboard->data("application/json").toStdString();
 
-  ////Get json from global clipboard and convert it to string
-  //Get global clipboard
-  QClipboard *clipboard = QApplication::clipboard();
-
-  //Get clipboard MimeData and convert to string
-  const QMimeData *qMimeDataFromClipboard = clipboard->mimeData(QClipboard::Clipboard);
-  std::string stringJsonFromClipboard = qMimeDataFromClipboard->data("application/json").toStdString();
-
-
-  //Convert back to ConfigurationNode
-  cedar::aux::ConfigurationNode inputNode;
-  std::stringstream jsonFromClipboardStream;
-  jsonFromClipboardStream << stringJsonFromClipboard;
-  read_json(jsonFromClipboardStream, inputNode);
-
-  //Get steps and ui tree
-  cedar::aux::ConfigurationNode &stepsTree = inputNode.get_child("steps");
-  cedar::aux::ConfigurationNode &uiTree = inputNode.get_child("ui");
-  cedar::aux::ConfigurationNode &groupTree = inputNode.get_child("groups");
-
-  //Get center of pasted elements to paste elements to the cursor position
-  //Determine the position offset of the duplicates as the average of the positions of all selected elements
-  QPointF center(0.0, 0.0);
-  int counterofUis = 0;
-  for (auto &uiPair:uiTree)
-  {
-    if(uiPair.second.find("positionX") != uiPair.second.not_found())
-    {
-      double positionX = uiPair.second.find("positionX")->second.get_value<double>();
-      double positionY = uiPair.second.find("positionY")->second.get_value<double>();
-      QPointF pointofStep(positionX, positionY);
-      center += pointofStep;
-      counterofUis++;
-    }
-    boost::property_tree::ptree::const_assoc_iterator itType = uiPair.second.find("type");
-    if(itType != uiPair.second.not_found())
-    {
-      if (itType->second.get_value<std::string>() == "stickyNote")
-      {
-        if(uiPair.second.find("x") != uiPair.second.not_found())
-        {
-          double positionX = uiPair.second.find("x")->second.get_value<double>();
-          double positionY = uiPair.second.find("y")->second.get_value<double>();
-          QPointF pointofStep(positionX, positionY);
-          center += pointofStep;
-          counterofUis++;
-        }
-      }
-    }
-  }
-  for(auto &groupPair:groupTree)
-  {
-    if(groupPair.second.find("ui generic") != groupPair.second.not_found())
-    {
-      auto ui_generic = groupPair.second.find("ui generic");
-      if(ui_generic->second.find("positionX") != ui_generic->second.not_found() && ui_generic->second.find("width") != ui_generic->second.not_found())
-      {
-        double positionX = ui_generic->second.find("positionX")->second.get_value<double>();
-        double positionY = ui_generic->second.find("positionY")->second.get_value<double>();
-        double width = ui_generic->second.find("width")->second.get_value<double>();
-        double height = ui_generic->second.find("height")->second.get_value<double>();
-        QPointF pointofGroup(positionX + width / 2, positionY + height / 2);
-        center += pointofGroup;
-        counterofUis++;
-      }
-    }
-  }
-
-  center /= counterofUis;
-  boost::optional<boost::property_tree::ptree &> connectionsTree = inputNode.get_child_optional("connections");
-  //Get gui connections tree
-  boost::optional<boost::property_tree::ptree &> uiConnectionsTree;
-  for(auto &uiPair:uiTree)
-  {
-    boost::property_tree::ptree::const_assoc_iterator it = uiPair.second.find("type");
-    if(it != uiPair.second.not_found())
-    {
-      std::string type = it->second.get_value<std::string>();
-      if (type == "connections")
-      {
-        uiConnectionsTree = uiPair.second.get_child_optional("connections");
-        if(uiConnectionsTree)
-        {
-          break;
-        }
-      }
-    }
-  }
-
-  //Rename and add steps, rename connections
-  for (auto &stepsPair:stepsTree)
-  {
-    cedar::aux::ConfigurationNode singleUiValue;
-
-    cedar::aux::ConfigurationNode singleStepValue;
-
-    if(stepsPair.second.find("name") == stepsPair.second.not_found())
-    {
-      continue;
-    }
-    std::string oldName = stepsPair.second.find("name")->second.get_value<std::string>();
-    std::string newName = this->mGroup->getGroup()->getUniqueIdentifier(oldName);
-
-    //In UI rename every occurrence of oldName to newName and change position
-    for (auto &uiPair:uiTree)
-    {
-      if(uiPair.second.find("step") != uiPair.second.not_found() && uiPair.second.find("positionX") != uiPair.second.not_found())
-      {
-        std::string uiName = uiPair.second.find("step")->second.get_value<std::string>();
-
-        if (uiName == oldName)
-        {
-          //Rename occurence
-          uiPair.second.put("step", newName);
-
-          ////Change position
-          double positionX = uiPair.second.find("positionX")->second.get_value<double>();
-          double positionY = uiPair.second.find("positionY")->second.get_value<double>();
-          QPointF pointofStep(positionX, positionY);
-
-          //Add vector from center to step to mouse position
-          QPointF vectorFromCenterToStep = pointofStep - center;
-          QPointF newPositionOfStep = mousePositionScenePos + vectorFromCenterToStep;
-
-          //Set new position
-          uiPair.second.put("positionX", newPositionOfStep.x());
-          uiPair.second.put("positionY", newPositionOfStep.y());
-
-          singleUiValue.push_back(cedar::aux::ConfigurationNode::value_type("", uiPair.second));
-        }
-      }
-    }
-
-    if(connectionsTree)
-    {
-      renameElementInConnection(*connectionsTree, oldName, newName, "source", "target");
-    }
-    if(uiConnectionsTree)
-    {
-      renameElementInConnection(*uiConnectionsTree, oldName, newName, "source slot", "target slot");
-    }
-
-    stepsPair.second.put("name", newName);
-
-    cedar::aux::ConfigurationNode rootNode;
-
-    singleStepValue.push_front(cedar::aux::ConfigurationNode::value_type(stepsPair.first, stepsPair.second));
-    cedar::aux::ConfigurationNode emptyNode;
-
-    this->pasteConfigurationNodes(singleStepValue, singleUiValue, emptyNode, emptyNode);
-  }
-
-  ////StickyNotes
-  for (auto &uiPair:uiTree)
-  {
-    cedar::aux::ConfigurationNode singleUiValue;
-
-    boost::property_tree::ptree::const_assoc_iterator itType = uiPair.second.find("type");
-    if(itType != uiPair.second.not_found() && itType->second.get_value<std::string>() == "stickyNote" &&
-        uiPair.second.find("x") != uiPair.second.not_found())
-    {
-      ////Change position
-      //Get
-      double positionX = uiPair.second.find("x")->second.get_value<double>();
-      double positionY = uiPair.second.find("y")->second.get_value<double>();
-      QPointF pointOfNote(positionX,positionY);
-
-      //Add vector from center to stickynote to mouse position
-      QPointF vectorFromCenterToNote = pointOfNote - center;
-      QPointF newPostionOfNote = mousePositionScenePos + vectorFromCenterToNote;
-
-      //Set
-      uiPair.second.put("x", (int)newPostionOfNote.x());
-      uiPair.second.put("y",  (int)newPostionOfNote.y());
-      singleUiValue.push_back(cedar::aux::ConfigurationNode::value_type("", uiPair.second));
-    }
-
-    cedar::aux::ConfigurationNode emptyNode;
-    this->pasteConfigurationNodes(emptyNode,singleUiValue,emptyNode,emptyNode);
-  }
-  //Rename and add groups
-  for(auto &groupPair:groupTree)
-  {
-    std::string oldName = groupPair.first;
-    std::string newName = this->mGroup->getGroup()->getUniqueIdentifier(oldName);
-
-    ////Change position
-    auto ui_generic = groupPair.second.find("ui generic");
-    if(ui_generic != groupPair.second.not_found() && ui_generic->second.find("positionX") != ui_generic->second.not_found())
-    {
-      double positionX = ui_generic->second.find("positionX")->second.get_value<double>();
-      double positionY = ui_generic->second.find("positionY")->second.get_value<double>();
-      QPointF pointofGroup(positionX, positionY);
-
-      //Manipulate: Get vector from center to step and add this vector to the mouse
-      QPointF vectorFromCenterToGroup = pointofGroup - center;
-      QPointF newPostionofGroup = mousePositionScenePos + vectorFromCenterToGroup;
-      //Set
-      ui_generic->second.put("positionX", newPostionofGroup.x());
-      ui_generic->second.put("positionY", newPostionofGroup.y());
-
-      //Rename other occurences at "name" and ui generic/group
-      groupPair.second.put("name", newName);
-      ui_generic->second.put("group", newName);
-      if (connectionsTree)
-      {
-        renameElementInConnection(*connectionsTree, oldName, newName, "source", "target");
-      }
-      if (uiConnectionsTree)
-      {
-        renameElementInConnection(*uiConnectionsTree, oldName, newName, "source slot", "target slot");
-      }
-
-      cedar::aux::ConfigurationNode singleGroupPair;
-      singleGroupPair.push_front(cedar::aux::ConfigurationNode::value_type(newName, groupPair.second));
-
-      cedar::aux::ConfigurationNode emptyNode;
-      this->pasteConfigurationNodes(emptyNode, emptyNode, emptyNode, singleGroupPair);
-    }
-  }
-
-  ////Generate Configuration node for ui connections
-  cedar::aux::ConfigurationNode uiConnectionsNode;
-  for (auto &uiPair:uiTree)
-  {
-    boost::property_tree::ptree::const_assoc_iterator it = uiPair.second.find("type");
-    if(it != uiPair.second.not_found())
-    {
-      std::string type = it->second.get_value<std::string>();
-      if (type == "connections")
-      {
-        uiConnectionsNode.push_front(cedar::aux::ConfigurationNode::value_type(uiPair.first, uiPair.second));
-        break;
-      }
-    }
-  }
-
-  ////Paste connections
-  if (connectionsTree)
-  {
-    cedar::aux::ConfigurationNode emptyNode;
-    this->pasteConfigurationNodes(emptyNode, uiConnectionsNode, *connectionsTree, emptyNode);
-  }
+	cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::Paste(jsonFromClipboard,this->mGroup, mousePositionScenePos));
 }
 
-void cedar::proc::gui::Ide::pasteConfigurationNodes(cedar::aux::ConfigurationNode stepNode, cedar::aux::ConfigurationNode uiNode, cedar::aux::ConfigurationNode connectionNode, cedar::aux::ConfigurationNode groupNode)
+void cedar::proc::gui::Ide::copyStepConfiguration()
 {
-  cedar::aux::ConfigurationNode rootNode;
-
-  //Add meta Infos
-  cedar::aux::ConfigurationNode metaNode;
-  metaNode.put("format", "1");
-
-  rootNode.add_child("meta", metaNode);
-  rootNode.add_child("steps", stepNode);
-  rootNode.add_child("ui", uiNode);
-  rootNode.add_child("connections", connectionNode);
-  rootNode.add_child("groups", groupNode);
-
-  std::stringstream stringstream;
-  boost::property_tree::write_json(stringstream, rootNode);
-
-  //Debug: Print modified pasted
-  //boost::property_tree::write_json("Paste: Modified Final Into read Function.json", rootNode);
-
-  //Use readJsonFromString to paste the stringJson
-  try
-  {
-    this->mGroup->readJsonFromString(stringstream.str());
-
-  }
-  catch (const boost::property_tree::json_parser_error &e)
-  {
-    std::string info(e.what());
-    std::cout << info << std::endl;
-  }
-}
-
-void cedar::proc::gui::Ide::copyStepConfiguration() {
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
   // make sure there is only one item
   if (selected_items.size() > 1)
@@ -2000,6 +1945,9 @@ void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
 void cedar::proc::gui::Ide::storeSettings()
 {
   cedar::proc::gui::SettingsSingleton::getInstance()->logSettings()->getFrom(this->mpLogWidget);
+  #ifdef CEDAR_USE_COPY
+  cedar::proc::gui::SettingsSingleton::getInstance()->coPYSettings()->getFrom(mpCopyWidget);
+  #endif
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->getFrom(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->getFrom(this->mpItemsWidget);
 
@@ -2017,9 +1965,11 @@ void cedar::proc::gui::Ide::storeSettings()
 void cedar::proc::gui::Ide::restoreSettings()
 {
   cedar::proc::gui::SettingsSingleton::getInstance()->logSettings()->setTo(this->mpLogWidget);
+  #ifdef CEDAR_USE_COPY
+  cedar::proc::gui::SettingsSingleton::getInstance()->coPYSettings()->setTo(mpCopyWidget);
+  #endif
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->setTo(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->setTo(this->mpItemsWidget);
-
   cedar::proc::gui::SettingsSingleton::getInstance()->restoreMainWindow(this);
 }
 
@@ -2067,7 +2017,6 @@ void cedar::proc::gui::Ide::notify(const QString& message)
 {
   QMessageBox::critical(this,"Notification", message);
 }
-
 void cedar::proc::gui::Ide::triggerStarted()
 {
   QWriteLocker locker(this->mSimulationRunning.getLockPtr());
@@ -2075,6 +2024,10 @@ void cedar::proc::gui::Ide::triggerStarted()
   this->updateSimulationRunningIcon(this->mSimulationRunning.member());
 
   this->mpActionResetSimulation->setEnabled(true);
+
+  this->mpSimulatedTimeStepSlider->setEnabled(false);
+  this->mpSimulatedTimeStepSpinBox->setEnabled(false);
+  this->mpSimulationModeComboBox->setEnabled(false);
 }
 
 void cedar::proc::gui::Ide::allTriggersStopped()
@@ -2082,10 +2035,19 @@ void cedar::proc::gui::Ide::allTriggersStopped()
   QWriteLocker locker(this->mSimulationRunning.getLockPtr());
   this->mSimulationRunning.member() = false;
   this->updateSimulationRunningIcon(this->mSimulationRunning.member());
+
+  this->mpSimulationModeComboBox->setEnabled(true);
+  this->mpSimulatedTimeStepSlider->setEnabled(mpSimulationModeComboBox->currentIndex() == 0);
+  this->mpSimulatedTimeStepSpinBox->setEnabled(mpSimulationModeComboBox->currentIndex() == 0);
 }
 
 void cedar::proc::gui::Ide::updateSimulationRunningIcon(bool running)
 {
+  #ifdef CEDAR_USE_COPY
+  //lock execute Button when simulating
+  this->mpCopy->lockExecuteButton(running);
+  #endif
+
   if (running)
   {
     this->mpActionStartPauseSimulation->setIcon(QIcon(":/cedar/auxiliaries/gui/pause.svg"));
@@ -2094,19 +2056,25 @@ void cedar::proc::gui::Ide::updateSimulationRunningIcon(bool running)
   else
   {
     this->mpActionStartPauseSimulation->setIcon(QIcon(":/cedar/auxiliaries/gui/start.svg"));
-    this->mpThreadsSingleStep->setEnabled(true);
+//    this->mpThreadsSingleStep->setEnabled(true);
+    this->mpThreadsSingleStep->setEnabled(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT);
   }
 }
 
 void cedar::proc::gui::Ide::startPauseSimulationClicked()
 {
+
   if (this->mStopThreadsCaller->isRunning() || this->mStartThreadsCaller->isRunning())
   {
     return;
   }
 
+
   QReadLocker locker(this->mSimulationRunning.getLockPtr());
   bool running = this->mSimulationRunning.member();
+
+
+
 
   if (running)
   {
@@ -2153,15 +2121,9 @@ void cedar::proc::gui::Ide::resetSimulationClicked()
 void cedar::proc::gui::Ide::stepThreads()
 {
   this->mpActionResetSimulation->setEnabled(true);
-  if (this->mpCustomTimeStep->isEnabled())
-  {
-    cedar::unit::Time step_size(this->mpCustomTimeStep->value() * cedar::unit::milli * cedar::unit::seconds);
-    this->mGroup->getGroup()->stepTriggers(step_size);
-  }
-  else
-  {
-    this->mGroup->getGroup()->stepTriggers();
-  }
+
+  this->mGroup->getGroup()->stepTriggers();
+
 }
 
 void cedar::proc::gui::Ide::newFile()
@@ -2176,6 +2138,9 @@ void cedar::proc::gui::Ide::newFile()
 
   this->displayFilename("unnamed file");
   cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName("unnamed file");
+
+  // Reset the undo/redo stack
+  pUndoStack->clear();
 
   // set the smart connection button
   this->mpActionToggleSmartConnections->blockSignals(true);
@@ -2354,35 +2319,37 @@ bool cedar::proc::gui::Ide::saveAs()
 {
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
 
-  QString file = QFileDialog::getSaveFileName(this, // parent
-                                              "Select where to save", // caption
-                                              last_dir->getValue().absolutePath(), // initial directory;
-                                              "architecture (*.json)", // filter(s), separated by ';;'
-                                              0,
-                                              // js: Workaround for freezing file dialogs in QT5 (?)
-                                              QFileDialog::DontUseNativeDialog
-                                              );
+  QString file = "";
+  QFileDialog* fileDialog = new QFileDialog();
+
+  fileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
+  fileDialog->setAcceptMode(QFileDialog::AcceptSave);
+  fileDialog->setWindowTitle("Select where to save");
+  fileDialog->setDirectory(last_dir->getValue().absolutePath());
+  fileDialog->setNameFilter("architecture (*.json)");
+  fileDialog->setDefaultSuffix(".json");
+
+  if(fileDialog->exec() == QDialog::Accepted)
+  {
+    file = fileDialog->selectedFiles().front();
+  }
 
   if (file.isEmpty())
   {
     return false;
   }
 
-  if (!file.endsWith(".json"))
-  {
-    file += ".json";
-  }
-
   cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
-
   cedar::aux::SettingsSingleton::getInstance()->setCurrentArchitectureFileName(file.toStdString());
 
   this->mGroup->writeJson(file.toStdString());
   this->displayFilename(file.toStdString());
   this->setArchitectureChanged(false);
-  
 
+  #ifndef CEDAR_OS_WINDOWS
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+  #endif
+
   last_dir->setValue(path);
 
   return true;
@@ -2426,11 +2393,6 @@ void cedar::proc::gui::Ide::load()
 
 void cedar::proc::gui::Ide::loadFile(QString file)
 {
-  if (!this->checkSave())
-  {
-    return;
-  }
-
   // print message
   cedar::aux::LogSingleton::getInstance()->message
                                            (
@@ -2606,6 +2568,9 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
   last_dir->setValue(path);
 
+  // Reset the undo/redo stack
+  pUndoStack->clear();
+
   // set the smart connection button
   this->mpActionToggleSmartConnections->blockSignals(true);
   this->mpActionToggleSmartConnections->setChecked(this->mGroup->getSmartConnection());
@@ -2621,6 +2586,10 @@ void cedar::proc::gui::Ide::recentFileItemTriggered()
   CEDAR_DEBUG_ASSERT(p_sender != NULL);
 
   const QString& file = p_sender->text();
+  if (!this->checkSave())
+  {
+    return;
+  }
   try
   {
     this->loadFile(file);
@@ -2932,6 +2901,10 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   }
 
   this->mGroup->getGroup()->applyTimeFactor();
+  this->mGroup->getGroup()->applyLoopMode();
+  this->mGroup->getGroup()->applySimulationTimeStep();
+  this->mGroup->getGroup()->applyDefaultCPUStep();
+  this->mGroup->getGroup()->applyMinimumComputationTime();
 }
 
 void cedar::proc::gui::Ide::updateArchitectureWidgetsMenu()
@@ -3038,6 +3011,26 @@ void cedar::proc::gui::Ide::resizeEvent(QResizeEvent* event)
   QMainWindow::resizeEvent(event);
   cedar::proc::gui::SettingsSingleton::getInstance()->setIdeSize(QPoint(this->width(),this->height()));
 //  std::cout<<"This is the IDE resize event! My new size is: " << this->width() << ", " << this->height() << std::endl;
+}
+
+void cedar::proc::gui::Ide::processLoopModeChangedSignal(cedar::aux::LoopMode::Id newMode)
+{
+  switch(newMode)
+  {
+    case cedar::aux::LoopMode::RealDT:
+    case cedar::aux::LoopMode::Fixed:
+    case cedar::aux::LoopMode::FixedAdaptive:
+    case cedar::aux::LoopMode::RealTime:
+      this->mpSimulationModeComboBox->setCurrentIndex(1);
+      break;
+    default:
+      this->mpSimulationModeComboBox->setCurrentIndex(0);
+  }
+}
+
+void cedar::proc::gui::Ide::processSimulationStepChangedSignal(cedar::unit::Time newStep)
+{
+  this->mpSimulatedTimeStepSpinBox->setValue( newStep / cedar::unit::Time(1.0*cedar::unit::milli*cedar::unit::seconds));
 }
 
 

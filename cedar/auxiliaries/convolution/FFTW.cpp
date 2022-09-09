@@ -60,7 +60,8 @@
 #endif // CEDAR_USE_FFTW_THREADED
 
 QReadWriteLock cedar::aux::conv::FFTW::mPlanLock;
-bool cedar::aux::conv::FFTW::mMultiThreadActivated = false;
+std::once_flag cedar::aux::conv::FFTW::mInitThreadFlag;
+std::atomic_bool cedar::aux::conv::FFTW::mMultiThreadActivated = ATOMIC_VAR_INIT(false);
 std::set<std::string> cedar::aux::conv::FFTW::mLoadedWisdoms;
 std::map<std::string, fftw_plan> cedar::aux::conv::FFTW::mForwardPlans;
 std::map<std::string, fftw_plan> cedar::aux::conv::FFTW::mBackwardPlans;
@@ -544,7 +545,8 @@ fftw_plan cedar::aux::conv::FFTW::getForwardPlan(unsigned int dimensionality, st
   else
   {
 #ifdef CEDAR_USE_FFTW_THREADED
-    cedar::aux::conv::FFTW::initThreads();
+    std::call_once(mInitThreadFlag,cedar::aux::conv::FFTW::initThreads);
+//    cedar::aux::conv::FFTW::initThreads();
 #endif
     QWriteLocker plan_locker(&cedar::aux::conv::FFTW::mPlanLock);
     cedar::aux::conv::FFTW::loadWisdom(unique_identifier);
@@ -668,16 +670,17 @@ fftw_plan cedar::aux::conv::FFTW::getBackwardPlan(unsigned int dimensionality, s
 void cedar::aux::conv::FFTW::initThreads()
 {
 #ifdef CEDAR_USE_FFTW_THREADED
-  if (!mMultiThreadActivated)
+  if (!mMultiThreadActivated.load())
   {
     // this should be done only once
+    // JT:09.08.2021 This is now ensured through the std::call_once function
     fftw_init_threads();
     omp_set_num_threads(cedar::aux::SettingsSingleton::getInstance()->getFFTWNumberOfThreads());
     fftw_set_timelimit(30.0);
     // from now on, all plans are generated for n threads
     fftw_plan_with_nthreads(cedar::aux::SettingsSingleton::getInstance()->getFFTWNumberOfThreads());
     // make sure that we do not initialize this again
-    mMultiThreadActivated = true;
+    mMultiThreadActivated.store(true);
   }
 #endif
 }

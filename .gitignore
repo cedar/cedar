@@ -77,3 +77,4 @@ resources/meshes/PowerCubeWrist90
 tools/issues\.txt
 
 *.pydevproject
+.vs

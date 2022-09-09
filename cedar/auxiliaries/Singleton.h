@@ -57,6 +57,9 @@
  *
  * This specific implementation is thread-safe and returns a boost shared pointer to the Singleton instance.
  *
+ * cedar::proc::aux::Singleton is a duplicate of this class, but it is needed to ensure Windows compilation for
+ * Parameter-related classes in cedar::proc::aux. Any changes in any Singleton class should be applied to both classes.
+ *
  * \todo Separate into policies according to Alexandrescu (2001) [threading model, lifetime policy].
  */
 template<class InstanceType>

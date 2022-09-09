@@ -46,10 +46,10 @@
 #include "cedar/processing/Group.h"
 #include "cedar/processing/GroupPath.h"
 #include "cedar/processing/Element.h"
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/processing/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/Singleton.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
@@ -160,13 +160,13 @@ void cedar::proc::gui::BoostControl::boostAdded(QTreeWidgetItem* pItem, cedar::p
 
   // create checkbox for enabling/disabling boost (by creating a gui::BoolParameter and passing the boost's parameter)
   auto active_parameter = boost->getParameter("active");
-  auto p_enabler = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(active_parameter)->allocateRaw();
+  auto p_enabler = cedar::proc::aux::gui::ParameterFactorySingleton::getInstance()->get(active_parameter)->allocateRaw();
   this->mpBoostTree->setItemWidget(pItem, 1, p_enabler);
   p_enabler->setParameter(active_parameter);
 
   // create spinbox for setting boost strength (by creating a gui::DoubleParameter and passing the boost's parameter)
   auto strength_parameter = boost->getParameter("strength");
-  auto p_strength = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(strength_parameter)->allocateRaw();
+  auto p_strength = cedar::proc::aux::gui::ParameterFactorySingleton::getInstance()->get(strength_parameter)->allocateRaw();
   this->mpBoostTree->setItemWidget(pItem, 2, p_strength);
   p_strength->setParameter(strength_parameter);
 }

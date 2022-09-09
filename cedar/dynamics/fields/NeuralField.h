@@ -92,6 +92,8 @@ public:
   //!@brief The standard constructor.
   NeuralField();
 
+  virtual ~NeuralField();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -158,6 +160,11 @@ public:
   inline unsigned int getDimensionality() const
   {
     return this->_mDimensionality->getValue();
+  }
+
+  inline double getTau() const
+  {
+      return this->mTau->getValue();
   }
 
   //!@brief Set the size at given dimension of the field.
@@ -243,6 +250,7 @@ private slots:
   void activationAsOutputChanged();
   void discreteMetricChanged();
   void updateEducationalKernel();
+  void timescaleChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

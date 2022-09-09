@@ -25,7 +25,7 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="cedar::aux::gui::SettingsWidget" name="mpAuxSettingsTab">
+     <widget class="cedar::proc::aux::gui::SettingsWidget" name="mpAuxSettingsTab">
       <attribute name="title">
        <string>auxiliaries</string>
       </attribute>
@@ -62,9 +62,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>cedar::aux::gui::SettingsWidget</class>
+   <class>cedar::proc::aux::gui::SettingsWidget</class>
    <extends>QWidget</extends>
-   <header>cedar/auxiliaries/gui/SettingsWidget.h</header>
+   <header>cedar/processing/auxiliaries/gui/SettingsWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/gui/ExperimentItemWidget.h"
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/processing/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/ObjectParameter.h"
 // SYSTEM INCLUDES
@@ -70,8 +70,8 @@ void cedar::proc::experiment::gui::ExperimentItemWidget::display(cedar::aux::Con
   clear();
   for (auto parameter : experimentItem->getParameters())
   {
-    cedar::aux::gui::Parameter* parameterWidget;
-    parameterWidget = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
+    cedar::proc::aux::gui::Parameter* parameterWidget;
+    parameterWidget = cedar::proc::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
     parameterWidget->setParameter(parameter);
     parameterWidget->setParent(this);
 
@@ -129,8 +129,8 @@ void cedar::proc::experiment::gui::ExperimentItemWidget::objectParameterChanged(
   CEDAR_DEBUG_ASSERT(p_parameter != nullptr);
   CEDAR_DEBUG_ASSERT(p_parameter->hasSingleConfigurableChild());
 
-  QList<cedar::aux::gui::Parameter*> parameter_list = this->findChildren<cedar::aux::gui::Parameter*>();
-  for(cedar::aux::gui::Parameter* parameter : parameter_list)
+  QList<cedar::proc::aux::gui::Parameter*> parameter_list = this->findChildren<cedar::proc::aux::gui::Parameter*>();
+  for(cedar::proc::aux::gui::Parameter* parameter : parameter_list)
   {
     if(parameter->getParameter().get() == p_parameter)
     {

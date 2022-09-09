@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -86,6 +87,10 @@ cedar::aux::Parameter::~Parameter()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::Parameter::postConstructor()
+{
+}
 
 std::string cedar::aux::Parameter::childIndexToString(size_t i) const
 {
@@ -138,6 +143,22 @@ cedar::aux::ConstConfigurablePtr cedar::aux::Parameter::retrieveConfigurableChil
 {
   // default implementation returns an empty pointer; this should never be called.
   return cedar::aux::ConstConfigurablePtr();
+}
+
+cedar::aux::NamedConfigurable* cedar::aux::Parameter::getNamedConfigurableOwner() const
+{
+  CEDAR_ASSERT(this != nullptr)
+  cedar::aux::Configurable* owner = this->getOwner();
+  cedar::aux::NamedConfigurable* namedConfigurable = nullptr;
+  while(owner != nullptr)
+  {
+    if (auto namedConfig = dynamic_cast<cedar::aux::NamedConfigurable *>(owner))
+    {
+      namedConfigurable = namedConfig;
+    }
+    owner = owner->getParent().lock().get();
+  }
+  return namedConfigurable;
 }
 
 bool cedar::aux::Parameter::isLinked() const

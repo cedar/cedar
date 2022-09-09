@@ -41,9 +41,9 @@
 #include "cedar/processing/experiment/gui/StepPropertyParameter.h"
 #include "cedar/processing/experiment/StepPropertyParameter.h"
 #include "cedar/processing/experiment/Supervisor.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
-#include "cedar/auxiliaries/Singleton.h"
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/processing/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/auxiliaries/Singleton.h"
+#include "cedar/processing/auxiliaries/gui/Parameter.h"
 
 // SYSTEM INCLUDES
 #include <QFormLayout>
@@ -57,7 +57,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace
 {
-  bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->add
+  bool registered = cedar::proc::aux::gui::ParameterFactorySingleton::getInstance()->add
       <
         cedar::proc::experiment::StepPropertyParameter,
         cedar::proc::experiment::gui::StepPropertyParameter
@@ -70,7 +70,7 @@ namespace
 
 cedar::proc::experiment::gui::StepPropertyParameter::StepPropertyParameter(QWidget *pParent)
 :
-cedar::aux::gui::Parameter(pParent),
+cedar::proc::aux::gui::Parameter(pParent),
 mpElement(new QComboBox()),
 mpProperty(new QComboBox()),
 mpPropertyCopy(nullptr)
@@ -210,8 +210,8 @@ void cedar::proc::experiment::gui::StepPropertyParameter::updateValue()
         return;
       }
 
-      cedar::aux::gui::Parameter* parameter_widget =
-          cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter_copy)->allocateRaw();
+      cedar::proc::aux::gui::Parameter* parameter_widget =
+          cedar::proc::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter_copy)->allocateRaw();
       parameter_widget->setParameter(parameter_copy);
       mpPropertyCopy = parameter_widget;
       layout->setWidget(2, QFormLayout::FieldRole, mpPropertyCopy);

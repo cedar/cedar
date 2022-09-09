@@ -223,7 +223,7 @@ cedar::dev::ComponentPtr cedar::dev::ComponentSlot::getComponent()
     std::string channel_type = this->_mConfigurationName->getValue();
     std::string component_type_id = this->mComponentTypeIds[channel_type];
     this->mComponent = FactorySingleton::getInstance()->allocate(component_type_id);
-    this->mComponent->setSlot(this->shared_from_this());
+    this->mComponent->setSlot(boost::dynamic_pointer_cast<cedar::dev::ComponentSlot>(this->shared_from_this()));
   }
 
   return this->mComponent;

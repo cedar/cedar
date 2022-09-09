@@ -111,6 +111,16 @@ public:
 
   bool canConnectTo(cedar::proc::ConstTriggerablePtr target) const;
 
+  //! Called when the trigger is started.
+  void prepareStart(); // JT: Made this public for the alternate way to loop triggers
+
+  //! Called when the trigger is started.
+  void processQuit();  // JT: Made this public for the alternate way to loop triggers
+
+  void setUseDefaultCPUStepSize(bool useDefaultCPUStepSize);
+
+  void setPreviousCustomCPUStepSize(cedar::unit::Time time);
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
@@ -150,11 +160,18 @@ private:
    */
   void addListener(cedar::proc::TriggerablePtr triggerable);
 
-  //! Called when the trigger is started.
-  void prepareStart();
+  void processDefaultStepSizeChange(cedar::unit::Time newStepSize);
 
-  //! Called when the trigger is started.
-  void processQuit();
+  void processSimulationModeChange(cedar::aux::LoopMode::Id newMode);
+
+  void processSimulationStepSizeChanged(cedar::unit::Time newStepSize);
+
+  cedar::unit::Time getDefaultStepSize();
+
+private slots:
+  void stepSizeManagementChanged();
+
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -171,6 +188,16 @@ private:
 
   TimeAveragePtr mStatistics;
 
+  boost::signals2::scoped_connection mDefaultCPUStepSizeChangeConnection;
+
+  boost::signals2::scoped_connection mSimulationModeChangeConnection;
+
+  boost::signals2::scoped_connection mSimulationStepSizeChangeConnection;
+
+  
+
+  bool _mPreviousUseDefaultCPUStepSize;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -179,6 +206,8 @@ protected:
 
 private:
   cedar::aux::BoolParameterPtr _mStartWithAll;
+
+  cedar::aux::TimeParameterPtr _mPreviousCustomStepSize;
 
 }; // class cedar::proc::LoopedTrigger
 

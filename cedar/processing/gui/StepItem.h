@@ -42,14 +42,15 @@
 #define CEDAR_PROC_STEP_ITEM_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/EnumType.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/Step.h"
 #include "cedar/processing/gui/Connectable.h"
 #include "cedar/processing/gui/PlotWidget.h"
-#include "cedar/processing/ElementDeclaration.h"
-#include "cedar/auxiliaries/EnumType.h"
 
 // FORWARD DECLARATION
+
 #include "cedar/auxiliaries/gui/PlotDeclaration.fwd.h"
 #include "cedar/processing/gui/DataSlotItem.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"
@@ -143,6 +144,7 @@ public slots:
 
   //! Calls reset on the underlying step
   void reset();
+
 
 signals:
   /*!@brief Emitted whenever the state of the step displayed by this step item changes.

@@ -60,8 +60,7 @@ SOFTWARE.
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-#ifdef CEDAR_USE_PYTHON
-
+#ifdef CEDAR_USE_PYTHONSTEP
 // CLASS HEADER
 #include "cedar/processing/steps/PythonScript.h"
 
@@ -394,6 +393,10 @@ pythonScript(pScript)
   init();
 }
 
+cedar::proc::steps::PythonScriptScope::ValidationMaskInputDialog::~ValidationMaskInputDialog()
+{
+
+}
 
 void cedar::proc::steps::PythonScriptScope::NDArrayConverter::init()
 {
@@ -834,18 +837,24 @@ _mAutoConvertDoubleToFloat (new cedar::aux::BoolParameter(this, "auto-convert do
   
   cedar::proc::steps::PythonScript::executionFailed = 0;
 
+}
+
+void cedar::proc::steps::PythonScript::initPython()
+{
 #if PY_MAJOR_VERSION >= 3
   PyImport_AppendInittab("pycedar", &PyInit_pycedar);
 #else // PY_MAJOR_VERSION >= 3
   PyImport_AppendInittab("pycedar", &initpycedar);
-  PyEval_InitThreads();
 #endif // PY_MAJOR_VERSION >= 3
-
   Py_Initialize();
-
+  PyEval_InitThreads();
 }
 
-cedar::proc::steps::PythonScript::~PythonScript() { }
+
+cedar::proc::steps::PythonScript::~PythonScript()
+{
+
+}
 
 template<typename T>
 cv::Mat cedar::proc::steps::PythonScript::convert3DMatToFloat(cv::Mat &mat)
@@ -912,24 +921,27 @@ std::vector<cedar::proc::steps::PythonScript::TemplateName> cedar::proc::steps::
   {
     boost::property_tree::ptree root;
     boost::property_tree::read_json(cedar::aux::Path("resource://pythonTemplates/python.json").absolute(), root);
-    for (boost::property_tree::ptree::value_type &nodeOuter : root.get_child("steps"))
+    if(root.find("steps") != root.not_found())
     {
-      std::string left = nodeOuter.first;
-      boost::trim(left);
-      bool isLooped = false, isNonLooped = false;
-      if(!left.compare("cedar.processing.steps.PythonScriptLooped")) isLooped = true;
-      if(!left.compare("cedar.processing.steps.PythonScript")) isNonLooped = true;
-      if(isLooped || isNonLooped)
+      for (boost::property_tree::ptree::value_type &nodeOuter : root.get_child("steps"))
       {
-        for (boost::property_tree::ptree::value_type &node : nodeOuter.second)
+        std::string left = nodeOuter.first;
+        boost::trim(left);
+        bool isLooped = false, isNonLooped = false;
+        if (!left.compare("cedar.processing.steps.PythonScriptLooped")) isLooped = true;
+        if (!left.compare("cedar.processing.steps.PythonScript")) isNonLooped = true;
+        if (isLooped || isNonLooped)
         {
-          std::string left = node.first;
-          boost::trim(left);
-          if(!left.compare("name"))
+          for (boost::property_tree::ptree::value_type &node : nodeOuter.second)
           {
-            list.push_back(TemplateName());
-            list[list.size() - 1].name = node.second.data();
-            list[list.size() - 1].isLooped = isLooped;
+            std::string left = node.first;
+            boost::trim(left);
+            if (!left.compare("name"))
+            {
+              list.push_back(TemplateName());
+              list[list.size() - 1].name = node.second.data();
+              list[list.size() - 1].isLooped = isLooped;
+            }
           }
         }
       }
@@ -1155,6 +1167,7 @@ std::string cedar::proc::steps::PythonScript::makeOutputSlotName(const int i)
 }
 
 void cedar::proc::steps::PythonScript::freePythonVariables() {
+
   PyObject * poMainModule = PyImport_AddModule("__main__");
 
   PyObject * poAttrList = PyObject_Dir(poMainModule);
@@ -1213,20 +1226,24 @@ void cedar::proc::steps::PythonScript::freePythonVariables() {
 
 void cedar::proc::steps::PythonScript::executePythonScript(bool use_data_lock)
 {
-  mutex.lock();
 
+  mutex.lock();
+  //PyThreadState_Swap(_nstate);
+
+  //Interpreter
+  //cedar::proc::steps::PythonScriptScope::PyEnsureGIL gil;
   this->mIsExecuting = 1;
   cedar::proc::steps::PythonScript::executionFailed = 0;
 
   nameOfExecutingStep = this->getName();
 
   // Swap to the interpreter of this specific PythonScript step
-  
   // Python...
   try
   {
     // Loading main module
-    boost::python::object main_module = boost::python::import("__main__");
+    //boost::python::object main_module = boost::python::import("__main__");
+    boost::python::object main_module((boost::python::handle<>(boost::python::borrowed(PyImport_AddModule("__main__")))));
     boost::python::object main_namespace = main_module.attr("__dict__");
 
     // Loading pycedar module
@@ -1446,7 +1463,7 @@ void cedar::proc::steps::PythonScript::executePythonScript(bool use_data_lock)
       }
       i++;
     }
-    
+
     // update the "state" variable. It will be held until the next iteration
     std::list<PyObject*> pythonStatesList = boost::python::extract<std::list<PyObject*>>(boost::python::scope(pycedar_module).attr("states"));
 
@@ -1489,7 +1506,7 @@ void cedar::proc::steps::PythonScript::executePythonScript(bool use_data_lock)
   catch(const boost::python::error_already_set&){
 
     cedar::proc::steps::PythonScript::executionFailed = 1;
-    
+
     if(PyErr_Occurred() == 0) std::cout << "No PyErr occured!" << std::endl;
 
     // Try to extract the error message from python
@@ -1542,13 +1559,14 @@ void cedar::proc::steps::PythonScript::executePythonScript(bool use_data_lock)
       );
 
   }
-  
+
   if(cedar::proc::steps::PythonScript::executionFailed) this->setState(cedar::proc::Triggerable::STATE_EXCEPTION, "An exception occured");
   else this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
 
   freePythonVariables();
 
   this->mIsExecuting = 0;
+
   mutex.unlock();
   mWasResetted= false;
 }
@@ -1560,6 +1578,7 @@ void cedar::proc::steps::PythonScript::inputConnectionChanged(const std::string&
 
   unsigned slot_id;
   std::istringstream(inputName.substr(5)) >> slot_id;
+
 
   if (slot_id < mInputs.size())
   {
@@ -1589,4 +1608,4 @@ void cedar::proc::steps::PythonScript::reset()
   mWasResetted= true;
 }
 
-#endif // CEDAR_USE_PYTHON
+#endif // CEDAR_USE_PYTHONSTEP
