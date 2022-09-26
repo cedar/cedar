@@ -33,7 +33,6 @@
     </property>
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
-
       <property name="currentIndex">
        <number>0</number>
       </property>
@@ -85,7 +84,7 @@
      <x>0</x>
      <y>0</y>
      <width>983</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -325,7 +324,7 @@
               <x>0</x>
               <y>0</y>
               <width>254</width>
-              <height>495</height>
+              <height>481</height>
              </rect>
             </property>
             <property name="palette">
@@ -443,7 +442,7 @@
               <x>0</x>
               <y>0</y>
               <width>254</width>
-              <height>495</height>
+              <height>481</height>
              </rect>
             </property>
             <property name="palette">
@@ -561,7 +560,7 @@
               <x>0</x>
               <y>0</y>
               <width>254</width>
-              <height>495</height>
+              <height>481</height>
              </rect>
             </property>
             <property name="palette">
@@ -695,6 +694,7 @@
    <addaction name="mpActionDummy"/>
    <addaction name="separator"/>
    <addaction name="mpActionToggleVisibilityOfPlots"/>
+   <addaction name="mpActionClosePlots"/>
    <addaction name="separator"/>
    <addaction name="mpActionDisplayPlotGroup"/>
    <addaction name="mpActionNewPlotGroup"/>
@@ -734,12 +734,12 @@
    </property>
   </action>
   <action name="mpActionLoad">
-   <property name="text">
-    <string>Open file...</string>
-   </property>
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/open.svg</normaloff>:/toolbaricons/open.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Open file...</string>
    </property>
    <property name="toolTip">
     <string>Load an architecture file</string>
@@ -1099,7 +1099,6 @@
     <string>Ctrl+Shift+C</string>
    </property>
   </action>
-
   <action name="mpActionPaste">
    <property name="text">
     <string>Paste</string>
@@ -1108,7 +1107,6 @@
     <string>Ctrl+V</string>
    </property>
   </action>
-
   <action name="mpActionPasteConfiguration">
    <property name="text">
     <string>Paste step configuration</string>
@@ -1299,12 +1297,6 @@
    <class>cedar::aux::gui::SceneControl</class>
    <extends>QWidget</extends>
    <header>cedar/auxiliaries/gui/SceneControl.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>cedar::proc::gui::CoPYWidget</class>
-   <extends>QWidget</extends>
-   <header>cedar/processing/gui/CoPYWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
