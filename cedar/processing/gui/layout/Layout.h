@@ -74,7 +74,9 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  virtual void arrange(cedar::proc::gui::Group* group) = 0;
+  virtual void setGroup(cedar::proc::gui::Group* pGroup);
+
+  virtual void arrange() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -92,7 +94,8 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  cedar::proc::gui::Group* mpGroup;
+
 private:
   // none yet
 

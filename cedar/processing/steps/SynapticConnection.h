@@ -61,9 +61,10 @@
 
 
 
-/*!@todo describe.
+/*! SynapticConnection Step
  *
- * @todo describe more.
+ * This step combines the StaticGain, Projection and Convolution step and is used primarily for the XML import/export
+ * to serve as a visualization of the properties of a connection.
  */
 class cedar::proc::steps::SynapticConnection : public cedar::proc::Step, cedar::proc::ProjectionFunctions
 {

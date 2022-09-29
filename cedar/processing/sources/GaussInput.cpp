@@ -104,12 +104,6 @@ _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
   this->mXMLParameterWhitelist = {"amplitude"};
 
   this->declareOutput("Gauss input", mOutput);
-  std::vector<cedar::aux::math::Limits<double>> sizesRange;
-  for(unsigned int size : this->_mSizes->getValue())
-  {
-    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
-  }
-  this->mOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
   this->updateSizesRange();
   QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));

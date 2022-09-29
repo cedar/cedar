@@ -114,6 +114,7 @@ cedar_add_library(cedarproc
   gui/AdvancedParameterLinker.h
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureWidget.h
+  gui/AutoPositionStepsDialog.h
   gui/BoostControl.h
   gui/CodeWidget.h
   gui/CommentWidget.h

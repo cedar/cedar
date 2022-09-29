@@ -44,6 +44,7 @@
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/ArchitectureWidgetList.h"
 #include "cedar/processing/gui/ArchitectureScriptEditor.h"
+#include "cedar/processing/gui/AutoPositionStepsDialog.h"
 #include "cedar/processing/gui/FindDialog.h"
 #include "cedar/processing/gui/AdvancedParameterLinker.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.h"
@@ -293,6 +294,34 @@ class cedar::proc::gui::Ide::OpenableArchitectureConsistencyCheck : public cedar
   private:
     cedar::proc::gui::View* mpView;
 };
+
+
+// An internal class that implements the auto-position steps widget as an openable dialog.
+class cedar::proc::gui::Ide::OpenableAutoPositionSteps : public cedar::proc::gui::Ide::OpenableDialog
+{
+public:
+  OpenableAutoPositionSteps()
+    :
+    OpenableDialog("Auto-position steps", ":/toolbaricons/auto_position_steps.svg", "auto position steps")
+  {
+    this->setIsInToolbar(true);
+  }
+
+  QWidget* createOpenable() const
+  {
+    return new cedar::proc::gui::AutoPositionStepsDialog();
+  }
+
+  void setGroup(cedar::proc::gui::GroupPtr group)
+  {
+    if (this->mpOpenedWidget)
+    {
+      auto widget = dynamic_cast<cedar::proc::gui::AutoPositionStepsDialog*>(this->mpOpenedWidget);
+      widget->setGroup(group);
+    }
+  }
+};
+
 
 // An internal class that implements the simulation control widget as an openable dialog.
 class cedar::proc::gui::Ide::OpenableSimulationControl : public cedar::proc::gui::Ide::OpenableDialog
@@ -617,6 +646,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   std::vector<OpenableDialogPtr> openable_dialogs;
 
   openable_dialogs.push_back(OpenableDialogPtr(new OpenableSimulationControl()));
+  openable_dialogs.push_back(OpenableDialogPtr(new OpenableAutoPositionSteps()));
   openable_dialogs.push_back(boost_ctrl);
   openable_dialogs.push_back(OpenableDialogPtr(new OpenableArchitectureConsistencyCheck(this->mpProcessingDrawer)));
   openable_dialogs.push_back(OpenableDialogPtr(new OpenableUndoRedoStack()));

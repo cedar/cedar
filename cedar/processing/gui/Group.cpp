@@ -42,6 +42,7 @@
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/layout/Layout.h"
 #include "cedar/processing/gui/layout/GridLayout.h"
+#include "cedar/processing/gui/layout/ForceDirectedLayout.h"
 #include "cedar/processing/gui/GroupContainerItem.h"
 #include "cedar/processing/gui/ArchitectureWidget.h"
 #include "cedar/processing/gui/Connection.h"
@@ -1435,8 +1436,9 @@ void cedar::proc::gui::Group::readConfigurationXML(const cedar::aux::Configurati
   this->updateCollapsedness();
 
   // Layout the steps, as there are no positions specified in the xml file
-  cedar::proc::gui::layout::Layout* layout = new cedar::proc::gui::layout::GridLayout();
-  layout->arrange(this);
+  cedar::proc::gui::layout::Layout* layout = new cedar::proc::gui::layout::ForceDirectedLayout();
+  layout->setGroup(this);
+  layout->arrange();
 
 }
 

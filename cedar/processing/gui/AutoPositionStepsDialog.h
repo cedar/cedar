@@ -22,59 +22,72 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GridLayout.h
+    File:        AutoPositionStepsDialog.h
 
     Maintainer:  Lars Janssen
     Email:       lars.janssen@ini.rub.de
-    Date:        2022 08 16
+    Date:        2022 09 12
 
-    Description: Header file for the class cedar::proc::gui::layout::GridLayout.
+    Description: Header file for the class cedar::proc::gui::AutoPositionStepsDialog.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_LAYOUT_GRID_LAYOUT_H
-#define CEDAR_PROC_GUI_LAYOUT_GRID_LAYOUT_H
+#ifndef CEDAR_PROC_GUI_AUTO_POSITION_STEPS_DIALOG_H
+#define CEDAR_PROC_GUI_AUTO_POSITION_STEPS_DIALOG_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/layout/Layout.h"
+#include "cedar/processing/gui/ui_AutoPositionStepsDialog.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/gui/layout/GridLayout.fwd.h"
+#include "cedar/processing/gui/AutoPositionStepsDialog.fwd.h"
+#include "cedar/processing/gui/layout/ForceDirectedLayout.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QDialog>
 
-
-/*!@ Grid layout
+/*! Auto-position steps dialog
  *
- * Places steps into a grid of "side length" sqrt(numSteps)
+ * Dialog to enable the user to rearrange the steps in an automatic manner
  */
-class cedar::proc::gui::layout::GridLayout : public cedar::proc::gui::layout::Layout
+class cedar::proc::gui::AutoPositionStepsDialog : public QDialog, public Ui_AutoPositionStepsDialog
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  GridLayout();
+  AutoPositionStepsDialog(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  virtual ~GridLayout();
+  virtual ~AutoPositionStepsDialog();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  void arrange() override;
+  void setGroup(cedar::proc::gui::GroupPtr pGroup);
+
+public slots:
+
+  void liveUpdateChecked(bool toggled);
+
+  void arrange();
+
+  void reset();
+
+  void attractionForceValueChanged();
+
+  void attractionForceParameterPointerChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -94,7 +107,11 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+
+  cedar::proc::gui::GroupPtr mpGroup;
+  cedar::proc::gui::layout::ForceDirectedLayoutPtr mpForceDirectedLayout;
+  cedar::aux::DoubleParameterPtr mpAttractionForceParameter;
+  bool liveUpdate;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -105,7 +122,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::gui::layout::GridLayout
+}; // class cedar::proc::gui::AutoPositionStepsDialog
 
-#endif // CEDAR_PROC_GUI_LAYOUT_GRID_LAYOUT_H
+#endif // CEDAR_PROC_GUI_AUTO_POSITION_STEPS_DIALOG_H
 

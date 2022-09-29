@@ -88,6 +88,7 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   ui_settings->addConfigurableChild("properties", mProperties);
   this->declareDockSettings("boost control", false);
   this->declareDockSettings("thread control", false);
+  this->declareDockSettings("auto position steps", false);
   this->declareDockSettings("architecture consistency check", false);
   this->declareDockSettings("undo redo stack", false);
 

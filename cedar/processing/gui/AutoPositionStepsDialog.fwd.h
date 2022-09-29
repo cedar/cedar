@@ -22,45 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Layout.cpp
+    File:        AutoPositionStepsDialog.fwd.h
 
     Maintainer:  Lars Janssen
     Email:       lars.janssen@ini.rub.de
-    Date:        2022 08 16
+    Date:        2022 09 12
 
-    Description: Source file for the class cedar::proc::gui::layout::Layout.
+    Description: Forward declaration file for the class cedar::proc::gui::AutoPositionStepsDialog.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_PROC_GUI_AUTO_POSITION_STEPS_DIALOG_FWD_H
+#define CEDAR_PROC_GUI_AUTO_POSITION_STEPS_DIALOG_FWD_H
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-// CLASS HEADER
-#include "cedar/processing/gui/layout/Layout.h"
-
 // CEDAR INCLUDES
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::layout::Layout::Layout()
+namespace cedar
 {
+  namespace proc
+  {
+    namespace gui
+    {
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_PROC_CLASS(AutoPositionStepsDialog);
+      //!@endcond
+    }
+  }
 }
 
-cedar::proc::gui::layout::Layout::~Layout()
-{
-}
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
+#endif // CEDAR_PROC_GUI_AUTO_POSITION_STEPS_DIALOG_FWD_H
 
-void cedar::proc::gui::layout::Layout::setGroup(cedar::proc::gui::Group* pGroup)
-{
-  this->mpGroup = pGroup;
-}

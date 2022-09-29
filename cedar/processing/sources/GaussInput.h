@@ -125,6 +125,7 @@ private:
 
   void calculateOutput();
 
+  //! Updates the SizesRange annotation to the default values took from _mSizes
   void updateSizesRange();
 
   //--------------------------------------------------------------------------------------------------------------------

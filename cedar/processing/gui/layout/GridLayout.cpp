@@ -57,9 +57,11 @@ cedar::proc::gui::layout::GridLayout::~GridLayout()
 {
 }
 
-void cedar::proc::gui::layout::GridLayout::arrange(cedar::proc::gui::Group* group)
+void cedar::proc::gui::layout::GridLayout::arrange()
 {
-  std::map<std::string, cedar::proc::ElementPtr> elements = group->getGroup()->getElements();
+  CEDAR_ASSERT(this->mpGroup != nullptr)
+
+  std::map<std::string, cedar::proc::ElementPtr> elements = this->mpGroup->getGroup()->getElements();
   int numElements = elements.size();
   if(numElements <= 0)
   {
@@ -69,7 +71,7 @@ void cedar::proc::gui::layout::GridLayout::arrange(cedar::proc::gui::Group* grou
   int i = 0;
   for (auto iter = elements.begin(); iter != elements.end(); ++iter)
   {
-    cedar::proc::gui::Element* guiElement = group->getScene()->getGraphicsItemFor(iter->second);
+    cedar::proc::gui::Element* guiElement = this->mpGroup->getScene()->getGraphicsItemFor(iter->second);
     if(guiElement != nullptr)
     {
       guiElement->setPos((i % width) * 200 + rand() % 30 - 15, (i / width) * 110 + rand() % 30 - 15);

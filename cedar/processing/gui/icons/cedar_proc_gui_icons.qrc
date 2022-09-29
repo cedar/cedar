@@ -119,6 +119,7 @@
         <file>toolbaricons/snap_to_grid.svg</file>
         <file>toolbaricons/close_all_plots.svg</file>
         <file>toolbaricons/simulation_control.svg</file>
+        <file>toolbaricons/auto_position_steps.svg</file>
         <file>toolbaricons/show_trigger_colors.svg</file>
         <file>toolbaricons/snapshot.svg</file>
         <file>toolbaricons/store_plotgroup.svg</file>

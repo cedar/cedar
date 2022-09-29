@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AutoPositionStepsDialog</class>
+ <widget class="QDialog" name="AutoPositionStepsDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>300</width>
+    <height>200</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Auto-position Steps</string>
+  </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>Force Directed Layout</string>
+      </property>
+
+      <layout class="QFormLayout" name="formLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Attraction Force</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="cedar::proc::aux::gui::DoubleParameter" name="mpAttractionForce" native="true"/>
+       </item>
+       <item row="2" column="">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
+
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_0" stretch="1,0">
+      <item>
+       <spacer name="horizontalSpacer_0">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="mpLiveUpdate">
+        <property name="text">
+         <string>Live update</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_1" stretch="1,0,0,0">
+      <item>
+       <spacer name="horizontalSpacer_1">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="mpResetBtn">
+        <property name="text">
+         <string>Reset</string>
+        </property>
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="mpArrangeBtn">
+        <property name="text">
+         <string>Arrange</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+   </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>cedar::proc::aux::gui::DoubleParameter</class>
+   <extends>QWidget</extends>
+   <header>cedar/processing/auxiliaries/gui/DoubleParameter.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+</ui>

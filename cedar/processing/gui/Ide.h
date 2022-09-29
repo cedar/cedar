@@ -92,6 +92,8 @@ private:
 
   class OpenableArchitectureConsistencyCheck;
 
+  class OpenableAutoPositionSteps;
+
   class OpenableSimulationControl;
 
   class OpenableBoostControl;
