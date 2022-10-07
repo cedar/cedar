@@ -44,6 +44,7 @@
 #include <cedar/processing/Step.h>
 #include <cedar/processing/InputSlotHelper.h>
 #include <cedar/auxiliaries/MatData.h>
+#include <cedar/auxiliaries/UIntParameter.fwd.h>
 #include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
@@ -61,7 +62,7 @@ class cedar::proc::steps::Delay : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -74,6 +75,9 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   // none yet
+
+public slots:
+  void numberOfTimestepsChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -102,7 +106,8 @@ private:
   cedar::aux::MatDataPtr mOutput;
   cedar::aux::MatDataPtr mOutputTimeStep;
 
-  cedar::aux::MatDataPtr mOldInput;
+  std::vector<cedar::aux::MatDataPtr> mOldInput;
+  bool mFirstIteration;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -112,7 +117,7 @@ protected:
 
 private:
   cedar::unit::Time mLastTime;
-  bool              mFirstIteration;
+  cedar::aux::UIntParameterPtr mNumberOfTimesteps;
 
 }; // class cedar::proc::steps::Delay
 

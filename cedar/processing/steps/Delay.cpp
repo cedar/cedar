@@ -44,6 +44,7 @@
 #include "cedar/processing/typecheck/IsMatrix.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/GlobalClock.h"
+#include <cedar/auxiliaries/UIntParameter.h>
 #include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
@@ -91,15 +92,31 @@ cedar::proc::steps::Delay::Delay()
 // outputs
 mOutput(new cedar::aux::MatData(cv::Mat())),
 mOutputTimeStep(new cedar::aux::MatData(cv::Mat::zeros(1,1,CV_32F))),
-mOldInput(new cedar::aux::MatData(cv::Mat())),
-mFirstIteration(true)
+mFirstIteration(true),
+mNumberOfTimesteps(
+    new cedar::aux::UIntParameter
+      (
+        this,
+        "number of time steps",
+        1,
+        cedar::aux::UIntParameter::LimitType::positive(),
+        1 // step size
+      )
+  )
 {
+  for (int i = 0; i < mNumberOfTimesteps->getValue(); ++i)
+  {
+    mOldInput.push_back(boost::shared_ptr<cedar::aux::MatData>(new cedar::aux::MatData(cv::Mat())));
+  }
+
   // declare all data
   cedar::proc::DataSlotPtr input = this->declareInput("input");
   this->declareOutput("output", mOutput);
   this->declareOutput("last time step", mOutputTimeStep);
 
   input->setCheck(cedar::proc::typecheck::IsMatrix());
+  QObject::connect(this->mNumberOfTimesteps.get(), SIGNAL(valueChanged()),
+                   this, SLOT(numberOfTimestepsChanged()));
 
   mLastTime= cedar::aux::GlobalClockSingleton::getInstance()->getTime();
 }
@@ -123,7 +140,7 @@ void cedar::proc::steps::Delay::inputConnectionChanged(const std::string& inputN
   {
     // no input -> no output
     this->mOutput->setData(cv::Mat());
-    this->mOldInput->setData(cv::Mat());
+    this->numberOfTimestepsChanged();
     output_changed = true;
   }
   else
@@ -139,7 +156,10 @@ void cedar::proc::steps::Delay::inputConnectionChanged(const std::string& inputN
 
     // Make a copy to create a matrix of the same type, dimensions, ...
     this->mOutput->setData(input.clone());
-    this->mOldInput->setData(input.clone());
+    for (int i = 0; i < mNumberOfTimesteps->getValue(); ++i)
+    {
+      this->mOldInput.at(i)->setData(input.clone());
+    }
 
     this->mOutput->copyAnnotationsFrom(this->mInput);
   }
@@ -150,6 +170,14 @@ void cedar::proc::steps::Delay::inputConnectionChanged(const std::string& inputN
   }
 
   mFirstIteration= true;
+}
+
+void cedar::proc::steps::Delay::numberOfTimestepsChanged()
+{
+  for (int i = 0; i < mNumberOfTimesteps->getValue(); ++i)
+  {
+    mOldInput.push_back(boost::shared_ptr<cedar::aux::MatData>(new cedar::aux::MatData(cv::Mat())));
+  }
 }
 
 void cedar::proc::steps::Delay::compute(const cedar::proc::Arguments& )//arguments)
@@ -165,8 +193,19 @@ void cedar::proc::steps::Delay::compute(const cedar::proc::Arguments& )//argumen
   }
   else
   {
-    this->mOutput->setData( this->mOldInput->getData().clone() );
-    this->mOldInput->setData( this->mInput->getData().clone() );
+    this->mOutput->setData( this->mOldInput.at(0)->getData().clone() );
+
+    for (int i = 0; i < mNumberOfTimesteps->getValue(); ++i)
+    {
+      if(i < mNumberOfTimesteps->getValue() - 1)
+      {
+        this->mOldInput.at(i)->setData( this->mOldInput.at(i+1)->getData().clone());
+      }
+      else
+      {
+        this->mOldInput.at(i)->setData( this->mInput->getData().clone());
+      }
+    }
 
 
     this->mOutputTimeStep->getData().at<float>(0,0)= (newtime - mLastTime) / boost::units::si::second;
