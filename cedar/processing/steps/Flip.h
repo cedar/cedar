@@ -75,8 +75,7 @@ public slots:
    *
    * @throws cedar::aux::IndexOutOfRangeException if the dimension exceeds the dimension of the input.
    */
-  bool isDimensionFlipped(unsigned int dimension) const
-       throw (cedar::aux::IndexOutOfRangeException, cedar::aux::FailedAssertionException);
+  bool isDimensionFlipped(unsigned int dimension) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

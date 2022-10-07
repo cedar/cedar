@@ -2255,7 +2255,7 @@ void cedar::dev::Component::stepStaticWatchDog(cedar::unit::Time)
       }
       else
       {
-        doCountWatchdog++;
+        doCountWatchdog = !doCountWatchdog;
 
         components_to_delete.push_back(componentpointer);
       }

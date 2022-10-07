@@ -154,7 +154,6 @@ void cedar::proc::steps::Flip::recompute()
 }
 
 bool cedar::proc::steps::Flip::isDimensionFlipped(unsigned int dimension) const
-     throw (cedar::aux::IndexOutOfRangeException, cedar::aux::FailedAssertionException)
 {
   CEDAR_ASSERT(this->mInput);
   CEDAR_ASSERT(this->_mFlipDimensions->size() == this->mInput->getDimensionality());
