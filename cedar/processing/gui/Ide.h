@@ -194,6 +194,10 @@ public slots:
    */
   void showManagePluginsDialog();
 
+  /*!@brief Opens the python plot recording tool
+ */
+  void showPlotRecordingTool();
+
   /*!@brief Shows the settings dialog.
    */
   void showSettingsDialog();

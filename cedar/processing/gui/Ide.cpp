@@ -586,6 +586,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   QObject::connect(this->mpActionLoadSerializableData, SIGNAL(triggered()), this, SLOT(loadSerializableData()));
 
   QObject::connect(this->mpActionManagePlugins, SIGNAL(triggered()), this, SLOT(showManagePluginsDialog()));
+  QObject::connect(this->mpActionPlotRecordingTool, SIGNAL(triggered()), this, SLOT(showPlotRecordingTool()));
   QObject::connect(this->mpActionSettings, SIGNAL(triggered()), this, SLOT(showSettingsDialog()));
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
   QObject::connect(this->mpActionAutoSnapAll, SIGNAL(triggered()), this, SLOT(autoSnapAll()));
@@ -1861,6 +1862,9 @@ void cedar::proc::gui::Ide::showAboutDialog()
   QObject::connect(p_buttons, SIGNAL(accepted()), p_dialog, SLOT(accept()));
 
   p_dialog->exec();
+
+  //python launch script. just temp
+
 }
 
 cedar::proc::gui::View* cedar::proc::gui::Ide::getArchitectureView()
@@ -1983,6 +1987,11 @@ void cedar::proc::gui::Ide::showManagePluginsDialog()
   cedar::aux::gui::PluginManagerDialog* p_dialog = new cedar::aux::gui::PluginManagerDialog(this);
   p_dialog->exec();
   delete p_dialog;
+}
+
+void cedar::proc::gui::Ide::showPlotRecordingTool()
+{
+
 }
 
 void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::GroupPtr group)

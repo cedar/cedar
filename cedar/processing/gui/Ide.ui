@@ -186,8 +186,9 @@
     <addaction name="separator"/>
     <addaction name="mpActionManagePlugins"/>
     <addaction name="separator"/>
-    <addaction name="mpActionSettings"/>
+    <addaction name="mpActionPlotRecordingTool"/>
     <addaction name="separator"/>
+    <addaction name="mpActionSettings"/>
    </widget>
    <widget class="QMenu" name="mpMenuArchitectureScripts">
     <property name="title">
@@ -1249,6 +1250,11 @@
    </property>
    <property name="toolTip">
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;open Robot Manager&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </action>
+  <action name="mpActionPlotRecordingTool">
+   <property name="text">
+    <string>Plot Recording Tool</string>
    </property>
   </action>
  </widget>
