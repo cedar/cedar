@@ -116,6 +116,7 @@ namespace
     (
       "A grouping element for steps."
     );
+    group_decl->deprecate();
     group_decl->declare();
 
 #ifdef CEDAR_OS_WINDOWS

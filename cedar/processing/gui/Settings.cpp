@@ -129,7 +129,7 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
       (
         ui_settings.get(),
         "show deprecated steps in elemen list",
-        true
+        false
       );
 
   this->_mHighlightConnections = new cedar::aux::BoolParameter
