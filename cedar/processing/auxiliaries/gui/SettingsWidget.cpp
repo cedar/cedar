@@ -67,6 +67,11 @@ QWidget(pParent)
                                    cedar::aux::SettingsSingleton::getInstance()->getRecorderWorkspaceParameter()
                                  );
 
+  this->mpPythonInterpreterPathEdit->setParameter
+          (
+                  cedar::aux::SettingsSingleton::getInstance()->getPythonInterpreterPathParameter()
+          );
+
   this->fillPossible2dMatDataPlots();
   QObject::connect(this->mpDefault2dMatDataPlot, SIGNAL(currentIndexChanged(int)), this, SLOT(default2dMatDataPlotChanged()));
 

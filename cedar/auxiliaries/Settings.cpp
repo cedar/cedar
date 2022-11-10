@@ -43,6 +43,10 @@
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/exceptions.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/FileParameter.fwd.h"
+
+
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/json_parser.hpp>
@@ -75,6 +79,14 @@ _mYarpConfigInfo(new cedar::aux::StringParameter(this,"yarp config info","134.14
                           "recorder output directory",
                           cedar::aux::getUserHomeDirectory() + "/cedarRecordings/"
                         );
+
+  _mPythonInterpreterPath = new cedar::aux::FileParameter
+                            (
+                                    this,
+                                    "python interpreter path",
+                                    cedar::aux::FileParameter::READ,
+                                    "usr/bin/python3"
+                            );
 
   cedar::aux::ConfigurablePtr plugins(new cedar::aux::Configurable());
   this->addConfigurableChild("plugins", plugins);
@@ -242,6 +254,11 @@ double cedar::aux::Settings::getGlobalTimeFactor() const
 cedar::aux::DirectoryParameterPtr cedar::aux::Settings::getRecorderWorkspaceParameter() const
 {
   return this->_mRecorderWorkspace;
+}
+
+cedar::aux::FileParameterPtr cedar::aux::Settings::getPythonInterpreterPathParameter() const
+{
+  return this->_mPythonInterpreterPath;
 }
 
 cedar::aux::StringParameterPtr cedar::aux::Settings::getYarpConfigInfoParameter() const
