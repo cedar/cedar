@@ -1991,7 +1991,8 @@ void cedar::proc::gui::Ide::showManagePluginsDialog()
 
 void cedar::proc::gui::Ide::showPlotRecordingTool()
 {
-
+  //system("gnome-terminal --execute which python3");
+  //system("gnome-terminal --execute python3 /home/work/CLionProjects/cedar/tools/plot_recording.py");
 }
 
 void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::GroupPtr group)

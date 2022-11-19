@@ -55,6 +55,7 @@
 #include "cedar/auxiliaries/Settings.fwd.h"
 #include "cedar/auxiliaries/PluginProxy.fwd.h"
 #include "cedar/auxiliaries/StringSetParameter.fwd.h"
+#include "cedar/auxiliaries/FileParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -108,6 +109,9 @@ public:
 
   //! Returns the parameter that contains the recorder's output directory.
   cedar::aux::DirectoryParameterPtr getRecorderWorkspaceParameter() const;
+
+  //! Returns the parameter that contains the python interpreters path
+  cedar::aux::FileParameterPtr getPythonInterpreterPathParameter() const;
 
   //! Returns the parameter that contains the recorder's output directory.
   cedar::aux::StringParameterPtr getYarpConfigInfoParameter() const;
@@ -274,6 +278,9 @@ protected:
 
   //!@brief Parameter representing where recorded files will be saved.
   cedar::aux::DirectoryParameterPtr _mRecorderWorkspace;
+
+  //!@brief Parameter representing where the users python interpreter is
+  cedar::aux::FileParameterPtr _mPythonInterpreterPath;
 
   //!@brief List of plugins that should be loaded on startup.
   cedar::aux::StringSetParameterPtr _mPluginsToLoad;
