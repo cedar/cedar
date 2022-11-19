@@ -1,10 +1,11 @@
 import sys
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets, QtGui
 
 import matplotlib
 matplotlib.use('Qt5Agg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 # MatPlotLib Canvas: Widget used to show plots
@@ -15,17 +16,44 @@ class MPLCanvas(FigureCanvasQTAgg):
         
         super(MPLCanvas, self).__init__(self.fig)
 
+
+class TwoLineInputDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.first = QtWidgets.QLineEdit(self)
+        self.second = QtWidgets.QLineEdit(self)
+        buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok, self);
+
+        layout = QtWidgets.QFormLayout(self)
+        layout.addRow("Lower bound", self.first)
+        layout.addRow("Upper bound", self.second)
+        layout.addWidget(buttonBox)
+
+        buttonBox.accepted.connect(self.accept)
+        buttonBox.rejected.connect(self.reject)
+
+    def getInputs(self):
+        return (self.first.text(), self.second.text())
+
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
+        self.plotdata = []
+        self.valueRange_lower = None
+        self.valueRange_upper = None
+        self.cbar = None
         self.init_layout()
 
     # Defines layout of the main window
     def init_layout(self):
-        vbox_widget = QtWidgets.QWidget(self)
+        splitter_main_widget = QtWidgets.QSplitter(self)
+
+        vbox_widget = QtWidgets.QWidget(splitter_main_widget)
         vbox_widget.layout = QtWidgets.QVBoxLayout(vbox_widget)
 
         self.canvas = MPLCanvas()
+
         # Insert a default plot, to be removed
         self.canvas.axes.plot([0,1,2,3,4], [10,1,20,3,40])
         vbox_widget.layout.addWidget(self.canvas)
@@ -49,21 +77,106 @@ class MainWindow(QtWidgets.QMainWindow):
         slider_hbox_widget.layout.addWidget(self.sliderValueLabel)
         vbox_widget.layout.addWidget(slider_hbox_widget)
         
+        hbox_button_widget = QtWidgets.QWidget(self)
+        hbox_button_widget.layout = QtWidgets.QHBoxLayout(hbox_button_widget)
+
+
+        # Add button to set the value range
+        buttonValRange = QtWidgets.QPushButton(self)
+        buttonValRange.setText("Set value range")
+        buttonValRange.clicked.connect(self.openValueRangeDialog)
+        hbox_button_widget.layout.addWidget(buttonValRange)
+
         # Add button to load a file
         button = QtWidgets.QPushButton(self)
         button.setText("Load file")
-        button.clicked.connect(self.openFileDialog)
-        vbox_widget.layout.addWidget(button)
+        button.clicked.connect(self.openFileReadDialog)
+        hbox_button_widget.layout.addWidget(button)
 
-        self.setCentralWidget(vbox_widget)
+        vbox_widget.layout.addWidget(hbox_button_widget)
+
+        splitter_main_widget.addWidget(vbox_widget)
+
+
+        vbox_list_widget = QtWidgets.QWidget(splitter_main_widget)
+        vbox_list_widget.layout = QtWidgets.QVBoxLayout(vbox_list_widget)
+
+
+        self.list_view = QtWidgets.QListWidget(self)
+        self.list_view.currentRowChanged.connect(self.listViewRowChanged)
+
+        exportButton = QtWidgets.QPushButton(self)
+        exportButton.setText("Export")
+        exportButton.clicked.connect(self.openFileSaveDialog)
+
+
+        vbox_list_widget.layout.addWidget(self.list_view)
+        vbox_list_widget.layout.addWidget(exportButton)
+        
+        splitter_main_widget.addWidget(vbox_list_widget)
+
+        self.setCentralWidget(splitter_main_widget)
         self.show()
 
+    # Show saveFile dialog and export to file if successful
+    def openFileSaveDialog(self):
+        file, success = QtWidgets.QFileDialog.getSaveFileName(None, "Export recordings",
+                                                   "/home/lars/cedarRecordings", "CSV Files (*.csv);;All Files (*)")
+        if success:
+            self.exportFile(file)
+
+    # export selected timesteps to file
+    def exportFile(self, filename):
+        # prepare lines to write to file
+        lines = [",".join(self.metadata) + "\n"]
+        for index in range(len(self.plotdata)):
+            if self.list_view.item(index).checkState() == QtCore.Qt.CheckState.Checked:
+                lines.append(self.plotdata[index]) # str(index + 1) + ": " + 
+        
+        # export
+        with open(filename, "w") as f:
+            f.writelines(lines)
+
     # open the file dialog and load the file if successful
-    def openFileDialog(self):
+    def openFileReadDialog(self):
         file, success = QtWidgets.QFileDialog.getOpenFileName(None, "Select recording",
                                                    "/home/lars/cedarRecordings", "CSV Files (*.csv);;All Files (*)")
         if success:
             self.loadFile(file)
+
+    # open a dialog to set the value range
+    def openValueRangeDialog(self):
+        valueRangeDialog = TwoLineInputDialog()
+        if valueRangeDialog.exec():
+            lower, upper = valueRangeDialog.getInputs()
+
+            if(lower.strip() == ""):
+                lower = None
+            else:
+                lower = float(lower)
+            if(upper.strip() == ""):
+                upper = None
+            else:
+                upper = float(upper)
+
+            self.setValueRange(lower, upper)
+
+    def setValueRange(self, lower, upper):
+        self.valueRange_lower = lower
+        self.valueRange_upper = upper
+        self.repaint()
+
+    def leftAppendString(self, string, digits):
+        return "0" * (digits - len(string)) + string
+
+    def listViewRowChanged(self, currentRow):
+        if not currentRow + 1 == self.slider.value():
+            self.slider.setValue(currentRow + 1) 
+
+    def sliderValueChanged(self):
+        if not self.slider.value() == self.list_view.currentRow() + 1:   
+            self.list_view.setCurrentRow(self.slider.value() - 1)
+        self.repaint()
 
     def loadFile(self, filename):
         lines = []
@@ -99,16 +212,23 @@ class MainWindow(QtWidgets.QMainWindow):
         self.slider.setRange(1, len(self.plotdata))
         self.slider.valueChanged.connect(self.sliderValueChanged)     
 
+        model = QtGui.QStandardItemModel(self.list_view)
+        for index in range(len(self.plotdata)):
+            time = self.plotdata[index].strip().split(",")[0]
+            text = self.leftAppendString(str(index + 1), 2) + " - Time: " + time
+            item = QtWidgets.QListWidgetItem(text)
+            item.setCheckState(QtCore.Qt.CheckState.Unchecked)
+            self.list_view.addItem(item)
+
         # Plot data at timestep 0
-        self.plot_at_index(0)
-    
-    def sliderValueChanged(self):
+        self.repaint()
+
+    def repaint(self):
         # Plot data at the selected timestep
-        self.plot_at_index(self.slider.value()) 
+        self.plot_at_index(self.slider.value() - 1) 
 
     def plot_at_index(self, index):
         if(len(self.plotdata) <= index):
-            #TODO add throw
             return
         
         data = self.plotdata[index].strip().split(",")
@@ -138,11 +258,15 @@ class MainWindow(QtWidgets.QMainWindow):
     def plot1D(self, x, y):
         self.canvas.axes.cla()
         self.canvas.axes.plot(x, y)
+        self.canvas.axes.set_ylim([self.valueRange_lower, self.valueRange_upper])
         self.canvas.draw()
 
-    def plot2D(self, im):
+    def plot2D(self, im):        
         self.canvas.axes.cla()
-        self.canvas.axes.imshow(im)
+        if not self.cbar == None:
+            self.cbar.remove()
+        ax = self.canvas.axes.imshow(im, vmin = self.valueRange_lower, vmax = self.valueRange_upper)
+        self.cbar = self.canvas.fig.colorbar(ax)
         self.canvas.draw()
 
 if __name__ == "__main__":
