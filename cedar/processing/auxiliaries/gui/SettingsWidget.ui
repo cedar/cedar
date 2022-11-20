@@ -147,6 +147,12 @@
    <header>cedar/processing/auxiliaries/gui/StringParameter.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>cedar::proc::aux::gui::FileParameter</class>
+   <extends>QWidget</extends>
+   <header>cedar/processing/auxiliaries/gui/FileParameter.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources/>
  <connections/>

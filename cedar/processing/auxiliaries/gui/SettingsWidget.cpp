@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/FileParameter.h"
 #include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES

@@ -38,6 +38,7 @@
 #include "cedar/auxiliaries/convolution/FFTWPlanningStrategy.h"
 #include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/SetParameter.h"
+#include "cedar/auxiliaries/FileParameter.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/PluginProxy.h"
 #include "cedar/auxiliaries/systemFunctions.h"
@@ -85,7 +86,7 @@ _mYarpConfigInfo(new cedar::aux::StringParameter(this,"yarp config info","134.14
                                     this,
                                     "python interpreter path",
                                     cedar::aux::FileParameter::READ,
-                                    "usr/bin/python3"
+                                    "/usr/bin/python3"
                             );
 
   cedar::aux::ConfigurablePtr plugins(new cedar::aux::Configurable());
