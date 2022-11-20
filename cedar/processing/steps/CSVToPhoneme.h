@@ -22,53 +22,50 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Multiplexer.h
+    File:        CSVToPhoneme.h
 
-    Maintainer:  Guido Knips
-    Email:       guido.knips@ini.rub.de
-    Date:        2013 12 04
+    Maintainer:  Yogeshwar Agnihotri
+    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
+    Date:        2022 11 20
 
-    Description: Takes a number of scalar inputs and copies them into a one-dimensional vector
+    Description: Header file for the class cedar::proc::steps::CSVToPhoneme.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_MULTIPLEXER_H
-#define CEDAR_PROC_STEPS_MULTIPLEXER_H
+#ifndef CEDAR_PROC_STEPS_CSVTO_PHONEME_H
+#define CEDAR_PROC_STEPS_CSVTO_PHONEME_H
 
-// LOCAL INCLUDES
-#include "cedar/processing/steps/ScalarsToVector.fwd.h"
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/FileParameter.h"
+#include "cedar/auxiliaries/MatData.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/steps/CSVToPhoneme.fwd.h"
 
 // SYSTEM INCLUDES
-#include <cedar/processing/Step.h>
-#include <cedar/auxiliaries/MatData.h>
-#include <cedar/auxiliaries/UIntParameter.h>
-#include <vector>
 
-
-/*!@todo describe.
- *
- * @todo describe more.
- */
-class cedar::proc::steps::ScalarsToVector : public cedar::proc::Step
+class cedar::proc::steps::CSVToPhoneme : public cedar::proc::Step
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ScalarsToVector();
+  CSVToPhoneme();
+
+  //!@brief Destructor
+  virtual ~CSVToPhoneme();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public slots
@@ -76,17 +73,12 @@ public:
 public slots:
   //@called when the vector dimension changes
   void vectorDimensionChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void inputConnectionChanged(const std::string& inputName);
-  //!@brief input verification
-  cedar::proc::DataSlot::VALIDITY determineInputValidity
-  (
-    cedar::proc::ConstDataSlotPtr slot,
-    cedar::aux::ConstDataPtr data
-  )const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -97,8 +89,10 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private:
   void compute(const cedar::proc::Arguments&);
+private:
+  // returns i-th slots name
+  std::string makeSlotName(const int i);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -106,13 +100,13 @@ private:
 protected:
   // none yet
 private:
-  //output vector
-  cedar::aux::MatDataPtr mOutput;
-  //input scalars
-  std::vector<cedar::aux::ConstMatDataPtr> mInputs;
+  cedar::aux::MatDataPtr _mInput;
 
-  // returns i-th slots name
-  std::string makeSlotName(const int i);
+  std::vector<cedar::aux::MatDataPtr> _mOutputs;
+
+  float _mElapsedTime;
+  bool _mIsLogging;
+  bool _mHasLogged;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -121,10 +115,12 @@ protected:
   // none yet
 
 private:
+  cedar::aux::FileParameterPtr _mCSVPath;
+  cedar::aux::DoubleParameterPtr _mLogThreshold;
   //Parameter for the dimension of the output vector
   cedar::aux::UIntParameterPtr _mOutputDimension;
 
-}; // cedar::proc::steps::Multiplexer
+}; // class cedar::proc::steps::CSVToPhoneme
 
-#endif // CEDAR_PROC_STEPS_MULTIPLEXER_H
+#endif // CEDAR_PROC_STEPS_CSVTO_PHONEME_H
 
