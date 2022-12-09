@@ -26,22 +26,22 @@
 
     Maintainer:  Yogeshwar Agnihotri
     Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2022 11 20
+    Date:        2022 12 08
 
-    Description: Forward declaration file for the class cedar::proc::steps::CSVToPhoneme.
+    Description: Forward declaration file for the class cedar::dyn::steps::CSVToPhoneme.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_CSVTO_PHONEME_FWD_H
-#define CEDAR_PROC_STEPS_CSVTO_PHONEME_FWD_H
+#ifndef CEDAR_DYN_STEPS_CSVTO_PHONEME_FWD_H
+#define CEDAR_DYN_STEPS_CSVTO_PHONEME_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/lib.h"
+#include "cedar/dynamics/lib.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -51,17 +51,17 @@
 
 namespace cedar
 {
-  namespace proc
+  namespace dyn
   {
     namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(CSVToPhoneme);
+      CEDAR_DECLARE_DYN_CLASS(CSVToPhoneme);
       //!@endcond
     }
   }
 }
 
 
-#endif // CEDAR_PROC_STEPS_CSVTO_PHONEME_FWD_H
+#endif // CEDAR_DYN_STEPS_CSVTO_PHONEME_FWD_H
 

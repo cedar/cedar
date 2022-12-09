@@ -245,7 +245,6 @@ cedar_add_library(cedarproc
   steps/NaNCheck.h
   steps/PositionOfMaximum.h
   steps/DiagonalReadout.h
-  steps/CSVToPhoneme.h
   CppScript.h
   Group.h
   Step.h

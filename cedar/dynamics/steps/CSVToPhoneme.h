@@ -26,35 +26,43 @@
 
     Maintainer:  Yogeshwar Agnihotri
     Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
-    Date:        2022 11 20
+    Date:        2022 12 08
 
-    Description: Header file for the class cedar::proc::steps::CSVToPhoneme.
+    Description: Header file for the class cedar::dyn::steps::CSVToPhoneme.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_CSVTO_PHONEME_H
-#define CEDAR_PROC_STEPS_CSVTO_PHONEME_H
+#ifndef CEDAR_DYN_STEPS_CSVTO_PHONEME_H
+#define CEDAR_DYN_STEPS_CSVTO_PHONEME_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
+#include "cedar/dynamics/Dynamics.h"
 #include "cedar/auxiliaries/FileParameter.h"
 #include "cedar/auxiliaries/MatData.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/CSVToPhoneme.fwd.h"
+#include "cedar/dynamics/steps/CSVToPhoneme.fwd.h"
 
 // SYSTEM INCLUDES
 
-class cedar::proc::steps::CSVToPhoneme : public cedar::proc::Step
+
+/*!@todo describe.
+ *
+ * @todo describe more.
+ */
+
+//todo add briefs to all methods
+class cedar::dyn::steps::CSVToPhoneme : public cedar::dyn::Dynamics
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
-  //--------------------------------------------------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------------------------------------q
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -73,12 +81,13 @@ public:
 public slots:
   //@called when the vector dimension changes
   void vectorDimensionChanged();
+  void csvPathChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -89,10 +98,16 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-  void compute(const cedar::proc::Arguments&);
 private:
-  // returns i-th slots name
+  //!@brief Updates the output matrix.
+  void eulerStep(const cedar::unit::Time& time);
+
+  //!@brief returns i-th slots name
   std::string makeSlotName(const int i);
+
+  void reloadLookupTable();
+
+  void setAllOutputsToValue(int value);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -100,13 +115,12 @@ private:
 protected:
   // none yet
 private:
-  cedar::aux::MatDataPtr _mInput;
+  cedar::aux::MatDataPtr mInput;
 
-  std::vector<cedar::aux::MatDataPtr> _mOutputs;
+  std::vector<cedar::aux::MatDataPtr> mOutputs;
 
-  float _mElapsedTime;
-  bool _mIsLogging;
-  bool _mHasLogged;
+  float mElapsedTime;
+  bool mDoneWithCVS;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -115,12 +129,13 @@ protected:
   // none yet
 
 private:
-  cedar::aux::FileParameterPtr _mCSVPath;
-  cedar::aux::DoubleParameterPtr _mLogThreshold;
+  cedar::aux::FileParameterPtr mCSVPath;
+  cedar::aux::DoubleParameterPtr mLogThreshold;
   //Parameter for the dimension of the output vector
-  cedar::aux::UIntParameterPtr _mOutputDimension;
+  cedar::aux::UIntParameterPtr mOutputDimension;
+  std::vector<int> mLookupTable;
 
-}; // class cedar::proc::steps::CSVToPhoneme
+}; // class cedar::dyn::steps::CSVToPhoneme
 
-#endif // CEDAR_PROC_STEPS_CSVTO_PHONEME_H
+#endif // CEDAR_DYN_STEPS_CSVTO_PHONEME_H
 

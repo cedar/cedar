@@ -55,6 +55,7 @@ cedar_add_library(cedardyn
                   steps/SpaceToRateCode.h
                   steps/TwoStepInput.h
                   steps/LogTimeInterval.h
+                  steps/CSVToPhoneme.h
                   RESOURCES
                   gui/icons/cedar_dynamics_gui_icons.qrc
                   )
