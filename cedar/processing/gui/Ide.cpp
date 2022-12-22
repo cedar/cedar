@@ -459,6 +459,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   //CopyWidget
   mpCopyWidget = new QDockWidget(this);
   mpCopyWidget->setObjectName(QString::fromUtf8("mpCopyWidget"));
+  mpCopyWidget->setWindowTitle("CoPY Console");
   QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
   sizePolicy.setHorizontalStretch(0);
   sizePolicy.setVerticalStretch(0);

@@ -1,0 +1,63 @@
+Set CEDAR_PORTABLE and BUNDLE_MAC_PATHS TO 1
+Delete (-std=gnu++11)
+Build in Release Mode
+
+Run from bin Folder
+
+Run macdeployqt:
+/usr/local/Cellar/qt5/5.15.2/clang_64/bin/macdeployqt cedar.app -always-overwrite
+
+Cp CoPY and Python:
+cp /Users/cedarmac/CLionProjects/pythonqt/lib/libPythonQt_QtAll-Qt5-Python3.9.3.dylib cedar.app/Contents/Frameworks 
+cp /Users/cedarmac/CLionProjects/‚/lib/libPythonQt-Qt5-Python3.9.3.dylib cedar.app/Contents/Frameworks 
+cp /Library/Frameworks/Python.framework/Versions/3.9/lib/libpython3.9.dylib cedar.app/Contents/Frameworks 
+cp -R /Library/Frameworks/Python.framework/ cedar.app/Contents/Frameworks/Python.framework
+
+install_name_tool -change libPythonQt_QtAll-Qt5-Python3.9.3.dylib @executable_path/../Frameworks/libPythonQt_QtAll-Qt5-Python3.9.3.dylib cedar.app/Contents/MacOS/cedar
+
+install_name_tool -change libPythonQt-Qt5-Python3.9.3.dylib @executable_path/../Frameworks/libPythonQt-Qt5-Python3.9.3.dylib cedar.app/Contents/MacOS/cedar
+
+install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python @executable_path/../Frameworks/Python.framework/Versions/3.9/Python cedar.app/Contents/MacOS/cedar-6.2.0
+
+
+Cd to cedar.app/Contents/Frameworks:
+install_name_tool -change /usr/local/opt/qt@5/lib/QtPrintSupport.framework/Versions/5/QtPrintSupport @executable_path/../Frameworks/QtPrintSupport.framework/Versions/5/QtPrintSupport libPythonQt_QtAll-Qt5-Python3.9.3.dylib
+install_name_tool -change /usr/local/opt/qt@5/lib/QtSvg.framework/Versions/5/QtSvg @executable_path/../Frameworks/QtSvg.framework/Versions/5/QtSvg libPythonQt_QtAll-Qt5-Python3.9.3.dylib
+install_name_tool -change /usr/local/opt/qt@5/lib/QtOpenGL.framework/Versions/5/QtOpenGL @executable_path/../Frameworks/QtOpenGL.framework/Versions/5/QtOpenGL libPythonQt_QtAll-Qt5-Python3.9.3.dylib
+install_name_tool -change /usr/local/opt/qt@5/lib/QtMultimediaWidgets.framework/Versions/5/QtMultimediaWidgets @executable_path/../Frameworks/QtMultimediaWidgets.framework/Versions/5/QtMultimediaWidgets libPythonQt_QtAll-Qt5-Python3.9.3.dylib
+install_name_tool -change /usr/local/opt/qt@5/lib/QtQuickWidgets.framework/Versions/5/QtQuickWidgets @executable_path/../Frameworks/QtQuickWidgets.framework/Versions/5/QtQuickWidgets libPythonQt_QtAll-Qt5-Python3.9.3.dylib
+install_name_tool -change /usr/local/opt/qt@5/lib/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets libPythonQt_QtAll-Qt5-Python3.9.3.dylib
+install_name_tool -change /usr/local/opt/qt@5/lib/QtMultimedia.framework/Versions/5/QtMultimedia @executable_path/../Frameworks/QtMultimedia.framework/Versions/5/QtMultimedia libPythonQt_QtAll-Qt5-Python3.9.3.dylib
+install_name_tool -change /usr/local/opt/qt@5/lib/QtQuick.framework/Versions/5/QtQuick @executable_path/../Frameworks/QtQuick.framework/Versions/5/QtQuick libPythonQt_QtAll-Qt5-Python3.9.3.dylib
+install_name_tool -change /usr/local/opt/qt@5/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui libPythonQt_QtAll-Qt5-Python3.9.3.dylib
+install_name_tool -change /usr/local/opt/qt@5/lib/QtSql.framework/Versions/5/QtSql @executable_path/../Frameworks/QtSql.framework/Versions/5/QtSql libPythonQt_QtAll-Qt5-Python3.9.3.dylib
+install_name_tool -change /usr/local/opt/qt@5/lib/QtXmlPatterns.framework/Versions/5/QtXmlPatterns @executable_path/../Frameworks/QtXmlPatterns.framework/Versions/5/QtXmlPatterns libPythonQt_QtAll-Qt5-Python3.9.3.dylib
+install_name_tool -change /usr/local/opt/qt@5/lib/QtQmlModels.framework/Versions/5/QtQmlModels @executable_path/../Frameworks/QtQmlModels.framework/Versions/5/QtQmlModels libPythonQt_QtAll-Qt5-Python3.9.3.dylib
+install_name_tool -change /usr/local/opt/qt@5/lib/QtQml.framework/Versions/5/QtQml @executable_path/../Frameworks/QtQml.framework/Versions/5/QtQml libPythonQt_QtAll-Qt5-Python3.9.3.dylib
+install_name_tool -change /usr/local/opt/qt@5/lib/QtNetwork.framework/Versions/5/QtNetwork @executable_path/../Frameworks/QtNetwork.framework/Versions/5/QtNetwork libPythonQt_QtAll-Qt5-Python3.9.3.dylib
+install_name_tool -change /usr/local/opt/qt@5/lib/QtXml.framework/Versions/5/QtXml @executable_path/../Frameworks/QtXml.framework/Versions/5/QtXml libPythonQt_QtAll-Qt5-Python3.9.3.dylib
+install_name_tool -change /usr/local/opt/qt@5/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore libPythonQt_QtAll-Qt5-Python3.9.3.dylib
+install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python @executable_path/../Frameworks/Python.framework/Versions/3.9/Python libPythonQt_QtAll-Qt5-Python3.9.3.dylib
+install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python @executable_path/../Frameworks/Python.framework/Versions/3.9/Python libPythonQt-Qt5-Python3.9.3.dylib
+
+install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python @executable_path/../Frameworks/Python.framework/Versions/3.9/Python libcedardyn.6.2.0.dylib
+install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python @executable_path/../Frameworks/Python.framework/Versions/3.9/Python libcedarunits.6.2.0.dylib
+install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python @executable_path/../Frameworks/Python.framework/Versions/3.9/Python libcedardev.6.2.0.dylib
+install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python @executable_path/../Frameworks/Python.framework/Versions/3.9/Python libcedarproc.6.2.0.dylib
+install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python @executable_path/../Frameworks/Python.framework/Versions/3.9/Python libcedaraux.6.2.0.dylib
+
+Copy libgcc if necessary:
+cp /usr/local/opt/gcc/lib/gcc/11/libgcc_s.1.1.dylib cedar.app/Contents/Frameworks
+
+copy Resources and create Pluginordner
+cp -R ../resources cedar.app/Contents/Cedar_Resources
+mkdir cedar.app/Contents/Cedar_Plugins
+
+Download macdeployqtfix
+
+curl -o macdeployqtfix.py https://raw.githubusercontent.com/arl/macdeployqtfix/master/macdeployqtfix.py
+
+Apply macdeployqtfix with Python 2.7!!! brew install python@2
+/usr/local/bin/python2.7 macdeployqtfix.py cedar.app/Contents/MacOS/cedar /usr/local/Cellar/qt5/5.15.2/clang_64
+
+ 
