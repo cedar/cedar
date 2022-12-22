@@ -43,6 +43,7 @@
 #include "cedar/processing/gui/CouplingCollection.h"
 #include "cedar/processing/gui/ResizeHandle.h"
 #include "cedar/processing/gui/Scene.h"
+#include "cedar/processing/gui/CoPYWidget.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/StickyNote.h"
 #include "cedar/processing/gui/DataSlotItem.h"
