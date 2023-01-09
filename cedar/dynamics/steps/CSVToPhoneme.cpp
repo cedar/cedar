@@ -59,7 +59,7 @@ namespace
             (
                     new ElementDeclarationTemplate<cedar::dyn::steps::CSVToPhoneme>
                             (
-                                    "Programming",
+                                    "Sources",
                                     "cedar.dynamics.CSVToPhoneme"
                             )
             );
