@@ -45,6 +45,8 @@
 #include "cedar/dynamics/Dynamics.h"
 #include "cedar/auxiliaries/FileParameter.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/StringParameter.h"
+
 
 // FORWARD DECLARATIONS
 #include "cedar/dynamics/steps/CSVToPhoneme.fwd.h"
@@ -134,6 +136,7 @@ private:
   //Parameter for the dimension of the output vector
   cedar::aux::UIntParameterPtr mOutputDimension;
   std::vector<int> mLookupTable;
+  cedar::aux::StringParameterPtr mDelimiter;
 
 }; // class cedar::dyn::steps::CSVToPhoneme
 

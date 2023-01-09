@@ -44,6 +44,7 @@
 #include "cedar/units/prefixes.h"
 #include <boost/algorithm/string.hpp>
 
+
 // CEDAR INCLUDES
 
 // SYSTEM INCLUDES
@@ -90,6 +91,7 @@ cedar::dyn::steps::CSVToPhoneme::CSVToPhoneme():
                                                "example.txt")),
         mLogThreshold(new cedar::aux::DoubleParameter(this, "log threshold", 0.5)),
         mOutputDimension(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1, 255)),
+        mDelimiter(new cedar::aux::StringParameter(this, "delimiter", ",")),
         mDoneWithCVS(false)
 {
   this->declareInput("input", false);
@@ -112,7 +114,7 @@ void cedar::dyn::steps::CSVToPhoneme::eulerStep(const cedar::unit::Time& time)
 {
   mElapsedTime +=  time / cedar::unit::Time(1*cedar::unit::milli * cedar::unit::seconds);
 
-  std::cout << "Seconds passed: " << mElapsedTime/1000 << std::endl;
+  //std::cout << "Seconds passed: " << mElapsedTime/1000 << std::endl;
 
   if(!mDoneWithCVS)
   {
@@ -158,35 +160,46 @@ void cedar::dyn::steps::CSVToPhoneme::csvPathChanged()
 void cedar::dyn::steps::CSVToPhoneme::reloadLookupTable()
 {
   //todo: check if file exists, is readable etc.
-  std::string delimeter = ",";
+  QString delimeter = ",";
+
   std::ifstream CSVFile(mCSVPath->getPath());
 
   //each vector in data is a line of the csv (also represented as vector)
   //in line 0=unique phoneme index, 1=phoneme string, 2=starting time in seconds, 3=ending times in second
   //todo: remove this magic number stuff. Use a better datastructure where the index gets replaced by string (e.g data[0]["ending_time"])
   //todo: other name than 'data'
-  std::vector<std::vector<std::string>> data;
-  if(CSVFile.good())
-  {
-    std::string line = "";
-    // Iterate through each line and split the content using delimeter
-    while (getline(CSVFile, line))
-    {
-      //Skip empty lines
-      if(!(line.empty() || line.find_first_not_of(' ') == std::string::npos))
-      {
-        std::vector<std::string> vec;
-        boost::split(vec, line, boost::is_any_of(delimeter));
-        data.push_back(vec);
-      }
 
-    }
-    // Close the File
-    CSVFile.close();
-  }
-  else
+  QFile csvFile(QString::fromStdString(mCSVPath->getPath()));
+
+  if (!csvFile.open(QIODevice::ReadOnly))
   {
-    //todo: throw some correct extection. which ertype here?
+    CEDAR_THROW(cedar::aux::ParseException, "Error while reading from CSV file: " + csvFile.errorString().toStdString())
+  }
+
+  QString fullFile = QString(csvFile.readAll());
+
+  fullFile.replace("\r", "\n");
+  fullFile.replace("\n\n", "\n");
+  fullFile.replace("\n\n", "\n");
+
+  QStringList splittedLines = fullFile.split("\n");
+
+  std::vector<std::vector<std::string>> data;
+
+  for(QString line:splittedLines)
+  {
+    std::cout << "hi" << std::endl;
+
+    std::cout << "line: " + line.toStdString() << std::endl;
+
+    QStringList lineSplitted = line.split(delimeter);
+
+    std::vector<std::string> vec;
+    for (QString splittedElements: lineSplitted)
+    {
+      vec.push_back(splittedElements.toStdString());
+    }
+    data.push_back(vec);
   }
 
   //Go to last line and find size and init lookup table with 0 values
