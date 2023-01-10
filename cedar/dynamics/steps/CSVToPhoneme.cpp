@@ -101,6 +101,7 @@ cedar::dyn::steps::CSVToPhoneme::CSVToPhoneme():
 
   QObject::connect(mOutputDimension.get(), SIGNAL(valueChanged()), this, SLOT(vectorDimensionChanged()));
   QObject::connect(mCSVPath.get(), SIGNAL(valueChanged()), this, SLOT(csvPathChanged()));
+  QObject::connect(mDelimiter.get(), SIGNAL(valueChanged()), this, SLOT(delimiterChanged()));
 }
 
 cedar::dyn::steps::CSVToPhoneme::~CSVToPhoneme()
@@ -152,22 +153,27 @@ void cedar::dyn::steps::CSVToPhoneme::eulerStep(const cedar::unit::Time& time)
 
 void cedar::dyn::steps::CSVToPhoneme::csvPathChanged()
 {
-  reloadLookupTable();
-
   this->reset();
+
+  reloadLookupTable();
+}
+
+void cedar::dyn::steps::CSVToPhoneme::delimiterChanged()
+{
+  this->reset();
+
+  reloadLookupTable();
 }
 
 void cedar::dyn::steps::CSVToPhoneme::reloadLookupTable()
 {
-  //todo: check if file exists, is readable etc.
-  QString delimeter = ",";
+  QString delimiter = QString::fromStdString(mDelimiter->getValue());
 
+  //todo: check if file exists, is readable etc.
   std::ifstream CSVFile(mCSVPath->getPath());
 
   //each vector in data is a line of the csv (also represented as vector)
   //in line 0=unique phoneme index, 1=phoneme string, 2=starting time in seconds, 3=ending times in second
-  //todo: remove this magic number stuff. Use a better datastructure where the index gets replaced by string (e.g data[0]["ending_time"])
-  //todo: other name than 'data'
 
   QFile csvFile(QString::fromStdString(mCSVPath->getPath()));
 
@@ -188,11 +194,15 @@ void cedar::dyn::steps::CSVToPhoneme::reloadLookupTable()
 
   for(QString line:splittedLines)
   {
-    std::cout << "hi" << std::endl;
+    QStringList lineSplitted = line.split(delimiter);
 
-    std::cout << "line: " + line.toStdString() << std::endl;
-
-    QStringList lineSplitted = line.split(delimeter);
+    //Check if the count of the split elements in the split line = 4, if not the delimiter is not correct,
+    //since one line always contains for elemets.
+    if(lineSplitted.count() != 4)
+    {
+      CEDAR_THROW(cedar::aux::ParseException, "The delimiter is not correct or and can't be used. "
+                                              "Please look at your file again and choose the correct ")
+    }
 
     std::vector<std::string> vec;
     for (QString splittedElements: lineSplitted)

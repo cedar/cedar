@@ -84,6 +84,7 @@ public slots:
   //@called when the vector dimension changes
   void vectorDimensionChanged();
   void csvPathChanged();
+  void delimiterChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -137,7 +138,6 @@ private:
   cedar::aux::UIntParameterPtr mOutputDimension;
   std::vector<int> mLookupTable;
   cedar::aux::StringParameterPtr mDelimiter;
-
 }; // class cedar::dyn::steps::CSVToPhoneme
 
 #endif // CEDAR_DYN_STEPS_CSVTO_PHONEME_H
