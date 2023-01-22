@@ -84,17 +84,15 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::dyn::steps::CSVToPhoneme::CSVToPhoneme():
-        mInput(cedar::aux::MatDataPtr()),
         mOutputs(1, cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))),
         mElapsedTime(0.0),
-        mCSVPath(new cedar::aux::FileParameter(this, "CSV file", cedar::aux::FileParameter::Mode::READ,
-                                               "example.txt")),
+        mCSVPath(new cedar::aux::FileParameter(this, "CSV file", cedar::aux::FileParameter::Mode::READ)),
         mLogThreshold(new cedar::aux::DoubleParameter(this, "log threshold", 0.5)),
         mOutputDimension(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1, 255)),
         mDelimiter(new cedar::aux::StringParameter(this, "delimiter", ",")),
         mDoneWithCVS(false)
 {
-  this->declareInput("input", false);
+  this->declareInput(inputName, false);
 
   this->declareOutput(makeSlotName(0), mOutputs.front());
 
@@ -113,50 +111,51 @@ cedar::dyn::steps::CSVToPhoneme::~CSVToPhoneme()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dyn::steps::CSVToPhoneme::eulerStep(const cedar::unit::Time& time)
 {
-  mElapsedTime +=  time / cedar::unit::Time(1*cedar::unit::milli * cedar::unit::seconds);
-
-  // For debugging, leave this in the code. Is often needed when working with this step as a developer
-  std::cout << "Seconds passed: " << mElapsedTime/1000 << std::endl;
-
-  if(!mDoneWithCVS)
+  if(mInput)
   {
-    if(mElapsedTime <= mLookupTable.size())
+    mElapsedTime += time / cedar::unit::Time(1 * cedar::unit::milli * cedar::unit::seconds);
+
+    // For debugging, leave this in the code. Is often needed when working with this step as a developer
+    std::cout << "Seconds passed: " << mElapsedTime / 1000 << std::endl;
+
+    if (!mDoneWithCVS && mInput->getData().at<float>(0, 0) > this->mLogThreshold->getValue())
     {
-      //todo add comments here
-      if (mLookupTable.at(mElapsedTime) == 0)
+      if (mElapsedTime <= mLookupTable.size())
       {
+        //todo add comments here
+        if (mLookupTable.at(mElapsedTime) == 0)
+        {
+          setAllOutputsToValue(0);
+        } else
+        {
+          //-1 because LookUp Table starts with 1, mOutputs vector internally starts with 0 (but also starts with 1 in naming in the tooltip/id)
+          int ActivatedPhonemeIndex = mLookupTable.at(mElapsedTime) - 1;
+          mOutputs.at(ActivatedPhonemeIndex)->getData().setTo(1);
+
+          //Edge case: if there is not time between 2 phonemes, the first will be kept on till the first 0 comes again. Therefore set all outputs to 0 except current
+          for (auto output: mOutputs)
+          {
+            if (output == mOutputs.at(ActivatedPhonemeIndex))
+              continue;
+
+            output->getData().setTo(0);
+          }
+        }
+      } else
+      {
+        mDoneWithCVS = true;
         setAllOutputsToValue(0);
       }
-      else
-      {
-        //-1 because LookUp Table starts with 1, mOutputs vector internally starts with 0 (but also starts with 1 in naming in the tooltip/id)
-        int ActivatedPhonemeIndex = mLookupTable.at(mElapsedTime) - 1;
-        mOutputs.at(ActivatedPhonemeIndex)->getData().setTo(1);
 
-        //Edge case: if there is not time between 2 phonemes, the first will be kept on till the first 0 comes again. Therefore set all outputs to 0 except current
-        for (auto output: mOutputs)
+      //for debugging, output list of current activated output slots
+      for (int i = 0; i < mOutputs.size(); i++)
+      {
+        cedar::aux::MatDataPtr output = mOutputs.at(i);
+        std::vector<std::string> currentOutputSetToOne;
+        if (output->getData().at<float>(0, 0) == 1)
         {
-          if (output == mOutputs.at(ActivatedPhonemeIndex))
-            continue;
-
-          output->getData().setTo(0);
+          std::cout << "slot activated: " << i + 1 << std::endl;
         }
-      }
-    }
-    else
-    {
-      mDoneWithCVS = true;
-      setAllOutputsToValue(0);
-    }
-
-    //for debugging, output list of current activated output slots
-    for (int i = 0; i < mOutputs.size(); i++)
-    {
-      cedar::aux::MatDataPtr output = mOutputs.at(i);
-      std::vector<std::string> currentOutputSetToOne;
-      if(output->getData().at<float>(0,0) == 1)
-      {
-        std::cout << "slot activated: " << i+1 << std::endl;
       }
     }
   }
@@ -317,4 +316,13 @@ std::string cedar::dyn::steps::CSVToPhoneme::makeSlotName(const int i)
   std::stringstream s;
   s << "phoneme " << i+1;
   return s.str();
+}
+
+void cedar::dyn::steps::CSVToPhoneme::inputConnectionChanged(const std::string& inputName)
+{
+  // Assign the input to the member. This saves us from casting in every computation step.
+  if(inputName == this->inputName)
+  {
+    this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
+  }
 }

@@ -102,6 +102,9 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
+
   //!@brief Updates the output matrix.
   void eulerStep(const cedar::unit::Time& time);
 
@@ -118,7 +121,9 @@ private:
 protected:
   // none yet
 private:
-  cedar::aux::MatDataPtr mInput;
+  cedar::aux::ConstMatDataPtr mInput;
+
+  std::string inputName = "input";
 
   std::vector<cedar::aux::MatDataPtr> mOutputs;
 
