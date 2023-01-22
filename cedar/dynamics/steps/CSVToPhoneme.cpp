@@ -64,7 +64,7 @@ namespace
                                     "cedar.dynamics.CSVToPhoneme"
                             )
             );
-    //declaration->setIconPath(":/steps/log_time_interval.svg");
+    declaration->setIconPath(":/steps/CSVToPhoneme.svg");
     declaration->setDescription
             (
                     //todo add description
