@@ -86,8 +86,8 @@ namespace
 cedar::dyn::steps::CSVToPhoneme::CSVToPhoneme():
         mOutputs(1, cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))),
         mElapsedTime(0.0),
-        mCSVPath(new cedar::aux::FileParameter(this, "CSV file", cedar::aux::FileParameter::Mode::READ)),
-        mLogThreshold(new cedar::aux::DoubleParameter(this, "log threshold", 0.5)),
+        mCSVPath(new cedar::aux::FileParameter(this, "csv file path", cedar::aux::FileParameter::Mode::READ)),
+        mStartingThreshold(new cedar::aux::DoubleParameter(this, "starting threshold", 0.5)),
         mOutputDimension(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1, 255)),
         mDelimiter(new cedar::aux::StringParameter(this, "delimiter", ",")),
         mDoneWithCVS(false)
@@ -118,7 +118,7 @@ void cedar::dyn::steps::CSVToPhoneme::eulerStep(const cedar::unit::Time& time)
     // For debugging, leave this in the code. Is often needed when working with this step as a developer
     std::cout << "Seconds passed: " << mElapsedTime / 1000 << std::endl;
 
-    if (!mDoneWithCVS && mInput->getData().at<float>(0, 0) > this->mLogThreshold->getValue())
+    if (!mDoneWithCVS && mInput->getData().at<float>(0, 0) > this->mStartingThreshold->getValue())
     {
       if (mElapsedTime <= mLookupTable.size())
       {
@@ -300,6 +300,7 @@ void cedar::dyn::steps::CSVToPhoneme::reset()
   mElapsedTime = 0;
   mDoneWithCVS = false;
 
+  //for debugging
   std::cout << "melapsedteime and mdonewithCSV reset in reset() " << std::endl;
 }
 

@@ -138,7 +138,7 @@ protected:
 
 private:
   cedar::aux::FileParameterPtr mCSVPath;
-  cedar::aux::DoubleParameterPtr mLogThreshold;
+  cedar::aux::DoubleParameterPtr mStartingThreshold;
   //Parameter for the dimension of the output vector
   cedar::aux::UIntParameterPtr mOutputDimension;
   std::vector<int> mLookupTable;
