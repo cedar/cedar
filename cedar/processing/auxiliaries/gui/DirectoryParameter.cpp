@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/processing/auxiliaries/TypeBasedFactory.h"
 #include "cedar/processing/auxiliaries/Singleton.h"
+#include "cedar/processing/gui/Ide.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
@@ -72,11 +73,19 @@ cedar::proc::aux::gui::Parameter(pParent)
 {
   QHBoxLayout *p_layout = new QHBoxLayout();
   this->setLayout(p_layout);
+
+  QWidget *fileStringWidget = new QWidget();
+  QVBoxLayout *v_layout = new QVBoxLayout();
+  fileStringWidget->setLayout(v_layout);
   this->mpEdit = new QLineEdit();
   this->mpEdit->setReadOnly(true);
-  p_layout->addWidget(this->mpEdit);
+  v_layout->addWidget(this->mpEdit);
 
-  QPushButton *p_button = new QPushButton(">");
+  this->mpCheckRelative = new QCheckBox("use relative path?");
+  v_layout->addWidget(this->mpCheckRelative);
+  p_layout->addWidget(fileStringWidget);
+
+  QPushButton *p_button = new QPushButton("...");
   p_button->setMinimumWidth(20);
   p_button->setMaximumWidth(30);
   p_layout->addWidget(p_button);
@@ -86,6 +95,7 @@ cedar::proc::aux::gui::Parameter(pParent)
   p_layout->setStretch(1, 0);
 
   QObject::connect(p_button, SIGNAL(clicked()), this, SLOT(onBrowseClicked()));
+  QObject::connect(this->mpCheckRelative, SIGNAL(clicked()), this, SLOT(onUseRelativeClicked()));
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
 }
 
@@ -114,7 +124,7 @@ void cedar::proc::aux::gui::DirectoryParameter::parameterValueChanged()
   parameter = boost::dynamic_pointer_cast<cedar::aux::DirectoryParameter>(this->getParameter());
 
   parameter->lockForRead();
-  QString value = parameter->getValue().absolutePath();
+  QString value = QString::fromStdString(parameter->getPath());
   parameter->unlock();
 
   this->mpEdit->setReadOnly(false);
@@ -131,5 +141,21 @@ void cedar::proc::aux::gui::DirectoryParameter::onBrowseClicked()
   if (!value.isEmpty())
   {
     parameter->setValue(value.toStdString(), true);
+  }
+}
+
+void cedar::proc::aux::gui::DirectoryParameter::onUseRelativeClicked()
+{
+  if(auto parameter = boost::dynamic_pointer_cast<cedar::aux::DirectoryParameter>(this->getParameter()))
+  {
+    if(this->mpCheckRelative->isChecked())
+    {
+      parameter->setPathMode(cedar::aux::DirectoryParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
+    }
+    else
+    {
+      parameter->setPathMode(cedar::aux::DirectoryParameter::PathMode::PATH_MODE_ABSOLUTE);
+    }
+
   }
 }

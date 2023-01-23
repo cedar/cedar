@@ -40,7 +40,6 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/SetParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
@@ -56,6 +55,7 @@
 #include "cedar/auxiliaries/PluginProxy.fwd.h"
 #include "cedar/auxiliaries/StringSetParameter.fwd.h"
 #include "cedar/auxiliaries/FileParameter.fwd.h"
+#include "cedar/auxiliaries/DirectoryParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>

@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/Settings.h"
 #include "cedar/defines.h"
 
 // FORWARD DECLARATIONS
@@ -54,13 +55,32 @@
 class cedar::aux::DirectoryParameter : public cedar::aux::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+
+  /*!@brief Sets the mode of the path, i.e., is the path treated as a relative or an absolute path?
+   */
+  enum PathMode
+  {
+    //! Paths are specified absolutely.
+    PATH_MODE_ABSOLUTE,
+
+    //! Paths are specified relative to the application's current working directory.
+    PATH_MODE_RELATIVE_TO_WORKING_DIR,
+
+    PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR
+  };
+
+  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
   DirectoryParameter(cedar::aux::Configurable *pOwner, const std::string& name)
   :
-  cedar::aux::Parameter(pOwner, name, false)
+  cedar::aux::Parameter(pOwner, name, false),
+  mPathMode(PATH_MODE_ABSOLUTE)
   {
   }
 
@@ -69,7 +89,8 @@ public:
   :
   cedar::aux::Parameter(pOwner, name, true),
   mValue(QString::fromStdString(defaultValue)),
-  mDefault(QString::fromStdString(defaultValue))
+  mDefault(QString::fromStdString(defaultValue)),
+  mPathMode(PATH_MODE_ABSOLUTE)
   {
   }
 
@@ -98,14 +119,33 @@ public:
 #endif // CEDAR_PORTABLE
   }
 
+  QDir getCurrentArchitectureFileDirectory() const
+  {
+    auto lastArchitectureFile = cedar::aux::SettingsSingleton::getInstance()->getCurrentArchitectureFileName();
+    QDir curArchitectureDir(QString::fromStdString(lastArchitectureFile));
+    curArchitectureDir.cdUp(); // Get the folder not the file
+    return curArchitectureDir;
+  }
+
   //!@brief sets a new directory from string
   void setValue(const std::string& value, bool lock = false)
   {
+    QDir newValue;
+    if(this->getPathMode()==PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR)
+    {
+      newValue = this->getCurrentArchitectureFileDirectory().filePath(QString::fromStdString(value));
+    }
+    else
+    {
+      newValue = QString::fromStdString(value);
+    }
+
+    cedar::aux::Parameter::WriteLockerPtr write_locker;
     if (lock)
     {
       this->lockForWrite();
     }
-    this->mValue.setPath(QString::fromStdString(value));
+    this->mValue = newValue;
     if (lock)
     {
       this->unlock();
@@ -140,6 +180,45 @@ public:
     return this->mValue;
   }
 
+  /*!@brief Returns the path stored in the parameter.
+   *
+   * @remarks This is an alias for calling getValue().path().toStdString(). See the documentation for QDir for details.
+   */
+  std::string getPath(bool forceAbsolutePath = false) const
+  {
+    //All the Grabberclasses expect this filePath, but maybe this could me removed in the long term. The other return values seem to work, but only during initialisation errors are thrown.
+    if(forceAbsolutePath)
+    {
+      return this->mValue.path().toStdString();
+    }
+
+    switch (this->mPathMode)
+    {
+      default:
+      case PATH_MODE_ABSOLUTE:
+        return this->mValue.absolutePath().toStdString();
+
+      case PATH_MODE_RELATIVE_TO_WORKING_DIR:
+        return QDir::current().relativeFilePath(this->mValue.absolutePath()).toStdString();
+
+      case PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR:
+        return this->getCurrentArchitectureFileDirectory().relativeFilePath(this->mValue.absolutePath()).toStdString();
+    }
+  }
+
+  /*!@brief Sets the path mode.
+   */
+  void setPathMode(PathMode mode)
+  {
+    this->mPathMode = mode;
+    this->emitChangedSignal();
+  }
+
+  PathMode getPathMode()
+  {
+    return this->mPathMode;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -163,6 +242,9 @@ private:
 
   //!@brief a default directory
   QDir mDefault;
+
+  //!@brief The path mode.
+  PathMode mPathMode;
 
 }; // class cedar::aux::DirectoryParameter
 
