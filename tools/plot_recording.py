@@ -1,5 +1,8 @@
 import sys
 import os
+import math
+import numpy as np
+from textwrap import wrap
 from PyQt5 import QtCore, QtWidgets, QtGui
 
 import matplotlib
@@ -10,9 +13,16 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 # MatPlotLib Canvas: Widget used to show plots
 class MPLCanvas(FigureCanvasQTAgg):
-    def __init__(self, nbrOfSubplots=1, width=10, height=5, dpi=100):
+    def __init__(self, nbrOfSubplots=1, width=16, height=8, dpi=100):
         self.fig = Figure(dpi=dpi, figsize=(width, height))
-        self.axes = [self.fig.add_subplot(101 + 10 * nbrOfSubplots + index) for index in range(nbrOfSubplots)]
+        
+        # Order the subplots in a grid, suitable for the given aspect ratio
+        self.rows = math.ceil(nbrOfSubplots / math.sqrt(nbrOfSubplots * (width/height)))
+        self.cols = math.ceil(nbrOfSubplots / self.rows)
+        self.axes = self.fig.subplots(self.rows, self.cols, squeeze=False, subplot_kw={"box_aspect": 1.0}, gridspec_kw={"wspace": 0.25, "hspace": 0.25})
+        
+        self.axes = [ax for row in self.axes for ax in row]
+        self.axes = self.axes[:nbrOfSubplots]
 
         super(MPLCanvas, self).__init__(self.fig)
 
@@ -44,7 +54,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.metadata = []
         self.valueRange_lower = None
         self.valueRange_upper = None
-        self.cbar = None
+        self.cbars = []
 
         self.init_layout()
 
@@ -299,16 +309,27 @@ class MainWindow(QtWidgets.QMainWindow):
         self.canvas.axes[subplotIndex].cla()
         self.canvas.axes[subplotIndex].plot(x, y)
         self.canvas.axes[subplotIndex].set_ylim([self.valueRange_lower, self.valueRange_upper])
-        self.canvas.axes[subplotIndex].set_title(f"{self.filenames[subplotIndex].split('/')[-1]}\nTime: {self.plotdata[subplotIndex][self.slider.value() - 1].strip().split(' ')[0]}", fontsize=8)
+        # Set title
+        title = f"{self.filenames[subplotIndex].split('/')[-1].replace('_', ' ')}\nTime: {self.plotdata[subplotIndex][self.slider.value() - 1].strip().split(' ')[0]}"
+        title = '\n'.join(wrap(title, 40))
+        self.canvas.axes[subplotIndex].set_title(title, fontsize=max(6, 16*(1/self.canvas.cols)))
+        
         self.canvas.draw()
 
     def plot2D(self, im, subplotIndex):
         self.canvas.axes[subplotIndex].cla()
-        if not self.cbar == None:
-            self.cbar.remove()
+        # Remove old colorbars
+        if subplotIndex == 0:
+            for bar in self.cbars:
+                bar.remove()
+            self.cbars = []
         ax = self.canvas.axes[subplotIndex].imshow(im, vmin = self.valueRange_lower, vmax = self.valueRange_upper)
-        self.cbar = self.canvas.fig.colorbar(ax)
-        self.canvas.axes[subplotIndex].set_title(f"{self.filenames[subplotIndex].split('/')[-1]}\nTime: {self.plotdata[subplotIndex][self.slider.value() - 1].strip().split(' ')[0]}", fontsize=8)
+        self.cbars += [self.canvas.fig.colorbar(ax)]
+        # Set title
+        title = f"{self.filenames[subplotIndex].split('/')[-1].replace('_', ' ')}\nTime: {self.plotdata[subplotIndex][self.slider.value() - 1].strip().split(' ')[0]}"
+        title = '\n'.join(wrap(title, 40))
+        self.canvas.axes[subplotIndex].set_title(title, fontsize=max(6, 16*(1/self.canvas.cols)))
+        
         self.canvas.draw()
 
 if __name__ == "__main__":
