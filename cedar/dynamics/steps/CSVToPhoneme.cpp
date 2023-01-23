@@ -116,7 +116,7 @@ void cedar::dyn::steps::CSVToPhoneme::eulerStep(const cedar::unit::Time& time)
     mElapsedTime += time / cedar::unit::Time(1 * cedar::unit::milli * cedar::unit::seconds);
 
     // For debugging, leave this in the code. Is often needed when working with this step as a developer
-    std::cout << "Seconds passed: " << mElapsedTime / 1000 << std::endl;
+    //std::cout << "Seconds passed: " << mElapsedTime / 1000 << std::endl;
 
     if (!mDoneWithCVS && mInput->getData().at<float>(0, 0) > this->mStartingThreshold->getValue())
     {
@@ -147,7 +147,7 @@ void cedar::dyn::steps::CSVToPhoneme::eulerStep(const cedar::unit::Time& time)
         setAllOutputsToValue(0);
       }
 
-      //for debugging, output list of current activated output slots
+      /* //for debugging, output list of current activated output slots
       for (int i = 0; i < mOutputs.size(); i++)
       {
         cedar::aux::MatDataPtr output = mOutputs.at(i);
@@ -156,7 +156,7 @@ void cedar::dyn::steps::CSVToPhoneme::eulerStep(const cedar::unit::Time& time)
         {
           std::cout << "slot activated: " << i + 1 << std::endl;
         }
-      }
+      } */
     }
   }
 }
@@ -301,7 +301,7 @@ void cedar::dyn::steps::CSVToPhoneme::reset()
   mDoneWithCVS = false;
 
   //for debugging
-  std::cout << "melapsedteime and mdonewithCSV reset in reset() " << std::endl;
+  //std::cout << "melapsedteime and mdonewithCSV reset in reset() " << std::endl;
 }
 
 void cedar::dyn::steps::CSVToPhoneme::setAllOutputsToValue(int value)
