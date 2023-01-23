@@ -62,6 +62,7 @@
         <file>steps/linear_spatial_template_1xn.svg</file>
         <file>steps/linear_spatial_template_nx1.svg</file>
 		<file>steps/log_time_interval.svg</file>
+        <file>steps/CSVToPhoneme.svg</file>
         <file>steps/static_gain.svg</file>
         <file>steps/static_gain_green.svg</file>
         <file>steps/static_gain_red.svg</file>
