@@ -121,6 +121,7 @@
 #include <string>
 #include <utility>
 #include <QtGui/QClipboard>
+#include <QProcess>
 
 #ifdef CEDAR_USE_YARP
 #include <yarp/conf/version.h>
@@ -1991,8 +1992,22 @@ void cedar::proc::gui::Ide::showManagePluginsDialog()
 
 void cedar::proc::gui::Ide::showPlotRecordingTool()
 {
-  //system("gnome-terminal --execute which python3");
-  //system("gnome-terminal --execute python3 /home/work/CLionProjects/cedar/tools/plot_recording.py");
+  QProcess p;
+
+  QString program = QString::fromStdString(cedar::aux::SettingsSingleton::getInstance()->getPythonInterpreterPathParameter()->getPath());
+
+  QStringList params;
+  params << QString::fromStdString(QCoreApplication::applicationDirPath().toStdString() + "/.." + "/tools/plot_recording.py");
+
+  p.start(program, params);
+  p.waitForFinished(-1);
+  QString p_stdout = p.readAllStandardError();
+
+  if(!p_stdout.isEmpty())
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, p_stdout.toStdString());
+
+  }
 }
 
 void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::GroupPtr group)
