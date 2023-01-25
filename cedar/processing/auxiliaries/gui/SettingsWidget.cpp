@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/FileParameter.h"
 #include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
@@ -66,6 +67,11 @@ QWidget(pParent)
                                  (
                                    cedar::aux::SettingsSingleton::getInstance()->getRecorderWorkspaceParameter()
                                  );
+
+  this->mpPythonInterpreterPathEdit->setParameter
+          (
+                  cedar::aux::SettingsSingleton::getInstance()->getPythonInterpreterPathParameter()
+          );
 
   this->fillPossible2dMatDataPlots();
   QObject::connect(this->mpDefault2dMatDataPlot, SIGNAL(currentIndexChanged(int)), this, SLOT(default2dMatDataPlotChanged()));

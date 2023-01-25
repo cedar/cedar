@@ -149,7 +149,9 @@ cedar::dyn::steps::HebbianConnection::HebbianConnection()
 //      mRewardTrigger(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
 //      mReadOutTrigger(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
       mWeightSizeX(mAssociationDimension->getValue() > 0 ? mAssociationSizes->getValue().at(0) : 1),
-      mWeightSizeY(mAssociationDimension->getValue() > 1 ? mAssociationSizes->getValue().at(1) : 1)
+      mWeightSizeY(mAssociationDimension->getValue() > 1 ? mAssociationSizes->getValue().at(1) : 1),
+      mWeightedTargetOutput((new cedar::aux::MatData(cv::Mat::zeros(100, 100, CV_32F)))),
+      mWeightedTargetSumOutput((new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))))
 
 {
   //Initialize 3D Matrices
@@ -190,9 +192,12 @@ cedar::dyn::steps::HebbianConnection::HebbianConnection()
   thetaBuffer->setSerializable(true);
 
   auto weightTriggerOutput = this->declareOutput(mTriggerOutputName, mWeightOutput);
+  this->declareOutput(mWeightedTargetOutputName, mWeightedTargetOutput);
+  this->declareOutput(mWeightedTargetSumOutputName, mWeightedTargetSumOutput);
 
   this->mConnectionWeights->getData() = initializeWeightMatrix();
   mWeightOutput->setData(mConnectionWeights->getData());
+  this->updateWeightedTargetOutput();
 
   mRewardDuration->setConstant(!mUseRewardDuration->getValue());
   mWeightAmplitude->setConstant(!mSetWeights->getValue());
@@ -312,6 +317,38 @@ void cedar::dyn::steps::HebbianConnection::updateLearningRule()
   }
 
   this->mConnectionWeights->setData(initializeWeightMatrix());
+  this->updateWeightedTargetOutput();
+}
+
+void cedar::dyn::steps::HebbianConnection::resetWeightedTargetOutput()
+{
+  this->mWeightedTargetOutput->setData(cv::Mat::zeros(100, 100, CV_32F));
+  this->mWeightedTargetSumOutput->setData(cv::Mat::zeros(1, 1, CV_32F));
+}
+
+void cedar::dyn::steps::HebbianConnection::updateWeightedTargetOutput()
+{
+  if(!this->mAssoInput)
+  {
+    resetWeightedTargetOutput();
+    return;
+  }
+  cv::Mat weights = this->mConnectionWeights->getData();
+  cv::Mat targetField = this->mAssoInput->getData();
+
+  if (weights.dims != 2 || targetField.dims != 2)
+  {
+    resetWeightedTargetOutput();
+    return;
+  }
+  if (weights.size[0] != targetField.size[0] || weights.size[1] != targetField.size[1])
+  {
+    resetWeightedTargetOutput();
+    return;
+  }
+  cv::Mat prod = weights.mul(targetField);
+  this->mWeightedTargetOutput->setData(prod);
+  this->mWeightedTargetSumOutput->setData(cv::Mat::ones(1, 1, CV_32F) * cv::sum(prod)[0]);
 }
 
 cv::Mat cedar::dyn::steps::HebbianConnection::initializeWeightMatrix()
@@ -455,6 +492,7 @@ void cedar::dyn::steps::HebbianConnection::eulerStep(const cedar::unit::Time& ti
       auto weightChange = calculateWeightChange(time,mReadOutTrigger->getData(),mAssoInput->getData(),mRewardTrigger->getData());
       currentWeights = currentWeights + weightChange;
       mConnectionWeights->setData(currentWeights);
+      this->updateWeightedTargetOutput();
     }
   }
 
@@ -466,6 +504,7 @@ void cedar::dyn::steps::HebbianConnection::eulerStep(const cedar::unit::Time& ti
   {
     mWeightOutput->setData(calculateDefaultOutput());
   }
+  this->updateWeightedTargetOutput();
 }
 
 void cedar::dyn::steps::HebbianConnection::inputConnectionChanged(const std::string& inputName)
@@ -473,6 +512,7 @@ void cedar::dyn::steps::HebbianConnection::inputConnectionChanged(const std::str
   if (inputName == mAssoInputName)
   {
     this->mAssoInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
+    this->updateWeightedTargetOutput();
   }
   if (inputName == mRewardInputName)
   {
@@ -535,6 +575,8 @@ void cedar::dyn::steps::HebbianConnection::resetWeights()
   this->mConnectionWeights->setData(initializeWeightMatrix());
 
   this->mWeightOutput->setData(calculateDefaultOutput());
+
+  this->updateWeightedTargetOutput();
 
   if(this->mLearningRule->getValue() == cedar::dyn::steps::HebbianConnection::LearningRule::BCM)
   {
@@ -612,6 +654,7 @@ void cedar::dyn::steps::HebbianConnection::setWeights(cv::Mat newWeights)
 {
   this->mConnectionWeights->setData(newWeights);
   this->mWeightOutput->setData(newWeights);
+  this->updateWeightedTargetOutput();
 }
 
 

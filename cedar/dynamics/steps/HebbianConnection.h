@@ -169,6 +169,10 @@ private:
 
   cv::Mat calculateDefaultOutput();
 
+  void updateWeightedTargetOutput();
+
+  void resetWeightedTargetOutput();
+
   //!@brief Updates the output matrix.
   void eulerStep(const cedar::unit::Time& time);
 
@@ -225,12 +229,16 @@ protected:
   //!@brief The data containing the output.
   cedar::aux::MatDataPtr mConnectionWeights;
   cedar::aux::MatDataPtr mWeightOutput;
+  cedar::aux::MatDataPtr mWeightedTargetOutput;
+  cedar::aux::MatDataPtr mWeightedTargetSumOutput;
   cedar::aux::MatDataPtr mBCMTheta;
 
 private:
   std::string mAssoInputName = "target field";
   std::string mOutputName = "weights";
   std::string mTriggerOutputName = "learned output";
+  std::string mWeightedTargetOutputName = "weighted input";
+  std::string mWeightedTargetSumOutputName = "weighted input sum";
   std::string mRewardInputName = "reward signal";
   std::string mReadOutInputName= "source node";
 
