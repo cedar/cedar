@@ -111,41 +111,49 @@ cedar::dyn::steps::CSVToPhoneme::~CSVToPhoneme()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dyn::steps::CSVToPhoneme::eulerStep(const cedar::unit::Time& time)
 {
-  if(mInput)
+  bool threshholdPassed = mInput && mInput->getData().at<float>(0, 0) > this->mStartingThreshold->getValue();
+
+  if(threshholdPassed)
   {
     mElapsedTime += time / cedar::unit::Time(1 * cedar::unit::milli * cedar::unit::seconds);
 
-    // For debugging, leave this in the code. Is often needed when working with this step as a developer
-    //std::cout << "Seconds passed: " << mElapsedTime / 1000 << std::endl;
-
-    if (!mDoneWithCVS && mInput->getData().at<float>(0, 0) > this->mStartingThreshold->getValue())
+    if (mInput)
     {
-      if (mElapsedTime <= mLookupTable.size())
+      // For debugging, leave this in the code. Is often needed when working with this step as a developer
+      // std::cout << "Seconds passed: " << mElapsedTime / 1000 << std::endl;
+
+      if (!mDoneWithCVS)
       {
-        //todo add comments here
-        if (mLookupTable.at(mElapsedTime) == 0)
+        if (mElapsedTime <= mLookupTable.size())
         {
-          setAllOutputsToValue(0);
+          //todo add comments here
+          if (mLookupTable.at(mElapsedTime) == 0)
+          {
+            setAllOutputsToValue(0);
+          } else
+          {
+            //-1 because LookUp Table starts with 1, mOutputs vector internally starts with 0 (but also starts with 1 in naming in the tooltip/id)
+            int ActivatedPhonemeIndex = mLookupTable.at(mElapsedTime) - 1;
+
+            if(mOutputs.size() > ActivatedPhonemeIndex)
+            {
+              mOutputs.at(ActivatedPhonemeIndex)->getData().setTo(1);
+            }
+
+            //Edge case: if there is not time between 2 phonemes, the first will be kept on till the first 0 comes again. Therefore set all outputs to 0 except current
+            for (auto output: mOutputs)
+            {
+              if (mOutputs.size() > ActivatedPhonemeIndex && output == mOutputs.at(ActivatedPhonemeIndex))
+                continue;
+
+              output->getData().setTo(0);
+            }
+          }
         } else
         {
-          //-1 because LookUp Table starts with 1, mOutputs vector internally starts with 0 (but also starts with 1 in naming in the tooltip/id)
-          int ActivatedPhonemeIndex = mLookupTable.at(mElapsedTime) - 1;
-          mOutputs.at(ActivatedPhonemeIndex)->getData().setTo(1);
-
-          //Edge case: if there is not time between 2 phonemes, the first will be kept on till the first 0 comes again. Therefore set all outputs to 0 except current
-          for (auto output: mOutputs)
-          {
-            if (output == mOutputs.at(ActivatedPhonemeIndex))
-              continue;
-
-            output->getData().setTo(0);
-          }
+          mDoneWithCVS = true;
+          setAllOutputsToValue(0);
         }
-      } else
-      {
-        mDoneWithCVS = true;
-        setAllOutputsToValue(0);
-      }
 
       /* //for debugging, output list of current activated output slots
       for (int i = 0; i < mOutputs.size(); i++)
