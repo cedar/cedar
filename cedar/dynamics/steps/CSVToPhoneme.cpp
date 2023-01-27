@@ -335,3 +335,15 @@ void cedar::dyn::steps::CSVToPhoneme::inputConnectionChanged(const std::string& 
     this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
   }
 }
+
+void cedar::dyn::steps::CSVToPhoneme::onStart()
+{
+  this->mDelimiter->setConstant(true);
+  this->mOutputDimension->setConstant(true);
+}
+
+void cedar::dyn::steps::CSVToPhoneme::onStop()
+{
+  this->mDelimiter->setConstant(false);
+  this->mOutputDimension->setConstant(false);
+}
