@@ -135,7 +135,7 @@ void cedar::dyn::steps::CSVToPhoneme::eulerStep(const cedar::unit::Time& time)
             //-1 because LookUp Table starts with 1, mOutputs vector internally starts with 0 (but also starts with 1 in naming in the tooltip/id)
             int ActivatedPhonemeIndex = mLookupTable.at(mElapsedTime) - 1;
 
-            if(mOutputs.size() > ActivatedPhonemeIndex)
+            if (mOutputs.size() > ActivatedPhonemeIndex)
             {
               mOutputs.at(ActivatedPhonemeIndex)->getData().setTo(1);
             }
@@ -155,16 +155,17 @@ void cedar::dyn::steps::CSVToPhoneme::eulerStep(const cedar::unit::Time& time)
           setAllOutputsToValue(0);
         }
 
-      /* //for debugging, output list of current activated output slots
-      for (int i = 0; i < mOutputs.size(); i++)
-      {
-        cedar::aux::MatDataPtr output = mOutputs.at(i);
-        std::vector<std::string> currentOutputSetToOne;
-        if (output->getData().at<float>(0, 0) == 1)
+        /* //for debugging, output list of current activated output slots
+        for (int i = 0; i < mOutputs.size(); i++)
         {
-          std::cout << "slot activated: " << i + 1 << std::endl;
-        }
-      } */
+          cedar::aux::MatDataPtr output = mOutputs.at(i);
+          std::vector<std::string> currentOutputSetToOne;
+          if (output->getData().at<float>(0, 0) == 1)
+          {
+            std::cout << "slot activated: " << i + 1 << std::endl;
+          }
+        } */
+      }
     }
   }
 }
