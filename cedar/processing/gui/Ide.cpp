@@ -2374,6 +2374,8 @@ bool cedar::proc::gui::Ide::saveAs()
 
   #ifndef CEDAR_OS_WINDOWS
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+  #else
+  QString path = file;
   #endif
 
   last_dir->setValue(path);
