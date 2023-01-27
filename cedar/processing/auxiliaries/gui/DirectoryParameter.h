@@ -49,6 +49,7 @@
 
 // SYSTEM INCLUDES
 #include <QLineEdit>
+#include <QCheckBox>
 
 
 /*!@brief A widget for a cedar::aux::DirectoryParameter.
@@ -80,6 +81,10 @@ public slots:
    */
   void onBrowseClicked();
 
+  /*!@brief Handles a click on the relative path checkbox.
+   */
+  void onUseRelativeClicked();
+
   /*!@brief Handles a changed parameter pointer.
    */
   void parameterPointerChanged();
@@ -108,6 +113,9 @@ protected:
 private:
   //! QLineEdit used for displaying the parameter value.
   QLineEdit *mpEdit;
+
+  //!Checkbox to switch between absolute and relative paths
+  QCheckBox* mpCheckRelative;
 
 }; // class cedar::proc::aux::gui::DirectoryParameter
 
