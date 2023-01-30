@@ -204,7 +204,13 @@ void cedar::dyn::steps::CSVToPhoneme::reloadLookupTable()
 
   QString fullFile = QString(csvFile.readAll());
 
+  //trimming to delete end and start whitespaces
+  fullFile = fullFile.trimmed();
+
+  //Replace all CR with LF
   fullFile.replace("\r", "\n");
+
+  //Replace all LFLF with LF. Twice to remove uneven LF number. Dosent work with >= 5 LFs
   fullFile.replace("\n\n", "\n");
   fullFile.replace("\n\n", "\n");
 
@@ -259,8 +265,11 @@ void cedar::dyn::steps::CSVToPhoneme::reloadLookupTable()
   //todo: no idea what the *does check before pushing
   int maxValueOfPhonemeIndenitifier = *std::max_element(mLookupTable.begin(), mLookupTable.end());
 
-  //set output dim to max
-  mOutputDimension->setValue(maxValueOfPhonemeIndenitifier);
+  if(mOutputDimension->getValue() == 1)
+  {
+    //set output dim to max
+    mOutputDimension->setValue(maxValueOfPhonemeIndenitifier);
+  }
 
   //print lookup table - for debugging
   /*for(int i = 0; i < mLookupTable.size(); i++)
