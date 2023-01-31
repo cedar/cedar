@@ -1,5 +1,4 @@
 Set CEDAR_PORTABLE and BUNDLE_MAC_PATHS TO 1
-Delete (-std=gnu++11)
 Build in Release Mode
 
 Run from bin Folder
@@ -7,18 +6,17 @@ Run from bin Folder
 Run macdeployqt:
 /usr/local/Cellar/qt5/5.15.2/clang_64/bin/macdeployqt cedar.app -always-overwrite
 
+FOR PYTHON:
+
 Cp CoPY and Python:
 cp /Users/cedarmac/CLionProjects/pythonqt/lib/libPythonQt_QtAll-Qt5-Python3.9.3.dylib cedar.app/Contents/Frameworks 
-cp /Users/cedarmac/CLionProjects/‚/lib/libPythonQt-Qt5-Python3.9.3.dylib cedar.app/Contents/Frameworks 
+cp /Users/cedarmac/CLionProjects/pythonqt/lib/libPythonQt-Qt5-Python3.9.3.dylib cedar.app/Contents/Frameworks
 cp /Library/Frameworks/Python.framework/Versions/3.9/lib/libpython3.9.dylib cedar.app/Contents/Frameworks 
 cp -R /Library/Frameworks/Python.framework/ cedar.app/Contents/Frameworks/Python.framework
 
 install_name_tool -change libPythonQt_QtAll-Qt5-Python3.9.3.dylib @executable_path/../Frameworks/libPythonQt_QtAll-Qt5-Python3.9.3.dylib cedar.app/Contents/MacOS/cedar
-
 install_name_tool -change libPythonQt-Qt5-Python3.9.3.dylib @executable_path/../Frameworks/libPythonQt-Qt5-Python3.9.3.dylib cedar.app/Contents/MacOS/cedar
-
 install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python @executable_path/../Frameworks/Python.framework/Versions/3.9/Python cedar.app/Contents/MacOS/cedar-6.2.0
-
 
 Cd to cedar.app/Contents/Frameworks:
 install_name_tool -change /usr/local/opt/qt@5/lib/QtPrintSupport.framework/Versions/5/QtPrintSupport @executable_path/../Frameworks/QtPrintSupport.framework/Versions/5/QtPrintSupport libPythonQt_QtAll-Qt5-Python3.9.3.dylib
@@ -45,6 +43,8 @@ install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Pyth
 install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python @executable_path/../Frameworks/Python.framework/Versions/3.9/Python libcedardev.6.2.0.dylib
 install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python @executable_path/../Frameworks/Python.framework/Versions/3.9/Python libcedarproc.6.2.0.dylib
 install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python @executable_path/../Frameworks/Python.framework/Versions/3.9/Python libcedaraux.6.2.0.dylib
+
+FOR EVERYTHING:
 
 Copy libgcc if necessary:
 cp /usr/local/opt/gcc/lib/gcc/11/libgcc_s.1.1.dylib cedar.app/Contents/Frameworks

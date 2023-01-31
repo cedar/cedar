@@ -176,8 +176,11 @@ elseif (MSVC)
 endif (CMAKE_COMPILER_IS_GNUCC)
 
 # add definitions for clang
+
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   add_definitions(-std=c++14 -stdlib=libc++)
+  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 
 add_definitions(-D CEDAR_LOG_DIR=\\"${CEDAR_LOG_DIR}/\\")
