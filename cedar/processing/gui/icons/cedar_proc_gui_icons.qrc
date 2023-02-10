@@ -96,8 +96,9 @@
         <file>steps/unit_converter.svg</file>
         <file>steps/transferFunction.svg</file>
         <file>steps/video_grabber.svg</file>
-	<file>steps/video_sink.svg</file>
-	<file>steps/weighted_sum.svg</file>
+        <file>steps/video_sink.svg</file>
+        <file>steps/viewport_camera.svg</file>
+        <file>steps/weighted_sum.svg</file>
         <file>menus/properties.svg</file>
         <file>menus/plot.svg</file>
         <file>menus/plot_advanced.svg</file>
