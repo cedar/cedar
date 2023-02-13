@@ -142,16 +142,26 @@ void cedar::proc::steps::ViewportCamera::compute(const cedar::proc::Arguments&)
     return;
   }
   // Find peak in activation input and use it as the center point for the viewport
-  double centerX, centerY;
-  this->getCenterPoint(centerX, centerY);
-  int left = std::round(centerX * (inputWidth - viewportWidth));
-  int top = std::round(centerY * (inputHeight - viewportHeight));
-  CEDAR_ASSERT(left >= 0 && left <= inputWidth - viewportWidth)
-  CEDAR_ASSERT(top >= 0 && top <= inputHeight - viewportHeight)
-
-  // Crop the image
-  cv::Rect viewportRect(left, top, viewportWidth, viewportHeight);
-  output = input(viewportRect);
+  double centerX, centerY, max;
+  this->getCenterPoint(centerX, centerY, max);
+  //CEDAR_ASSERT(left >= 0 && left <= inputWidth - viewportWidth)
+  //CEDAR_ASSERT(top >= 0 && top <= inputHeight - viewportHeight)
+  if(max < 0.5)
+  {
+    output = cv::Mat(viewportHeight, viewportWidth, CV_8UC3, cv::Scalar(0, 0, 0));
+  }
+  else
+  {
+    int hvw = std::round(viewportWidth/2);
+    int hvh = std::round(viewportHeight/2);
+    cv::Mat input_padded;
+    cv::copyMakeBorder( input, input_padded, hvh, hvh, hvw, hvw, cv::BORDER_CONSTANT,  cv::Scalar(0, 0, 0) );
+    int left = std::round(centerX * inputWidth);
+    int top = std::round(centerY * inputHeight);
+    // Crop the image
+    cv::Rect viewportRect(left, top, viewportWidth, viewportHeight);
+    output = input_padded(viewportRect);
+  }
 }
 
 
@@ -164,25 +174,26 @@ void cedar::proc::steps::ViewportCamera::updateViewportSizeRange()
   }
 }
 
-void cedar::proc::steps::ViewportCamera::getCenterPoint(double &centerX, double &centerY)
+void cedar::proc::steps::ViewportCamera::getCenterPoint(double &centerX, double &centerY, double &max)
 {
   if(this->mViewportCenterInput)
   {
     const cv::Mat& viewportCenterInput = this->mViewportCenterInput->getData();
 
     // Find the max peak in the input
-    double min, max;
+    double min;
     cv::Point minLoc, maxLoc;
     cv::minMaxLoc(viewportCenterInput, &min, &max, &minLoc, &maxLoc);
-    centerX = (maxLoc.x * 1.0) / viewportCenterInput.size[0];
-    centerY = (maxLoc.y * 1.0) / viewportCenterInput.size[1];
+    centerX = (maxLoc.x * 1.0) / viewportCenterInput.size[1];
+    centerY = (maxLoc.y * 1.0) / viewportCenterInput.size[0];
     CEDAR_ASSERT(centerX >= 0 && centerX < 1)
     CEDAR_ASSERT(centerY >= 0 && centerY < 1)
   }
   else
   {
-    centerX = 0.5;
-    centerY = 0.5;
+    centerY = 0.0;
+    centerY = 0.0;
+    max = 0.0;
   }
 }
 
