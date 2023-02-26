@@ -120,7 +120,7 @@ void cedar::dyn::steps::LogTimeInterval::eulerStep(const cedar::unit::Time& time
     {
       _mIsLogging = false;
       _mHasLogged = true;
-      std::cout << "Logging Ends! It took "<< _mElapsedTime<<" seconds!" << std::endl;
+      std::cout << "Logging Ends! It took "<< _mElapsedTime<<" !" << std::endl;
       this->print(_mElapsedTime);
       _mOutput->getData().setTo(5);
     }

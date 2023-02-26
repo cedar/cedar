@@ -217,7 +217,6 @@ cedar_add_library(cedarproc
   steps/TransferFunction.h
   steps/VectorToScalars.h
   steps/VehicleRotation.h
-  steps/ViewportCamera.h
   steps/Delay.h
   steps/WeightedSum.h
   steps/PythonScript.h
