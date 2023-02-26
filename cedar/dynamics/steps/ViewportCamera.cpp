@@ -24,11 +24,11 @@
 
     File:        ViewportCamera.cpp
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
-    Date:        2023 01 24
+    Maintainer:  Lars Janssen, Raul Grieben
+    Email:       lars.janssen@ini.rub.de, raul.grieben@ini.rub.de
+    Date:        2023 02 26
 
-    Description: Source file for the class cedar::proc::steps::ViewportCamera.
+    Description: Source file for the class cedar::dyn::steps::ViewportCamera.
 
     Credits:
 
@@ -69,7 +69,7 @@ namespace
         new ElementDeclarationTemplate<cedar::dyn::steps::ViewportCamera>
           (
             "Image Processing",
-            "cedar.processing.ViewpointCamera"
+            "cedar.dynamics.ViewpointCamera"
           )
       );
     resize_decl->setIconPath(":/steps/viewport_camera.svg");

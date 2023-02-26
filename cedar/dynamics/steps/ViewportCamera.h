@@ -24,11 +24,11 @@
 
     File:        ViewportCamera.h
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
-    Date:        2023 01 24
+    Maintainer:  Lars Janssen, Raul Grieben
+    Email:       lars.janssen@ini.rub.de, raul.grieben@ini.rub.de
+    Date:        2023 02 26
 
-    Description: Header file for the class cedar::proc::steps::ViewportCamera.
+    Description: Header file for the class cedar::dyn::steps::ViewportCamera.
 
     Credits:
 
