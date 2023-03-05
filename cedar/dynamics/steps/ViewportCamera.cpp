@@ -194,7 +194,7 @@ void cedar::dyn::steps::ViewportCamera::eulerStep(const cedar::unit::Time& time)
       }
       else
       {
-          if( (std::abs(_lastX - centerX) > 0.009 || std::abs(_lastY - centerY) > 0.009) && max > 0.5 )
+          if( !_startSC && !_endSC && (std::abs(_lastX - centerX) > 0.009 || std::abs(_lastY - centerY) > 0.009) && max > 0.5 )
           {
               _lastX = centerX;
               _lastY = centerY;
