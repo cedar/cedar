@@ -258,7 +258,7 @@ void cedar::dyn::steps::ViewportCamera::eulerStep(const cedar::unit::Time& time)
       _endSC = false;
       _mElapsedTime = 0.0;
       output = cv::Mat(viewportHeight, viewportWidth, CV_8UC3, cv::Scalar(0, 0, 0));
-      kernel = cv::Mat(50,50, CV_32F, cv::Scalar(0.0));
+      kernel = cv::Mat(2,2, CV_32F, cv::Scalar(0.0));
       mOutputCOS->getData().setTo(0);
   }
 }
@@ -295,7 +295,8 @@ void cedar::dyn::steps::ViewportCamera::reset()
     _mElapsedTime = 0.0;
     mOutput->getData().setTo(0);
     mOutputCOS->getData().setTo(0);
-    mOutputKernel->getData().setTo(0);
+    cv::Mat& kernel = this->mOutputKernel->getData();
+    kernel = cv::Mat(2,2, CV_32F, cv::Scalar(0.0));
 }
 
 void cedar::dyn::steps::ViewportCamera::inputConnectionChanged(const std::string& inputName)
