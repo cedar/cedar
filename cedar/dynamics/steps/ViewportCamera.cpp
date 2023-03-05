@@ -69,7 +69,7 @@ namespace
         new ElementDeclarationTemplate<cedar::dyn::steps::ViewportCamera>
           (
             "Image Processing",
-            "cedar.dynamics.ViewpointCamera"
+            "cedar.dynamics.ViewportCamera"
           )
       );
     resize_decl->setIconPath(":/steps/viewport_camera.svg");
@@ -92,9 +92,9 @@ namespace
 
 cedar::dyn::steps::ViewportCamera::ViewportCamera()
 :
-  mOutput(new cedar::aux::MatData(cv::Mat(50, 50, CV_8UC3, cv::Scalar(0, 0, 0)))),
+  mOutput(new cedar::aux::MatData(cv::Mat(2, 2, CV_8UC3, cv::Scalar(0, 0, 0)))),
   mOutputCOS(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
-  mOutputKernel(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
+  mOutputKernel(new cedar::aux::MatData(cv::Mat::zeros(2, 2, CV_32F))),
   _mElapsedTime(0.0),
   _lastX(0),
   _lastY(0),
@@ -163,10 +163,11 @@ void cedar::dyn::steps::ViewportCamera::eulerStep(const cedar::unit::Time& time)
       {
           _startSC = false;
           _endSC = false;
-          _lastX = 0;
-          _lastY = 0;
+          _lastX = 0.5;
+          _lastY = 0.5;
           _mElapsedTime = 0.0;
           kernel = cv::Mat(viewportCenterInput.size[0],viewportCenterInput.size[1], CV_32F, cv::Scalar(0.0));
+          kernel.at<float>(std::round(_lastY * kernel.size[0]), std::round(_lastX * kernel.size[1])) = 1.0;
       }
 
       if(this->_msimplified->getValue())
@@ -193,7 +194,7 @@ void cedar::dyn::steps::ViewportCamera::eulerStep(const cedar::unit::Time& time)
       }
       else
       {
-          if( std::abs(_lastX - centerX) > 0.009 || std::abs(_lastY - centerY) > 0.009 )
+          if( (std::abs(_lastX - centerX) > 0.009 || std::abs(_lastY - centerY) > 0.009) && max > 0.5 )
           {
               _lastX = centerX;
               _lastY = centerY;
@@ -251,8 +252,8 @@ void cedar::dyn::steps::ViewportCamera::eulerStep(const cedar::unit::Time& time)
   }
   else
   {
-      _lastX = 0;
-      _lastY = 0;
+      _lastX = 0.5;
+      _lastY = 0.5;
       _startSC = false;
       _endSC = false;
       _mElapsedTime = 0.0;
@@ -279,16 +280,16 @@ void cedar::dyn::steps::ViewportCamera::getCenterPoint(double &centerX, double &
   }
   else
   {
-      centerX = 0.0;
-      centerY = 0.0;
+      centerX = 0.5;
+      centerY = 0.5;
       max = 0.0;
   }
 }
 
 void cedar::dyn::steps::ViewportCamera::reset()
 {
-    _lastX = 0;
-    _lastY = 0;
+    _lastX = 0.5;
+    _lastY = 0.5;
     _startSC = false;
     _endSC = false;
     _mElapsedTime = 0.0;
