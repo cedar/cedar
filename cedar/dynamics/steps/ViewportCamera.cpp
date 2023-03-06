@@ -168,6 +168,7 @@ void cedar::dyn::steps::ViewportCamera::eulerStep(const cedar::unit::Time& time)
           _mElapsedTime = 0.0;
           kernel = cv::Mat(viewportCenterInput.size[0],viewportCenterInput.size[1], CV_32F, cv::Scalar(0.0));
           kernel.at<float>(std::round(_lastY * kernel.size[0]), std::round(_lastX * kernel.size[1])) = 1.0;
+          this->emitOutputPropertiesChangedSignal("kernel");
       }
 
       if(this->_msimplified->getValue())
@@ -194,7 +195,7 @@ void cedar::dyn::steps::ViewportCamera::eulerStep(const cedar::unit::Time& time)
       }
       else
       {
-          if( !_startSC && !_endSC && (std::abs(_lastX - centerX) > 0.009 || std::abs(_lastY - centerY) > 0.009) && max > 0.5 )
+          if( !_startSC && !_endSC && (std::abs(_lastX - centerX) > 0.05 || std::abs(_lastY - centerY) > 0.05) && max > 0.5 )
           {
               _lastX = centerX;
               _lastY = centerY;
