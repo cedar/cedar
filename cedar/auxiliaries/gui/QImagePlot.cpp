@@ -598,6 +598,8 @@ void cedar::aux::gui::detail::QImagePlotLegend::updateMinMax(double min, double 
   {
     precision = std::max(precision, static_cast<int>(cedar::aux::math::round(std::abs(log))));
   }
+  // Maximum precision
+  precision = std::min(precision, 10);
   this->mpMin->setText(QString("%1").arg(min, 0, 'g', precision));
   this->mpMax->setText(QString("%1").arg(max, 0, 'g', precision));
 }
