@@ -156,6 +156,28 @@ public:
     root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), object_list_node));
   }
 
+  //!@brief write value to a configuration node
+  virtual void writeToNodeXML(cedar::aux::ConfigurationNode& root) const
+  {
+    cedar::aux::ConfigurationNode object_list_node;
+    for
+            (
+            typename std::vector<BaseTypePtr>::const_iterator iter = this->mObjectList.begin();
+            iter != this->mObjectList.end();
+            ++iter
+            )
+    {
+      BaseTypePtr value = *iter;
+      cedar::aux::ConfigurationNode value_node;
+      value->writeConfiguration(value_node);
+
+      const std::string& type_id = FactorySingleton::getInstance()->getTypeId(value);
+
+      object_list_node.push_back(cedar::aux::ConfigurationNode::value_type(type_id, value_node));
+    }
+    root.push_back(cedar::aux::ConfigurationNode::value_type(cedar::aux::toUpperCamelCase(this->getName(), " "), object_list_node));
+  }
+
   //!@brief set parameter to default
   virtual void makeDefault()
   {
@@ -295,6 +317,27 @@ public:
   void listTypes(std::vector<std::string>& types) const
   {
     FactorySingleton::getInstance()->listTypes(types);
+
+    if(!this->mWhitelist.empty())
+    {
+      std::vector<std::string>::iterator type = types.begin();
+
+      while(type != types.end())
+      {
+        //Check if type on whitelist, if not remove it from the types vector
+        if(std::find(this->mWhitelist.begin(), this->mWhitelist.end(), *type) == this->mWhitelist.end())
+        {
+          //If not found in whitelist, then remove the type from the vector
+          type = types.erase(type);
+        }
+        else ++type;
+      }
+    }
+  }
+
+  void setWhitelist(std::vector<std::string> whitelist)
+  {
+    this->mWhitelist = whitelist;
   }
 
   //!@brief returns the type id of an object

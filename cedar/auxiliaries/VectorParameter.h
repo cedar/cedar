@@ -224,6 +224,20 @@ public:
     root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), vector_node));
   }
 
+  //!@brief store the vector values in a configuration tree
+  void writeToNodeXML(cedar::aux::ConfigurationNode& root) const
+  {
+    cedar::aux::ConfigurationNode vector_node;
+    for (T value : this->mValues)
+    {
+      cedar::aux::ConfigurationNode value_node;
+      value_node.put_value(value);
+      vector_node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));
+    }
+    root.push_back(cedar::aux::ConfigurationNode::value_type(cedar::aux::toUpperCamelCase(this->getName(), " "),
+                                                             vector_node));
+  }
+
   //!@brief get the current vector (const)
   const std::vector<T>& getValue() const
   {

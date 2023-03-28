@@ -1336,6 +1336,11 @@ void cedar::proc::Connectable::writeConfiguration(cedar::aux::ConfigurationNode&
   root.put("comments",this->getCommentString());
 }
 
+void cedar::proc::Connectable::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::proc::Element::writeConfigurationXML(root);
+}
+
 bool cedar::proc::Connectable::hasComment() const
 {
   return this->getCommentString() != "";

@@ -118,6 +118,12 @@ public:
 
   void readJsonFromString(std::string jsonString, bool ignoreSnapToGrid = true);
 
+  //!@brief write configuration to path
+  void writeXML(const cedar::aux::Path& filename) const;
+
+	//!@brief read xml configuration from path
+  void readXML(const cedar::aux::Path& filename);
+
   //!@brief called after the architecture has been loaded
   void afterArchitectureLoaded();
 
@@ -165,6 +171,9 @@ public:
 
   //!@brief reads a configuration from a node
   void readConfiguration(const cedar::aux::ConfigurationNode& node, bool ignoreSnapToGrid = true);
+
+  //!@brief reads a configuration from a node
+  void readConfigurationXML(const cedar::aux::ConfigurationNode& node, bool ignoreSnapToGrid = true);
 
   /*!@brief Reads the defined robots from a configuration node and initializes them in the RobotManager
    */
@@ -456,6 +465,8 @@ private:
   void addElementsToGroup();
 
   void internalWriteJson(const cedar::aux::Path& filename) const;
+
+  void internalWriteXML(const cedar::aux::Path& filename) const;
 
 signals:
   //!@brief signal that is emitted when a boost signal is received

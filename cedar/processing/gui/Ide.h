@@ -95,6 +95,8 @@ private:
 
   class OpenableArchitectureConsistencyCheck;
 
+  class OpenableAutoPositionSteps;
+
   class OpenableSimulationControl;
 
   class OpenableBoostControl;
@@ -175,6 +177,12 @@ public slots:
   /*!@brief Slot that is connected to the "save as" item in the file menu.
    */
   bool saveAs();
+
+  bool exportXML();
+
+	void importXML();
+
+	void importXMLFile(QString file);
 
   //! Allows the user to choose a destination for saving the data of serializable data slots in all steps.
   bool saveSerializableDataAs();

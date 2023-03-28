@@ -91,6 +91,7 @@ mLastExecutionTime(cedar::unit::Time(-1.0*cedar::unit::seconds)) //not sure abou
   this->mLockingTimeId = this->registerTimeMeasurement("locking");
   this->mRoundTimeId = this->registerTimeMeasurement("round time");
 
+  this->mXMLExportable = false;
 
   // create the finished trigger singleton.
   this->getFinishedTrigger();
@@ -223,6 +224,14 @@ bool cedar::proc::Step::isRegistered(const std::string& actionName)
   return false;
 }
 
+bool cedar::proc::Step::isXMLExportable(std::string&){
+  return this->mXMLExportable;
+}
+
+bool cedar::proc::Step::isXMLExportable(){
+  std::string str = "";
+  return this->isXMLExportable(str);
+}
 
 void cedar::proc::Step::callAction(const std::string& name)
 {

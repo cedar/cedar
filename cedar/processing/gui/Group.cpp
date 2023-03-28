@@ -40,6 +40,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Group.h"
+#include "cedar/processing/gui/layout/Layout.h"
+#include "cedar/processing/gui/layout/GridLayout.h"
+#include "cedar/processing/gui/layout/ForceDirectedLayout.h"
 #include "cedar/processing/gui/GroupContainerItem.h"
 #include "cedar/processing/gui/ArchitectureWidget.h"
 #include "cedar/processing/gui/Connection.h"
@@ -98,6 +101,7 @@
 #ifndef Q_MOC_RUN
 
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 #include <boost/pointer_cast.hpp>
 #include <boost/filesystem.hpp>
 
@@ -360,7 +364,10 @@ void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
     //Push a createDeleteCommand (as a create) onto the UndoStack
     cedar::proc::gui::Ide::pUndoStack->push(new cedar::proc::undoRedo::commands::CreateDeleteElement(
             elem_declaration->getClassName(), target_group, mpScene, true, mapped));
+
+		//Test
   }
+
   //TODO: Do Group Declaration (with an own Command). This works with Json Templates
   else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration *>(declaration))
   {
@@ -1175,6 +1182,18 @@ void cedar::proc::gui::Group::internalWriteJson(const cedar::aux::Path &filename
   this->mGroup->writeDataFile(filename.toString() + ".data");
 }
 
+void cedar::proc::gui::Group::internalWriteXML(const cedar::aux::Path &filename) const
+{
+  QMutexLocker lock( &mIOLock );
+
+  cedar::aux::ConfigurationNode root;
+
+  this->mGroup->writeConfigurationXML(root);
+
+  boost::property_tree::xml_writer_settings<std::string> settings(' ', 2);
+  write_xml(filename.toString(), root, std::locale(), settings);
+}
+
 void cedar::proc::gui::Group::writeJson(const cedar::aux::Path &filename) const
 {
   this->mFileName = filename.toString();
@@ -1252,6 +1271,58 @@ void cedar::proc::gui::Group::readJsonFromString(std::string jsonString, bool ig
   this->readRobots(root);
   this->mGroup->readConfiguration(root);
   this->readConfiguration(root, ignoreSnapToGrid);
+}
+
+void cedar::proc::gui::Group::writeXML(const cedar::aux::Path &filename) const
+{
+  this->internalWriteXML(filename);
+}
+
+void cedar::proc::gui::Group::readXML(const cedar::aux::Path &source)
+{
+	QMutexLocker lock( &mIOLock );
+
+	this->mFileName = source.toString();
+	cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
+
+	cedar::aux::ConfigurationNode root;
+	read_xml(source.toString(), root);
+
+	std::vector<std::string> exceptions;
+
+	try
+	{
+		this->mGroup->readConfigurationXML(root);
+	}
+	catch(const cedar::proc::ArchitectureLoadingException& e)
+	{
+		exceptions.insert( std::end(exceptions),
+											 std::begin(e.getMessages()),
+											 std::end(e.getMessages()) );
+	}
+
+	try
+	{
+		this->readConfigurationXML(root);
+	}
+	catch(const cedar::proc::ArchitectureLoadingException& e)
+	{
+		exceptions.insert( std::end(exceptions),
+											 std::begin(e.getMessages()),
+											 std::end(e.getMessages()) );
+	}
+
+	if (boost::filesystem::exists(source.toString() + ".data"))
+	{
+		this->mGroup->readDataFile(source.toString() + ".data");
+	}
+
+	// rethrow after having finished as much as possible ...
+	if (!exceptions.empty())
+	{
+		cedar::proc::ArchitectureLoadingException exception(exceptions);
+		CEDAR_THROW_EXCEPTION(exception);
+	}
 }
 
 void cedar::proc::gui::Group::readRobots(const cedar::aux::ConfigurationNode &root)
@@ -1348,6 +1419,28 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
 
   // after loading, make sure the collapsed state is properly applied
   this->updateCollapsedness();
+}
+
+void cedar::proc::gui::Group::readConfigurationXML(const cedar::aux::ConfigurationNode &root, bool ignoreSnapToGrid)
+{
+  this->toggleSmartConnectionMode(false);
+
+  // update recorder icons
+  this->stepRecordStateChanged();
+
+  //!@todo This is a quickfix, I think the entire read process needs to be revised
+  cedar::aux::ConfigurationNode root_copy = root;
+  // try to apply the UI configuration to any elements that may have already been added to the group.
+  this->tryRestoreUIConfigurationsOfElements(root_copy, ignoreSnapToGrid);
+
+  // after loading, make sure the collapsed state is properly applied
+  this->updateCollapsedness();
+
+  // Layout the steps, as there are no positions specified in the xml file
+  cedar::proc::gui::layout::Layout* layout = new cedar::proc::gui::layout::ForceDirectedLayout();
+  layout->setGroup(this);
+  layout->arrange();
+
 }
 
 void cedar::proc::gui::Group::openSceneViewer(const cedar::aux::ConfigurationNode &node)

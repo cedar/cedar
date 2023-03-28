@@ -240,6 +240,10 @@ public:
   //! True if the step currently has a run time measurement.
   bool hasRunTimeMeasurement() const;
 
+  virtual bool isXMLExportable(std::string& errorMsg);
+
+  bool isXMLExportable();
+
   /*!@brief Returns the last run time measured for this step.
    */
   cedar::unit::Time getRunTimeMeasurement() const;
@@ -464,7 +468,8 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief: true if step is XML exportable. By default set to false.
+  bool mXMLExportable;
 
 private:
   //!@brief flag that states if step is still computing its latest output

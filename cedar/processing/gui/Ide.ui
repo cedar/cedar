@@ -95,6 +95,8 @@
     <addaction name="separator"/>
     <addaction name="mpActionSave"/>
     <addaction name="mpActionSaveAs"/>
+    <addaction name="mpActionExportXML"/>
+    <addaction name="mpActionImportXML"/>
     <addaction name="mpActionLoad"/>
     <addaction name="mpRecentFiles"/>
     <addaction name="separator"/>
@@ -732,6 +734,16 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="mpActionExportXML">
+   <property name="text">
+    <string>Export as XML..</string>
+   </property>
+  </action>
+  <action name="mpActionImportXML">
+   <property name="text">
+    <string>Import from XML..</string>
    </property>
   </action>
   <action name="mpActionLoad">

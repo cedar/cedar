@@ -120,6 +120,14 @@ void cedar::proc::experiment::ConnectableParameter::writeToNode(cedar::aux::Conf
   root.add_child(this->getName(), connectable_node);
 }
 
+void cedar::proc::experiment::ConnectableParameter::writeToNodeXML(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::aux::ConfigurationNode connectable_node;
+  connectable_node.put("connectable path", this->getConnectablePath());
+  root.add_child(cedar::aux::toUpperCamelCase(this->getName(), " "), connectable_node);
+}
+
+
 void cedar::proc::experiment::ConnectableParameter::setConnectable(cedar::proc::ConnectablePtr connectable)
 {
   this->mConnectable = connectable;

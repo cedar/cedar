@@ -334,30 +334,30 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-private:
-  /*! The type of border handling applied to convolutions performed with this object.
-   *
-   *  @see cedar::aux::conv::BorderType
-   */
-  cedar::aux::EnumParameterPtr _mBorderType;
-
-  /*! The mode of this convolution object.
-   *
-   *  @see cedar::aux::conv::Mode
-   */
-  cedar::aux::EnumParameterPtr _mMode;
-
-  //! The list of kernel with which to convolve.
-  cedar::aux::conv::KernelListPtr mKernelList;
-
+//Todo: For now set to public to gray them out in Synaptic Connection, better solution should be implemented?
+public:
   //! The engine used for convolutions performed with this object.
   cedar::aux::conv::EngineParameterPtr _mEngine;
 
+  /*! The type of border handling applied to convolutions performed with this object.
+ *
+ *  @see cedar::aux::conv::BorderType
+ */
+  cedar::aux::EnumParameterPtr _mBorderType;
+
+  /*! The mode of this convolution object.
+ *
+ *  @see cedar::aux::conv::Mode
+ */
+  cedar::aux::EnumParameterPtr _mMode;
+
   //! When true, the center in even kernels is shifted to the left rather than the right.
   cedar::aux::BoolParameterPtr _mAlternateEvenKernelCenter;
-
+protected:
+  // none yet
+private:
+  //! The list of kernel with which to convolve.
+  cedar::aux::conv::KernelListPtr mKernelList;
 }; // cedar::aux::conv::Convolution
 
 #endif // CEDAR_AUX_CONV_CONVOLUTION_H

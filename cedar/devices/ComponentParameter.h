@@ -83,6 +83,8 @@ public:
 
   virtual void writeToNode(cedar::aux::ConfigurationNode& root) const;
 
+  virtual void writeToNodeXML(cedar::aux::ConfigurationNode& root) const;
+
   virtual void makeDefault();
 
   cedar::dev::ComponentPtr getValue() const;

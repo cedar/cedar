@@ -769,6 +769,43 @@ void cedar::aux::Configurable::writeConfiguration(cedar::aux::ConfigurationNode&
 }
 
 
+void cedar::aux::Configurable::writeConfigurationXML(cedar::aux::ConfigurationNode& root, bool ignoreWhiteList) const
+{
+  for
+  (
+    ParameterList::const_iterator iter = this->mParameterList.begin();
+    iter != this->mParameterList.end();
+    ++iter
+  )
+  {
+    if(ignoreWhiteList || std::find(this->mXMLParameterWhitelist.begin(), this->mXMLParameterWhitelist.end(),
+                                    iter->get()->getName()) != this->mXMLParameterWhitelist.end())
+    {
+      // write the parameter to the configuration
+      (*iter)->writeToNodeXML(root);
+    }
+  }
+
+  for
+    (
+    Children::const_iterator child = this->mChildren.begin();
+    child != this->mChildren.end();
+    ++child
+    )
+  {
+
+    if(ignoreWhiteList || std::find(this->mXMLParameterWhitelist.begin(), this->mXMLParameterWhitelist.end(),
+                                    child->first) != this->mXMLParameterWhitelist.end())
+    {
+      cedar::aux::ConfigurationNode child_node;
+      child->second->writeConfigurationXML(child_node);
+      root.push_back(cedar::aux::ConfigurationNode::value_type(child->first, child_node));
+    }
+  }
+
+  this->resetChangedStates(false);
+}
+
 void cedar::aux::Configurable::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   for (ParameterList::iterator iter = this->mParameterList.begin(); iter != this->mParameterList.end(); ++iter)
@@ -802,7 +839,6 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
         }
       }
     }
-
 
     if (param_iter == node.not_found())
     {
@@ -844,6 +880,98 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
     {
       const cedar::aux::ConfigurationNode& child_node = node.get_child(child->first);
       child->second->readConfiguration(child_node);
+    }
+    catch (const boost::property_tree::ptree_bad_path&)
+    {
+      // no node present for the child
+    }
+  }
+
+  mIsConfigured= true;
+  this->configurationLoaded();
+}
+
+void cedar::aux::Configurable::readConfigurationXML(const cedar::aux::ConfigurationNode& node)
+{
+  for (ParameterList::iterator iter = this->mParameterList.begin(); iter != this->mParameterList.end(); ++iter)
+  {
+    // check if parameter in whitelist, if so then read it from the node and import it into
+    if(std::find(this->mXMLParameterWhitelist.begin(), this->mXMLParameterWhitelist.end(),
+                                    iter->get()->getName()) != this->mXMLParameterWhitelist.end())
+    {
+      cedar::aux::ParameterPtr &parameter = *iter;
+
+      //The xml node uses upper camel case therefore the parameter name has to be converted to upper camel case
+      std::string parameterNameUpperCamelCase = cedar::aux::toUpperCamelCase(parameter->getName(), " ");
+
+      auto param_iter = node.find(parameterNameUpperCamelCase);
+
+      if (param_iter == node.not_found())
+      {
+        // check if there are deprecated names for this parameter
+        auto depr_iter = this->mDeprecatedParameterNames.find(parameter->getName());
+        if (depr_iter != this->mDeprecatedParameterNames.end())
+        {
+          // if so, see if there is a node for any of them
+          const std::vector<std::string> &depr_names = depr_iter->second;
+          for (auto iter = depr_names.begin(); iter != depr_names.end(); ++iter)
+          {
+            const std::string &deprecated_name = *iter;
+            param_iter = node.find(deprecated_name);
+            if (param_iter != node.not_found())
+            {
+              cedar::aux::LogSingleton::getInstance()->warning
+                  (
+                      "Using deprecated name \"" + deprecated_name + "\" for parameter \"" + parameter->getName() +
+                      "\".",
+                      "cedar::aux::Configurable::readConfiguration(const cedar::aux::ConfigurationNode&)"
+                  );
+              break;
+            }
+          }
+        }
+      }
+
+      if (param_iter == node.not_found())
+      {
+        if (!parameter->getHasDefault())
+        {
+          std::string error_message;
+          error_message =
+              "Mandatory parameter " + parameter->getName() + " not found in configuration. Node names are:";
+
+          for (cedar::aux::ConfigurationNode::const_iterator node_iter = node.begin();
+               node_iter != node.end();
+               ++node_iter)
+          {
+            error_message += " " + node_iter->first;
+          }
+          error_message += ".";
+
+          CEDAR_THROW(cedar::aux::ParameterNotFoundException, error_message);
+        } else
+        {
+          parameter->makeDefault();
+          // nothing to read -- continue with next parameter
+          continue;
+        }
+      }
+      const cedar::aux::ConfigurationNode &value = param_iter->second;
+
+      // set the parameter to the value read from the file
+      parameter->readFromNode(value);
+
+      // reset the changed flag of the parameter
+      (*iter)->setChangedFlag(false);
+    }
+  }
+
+  for (Children::iterator child = this->mChildren.begin(); child != this->mChildren.end(); ++child)
+  {
+    try
+    {
+      const cedar::aux::ConfigurationNode& child_node = node.get_child(child->first);
+      child->second->readConfigurationXML(child_node);
     }
     catch (const boost::property_tree::ptree_bad_path&)
     {

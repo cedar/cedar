@@ -122,6 +122,21 @@ public:
     root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), map_node));
   }
 
+  //!@brief store the vector values in a configuration tree for XML
+  void writeToNodeXML(cedar::aux::ConfigurationNode& root) const
+  {
+    cedar::aux::ConfigurationNode map_node;
+    for (auto iter = this->mValues.begin(); iter != this->mValues.end(); ++iter)
+    {
+      const std::string& key = iter->first;
+      const T& value = iter->second;
+      cedar::aux::ConfigurationNode value_node;
+      value_node.put_value(value);
+      map_node.push_back(cedar::aux::ConfigurationNode::value_type(key, value_node));
+    }
+    root.push_back(cedar::aux::ConfigurationNode::value_type(cedar::aux::toUpperCamelCase(this->getName(), " "), map_node));
+  }
+
   //!@brief get the current vector (const)
   const std::map<std::string, T>& getValue() const
   {

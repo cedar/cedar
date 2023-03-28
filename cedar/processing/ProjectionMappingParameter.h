@@ -90,6 +90,12 @@ public:
    */
   void writeToNode(cedar::aux::ConfigurationNode& root) const;
 
+  /*!@brief Write the current mapping into a configuration tree for XML
+ *
+ * @param root root of the configuration node the mapping information will be written to
+ */
+  void writeToNodeXML(cedar::aux::ConfigurationNode& root) const;
+
   /*!@brief Initialize the mapping with a given number of mappings.
    *
    * @param numberOfMappings number of initial mappings

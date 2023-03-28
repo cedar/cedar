@@ -43,6 +43,8 @@
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/GroupXMLFileFormatV1.h"
+#include "cedar/auxiliaries/annotation/SizesRangeHint.h"
 #include "cedar/auxiliaries/math/functions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -98,7 +100,11 @@ _mCenters(new cedar::aux::DoubleVectorParameter(this, "centers", 2, 24.0, -10000
 _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigma", 2, 3.0, 0.01, 1000.0, 0.5)),
 _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
 {
+  this->mXMLExportable = true;
+  this->mXMLParameterWhitelist = {"amplitude"};
+
   this->declareOutput("Gauss input", mOutput);
+  this->updateSizesRange();
   QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mCenters.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
@@ -111,6 +117,27 @@ _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::sources::GaussInput::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::aux::Configurable::writeConfigurationXML(root);
+
+  // dimensionality/sizes parameter
+  cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(this->_mDimensionality, this->_mSizes,
+            this->mOutput->getAnnotation<cedar::aux::annotation::SizesRangeHint>()->getRange(), root);
+}
+
+void cedar::proc::sources::GaussInput::readConfigurationXML(const cedar::aux::ConfigurationNode& node)
+{
+  cedar::aux::Configurable::readConfigurationXML(node);
+
+  //readDimensionsParameter
+  std::vector<cedar::aux::math::Limits<double>> sizesRange;
+  cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(this->_mDimensionality, this->_mSizes,
+                                                             sizesRange, node);
+  this->mOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(
+                                                                      sizesRange)));
+}
 
 void cedar::proc::sources::GaussInput::setDimensionality(unsigned int dimensionality)
 {
@@ -180,6 +207,9 @@ void cedar::proc::sources::GaussInput::updateDimensionality()
   _mCenters->setDefaultSize(new_dimensionality);
   _mSizes->resize(new_dimensionality, _mSizes->getDefaultValue());
   _mSizes->setDefaultSize(new_dimensionality);
+
+  this->updateSizesRange();
+
   this->lock(cedar::aux::LOCK_TYPE_READ);
   this->compute(cedar::proc::Arguments());
   this->unlock();
@@ -194,4 +224,20 @@ void cedar::proc::sources::GaussInput::updateMatrixSize()
   this->unlock();
   this->emitOutputPropertiesChangedSignal("Gauss input");
   this->onTrigger();
+
+  // Update the sizes annotation
+  this->updateSizesRange();
+}
+
+void cedar::proc::sources::GaussInput::updateSizesRange()
+{
+  // Set the sizes annotation
+  std::vector<cedar::aux::math::Limits<double>> sizesRange;
+  for(unsigned int size : this->_mSizes->getValue())
+  {
+    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
+  }
+  CEDAR_ASSERT(this->mOutput);
+  this->mOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(
+      new cedar::aux::annotation::SizesRangeHint(sizesRange)));
 }

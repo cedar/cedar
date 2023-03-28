@@ -127,6 +127,7 @@ cedar_add_library(cedarproc
   gui/AdvancedParameterLinker.h
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureWidget.h
+  gui/AutoPositionStepsDialog.h
   gui/BoostControl.h
   ${copyscript_moc_headers}
   gui/CodeWidget.h
@@ -239,6 +240,7 @@ cedar_add_library(cedarproc
   steps/AddConstant.h
   steps/Count.h
   steps/Switch.h
+  steps/SynapticConnection.h
   steps/LinearLateralShift.h
   steps/HopfOscillatorRHS.h
   steps/HarmonicOscillatorRHS.h

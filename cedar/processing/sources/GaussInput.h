@@ -97,6 +97,10 @@ public:
   //! Returns the size of the Gauss in the given dimension.
   unsigned int getSize(unsigned int dimension) const;
 
+  void writeConfigurationXML(cedar::aux::ConfigurationNode& root) const;
+
+  void readConfigurationXML(const cedar::aux::ConfigurationNode& node);
+
 public slots:
   //!@brief a slot that is triggered if any of the Gauss function parameters are changed
   void updateMatrix();
@@ -120,6 +124,9 @@ private:
   void compute(const cedar::proc::Arguments& arguments);
 
   void calculateOutput();
+
+  //! Updates the SizesRange annotation to the default values took from _mSizes
+  void updateSizesRange();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

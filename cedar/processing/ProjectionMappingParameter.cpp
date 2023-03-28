@@ -111,6 +111,29 @@ void cedar::proc::ProjectionMappingParameter::writeToNode(cedar::aux::Configurat
   root.push_back(cedar::aux::ConfigurationNode::value_type(getName(), map_node));
 }
 
+void cedar::proc::ProjectionMappingParameter::writeToNodeXML(cedar::aux::ConfigurationNode& root) const
+{
+  for
+          (
+          std::map<unsigned int, unsigned int>::iterator iter = mValues->begin();
+          iter != mValues->end();
+          ++iter
+          )
+  {
+    cedar::aux::ConfigurationNode map;
+    map.add("<xmlattr>.from", cedar::aux::toString<unsigned int>(iter->first));
+    if(iter->second < std::numeric_limits<unsigned int>::max())
+    {
+      map.add("<xmlattr>.to", cedar::aux::toString<unsigned int>(iter->second));
+    }
+    else
+    {
+      map.add("<xmlattr>.to", "drop");
+    }
+    root.push_back(cedar::aux::ConfigurationNode::value_type("Map", map));
+  }
+}
+
 void cedar::proc::ProjectionMappingParameter::changeMapping(unsigned int inputIndex, unsigned int outputIndex)
 {
   mValues->changeMapping(inputIndex, outputIndex);

@@ -233,6 +233,9 @@ public:
   bool hasComment() const;
 
   virtual void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
+
+  virtual void writeConfigurationXML(cedar::aux::ConfigurationNode& root) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

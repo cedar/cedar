@@ -45,6 +45,7 @@
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/ArchitectureWidgetList.h"
 #include "cedar/processing/gui/ArchitectureScriptEditor.h"
+#include "cedar/processing/gui/AutoPositionStepsDialog.h"
 #include "cedar/processing/gui/FindDialog.h"
 #include "cedar/processing/gui/AdvancedParameterLinker.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.h"
@@ -68,6 +69,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/devices/gui/RobotManager.h"
 #include "cedar/devices/Component.h"
+#include "cedar/dynamics/fields/NeuralField.h"
 #include "cedar/auxiliaries/CommandLineParser.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/gui/PluginManagerDialog.h"
@@ -300,6 +302,34 @@ class cedar::proc::gui::Ide::OpenableArchitectureConsistencyCheck : public cedar
   private:
     cedar::proc::gui::View* mpView;
 };
+
+
+// An internal class that implements the auto-position steps widget as an openable dialog.
+class cedar::proc::gui::Ide::OpenableAutoPositionSteps : public cedar::proc::gui::Ide::OpenableDialog
+{
+public:
+  OpenableAutoPositionSteps()
+    :
+    OpenableDialog("Auto-position steps", ":/toolbaricons/auto_position_steps.svg", "auto position steps")
+  {
+    this->setIsInToolbar(true);
+  }
+
+  QWidget* createOpenable() const
+  {
+    return new cedar::proc::gui::AutoPositionStepsDialog();
+  }
+
+  void setGroup(cedar::proc::gui::GroupPtr group)
+  {
+    if (this->mpOpenedWidget)
+    {
+      auto widget = dynamic_cast<cedar::proc::gui::AutoPositionStepsDialog*>(this->mpOpenedWidget);
+      widget->setGroup(group);
+    }
+  }
+};
+
 
 // An internal class that implements the simulation control widget as an openable dialog.
 class cedar::proc::gui::Ide::OpenableSimulationControl : public cedar::proc::gui::Ide::OpenableDialog
@@ -582,7 +612,9 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   QObject::connect(this->mpActionSave, SIGNAL(triggered()), this, SLOT(save()));
   QObject::connect(this->mpActionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
-  QObject::connect(this->mpActionLoad, SIGNAL(triggered()), this, SLOT(load()));
+  QObject::connect(this->mpActionExportXML, SIGNAL(triggered()), this, SLOT(exportXML()));
+	QObject::connect(this->mpActionImportXML, SIGNAL(triggered()), this, SLOT(importXML()));
+	QObject::connect(this->mpActionLoad, SIGNAL(triggered()), this, SLOT(load()));
 
   QObject::connect(this->mpActionSaveSerializableData, SIGNAL(triggered()), this, SLOT(saveSerializableDataAs()));
   QObject::connect(this->mpActionLoadSerializableData, SIGNAL(triggered()), this, SLOT(loadSerializableData()));
@@ -717,6 +749,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   std::vector<OpenableDialogPtr> openable_dialogs;
 
   openable_dialogs.push_back(OpenableDialogPtr(new OpenableSimulationControl()));
+  openable_dialogs.push_back(OpenableDialogPtr(new OpenableAutoPositionSteps()));
   openable_dialogs.push_back(boost_ctrl);
   openable_dialogs.push_back(OpenableDialogPtr(new OpenableArchitectureConsistencyCheck(this->mpProcessingDrawer)));
   openable_dialogs.push_back(OpenableDialogPtr(new OpenableUndoRedoStack()));
@@ -786,7 +819,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 void cedar::proc::gui::Ide::showCoPYDocumentation()
 {
   cedar::aux::Path path = "resource://CoPYDocumentation.pdf";
-  QString absPath = QString::fromStdString(path.absolute(false).toString()); 
+  QString absPath = QString::fromStdString(path.absolute(false).toString());
   QDesktopServices::openUrl(QUrl("file:///" + absPath));
 }
 #endif
@@ -1976,6 +2009,7 @@ void cedar::proc::gui::Ide::restoreSettings()
   #endif
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->setTo(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->setTo(this->mpItemsWidget);
+
   cedar::proc::gui::SettingsSingleton::getInstance()->restoreMainWindow(this);
 }
 
@@ -2043,6 +2077,7 @@ void cedar::proc::gui::Ide::notify(const QString& message)
 {
   QMessageBox::critical(this,"Notification", message);
 }
+
 void cedar::proc::gui::Ide::triggerStarted()
 {
   QWriteLocker locker(this->mSimulationRunning.getLockPtr());
@@ -2343,6 +2378,7 @@ bool cedar::proc::gui::Ide::loadSerializableData()
 
 bool cedar::proc::gui::Ide::saveAs()
 {
+  //todo: maybe make this together with the export part of exportXML a function which is included in both saveAs and exportXML functions
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
 
   QString file = "";
@@ -2381,6 +2417,231 @@ bool cedar::proc::gui::Ide::saveAs()
   last_dir->setValue(path);
 
   return true;
+}
+
+bool cedar::proc::gui::Ide::exportXML()
+{
+  // Check if all steps in scene are exportable
+  QList<QGraphicsItem *> sceneItems = this->mpProcessingDrawer->getScene()->items();
+  std::set<std::string> nonExportableSteps;
+  std::set<std::string> nonExportableKernels;
+  bool isExportable = true;
+  for(auto item : sceneItems){
+
+    if(auto stepItem = dynamic_cast<cedar::proc::gui::StepItem*>(item)){
+      std::string errorMsg = "";
+      if(!stepItem->getStep()->isXMLExportable(errorMsg)){
+        isExportable = false;
+        if(!errorMsg.compare(""))
+        {
+          nonExportableSteps.insert(cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(stepItem->getStep())->getClassNameWithoutNamespace());
+        }
+        else
+        {
+          cedar::aux::LogSingleton::getInstance()->error
+            (
+              errorMsg + " (" + cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(
+                stepItem->getStep())->getClassNameWithoutNamespace() + ")",
+              "cedar::proc::gui::Ide::exportXML()"
+            );
+        }
+      }
+    }
+  }
+  if(nonExportableSteps.size() > 0){
+    std::set<std::string>::iterator itr = nonExportableSteps.begin();
+    std::string stepsString = *itr;
+    for (itr++;itr != nonExportableSteps.end(); itr++)
+    {
+      stepsString += ", " + *itr;
+    }
+    cedar::aux::LogSingleton::getInstance()->error
+            (
+                    "The following steps are not XML exportable: " + stepsString,
+                    "cedar::proc::gui::Ide::exportXML()"
+            );
+  }
+  if(!isExportable)
+  {
+    // If the Log Pane is minimized, show a pop up
+    if(!this->getLog()->isVisible())
+    {
+      QMessageBox::warning(this, "XML export error", "An error occurred during the export process. See the Log pane for more details.");
+    }
+    return false;
+  }
+
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
+
+  QString file = "";
+  QFileDialog* fileDialog = new QFileDialog();
+
+  fileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
+  fileDialog->setAcceptMode(QFileDialog::AcceptSave);
+  fileDialog->setWindowTitle("Select where to save");
+  fileDialog->setDirectory(last_dir->getValue().absolutePath());
+  fileDialog->setNameFilter("architecture (*.xml)");
+  fileDialog->setDefaultSuffix(".xml");
+
+  if(fileDialog->exec() == QDialog::Accepted)
+  {
+    file = fileDialog->selectedFiles().front();
+  }
+
+  if (file.isEmpty())
+  {
+    return false;
+  }
+
+
+  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
+  cedar::aux::SettingsSingleton::getInstance()->setCurrentArchitectureFileName(file.toStdString());
+
+  this->mGroup->writeXML(file.toStdString());
+  this->displayFilename(file.toStdString());
+  this->setArchitectureChanged(false);
+
+#ifndef CEDAR_OS_WINDOWS
+  QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+  #else
+  QString path = file;
+  #endif
+
+  last_dir->setValue(path);
+  return true;
+}
+
+void cedar::proc::gui::Ide::importXML()
+{
+	if (!this->checkSave())
+	{
+		return;
+	}
+
+	cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()
+      ->lastArchitectureLoadDialogDirectory();
+
+	QFileDialog filedialog(this, "Select which file to load");
+	filedialog.setNameFilter( tr("architecture (*.xml)") );
+	filedialog.setDirectory( last_dir->getValue().absolutePath() ); // initial directory
+	filedialog.setFilter( QDir::AllDirs | QDir::Files
+												| QDir::NoDot
+												| QDir::Hidden);
+	// see hidden files to see the backup files
+#ifdef CEDAR_USE_QT5
+	filedialog.setOptions( QFileDialog::DontUseNativeDialog);
+	// js: Workaround for freezing file dialogs in QT5 (?)
+#endif
+
+	QString file;
+
+	if (filedialog.exec())
+	{
+		QStringList filelist;
+		filelist = filedialog.selectedFiles();
+		file= filelist.first();
+	}
+
+	if (!file.isEmpty())
+	{
+		this->importXMLFile(file);
+	}
+}
+void cedar::proc::gui::Ide::importXMLFile(QString file)
+{
+	// reset scene
+	this->mpProcessingDrawer->resetViewport();
+	// create new root network
+	cedar::proc::gui::GroupPtr group(new cedar::proc::gui::Group(this, this->mpProcessingDrawer->getScene()));
+	group->getGroup()->setName("root");
+	group->toggleTriggerColors(this->mpActionToggleTriggerColor->isChecked());
+	this->mpProcessingDrawer->getScene()->setGroup(group);
+
+	//This is needed for relative paths
+	cedar::aux::SettingsSingleton::getInstance()->setCurrentArchitectureFileName(file.toStdString());
+
+	// read network
+	try
+	{
+		group->readXML(file.toStdString());
+
+		group->afterArchitectureLoaded();
+	}
+	catch(const cedar::proc::ArchitectureLoadingException& e)
+	{
+		// Construct error dialog.
+		QString intro = "There were one or more errors while loading the specified file. Please review them below. <b>Note,"
+										" that this means that at least parts of your architecture have not been loaded correctly!</b>";
+		QDialog* p_dialog = new QDialog(this);
+		p_dialog->setWindowTitle("Errors while Loading Architecture");
+		p_dialog->setMinimumWidth(500);
+
+		QVBoxLayout *p_layout = new QVBoxLayout();
+		p_dialog->setLayout(p_layout);
+		QLabel* p_intro_label = new QLabel(intro);
+		p_intro_label->setWordWrap(true);
+		p_layout->addWidget(p_intro_label);
+
+		QListWidget* p_error_widget = new QListWidget();
+		p_error_widget->setWordWrap(true);
+		p_layout->addWidget(p_error_widget);
+
+		for (size_t i = 0; i < e.getMessages().size(); ++i)
+		{
+			QString error = QString::fromStdString(e.getMessages()[i]);
+			p_error_widget->addItem(error);
+		}
+
+		// Create ok button
+		QDialogButtonBox* p_button_box = new QDialogButtonBox(QDialogButtonBox::Ok);
+		p_layout->addWidget(p_button_box);
+
+		QObject::connect(p_button_box, SIGNAL(accepted()), p_dialog, SLOT(accept()));
+
+		/* int r = */ p_dialog->exec();
+		delete p_dialog;
+	}
+	catch(const cedar::aux::ExceptionBase& e)
+	{
+		auto p_dialog = new cedar::aux::gui::ExceptionDialog();
+		p_dialog->setAdditionalString("The exception occurred during loading of the architecture."
+																	" Your architecture has probably not been loaded correctly!");
+		p_dialog->displayCedarException(e);
+		p_dialog->exec();
+	}
+	catch (const boost::property_tree::json_parser::json_parser_error& e)
+	{
+		auto p_dialog = new cedar::aux::gui::ExceptionDialog();
+		p_dialog->setAdditionalString("Could not load architecture.");
+		p_dialog->displayStdException(e);
+		p_dialog->exec();
+	}
+
+	cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(QDir(file).absolutePath().toStdString());
+
+	//!@todo Why doesn't this call resetTo?
+	this->setGroup(group);
+
+	this->displayFilename(file.toStdString());
+
+	this->updateTriggerStartStopThreadCallers();
+	this->loadPlotGroupsIntoComboBox();
+
+
+	QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+	cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
+	last_dir->setValue(path);
+
+	// Reset the undo/redo stack
+	pUndoStack->clear();
+
+	// set the smart connection button
+	this->mpActionToggleSmartConnections->blockSignals(true);
+	this->mpActionToggleSmartConnections->setChecked(this->mGroup->getSmartConnection());
+	this->mpActionToggleSmartConnections->blockSignals(false);
+
+	this->setArchitectureChanged(false);
+	this->mpProcessingDrawer->setWidgets(this, this->mpPropertyTable, this->mpRecorderWidget,this->mpCommentWidget, this->mpCodeWidget);
 }
 
 void cedar::proc::gui::Ide::load()

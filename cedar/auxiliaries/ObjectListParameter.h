@@ -78,6 +78,8 @@ public:
    */
   virtual void listTypes(std::vector<std::string>& types) const = 0;
 
+  virtual void setWhitelist(std::vector<std::string> whitelist) = 0;
+
   /*!@brief Returns the type id of the parameter with the given index.
    */
   virtual const std::string& getTypeOfObject(cedar::aux::ConfigurablePtr object) const = 0;
@@ -130,6 +132,7 @@ protected:
   //! Signal that is sent when an object is removed.
   boost::signals2::signal<void (int)> mObjectRemoved;
 
+  std::vector<std::string> mWhitelist;
 private:
   // none yet
 

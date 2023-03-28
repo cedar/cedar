@@ -69,7 +69,7 @@ class cedar::proc::aux::gui::ObjectListParameter : public cedar::proc::aux::gui:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ObjectListParameter();
+	ObjectListParameter();
 
   //!@brief Destructor
   ~ObjectListParameter();

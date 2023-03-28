@@ -44,6 +44,7 @@
 #include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/CppScript.h"
 #include "cedar/processing/GroupFileFormatV1.h"
+#include "cedar/processing/GroupXMLFileFormatV1.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/DataSlot.h"
@@ -2231,6 +2232,12 @@ void cedar::proc::Group::writeConfiguration(cedar::aux::ConfigurationNode& root)
   format.write(boost::dynamic_pointer_cast<cedar::proc::ConstGroup>(this->shared_from_this()), root);
 }
 
+void cedar::proc::Group::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::proc::GroupXMLFileFormatV1 format;
+  format.write(boost::static_pointer_cast<cedar::proc::ConstGroup>(this->shared_from_this()), root);
+}
+
 void cedar::proc::Group::writeData(cedar::aux::ConfigurationNode& root) const
 {
   for (auto name_element_pair : this->getElements())
@@ -2332,6 +2339,37 @@ void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& 
   }
 }
 
+void cedar::proc::Group::readConfigurationXML(const cedar::aux::ConfigurationNode& root)
+{
+	bool holding = this->holdTriggerChainUpdates();
+	this->setHoldTriggerChainUpdates(true);
+
+	std::vector<std::string> exceptions;
+	this->readConfigurationXML(root, exceptions);
+
+	this->setHoldTriggerChainUpdates(holding);
+	std::set<cedar::proc::Trigger*> visited;
+	this->updateTriggerChains(visited);
+
+	// holding trigger chain updates may have caused some steps to not be computed; thus, re-trigger all sources
+	for (const auto& name_element_pair : this->getElements())
+	{
+		auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(name_element_pair.second);
+		if (triggerable && triggerable->isTriggerSource() && !triggerable->isLooped())
+		{
+			triggerable->onTrigger();
+		}
+	}
+
+	// do this as late as possible so as to rescue as much as possible
+	// of the defunct architecture file
+	if (!exceptions.empty())
+	{
+		cedar::proc::ArchitectureLoadingException exception(exceptions);
+		CEDAR_THROW_EXCEPTION(exception);
+	}
+}
+
 void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions)
 {
   unsigned int format_version = 1; // default value is the current format
@@ -2373,6 +2411,49 @@ void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& 
       break;
     }
   }
+}
+
+void cedar::proc::Group::readConfigurationXML(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions)
+{
+	unsigned int format_version = 1; // default value is the current format
+	/*try
+	{
+		const cedar::aux::ConfigurationNode& meta = root.get_child("meta");
+		format_version = meta.get<unsigned int>("format");
+	}
+	catch (const boost::property_tree::ptree_bad_path&)
+	{
+		cedar::aux::LogSingleton::getInstance()->warning
+						(
+										"Could not recognize format for group \"" + this->getName()
+										+ "\": format or meta node missing. Defaulting to current version.",
+										"Reading group",
+										"cedar::proc::Group::readFrom(const cedar::aux::ConfigurationNode&)"
+						);
+	}*/
+	// make a copy of the configuration that was read -- the ui may need to read additional information from it
+	mLastReadConfiguration = root;
+	this->signalLastReadConfigurationChanged();
+
+	// select the proper format for reading the group
+	switch (format_version)
+	{
+		default:
+			cedar::aux::LogSingleton::getInstance()->warning
+							(
+											"Could not recognize format for group \"" + this->getName() + "\": "
+											+ cedar::aux::toString(format_version)
+											+ ". Defaulting to current version.",
+											"group reading",
+											"cedar::proc::Group::readFrom(const cedar::aux::ConfigurationNode&)"
+							);
+		case 1:
+		{
+			GroupXMLFileFormatV1 reader;
+			reader.read(boost::static_pointer_cast<cedar::proc::Group>(this->shared_from_this()), root, exceptions);
+			break;
+		}
+	}
 }
 
 bool cedar::proc::Group::isConnected(const std::string& source, const std::string& target) const

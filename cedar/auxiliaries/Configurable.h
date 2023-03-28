@@ -113,6 +113,9 @@ public:
   //!@brief read a configuration for all registered parameters from a cedar::aux::ConfigurationNode
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
+	//!@brief read a configuration for all registered parameters from a cedar::aux::ConfigurationNode from a xml import
+	virtual void readConfigurationXML(const cedar::aux::ConfigurationNode& node);
+
   /*!@brief Reads the configuration of this object from the given json file.
    */
   virtual void readJson(const cedar::aux::Path& filename);
@@ -133,6 +136,9 @@ public:
 
   //!@brief write a configuration for all registered parameters to a root node of type cedar::aux::ConfigurationNode
   virtual void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
+
+  //!@brief write a configuration for XML exportable parameters to a root node of type cedar::aux::ConfigurationNode
+  virtual void writeConfigurationXML(cedar::aux::ConfigurationNode& root, bool ignoreWhiteList = false) const;
 
   //!@brief write a configuration to a cedar::aux::ConfigurationNode tree and store this tree in a json file
   virtual void writeJson(const cedar::aux::Path& filename) const;
@@ -410,7 +416,7 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  std::vector<std::string> mXMLParameterWhitelist;
 
 private:
   //!@brief list of parameters registered at this Configurable instance

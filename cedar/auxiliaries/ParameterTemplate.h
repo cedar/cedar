@@ -207,6 +207,11 @@ public:
     node.put(this->getName(), this->getValuePrivate());
   }
 
+  void writeToNodeXML(cedar::aux::ConfigurationNode& node) const
+  {
+    node.put(cedar::aux::toUpperCamelCase(this->getName(), " "), this->getValuePrivate());
+  }
+
   //!@brief load a value of type T from a configuration tree
   void readFromNode(const cedar::aux::ConfigurationNode& node)
   {

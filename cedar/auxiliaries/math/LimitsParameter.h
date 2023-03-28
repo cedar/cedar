@@ -148,6 +148,21 @@ public:
     root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), limits_node));
   }
 
+  void writeToNodeXML(cedar::aux::ConfigurationNode& root) const
+  {
+    cedar::aux::ConfigurationNode limits_node;
+
+    cedar::aux::ConfigurationNode lower_limit_node;
+    lower_limit_node.put_value(mLimits.getLower());
+    limits_node.push_back(cedar::aux::ConfigurationNode::value_type("lower limit", lower_limit_node));
+
+    cedar::aux::ConfigurationNode upper_limit_node;
+    upper_limit_node.put_value(mLimits.getUpper());
+    limits_node.push_back(cedar::aux::ConfigurationNode::value_type("upper limit", upper_limit_node));
+
+    root.push_back(cedar::aux::ConfigurationNode::value_type(cedar::aux::toUpperCamelCase(this->getName(), " "), limits_node));
+  }
+
   //!@brief set value to default
   void makeDefault()
   {

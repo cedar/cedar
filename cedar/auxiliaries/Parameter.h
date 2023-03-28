@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/LockableMember.h"
 #include "cedar/auxiliaries/LockerBase.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Configurable.fwd.h"
@@ -187,6 +188,8 @@ public:
   virtual void readFromNode(const cedar::aux::ConfigurationNode& node) = 0;
   //!@brief write value to a configuration node
   virtual void writeToNode(cedar::aux::ConfigurationNode& root) const = 0;
+  //!@brief write value to a configuration node in XML
+  virtual void writeToNodeXML(cedar::aux::ConfigurationNode& root) const = 0;
   //!@brief set parameter to default
   virtual void makeDefault() = 0;
 

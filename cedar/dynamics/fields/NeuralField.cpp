@@ -46,14 +46,17 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/GroupXMLFileFormatV1.h"
 #include "cedar/auxiliaries/annotation/DiscreteMetric.h"
 #include "cedar/auxiliaries/annotation/ValueRangeHint.h"
+#include "cedar/auxiliaries/annotation/SizesRangeHint.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/convolution/FFTW.h"
 #include "cedar/auxiliaries/convolution/OpenCV.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
 #include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/ExpSigmoid.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -245,6 +248,9 @@ mGlobalInhibition
 _mLateralKernelConvolution(new cedar::aux::conv::Convolution()),
 _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 {
+  this->mXMLExportable = true;
+  this->mXMLParameterWhitelist = {"time scale", "resting level", "global inhibition"};
+
   this->setAutoLockInputsAndOutputs(false);
 
   this->declareBuffer("activation", mActivation);
@@ -261,7 +267,10 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
     _mMultiplicativeNoiseActivation->markAdvanced(true);
 
   this->declareOutput("sigmoided activation", mSigmoidalActivation);
-  this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::ValueRangeHint(0, 1)));
+  this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(
+  				new cedar::aux::annotation::ValueRangeHint(0, 1)));
+
+  this->updateSizesRange();
 
   this->declareInputCollection("input");
 
@@ -705,6 +714,40 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   mCurrentDeltaT->getData().at<float>(0,0)= time / cedar::unit::seconds;
 }
 
+void cedar::dyn::NeuralField::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::aux::Configurable::writeConfigurationXML(root);
+
+  // sigma parameter
+  cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(this->_mSigmoid.get(), root);
+
+  // dimensionality/sizes parameter
+  cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(this->_mDimensionality, this->_mSizes,
+              this->mSigmoidalActivation->getAnnotation<cedar::aux::annotation::SizesRangeHint>()->getRange(),
+              root);
+
+  // kernels parameter
+  cedar::aux::ConfigurationNode sumWeightPattern;
+  cedar::proc::GroupXMLFileFormatV1::writeKernelListParameter(this->_mKernels.get(), sumWeightPattern);
+  root.add_child("InteractionKernel", sumWeightPattern);
+}
+
+void cedar::dyn::NeuralField::readConfigurationXML(const cedar::aux::ConfigurationNode& node)
+{
+  cedar::aux::Configurable::readConfigurationXML(node);
+
+  //readDimensionsParameter
+  std::vector<cedar::aux::math::Limits<double>> sizesRange;
+  cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(this->_mDimensionality, this->_mSizes, sizesRange, node);
+	this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(
+					new cedar::aux::annotation::SizesRangeHint(sizesRange)));
+
+  cedar::proc::GroupXMLFileFormatV1::readKernelListParameter(this->_mKernels.get(),
+                                                             node.get_child("InteractionKernel"));
+
+  cedar::proc::GroupXMLFileFormatV1::readActivationFunctionParameter(this->_mSigmoid.get(), node);
+}
+
 void cedar::dyn::NeuralField::updateInputSum()
 {
   cedar::proc::steps::Sum::sumSlot(this->getInputSlot("input"), this->mInputSum->getData(), true);
@@ -736,12 +779,22 @@ void cedar::dyn::NeuralField::dimensionalityChanged()
     this->_mNoiseCorrelationKernelConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
   }
 #endif // CEDAR_USE_FFTW
-  this->updateMatrices();
+
+	this->updateSizesRange();
+	this->updateMatrices();
 }
 
 void cedar::dyn::NeuralField::dimensionSizeChanged()
 {
   this->updateMatrices();
+  // Update the sizes annotation
+  std::vector<cedar::aux::math::Limits<double>> sizesRange;
+  for(unsigned int size : this->_mSizes->getValue())
+  {
+    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
+  }
+  this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
+
 }
 
 void cedar::dyn::NeuralField::updateMatrices()
@@ -825,6 +878,45 @@ void cedar::dyn::NeuralField::onStop()
   this->_mSizes->setConstant(false);
 }
 
+bool cedar::dyn::NeuralField::isXMLExportable(std::string& errorMsg){
+  for(int i = 0; i < this->_mKernels->size(); i++)
+  {
+    if(!dynamic_cast<cedar::aux::kernel::Gauss*>(this->_mKernels->at(i).get()))
+    {
+      errorMsg = "The XML export only supports Gauss kernels.";
+      return false;
+    }
+  }
+  if(this->_mLateralKernelConvolution->getBorderType() != cedar::aux::conv::BorderType::Zero)
+  {
+    errorMsg = "The XML export only supports \"zero-filled borders\" as border type.";
+    return false;
+  }
+  if(this->_mLateralKernelConvolution->getMode() != cedar::aux::conv::Mode::Same)
+  {
+    errorMsg = "The XML export only supports \"same\" as mode.";
+    return false;
+  }
+  if(this->_mLateralKernelConvolution->getAlternateEvenKernelCenter())
+  {
+    errorMsg = "The XML export only supports \"alternate even kernel center\" set to false.";
+    return false;
+  }
+  if(auto expSigmoid = dynamic_cast<cedar::aux::math::ExpSigmoid*>(this->_mSigmoid->getValue().get()))
+  {
+    if(expSigmoid->getThreshold() != 0)
+    {
+      errorMsg = "The XML export only supports 0 as the threshold for the ExpSigmoid transfer function.";
+      return false;
+    }
+  }
+  else{
+    errorMsg = "The XML export only supports \"ExpSigmoid\" as the transfer function.";
+    return false;
+  }
+  return true;
+}
+
 
 void cedar::dyn::NeuralField::updateEducationalKernel()
 {
@@ -885,17 +977,16 @@ void cedar::dyn::NeuralField::updateEducationalKernel()
     }
     else
     {
-
-        if(this->getDimensionality() == 1)
-        {
-            this->mLateralKernelEducational->setData(
-                    cv::Mat(1, 1, CV_32F, this->mGlobalInhibition->getValue()));
-        }
-        else if(this->getDimensionality() == 3)
-        {
-            int sizearray[3] = {(int)this->_mSizes->getValue().at(0),(int)this->_mSizes->getValue().at(1),(int)this->_mSizes->getValue().at(2)};
-            this->mLateralKernelEducational->setData(cv::Mat(3,sizearray,CV_32F,this->mGlobalInhibition->getValue()));
-        }
+      if(this->getDimensionality() == 1)
+      {
+          this->mLateralKernelEducational->setData(
+                  cv::Mat(1, 1, CV_32F, this->mGlobalInhibition->getValue()));
+      }
+      else if(this->getDimensionality() == 3)
+      {
+          int sizearray[3] = {(int)this->_mSizes->getValue().at(0),(int)this->_mSizes->getValue().at(1),(int)this->_mSizes->getValue().at(2)};
+          this->mLateralKernelEducational->setData(cv::Mat(3,sizearray,CV_32F,this->mGlobalInhibition->getValue()));
+      }
     }
   }
 }
@@ -904,4 +995,16 @@ void cedar::dyn::NeuralField::timescaleChanged()
 {
     cedar::proc::ElementWeakPtr weakElementPtr(boost::dynamic_pointer_cast<cedar::proc::Element>(this->shared_from_this()));
     cedar::aux::GlobalClockSingleton::getInstance()->updateFieldTauMap(weakElementPtr,this->mTau->getValue());
+}
+void cedar::dyn::NeuralField::updateSizesRange()
+{
+	// Set the sizes annotation
+	std::vector<cedar::aux::math::Limits<double>> sizesRange;
+	for(unsigned int size : this->_mSizes->getValue())
+	{
+		sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
+	}
+  CEDAR_ASSERT(this->mSigmoidalActivation);
+  this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(
+					new cedar::aux::annotation::SizesRangeHint(sizesRange)));
 }

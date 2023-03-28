@@ -186,6 +186,12 @@ public:
     return this->mRestingLevel->setValue(restingLevel, true);
   }
 
+  void writeConfigurationXML(cedar::aux::ConfigurationNode& root) const;
+
+  void readConfigurationXML(const cedar::aux::ConfigurationNode& node);
+
+  bool isXMLExportable(std::string& errorMsg) override;
+
 public slots:
   //!@brief handle a change in dimensionality, which leads to creating new matrices
   void dimensionalityChanged();
@@ -244,6 +250,8 @@ private:
    * @remarks This method assumes that all data is locked.
    */
   void updateInputSum();
+
+  void updateSizesRange();
 
 
 private slots:
