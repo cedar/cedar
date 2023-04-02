@@ -2235,7 +2235,7 @@ void cedar::proc::Group::writeConfiguration(cedar::aux::ConfigurationNode& root)
 void cedar::proc::Group::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
 {
   cedar::proc::GroupXMLFileFormatV1 format;
-  format.write(boost::static_pointer_cast<cedar::proc::ConstGroup>(this->shared_from_this()), root);
+  format.write(boost::dynamic_pointer_cast<cedar::proc::ConstGroup>(this->shared_from_this()), root);
 }
 
 void cedar::proc::Group::writeData(cedar::aux::ConfigurationNode& root) const
@@ -2450,7 +2450,7 @@ void cedar::proc::Group::readConfigurationXML(const cedar::aux::ConfigurationNod
 		case 1:
 		{
 			GroupXMLFileFormatV1 reader;
-			reader.read(boost::static_pointer_cast<cedar::proc::Group>(this->shared_from_this()), root, exceptions);
+			reader.read(boost::dynamic_pointer_cast<cedar::proc::Group>(this->shared_from_this()), root, exceptions);
 			break;
 		}
 	}
