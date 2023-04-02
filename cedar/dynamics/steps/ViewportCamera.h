@@ -109,6 +109,8 @@ protected:
   //!@brief MatrixData representing the input. Storing it like this saves time during computation.
   cedar::aux::ConstMatDataPtr mViewportCenterInput;
 
+    cedar::aux::ConstMatDataPtr mLearnInput;
+
   //!@brief The data containing the output.
   cedar::aux::MatDataPtr mOutput;
   cedar::aux::MatDataPtr mOutputCOS;
@@ -116,6 +118,7 @@ protected:
 
 private:
     float _mElapsedTime;
+    float _mElapsedLearnTime;
     double _lastX;
     double _lastY;
     bool _startSC;
