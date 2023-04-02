@@ -57,6 +57,7 @@ cedar_add_library(cedardyn
                   steps/LogTimeInterval.h
                   steps/CSVToPhoneme.h
                   steps/ViewportCamera.h
+			steps/ViewportSlice.h
                   RESOURCES
                   gui/icons/cedar_dynamics_gui_icons.qrc
                   )

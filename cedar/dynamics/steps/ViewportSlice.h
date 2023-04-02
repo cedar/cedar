@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ViewportCamera.h
+    File:        ViewportSlice.h
 
     Maintainer:  Lars Janssen, Raul Grieben
     Email:       lars.janssen@ini.rub.de, raul.grieben@ini.rub.de
     Date:        2023 02 26
 
-    Description: Header file for the class cedar::dyn::steps::ViewportCamera.
+    Description: Header file for the class cedar::dyn::steps::ViewportSlice.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DYN_STEPS_VIEWPORT_CAMERA_H
-#define CEDAR_DYN_STEPS_VIEWPORT_CAMERA_H
+#ifndef CEDAR_DYN_STEPS_VIEWPORT_SLICE_H
+#define CEDAR_DYN_STEPS_VIEWPORT_SLICE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -47,16 +47,16 @@
 #include "cedar/auxiliaries/BoolParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/dynamics/steps/ViewportCamera.fwd.h"
+#include "cedar/dynamics/steps/ViewportSlice.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*! Viewport Camera
+/*! Viewport Slice
  *
  * Crops a given input image to a viewpoint defined by the activation of a second input
  */
-class cedar::dyn::steps::ViewportCamera : public cedar::dyn::Dynamics
+class cedar::dyn::steps::ViewportSlice : public cedar::dyn::Dynamics
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -67,10 +67,10 @@ class cedar::dyn::steps::ViewportCamera : public cedar::dyn::Dynamics
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ViewportCamera();
+  ViewportSlice();
 
   //!@brief Destructor
-  virtual ~ViewportCamera();
+  virtual ~ViewportSlice();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -109,8 +109,6 @@ protected:
   //!@brief MatrixData representing the input. Storing it like this saves time during computation.
   cedar::aux::ConstMatDataPtr mViewportCenterInput;
 
-    cedar::aux::ConstMatDataPtr mLearnInput;
-
   //!@brief The data containing the output.
   cedar::aux::MatDataPtr mOutput;
   cedar::aux::MatDataPtr mOutputCOS;
@@ -118,7 +116,6 @@ protected:
 
 private:
     float _mElapsedTime;
-    float _mElapsedLearnTime;
     double _lastX;
     double _lastY;
     bool _startSC;
@@ -135,7 +132,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dyn::steps::ViewportCamera
+}; // class cedar::dyn::steps::ViewportSlice
 
-#endif // CEDAR_DYN_STEPS_VIEWPORT_CAMERA_H
+#endif // CEDAR_DYN_STEPS_VIEWPORT_SLICE_H
 

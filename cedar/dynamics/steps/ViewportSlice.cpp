@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ViewportCamera.cpp
+    File:        ViewportSlice.cpp
 
     Maintainer:  Lars Janssen, Raul Grieben
     Email:       lars.janssen@ini.rub.de, raul.grieben@ini.rub.de
     Date:        2023 02 26
 
-    Description: Source file for the class cedar::dyn::steps::ViewportCamera.
+    Description: Source file for the class cedar::dyn::steps::ViewportSlice.
 
     Credits:
 
@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CLASS HEADER
-#include "cedar/dynamics/steps/ViewportCamera.h"
+#include "cedar/dynamics/steps/ViewportSlice.h"
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Log.h"
@@ -66,16 +66,16 @@ namespace
 
     ElementDeclarationPtr resize_decl
       (
-        new ElementDeclarationTemplate<cedar::dyn::steps::ViewportCamera>
+        new ElementDeclarationTemplate<cedar::dyn::steps::ViewportSlice>
           (
             "Image Processing",
-            "cedar.dynamics.ViewportCamera"
+            "cedar.dynamics.ViewportSlice"
           )
       );
     resize_decl->setIconPath(":/steps/viewport_camera.svg");
     resize_decl->setDescription
       (
-        "Crops an image to a viewport given as an activation input."
+        "Crops an array to a viewport given as an activation input."
       );
 
     resize_decl->declare();
@@ -90,13 +90,12 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dyn::steps::ViewportCamera::ViewportCamera()
+cedar::dyn::steps::ViewportSlice::ViewportSlice()
 :
-  mOutput(new cedar::aux::MatData(cv::Mat(120, 120, CV_8UC3, cv::Scalar(0, 0, 0)))),
+  mOutput(new cedar::aux::MatData(cv::Mat(120, 120, CV_32F, cv::Scalar(0.0)))),
   mOutputCOS(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
   mOutputKernel(new cedar::aux::MatData(cv::Mat::zeros(120, 180, CV_32F))),
   _mElapsedTime(0.0),
-  _mElapsedLearnTime(0.0),
   _lastX(0),
   _lastY(0),
   _startSC(false),
@@ -110,8 +109,6 @@ cedar::dyn::steps::ViewportCamera::ViewportCamera()
   auto input_slot = this->declareInput("input");
   auto viewport_center_slot = this->declareInput("viewport center", false);
 
-  this->declareInput("learn mode",false);
-
   cedar::proc::typecheck::Matrix input_check;
   input_check.addAcceptedDimensionality(2);
   input_slot->setCheck(input_check);
@@ -122,7 +119,7 @@ cedar::dyn::steps::ViewportCamera::ViewportCamera()
   this->declareOutput("CoS", mOutputCOS);
 }
 
-cedar::dyn::steps::ViewportCamera::~ViewportCamera()
+cedar::dyn::steps::ViewportSlice::~ViewportSlice()
 {
 }
 
@@ -130,7 +127,7 @@ cedar::dyn::steps::ViewportCamera::~ViewportCamera()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dyn::steps::ViewportCamera::eulerStep(const cedar::unit::Time& time)
+void cedar::dyn::steps::ViewportSlice::eulerStep(const cedar::unit::Time& time)
 {
   if(!this->mInput)
   {
@@ -150,7 +147,7 @@ void cedar::dyn::steps::ViewportCamera::eulerStep(const cedar::unit::Time& time)
     cedar::aux::LogSingleton::getInstance()->error
       (
         "Viewport windows is set to be larger than the input image",
-        "cedar::dyn::steps::ViewportCamera::eulerStep()"
+        "cedar::dyn::steps::ViewportSlice::eulerStep()"
       );
     return;
   }
@@ -178,7 +175,7 @@ void cedar::dyn::steps::ViewportCamera::eulerStep(const cedar::unit::Time& time)
       {
           if(max < 0.5)
           {
-              output = cv::Mat(viewportHeight, viewportWidth, CV_8UC3, cv::Scalar(0, 0, 0));
+              output = cv::Mat(viewportHeight, viewportWidth, CV_32F, cv::Scalar(0.0));
           }
           else
           {
@@ -212,7 +209,7 @@ void cedar::dyn::steps::ViewportCamera::eulerStep(const cedar::unit::Time& time)
           if(_startSC)
           {
               mOutputCOS->getData().setTo(0);
-              output = cv::Mat(viewportHeight, viewportWidth, CV_8UC3, cv::Scalar(0, 0, 0));
+              output = cv::Mat(viewportHeight, viewportWidth, CV_32F, cv::Scalar(0.0));
               if(_mElapsedTime > 20)
               {
                   _startSC = false;
@@ -248,39 +245,6 @@ void cedar::dyn::steps::ViewportCamera::eulerStep(const cedar::unit::Time& time)
               cv::copyMakeBorder( input, input_padded, hvh, hvh, hvw, hvw, cv::BORDER_CONSTANT,  cv::Scalar(0, 0, 0) );
               int left = std::round(_lastX * inputWidth);
               int top = std::round(_lastY * inputHeight);
-              if (mLearnInput)
-              {
-                  if (mLearnInput->getData().at<float>(0, 0) > 0.5)
-                  {
-                      _mElapsedLearnTime +=  time / cedar::unit::Time(1*cedar::unit::milli * cedar::unit::seconds);
-                      if(_mElapsedLearnTime >= 25 && _mElapsedLearnTime < 325)
-                      {
-                          int step = floor( (_mElapsedLearnTime-25) / 20);
-                          if(step >= 0 && step <= 2){
-                              top += hvh;
-                          }
-                          if(step >= 3 && step <= 5){
-                              top += hvh/2;
-                          }
-                          if(step >= 9 && step <= 11){
-                              top -= hvh/2;
-                          }
-                          if(step >= 12 && step <= 14){
-                              top -= hvh;
-                          }
-                          if(step == 0 || step == 3 || step == 6 || step == 9 || step == 12){
-                              left += hvw;
-                          }
-                          if(step == 2 || step == 5 || step == 8 || step == 11 || step == 14){
-                              left -= hvw;
-                          }
-                      }
-                  }
-                  else
-                  {
-                      _mElapsedLearnTime = 0.0;
-                  }
-              }
               // Crop the image
               cv::Rect viewportRect(left, top, viewportWidth, viewportHeight);
               output = input_padded(viewportRect);
@@ -294,14 +258,13 @@ void cedar::dyn::steps::ViewportCamera::eulerStep(const cedar::unit::Time& time)
       _startSC = false;
       _endSC = false;
       _mElapsedTime = 0.0;
-      _mElapsedLearnTime = 0.0;
-      output = cv::Mat(viewportHeight, viewportWidth, CV_8UC3, cv::Scalar(0, 0, 0));
+      output = cv::Mat(viewportHeight, viewportWidth, CV_32F, cv::Scalar(0.0));
       kernel = cv::Mat(120,180, CV_32F, cv::Scalar(0.0));
       mOutputCOS->getData().setTo(0);
   }
 }
 
-void cedar::dyn::steps::ViewportCamera::getCenterPoint(double &centerX, double &centerY, double &max)
+void cedar::dyn::steps::ViewportSlice::getCenterPoint(double &centerX, double &centerY, double &max)
 {
   if(this->mViewportCenterInput)
   {
@@ -324,32 +287,27 @@ void cedar::dyn::steps::ViewportCamera::getCenterPoint(double &centerX, double &
   }
 }
 
-void cedar::dyn::steps::ViewportCamera::reset()
+void cedar::dyn::steps::ViewportSlice::reset()
 {
     _lastX = 0.5;
     _lastY = 0.5;
     _startSC = false;
     _endSC = false;
     _mElapsedTime = 0.0;
-    _mElapsedLearnTime = 0.0;
     mOutput->getData().setTo(0);
     mOutputCOS->getData().setTo(0);
     cv::Mat& kernel = this->mOutputKernel->getData();
     kernel = cv::Mat(120,180, CV_32F, cv::Scalar(0.0));
 }
 
-void cedar::dyn::steps::ViewportCamera::inputConnectionChanged(const std::string& inputName)
+void cedar::dyn::steps::ViewportSlice::inputConnectionChanged(const std::string& inputName)
 {
   if(inputName == "input")
   {
     this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
   }
-    if(inputName == "viewport center")
-    {
-        this->mViewportCenterInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
-    }
-    if(inputName == "learn mode")
-    {
-        this->mLearnInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
-    }
+  if(inputName == "viewport center")
+  {
+    this->mViewportCenterInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
+  }
 }
