@@ -232,7 +232,7 @@ public:
     {
       cedar::aux::ConfigurationNode value_node;
       value_node.put_value(value);
-      vector_node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));
+      vector_node.push_back(cedar::aux::ConfigurationNode::value_type(cedar::aux::toUpperCamelCase(this->getName(), " ")+"Elem", value_node));
     }
     root.push_back(cedar::aux::ConfigurationNode::value_type(cedar::aux::toUpperCamelCase(this->getName(), " "),
                                                              vector_node));

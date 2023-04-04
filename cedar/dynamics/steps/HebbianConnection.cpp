@@ -52,6 +52,9 @@
 #include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
 #include "cedar/auxiliaries/math/transferFunctions/HeavisideSigmoid.h"
 #include "cedar/auxiliaries/math/transferFunctions/LinearTransferFunction.h"
+#include "cedar/processing/GroupXMLFileFormatV1.h"
+#include "cedar/auxiliaries/math/transferFunctions/ExpSigmoid.h"
+#include "cedar/auxiliaries/annotation/SizesRangeHint.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -154,6 +157,9 @@ cedar::dyn::steps::HebbianConnection::HebbianConnection()
       mWeightedTargetSumOutput((new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))))
 
 {
+  this->mXMLExportable = true;
+  this->mXMLParameterWhitelist = {"learning rate","fixed reward duration", "reward duration", "manual weights", "weight centers", "weight sigmas", "weight amplitude"};
+
   //Initialize 3D Matrices
   std::vector<int> defaultThetaSizes{7,7,10};
   mBCMTheta = cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat(3,&defaultThetaSizes.at(0), CV_32F,cv::Scalar(0.5))));
@@ -223,16 +229,100 @@ cedar::dyn::steps::HebbianConnection::HebbianConnection()
   QObject::connect(mFixedThetaValue.get(),SIGNAL(valueChanged()),this,SLOT(applyFixedTheta()));
 
   this->updateLearningRule();
+  this->updateAssociationSizesRange();
+  this->updateInputSizesRange();
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::dyn::steps::HebbianConnection::readConfigurationXML(const cedar::aux::ConfigurationNode &node)
+{
+  cedar::aux::Configurable::readConfigurationXML(node);
+
+  //readDimensionsParameter
+  std::vector<cedar::aux::math::Limits<double>> inputSizesRange;
+  cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(this->mInputDimension, this->mInputSizes, inputSizesRange, node, "SourceDimensions");
+  this->mConnectionWeights->setAnnotation(cedar::aux::annotation::AnnotationPtr(
+          new cedar::aux::annotation::SizesRangeHint(inputSizesRange)));
+
+  //readDimensionsParameter
+  std::vector<cedar::aux::math::Limits<double>> assSizesRange;
+  cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(this->mAssociationDimension, this->mAssociationSizes, assSizesRange, node, "TargetDimensions");
+  this->mWeightOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(
+          new cedar::aux::annotation::SizesRangeHint(assSizesRange)));
+
+  //readActivationFunction
+  cedar::proc::GroupXMLFileFormatV1::readActivationFunctionParameter(this->mSigmoidF.get(), node, "SourceFunction");
+  cedar::proc::GroupXMLFileFormatV1::readActivationFunctionParameter(this->mSigmoidG.get(), node, "RewardFunction");
+  cedar::proc::GroupXMLFileFormatV1::readActivationFunctionParameter(this->mSigmoidH.get(), node, "TargetFunction");
+
+
+}
+
+void cedar::dyn::steps::HebbianConnection::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
+{
+
+  cedar::aux::Configurable::writeConfigurationXML(root);
+
+  // sigma parameter
+  cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(this->mSigmoidF.get(), root, "SourceFunction");
+  cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(this->mSigmoidG.get(), root, "RewardFunction");
+  cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(this->mSigmoidH.get(), root, "TargetFunction");
+
+  //source dimensionality/sizes parameter
+  cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(this->mInputDimension, this->mInputSizes, this->mConnectionWeights->getAnnotation<cedar::aux::annotation::SizesRangeHint>()->getRange(),
+                                                              root, "SourceDimensions");
+
+  // target dimensionality/sizes parameter
+  cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(this->mAssociationDimension, this->mAssociationSizes, this->mWeightOutput->getAnnotation<cedar::aux::annotation::SizesRangeHint>()->getRange(),
+                                                                 root, "TargetDimensions");
+//
+//  if(this -> mSetWeights -> getValue())
+//  {
+//    this->mWeightCenters->writeToNodeXML(root);
+//    this->mWeightSigmas->writeToNodeXML(root);
+//    this->mWeightAmplitude->writeToNodeXML(root);
+//  }
+}
+
+bool cedar::dyn::steps::HebbianConnection::isXMLExportable(std::string& errorMsg){
+
+  if(this->mLearningRule->getValue() != cedar::dyn::steps::HebbianConnection::LearningRule::OJA)
+  {
+    errorMsg = "The XML export only supports Oja's Rule as learning rule.";
+    return false;
+  }
+
+  std::vector<std::tuple<boost::intrusive_ptr<aux::ObjectParameterTemplate<aux::math::TransferFunction>>, std::string>> sigmoid_functions;
+  sigmoid_functions.emplace_back(this -> mSigmoidF, "source");
+  sigmoid_functions.emplace_back(this -> mSigmoidG, "reward");
+  sigmoid_functions.emplace_back(this -> mSigmoidH, "target");
+
+  for (const auto& sigmoid_tuple : sigmoid_functions)
+  {
+    if(auto expSigmoid = dynamic_cast<cedar::aux::math::ExpSigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get()))
+    {
+      if(expSigmoid->getThreshold() != 0)
+      {
+        errorMsg = "The XML export only supports 0 as the threshold for the ExpSigmoid source sigmoid function.";
+        return false;
+      }
+    }
+    else{
+      errorMsg = "The XML export only supports \"ExpSigmoid\" as the " + std::get<1>(sigmoid_tuple) + " sigmoid function.";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
 void cedar::dyn::steps::HebbianConnection::updateAssociationDimension()
 {
   int new_dim = static_cast<int>(mAssociationDimension->getValue());
   mAssociationSizes->resize(new_dim, mAssociationSizes->getDefaultValue());
-
 
   auto newWeightDimension = determineWeightDimension();
 
@@ -241,6 +331,14 @@ void cedar::dyn::steps::HebbianConnection::updateAssociationDimension()
   mWeightSigmas->resize(newWeightDimension, mWeightCenters->getDefaultValue());
   mWeightSizeX = determineWeightSizes(0);
   mWeightSizeY = determineWeightSizes(1);
+
+  // Update the sizes annotation
+  std::vector<cedar::aux::math::Limits<double>> sizesRange;
+  for(unsigned int size : this->mAssociationSizes->getValue())
+  {
+    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
+  }
+  this->mWeightedTargetOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
 
 //  std::cout<<"updateAssociationDimension: WeightDim! " << determineWeightDimension() << " WeightX=" << determineWeightSizes(0) << " WeightY=" << determineWeightSizes(1) << std::endl;
   this->resetWeights();
@@ -258,6 +356,13 @@ void cedar::dyn::steps::HebbianConnection::updateInputDimension()
   mWeightSigmas->resize(newWeightDimension, mWeightCenters->getDefaultValue());
 
 //  std::cout<<"updateInputDimension: WeightDim! " << determineWeightDimension() << " WeightX=" << determineWeightSizes(0) << " WeightY=" << determineWeightSizes(1) << std::endl;
+
+  std::vector<cedar::aux::math::Limits<double>> sizesRange;
+  for(unsigned int size : this->mInputSizes->getValue())
+  {
+    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
+  }
+  this->mConnectionWeights->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
 
   this->resetWeights();
 }
@@ -644,6 +749,7 @@ std::string cedar::dyn::steps::HebbianConnection::getTriggerOutputName()
 void cedar::dyn::steps::HebbianConnection::setDimensionality(unsigned int dim)
 {
   mAssociationDimension->setValue(dim);
+  this->updateAssociationSizesRange();
 }
 void cedar::dyn::steps::HebbianConnection::setSize(unsigned int dim, unsigned int size)
 {
@@ -997,4 +1103,30 @@ void cedar::dyn::steps::HebbianConnection::applyFixedTheta()
 //  });
 
   mBCMTheta->setData(thetaMat);
+}
+
+void cedar::dyn::steps::HebbianConnection::updateInputSizesRange()
+{
+  // Set the sizes annotation
+  std::vector<cedar::aux::math::Limits<double>> sizesRange;
+  for(unsigned int size : this->mInputSizes->getValue())
+  {
+    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
+  }
+  CEDAR_ASSERT(this->mConnectionWeights);
+  this->mConnectionWeights->setAnnotation(cedar::aux::annotation::AnnotationPtr(
+          new cedar::aux::annotation::SizesRangeHint(sizesRange)));
+}
+
+void cedar::dyn::steps::HebbianConnection::updateAssociationSizesRange()
+{
+  // Set the sizes annotation
+  std::vector<cedar::aux::math::Limits<double>> sizesRange;
+  for(unsigned int size : this->mAssociationSizes->getValue())
+  {
+    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
+  }
+  CEDAR_ASSERT(this->mWeightOutput);
+  this->mWeightOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(
+          new cedar::aux::annotation::SizesRangeHint(sizesRange)));
 }

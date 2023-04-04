@@ -584,33 +584,33 @@ void cedar::proc::GroupXMLFileFormatV1::readProjectionMappingsParameter(
 }
 
 void cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(
-  cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* sigmoid,
-  cedar::aux::ConfigurationNode& root)
+        cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* sigmoid,
+        cedar::aux::ConfigurationNode& root, const std::string & name)
 {
   cedar::aux::ConfigurationNode activationFunction;
 
   // get transfere function and beta parameter
   cedar::aux::math::TransferFunctionPtr transferFunction = sigmoid->getValue();
   cedar::aux::NumericParameter<double>* beta = dynamic_cast<cedar::aux::NumericParameter<double>*>(
-            transferFunction->getParameter("beta").get());
+          transferFunction->getParameter("beta").get());
   CEDAR_ASSERT(beta != nullptr)
   activationFunction.put("Beta", beta->getValue());
   // add beta parameter to node
-  root.add_child("ActivationFunction", activationFunction);
+  root.add_child(name, activationFunction);
 
   // add looked up transfer function to xml attribute
-  root.add("ActivationFunction.<xmlattr>.type", cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
-    cedar::proc::GroupXMLFileFormatV1::transferFunctionNameLookupTableXML,
-    cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->getTypeId(transferFunction)
-    ));
+  root.add(name + ".<xmlattr>.type", cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
+          cedar::proc::GroupXMLFileFormatV1::transferFunctionNameLookupTableXML,
+          cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->getTypeId(transferFunction)
+  ));
 }
 
 void cedar::proc::GroupXMLFileFormatV1::readActivationFunctionParameter(
   cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* sigmoid,
-  const cedar::aux::ConfigurationNode& root)
+  const cedar::aux::ConfigurationNode& root, const std::string& name)
 {
   //get transfere function and beta values from node
-  cedar::aux::ConfigurationNode transfereFunctionNode = root.get_child("ActivationFunction");
+  cedar::aux::ConfigurationNode transfereFunctionNode = root.get_child(name);
   std::string transfereFunctionTypeId = cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
           cedar::proc::GroupXMLFileFormatV1::transferFunctionNameLookupTableXML,
           transfereFunctionNode.get<std::string>("<xmlattr>.type"),
@@ -628,7 +628,7 @@ void cedar::proc::GroupXMLFileFormatV1::readActivationFunctionParameter(
 
 void cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(cedar::aux::UIntParameterPtr dimensionality,
   cedar::aux::UIntVectorParameterPtr sizes, std::vector<cedar::aux::math::Limits<double>> sizesRange,
-  cedar::aux::ConfigurationNode& root)
+  cedar::aux::ConfigurationNode& root, const std::string & name)
 {
   cedar::aux::ConfigurationNode dimensions;
   std::vector<unsigned int> sizesVector = sizes->getValue();
@@ -643,20 +643,20 @@ void cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(cedar::aux::UIn
     dimension.add("<xmlattr>.size", sizesVector[i]);
     dimensions.add_child("Dimension", dimension);
   }
-  root.add_child("Dimensions", dimensions);
+  root.add_child(name, dimensions);
 }
 
 void cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(cedar::aux::UIntParameterPtr dimensionality,
                                                               cedar::aux::UIntVectorParameterPtr sizes,
                                                               std::vector<cedar::aux::math::Limits<double>>& sizesRange,
-                                                              const cedar::aux::ConfigurationNode& node)
+                                                              const cedar::aux::ConfigurationNode& node,  const std::string & name)
 {
   std::vector<unsigned int> sizeList;
   unsigned int dimensionalitySize = 0;
   sizesRange.clear();
 
   //First find dimensions
-  auto dimensions_iter = node.find("Dimensions");
+  auto dimensions_iter = node.find(name);
   const cedar::aux::ConfigurationNode& dimensions_value = dimensions_iter->second;
 
   //Count the dimensionalitySize and add the sizes to the sizeList

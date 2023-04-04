@@ -101,6 +101,9 @@ _mSigmaTh(new cedar::aux::DoubleParameter(this, "sigma th hor", 0.25, cedar::aux
 _mMuR(new cedar::aux::DoubleParameter(this, "mu r", 15.0, cedar::aux::DoubleParameter::LimitType::positiveZero(1000.0))),
 _mSigmaR(new cedar::aux::DoubleParameter(this, "sigma r", 100.0, cedar::aux::DoubleParameter::LimitType::positiveZero(1000.0)))
 {
+  this->mXMLExportable = true;
+  this->mXMLParameterWhitelist = {"sigma r","mu r", "sigma th hor","mu th","size y","size x"};
+
   // output
   this->declareOutput("spatial pattern", mPattern);
 
@@ -113,6 +116,24 @@ _mSigmaR(new cedar::aux::DoubleParameter(this, "sigma r", 100.0, cedar::aux::Dou
 
   this->recompute();
 }
+
+/*void cedar::dyn::NeuralField::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::aux::Configurable::writeConfigurationXML(root);
+
+  // sigma parameter
+  cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(this->_mSigmoid.get(), root);
+
+  // dimensionality/sizes parameter
+  cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(this->_mDimensionality, this->_mSizes,
+                                                              this->mSigmoidalActivation->getAnnotation<cedar::aux::annotation::SizesRangeHint>()->getRange(),
+                                                              root);
+
+  // kernels parameter
+  cedar::aux::ConfigurationNode sumWeightPattern;
+  cedar::proc::GroupXMLFileFormatV1::writeKernelListParameter(this->_mKernels.get(), sumWeightPattern);
+  root.add_child("InteractionKernel", sumWeightPattern);
+}*/
 
 cedar::proc::sources::SpatialTemplate::~SpatialTemplate()
 {

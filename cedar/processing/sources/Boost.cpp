@@ -87,6 +87,9 @@ _mStrength(new cedar::aux::DoubleParameter(this, "strength", 1.0)),
 _mActive(new cedar::aux::BoolParameter(this, "active", false)),
 _mDeactivateOnReset(new cedar::aux::BoolParameter(this, "deactivate on reset", false))
 {
+  this->mXMLExportable = true;
+  this->mXMLParameterWhitelist = {"strength", "active"};
+
   this->declareOutput("boost", this->mBoost);
 
   QObject::connect(_mStrength.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));

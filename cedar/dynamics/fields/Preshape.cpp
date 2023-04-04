@@ -45,6 +45,10 @@
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
+#include "cedar/auxiliaries/math/transferFunctions/ExpSigmoid.h"
+#include "cedar/processing/GroupXMLFileFormatV1.h"
+#include "cedar/auxiliaries/annotation/SizesRangeHint.h"
+#include "cedar/auxiliaries/annotation/ValueRangeHint.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -107,12 +111,16 @@ _mSigmoid
   )
 )
 {
+  this->mXMLExportable = true;
+  this->mXMLParameterWhitelist = {"time scale build up","time scale decay" };
+
   _mSizes->makeDefault();
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
   auto activation_slot = this->declareOutput("activation", mActivation);
   activation_slot->setSerializable(true);
-
+//  this->mSigmoidalActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(
+//          new cedar::aux::annotation::ValueRangeHint(0, 1)));
   this->declareInput("input", true);
   this->declareInput("peak detector", false);
 
@@ -120,10 +128,57 @@ _mSigmoid
   this->updateMatrices();
 
   this->registerFunction("reset memory", boost::bind(&cedar::dyn::Preshape::resetMemory, this));
+
+  this->mActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(
+          new cedar::aux::annotation::ValueRangeHint(0, 1)));
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dyn::Preshape::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::aux::Configurable::writeConfigurationXML(root);
+
+  // sigma parameter
+  cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(this->_mSigmoid.get(), root);
+
+  // dimensionality/sizes parameter
+  cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(this->_mDimensionality, this->_mSizes, this->mActivation->getAnnotation<cedar::aux::annotation::SizesRangeHint>()->getRange(),
+                                                              root);
+}
+
+void cedar::dyn::Preshape::readConfigurationXML(const cedar::aux::ConfigurationNode& node)
+{
+  cedar::aux::Configurable::readConfigurationXML(node);
+
+  //readDimensionsParameter
+  std::vector<cedar::aux::math::Limits<double>> sizesRange;
+  cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(this->_mDimensionality, this->_mSizes, sizesRange, node);
+  this->mActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(
+          new cedar::aux::annotation::SizesRangeHint(sizesRange)));
+
+  //readActivationFunction
+  cedar::proc::GroupXMLFileFormatV1::readActivationFunctionParameter(this->_mSigmoid.get(), node);
+}
+
+bool cedar::dyn::Preshape::isXMLExportable(std::string& errorMsg){
+  if(auto expSigmoid = dynamic_cast<cedar::aux::math::ExpSigmoid*>(this->_mSigmoid->getValue().get()))
+  {
+    if(expSigmoid->getThreshold() != 0)
+    {
+      errorMsg = "The XML export only supports 0 as the threshold for the ExpSigmoid transfer function.";
+      return false;
+    }
+  }
+  else{
+    errorMsg = "The XML export only supports \"ExpSigmoid\" as the transfer function.";
+    return false;
+  }
+  return true;
+}
+
+
 
 void cedar::dyn::Preshape::eulerStep(const cedar::unit::Time& time)
 {
@@ -203,11 +258,28 @@ void cedar::dyn::Preshape::dimensionalityChanged()
 {
   this->_mSizes->resize(_mDimensionality->getValue(), _mSizes->getDefaultValue());
   this->updateMatrices();
+
+  // Update the sizes annotation
+  std::vector<cedar::aux::math::Limits<double>> sizesRange;
+  for(unsigned int size : this->_mSizes->getValue())
+  {
+    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
+  }
+  this->mActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
+
 }
 
 void cedar::dyn::Preshape::dimensionSizeChanged()
 {
   this->updateMatrices();
+
+  // Update the sizes annotation
+  std::vector<cedar::aux::math::Limits<double>> sizesRange;
+  for(unsigned int size : this->_mSizes->getValue())
+  {
+    sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
+  }
+  this->mActivation->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
 }
 
 void cedar::dyn::Preshape::resetMemory()

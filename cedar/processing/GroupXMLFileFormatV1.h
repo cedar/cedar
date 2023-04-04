@@ -56,6 +56,7 @@
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/ProjectionMappingParameter.fwd.h"
 #include "cedar/processing/Step.fwd.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
 
 // SYSTEM INCLUDES
 #include <boost/bimap.hpp>
@@ -116,22 +117,23 @@ public:
 
   // Write sigmoid parameter
   static void writeActivationFunctionParameter(
-    cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>*, cedar::aux::ConfigurationNode&);
+    cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>*, cedar::aux::ConfigurationNode&, const std::string& name = "ActivationFunction");
 
   static void readActivationFunctionParameter(
     cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* sigmoid,
-    const cedar::aux::ConfigurationNode& root);
+    const cedar::aux::ConfigurationNode& root, const std::string& name = "ActivationFunction");
 
   // Write dimensionality/sizes parameter
   static void writeDimensionsParameter(
     cedar::aux::UIntParameterPtr, cedar::aux::UIntVectorParameterPtr,
-    std::vector<cedar::aux::math::Limits<double>> sizesRange, cedar::aux::ConfigurationNode&);
+    std::vector<cedar::aux::math::Limits<double>> sizesRange, cedar::aux::ConfigurationNode&, const std::string& name = "Dimensions");
+
 
   static void readDimensionsParameter(
     cedar::aux::UIntParameterPtr dimensionality, cedar::aux::UIntVectorParameterPtr sizes,
-    std::vector<cedar::aux::math::Limits<double>>& sizesRange, const cedar::aux::ConfigurationNode& node);
+    std::vector<cedar::aux::math::Limits<double>>& sizesRange, const cedar::aux::ConfigurationNode& node, const std::string& name = "Dimensions");
 
-  // Read dimension mappings of a projection
+    // Read dimension mappings of a projection
   static void readProjectionMappingsParameter(
     cedar::proc::ProjectionMappingParameterPtr& mappingParameter,
     const cedar::aux::ConfigurationNode& root);

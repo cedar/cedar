@@ -92,6 +92,12 @@ public:
 
   void resetMemory();
 
+  bool isXMLExportable(std::string& errorMsg) override;
+
+  void writeConfigurationXML(cedar::aux::ConfigurationNode& root) const;
+
+  void readConfigurationXML(const cedar::aux::ConfigurationNode& node);
+
 public slots:
   //!@brief handle a change in dimensionality, which leads to creating new matrices
   void dimensionalityChanged();

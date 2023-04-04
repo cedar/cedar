@@ -139,6 +139,12 @@ public:
   void setSize(unsigned int dim, unsigned int size);
   void setWeights(cv::Mat newWeights);
 
+  void writeConfigurationXML(cedar::aux::ConfigurationNode& root) const;
+
+  void readConfigurationXML(const cedar::aux::ConfigurationNode& node);
+
+  bool isXMLExportable(std::string& errorMsg) override;
+
 public slots:
   //!@brief This slot is connected to the valueChanged() event of the gain value parameter.
  void updateAssociationDimension();
@@ -190,7 +196,9 @@ private:
 
   cv::Mat calculateOutputMatrix( cv::Mat mat);
 
+  void updateInputSizesRange();
 
+  void updateAssociationSizesRange();
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
