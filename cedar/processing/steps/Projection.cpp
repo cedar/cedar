@@ -110,6 +110,7 @@ namespace
 cedar::proc::steps::Projection::Projection()
 :
 mOutput(new cedar::aux::MatData(cv::Mat())),
+mpProjectionMethod(nullptr),
 _mDimensionMappings(new cedar::proc::ProjectionMappingParameter(this, "dimension mapping")),
 _mOutputDimensionality(new cedar::aux::UIntParameter(this, "output dimensionality", 1, 0, 4)),
 _mOutputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "output dimension sizes", 1, 50, 1, 1000)),
@@ -155,7 +156,10 @@ void cedar::proc::steps::Projection::compute(const cedar::proc::Arguments&)
     return;
 
   // call the appropriate projection method via the function pointer
-  (this->*mpProjectionMethod)(this->mInput, this->mOutput, this->mIndicesToCompress, this->_mCompressionType, this->_mDimensionMappings);
+  if(this->mpProjectionMethod)
+  {
+    (this->*mpProjectionMethod)(this->mInput, this->mOutput, this->mIndicesToCompress, this->_mCompressionType, this->_mDimensionMappings);
+  }
 }
 
 void cedar::proc::steps::Projection::outputDimensionalityChanged()
@@ -297,7 +301,7 @@ void cedar::proc::steps::Projection::reconfigure(bool triggerSubsequent)
     }
     else if (input_dimensionality == 2 && output_dimensionality == 3)
     {
-      //this->mpProjectionMethod = &cedar::proc::steps::Projection::expand2Dto3D;
+      this->mpProjectionMethod = &cedar::proc::steps::Projection::expand2Dto3D;
     }
     else
     {
