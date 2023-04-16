@@ -95,6 +95,10 @@ public:
     return this->mConvolution->getMode();
   }
 
+  void writeConfigurationXML(cedar::aux::ConfigurationNode& root) const;
+
+  bool isXMLExportable(std::string& errorMsg) override;
+
 public slots:
   //!@brief Triggers a computation of a step.
   void recompute();

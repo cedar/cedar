@@ -43,6 +43,7 @@
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/GroupXMLFileFormatV1.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -427,4 +428,17 @@ void cedar::proc::steps::Projection::inputConnectionChanged(const std::string& i
   this->_mDimensionMappings->initialize(input_dimensionality);
 
   this->reconfigure(false);
+}
+
+bool cedar::proc::steps::Projection::isXMLExportable(std::string& errorMsg){
+  return cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportable(this, errorMsg);
+}
+
+void cedar::proc::steps::Projection::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::aux::Configurable::writeConfigurationXML(root);
+
+  cedar::aux::ConfigurationNode dimensionMapping;
+  this->_mDimensionMappings->writeToNodeXML(dimensionMapping);
+  root.add_child("DimensionMapping", dimensionMapping);
 }

@@ -2424,7 +2424,6 @@ bool cedar::proc::gui::Ide::exportXML()
   // Check if all steps in scene are exportable
   QList<QGraphicsItem *> sceneItems = this->mpProcessingDrawer->getScene()->items();
   std::set<std::string> nonExportableSteps;
-  std::set<std::string> nonExportableKernels;
   bool isExportable = true;
   for(auto item : sceneItems){
 

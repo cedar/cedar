@@ -40,6 +40,7 @@
 #include "cedar/processing/typecheck/IsMatrix.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/GroupXMLFileFormatV1.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -158,4 +159,15 @@ void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& i
   {
     this->emitOutputPropertiesChangedSignal("output");
   }
+}
+
+bool cedar::proc::steps::StaticGain::isXMLExportable(std::string& errorMsg){
+  return cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportable(this, errorMsg);
+}
+
+void cedar::proc::steps::StaticGain::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::aux::Configurable::writeConfigurationXML(root);
+
+  root.put("ScalarWeight", this->_mGainFactor->getValue());
 }

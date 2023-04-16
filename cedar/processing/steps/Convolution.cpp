@@ -41,6 +41,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ExternalData.h"
+#include "cedar/processing/GroupXMLFileFormatV1.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/auxiliaries/assert.h"
@@ -339,6 +340,19 @@ void cedar::proc::steps::Convolution::readConfiguration(const cedar::aux::Config
       (
         boost::bind(&cedar::proc::steps::Convolution::removeKernelFromConvolution, this, _1)
       );
+}
+
+bool cedar::proc::steps::Convolution::isXMLExportable(std::string& errorMsg){
+  return cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportable(this, errorMsg);
+}
+
+void cedar::proc::steps::Convolution::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::aux::Configurable::writeConfigurationXML(root);
+
+  cedar::aux::ConfigurationNode sumWeightPattern;
+  cedar::proc::GroupXMLFileFormatV1::writeKernelListParameter(this->_mKernels.get(), sumWeightPattern);
+  root.add_child("KernelWeights", sumWeightPattern);
 }
 
 void cedar::proc::steps::Convolution::slotKernelAdded(size_t kernelIndex)

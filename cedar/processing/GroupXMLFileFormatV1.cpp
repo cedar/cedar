@@ -51,6 +51,9 @@
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/sinks/GroupSink.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/steps/Convolution.h"
+#include "cedar/processing/steps/Projection.h"
+#include "cedar/processing/steps/StaticGain.h"
 #include "cedar/processing/steps/SynapticConnection.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/math/transferFunctions/ExpSigmoid.h"
@@ -123,6 +126,7 @@ void cedar::proc::GroupXMLFileFormatV1::write
 
     cedar::aux::ConfigurationNode connections;
     this->writeSynapticConnections(group, connections);
+    this->writeChainedSynapticConnections(group, connections);
     this->writeDataConnections(group, connections);
     if (!connections.empty())
     {
@@ -144,12 +148,7 @@ void cedar::proc::GroupXMLFileFormatV1::writeSteps
     // if this is a step, write this to the configuration tree
     if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
     {
-      if
-      (
-        boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(step)
-        || boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(step)
-        || boost::dynamic_pointer_cast<cedar::proc::steps::SynapticConnection>(step)
-      )
+      if(this->isStepBlacklisted(step.get()))
       {
         continue;
       }
@@ -257,6 +256,97 @@ const cedar::aux::ConfigurationNode& stepNode, std::vector<std::string>& excepti
   return nullptr;
 }
 
+bool cedar::proc::GroupXMLFileFormatV1::isStepBlacklisted(cedar::proc::Connectable* step) const
+{
+  return dynamic_cast<cedar::proc::sinks::GroupSink*>(step)
+    || dynamic_cast<cedar::proc::sources::GroupSource*>(step)
+    || dynamic_cast<cedar::proc::steps::SynapticConnection*>(step)
+    || dynamic_cast<cedar::proc::steps::StaticGain*>(step)
+    || dynamic_cast<cedar::proc::steps::Convolution*>(step)
+    || dynamic_cast<cedar::proc::steps::Projection*>(step);
+}
+
+bool cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportable(cedar::proc::Connectable* chainSource, std::string& errorMsg)
+{
+  // Get the source step of the incoming connection
+  std::vector<cedar::proc::DataSlotPtr> inputSlots = chainSource->getOrderedDataSlots(cedar::proc::DataRole::INPUT);
+  CEDAR_ASSERT(inputSlots.size() > 0)
+  cedar::proc::DataSlotPtr inputSlot = inputSlots.at(0);
+  CEDAR_ASSERT(inputSlot->getDataConnections().size() <= 1)
+  if(inputSlot->getDataConnections().size() == 0)
+  {
+    errorMsg = "Without an incoming connection, this step cannot be chained to a SynapticConnection.";
+    return false;
+  }
+  cedar::proc::DataConnectionPtr inputConn = inputSlot->getDataConnections().at(0);
+  cedar::proc::Connectable *source = inputConn.get()->getSource()->getParentPtr();
+  CEDAR_ASSERT(source != nullptr);
+  // If the source step is one of the chainable steps, this is not the beginning of the chain => return true
+  if (!dynamic_cast<cedar::proc::steps::StaticGain *>(source)
+      && !dynamic_cast<cedar::proc::steps::Convolution *>(source)
+      && !dynamic_cast<cedar::proc::steps::Projection *>(source))
+  {
+    // This is the beginning of the chain, thus check recursively if this whole chain is exportable
+    bool chainExportable = cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportableRecursive(
+                    chainSource,
+                    dynamic_cast<cedar::proc::steps::StaticGain*>(chainSource),
+                    dynamic_cast<cedar::proc::steps::Convolution*>(chainSource),
+                    dynamic_cast<cedar::proc::steps::Projection*>(chainSource));
+    if(!chainExportable)
+    {
+      errorMsg = "Cannot export chain of steps as SynapticConnection. "
+                 "Do you have more than one of the same step in the chain?";
+      return false;
+    }
+  }
+  return true;
+}
+
+
+bool cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportableRecursive(cedar::proc::Connectable* chainSource, bool hasStaticGain,
+                                         bool hasConvolution, bool hasProjection)
+{
+  // Get all target steps of outgoing connections
+  std::vector<cedar::proc::DataSlotPtr> outputSlots = chainSource->getOrderedDataSlots(cedar::proc::DataRole::OUTPUT);
+  CEDAR_ASSERT(outputSlots.size() > 0)
+  cedar::proc::DataSlotPtr outputSlot = outputSlots.at(0);
+  for(cedar::proc::DataConnectionPtr outputConn : outputSlot->getDataConnections())
+  {
+    cedar::proc::Connectable *target = outputConn->getTarget()->getParentPtr();
+    // If the target is not a chainable step, skip this and return true
+    // If the target is chainable, make sure this is the only steo of that type in the chain.
+    if(dynamic_cast<cedar::proc::steps::StaticGain*>(target))
+    {
+      // If there already was a static gain in the chain, or if the rest of the chain is not exportable, return false
+      if(hasStaticGain
+         || !cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportableRecursive(target, true,
+                                                                                   hasConvolution, hasProjection))
+      {
+        return false;
+      }
+    }
+    else if(dynamic_cast<cedar::proc::steps::Convolution*>(target))
+    {
+      if(hasConvolution
+         || !cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportableRecursive(target, hasStaticGain,
+                                                                                   true, hasProjection))
+      {
+        return false;
+      }
+    }
+    else if(dynamic_cast<cedar::proc::steps::Projection*>(target))
+    {
+      if(hasProjection
+         || !cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportableRecursive(target, hasStaticGain,
+                                                                                   hasConvolution, true))
+      {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 void cedar::proc::GroupXMLFileFormatV1::writeSynapticConnection(cedar::aux::ConfigurationNode& root,
                                                                 const cedar::proc::steps::SynapticConnectionPtr connection)
 const
@@ -287,7 +377,7 @@ const
     {
       if(auto sourceElement = dynamic_cast<cedar::proc::Element*>(outputConn.get()->getSource()->getParentPtr()))
       {
-        // This is the target step
+        // This is the source step
         sources.push_back(sourceElement->getFullPath());
       }
     }
@@ -346,8 +436,8 @@ void cedar::proc::GroupXMLFileFormatV1::writeDataConnections
 {
   for (auto data_connection : group->getDataConnections())
   {
-    if(dynamic_cast<cedar::proc::steps::SynapticConnection*>(data_connection.get()->getTarget()->getParentPtr())
-      || dynamic_cast<cedar::proc::steps::SynapticConnection*>(data_connection.get()->getSource()->getParentPtr()))
+    if(this->isStepBlacklisted(data_connection.get()->getSource()->getParentPtr())
+      || this->isStepBlacklisted(data_connection.get()->getTarget()->getParentPtr()))
     {
       continue;
     }
@@ -644,6 +734,101 @@ void cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(cedar::aux::UIn
     dimensions.add_child("Dimension", dimension);
   }
   root.add_child(name, dimensions);
+}
+
+void cedar::proc::GroupXMLFileFormatV1::writeChainedSynapticConnection(cedar::proc::Connectable* connectable,
+                                                                       cedar::aux::ConfigurationNode synCon,
+                                                                       cedar::aux::ConfigurationNode& root) const
+{
+  // write configuration to synCon
+  // Make sure another step of the same class has not already been added to the current chain previously, however,
+  // this should never happen because the isXMLExportable() function should take care of checking this beforehand.
+  if(dynamic_cast<cedar::proc::steps::StaticGain*>(connectable))
+  {
+    auto child = synCon.get_child_optional("ScalarWeight");
+    CEDAR_ASSERT(!child)
+    connectable->writeConfigurationXML(synCon);
+  }
+  else if(dynamic_cast<cedar::proc::steps::Convolution*>(connectable))
+  {
+    auto child = synCon.get_child_optional("KernelWeights");
+    CEDAR_ASSERT(!child)
+    connectable->writeConfigurationXML(synCon);
+  }
+  else if(dynamic_cast<cedar::proc::steps::Projection*>(connectable))
+  {
+    auto child = synCon.get_child_optional("DimensionMapping");
+    CEDAR_ASSERT(!child)
+    connectable->writeConfigurationXML(synCon);
+  }
+  else
+  {
+    return;
+  }
+
+  // Get the target step of any outgoing connections
+  std::vector<cedar::proc::DataSlotPtr> outputSlots = connectable->getOrderedDataSlots(DataRole::OUTPUT);
+  CEDAR_ASSERT(outputSlots.size() > 0)
+  cedar::proc::DataSlotPtr outputSlot = outputSlots.at(0);
+  for(cedar::proc::DataConnectionPtr outputConn : outputSlot->getDataConnections())
+  {
+    cedar::proc::Connectable *target = outputConn->getTarget()->getParentPtr();
+    if (dynamic_cast<cedar::proc::steps::StaticGain *>(target) ||
+        dynamic_cast<cedar::proc::steps::Convolution *>(target) ||
+        dynamic_cast<cedar::proc::steps::Projection *>(target))
+    {
+      // Pass the synCon node on along the chain
+      this->writeChainedSynapticConnection(target, synCon, root);
+    }
+    else
+    {
+      // This is the end of the chain, write the target of the synaptic connection
+      cedar::aux::ConfigurationNode connection_node(synCon);
+      if(auto targetElem = dynamic_cast<cedar::proc::Element*>(target))
+      {
+        connection_node.put("Target", targetElem->getFullPath());
+      }
+      root.push_back(cedar::aux::ConfigurationNode::value_type("SynapticConnection", connection_node));
+    }
+  }
+}
+
+void cedar::proc::GroupXMLFileFormatV1::writeChainedSynapticConnections(cedar::proc::ConstGroupPtr group,
+                                                                        cedar::aux::ConfigurationNode& root) const
+{
+  // Find all steps that are chainable
+  for (auto& name_element_pair : group->getElements())
+  {
+    auto element = name_element_pair.second;
+    if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
+    {
+      // Check if this is a step that belongs to a chain that can be merged into a SynapticConnection
+      if (boost::dynamic_pointer_cast<cedar::proc::steps::StaticGain>(step) ||
+          boost::dynamic_pointer_cast<cedar::proc::steps::Convolution>(step) ||
+          boost::dynamic_pointer_cast<cedar::proc::steps::Projection>(step))
+      {
+        CEDAR_ASSERT(step->isXMLExportable())
+
+        // Check if this is the first step of the chain
+        std::vector<cedar::proc::DataSlotPtr> inputSlots = step->getOrderedDataSlots(DataRole::INPUT);
+        CEDAR_ASSERT(inputSlots.size() > 0)
+        cedar::proc::DataSlotPtr inputSlot = inputSlots.at(0);
+        CEDAR_ASSERT(inputSlot->getDataConnections().size() == 1)
+        cedar::proc::DataConnectionPtr inputConn = inputSlot->getDataConnections().at(0);
+        cedar::proc::Connectable *source = inputConn.get()->getSource()->getParentPtr();
+        CEDAR_ASSERT(source != nullptr);
+        if (!dynamic_cast<cedar::proc::steps::StaticGain *>(source) &&
+            !dynamic_cast<cedar::proc::steps::Convolution *>(source) &&
+            !dynamic_cast<cedar::proc::steps::Projection *>(source))
+        {
+          // First step of the chain.
+          cedar::aux::ConfigurationNode synCon;
+          synCon.put("Source", source->getFullPath());
+          this->writeChainedSynapticConnection(step.get(), synCon, root);
+        }
+      }
+    }
+  }
 }
 
 void cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(cedar::aux::UIntParameterPtr dimensionality,

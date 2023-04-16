@@ -52,6 +52,7 @@
 #include "cedar/auxiliaries/ObjectListParameterTemplate.fwd.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.fwd.h"
 #include "cedar/processing/steps/SynapticConnection.fwd.h"
+#include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/DataConnection.fwd.h"
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/ProjectionMappingParameter.fwd.h"
@@ -128,7 +129,6 @@ public:
     cedar::aux::UIntParameterPtr, cedar::aux::UIntVectorParameterPtr,
     std::vector<cedar::aux::math::Limits<double>> sizesRange, cedar::aux::ConfigurationNode&, const std::string& name = "Dimensions");
 
-
   static void readDimensionsParameter(
     cedar::aux::UIntParameterPtr dimensionality, cedar::aux::UIntVectorParameterPtr sizes,
     std::vector<cedar::aux::math::Limits<double>>& sizesRange, const cedar::aux::ConfigurationNode& node, const std::string& name = "Dimensions");
@@ -137,6 +137,9 @@ public:
   static void readProjectionMappingsParameter(
     cedar::proc::ProjectionMappingParameterPtr& mappingParameter,
     const cedar::aux::ConfigurationNode& root);
+
+  // Checks if a synaptic connection chain is exportable (chain of StaticGain/Projection/Convolution)
+  static bool isSynapticConnectionChainExportable(cedar::proc::Connectable* chainSource, std::string& errorMsg);
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -164,6 +167,13 @@ private:
   cedar::proc::StepPtr createStep(std::string name, std::string class_id, cedar::proc::GroupPtr group,
                   const cedar::aux::ConfigurationNode& stepNode, std::vector<std::string>& exceptions);
 
+  // Returns true if provided step is on the blacklist for the common export for steps
+  bool isStepBlacklisted(cedar::proc::Connectable* step) const;
+
+  // Checks if a synaptic connection chain is exportable (chain of StaticGain/Projection/Convolution)
+  static bool isSynapticConnectionChainExportableRecursive(cedar::proc::Connectable* chainSource, bool hasStaticGain,
+                                                  bool hasConvolution, bool hasProjection);
+
   /*!@brief Writes a synaptic connection to the configuration node.
    */
   void writeSynapticConnection(cedar::aux::ConfigurationNode& root,
@@ -172,6 +182,16 @@ private:
   /*!@brief Writes the data connections in the group to the configuration node.
    */
   void writeSynapticConnections(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
+
+  /*!@brief Writes a chained synaptic connection to the configuration node.
+   */
+  void writeChainedSynapticConnection(cedar::proc::Connectable* connectable, cedar::aux::ConfigurationNode synCon,
+                                      cedar::aux::ConfigurationNode& root) const;
+
+  /*!@brief Writes the chained synaptic connections in the group to the configuration node.
+   */
+  void writeChainedSynapticConnections(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
+
 
   /*!@brief Writes a data connection to the configuration node.
    */

@@ -90,6 +90,10 @@ public:
     this->_mGainFactor->setValue(gainFactor);
   }
 
+  void writeConfigurationXML(cedar::aux::ConfigurationNode& root) const;
+
+  bool isXMLExportable(std::string& errorMsg) override;
+
 public slots:
   //!@brief This slot is connected to the valueChanged() event of the gain value parameter.
   void gainChanged();

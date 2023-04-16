@@ -156,6 +156,10 @@ public:
     this->_mOutputDimensionSizes->setValue(dimension, size);
   }
 
+  void writeConfigurationXML(cedar::aux::ConfigurationNode& root) const;
+
+  bool isXMLExportable(std::string& errorMsg) override;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
