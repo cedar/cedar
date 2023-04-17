@@ -106,7 +106,30 @@ public:
   //!@brief reads a directory from a configuration node
   void readFromNode(const cedar::aux::ConfigurationNode& node)
   {
-    this->mValue.setPath(QString::fromStdString(node.get_value<std::string>()));
+    bool oldFileFormat = true;
+
+    auto mode_iter = node.find("isRelative");
+    if (mode_iter != node.not_found())
+    {
+      auto pathMode = node.get<bool>("isRelative") ?
+        DirectoryParameter::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR : DirectoryParameter::PATH_MODE_ABSOLUTE;
+      this->mPathMode = pathMode;
+      oldFileFormat = false;
+    }
+
+    auto path_iter = node.find("path");
+    if (path_iter != node.not_found())
+    {
+      this->setValue(node.get<std::string>("path"));
+      oldFileFormat = false;
+    }
+
+    //Old version for legacy architecture files
+    if(oldFileFormat)
+    {
+      this->mValue.setPath(QString::fromStdString(node.get_value<std::string>()));
+      this->setPathMode(DirectoryParameter::PATH_MODE_ABSOLUTE);
+    }
   }
 
   //!@brief stores a directory as string in a configuration node
@@ -115,7 +138,13 @@ public:
 #ifdef CEDAR_PORTABLE
     root.put(this->getName(), this->mValue.path().toStdString());
 #else
-    root.put(this->getName(), this->mValue.absolutePath().toStdString());
+    cedar::aux::ConfigurationNode dirNode;
+
+    dirNode.put("path",this->getPath());
+    dirNode.put("isRelative",
+                this->mPathMode == DirectoryParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
+
+    root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), dirNode));
 #endif // CEDAR_PORTABLE
   }
 
@@ -133,7 +162,14 @@ public:
 #ifdef CEDAR_PORTABLE
     root.put(this->getName(), this->mValue.path().toStdString());
 #else
-    root.put(cedar::aux::toUpperCamelCase(this->getName(), " "), this->mValue.absolutePath().toStdString());
+    cedar::aux::ConfigurationNode dirNode;
+
+    dirNode.put("path",this->getPath());
+    dirNode.put("isRelative",
+                this->mPathMode == DirectoryParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
+
+    root.push_back(cedar::aux::ConfigurationNode::value_type(cedar::aux::toUpperCamelCase(
+                      this->getName(), " "), dirNode));
 #endif // CEDAR_PORTABLE
   }
 

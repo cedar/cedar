@@ -125,11 +125,13 @@ void cedar::proc::aux::gui::DirectoryParameter::parameterValueChanged()
 
   parameter->lockForRead();
   QString value = QString::fromStdString(parameter->getPath());
+  bool isRelative = parameter->getPathMode() == cedar::aux::DirectoryParameter::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR;
   parameter->unlock();
 
   this->mpEdit->setReadOnly(false);
   this->mpEdit->setText(value);
   this->mpEdit->setReadOnly(true);
+  this->mpCheckRelative->setChecked(isRelative);
 }
 
 void cedar::proc::aux::gui::DirectoryParameter::onBrowseClicked()
