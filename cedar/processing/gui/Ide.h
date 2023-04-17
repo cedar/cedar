@@ -143,6 +143,8 @@ public:
   //! Adds command line options that are processed by the IDE to the given command line parser.
   static void addCommandLineOptionsTo(cedar::aux::CommandLineParser& parser);
 
+  void setSimulationControlsEnabled(bool enabled);
+
 public slots:
   //!@brief
   void togglePlotGroupActions();
@@ -418,8 +420,6 @@ private:
   void setArchitectureSavingLoadingEnabled(bool enabled);
 
   void setRecordingControlsEnabled(bool enabled);
-
-  void setSimulationControlsEnabled(bool enabled);
 
   void showEvent( QShowEvent *event );
 

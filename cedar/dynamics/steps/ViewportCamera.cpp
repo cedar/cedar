@@ -257,22 +257,22 @@ void cedar::dyn::steps::ViewportCamera::eulerStep(const cedar::unit::Time& time)
                       {
                           int step = floor( (_mElapsedLearnTime-25) / 20);
                           if(step >= 0 && step <= 2){
-                              top += hvh;
-                          }
-                          if(step >= 3 && step <= 5){
                               top += hvh/2;
                           }
+                          if(step >= 3 && step <= 5){
+                              top += hvh/4;
+                          }
                           if(step >= 9 && step <= 11){
-                              top -= hvh/2;
+                              top -= hvh/4;
                           }
                           if(step >= 12 && step <= 14){
-                              top -= hvh;
+                              top -= hvh/2;
                           }
                           if(step == 0 || step == 3 || step == 6 || step == 9 || step == 12){
-                              left += hvw;
+                              left += hvw/2;
                           }
                           if(step == 2 || step == 5 || step == 8 || step == 11 || step == 14){
-                              left -= hvw;
+                              left -= hvw/2;
                           }
                       }
                   }

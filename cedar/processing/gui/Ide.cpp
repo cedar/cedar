@@ -977,7 +977,9 @@ void cedar::proc::gui::Ide::setArchitectureSavingLoadingEnabled(bool enabled)
 void cedar::proc::gui::Ide::setSimulationControlsEnabled(bool enabled)
 {
   this->mpActionStartPauseSimulation->setEnabled(enabled);
-  // jokeit: see above this->mpActionResetSimulation->setEnabled(enabled);
+  this->mpActionResetSimulation->setEnabled(enabled);
+  this->mpActionUndo->setEnabled(enabled);
+  this->mpActionRedo->setEnabled(enabled);
   this->mpThreadsSingleStep->setEnabled(enabled && cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT);
 }
 

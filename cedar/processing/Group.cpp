@@ -1141,13 +1141,24 @@ void cedar::proc::Group::listSubgroups(std::set<cedar::proc::GroupPtr>& subgroup
 void cedar::proc::Group::reset()
 {
   // first, find all looped triggers that are running and stop them
-  
   bool wasTriggerRunningUponResetCall = this->isAnyTriggerRunning();
 
   // JT:Why is this not using stopTriggers?
   // JT:The old manual way did not work properly with the new simulation mode
   if(wasTriggerRunningUponResetCall)
     this->stopTriggers(true);
+
+    auto app = QCoreApplication::instance();
+
+    if (app && this->isRoot())
+    {
+        auto pointer = dynamic_cast< cedar::proc::gui::IdeApplication* >(app);
+        if (pointer)
+        {
+            auto ide = pointer->getIde();
+            ide->setSimulationControlsEnabled(false);
+        }
+    }
 
   //auto looped_triggers = this->findAll<cedar::proc::LoopedTrigger>(true);
   //std::set<cedar::proc::LoopedTriggerPtr> running_triggers;
@@ -1173,6 +1184,16 @@ void cedar::proc::Group::reset()
     auto element = name_element_pair.second;
     element->callReset();
   }
+
+    if (app && this->isRoot())
+    {
+        auto pointer = dynamic_cast< cedar::proc::gui::IdeApplication* >(app);
+        if (pointer)
+        {
+            auto ide = pointer->getIde();
+            ide->setSimulationControlsEnabled(true);
+        }
+    }
 
   //JT: Why was this not using start triggers?
   if(wasTriggerRunningUponResetCall)
