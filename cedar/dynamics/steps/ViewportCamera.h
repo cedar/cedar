@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/MatData.fwd.h"
 #include "cedar/auxiliaries/UIntVectorParameter.fwd.h"
 #include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/dynamics/steps/ViewportCamera.fwd.h"
@@ -123,6 +124,8 @@ private:
     double _lastY;
     bool _startSC;
     bool _endSC;
+    bool _recorded;
+    int _recordedCount;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -131,6 +134,8 @@ protected:
   //!@brief The size of the viewport
   cedar::aux::UIntVectorParameterPtr mViewportSize;
   cedar::aux::BoolParameterPtr _msimplified;
+  cedar::aux::DirectoryParameterPtr _mRecordPath;
+  cedar::aux::BoolParameterPtr _mRecord;
 
 private:
   // none yet
