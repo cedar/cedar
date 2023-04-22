@@ -75,7 +75,6 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    //Todo: Add right name, icon and description
     ElementDeclarationPtr declaration
             (
                     new ElementDeclarationTemplate<cedar::proc::steps::SynapticConnection>
@@ -84,10 +83,10 @@ namespace
                                     "cedar.processing.SynapticConnection"
                             )
             );
-    declaration->setIconPath(":/steps/<em>YOURICON</em>.svg");
+    declaration->setIconPath(":/steps/synaptic_connection.svg");
     declaration->setDescription
             (
-                    "<em>ADD A DESCRIPTION FOR THE TOOLTIP OF YOUR STEP IN HERE</em>"
+                    "Combines StaticGain, Convolution and Projection into a connection step, that is xml exportable."
             );
 
     ElementDeclaration::PlotDefinition default_plot_data("default plot", ":/cedar/dynamics/gui/field_plot.svg");

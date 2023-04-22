@@ -58,6 +58,7 @@
         <file>steps/serial_order.svg</file>
         <file>steps/space_to_rate_code.svg</file>
         <file>steps/spatial_template.svg</file>
+        <file>steps/synaptic_connection.svg</file>
         <file>steps/linear_spatial_template.svg</file>
         <file>steps/linear_spatial_template_1xn.svg</file>
         <file>steps/linear_spatial_template_nx1.svg</file>
