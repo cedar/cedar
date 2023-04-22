@@ -181,6 +181,8 @@ protected slots:
 private:
   void compute(const Arguments &);
 
+  void updateInputSum();
+
 	////Functions for Convolution Step
 
   void inputConnectionChanged(const std::string& inputName);
@@ -225,7 +227,7 @@ protected:
   // none yet
 private:
 	//!@brief The Data containing the input matrix
-	cedar::aux::ConstMatDataPtr mMatrix;
+	cedar::aux::MatDataPtr mMatrix;
 
   //// Members for Convolution
   cedar::aux::conv::ConvolutionPtr mConvolution;
@@ -240,6 +242,8 @@ private:
 	boost::signals2::connection mKernelRemovedConnection;
 
 	bool mRevalidating;
+
+  cedar::aux::MatDataPtr mInputSum;
 
   cedar::aux::MatDataPtr mConvolutionOutput;
 

@@ -48,6 +48,7 @@
 #include "cedar/processing/typecheck/IsMatrix.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/processing/steps/Convolution.h"
+#include "cedar/processing/steps/Sum.h"
 #include "cedar/auxiliaries/convolution/FFTW.h"
 #include "cedar/processing/steps/Projection.h"
 #include "cedar/auxiliaries/Configurable.h"
@@ -88,6 +89,14 @@ namespace
             (
                     "<em>ADD A DESCRIPTION FOR THE TOOLTIP OF YOUR STEP IN HERE</em>"
             );
+
+    ElementDeclaration::PlotDefinition default_plot_data("default plot", ":/cedar/dynamics/gui/field_plot.svg");
+    default_plot_data.appendData(DataRole::BUFFER, "input sum");
+    default_plot_data.appendData(DataRole::BUFFER, "convolution kernel", true);
+    default_plot_data.appendData(DataRole::BUFFER, "point wise weights", true);
+    default_plot_data.appendData(DataRole::OUTPUT, "result", true);
+    declaration->definePlot(default_plot_data);
+
     ElementDeclaration::PlotDefinition kernel_plot_data("convolution kernel", ":/cedar/dynamics/gui/kernel_plot.svg");
     kernel_plot_data.appendData(DataRole::BUFFER, "convolution kernel");
     declaration->definePlot(kernel_plot_data);
@@ -96,9 +105,7 @@ namespace
     pointWiseWeight_plot_data.appendData(DataRole::BUFFER, "point wise weights");
     declaration->definePlot(pointWiseWeight_plot_data);
 
-    ElementDeclaration::PlotDefinition pointWiseWeight_padded_plot_data("pointWiseWeights (padded)", ":/cedar/dynamics/gui/kernel_plot.svg");
-    pointWiseWeight_padded_plot_data.appendData(DataRole::BUFFER, "point wise weights (padded)");
-    declaration->definePlot(pointWiseWeight_padded_plot_data);
+    declaration->setDefaultPlot("default plot");
 
     declaration->declare();
 
@@ -113,22 +120,24 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::steps::SynapticConnection::SynapticConnection()
-        :
-        mConvolution(new cedar::aux::conv::Convolution()),
-        mPointWiseWeightConvolution(new cedar::aux::conv::Convolution()),
-        mPreparedPointWiseMat(new cedar::aux::MatData()),
-        mRevalidating(false),
-        mConvolutionOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
-        mStaticGainOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
-        mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
-        mpProjectionMethod(nullptr)
+:
+mConvolution(new cedar::aux::conv::Convolution()),
+mPointWiseWeightConvolution(new cedar::aux::conv::Convolution()),
+mPreparedPointWiseMat(new cedar::aux::MatData()),
+mRevalidating(false),
+mMatrix(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
+mConvolutionOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
+mStaticGainOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
+mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
+mpProjectionMethod(nullptr)
 {
   ////General
   this->mXMLExportable = true;
-  this->declareInput("matrix", true);
+  this->declareInputCollection("matrix");
   this->declareOutput("result", mOutput);
   this->declareBuffer("convolution kernel", this->mConvolution->getCombinedKernel());
   this->declareBuffer("point wise weights", this->mPreparedPointWiseMat);
+  this->declareBuffer("input sum", this->mMatrix);
 
   ////Convolution code
   QObject::connect(this->mConvolution.get(), SIGNAL(configurationChanged()), this,
@@ -251,8 +260,9 @@ cedar::proc::steps::SynapticConnection::~SynapticConnection()
 // The arguments are unused here
 void cedar::proc::steps::SynapticConnection::compute(const cedar::proc::Arguments&)
 {
+  this->updateInputSum();
   ////First: Convolution
-  const cv::Mat& matrix = mMatrix->getData();
+  const cv::Mat& matrix = this->mMatrix->getData();
   if (this->mKernelsParameter->size() > 0)
   {
     if (this->mKernelsParameter->at(0)->getDimensionality() != this->convolutionGetDimensionality())
@@ -296,6 +306,11 @@ void cedar::proc::steps::SynapticConnection::compute(const cedar::proc::Argument
 void cedar::proc::steps::SynapticConnection::recompute()
 {
   this->onTrigger();
+}
+
+void cedar::proc::steps::SynapticConnection::updateInputSum()
+{
+  cedar::proc::steps::Sum::sumSlot(this->getInputSlot("matrix"), this->mMatrix->getData(), true);
 }
 
 void cedar::proc::steps::SynapticConnection::preparePointWiseWeightMat(cv::Mat& pointWiseMat)
@@ -409,14 +424,13 @@ void cedar::proc::steps::SynapticConnection::readConfigurationXML(const cedar::a
 void cedar::proc::steps::SynapticConnection::inputConnectionChanged(const std::string& inputName)
 {
 // Again, let's first make sure that this is really the input in case anyone ever changes our interface.
-  CEDAR_DEBUG_ASSERT(inputName == "matrix" || inputName == "kernel");
+  CEDAR_DEBUG_ASSERT(inputName == "matrix");
 
   cv::Mat old_output = this->mOutput->getData().clone();
 
   if (inputName == "matrix")
   {
-    // Assign the input to the member. This saves us from casting in every computation step.
-    this->mMatrix = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
+    this->updateInputSum();
     // This should always work since other types should not be accepted.
     if (!this->mMatrix || this->mMatrix->isEmpty())
     {
