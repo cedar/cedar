@@ -277,10 +277,6 @@ void cedar::proc::steps::SynapticConnection::compute(const cedar::proc::Argument
     this->mPreparedPointWiseMat->setData(pointWiseMat);
     mConvolutionOutput->setData(pointWiseMat.mul(mConvolutionOutput->getData()));
   }
-  else
-  {
-    this->mConvolutionOutput->setData(this->mMatrix->getData().clone());
-  }
 
   ////Second: Static Gain
   this->mStaticGainOutput->setData(this->mConvolutionOutput->getData() * this->mGainFactorParameter->getValue());
