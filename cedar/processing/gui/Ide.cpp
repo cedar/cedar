@@ -2431,18 +2431,23 @@ bool cedar::proc::gui::Ide::exportXML()
 
     if(auto stepItem = dynamic_cast<cedar::proc::gui::StepItem*>(item)){
       std::string errorMsg = "";
+      // Don't consider steps in groups
+      if(stepItem->getStep()->getFullPath().find('.') != std::string::npos)
+      {
+        continue;
+      }
       if(!stepItem->getStep()->isXMLExportable(errorMsg)){
         isExportable = false;
         if(!errorMsg.compare(""))
         {
-          nonExportableSteps.insert(cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(stepItem->getStep())->getClassNameWithoutNamespace());
+          nonExportableSteps.insert(cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(
+            stepItem->getStep())->getClassNameWithoutNamespace());
         }
         else
         {
           cedar::aux::LogSingleton::getInstance()->error
             (
-              errorMsg + " (" + cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(
-                stepItem->getStep())->getClassNameWithoutNamespace() + ")",
+              errorMsg + " (" + stepItem->getStep()->getFullPath() + ")",
               "cedar::proc::gui::Ide::exportXML()"
             );
         }
