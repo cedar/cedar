@@ -101,9 +101,12 @@ cedar::dyn::steps::ViewportCamera::ViewportCamera()
   _lastY(0),
   _startSC(false),
   _endSC(false),
-  mViewportSize(new cedar::aux::UIntVectorParameter(this, "viewport size", 2, 10,
-                                                      1, 500000)),
-  _msimplified(new cedar::aux::BoolParameter(this, "simplified", false))
+  _recorded(false),
+  _recordedCount(0),
+  mViewportSize(new cedar::aux::UIntVectorParameter(this, "viewport size", 2, 10,1, 500000)),
+  _msimplified(new cedar::aux::BoolParameter(this, "simplified", false)),
+  _mRecordPath(new cedar::aux::DirectoryParameter(this,"directory","")),
+  _mRecord(new cedar::aux::BoolParameter(this, "record", false))
 {
 
   // declare all data
@@ -216,6 +219,7 @@ void cedar::dyn::steps::ViewportCamera::eulerStep(const cedar::unit::Time& time)
               if(_mElapsedTime > 20)
               {
                   _startSC = false;
+                  _recorded = false;
                   _endSC = true;
                   mOutputCOS->getData().setTo(1);
                   _mElapsedTime = 0.0;
@@ -284,6 +288,11 @@ void cedar::dyn::steps::ViewportCamera::eulerStep(const cedar::unit::Time& time)
               // Crop the image
               cv::Rect viewportRect(left, top, viewportWidth, viewportHeight);
               output = input_padded(viewportRect);
+              if(!_recorded && this->_mRecord->getValue()){
+                  cv::imwrite(_mRecordPath->getPath(true) + "\\" + std::to_string(_recordedCount) +".png", output);
+                  _recordedCount++;
+                  _recorded = true;
+              }
           }
       }
   }
@@ -294,6 +303,7 @@ void cedar::dyn::steps::ViewportCamera::eulerStep(const cedar::unit::Time& time)
       _startSC = false;
       _endSC = false;
       _mElapsedTime = 0.0;
+      _recordedCount = 0;
       _mElapsedLearnTime = 0.0;
       output = cv::Mat(viewportHeight, viewportWidth, CV_8UC3, cv::Scalar(0, 0, 0));
       kernel = cv::Mat(120,180, CV_32F, cv::Scalar(0.0));
@@ -331,6 +341,7 @@ void cedar::dyn::steps::ViewportCamera::reset()
     _startSC = false;
     _endSC = false;
     _mElapsedTime = 0.0;
+    _recordedCount = 0;
     _mElapsedLearnTime = 0.0;
     mOutput->getData().setTo(0);
     mOutputCOS->getData().setTo(0);

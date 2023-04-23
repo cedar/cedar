@@ -135,9 +135,7 @@ public:
   //!@brief stores a directory as string in a configuration node
   void writeToNode(cedar::aux::ConfigurationNode& root) const
   {
-#ifdef CEDAR_PORTABLE
-    root.put(this->getName(), this->mValue.path().toStdString());
-#else
+
     cedar::aux::ConfigurationNode dirNode;
 
     dirNode.put("path",this->getPath());
@@ -145,7 +143,7 @@ public:
                 this->mPathMode == DirectoryParameter::PathMode::PATH_MODE_RELATIVE_TO_CURRENT_ARCHITECTURE_DIR);
 
     root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), dirNode));
-#endif // CEDAR_PORTABLE
+
   }
 
   QDir getCurrentArchitectureFileDirectory() const
@@ -159,9 +157,7 @@ public:
   //!@brief stores a directory as string in a configuration node for XML
   void writeToNodeXML(cedar::aux::ConfigurationNode& root) const
   {
-#ifdef CEDAR_PORTABLE
-    root.put(this->getName(), this->mValue.path().toStdString());
-#else
+
     cedar::aux::ConfigurationNode dirNode;
 
     dirNode.put("path",this->getPath());
@@ -170,7 +166,7 @@ public:
 
     root.push_back(cedar::aux::ConfigurationNode::value_type(cedar::aux::toUpperCamelCase(
                       this->getName(), " "), dirNode));
-#endif // CEDAR_PORTABLE
+
   }
 
   //!@brief sets a new directory from string
