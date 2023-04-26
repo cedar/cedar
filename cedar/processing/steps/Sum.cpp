@@ -167,10 +167,6 @@ void cedar::proc::steps::Sum::sumSlot(cedar::proc::ExternalDataPtr slot, cv::Mat
 
 void cedar::proc::steps::Sum::compute(const cedar::proc::Arguments&)
 {
-  if(this->getName().find("Debug")!=std::string::npos)
-  {
-    std::cout<<this->getName() << " compute!"<<std::endl;
-  }
   cedar::proc::steps::Sum::sumSlot(this->mInputs, this->mOutput->getData(), false);
 }
 
