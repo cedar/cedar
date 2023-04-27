@@ -689,6 +689,7 @@ void cedar::dyn::steps::HebbianConnection::resetWeights()
   }
 
   this->emitOutputPropertiesChangedSignal(mTriggerOutputName);
+  this->revalidateInputSlot(mReadOutInputName);
   this->revalidateInputSlot(mAssoInputName);
 }
 
