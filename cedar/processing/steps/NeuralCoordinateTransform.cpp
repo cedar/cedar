@@ -109,7 +109,7 @@ cedar::proc::steps::NeuralCoordinateTransform::NeuralCoordinateTransform()
 {
   // declare all data
   this->declareInput("matrix", true);
-  this->declareInput("kernel", false);
+  this->declareInput("kernel", true);
 
   this->declareOutput("result", mFlipAllDimensionsOutput);
 
