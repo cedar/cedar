@@ -103,7 +103,7 @@ cedar::proc::steps::NeuralCoordinateTransform::NeuralCoordinateTransform()
 //matrix slice
         mMatrixSliceOutput(new cedar::aux::MatData(cv::Mat())),
 //flip all dimensions stuff
-        mFlipAllDimensions(new cedar::aux::BoolParameter(this, "flip all dimensions", false)),
+        mFlipAllDimensions(new cedar::aux::BoolParameter(this, "flip kernel", false)),
         mFlipAllDimensionsOutput(new cedar::aux::MatData(cv::Mat()))
 
 {
@@ -111,7 +111,7 @@ cedar::proc::steps::NeuralCoordinateTransform::NeuralCoordinateTransform()
   this->declareInput("matrix", true);
   this->declareInput("kernel", true);
 
-  this->declareOutput("result", mFlipAllDimensionsOutput);
+  this->declareOutput("result", mMatrixSliceOutput);
 
   QObject::connect(this->mConvolution.get(), SIGNAL(configurationChanged()), this, SLOT(recompute()));
 
@@ -149,12 +149,27 @@ cedar::proc::steps::NeuralCoordinateTransform::NeuralCoordinateTransform()
 
 void cedar::proc::steps::NeuralCoordinateTransform::compute(const cedar::proc::Arguments&)
 {
+  const cv::Mat& kernelMatrx = mInputMatrix->getData();
+  unsigned int dimensionalityKernelMatrx = cedar::aux::math::getDimensionalityOf(kernelMatrx);
+
   ////Convolution Stuff
   const cv::Mat& matrix = mInputMatrix->getData();
   if (mKernel)
   {
-    const cv::Mat& kernel = mKernel->getData();
-    mConvolutionOutput->setData(this->mConvolution->convolve(matrix, kernel));
+    //check if kernel should be flipped
+    if(this->mFlipAllDimensions->getValue())
+    {
+      cv::Mat flipped_kernel;
+      std::vector<bool> trueVector(dimensionalityKernelMatrx, true);
+      cedar::aux::math::flip(this->mKernel->getData(), flipped_kernel, trueVector);
+      mConvolutionOutput->setData(this->mConvolution->convolve(matrix, flipped_kernel));
+    }
+    //non flipped kernel
+    else
+    {
+      const cv::Mat& kernel = mKernel->getData();
+      mConvolutionOutput->setData(this->mConvolution->convolve(matrix, kernel));
+    }
   }
   else
   {
@@ -170,9 +185,6 @@ void cedar::proc::steps::NeuralCoordinateTransform::compute(const cedar::proc::A
 
   const cv::Mat& inputMatrix = mInputMatrix->getData();
   unsigned int dimensionalityInputMatrix = cedar::aux::math::getDimensionalityOf(inputMatrix);
-
-  const cv::Mat& kernelMatrx = mInputMatrix->getData();
-  unsigned int dimensionalityKernelMatrx = cedar::aux::math::getDimensionalityOf(kernelMatrx);
 
   //have to be all the same otherwise this cant work
   CEDAR_ASSERT(dimensionalityConvolutionOutput == dimensionalityInputMatrix &&
@@ -274,17 +286,6 @@ void cedar::proc::steps::NeuralCoordinateTransform::compute(const cedar::proc::A
   cv::Mat& matrixSliceOutputMatrix = this->mMatrixSliceOutput->getData();
   matrixSliceOutputMatrix = convolutionOutputMatrix(&mRanges.front()).clone();
   mMatrixSliceOutput->setData(matrixSliceOutputMatrix);
-
-  //Last Step Flip everything if wanted
-  if(this->mFlipAllDimensions->getValue())
-  {
-    std::vector<bool> trueVector(cedar::aux::math::getDimensionalityOf(matrixSliceOutputMatrix), true);
-    cedar::aux::math::flip(this->mMatrixSliceOutput->getData(), this->mFlipAllDimensionsOutput->getData(), trueVector);
-  }
-  else
-  {
-    mFlipAllDimensionsOutput->setData(this->mMatrixSliceOutput->getData().clone());
-  }
 }
 
 void cedar::proc::steps::NeuralCoordinateTransform::recompute()
