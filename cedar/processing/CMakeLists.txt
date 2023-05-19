@@ -179,6 +179,7 @@ cedar_add_library(cedarproc
   steps/BufferReader.h
   steps/Component.h
   steps/Convolution.h
+  steps/NeuralCoordinateTransform.h
   steps/ConvertToValueRange.h
   steps/ColorConversion.h
   steps/ComponentMultiply.h
