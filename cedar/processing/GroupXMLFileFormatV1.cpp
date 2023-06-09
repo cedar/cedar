@@ -142,6 +142,7 @@ void cedar::proc::GroupXMLFileFormatV1::writeSteps
 	cedar::aux::ConfigurationNode& steps
 ) const
 {
+  bool hasGroup = false;
   for (auto& name_element_pair : group->getElements())
   {
     auto element = name_element_pair.second;
@@ -168,6 +169,19 @@ void cedar::proc::GroupXMLFileFormatV1::writeSteps
       step->writeConfigurationXML(step_node);
       steps.push_back(cedar::aux::ConfigurationNode::value_type(node_name, step_node));
     }
+    // Print a warning if the architecture contains groups
+    else if (boost::dynamic_pointer_cast<cedar::proc::Group>(element))
+    {
+      hasGroup = true;
+    }
+  }
+  if(hasGroup)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Groups are not xml-exportable. Groups and all steps within are not considered for the XML export.",
+        "cedar::proc::GroupXMLFileFormatV1::writeSteps()"
+      );
   }
 }
 
