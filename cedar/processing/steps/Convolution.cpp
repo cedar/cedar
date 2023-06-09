@@ -353,6 +353,15 @@ void cedar::proc::steps::Convolution::writeConfigurationXML(cedar::aux::Configur
   cedar::aux::ConfigurationNode sumWeightPattern;
   cedar::proc::GroupXMLFileFormatV1::writeKernelListParameter(this->_mKernels.get(), sumWeightPattern);
   root.add_child("KernelWeights", sumWeightPattern);
+
+  if(this->getInputSlot("kernel")->getDataConnections().size() > 0)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Kernel input to Convolution step is not xml-exportable. Only manually set kernels are exported.",
+        "cedar::proc::steps::Convolution::writeConfigurationXML()"
+      );
+  }
 }
 
 void cedar::proc::steps::Convolution::slotKernelAdded(size_t kernelIndex)

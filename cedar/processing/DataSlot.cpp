@@ -260,6 +260,11 @@ std::vector<cedar::proc::DataConnectionPtr>& cedar::proc::DataSlot::getDataConne
   return this->mConnections;
 }
 
+const std::vector<cedar::proc::DataConnectionPtr>& cedar::proc::DataSlot::getDataConnections() const
+{
+  return this->mConnections;
+}
+
 const std::string& cedar::proc::DataSlot::getValidityInfo() const
 {
   return this->mValidityInfo;
