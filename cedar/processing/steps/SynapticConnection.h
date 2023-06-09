@@ -174,7 +174,8 @@ protected slots:
   void projectionOutputDimensionSizesChanged();
   //!@brief chooses the appropriate projection method for the current input and output
   void reconfigure(bool triggerSubsequent = true);
-
+  //!@brief this slot is triggered whenever the projectionEnabled parameter is toggled
+  void projectionEnabledToggled();
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -252,6 +253,9 @@ private:
   cedar::aux::MatDataPtr mStaticGainOutput;
 
   ////Members for Projection
+  //!@brief Boolean that enables the projection
+  cedar::aux::BoolParameterPtr mProjectionEnabled;
+
   //!@brief mapping between the input and output dimensions
   cedar::proc::ProjectionMappingParameterPtr mProjectionDimensionMappings;
 

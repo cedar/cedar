@@ -216,6 +216,7 @@ mpProjectionMethod(nullptr)
   //Add projectionConfigurable parameter to "grey grouping box"
   cedar::aux::ConfigurablePtr projectionConfigurable = boost::shared_ptr<cedar::aux::Configurable>(
           new cedar::aux::Configurable());
+  mProjectionEnabled = new cedar::aux::BoolParameter(projectionConfigurable.get(), "enabled", false);
   mProjectionDimensionMappings = new cedar::proc::ProjectionMappingParameter(projectionConfigurable.get(),
                                                                              "dimension mapping");
   mProjectionOutputDimensionality = new cedar::aux::UIntParameter(projectionConfigurable.get(),
@@ -233,12 +234,18 @@ mpProjectionMethod(nullptr)
                                                              "compression type",
                                                              cedar::proc::steps::SynapticConnection::ReducedCompressionType::typePtr(),
                                                              cedar::proc::steps::SynapticConnection::ReducedCompressionType::SUM);
+  this->mProjectionDimensionMappings->setConstant(true);
+  this->mProjectionOutputDimensionSizes->setConstant(true);
+  this->mProjectionCompressionType->setConstant(true);
+  this->mProjectionOutputDimensionality->setConstant(true);
   this->addConfigurableChild("projection", projectionConfigurable);
 
   // initialize the output buffer to the correct size
   this->projectionOutputDimensionalityChanged();
 
   // connect signals and slots
+  QObject::connect(mProjectionEnabled.get(), SIGNAL(valueChanged()), this,
+                   SLOT(projectionEnabledToggled()), Qt::DirectConnection);
   QObject::connect(mProjectionDimensionMappings.get(), SIGNAL(valueChanged()), this,
                    SLOT(reconfigure()), Qt::DirectConnection);
   QObject::connect(mProjectionCompressionType.get(), SIGNAL(valueChanged()), this,
@@ -293,12 +300,18 @@ void cedar::proc::steps::SynapticConnection::compute(const cedar::proc::Argument
   ////Third: Projection
   if (!mStaticGainOutput) // quickfix
     return;
-
-  // call the appropriate projection method via the function pointer
-  if(mpProjectionMethod)
+  if(this->mProjectionEnabled->getValue())
   {
-    (this->*mpProjectionMethod)(mStaticGainOutput, mOutput, mProjectionIndicesToCompress, mProjectionCompressionType,
-                                mProjectionDimensionMappings);
+    // call the appropriate projection method via the function pointer
+    if (mpProjectionMethod)
+    {
+      (this->*mpProjectionMethod)(mStaticGainOutput, mOutput, mProjectionIndicesToCompress, mProjectionCompressionType,
+                                  mProjectionDimensionMappings);
+    }
+  }
+  else
+  {
+    this->mOutput->setData(this->mStaticGainOutput->getData());
   }
 }
 
@@ -377,9 +390,12 @@ void cedar::proc::steps::SynapticConnection::writeConfigurationXML(cedar::aux::C
   root.put("ScalarWeight", this->mGainFactorParameter->getValue());
 
   // Write projection
-  cedar::aux::ConfigurationNode dimensionMapping;
-  this->mProjectionDimensionMappings->writeToNodeXML(dimensionMapping);
-  root.add_child("DimensionMapping", dimensionMapping);
+  if(this->mProjectionEnabled->getValue())
+  {
+    cedar::aux::ConfigurationNode dimensionMapping;
+    this->mProjectionDimensionMappings->writeToNodeXML(dimensionMapping);
+    root.add_child("DimensionMapping", dimensionMapping);
+  }
 }
 
 void cedar::proc::steps::SynapticConnection::readConfigurationXML(const cedar::aux::ConfigurationNode& root)
@@ -413,6 +429,8 @@ void cedar::proc::steps::SynapticConnection::readConfigurationXML(const cedar::a
     cedar::proc::GroupXMLFileFormatV1::readProjectionMappingsParameter(
       this->mProjectionDimensionMappings,
       root.get_child("DimensionMapping"));
+    this->mProjectionEnabled->setValue(true);
+    this->projectionEnabledToggled();
   }
 }
 
@@ -604,6 +622,15 @@ void cedar::proc::steps::SynapticConnection::initializeOutputMatrix()
   }
 }
 
+void cedar::proc::steps::SynapticConnection::projectionEnabledToggled()
+{
+  this->mProjectionDimensionMappings->setConstant(!this->mProjectionEnabled->getValue());
+  this->mProjectionOutputDimensionSizes->setConstant(!this->mProjectionEnabled->getValue());
+  this->mProjectionCompressionType->setConstant(!this->mProjectionEnabled->getValue());
+  this->mProjectionOutputDimensionality->setConstant(!this->mProjectionEnabled->getValue());
+  this->reconfigure();
+}
+
 void cedar::proc::steps::SynapticConnection::reconfigure(bool triggerSubsequent)
 {
   if (!this->mStaticGainOutput)
@@ -620,144 +647,146 @@ void cedar::proc::steps::SynapticConnection::reconfigure(bool triggerSubsequent)
 
   unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(this->mStaticGainOutput->getData());
   unsigned int output_dimensionality = mProjectionOutputDimensionality->getValue();
-
-  // if the projection compresses ...
-  if (input_dimensionality > output_dimensionality)
+  if(this->mProjectionEnabled->getValue() && mProjectionDimensionMappings->getValue()->getNumberOfMappings() > 0)
   {
-    CEDAR_DEBUG_ASSERT(input_dimensionality == mProjectionDimensionMappings->getValue()->getNumberOfMappings())
-
-    // ... compute which indices need to be compressed
-    mProjectionIndicesToCompress.clear();
-
-    for (unsigned int index = 0; index < input_dimensionality; ++index)
+    // if the projection compresses ...
+    if (input_dimensionality > output_dimensionality)
     {
-      if (mProjectionDimensionMappings->getValue()->isDropped(index))
-      {
-        mProjectionIndicesToCompress.push_back(index);
-      }
-    }
+      CEDAR_DEBUG_ASSERT(input_dimensionality == mProjectionDimensionMappings->getValue()->getNumberOfMappings())
 
-    // set up the appropriate function pointer for different combinations of
-    // input and output dimensionality
-    if (input_dimensionality == 3 && output_dimensionality == 2)
-    {
-      std::vector<unsigned int> mapped_indices;
+      // ... compute which indices need to be compressed
+      mProjectionIndicesToCompress.clear();
 
       for (unsigned int index = 0; index < input_dimensionality; ++index)
       {
-        if (!mProjectionDimensionMappings->getValue()->isDropped(index))
+        if (mProjectionDimensionMappings->getValue()->isDropped(index))
         {
-          mapped_indices.push_back(mProjectionDimensionMappings->getValue()->lookUp(index));
+          mProjectionIndicesToCompress.push_back(index);
         }
       }
 
-      if (mapped_indices.size() == 2)
+      // set up the appropriate function pointer for different combinations of
+      // input and output dimensionality
+      if (input_dimensionality == 3 && output_dimensionality == 2)
       {
-        if (mapped_indices.at(0) == mapped_indices.at(1))
-        {
-          this->setState(
-                  cedar::proc::Triggerable::STATE_EXCEPTION,
-                  "Cannot map the same dimension onto multiple dimensions."
-          );
-          return;
-        }
-        bool swapped = mapped_indices.at(0) > mapped_indices.at(1);
+        std::vector<unsigned int> mapped_indices;
 
-        if (swapped)
+        for (unsigned int index = 0; index < input_dimensionality; ++index)
         {
-          mpProjectionMethod = &cedar::proc::ProjectionFunctions::compress3Dto2DSwapped;
+          if (!mProjectionDimensionMappings->getValue()->isDropped(index))
+          {
+            mapped_indices.push_back(mProjectionDimensionMappings->getValue()->lookUp(index));
+          }
         }
-        else
+
+        if (mapped_indices.size() == 2)
         {
-          mpProjectionMethod = &cedar::proc::ProjectionFunctions::compress3Dto2D;
+          if (mapped_indices.at(0) == mapped_indices.at(1))
+          {
+            this->setState(
+              cedar::proc::Triggerable::STATE_EXCEPTION,
+              "Cannot map the same dimension onto multiple dimensions."
+            );
+            return;
+          }
+          bool swapped = mapped_indices.at(0) > mapped_indices.at(1);
+
+          if (swapped)
+          {
+            mpProjectionMethod = &cedar::proc::ProjectionFunctions::compress3Dto2DSwapped;
+          }
+          else
+          {
+            mpProjectionMethod = &cedar::proc::ProjectionFunctions::compress3Dto2D;
+          }
         }
       }
+      else if (input_dimensionality == 3 && output_dimensionality == 1)
+      {
+        mpProjectionMethod = &cedar::proc::ProjectionFunctions::compress3Dto1D;
+      }
+      else if (input_dimensionality == 2 && output_dimensionality == 1)
+      {
+        mpProjectionMethod = &cedar::proc::ProjectionFunctions::compress2Dto1D;
+      }
+      else if (output_dimensionality == 0)
+      {
+        if (mProjectionCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::MAXIMUM)
+        {
+          mpProjectionMethod = &cedar::proc::ProjectionFunctions::compressNDto0Dmax;
+        }
+        else if (mProjectionCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::MINIMUM)
+        {
+          mpProjectionMethod = &cedar::proc::ProjectionFunctions::compressNDto0Dmin;
+        }
+        else if (mProjectionCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::AVERAGE)
+        {
+          mpProjectionMethod = &cedar::proc::ProjectionFunctions::compressNDto0Dmean;
+        }
+        else if (mProjectionCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::SUM)
+        {
+          mpProjectionMethod = &cedar::proc::ProjectionFunctions::compressNDto0Dsum;
+        }
+      }
+      else
+      {
+        mpProjectionMethod = NULL;
+        CEDAR_THROW(cedar::aux::NotImplementedException, "The projection for this configuration is not implemented.");
+      }
     }
-    else if (input_dimensionality == 3 && output_dimensionality == 1)
+      // if the projection expands ...
+    else
     {
-      mpProjectionMethod = &cedar::proc::ProjectionFunctions::compress3Dto1D;
+      // ... set up the appropriate function pointer
+      if (input_dimensionality == 0)
+      {
+        this->mpProjectionMethod = &cedar::proc::ProjectionFunctions::expand0DtoND;
+      }
+      else if (input_dimensionality == 1 && output_dimensionality == 3)
+      {
+        this->mpProjectionMethod = &cedar::proc::ProjectionFunctions::expand1Dto3D;
+      }
+      else if (input_dimensionality == 2 && output_dimensionality == 3)
+      {
+        this->mpProjectionMethod = &cedar::proc::ProjectionFunctions::expand2Dto3D;
+      }
+      else
+      {
+        this->mpProjectionMethod = &cedar::proc::ProjectionFunctions::expandMDtoND;
+      }
     }
-    else if (input_dimensionality == 2 && output_dimensionality == 1)
+
+    if (this->mProjectionDimensionMappings->getValue()->getValidity() == cedar::proc::ProjectionMapping::VALIDITY_ERROR)
     {
-      mpProjectionMethod = &cedar::proc::ProjectionFunctions::compress2Dto1D;
-    }
-    else if (output_dimensionality == 0)
-    {
-      if (mProjectionCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::MAXIMUM)
-      {
-        mpProjectionMethod = &cedar::proc::ProjectionFunctions::compressNDto0Dmax;
-      }
-      else if (mProjectionCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::MINIMUM)
-      {
-        mpProjectionMethod = &cedar::proc::ProjectionFunctions::compressNDto0Dmin;
-      }
-      else if (mProjectionCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::AVERAGE)
-      {
-        mpProjectionMethod = &cedar::proc::ProjectionFunctions::compressNDto0Dmean;
-      }
-      else if (mProjectionCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::SUM)
-      {
-        mpProjectionMethod = &cedar::proc::ProjectionFunctions::compressNDto0Dsum;
-      }
+      this->setState(
+        cedar::proc::Triggerable::STATE_EXCEPTION,
+        "The projection, as you have set it up, does not work in the given context. Please revise the "
+        "mapping parameters."
+      );
     }
     else
     {
-      mpProjectionMethod = NULL;
-      CEDAR_THROW(cedar::aux::NotImplementedException, "The projection for this configuration is not implemented.");
+      this->setState(
+        cedar::proc::Triggerable::STATE_UNKNOWN,
+        "Projection mapping is set up correctly."
+      );
     }
-  }
-    // if the projection expands ...
-  else
-  {
-    // ... set up the appropriate function pointer
-    if (input_dimensionality == 0)
-    {
-      this->mpProjectionMethod = &cedar::proc::ProjectionFunctions::expand0DtoND;
-    }
-    else if (input_dimensionality == 1 && output_dimensionality == 3)
-    {
-      this->mpProjectionMethod = &cedar::proc::ProjectionFunctions::expand1Dto3D;
-    }
-    else if (input_dimensionality == 2 && output_dimensionality == 3)
-    {
-      this->mpProjectionMethod = &cedar::proc::ProjectionFunctions::expand2Dto3D;
-    }
-    else
-    {
-      this->mpProjectionMethod = &cedar::proc::ProjectionFunctions::expandMDtoND;
-    }
-  }
 
-  if (this->mProjectionDimensionMappings->getValue()->getValidity() == cedar::proc::ProjectionMapping::VALIDITY_ERROR)
-  {
-    this->setState(
-            cedar::proc::Triggerable::STATE_EXCEPTION,
-            "The projection, as you have set it up, does not work in the given context. Please revise the "
-            "mapping parameters."
-    );
-  }
-  else
-  {
-    this->setState(
-            cedar::proc::Triggerable::STATE_UNKNOWN,
-            "Projection mapping is set up correctly."
-    );
-  }
+    // reset constness of all mappings
+    this->mProjectionOutputDimensionSizes->unconstAll();
 
-  // reset constness of all mappings
-  this->mProjectionOutputDimensionSizes->unconstAll();
-
-  for (unsigned int input_dim = 0; input_dim < input_dimensionality; ++input_dim)
-  {
-    if (mProjectionDimensionMappings->getValue()->isDropped(input_dim))
+    for (unsigned int input_dim = 0; input_dim < input_dimensionality; ++input_dim)
     {
-      continue;
+      if (mProjectionDimensionMappings->getValue()->isDropped(input_dim))
+      {
+        continue;
+      }
+      unsigned int output_dim = mProjectionDimensionMappings->getValue()->lookUp(input_dim);
+      CEDAR_ASSERT(output_dim < output_dimensionality);
+      this->mProjectionOutputDimensionSizes->setValue(output_dim,
+                                                      this->mStaticGainOutput->getData().size[input_dim]);
+      this->mProjectionOutputDimensionSizes->setConstantAt(output_dim, true);
     }
-    unsigned int output_dim = mProjectionDimensionMappings->getValue()->lookUp(input_dim);
-    CEDAR_ASSERT(output_dim < output_dimensionality);
-    this->mProjectionOutputDimensionSizes->setValue(output_dim,
-                                                    this->mStaticGainOutput->getData().size[input_dim]);
-    this->mProjectionOutputDimensionSizes->setConstantAt(output_dim, true);
   }
 
   // if input type and output type do not match, we have to re-initialize the output matrix
