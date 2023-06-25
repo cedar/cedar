@@ -3291,7 +3291,10 @@ void cedar::proc::gui::Ide::backupSaveCallback()
     // auto-save every getAutoSaveInterval seconds
     if (countSmallSteps >= 10 * cedar::proc::gui::SettingsSingleton::getInstance()->getAutoSaveInterval() )
     {
-      backupSave();
+      if(cedar::proc::gui::SettingsSingleton::getInstance()->isAutoSaving())
+      {
+        backupSave();
+      }
       countSmallSteps= 0;
     }
 

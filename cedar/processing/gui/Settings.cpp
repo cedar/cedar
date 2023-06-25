@@ -109,6 +109,9 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
 
   this->_mSnapGridSize = 14.0;
 
+  this->_mAutoSave
+    = new cedar::aux::BoolParameter(ui_settings.get(), "autosave", true);
+
   this->_mAutoSaveInterval
           = new cedar::aux::UIntParameter(ui_settings.get(), "autosave interval", 600,cedar::aux::UIntParameter::LimitType::positive());
 
