@@ -566,12 +566,6 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
 
 void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 {
-  if(this->getName().find("Debug") != std::string::npos)
-  {
-    std::cout<<"This is field: " << this->getName() << ". I perform my euler step with a delta t of: " << time << std::endl;
-  }
-
-
   // get all members needed for the Euler step
   cv::Mat& lateral_interaction = this->mLateralInteraction->getData();
   cv::Mat& input_noise = this->mInputNoise->getData();
