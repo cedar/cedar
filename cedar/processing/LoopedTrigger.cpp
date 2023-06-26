@@ -225,7 +225,10 @@ void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
   auto seed = boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds();
   srand(seed);
   cv::theRNG().state = seed;
-
+  //hotfix do not remove, since we are reseeding each euler, we need to warm the generator up... step fixes the node bug
+  cv::Mat ds = cv::Mat::zeros(50, 50, CV_32F);
+  cv::randn(ds, cv::Scalar(0), cv::Scalar(1));
+  //hotfix end
 
   cedar::proc::ArgumentsPtr arguments(new cedar::proc::StepTime(time,cedar::aux::GlobalClockSingleton::getInstance()->getTime()));
 
