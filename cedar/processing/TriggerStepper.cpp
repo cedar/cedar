@@ -53,8 +53,6 @@
 
 cedar::proc::TriggerStepper::TriggerStepper()
 {
-//  minimalSleepTime = cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds);
-  minimalSleepTime = cedar::unit::Time(0.0 * cedar::unit::milli * cedar::unit::seconds);
 }
 
 
@@ -77,15 +75,14 @@ void cedar::proc::TriggerStepper::stop()
 void cedar::proc::TriggerStepper::run()
 {
   mAbortRequested.store(false);
-  this->minimalSleepTime = cedar::aux::GlobalClockSingleton ::getInstance()->getMinimumComputationTime();
-    try
-    {
-      mThread = std::thread(&cedar::proc::TriggerStepper::runFunc, this);
-    }
-    catch (...)
-    {
-      std::cout<<" Starting the Thread did somehow not work!" <<std::endl;
-    }
+  try
+  {
+    mThread = std::thread(&cedar::proc::TriggerStepper::runFunc, this);
+  }
+  catch (...)
+  {
+    std::cout<<" Starting the Thread did somehow not work!" <<std::endl;
+  }
 }
 
 void cedar::proc::TriggerStepper::setTriggers(std::vector<LoopedTriggerPtr> trigger)
@@ -109,23 +106,7 @@ void cedar::proc::TriggerStepper::runFunc()
   {
     try
     {
-      auto start_time = boost::posix_time::microsec_clock::universal_time();
-
       this->stepTriggers();
-
-      auto time_after_stepping = boost::posix_time::microsec_clock::universal_time();
-      
-      boost::posix_time::time_duration measured_step_time_unitless = time_after_stepping - start_time;
-      double elapsedMilliSeconds = measured_step_time_unitless.total_microseconds() / 1000.0;
-      double minimumComputeTimeMilliSeconds = static_cast<double>(minimalSleepTime / (0.001 * cedar::unit::seconds));
-//      std::cout<<"TriggerStepper: Stepping lasted " << elapsedMilliSeconds  <<  " milliseconds and minimum Steptime is " << minimumComputeTimeMilliSeconds << std::endl;
-      if(elapsedMilliSeconds < minimumComputeTimeMilliSeconds)
-      {
-        double sleepTime = minimumComputeTimeMilliSeconds - elapsedMilliSeconds;
-//        std::cout<<"Triggerstepper sleeps: " << sleepTime << " milliseconds" <<std::endl;
-        int sleepTimeMicroSeconds = (int) (sleepTime* 1000);
-        cedar::aux::usleep(sleepTimeMicroSeconds);
-      }
     }
     catch (std::runtime_error &e)
     {
