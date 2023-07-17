@@ -678,8 +678,12 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   CEDAR_ASSERT(u.size == lateral_interaction.size);
   CEDAR_ASSERT(u.size == input_sum.size);
 
-  // the field equation
-  cv::Mat d_u = -u + h + lateral_interaction + global_inhibition * cv::sum(sigmoid_u)[0] + input_sum;
+  // the field equation (split up into four separate computations as putting them all in one sum results in strange
+  // behaviour, probably due to rounding problems or float inaccuracies)
+  cv::Mat d_u = -u + h;
+  d_u += lateral_interaction;
+  d_u += global_inhibition * cv::sum(sigmoid_u)[0];
+  d_u += input_sum;
 
   boost::shared_ptr<QWriteLocker> activation_write_locker;
   if (this->activationIsOutput())
