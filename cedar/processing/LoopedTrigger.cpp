@@ -234,9 +234,45 @@ void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
 
   QReadLocker locker(this->mListeners.getLockPtr());
   auto this_ptr = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this());
-  for (const auto& listener : this->mListeners.member())
+  if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT)
   {
-    listener->onTrigger(arguments, this_ptr);
+    // Pre-trigger steps, they will copy the current input to allow for concurrent but deterministic execution of onTrigger()
+    {
+      QList<QFuture<void> > futures;
+      auto lambda = [&](auto listener)
+      {
+        listener->preTrigger();
+      };
+      for (const auto &listener: this->mListeners.member())
+      {
+        auto future = QtConcurrent::run(lambda, listener);
+        futures.append(future);
+      }
+      for (auto future: futures)
+      {
+        future.waitForFinished();
+      }
+    }
+    // Concurrently call onTrigger on all looped steps
+    QList<QFuture<void> > futures;
+    auto lambda = [&] (auto listener, auto arguments, auto this_ptr) {
+      listener->onTrigger(arguments, this_ptr);
+    };
+    for (const auto& listener : this->mListeners.member())
+    {
+      auto future =  QtConcurrent::run(lambda,listener,arguments,this_ptr);
+      futures.append(future);
+    }
+    for(auto future:futures){
+      future.waitForFinished();
+    }
+  }
+  else
+  {
+    for (const auto& listener : this->mListeners.member())
+    {
+      listener->onTrigger(arguments, this_ptr);
+    }
   }
   this->mStatistics->append(time);
 
