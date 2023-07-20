@@ -311,6 +311,10 @@ void cedar::proc::Step::addTrigger(cedar::proc::TriggerPtr trigger)
 
 void cedar::proc::Step::preTrigger()
 {
+  if (!this->hasSlotForRole(DataRole::INPUT))
+  {
+    return;
+  }
   // Call updateData on input slots to deep copy the input into a buffer that will be used in compute
   auto slotList = this->getOrderedDataSlots(DataRole::INPUT);
   for(auto slot : slotList){
