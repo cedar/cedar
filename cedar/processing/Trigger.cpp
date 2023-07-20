@@ -787,8 +787,27 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 
   if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT)
   {
-    // Pre-trigger steps, they will copy the current input to allow for concurrent but deterministic execution of onTrigger()
+    for (auto order_triggerables_pair : this->mTriggeringOrder.member())
     {
+      auto triggerables = order_triggerables_pair.second;
+      for (cedar::proc::TriggerablePtr triggerable: triggerables)
+      {
+        triggerable->preTrigger();
+      }
+    }
+    for (auto order_triggerables_pair : this->mTriggeringOrder.member())
+    {
+      auto triggerables = order_triggerables_pair.second;
+      for (cedar::proc::TriggerablePtr triggerable: triggerables)
+      {
+        triggerable->onTrigger(arguments, this_ptr);
+      }
+    }
+
+    //QThreadPool::globalInstance()->setMaxThreadCount(6);
+
+    // Pre-trigger steps, they will copy the current input to allow for concurrent but deterministic execution of onTrigger()
+    /*{
       QList<QFuture<void> > futures;
       auto lambda = [&](auto triggerable)
       {
@@ -807,9 +826,9 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
       {
         future.waitForFinished();
       }
-    }
+    }*/
     // Concurrently call onTrigger on all listening triggerables
-    QList<QFuture<void> > futures;
+    /*QList<QFuture<void> > futures;
     auto lambda = [&] (auto triggerable, auto arguments, auto this_ptr) {
       triggerable->onTrigger(arguments, this_ptr);
     };
@@ -824,7 +843,7 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
     }
     for(auto future:futures){
       future.waitForFinished();
-    }
+    }*/
   }
   else
   {

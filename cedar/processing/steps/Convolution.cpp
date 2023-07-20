@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/convolution/FFTW.h"
+#include "cedar/auxiliaries/convolution/ArrayFire.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -298,13 +299,15 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
 void cedar::proc::steps::Convolution::inputDimensionalityChanged()
 {
   unsigned int new_dimensionality = this->getDimensionality();
-  #ifdef CEDAR_USE_FFTW
-  if (new_dimensionality >= 3)
-  {
-    this->mConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
-  }
-#endif // CEDAR_USE_FFTW
 
+    if (this->getDimensionality() >= 3)
+    {
+#ifdef CEDAR_USE_ARRAYFIRE
+        this->mConvolution->setEngine(cedar::aux::conv::ArrayFirePtr(new cedar::aux::conv::ArrayFire()));
+#elif CEDAR_USE_FFTW
+        this->mConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
+#endif //CEDAR_USE_ARRAYFIRE
+    }
 
   for (size_t i = 0; i < this->_mKernels->size(); ++i)
   {

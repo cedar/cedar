@@ -52,6 +52,7 @@
 #include "cedar/auxiliaries/annotation/SizesRangeHint.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/convolution/FFTW.h"
+#include "cedar/auxiliaries/convolution/ArrayFire.h"
 #include "cedar/auxiliaries/convolution/OpenCV.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
@@ -770,13 +771,18 @@ bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) con
 void cedar::dyn::NeuralField::dimensionalityChanged()
 {
   this->_mSizes->resize(this->getDimensionality(), _mSizes->getDefaultValue());
-#ifdef CEDAR_USE_FFTW
-  if (this->getDimensionality() >= 3)
-  {
-    this->_mLateralKernelConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
-    this->_mNoiseCorrelationKernelConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
-  }
-#endif // CEDAR_USE_FFTW
+
+    if (this->getDimensionality() >= 3)
+    {
+#ifdef CEDAR_USE_ARRAYFIRE
+        this->_mLateralKernelConvolution->setEngine(cedar::aux::conv::ArrayFirePtr(new cedar::aux::conv::ArrayFire()));
+        this->_mNoiseCorrelationKernelConvolution->setEngine(cedar::aux::conv::ArrayFirePtr(new cedar::aux::conv::ArrayFire()));
+#elif CEDAR_USE_FFTW
+        this->_mLateralKernelConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
+      this->_mNoiseCorrelationKernelConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
+#endif //CEDAR_USE_ARRAYFIRE
+    }
+
 
 	this->updateSizesRange();
 	this->updateMatrices();

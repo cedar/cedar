@@ -214,7 +214,9 @@ void cedar::proc::ExternalData::updateData()
   {
     if (this->mData.at(i).lock())
     {
-      this->mData.at(i).lock()->copyValueFrom(this->mOriginalData.at(i).lock());
+        QReadLocker locker(&this->mOriginalData.at(i).lock()->getLock());
+        this->mData.at(i).lock()->copyValueFrom(this->mOriginalData.at(i).lock());
+        locker.unlock();
     }
   }
 }
@@ -253,7 +255,10 @@ void cedar::proc::ExternalData::setDataInternal(cedar::aux::DataPtr data, unsign
     // In case of simulated time, deep-copy the content of the external data. Store a shared_ptr in mDataShared so the
     // weak ptr does not instantly get destroyed.
     // The original pointer to the external data is kept in mOriginalData
+
+      QReadLocker locker(&data->getLock());
     auto data_shr_ptr = data->clone();
+      locker.unlock();
     this->mDataShared.at(index) = data_shr_ptr;
     this->mData.at(index) = data_shr_ptr;
     this->mOriginalData.at(index) = data;
