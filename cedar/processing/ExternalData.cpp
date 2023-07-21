@@ -214,9 +214,19 @@ void cedar::proc::ExternalData::updateData()
   {
     if (this->mData.at(i).lock())
     {
-        QReadLocker locker(&this->mOriginalData.at(i).lock()->getLock());
-        this->mData.at(i).lock()->copyValueFrom(this->mOriginalData.at(i).lock());
-        locker.unlock();
+      if(this->mOriginalData.at(i).lock().get() != this->mData.at(i).lock().get())
+      {
+        if (cedar::aux::ConstMatDataPtr mat_data_ptr = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->mOriginalData.at(i).lock()))
+        {
+          QReadLocker locker(&mat_data_ptr->getLock());
+          this->mData.at(i).lock()->copyValueFrom(mat_data_ptr);
+          locker.unlock();
+        }
+        else
+        {
+          this->mData.at(i) = this->mOriginalData.at(i);
+        }
+      }
     }
   }
 }
@@ -256,12 +266,22 @@ void cedar::proc::ExternalData::setDataInternal(cedar::aux::DataPtr data, unsign
     // weak ptr does not instantly get destroyed.
     // The original pointer to the external data is kept in mOriginalData
 
-      QReadLocker locker(&data->getLock());
-    auto data_shr_ptr = data->clone();
+    if (cedar::aux::ConstMatDataPtr mat_data_ptr = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
+    {
+      QReadLocker locker(&mat_data_ptr->getLock());
+      auto data_shr_ptr = mat_data_ptr->clone();
       locker.unlock();
-    this->mDataShared.at(index) = data_shr_ptr;
-    this->mData.at(index) = data_shr_ptr;
-    this->mOriginalData.at(index) = data;
+      this->mDataShared.at(index) = data_shr_ptr;
+      this->mData.at(index) = data_shr_ptr;
+      this->mOriginalData.at(index) = data;
+    }
+    else
+    {
+      auto data_shr_ptr = cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)));
+      this->mDataShared.at(index) = data_shr_ptr;
+      this->mData.at(index) = data_shr_ptr;
+      this->mOriginalData.at(index) = data;
+    }
   }
   else
   {
