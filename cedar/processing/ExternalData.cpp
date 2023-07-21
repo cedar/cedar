@@ -55,12 +55,15 @@ cedar::proc::ExternalData::ExternalData(
                                        )
 :
 cedar::proc::DataSlot(role, name, pParent, isMandatory),
+mpAccessLock(new QReadWriteLock()),
+mLoopMode(cedar::aux::LoopMode::FakeDT),
 mIsCollection(false)
 {
 }
 
 cedar::proc::ExternalData::~ExternalData()
 {
+  delete this->mpAccessLock;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -85,7 +88,7 @@ bool cedar::proc::ExternalData::isCollection() const
 
 bool cedar::proc::ExternalData::hasData(cedar::aux::ConstDataPtr data) const
 {
-  if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT)
+  if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDTSync)
   {
     std::vector<cedar::aux::DataWeakPtr>::const_iterator iter;
     for (iter = this->mOriginalData.begin(); iter != this->mOriginalData.end(); ++iter)
@@ -132,7 +135,7 @@ void cedar::proc::ExternalData::removeDataInternal(cedar::aux::DataPtr data)
 {
   CEDAR_DEBUG_ASSERT(data);
   // Find the data entry.
-  if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT)
+  if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDTSync)
   {
     for(int i = 0; i < this->mOriginalData.size(); i++)
     {
@@ -209,30 +212,98 @@ void cedar::proc::ExternalData::setDataInternal(cedar::aux::DataPtr data)
 
 void cedar::proc::ExternalData::updateData()
 {
-  // Save the current (external) data in the (owned) buffer mData
-  for (size_t i = 0; i < this->mData.size(); ++i)
-  {
-    if (this->mData.at(i).lock())
-    {
-      if(this->mOriginalData.at(i).lock().get() != this->mData.at(i).lock().get())
-      {
-        if (cedar::aux::ConstMatDataPtr mat_data_ptr = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->mOriginalData.at(i).lock()))
-        {
-          QReadLocker locker(&mat_data_ptr->getLock());
-          this->mData.at(i).lock()->copyValueFrom(mat_data_ptr);
-          locker.unlock();
-        }
-        else
-        {
-          this->mData.at(i) = this->mOriginalData.at(i);
+  if(this->mLoopMode != cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode()){
+    loopModeChanged();
+  }
+
+  if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDTSync) {
+    // Save the current (external) data in the (owned) buffer mData
+    for (size_t i = 0; i < this->mData.size(); ++i) {
+      if (this->mData.at(i).lock()) {
+        if (this->mOriginalData.at(i).lock().get() != this->mData.at(i).lock().get()) {
+          if (cedar::aux::ConstMatDataPtr mat_data_ptr = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(
+              this->mOriginalData.at(i).lock())) {
+            QReadLocker locker(&mat_data_ptr->getLock());
+            this->mData.at(i).lock()->copyValueFrom(mat_data_ptr);
+            locker.unlock();
+          } else {
+            this->mData.at(i) = this->mOriginalData.at(i);
+          }
         }
       }
     }
   }
 }
 
+void cedar::proc::ExternalData::loopModeChanged()
+{
+  auto oldLoopMode = this->mLoopMode;
+  this->mLoopMode = cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode();
+  if(!this->mData.empty())
+  {
+    QReadLocker locker(this->mpAccessLock);
+    if(this->mLoopMode == cedar::aux::LoopMode::FakeDTSync)
+    {
+      //from old to new
+      std::vector<cedar::aux::DataWeakPtr> mDataBack = this->mData;
+      this->mDataShared.clear();
+      this->mOriginalData.clear();
+      this->mData.clear();
+      for (const auto & mD : mDataBack)
+      {
+        if (auto mDl = mD.lock())
+        {
+          cedar::aux::DataPtr data_shr_ptr;
+          if (cedar::aux::ConstMatDataPtr mat_data_ptr = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(mDl))
+          {
+            QReadLocker locker2(&mat_data_ptr->getLock());
+            data_shr_ptr = mat_data_ptr->clone();
+            locker2.unlock();
+          }
+          else
+          {
+            data_shr_ptr = cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)));
+          }
+          this->mDataShared.push_back(data_shr_ptr);
+          this->mData.push_back(data_shr_ptr);
+          this->mOriginalData.push_back(mDl);
+        }
+      }
+    }
+    else
+    {
+      if(oldLoopMode == cedar::aux::LoopMode::FakeDTSync)
+      {
+        //from new to old
+        this->mData.clear();
+        this->mData = this->mOriginalData;
+        this->mDataShared.clear();
+        this->mOriginalData.clear();
+      }
+      else
+      {
+        //from old to old
+        this->mDataShared.clear();
+        this->mOriginalData.clear();
+      }
+
+    }
+    locker.unlock();
+  }
+  else
+  {
+    this->mData.clear();
+    this->mDataShared.clear();
+    this->mOriginalData.clear();
+  }
+}
+
 void cedar::proc::ExternalData::setDataInternal(cedar::aux::DataPtr data, unsigned int index)
 {
+  if(this->mLoopMode != cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode()){
+    loopModeChanged();
+  }
+
   // reset validity when the data changes.
   if (this->getRole() == cedar::proc::DataRole::INPUT)
   {
@@ -244,7 +315,7 @@ void cedar::proc::ExternalData::setDataInternal(cedar::aux::DataPtr data, unsign
     this->mData.resize(index + 1);
   }
 
-  if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT)
+  if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDTSync)
   {
     if (this->mOriginalData.size() <= index)
     {

@@ -234,7 +234,7 @@ void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
 
   QReadLocker locker(this->mListeners.getLockPtr());
   auto this_ptr = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this());
-  if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT)
+  if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT || cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDTSync)
   {
     for (const auto& listener : this->mListeners.member())
     {
@@ -279,6 +279,7 @@ void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
   {
     for (const auto& listener : this->mListeners.member())
     {
+      listener->preTrigger();
       listener->onTrigger(arguments, this_ptr);
     }
   }

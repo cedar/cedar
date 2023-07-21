@@ -281,6 +281,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
     // NEW AND SHINY:
     case cedar::aux::LoopMode::RealDT:
     case cedar::aux::LoopMode::FakeDT:
+    case cedar::aux::LoopMode::FakeDTSync:
     {
       // ALL NEW LOOP MODES HERE, share as much code as possible:
 
@@ -383,7 +384,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         cedar::unit::Time measured_iteration_time( measured_iteration_time_unitless.total_microseconds() * cedar::unit::micro * cedar::unit::seconds);
 
         ///////// STEP
-        if (loop_mode == cedar::aux::LoopMode::FakeDT)
+        if (loop_mode == cedar::aux::LoopMode::FakeDT || loop_mode == cedar::aux::LoopMode::FakeDTSync)
         {
           if (check_locked_vars)
           {

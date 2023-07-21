@@ -125,6 +125,10 @@ public:
    */
   static const Id FakeDT = 6;
 
+  /*! FakeDT + sync input
+   */
+  static const Id FakeDTSync = 7;
+
 protected:
   // none yet
 

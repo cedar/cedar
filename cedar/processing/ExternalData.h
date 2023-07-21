@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/DataSlot.h"
 #include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/LoopMode.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/ExternalData.fwd.h"
@@ -167,6 +168,7 @@ private:
    */
   void removeDataInternal(cedar::aux::DataPtr data);
 
+  void loopModeChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -174,10 +176,14 @@ protected:
   // none yet
 
 private:
+  mutable QReadWriteLock* mpAccessLock;
+
   //!@brief Vector of data references connected to this slot.
   std::vector<cedar::aux::DataWeakPtr> mData;
   std::vector<cedar::aux::DataWeakPtr> mOriginalData;
   std::vector<cedar::aux::DataPtr> mDataShared;
+
+  cedar::aux::LoopMode::Id mLoopMode;
 
   //!@brief Whether this slot can have multiple data items.
   bool mIsCollection;

@@ -58,6 +58,7 @@ const cedar::aux::LoopMode::Id cedar::aux::LoopMode::Simulated;
 // new and shiny:
 const cedar::aux::LoopMode::Id cedar::aux::LoopMode::RealDT;
 const cedar::aux::LoopMode::Id cedar::aux::LoopMode::FakeDT;
+const cedar::aux::LoopMode::Id cedar::aux::LoopMode::FakeDTSync;
 #endif
 
 
@@ -80,6 +81,7 @@ void cedar::aux::LoopMode::construct()
   mType.type()->def(cedar::aux::Enum(cedar::aux::LoopMode::Simulated, "Simulated", "simulated time"));
   mType.type()->def(cedar::aux::Enum(cedar::aux::LoopMode::RealDT, "real deltaT", "real deltaT"));
   mType.type()->def(cedar::aux::Enum(cedar::aux::LoopMode::FakeDT, "fake deltaT", "fake deltaT"));
+  mType.type()->def(cedar::aux::Enum(cedar::aux::LoopMode::FakeDTSync, "fake deltaT (sync)", "fake deltaT (sync)"));
 }
 
 const cedar::aux::EnumBase& cedar::aux::LoopMode::type()

@@ -785,7 +785,7 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 /* DEBUG_TRIGGERING */  std::cout << "> Triggering " << nameTrigger(this) << std::endl;
 #endif
 
-  if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT)
+  if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT || cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDTSync)
   {
     for (auto order_triggerables_pair : this->mTriggeringOrder.member())
     {
@@ -855,6 +855,7 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
   #ifdef DEBUG_TRIGGERING
         /* DEBUG_TRIGGERING */ std::cout << "  > Triggering chain item " << nameTriggerable(triggerable) << std::endl;
   #endif
+        triggerable->preTrigger();
         triggerable->onTrigger(arguments, this_ptr);
 
   #ifdef DEBUG_TRIGGERING

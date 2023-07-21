@@ -891,7 +891,7 @@ std::vector<cedar::proc::LoopedTriggerPtr> cedar::proc::Group::listLoopedTrigger
 
 void cedar::proc::Group::startTriggers(bool wait)
 {
-  if(this->getLoopMode() == cedar::aux::LoopMode::FakeDT)
+  if(this->getLoopMode() == cedar::aux::LoopMode::FakeDT || this->getLoopMode() == cedar::aux::LoopMode::FakeDTSync)
   {
     //The new way... still in evaluation...
 
@@ -937,7 +937,7 @@ void cedar::proc::Group::startTriggers(bool wait)
 void cedar::proc::Group::stopTriggers(bool wait)
 {
 
-  if(this->getLoopMode() == cedar::aux::LoopMode::FakeDT)
+  if(this->getLoopMode() == cedar::aux::LoopMode::FakeDT || this->getLoopMode() == cedar::aux::LoopMode::FakeDTSync)
   {
     if(mTriggerStepper->isRunning())
     {
@@ -986,7 +986,7 @@ void cedar::proc::Group::stepTriggers()
 {
 
   //Todo: This function needs to be rethought conceptually
-  if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT)
+  if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT || cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDTSync)
   {
     this->stepTriggers(cedar::aux::GlobalClockSingleton::getInstance()->getSimulationStepSize());
   }
@@ -2794,7 +2794,7 @@ void cedar::proc::Group::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::
   if (this->isLooped())
   {
     QReadLocker looped_lock(this->mLoopedTriggerables.getLockPtr());
-    if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT)
+    if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT || cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDTSync)
     {
       // trigger every looped element in this group
       for (const auto& triggerable : this->mLoopedTriggerables.member())
@@ -2824,6 +2824,7 @@ void cedar::proc::Group::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::
       // trigger every looped element in this group
       for (auto triggerable : this->mLoopedTriggerables.member())
       {
+        triggerable->preTrigger();
         triggerable->onTrigger(args, trigger);
       }
     }
@@ -3643,6 +3644,7 @@ bool cedar::proc::Group::isAnyTriggerRunning()
     switch (this->getLoopMode())
     {
     case cedar::aux::LoopMode::FakeDT:
+    case cedar::aux::LoopMode::FakeDTSync:
         return this->isTriggerStepperRunning();
     case cedar::aux::LoopMode::RealDT:
         for (auto trigger : triggers)

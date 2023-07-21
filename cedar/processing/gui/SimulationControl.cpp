@@ -607,7 +607,7 @@ void cedar::proc::gui::SimulationControl::allTriggersStopped()
   this->updateSimulationRunningIcon(this->mSimulationRunning.member());
 
   this->mpCPUStepSpinBox->setEnabled(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode()==cedar::aux::LoopMode::RealDT);
-  this->mpMinimumSleepSpinBox->setEnabled(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode()==cedar::aux::LoopMode::FakeDT);
+  this->mpMinimumSleepSpinBox->setEnabled(false);//cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode()==cedar::aux::LoopMode::FakeDT
 }
 
 void cedar::proc::gui::SimulationControl::updateSimulationRunningIcon(bool running)
