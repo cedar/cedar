@@ -56,7 +56,7 @@ cedar::proc::ExternalData::ExternalData(
 :
 cedar::proc::DataSlot(role, name, pParent, isMandatory),
 mpAccessLock(new QReadWriteLock()),
-mLoopMode(cedar::aux::LoopMode::FakeDT),
+mLoopMode(cedar::aux::LoopMode::None),
 mIsCollection(false)
 {
 }

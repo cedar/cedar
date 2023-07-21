@@ -2891,6 +2891,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
 
   this->setArchitectureChanged(false);
   this->mpProcessingDrawer->setWidgets(this, this->mpPropertyTable, this->mpRecorderWidget,this->mpCommentWidget, this->mpCodeWidget);
+  resetSimulationClicked();
 }
 
 void cedar::proc::gui::Ide::recentFileItemTriggered()
