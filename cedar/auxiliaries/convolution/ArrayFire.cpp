@@ -36,7 +36,7 @@
 
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_FFTW
+#ifdef CEDAR_USE_ARRAYFIRE
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/ArrayFire.h"
