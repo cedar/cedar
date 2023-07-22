@@ -176,8 +176,6 @@ protected:
   // none yet
 
 private:
-  mutable QReadWriteLock* mpAccessLock;
-
   //!@brief Vector of data references connected to this slot.
   std::vector<cedar::aux::DataWeakPtr> mData;
   std::vector<cedar::aux::DataWeakPtr> mOriginalData;

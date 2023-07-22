@@ -55,7 +55,6 @@ cedar::proc::ExternalData::ExternalData(
                                        )
 :
 cedar::proc::DataSlot(role, name, pParent, isMandatory),
-mpAccessLock(new QReadWriteLock()),
 mLoopMode(cedar::aux::LoopMode::None),
 mIsCollection(false)
 {
@@ -63,7 +62,6 @@ mIsCollection(false)
 
 cedar::proc::ExternalData::~ExternalData()
 {
-  delete this->mpAccessLock;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -241,7 +239,6 @@ void cedar::proc::ExternalData::loopModeChanged()
   this->mLoopMode = cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode();
   if(!this->mData.empty())
   {
-    QReadLocker locker(this->mpAccessLock);
     if(this->mLoopMode == cedar::aux::LoopMode::FakeDTSync)
     {
       //from old to new
@@ -288,7 +285,6 @@ void cedar::proc::ExternalData::loopModeChanged()
       }
 
     }
-    locker.unlock();
   }
   else
   {

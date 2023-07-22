@@ -643,13 +643,13 @@ void cedar::dyn::NeuralField::eulerStepAF(const cedar::unit::Time& time)
   const double h = mRestingLevel->getValue();
   const double tau = mTau->getValue();
   const double global_inhibition = mGlobalInhibition->getValue();
-  //_mSigmoid->getValue()->compute(u);
   auto betaPtr = boost::dynamic_pointer_cast<cedar::aux::ConstDoubleParameter>(_mSigmoid->getValue()->getParameter("beta"));
   auto beta = betaPtr->getValue();
   af::array sigmoid_u;
   sigmoid_u = 1/(1+af::exp(-beta * this->af_u));
   af::array curkernel = mat2af(this->_mLateralKernelConvolution->getKernelList()->getCombinedKernel());
   af::array lateral_interaction = af::convolve(sigmoid_u, curkernel);
+  //todo add missing advanced functionalities
   af::array af_rand;
   switch (this->getDimensionality()) {
     case 0: case 1:{af_rand = af::randn(this->af_u.dims(0));}break;
@@ -661,7 +661,10 @@ void cedar::dyn::NeuralField::eulerStepAF(const cedar::unit::Time& time)
                 + (sqrt(time / (cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))) / tau)
                 * _mInputNoiseGain->getValue() * af_rand);
   this->af_u = new_af_u.copy();
-  af2mat(this->af_u,this->mActivation->getData());
+  if (this->activationIsOutput())
+  {
+    af2mat(this->af_u,this->mActivation->getData());
+  }
   af2mat(sigmoid_u,this->mSigmoidalActivation->getData());
   mCurrentDeltaT->getData().at<float>(0,0)= time / cedar::unit::seconds;
 }
