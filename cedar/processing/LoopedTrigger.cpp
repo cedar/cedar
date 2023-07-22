@@ -240,9 +240,9 @@ void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
     {
       listener->preTrigger();
     }
-    if(QThreadPool::globalInstance()->maxThreadCount() > 6)
+    if(QThreadPool::globalInstance()->maxThreadCount() > 8)
     {
-      QThreadPool::globalInstance()->setMaxThreadCount(6);
+      QThreadPool::globalInstance()->setMaxThreadCount(8);
     }
     // Pre-trigger steps, they will copy the current input to allow for concurrent but deterministic execution of onTrigger()
     /*{

@@ -2801,9 +2801,9 @@ void cedar::proc::Group::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::
       {
         triggerable->preTrigger();
       }
-      if(QThreadPool::globalInstance()->maxThreadCount() > 6)
+      if(QThreadPool::globalInstance()->maxThreadCount() > 8)
       {
-        QThreadPool::globalInstance()->setMaxThreadCount(6);
+        QThreadPool::globalInstance()->setMaxThreadCount(8);
       }
       // Concurrently call onTrigger on all looped steps
       QList<QFuture<void> > futures;
