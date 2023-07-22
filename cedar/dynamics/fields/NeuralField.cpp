@@ -532,6 +532,9 @@ void cedar::dyn::NeuralField::reset()
 {
   // these buffers are still locked automatically
   this->mActivation->getData() = mRestingLevel->getValue();
+#ifdef CEDAR_USE_ARRAYFIRE
+  this->af_u = af::array();
+#endif //CEDAR_USE_ARRAYFIRE
   this->mLateralInteraction->getData() = cv::Scalar(0);
   this->mInputNoise->getData() = cv::Scalar(0);
   this->mNeuralNoise->getData() = cv::Scalar(0);
@@ -565,8 +568,114 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
   return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
+#ifdef CEDAR_USE_ARRAYFIRE
+af::array cedar::dyn::NeuralField::mat2af(const cv::Mat& mat)
+{
+  switch (cedar::aux::math::getDimensionalityOf(mat)) {
+    case 1:{
+      cv::Mat matTF = mat.t();
+      af::array af_mat(mat.size[0], matTF.ptr<float>(0));
+      return af_mat;
+    }break;
+    case 2:{
+      cv::Mat matTF = mat.t();
+      af::array af_mat(mat.size[0], mat.size[1], matTF.ptr<float>(0));
+      return af_mat;
+    }break;
+    case 3:{
+      std::vector<float> vec_mat;
+      for (int dim = 0; dim < mat.size[2]; dim++){
+        for (int col = 0; col < mat.size[1]; col++){
+          for (int row = 0; row < mat.size[0]; row++){
+            vec_mat.push_back(mat.at<float>(row,col,dim));
+          }
+        }
+      }
+      af::array af_mat(mat.size[0], mat.size[1], mat.size[2],vec_mat.data());
+      return af_mat;
+    }break;
+  }
+  return af::array();
+}
+
+void cedar::dyn::NeuralField::af2mat(const af::array& af, cv::Mat& mat)
+{
+  switch ( af.numdims()) {
+    case 1:{
+      int sizes[1] = {static_cast<int>(af.dims(0))};
+      auto data = mat.ptr<float>(0);
+      af.T().host((void*)data);
+    }break;
+    case 2:{
+      int sizes[2] = {static_cast<int>(af.dims(0)), static_cast<int>(af.dims(1))};
+       auto data = mat.ptr<float>(0);
+      af.T().host((void*)data);
+    }break;
+    case 3:{
+      std::vector<float> vec_mat(af.elements());
+      af.host(&vec_mat[0]);
+      int col = 0,row = 0,dim = 0;
+      for(float i : vec_mat){
+        mat.at<float>(row,col, dim) = i;
+        row++;
+        if(row == mat.size[0]){
+          row = 0;
+          col++;
+        }
+        if(col == mat.size[1]){
+          col = 0;
+          row = 0;
+          dim++;
+        }
+      }
+    }break;
+  }
+}
+
+void cedar::dyn::NeuralField::eulerStepAF(const cedar::unit::Time& time)
+{
+  auto seed = boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds();
+  af::setSeed(seed);
+  if(this->af_u.isempty() ){
+    this->af_u = mat2af(this->mActivation->getData());
+  }
+  af::array input_sum = mat2af(this->mInputSum->getData());
+  const double h = mRestingLevel->getValue();
+  const double tau = mTau->getValue();
+  const double global_inhibition = mGlobalInhibition->getValue();
+  //_mSigmoid->getValue()->compute(u);
+  auto betaPtr = boost::dynamic_pointer_cast<cedar::aux::ConstDoubleParameter>(_mSigmoid->getValue()->getParameter("beta"));
+  auto beta = betaPtr->getValue();
+  af::array sigmoid_u;
+  sigmoid_u = 1/(1+af::exp(-beta * this->af_u));
+  af::array curkernel = mat2af(this->_mLateralKernelConvolution->getKernelList()->getCombinedKernel());
+  af::array lateral_interaction = af::convolve(sigmoid_u, curkernel);
+  af::array af_rand;
+  switch (this->getDimensionality()) {
+    case 0: case 1:{af_rand = af::randn(this->af_u.dims(0));}break;
+    case 2:{af_rand = af::randn(this->af_u.dims(0),this->af_u.dims(1));}break;
+    case 3:{af_rand = af::randn(this->af_u.dims(0),this->af_u.dims(1),this->af_u.dims(2));}break;
+  }
+  auto ginh = global_inhibition * af::sum(af::sum(af::sum(sigmoid_u)));
+  af::array new_af_u = this->af_u + (time / cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds) * (-this->af_u + (h + ginh(0).scalar<float>()) + lateral_interaction + input_sum)
+                + (sqrt(time / (cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))) / tau)
+                * _mInputNoiseGain->getValue() * af_rand);
+  this->af_u = new_af_u.copy();
+  af2mat(this->af_u,this->mActivation->getData());
+  af2mat(sigmoid_u,this->mSigmoidalActivation->getData());
+  mCurrentDeltaT->getData().at<float>(0,0)= time / cedar::unit::seconds;
+}
+#endif //CEDAR_USE_ARRAYFIRE
+
 void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 {
+  this->updateInputSum();
+#ifdef CEDAR_USE_ARRAYFIRE
+  if(this->getDimensionality() == 3){
+    eulerStepAF(time);
+    return;
+  }
+#endif //CEDAR_USE_ARRAYFIRE
   // get all members needed for the Euler step
   cv::Mat& lateral_interaction = this->mLateralInteraction->getData();
   cv::Mat& input_noise = this->mInputNoise->getData();
@@ -603,7 +712,8 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
     // calculate output
     sigmoid_u = _mSigmoid->getValue()->compute(u);
   }
-//  //Experimental Part to Update the GUI
+  /*
+  //Experimental Part to Update the GUI
   if(_mUpdateStepGui->getValue() && cedar::proc::gui::SettingsSingleton::getInstance()->getUseDynamicFieldIcons() )
   {
     double maximum =std::numeric_limits<double>::min();
@@ -668,12 +778,11 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
     }
   }
   //End of Experimental Part
+   */
   sigmoid_u_lock.unlock();
 
   QReadLocker sigmoid_u_readlock(&this->mSigmoidalActivation->getLock());
   lateral_interaction = this->_mLateralKernelConvolution->convolve(sigmoid_u);
-
-  this->updateInputSum();
 
   CEDAR_ASSERT(u.size == sigmoid_u.size);
   CEDAR_ASSERT(u.size == lateral_interaction.size);
@@ -821,6 +930,9 @@ void cedar::dyn::NeuralField::updateMatrices()
       return;
     }
   }
+#ifdef CEDAR_USE_ARRAYFIRE
+  this->af_u = af::array();
+#endif //CEDAR_USE_ARRAYFIRE
   this->lockAll();
   if (dimensionality == 0)
   {
