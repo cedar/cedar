@@ -602,13 +602,11 @@ void cedar::dyn::NeuralField::af2mat(const af::array& af, cv::Mat& mat)
 {
   switch ( af.numdims()) {
     case 1:{
-      int sizes[1] = {static_cast<int>(af.dims(0))};
       auto data = mat.ptr<float>(0);
       af.T().host((void*)data);
     }break;
     case 2:{
-      int sizes[2] = {static_cast<int>(af.dims(0)), static_cast<int>(af.dims(1))};
-       auto data = mat.ptr<float>(0);
+      auto data = mat.ptr<float>(0);
       af.T().host((void*)data);
     }break;
     case 3:{
@@ -661,10 +659,7 @@ void cedar::dyn::NeuralField::eulerStepAF(const cedar::unit::Time& time)
                 + (sqrt(time / (cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))) / tau)
                 * _mInputNoiseGain->getValue() * af_rand);
   this->af_u = new_af_u.copy();
-  if (this->activationIsOutput())
-  {
-    af2mat(this->af_u,this->mActivation->getData());
-  }
+  af2mat(this->af_u,this->mActivation->getData());
   af2mat(sigmoid_u,this->mSigmoidalActivation->getData());
   mCurrentDeltaT->getData().at<float>(0,0)= time / cedar::unit::seconds;
 }
