@@ -342,6 +342,9 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 
   // now check the dimensionality and sizes of all matrices
   this->updateMatrices();
+#ifdef CEDAR_USE_ARRAYFIRE
+  this->af_kernel = mat2af(this->_mLateralKernelConvolution->getKernelList()->getCombinedKernel());
+#endif //CEDAR_USE_ARRAYFIRE
 }
 
 cedar::dyn::NeuralField::~NeuralField()
@@ -645,8 +648,7 @@ void cedar::dyn::NeuralField::eulerStepAF(const cedar::unit::Time& time)
   auto beta = betaPtr->getValue();
   af::array sigmoid_u;
   sigmoid_u = 1/(1+af::exp(-beta * this->af_u));
-  af::array curkernel = mat2af(this->_mLateralKernelConvolution->getKernelList()->getCombinedKernel());
-  af::array lateral_interaction = af::convolve(sigmoid_u, curkernel);
+  af::array lateral_interaction = af::convolve(sigmoid_u, af_kernel);
   //todo add missing advanced functionalities
   af::array af_rand;
   switch (this->getDimensionality()) {
@@ -1038,6 +1040,9 @@ void cedar::dyn::NeuralField::updateEducationalKernel()
           this->_mLateralKernelConvolution->getKernelList()->getCombinedKernel();
   cv::Mat paddedKernel;
 
+#ifdef CEDAR_USE_ARRAYFIRE
+  this->af_kernel = mat2af(curkernel);
+#endif //CEDAR_USE_ARRAYFIRE
 
   //TODO: This needs revision! e.g. what happens if the kernel is bigger than the field?
   int firstDimLeft = 0;

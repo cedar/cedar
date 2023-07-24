@@ -307,6 +307,7 @@ private:
 
 #ifdef CEDAR_USE_ARRAYFIRE
   af::array af_u;
+  af::array af_kernel;
 #endif //CEDAR_USE_ARRAYFIRE
 
   //--------------------------------------------------------------------------------------------------------------------
