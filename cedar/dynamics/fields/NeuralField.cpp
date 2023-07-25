@@ -343,7 +343,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   // now check the dimensionality and sizes of all matrices
   this->updateMatrices();
 #ifdef CEDAR_USE_ARRAYFIRE
-  this->af_kernel = mat2af(this->_mLateralKernelConvolution->getKernelList()->getCombinedKernel());
+  this->af_kernel = mat2af(this->_mLateralKernelConvolution->getKernelList()->getCombinedKernel(),true);
 #endif //CEDAR_USE_ARRAYFIRE
 }
 
@@ -572,8 +572,26 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
 }
 
 #ifdef CEDAR_USE_ARRAYFIRE
-af::array cedar::dyn::NeuralField::mat2af(const cv::Mat& mat)
+af::array cedar::dyn::NeuralField::mat2af(const cv::Mat& mat, bool kernel)
 {
+  if(kernel && this->getDimensionality() == 3 && (mat.dims == 2 || mat.size[2] == 1)){
+    std::vector<float> vec_kernel;
+    af::array af_mat;
+    for (int dim = 0; dim < 2; dim++){
+      for (int col = 0; col < mat.size[1]; col++){
+        for (int row = 0; row < mat.size[0]; row++){
+          if(dim == 0){
+            vec_kernel.push_back(mat.at<float>(row,col,dim));
+          }else{
+            vec_kernel.push_back(0.0);
+          }
+        }
+      }
+    }
+    af_mat = af::array(mat.size[0], mat.size[1], 2,vec_kernel.data());
+    return af_mat;
+  }
+
   switch (cedar::aux::math::getDimensionalityOf(mat)) {
     case 1:{
       cv::Mat matTF = mat.t();
@@ -1041,7 +1059,7 @@ void cedar::dyn::NeuralField::updateEducationalKernel()
   cv::Mat paddedKernel;
 
 #ifdef CEDAR_USE_ARRAYFIRE
-  this->af_kernel = mat2af(curkernel);
+  this->af_kernel = mat2af(curkernel,true);
 #endif //CEDAR_USE_ARRAYFIRE
 
   //TODO: This needs revision! e.g. what happens if the kernel is bigger than the field?

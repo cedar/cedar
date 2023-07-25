@@ -222,11 +222,11 @@ cv::Mat cedar::aux::conv::ArrayFire::convolveInternal
     CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot convolve matrices of this type.");//todo add more
   }
   cv::Mat returned = cv::Mat(matrix.dims, matrix.size, type, cv::Scalar(0.0));
-  if(cedar::aux::math::getDimensionalityOf(kernel) == cedar::aux::math::getDimensionalityOf(matrix) && matrix.isContinuous() && kernel.isContinuous())
+  if( matrix.isContinuous() && kernel.isContinuous())//cedar::aux::math::getDimensionalityOf(kernel) == cedar::aux::math::getDimensionalityOf(matrix) &&
   {
     af::array af_result;
     auto af_mode =  (mode == cedar::aux::conv::Mode::Full) ? AF_CONV_EXPAND : AF_CONV_DEFAULT;//todo resize
-    switch (cedar::aux::math::getDimensionalityOf(kernel)) {
+    switch (cedar::aux::math::getDimensionalityOf(matrix)) {
       case 1:{
         cv::Mat matrixTF = matrix.t();
         cv::Mat kernelTF = kernel.t();
@@ -254,15 +254,31 @@ cv::Mat cedar::aux::conv::ArrayFire::convolveInternal
             }
           }
         }
-        for (int dim = 0; dim < kernel.size[2]; dim++){
-          for (int col = 0; col < kernel.size[1]; col++){
-            for (int row = 0; row < kernel.size[0]; row++){
-              vec_kernel.push_back(kernel.at<float>(row,col,dim));
+        af::array af_matrix(matrix.size[0], matrix.size[1], matrix.size[2],vec_matrix.data());
+        af::array af_kernel;
+        if(kernel.dims == 2 || kernel.size[2] == 1 ){
+          for (int dim = 0; dim < 2; dim++){
+            for (int col = 0; col < kernel.size[1]; col++){
+              for (int row = 0; row < kernel.size[0]; row++){
+                if(dim == 0){
+                  vec_kernel.push_back(kernel.at<float>(row,col,dim));
+                }else{
+                  vec_kernel.push_back(0.0);
+                }
+              }
             }
           }
+          af_kernel = af::array(kernel.size[0], kernel.size[1], 2,vec_kernel.data());
+        }else{
+          for (int dim = 0; dim < kernel.size[2]; dim++){
+            for (int col = 0; col < kernel.size[1]; col++){
+              for (int row = 0; row < kernel.size[0]; row++){
+                vec_kernel.push_back(kernel.at<float>(row,col,dim));
+              }
+            }
+          }
+          af_kernel = af::array(kernel.size[0], kernel.size[1], kernel.size[2],vec_kernel.data());
         }
-        af::array af_matrix(matrix.size[0], matrix.size[1], matrix.size[2],vec_matrix.data());
-        af::array af_kernel(kernel.size[0], kernel.size[1], kernel.size[2],vec_kernel.data());
         af_result = af::convolve(af_matrix, af_kernel,af_mode);
         std::vector<float> vec_result(af_result.elements());
         af_result.host(&vec_result[0]);

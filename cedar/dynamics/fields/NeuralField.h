@@ -214,7 +214,7 @@ protected:
   void eulerStep(const cedar::unit::Time& time);
 #ifdef CEDAR_USE_ARRAYFIRE
   void eulerStepAF(const cedar::unit::Time& time);
-  af::array mat2af(const cv::Mat& mat);
+  af::array mat2af(const cv::Mat& mat, bool kernel = false);
   void af2mat(const af::array& af, cv::Mat& mat);
 #endif //CEDAR_USE_ARRAYFIRE
   //--------------------------------------------------------------------------------------------------------------------
