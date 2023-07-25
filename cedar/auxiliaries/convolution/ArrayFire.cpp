@@ -257,18 +257,31 @@ cv::Mat cedar::aux::conv::ArrayFire::convolveInternal
         af::array af_matrix(matrix.size[0], matrix.size[1], matrix.size[2],vec_matrix.data());
         af::array af_kernel;
         if(kernel.dims == 2 || kernel.size[2] == 1 ){
-          for (int dim = 0; dim < 2; dim++){
+          for (int dim = 0; dim < 3; dim++){
             for (int col = 0; col < kernel.size[1]; col++){
               for (int row = 0; row < kernel.size[0]; row++){
-                if(dim == 0){
-                  vec_kernel.push_back(kernel.at<float>(row,col,dim));
+                if(dim == 1){
+                  vec_kernel.push_back(kernel.at<float>(row,col,0));
                 }else{
                   vec_kernel.push_back(0.0);
                 }
               }
             }
           }
-          af_kernel = af::array(kernel.size[0], kernel.size[1], 2,vec_kernel.data());
+          af_kernel = af::array(kernel.size[0], kernel.size[1], 3,vec_kernel.data());
+        }else if(cedar::aux::math::getDimensionalityOf(kernel) == 1 || (kernel.size[1] == 1 && kernel.size[2] == 1) ){
+          for (int dim = 0; dim < 3; dim++){
+            for (int col = 0; col < 3; col++){
+              for (int row = 0; row < kernel.size[0]; row++){
+                if(dim == 1 && row == 1){
+                  vec_kernel.push_back(kernel.at<float>(row,0,0));
+                }else{
+                  vec_kernel.push_back(0.0);
+                }
+              }
+            }
+          }
+          af_kernel = af::array(kernel.size[0], 3, 3,vec_kernel.data());
         }else{
           for (int dim = 0; dim < kernel.size[2]; dim++){
             for (int col = 0; col < kernel.size[1]; col++){

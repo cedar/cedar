@@ -574,21 +574,36 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
 #ifdef CEDAR_USE_ARRAYFIRE
 af::array cedar::dyn::NeuralField::mat2af(const cv::Mat& mat, bool kernel)
 {
-  if(kernel && this->getDimensionality() == 3 && (mat.dims == 2 || mat.size[2] == 1)){
+  if(kernel && this->getDimensionality() == 3 && ((mat.dims == 2 || mat.size[2] == 1) || (cedar::aux::math::getDimensionalityOf(mat) == 1 || (mat.size[1] == 1 && mat.size[2] == 1) ) )){
     std::vector<float> vec_kernel;
     af::array af_mat;
-    for (int dim = 0; dim < 2; dim++){
-      for (int col = 0; col < mat.size[1]; col++){
-        for (int row = 0; row < mat.size[0]; row++){
-          if(dim == 0){
-            vec_kernel.push_back(mat.at<float>(row,col,dim));
-          }else{
-            vec_kernel.push_back(0.0);
+    if(mat.dims == 2 || mat.size[2] == 1){
+      for (int dim = 0; dim < 3; dim++){
+        for (int col = 0; col < mat.size[1]; col++){
+          for (int row = 0; row < mat.size[0]; row++){
+            if(dim == 1){
+              vec_kernel.push_back(mat.at<float>(row,col,0));
+            }else{
+              vec_kernel.push_back(0.0);
+            }
           }
         }
       }
+      af_mat = af::array(mat.size[0], mat.size[1], 3,vec_kernel.data());
+    }else if(cedar::aux::math::getDimensionalityOf(mat) == 1 || (mat.size[1] == 1 && mat.size[2] == 1) ){
+      for (int dim = 0; dim < 3; dim++){
+        for (int col = 0; col < 3; col++){
+          for (int row = 0; row < mat.size[0]; row++){
+            if(dim == 1 && row == 1){
+              vec_kernel.push_back(mat.at<float>(row,0,0));
+            }else{
+              vec_kernel.push_back(0.0);
+            }
+          }
+        }
+      }
+      af_mat = af::array(mat.size[0], 3, 3,vec_kernel.data());
     }
-    af_mat = af::array(mat.size[0], mat.size[1], 2,vec_kernel.data());
     return af_mat;
   }
 
