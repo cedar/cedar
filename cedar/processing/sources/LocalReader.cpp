@@ -147,13 +147,13 @@ void cedar::proc::sources::LocalReader::compute(const cedar::proc::Arguments&)
     }
   else if(cedar::proc::sinks::LocalWriter::getPortCount( _mPort->getValue() ) > 0)
   {
-    //cv::Mat old = this->mOutput->getData();
+    cv::Mat old = this->mOutput->getData();
 
     cv::Mat read = cedar::proc::sinks::LocalWriter::getMatrix( _mPort->getValue() );
 
-    //bool changed = (old.type() != read.type() || old.size != read.size);
+    bool changed = (old.type() != read.type() || old.size != read.size);
     this->mOutput->setData(read.clone()); // this should already be a clone, but I get crashes when I remove the .clone() here
-    //if (changed)
+    if (changed)
     {
       this->emitOutputPropertiesChangedSignal("output");
     }
