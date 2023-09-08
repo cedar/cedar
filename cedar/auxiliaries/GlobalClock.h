@@ -109,7 +109,11 @@ public:
 
   cedar::aux::LoopMode::Id getLoopMode();
 
+  bool isBatchMode();
+
   void setLoopMode(cedar::aux::LoopMode::Id newLoopMode);
+
+  void setBatchMode(bool batchMode);
 
   void updateTakenSteps(unsigned long newStepsTaken);
 
@@ -194,6 +198,8 @@ private:
   cedar::unit::Time mSimulationStepSize;
 
   cedar::aux::LoopMode::Id mLoopMode;
+
+  bool mBatchMode;
 
   //Current Minimal Tau across all Fields in the Architecture
   std::atomic<double> mCurMinTau;

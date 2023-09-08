@@ -525,7 +525,13 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
     this->mpToolBar->insertWidget(this->mpActionRecord, this->mpSimulationModeComboBox);
 
+    this->mpSimulationModeCheckBox = new QCheckBox("batch mode");
+
+    this->mpToolBar->insertWidget(this->mpActionRecord, this->mpSimulationModeCheckBox);
+
     QObject::connect(this->mpSimulationModeComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(simulationModeComboBoxChanged(int)));
+
+    QObject::connect(this->mpSimulationModeCheckBox,SIGNAL(toggled(bool)),this,SLOT(mpSimulationModeCheckBoxChanged(bool)));
 
     //Todo Connect to something meaningful! Maybe fill with enum...
 
@@ -1108,6 +1114,11 @@ void cedar::proc::gui::Ide::globalTimeFactorSettingChanged(double newValue)
 //  blocked = this->mpSimulatedTimeStepSpinBox->blockSignals(true);
 //  this->mpSimulatedTimeStepSpinBox->setValue(newValue);
 //  this->mpSimulatedTimeStepSpinBox->blockSignals(blocked);
+}
+
+void cedar::proc::gui::Ide::mpSimulationModeCheckBoxChanged( bool newValue)
+{
+  cedar::aux::GlobalClockSingleton::getInstance()->setBatchMode(newValue);
 }
 
 void cedar::proc::gui::Ide::simulationModeComboBoxChanged(int newIndex)
