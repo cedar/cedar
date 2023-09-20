@@ -94,7 +94,7 @@ signals :
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! Upates the plot.
+  //! Updates the plot.
   void timerEvent(QTimerEvent* /* pEvent */);
 
   //! Starts the plot.

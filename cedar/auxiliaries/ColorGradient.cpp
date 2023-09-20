@@ -99,9 +99,9 @@ bool cedar::aux::ColorGradient::empty() const
   return this->mGradientColors.empty();
 }
 
-cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getStandardGradient(const cedar::aux::Enum& id)
+cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getStandardGradient(const cedar::aux::EnumId& id)
 {
-  switch (id.id())
+  switch (id)
   {
     default:
     case cedar::aux::ColorGradient::StandardGradients::PlotDefault:
@@ -278,7 +278,8 @@ void cedar::aux::ColorGradient::updateLookupTable()
   }
 }
 
-cv::Mat cedar::aux::ColorGradient::applyTo(const cv::Mat& matrix, bool limits, double min, double max)
+cv::Mat cedar::aux::ColorGradient::applyTo(const cv::Mat& matrix, bool limits, double min, double max,
+                                           cv::InputArray limitColor)
 {
   int channels = matrix.channels();
 
@@ -349,8 +350,7 @@ cv::Mat cedar::aux::ColorGradient::applyTo(const cv::Mat& matrix, bool limits, d
   {
     cv::Mat min_vals = (matrix < min);
     cv::Mat max_vals = (matrix > max);
-    converted.setTo(0xFFFFFF, min_vals | max_vals);
+    converted.setTo(limitColor, min_vals | max_vals);
   }
-
   return converted;
 }

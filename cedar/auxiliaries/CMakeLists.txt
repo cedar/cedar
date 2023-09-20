@@ -84,6 +84,7 @@ cedar_add_library(cedaraux
   gui/BaseWidget.h
   gui/ExceptionDialog.h
   gui/HistoryPlot.h
+  gui/ImageDisplay.h
   gui/ImagePlot.h
   gui/LocalCoordinateFrameWidget.h
   gui/Log.h
@@ -94,6 +95,8 @@ cedar_add_library(cedaraux
   gui/PluginInfoDialog.h
   gui/PluginManagerDialog.h
   gui/QImagePlot.h
+  gui/QC2DMatrixPlot.h
+  gui/QCImageDisplay.h
   gui/QwtMatrixPlot.h
   gui/ResourceDialog.h
   gui/SceneControl.h

@@ -113,7 +113,8 @@ public:
   void setStop(double location, const QColor& color);
 
   //! applies the color gradient to a matrix
-  cv::Mat applyTo(const cv::Mat& matrix, bool limits = false, double min = 0.0, double max = 1.0);
+  cv::Mat applyTo(const cv::Mat& matrix, bool limits = false, double min = 0.0, double max = 1.0,
+                  cv::InputArray limitColor = 0xFFFFFF);
 
   //! get a map of all color stops along the gradient
   const std::map<double, QColor>& getStops() const;
@@ -138,7 +139,7 @@ public:
   static ColorGradientPtr getPlotInverseGrayColorJet();
 
   //! get a gradient from enum
-  static ColorGradientPtr getStandardGradient(const cedar::aux::Enum& id);
+  static ColorGradientPtr getStandardGradient(const cedar::aux::EnumId& id);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

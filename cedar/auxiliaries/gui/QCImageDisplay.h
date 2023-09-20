@@ -22,84 +22,78 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ImagePlot.h
+    File:        QCImageDisplay.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 22
+    Maintainer:  Lars Janssen
+    Email:       lars.janssen@ini.rub.de
+    Date:        2023 09 18
 
-    Description:
+    Description: Header file for the class cedar::aux::gui::QCImageDisplay.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_IMAGE_PLOT_H
-#define CEDAR_AUX_GUI_IMAGE_PLOT_H
+#ifndef CEDAR_AUX_GUI_QCIMAGE_DISPLAY_H
+#define CEDAR_AUX_GUI_QCIMAGE_DISPLAY_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/gui/qcustomplot.h"
 #include "cedar/auxiliaries/gui/QImagePlot.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/MatData.fwd.h"
-#include "cedar/auxiliaries/annotation/Annotation.fwd.h"
-#include "cedar/auxiliaries/annotation/ColorSpace.fwd.h"
-#include "cedar/auxiliaries/gui/ImagePlot.fwd.h"
-#include "cedar/auxiliaries/ColorGradient.fwd.h"
+#include "cedar/auxiliaries/gui/QCImageDisplay.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QReadWriteLock>
-#include <vector>
 
 
-/*!@brief A plot for images.
- */
-class cedar::aux::gui::ImagePlot : public cedar::aux::gui::QImagePlot
+//! Widget used for displaying the image using qcustomplot, this allows e.g. for adding axis to the image
+class cedar::aux::gui::QCImageDisplay : public cedar::aux::gui::QImagePlot::AbstractImageDisplay
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  //! Enum for quickly accessing the type of the data displayed by the viewer.
-  enum DataType
-  {
-    DATA_TYPE_IMAGE,
-    DATA_TYPE_MAT,
-    DATA_TYPE_UNKNOWN
-  };
+
+  class ColorMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ImagePlot(QWidget *pParent = NULL, bool useQC = false);
+  QCImageDisplay(cedar::aux::gui::QImagePlot* pPlot);
 
-  //!@brief Constructor that plots some data.
-  ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL, bool useQC = false);
-
-  ~ImagePlot();
+  //!@brief Destructor
+  virtual ~QCImageDisplay();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Displays the data.
-   *
-   * @param data A pointer to the data to display. If this isn't a pointer to a cedar::aux::ImageData, the function
-   *             throws.
-   * @param title title of the plot window
-   */
-  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
+  //!@brief Set text to be displayed, instead of showing the image
+  void setText(const QString & text);
 
-  //! Reacts to a click on the image plot.
-  void plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY);
+  //!@brief returns the widget that draws the image
+  QWidget* widget();
 
+  //!@brief maps a relative position to a global position
+  QPoint mapToGlobal(const QPoint & pos) const;
+
+  //!@brief update the image plot with the supplied QImage
+  void updatePlot(QImage image);
+
+  //!@brief sets the colorjet of mpColorMap
+  void setColorJet(cedar::aux::EnumId gradient_id);
+
+  //!@brief smooth scaling parameter changed
+  void smoothScalingChanged(bool value) override;
+
+  //!@brief colorize the matrix with the grayscale gradient
+  cv::Mat colorizeMatrix(cedar::aux::ColorGradientPtr /*colorGradient*/, const cv::Mat& toColorize, bool applyLimits,
+                         double min, double max) const;
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -110,14 +104,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Converts a one-channel input matrix to a three-channel matrix that contains the one-channel matrix in all
-   *        channels.
-   */
-  cv::Mat threeChannelGrayscale(const cv::Mat& in);
-  
-  void construct();
-
-  bool doConversion();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -125,15 +112,23 @@ private:
 protected:
   // none yet
 private:
-  //! Data displayed by the plot.
-  cedar::aux::ConstMatDataPtr mData;
+  QCustomPlot *mpChart;
+  ColorMap *mpColorMap;
+  QCPItemText *mpInfoLabel;
 
-  //! The color space annotation of the data (if present).
-  cedar::aux::annotation::ConstColorSpacePtr mDataColorSpace;
+  double mNan;
+  cedar::aux::gui::QImagePlot* mpPlot;
 
-  //! Type of the data.
-  DataType mDataType;
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-}; // class cedar::aux::gui::ImagePlot
+private:
+  // none yet
 
-#endif // CEDAR_AUX_GUI_IMAGE_PLOT_H
+}; // class cedar::aux::gui::QCImageDisplay
+
+#endif // CEDAR_AUX_GUI_QCIMAGE_DISPLAY_H
+

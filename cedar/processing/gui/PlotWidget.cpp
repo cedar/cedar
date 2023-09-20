@@ -38,6 +38,7 @@
 // CEDAR INCLUDES
 #include "cedar/configuration.h"
 #include "PlotWidget.h"
+#include "cedar/auxiliaries/gui/QCMatrixPlot.h"
 #include "cedar/processing/auxiliaries/gui/DataPlotter.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Group.h"
@@ -227,6 +228,11 @@ void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openQCPlot()
     this->openPlotFromDeclaration(std::string("cedar::aux::gui::QCMatrixPlot"));
 }
 
+void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openQC2DPlot()
+{
+  this->openPlotFromDeclaration(std::string("cedar::aux::gui::QC2DMatrixPlot"));
+}
+
 void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openQt5Plot()
 {
     this->openPlotFromDeclaration(std::string("cedar::aux::gui::Qt5MatrixPlot"));
@@ -285,6 +291,8 @@ void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::fillPlotOptions(QMenu* me
             {
                 auto ip_action = menu->addAction("2D image Plot (default)");
                 QObject::connect(ip_action, SIGNAL(triggered()), this, SLOT(openQCPlot()));
+                auto qcp_action = menu->addAction("2D image Plot (QCP, labeled axes)");
+                QObject::connect(qcp_action, SIGNAL(triggered()), this, SLOT(openQC2DPlot()));
 #ifdef CEDAR_USE_QT5_PLOTS
                 auto qt5_action = menu->addAction("3D Plot (Qt5)");
                 QObject::connect(qt5_action, SIGNAL(triggered()), this, SLOT(openQt5Plot()));

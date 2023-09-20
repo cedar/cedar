@@ -98,6 +98,7 @@ namespace cedar
           void openDefaultPlot();
           void openHistoryPlot();
           void openQCPlot();
+          void openQC2DPlot();
           void openQt5Plot();
           void openImagePlot();
           void openMatDataPlot();

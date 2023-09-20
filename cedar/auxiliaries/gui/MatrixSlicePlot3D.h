@@ -91,6 +91,8 @@ public:
    * @param title title of the plot window
    */
   void plot(cedar::aux::ConstDataPtr data, const std::string& title);
+
+  void plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY);
   
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -114,8 +116,6 @@ private:
 
   //! initialize the widget
   void init();
-
-  void plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY);
 
   void fillContextMenu(QMenu& menu);
 

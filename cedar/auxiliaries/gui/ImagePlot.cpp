@@ -84,16 +84,16 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::aux::gui::ImagePlot::ImagePlot(QWidget *pParent)
+cedar::aux::gui::ImagePlot::ImagePlot(QWidget *pParent, bool useQC)
 :
-cedar::aux::gui::QImagePlot(pParent)
+cedar::aux::gui::QImagePlot(pParent, useQC)
 {
   this->construct();
 }
 
-cedar::aux::gui::ImagePlot::ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent)
+cedar::aux::gui::ImagePlot::ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent, bool useQC)
 :
-cedar::aux::gui::QImagePlot(pParent)
+cedar::aux::gui::QImagePlot(pParent, useQC)
 {
   this->construct();
 

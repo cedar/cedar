@@ -113,15 +113,26 @@ class cedar::aux::gui::QImagePlot : public cedar::aux::gui::ThreadedPlot
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  class ImageDisplay;
+public:
+  class AbstractImageDisplay{
+  public:
+    virtual void setText(const QString &text) = 0;
+    virtual QWidget* widget() = 0;
+    virtual void resizeEvent(QResizeEvent * pResizeEvent, QImage image) {}
+    virtual QPoint mapToGlobal(const QPoint &pos) const = 0;
+    virtual void updatePlot(QImage image) = 0;
+    virtual void setColorJet(cedar::aux::EnumId gradient_id){}
+    virtual void smoothScalingChanged(bool value) {}
+    virtual cv::Mat colorizeMatrix(cedar::aux::ColorGradientPtr colorGradient, const cv::Mat& toColorize,
+                                   bool applyLimits, double min, double max) const = 0;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  QImagePlot(QWidget* pParent = NULL);
+  QImagePlot(QWidget* pParent = NULL, bool useQC = false);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -160,6 +171,8 @@ public:
   cedar::aux::ColorGradient::StandardGradients::Id getColorJet() const;
 
   void plot(cedar::aux::ConstDataPtr data, const std::string& title);
+
+  virtual void plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY);
 
 public slots:
   /*!@brief Set the scaling mode of the plot.
@@ -226,15 +239,10 @@ protected slots:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Resizes the pixmap used to display the image data.
-  */
-  void resizePixmap();
 
   virtual void fillContextMenu(QMenu& menu);
 
-  virtual void plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY);
-
-  void setColorJet(cedar::aux::ColorGradientPtr gradient);
+  void setColorJet(cedar::aux::EnumId gradient_id);
 
 private slots:
   void queryFixedValueScale();
@@ -246,16 +254,20 @@ private slots:
 
   void colorJetChanged();
 
+  void smoothScalingChanged();
+
   void colorJetActionTriggered();
 
   void saveImageActionTriggered();
+
+  void showContextMenu(QPoint pos, bool isGlobalPos = false);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //! Label used for displaying the image.
-  ImageDisplay* mpImageDisplay;
+  AbstractImageDisplay* mpImageDisplay;
 
 private:
   //! Converted image.

@@ -39,6 +39,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/annotation/ValueRangeHint.h"
+#include "cedar/auxiliaries/gui/ImageDisplay.h"
+#include "cedar/auxiliaries/gui/QCImageDisplay.h"
 #include "cedar/auxiliaries/gui/QImagePlot.h"
 #include "cedar/auxiliaries/ColorGradient.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -56,33 +58,6 @@
 #include <QPushButton>
 #include <QFileDialog>
 
-
-//!@cond SKIPPED_DOCUMENTATION
-
-//! Widget used for displaying the image.
-class cedar::aux::gui::QImagePlot::ImageDisplay : public QLabel
-{
-public:
-  ImageDisplay(cedar::aux::gui::QImagePlot* pPlot, const QString& text)
-  :
-  QLabel(text),
-  mpPlot(pPlot)
-  {
-    this->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    this->setWordWrap(true);
-  }
-
-protected:
-  void mousePressEvent(QMouseEvent * pEvent);
-
-public:
-  cedar::aux::ConstMatDataPtr mData;
-
-  cedar::aux::gui::QImagePlot* mpPlot;
-};
-
-//!@endcond
-
 //----------------------------------------------------------------------------------------------------------------------
 // static members
 //----------------------------------------------------------------------------------------------------------------------
@@ -93,7 +68,7 @@ cedar::aux::LockableMember<QDir> cedar::aux::gui::QImagePlot::mLastSaveLocation;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::QImagePlot::QImagePlot(QWidget* pParent)
+cedar::aux::gui::QImagePlot::QImagePlot(QWidget* pParent, bool useQC)
 :
 cedar::aux::gui::ThreadedPlot(pParent),
 mLegendAvailable(false),
@@ -103,18 +78,24 @@ _mKeepAspectRatio(new cedar::aux::BoolParameter(this, "keep aspect ratio", true)
 _mAutoScaling(new cedar::aux::BoolParameter(this, "automatic value scaling", true)),
 _mShowLegend(new cedar::aux::BoolParameter(this, "show legend", true)),
 _mValueLimits(new cedar::aux::math::DoubleLimitsParameter(this, "value limits", 0.0, 1.0)),
-_mColorJet(new cedar::aux::EnumParameter(this, "color jet", cedar::aux::ColorGradient::StandardGradients::typePtr(), cedar::aux::ColorGradient::StandardGradients::PlotDefault))
+_mColorJet(new cedar::aux::EnumParameter(this, "color jet", cedar::aux::ColorGradient::StandardGradients::typePtr(),
+                                            cedar::aux::ColorGradient::StandardGradients::PlotDefault))
 {
-  this->setColorJet(cedar::aux::ColorGradient::getDefaultPlotColorJet());
+  if(useQC)
+  {
+    this->mpImageDisplay = new cedar::aux::gui::QCImageDisplay(this);
+  }
+  else
+  {
+    this->mpImageDisplay = new cedar::aux::gui::ImageDisplay(this, "no data");
+  }
+  this->setColorJet(cedar::aux::ColorGradient::StandardGradients::PlotDefault);
   auto p_layout = new QHBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
   this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
-  this->mpImageDisplay = new cedar::aux::gui::QImagePlot::ImageDisplay(this, "no data");
-  p_layout->addWidget(mpImageDisplay);
-  this->mpImageDisplay->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-  this->mpImageDisplay->setMinimumSize(QSize(5, 5));
+  p_layout->addWidget(mpImageDisplay->widget());
 
   this->showLegendChanged(); //Initialize the Legend with this, as _mShowLegend is true by default now.
 
@@ -124,6 +105,14 @@ _mColorJet(new cedar::aux::EnumParameter(this, "color jet", cedar::aux::ColorGra
     SIGNAL(minMaxChanged(double, double)),
     this,
     SLOT(updateMinMax(double, double))
+  );
+
+  QObject::connect
+  (
+    this->_mSmoothScaling.get(),
+    SIGNAL(valueChanged()),
+    this,
+    SLOT(smoothScalingChanged())
   );
 
   QObject::connect
@@ -206,18 +195,18 @@ void cedar::aux::gui::QImagePlot::plot(cedar::aux::ConstDataPtr data, const std:
 void cedar::aux::gui::QImagePlot::colorJetChanged()
 {
   auto enum_id = this->_mColorJet->getValue();
-  auto gradient = cedar::aux::ColorGradient::getStandardGradient(enum_id);
-  this->setColorJet(gradient);
+  this->setColorJet(enum_id.id());
 }
 
-void cedar::aux::gui::QImagePlot::setColorJet(cedar::aux::ColorGradientPtr gradient)
+void cedar::aux::gui::QImagePlot::setColorJet(cedar::aux::EnumId gradient_id)
 {
-  this->mColorGradient = gradient;
+  this->mColorGradient = cedar::aux::ColorGradient::getStandardGradient(gradient_id);
 
   if (this->mpLegend)
   {
     this->mpLegend->setGradient(this->mColorGradient);
   }
+  this->mpImageDisplay->setColorJet(gradient_id);
 }
 
 //!@cond SKIPPED_DOCUMENTATION
@@ -266,15 +255,10 @@ cv::Mat cedar::aux::gui::QImagePlot::colorizeMatrix(const cv::Mat& toColorize)
   );
 }
 
-cv::Mat cedar::aux::gui::QImagePlot::colorizeMatrix(const cv::Mat& toColorize, bool applyLimits, double min, double max) const
+cv::Mat cedar::aux::gui::QImagePlot::colorizeMatrix(const cv::Mat& toColorize, bool applyLimits, double min,
+                                                    double max) const
 {
-  return this->mColorGradient->applyTo
-  (
-    toColorize,
-    applyLimits,
-    min,
-    max
-  );
+  return this->mpImageDisplay->colorizeMatrix(this->mColorGradient, toColorize, applyLimits, min, max);
 }
 
 void cedar::aux::gui::QImagePlot::setAutomaticScaling()
@@ -353,7 +337,12 @@ void cedar::aux::gui::QImagePlot::setSmoothScaling(bool smooth)
   this->_mSmoothScaling->setValue(smooth);
 }
 
-void cedar::aux::gui::QImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
+void cedar::aux::gui::QImagePlot::smoothScalingChanged()
+{
+  this->mpImageDisplay->smoothScalingChanged(this->_mSmoothScaling->getValue());
+}
+
+void cedar::aux::gui::QImagePlot::showContextMenu(QPoint pos, bool isGlobalPos)
 {
   QMenu menu(this);
 
@@ -403,7 +392,16 @@ void cedar::aux::gui::QImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
   p_save->setIcon(QIcon(":/cedar/auxiliaries/gui/menu_save.svg"));
   QObject::connect(p_save, SIGNAL(triggered()), this, SLOT(saveImageActionTriggered()));
 
-  menu.exec(pEvent->globalPos());
+  if(!isGlobalPos)
+  {
+    pos = this->mpImageDisplay->mapToGlobal(pos);
+  }
+  menu.exec(pos);
+}
+
+void cedar::aux::gui::QImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
+{
+  this->showContextMenu(pEvent->globalPos(), true);
 }
 
 void cedar::aux::gui::QImagePlot::saveImageActionTriggered()
@@ -454,42 +452,11 @@ void cedar::aux::gui::QImagePlot::colorJetActionTriggered()
   this->_mColorJet->setValue(enum_id, true);
 }
 
-void cedar::aux::gui::QImagePlot::resizeEvent(QResizeEvent * /*pEvent*/)
+void cedar::aux::gui::QImagePlot::resizeEvent(QResizeEvent * pEvent)
 {
-  this->resizePixmap();
-}
-
-void cedar::aux::gui::QImagePlot::resizePixmap()
-{
-  Qt::AspectRatioMode aspect_ratio_mode = Qt::KeepAspectRatio;
-
-  if (!this->keepAspectRatio())
-  {
-    aspect_ratio_mode = Qt::IgnoreAspectRatio;
-  }
-
   QReadLocker lock(&this->mImageLock);
-  QSize scaled_size = this->mImage.size();
-  scaled_size.scale(this->mpImageDisplay->size(), aspect_ratio_mode);
-  if ((!this->mpImageDisplay->pixmap()
-    || scaled_size != this->mpImageDisplay->pixmap()->size()
-    )
-    && !this->mImage.isNull()
-    )
-  {
-    Qt::TransformationMode transformation_mode;
-    if (this->isSmoothScaling())
-    {
-      transformation_mode = Qt::SmoothTransformation;
-    }
-    else
-    {
-      transformation_mode = Qt::FastTransformation;
-    }
-
-    QImage scaled_image = this->mImage.scaled(this->mpImageDisplay->size(), aspect_ratio_mode, transformation_mode);
-    this->mpImageDisplay->setPixmap(QPixmap::fromImage(scaled_image));
-  }
+  this->mpImageDisplay->resizeEvent(pEvent, this->mImage);
+  lock.unlock();
 }
 
 void cedar::aux::gui::QImagePlot::setInfo(const std::string& text)
@@ -500,10 +467,8 @@ void cedar::aux::gui::QImagePlot::setInfo(const std::string& text)
 void cedar::aux::gui::QImagePlot::updatePlot()
 {
   QReadLocker lock(&this->mImageLock);
-  this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));
+  this->mpImageDisplay->updatePlot(this->mImage);
   lock.unlock();
-
-  this->resizePixmap();
 }
 
 void cedar::aux::gui::QImagePlot::displayMatrix(const cv::Mat& matrix)
@@ -517,25 +482,8 @@ void cedar::aux::gui::QImagePlot::displayMatrix(const cv::Mat& matrix)
                    matrix.step,
                    QImage::Format_RGB888
                  ).rgbSwapped();
+  lock.unlock();
 }
-
-//!@cond SKIPPED_DOCUMENTATION
-void cedar::aux::gui::QImagePlot::ImageDisplay::mousePressEvent(QMouseEvent* pEvent)
-{
-  if (!this->pixmap())
-    return;
-
-  int global_x = pEvent->x();
-  int global_y = pEvent->y();
-  int label_relative_x = global_x - (this->width() - this->pixmap()->width()) / 2;
-  int label_relative_y = global_y - (this->height() - this->pixmap()->height()) / 2;
-
-  double image_x = static_cast<double>(label_relative_x) / static_cast<double>(this->pixmap()->width());
-  double image_y = static_cast<double>(label_relative_y) / static_cast<double>(this->pixmap()->height());
-
-  this->mpPlot->plotClicked(pEvent, image_x, image_y);
-}
-//!@endcond
 
 void cedar::aux::gui::QImagePlot::fillContextMenu(QMenu&)
 {
@@ -585,6 +533,7 @@ bool cedar::aux::gui::QImagePlot::keepAspectRatio() const
 {
   cedar::aux::Parameter::ReadLocker locker(this->_mKeepAspectRatio.get());
   bool keep = this->_mKeepAspectRatio->getValue();
+  locker.unlock();
   return keep;
 }
 

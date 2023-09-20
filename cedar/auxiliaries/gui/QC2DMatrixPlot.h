@@ -22,83 +22,77 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ImagePlot.h
+    File:        QC2DMatrixPlot.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 22
+    Maintainer:  Lars Janssen
+    Email:       lars.janssen@ini.rub.de
+    Date:        2023 09 05
 
-    Description:
+    Description: Header file for the class cedar::aux::gui::QC2DMatrixPlot.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_IMAGE_PLOT_H
-#define CEDAR_AUX_GUI_IMAGE_PLOT_H
+#ifndef CEDAR_AUX_GUI_QC2DMATRIX_PLOT_H
+#define CEDAR_AUX_GUI_QC2DMATRIX_PLOT_H
+
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/QImagePlot.h"
+#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
-#include "cedar/auxiliaries/annotation/Annotation.fwd.h"
-#include "cedar/auxiliaries/annotation/ColorSpace.fwd.h"
-#include "cedar/auxiliaries/gui/ImagePlot.fwd.h"
-#include "cedar/auxiliaries/ColorGradient.fwd.h"
+#include "cedar/auxiliaries/gui/ColorValueRGBA.fwd.h"
+#include "cedar/auxiliaries/gui/QC2DMatrixPlot.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QWidget>
 #include <QReadWriteLock>
+#include <opencv2/opencv.hpp>
 #include <vector>
+#include <string>
 
-
-/*!@brief A plot for images.
+/*!@brief A class used for plotting 2D plots with the QCustomPlot library.
+ *
+ * @todo This code is highly redundant with QCMatrixPlot. Unify them.
  */
-class cedar::aux::gui::ImagePlot : public cedar::aux::gui::QImagePlot
+class cedar::aux::gui::QC2DMatrixPlot : public cedar::aux::gui::MultiPlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // nested types
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  //! Enum for quickly accessing the type of the data displayed by the viewer.
-  enum DataType
-  {
-    DATA_TYPE_IMAGE,
-    DATA_TYPE_MAT,
-    DATA_TYPE_UNKNOWN
-  };
+Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ImagePlot(QWidget *pParent = NULL, bool useQC = false);
-
-  //!@brief Constructor that plots some data.
-  ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL, bool useQC = false);
-
-  ~ImagePlot();
+  QC2DMatrixPlot(QWidget *pParent = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Displays the data.
-   *
-   * @param data A pointer to the data to display. If this isn't a pointer to a cedar::aux::ImageData, the function
-   *             throws.
-   * @param title title of the plot window
-   */
+  //!@brief display a MatData
   void plot(cedar::aux::ConstDataPtr data, const std::string& title);
+  //!@brief Check if the given data can be appended to the plot.
+  bool canAppend(cedar::aux::ConstDataPtr data) const;
+  //!@brief Check if the given data can be detached from the plot.
+  bool canDetach(cedar::aux::ConstDataPtr data) const;
 
-  //! Reacts to a click on the image plot.
-  void plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY);
+  void readConfiguration(const cedar::aux::ConfigurationNode& configuration);
+
+  void writeConfiguration(cedar::aux::ConfigurationNode& configuration) const;
+
+public slots:
+  /*!@brief Reacts to a change in the plotted data.
+   *
+   * When the dimensionality of the plotted data changes, this causes a switch of the plot type.
+   */
+  void processChangedData();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -110,14 +104,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Converts a one-channel input matrix to a three-channel matrix that contains the one-channel matrix in all
-   *        channels.
-   */
-  cv::Mat threeChannelGrayscale(const cv::Mat& in);
-  
-  void construct();
-
-  bool doConversion();
+  void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+  void doDetach(cedar::aux::ConstDataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -125,15 +113,15 @@ private:
 protected:
   // none yet
 private:
-  //! Data displayed by the plot.
+  //!@brief the displayed MatData
   cedar::aux::ConstMatDataPtr mData;
 
-  //! The color space annotation of the data (if present).
-  cedar::aux::annotation::ConstColorSpacePtr mDataColorSpace;
+  //!@brief the plot widget
+  QWidget* mpCurrentPlotWidget;
 
-  //! Type of the data.
-  DataType mDataType;
+  std::string mTitle;
 
-}; // class cedar::aux::gui::ImagePlot
+}; // class cedar::aux::gui::QC2DMatrixPlot
 
-#endif // CEDAR_AUX_GUI_IMAGE_PLOT_H
+#endif // CEDAR_AUX_GUI_QC2DMATRIX_PLOT_H
+
