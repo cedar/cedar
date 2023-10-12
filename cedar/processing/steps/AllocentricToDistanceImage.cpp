@@ -98,7 +98,7 @@ mCameraTranslation(new cedar::aux::DoubleVectorParameter(this,"camera joint tran
 mTiltJointDistance(new cedar::aux::DoubleParameter (this,"cam distance to tiltjoint (m)",0)),
 mCameraFrustrumAngleDeg(new cedar::aux::DoubleVectorParameter(this,"camera frustrum angle (deg)",2,45)),
 mOutputSizes(new cedar::aux::IntVectorParameter(this,"output sizes",2,100)),
-mOutputScaling(new cedar::aux::DoubleParameter(this,"allo field unit per meter",100,1,1000)),
+mOutputScaling(new cedar::aux::IntVectorParameter(this,"allo field unit per meter",3,50)),
 mOutputTranslation(new cedar::aux::DoubleVectorParameter(this,"allo translation (m)",3,0)),
 mAlloDetectionThreshold(new cedar::aux::DoubleParameter(this,"allo detection threshold",0.1))
 {
@@ -195,8 +195,8 @@ cv::Mat cedar::proc::steps::AllocentricToDistanceImage::computeEgocentricReprese
       if(p > alloDetectionThreshold)
       {
         //There is something in the allocentric representation
-        float zCoordinate = position[0] / fieldUnitPerMeter + outputTranslation.at(0);
-        float xCoordinate = position[1] / fieldUnitPerMeter + outputTranslation.at(1);
+        float zCoordinate = position[0] / fieldUnitPerMeter.at(0) + outputTranslation.at(0);
+        float xCoordinate = position[1] / fieldUnitPerMeter.at(1) + outputTranslation.at(1);
         float yCoordiante = outputTranslation.at(2);
 
           //Subtract Camera Transform
