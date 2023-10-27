@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/UIntVectorParameter.fwd.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/UIntParameter.fwd.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/dynamics/steps/ViewportCamera.fwd.h"
@@ -136,6 +137,8 @@ protected:
   cedar::aux::BoolParameterPtr _msimplified;
   cedar::aux::DirectoryParameterPtr _mRecordPath;
   cedar::aux::BoolParameterPtr _mRecord;
+  cedar::aux::UIntParameterPtr _mLearnInterval;
+  cedar::aux::UIntParameterPtr _mLearnTotalDuration;
 
 private:
   // none yet
