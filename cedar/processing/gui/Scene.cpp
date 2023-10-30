@@ -126,7 +126,7 @@ mDraggingItems(false)
   QObject::connect(this, SIGNAL(selectionChanged()), this, SLOT(itemSelected()));
 
   this->setSnapToGrid(cedar::proc::gui::SettingsSingleton::getInstance()->snapToGrid());
-  
+  // this->setBackgroundBrush(QBrush(QColor(Qt::red)));
 }
 
 cedar::proc::gui::Scene::~Scene()
@@ -1894,7 +1894,8 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::createElement
   cedar::aux::split(classId, ".", split_class_name);
   CEDAR_DEBUG_ASSERT(split_class_name.size() > 0);
   std::string name = split_class_name.back();
-
+  std::cout << group->getName() << std::endl;
+  std::cout << position.x() << "," << position.y() << std::endl;
   return this->createElement(group, classId, name, position);
 }
 

@@ -107,6 +107,8 @@ public slots:
   //!@brief copy StepConfiguration from source to target
   void copyTo(const QString &fromStep, const QString &targetStep);
 
+  void copyTo(const QString &fromStep, const QStringList &targetStep);
+
   //!@brief set specific parameter of given elementString
   void setParameter(const QString &elem, const QString &param, const QVariant &value);
 
