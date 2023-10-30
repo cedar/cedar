@@ -294,6 +294,11 @@ public:
     return this->_mSnapGridSize;
   }
 
+  bool isAutoSaving() const
+  {
+    return this->_mAutoSave->getValue();
+  }
+
   unsigned int getAutoSaveInterval() const
   {
     return this->_mAutoSaveInterval->getValue();
@@ -502,7 +507,10 @@ private:
   //! Sensitivity for slot items growth when the mouse approaches them while connecting.
   cedar::aux::DoubleParameterPtr _mDataSlotScalingSensitivity;
 
-  //! Size of the Snapgrid, when snapping is enabled
+  //! Disables or enables autosave
+  cedar::aux::BoolParameterPtr _mAutoSave;
+
+  //! Interval that specifies how often the architecture should autosave
   cedar::aux::UIntParameterPtr _mAutoSaveInterval;
 
   //!@brief Disables or enables simultaneous undo operations on the same parameter value

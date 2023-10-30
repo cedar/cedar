@@ -204,6 +204,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   cedar::aux::EnumParameterPtr mLearningRule;
+  cedar::aux::DoubleParameterPtr mTau;
   cedar::aux::UIntParameterPtr mInputDimension;
   cedar::aux::UIntVectorParameterPtr mInputSizes;
   cedar::aux::UIntParameterPtr mAssociationDimension;

@@ -134,7 +134,7 @@ protected:
   cedar::aux::DoubleVectorParameterPtr mCameraFrustrumAngleDeg;
 
   cedar::aux::IntVectorParameterPtr mOutputSizes;
-  cedar::aux::DoubleParameterPtr mOutputScaling;
+  cedar::aux::IntVectorParameterPtr mOutputScaling;
   cedar::aux::DoubleVectorParameterPtr mOutputTranslation;
   cedar::aux::DoubleParameterPtr mAlloDetectionThreshold;
 

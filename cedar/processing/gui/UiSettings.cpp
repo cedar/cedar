@@ -64,6 +64,7 @@ QWidget(pParent)
   // slot item growth settings
   this->mpSlotGrowthEnabled->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDataSlotScalingEnabled);
   this->mpGrowthFactor->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDataSlotScaling);
+  this->mpAutoSave->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mAutoSave);
   this->mpAutoSaveInterval->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mAutoSaveInterval);
   this->mpUseDynamicFieldIcons->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mUseDynamicFieldIcons);
   this->mpSensitivity->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDataSlotScalingSensitivity);

@@ -105,6 +105,7 @@ cedar::dyn::steps::HebbianConnection::HebbianConnection()
         mLearningRule(
                 new cedar::aux::EnumParameter(this, "learning rule", cedar::dyn::steps::HebbianConnection::LearningRule::typePtr(),
                                               LearningRule::OJA)),
+        mTau(new cedar::aux::DoubleParameter(this, "time scale", 20.0)),
       mInputDimension(new cedar::aux::UIntParameter(this, "source dimension", 1, 0, 3)),
       mInputSizes(new cedar::aux::UIntVectorParameter(this, "source sizes", 1, 50,cedar::aux::UIntParameter::LimitType::positive(5000))),
       mAssociationDimension(new cedar::aux::UIntParameter(this, "target dimension", 2, 0, 3)),
@@ -386,6 +387,7 @@ void cedar::dyn::steps::HebbianConnection::updateLearningRule()
       }
       mAssociationDimension->setMaximum(2);
       mSetWeights->setConstant(false);
+      mTau->setConstant(false);
       //Unfortunately no iteration
       mTauWeights->setConstant(true);
       mTauTheta->setConstant(true);
@@ -403,6 +405,7 @@ void cedar::dyn::steps::HebbianConnection::updateLearningRule()
       mAssociationDimension->setMinimum(3);
       mSetWeights->setValue(false);
       mSetWeights->setConstant(true);
+      mTau->setConstant(true);
 
 //      auto bcmParameterList = mBcmParameterGroup->getParameters(); //THIS CALL CRASHES. WHY?
 //      for(auto parameter:mBcmParameterGroup->getParameters())
@@ -877,18 +880,20 @@ cv::Mat cedar::dyn::steps::HebbianConnection::calculateWeightChange(const cedar:
   {
     case cedar::dyn::steps::HebbianConnection::LearningRule::OJA:
     {
+      float timeFactor = (delta_t / cedar::unit::Time(
+          mTau->getValue() * cedar::unit::milli * cedar::unit::seconds));
 
       //One case is outstar the other instar
       if (mInputDimension->getValue() == 0) // The old case! && And the 0 to 0 case! Be careful!
       {
-        return learnRate * inputSigmoid.at<float>(0, 0) * rewardSigValue.at<float>(0, 0) *
-               (targetSigmoid - currentWeights);
+        return timeFactor * (learnRate * inputSigmoid.at<float>(0, 0) * rewardSigValue.at<float>(0, 0) *
+               (targetSigmoid - currentWeights));
       }
 
       if (mAssociationDimension->getValue() == 0) // The reverse case
       {
-        return learnRate * rewardSigValue.at<float>(0, 0) * targetSigmoid.at<float>(0, 0) *
-               (inputSigmoid - currentWeights);
+        return timeFactor * (learnRate * rewardSigValue.at<float>(0, 0) * targetSigmoid.at<float>(0, 0) *
+               (inputSigmoid - currentWeights));
       }
 
       if (mAssociationDimension->getValue() == 1 && mInputDimension->getValue() == 1)
@@ -901,7 +906,7 @@ cv::Mat cedar::dyn::steps::HebbianConnection::calculateWeightChange(const cedar:
           {
             float combinedValue = inputSigmoid.at<float>(x, 0) * targetSigmoid.at<float>(y, 0);
             float weightChange = learnRate * (combinedValue - currentWeights.at<float>(x, y));
-            weightChangeMat.at<float>(x, y) = weightChange;
+            weightChangeMat.at<float>(x, y) = timeFactor * weightChange;
           }
         }
         return weightChangeMat;

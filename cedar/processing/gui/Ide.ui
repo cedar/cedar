@@ -1167,7 +1167,7 @@
     <string>Find</string>
    </property>
    <property name="toolTip">
-    <string>Find an step</string>
+    <string>Find a step</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
