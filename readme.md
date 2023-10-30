@@ -23,12 +23,6 @@ with cedar. If not, see <http://www.gnu.org/licenses/>.
 
 # cedar
 
-Build status Ubuntu 16.04: [![Build status](https://dev.azure.com/ini-cedar/cedar/_apis/build/status/ubuntu1604)](https://dev.azure.com/ini-cedar/cedar/_build/latest?definitionId=11)
-
-Build status MacOS 10.13: [![Build Status](https://dev.azure.com/ini-cedar/cedar/_apis/build/status/macos1013)](https://dev.azure.com/ini-cedar/cedar/_build/latest?definitionId=5)
-
-Build status Windows 10: [![Build Status](https://dev.azure.com/ini-cedar/cedar/_apis/build/status/win10)](https://dev.azure.com/ini-cedar/cedar/_build/latest?definitionId=7)
-
 You will find the documentation and installation instructions for CEDAR on our
 [official website](https://cedar.ini.rub.de).
 
