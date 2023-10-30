@@ -51,7 +51,7 @@ sudo rm PythonQtPythonInclude1.h
 echo -e "Necessary changes made. \nNow building PythonQt" 
 cd ..
 sudo qmake
-sudo make all &&
+sudo PYTHON_VERSION=${pythonv} make all &&
 echo -e "Successfully built PythonQt. \nIn CEDAR.CONF do the following changes: \n" &&
 echo "SET (CEDAR_INCLUDE_PYTHON   1)" 
 echo "SET (PYTHON_MAJOR_VERSION   ${py_major})" &&

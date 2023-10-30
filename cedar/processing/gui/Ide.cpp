@@ -124,6 +124,7 @@
 #include <utility>
 #include <QtGui/QClipboard>
 #include <QProcess>
+#include <QCommonStyle>
 
 #ifdef CEDAR_USE_YARP
 #include <yarp/conf/version.h>
@@ -514,6 +515,36 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   this->addDockWidget(static_cast<Qt::DockWidgetArea>(4), mpCopyWidget);
   #endif
 //  this->mpToolBar->insertSeparator(this->mpActionRecord);
+
+    /*QFile f(":/cedar/auxiliaries/gui/darktheme/darkstyle.qss");
+
+    if (!f.exists())   {
+        printf("Unable to set stylesheet, file not found\n");
+    }
+    else   {
+        f.open(QFile::ReadOnly | QFile::Text);
+        QTextStream ts(&f);
+        this->setStyleSheet(ts.readAll());
+    }
+     */
+/*
+
+    QPalette palette;
+    palette.setColor(QPalette::Window, QColor(240, 240, 240));
+    palette.setColor(QPalette::WindowText, QColor(0, 0, 0));
+    palette.setColor(QPalette::Base, QColor(255, 255, 255));
+    palette.setColor(QPalette::AlternateBase, QColor(240, 240, 240));
+    palette.setColor(QPalette::ToolTipBase, QColor(255, 255, 225));
+    palette.setColor(QPalette::ToolTipText, QColor(0, 0, 0));
+    palette.setColor(QPalette::Text, QColor(0, 0, 0));
+    palette.setColor(QPalette::Button, QColor(240, 240, 240));
+    palette.setColor(QPalette::ButtonText, QColor(0, 0, 0));
+    palette.setColor(QPalette::BrightText, QColor(255, 0, 0));
+    palette.setColor(QPalette::Highlight, QColor(76, 163, 224));
+    palette.setColor(QPalette::HighlightedText, QColor(0, 0, 0));
+    this->setPalette(palette);
+*/
+
 
 
 // NEW GUI STUFF HERE: ******************************************************
@@ -2884,6 +2915,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
 
   this->setArchitectureChanged(false);
   this->mpProcessingDrawer->setWidgets(this, this->mpPropertyTable, this->mpRecorderWidget,this->mpCommentWidget, this->mpCodeWidget);
+  this->mpCopy->setScene(this->mpProcessingDrawer->getScene());
 }
 
 void cedar::proc::gui::Ide::recentFileItemTriggered()
