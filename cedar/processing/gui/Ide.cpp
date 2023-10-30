@@ -2915,7 +2915,9 @@ void cedar::proc::gui::Ide::loadFile(QString file)
 
   this->setArchitectureChanged(false);
   this->mpProcessingDrawer->setWidgets(this, this->mpPropertyTable, this->mpRecorderWidget,this->mpCommentWidget, this->mpCodeWidget);
+  #ifdef CEDAR_USE_COPY
   this->mpCopy->setScene(this->mpProcessingDrawer->getScene());
+  #endif
 }
 
 void cedar::proc::gui::Ide::recentFileItemTriggered()
