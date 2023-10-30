@@ -919,7 +919,7 @@ void cedar::dyn::NeuralField::dimensionalityChanged()
 #ifdef CEDAR_USE_ARRAYFIRE
         this->_mLateralKernelConvolution->setEngine(cedar::aux::conv::ArrayFirePtr(new cedar::aux::conv::ArrayFire()));
         this->_mNoiseCorrelationKernelConvolution->setEngine(cedar::aux::conv::ArrayFirePtr(new cedar::aux::conv::ArrayFire()));
-#elif CEDAR_USE_FFTW
+#elif defined(CEDAR_USE_FFTW)
         this->_mLateralKernelConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
       this->_mNoiseCorrelationKernelConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
 #endif //CEDAR_USE_ARRAYFIRE

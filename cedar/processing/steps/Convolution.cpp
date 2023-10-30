@@ -304,7 +304,7 @@ void cedar::proc::steps::Convolution::inputDimensionalityChanged()
     {
 #ifdef CEDAR_USE_ARRAYFIRE
         this->mConvolution->setEngine(cedar::aux::conv::ArrayFirePtr(new cedar::aux::conv::ArrayFire()));
-#elif CEDAR_USE_FFTW
+#elif defined(CEDAR_USE_FFTW)
         this->mConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
 #endif //CEDAR_USE_ARRAYFIRE
     }
