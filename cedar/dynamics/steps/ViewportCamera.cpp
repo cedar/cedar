@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
@@ -106,7 +107,9 @@ cedar::dyn::steps::ViewportCamera::ViewportCamera()
   mViewportSize(new cedar::aux::UIntVectorParameter(this, "viewport size", 2, 10,1, 500000)),
   _msimplified(new cedar::aux::BoolParameter(this, "simplified", false)),
   _mRecordPath(new cedar::aux::DirectoryParameter(this,"directory","")),
-  _mRecord(new cedar::aux::BoolParameter(this, "record", false))
+  _mRecord(new cedar::aux::BoolParameter(this, "record", false)),
+  _mLearnInterval(new cedar::aux::UIntParameter(this, "Learn Intervall Duration", 25)),
+  _mLearnTotalDuration(new cedar::aux::UIntParameter(this, "Total Learn Duration", 325))
 {
 
   // declare all data
@@ -257,9 +260,9 @@ void cedar::dyn::steps::ViewportCamera::eulerStep(const cedar::unit::Time& time)
                   if (mLearnInput->getData().at<float>(0, 0) > 0.5)
                   {
                       _mElapsedLearnTime +=  time / cedar::unit::Time(1*cedar::unit::milli * cedar::unit::seconds);
-                      if(_mElapsedLearnTime >= 25 && _mElapsedLearnTime < 325)
+                      if(_mElapsedLearnTime >= this->_mLearnInterval->getValue() && _mElapsedLearnTime < this->_mLearnTotalDuration->getValue())
                       {
-                          int step = floor( (_mElapsedLearnTime-25) / 20);
+                          int step = floor( (_mElapsedLearnTime-this->_mLearnInterval->getValue()) / this->_mLearnInterval->getValue());
                           if(step >= 0 && step <= 2){
                               top += hvh/2;
                           }

@@ -49,7 +49,8 @@ mAdditionalTakenSteps(0),
 mpSimulationStepsTaken(0),
 mDefaultCPUStepSize(cedar::unit::Time(20 * cedar::unit::milli * cedar::unit::seconds)),
 mSimulationStepSize(cedar::unit::Time(20 * cedar::unit::milli * cedar::unit::seconds)),
-mLoopMode(cedar::aux::LoopMode::FakeDT)
+mLoopMode(cedar::aux::LoopMode::FakeDT),
+mBatchMode(false)
 {
   //Initialize to 100.0, which is the default field value
   mCurMinTau.store(100.0);
@@ -231,6 +232,16 @@ void cedar::aux::GlobalClock::setLoopMode(cedar::aux::LoopMode::Id newLoopMode)
 cedar::aux::LoopMode::Id cedar::aux::GlobalClock::getLoopMode()
 {
   return mLoopMode;
+}
+
+bool cedar::aux::GlobalClock::isBatchMode()
+{
+  return mBatchMode;
+}
+
+void cedar::aux::GlobalClock::setBatchMode(bool batchMode)
+{
+  mBatchMode = batchMode;
 }
 
 void cedar::aux::GlobalClock::updateTakenSteps(unsigned long newStepsTaken)

@@ -61,7 +61,6 @@
 //PythonQtConsole
 cedar::proc::gui::PythonQtConsole::PythonQtConsole(QWidget *parent) : cedar::proc::gui::CodeWidgetScope::CodeEditor(parent)
 {
-
   mDefaultTextCharacterFormat = currentCharFormat();
 
   mpCompleter = new QCompleter(this);
