@@ -153,6 +153,7 @@ void cedar::aux::kernel::Gauss::calculateParts()
   // calculate the kernel parts for every dimension
   if (dimensionality > 0)
   {
+    double normalizationFactor = 1;
     for (unsigned int dim = 0; dim < dimensionality; dim++)
     {
       QReadLocker sigma_lock(_mSigmas->getLock());
@@ -192,11 +193,13 @@ void cedar::aux::kernel::Gauss::calculateParts()
       // normalize
       if (this->_mNormalize->getValue())
       {
-        kernel_part /= cv::sum(kernel_part).val[0];
+        double kernel_part_sum = cv::sum(kernel_part).val[0];
+        normalizationFactor *= kernel_part_sum;
+        kernel_part /= kernel_part_sum;
       }
-
       this->setKernelPart(dim, kernel_part);
     }
+    this->_mNormalizationFactor = normalizationFactor;
 
     this->setKernelPart(0, amplitude * this->getKernelPart(0));
   }
@@ -245,9 +248,28 @@ void cedar::aux::kernel::Gauss::setAmplitude(double amplitude)
   _mAmplitude->setValue(amplitude);
 }
 
+void cedar::aux::kernel::Gauss::setNormalize(bool normalize)
+{
+  this->_mNormalize->setValue(normalize);
+}
+
 double cedar::aux::kernel::Gauss::getAmplitude() const
 {
   return _mAmplitude->getValue();
+}
+
+double cedar::aux::kernel::Gauss::getDenormalizedAmplitude() const
+{
+  if(!this->_mNormalize->getValue())
+  {
+    return _mAmplitude->getValue();
+  }
+  else
+  {
+    this->mKernel->lockForRead();
+    return _mAmplitude->getValue() / this->_mNormalizationFactor;
+    this->mKernel->unlock();
+  }
 }
 
 unsigned int cedar::aux::kernel::Gauss::estimateWidth(unsigned int dim) const

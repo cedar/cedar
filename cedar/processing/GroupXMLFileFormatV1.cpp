@@ -599,7 +599,7 @@ void cedar::proc::GroupXMLFileFormatV1::writeKernelListParameter(
     // This must be a Gauss kernel, otherwise the architecture would not be exportable
     auto gauss = dynamic_cast<cedar::aux::kernel::Gauss*>(kernel.get());
     CEDAR_ASSERT(gauss != nullptr);
-    gaussWeightPattern.add("Height", gauss->getAmplitude());
+    gaussWeightPattern.add("Height", gauss->getDenormalizedAmplitude());
     // Write sigma data
     if(gauss->getDimensionality() > 0)
     {
@@ -636,6 +636,9 @@ void cedar::proc::GroupXMLFileFormatV1::readKernelListParameter(
 
     //Get the "height" (in cedar "amplitude")
     kernel->setAmplitude(gaussWeightPattern.get<double>("Height"));
+
+    // Set normalized to false
+    kernel->setNormalize(false);
 
     //The sigma string is concatinated by ",", therefore split them and set the Sigma of the kernel
     std::vector<std::string> sigmas;

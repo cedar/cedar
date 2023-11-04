@@ -105,8 +105,14 @@ public:
   //!@brief get the amplitude of the kernel
   double getAmplitude() const;
 
+  //!@brief get the amplitude of the kernel
+  double getDenormalizedAmplitude() const;
+
   //!@brief set the amplitude of the kernel
   void setAmplitude(double amplitude);
+
+  //!@brief set the amplitude of the kernel
+  void setNormalize(bool normalize);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -160,8 +166,10 @@ protected:
 
   //!@brief scalar value, which is multiplied by the dimensions' sigmas to determine the pixel size
   cedar::aux::DoubleParameterPtr _mLimit;
+
 private:
-  // none yet
+  //! Factor needed to denormalize the amplitude.
+  double _mNormalizationFactor;
 
 }; // class cedar::aux::kernel::Gauss
 
