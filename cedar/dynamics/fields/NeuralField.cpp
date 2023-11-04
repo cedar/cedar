@@ -57,6 +57,7 @@
 #include "cedar/auxiliaries/math/Sigmoid.h"
 #include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
 #include "cedar/auxiliaries/math/transferFunctions/ExpSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/HeavisideSigmoid.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -900,16 +901,24 @@ bool cedar::dyn::NeuralField::isXMLExportable(std::string& errorMsg){
     errorMsg = "The XML export only supports \"alternate even kernel center\" set to false.";
     return false;
   }
-  if(auto expSigmoid = dynamic_cast<cedar::aux::math::ExpSigmoid*>(this->_mSigmoid->getValue().get()))
+  if(auto sigmoid = dynamic_cast<cedar::aux::math::Sigmoid*>(this->_mSigmoid->getValue().get()))
   {
-    if(expSigmoid->getThreshold() != 0)
+    if(sigmoid->getThreshold() != 0)
     {
-      errorMsg = "The XML export only supports 0 as the threshold for the ExpSigmoid transfer function.";
+      errorMsg = "The XML export only supports 0 as the threshold for sigmoids.";
+      return false;
+    }
+    if(!(dynamic_cast<cedar::aux::math::ExpSigmoid*>(this->_mSigmoid->getValue().get()) ||
+          dynamic_cast<cedar::aux::math::AbsSigmoid*>(this->_mSigmoid->getValue().get()) ||
+          dynamic_cast<cedar::aux::math::HeavisideSigmoid*>(this->_mSigmoid->getValue().get())))
+    {
+      errorMsg = "The XML export only supports \"AbsSigmoid\", \"ExpSigmoid\" and \"HeavisideSigmoid\" as the transfer function.";
       return false;
     }
   }
-  else{
-    errorMsg = "The XML export only supports \"ExpSigmoid\" as the transfer function.";
+  else
+  {
+    errorMsg = "The XML export only supports sigmoids as transfer functions.";
     return false;
   }
   return true;

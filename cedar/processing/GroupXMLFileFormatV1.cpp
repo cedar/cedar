@@ -43,6 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
+#include "cedar/auxiliaries/math/transferFunctions/HeavisideSigmoid.h"
 #include "cedar/auxiliaries/math/TransferFunction.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/processing/Group.h"
@@ -561,10 +562,7 @@ boost::bimap<std::string, std::string> cedar::proc::GroupXMLFileFormatV1::transf
   boost::assign::list_of< boost::bimap<std::string, std::string>::relation >
     ("cedar.aux.math.AbsSigmoid", "AbsSigmoid")
     ("cedar.aux.math.ExpSigmoid", "ExpSigmoid")
-    ("cedar.aux.math.HeavisideSigmoid","HeavisideSigmoid")
-    ("cedar.aux.math.LinearTransferFunction","LinearTransferFunction")
-    ("cedar.aux.math.Logarithm","Logarithm")
-    ("cedar.aux.math.SemiLinearTransferFunction","SemiLinearTransferFunction");
+    ("cedar.aux.math.HeavisideSigmoid","HeavisideSigmoid");
 
 
 std::string cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(boost::bimap<std::string, std::string> bimap, std::string name, bool directionCedarToXML)
@@ -693,20 +691,32 @@ void cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(
 {
   cedar::aux::ConfigurationNode activationFunction;
 
-  // get transfere function and beta parameter
+  // get transfer function and beta parameter
   cedar::aux::math::TransferFunctionPtr transferFunction = sigmoid->getValue();
-  cedar::aux::NumericParameter<double>* beta = dynamic_cast<cedar::aux::NumericParameter<double>*>(
-          transferFunction->getParameter("beta").get());
-  CEDAR_ASSERT(beta != nullptr)
-  activationFunction.put("Beta", beta->getValue());
+  double beta = 0;
+  if(dynamic_cast<cedar::aux::math::HeavisideSigmoid*>(transferFunction.get()))
+  {
+    beta = 9001;
+  }
+  else
+  {
+    cedar::aux::NumericParameter<double>* betaParam = dynamic_cast<cedar::aux::NumericParameter<double>*>(
+      transferFunction->getParameter("beta").get());
+    CEDAR_ASSERT(betaParam != nullptr)
+    beta = betaParam->getValue();
+  }
+  activationFunction.put("Beta", beta);
   // add beta parameter to node
   root.add_child(name, activationFunction);
 
-  // add looked up transfer function to xml attribute
-  root.add(name + ".<xmlattr>.type", cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
+  // add transfer function name to xml attribute
+  root.add(name + ".<xmlattr>.type", "ExpSigmoid");
+  // We are hard-coding ExpSigmoid here as we are exporting Abs and HeavisideSigmoid as an approximation of ExpSigmoid
+  // If this should change in the future, use the next line to properly map type-ids to xml names
+  /*root.add(name + ".<xmlattr>.type", cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
           cedar::proc::GroupXMLFileFormatV1::transferFunctionNameLookupTableXML,
           cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->getTypeId(transferFunction)
-  ));
+  ));*/
 }
 
 void cedar::proc::GroupXMLFileFormatV1::readActivationFunctionParameter(
