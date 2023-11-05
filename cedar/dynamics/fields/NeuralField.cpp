@@ -68,6 +68,7 @@
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/processing/Group.h"
+#include "cedar/auxiliaries/kernel/Box.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -880,9 +881,10 @@ void cedar::dyn::NeuralField::onStop()
 bool cedar::dyn::NeuralField::isXMLExportable(std::string& errorMsg){
   for(int i = 0; i < this->_mKernels->size(); i++)
   {
-    if(!dynamic_cast<cedar::aux::kernel::Gauss*>(this->_mKernels->at(i).get()))
+    if(!(dynamic_cast<cedar::aux::kernel::Gauss*>(this->_mKernels->at(i).get()) ||
+      (this->getDimensionality() == 0 && dynamic_cast<cedar::aux::kernel::Box*>(this->_mKernels->at(i).get()))))
     {
-      errorMsg = "The XML export only supports Gauss kernels.";
+      errorMsg = "The XML export only supports Gauss kernels (and Box kernels for Nodes).";
       return false;
     }
   }

@@ -36,10 +36,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/steps/Sum.h"
+#include "cedar/processing/Arguments.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
-#include "cedar/processing/Arguments.h"
+#include "cedar/processing/GroupXMLFileFormatV1.h"
 #include "cedar/processing/typecheck/SameSizedCollection.h"
 #include "cedar/processing/typecheck/SameTypeCollection.h"
 #include "cedar/processing/typecheck/And.h"
@@ -102,6 +103,7 @@ mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))
 
   input_slot->setCheck(sum_check);
 
+  this->mXMLExportable = true;
   this->declareOutput("sum", this->mOutput);
 
   this->mInputs = this->getInputSlot("terms");
@@ -230,4 +232,8 @@ void cedar::proc::steps::Sum::inputConnectionChanged(const std::string& /*inputN
       this->emitOutputPropertiesChangedSignal("sum");
     }
   }
+}
+
+bool cedar::proc::steps::Sum::isXMLExportable(std::string& errorMsg){
+  return cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportable(this, errorMsg);
 }
