@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 #include "cedar/auxiliaries/math/transferFunctions/ExpSigmoid.h"
 #include "cedar/auxiliaries/math/transferFunctions/HeavisideSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/LinearTransferFunction.h"
 #include "cedar/auxiliaries/math/TransferFunction.h"
 #include "cedar/auxiliaries/kernel/Box.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
@@ -54,7 +55,9 @@
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/sinks/GroupSink.h"
+#include "cedar/processing/sources/GaussInput.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/steps/ComponentMultiply.h"
 #include "cedar/processing/steps/Convolution.h"
 #include "cedar/processing/steps/Projection.h"
 #include "cedar/processing/steps/StaticGain.h"
@@ -113,6 +116,7 @@ void cedar::proc::GroupXMLFileFormatV1::write
   cedar::aux::ConfigurationNode& dftArchitecture
 )
 {
+  this->mBlacklistedSteps.clear();
   cedar::aux::ConfigurationNode root;
   if (group->isLinked())
   {
@@ -120,6 +124,7 @@ void cedar::proc::GroupXMLFileFormatV1::write
   }
   else
   {
+    this->markBlacklistedSteps(group);
     cedar::aux::ConfigurationNode steps;
     this->writeSteps(group, steps);
     if (!steps.empty())
@@ -137,6 +142,42 @@ void cedar::proc::GroupXMLFileFormatV1::write
     }
   }
   dftArchitecture.add_child("DFTArchitecture", root);
+}
+
+void cedar::proc::GroupXMLFileFormatV1::markBlacklistedSteps(cedar::proc::ConstGroupPtr group)
+{
+  for (auto& name_element_pair : group->getElements())
+  {
+    auto element = name_element_pair.second;
+    // if this is a step, write this to the configuration tree
+    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::steps::ComponentMultiply>(element))
+    {
+      auto inputSlot = step->getInputSlot("operands");
+      CEDAR_ASSERT(inputSlot != nullptr)
+      for (auto inCon : inputSlot->getDataConnections())
+      {
+        cedar::proc::Connectable *connectable = inCon->getSource()->getParentPtr();
+        CEDAR_ASSERT(connectable != nullptr)
+        if (auto gauss = dynamic_cast<cedar::proc::sources::GaussInput*>(connectable))
+        {
+          auto gaussOutputSlot = gauss->getOutputSlot("Gauss input");
+          bool gaussHasOtherTargets = false;
+          for(auto outCon : gaussOutputSlot->getDataConnections())
+          {
+            if(!dynamic_cast<cedar::proc::steps::ComponentMultiply*>(outCon->getTarget()->getParentPtr()))
+            {
+              gaussHasOtherTargets = true;
+            }
+          }
+          if(gaussHasOtherTargets || std::find(this->mBlacklistedSteps.begin(), this->mBlacklistedSteps.end(), gauss->getFullPath()) != this->mBlacklistedSteps.end())
+          {
+            continue;
+          }
+          this->mBlacklistedSteps.push_back(gauss->getFullPath());
+        }
+      }
+    }
+  }
 }
 
 void cedar::proc::GroupXMLFileFormatV1::writeSteps
@@ -275,6 +316,13 @@ const cedar::aux::ConfigurationNode& stepNode, std::vector<std::string>& excepti
 
 bool cedar::proc::GroupXMLFileFormatV1::isStepBlacklisted(cedar::proc::Connectable* step) const
 {
+  for(std::string name : this->mBlacklistedSteps)
+  {
+    if(step->getFullPath().compare(name) == 0)
+    {
+      return true;
+    }
+  }
   return dynamic_cast<cedar::proc::sinks::GroupSink*>(step)
     || dynamic_cast<cedar::proc::sources::GroupSource*>(step)
     || dynamic_cast<cedar::proc::steps::SynapticConnection*>(step)
@@ -282,6 +330,19 @@ bool cedar::proc::GroupXMLFileFormatV1::isStepBlacklisted(cedar::proc::Connectab
     || dynamic_cast<cedar::proc::steps::Convolution*>(step)
     || dynamic_cast<cedar::proc::steps::Projection*>(step)
     || dynamic_cast<cedar::proc::steps::Sum*>(step);
+}
+
+bool cedar::proc::GroupXMLFileFormatV1::isConnectionBlacklisted(cedar::proc::DataConnection* connection) const
+{
+  // Special case: Connections from GaussInput to ComponentMultiply should not be exported
+  if(dynamic_cast<cedar::proc::sources::GaussInput*>(connection->getSource()->getParentPtr()) &&
+      dynamic_cast<cedar::proc::steps::ComponentMultiply*>(connection->getTarget()->getParentPtr()))
+  {
+    return true;
+  }
+  // Normal case: If source or target is blacklisted, do not export connection
+  return this->isStepBlacklisted(connection->getSource()->getParentPtr())
+     || this->isStepBlacklisted(connection->getTarget()->getParentPtr());
 }
 
 bool cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportable(cedar::proc::Connectable* chainSource, std::string& errorMsg)
@@ -462,15 +523,13 @@ void cedar::proc::GroupXMLFileFormatV1::writeDataConnections
 {
   for (auto data_connection : group->getDataConnections())
   {
-    if(this->isStepBlacklisted(data_connection.get()->getSource()->getParentPtr())
-      || this->isStepBlacklisted(data_connection.get()->getTarget()->getParentPtr()))
+    if(this->isConnectionBlacklisted(data_connection.get()))
     {
       continue;
     }
     this->writeDataConnection(root, data_connection);
   }
 }
-
 
 void cedar::proc::GroupXMLFileFormatV1::readConnections
 (
@@ -567,6 +626,8 @@ std::vector<std::string> cedar::proc::GroupXMLFileFormatV1::chainableSteps = {"c
 
 boost::bimap<std::string, std::string> cedar::proc::GroupXMLFileFormatV1::stepNameLookupTableXML =
   boost::assign::list_of< boost::bimap<std::string, std::string>::relation >
+    ("cedar.processing.sources.Boost", "Boost")
+    ("cedar.dynamics.HebbianConnection", "HebbianConnection")
     ("cedar.dynamics.NeuralField", "Field")
     ("cedar.processing.sources.GaussInput", "GaussInput");
 
@@ -581,6 +642,12 @@ std::string cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(boost::bimap<s
 {
   if(directionCedarToXML)
   {
+    // Special unidirectional translations
+    if(name.compare("cedar.processing.ComponentMultiply") == 0)
+    {
+      name = "cedar.dynamics.HebbianConnection";
+    }
+    // Normal translations
     boost::bimap<std::string, std::string>::left_const_iterator iter = bimap.left.find(name);
     if(iter != bimap.left.end())
     {
@@ -724,6 +791,11 @@ void cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(
   {
     beta = 9001;
   }
+  else if(dynamic_cast<cedar::aux::math::LinearTransferFunction*>(transferFunction.get()))
+  {
+    // Should only be the case for HebbianConnections
+    beta = 200;
+  }
   else
   {
     cedar::aux::NumericParameter<double>* betaParam = dynamic_cast<cedar::aux::NumericParameter<double>*>(
@@ -749,16 +821,16 @@ void cedar::proc::GroupXMLFileFormatV1::readActivationFunctionParameter(
   cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* sigmoid,
   const cedar::aux::ConfigurationNode& root, const std::string& name)
 {
-  //get transfere function and beta values from node
-  cedar::aux::ConfigurationNode transfereFunctionNode = root.get_child(name);
-  std::string transfereFunctionTypeId = cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
+  //get transfer function and beta values from node
+  cedar::aux::ConfigurationNode transferFunctionNode = root.get_child(name);
+  std::string transferFunctionTypeId = cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
           cedar::proc::GroupXMLFileFormatV1::transferFunctionNameLookupTableXML,
-          transfereFunctionNode.get<std::string>("<xmlattr>.type"),
+          transferFunctionNode.get<std::string>("<xmlattr>.type"),
           false);
-  double beta = transfereFunctionNode.get<double>("Beta");
+  double beta = transferFunctionNode.get<double>("Beta");
 
   //set the values in the given sigmoid field
-  if(transfereFunctionTypeId == "cedar.aux.math.ExpSigmoid")
+  if(transferFunctionTypeId == "cedar.aux.math.ExpSigmoid")
   {
     // create new exp sigmoid transfere funcion with given parameter (threshhold is not export and therefore set to the
     // default value of 0) and set it to the sigmoid

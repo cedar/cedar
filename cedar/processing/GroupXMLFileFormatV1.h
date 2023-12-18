@@ -171,6 +171,12 @@ private:
   // Returns true if provided step is on the blacklist for the common export for steps
   bool isStepBlacklisted(cedar::proc::Connectable* step) const;
 
+  // Returns true if provided connection contains steps on the blacklist for the common export for steps
+  bool isConnectionBlacklisted(cedar::proc::DataConnection* connection) const;
+
+  // Marks all steps that should not be exported normally as blacklisted
+  void markBlacklistedSteps(cedar::proc::ConstGroupPtr group);
+
   // Checks if given step is chainable
   static bool isChainable(cedar::proc::ElementPtr element);
 
@@ -224,6 +230,8 @@ private:
   static boost::bimap<std::string, std::string> transferFunctionNameLookupTableXML;
 
   static std::vector<std::string> chainableSteps;
+
+  std::vector<std::string> mBlacklistedSteps;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

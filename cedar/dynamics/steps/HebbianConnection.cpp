@@ -302,20 +302,27 @@ bool cedar::dyn::steps::HebbianConnection::isXMLExportable(std::string& errorMsg
 
   for (const auto& sigmoid_tuple : sigmoid_functions)
   {
-    if(auto expSigmoid = dynamic_cast<cedar::aux::math::ExpSigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get()))
+    if(auto sigmoid = dynamic_cast<cedar::aux::math::Sigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get()))
     {
-      if(expSigmoid->getThreshold() != 0)
+      if(sigmoid->getThreshold() != 0)
       {
-        errorMsg = "The XML export only supports 0 as the threshold for the ExpSigmoid source sigmoid function.";
+        errorMsg = "The XML export only supports 0 as the threshold for sigmoids.";
+        return false;
+      }
+      if(!(dynamic_cast<cedar::aux::math::ExpSigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get()) ||
+           dynamic_cast<cedar::aux::math::AbsSigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get()) ||
+           dynamic_cast<cedar::aux::math::HeavisideSigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get())))
+      {
+        errorMsg = "The XML export only supports \"AbsSigmoid\", \"ExpSigmoid\" and \"HeavisideSigmoid\" as the transfer function.";
         return false;
       }
     }
-    else{
-      errorMsg = "The XML export only supports \"ExpSigmoid\" as the " + std::get<1>(sigmoid_tuple) + " sigmoid function.";
+    else if(!dynamic_cast<cedar::aux::math::LinearTransferFunction*>(std::get<0>(sigmoid_tuple)->getValue().get()))
+    {
+      errorMsg = "The XML export only supports sigmoids and LinearTransferFunction as transfer functions.";
       return false;
     }
   }
-
   return true;
 }
 
@@ -339,7 +346,7 @@ void cedar::dyn::steps::HebbianConnection::updateAssociationDimension()
   {
     sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
   }
-  this->mWeightedTargetOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
+  this->mWeightOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
 
 //  std::cout<<"updateAssociationDimension: WeightDim! " << determineWeightDimension() << " WeightX=" << determineWeightSizes(0) << " WeightY=" << determineWeightSizes(1) << std::endl;
   this->resetWeights();

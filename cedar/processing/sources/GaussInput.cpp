@@ -101,7 +101,7 @@ _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigma", 2, 3.0, 0.01, 1000
 _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
 {
   this->mXMLExportable = true;
-  this->mXMLParameterWhitelist = {"amplitude"};
+  this->mXMLParameterWhitelist = {"amplitude", "centers", "sigma"};
 
   this->declareOutput("Gauss input", mOutput);
   this->updateSizesRange();
