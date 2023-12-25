@@ -43,6 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
+#include "cedar/processing/Connectable.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/GroupXMLFileFormatV1.fwd.h"
@@ -51,8 +52,9 @@
 #include "cedar/auxiliaries/Configurable.fwd.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.fwd.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.fwd.h"
+#include "cedar/dynamics/steps/HebbianConnection.fwd.h"
 #include "cedar/processing/steps/SynapticConnection.fwd.h"
-#include "cedar/processing/Connectable.fwd.h"
+#include "cedar/processing/steps/ComponentMultiply.fwd.h"
 #include "cedar/processing/DataConnection.fwd.h"
 #include "cedar/processing/Element.fwd.h"
 #include "cedar/processing/Group.fwd.h"
@@ -192,6 +194,17 @@ private:
   /*!@brief Writes the data connections in the group to the configuration node.
    */
   void writeSynapticConnections(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
+
+  /*!@brief Writes a hebbian connection to the configuration node.
+   */
+  void writeHebbianConnection(cedar::aux::ConfigurationNode& root,
+                               const cedar::dyn::steps::HebbianConnectionPtr connection) const;
+  void writeHebbianConnection(cedar::aux::ConfigurationNode& root,
+                              const cedar::proc::steps::ComponentMultiplyPtr connection) const;
+
+  /*!@brief Writes the hebbian connections in the group to the configuration node.
+   */
+  void writeHebbianConnections(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief Writes a chained synaptic connection to the configuration node.
    */

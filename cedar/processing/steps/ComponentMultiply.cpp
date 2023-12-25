@@ -49,7 +49,8 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/annotation/SizesRangeHint.h"
-#include "cedar/auxiliaries/math/transferFunctions/ExpSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/HeavisideSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/LinearTransferFunction.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -249,10 +250,13 @@ void cedar::proc::steps::ComponentMultiply::writeConfigurationXML(cedar::aux::Co
       break;
     }
   }
-  cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* pSigmoid =
+  cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* pHeavisideSigmoid =
       new cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>(nullptr, "temp",
-      cedar::aux::math::SigmoidPtr(new cedar::aux::math::ExpSigmoid(0)));
-  cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(pSigmoid, root, "SourceFunction");
-  cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(pSigmoid, root, "RewardFunction");
-  cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(pSigmoid, root, "TargetFunction");
+      cedar::aux::math::SigmoidPtr(new cedar::aux::math::HeavisideSigmoid()));
+  cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* pLinearTransferFunction =
+      new cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>(nullptr, "temp",
+      cedar::aux::math::LinearTransferFunctionPtr(new cedar::aux::math::LinearTransferFunction()));
+  cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(pHeavisideSigmoid, root, "SourceFunction");
+  cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(pHeavisideSigmoid, root, "RewardFunction");
+  cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(pLinearTransferFunction, root, "TargetFunction");
 }

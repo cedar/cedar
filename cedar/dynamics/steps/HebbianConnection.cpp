@@ -323,6 +323,12 @@ bool cedar::dyn::steps::HebbianConnection::isXMLExportable(std::string& errorMsg
       return false;
     }
   }
+
+  if(this->getOutputSlot(mTriggerOutputName)->getDataConnections().size() > 1 ||
+     this->getInputSlot(mAssoInputName)->getDataConnections().size() > 1)
+  {
+    return false;
+  }
   return true;
 }
 

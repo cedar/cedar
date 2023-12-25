@@ -50,6 +50,8 @@
 #include "cedar/auxiliaries/kernel/Box.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
+#include "cedar/dynamics/steps/HebbianConnection.h"
+#include "cedar/dynamics/fields/NeuralField.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataConnection.h"
@@ -134,6 +136,7 @@ void cedar::proc::GroupXMLFileFormatV1::write
 
     cedar::aux::ConfigurationNode connections;
     this->writeSynapticConnections(group, connections);
+    this->writeHebbianConnections(group, connections);
     this->writeChainedSynapticConnections(group, connections);
     this->writeDataConnections(group, connections);
     if (!connections.empty())
@@ -149,7 +152,6 @@ void cedar::proc::GroupXMLFileFormatV1::markBlacklistedSteps(cedar::proc::ConstG
   for (auto& name_element_pair : group->getElements())
   {
     auto element = name_element_pair.second;
-    // if this is a step, write this to the configuration tree
     if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::steps::ComponentMultiply>(element))
     {
       auto inputSlot = step->getInputSlot("operands");
@@ -326,6 +328,8 @@ bool cedar::proc::GroupXMLFileFormatV1::isStepBlacklisted(cedar::proc::Connectab
   return dynamic_cast<cedar::proc::sinks::GroupSink*>(step)
     || dynamic_cast<cedar::proc::sources::GroupSource*>(step)
     || dynamic_cast<cedar::proc::steps::SynapticConnection*>(step)
+    || dynamic_cast<cedar::dyn::steps::HebbianConnection*>(step)
+    || dynamic_cast<cedar::proc::steps::ComponentMultiply*>(step)
     || dynamic_cast<cedar::proc::steps::StaticGain*>(step)
     || dynamic_cast<cedar::proc::steps::Convolution*>(step)
     || dynamic_cast<cedar::proc::steps::Projection*>(step)
@@ -453,7 +457,6 @@ const
     {
       if(auto targetElement = dynamic_cast<cedar::proc::Element*>(outputConn.get()->getTarget()->getParentPtr()))
       {
-        // This is the target step
         targets.push_back(targetElement->getFullPath());
       }
     }
@@ -464,7 +467,6 @@ const
     {
       if(auto sourceElement = dynamic_cast<cedar::proc::Element*>(outputConn.get()->getSource()->getParentPtr()))
       {
-        // This is the source step
         sources.push_back(sourceElement->getFullPath());
       }
     }
@@ -495,6 +497,127 @@ void cedar::proc::GroupXMLFileFormatV1::writeSynapticConnections
     if(auto connection = boost::dynamic_pointer_cast<cedar::proc::steps::SynapticConnection>(name_element_pair.second))
     {
       this->writeSynapticConnection(root, connection);
+    }
+  }
+}
+
+
+void cedar::proc::GroupXMLFileFormatV1::writeHebbianConnection(cedar::aux::ConfigurationNode& root,
+                                                                const cedar::dyn::steps::HebbianConnectionPtr connection)
+const
+{
+  // Write the properties of this connection to a template node
+  cedar::aux::ConfigurationNode properties;
+  connection->writeConfigurationXML(properties);
+
+  // Enumerate all source and target steps of the connection
+  std::vector<std::string> sources;
+  std::vector<std::string> targets;
+  auto learnedOutputSlot = connection->getOutputSlot("learned output");
+  auto targetFieldSlot = connection->getInputSlot("target field");
+  CEDAR_ASSERT(learnedOutputSlot->getDataConnections().size() <= 1 && targetFieldSlot->getDataConnections().size() <= 1)
+
+  if(learnedOutputSlot->getDataConnections().size() == 1)
+  {
+    CEDAR_ASSERT(learnedOutputSlot->getDataConnections().at(0)->getTarget() != nullptr)
+    if(auto targetElement = dynamic_cast<cedar::proc::Element*>(learnedOutputSlot->getDataConnections().at(0)->getTarget()->getParentPtr()))
+    {
+      targets.push_back(targetElement->getFullPath());
+    }
+  } else if(targetFieldSlot->getDataConnections().size() == 1)
+  {
+    CEDAR_ASSERT(targetFieldSlot->getDataConnections().at(0)->getSource() != nullptr)
+    if(auto targetElement = dynamic_cast<cedar::proc::Element*>(targetFieldSlot->getDataConnections().at(0)->getSource()->getParentPtr()))
+    {
+      targets.push_back(targetElement->getFullPath());
+    }
+  }
+  auto inputSlot = connection->getInputSlot("source node");
+  for(cedar::proc::DataConnectionPtr outputConn : inputSlot->getDataConnections())
+  {
+    CEDAR_ASSERT(outputConn->getSource() != nullptr)
+    if(auto sourceElement = dynamic_cast<cedar::proc::Element*>(outputConn->getSource()->getParentPtr()))
+    {
+      sources.push_back(sourceElement->getFullPath());
+    }
+  }
+
+
+  // Save a Hebbian connection for all source/target pairs
+  for(std::string source : sources)
+  {
+    for(std::string target : targets)
+    {
+      cedar::aux::ConfigurationNode connection_node(properties);
+      connection_node.put("Source", source);
+      connection_node.put("Target", target);
+      root.push_back(cedar::aux::ConfigurationNode::value_type("HebbianConnection", connection_node));
+    }
+  }
+}
+
+void cedar::proc::GroupXMLFileFormatV1::writeHebbianConnection(cedar::aux::ConfigurationNode& root,
+                                                               const cedar::proc::steps::ComponentMultiplyPtr connection)
+const
+{
+  // Write the properties of this connection to a template node
+  cedar::aux::ConfigurationNode properties;
+  connection->writeConfigurationXML(properties);
+
+  // Enumerate all source and target steps of the connection
+  std::vector<std::string> sources;
+  std::vector<std::string> targets;
+  std::map<std::string, cedar::proc::DataSlotPtr> outputSlots = connection->getDataSlots(DataRole::OUTPUT);
+  std::map<std::string, cedar::proc::DataSlotPtr> inputSlots = connection->getDataSlots(DataRole::INPUT);
+  for(auto slot : outputSlots)
+  {
+    for(cedar::proc::DataConnectionPtr outputConn : slot.second->getDataConnections())
+    {
+      if(auto targetElement = dynamic_cast<cedar::proc::Element*>(outputConn.get()->getTarget()->getParentPtr()))
+      {
+        targets.push_back(targetElement->getFullPath());
+      }
+    }
+  }
+  for(auto slot : inputSlots)
+  {
+    for(cedar::proc::DataConnectionPtr outputConn : slot.second->getDataConnections())
+    {
+      if(auto sourceElement = dynamic_cast<cedar::dyn::NeuralField*>(outputConn.get()->getSource()->getParentPtr()))
+      {
+        sources.push_back(sourceElement->getFullPath());
+      }
+    }
+  }
+  // Save a Hebbian connection for all source/target pairs
+  for(std::string source : sources)
+  {
+    for(std::string target : targets)
+    {
+      cedar::aux::ConfigurationNode connection_node(properties);
+      connection_node.put("Source", source);
+      connection_node.put("Target", target);
+      root.push_back(cedar::aux::ConfigurationNode::value_type("HebbianConnection", connection_node));
+    }
+  }
+}
+
+void cedar::proc::GroupXMLFileFormatV1::writeHebbianConnections
+  (
+    cedar::proc::ConstGroupPtr group,
+    cedar::aux::ConfigurationNode& root
+  ) const
+{
+
+  for (auto& name_element_pair : group->getElements())
+  {
+    if(auto connection = boost::dynamic_pointer_cast<cedar::dyn::steps::HebbianConnection>(name_element_pair.second))
+    {
+      this->writeHebbianConnection(root, connection);
+    }
+    else if(auto connection = boost::dynamic_pointer_cast<cedar::proc::steps::ComponentMultiply>(name_element_pair.second))
+    {
+      this->writeHebbianConnection(root, connection);
     }
   }
 }
@@ -563,36 +686,58 @@ void cedar::proc::GroupXMLFileFormatV1::readConnections
     CEDAR_ASSERT(targetConnectable != nullptr)
     auto targetSlots = targetConnectable->getOrderedDataSlots(DataRole::INPUT);
     CEDAR_ASSERT(targetSlots.size() > 0)
+
+    bool isHebbian = iter->first.compare("HebbianConnection") == 0;
+    bool isSynaptic = kernelWeights    != iter->second.not_found() || pointWiseWeights != iter->second.not_found() ||
+                      scalarWeight     != iter->second.not_found() || dimensionMapping != iter->second.not_found();
     try
     {
-      if (kernelWeights    != iter->second.not_found() ||
-          pointWiseWeights != iter->second.not_found() ||
-          scalarWeight     != iter->second.not_found() ||
-          dimensionMapping != iter->second.not_found())
+      if (isHebbian || isSynaptic)
       {
-        // Insert SynapticConnection step between source and target
-        std::string synName = group->getUniqueIdentifier("Synaptic Connection");
-        cedar::proc::StepPtr synStep = this->createStep(synName, "cedar.processing.SynapticConnection", group,
-                         iter->second, exceptions);
-        // Get the input and output slot for the synaptic connection step
-        auto synConnectable = dynamic_cast<cedar::proc::Connectable *>(synStep.get());
-        CEDAR_ASSERT(synConnectable != nullptr)
+        std::string conName;
+        cedar::proc::StepPtr conStep;
+        // Insert Synaptic/Hebbian step between source and target
+        if(isSynaptic)
+        {
+          conName = group->getUniqueIdentifier("Synaptic Connection");
+          conStep = this->createStep(conName, "cedar.processing.SynapticConnection", group, iter->second, exceptions);
+        }
+        else
+        {
+          conName = group->getUniqueIdentifier("Hebbian Connection");
+          conStep = this->createStep(conName, "cedar.dynamics.HebbianConnection", group, iter->second, exceptions);
+        }
 
-        auto synInputSlots = synConnectable->getOrderedDataSlots(DataRole::INPUT);
-        auto synOutputSlots = synConnectable->getOrderedDataSlots(DataRole::OUTPUT);
-        CEDAR_ASSERT(synInputSlots.size() > 0)
-        CEDAR_ASSERT(synOutputSlots.size() > 0)
+        // Get the input and output slot of the connection step
+        auto conConnectable = dynamic_cast<cedar::proc::Connectable *>(conStep.get());
+        CEDAR_ASSERT(conConnectable != nullptr)
 
-        group->connectSlots(source + "." + sourceSlots.at(0)->getName(),
-                            synName+ "." + synInputSlots.at(0)->getName());
-        group->connectSlots(synName + "." + synOutputSlots.at(0)->getName(),
-                            target + "." + targetSlots.at(0)->getName());
+        auto conInputSlots = conConnectable->getOrderedDataSlots(DataRole::INPUT);
+        auto conOutputSlots = conConnectable->getOrderedDataSlots(DataRole::OUTPUT);
+        CEDAR_ASSERT(conInputSlots.size() > 0)
+        CEDAR_ASSERT(conOutputSlots.size() > 0)
+
+        if(isSynaptic)
+        {
+          group->connectSlots(source + "." + sourceSlots.at(0)->getName(),
+                              conName + "." + conInputSlots.at(0)->getName());
+          group->connectSlots(conName + "." + conOutputSlots.at(0)->getName(),
+                              target + "." + targetSlots.at(0)->getName());
+        }
+        else
+        {
+          auto targetOutputSlots = targetConnectable->getOrderedDataSlots(DataRole::OUTPUT);
+          CEDAR_ASSERT(targetOutputSlots.size() > 0)
+          group->connectSlots(source + "." + sourceSlots.at(0)->getName(), conName + ".source node");
+          group->connectSlots(conName + ".learned output", target + "." + targetSlots.at(0)->getName());
+          group->connectSlots(target + "." + targetOutputSlots.at(0)->getName(), conName + ".target field");
+        }
 
         try
         {
           // Analog to writeSteps. The base readConfiguration reads only the fields which are set in the whitelist of
           // each step. Everything else is done by the steps itself in their own overwritten readConfiguration function
-          synStep->readConfigurationXML(iter->second);
+          conStep->readConfigurationXML(iter->second);
         }
         catch (cedar::aux::ExceptionBase &e)
         {
@@ -794,7 +939,7 @@ void cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(
   else if(dynamic_cast<cedar::aux::math::LinearTransferFunction*>(transferFunction.get()))
   {
     // Should only be the case for HebbianConnections
-    beta = 200;
+    beta = 100;
   }
   else
   {
