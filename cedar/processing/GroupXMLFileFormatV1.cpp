@@ -774,7 +774,9 @@ boost::bimap<std::string, std::string> cedar::proc::GroupXMLFileFormatV1::stepNa
     ("cedar.processing.sources.Boost", "Boost")
     ("cedar.dynamics.HebbianConnection", "HebbianConnection")
     ("cedar.dynamics.NeuralField", "Field")
-    ("cedar.processing.sources.GaussInput", "GaussInput");
+    ("cedar.processing.sources.GaussInput", "GaussInput")
+    ("cedar.dynamics.Preshape", "Preshape")
+    ("cedar.processing.sources.SpatialTemplate", "SpatialTemplate");
 
 boost::bimap<std::string, std::string> cedar::proc::GroupXMLFileFormatV1::transferFunctionNameLookupTableXML =
   boost::assign::list_of< boost::bimap<std::string, std::string>::relation >
