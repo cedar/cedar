@@ -328,7 +328,8 @@ bool cedar::proc::GroupXMLFileFormatV1::isStepBlacklisted(cedar::proc::Connectab
   return dynamic_cast<cedar::proc::sinks::GroupSink*>(step)
     || dynamic_cast<cedar::proc::sources::GroupSource*>(step)
     || dynamic_cast<cedar::proc::steps::SynapticConnection*>(step)
-    || dynamic_cast<cedar::dyn::steps::HebbianConnection*>(step)
+    //this gives a linker error... needs to be fixed
+    //  || dynamic_cast<cedar::dyn::steps::HebbianConnection*>(step)
     || dynamic_cast<cedar::proc::steps::ComponentMultiply*>(step)
     || dynamic_cast<cedar::proc::steps::StaticGain*>(step)
     || dynamic_cast<cedar::proc::steps::Convolution*>(step)
@@ -612,14 +613,15 @@ void cedar::proc::GroupXMLFileFormatV1::writeHebbianConnections
 
   for (auto& name_element_pair : group->getElements())
   {
-    if(auto connection = boost::dynamic_pointer_cast<cedar::dyn::steps::HebbianConnection>(name_element_pair.second))
+     //this gives a linker error... needs to be fixed
+    /*if(auto connection = boost::dynamic_pointer_cast<cedar::dyn::steps::HebbianConnection>(name_element_pair.second))
     {
       this->writeHebbianConnection(root, connection);
     }
     else if(auto connection = boost::dynamic_pointer_cast<cedar::proc::steps::ComponentMultiply>(name_element_pair.second))
     {
       this->writeHebbianConnection(root, connection);
-    }
+    }*/
   }
 }
 
