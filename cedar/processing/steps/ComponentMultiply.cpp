@@ -191,13 +191,14 @@ bool cedar::proc::steps::ComponentMultiply::isXMLExportable(std::string& errorMs
       {
         gauss = true;
       }
-      if (auto neuralField = dynamic_cast<cedar::dyn::NeuralField *>(connectable))
+        //this gives a linker error... needs to be fixed
+      /*if (auto neuralField = dynamic_cast<cedar::dyn::NeuralField *>(connectable))
       {
         if (neuralField->getDimensionality() == 0)
         {
           node = true;
         }
-      }
+      }*/
     }
     if(gauss && node)
     {
