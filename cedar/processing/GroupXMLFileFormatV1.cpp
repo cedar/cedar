@@ -583,10 +583,11 @@ const
   {
     for(cedar::proc::DataConnectionPtr outputConn : slot.second->getDataConnections())
     {
-      if(auto sourceElement = dynamic_cast<cedar::dyn::NeuralField*>(outputConn.get()->getSource()->getParentPtr()))
+      //this gives a linker error... needs to be fixed
+      /*if(auto sourceElement = dynamic_cast<cedar::dyn::NeuralField*>(outputConn.get()->getSource()->getParentPtr()))
       {
         sources.push_back(sourceElement->getFullPath());
-      }
+      }*/
     }
   }
   // Save a Hebbian connection for all source/target pairs
