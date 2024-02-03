@@ -325,16 +325,18 @@ bool cedar::proc::GroupXMLFileFormatV1::isStepBlacklisted(cedar::proc::Connectab
       return true;
     }
   }
-  return dynamic_cast<cedar::proc::sinks::GroupSink*>(step)
-    || dynamic_cast<cedar::proc::sources::GroupSource*>(step)
-    || dynamic_cast<cedar::proc::steps::SynapticConnection*>(step)
-    //this gives a linker error... needs to be fixed
-    //  || dynamic_cast<cedar::dyn::steps::HebbianConnection*>(step)
-    || dynamic_cast<cedar::proc::steps::ComponentMultiply*>(step)
-    || dynamic_cast<cedar::proc::steps::StaticGain*>(step)
-    || dynamic_cast<cedar::proc::steps::Convolution*>(step)
-    || dynamic_cast<cedar::proc::steps::Projection*>(step)
-    || dynamic_cast<cedar::proc::steps::Sum*>(step);
+
+  if(auto stepPtr = step->shared_from_this())
+  {
+    for (std::string classID : this->mBlacklistedClassIDs)
+    {
+      if (cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(boost::dynamic_pointer_cast<cedar::proc::Element>(stepPtr)).compare(classID) == 0)
+      {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 bool cedar::proc::GroupXMLFileFormatV1::isConnectionBlacklisted(cedar::proc::DataConnection* connection) const
@@ -504,7 +506,7 @@ void cedar::proc::GroupXMLFileFormatV1::writeSynapticConnections
 
 
 void cedar::proc::GroupXMLFileFormatV1::writeHebbianConnection(cedar::aux::ConfigurationNode& root,
-                                                                const cedar::dyn::steps::HebbianConnectionPtr connection)
+                                                                const cedar::proc::ConnectablePtr connection)
 const
 {
   // Write the properties of this connection to a template node
@@ -557,8 +559,8 @@ const
   }
 }
 
-void cedar::proc::GroupXMLFileFormatV1::writeHebbianConnection(cedar::aux::ConfigurationNode& root,
-                                                               const cedar::proc::steps::ComponentMultiplyPtr connection)
+void cedar::proc::GroupXMLFileFormatV1::writeComponentMultiplyConnection(cedar::aux::ConfigurationNode& root,
+                                                               const cedar::proc::ConnectablePtr connection)
 const
 {
   // Write the properties of this connection to a template node
@@ -582,13 +584,20 @@ const
   }
   for(auto slot : inputSlots)
   {
-    for(cedar::proc::DataConnectionPtr outputConn : slot.second->getDataConnections())
+    for(cedar::proc::DataConnectionPtr inputConn : slot.second->getDataConnections())
     {
-      //this gives a linker error... needs to be fixed
-      /*if(auto sourceElement = dynamic_cast<cedar::dyn::NeuralField*>(outputConn.get()->getSource()->getParentPtr()))
+      cedar::proc::Element* sourceElement = inputConn.get()->getSource()->getParentPtr();
+      if(sourceElement)
       {
-        sources.push_back(sourceElement->getFullPath());
-      }*/
+        if(auto sourceElementPtr = sourceElement->shared_from_this())
+        {
+          if(!cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(
+                boost::dynamic_pointer_cast<cedar::proc::Element>(sourceElementPtr)).compare("cedar.dynamics.NeuralField"))
+          {
+            sources.push_back(sourceElement->getFullPath());
+          }
+        }
+      }
     }
   }
   // Save a Hebbian connection for all source/target pairs
@@ -610,18 +619,16 @@ void cedar::proc::GroupXMLFileFormatV1::writeHebbianConnections
     cedar::aux::ConfigurationNode& root
   ) const
 {
-
   for (auto& name_element_pair : group->getElements())
   {
-     //this gives a linker error... needs to be fixed
-    /*if(auto connection = boost::dynamic_pointer_cast<cedar::dyn::steps::HebbianConnection>(name_element_pair.second))
+    if(!cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(name_element_pair.second).compare("cedar.dynamics.HebbianConnection"))
     {
-      this->writeHebbianConnection(root, connection);
+      this->writeHebbianConnection(root, boost::dynamic_pointer_cast<cedar::proc::Connectable>(name_element_pair.second));
     }
-    else if(auto connection = boost::dynamic_pointer_cast<cedar::proc::steps::ComponentMultiply>(name_element_pair.second))
+    else if(!cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(name_element_pair.second).compare("cedar.processing.ComponentMultiply"))
     {
-      this->writeHebbianConnection(root, connection);
-    }*/
+      this->writeComponentMultiplyConnection(root, boost::dynamic_pointer_cast<cedar::proc::Connectable>(name_element_pair.second));
+    }
   }
 }
 
@@ -786,6 +793,11 @@ boost::bimap<std::string, std::string> cedar::proc::GroupXMLFileFormatV1::transf
     ("cedar.aux.math.AbsSigmoid", "AbsSigmoid")
     ("cedar.aux.math.ExpSigmoid", "ExpSigmoid")
     ("cedar.aux.math.HeavisideSigmoid","HeavisideSigmoid");
+
+std::vector<std::string> cedar::proc::GroupXMLFileFormatV1::mBlacklistedClassIDs =
+    {"cedar.processing.sinks.GroupSink", "cedar.processing.sources.GroupSource", "cedar.processing.SynapticConnection",
+     "cedar.dynamics.HebbianConnection", "cedar.processing.ComponentMultiply", "cedar.processing.StaticGain",
+     "cedar.processing.steps.Convolution", "cedar.processing.Projection", "cedar.processing.steps.Sum"};
 
 
 std::string cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(boost::bimap<std::string, std::string> bimap, std::string name, bool directionCedarToXML)

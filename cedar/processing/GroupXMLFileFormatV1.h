@@ -198,9 +198,9 @@ private:
   /*!@brief Writes a hebbian connection to the configuration node.
    */
   void writeHebbianConnection(cedar::aux::ConfigurationNode& root,
-                               const cedar::dyn::steps::HebbianConnectionPtr connection) const;
-  void writeHebbianConnection(cedar::aux::ConfigurationNode& root,
-                              const cedar::proc::steps::ComponentMultiplyPtr connection) const;
+                               const cedar::proc::ConnectablePtr connection) const;
+  void writeComponentMultiplyConnection(cedar::aux::ConfigurationNode& root,
+                              const cedar::proc::ConnectablePtr connection) const;
 
   /*!@brief Writes the hebbian connections in the group to the configuration node.
    */
@@ -245,6 +245,7 @@ private:
   static std::vector<std::string> chainableSteps;
 
   std::vector<std::string> mBlacklistedSteps;
+  static std::vector<std::string> mBlacklistedClassIDs;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
