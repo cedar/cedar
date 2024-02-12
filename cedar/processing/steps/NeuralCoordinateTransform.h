@@ -154,7 +154,7 @@ private:
   }
 
   ////MATRIX SLICE STUFF
-  void allocateMatricSliceOutputMatrix();
+  void allocateMatrixSliceOutputMatrix();
 
   void updateMatrixSliceDimensionality();
 

@@ -149,7 +149,7 @@ cedar::proc::steps::NeuralCoordinateTransform::NeuralCoordinateTransform()
 
 void cedar::proc::steps::NeuralCoordinateTransform::compute(const cedar::proc::Arguments&)
 {
-  const cv::Mat& kernelMatrx = mInputMatrix->getData();
+  const cv::Mat& kernelMatrx = mKernel->getData();
   unsigned int dimensionalityKernelMatrx = cedar::aux::math::getDimensionalityOf(kernelMatrx);
 
   ////Convolution Stuff
@@ -244,7 +244,7 @@ void cedar::proc::steps::NeuralCoordinateTransform::compute(const cedar::proc::A
     }
 
     //apply_range(slice_dim, 0, input);
-    //get the size of the current dimesnion of the matrix we want to slice
+    //get the size of the current dimension of the matrix we want to slice
     int dimSize = convolutionOutputMatrix.size[slice_dim];
     int centerOfCurrentMatrixDimension = std::floor(dimSize / 2);
 
@@ -505,11 +505,11 @@ void cedar::proc::steps::NeuralCoordinateTransform::updateMatrixSliceDimensional
 
   if (this->allInputsValid())
   {
-    this->allocateMatricSliceOutputMatrix();
+    this->allocateMatrixSliceOutputMatrix();
   }
 }
 
-void cedar::proc::steps::NeuralCoordinateTransform::allocateMatricSliceOutputMatrix()
+void cedar::proc::steps::NeuralCoordinateTransform::allocateMatrixSliceOutputMatrix()
 {
   cedar::proc::Step::ReadLocker locker(this);
   if (!this->mInputMatrix || this->mInputMatrix->isEmpty())
