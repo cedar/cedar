@@ -55,6 +55,8 @@
 #include <QStyleFactory>
 #include <fstream>
 #include <cstdlib>
+#include <QApplication>
+#include <QPalette>
 #ifdef CEDAR_COMPILER_GCC
   #include <csignal>
 #elif defined CEDAR_COMPILER_MSVC
@@ -98,6 +100,25 @@ mLastExceptionType(NONE)
   parser.writeSummary();
 
   this->QApplication::setStyle(QStyleFactory::create("Fusion"));//Forcing the same look and feel for all OS
+
+  // Get the application's palette
+  QPalette palette = QApplication::palette();
+
+  // Modify the palette colors
+  palette.setColor(QPalette::Window, QColor(Qt::white));  // Window background color
+  palette.setColor(QPalette::WindowText, QColor(Qt::black));  // Window text color
+  palette.setColor(QPalette::Base, QColor(Qt::white));  // Base background color
+  palette.setColor(QPalette::AlternateBase, QColor("#F0F0F0"));  // Alternate base color (used in views)
+  palette.setColor(QPalette::Text, QColor(Qt::black));  // Text color
+  palette.setColor(QPalette::Button, QColor("#F0F0F0"));  // Button background color
+  palette.setColor(QPalette::ButtonText, QColor(Qt::black));  // Button text color
+  palette.setColor(QPalette::Highlight, QColor("#C0C0C0"));  // Selection background color
+  palette.setColor(QPalette::HighlightedText, QColor(Qt::black));  // Selection text color
+  palette.setColor(QPalette::Link, QColor("#0000FF"));  // Link color
+  palette.setColor(QPalette::LinkVisited, QColor("#800080"));  // Visited link color
+
+  // Set the modified palette to the application
+  this->QApplication::setPalette(palette);
 
   cedar::aux::LogSingleton::getInstance()->setDontCatchExceptions( 
     parser.hasParsedFlag("dont-catch-exceptions") );

@@ -576,6 +576,15 @@ void cedar::aux::gui::QImagePlot::showLegendChanged()
   }
 }
 
+void cedar::aux::gui::QImagePlot::setLegendAvailable(bool available)
+{
+  this->mLegendAvailable = available;
+  if(this->_mShowLegend->getValue() && !available)
+  {
+    this->showLegend(false);
+  }
+}
+
 void cedar::aux::gui::QImagePlot::setKeepAspectRatio(bool keepAspectRatio)
 {
   this->_mKeepAspectRatio->setValue(keepAspectRatio, true);

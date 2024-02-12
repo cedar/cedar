@@ -198,10 +198,7 @@ protected:
   void displayMatrix(const cv::Mat& matrix);
 
   //! Notifies the image plot if a legend can be displayed or not.
-  void setLegendAvailable(bool available)
-  {
-    this->mLegendAvailable = available;
-  }
+  void setLegendAvailable(bool available);
 
   //! If set to true, fixed values can be set for the minimum and maximum of the plot.
   void setValueScalingEnabled(bool enabled)

@@ -34,6 +34,8 @@
 
 ======================================================================================================================*/
 
+#define BOOST_TIMER_ENABLE_DEPRECATED
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 

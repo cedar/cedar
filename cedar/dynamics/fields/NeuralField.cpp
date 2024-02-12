@@ -57,6 +57,7 @@
 #include "cedar/auxiliaries/math/Sigmoid.h"
 #include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
 #include "cedar/auxiliaries/math/transferFunctions/ExpSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/HeavisideSigmoid.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -67,6 +68,7 @@
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/processing/Group.h"
+#include "cedar/auxiliaries/kernel/Box.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -566,12 +568,6 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
 
 void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 {
-  if(this->getName().find("Debug") != std::string::npos)
-  {
-    std::cout<<"This is field: " << this->getName() << ". I perform my euler step with a delta t of: " << time << std::endl;
-  }
-
-
   // get all members needed for the Euler step
   cv::Mat& lateral_interaction = this->mLateralInteraction->getData();
   cv::Mat& input_noise = this->mInputNoise->getData();
@@ -684,8 +680,12 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   CEDAR_ASSERT(u.size == lateral_interaction.size);
   CEDAR_ASSERT(u.size == input_sum.size);
 
-  // the field equation
-  cv::Mat d_u = -u + h + lateral_interaction + global_inhibition * cv::sum(sigmoid_u)[0] + input_sum;
+  // the field equation (split up into four separate computations as putting them all in one sum results in strange
+  // behaviour, probably due to rounding problems or float inaccuracies)
+  cv::Mat d_u = -u + h;
+  d_u += lateral_interaction;
+  d_u += global_inhibition * cv::sum(sigmoid_u)[0];
+  d_u += input_sum;
 
   boost::shared_ptr<QWriteLocker> activation_write_locker;
   if (this->activationIsOutput())
@@ -881,9 +881,10 @@ void cedar::dyn::NeuralField::onStop()
 bool cedar::dyn::NeuralField::isXMLExportable(std::string& errorMsg){
   for(int i = 0; i < this->_mKernels->size(); i++)
   {
-    if(!dynamic_cast<cedar::aux::kernel::Gauss*>(this->_mKernels->at(i).get()))
+    if(!(dynamic_cast<cedar::aux::kernel::Gauss*>(this->_mKernels->at(i).get()) ||
+      (this->getDimensionality() == 0 && dynamic_cast<cedar::aux::kernel::Box*>(this->_mKernels->at(i).get()))))
     {
-      errorMsg = "The XML export only supports Gauss kernels.";
+      errorMsg = "The XML export only supports Gauss kernels (and Box kernels for Nodes).";
       return false;
     }
   }
@@ -902,16 +903,24 @@ bool cedar::dyn::NeuralField::isXMLExportable(std::string& errorMsg){
     errorMsg = "The XML export only supports \"alternate even kernel center\" set to false.";
     return false;
   }
-  if(auto expSigmoid = dynamic_cast<cedar::aux::math::ExpSigmoid*>(this->_mSigmoid->getValue().get()))
+  if(auto sigmoid = dynamic_cast<cedar::aux::math::Sigmoid*>(this->_mSigmoid->getValue().get()))
   {
-    if(expSigmoid->getThreshold() != 0)
+    if(sigmoid->getThreshold() != 0)
     {
-      errorMsg = "The XML export only supports 0 as the threshold for the ExpSigmoid transfer function.";
+      errorMsg = "The XML export only supports 0 as the threshold for sigmoids.";
+      return false;
+    }
+    if(!(dynamic_cast<cedar::aux::math::ExpSigmoid*>(this->_mSigmoid->getValue().get()) ||
+          dynamic_cast<cedar::aux::math::AbsSigmoid*>(this->_mSigmoid->getValue().get()) ||
+          dynamic_cast<cedar::aux::math::HeavisideSigmoid*>(this->_mSigmoid->getValue().get())))
+    {
+      errorMsg = "The XML export only supports \"AbsSigmoid\", \"ExpSigmoid\" and \"HeavisideSigmoid\" as the transfer function.";
       return false;
     }
   }
-  else{
-    errorMsg = "The XML export only supports \"ExpSigmoid\" as the transfer function.";
+  else
+  {
+    errorMsg = "The XML export only supports sigmoids as transfer functions.";
     return false;
   }
   return true;

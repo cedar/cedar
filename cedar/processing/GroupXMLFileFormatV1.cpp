@@ -43,20 +43,28 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
+#include "cedar/auxiliaries/math/transferFunctions/ExpSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/HeavisideSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/LinearTransferFunction.h"
 #include "cedar/auxiliaries/math/TransferFunction.h"
+#include "cedar/auxiliaries/kernel/Box.h"
+#include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
+#include "cedar/dynamics/steps/HebbianConnection.h"
+#include "cedar/dynamics/fields/NeuralField.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/sinks/GroupSink.h"
+#include "cedar/processing/sources/GaussInput.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/steps/ComponentMultiply.h"
 #include "cedar/processing/steps/Convolution.h"
 #include "cedar/processing/steps/Projection.h"
 #include "cedar/processing/steps/StaticGain.h"
+#include "cedar/processing/steps/Sum.h"
 #include "cedar/processing/steps/SynapticConnection.h"
-#include "cedar/auxiliaries/kernel/Gauss.h"
-#include "cedar/auxiliaries/math/transferFunctions/ExpSigmoid.h"
 
 // SYSTEM INCLUDES
 #include <boost/assign.hpp>
@@ -110,6 +118,7 @@ void cedar::proc::GroupXMLFileFormatV1::write
   cedar::aux::ConfigurationNode& dftArchitecture
 )
 {
+  this->mBlacklistedSteps.clear();
   cedar::aux::ConfigurationNode root;
   if (group->isLinked())
   {
@@ -117,6 +126,7 @@ void cedar::proc::GroupXMLFileFormatV1::write
   }
   else
   {
+    this->markBlacklistedSteps(group);
     cedar::aux::ConfigurationNode steps;
     this->writeSteps(group, steps);
     if (!steps.empty())
@@ -126,6 +136,7 @@ void cedar::proc::GroupXMLFileFormatV1::write
 
     cedar::aux::ConfigurationNode connections;
     this->writeSynapticConnections(group, connections);
+    this->writeHebbianConnections(group, connections);
     this->writeChainedSynapticConnections(group, connections);
     this->writeDataConnections(group, connections);
     if (!connections.empty())
@@ -136,12 +147,48 @@ void cedar::proc::GroupXMLFileFormatV1::write
   dftArchitecture.add_child("DFTArchitecture", root);
 }
 
+void cedar::proc::GroupXMLFileFormatV1::markBlacklistedSteps(cedar::proc::ConstGroupPtr group)
+{
+  for (auto& name_element_pair : group->getElements())
+  {
+    auto element = name_element_pair.second;
+    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::steps::ComponentMultiply>(element))
+    {
+      auto inputSlot = step->getInputSlot("operands");
+      CEDAR_ASSERT(inputSlot != nullptr)
+      for (auto inCon : inputSlot->getDataConnections())
+      {
+        cedar::proc::Connectable *connectable = inCon->getSource()->getParentPtr();
+        CEDAR_ASSERT(connectable != nullptr)
+        if (auto gauss = dynamic_cast<cedar::proc::sources::GaussInput*>(connectable))
+        {
+          auto gaussOutputSlot = gauss->getOutputSlot("Gauss input");
+          bool gaussHasOtherTargets = false;
+          for(auto outCon : gaussOutputSlot->getDataConnections())
+          {
+            if(!dynamic_cast<cedar::proc::steps::ComponentMultiply*>(outCon->getTarget()->getParentPtr()))
+            {
+              gaussHasOtherTargets = true;
+            }
+          }
+          if(gaussHasOtherTargets || std::find(this->mBlacklistedSteps.begin(), this->mBlacklistedSteps.end(), gauss->getFullPath()) != this->mBlacklistedSteps.end())
+          {
+            continue;
+          }
+          this->mBlacklistedSteps.push_back(gauss->getFullPath());
+        }
+      }
+    }
+  }
+}
+
 void cedar::proc::GroupXMLFileFormatV1::writeSteps
 (
 	cedar::proc::ConstGroupPtr group,
 	cedar::aux::ConfigurationNode& steps
 ) const
 {
+  bool hasGroup = false;
   for (auto& name_element_pair : group->getElements())
   {
     auto element = name_element_pair.second;
@@ -168,6 +215,19 @@ void cedar::proc::GroupXMLFileFormatV1::writeSteps
       step->writeConfigurationXML(step_node);
       steps.push_back(cedar::aux::ConfigurationNode::value_type(node_name, step_node));
     }
+    // Print a warning if the architecture contains groups
+    else if (boost::dynamic_pointer_cast<cedar::proc::Group>(element))
+    {
+      hasGroup = true;
+    }
+  }
+  if(hasGroup)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Groups are not xml-exportable. Groups and all steps within are not considered for the XML export.",
+        "cedar::proc::GroupXMLFileFormatV1::writeSteps()"
+      );
   }
 }
 
@@ -258,12 +318,38 @@ const cedar::aux::ConfigurationNode& stepNode, std::vector<std::string>& excepti
 
 bool cedar::proc::GroupXMLFileFormatV1::isStepBlacklisted(cedar::proc::Connectable* step) const
 {
-  return dynamic_cast<cedar::proc::sinks::GroupSink*>(step)
-    || dynamic_cast<cedar::proc::sources::GroupSource*>(step)
-    || dynamic_cast<cedar::proc::steps::SynapticConnection*>(step)
-    || dynamic_cast<cedar::proc::steps::StaticGain*>(step)
-    || dynamic_cast<cedar::proc::steps::Convolution*>(step)
-    || dynamic_cast<cedar::proc::steps::Projection*>(step);
+  for(std::string name : this->mBlacklistedSteps)
+  {
+    if(step->getFullPath().compare(name) == 0)
+    {
+      return true;
+    }
+  }
+
+  if(auto stepPtr = step->shared_from_this())
+  {
+    for (std::string classID : this->mBlacklistedClassIDs)
+    {
+      if (cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(boost::dynamic_pointer_cast<cedar::proc::Element>(stepPtr)).compare(classID) == 0)
+      {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool cedar::proc::GroupXMLFileFormatV1::isConnectionBlacklisted(cedar::proc::DataConnection* connection) const
+{
+  // Special case: Connections from GaussInput to ComponentMultiply should not be exported
+  if(dynamic_cast<cedar::proc::sources::GaussInput*>(connection->getSource()->getParentPtr()) &&
+      dynamic_cast<cedar::proc::steps::ComponentMultiply*>(connection->getTarget()->getParentPtr()))
+  {
+    return true;
+  }
+  // Normal case: If source or target is blacklisted, do not export connection
+  return this->isStepBlacklisted(connection->getSource()->getParentPtr())
+     || this->isStepBlacklisted(connection->getTarget()->getParentPtr());
 }
 
 bool cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportable(cedar::proc::Connectable* chainSource, std::string& errorMsg)
@@ -272,31 +358,31 @@ bool cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportable(ceda
   std::vector<cedar::proc::DataSlotPtr> inputSlots = chainSource->getOrderedDataSlots(cedar::proc::DataRole::INPUT);
   CEDAR_ASSERT(inputSlots.size() > 0)
   cedar::proc::DataSlotPtr inputSlot = inputSlots.at(0);
-  CEDAR_ASSERT(inputSlot->getDataConnections().size() <= 1)
   if(inputSlot->getDataConnections().size() == 0)
   {
     errorMsg = "Without an incoming connection, this step cannot be chained to a SynapticConnection.";
     return false;
   }
-  cedar::proc::DataConnectionPtr inputConn = inputSlot->getDataConnections().at(0);
-  cedar::proc::Connectable *source = inputConn.get()->getSource()->getParentPtr();
-  CEDAR_ASSERT(source != nullptr);
-  // If the source step is one of the chainable steps, this is not the beginning of the chain => return true
-  if (!dynamic_cast<cedar::proc::steps::StaticGain *>(source)
-      && !dynamic_cast<cedar::proc::steps::Convolution *>(source)
-      && !dynamic_cast<cedar::proc::steps::Projection *>(source))
+  for(cedar::proc::DataConnectionPtr inputConn : inputSlot->getDataConnections())
   {
-    // This is the beginning of the chain, thus check recursively if this whole chain is exportable
-    bool chainExportable = cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportableRecursive(
-                    chainSource,
-                    dynamic_cast<cedar::proc::steps::StaticGain*>(chainSource),
-                    dynamic_cast<cedar::proc::steps::Convolution*>(chainSource),
-                    dynamic_cast<cedar::proc::steps::Projection*>(chainSource));
-    if(!chainExportable)
+    cedar::proc::Connectable *source = inputConn.get()->getSource()->getParentPtr();
+    CEDAR_ASSERT(source != nullptr);
+    // If the source step is one of the chainable steps, this is not the beginning of the chain => return true
+    if (!cedar::proc::GroupXMLFileFormatV1::isChainable(boost::dynamic_pointer_cast<cedar::proc::Element>
+                (source->shared_from_this())))
     {
-      errorMsg = "Cannot export chain of steps as SynapticConnection. "
-                 "Do you have more than one of the same step in the chain?";
-      return false;
+      // This is the beginning of the chain, thus check recursively if this whole chain is exportable
+      bool chainExportable = cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportableRecursive(
+        chainSource,
+        dynamic_cast<cedar::proc::steps::StaticGain *>(chainSource),
+        dynamic_cast<cedar::proc::steps::Convolution *>(chainSource),
+        dynamic_cast<cedar::proc::steps::Projection *>(chainSource));
+      if (!chainExportable)
+      {
+        errorMsg = "Cannot export chain of steps as SynapticConnection. "
+                   "Do you have more than one of the same type of step in the chain?";
+        return false;
+      }
     }
   }
   return true;
@@ -343,6 +429,14 @@ bool cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportableRecur
         return false;
       }
     }
+    else if(dynamic_cast<cedar::proc::steps::Sum*>(target))
+    {
+      if(!cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportableRecursive(target, hasStaticGain,
+                                                                                   hasConvolution, hasProjection))
+      {
+        return false;
+      }
+    }
   }
   return true;
 }
@@ -366,7 +460,6 @@ const
     {
       if(auto targetElement = dynamic_cast<cedar::proc::Element*>(outputConn.get()->getTarget()->getParentPtr()))
       {
-        // This is the target step
         targets.push_back(targetElement->getFullPath());
       }
     }
@@ -377,7 +470,6 @@ const
     {
       if(auto sourceElement = dynamic_cast<cedar::proc::Element*>(outputConn.get()->getSource()->getParentPtr()))
       {
-        // This is the source step
         sources.push_back(sourceElement->getFullPath());
       }
     }
@@ -412,6 +504,134 @@ void cedar::proc::GroupXMLFileFormatV1::writeSynapticConnections
   }
 }
 
+
+void cedar::proc::GroupXMLFileFormatV1::writeHebbianConnection(cedar::aux::ConfigurationNode& root,
+                                                                const cedar::proc::ConnectablePtr connection)
+const
+{
+  // Write the properties of this connection to a template node
+  cedar::aux::ConfigurationNode properties;
+  connection->writeConfigurationXML(properties);
+
+  // Enumerate all source and target steps of the connection
+  std::vector<std::string> sources;
+  std::vector<std::string> targets;
+  auto learnedOutputSlot = connection->getOutputSlot("learned output");
+  auto targetFieldSlot = connection->getInputSlot("target field");
+  CEDAR_ASSERT(learnedOutputSlot->getDataConnections().size() <= 1 && targetFieldSlot->getDataConnections().size() <= 1)
+
+  if(learnedOutputSlot->getDataConnections().size() == 1)
+  {
+    CEDAR_ASSERT(learnedOutputSlot->getDataConnections().at(0)->getTarget() != nullptr)
+    if(auto targetElement = dynamic_cast<cedar::proc::Element*>(learnedOutputSlot->getDataConnections().at(0)->getTarget()->getParentPtr()))
+    {
+      targets.push_back(targetElement->getFullPath());
+    }
+  } else if(targetFieldSlot->getDataConnections().size() == 1)
+  {
+    CEDAR_ASSERT(targetFieldSlot->getDataConnections().at(0)->getSource() != nullptr)
+    if(auto targetElement = dynamic_cast<cedar::proc::Element*>(targetFieldSlot->getDataConnections().at(0)->getSource()->getParentPtr()))
+    {
+      targets.push_back(targetElement->getFullPath());
+    }
+  }
+  auto inputSlot = connection->getInputSlot("source node");
+  for(cedar::proc::DataConnectionPtr outputConn : inputSlot->getDataConnections())
+  {
+    CEDAR_ASSERT(outputConn->getSource() != nullptr)
+    if(auto sourceElement = dynamic_cast<cedar::proc::Element*>(outputConn->getSource()->getParentPtr()))
+    {
+      sources.push_back(sourceElement->getFullPath());
+    }
+  }
+
+
+  // Save a Hebbian connection for all source/target pairs
+  for(std::string source : sources)
+  {
+    for(std::string target : targets)
+    {
+      cedar::aux::ConfigurationNode connection_node(properties);
+      connection_node.put("Source", source);
+      connection_node.put("Target", target);
+      root.push_back(cedar::aux::ConfigurationNode::value_type("HebbianConnection", connection_node));
+    }
+  }
+}
+
+void cedar::proc::GroupXMLFileFormatV1::writeComponentMultiplyConnection(cedar::aux::ConfigurationNode& root,
+                                                               const cedar::proc::ConnectablePtr connection)
+const
+{
+  // Write the properties of this connection to a template node
+  cedar::aux::ConfigurationNode properties;
+  connection->writeConfigurationXML(properties);
+
+  // Enumerate all source and target steps of the connection
+  std::vector<std::string> sources;
+  std::vector<std::string> targets;
+  std::map<std::string, cedar::proc::DataSlotPtr> outputSlots = connection->getDataSlots(DataRole::OUTPUT);
+  std::map<std::string, cedar::proc::DataSlotPtr> inputSlots = connection->getDataSlots(DataRole::INPUT);
+  for(auto slot : outputSlots)
+  {
+    for(cedar::proc::DataConnectionPtr outputConn : slot.second->getDataConnections())
+    {
+      if(auto targetElement = dynamic_cast<cedar::proc::Element*>(outputConn.get()->getTarget()->getParentPtr()))
+      {
+        targets.push_back(targetElement->getFullPath());
+      }
+    }
+  }
+  for(auto slot : inputSlots)
+  {
+    for(cedar::proc::DataConnectionPtr inputConn : slot.second->getDataConnections())
+    {
+      cedar::proc::Element* sourceElement = inputConn.get()->getSource()->getParentPtr();
+      if(sourceElement)
+      {
+        if(auto sourceElementPtr = sourceElement->shared_from_this())
+        {
+          if(!cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(
+                boost::dynamic_pointer_cast<cedar::proc::Element>(sourceElementPtr)).compare("cedar.dynamics.NeuralField"))
+          {
+            sources.push_back(sourceElement->getFullPath());
+          }
+        }
+      }
+    }
+  }
+  // Save a Hebbian connection for all source/target pairs
+  for(std::string source : sources)
+  {
+    for(std::string target : targets)
+    {
+      cedar::aux::ConfigurationNode connection_node(properties);
+      connection_node.put("Source", source);
+      connection_node.put("Target", target);
+      root.push_back(cedar::aux::ConfigurationNode::value_type("HebbianConnection", connection_node));
+    }
+  }
+}
+
+void cedar::proc::GroupXMLFileFormatV1::writeHebbianConnections
+  (
+    cedar::proc::ConstGroupPtr group,
+    cedar::aux::ConfigurationNode& root
+  ) const
+{
+  for (auto& name_element_pair : group->getElements())
+  {
+    if(!cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(name_element_pair.second).compare("cedar.dynamics.HebbianConnection"))
+    {
+      this->writeHebbianConnection(root, boost::dynamic_pointer_cast<cedar::proc::Connectable>(name_element_pair.second));
+    }
+    else if(!cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(name_element_pair.second).compare("cedar.processing.ComponentMultiply"))
+    {
+      this->writeComponentMultiplyConnection(root, boost::dynamic_pointer_cast<cedar::proc::Connectable>(name_element_pair.second));
+    }
+  }
+}
+
 void cedar::proc::GroupXMLFileFormatV1::writeDataConnection
   (
     cedar::aux::ConfigurationNode& root,
@@ -436,15 +656,13 @@ void cedar::proc::GroupXMLFileFormatV1::writeDataConnections
 {
   for (auto data_connection : group->getDataConnections())
   {
-    if(this->isStepBlacklisted(data_connection.get()->getSource()->getParentPtr())
-      || this->isStepBlacklisted(data_connection.get()->getTarget()->getParentPtr()))
+    if(this->isConnectionBlacklisted(data_connection.get()))
     {
       continue;
     }
     this->writeDataConnection(root, data_connection);
   }
 }
-
 
 void cedar::proc::GroupXMLFileFormatV1::readConnections
 (
@@ -478,36 +696,58 @@ void cedar::proc::GroupXMLFileFormatV1::readConnections
     CEDAR_ASSERT(targetConnectable != nullptr)
     auto targetSlots = targetConnectable->getOrderedDataSlots(DataRole::INPUT);
     CEDAR_ASSERT(targetSlots.size() > 0)
+
+    bool isHebbian = iter->first.compare("HebbianConnection") == 0;
+    bool isSynaptic = kernelWeights    != iter->second.not_found() || pointWiseWeights != iter->second.not_found() ||
+                      scalarWeight     != iter->second.not_found() || dimensionMapping != iter->second.not_found();
     try
     {
-      if (kernelWeights    != iter->second.not_found() ||
-          pointWiseWeights != iter->second.not_found() ||
-          scalarWeight     != iter->second.not_found() ||
-          dimensionMapping != iter->second.not_found())
+      if (isHebbian || isSynaptic)
       {
-        // Insert SynapticConnection step between source and target
-        std::string synName = group->getUniqueIdentifier("Synaptic Connection");
-        cedar::proc::StepPtr synStep = this->createStep(synName, "cedar.processing.SynapticConnection", group,
-                         iter->second, exceptions);
-        // Get the input and output slot for the synaptic connection step
-        auto synConnectable = dynamic_cast<cedar::proc::Connectable *>(synStep.get());
-        CEDAR_ASSERT(synConnectable != nullptr)
+        std::string conName;
+        cedar::proc::StepPtr conStep;
+        // Insert Synaptic/Hebbian step between source and target
+        if(isSynaptic)
+        {
+          conName = group->getUniqueIdentifier("Synaptic Connection");
+          conStep = this->createStep(conName, "cedar.processing.SynapticConnection", group, iter->second, exceptions);
+        }
+        else
+        {
+          conName = group->getUniqueIdentifier("Hebbian Connection");
+          conStep = this->createStep(conName, "cedar.dynamics.HebbianConnection", group, iter->second, exceptions);
+        }
 
-        auto synInputSlots = synConnectable->getOrderedDataSlots(DataRole::INPUT);
-        auto synOutputSlots = synConnectable->getOrderedDataSlots(DataRole::OUTPUT);
-        CEDAR_ASSERT(synInputSlots.size() > 0)
-        CEDAR_ASSERT(synOutputSlots.size() > 0)
+        // Get the input and output slot of the connection step
+        auto conConnectable = dynamic_cast<cedar::proc::Connectable *>(conStep.get());
+        CEDAR_ASSERT(conConnectable != nullptr)
 
-        group->connectSlots(source + "." + sourceSlots.at(0)->getName(),
-                            synName+ "." + synInputSlots.at(0)->getName());
-        group->connectSlots(synName + "." + synOutputSlots.at(0)->getName(),
-                            target + "." + targetSlots.at(0)->getName());
+        auto conInputSlots = conConnectable->getOrderedDataSlots(DataRole::INPUT);
+        auto conOutputSlots = conConnectable->getOrderedDataSlots(DataRole::OUTPUT);
+        CEDAR_ASSERT(conInputSlots.size() > 0)
+        CEDAR_ASSERT(conOutputSlots.size() > 0)
+
+        if(isSynaptic)
+        {
+          group->connectSlots(source + "." + sourceSlots.at(0)->getName(),
+                              conName + "." + conInputSlots.at(0)->getName());
+          group->connectSlots(conName + "." + conOutputSlots.at(0)->getName(),
+                              target + "." + targetSlots.at(0)->getName());
+        }
+        else
+        {
+          auto targetOutputSlots = targetConnectable->getOrderedDataSlots(DataRole::OUTPUT);
+          CEDAR_ASSERT(targetOutputSlots.size() > 0)
+          group->connectSlots(source + "." + sourceSlots.at(0)->getName(), conName + ".source node");
+          group->connectSlots(conName + ".learned output", target + "." + targetSlots.at(0)->getName());
+          group->connectSlots(target + "." + targetOutputSlots.at(0)->getName(), conName + ".target field");
+        }
 
         try
         {
           // Analog to writeSteps. The base readConfiguration reads only the fields which are set in the whitelist of
           // each step. Everything else is done by the steps itself in their own overwritten readConfiguration function
-          synStep->readConfigurationXML(iter->second);
+          conStep->readConfigurationXML(iter->second);
         }
         catch (cedar::aux::ExceptionBase &e)
         {
@@ -536,27 +776,40 @@ void cedar::proc::GroupXMLFileFormatV1::readConnections
   }
 }
 
-
+std::vector<std::string> cedar::proc::GroupXMLFileFormatV1::chainableSteps = {"cedar.processing.steps.Convolution",
+          "cedar.processing.steps.Sum", "cedar.processing.Projection", "cedar.processing.StaticGain"};
 
 boost::bimap<std::string, std::string> cedar::proc::GroupXMLFileFormatV1::stepNameLookupTableXML =
   boost::assign::list_of< boost::bimap<std::string, std::string>::relation >
+    ("cedar.processing.sources.Boost", "Boost")
+    ("cedar.dynamics.HebbianConnection", "HebbianConnection")
     ("cedar.dynamics.NeuralField", "Field")
-    ("cedar.processing.sources.GaussInput", "GaussInput");
+    ("cedar.processing.sources.GaussInput", "GaussInput")
+    ("cedar.dynamics.Preshape", "Preshape")
+    ("cedar.processing.sources.SpatialTemplate", "SpatialTemplate");
 
 boost::bimap<std::string, std::string> cedar::proc::GroupXMLFileFormatV1::transferFunctionNameLookupTableXML =
   boost::assign::list_of< boost::bimap<std::string, std::string>::relation >
     ("cedar.aux.math.AbsSigmoid", "AbsSigmoid")
     ("cedar.aux.math.ExpSigmoid", "ExpSigmoid")
-    ("cedar.aux.math.HeavisideSigmoid","HeavisideSigmoid")
-    ("cedar.aux.math.LinearTransferFunction","LinearTransferFunction")
-    ("cedar.aux.math.Logarithm","Logarithm")
-    ("cedar.aux.math.SemiLinearTransferFunction","SemiLinearTransferFunction");
+    ("cedar.aux.math.HeavisideSigmoid","HeavisideSigmoid");
+
+std::vector<std::string> cedar::proc::GroupXMLFileFormatV1::mBlacklistedClassIDs =
+    {"cedar.processing.sinks.GroupSink", "cedar.processing.sources.GroupSource", "cedar.processing.SynapticConnection",
+     "cedar.dynamics.HebbianConnection", "cedar.processing.ComponentMultiply", "cedar.processing.StaticGain",
+     "cedar.processing.steps.Convolution", "cedar.processing.Projection", "cedar.processing.steps.Sum"};
 
 
 std::string cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(boost::bimap<std::string, std::string> bimap, std::string name, bool directionCedarToXML)
 {
   if(directionCedarToXML)
   {
+    // Special unidirectional translations
+    if(name.compare("cedar.processing.ComponentMultiply") == 0)
+    {
+      name = "cedar.dynamics.HebbianConnection";
+    }
+    // Normal translations
     boost::bimap<std::string, std::string>::left_const_iterator iter = bimap.left.find(name);
     if(iter != bimap.left.end())
     {
@@ -584,23 +837,34 @@ void cedar::proc::GroupXMLFileFormatV1::writeKernelListParameter(
   {
     cedar::aux::ConfigurationNode gaussWeightPattern;
     cedar::aux::kernel::KernelPtr kernel = kernels->at(i);
-    // This must be a Gauss kernel, otherwise the architecture would not be exportable
-    auto gauss = dynamic_cast<cedar::aux::kernel::Gauss*>(kernel.get());
-    CEDAR_ASSERT(gauss != nullptr);
-    gaussWeightPattern.add("Height", gauss->getAmplitude());
-    // Write sigma data
-    if(gauss->getDimensionality() > 0)
+    // This must be a Gauss or Box kernel, otherwise the architecture would not be exportable
+    double height;
+    std::ostringstream sigmaString;
+    if(auto gauss = dynamic_cast<cedar::aux::kernel::Gauss*>(kernel.get()))
     {
-      cedar::aux::ConfigurationNode sigma;
-      std::ostringstream sigmaString;
-      sigmaString << gauss->getSigma(0);
-      for(int j = 1; j < gauss->getDimensionality(); j++)
+      height = gauss->getDenormalizedAmplitude();
+      // Write sigma data
+      if(gauss->getDimensionality() > 0)
       {
-        sigmaString << ",";
-        sigmaString << gauss->getSigma(j);
+        cedar::aux::ConfigurationNode sigma;
+
+        sigmaString << gauss->getSigma(0);
+        for(int j = 1; j < gauss->getDimensionality(); j++)
+        {
+          sigmaString << ",";
+          sigmaString << gauss->getSigma(j);
+        }
       }
-      gaussWeightPattern.add("Sigmas", sigmaString.str());
     }
+    else
+    {
+      auto box = dynamic_cast<cedar::aux::kernel::Box*>(kernel.get());
+      CEDAR_ASSERT(box != nullptr);
+      height = box->getAmplitude();
+      sigmaString << "0";
+    }
+    gaussWeightPattern.add("Sigmas", sigmaString.str());
+    gaussWeightPattern.add("Height", height);
     sumWeightPattern.add_child("GaussWeightPattern", gaussWeightPattern);
   }
   root.add_child("SumWeightPattern", sumWeightPattern);
@@ -624,6 +888,9 @@ void cedar::proc::GroupXMLFileFormatV1::readKernelListParameter(
 
     //Get the "height" (in cedar "amplitude")
     kernel->setAmplitude(gaussWeightPattern.get<double>("Height"));
+
+    // Set normalized to false
+    kernel->setNormalize(false);
 
     //The sigma string is concatinated by ",", therefore split them and set the Sigma of the kernel
     std::vector<std::string> sigmas;
@@ -679,36 +946,53 @@ void cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(
 {
   cedar::aux::ConfigurationNode activationFunction;
 
-  // get transfere function and beta parameter
+  // get transfer function and beta parameter
   cedar::aux::math::TransferFunctionPtr transferFunction = sigmoid->getValue();
-  cedar::aux::NumericParameter<double>* beta = dynamic_cast<cedar::aux::NumericParameter<double>*>(
-          transferFunction->getParameter("beta").get());
-  CEDAR_ASSERT(beta != nullptr)
-  activationFunction.put("Beta", beta->getValue());
+  double beta = 0;
+  if(dynamic_cast<cedar::aux::math::HeavisideSigmoid*>(transferFunction.get()))
+  {
+    beta = 9001;
+  }
+  else if(dynamic_cast<cedar::aux::math::LinearTransferFunction*>(transferFunction.get()))
+  {
+    // Should only be the case for HebbianConnections
+    beta = 100;
+  }
+  else
+  {
+    cedar::aux::NumericParameter<double>* betaParam = dynamic_cast<cedar::aux::NumericParameter<double>*>(
+      transferFunction->getParameter("beta").get());
+    CEDAR_ASSERT(betaParam != nullptr)
+    beta = betaParam->getValue();
+  }
+  activationFunction.put("Beta", beta);
   // add beta parameter to node
   root.add_child(name, activationFunction);
 
-  // add looked up transfer function to xml attribute
-  root.add(name + ".<xmlattr>.type", cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
+  // add transfer function name to xml attribute
+  root.add(name + ".<xmlattr>.type", "ExpSigmoid");
+  // We are hard-coding ExpSigmoid here as we are exporting Abs and HeavisideSigmoid as an approximation of ExpSigmoid
+  // If this should change in the future, use the next line to properly map type-ids to xml names
+  /*root.add(name + ".<xmlattr>.type", cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
           cedar::proc::GroupXMLFileFormatV1::transferFunctionNameLookupTableXML,
           cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->getTypeId(transferFunction)
-  ));
+  ));*/
 }
 
 void cedar::proc::GroupXMLFileFormatV1::readActivationFunctionParameter(
   cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* sigmoid,
   const cedar::aux::ConfigurationNode& root, const std::string& name)
 {
-  //get transfere function and beta values from node
-  cedar::aux::ConfigurationNode transfereFunctionNode = root.get_child(name);
-  std::string transfereFunctionTypeId = cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
+  //get transfer function and beta values from node
+  cedar::aux::ConfigurationNode transferFunctionNode = root.get_child(name);
+  std::string transferFunctionTypeId = cedar::proc::GroupXMLFileFormatV1::bimapNameLookupXML(
           cedar::proc::GroupXMLFileFormatV1::transferFunctionNameLookupTableXML,
-          transfereFunctionNode.get<std::string>("<xmlattr>.type"),
+          transferFunctionNode.get<std::string>("<xmlattr>.type"),
           false);
-  double beta = transfereFunctionNode.get<double>("Beta");
+  double beta = transferFunctionNode.get<double>("Beta");
 
   //set the values in the given sigmoid field
-  if(transfereFunctionTypeId == "cedar.aux.math.ExpSigmoid")
+  if(transferFunctionTypeId == "cedar.aux.math.ExpSigmoid")
   {
     // create new exp sigmoid transfere funcion with given parameter (threshhold is not export and therefore set to the
     // default value of 0) and set it to the sigmoid
@@ -743,25 +1027,25 @@ void cedar::proc::GroupXMLFileFormatV1::writeChainedSynapticConnection(cedar::pr
   // write configuration to synCon
   // Make sure another step of the same class has not already been added to the current chain previously, however,
   // this should never happen because the isXMLExportable() function should take care of checking this beforehand.
-  if(dynamic_cast<cedar::proc::steps::StaticGain*>(connectable))
+  if (dynamic_cast<cedar::proc::steps::StaticGain*>(connectable))
   {
     auto child = synCon.get_child_optional("ScalarWeight");
     CEDAR_ASSERT(!child)
     connectable->writeConfigurationXML(synCon);
   }
-  else if(dynamic_cast<cedar::proc::steps::Convolution*>(connectable))
+  else if (dynamic_cast<cedar::proc::steps::Convolution*>(connectable))
   {
     auto child = synCon.get_child_optional("KernelWeights");
     CEDAR_ASSERT(!child)
     connectable->writeConfigurationXML(synCon);
   }
-  else if(dynamic_cast<cedar::proc::steps::Projection*>(connectable))
+  else if (dynamic_cast<cedar::proc::steps::Projection*>(connectable))
   {
     auto child = synCon.get_child_optional("DimensionMapping");
     CEDAR_ASSERT(!child)
     connectable->writeConfigurationXML(synCon);
   }
-  else
+  else if (!dynamic_cast<cedar::proc::steps::Sum*>(connectable))
   {
     return;
   }
@@ -773,9 +1057,7 @@ void cedar::proc::GroupXMLFileFormatV1::writeChainedSynapticConnection(cedar::pr
   for(cedar::proc::DataConnectionPtr outputConn : outputSlot->getDataConnections())
   {
     cedar::proc::Connectable *target = outputConn->getTarget()->getParentPtr();
-    if (dynamic_cast<cedar::proc::steps::StaticGain *>(target) ||
-        dynamic_cast<cedar::proc::steps::Convolution *>(target) ||
-        dynamic_cast<cedar::proc::steps::Projection *>(target))
+    if (cedar::proc::GroupXMLFileFormatV1::isChainable(boost::dynamic_pointer_cast<cedar::proc::Element>(target->shared_from_this())))
     {
       // Pass the synCon node on along the chain
       this->writeChainedSynapticConnection(target, synCon, root);
@@ -803,9 +1085,7 @@ void cedar::proc::GroupXMLFileFormatV1::writeChainedSynapticConnections(cedar::p
     if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
     {
       // Check if this is a step that belongs to a chain that can be merged into a SynapticConnection
-      if (boost::dynamic_pointer_cast<cedar::proc::steps::StaticGain>(step) ||
-          boost::dynamic_pointer_cast<cedar::proc::steps::Convolution>(step) ||
-          boost::dynamic_pointer_cast<cedar::proc::steps::Projection>(step))
+      if (this->isChainable(step))
       {
         CEDAR_ASSERT(step->isXMLExportable())
 
@@ -813,22 +1093,34 @@ void cedar::proc::GroupXMLFileFormatV1::writeChainedSynapticConnections(cedar::p
         std::vector<cedar::proc::DataSlotPtr> inputSlots = step->getOrderedDataSlots(DataRole::INPUT);
         CEDAR_ASSERT(inputSlots.size() > 0)
         cedar::proc::DataSlotPtr inputSlot = inputSlots.at(0);
-        CEDAR_ASSERT(inputSlot->getDataConnections().size() == 1)
-        cedar::proc::DataConnectionPtr inputConn = inputSlot->getDataConnections().at(0);
-        cedar::proc::Connectable *source = inputConn.get()->getSource()->getParentPtr();
-        CEDAR_ASSERT(source != nullptr);
-        if (!dynamic_cast<cedar::proc::steps::StaticGain *>(source) &&
-            !dynamic_cast<cedar::proc::steps::Convolution *>(source) &&
-            !dynamic_cast<cedar::proc::steps::Projection *>(source))
+        for (cedar::proc::DataConnectionPtr inputConn : inputSlot->getDataConnections())
         {
-          // First step of the chain.
-          cedar::aux::ConfigurationNode synCon;
-          synCon.put("Source", source->getFullPath());
-          this->writeChainedSynapticConnection(step.get(), synCon, root);
+          cedar::proc::Connectable *source = inputConn.get()->getSource()->getParentPtr();
+          CEDAR_ASSERT(source != nullptr);
+          if (!this->isChainable(boost::dynamic_pointer_cast<cedar::proc::Element>(source->shared_from_this())))
+          {
+            // First step of the chain.
+            cedar::aux::ConfigurationNode synCon;
+            synCon.put("Source", source->getFullPath());
+            this->writeChainedSynapticConnection(step.get(), synCon, root);
+          }
         }
       }
     }
   }
+}
+
+bool cedar::proc::GroupXMLFileFormatV1::isChainable(cedar::proc::ElementPtr element)
+{
+  std::string typeId = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(element);
+  for(std::string chainable : cedar::proc::GroupXMLFileFormatV1::chainableSteps)
+  {
+    if(typeId == chainable)
+    {
+      return true;
+    }
+  }
+  return false;
 }
 
 void cedar::proc::GroupXMLFileFormatV1::readDimensionsParameter(cedar::aux::UIntParameterPtr dimensionality,

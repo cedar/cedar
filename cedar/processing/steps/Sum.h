@@ -76,6 +76,8 @@ public:
    */
   static void sumSlot(cedar::proc::ExternalDataPtr slot, cv::Mat& sum, bool lock = false);
 
+  bool isXMLExportable(std::string& errorMsg) override;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

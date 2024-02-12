@@ -105,6 +105,7 @@ cedar::dyn::steps::HebbianConnection::HebbianConnection()
         mLearningRule(
                 new cedar::aux::EnumParameter(this, "learning rule", cedar::dyn::steps::HebbianConnection::LearningRule::typePtr(),
                                               LearningRule::OJA)),
+        mTau(new cedar::aux::DoubleParameter(this, "time scale", 20.0)),
       mInputDimension(new cedar::aux::UIntParameter(this, "source dimension", 1, 0, 3)),
       mInputSizes(new cedar::aux::UIntVectorParameter(this, "source sizes", 1, 50,cedar::aux::UIntParameter::LimitType::positive(5000))),
       mAssociationDimension(new cedar::aux::UIntParameter(this, "target dimension", 2, 0, 3)),
@@ -301,20 +302,33 @@ bool cedar::dyn::steps::HebbianConnection::isXMLExportable(std::string& errorMsg
 
   for (const auto& sigmoid_tuple : sigmoid_functions)
   {
-    if(auto expSigmoid = dynamic_cast<cedar::aux::math::ExpSigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get()))
+    if(auto sigmoid = dynamic_cast<cedar::aux::math::Sigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get()))
     {
-      if(expSigmoid->getThreshold() != 0)
+      if(sigmoid->getThreshold() != 0)
       {
-        errorMsg = "The XML export only supports 0 as the threshold for the ExpSigmoid source sigmoid function.";
+        errorMsg = "The XML export only supports 0 as the threshold for sigmoids.";
+        return false;
+      }
+      if(!(dynamic_cast<cedar::aux::math::ExpSigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get()) ||
+           dynamic_cast<cedar::aux::math::AbsSigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get()) ||
+           dynamic_cast<cedar::aux::math::HeavisideSigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get())))
+      {
+        errorMsg = "The XML export only supports \"AbsSigmoid\", \"ExpSigmoid\" and \"HeavisideSigmoid\" as the transfer function.";
         return false;
       }
     }
-    else{
-      errorMsg = "The XML export only supports \"ExpSigmoid\" as the " + std::get<1>(sigmoid_tuple) + " sigmoid function.";
+    else if(!dynamic_cast<cedar::aux::math::LinearTransferFunction*>(std::get<0>(sigmoid_tuple)->getValue().get()))
+    {
+      errorMsg = "The XML export only supports sigmoids and LinearTransferFunction as transfer functions.";
       return false;
     }
   }
 
+  if(this->getOutputSlot(mTriggerOutputName)->getDataConnections().size() > 1 ||
+     this->getInputSlot(mAssoInputName)->getDataConnections().size() > 1)
+  {
+    return false;
+  }
   return true;
 }
 
@@ -338,7 +352,7 @@ void cedar::dyn::steps::HebbianConnection::updateAssociationDimension()
   {
     sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
   }
-  this->mWeightedTargetOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
+  this->mWeightOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
 
 //  std::cout<<"updateAssociationDimension: WeightDim! " << determineWeightDimension() << " WeightX=" << determineWeightSizes(0) << " WeightY=" << determineWeightSizes(1) << std::endl;
   this->resetWeights();
@@ -386,6 +400,7 @@ void cedar::dyn::steps::HebbianConnection::updateLearningRule()
       }
       mAssociationDimension->setMaximum(2);
       mSetWeights->setConstant(false);
+      mTau->setConstant(false);
       //Unfortunately no iteration
       mTauWeights->setConstant(true);
       mTauTheta->setConstant(true);
@@ -403,6 +418,7 @@ void cedar::dyn::steps::HebbianConnection::updateLearningRule()
       mAssociationDimension->setMinimum(3);
       mSetWeights->setValue(false);
       mSetWeights->setConstant(true);
+      mTau->setConstant(true);
 
 //      auto bcmParameterList = mBcmParameterGroup->getParameters(); //THIS CALL CRASHES. WHY?
 //      for(auto parameter:mBcmParameterGroup->getParameters())
@@ -578,6 +594,17 @@ void cedar::dyn::steps::HebbianConnection::eulerStep(const cedar::unit::Time& ti
         //Reward is present and start counting
         mElapsedTime = 0;
         mIsRewarded = true;
+
+        //For 0d/0d case: Pause learning until either input or target field is active
+        auto targetSigmoid = this->mSigmoidH->getValue()->compute(mAssoInput->getData());
+        auto inputSigmoid = this->mSigmoidF->getValue()->compute(mReadOutTrigger->getData());
+        if (mInputDimension->getValue() == 0 && mAssociationDimension->getValue() == 0)
+        {
+          if (inputSigmoid.at<float>(0, 0) < 0.5 && targetSigmoid.at<float>(0, 0) < 0.5)
+          {
+            mIsRewarded = false;
+          }
+        }
       }
       //Count the time the reward is present
       float curTime = time / cedar::unit::Time(1 * cedar::unit::milli * cedar::unit::seconds);
@@ -689,6 +716,7 @@ void cedar::dyn::steps::HebbianConnection::resetWeights()
   }
 
   this->emitOutputPropertiesChangedSignal(mTriggerOutputName);
+  this->revalidateInputSlot(mReadOutInputName);
   this->revalidateInputSlot(mAssoInputName);
 }
 
@@ -876,18 +904,20 @@ cv::Mat cedar::dyn::steps::HebbianConnection::calculateWeightChange(const cedar:
   {
     case cedar::dyn::steps::HebbianConnection::LearningRule::OJA:
     {
+      float timeFactor = (delta_t / cedar::unit::Time(
+          mTau->getValue() * cedar::unit::milli * cedar::unit::seconds));
 
       //One case is outstar the other instar
       if (mInputDimension->getValue() == 0) // The old case! && And the 0 to 0 case! Be careful!
       {
-        return learnRate * inputSigmoid.at<float>(0, 0) * rewardSigValue.at<float>(0, 0) *
-               (targetSigmoid - currentWeights);
+        return timeFactor * (learnRate * inputSigmoid.at<float>(0, 0) * rewardSigValue.at<float>(0, 0) *
+               (targetSigmoid - currentWeights));
       }
 
       if (mAssociationDimension->getValue() == 0) // The reverse case
       {
-        return learnRate * rewardSigValue.at<float>(0, 0) * targetSigmoid.at<float>(0, 0) *
-               (inputSigmoid - currentWeights);
+        return timeFactor * (learnRate * rewardSigValue.at<float>(0, 0) * targetSigmoid.at<float>(0, 0) *
+               (inputSigmoid - currentWeights));
       }
 
       if (mAssociationDimension->getValue() == 1 && mInputDimension->getValue() == 1)
@@ -900,7 +930,7 @@ cv::Mat cedar::dyn::steps::HebbianConnection::calculateWeightChange(const cedar:
           {
             float combinedValue = inputSigmoid.at<float>(x, 0) * targetSigmoid.at<float>(y, 0);
             float weightChange = learnRate * (combinedValue - currentWeights.at<float>(x, y));
-            weightChangeMat.at<float>(x, y) = weightChange;
+            weightChangeMat.at<float>(x, y) = timeFactor * weightChange;
           }
         }
         return weightChangeMat;

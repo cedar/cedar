@@ -160,7 +160,7 @@ if (CMAKE_COMPILER_IS_GNUCC)
   add_definitions(-Wall -Wextra)
 #This is outdated by now. The new standard is c++14
 #  add_definitions(-std=gnu++0x)
-  	
+   add_definitions(-std=c++14)
   if (WIN32)
 	add_definitions(-Wno-unused-local-typedefs)
   endif(WIN32)

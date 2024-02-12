@@ -69,6 +69,7 @@
 #include <QKeyEvent>
 #include <QDoubleSpinBox>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QLabel>
 #include <map>
 #include <vector>
@@ -440,6 +441,8 @@ private slots:
 
   void simulationModeComboBoxChanged( int newIndex);
 
+  void mpSimulationModeCheckBoxChanged( bool newValue);
+
   void simulatedTimeStepSliderChanged(int newValue);
 
   void simulatedTimeStepSpinBoxChanged(double value);
@@ -509,6 +512,7 @@ private:
 
   //! Combobox to select plot groups
   QComboBox* mpSimulationModeComboBox;
+  QCheckBox* mpSimulationModeCheckBox;
 
   //! Combobox to select plot groups
   QComboBox* mpPlotGroupsComboBox;

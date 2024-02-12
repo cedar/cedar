@@ -92,6 +92,7 @@ cedar::proc::gui::CoPYObject::createElem(const QString &classId, const int &x, c
       auto group = getGroupByName(groupname.toStdString());
       GROUP_ASSERT(group, groupname.toStdString());
       CLASS_ASSERT(classId);
+
       auto elem = mpScene->createElement(group, classId.toStdString(), QPointF(x, y + i)).get();
       if (cedar::proc::Step *step = dynamic_cast<cedar::proc::Step *>(elem))
       {
@@ -166,6 +167,14 @@ void cedar::proc::gui::CoPYObject::copyTo(const QString &fromStep, const QString
   } catch (cedar::aux::ExceptionBase e)
   {
     throwError(e.getMessage());
+  }
+}
+
+void cedar::proc::gui::CoPYObject::copyTo(const QString &fromStep, const QStringList &targetSteps)
+{
+  for (QString step : targetSteps)
+  {
+    this->copyTo(fromStep, step);
   }
 }
 

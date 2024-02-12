@@ -76,7 +76,7 @@ mDataSlot(slot)
 
   //Create spin box.
   mStepSize = new QSpinBox();
-  mStepSize->setMaximum(1000);
+  mStepSize->setMaximum(100000);
   mStepSize->setMinimum(0);
 
   if (registered)

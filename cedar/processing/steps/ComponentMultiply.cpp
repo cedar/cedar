@@ -36,14 +36,21 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/steps/ComponentMultiply.h"
+#include "cedar/dynamics/fields/NeuralField.h"
+#include "cedar/processing/sources/GaussInput.h"
 #include "cedar/processing/typecheck/SameSizedCollection.h"
 #include "cedar/processing/typecheck/SameTypeCollection.h"
 #include "cedar/processing/typecheck/And.h"
 #include "cedar/processing/ExternalData.h"
+#include "cedar/processing/DataConnection.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/GroupXMLFileFormatV1.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/Arguments.h"
+#include "cedar/auxiliaries/annotation/SizesRangeHint.h"
+#include "cedar/auxiliaries/math/transferFunctions/HeavisideSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/LinearTransferFunction.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -167,4 +174,94 @@ void cedar::proc::steps::ComponentMultiply::compute(const cedar::proc::Arguments
       }
     }
   }
+}
+
+bool cedar::proc::steps::ComponentMultiply::isXMLExportable(std::string& errorMsg)
+{
+  std::vector<cedar::proc::DataConnectionPtr> inCons = this->mInputs->getDataConnections();
+  if(inCons.size() == 2)
+  {
+    bool gauss = false;
+    bool node = false;
+    for (int i = 0; i < inCons.size(); i++)
+    {
+      cedar::proc::Connectable *connectable = inCons.at(i)->getSource()->getParentPtr();
+      CEDAR_ASSERT(connectable != nullptr)
+      if (dynamic_cast<cedar::proc::sources::GaussInput *>(connectable))
+      {
+        gauss = true;
+      }
+
+
+      if(!cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(
+        boost::dynamic_pointer_cast<cedar::proc::Element>(connectable->shared_from_this())).compare("cedar.dynamics.NeuralField"))
+      {
+        cedar::aux::ConfigurationNode configuration;
+        connectable->writeConfiguration(configuration);
+        if(configuration.get<int>("dimensionality") == 0)
+        {
+          node = true;
+        }
+      }
+    }
+    if(gauss && node)
+    {
+      return true;
+    }
+  }
+  errorMsg = "ComponentMultiply is only exportable with one incoming GaussInput and one incoming Node.";
+  return false;
+}
+
+void cedar::proc::steps::ComponentMultiply::writeConfigurationXML(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::aux::Configurable::writeConfigurationXML(root);
+  root.put("LearningRate", 0.01);
+  root.put("FixedRewardDuration", false);
+  root.put("RewardDuration", 200);
+  root.put("ManualWeights", true);
+
+  std::vector<cedar::proc::DataConnectionPtr> inCons = this->mInputs->getDataConnections();
+  CEDAR_ASSERT(inCons.size() == 2)
+  for (int i = 0; i < inCons.size(); i++)
+  {
+    cedar::proc::Connectable *connectable = inCons.at(i)->getSource()->getParentPtr();
+    CEDAR_ASSERT(connectable != nullptr)
+    if (auto gauss = dynamic_cast<cedar::proc::sources::GaussInput *>(connectable))
+    {
+      for(std::string paramName : {"Centers", "Sigma"})
+      {
+        auto param = boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(gauss->getParameter(cedar::aux::toLower(paramName)));
+        cedar::aux::ConfigurationNode vector_node;
+        for (double value: param->getValue())
+        {
+          cedar::aux::ConfigurationNode value_node;
+          value_node.put_value(value);
+          vector_node.push_back(cedar::aux::ConfigurationNode::value_type("Weight" + paramName + "Elem", value_node));
+        }
+        root.push_back(cedar::aux::ConfigurationNode::value_type("Weight" + paramName, vector_node));
+      }
+      root.put("WeightAmplitude", gauss->getAmplitude());
+      // dimensionality/sizes parameter
+      root.add_child("SourceDimensions", cedar::aux::ConfigurationNode());
+      auto output = gauss->getOutput("Gauss input");
+      CEDAR_ASSERT(output != nullptr)
+      cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(
+          gauss->getParameter("dimensionality")), boost::dynamic_pointer_cast<cedar::aux::UIntVectorParameter>(gauss->getParameter("sizes")),
+          output->getAnnotation<cedar::aux::annotation::SizesRangeHint>()->getRange(), root);
+      // Rename parameter to the name conventions of the HebbianConnection Parameters
+      root.add_child("TargetDimensions", root.get_child("Dimensions"));
+      root.erase("Dimensions");
+      break;
+    }
+  }
+  cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* pHeavisideSigmoid =
+      new cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>(nullptr, "temp",
+      cedar::aux::math::SigmoidPtr(new cedar::aux::math::HeavisideSigmoid()));
+  cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>* pLinearTransferFunction =
+      new cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction>(nullptr, "temp",
+      cedar::aux::math::LinearTransferFunctionPtr(new cedar::aux::math::LinearTransferFunction()));
+  cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(pHeavisideSigmoid, root, "SourceFunction");
+  cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(pHeavisideSigmoid, root, "RewardFunction");
+  cedar::proc::GroupXMLFileFormatV1::writeActivationFunctionParameter(pLinearTransferFunction, root, "TargetFunction");
 }

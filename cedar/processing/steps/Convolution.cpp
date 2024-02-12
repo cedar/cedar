@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/convolution/FFTW.h"
+#include "cedar/auxiliaries/kernel/Gauss.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -343,6 +344,14 @@ void cedar::proc::steps::Convolution::readConfiguration(const cedar::aux::Config
 }
 
 bool cedar::proc::steps::Convolution::isXMLExportable(std::string& errorMsg){
+  for(int i = 0; i < this->_mKernels->size(); i++)
+  {
+    if(!dynamic_cast<cedar::aux::kernel::Gauss*>(this->_mKernels->at(i).get()))
+    {
+      errorMsg = "The XML export only supports Gauss kernel for Convolution steps.";
+      return false;
+    }
+  }
   return cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportable(this, errorMsg);
 }
 
@@ -353,6 +362,15 @@ void cedar::proc::steps::Convolution::writeConfigurationXML(cedar::aux::Configur
   cedar::aux::ConfigurationNode sumWeightPattern;
   cedar::proc::GroupXMLFileFormatV1::writeKernelListParameter(this->_mKernels.get(), sumWeightPattern);
   root.add_child("KernelWeights", sumWeightPattern);
+
+  if(this->getInputSlot("kernel")->getDataConnections().size() > 0)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Kernel input to Convolution step is not xml-exportable. Only manually set kernels are exported.",
+        "cedar::proc::steps::Convolution::writeConfigurationXML()"
+      );
+  }
 }
 
 void cedar::proc::steps::Convolution::slotKernelAdded(size_t kernelIndex)

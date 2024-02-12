@@ -98,8 +98,8 @@ mCameraTranslation(new cedar::aux::DoubleVectorParameter(this,"camera joint tran
 mTiltJointDistance(new cedar::aux::DoubleParameter (this,"cam distance to tiltjoint (m)",0)),
 mCameraFrustrumAngleDeg(new cedar::aux::DoubleVectorParameter(this,"camera frustrum angle (deg)",2,45)),
 mOutputSizes(new cedar::aux::IntVectorParameter(this,"output sizes",2,100)),
-mOutputScaling(new cedar::aux::DoubleParameter(this,"allo field unit per meter",100,1,1000)),
-mOutputTranslation(new cedar::aux::DoubleVectorParameter(this,"allo translation (m)",3,0)),
+mOutputScaling(new cedar::aux::IntVectorParameter(this,"allo field unit per meter",3,50)),
+mOutputTranslation(new cedar::aux::DoubleVectorParameter(this,"output translation (m)",3,0)),
 mAlloDetectionThreshold(new cedar::aux::DoubleParameter(this,"allo detection threshold",0.1))
 {
 //  std::vector<int> defaultSizes {mOutputSizes->getValue().at(0),mOutputSizes->getValue().at(1),mOutputSizes->getValue().at(2)};
@@ -192,12 +192,13 @@ cv::Mat cedar::proc::steps::AllocentricToDistanceImage::computeEgocentricReprese
     float alloDetectionThreshold = this->mAlloDetectionThreshold->getValue();
 
   allocentricImage.forEach<float>([&returnMat,angleRangeHorizontal,xZeroAnglePixel,horizontalPixelPerAngle,angleRangeVertical,yZeroAnglePixel,verticalPixelPerAngle,inverseRotationMat,translationVectorToJoint,translationVectorJointToCam,outputTranslation,fieldUnitPerMeter,alloDetectionThreshold](float &p, const int * position) -> void {
+
       if(p > alloDetectionThreshold)
-      {
+      {      
         //There is something in the allocentric representation
-        float zCoordinate = position[0] / fieldUnitPerMeter + outputTranslation.at(0);
-        float xCoordinate = position[1] / fieldUnitPerMeter + outputTranslation.at(1);
-        float yCoordiante = outputTranslation.at(2);
+        float zCoordinate = (double) position[0] / (double) fieldUnitPerMeter.at(0) + outputTranslation.at(0);
+        float xCoordinate = (double) position[1] / (double) fieldUnitPerMeter.at(1) + outputTranslation.at(1);
+        float yCoordiante = (double) position[2] / (double) fieldUnitPerMeter.at(2) + outputTranslation.at(2);
 
           //Subtract Camera Transform
         zCoordinate = zCoordinate - translationVectorToJoint.at(0) - translationVectorJointToCam.at(0);
@@ -222,7 +223,7 @@ cv::Mat cedar::proc::steps::AllocentricToDistanceImage::computeEgocentricReprese
           float imagePosY = yZeroAnglePixel + angleY * verticalPixelPerAngle * -1; //y-direction is flipped
           int imagePosXInt = round(imagePosX);
           int imagePosYInt = round(imagePosY);
-          returnMat.at<float>(imagePosYInt, imagePosXInt) = reRotatedVector.at<float>(0, 0);
+          returnMat.at<float>(imagePosYInt, imagePosXInt) = sqrt(pow(reRotatedVector.at<float>(0, 0),2) + pow(reRotatedVector.at<float>(1, 0),2) +pow(reRotatedVector.at<float>(2, 0),2));
         }
       }
 
@@ -294,7 +295,7 @@ std::vector<float> cedar::proc::steps::AllocentricToDistanceImage::calculateTran
 
 void cedar::proc::steps::AllocentricToDistanceImage::outputSizeChanged()
 {
-//  std::cout<<"OutputSizeChanged >> RecalculateOutputData" << std::endl;
+  //std::cout<<"OutputSizeChanged >> RecalculateOutputData" << std::endl;
   cv::Mat outPutMat = cv::Mat::zeros(mOutputSizes->getValue().at(0), mOutputSizes->getValue().at(1) , CV_32F);
   mEgoOutput->setData(outPutMat);
 

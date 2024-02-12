@@ -98,7 +98,7 @@ mCameraTranslation(new cedar::aux::DoubleVectorParameter(this,"camera joint tran
 mTiltJointDistance(new cedar::aux::DoubleParameter (this,"cam distance to tiltjoint (m)",0)),
 mCameraFrustrumAngleDeg(new cedar::aux::DoubleVectorParameter(this,"camera frustrum angle (deg)",2,45)),
 mOutputSizes(new cedar::aux::IntVectorParameter(this,"output sizes",3,100)),
-mOutputScaling(new cedar::aux::DoubleParameter(this,"field unit per meter",100,1,1000)),
+mOutputScaling(new cedar::aux::IntVectorParameter(this,"field unit per meter",3,50)),
 mOutputTranslation(new cedar::aux::DoubleVectorParameter(this,"output translation (m)",3,0))
 {
   std::vector<int> defaultSizes {mOutputSizes->getValue().at(0),mOutputSizes->getValue().at(1),mOutputSizes->getValue().at(2)};
@@ -216,9 +216,9 @@ cv::Mat cedar::proc::steps::DistanceImageCoordinateTransform::computeAllocentric
 
 
             //Translate the measure values in the field coordinate frame
-            int outPutX = (int) round((xReal - outputTranslation.at(1)) * fieldUnitPerMeter);
-            int outPutY = (int) round((yReal - outputTranslation.at(2)) * fieldUnitPerMeter);
-            int outPutZ = (int) round((zReal - outputTranslation.at(0)) * fieldUnitPerMeter);
+            int outPutX = (int) round((xReal - outputTranslation.at(1)) * fieldUnitPerMeter.at(1));
+            int outPutY = (int) round((yReal - outputTranslation.at(2)) * fieldUnitPerMeter.at(2));
+            int outPutZ = (int) round((zReal - outputTranslation.at(0)) * fieldUnitPerMeter.at(0));
 
             if(outPutX<returnMat.size[1] && outPutX >=0 && outPutY<returnMat.size[2] && outPutY >=0 && outPutZ<returnMat.size[0] && outPutZ >=0)
             {

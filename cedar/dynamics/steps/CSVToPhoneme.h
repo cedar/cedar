@@ -105,17 +105,19 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //!@brief Reacts to a change in the input connection.
-  void inputConnectionChanged(const std::string& inputName);
+  void inputConnectionChanged(const std::string& inName);
 
   //!@brief Updates the output matrix.
   void eulerStep(const cedar::unit::Time& time);
 
   //!@brief returns i-th slots name
-  std::string makeSlotName(const int i);
+  static std::string makeSlotName(unsigned i);
 
   void reloadLookupTable();
 
   void setAllOutputsToValue(int value);
+
+  static bool fileExists(QString path);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
