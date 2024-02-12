@@ -594,6 +594,17 @@ void cedar::dyn::steps::HebbianConnection::eulerStep(const cedar::unit::Time& ti
         //Reward is present and start counting
         mElapsedTime = 0;
         mIsRewarded = true;
+
+        //For 0d/0d case: Pause learning until either input or target field is active
+        auto targetSigmoid = this->mSigmoidH->getValue()->compute(mAssoInput->getData());
+        auto inputSigmoid = this->mSigmoidF->getValue()->compute(mReadOutTrigger->getData());
+        if (mInputDimension->getValue() == 0 && mAssociationDimension->getValue() == 0)
+        {
+          if (inputSigmoid.at<float>(0, 0) < 0.5 && targetSigmoid.at<float>(0, 0) < 0.5)
+          {
+            mIsRewarded = false;
+          }
+        }
       }
       //Count the time the reward is present
       float curTime = time / cedar::unit::Time(1 * cedar::unit::milli * cedar::unit::seconds);
