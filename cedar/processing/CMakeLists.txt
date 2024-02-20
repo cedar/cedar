@@ -248,6 +248,7 @@ cedar_add_library(cedarproc
   steps/PositionOfMaximum.h
   steps/DiagonalReadout.h
   steps/HeadCenteredTransform.h
+  steps/InvHeadCenteredTransform.h
   CppScript.h
   Group.h
   Step.h

@@ -28,14 +28,14 @@
     Email:       stephan.sehring@rub.de
     Date:        2024 02 16
 
-    Description: Caren camera to head centered transform
+    Description: Caren camera to head centered transform inverse
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_HEAD_CENTERED_TRANSFORM_H
-#define CEDAR_PROC_STEPS_HEAD_CENTERED_TRANSFORM_H
+#ifndef CEDAR_PROC_STEPS_INV_HEAD_CENTERED_TRANSFORM_H
+#define CEDAR_PROC_STEPS_INV_HEAD_CENTERED_TRANSFORM_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -47,7 +47,7 @@
 #include "cedar/processing/Step.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/HeadCenteredTransform.fwd.h"
+#include "cedar/processing/steps/InvHeadCenteredTransform.fwd.h"
 #include "cedar/auxiliaries/MatData.fwd.h"
 
 // SYSTEM INCLUDES
@@ -57,7 +57,7 @@
  *
  * @todo describe more.
  */
-class cedar::proc::steps::HeadCenteredTransform: public cedar::proc::Step
+class cedar::proc::steps::InvHeadCenteredTransform: public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -72,10 +72,10 @@ class cedar::proc::steps::HeadCenteredTransform: public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  HeadCenteredTransform();
+  InvHeadCenteredTransform();
 
   //!@brief Destructor
-  virtual ~HeadCenteredTransform();
+  virtual ~InvHeadCenteredTransform();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -97,9 +97,11 @@ private:
 
   void inputConnectionChanged(const std::string& inputName);
 
-  cv::Mat computeAllocentricRepresentation(cv::Mat distanceImage,float rollRad,float tiltRad, float panRad);
+  cv::Mat computeEgocentricRepresentation(cv::Mat distanceImage,float rollRad,float tiltRad, float panRad);
 
   cv::Matx33f calculateRotationMatrix(float rollRad,float tiltRad, float panRad);
+  cv::Matx33f calculateRotationMatrix2(float rollRad,float tiltRad, float panRad);
+  cv::Matx44f calculateExtrinsicMatrix(float rollRad, float tiltRad, float panRad, cv::Vec3f translation);
 
 private slots:
   void outputSizeChanged();
@@ -109,18 +111,18 @@ private slots:
 protected:
   // none yet
 private:
-    cedar::aux::MatDataPtr mAlloOutput;
+    cedar::aux::MatDataPtr mEgoOutput;
 
-    cedar::aux::ConstMatDataPtr mDistanceImageInput;
+    cedar::aux::ConstMatDataPtr mAlloInput;
     cedar::aux::ConstMatDataPtr mPanInput;
     cedar::aux::ConstMatDataPtr mTiltInput;
     cedar::aux::ConstMatDataPtr mRollInput;
 
-    std::string mDistanceImageInputName = "distance image";
+    std::string mAlloInputName = "Head-Centered Representation";
     std::string mPanInputName = "camera pan (deg)";
     std::string mTiltInputName = "camera tilt (deg)";
     std::string mRollInputName = "camera roll (deg)";
-    std::string mAlloOutputName = "HeadCentered representation";
+    std::string mEgoOutputName = "Cameracentric Output";
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -136,7 +138,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::steps::HeadCenteredTransform
+}; // class cedar::proc::steps::InvHeadCenteredTransform
 
-#endif // CEDAR_PROC_STEPS_HEAD_CENTERED_TRANSFORM_H
+#endif // CEDAR_PROC_STEPS_INV_HEAD_CENTERED_TRANSFORM_H
 
