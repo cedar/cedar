@@ -224,6 +224,7 @@ cv::Mat cedar::proc::steps::InvHeadCenteredTransform::computeEgocentricRepresent
             //cv::Vec4f r_ego4(-r_ego(0), -r_ego(1), -r_ego(2), 1);
             cv::Mat pix_mat = camMat * r_ego;
             cv::Vec3f pix_vec = pix_mat.col(0);
+            float d = pix_vec(2);
             pix_vec = pix_vec/pix_vec(2);
             
 
@@ -234,7 +235,7 @@ cv::Mat cedar::proc::steps::InvHeadCenteredTransform::computeEgocentricRepresent
             if(outPutX<returnMat.size[1] && outPutX >=0 && outPutY < returnMat.size[0] && outPutY >=0)
             {
               //Again the OpenCV Plot treats the first two dimensions in the plot different than usual (for me)
-              returnMat.at<float>(outPutY, outPutX) = distance;
+              returnMat.at<float>(outPutY, outPutX) = d;
             }
 
             //debug code...
