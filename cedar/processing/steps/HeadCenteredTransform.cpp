@@ -239,8 +239,8 @@ cv::Mat cedar::proc::steps::HeadCenteredTransform::computeAllocentricRepresentat
             float tilt = acos(r_allo(2)/l_allo);
 
             // calculate field positions
-            int outPutX = (int) round((pan+M_PI)/M_PI/2.0 * (float)returnMat.size[1]); // pan in range o,2pi
-            int outPutY = (int) round(tilt/M_PI * (float)returnMat.size[0]);   // tilt in range 0,pi
+            int outPutX = (int) floor((pan+M_PI)/M_PI/2.0 * (float)returnMat.size[1]); // pan in range o,2pi
+            int outPutY = (int) floor(tilt/M_PI * (float)returnMat.size[0]);   // tilt in range 0,pi
 
             if(outPutX<returnMat.size[1] && outPutX >=0 && outPutY < returnMat.size[0] && outPutY >=0)
             {

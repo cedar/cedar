@@ -229,8 +229,8 @@ cv::Mat cedar::proc::steps::InvHeadCenteredTransform::computeEgocentricRepresent
             
 
             // calculate field positions
-            int outPutX = (int) round(pix_vec(1));
-            int outPutY = (int) round(pix_vec(0));
+            int outPutX = (int) floor(pix_vec(1));
+            int outPutY = (int) floor(pix_vec(0));
 
             if(outPutX<returnMat.size[1] && outPutX >=0 && outPutY < returnMat.size[0] && outPutY >=0)
             {
