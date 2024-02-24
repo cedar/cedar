@@ -176,8 +176,8 @@ cv::Mat cedar::proc::steps::InvHeadCenteredTransform::computeEgocentricRepresent
   float panSampling = (float) HeadCenteredRep.cols;
   float tiltSampling = (float) HeadCenteredRep.rows;
 
-  float xPixels = mOutputSizes->getValue().at(0);
-  float yPixels = mOutputSizes->getValue().at(1);
+  float xPixels = mOutputSizes->getValue().at(1);
+  float yPixels = mOutputSizes->getValue().at(0);
 
 
   cv::Matx33f jointRotationMat = calculateRotationMatrix2(rollRad,tiltRad,panRad);
@@ -191,16 +191,16 @@ cv::Mat cedar::proc::steps::InvHeadCenteredTransform::computeEgocentricRepresent
   r_cd = r_cd/l_cd; // normalize
 
   // calculate camera matrix
-  float f = 0.01;
+  float f = this->mCameraFocalLength->getValue();
   float s_x = xPixels/(2*f*tan(angleRangeX/2));
   float s_y = yPixels/(2*f*tan(angleRangeY/2));
   float u_0 = xPixels/2;
   float v_0 = yPixels/2;
-  cv::Mat camMat(3,4,CV_32F, cv::Scalar(0));
-  camMat.at<float>(0,0) = s_x*f;
-  camMat.at<float>(0,2) = u_0;
-  camMat.at<float>(1,1) = s_y*f;
-  camMat.at<float>(1,2) = v_0;
+  cv::Mat camMat(3,4,CV_32F, cv::Scalar(0)); // I have no idea why I have to fly y and y here... but it works somehow
+  camMat.at<float>(0,0) = s_y*f;
+  camMat.at<float>(0,2) = v_0;
+  camMat.at<float>(1,1) = s_x*f;
+  camMat.at<float>(1,2) = u_0;
   camMat.at<float>(2,2) = 1;
   cv::Mat invCamMat = camMat.inv(cv::DecompTypes::DECOMP_SVD);
 
