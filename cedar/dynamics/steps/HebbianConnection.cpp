@@ -695,6 +695,8 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::steps::HebbianConnection::determineI
 
 void cedar::dyn::steps::HebbianConnection::reset()
 {
+  resetWeightedTargetOutput();
+  mWeightOutput->setData(cv::Mat::zeros(mWeightSizeX, mWeightSizeY, CV_32F));
 }
 
 void cedar::dyn::steps::HebbianConnection::resetWeights()
