@@ -200,7 +200,7 @@ cv::Mat cedar::proc::steps::AllocentricToDistanceImage::computeEgocentricReprese
         float xCoordinate = (double) position[1] / (double) fieldUnitPerMeter.at(1) + outputTranslation.at(1);
         float yCoordiante = (double) position[2] / (double) fieldUnitPerMeter.at(2) + outputTranslation.at(2);
 
-          //Subtract Camera Transform
+        //Subtract Camera Transform
         zCoordinate = zCoordinate - translationVectorToJoint.at(0) - translationVectorJointToCam.at(0);
         xCoordinate = xCoordinate - translationVectorToJoint.at(1) - translationVectorJointToCam.at(1);
         yCoordiante = yCoordiante - translationVectorToJoint.at(2) - translationVectorJointToCam.at(2);
@@ -215,18 +215,16 @@ cv::Mat cedar::proc::steps::AllocentricToDistanceImage::computeEgocentricReprese
 
         float angleX = atan(reRotatedVector.at<float>(1, 0) / reRotatedVector.at<float>(0, 0));
         float angleY = atan(reRotatedVector.at<float>(2, 0) / reRotatedVector.at<float>(0, 0));
-
         if (abs(angleX) <= (angleRangeHorizontal / 2.0) && abs(angleY) <= (angleRangeVertical / 2.0))
         {
           // If inside the camera add it to correct location of the output matrix with correct distance value
           float imagePosX = xZeroAnglePixel + angleX * horizontalPixelPerAngle;
           float imagePosY = yZeroAnglePixel + angleY * verticalPixelPerAngle * -1; //y-direction is flipped
-          int imagePosXInt = round(imagePosX);
-          int imagePosYInt = round(imagePosY);
+          int imagePosXInt = floor(imagePosX);
+          int imagePosYInt = floor(imagePosY);
           returnMat.at<float>(imagePosYInt, imagePosXInt) = sqrt(pow(reRotatedVector.at<float>(0, 0),2) + pow(reRotatedVector.at<float>(1, 0),2) +pow(reRotatedVector.at<float>(2, 0),2));
         }
       }
-
   });
 
 

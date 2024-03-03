@@ -67,6 +67,8 @@ CTestTestfile.cmake
 */lib.h
 cedar/processing/Testing/Temporary/*
 
+.vscode/*
+
 tests/unit/processing/ArchitectureIO/architecture1\.json
 tests/unit/processing/Network/Nested\.json
 cedar.conf
