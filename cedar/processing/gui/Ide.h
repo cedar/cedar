@@ -74,6 +74,9 @@
 #include <map>
 #include <vector>
 
+#ifdef CEDAR_USE_ARRAYFIRE
+#include <arrayfire.h>
+#endif //CEDAR_USE_ARRAYFIRE
 
 /*!@brief This is the main window of the cedar application.
  */
@@ -566,6 +569,11 @@ private:
   QLabel* mpErrorStateCount;
 
   cedar::aux::CallFunctionInThreadPtr mBackupSaveThreadWrapper;
+
+#ifdef CEDAR_USE_ARRAYFIRE
+  af::array init_af;//leave for performance warmup
+#endif //CEDAR_USE_ARRAYFIRE
+
 }; // class cedar::MainWindow
 
 #endif // CEDAR_PROC_GUI_MAIN_WINDOW_H

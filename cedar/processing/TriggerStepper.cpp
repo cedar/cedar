@@ -113,6 +113,7 @@ void cedar::proc::TriggerStepper::runFunc()
         auto time_after_stepping = boost::posix_time::microsec_clock::universal_time();
         boost::posix_time::time_duration measured_step_time_unitless = time_after_stepping - start_time;
         double elapsedMilliSeconds = measured_step_time_unitless.total_microseconds() / 1000.0;
+        std::cout << "Euler roundtime: " << elapsedMilliSeconds << "ms" << std::endl;
         auto minimalSleepTime = cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds);
         double minimumComputeTimeMilliSeconds = static_cast<double>(minimalSleepTime / (0.001 * cedar::unit::seconds));
         if(elapsedMilliSeconds < minimumComputeTimeMilliSeconds) {

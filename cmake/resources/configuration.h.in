@@ -42,6 +42,7 @@
 #define CEDAR_CONFIGURATION_H
 
 // Optional libraries ==================================================================================================
+#cmakedefine CEDAR_USE_ARRAYFIRE
 #cmakedefine CEDAR_USE_GLEW
 #cmakedefine CEDAR_USE_FFTW
 #cmakedefine CEDAR_USE_FFTW_THREADED

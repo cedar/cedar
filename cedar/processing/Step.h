@@ -215,6 +215,8 @@ public:
          cedar::proc::TriggerPtr = cedar::proc::TriggerPtr()
        );
 
+  void preTrigger() override;
+
   //! The same as onTrigger, but does not trigger subsequent steps.
   void callComputeWithoutTriggering(cedar::proc::ArgumentsPtr args = cedar::proc::ArgumentsPtr());
 

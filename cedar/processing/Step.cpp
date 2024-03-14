@@ -44,6 +44,7 @@
 #include "cedar/processing/StepTime.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/processing/ExternalData.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/LoopedTrigger.h"
@@ -307,6 +308,21 @@ void cedar::proc::Step::addTrigger(cedar::proc::TriggerPtr trigger)
 }
 
 #include "cedar/auxiliaries/MatData.h"
+
+void cedar::proc::Step::preTrigger()
+{
+  if (!this->hasSlotForRole(DataRole::INPUT))
+  {
+    return;
+  }
+  // Call updateData on input slots to deep copy the input into a buffer that will be used in compute
+  auto slotList = this->getOrderedDataSlots(DataRole::INPUT);
+  for(auto slot : slotList){
+    auto externalData = boost::dynamic_pointer_cast<cedar::proc::ExternalData>(slot);
+    CEDAR_ASSERT(externalData);
+    externalData->updateData();
+  }
+}
 
 void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::proc::TriggerPtr trigger)
 {

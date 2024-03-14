@@ -49,6 +49,7 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/sinks/GroupSink.h"
+#include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/auxiliaries/GraphTemplate.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
@@ -784,20 +785,83 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 /* DEBUG_TRIGGERING */  std::cout << "> Triggering " << nameTrigger(this) << std::endl;
 #endif
 
-  for (auto order_triggerables_pair : this->mTriggeringOrder.member())
+  if(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT || cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDTSync)
   {
-    auto triggerables = order_triggerables_pair.second;
-    for (cedar::proc::TriggerablePtr triggerable : triggerables)
+    for (auto order_triggerables_pair : this->mTriggeringOrder.member())
     {
-#ifdef DEBUG_TRIGGERING
-/* DEBUG_TRIGGERING */ std::cout << "  > Triggering chain item " << nameTriggerable(triggerable) << std::endl;
-#endif
+      auto triggerables = order_triggerables_pair.second;
+      for (cedar::proc::TriggerablePtr triggerable: triggerables)
+      {
+        triggerable->preTrigger();
+      }
+    }
+    for (auto order_triggerables_pair : this->mTriggeringOrder.member())
+    {
+      auto triggerables = order_triggerables_pair.second;
+      for (cedar::proc::TriggerablePtr triggerable: triggerables)
+      {
+        triggerable->onTrigger(arguments, this_ptr);
+      }
+    }
 
+    //QThreadPool::globalInstance()->setMaxThreadCount(6);
+
+    // Pre-trigger steps, they will copy the current input to allow for concurrent but deterministic execution of onTrigger()
+    /*{
+      QList<QFuture<void> > futures;
+      auto lambda = [&](auto triggerable)
+      {
+        triggerable->preTrigger();
+      };
+      for (auto order_triggerables_pair: this->mTriggeringOrder.member())
+      {
+        auto triggerables = order_triggerables_pair.second;
+        for (cedar::proc::TriggerablePtr triggerable: triggerables)
+        {
+          auto future = QtConcurrent::run(lambda, triggerable);
+          futures.append(future);
+        }
+      }
+      for (auto future: futures)
+      {
+        future.waitForFinished();
+      }
+    }*/
+    // Concurrently call onTrigger on all listening triggerables
+    /*QList<QFuture<void> > futures;
+    auto lambda = [&] (auto triggerable, auto arguments, auto this_ptr) {
       triggerable->onTrigger(arguments, this_ptr);
+    };
+    for (auto order_triggerables_pair : this->mTriggeringOrder.member())
+    {
+      auto triggerables = order_triggerables_pair.second;
+      for (cedar::proc::TriggerablePtr triggerable : triggerables)
+      {
+        auto future =  QtConcurrent::run(lambda,triggerable,arguments,this_ptr);
+        futures.append(future);
+      }
+    }
+    for(auto future:futures){
+      future.waitForFinished();
+    }*/
+  }
+  else
+  {
+    for (auto order_triggerables_pair : this->mTriggeringOrder.member())
+    {
+      auto triggerables = order_triggerables_pair.second;
+      for (cedar::proc::TriggerablePtr triggerable: triggerables)
+      {
+  #ifdef DEBUG_TRIGGERING
+        /* DEBUG_TRIGGERING */ std::cout << "  > Triggering chain item " << nameTriggerable(triggerable) << std::endl;
+  #endif
+        triggerable->preTrigger();
+        triggerable->onTrigger(arguments, this_ptr);
 
-#ifdef DEBUG_TRIGGERING
-/* DEBUG_TRIGGERING */ std::cout << "  < Done triggering chain item " << nameTriggerable(triggerable) << std::endl;
-#endif
+  #ifdef DEBUG_TRIGGERING
+        /* DEBUG_TRIGGERING */ std::cout << "  < Done triggering chain item " << nameTriggerable(triggerable) << std::endl;
+  #endif
+      }
     }
   }
 #ifdef DEBUG_TRIGGERING

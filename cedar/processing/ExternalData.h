@@ -39,6 +39,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/DataSlot.h"
+#include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/LoopMode.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/ExternalData.fwd.h"
@@ -135,6 +137,7 @@ public:
   //!@brief Removes an incoming connection from the list of connections to this slot
   void removeIncomingConnection(cedar::proc::DataConnectionPtr removedConnection);
 
+  void updateData();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -165,6 +168,7 @@ private:
    */
   void removeDataInternal(cedar::aux::DataPtr data);
 
+  void loopModeChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -174,6 +178,10 @@ protected:
 private:
   //!@brief Vector of data references connected to this slot.
   std::vector<cedar::aux::DataWeakPtr> mData;
+  std::vector<cedar::aux::DataWeakPtr> mOriginalData;
+  std::vector<cedar::aux::DataPtr> mDataShared;
+
+  cedar::aux::LoopMode::Id mLoopMode;
 
   //!@brief Whether this slot can have multiple data items.
   bool mIsCollection;

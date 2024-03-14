@@ -125,6 +125,12 @@ public:
    */
   static const Id FakeDT = 6;
 
+  /*! FakeDT + sync input
+   */
+  static const Id FakeDTSync = 7;
+
+  static const Id None = 8;//important for externalData initial refresh. Keep!
+
 protected:
   // none yet
 

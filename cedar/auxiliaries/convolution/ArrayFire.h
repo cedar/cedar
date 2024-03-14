@@ -22,79 +22,134 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TriggerStepper.h
+    File:        ArrayFire.h
 
-    Maintainer:  Jan Tekuelve
-    Email:       jan.tekuelve@ini.rub.de
-    Date:        2021 08 05
+    Maintainer:  
+    Email:       
+    Date:       
 
-    Description: Header file for the class cedar::proc::TriggerStepper.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_TRIGGER_STEPPER_H
-#define CEDAR_PROC_TRIGGER_STEPPER_H
+#ifndef CEDAR_AUX_CONVOLUTION_ARRAYFIRE_H
+#define CEDAR_AUX_CONVOLUTION_ARRAYFIRE_H
 
-// CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+#ifdef CEDAR_USE_ARRAYFIRE
+
 // CEDAR INCLUDES
-#include "cedar/processing/LoopedTrigger.h"
+#include "cedar/auxiliaries/convolution/Engine.h"
+#include "cedar/auxiliaries/opencv_helper.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/TriggerStepper.fwd.h"
+#include "cedar/auxiliaries/convolution/ArrayFire.fwd.h"
 
-// SYSTEM INCLUDES
-#include "thread"
-#include "atomic"
-#include <chrono>
+#include <arrayfire.h>
 
-/*!@todo describe.
- *
- * @todo describe more.
+
+/*!@brief A convolution engine based on ArrayFire's filter engine.
  */
-class cedar::proc::TriggerStepper
+class cedar::aux::conv::ArrayFire : public cedar::aux::conv::Engine
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  TriggerStepper();
+  ArrayFire();
 
-  //!@brief Destructor
-  virtual ~TriggerStepper();
-
+  ~ArrayFire();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  bool isRunning();
-  void stop();
-  void run();
-  void setTriggers(std::vector<LoopedTriggerPtr> trigger);
+  cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    cedar::aux::conv::BorderType::Id borderType,
+    cedar::aux::conv::Mode::Id mode,
+    bool alternateEvenCenter = false
+  ) const;
 
+  cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    const cv::Mat& kernel,
+    cedar::aux::conv::BorderType::Id borderType,
+    cedar::aux::conv::Mode::Id mode,
+    const std::vector<int>& anchor,
+    bool alternateEvenCenter = false
+  ) const;
 
+  cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    cedar::aux::kernel::ConstKernelPtr kernel,
+    cedar::aux::conv::BorderType::Id borderType,
+    cedar::aux::conv::Mode::Id mode,
+    bool alternateEvenCenter = false
+  ) const;
+
+  cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    cedar::aux::conv::ConstKernelListPtr kernelList,
+    cedar::aux::conv::BorderType::Id borderType,
+    cedar::aux::conv::Mode::Id mode,
+    bool alternateEvenCenter = false
+  ) const;
+
+  bool checkCapability
+  (
+    size_t matrixDim,
+    size_t kernelDim,
+    cedar::aux::conv::BorderType::Id borderType,
+    cedar::aux::conv::Mode::Id mode
+  ) const;
+
+  bool checkCapability
+  (
+    cv::Mat matrix,
+    cv::Mat kernel,
+    cedar::aux::conv::BorderType::Id borderType,
+    cedar::aux::conv::Mode::Id mode
+  ) const;
+
+  bool checkBorderTypeCapability
+  (
+    cedar::aux::conv::BorderType::Id borderType
+  ) const;
+
+  bool checkModeCapability
+  (
+    cedar::aux::conv::Mode::Id mode
+  ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-
+  cv::Mat convolveInternal
+          (
+                  const cv::Mat& matrix,
+                  const cv::Mat& kernel,
+                  cedar::aux::conv::BorderType::Id borderType,
+                  cedar::aux::conv::Mode::Id mode,
+                  bool alternateEvenCenter
+          ) const;
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-    void runFunc();
-    void abortAndJoin();
-    void stepTriggers();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -102,10 +157,6 @@ private:
 protected:
   // none yet
 private:
-  std::thread mThread;
-  std::atomic_bool mRunning;
-  std::atomic_bool mAbortRequested;
-  std::vector<cedar::proc::LoopedTriggerPtr> mTriggerList;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -116,7 +167,8 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::TriggerStepper
+}; // class cedar::aux::conv::ArrayFire
 
-#endif // CEDAR_PROC_TRIGGER_STEPPER_H
+#endif // CEDAR_AUX_CONVOLUTION_ARRAYFIRE_H
 
+#endif

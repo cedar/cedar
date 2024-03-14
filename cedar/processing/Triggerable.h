@@ -177,6 +177,8 @@ public:
   //!@brief Returns this step's looped trigger. Steps may only be triggered by one looped trigger.
   cedar::proc::ConstLoopedTriggerPtr getLoopedTrigger() const;
 
+  virtual void preTrigger();
+
   //!@brief Resets the parent looped trigger. Note that this can be called for non-looped triggerables.
   void resetLoopedTrigger();
 
