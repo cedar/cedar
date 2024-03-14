@@ -302,20 +302,33 @@ bool cedar::dyn::steps::HebbianConnection::isXMLExportable(std::string& errorMsg
 
   for (const auto& sigmoid_tuple : sigmoid_functions)
   {
-    if(auto expSigmoid = dynamic_cast<cedar::aux::math::ExpSigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get()))
+    if(auto sigmoid = dynamic_cast<cedar::aux::math::Sigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get()))
     {
-      if(expSigmoid->getThreshold() != 0)
+      if(sigmoid->getThreshold() != 0)
       {
-        errorMsg = "The XML export only supports 0 as the threshold for the ExpSigmoid source sigmoid function.";
+        errorMsg = "The XML export only supports 0 as the threshold for sigmoids.";
+        return false;
+      }
+      if(!(dynamic_cast<cedar::aux::math::ExpSigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get()) ||
+           dynamic_cast<cedar::aux::math::AbsSigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get()) ||
+           dynamic_cast<cedar::aux::math::HeavisideSigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get())))
+      {
+        errorMsg = "The XML export only supports \"AbsSigmoid\", \"ExpSigmoid\" and \"HeavisideSigmoid\" as the transfer function.";
         return false;
       }
     }
-    else{
-      errorMsg = "The XML export only supports \"ExpSigmoid\" as the " + std::get<1>(sigmoid_tuple) + " sigmoid function.";
+    else if(!dynamic_cast<cedar::aux::math::LinearTransferFunction*>(std::get<0>(sigmoid_tuple)->getValue().get()))
+    {
+      errorMsg = "The XML export only supports sigmoids and LinearTransferFunction as transfer functions.";
       return false;
     }
   }
 
+  if(this->getOutputSlot(mTriggerOutputName)->getDataConnections().size() > 1 ||
+     this->getInputSlot(mAssoInputName)->getDataConnections().size() > 1)
+  {
+    return false;
+  }
   return true;
 }
 
@@ -339,7 +352,7 @@ void cedar::dyn::steps::HebbianConnection::updateAssociationDimension()
   {
     sizesRange.push_back(cedar::aux::math::Limits<double>(0, size - 1));
   }
-  this->mWeightedTargetOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
+  this->mWeightOutput->setAnnotation(cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::SizesRangeHint(sizesRange)));
 
 //  std::cout<<"updateAssociationDimension: WeightDim! " << determineWeightDimension() << " WeightX=" << determineWeightSizes(0) << " WeightY=" << determineWeightSizes(1) << std::endl;
   this->resetWeights();
@@ -581,6 +594,17 @@ void cedar::dyn::steps::HebbianConnection::eulerStep(const cedar::unit::Time& ti
         //Reward is present and start counting
         mElapsedTime = 0;
         mIsRewarded = true;
+
+        //For 0d/0d case: Pause learning until either input or target field is active
+        auto targetSigmoid = this->mSigmoidH->getValue()->compute(mAssoInput->getData());
+        auto inputSigmoid = this->mSigmoidF->getValue()->compute(mReadOutTrigger->getData());
+        if (mInputDimension->getValue() == 0 && mAssociationDimension->getValue() == 0)
+        {
+          if (inputSigmoid.at<float>(0, 0) < 0.5 && targetSigmoid.at<float>(0, 0) < 0.5)
+          {
+            mIsRewarded = false;
+          }
+        }
       }
       //Count the time the reward is present
       float curTime = time / cedar::unit::Time(1 * cedar::unit::milli * cedar::unit::seconds);
@@ -671,6 +695,8 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::steps::HebbianConnection::determineI
 
 void cedar::dyn::steps::HebbianConnection::reset()
 {
+  resetWeightedTargetOutput();
+  mWeightOutput->setData(cv::Mat::zeros(mWeightSizeX, mWeightSizeY, CV_32F));
 }
 
 void cedar::dyn::steps::HebbianConnection::resetWeights()

@@ -38,6 +38,8 @@
 
 ======================================================================================================================*/
 
+#define BOOST_TIMER_ENABLE_DEPRECATED
+
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/layout/Layout.h"

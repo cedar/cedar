@@ -71,6 +71,10 @@ public:
 public:
   void inputConnectionChanged(const std::string& inputName);
 
+  void writeConfigurationXML(cedar::aux::ConfigurationNode& root) const;
+
+  bool isXMLExportable(std::string& errorMsg) override;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

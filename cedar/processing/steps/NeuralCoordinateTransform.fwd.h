@@ -22,47 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Layout.cpp
+    File:        NeuralCoordinateTransform.fwd.h
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
-    Date:        2022 08 16
+    Maintainer:  Yogeshwar Agnihotri
+    Email:       yogeshwar.agnihotri@ini.ruhr-uni-bochum.de
+    Date:        2023 05 03
 
-    Description: Source file for the class cedar::proc::gui::layout::Layout.
+    Description: Forward declaration file for the class cedar::proc::steps::NeuralCoordinateTransform.
 
     Credits:
 
 ======================================================================================================================*/
 
-#define BOOST_TIMER_ENABLE_DEPRECATED
+#ifndef CEDAR_PROC_STEPS_NEURAL_COORDINATE_TRANSFORM_FWD_H
+#define CEDAR_PROC_STEPS_NEURAL_COORDINATE_TRANSFORM_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-// CLASS HEADER
-#include "cedar/processing/gui/layout/Layout.h"
-
 // CEDAR INCLUDES
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::layout::Layout::Layout()
+namespace cedar
 {
+  namespace proc
+  {
+    namespace steps
+    {
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_PROC_CLASS(NeuralCoordinateTransform);
+      //!@endcond
+    }
+  }
 }
 
-cedar::proc::gui::layout::Layout::~Layout()
-{
-}
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
+#endif // CEDAR_PROC_STEPS_NEURAL_COORDINATE_TRANSFORM_FWD_H
 
-void cedar::proc::gui::layout::Layout::setGroup(cedar::proc::gui::Group* pGroup)
-{
-  this->mpGroup = pGroup;
-}

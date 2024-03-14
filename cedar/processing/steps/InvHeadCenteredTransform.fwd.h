@@ -22,47 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Layout.cpp
+    File:        DistanceImageCoordinateTransform.fwd.h
 
-    Maintainer:  Lars Janssen
-    Email:       lars.janssen@ini.rub.de
-    Date:        2022 08 16
+    Maintainer:  Stephan Sehring
+    Email:       stephan.sehring@rub.de
+    Date:        2024 02 16
 
-    Description: Source file for the class cedar::proc::gui::layout::Layout.
+    Description: Caren camera to head centered transform inverse
 
     Credits:
 
 ======================================================================================================================*/
 
-#define BOOST_TIMER_ENABLE_DEPRECATED
+#ifndef CEDAR_PROC_STEPS_INV_HEAD_CENTERED_TRANSFORM_FWD_H
+#define CEDAR_PROC_STEPS_INV_HEAD_CENTERED_TRANSFORM_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-// CLASS HEADER
-#include "cedar/processing/gui/layout/Layout.h"
-
 // CEDAR INCLUDES
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::layout::Layout::Layout()
+namespace cedar
 {
+  namespace proc
+  {
+    namespace steps
+    {
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_PROC_CLASS(InvHeadCenteredTransform);
+      //!@endcond
+    }
+  }
 }
 
-cedar::proc::gui::layout::Layout::~Layout()
-{
-}
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
+#endif // CEDAR_PROC_STEPS_INV_HEAD_CENTERED_TRANSFORM_FWD_H
 
-void cedar::proc::gui::layout::Layout::setGroup(cedar::proc::gui::Group* pGroup)
-{
-  this->mpGroup = pGroup;
-}

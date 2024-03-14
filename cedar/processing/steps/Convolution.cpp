@@ -49,7 +49,7 @@
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/convolution/FFTW.h"
 #include "cedar/auxiliaries/convolution/ArrayFire.h"
-
+#include "cedar/auxiliaries/kernel/Gauss.h"
 // SYSTEM INCLUDES
 #include <iostream>
 #include <vector>
@@ -346,6 +346,14 @@ void cedar::proc::steps::Convolution::readConfiguration(const cedar::aux::Config
 }
 
 bool cedar::proc::steps::Convolution::isXMLExportable(std::string& errorMsg){
+  for(int i = 0; i < this->_mKernels->size(); i++)
+  {
+    if(!dynamic_cast<cedar::aux::kernel::Gauss*>(this->_mKernels->at(i).get()))
+    {
+      errorMsg = "The XML export only supports Gauss kernel for Convolution steps.";
+      return false;
+    }
+  }
   return cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportable(this, errorMsg);
 }
 

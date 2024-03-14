@@ -43,6 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
+#include "cedar/processing/Connectable.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/GroupXMLFileFormatV1.fwd.h"
@@ -51,9 +52,11 @@
 #include "cedar/auxiliaries/Configurable.fwd.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.fwd.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.fwd.h"
+#include "cedar/dynamics/steps/HebbianConnection.fwd.h"
 #include "cedar/processing/steps/SynapticConnection.fwd.h"
-#include "cedar/processing/Connectable.fwd.h"
+#include "cedar/processing/steps/ComponentMultiply.fwd.h"
 #include "cedar/processing/DataConnection.fwd.h"
+#include "cedar/processing/Element.fwd.h"
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/ProjectionMappingParameter.fwd.h"
 #include "cedar/processing/Step.fwd.h"
@@ -170,6 +173,15 @@ private:
   // Returns true if provided step is on the blacklist for the common export for steps
   bool isStepBlacklisted(cedar::proc::Connectable* step) const;
 
+  // Returns true if provided connection contains steps on the blacklist for the common export for steps
+  bool isConnectionBlacklisted(cedar::proc::DataConnection* connection) const;
+
+  // Marks all steps that should not be exported normally as blacklisted
+  void markBlacklistedSteps(cedar::proc::ConstGroupPtr group);
+
+  // Checks if given step is chainable
+  static bool isChainable(cedar::proc::ElementPtr element);
+
   // Checks if a synaptic connection chain is exportable (chain of StaticGain/Projection/Convolution)
   static bool isSynapticConnectionChainExportableRecursive(cedar::proc::Connectable* chainSource, bool hasStaticGain,
                                                   bool hasConvolution, bool hasProjection);
@@ -182,6 +194,17 @@ private:
   /*!@brief Writes the data connections in the group to the configuration node.
    */
   void writeSynapticConnections(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
+
+  /*!@brief Writes a hebbian connection to the configuration node.
+   */
+  void writeHebbianConnection(cedar::aux::ConfigurationNode& root,
+                               const cedar::proc::ConnectablePtr connection) const;
+  void writeComponentMultiplyConnection(cedar::aux::ConfigurationNode& root,
+                              const cedar::proc::ConnectablePtr connection) const;
+
+  /*!@brief Writes the hebbian connections in the group to the configuration node.
+   */
+  void writeHebbianConnections(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief Writes a chained synaptic connection to the configuration node.
    */
@@ -218,6 +241,11 @@ private:
   //!@brief: these are for switching between cedar and xml dft architecture naming conventions
   static boost::bimap<std::string, std::string> stepNameLookupTableXML;
   static boost::bimap<std::string, std::string> transferFunctionNameLookupTableXML;
+
+  static std::vector<std::string> chainableSteps;
+
+  std::vector<std::string> mBlacklistedSteps;
+  static std::vector<std::string> mBlacklistedClassIDs;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,35 +22,47 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StaticGain.h
+    File:        DistanceImageCoordinateTransform.fwd.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 06 26
+    Maintainer:  Stephan Sehring
+    Email:       stephan.sehring@rub.de
+    Date:        2024 02 16
 
-    Description:
+    Description: Caren camera to head centered transform
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_SUM_H
-#define CEDAR_PROC_STEPS_SUM_H
+#ifndef CEDAR_PROC_STEPS_HEAD_CENTERED_TRANSFORM_H
+#define CEDAR_PROC_STEPS_HEAD_CENTERED_TRANSFORM_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/IntVectorParameter.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/processing/Step.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/steps/HeadCenteredTransform.fwd.h"
 #include "cedar/auxiliaries/MatData.fwd.h"
-#include "cedar/processing/steps/Sum.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief   This is a step that sums up a number of inputs.
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::proc::steps::Sum : public cedar::proc::Step
+class cedar::proc::steps::HeadCenteredTransform: public cedar::proc::Step
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -60,23 +72,16 @@ class cedar::proc::steps::Sum : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Sum();
+  HeadCenteredTransform();
+
+  //!@brief Destructor
+  virtual ~HeadCenteredTransform();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Updates the output matrix.
-  void compute(const cedar::proc::Arguments& arguments);
-
-  /*! A helper function that calculates the sum of all matrices in the given slot.
-   *
-   * @remarks This function assumes that the output matrix, sum, is initialized to the appropriate size, and that all
-   *          matrices in the slot are the same size (0D matrices are treated as scalar additions).
-   */
-  static void sumSlot(cedar::proc::ExternalDataPtr slot, cv::Mat& sum, bool lock = false);
-
-  bool isXMLExportable(std::string& errorMsg) override;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -88,20 +93,50 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief Method that is called whenever an input is connected to the Connectable.
-  virtual void inputConnectionChanged(const std::string& inputName);
+  void compute(const cedar::proc::Arguments& arguments);
+
+  void inputConnectionChanged(const std::string& inputName);
+
+  cv::Mat computeAllocentricRepresentation(cv::Mat distanceImage,float rollRad,float tiltRad, float panRad);
+
+  cv::Matx33f calculateRotationMatrix(float rollRad,float tiltRad, float panRad);
+
+private slots:
+  void outputSizeChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief The input slot containing all the terms.
-  cedar::proc::ExternalDataPtr mInputs;
+  // none yet
+private:
+    cedar::aux::MatDataPtr mAlloOutput;
 
-  //!@brief The data containing the output.
-  cedar::aux::MatDataPtr mOutput;
+    cedar::aux::ConstMatDataPtr mDistanceImageInput;
+    cedar::aux::ConstMatDataPtr mPanInput;
+    cedar::aux::ConstMatDataPtr mTiltInput;
+    cedar::aux::ConstMatDataPtr mRollInput;
+
+    std::string mDistanceImageInputName = "distance image";
+    std::string mPanInputName = "camera pan (deg)";
+    std::string mTiltInputName = "camera tilt (deg)";
+    std::string mRollInputName = "camera roll (deg)";
+    std::string mAlloOutputName = "HeadCentered representation";
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+  cedar::aux::DoubleParameterPtr mTiltJointDistance;
+  cedar::aux::DoubleVectorParameterPtr mCameraFrustrumAngleDeg;
+  cedar::aux::DoubleParameterPtr mCameraFocalLength;
+
+  cedar::aux::IntVectorParameterPtr mOutputSizes;
 
 private:
   // none yet
-}; // class cedar::proc::steps::Sum
 
-#endif // CEDAR_PROC_STEPS_SUM_H
+}; // class cedar::proc::steps::HeadCenteredTransform
+
+#endif // CEDAR_PROC_STEPS_HEAD_CENTERED_TRANSFORM_H
+
