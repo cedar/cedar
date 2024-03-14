@@ -846,7 +846,7 @@ void cedar::proc::GroupFileFormatV1::readTriggers
 
               auto loopMode = loopedTrigger->getLoopModeParameter().id();
               //Heuristic: If any Loopedtrigger was running in realTime, they all have to run in real time.
-              if (!(loopMode == cedar::aux::LoopMode::FakeDT || loopMode == cedar::aux::LoopMode::FakeDTSync || loopMode == cedar::aux::LoopMode::Simulated))
+              if (!(loopMode == cedar::aux::LoopMode::FakeDT || loopMode == cedar::aux::LoopMode::Simulated))
               {
                       //Any of the other realtime variants
                       //cedar::aux::GlobalClockSingleton::getInstance()->setLoopMode(cedar::aux::LoopMode::RealDT); // This might not be required ultimately

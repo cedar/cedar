@@ -269,7 +269,7 @@ void cedar::aux::LoopedThread::makeParametersConst(bool makeConst)
 
   if(!makeConst) //parameters should be made available again
   {
-    this->_mUseDefaultCPUStep->setConstant(this->_mLoopMode->getValue() == cedar::aux::LoopMode::FakeDT || this->_mLoopMode->getValue() == cedar::aux::LoopMode::FakeDTSync);
+    this->_mUseDefaultCPUStep->setConstant(this->_mLoopMode->getValue() == cedar::aux::LoopMode::FakeDT);
   } else
   {
     this->_mUseDefaultCPUStep->setConstant(makeConst);
@@ -400,6 +400,7 @@ cedar::aux::detail::ThreadWorker* cedar::aux::LoopedThread::resetWorker()
 
 void cedar::aux::LoopedThread::modeChanged()
 {
+
   //todo: Either Remove or use this function!
 
   //Todo: It should also have been a function in Trigger in the first place right?

@@ -49,7 +49,6 @@
 // SYSTEM INCLUDES
 #include "thread"
 #include "atomic"
-#include <chrono>
 
 /*!@todo describe.
  *

@@ -50,7 +50,6 @@
 #include "cedar/processing/steps/Convolution.h"
 #include "cedar/processing/steps/Sum.h"
 #include "cedar/auxiliaries/convolution/FFTW.h"
-#include "cedar/auxiliaries/convolution/ArrayFire.h"
 #include "cedar/processing/steps/Projection.h"
 #include "cedar/auxiliaries/Configurable.h"
 
@@ -533,15 +532,13 @@ void cedar::proc::steps::SynapticConnection::transferKernelsToConvolution(cedar:
 void cedar::proc::steps::SynapticConnection::convolutionInputDimensionalityChanged()
 {
   unsigned int new_dimensionality = this->convolutionGetDimensionality();
+#ifdef CEDAR_USE_FFTW
+  if (new_dimensionality >= 3)
+  {
+    this->mConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
+  }
+#endif // CEDAR_USE_FFTW
 
-    if (new_dimensionality >= 3)
-    {
-#ifdef CEDAR_USE_ARRAYFIRE
-        this->mConvolution->setEngine(cedar::aux::conv::ArrayFirePtr(new cedar::aux::conv::ArrayFire()));
-#elif defined(CEDAR_USE_FFTW)
-        this->mConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
-#endif //CEDAR_USE_ARRAYFIRE
-    }
 
   for (size_t i = 0; i < this->mKernelsParameter->size(); ++i)
   {

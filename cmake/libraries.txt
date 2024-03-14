@@ -195,22 +195,6 @@ else(Boost_FOUND)
   You can try to alter the default search paths in cedar.conf.")
 endif()
 
-option(CEDAR_USE_ARRAYFIRE "Use ArrayFire." ON)
-message("-- Searching for ArrayFire...")
-FIND_PACKAGE(ArrayFire)
-if(ArrayFire_FOUND)
-  if (CEDAR_VERBOSE_BUILD_SYSTEM)
-    message("   ArrayFire was found in ${ArrayFire_INCLUDE_DIRS}")
-  else()
-    message("-- ArrayFire was found")
-  endif()
-  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${ArrayFire_Unified_LIBRARIES})
-  include_directories(${ArrayFire_INCLUDE_DIRS})
-else(ArrayFire_FOUND)
-  message("-- ArrayFire not found.")
-  set(CEDAR_USE_ARRAYFIRE OFF)
-endif(ArrayFire_FOUND)
-
 # OpenCV
 message("-- Searching for OpenCV...")
 set (OpenCV_DIR ${CEDAR_OPENCV_CMAKE_DIR})
@@ -243,7 +227,8 @@ set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
           message("-- QGLViewer not found.")
           set(CEDAR_USE_QGLVIEWER OFF)
     endif(QGLViewer_FOUND)
-
+    
+    
     option(CEDAR_USE_GLEW "Use GLEW." ON)
         message("-- Searching for GLEW...")
         find_package(GLEW REQUIRED)

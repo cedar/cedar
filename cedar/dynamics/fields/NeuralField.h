@@ -60,9 +60,6 @@
 #include "cedar/dynamics/fields/NeuralField.fwd.h"
 
 // SYSTEM INCLUDES
-#ifdef CEDAR_USE_ARRAYFIRE
-#include <arrayfire.h>
-#endif //CEDAR_USE_ARRAYFIRE
 
 
 /*!@brief An implementation of Neural Fields for the processing framework.
@@ -212,11 +209,7 @@ protected:
    * \f]
    */
   void eulerStep(const cedar::unit::Time& time);
-#ifdef CEDAR_USE_ARRAYFIRE
-  void eulerStepAF(const cedar::unit::Time& time);
-  af::array mat2af(const cv::Mat& mat, bool kernel = false);
-  void af2mat(const af::array& af, cv::Mat& mat);
-#endif //CEDAR_USE_ARRAYFIRE
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -304,11 +297,6 @@ private:
   boost::signals2::connection mKernelAddedConnection;
   boost::signals2::connection mKernelRemovedConnection;
   bool mIsActive;
-
-#ifdef CEDAR_USE_ARRAYFIRE
-  af::array af_u;
-  af::array af_kernel;
-#endif //CEDAR_USE_ARRAYFIRE
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

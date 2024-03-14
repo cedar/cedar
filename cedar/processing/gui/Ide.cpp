@@ -551,8 +551,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
     this->mpSimulationModeComboBox = new QComboBox;
     this->mpSimulationModeComboBox->setToolTip("Choose to run the architecture in simulated or real time");
     this->mpSimulationModeComboBox->insertItem(0,QString::fromStdString("Simulated Time"));
-    this->mpSimulationModeComboBox->insertItem(1,QString::fromStdString("Simulated Time (sync)"));
-    this->mpSimulationModeComboBox->insertItem(2,QString::fromStdString("Real Time"));
+    this->mpSimulationModeComboBox->insertItem(1,QString::fromStdString("Real Time"));
     this->mpSimulationModeComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
     this->mpToolBar->insertWidget(this->mpActionRecord, this->mpSimulationModeComboBox);
@@ -1018,7 +1017,7 @@ void cedar::proc::gui::Ide::setSimulationControlsEnabled(bool enabled)
   this->mpActionResetSimulation->setEnabled(enabled);
   this->mpActionUndo->setEnabled(enabled);
   this->mpActionRedo->setEnabled(enabled);
-  this->mpThreadsSingleStep->setEnabled(enabled && (cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT || cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDTSync));
+  this->mpThreadsSingleStep->setEnabled(enabled && cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT);
 }
 
 void cedar::proc::gui::Ide::buildStatusBar()
@@ -1155,8 +1154,8 @@ void cedar::proc::gui::Ide::mpSimulationModeCheckBoxChanged( bool newValue)
 
 void cedar::proc::gui::Ide::simulationModeComboBoxChanged(int newIndex)
 {
-  //std::cout<<"Ide::simulationModeComboBoxChanged index: " << newIndex << std::endl;
-  if(newIndex == 2 ) //For now Zero is the default index, which is simulated Time. Todo:Use an Enum for the mode
+//  std::cout<<"Ide::simulationModeComboBoxChanged index: " << newIndex << std::endl;
+  if(newIndex != 0 ) //For now Zero is the default index, which is simulated Time. Todo:Use an Enum for the mode
   {
     //Case RealTime
     this->mpSimulatedTimeStepSlider->setEnabled(false);
@@ -1168,22 +1167,6 @@ void cedar::proc::gui::Ide::simulationModeComboBoxChanged(int newIndex)
       this->mGroup->getGroup()->setLoopMode(cedar::aux::LoopMode::RealDT);
     }
 
-  }
-  else if(newIndex == 1 )
-  {
-    //Case Simulated Time (sync)
-    this->mpSimulatedTimeStepSlider->setEnabled(true);
-    this->mpSimulatedTimeStepSpinBox->setEnabled(true);
-
-    if(this->mGroup)
-    {
-      this->mGroup->getGroup()->setLoopMode(cedar::aux::LoopMode::FakeDTSync);
-    }
-
-    QReadLocker locker(this->mSimulationRunning.getLockPtr());
-    bool running = this->mSimulationRunning.member();
-
-    this->mpThreadsSingleStep->setEnabled(!running);
   }
   else
   {
@@ -1201,7 +1184,6 @@ void cedar::proc::gui::Ide::simulationModeComboBoxChanged(int newIndex)
 
     this->mpThreadsSingleStep->setEnabled(!running);
   }
-  resetSimulationClicked();
 }
 
 void cedar::proc::gui::Ide::simulatedTimeStepSliderChanged(int newValue)
@@ -2160,8 +2142,8 @@ void cedar::proc::gui::Ide::allTriggersStopped()
   this->updateSimulationRunningIcon(this->mSimulationRunning.member());
 
   this->mpSimulationModeComboBox->setEnabled(true);
-  this->mpSimulatedTimeStepSlider->setEnabled(mpSimulationModeComboBox->currentIndex() == 0 || mpSimulationModeComboBox->currentIndex() == 1);
-  this->mpSimulatedTimeStepSpinBox->setEnabled(mpSimulationModeComboBox->currentIndex() == 0 || mpSimulationModeComboBox->currentIndex() == 1);
+  this->mpSimulatedTimeStepSlider->setEnabled(mpSimulationModeComboBox->currentIndex() == 0);
+  this->mpSimulatedTimeStepSpinBox->setEnabled(mpSimulationModeComboBox->currentIndex() == 0);
 }
 
 void cedar::proc::gui::Ide::updateSimulationRunningIcon(bool running)
@@ -2180,7 +2162,7 @@ void cedar::proc::gui::Ide::updateSimulationRunningIcon(bool running)
   {
     this->mpActionStartPauseSimulation->setIcon(QIcon(":/cedar/auxiliaries/gui/start.svg"));
 //    this->mpThreadsSingleStep->setEnabled(true);
-    this->mpThreadsSingleStep->setEnabled(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT || cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDTSync);
+    this->mpThreadsSingleStep->setEnabled(cedar::aux::GlobalClockSingleton::getInstance()->getLoopMode() == cedar::aux::LoopMode::FakeDT);
   }
 }
 
@@ -2936,7 +2918,6 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   #ifdef CEDAR_USE_COPY
   this->mpCopy->setScene(this->mpProcessingDrawer->getScene());
   #endif
-  resetSimulationClicked();
 }
 
 void cedar::proc::gui::Ide::recentFileItemTriggered()
@@ -3383,9 +3364,6 @@ void cedar::proc::gui::Ide::processLoopModeChangedSignal(cedar::aux::LoopMode::I
     case cedar::aux::LoopMode::Fixed:
     case cedar::aux::LoopMode::FixedAdaptive:
     case cedar::aux::LoopMode::RealTime:
-      this->mpSimulationModeComboBox->setCurrentIndex(2);
-      break;
-    case cedar::aux::LoopMode::FakeDTSync:
       this->mpSimulationModeComboBox->setCurrentIndex(1);
       break;
     default:

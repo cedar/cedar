@@ -39,7 +39,6 @@
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/exceptions.h"
-#include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -210,10 +209,6 @@ cedar::proc::ConstLoopedTriggerPtr cedar::proc::Triggerable::getLoopedTrigger() 
     CEDAR_THROW(cedar::proc::LoopStateException, "Only looped triggerables have a looped trigger.");
   }
   return this->mLoopedTrigger.lock();
-}
-
-void cedar::proc::Triggerable::preTrigger()
-{
 }
 
 void cedar::proc::Triggerable::callOnStart()

@@ -45,9 +45,6 @@ set(BOOST_ROOT "C:/boost_1_65_0/boost")
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_DEBUG ON)
-set(ArrayFire_DIR "C:/Program Files/ArrayFire/v3/cmake")
-set(ArrayFire_LIBRARYDIR "C:/Program Files/ArrayFire/v3/lib")
-link_directories(${ArrayFire_LIBRARYDIR})
 endif(WIN32)
 
 # general options

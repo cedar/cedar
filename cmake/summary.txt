@@ -145,7 +145,6 @@ message("")
 
 cedar_summary_h3("Misc. Libraries")
 
-cedar_summary_lib_found("ArrayFire" ArrayFire_FOUND)
 cedar_summary_lib_found("GLEW" GLEW_FOUND)
 cedar_summary_lib_found("QGLViewer" QGLViewer_FOUND)
 if(CEDAR_USE_FFTW_THREADED)

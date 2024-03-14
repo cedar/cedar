@@ -45,7 +45,6 @@
 #include "cedar/processing/Trigger.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/units/Time.h"
-#include "cedar/auxiliaries/LoopMode.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/LoopedTrigger.fwd.h"
@@ -54,11 +53,6 @@
 // SYSTEM INCLUDES
 #include <vector>
 #include <QObject>
-#ifdef CEDAR_USE_QT5
-#include <QtConcurrent/QtConcurrentRun>
-#else
-#include <QtConcurrentRun>
-#endif
 
 /*!@brief A Trigger that sends trigger events in a constant loop.
  *
