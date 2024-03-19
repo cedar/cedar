@@ -259,6 +259,10 @@ void cedar::proc::experiment::Experiment::stopExperiment()
   std::string time_stamp = cedar::aux::RecorderSingleton::getInstance()->getTimeStamp();
   cedar::aux::LogSingleton::getInstance()->message("Experiment stopped. Timestamp: " + time_stamp, "Experiment");
   this->removeLog();
+  if (this->getRepeating())
+  {
+    startExperiment();
+  }
 }
 
 void cedar::proc::experiment::Experiment::startTrial()
@@ -338,14 +342,7 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset, bool st
   }
   this->mCurrentTrial++;
 
-  // reset the trial number if the actual trial exceeds the number of wanted trials
-  if (this->mCurrentTrial >_mTrials->getValue())
-  {
-    if (this->getRepeating())
-    {
-      mCurrentTrial = 0;
-    }
-  }
+
   this->postExperiment();
   mTrialIsRunning = false;
 }
@@ -471,7 +468,7 @@ cedar::proc::GroupPtr cedar::proc::experiment::Experiment::getGroup()
 
 bool cedar::proc::experiment::Experiment::hasMoreTrials() const
 {
-  if (this->mCurrentTrial < _mTrials->getValue() || this->getRepeating())
+  if (this->mCurrentTrial < _mTrials->getValue())
   {
     return true;
   }
