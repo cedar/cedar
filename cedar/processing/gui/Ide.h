@@ -144,8 +144,6 @@ public:
   //! Adds command line options that are processed by the IDE to the given command line parser.
   static void addCommandLineOptionsTo(cedar::aux::CommandLineParser& parser);
 
-  void setSimulationControlsEnabled(bool enabled);
-
 public slots:
   //!@brief
   void togglePlotGroupActions();
@@ -355,6 +353,9 @@ public slots:
 
   //! Locks the UI, i.e., prevents users from moving around the log and other such docks.
   void lockUI(bool lock);
+
+  //Sets Button States
+  void setSimulationControlsEnabled(bool enabled);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

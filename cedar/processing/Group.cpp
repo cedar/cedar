@@ -1152,12 +1152,7 @@ void cedar::proc::Group::reset()
 
     if (app && this->isRoot())
     {
-        auto pointer = dynamic_cast< cedar::proc::gui::IdeApplication* >(app);
-        if (pointer)
-        {
-            auto ide = pointer->getIde();
-            ide->setSimulationControlsEnabled(false);
-        }
+      emit this->setSimulationControlsEnabled(false);
     }
 
   //auto looped_triggers = this->findAll<cedar::proc::LoopedTrigger>(true);
@@ -1187,12 +1182,7 @@ void cedar::proc::Group::reset()
 
     if (app && this->isRoot())
     {
-        auto pointer = dynamic_cast< cedar::proc::gui::IdeApplication* >(app);
-        if (pointer)
-        {
-            auto ide = pointer->getIde();
-            ide->setSimulationControlsEnabled(true);
-        }
+        emit this->setSimulationControlsEnabled(true);
     }
 
   //JT: Why was this not using start triggers?
@@ -1205,6 +1195,7 @@ void cedar::proc::Group::reset()
   //{
   //  trigger->start();
   //}
+
 }
 
 const cedar::proc::Group::ElementMap& cedar::proc::Group::getElements() const

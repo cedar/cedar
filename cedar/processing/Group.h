@@ -145,6 +145,10 @@ public:
   };
 
 signals:
+
+  //! signals to reset buttons.
+  void setSimulationControlsEnabled(const bool& enabled);
+
   //! Signals when a step name changes.
   void stepNameChanged(const std::string& from, const std::string& to);
 

@@ -844,7 +844,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
 #ifdef CEDAR_USE_COPY
   //send Scene to CoPYWidget
-  mpCopy->setScene(mpProcessingDrawer->getScene());
+  mpCopy->setScene(this->mpProcessingDrawer->getScene());
   mpProcessingDrawer->getScene()->setCoPYWidget(mpCopy);
 #endif
 #ifdef CEDAR_USE_PYTHONSTEP
@@ -2917,6 +2917,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   this->mpProcessingDrawer->setWidgets(this, this->mpPropertyTable, this->mpRecorderWidget,this->mpCommentWidget, this->mpCodeWidget);
   #ifdef CEDAR_USE_COPY
   this->mpCopy->setScene(this->mpProcessingDrawer->getScene());
+  this->mpProcessingDrawer->getScene()->setCoPYWidget(mpCopy);
   #endif
 }
 
@@ -3197,6 +3198,7 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   this->mGroup = group;
   this->mGroup->toggleTriggerColors(this->mpActionToggleTriggerColor->isChecked());
 
+  QObject::connect(this->mGroup->getGroup().get(), SIGNAL(setSimulationControlsEnabled(const bool &)), this, SLOT(setSimulationControlsEnabled(bool)));
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(triggerStarted()), this, SLOT(triggerStarted()));
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(allTriggersStopped()), this, SLOT(allTriggersStopped()));
 
