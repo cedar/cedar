@@ -105,7 +105,8 @@ cedar::dyn::steps::HebbianConnection::HebbianConnection()
         mLearningRule(
                 new cedar::aux::EnumParameter(this, "learning rule", cedar::dyn::steps::HebbianConnection::LearningRule::typePtr(),
                                               LearningRule::OJA)),
-        mTau(new cedar::aux::DoubleParameter(this, "time scale", 20.0)),
+        mTau(new cedar::aux::DoubleParameter(this, "time scale", 0.0)),
+        mTauDecay(new cedar::aux::DoubleParameter(this, "time scale decay", 0.0)),
       mInputDimension(new cedar::aux::UIntParameter(this, "source dimension", 1, 0, 3)),
       mInputSizes(new cedar::aux::UIntVectorParameter(this, "source sizes", 1, 50,cedar::aux::UIntParameter::LimitType::positive(5000))),
       mAssociationDimension(new cedar::aux::UIntParameter(this, "target dimension", 2, 0, 3)),
@@ -401,6 +402,7 @@ void cedar::dyn::steps::HebbianConnection::updateLearningRule()
       mAssociationDimension->setMaximum(2);
       mSetWeights->setConstant(false);
       mTau->setConstant(false);
+      mTauDecay->setConstant(false);
       //Unfortunately no iteration
       mTauWeights->setConstant(true);
       mTauTheta->setConstant(true);
@@ -419,6 +421,7 @@ void cedar::dyn::steps::HebbianConnection::updateLearningRule()
       mSetWeights->setValue(false);
       mSetWeights->setConstant(true);
       mTau->setConstant(true);
+      mTauDecay->setConstant(true);
 
 //      auto bcmParameterList = mBcmParameterGroup->getParameters(); //THIS CALL CRASHES. WHY?
 //      for(auto parameter:mBcmParameterGroup->getParameters())
@@ -906,20 +909,49 @@ cv::Mat cedar::dyn::steps::HebbianConnection::calculateWeightChange(const cedar:
   {
     case cedar::dyn::steps::HebbianConnection::LearningRule::OJA:
     {
-      float timeFactor = (delta_t / cedar::unit::Time(
-          mTau->getValue() * cedar::unit::milli * cedar::unit::seconds));
-
       //One case is outstar the other instar
       if (mInputDimension->getValue() == 0) // The old case! && And the 0 to 0 case! Be careful!
       {
-        return timeFactor * (learnRate * inputSigmoid.at<float>(0, 0) * rewardSigValue.at<float>(0, 0) *
-               (targetSigmoid - currentWeights));
+        cv::Mat weightChangeMat = cv::Mat::zeros(mWeightSizeX, mWeightSizeY, CV_32F);
+        for (unsigned int x = 0; x < mWeightSizeX; x++)
+        {
+          for (unsigned int y = 0; y < mWeightSizeY; y++)
+          {
+            if(mTau->getValue() > 0 && mTauDecay->getValue() == 0) {
+              auto timeFactor = (delta_t / cedar::unit::Time(mTau->getValue() * cedar::unit::milli * cedar::unit::seconds));
+              weightChangeMat.at<float>(x, y) = timeFactor * (learnRate * inputSigmoid.at<float>(0, 0) * rewardSigValue.at<float>(0, 0) * (targetSigmoid.at<float>(x, y) - currentWeights.at<float>(x, y)));
+            } else if(mTau->getValue() > 0 && mTauDecay->getValue() > 0) {
+              auto timeFactor1 = (delta_t / cedar::unit::Time(mTau->getValue() * cedar::unit::milli * cedar::unit::seconds)) * targetSigmoid.at<float>(x, y);
+              auto timeFactor2 = (delta_t / cedar::unit::Time(mTauDecay->getValue() * cedar::unit::milli * cedar::unit::seconds)) * (1 - targetSigmoid.at<float>(x, y));
+              weightChangeMat.at<float>(x, y) = (timeFactor1 + timeFactor2) * (learnRate * inputSigmoid.at<float>(0, 0) * rewardSigValue.at<float>(0, 0) * (targetSigmoid.at<float>(x, y) - currentWeights.at<float>(x, y)));
+            } else {
+              weightChangeMat.at<float>(x, y) = (learnRate * inputSigmoid.at<float>(0, 0) * rewardSigValue.at<float>(0, 0) * (targetSigmoid.at<float>(x, y) - currentWeights.at<float>(x, y)));
+            }
+          }
+        }
+        return weightChangeMat;
       }
 
       if (mAssociationDimension->getValue() == 0) // The reverse case
       {
-        return timeFactor * (learnRate * rewardSigValue.at<float>(0, 0) * targetSigmoid.at<float>(0, 0) *
-               (inputSigmoid - currentWeights));
+        cv::Mat weightChangeMat = cv::Mat::zeros(mWeightSizeX, mWeightSizeY, CV_32F);
+        for (unsigned int x = 0; x < mWeightSizeX; x++)
+        {
+          for (unsigned int y = 0; y < mWeightSizeY; y++)
+          {
+            if(mTau->getValue() > 0 && mTauDecay->getValue() == 0) {
+              auto timeFactor = (delta_t / cedar::unit::Time(mTau->getValue() * cedar::unit::milli * cedar::unit::seconds));
+              weightChangeMat.at<float>(x, y) = timeFactor * (learnRate * targetSigmoid.at<float>(0, 0) * rewardSigValue.at<float>(0, 0) * (inputSigmoid.at<float>(x, y) - currentWeights.at<float>(x, y)));
+            } else if(mTau->getValue() > 0 && mTauDecay->getValue() > 0) {
+              auto timeFactor1 = (delta_t / cedar::unit::Time(mTau->getValue() * cedar::unit::milli * cedar::unit::seconds)) * inputSigmoid.at<float>(x, y);
+              auto timeFactor2 = (delta_t / cedar::unit::Time(mTauDecay->getValue() * cedar::unit::milli * cedar::unit::seconds)) * (1 - inputSigmoid.at<float>(x, y));
+              weightChangeMat.at<float>(x, y) = (timeFactor1 + timeFactor2) * (learnRate * targetSigmoid.at<float>(0, 0) * rewardSigValue.at<float>(0, 0) * (inputSigmoid.at<float>(x, y) - currentWeights.at<float>(x, y)));
+            } else {
+              weightChangeMat.at<float>(x, y) = (learnRate * targetSigmoid.at<float>(0, 0) * rewardSigValue.at<float>(0, 0) * (inputSigmoid.at<float>(x, y) - currentWeights.at<float>(x, y)));
+            }
+          }
+        }
+        return weightChangeMat;
       }
 
       if (mAssociationDimension->getValue() == 1 && mInputDimension->getValue() == 1)
@@ -930,9 +962,22 @@ cv::Mat cedar::dyn::steps::HebbianConnection::calculateWeightChange(const cedar:
         {
           for (unsigned int y = 0; y < mWeightSizeY; y++)
           {
-            float combinedValue = inputSigmoid.at<float>(x, 0) * targetSigmoid.at<float>(y, 0);
-            float weightChange = learnRate * (combinedValue - currentWeights.at<float>(x, y));
-            weightChangeMat.at<float>(x, y) = timeFactor * weightChange;
+            if(mTau->getValue() > 0 && mTauDecay->getValue() == 0) {
+              auto timeFactor = (delta_t / cedar::unit::Time(mTau->getValue() * cedar::unit::milli * cedar::unit::seconds));
+              float combinedValue = inputSigmoid.at<float>(x, 0) * targetSigmoid.at<float>(y, 0);
+              float weightChange = learnRate * (combinedValue - currentWeights.at<float>(x, y));
+              weightChangeMat.at<float>(x, y) = timeFactor * weightChange;
+            } else if(mTau->getValue() > 0 && mTauDecay->getValue() > 0) {
+              float combinedValue = inputSigmoid.at<float>(x, 0) * targetSigmoid.at<float>(y, 0);
+              auto timeFactor1 = (delta_t / cedar::unit::Time(mTau->getValue() * cedar::unit::milli * cedar::unit::seconds)) * combinedValue;
+              auto timeFactor2 = (delta_t / cedar::unit::Time(mTauDecay->getValue() * cedar::unit::milli * cedar::unit::seconds)) * (1 - combinedValue);
+              float weightChange = learnRate * (combinedValue - currentWeights.at<float>(x, y));
+              weightChangeMat.at<float>(x, y) =  (timeFactor1 + timeFactor2) * weightChange;
+            } else {
+              float combinedValue = inputSigmoid.at<float>(x, 0) * targetSigmoid.at<float>(y, 0);
+              float weightChange = learnRate * (combinedValue - currentWeights.at<float>(x, y));
+              weightChangeMat.at<float>(x, y) =  weightChange;
+            }
           }
         }
         return weightChangeMat;
