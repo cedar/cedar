@@ -883,18 +883,18 @@ void cedar::proc::GroupXMLFileFormatV1::readKernelListParameter(
   {
     cedar::aux::ConfigurationNode gaussWeightPattern = iter->second;
 
+    //The sigma string is concatinated by ",", therefore split them and set the Sigma of the kernel
+    std::vector<std::string> sigmas;
+    cedar::aux::split(gaussWeightPattern.get<std::string>("Sigmas"), ",", sigmas);
+
     //Create a new kernel that is pushed onto the ObjectListParameterTemplate
-    cedar::aux::kernel::GaussPtr kernel (new cedar::aux::kernel::Gauss());
+    cedar::aux::kernel::GaussPtr kernel (new cedar::aux::kernel::Gauss(sigmas.size()));
 
     //Get the "height" (in cedar "amplitude")
     kernel->setAmplitude(gaussWeightPattern.get<double>("Height"));
 
     // Set normalized to false
     kernel->setNormalize(false);
-
-    //The sigma string is concatinated by ",", therefore split them and set the Sigma of the kernel
-    std::vector<std::string> sigmas;
-    cedar::aux::split(gaussWeightPattern.get<std::string>("Sigmas"), ",", sigmas);
 
     for(int i = 0; i < sigmas.size(); i++)
     {
