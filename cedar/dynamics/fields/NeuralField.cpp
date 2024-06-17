@@ -251,7 +251,7 @@ _mLateralKernelConvolution(new cedar::aux::conv::Convolution()),
 _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 {
   this->mXMLExportable = true;
-  this->mXMLParameterWhitelist = {"time scale", "resting level", "global inhibition"};
+  this->mXMLParameterWhitelist = {"time scale", "resting level", "global inhibition", "input noise gain"};
 
   this->setAutoLockInputsAndOutputs(false);
 
@@ -888,7 +888,7 @@ bool cedar::dyn::NeuralField::isXMLExportable(std::string& errorMsg){
       return false;
     }
   }
-  if(this->_mLateralKernelConvolution->getBorderType() != cedar::aux::conv::BorderType::Zero)
+  if(this->_mLateralKernelConvolution->getBorderType() != cedar::aux::conv::BorderType::Zero && this->getDimensionality() != 3)
   {
     errorMsg = "The XML export only supports \"zero-filled borders\" as border type.";
     return false;
