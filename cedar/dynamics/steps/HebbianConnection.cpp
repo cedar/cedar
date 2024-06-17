@@ -303,13 +303,8 @@ bool cedar::dyn::steps::HebbianConnection::isXMLExportable(std::string& errorMsg
 
   for (const auto& sigmoid_tuple : sigmoid_functions)
   {
-    if(auto sigmoid = dynamic_cast<cedar::aux::math::Sigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get()))
+    if(dynamic_cast<cedar::aux::math::Sigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get()))
     {
-      if(sigmoid->getThreshold() != 0)
-      {
-        errorMsg = "The XML export only supports 0 as the threshold for sigmoids.";
-        return false;
-      }
       if(!(dynamic_cast<cedar::aux::math::ExpSigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get()) ||
            dynamic_cast<cedar::aux::math::AbsSigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get()) ||
            dynamic_cast<cedar::aux::math::HeavisideSigmoid*>(std::get<0>(sigmoid_tuple)->getValue().get())))
