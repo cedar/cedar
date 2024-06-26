@@ -516,6 +516,7 @@ const
   // Enumerate all source and target steps of the connection
   std::vector<std::string> sources;
   std::vector<std::string> targets;
+  std::string rewardSignal;
   auto learnedOutputSlot = connection->getOutputSlot("learned output");
   auto targetFieldSlot = connection->getInputSlot("target field");
   CEDAR_ASSERT(learnedOutputSlot->getDataConnections().size() <= 1 && targetFieldSlot->getDataConnections().size() <= 1)
@@ -545,6 +546,16 @@ const
     }
   }
 
+  // Get reward signal
+  auto rewardSignalSlot = connection->getInputSlot("reward signal");
+  if(rewardSignalSlot->getDataConnections().size() > 0)
+  {
+    CEDAR_ASSERT(rewardSignalSlot->getDataConnections().size() == 1)
+    if(auto rewardSignalElement = dynamic_cast<cedar::proc::Element*>(rewardSignalSlot->getDataConnections().at(0)->getSource()->getParentPtr()))
+    {
+      rewardSignal = rewardSignalElement->getFullPath();
+    }
+  }
 
   // Save a Hebbian connection for all source/target pairs
   for(std::string source : sources)
@@ -554,6 +565,10 @@ const
       cedar::aux::ConfigurationNode connection_node(properties);
       connection_node.put("Source", source);
       connection_node.put("Target", target);
+      if(rewardSignal.compare(""))
+      {
+        connection_node.put("RewardSignal", rewardSignal);
+      }
       root.push_back(cedar::aux::ConfigurationNode::value_type("HebbianConnection", connection_node));
     }
   }
@@ -741,6 +756,18 @@ void cedar::proc::GroupXMLFileFormatV1::readConnections
           group->connectSlots(source + "." + sourceSlots.at(0)->getName(), conName + ".source node");
           group->connectSlots(conName + ".learned output", target + "." + targetSlots.at(0)->getName());
           group->connectSlots(target + "." + targetOutputSlots.at(0)->getName(), conName + ".target field");
+
+          // If RewardSignal is present, add the respective connection
+          if(auto rewardSignalOptional = iter->second.get_optional<std::string>("RewardSignal"))
+          {
+            std::string rewardSignal = *rewardSignalOptional;
+            cedar::proc::ElementPtr rewardSignalElement = group->getElement(rewardSignal);
+            auto rewardSignalConnectable = dynamic_cast<cedar::proc::Connectable *>(rewardSignalElement.get());
+            CEDAR_ASSERT(rewardSignalConnectable != nullptr)
+            auto rewardSignalOutputSlots = rewardSignalConnectable->getOrderedDataSlots(DataRole::OUTPUT);
+            CEDAR_ASSERT(rewardSignalOutputSlots.size() > 0)
+            group->connectSlots(rewardSignal + "." + rewardSignalOutputSlots.at(0)->getName(), conName + ".reward signal");
+          }
         }
 
         try
