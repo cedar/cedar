@@ -160,7 +160,7 @@ cedar::dyn::steps::HebbianConnection::HebbianConnection()
 
 {
   this->mXMLExportable = true;
-  this->mXMLParameterWhitelist = {"learning rate","fixed reward duration", "reward duration", "manual weights", "weight centers", "weight sigmas", "weight amplitude"};
+  this->mXMLParameterWhitelist = {"learning rate","time scale","time scale decay","fixed reward duration", "reward duration", "manual weights", "weight centers", "weight sigmas", "weight amplitude"};
 
   //Initialize 3D Matrices
   std::vector<int> defaultThetaSizes{7,7,10};
