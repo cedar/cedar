@@ -267,9 +267,12 @@ void cedar::proc::experiment::Experiment::stopExperiment()
 
 void cedar::proc::experiment::Experiment::startTrial()
 {
+  this->mStopGroup->start();
+  cedar::aux::GlobalClockSingleton::getInstance()->stop();
+  this->mGroup->reset();
   cedar::aux::GlobalClockSingleton::getInstance()->reset();
   cedar::aux::GlobalClockSingleton::getInstance()->start();
-  mTrialIsRunning = true;
+
   // reset all action sequences
   for (size_t i = 0; i < this->_mActionSequences->size(); ++i)
   {
@@ -283,6 +286,7 @@ void cedar::proc::experiment::Experiment::startTrial()
   std::string trial_number = ss.str();
   cedar::aux::RecorderSingleton::getInstance()->setSubfolder(this->mRecordFolderName + "/" + "Trial_" + trial_number);
   cedar::aux::RecorderSingleton::getInstance()->start();
+  mTrialIsRunning = true;
   this->mStartGroup->start();
 }
 
