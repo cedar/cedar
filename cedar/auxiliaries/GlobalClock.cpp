@@ -50,8 +50,14 @@ mpSimulationStepsTaken(0),
 mDefaultCPUStepSize(cedar::unit::Time(20 * cedar::unit::milli * cedar::unit::seconds)),
 mSimulationStepSize(cedar::unit::Time(20 * cedar::unit::milli * cedar::unit::seconds)),
 mLoopMode(cedar::aux::LoopMode::FakeDT),
-mBatchMode(false)
+mBatchMode(false),
+seedState(0)
 {
+  auto seed = time(0);
+  srand(seed);
+  cv::theRNG().state = seed;
+  seedState = cv::theRNG().state;
+
   //Initialize to 100.0, which is the default field value
   mCurMinTau.store(100.0);
 
@@ -232,6 +238,18 @@ void cedar::aux::GlobalClock::setLoopMode(cedar::aux::LoopMode::Id newLoopMode)
 cedar::aux::LoopMode::Id cedar::aux::GlobalClock::getLoopMode()
 {
   return mLoopMode;
+}
+
+long cedar::aux::GlobalClock::getSeed()
+{
+  return seedState;
+}
+
+void cedar::aux::GlobalClock::setSeed(long seed)
+{
+  srand(seed);
+  cv::theRNG().state = seed;
+  seedState = cv::theRNG().state;
 }
 
 bool cedar::aux::GlobalClock::isBatchMode()

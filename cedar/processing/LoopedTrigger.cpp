@@ -221,14 +221,8 @@ void cedar::proc::LoopedTrigger::processQuit()
 
 void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
 {
-  //OpenCV needs a new seed for every thread... This function is called by a different thread and therefore needs to generate its own seed. Will look for a better solution
-  auto seed = boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds();
-  srand(seed);
-  cv::theRNG().state = seed;
-  //hotfix do not remove, since we are reseeding each euler, we need to warm the generator up... step fixes the node bug
-  cv::Mat ds = cv::Mat::zeros(50, 50, CV_32F);
-  cv::randn(ds, cv::Scalar(0), cv::Scalar(1));
-  //hotfix end
+  srand(cedar::aux::GlobalClockSingleton ::getInstance()->getSeed());
+  cv::theRNG().state = cedar::aux::GlobalClockSingleton ::getInstance()->getSeed();
 
   cedar::proc::ArgumentsPtr arguments(new cedar::proc::StepTime(time,cedar::aux::GlobalClockSingleton::getInstance()->getTime()));
 
@@ -239,6 +233,8 @@ void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
     listener->onTrigger(arguments, this_ptr);
   }
   this->mStatistics->append(time);
+
+  cedar::aux::GlobalClockSingleton ::getInstance()->setSeed(cv::theRNG().state);
 
 //  unsigned long stepsTaken = this->getNumberOfSteps();
 //  std::cout<<this->getName() << " has taken " << stepsTaken << " steps. In LoopMode: "<< this->getLoopModeParameter() <<std::endl;
