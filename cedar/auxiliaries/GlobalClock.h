@@ -111,8 +111,8 @@ public:
 
   bool isBatchMode();
 
-  long getSeed();
-  void setSeed(long seed);
+  uint64 getSeed();
+  void setSeed(uint64 seed);
 
   void setLoopMode(cedar::aux::LoopMode::Id newLoopMode);
 
@@ -204,7 +204,7 @@ private:
 
   bool mBatchMode;
 
-  long seedState;
+  uint64 seedState;
 
   //Current Minimal Tau across all Fields in the Architecture
   std::atomic<double> mCurMinTau;

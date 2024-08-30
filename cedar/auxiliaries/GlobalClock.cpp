@@ -240,12 +240,12 @@ cedar::aux::LoopMode::Id cedar::aux::GlobalClock::getLoopMode()
   return mLoopMode;
 }
 
-long cedar::aux::GlobalClock::getSeed()
+uint64 cedar::aux::GlobalClock::getSeed()
 {
   return seedState;
 }
 
-void cedar::aux::GlobalClock::setSeed(long seed)
+void cedar::aux::GlobalClock::setSeed(uint64 seed)
 {
   srand(seed);
   cv::theRNG().state = seed;
