@@ -557,6 +557,13 @@ const
     }
   }
 
+  std::string iSBiDirStr = "FALSE";
+  auto wisFieldSlot = connection->getOutputSlot("weighted input sum");
+  if(wisFieldSlot->getDataConnections().size() == 1)
+  {
+    iSBiDirStr = "TRUE";
+  }
+
   // Save a Hebbian connection for all source/target pairs
   for(std::string source : sources)
   {
@@ -569,6 +576,7 @@ const
       {
         connection_node.put("RewardSignal", rewardSignal);
       }
+      connection_node.put("bidir", iSBiDirStr);
       root.push_back(cedar::aux::ConfigurationNode::value_type("HebbianConnection", connection_node));
     }
   }
