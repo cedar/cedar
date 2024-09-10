@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -129,16 +129,29 @@ void cedar::proc::GroupXMLFileFormatV1::write
     this->markBlacklistedSteps(group);
     cedar::aux::ConfigurationNode steps;
     this->writeSteps(group, steps);
+
+    cedar::aux::ConfigurationNode connections;
+    std::map<std::string, std::string> nopTargets;
+    this->writeSynapticConnections(group, connections);
+    this->writeHebbianConnections(group, nopTargets, steps, connections);
+    this->writeChainedSynapticConnections(group, connections);
+    this->writeDataConnections(group, connections);
+    // Rename connection targets to corresponding NOP steps (needed for SynapticConnections that are directly connected to HebbianConnections)
+    for (cedar::aux::ConfigurationNode::iterator iter = connections.begin(); iter != connections.end(); ++iter)
+    {
+      std::string target = iter->second.get<std::string>("Target");
+      for(auto const& nopTarget : nopTargets)
+      {
+        if(target.compare(nopTarget.first) == 0)
+        {
+          iter->second.put("Target", nopTarget.second);
+        }
+      }
+    }
     if (!steps.empty())
     {
       root.add_child("Components", steps);
     }
-
-    cedar::aux::ConfigurationNode connections;
-    this->writeSynapticConnections(group, connections);
-    this->writeHebbianConnections(group, connections);
-    this->writeChainedSynapticConnections(group, connections);
-    this->writeDataConnections(group, connections);
     if (!connections.empty())
     {
       root.add_child("Connections", connections);
@@ -248,7 +261,7 @@ void cedar::proc::GroupXMLFileFormatV1::readSteps(cedar::proc::GroupPtr group,
 
     // Create the step
     cedar::proc::StepPtr step = this->createStep(name, class_id, group, stepNode, exceptions);
-
+    CEDAR_ASSERT(step != nullptr)
     try
     {
       // Analog to writeSteps. The base readConfiguration reads only the fields which are set in the whitelist of
@@ -505,8 +518,8 @@ void cedar::proc::GroupXMLFileFormatV1::writeSynapticConnections
 }
 
 
-void cedar::proc::GroupXMLFileFormatV1::writeHebbianConnection(cedar::aux::ConfigurationNode& root,
-                                                                const cedar::proc::ConnectablePtr connection)
+void cedar::proc::GroupXMLFileFormatV1::writeHebbianConnection(cedar::proc::ConstGroupPtr group, std::map<std::string, std::string> &nopTargets, cedar::aux::ConfigurationNode& steps,
+                                                     cedar::aux::ConfigurationNode& root, const cedar::proc::ConnectablePtr connection)
 const
 {
   // Write the properties of this connection to a template node
@@ -517,6 +530,7 @@ const
   std::vector<std::string> sources;
   std::vector<std::string> targets;
   std::string rewardSignal;
+  std::vector<std::string> nops;
   auto learnedOutputSlot = connection->getOutputSlot("learned output");
   auto targetFieldSlot = connection->getInputSlot("target field");
   CEDAR_ASSERT(learnedOutputSlot->getDataConnections().size() <= 1 && targetFieldSlot->getDataConnections().size() <= 1)
@@ -542,7 +556,30 @@ const
     CEDAR_ASSERT(outputConn->getSource() != nullptr)
     if(auto sourceElement = dynamic_cast<cedar::proc::Element*>(outputConn->getSource()->getParentPtr()))
     {
-      sources.push_back(sourceElement->getFullPath());
+      std::string sourcePath = sourceElement->getFullPath();
+
+      // If the source of this is not a field (or similar) but a step belonging to, e.g., a SynapticConnection, insert
+      // a NOP step in between these connections.
+      for(std::string classID : this->mBlacklistedClassIDs)
+      {
+        if(auto elementPtr = boost::dynamic_pointer_cast<cedar::proc::Element>(sourceElement->shared_from_this()))
+        {
+          if (cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(elementPtr).compare(classID) == 0)
+          {
+            // Create Noop step
+            std::string newNoopName = group->getUniqueIdentifier("Noop");
+            cedar::aux::ConfigurationNode noop_step_node;
+            noop_step_node.add("<xmlattr>.name", newNoopName);
+            steps.push_back(cedar::aux::ConfigurationNode::value_type("NOP", noop_step_node));
+
+            //Connect Noop to HebbianConnection
+            sourcePath = newNoopName;
+            nopTargets[connection->getFullPath()] = newNoopName;
+            break;
+          }
+        }
+      }
+      sources.push_back(sourcePath);
     }
   }
 
@@ -639,6 +676,8 @@ const
 void cedar::proc::GroupXMLFileFormatV1::writeHebbianConnections
   (
     cedar::proc::ConstGroupPtr group,
+    std::map<std::string, std::string> &nopTargets,
+    cedar::aux::ConfigurationNode& steps,
     cedar::aux::ConfigurationNode& root
   ) const
 {
@@ -646,7 +685,7 @@ void cedar::proc::GroupXMLFileFormatV1::writeHebbianConnections
   {
     if(!cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(name_element_pair.second).compare("cedar.dynamics.HebbianConnection"))
     {
-      this->writeHebbianConnection(root, boost::dynamic_pointer_cast<cedar::proc::Connectable>(name_element_pair.second));
+      this->writeHebbianConnection(group, nopTargets, steps, root, boost::dynamic_pointer_cast<cedar::proc::Connectable>(name_element_pair.second));
     }
     else if(!cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(name_element_pair.second).compare("cedar.processing.ComponentMultiply"))
     {
@@ -821,6 +860,7 @@ boost::bimap<std::string, std::string> cedar::proc::GroupXMLFileFormatV1::stepNa
     ("cedar.dynamics.NeuralField", "Field")
     ("cedar.processing.sources.GaussInput", "GaussInput")
     ("cedar.dynamics.Preshape", "Preshape")
+    ("cedar.processing.steps.Noop", "NOP")
     ("cedar.processing.sources.SpatialTemplate", "SpatialTemplate");
 
 boost::bimap<std::string, std::string> cedar::proc::GroupXMLFileFormatV1::transferFunctionNameLookupTableXML =

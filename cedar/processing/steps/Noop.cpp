@@ -93,6 +93,7 @@ mOutput(new cedar::aux::MatData(cv::Mat()))
   this->declareOutput("output", mOutput);
 
   input->setCheck(cedar::proc::typecheck::IsMatrix());
+  this->mXMLExportable = true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

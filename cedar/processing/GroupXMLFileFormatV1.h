@@ -197,14 +197,15 @@ private:
 
   /*!@brief Writes a hebbian connection to the configuration node.
    */
-  void writeHebbianConnection(cedar::aux::ConfigurationNode& root,
-                               const cedar::proc::ConnectablePtr connection) const;
+  void writeHebbianConnection(cedar::proc::ConstGroupPtr group, std::map<std::string, std::string> &nopTargets, cedar::aux::ConfigurationNode& steps,
+            cedar::aux::ConfigurationNode& root, const cedar::proc::ConnectablePtr connection) const;
   void writeComponentMultiplyConnection(cedar::aux::ConfigurationNode& root,
                               const cedar::proc::ConnectablePtr connection) const;
 
   /*!@brief Writes the hebbian connections in the group to the configuration node.
    */
-  void writeHebbianConnections(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
+  void writeHebbianConnections(cedar::proc::ConstGroupPtr group, std::map<std::string, std::string> &nopTargets,
+                               cedar::aux::ConfigurationNode& steps, cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief Writes a chained synaptic connection to the configuration node.
    */
