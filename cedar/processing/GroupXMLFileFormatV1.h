@@ -175,6 +175,8 @@ private:
 
   // Returns true if provided connection contains steps on the blacklist for the common export for steps
   bool isConnectionBlacklisted(cedar::proc::DataConnection* connection) const;
+  bool isConnectionBlacklisted(cedar::proc::Connectable* source, cedar::proc::OwnedDataPtr sourceSlot,
+                               cedar::proc::Connectable* target, cedar::proc::ExternalDataPtr targetSlot) const;
 
   // Marks all steps that should not be exported normally as blacklisted
   void markBlacklistedSteps(cedar::proc::ConstGroupPtr group);
@@ -195,21 +197,10 @@ private:
    */
   void writeSynapticConnections(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
 
-  /*!@brief Writes a hebbian connection to the configuration node.
-   */
-  void writeHebbianConnection(cedar::proc::ConstGroupPtr group, std::map<std::string, std::string> &nopTargets, cedar::aux::ConfigurationNode& steps,
-            cedar::aux::ConfigurationNode& root, const cedar::proc::ConnectablePtr connection) const;
-  void writeComponentMultiplyConnection(cedar::aux::ConfigurationNode& root,
-                              const cedar::proc::ConnectablePtr connection) const;
-
-  /*!@brief Writes the hebbian connections in the group to the configuration node.
-   */
-  void writeHebbianConnections(cedar::proc::ConstGroupPtr group, std::map<std::string, std::string> &nopTargets,
-                               cedar::aux::ConfigurationNode& steps, cedar::aux::ConfigurationNode& root) const;
-
   /*!@brief Writes a chained synaptic connection to the configuration node.
    */
-  void writeChainedSynapticConnection(cedar::proc::Connectable* connectable, cedar::aux::ConfigurationNode synCon,
+  void writeChainedSynapticConnection(cedar::proc::Connectable* source, cedar::proc::OwnedDataPtr sourceSlot,
+                                      cedar::proc::Connectable* connectable, cedar::aux::ConfigurationNode synCon,
                                       cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief Writes the chained synaptic connections in the group to the configuration node.
@@ -230,9 +221,12 @@ private:
   void readConnections
   (
     cedar::proc::GroupPtr group,
+    const cedar::aux::ConfigurationNode& steps,
     const cedar::aux::ConfigurationNode& root,
     std::vector<std::string>& exceptions
   );
+
+  void connectSteps(cedar::proc::GroupPtr group, cedar::proc::Connectable* source, cedar::proc::Connectable* target);
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
