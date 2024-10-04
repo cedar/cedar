@@ -52,7 +52,6 @@
 #include "cedar/auxiliaries/Configurable.fwd.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.fwd.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.fwd.h"
-#include "cedar/dynamics/steps/HebbianConnection.fwd.h"
 #include "cedar/processing/steps/SynapticConnection.fwd.h"
 #include "cedar/processing/steps/ComponentMultiply.fwd.h"
 #include "cedar/processing/DataConnection.fwd.h"

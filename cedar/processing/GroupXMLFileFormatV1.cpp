@@ -50,8 +50,6 @@
 #include "cedar/auxiliaries/kernel/Box.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
-#include "cedar/dynamics/steps/HebbianConnection.h"
-#include "cedar/dynamics/fields/NeuralField.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataConnection.h"
@@ -356,9 +354,9 @@ bool cedar::proc::GroupXMLFileFormatV1::isConnectionBlacklisted(cedar::proc::Con
     return true;
   }
   // Special case: Connections from HebbianConnection on slot "weighted input sum" or to HebbianConnection on slot "target field" should not be exported
-  if((dynamic_cast<cedar::dyn::steps::HebbianConnection*>(source) &&
+  if((cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(boost::dynamic_pointer_cast<cedar::proc::Element>(source->shared_from_this())).compare("cedar.dynamics.HebbianConnection") == 0 &&
       sourceSlot->getName().compare("weighted input sum") == 0) ||
-     (dynamic_cast<cedar::dyn::steps::HebbianConnection*>(target) &&
+      (cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(boost::dynamic_pointer_cast<cedar::proc::Element>(target->shared_from_this())).compare("cedar.dynamics.HebbianConnection") == 0 &&
        targetSlot->getName().compare("target field") == 0))
   {
     return true;
@@ -557,7 +555,7 @@ void cedar::proc::GroupXMLFileFormatV1::connectSteps(cedar::proc::GroupPtr group
 {
   std::string sourceSlot = source->getOrderedDataSlots(DataRole::OUTPUT).at(0)->getName();
   std::string targetSlot = target->getOrderedDataSlots(DataRole::INPUT).at(0)->getName();
-  if(dynamic_cast<cedar::dyn::steps::HebbianConnection*>(target))
+  if(cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(boost::dynamic_pointer_cast<cedar::proc::Element>(target->shared_from_this())).compare("cedar.dynamics.HebbianConnection") == 0)
   {
     targetSlot = "source node";
   }
@@ -642,13 +640,14 @@ void cedar::proc::GroupXMLFileFormatV1::readConnections
       }
 
       // For HebbianConnections some extra connections have to be added depending on the configuration of the step
-      bool hebbianIsTarget = false;
-      auto hebbian = dynamic_cast<cedar::dyn::steps::HebbianConnection*>(sourceConnectable);
-      if(!hebbian){
-        hebbian = dynamic_cast<cedar::dyn::steps::HebbianConnection*>(targetConnectable);
-        hebbianIsTarget = true;
+      bool hebbianIsTarget = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(targetElement).compare("cedar.dynamics.HebbianConnection") == 0;
+      bool hebbianIsSource = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(sourceElement).compare("cedar.dynamics.HebbianConnection") == 0;
+      cedar::proc::Connectable* hebbian = sourceConnectable;
+      if(hebbianIsTarget)
+      {
+        hebbian = targetConnectable;
       }
-      if(hebbian)
+      if(hebbianIsSource || hebbianIsTarget)
       {
         // Find HebbianConnection XML properties
         cedar::aux::ConfigurationNode stepNode;
