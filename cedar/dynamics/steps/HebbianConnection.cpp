@@ -331,6 +331,28 @@ void cedar::dyn::steps::HebbianConnection::writeConfigurationXML(cedar::aux::Con
     }
   }
   root.put("bidir", isBiDirStr);
+
+  // Export names of steps connected to all inputs and outputs
+  std::vector<std::string> inputSlots = {mAssoInputName, mRewardInputName, mReadOutInputName};
+  for(std::string inputSlot : inputSlots)
+  {
+    auto connections = this->getInputSlot(inputSlot)->getDataConnections();
+    if(connections.size() > 0)
+    {
+      auto target = connections.at(0)->getSource()->getParentPtr();
+      root.put(cedar::aux::toUpperCamelCase(inputSlot, " ") + "InputSlot", target->getName());
+    }
+  }
+  std::vector<std::string> outputSlots = {mTriggerOutputName, mWeightedTargetOutputName, mWeightedTargetSumOutputName};
+  for(std::string outputSlot : outputSlots)
+  {
+    auto connections = this->getOutputSlot(outputSlot)->getDataConnections();
+    if(connections.size() > 0)
+    {
+      auto target = connections.at(0)->getTarget()->getParentPtr();
+      root.put(cedar::aux::toUpperCamelCase(outputSlot, " ") + "OutputSlot", target->getName());
+    }
+  }
 }
 
 bool cedar::dyn::steps::HebbianConnection::isXMLExportable(std::string& errorMsg){
