@@ -1148,12 +1148,12 @@ void cedar::proc::Group::reset()
   if(wasTriggerRunningUponResetCall)
     this->stopTriggers(true);
 
-    auto app = QCoreApplication::instance();
+   // auto app = QCoreApplication::instance();
 
-    if (app && this->isRoot())
-    {
-      emit this->setSimulationControlsEnabled(false);
-    }
+  //  if (app && this->isRoot())
+  //  {
+  //    emit this->setSimulationControlsEnabled(false);
+  //  }
 
   //auto looped_triggers = this->findAll<cedar::proc::LoopedTrigger>(true);
   //std::set<cedar::proc::LoopedTriggerPtr> running_triggers;
@@ -1180,10 +1180,10 @@ void cedar::proc::Group::reset()
     element->callReset();
   }
 
-    if (app && this->isRoot())
-    {
-        emit this->setSimulationControlsEnabled(true);
-    }
+   // if (app && this->isRoot())
+   // {
+   //     emit this->setSimulationControlsEnabled(true);
+   // }
 
   //JT: Why was this not using start triggers?
   if(wasTriggerRunningUponResetCall)

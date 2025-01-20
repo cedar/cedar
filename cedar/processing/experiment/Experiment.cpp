@@ -267,7 +267,8 @@ void cedar::proc::experiment::Experiment::stopExperiment()
 
 void cedar::proc::experiment::Experiment::startTrial()
 {
-  this->mStopGroup->start();
+  //this->mStopGroup->start();
+  this->mGroup->stopTriggers();
   cedar::aux::GlobalClockSingleton::getInstance()->stop();
   this->mGroup->reset();
   cedar::aux::GlobalClockSingleton::getInstance()->reset();
@@ -287,12 +288,14 @@ void cedar::proc::experiment::Experiment::startTrial()
   cedar::aux::RecorderSingleton::getInstance()->setSubfolder(this->mRecordFolderName + "/" + "Trial_" + trial_number);
   cedar::aux::RecorderSingleton::getInstance()->start();
   mTrialIsRunning = true;
-  this->mStartGroup->start();
+  //this->mStartGroup->start();
+  this->mGroup->startTriggers();
 }
 
 void cedar::proc::experiment::Experiment::startAllTriggers()
 {
-  this->mStartGroup->start();
+  //this->mStartGroup->start();
+  this->mGroup->startTriggers();
 }
 
 void cedar::proc::experiment::Experiment::addActionSequence(cedar::proc::experiment::ActionSequencePtr actionSequence)
@@ -314,7 +317,8 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset, bool st
 {
   if (stopTriggers)
   {
-    this->mStopGroup->start();
+    //this->mStopGroup->start();
+    this->mGroup->stopTriggers();
     cedar::aux::GlobalClockSingleton::getInstance()->stop();
   }
   cedar::aux::RecorderSingleton::getInstance()->stop();
@@ -439,7 +443,7 @@ void cedar::proc::experiment::Experiment::setGroup(cedar::proc::GroupPtr group)
   if (group != this->mGroup)
   {
     // Initialize Group starter and stopper
-    this->mStartGroup = cedar::aux::CallFunctionInThreadPtr
+    /*this->mStartGroup = cedar::aux::CallFunctionInThreadPtr
                                 (
                                   new cedar::aux::CallFunctionInThread
                                   (
@@ -453,7 +457,7 @@ void cedar::proc::experiment::Experiment::setGroup(cedar::proc::GroupPtr group)
                                  (
                                    boost::bind(&cedar::proc::Group::stopTriggers, group, true)
                                  )
-                               );
+                               );*/
     this->mGroup = group;
     QObject::connect
     (

@@ -992,9 +992,9 @@ void cedar::proc::gui::Ide::showOpenableDialog()
 
 void cedar::proc::gui::Ide::experimentRunningChanged(bool running)
 {
-  this->setSimulationControlsEnabled(!running);
-  this->setArchitectureSavingLoadingEnabled(!running);
-  this->setRecordingControlsEnabled(!running);
+  //this->setSimulationControlsEnabled(!running);
+  //this->setArchitectureSavingLoadingEnabled(!running);
+  //this->setRecordingControlsEnabled(!running);
 }
 
 void cedar::proc::gui::Ide::setRecordingControlsEnabled(bool enabled)
