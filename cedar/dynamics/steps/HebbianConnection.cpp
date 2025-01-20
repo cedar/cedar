@@ -40,8 +40,10 @@
 // CLASS HEADER
 #include "HebbianConnection.h"
 
+#include "cedar/processing/steps/StaticGain.h"
 #include "cedar/processing/typecheck/IsMatrix.h"
 #include "cedar/processing/DataSlot.h"
+#include "cedar/processing/DataConnection.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/assert.h"
@@ -279,13 +281,78 @@ void cedar::dyn::steps::HebbianConnection::writeConfigurationXML(cedar::aux::Con
   // target dimensionality/sizes parameter
   cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(this->mAssociationDimension, this->mAssociationSizes, this->mWeightOutput->getAnnotation<cedar::aux::annotation::SizesRangeHint>()->getRange(),
                                                                  root, "TargetDimensions");
-//
-//  if(this -> mSetWeights -> getValue())
-//  {
-//    this->mWeightCenters->writeToNodeXML(root);
-//    this->mWeightSigmas->writeToNodeXML(root);
-//    this->mWeightAmplitude->writeToNodeXML(root);
-//  }
+
+  // write weights of StaticGains if there exists one of the not explicitly exported connections
+  std::string isBiDirStr = "FALSE";
+  if(this->getOutputSlot(mWeightedTargetSumOutputName)->getDataConnections().size() > 1)
+  {
+    isBiDirStr = "TRUE";
+    cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "More than one outgoing connection on the '" + mWeightedTargetSumOutputName + "' slot of HebbianConnections is not fully supported for the XML export. (WeighedInputSumGain will not be exported)",
+        "cedar::dyn::steps::HebbianConnection::writeConfigurationXML()"
+      );
+  }
+  else if(this->getOutputSlot(mWeightedTargetSumOutputName)->getDataConnections().size() == 1)
+  {
+    isBiDirStr = "TRUE";
+    if(auto target = this->getOutputSlot(mWeightedTargetSumOutputName)->getDataConnections().at(0)->getTarget()->getParentPtr())
+    {
+      CEDAR_ASSERT(target->shared_from_this() != nullptr)
+      if(!cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(
+        boost::dynamic_pointer_cast<cedar::proc::Element>(target->shared_from_this())).compare("cedar.processing.StaticGain"))
+      {
+        auto staticGain = dynamic_cast<cedar::proc::steps::StaticGain*>(target);
+        CEDAR_ASSERT(staticGain != nullptr)
+        root.put("WeightedInputSumGain", staticGain->getGainFactor());
+      }
+    }
+  }
+  if(this->getInputSlot(mAssoInputName)->getDataConnections().size() > 1)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "More than one incoming connection on the '" + mAssoInputName + "' slot of HebbianConnections is not fully supported for the XML export. (TargetFieldGain will not be exported)",
+        "cedar::dyn::steps::HebbianConnection::writeConfigurationXML()"
+      );
+  }
+  else if(this->getInputSlot(mAssoInputName)->getDataConnections().size() == 1)
+  {
+    if(auto source = this->getInputSlot(mAssoInputName)->getDataConnections().at(0)->getSource()->getParentPtr())
+    {
+      CEDAR_ASSERT(source->shared_from_this() != nullptr)
+      if(!cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(
+        boost::dynamic_pointer_cast<cedar::proc::Element>(source->shared_from_this())).compare("cedar.processing.StaticGain"))
+      {
+        auto staticGain = dynamic_cast<cedar::proc::steps::StaticGain*>(source);
+        CEDAR_ASSERT(staticGain != nullptr)
+        root.put("TargetFieldGain", staticGain->getGainFactor());
+      }
+    }
+  }
+  root.put("bidir", isBiDirStr);
+
+  // Export names of steps connected to all inputs and outputs
+  std::vector<std::string> inputSlots = {mAssoInputName, mRewardInputName, mReadOutInputName};
+  for(std::string inputSlot : inputSlots)
+  {
+    auto connections = this->getInputSlot(inputSlot)->getDataConnections();
+    if(connections.size() > 0)
+    {
+      auto target = connections.at(0)->getSource()->getParentPtr();
+      root.put(cedar::aux::toUpperCamelCase(inputSlot, " ") + "InputSlot", target->getName());
+    }
+  }
+  std::vector<std::string> outputSlots = {mTriggerOutputName, mWeightedTargetOutputName, mWeightedTargetSumOutputName};
+  for(std::string outputSlot : outputSlots)
+  {
+    auto connections = this->getOutputSlot(outputSlot)->getDataConnections();
+    if(connections.size() > 0)
+    {
+      auto target = connections.at(0)->getTarget()->getParentPtr();
+      root.put(cedar::aux::toUpperCamelCase(outputSlot, " ") + "OutputSlot", target->getName());
+    }
+  }
 }
 
 bool cedar::dyn::steps::HebbianConnection::isXMLExportable(std::string& errorMsg){

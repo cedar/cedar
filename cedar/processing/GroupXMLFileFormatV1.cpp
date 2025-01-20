@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -50,8 +50,6 @@
 #include "cedar/auxiliaries/kernel/Box.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
-#include "cedar/dynamics/steps/HebbianConnection.h"
-#include "cedar/dynamics/fields/NeuralField.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataConnection.h"
@@ -107,10 +105,9 @@ void cedar::proc::GroupXMLFileFormatV1::read
 	auto connections = dftArchitecture.find("Connections");
   if (connections != dftArchitecture.not_found())
 	{
-		this->readConnections(group, connections->second, exceptions);
+		this->readConnections(group, steps->second, connections->second, exceptions);
 	}
 }
-
 
 void cedar::proc::GroupXMLFileFormatV1::write
 (
@@ -129,16 +126,16 @@ void cedar::proc::GroupXMLFileFormatV1::write
     this->markBlacklistedSteps(group);
     cedar::aux::ConfigurationNode steps;
     this->writeSteps(group, steps);
+
+    cedar::aux::ConfigurationNode connections;
+    this->writeSynapticConnections(group, connections);
+    this->writeChainedSynapticConnections(group, connections);
+    this->writeDataConnections(group, connections);
+
     if (!steps.empty())
     {
       root.add_child("Components", steps);
     }
-
-    cedar::aux::ConfigurationNode connections;
-    this->writeSynapticConnections(group, connections);
-    this->writeHebbianConnections(group, connections);
-    this->writeChainedSynapticConnections(group, connections);
-    this->writeDataConnections(group, connections);
     if (!connections.empty())
     {
       root.add_child("Connections", connections);
@@ -195,7 +192,7 @@ void cedar::proc::GroupXMLFileFormatV1::writeSteps
     // if this is a step, write this to the configuration tree
     if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
     {
-      if(this->isStepBlacklisted(step.get()))
+      if(this->isStepBlacklisted(step.get()) && !(cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(boost::dynamic_pointer_cast<cedar::proc::Element>(step)).compare("cedar.processing.ComponentMultiply") == 0))
       {
         continue;
       }
@@ -213,6 +210,7 @@ void cedar::proc::GroupXMLFileFormatV1::writeSteps
       //However, some steps with more special fields overrite this function in their own class (still calling the
       //base class)
       step->writeConfigurationXML(step_node);
+
       steps.push_back(cedar::aux::ConfigurationNode::value_type(node_name, step_node));
     }
     // Print a warning if the architecture contains groups
@@ -248,7 +246,7 @@ void cedar::proc::GroupXMLFileFormatV1::readSteps(cedar::proc::GroupPtr group,
 
     // Create the step
     cedar::proc::StepPtr step = this->createStep(name, class_id, group, stepNode, exceptions);
-
+    CEDAR_ASSERT(step != nullptr)
     try
     {
       // Analog to writeSteps. The base readConfiguration reads only the fields which are set in the whitelist of
@@ -341,15 +339,32 @@ bool cedar::proc::GroupXMLFileFormatV1::isStepBlacklisted(cedar::proc::Connectab
 
 bool cedar::proc::GroupXMLFileFormatV1::isConnectionBlacklisted(cedar::proc::DataConnection* connection) const
 {
+  return this->isConnectionBlacklisted(connection->getSource()->getParentPtr(), connection->getSource(),
+                                connection->getTarget()->getParentPtr(), connection->getTarget());
+}
+
+bool cedar::proc::GroupXMLFileFormatV1::isConnectionBlacklisted(cedar::proc::Connectable* source,
+                                              cedar::proc::OwnedDataPtr sourceSlot, cedar::proc::Connectable* target,
+                                              cedar::proc::ExternalDataPtr targetSlot) const
+{
   // Special case: Connections from GaussInput to ComponentMultiply should not be exported
-  if(dynamic_cast<cedar::proc::sources::GaussInput*>(connection->getSource()->getParentPtr()) &&
-      dynamic_cast<cedar::proc::steps::ComponentMultiply*>(connection->getTarget()->getParentPtr()))
+  if(dynamic_cast<cedar::proc::sources::GaussInput*>(source) &&
+      dynamic_cast<cedar::proc::steps::ComponentMultiply*>(target))
   {
     return true;
   }
+  // Special case: Connections from HebbianConnection on slot "weighted input sum" or to HebbianConnection on slot "target field" should not be exported
+  if((cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(boost::dynamic_pointer_cast<cedar::proc::Element>(source->shared_from_this())).compare("cedar.dynamics.HebbianConnection") == 0 &&
+      sourceSlot->getName().compare("weighted input sum") == 0) ||
+      (cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(boost::dynamic_pointer_cast<cedar::proc::Element>(target->shared_from_this())).compare("cedar.dynamics.HebbianConnection") == 0 &&
+       targetSlot->getName().compare("target field") == 0))
+  {
+    return true;
+  }
+
   // Normal case: If source or target is blacklisted, do not export connection
-  return this->isStepBlacklisted(connection->getSource()->getParentPtr())
-     || this->isStepBlacklisted(connection->getTarget()->getParentPtr());
+  return (this->isStepBlacklisted(source) && !(cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(boost::dynamic_pointer_cast<cedar::proc::Element>(source->shared_from_this())).compare("cedar.processing.ComponentMultiply") == 0))
+     || (this->isStepBlacklisted(target) && !(cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(boost::dynamic_pointer_cast<cedar::proc::Element>(target->shared_from_this())).compare("cedar.processing.ComponentMultiply") == 0));
 }
 
 bool cedar::proc::GroupXMLFileFormatV1::isSynapticConnectionChainExportable(cedar::proc::Connectable* chainSource, std::string& errorMsg)
@@ -504,157 +519,6 @@ void cedar::proc::GroupXMLFileFormatV1::writeSynapticConnections
   }
 }
 
-
-void cedar::proc::GroupXMLFileFormatV1::writeHebbianConnection(cedar::aux::ConfigurationNode& root,
-                                                                const cedar::proc::ConnectablePtr connection)
-const
-{
-  // Write the properties of this connection to a template node
-  cedar::aux::ConfigurationNode properties;
-  connection->writeConfigurationXML(properties);
-
-  // Enumerate all source and target steps of the connection
-  std::vector<std::string> sources;
-  std::vector<std::string> targets;
-  std::string rewardSignal;
-  auto learnedOutputSlot = connection->getOutputSlot("learned output");
-  auto targetFieldSlot = connection->getInputSlot("target field");
-  CEDAR_ASSERT(learnedOutputSlot->getDataConnections().size() <= 1 && targetFieldSlot->getDataConnections().size() <= 1)
-
-  if(learnedOutputSlot->getDataConnections().size() == 1)
-  {
-    CEDAR_ASSERT(learnedOutputSlot->getDataConnections().at(0)->getTarget() != nullptr)
-    if(auto targetElement = dynamic_cast<cedar::proc::Element*>(learnedOutputSlot->getDataConnections().at(0)->getTarget()->getParentPtr()))
-    {
-      targets.push_back(targetElement->getFullPath());
-    }
-  } else if(targetFieldSlot->getDataConnections().size() == 1)
-  {
-    CEDAR_ASSERT(targetFieldSlot->getDataConnections().at(0)->getSource() != nullptr)
-    if(auto targetElement = dynamic_cast<cedar::proc::Element*>(targetFieldSlot->getDataConnections().at(0)->getSource()->getParentPtr()))
-    {
-      targets.push_back(targetElement->getFullPath());
-    }
-  }
-  auto inputSlot = connection->getInputSlot("source node");
-  for(cedar::proc::DataConnectionPtr outputConn : inputSlot->getDataConnections())
-  {
-    CEDAR_ASSERT(outputConn->getSource() != nullptr)
-    if(auto sourceElement = dynamic_cast<cedar::proc::Element*>(outputConn->getSource()->getParentPtr()))
-    {
-      sources.push_back(sourceElement->getFullPath());
-    }
-  }
-
-  // Get reward signal
-  auto rewardSignalSlot = connection->getInputSlot("reward signal");
-  if(rewardSignalSlot->getDataConnections().size() > 0)
-  {
-    CEDAR_ASSERT(rewardSignalSlot->getDataConnections().size() == 1)
-    if(auto rewardSignalElement = dynamic_cast<cedar::proc::Element*>(rewardSignalSlot->getDataConnections().at(0)->getSource()->getParentPtr()))
-    {
-      rewardSignal = rewardSignalElement->getFullPath();
-    }
-  }
-
-  std::string iSBiDirStr = "FALSE";
-  auto wisFieldSlot = connection->getOutputSlot("weighted input sum");
-  if(wisFieldSlot->getDataConnections().size() == 1)
-  {
-    iSBiDirStr = "TRUE";
-  }
-
-  // Save a Hebbian connection for all source/target pairs
-  for(std::string source : sources)
-  {
-    for(std::string target : targets)
-    {
-      cedar::aux::ConfigurationNode connection_node(properties);
-      connection_node.put("Source", source);
-      connection_node.put("Target", target);
-      if(rewardSignal.compare(""))
-      {
-        connection_node.put("RewardSignal", rewardSignal);
-      }
-      connection_node.put("bidir", iSBiDirStr);
-      root.push_back(cedar::aux::ConfigurationNode::value_type("HebbianConnection", connection_node));
-    }
-  }
-}
-
-void cedar::proc::GroupXMLFileFormatV1::writeComponentMultiplyConnection(cedar::aux::ConfigurationNode& root,
-                                                               const cedar::proc::ConnectablePtr connection)
-const
-{
-  // Write the properties of this connection to a template node
-  cedar::aux::ConfigurationNode properties;
-  connection->writeConfigurationXML(properties);
-
-  // Enumerate all source and target steps of the connection
-  std::vector<std::string> sources;
-  std::vector<std::string> targets;
-  std::map<std::string, cedar::proc::DataSlotPtr> outputSlots = connection->getDataSlots(DataRole::OUTPUT);
-  std::map<std::string, cedar::proc::DataSlotPtr> inputSlots = connection->getDataSlots(DataRole::INPUT);
-  for(auto slot : outputSlots)
-  {
-    for(cedar::proc::DataConnectionPtr outputConn : slot.second->getDataConnections())
-    {
-      if(auto targetElement = dynamic_cast<cedar::proc::Element*>(outputConn.get()->getTarget()->getParentPtr()))
-      {
-        targets.push_back(targetElement->getFullPath());
-      }
-    }
-  }
-  for(auto slot : inputSlots)
-  {
-    for(cedar::proc::DataConnectionPtr inputConn : slot.second->getDataConnections())
-    {
-      cedar::proc::Element* sourceElement = inputConn.get()->getSource()->getParentPtr();
-      if(sourceElement)
-      {
-        if(auto sourceElementPtr = sourceElement->shared_from_this())
-        {
-          if(!cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(
-                boost::dynamic_pointer_cast<cedar::proc::Element>(sourceElementPtr)).compare("cedar.dynamics.NeuralField"))
-          {
-            sources.push_back(sourceElement->getFullPath());
-          }
-        }
-      }
-    }
-  }
-  // Save a Hebbian connection for all source/target pairs
-  for(std::string source : sources)
-  {
-    for(std::string target : targets)
-    {
-      cedar::aux::ConfigurationNode connection_node(properties);
-      connection_node.put("Source", source);
-      connection_node.put("Target", target);
-      root.push_back(cedar::aux::ConfigurationNode::value_type("HebbianConnection", connection_node));
-    }
-  }
-}
-
-void cedar::proc::GroupXMLFileFormatV1::writeHebbianConnections
-  (
-    cedar::proc::ConstGroupPtr group,
-    cedar::aux::ConfigurationNode& root
-  ) const
-{
-  for (auto& name_element_pair : group->getElements())
-  {
-    if(!cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(name_element_pair.second).compare("cedar.dynamics.HebbianConnection"))
-    {
-      this->writeHebbianConnection(root, boost::dynamic_pointer_cast<cedar::proc::Connectable>(name_element_pair.second));
-    }
-    else if(!cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(name_element_pair.second).compare("cedar.processing.ComponentMultiply"))
-    {
-      this->writeComponentMultiplyConnection(root, boost::dynamic_pointer_cast<cedar::proc::Connectable>(name_element_pair.second));
-    }
-  }
-}
-
 void cedar::proc::GroupXMLFileFormatV1::writeDataConnection
   (
     cedar::aux::ConfigurationNode& root,
@@ -687,9 +551,24 @@ void cedar::proc::GroupXMLFileFormatV1::writeDataConnections
   }
 }
 
+void cedar::proc::GroupXMLFileFormatV1::connectSteps(cedar::proc::GroupPtr group, cedar::proc::Connectable* source, cedar::proc::Connectable* target)
+{
+  std::string sourceSlot = source->getOrderedDataSlots(DataRole::OUTPUT).at(0)->getName();
+  std::string targetSlot = target->getOrderedDataSlots(DataRole::INPUT).at(0)->getName();
+  if(cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(boost::dynamic_pointer_cast<cedar::proc::Element>(target->shared_from_this())).compare("cedar.dynamics.HebbianConnection") == 0)
+  {
+    targetSlot = "source node";
+  }
+  CEDAR_ASSERT(source->hasSlot(DataRole::OUTPUT, sourceSlot));
+  CEDAR_ASSERT(target->hasSlot(DataRole::INPUT, targetSlot));
+  group->connectSlots(source->getName() + "." + sourceSlot,
+                      target->getName() + "." + targetSlot);
+}
+
 void cedar::proc::GroupXMLFileFormatV1::readConnections
 (
   cedar::proc::GroupPtr group,
+  const cedar::aux::ConfigurationNode& steps,
   const cedar::aux::ConfigurationNode& root,
   std::vector<std::string>& exceptions
 )
@@ -720,26 +599,17 @@ void cedar::proc::GroupXMLFileFormatV1::readConnections
     auto targetSlots = targetConnectable->getOrderedDataSlots(DataRole::INPUT);
     CEDAR_ASSERT(targetSlots.size() > 0)
 
-    bool isHebbian = iter->first.compare("HebbianConnection") == 0;
     bool isSynaptic = kernelWeights    != iter->second.not_found() || pointWiseWeights != iter->second.not_found() ||
                       scalarWeight     != iter->second.not_found() || dimensionMapping != iter->second.not_found();
     try
     {
-      if (isHebbian || isSynaptic)
+      if (isSynaptic)
       {
         std::string conName;
         cedar::proc::StepPtr conStep;
-        // Insert Synaptic/Hebbian step between source and target
-        if(isSynaptic)
-        {
-          conName = group->getUniqueIdentifier("Synaptic Connection");
-          conStep = this->createStep(conName, "cedar.processing.SynapticConnection", group, iter->second, exceptions);
-        }
-        else
-        {
-          conName = group->getUniqueIdentifier("Hebbian Connection");
-          conStep = this->createStep(conName, "cedar.dynamics.HebbianConnection", group, iter->second, exceptions);
-        }
+        // Insert Synaptic step between source and target
+        conName = group->getUniqueIdentifier("Synaptic Connection");
+        conStep = this->createStep(conName, "cedar.processing.SynapticConnection", group, iter->second, exceptions);
 
         // Get the input and output slot of the connection step
         auto conConnectable = dynamic_cast<cedar::proc::Connectable *>(conStep.get());
@@ -750,34 +620,8 @@ void cedar::proc::GroupXMLFileFormatV1::readConnections
         CEDAR_ASSERT(conInputSlots.size() > 0)
         CEDAR_ASSERT(conOutputSlots.size() > 0)
 
-        if(isSynaptic)
-        {
-          group->connectSlots(source + "." + sourceSlots.at(0)->getName(),
-                              conName + "." + conInputSlots.at(0)->getName());
-          group->connectSlots(conName + "." + conOutputSlots.at(0)->getName(),
-                              target + "." + targetSlots.at(0)->getName());
-        }
-        else
-        {
-          auto targetOutputSlots = targetConnectable->getOrderedDataSlots(DataRole::OUTPUT);
-          CEDAR_ASSERT(targetOutputSlots.size() > 0)
-          group->connectSlots(source + "." + sourceSlots.at(0)->getName(), conName + ".source node");
-          group->connectSlots(conName + ".learned output", target + "." + targetSlots.at(0)->getName());
-          group->connectSlots(target + "." + targetOutputSlots.at(0)->getName(), conName + ".target field");
-
-          // If RewardSignal is present, add the respective connection
-          if(auto rewardSignalOptional = iter->second.get_optional<std::string>("RewardSignal"))
-          {
-            std::string rewardSignal = *rewardSignalOptional;
-            cedar::proc::ElementPtr rewardSignalElement = group->getElement(rewardSignal);
-            auto rewardSignalConnectable = dynamic_cast<cedar::proc::Connectable *>(rewardSignalElement.get());
-            CEDAR_ASSERT(rewardSignalConnectable != nullptr)
-            auto rewardSignalOutputSlots = rewardSignalConnectable->getOrderedDataSlots(DataRole::OUTPUT);
-            CEDAR_ASSERT(rewardSignalOutputSlots.size() > 0)
-            group->connectSlots(rewardSignal + "." + rewardSignalOutputSlots.at(0)->getName(), conName + ".reward signal");
-          }
-        }
-
+        this->connectSteps(group, sourceConnectable, conConnectable);
+        this->connectSteps(group, conConnectable, targetConnectable);
         try
         {
           // Analog to writeSteps. The base readConfiguration reads only the fields which are set in the whitelist of
@@ -792,8 +636,101 @@ void cedar::proc::GroupXMLFileFormatV1::readConnections
       else
       {
         // No special properties, insert normal connection
-        group->connectSlots(source + "." + sourceSlots.at(0)->getName(),
-                            target + "." + targetSlots.at(0)->getName());
+        this->connectSteps(group, sourceConnectable, targetConnectable);
+      }
+
+      // For HebbianConnections some extra connections have to be added depending on the configuration of the step
+      bool hebbianIsTarget = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(targetElement).compare("cedar.dynamics.HebbianConnection") == 0;
+      bool hebbianIsSource = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(sourceElement).compare("cedar.dynamics.HebbianConnection") == 0;
+      cedar::proc::Connectable* hebbian = sourceConnectable;
+      if(hebbianIsTarget)
+      {
+        hebbian = targetConnectable;
+      }
+      if(hebbianIsSource || hebbianIsTarget)
+      {
+        // Find HebbianConnection XML properties
+        cedar::aux::ConfigurationNode stepNode;
+        for (cedar::aux::ConfigurationNode::const_iterator iter = steps.begin(); iter != steps.end(); ++iter)
+        {
+          // find the name of the step here and not using parameter later since the name is included as an xml node
+          std::string name = iter->second.get<std::string>("<xmlattr>.name");
+          if(hebbian->getName().compare(name) == 0)
+          {
+            stepNode = iter->second;
+            break;
+          }
+        }
+        CEDAR_ASSERT(stepNode.get_optional<std::string>("<xmlattr>.name").has_value())
+
+        if(hebbianIsTarget)
+        {
+          auto bidir = stepNode.get_optional<std::string>("bidir");
+          if (bidir.has_value())
+          {
+            if (bidir.value().compare("TRUE") == 0)
+            {
+              bool has_gain = false;
+              auto weightedInputSumGainStr = stepNode.get_optional<std::string>("WeightedInputSumGain");
+              if (weightedInputSumGainStr.has_value())
+              {
+                double weightedInputSumGain;
+                std::istringstream(weightedInputSumGainStr.get()) >> weightedInputSumGain;
+                if (weightedInputSumGain != 1)
+                {
+                  has_gain = true;
+                  // Create the step
+                  std::string staticGainName = group->getUniqueIdentifier("Static Gain");
+                  auto staticGain = dynamic_cast<cedar::proc::steps::StaticGain *>(this->createStep(staticGainName,
+                                  "cedar.processing.StaticGain", group, cedar::aux::ConfigurationNode(), exceptions).get());
+                  CEDAR_ASSERT(staticGain != nullptr)
+                  staticGain->setGainFactor(weightedInputSumGain);
+                  group->connectSlots(hebbian->getName() + ".weighted input sum",
+                          staticGainName + "." + staticGain->getOrderedDataSlots(DataRole::INPUT).at(0)->getName());
+                  group->connectSlots(staticGainName + "." + staticGain->getOrderedDataSlots(DataRole::OUTPUT).at(0)->getName(),
+                          sourceConnectable->getName() + "." + sourceConnectable->getOrderedDataSlots(DataRole::INPUT).at(0)->getName());
+                }
+              }
+              if (!has_gain)
+              {
+                group->connectSlots(hebbian->getName() + ".weighted input sum",
+                            sourceConnectable->getName() + "." + sourceConnectable->getOrderedDataSlots(DataRole::INPUT).at(0)->getName());
+              }
+            }
+          }
+        }
+        else // hebbian is source
+        {
+          bool has_gain = false;
+          auto targetFieldGainStr = stepNode.get_optional<std::string>("TargetFieldGain");
+          if (targetFieldGainStr.has_value())
+          {
+            double targetFieldGain;
+            std::istringstream(targetFieldGainStr.get()) >> targetFieldGain;
+            if (targetFieldGain != 1)
+            {
+              has_gain = true;
+              // Create the step
+              std::string staticGainName = group->getUniqueIdentifier("Static Gain");
+              auto staticGain = dynamic_cast<cedar::proc::steps::StaticGain *>(this->createStep(staticGainName,
+                                                                                                "cedar.processing.StaticGain",
+                                                                                                group,
+                                                                                                cedar::aux::ConfigurationNode(),
+                                                                                                exceptions).get());
+              CEDAR_ASSERT(staticGain != nullptr)
+              staticGain->setGainFactor(targetFieldGain);
+              group->connectSlots(targetConnectable->getName() + "." + targetConnectable->getOrderedDataSlots(DataRole::OUTPUT).at(0)->getName(),
+                        staticGainName + "." + staticGain->getOrderedDataSlots(DataRole::INPUT).at(0)->getName());
+              group->connectSlots(staticGainName + "." + staticGain->getOrderedDataSlots(DataRole::OUTPUT).at(0)->getName(),
+                        hebbian->getName() + ".target field");
+            }
+          }
+          if (!has_gain)
+          {
+            group->connectSlots(targetConnectable->getName() + "." + targetConnectable->getOrderedDataSlots(DataRole::OUTPUT).at(0)->getName(),
+                          hebbian->getName() + ".target field");
+          }
+        }
       }
     }
     catch (cedar::aux::ExceptionBase &e)
@@ -818,6 +755,7 @@ boost::bimap<std::string, std::string> cedar::proc::GroupXMLFileFormatV1::stepNa
   boost::assign::list_of< boost::bimap<std::string, std::string>::relation >
     ("cedar.processing.sources.Boost", "Boost")
     ("cedar.dynamics.HebbianConnection", "HebbianConnection")
+    ("cedar.dynamics.ComponentMultiply", "HebbianConnection")
     ("cedar.dynamics.NeuralField", "Field")
     ("cedar.processing.sources.GaussInput", "GaussInput")
     ("cedar.dynamics.Preshape", "Preshape")
@@ -831,7 +769,7 @@ boost::bimap<std::string, std::string> cedar::proc::GroupXMLFileFormatV1::transf
 
 std::vector<std::string> cedar::proc::GroupXMLFileFormatV1::mBlacklistedClassIDs =
     {"cedar.processing.sinks.GroupSink", "cedar.processing.sources.GroupSource", "cedar.processing.SynapticConnection",
-     "cedar.dynamics.HebbianConnection", "cedar.processing.ComponentMultiply", "cedar.processing.StaticGain",
+     "cedar.processing.ComponentMultiply", "cedar.processing.StaticGain",
      "cedar.processing.steps.Convolution", "cedar.processing.Projection", "cedar.processing.steps.Sum"};
 
 
@@ -1055,9 +993,9 @@ void cedar::proc::GroupXMLFileFormatV1::writeDimensionsParameter(cedar::aux::UIn
   root.add_child(name, dimensions);
 }
 
-void cedar::proc::GroupXMLFileFormatV1::writeChainedSynapticConnection(cedar::proc::Connectable* connectable,
-                                                                       cedar::aux::ConfigurationNode synCon,
-                                                                       cedar::aux::ConfigurationNode& root) const
+void cedar::proc::GroupXMLFileFormatV1::writeChainedSynapticConnection(cedar::proc::Connectable* source,
+                                        cedar::proc::OwnedDataPtr sourceSlot, cedar::proc::Connectable* connectable,
+                                        cedar::aux::ConfigurationNode synCon, cedar::aux::ConfigurationNode& root) const
 {
   // write configuration to synCon
   // Make sure another step of the same class has not already been added to the current chain previously, however,
@@ -1095,11 +1033,15 @@ void cedar::proc::GroupXMLFileFormatV1::writeChainedSynapticConnection(cedar::pr
     if (cedar::proc::GroupXMLFileFormatV1::isChainable(boost::dynamic_pointer_cast<cedar::proc::Element>(target->shared_from_this())))
     {
       // Pass the synCon node on along the chain
-      this->writeChainedSynapticConnection(target, synCon, root);
+      this->writeChainedSynapticConnection(source, sourceSlot, target, synCon, root);
     }
     else
     {
       // This is the end of the chain, write the target of the synaptic connection
+      if(this->isConnectionBlacklisted(source, sourceSlot, target, outputConn->getTarget()))
+      {
+        continue;
+      }
       cedar::aux::ConfigurationNode connection_node(synCon);
       if(auto targetElem = dynamic_cast<cedar::proc::Element*>(target))
       {
@@ -1137,7 +1079,7 @@ void cedar::proc::GroupXMLFileFormatV1::writeChainedSynapticConnections(cedar::p
             // First step of the chain.
             cedar::aux::ConfigurationNode synCon;
             synCon.put("Source", source->getFullPath());
-            this->writeChainedSynapticConnection(step.get(), synCon, root);
+            this->writeChainedSynapticConnection(source, inputConn.get()->getSource(), step.get(), synCon, root);
           }
         }
       }
