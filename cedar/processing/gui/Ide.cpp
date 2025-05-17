@@ -51,8 +51,7 @@
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.h"
 #include "cedar/processing/gui/PerformanceOverview.h"
 #include "cedar/processing/gui/BoostControl.h"
-#include "cedar/processing/gui/CodeWidget.h"
-#include "cedar/processing/gui/CoPYWidget.h"
+
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/SettingsDialog.h"
@@ -125,6 +124,12 @@
 #include <QtGui/QClipboard>
 #include <QProcess>
 #include <QCommonStyle>
+
+
+#if defined(CEDAR_USE_PYTHONSTEP) || defined (CEDAR_USE_COPY)
+#include "cedar/processing/gui/CodeWidget.h"
+#include "cedar/processing/gui/CoPYWidget.h"
+#endif
 
 #ifdef CEDAR_USE_YARP
 #include <yarp/conf/version.h>

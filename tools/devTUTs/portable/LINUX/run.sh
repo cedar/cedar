@@ -31,6 +31,8 @@ cp -r /opt/qt512/plugins release/cedar/plugins
 cp -P compile/libqglviewer/libQGLViewer-2.6.3/QGLViewer/libQGL*.so* release/cedar/lib/
 cd release
 wget https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+chmod +x linuxdeploy-x86_64.AppImage
 chmod +x linuxdeployqt-continuous-x86_64.AppImage
 ./linuxdeployqt-continuous-x86_64.AppImage cedar/bin/cedar -always-overwrite -bundle-non-qt-libs -no-copy-copyright-files -no-translations -unsupported-allow-new-glibc -qmake=/opt/qt512/bin/qmake 
 mv AppRun cedar.app
